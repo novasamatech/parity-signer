@@ -95,7 +95,7 @@ fn meta_key() -> MetaKey {
 /// `VerifierKey` mock value.
 fn verifier_key() -> VerifierKey {
     VerifierKey::from_parts(
-        &hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").unwrap(),
+        H256::from_str("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").unwrap(),
     )
 }
 
@@ -349,7 +349,7 @@ fn database_signer() -> Vec<DatabaseSigner> {
     // All remaining [`DatabaseSigner`] errors.
     out.append(&mut vec![
         DatabaseSigner::UnexpectedGenesisHash {
-            verifier_key: VerifierKey::from_parts(genesis_hash().as_bytes()),
+            verifier_key: VerifierKey::from_parts(genesis_hash()),
             network_specs_key: network_specs_key_good(),
         },
         DatabaseSigner::SpecsCollision {

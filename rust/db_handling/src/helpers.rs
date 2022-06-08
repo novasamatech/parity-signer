@@ -507,7 +507,7 @@ pub fn remove_network(
     let general_verifier = get_general_verifier(database_name)?;
     let network_specs = get_network_specs(database_name, network_specs_key)?;
 
-    let verifier_key = VerifierKey::from_parts(network_specs.genesis_hash.as_bytes());
+    let verifier_key = VerifierKey::from_parts(network_specs.genesis_hash);
     let valid_current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
 
     // modify verifier as needed
