@@ -4,6 +4,8 @@ use parity_scale_codec::Decode;
 #[cfg(any(feature = "active", feature = "signer"))]
 use parity_scale_codec::Encode;
 use sled::{open, Batch, Db, Tree};
+#[cfg(feature = "signer")]
+use sp_core::H256;
 
 #[cfg(feature = "signer")]
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, VERIFIERS};
@@ -139,11 +141,13 @@ pub fn try_get_valid_current_verifier(
             // added at the same time.
             // If the genesis hash is found in network specs, but no verifier
             // entry exists, it indicated that the database is corrupted.
-            if let Some((network_specs_key, _)) = genesis_hash_in_specs(verifier_key, &database)? {
+            if let Some(specs_invariants) =
+                genesis_hash_in_specs(verifier_key.genesis_hash(), &database)?
+            {
                 return Err(ErrorSigner::Database(
                     DatabaseSigner::UnexpectedGenesisHash {
-                        verifier_key: verifier_key.to_owned(),
-                        network_specs_key,
+                        name: specs_invariants.name,
+                        genesis_hash: specs_invariants.genesis_hash,
                     },
                 ));
             }
@@ -169,6 +173,20 @@ pub fn get_valid_current_verifier(
     })
 }
 
+/// Specs invariants that are expected to stay unchanged for the network over
+/// time and can not be different for same genesis hash and different encryption
+/// algorithms.
+#[cfg(feature = "signer")]
+pub struct SpecsInvariants {
+    pub base58prefix: u16,
+
+    /// network with lowest order, for correct navigation when updating the
+    /// network metadata
+    pub first_network_specs_key: NetworkSpecsKey,
+    pub genesis_hash: H256,
+    pub name: String,
+}
+
 /// Search for network genesis hash in [`NetworkSpecs`] entries in [`SPECSTREE`]
 /// of the Signer database.
 ///
@@ -186,10 +204,9 @@ pub fn get_valid_current_verifier(
 /// encryption used.
 #[cfg(feature = "signer")]
 pub fn genesis_hash_in_specs(
-    verifier_key: &VerifierKey,
+    genesis_hash: H256,
     database: &Db,
-) -> Result<Option<(NetworkSpecsKey, NetworkSpecs)>, ErrorSigner> {
-    let genesis_hash = verifier_key.genesis_hash();
+) -> Result<Option<SpecsInvariants>, ErrorSigner> {
     let chainspecs = open_tree::<Signer>(database, SPECSTREE)?;
     let mut specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
     let mut found_permanent_specs: Option<(u16, String)> = None;
@@ -231,7 +248,12 @@ pub fn genesis_hash_in_specs(
     }
     specs_set.sort_by(|a, b| a.1.order.cmp(&b.1.order));
     match specs_set.get(0) {
-        Some(a) => Ok(Some(a.to_owned())),
+        Some(a) => Ok(Some(SpecsInvariants {
+            base58prefix: a.1.base58prefix,
+            first_network_specs_key: a.0.to_owned(),
+            genesis_hash,
+            name: a.1.name.to_string(),
+        })),
         None => Ok(None),
     }
 }
