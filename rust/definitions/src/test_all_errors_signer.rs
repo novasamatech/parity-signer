@@ -349,8 +349,8 @@ fn database_signer() -> Vec<DatabaseSigner> {
     // All remaining [`DatabaseSigner`] errors.
     out.append(&mut vec![
         DatabaseSigner::UnexpectedGenesisHash {
-            verifier_key: VerifierKey::from_parts(genesis_hash()),
-            network_specs_key: network_specs_key_good(),
+            name: String::from("westend"),
+            genesis_hash: genesis_hash(),
         },
         DatabaseSigner::SpecsCollision {
             name: String::from("westend"),
@@ -418,10 +418,16 @@ fn input_signer() -> Vec<InputSigner> {
             version: 9122,
         },
         InputSigner::ImportantSpecsChanged(network_specs_key_good()),
-        InputSigner::DifferentBase58 {
+        InputSigner::AddSpecsDifferentBase58 {
             genesis_hash: genesis_hash(),
+            name: String::from("westend"),
             base58_database: 42,
             base58_input: 104,
+        },
+        InputSigner::AddSpecsDifferentName {
+            genesis_hash: genesis_hash(),
+            name_database: String::from("westend"),
+            name_input: String::from("WeStEnD"),
         },
         InputSigner::EncryptionNotSupported(String::from("03")),
         InputSigner::BadSignature,
@@ -1048,7 +1054,7 @@ mod tests {
 "Database error. Bad metadata for westend9000. Base58 prefix 104 from system pallet constants does not match the base58 prefix from network specs 42."
 "Database error. Bad metadata for westend9000. Metadata vector does not start with 0x6d657461."
 "Database error. Bad metadata for westend9000. Runtime metadata could not be decoded."
-"Database error. No verifier information found for network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e, however genesis hash is encountered in network specs entry with key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
+"Database error. Network westend with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e has some network specs entries, while there is no verifier entry."
 "Database error. More than one entry for network specs with name westend and encryption sr25519."
 "Database error. Different network names (westend, WeStEnD) in database for same genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
 "Database error. Network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd verifier is set as a custom one. This custom verifier coinsides the database general verifier and not None. This should not have happened and likely indicates database corruption."
@@ -1072,7 +1078,8 @@ mod tests {
 "Bad input data. Metadata for kusama9110 is already in the database and is different from the one in received payload."
 "Bad input data. Metadata for westend9122 is already in the database."
 "Bad input data. Similar network specs are already stored in the database under key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e. Network specs in received payload have different unchangeable values (base58 prefix, decimals, encryption, network name, unit)."
-"Bad input data. Network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e already has entries in the database with base58 prefix 42. Received network specs have different base58 prefix 104."
+"Bad input data. Network westend with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e already has entries in the database with base58 prefix 42. Received network specs have same genesis hash and different base58 prefix 104."
+"Bad input data. Network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e has name westend in the database. Received network specs have same genesis hash and name WeStEnD."
 "Bad input data. Payload with encryption 0x03 is not supported."
 "Bad input data. Received payload has bad signature."
 "Bad input data. Network kulupu is not in the database. Add network specs before loading the metadata."
