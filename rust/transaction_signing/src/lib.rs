@@ -1,3 +1,5 @@
+#![deny(unused_crate_dependencies)]
+
 use sp_runtime::MultiSigner;
 
 use db_handling::db_transactions::TrDbColdStub;
