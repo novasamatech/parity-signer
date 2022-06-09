@@ -102,10 +102,10 @@ Sub-folders of the `rust` folder:
 If you get errors like `cargo: feature X is required`, it most likely means you have an old version of Rust. Update it by running `rustup update stable`.
 
 **2.** Install `uniffi-bindgen`. Version has to match the version of `uniffi` crates specified
-   in the project (currently it is `0.17.0`):
+   in the project (currently it is `0.18.0`):
 
    ```bash
-   cargo install uniffi_bindgen --version 0.17.0 
+   cargo install uniffi_bindgen --version 0.18.0 
    ```
 
 ## iOS
