@@ -1,36 +1,36 @@
-# Scope  
+# Scope
 
-# Terminology  
+# Terminology
 
 Signer receives information over the air-gap as QR codes. QR codes are read as
-`u8` vectors, and must always be parsed by Signer before use.  
+`u8` vectors, and must always be parsed by Signer before use.
 
 QR codes could contain information that user wants to sign with one of the
 Signer keys or the update information to ensure smooth Signer operation without
-reset or connecting to the network.  
+reset or connecting to the network.
 
-## QR code types  
+## QR code types
 
-- Signable, to generate and export signature:  
+- Signable, to generate and export signature:
 
    - Transaction: from call, gets later processed on chain if signature goes
-   through online client  
+   through online client
 
    - Message
-   
-- Update, for Signer inner functionality:  
+
+- Update, for Signer inner functionality:
 
    - add network specs
 
    - load metadata
-   
+
    - load types
-   
+
 - Derivations import, for bulk derivations import
 
 - Testing
 
-# QR code structure  
+# QR code structure
 
 (padding, length indicator, shift)
 
@@ -163,21 +163,21 @@ in question.
         - public key and encryption of the transaction author key
         - call and extensions parsing result
         - warning message, that suggests to add the address into Signer
-    
+
     - Address key is found, but it is not extended to the network used. Signing
     not possible. Output shows:
-        
+
         - detailed author key information (base58 representation, identicon,
         address details such as address being passworded etc)
         - call and extensions parsing result
         - warning message, that suggests extending the address into the network
         used
-    
+
     - Address key is found and is extended to the network used. Signer will
     proceed to try and interpret the call and extensions. Detailed author
     information will be output regardless of the parsing outcome. <- this is not so currently, need to fix it.
     The signing will be allowed only if the parsing is successful.
-    
+
 4. Separate the call and extensions. Call is prefixed by its length compact,
 the compact is cut off, the part with length that was indicated in the compact
 goes into call data, the part that remains goes into extensions data.
@@ -226,14 +226,14 @@ extensions have identifiers only, and in Signer the extensions for `V12` and
     - `u32` tx version
     - `H256` genesis hash
     - `H256` block hash
-    
+
     If the extensions could not be decoded as the standard set or not all
 extensions blob is used, the Signer rejects this metadata version and adds error
 into the error set.
 
     Metadata `V14` has extensions with both identifiers and properly described
 types, and Signer decodes extensions as they are recorded in the metadata. For
-this, 
+this,
 [`ExtrinsicMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.ExtrinsicMetadata.html)
 part of the metadata
 [`RuntimeMetadataV14`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.RuntimeMetadataV14.html)
@@ -292,18 +292,18 @@ extensions:
 
     If the extension set is different, this results in Signer error for this
 particular metadata version, this error goes into error set.
-    
+
     The extensions in the metadata are checked on the metadata loading step,
 long before any transactions are even produced. Metadata with incomplete
 extensions causes a warning on `load_metadata` update generation step, and
 another one when an update with such metadata gets loaded into Signer.
 Nevertheless, such metadata loading into Signer is allowed, as there could be
 other uses for metadata except signable transaction signing. Probably.
-    
+
     If the metadata version in extensions does not match the metadata version
 of the metadata used, this results in Signer error for this particular metadata
 version, this error goes into error set.
-    
+
     If the extensions are completely decoded, with correct set of the special
 extensions and the metadata version from the extensions match the metadata
 version of the metadata used, the extensions are considered correctly parsed,
@@ -346,12 +346,12 @@ the database **and** has to decode the transaction using `V12` or `V13`
 metadata, error is produced, indicating that there are no types. Elsewise, for
 each encountered argument type the encoded data size is determined, and the
 decoding is done according to the argument type.
-    
+
     There are types requiring special display:
-    
+
     - calls (for cases when a call contains other calls)
     - numbers that are processed as the balances
-    
+
     Calls in `V14` parsing are distinguished by `Call` in `ident` segment of the
 type [`Path`](https://paritytech.github.io/substrate/master/scale_info/struct.Path.html).
 Calls in `V12` and `V13` metadata are distinguished by any element of the set
@@ -362,7 +362,7 @@ transacrtions with `V14` metadata are determined by the type name `type_name` of
 the corresponding
 [`Field`](https://paritytech.github.io/substrate/master/scale_info/struct.Field.html)
 being:
-    
+
     - `Balance`
     - `T::Balance`
     - `BalanceOf<T>`
@@ -379,7 +379,7 @@ balance. However, sometimes the balance is **not** the balance in the units
 in the network specs, for example in the `assets` pallet. See issue
 [#1050](https://github.com/paritytech/parity-signer/issues/1050) and comments
 there for details.
-    
+
     If no errors were encountered while parsing and all call data was used in
 the process, the transaction is considered parsed and is displayed to the user,
 either ready for signing (if all other checks have passed) or as read-only.
@@ -420,13 +420,19 @@ Transaction:
 | `53` | Substrate-related content | 0 |
 | `01` | Sr25519 encryption algorithm | 1 |
 | `02` | Transaction | 2 |
-| `d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d` | Alice public key | 3..=34 |
-| `a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817` | SCALE-encoded call data | 35..=76 |
+| `d435..a27d`[^1] | Alice public key | 3..=34 |
+| `a404..4817`[^2] | SCALE-encoded call data | 35..=76 |
 | `a4` | Compact call data length, 41 | 35 |
-| `0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817` | Call data | 36..=76 |
+| `0403..4817`[^3] | Call data | 36..=76 |
 | `04` | Pallet index 4 in metadata, entry point for decoding | 36 |
-| `b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33` | Extensions | 77..=153 |
-| `e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e` | Westend genesis hash | 154..=185 |
+| `b501..3f33`[^4] | Extensions | 77..=153 |
+| `e143..423e`[^5] | Westend genesis hash | 154..=185 |
+
+[^1]: `d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d`
+[^2]: `a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817`
+[^3]: `0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817`
+[^4]: `b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33`
+[^5]: `e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e`
 
 #### Call content is parsed using Westend metadata, in this particular case westend9010
 
@@ -435,8 +441,10 @@ Transaction:
 | `04` | Pallet index 4 (`Balances`) in metadata, entry point for decoding |
 | `03` | Method index 3 in pallet 4 (`transfer_keep_alive`), search in metadata what the method contains. Here it is `MultiAddress` for transfer destination and `Compact(u128)` balance. |
 | `00` | Enum variant in `MultiAddress`, `AccountId` |
-| `8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48` | Associated `AccountId` data, Bob public key |
+| `8eaf..6a48`[^6] | Associated `AccountId` data, Bob public key |
 | `0700e8764817` | `Compact(u128)` balance. Amount paid: 100000000000 or, with Westend decimals and unit, 100.000000000 mWND. |
+
+[^6]: `8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48`
 
 #### Extensions content
 
@@ -447,8 +455,11 @@ Transaction:
 | `00` | Tip: 0 pWND |
 | `32230000` | Metadata version: 9010 |
 | `05000000` | Tx version: 5 |
-| `e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e` | Westend genesis hash |
-| `538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33` | Block hash |
+| `e143..423e`[^7] | Westend genesis hash |
+| `538a..3f33`[^8] | Block hash |
+
+[^7]: `e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e`
+[^8]: `538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33`
 
 ## Message
 
@@ -530,11 +541,36 @@ Payload signature is generated for SCALE-encoded `NetworkSpecsToSend`.
 Network specs are stored in dedicated `SPECSTREE` tree of the Signer database.
 Network specs identifier is `NetworkSpecsKey`, a key built from encryption used
 by the network and the network genesis hash. There could be networks with
-multiple encryption algorithms supported, thus the encryption encryption is part
-of the key. Network specs could be different for networks with same genesis hash
-and different encryptions, except the base58 prefix. The reason is that the
-base58 prefix can be a part of the network metadata, and the network metadata is
-not encryption-specific.
+multiple encryption algorithms supported, thus the encryption is part of the
+key.
+
+Some elements of the network specs could be slightly different for networks with
+the same genesis hash and different encryptions. There are:
+
+- Invariant specs, identical between all different encryptions:
+
+    - name (network name as it appears in metadata)
+    - base58 prefix
+    
+    The reason is that the network name is and the base58 prefix can be a part
+of the network metadata, and the network metadata is not encryption-specific.
+
+- Specs static for given encryption, that should not change over time once set:
+
+    - decimals
+    - unit
+
+    To replace these, the user would need to remove the network and add it
+again, i.e. it won't be possible to do by accident.
+
+- Flexible display-related and convenience specs, that can change and could be
+changed by simply loading new ones over the old ones:
+
+    - color and secondary color (both currently not used, but historically are
+    there and may return at some point)
+    - logo
+    - path (default derivation path for network, `//<network_name>`)
+    - title (network title as it gets displayed in the Signer)
 
 ### `load_metadata` update payload
 
@@ -550,6 +586,8 @@ Network metadata is stored in dedicated `METATREE` tree of the Signer database.
 Network metadata identifier in is `MetaKey`, a key built from the network name
 and network metadata version.
 
+#### Metadata suitable for Signer
+
 Network metadata that can get into Signer and can be used by Signer only if it
 complies with following requirements:
 
@@ -559,7 +597,7 @@ complies with following requirements:
 - Metadata has `System` pallet
 - There is `Version` constant in `System` pallet
 - `Version` is decodable as [`RuntimeVersion`](https://paritytech.github.io/substrate/master/sp_version/struct.RuntimeVersion.html)
-- If the metadata contain base58 prefix, it must be decodeable as `u16` or `u8`
+- If the metadata contains base58 prefix, it must be decodeable as `u16` or `u8`
 
 Additionally, if the metadata `V14` is received, its associated extensions will
 be scanned and user will be warned if the extensions are incompatible with
@@ -681,12 +719,12 @@ network metadata entries.
 
     - encryption used by verifier (single `u8` from prelude)
     - (only if the update is signed, i.e. the encryption is **not** `0xff`):
-        
+
         - update verifier public key, its length matching the encryption (32 or
         33 `u8` immediately after the prelude)
         - update verifier signature, its length matching the encryption (64 or
         65 `u8` at the end)
-        
+
     - concatenated update payload and reserved tail
 
     If the data length is insufficient, Signer produces an error and suggests to
@@ -703,51 +741,135 @@ indicating that the update has invalid signature.
 
 ### `add_specs` processing sequence
 
-1. Transform update payload into `ContentAddSpecs` and retrieve the incoming
-`NetworkSpecsToSend`.
+1. Update payload is transformed into `ContentAddSpecs` and the incoming
+`NetworkSpecsToSend` are retrieved, or the Signer produces an error indicating
+that the `add_specs` payload is damaged.
 
-2. If the genesis hash from the retrieved network specs is already known to the
-Signer database (i.e. there are entries in the `SPECSTREE` with same genesis
-hash even though the encryption not necessarily matches), the Signer checks that
-the base58 prefix in the received specs is same as in the specs already in the
-Signer database. The reason is that the base58 prefix can be a part of the
-network metadata, and the network metadata is not encryption-specific.
+2. Signer checks that there is no change in invariant specs occuring.
+
+    If there are entries in the `SPECSTREE` of the Signer database with same
+genesis hash as in newly received specs (the encryption not necessarily
+matches), the Signer checks that the name and base58 prefix in the received
+specs are same as in the specs already in the Signer database.
 
 3. Signer checks the verifier entry for the received genesis hash.
 
     If there are no entries, i.e. the network is altogether new to the Signer,
-the specs get added into the database. During the same database transaction the
-network verifier is set up:
+the specs could be added into the database. During the same database transaction
+the network verifier is set up:
 
     | `add_specs` update verification | General verifier in Signer database | Action |
     | :- | :- | :- |
     | unverified, `0xff` update encryption code | `None` or `Some(_)` | (1) set network verifier to custom, `None` (regardless of the general verifier); (2) add specs |
-    | verified by `a` | `None` | (1) set network verifier to general; (2) set general verifier to `Some(a)`, process the general hold; (3) add specs|
+    | verified by `a` | `None` | (1) set network verifier to general; (2) set general verifier to `Some(a)`, process the general hold; (3) add specs |
     | verified by `a` | `Some(b)` | (1) set network verifier to custom, `Some(a)`; (2) add specs |
     | verified by `a` | `Some(a)` | (1) set network verifier to general; (2) add specs |
-    
+
     If there are entries, i.e. the network was known to the Signer at some
 point after the last Signer reset, the network verifier in the database and the
-verifier of the update are compared.
+verifier of the update are compared. The specs could be added in the database if
+
+    1. there are no verifier mismatches encountered (i.e. verifier same or
+    stronger)
+    2. received data causes no change in specs static for encryption
+    3. the specs are not yet in the database in exactly same form
+
+    Note that if the exactly same specs as already in the database are received
+with **updated** verifier and the user accepts the update, the verifier will get
+updated and the specs will stay in the database.
 
     | `add_specs` update verification | Network verifier in Signer database | General verifier in Signer database | Action |
     | :- | :- | :- | :- |
     | unverified, `0xff` update encryption code | custom, `None` | `None` | accept specs if good |
     | unverified, `0xff` update encryption code | custom, `None` | `Some(a)` | accept specs if good |
     | unverified, `0xff` update encryption code | general | `None` | accept specs if good |
-    | unverified, `0xff` update encryption code | general | `Some(a)` | error: message should have been signed by `a` |
+    | unverified, `0xff` update encryption code | general | `Some(a)` | error: update should have been signed by `a` |
     | verified by `a` | custom, `None` | `None` | (1) change network verifier to general, process the network hold; (2) set general verifier to `Some(a)`, process the general hold; (3) accept specs if good |
     | verified by `a` | custom, `None` | `Some(a)` | (1) change network verifier to general, process the network hold; (2) accept specs if good |
     | verified by `a` | custom, `None` | `Some(b)` | (1) change network verifier to custom, `Some(a)`, process the network hold; (2) accept specs if good |
     | verified by `a` | custom, `Some(a)` | `Some(b)` | accept specs if good |
     | verified by `a` | custom, `Some(b)` | `Some(a)` | (1) change network verifier to general, process the network hold; (2) accept specs if good |
-    | verified by `a` | custom, `Some(b)` | `Some(c)` | error: message should have been signed by `b` or `c` |
+    | verified by `a` | custom, `Some(b)` | `Some(c)` | error: update should have been signed by `b` or `c` |
+
+    Before the `NetworkSpecsToSend` are added in the `SPECSTREE`, they get
+transformed into `NetworkSpecs`, and have the `order` field (display order in
+Signer network lists) added. Each new network specs entry gets added in the end
+of the list.
 
 ### `load_meta` processing sequence
 
-1. Update payload is cut into network metadata and network genesis hash.
+1. Update payload is transformed into `ContentLoadMeta`, from which the metadata
+and the genesis hash are retrieved, or the Signer produces an error indicating
+that the `load_metadata` payload is damaged.
+
+2. Signer checks that the received metadata fulfills all Signer metadata
+requirements outlined [above](#metadata-suitable-for-signer). Otherwise an
+error is produced indicating that the received metadata is invalid.
+
+    Incoming `MetaValues` are produced, that contain network name, network
+metadata version and optional base58 prefix (if it is recorded in the metadata).
+
+3. Network genesis hash is used to generate `VerifierKey` and check if the
+network has an established network verifier in the Signer database. If there
+is no network verifier associated with genesis hash, an error is produced,
+indicating that the network metadata could be loaded only for networks
+introduced to Signer.
+
+4. `SPECSTREE` tree of the Signer database is scanned in search of entries with
+genesis hash matching the one received in payload.
+
+    Signer accepts `load_metadata` updates only for the networks that have at
+least one network specs entry in the database.
+
+    Note that if the verifier in step (3) above is found, it not necessarily
+means that the specs are found (for example, if a network verified by general
+verifier was removed by user).
+
+    If the specs are found, the Signer checks that the network name and, if
+present, base58 prefix from the received metadata match the ones in network
+specs from the database. If the values do not match, the Signer produces an
+error.
+
+5. Signer compares the verifier of the received update and the verifier for the
+network from the database. The update verifier must be exactly the same as the
+verifier already in the database. If there is mismatch, Signer produces an
+error, indication that the `load_metadata` update for the network must be signed
+by the specified verifier (general or custom) or unsigned.
+
+6. If the update has passed all checks above, the Signer searches for the
+metadata entry in the `METATREE` of the Signer database, using network name and
+version from update to produce `MetaKey`.
+
+    If the key is not found in the database, the metadata could be added.
+    
+    If the key is found in the database and metadata is **exactly the same**,
+the Signer produces an error indicating that the metadata is already in the
+database. This is expected to be quite common outcome.
+
+    If the key is found in the database and the metadata is **different**, the
+Signer produces an error. Metadata must be not acceptable. This situation can
+occur if there was a silent metadata update or if the metadata is corrupted.
 
 ### `load_types` processing sequence
 
+1. Update payload is transformed into `ContentLoadTypes`, from which the types
+description vector `Vec<TypeEntry>` is retrieved, or the Signer produces an
+error indicating that the `load_types` payload is damaged.
+
+2. `load_types` updates must be signed by the general verifier.
+
+    | `load_types` update verification | General verifier in Signer database | Action |
+    | :- | :- | :- |
+    | unverified, `0xff` update encryption code | `None` | load types if the types are not yet in the database |
+    | verified by `a` | `None` | (1) set general verifier to `Some(a)`, process the general hold; (2) load types, warn if the types are the same as before |
+    | verified by `a` | `Some(b)` | reject types, error indicates that `load_types` requires general verifier signature |
+    | verified by `a` | `Some(a)` | load types if the types are not yet in the database |
+
+    If the `load_types` verifier is same as the general verifier in the database
+and the types are same as the types in the database, the Signer produces an
+error indicating that the types are already known.
+
+    Each time the types are loaded, the Signer produces a warning. `load_types`
+is rare and quite unexpected operation.
 
 
