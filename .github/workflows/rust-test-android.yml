@@ -58,3 +58,6 @@ jobs:
         run:                  |
           cd rust
           cargo nextest run --retries 2 --locked
+          cargo nextest run --no-default-features --features signer --retries 2 --locked
+          cargo nextest run --no-default-features --features active --retries 2 --locked
+          cargo nextest run --no-default-features --retries 2 --locked

@@ -155,8 +155,8 @@ impl VerifierKey {
     }
 
     /// Get genesis hash from the [`VerifierKey`]
-    pub fn genesis_hash(&self) -> Vec<u8> {
-        self.0.as_bytes().to_vec()
+    pub fn genesis_hash(&self) -> H256 {
+        self.0
     }
 
     /// Transform [`VerifierKey`] into `Vec<u8>` database key  
