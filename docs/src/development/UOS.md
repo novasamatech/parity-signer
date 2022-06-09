@@ -63,7 +63,7 @@ Signer supports following `<payload code>` variants:
 - `0x02` transaction (both mortal and immortal)
 - `0x03` message, **content under discussion**
 - `0x80` load metadata update
-- `0x7f` load compressed metadata update, **proposal only**
+- `0x88` load compressed metadata update, **proposal only**
 - `0x81` load types update
 - `0xc1` add specs update
 - `0xde` derivations import
@@ -496,7 +496,7 @@ Update has following general structure:
 
 <table>
     <tr>
-        <td>prelude</td><td>verifier public key (if signed)</td><td>update payload</td><td>reserved tail</td><td>signature (if signed)</td>
+        <td>prelude</td><td>verifier public key (if signed)</td><td>update payload</td><td>signature (if signed)</td><td>reserved tail</td>
     </tr>
 </table>
 
@@ -528,7 +528,7 @@ Detailed description of the update payloads and form in which they are used in
 update itself and for generating update signature, could be found in Rust module
 `definitions::qr_transfers`.
 
-### `add_specs` update payload
+### `add_specs` update payload, code `c1`
 
 Introduces a new network to Signer, i.e. adds network specs to the Signer
 database.
@@ -572,7 +572,7 @@ changed by simply loading new ones over the old ones:
     - path (default derivation path for network, `//<network_name>`)
     - title (network title as it gets displayed in the Signer)
 
-### `load_metadata` update payload
+### `load_metadata` update payload , code`80`
 
 Loads metadata for a network already known to Signer, i.e. for a network with
 network specs in the Signer database.
@@ -586,7 +586,17 @@ Network metadata is stored in dedicated `METATREE` tree of the Signer database.
 Network metadata identifier in is `MetaKey`, a key built from the network name
 and network metadata version.
 
-#### Metadata suitable for Signer
+### `load_metadata` compressed update payload, code `88`
+
+Loads metadata for a network already known to Signer, i.e. for a network with
+network specs in the Signer database. Exactly same as `load_metadata` code `80`
+payload, except the payload is (a) compressed to decrease the QR code size and
+(b) SCALE-encoded to have the exact payload length.
+
+Signature is made for decompressed payload, i.e. the same signature would be
+valid for `80` and `88` payload.
+
+### Metadata suitable for Signer
 
 Network metadata that can get into Signer and can be used by Signer only if it
 complies with following requirements:
@@ -609,7 +619,7 @@ principle could be different from `RuntimeVersion` above. At the moment, the
 type of the `Version` is hardcoded, and any other types would not be processed
 and would get rejected with an error.
 
-### `load_types` update payload
+### `load_types` update payload, code `81`
 
 Loads types information.
 
@@ -718,25 +728,30 @@ network metadata entries.
 1. Cut the QR data and get:
 
     - encryption used by verifier (single `u8` from prelude)
-    - (only if the update is signed, i.e. the encryption is **not** `0xff`):
-
-        - update verifier public key, its length matching the encryption (32 or
-        33 `u8` immediately after the prelude)
-        - update verifier signature, its length matching the encryption (64 or
-        65 `u8` at the end)
-
-    - concatenated update payload and reserved tail
+    - (only if the update is signed, i.e. the encryption is **not** `0xff`)
+    update verifier public key, its length matching the encryption (32 or
+    33 `u8` immediately after the prelude)
+    - concatenated update payload, verifier signature (only if the update is
+    signed) and reserved tail.
 
     If the data length is insufficient, Signer produces an error and suggests to
 load non-damaged update.
 
 2. Using the payload type from the prelude, determine the update payload length
-and cut payload from the reserved tail, which remains unused.
+and cut payload from the concatenated verifier signature and reserved tail.
 
     If the data length is insufficient, Signer produces an error and suggests to
 load non-damaged update.
 
-3. Verify the signature for the payload. If this fails, Signer produces an error
+3. (only if the update is signed, i.e. the encryption is **not** `0xff`)
+Cut verifier signature, its length matching the encryption (64 or 65 `u8`
+immediately after the update payload). Remaining data is reserved tail,
+currently it is not used.
+
+    If the data length is insufficient, Signer produces an error and suggests to
+load non-damaged update.
+
+4. Verify the signature for the payload. If this fails, Signer produces an error
 indicating that the update has invalid signature.
 
 ### `add_specs` processing sequence
