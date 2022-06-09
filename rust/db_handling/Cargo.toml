@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 blake2-rfc = {version = "0.2.18", optional = true}
-chrono = "0.4.19"
 constants = {path = "../constants"}
 defaults = {path = "../defaults", default-features = false, optional = true}
 definitions = {path = "../definitions", default-features = false}
@@ -20,6 +19,7 @@ regex = "1.5.4"
 sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"], optional = true}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false, optional = true}
+time = {version = "0.3.9", features = ["formatting", "macros"]}
 tiny-bip39 = {version = "0.8.0", default-features = false, optional = true}
 zeroize = {version = "1.5.5", optional = true}
 

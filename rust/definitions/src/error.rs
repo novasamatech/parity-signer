@@ -157,6 +157,9 @@ pub trait ErrorSource {
     /// expected to be in the database, but was not found
     fn metadata_not_found(name: String, version: u32) -> Self::Error;
 
+    /// `Error` when time could not be formatted for history record
+    fn timestamp_format(error: time::error::Format) -> Self::Error;
+
     /// Print `Error` as a `String`
     ///
     /// Generated string is used in parsing cards, in Signer side anyhow
