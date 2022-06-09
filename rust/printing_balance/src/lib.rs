@@ -1,3 +1,4 @@
+#![deny(unused_crate_dependencies)]
 struct CutNumber {
     before_point: String,
     after_point: Option<String>,
