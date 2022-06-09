@@ -1,3 +1,5 @@
+#![deny(unused_crate_dependencies)]
+
 use sp_runtime::MultiSigner;
 
 use db_handling::db_transactions::TrDbColdStub;
@@ -12,7 +14,6 @@ use sign_message::{
 };
 mod sign_transaction;
 use sign_transaction::create_signature_png;
-#[cfg(feature = "test")]
 #[cfg(test)]
 mod tests;
 
