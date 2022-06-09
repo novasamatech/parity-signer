@@ -22,16 +22,11 @@ image = { version = "0.24.0", default-features = false, features = ["ico"] }
 parser = { path = "../parser", default-features = false }
 quircs = { version = "0.10.0" }
 regex = { version = "1.5.4" }
+db_handling = {path = "../db_handling", default-features = false, features = ["signer", "test"]}
 
 pretty_assertions = "1"
 
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
-
-[features]
-default = ["test"]
-test = [
-	"db_handling/test",
-]
 
 [lib]
 name = "navigator"

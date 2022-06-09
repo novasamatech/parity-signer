@@ -16,7 +16,6 @@ pub mod modals;
 mod navstate;
 use navstate::{Navstate, State};
 pub mod screens;
-#[cfg(feature = "test")]
 #[cfg(test)]
 mod tests;
 
