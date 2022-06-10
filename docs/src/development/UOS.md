@@ -467,7 +467,7 @@ Message has following structure:
 
 <table>
     <tr>
-        <td>prelude</td><td>public key</td><td>`<Bytes> [u8] slice </Bytes>`</td><td>network genesis hash</td>
+        <td>prelude</td><td>public key</td><td>`&[u8]`</td><td>network genesis hash</td>
     </tr>
 </table>
 
