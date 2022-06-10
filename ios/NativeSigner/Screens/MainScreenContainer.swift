@@ -18,7 +18,18 @@ struct MainScreenContainer: View {
                 Header()
                 ZStack {
                     VStack (spacing:0) {
-                        ScreenSelector()
+                        ScreenSelector(
+                            screenData: data.actionResult.screenData,
+                            pushButton: {action, details, seedPhrase in data.pushButton(action: action, details: details, seedPhrase: seedPhrase)},
+                            getSeed: {seedName in return data.getSeed(seedName: seedName)},
+                            doJailbreak: data.jailbreak,
+                            pathCheck: {seed, path, network in
+                                return substratePathCheck(seedName: seed, path: path, network: network, dbname: data.dbName)
+                            },
+                            createAddress: {path, seedName in data.createAddress(path: path, seedName: seedName)},
+                            checkSeedCollision: {seedName in return data.checkSeedCollision(seedName: seedName)},
+                            restoreSeed: {seedName, seedPhrase, createRoots in data.restoreSeed(seedName: seedName, seedPhrase: seedPhrase, createRoots: createRoots)}
+                        )
                         Spacer()
                     }
                     ModalSelector()
@@ -63,7 +74,7 @@ struct MainScreenContainer: View {
                 if data.canaryDead /* || data.bsDetector.canaryDead)*/ {
                     Text("Please enable airplane mode, turn off bluetooth and wifi connection and disconnect all cables!").background(Color("Bg000"))
                 } else {
-                    LandingView()
+                    LandingView(onboard: {data.onboard()})
                 }
             } else {
                 Text("Please protect device with pin or password!").background(Color("Bg000"))

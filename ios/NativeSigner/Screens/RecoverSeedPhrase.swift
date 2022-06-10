@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct RecoverSeedPhrase: View {
-    @EnvironmentObject var data: SignerDataModel
     @State private var userInput: String = " "
     @State private var createRoots: Bool = true
     @State private var shadowUserInput: String = " "
     @FocusState private var focus: Bool
-    var content: MRecoverSeedPhrase
+    let content: MRecoverSeedPhrase
+    let restoreSeed: (String, String, Bool) -> Void
+    let pushButton: (Action, String, String) -> Void
     
     var body: some View {
         ZStack {
@@ -46,7 +47,7 @@ struct RecoverSeedPhrase: View {
                                     .keyboardType(.asciiCapable)
                                     .submitLabel(.done)
                                     .onChange(of: userInput, perform: { word in
-                                        data.pushButton(action: .textEntry, details: word)
+                                        pushButton(.textEntry, word, "")
                                         shadowUserInput = word
                                     })
                                     .onSubmit {
@@ -73,7 +74,7 @@ struct RecoverSeedPhrase: View {
                                 ForEach(content.guessSet, id: \.self) { guess in
                                     VStack {
                                         Button(action: {
-                                            data.pushButton(action: .pushWord, details: guess)
+                                            pushButton(.pushWord, guess, "")
                                         }) {
                                             Text(guess)
                                                 .foregroundColor(Color("Crypto400"))
@@ -89,7 +90,6 @@ struct RecoverSeedPhrase: View {
                         }.frame(height: 23)
                         
                         Spacer()
-                        Text(data.lastError).foregroundColor(.red)
                         Button(action: {
                             createRoots.toggle()
                         }) {
@@ -106,7 +106,7 @@ struct RecoverSeedPhrase: View {
                                 BigButton(
                                     text: "Next",
                                     action: {
-                                        data.restoreSeed(seedName: content.seedName, seedPhrase: content.readySeed ?? "", createRoots: createRoots)
+                                        restoreSeed(content.seedName, content.readySeed ?? "", createRoots)
                                     },
                                     isDisabled: content.readySeed == nil
                                 )

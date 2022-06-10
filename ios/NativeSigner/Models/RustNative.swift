@@ -27,7 +27,6 @@ class SignerDataModel: ObservableObject {
     //Data state
     @Published var seedNames: [String] = []
     @Published var onboardingDone: Bool = false
-    @Published var lastError: String = ""
     @Published var authenticated: Bool = false
     
     //This just starts camera reset. Could be done cleaner probably.

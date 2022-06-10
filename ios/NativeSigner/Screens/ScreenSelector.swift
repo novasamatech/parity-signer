@@ -8,10 +8,17 @@
 import SwiftUI
 
 struct ScreenSelector: View {
-    @EnvironmentObject var data: SignerDataModel
+    let screenData: ScreenData
+    let pushButton: (Action, String, String) -> Void
+    let getSeed: (String) -> String
+    let doJailbreak: () -> Void
+    let pathCheck: (String, String, String) -> DerivationCheck
+    let createAddress: (String, String) -> Void
+    let checkSeedCollision: (String) -> Bool
+    let restoreSeed: (String, String, Bool) -> Void
     
     var body: some View {
-        switch (data.actionResult.screenData) {
+        switch (screenData) {
         case .scan :
             TransactionScreen()
         case .keys(let value):
@@ -23,33 +30,62 @@ struct ScreenSelector: View {
         case .logDetails(let value):
             EventDetails(content: value)
         case .transaction(let value):
-            TransactionPreview(content: value)
+            TransactionPreview(
+                content: value,
+                pushButton: pushButton
+            )
         case .seedSelector(let value):
             SeedManager(content: value)
         case .keyDetails(let value):
             ExportAddress(content: value)
         case .newSeed(let value):
-            NewSeedScreen(content: value)
+            NewSeedScreen(
+                content: value,
+                checkSeedCollision: checkSeedCollision,
+                pushButton: pushButton
+            )
         case .recoverSeedName(let value):
-            RecoverSeedName(content: value)
+            RecoverSeedName(
+                content: value,
+                checkSeedCollision: checkSeedCollision,
+                pushButton: pushButton
+            )
         case .recoverSeedPhrase(let value):
-            RecoverSeedPhrase(content: value)
+            RecoverSeedPhrase(
+                content: value,
+                restoreSeed: restoreSeed,
+                pushButton: pushButton
+            )
         case .deriveKey(let value):
-            NewAddressScreen(content: value)
+            NewAddressScreen(
+                content: value,
+                pathCheck: pathCheck,
+                createAddress: createAddress,
+                pushButton: pushButton
+            )
         case .vVerifier(let value):
-            VerifierScreen(content: value)
+            VerifierScreen(
+                content: value,
+                doJailbreak: doJailbreak
+            )
         case .manageNetworks(let value):
             ManageNetworks(content: value)
         case .nNetworkDetails(let value):
             NetworkDetails(content: value)
         case .signSufficientCrypto(let value):
-            SignSufficientCrypto(content: value)
+            SignSufficientCrypto(
+                content: value,
+                pushButton: pushButton,
+                getSeed: getSeed)
         case .selectSeedForBackup(let value):
             SelectSeedForBackup(content: value)
         case .documents:
             DocumentModal()
         case .keyDetailsMulti(let value):
-            KeyDetailsMulti(content: value)
+            KeyDetailsMulti(
+                content: value,
+                pushButton: pushButton
+            )
         }
     }
 }
