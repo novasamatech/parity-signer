@@ -785,6 +785,11 @@ pub fn error_signer() -> Vec<ErrorSigner> {
     // `TempBlockMsg` error //TODO remove after message fix
     out.push(ErrorSigner::TempBlockMsg);
 
+    // `TimeFormat` error.
+    out.push(ErrorSigner::TimeFormat(
+        time::error::Format::InvalidComponent("distance"),
+    ));
+
     out
 }
 
@@ -1176,6 +1181,7 @@ mod tests {
 "Wrong password."
 "No networks available. Please load networks information to proceed."
 "This is a message payload. Message signing is temporarily disabled in Signer."
+"Unable to produce timestamp. The distance component cannot be formatted into the requested format."
 "#;
         assert!(print == print_expected, "\nReceived: {}", print);
     }

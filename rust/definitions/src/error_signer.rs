@@ -15,6 +15,7 @@
 //! error management is easier.
 use anyhow::anyhow;
 use sp_core::{crypto::SecretStringError, H256};
+use time::error::Format;
 #[cfg(feature = "test")]
 use variant_count::VariantCount;
 
@@ -168,6 +169,9 @@ impl ErrorSource for Signer {
     }
     fn metadata_not_found(name: String, version: u32) -> Self::Error {
         ErrorSigner::NotFound(NotFoundSigner::Metadata { name, version })
+    }
+    fn timestamp_format(error: time::error::Format) -> Self::Error {
+        ErrorSigner::TimeFormat(error)
     }
     fn show(error: &Self::Error) -> String {
         match error {
@@ -348,6 +352,7 @@ impl ErrorSource for Signer {
             ErrorSigner::WrongPasswordNewChecksum(_) => String::from("Wrong password."),
             ErrorSigner::NoNetworksAvailable => String::from("No networks available. Please load networks information to proceed."),
             ErrorSigner::TempBlockMsg => String::from("This is a message payload. Message signing is temporarily disabled in Signer."),
+            ErrorSigner::TimeFormat(e) => format!("Unable to produce timestamp. {}", e),
         }
     }
 }
@@ -442,6 +447,9 @@ pub enum ErrorSigner {
 
     /// Temporary block message
     TempBlockMsg,
+  
+    /// Time formatting error
+    TimeFormat(Format),
 }
 
 impl ErrorSigner {

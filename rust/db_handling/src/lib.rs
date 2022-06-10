@@ -25,8 +25,7 @@
 //! Feature `"test"` includes both `"signer"` and `"active"` features, along
 //! with some testing, and is the default one.  
 
-// this is a fix for `log` crate unused in ios
-// #![deny(unused_crate_dependencies)]
+#![deny(unused_crate_dependencies)]
 
 // possibly TODO: rename all database_name into database_path or whatever,
 // currently it is quite confusing

@@ -23,13 +23,6 @@ sp-runtime = {git = "https://github.com/paritytech/substrate", default-features 
 [dev-dependencies]
 pretty_assertions = "1"
 
-[features]
-default = ["test"]
-test = [
-	"constants/test",
-	"db_handling/test",
-]
-
 [lib]
 name = "transaction_parsing"
 crate-type = ["lib"]
