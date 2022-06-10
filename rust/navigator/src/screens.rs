@@ -624,7 +624,6 @@ impl Screen {
 }
 
 #[cfg(test)]
-#[cfg(feature = "test")]
 mod tests {
 
     use sp_core::sr25519::Public;

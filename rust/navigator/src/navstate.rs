@@ -514,9 +514,7 @@ impl State {
                             Modal::Empty => {
                                 if self.seed_names.is_empty() {
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(
-                                        InterfaceSigner::VersionNotU32(details_str.to_string()),
-                                    )));
+                                    errorline.push_str(&<Signer>::show(&ErrorSigner::NoKnownSeeds));
                                 } else {
                                     new_navstate.modal = Modal::SelectSeed;
                                 }
