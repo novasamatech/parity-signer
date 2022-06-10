@@ -447,7 +447,7 @@ pub enum ErrorSigner {
 
     /// Temporary block message
     TempBlockMsg,
-  
+
     /// Time formatting error
     TimeFormat(Format),
 }
