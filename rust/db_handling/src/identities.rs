@@ -205,10 +205,14 @@ pub(crate) fn create_address<T: ErrorSource>(
 ) -> Result<PrepData, T::Error> {
     // Check that the seed phrase is not empty.
     // In upstream, empty seed phrase means default Alice seed phrase.
-    if seed_phrase.is_empty() {return Err(<T>::empty_seed())}
+    if seed_phrase.is_empty() {
+        return Err(<T>::empty_seed());
+    }
 
     // Check that the seed name is not empty.
-    if seed_name.is_empty() {return Err(<T>::empty_seed_name())}
+    if seed_name.is_empty() {
+        return Err(<T>::empty_seed_name());
+    }
     let mut address_prep = input_batch_prep.to_vec();
     let network_specs_key =
         NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
