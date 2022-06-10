@@ -517,8 +517,9 @@ impl State {
                                     errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(
                                         InterfaceSigner::VersionNotU32(details_str.to_string()),
                                     )));
-                                }                
-                                else {new_navstate.modal = Modal::SelectSeed;}
+                                } else {
+                                    new_navstate.modal = Modal::SelectSeed;
+                                }
                             }
                             _ => println!("GoForward does nothing here"),
                         }
