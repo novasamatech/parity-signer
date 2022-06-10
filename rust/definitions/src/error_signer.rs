@@ -352,6 +352,7 @@ impl ErrorSource for Signer {
             ErrorSigner::WrongPasswordNewChecksum(_) => String::from("Wrong password."),
             ErrorSigner::NoNetworksAvailable => String::from("No networks available. Please load networks information to proceed."),
             ErrorSigner::TimeFormat(e) => format!("Unable to produce timestamp. {}", e),
+            ErrorSigner::NoKnownSeeds => String::from("There are no seeds. Please create a seed first."),
         }
     }
 }
@@ -446,6 +447,10 @@ pub enum ErrorSigner {
 
     /// Time formatting error
     TimeFormat(Format),
+
+    /// Signer has no seeds in storage. User tried an action that needs at least
+    /// one seed.
+    NoKnownSeeds,
 }
 
 impl ErrorSigner {

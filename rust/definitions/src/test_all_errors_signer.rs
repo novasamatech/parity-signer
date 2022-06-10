@@ -787,6 +787,9 @@ pub fn error_signer() -> Vec<ErrorSigner> {
         time::error::Format::InvalidComponent("distance"),
     ));
 
+    // `NoSeeds` error.
+    out.push(ErrorSigner::NoKnownSeeds);
+
     out
 }
 
@@ -1178,6 +1181,7 @@ mod tests {
 "Wrong password."
 "No networks available. Please load networks information to proceed."
 "Unable to produce timestamp. The distance component cannot be formatted into the requested format."
+"There are no seeds. Please create a seed first."
 "#;
         assert!(print == print_expected, "\nReceived: {}", print);
     }
