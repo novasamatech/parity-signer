@@ -15,6 +15,7 @@
 //! error management is easier.
 
 use sp_core::H256;
+use time::error::Format;
 
 use crate::{
     crypto::Encryption,
@@ -110,7 +111,7 @@ impl ErrorSource for Active {
             EntryDecodingActive::NetworkSpecs(key),
         ))
     }
-    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: Vec<u8>) -> Self::Error {
+    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: H256) -> Self::Error {
         ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::SpecsGenesisHash {
             key,
             genesis_hash,
@@ -163,6 +164,9 @@ impl ErrorSource for Active {
     }
     fn metadata_not_found(name: String, version: u32) -> Self::Error {
         ErrorActive::NotFound(NotFoundActive::Metadata { name, version })
+    }
+    fn timestamp_format(error: time::error::Format) -> Self::Error {
+        ErrorActive::TimeFormat(error)
     }
     fn show(error: &Self::Error) -> String {
         match error {
@@ -416,6 +420,7 @@ impl ErrorSource for Active {
                     Wasm::WasmiRuntime(e) => format!("Error processing .wasm file {}. Unable to generate WasmiRuntime. {}", filename, e),
                 }
             },
+            ErrorActive::TimeFormat(e) => format!("Unable to produce timestamp. {}", e),
         }
     }
 }
@@ -503,6 +508,9 @@ pub enum ErrorActive {
         /// error details
         wasm: Wasm,
     },
+
+    /// Time formatting error
+    TimeFormat(Format),
 }
 
 impl std::fmt::Display for ErrorActive {
@@ -873,7 +881,7 @@ pub enum MismatchActive {
         key: NetworkSpecsKey,
 
         /// genesis hash as it is in the `NetworkSpecs`
-        genesis_hash: Vec<u8>,
+        genesis_hash: H256,
     },
 
     /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
@@ -897,7 +905,7 @@ pub enum MismatchActive {
         key: NetworkSpecsKey,
 
         /// genesis hash as it is in the `NetworkSpecsToSend`
-        genesis_hash: Vec<u8>,
+        genesis_hash: H256,
     },
 
     /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].

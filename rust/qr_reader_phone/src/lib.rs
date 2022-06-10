@@ -1,3 +1,5 @@
+#![deny(unused_crate_dependencies)]
+
 use anyhow::anyhow;
 
 use std::convert::TryInto;

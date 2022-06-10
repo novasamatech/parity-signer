@@ -589,8 +589,10 @@ fn westend_network_details() {
         color: "#660D35".to_string(),
         decimals: 12,
         encryption: Encryption::Sr25519,
-        genesis_hash: "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
-            .to_string(),
+        genesis_hash: H256::from_str(
+            "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        )
+        .unwrap(),
         logo: "westend".to_string(),
         name: "westend".to_string(),
         order: "2".to_string(),
@@ -1990,7 +1992,7 @@ fn test_all_events() {
         &entries,
         &Event::NetworkVerifierSet {
             network_verifier_display: NetworkVerifierDisplay {
-                genesis_hash: hex::decode(
+                genesis_hash: H256::from_str(
                     "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 )
                 .unwrap(),

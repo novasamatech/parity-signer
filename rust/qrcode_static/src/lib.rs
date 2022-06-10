@@ -1,3 +1,5 @@
+#![deny(unused_crate_dependencies)]
+
 use anyhow::anyhow;
 use bitvec::prelude::{BitVec, Msb0};
 use constants::{qr_palette, BORDER, SCALING};
