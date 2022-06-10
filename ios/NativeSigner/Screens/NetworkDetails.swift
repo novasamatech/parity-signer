@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct NetworkDetails: View {
-    @EnvironmentObject var data: SignerDataModel
-    var content: MNetworkDetails
+    let content: MNetworkDetails
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         ZStack {
             VStack {
@@ -61,7 +61,7 @@ struct NetworkDetails: View {
                             metaEntry in
                             Button(
                                 action: {
-                                    data.pushButton(action: .manageMetadata, details: metaEntry.specsVersion)
+                                    pushButton(.manageMetadata, metaEntry.specsVersion, "")
                                 }
                             ){
                             MetadataCard(meta: metaEntry)

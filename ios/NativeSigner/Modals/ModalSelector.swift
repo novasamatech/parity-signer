@@ -8,42 +8,81 @@
 import SwiftUI
 
 struct ModalSelector: View {
-    @EnvironmentObject var data: SignerDataModel
+    let modalData: ModalData?
+    let alert: Bool
+    let alertShow: () -> Void
+    let pushButton: (Action, String, String) -> Void
+    let removeSeed: (String) -> Void
+    let restoreSeed: (String, String, Bool) -> Void
+    let createAddress: (String, String) -> Void
+    let getSeedForBackup: (String) -> String
+    let sign: (String, String) -> Void
     
     var body: some View {
-        switch (data.actionResult.modalData) {
+        switch (modalData) {
         case .newSeedMenu:
-            NewSeedMenu()
+            NewSeedMenu(
+                alert: alert,
+                alertShow: alertShow,
+                pushButton: pushButton
+            )
         case .networkSelector(let value):
-            NetworkManager(content: value)
+            NetworkManager(
+                content: value,
+                pushButton: pushButton
+            )
         case .seedMenu(let value):
-            SeedMenu(content: value)
+            SeedMenu(
+                content: value,
+                alert: alert,
+                alertShow: alertShow,
+                removeSeed: removeSeed,
+                pushButton: pushButton
+            )
         case .backup(let value):
-            Backup(content: value)
+            Backup(content: value,
+                   alert: alert,
+                   getSeedForBackup: getSeedForBackup,
+                   pushButton: pushButton)
         case .passwordConfirm(let value):
-            PasswordConfirm(content: value)
+            PasswordConfirm(content: value,
+                            createAddress: createAddress)
         case .signatureReady(let value):
-            SignatureReady(content: value)
+            SignatureReady(content: value,
+                           pushButton: pushButton)
         case .enterPassword(let value):
-            EnterPassword(content: value)
+            EnterPassword(content: value,
+                          pushButton: pushButton)
         case .logRight(let value):
-            LogMenu(content: value)
+            LogMenu(content: value,
+                    pushButton: pushButton)
         case .networkDetailsMenu:
-            NetworkDetailsMenu()
-        case .manageMetadata(let value)://(let value):
-            ManageMetadata(content: value)//content: value)
+            NetworkDetailsMenu(
+                               pushButton: pushButton)
+        case .manageMetadata(let value):
+            ManageMetadata(content: value,
+                           pushButton: pushButton)
         case .sufficientCryptoReady(let value):
             SufficientCryptoReady(content: value)
         case .keyDetailsAction:
-            KeyMenu()
+            KeyMenu(
+                    pushButton: pushButton)
         case .typesInfo(let value):
-            TypesMenu(content: value)
+            TypesMenu(content: value,
+                      pushButton: pushButton)
         case .newSeedBackup(let value):
-            NewSeedBackupModal(content: value)
+            NewSeedBackupModal(content: value,
+                               restoreSeed: restoreSeed,
+                               pushButton: pushButton)
         case .logComment:
-            LogComment()
-        case .selectSeed://(let value):
-            EmptyView()//SelectSeed(content: value)
+            LogComment(
+                       pushButton: pushButton)
+        case .selectSeed(let value):
+            SelectSeed(
+                content: value,
+                sign: sign,
+                pushButton: pushButton
+            )
         case nil:
             EmptyView()
         }

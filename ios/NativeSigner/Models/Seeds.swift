@@ -217,4 +217,19 @@ extension SignerDataModel {
             }
         }
     }
+    
+    /**
+     * Wrapper for signing with use of seed material
+     */
+    func sign(seedName: String, comment: String) {
+        if self.alert {
+            self.alertShow = true
+        } else {
+            self.pushButton(
+                action: .goForward,
+                details: comment,
+                seedPhrase: self.getSeed(seedName: seedName)
+            )
+        }
+    }
 }

@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct TransactionPreview: View {
-    @EnvironmentObject var data: SignerDataModel
     @State private var comment = ""
     @State var offset: CGFloat = 0
     @State var offsetOld: CGFloat = 0
     @FocusState private var focus: Bool
     let content: MTransaction
+    let sign: (String, String) -> Void
     let pushButton: (Action, String, String) -> Void
     var body: some View {
         VStack {
@@ -59,14 +59,8 @@ struct TransactionPreview: View {
                             isCrypto: true,
                             action: {
                                 focus = false
-                                if data.alert {
-                                    data.alertShow = true
-                                } else {
-                                    data.pushButton(
-                                        action: .goForward,
-                                        details: Data(comment.utf8).base64EncodedString(),
-                                        seedPhrase: data.getSeed(seedName: content.authorInfo?.seedName ?? "")
-                                    )
+                                if let seedName = content.authorInfo?.seedName {
+                                    sign(seedName, comment)
                                 }
                             }
                         )
