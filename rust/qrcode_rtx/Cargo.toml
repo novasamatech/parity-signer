@@ -10,7 +10,7 @@ edition = "2018"
 bitvec = "1.0.0"
 hex = "0.4.3"
 raptorq = "1.6.4"
-qrcodegen = "1.6.0"
+qrcodegen = "1.8.0"
 png = "0.17.5"
 constants = {path = "../constants"}
 qrcode_static = {path = "../qrcode_static"}
