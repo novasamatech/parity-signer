@@ -501,8 +501,8 @@ Update has following general structure:
 </table>
 
 Note that the `verifier public key` and `signature` parts appear only in signed
-uploads. Preludes `[0x53, 0xff, 0x<payload code>]` are followed only by the
-update payload.
+uploads. Preludes `[0x53, 0xff, 0x<payload code>]` are followed by the update
+payload.
 
 Every time user receives an unsigned update, the Signer displays a warning that
 the update is not verified. Generally, the use of unsigned updates is
@@ -528,13 +528,14 @@ Detailed description of the update payloads and form in which they are used in
 update itself and for generating update signature, could be found in Rust module
 `definitions::qr_transfers`.
 
-### `add_specs` update payload, code `c1`
+### `add_specs` update payload, payload code `c1`
 
 Introduces a new network to Signer, i.e. adds network specs to the Signer
 database.
 
-Update payload consists of **double** SCALE-encoded `NetworkSpecsToSend` (second
-SCALE is to have the exact payload length).
+Update payload is `ContentAddSpecs` in `to_transfer()` form, i.e. **double**
+SCALE-encoded `NetworkSpecsToSend` (second SCALE is to have the exact payload
+length).
 
 Payload signature is generated for SCALE-encoded `NetworkSpecsToSend`.
 
@@ -572,13 +573,14 @@ changed by simply loading new ones over the old ones:
     - path (default derivation path for network, `//<network_name>`)
     - title (network title as it gets displayed in the Signer)
 
-### `load_metadata` update payload , code`80`
+### `load_metadata` update payload, payload code `80`
 
 Loads metadata for a network already known to Signer, i.e. for a network with
 network specs in the Signer database.
 
-Update payload consists of concatenated SCALE-encoded metadata `Vec<u8>` and
-network genesis hash (H256, always 32 bytes).
+Update payload is `ContentLoadMeta` in `to_transfer()` form, and consists of
+concatenated SCALE-encoded metadata `Vec<u8>` and network genesis hash (H256,
+always 32 bytes).
 
 Same blob is used to generate the signature.
 
@@ -586,7 +588,7 @@ Network metadata is stored in dedicated `METATREE` tree of the Signer database.
 Network metadata identifier in is `MetaKey`, a key built from the network name
 and network metadata version.
 
-### `load_metadata` compressed update payload, code `88`
+### `load_metadata` compressed update payload, payload code `88` <- proposal only
 
 Loads metadata for a network already known to Signer, i.e. for a network with
 network specs in the Signer database. Exactly same as `load_metadata` code `80`
@@ -594,7 +596,7 @@ payload, except the payload is (a) compressed to decrease the QR code size and
 (b) SCALE-encoded to have the exact payload length.
 
 Signature is made for decompressed payload, i.e. the same signature would be
-valid for `80` and `88` payload.
+valid for `80` and `88` payloads.
 
 ### Metadata suitable for Signer
 
@@ -619,7 +621,7 @@ principle could be different from `RuntimeVersion` above. At the moment, the
 type of the `Version` is hardcoded, and any other types would not be processed
 and would get rejected with an error.
 
-### `load_types` update payload, code `81`
+### `load_types` update payload, payload code `81`
 
 Loads types information.
 
@@ -631,8 +633,9 @@ types information incorporated in the metadata itself.
 
 The `load_types` update is expected to become obsolete soon.
 
-Update payload consists of **double** SCALE-encoded `Vec<TypeEntry>` (second
-SCALE is to have the exact payload length).
+Update payload is `ContentLoadTypes` in `to_transfer()`, i.e. **double**
+SCALE-encoded `Vec<TypeEntry>` (second SCALE is to have the exact payload
+length).
 
 Payload signature is generated for SCALE-encoded `Vec<TypeEntry>`.
 
@@ -887,4 +890,66 @@ error indicating that the types are already known.
     Each time the types are loaded, the Signer produces a warning. `load_types`
 is rare and quite unexpected operation.
 
+## Derivations import, payload code `de`
+
+Derivations import has following general structure:
+
+<table>
+    <tr>
+        <td>prelude</td><td>update payload</td>
+    </tr>
+</table>
+
+Derivations imports are unsigned, and always have the same prelude, `53ffde`.
+
+Update payload is `ContentDerivations` in `to_transfer()` form. 
+
+`ContentDerivations` includes derivation path set to be imported (with password-
+free derivations only), network genesis hash and encryption for the network in
+which the import would be made. User, if approving the derivations import, is
+specifying the seed, for which the derivations are applied.
+
+When processing derivations import, all data after prelude is transformed into
+`ContentDerivations`. Network genesis hash, encryption and derivations set are
+derived from it, or the Signer produces an error indicating that the derivation
+import payload is corrupted.
+
+Signer checks that the network for which the derivations are imported has
+network specs in the Signer database. If not, an error is produced.
+
+Signer checks that the derivation set contains only valid, password-free
+derivations. If any derivation is unsuitable, an error is produced indicating
+this.
+
+If the user accepts the derivations import for some seed, Signer generates a key
+for each derivation for user-provided seed.
+
+If one of the derived keys already exists, it gets ingored, i.e. no error is
+produced.
+
+If there are two derivations with identical path within the payload, only one
+derived key is created.
+
+In case of key collision Signer always produces an error and imports no
+derivations. Key collision means that the public keys produced for two
+*different* derivation paths coincide. For example, `//1` and `//01` derivations
+would result in identical public key, and there would be uncertainty which path
+should be in the record.
+
+Key collision can occur:
+
+- if there are two colliding derivations within payload
+- if there already exists a derivation in Signer, with which the newly received
+derivation would collide
+
+The public key is determined for seed and derivation path combination for given
+encryption algorithm. The public key is not determined by the network. If there
+is already derived key with derivation path `//1` in network `Network 1`,
+adding through derivation import a derivation with path `//01` into another
+network `Network 2` must result in an error.
+
+## Testing parser card display
+
+Whole payload is `53fff0`. This is test payload, used to display all cards
+available in Signer interface.
 
