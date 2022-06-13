@@ -38,8 +38,10 @@ use parity_scale_codec::Encode;
 use regex::Regex;
 #[cfg(feature = "signer")]
 use sled::Batch;
+#[cfg(feature = "active")]
+use sp_core::H256;
 #[cfg(any(feature = "active", feature = "signer"))]
-use sp_core::{ecdsa, ed25519, sr25519, Pair, H256};
+use sp_core::{ecdsa, ed25519, sr25519, Pair};
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_runtime::MultiSigner;
 #[cfg(any(feature = "active", feature = "signer"))]
@@ -201,6 +203,16 @@ pub(crate) fn create_address<T: ErrorSource>(
     seed_name: &str,
     seed_phrase: &str,
 ) -> Result<PrepData, T::Error> {
+    // Check that the seed phrase is not empty.
+    // In upstream, empty seed phrase means default Alice seed phrase.
+    if seed_phrase.is_empty() {
+        return Err(<T>::empty_seed());
+    }
+
+    // Check that the seed name is not empty.
+    if seed_name.is_empty() {
+        return Err(<T>::empty_seed_name());
+    }
     let mut address_prep = input_batch_prep.to_vec();
     let network_specs_key =
         NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);

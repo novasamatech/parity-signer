@@ -25,17 +25,25 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
     let checked_info = pass_crypto(data_hex, TransferContent::AddSpecs)?;
     let specs = ContentAddSpecs::from_slice(&checked_info.message).specs::<Signer>()?;
     let network_specs_key = NetworkSpecsKey::from_parts(&specs.genesis_hash, &specs.encryption);
-    let verifier_key = VerifierKey::from_parts(specs.genesis_hash.as_bytes());
+    let verifier_key = VerifierKey::from_parts(specs.genesis_hash);
     let possible_valid_current_verifier =
         try_get_valid_current_verifier(&verifier_key, database_name)?;
     let general_verifier = get_general_verifier(database_name)?;
-    if let Some((_, known_network_specs)) =
-        genesis_hash_in_specs(&verifier_key, &open_db::<Signer>(database_name)?)?
+    if let Some(specs_invariants) =
+        genesis_hash_in_specs(specs.genesis_hash, &open_db::<Signer>(database_name)?)?
     {
-        if specs.base58prefix != known_network_specs.base58prefix {
-            return Err(ErrorSigner::Input(InputSigner::DifferentBase58 {
-                genesis_hash: specs.genesis_hash,
-                base58_database: known_network_specs.base58prefix,
+        if specs.name != specs_invariants.name {
+            return Err(ErrorSigner::Input(InputSigner::AddSpecsDifferentName {
+                genesis_hash: specs_invariants.genesis_hash,
+                name_database: specs_invariants.name,
+                name_input: specs.name,
+            }));
+        }
+        if specs.base58prefix != specs_invariants.base58prefix {
+            return Err(ErrorSigner::Input(InputSigner::AddSpecsDifferentBase58 {
+                genesis_hash: specs_invariants.genesis_hash,
+                name: specs_invariants.name,
+                base58_database: specs_invariants.base58prefix,
                 base58_input: specs.base58prefix,
             }));
         }

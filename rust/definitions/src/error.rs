@@ -1,6 +1,6 @@
 //! Trait [`ErrorSource`] and error-related types shared by Signer and active
 //! sides
-use sp_core::crypto::SecretStringError;
+use sp_core::{crypto::SecretStringError, H256};
 use sp_runtime::MultiSigner;
 #[cfg(feature = "test")]
 use variant_count::VariantCount;
@@ -111,7 +111,7 @@ pub trait ErrorSource {
     /// `Error` when there is genesis hash mismatch between stored
     /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) contents and the
     /// [`NetworkSpecsKey`]
-    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: Vec<u8>) -> Self::Error;
+    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: H256) -> Self::Error;
 
     /// `Error` when there is encryption mismatch between stored
     /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) contents and the
@@ -156,6 +156,17 @@ pub trait ErrorSource {
     /// `Error` when metadata for the network with given name and version was
     /// expected to be in the database, but was not found
     fn metadata_not_found(name: String, version: u32) -> Self::Error;
+
+    /// `Error` when time could not be formatted for history record
+    fn timestamp_format(error: time::error::Format) -> Self::Error;
+
+    /// `Error` when unexpectedly got empty seed phrase: if fed in upstream,
+    /// empty seed phrase is interpreted as Alice seed phrase automatically.
+    fn empty_seed() -> Self::Error;
+
+    /// `Error` when unexpectedly got empty seed name: already forbidden on the
+    /// interface, unlikely to happen in general.
+    fn empty_seed_name() -> Self::Error;
 
     /// Print `Error` as a `String`
     ///

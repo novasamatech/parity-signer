@@ -6,35 +6,30 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0"
-db_handling = {path = "../db_handling", default-features = false, features = ["signer"]}
-definitions = {path = "../definitions", default-features = false, features = ["signer"]}
 ffi-support = "0.4"
 hex = "0.4.3"
-libc = "0.2"
-log = "0.4"
-navigator = {path = "../navigator", default-features = false}
-qr_reader_phone = {path = "..//qr_reader_phone"}
-rustc-hex = "2.1.0"
-transaction_parsing = {path = "../transaction_parsing", default-features = false}
-transaction_signing = {path = "../transaction_signing", default-features = false}
-uniffi = {version="0.17.0", features=["builtin-bindgen"]}
-zeroize = {version = "1.3.0", features = ["zeroize_derive"]}
+uniffi = { version = "0.18.0", features=["builtin-bindgen"] }
 
-sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
-sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
-serde_json = "1.0.79"
+sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
+sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
+
+db_handling = { path = "../db_handling", default-features = false, features = ["signer"] }
+definitions = { path = "../definitions", default-features = false, features = ["signer"] }
+navigator = { path = "../navigator", default-features = false }
+qr_reader_phone = { path = "..//qr_reader_phone" }
+transaction_parsing = { path = "../transaction_parsing", default-features = false }
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
 env_logger = "0.9"
 
 [target.'cfg(target_os = "android")'.dependencies]
 android_logger = "0.11"
-jni = { version = "0.16.0" }
+log = "0.4.17"
 
 [build-dependencies]
 definitions = {path = "../definitions"}
 generate_message = {path = "../generate_message"}
-uniffi_build = { version = "0.17.0", features = ["builtin-bindgen"] }
+uniffi_build = { version = "0.18.0", features = ["builtin-bindgen"] }
 
 [lib]
 crate-type = ["staticlib", "cdylib"]

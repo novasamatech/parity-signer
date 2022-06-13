@@ -589,8 +589,10 @@ fn westend_network_details() {
         color: "#660D35".to_string(),
         decimals: 12,
         encryption: Encryption::Sr25519,
-        genesis_hash: "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
-            .to_string(),
+        genesis_hash: H256::from_str(
+            "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        )
+        .unwrap(),
         logo: "westend".to_string(),
         name: "westend".to_string(),
         order: "2".to_string(),
@@ -964,7 +966,7 @@ fn find_westend_verifier() {
     let dbname = "for_tests/find_westend_verifier";
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let verifier_key = VerifierKey::from_parts(
-        &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(),
+        H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(),
     );
     let westend_verifier = try_get_valid_current_verifier(&verifier_key, dbname).unwrap();
     assert_eq!(westend_verifier, Some(ValidCurrentVerifier::General));
@@ -976,7 +978,7 @@ fn not_find_mock_verifier() {
     let dbname = "for_tests/not_find_mock_verifier";
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let verifier_key = VerifierKey::from_parts(
-        &hex::decode("62bacaaa3d9bb01313bb882c23615aae6509ab2ef1e7e807581ee0b74c77416b").unwrap(),
+        H256::from_str("62bacaaa3d9bb01313bb882c23615aae6509ab2ef1e7e807581ee0b74c77416b").unwrap(),
     );
     match try_get_valid_current_verifier(&verifier_key, dbname) {
         Ok(Some(_)) => panic!("Found network key that should not be in database."),
@@ -1990,7 +1992,7 @@ fn test_all_events() {
         &entries,
         &Event::NetworkVerifierSet {
             network_verifier_display: NetworkVerifierDisplay {
-                genesis_hash: hex::decode(
+                genesis_hash: H256::from_str(
                     "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 )
                 .unwrap(),

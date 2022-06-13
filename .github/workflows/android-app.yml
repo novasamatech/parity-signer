@@ -18,7 +18,7 @@ jobs:
           access_token: ${{ github.token }}
 
       - name:           Checkout Sources
-        uses:           actions/checkout@v2.4.0
+        uses:           actions/checkout@v3.0.2
         with:
           fetch-depth:  50
           submodules:   'recursive'
@@ -39,14 +39,14 @@ jobs:
         uses:                 actions-rs/install@v0.1
         with:
           crate:              uniffi_bindgen
-          version:            0.17.0 # Must be in sync with version in Cargo.toml
+          version:            0.18.0 # Must be in sync with version in Cargo.toml
           use-tool-cache:     true
 
       - name:           Install additional rust targets
         run:            rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
 
       - name:           Set up JDK environment
-        uses:           actions/setup-java@v2
+        uses:           actions/setup-java@v3
         with:
           distribution: 'adopt'
           java-version: 11
@@ -55,7 +55,7 @@ jobs:
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@v1
+        uses:           Swatinem/rust-cache@v1.4.0
         with:
           working-directory: rust
 
@@ -85,7 +85,7 @@ jobs:
           access_token: ${{ github.token }}
 
       - name:           Checkout Sources
-        uses:           actions/checkout@v2.4.0
+        uses:           actions/checkout@v3.0.2
         with:
           fetch-depth:  50
           submodules:   'recursive'
@@ -114,7 +114,7 @@ jobs:
         run:            rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
 
       - name:           Set up JDK environment
-        uses:           actions/setup-java@v2
+        uses:           actions/setup-java@v3
         with:
           distribution: 'adopt'
           java-version: 11
@@ -123,7 +123,7 @@ jobs:
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@v1
+        uses:           Swatinem/rust-cache@v1.4.0
         with:
           working-directory: rust
 
@@ -143,7 +143,7 @@ jobs:
           ./gradlew clean assembleDebug --stacktrace
 
       - name:           Upload Gplay unsigned APKs
-        uses:           actions/upload-artifact@v2
+        uses:           actions/upload-artifact@v3
         with:
           name:         signer-debug-unsigned
           path:         |
