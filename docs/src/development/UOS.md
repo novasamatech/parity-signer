@@ -42,32 +42,86 @@ Every QR code content starts with a prelude `[0x53, 0x<encryption code>,
 `<encryption code>` for signables indicates encryption algorithm that will be
  used to generate the signature:
 
-- `0x00` stands for Ed25519
-- `0x01` stands for Sr25519
-- `0x02` stands for Ecdsa
+<table>
+    <tr>
+        <td><code>0x00</code></td>
+        <td>Ed25519</td>
+    </tr>
+    <tr>
+        <td><code>0x01</code></td>
+        <td>Sr25519</td>
+    </tr>
+    <tr>
+        <td><code>0x02</code></td>
+        <td>Ecdsa</td>
+    </tr>
+</table>
 
 `<encryption code>` for updates indicates encryption algorithm that was used to
 sign the update:
 
-- `0x00` stands for Ed25519
-- `0x01` stands for Sr25519
-- `0x02` stands for Ecdsa
-- `0xff` means the update is not signed
+<table>
+    <tr>
+        <td><code>0x00</code></td>
+        <td>Ed25519</td>
+    </tr>
+    <tr>
+        <td><code>0x01</code></td>
+        <td>Sr25519</td>
+    </tr>
+    <tr>
+        <td><code>0x02</code></td>
+        <td>Ecdsa</td>
+    </tr>
+    <tr>
+        <td><code>0xff</code></td>
+        <td>unsigned</td>
+    </tr>
+</table>
 
 Derivations import and testing are always unsigned, with `<encryption code>`
 always `0xff`.
 
 Signer supports following `<payload code>` variants:
 
-- `0x00` legacy mortal transaction
-- `0x02` transaction (both mortal and immortal)
-- `0x03` message, **content under discussion**
-- `0x80` load metadata update
-- `0x88` load compressed metadata update, **proposal only**
-- `0x81` load types update
-- `0xc1` add specs update
-- `0xde` derivations import
-- `0xf0` testing parser card display
+<table>
+    <tr>
+        <td><code>0x00</code></td>
+        <td>legacy mortal transaction</td>
+    </tr>
+    <tr>
+        <td><code>0x02</code></td>
+        <td>transaction (both mortal and immortal)</td>
+    </tr>
+    <tr>
+        <td><code>0x03</code></td>
+        <td>message, **content under discussion**</td>
+    </tr>
+    <tr>
+        <td><code>0x80</code></td>
+        <td>load metadata update</td>
+    </tr>
+    <tr>
+        <td><code>0x88</code></td>
+        <td>load compressed metadata update, **proposal only**</td>
+    </tr>
+    <tr>
+        <td><code>0x81</code></td>
+        <td>load types update</td>
+    </tr>
+    <tr>
+        <td><code>0xc1</code></td>
+        <td>add specs update</td>
+    </tr>
+    <tr>
+        <td><code>0xde</code></td>
+        <td>derivations import</td>
+    </tr>
+    <tr>
+        <td><code>0xf0</code></td>
+        <td>testing parser card display</td>
+    </tr>
+</table>
 
 Note: old UOS specified `0x00` as mortal transaction and `0x02` as immortal one,
 but currently both mortal and immortal transactions from polkadot-js are `0x02`.
@@ -467,28 +521,21 @@ Message has following structure:
 
 <table>
     <tr>
-        <td>prelude</td><td>public key</td><td>`&[u8]`</td><td>network genesis hash</td>
+        <td>prelude</td><td>public key</td><td><code>[u8]` slice</td><td>network genesis hash</td>
     </tr>
 </table>
 
-The message itself is the `[u8]` slice wrapped in `<Bytes>..</Bytes>`.
-Only `[u8]` slice is rendered for user, however whole payload, including
-`<Bytes>..</Bytes>` wrapping is getting signed.
-
 `[u8]` slice is represented as String if all bytes are valid UTF-8. If not all
-bytes are valid UTF-8 or if the `<Bytes>..</Bytes>` wrapping is not found,
-Signer produces an error.
+bytes are valid UTF-8, the Signer produces an error.
 
 It is critical that the message payloads are always clearly distinguishable from
 the transaction payloads, i.e. it is never possible to trick user to sign
 transaction posing as a message.
 
-`<Bytes>..</Bytes>` wrapping of the messages mean that the would-be sneaked call
-is done in pallet with index `60` (`<` as byte) with method `66` (`B` as byte),
-and that the extensions (typically, the last one is block hash) end in
-`</Bytes>`. This could be any Substrate-compatible metadata. To ensure that
-`<Bytes>..</Bytes>` wrapping is safe, pallet with index `60` and with method
-`66` get blocked in Substrate.
+Current proposal is to enable message signing only with Sr25519 encryption
+algorithm, with designated signing context, different from the signing context
+used for transactions signing. The proposal is currently under discussion,
+therefore the message signing is temporarily disabled.
 
 ## Update
 
@@ -507,6 +554,11 @@ payload.
 Every time user receives an unsigned update, the Signer displays a warning that
 the update is not verified. Generally, the use of unsigned updates is
 discouraged.
+
+For update signing it is recommended to use a dedicated key, not used for
+transactions. This way, if the signed data was not really the update data, but
+something else posing as the update data, the signature produced could not do
+any damage.
 
 | Encryption | Public key length, bytes | Signature length, bytes |
 |:-|:-| :- |
@@ -892,11 +944,11 @@ is rare and quite unexpected operation.
 
 ## Derivations import, payload code `de`
 
-Derivations import has following general structure:
+Derivations import has following structure:
 
 <table>
     <tr>
-        <td>prelude</td><td>update payload</td>
+        <td>prelude</td><td>derivations import payload</td>
     </tr>
 </table>
 
@@ -945,7 +997,7 @@ derivation would collide
 The public key is determined for seed and derivation path combination for given
 encryption algorithm. The public key is not determined by the network. If there
 is already derived key with derivation path `//1` in network `Network 1`,
-adding through derivation import a derivation with path `//01` into another
+adding through derivations import a derivation with path `//01` into another
 network `Network 2` must result in an error.
 
 ## Testing parser card display
