@@ -75,7 +75,7 @@ but currently both mortal and immortal transactions from polkadot-js are `0x02`.
 ## Shared QR code processing sequence:
 
 1. Read QR code, try interpreting it, and get the hexadecimal string from into
-Rust (hexadecimal string is getting changes to raw bytes soon).
+Rust (hexadecimal string is getting changed to raw bytes soon).
 If QR code is not processable, nothing happens and the scanner keeps trying to
 catch a processable one.
 2. Analyze prelude: is it Substrate? is it a known payload type? If not, Signer
@@ -175,7 +175,7 @@ in question.
 
     - Address key is found and is extended to the network used. Signer will
     proceed to try and interpret the call and extensions. Detailed author
-    information will be output regardless of the parsing outcome. <- this is not so currently, need to fix it.
+    information will be shown regardless of the parsing outcome.
     The signing will be allowed only if the parsing is successful.
 
 4. Separate the call and extensions. Call is prefixed by its length compact,
