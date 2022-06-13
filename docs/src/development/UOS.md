@@ -95,7 +95,7 @@ Signer supports following `<payload code>` variants:
     </tr>
     <tr>
         <td><code>0x03</code></td>
-        <td>message, **content under discussion**</td>
+        <td>message, <b>content under discussion</b></td>
     </tr>
     <tr>
         <td><code>0x80</code></td>
@@ -103,7 +103,7 @@ Signer supports following `<payload code>` variants:
     </tr>
     <tr>
         <td><code>0x88</code></td>
-        <td>load compressed metadata update, **proposal only**</td>
+        <td>load compressed metadata update, <b>proposal only</b></td>
     </tr>
     <tr>
         <td><code>0x81</code></td>
@@ -173,7 +173,7 @@ Thus, the transaction structure could also be represented as:
 
 <table>
     <tr>
-        <td>prelude</td><td>public key</td><td>compact of call data length</td><td>**call data**</td><td>**SCALE-encoded extensions**</td><td>network genesis hash</td>
+        <td>prelude</td><td>public key</td><td>compact of call data length</td><td><b>call data</b></td><td><b>SCALE-encoded extensions</b></td><td>network genesis hash</td>
     </tr>
 </table>
 
