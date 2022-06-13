@@ -16,7 +16,8 @@ use crate::helpers::{
 
 /// Display all metadata currenty stored in the hot database
 ///
-/// Function prints for each entry in hot database [`METATREE`] tree:
+/// Function prints for each entry in hot database
+/// [`METATREE`](constants::METATREE) tree:
 ///
 /// - network name
 /// - network version

@@ -200,7 +200,7 @@ impl TypesDisplay {
     }
 }
 
-/// Event content for generating [`SufficientCrypto`]
+/// Event content for generating [`SufficientCrypto`](crate::crypto::SufficientCrypto)
 /// QR code for `load_types` message  
 ///
 /// Effectively records that types information was signed by user.

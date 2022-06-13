@@ -5,25 +5,13 @@
 //! This crate is mainly used to:
 //!
 //! - fetch network data through rpc calls
-//! - prepare Signer update payloads
-//! - generate Signer update QR codes, either signed or unsigned, to be scanned
-//! into Signer
+//! - prepare Signer update and derivation import payloads
+//! - generate Signer update QR codes, either signed or unsigned, and
+//! derivations import QR codes, to be scanned into Signer
 //! - maintain the `hot` database on the network-connected device, to store and
-//! manage the data that went into QR codes
+//! manage the data that went into update QR codes
 //! - maintain Signer default network metadata set in `default` crate and
 //! prepare the `cold` database for the Signer release
-//!
-//! Signer air-gap holds true as long as the data loaded into Signer from the
-//! start is valid and the updates generated and received through the air-gap
-//! are valid and uncompomised.
-//!
-//! Parity maintains [Metadata Portal](https://metadata.parity.io) with network
-//! specs and fresh network metadata QR codes, signed by Parity-associated key.
-//!
-//! To load into Signer network specs and network metadata for the networks not
-//! published on the metadata portal yet or to keep a different trusted
-//! [`CurrentVerifier`](definitions::network_specs::CurrentVerifier) for a
-//! network, crate `generate_message` should be used.
 //!
 //! # Supported Signer updates
 //!
@@ -34,180 +22,390 @@
 //! - `load_metadata`, to load into the Signer the network metadata, for
 //! networks that already have corresponding network specs entry in the Signer
 //! database
-//! - `load_types`, to load types information (it  is used to support the
+//! - `load_types`, to load types information (it is used to support the
 //! transactions parsing in networks with legacy metadata, `RuntimeMetadata`
 //! version below V14)
-//! - `derivations`, for bulk-import of password-free derivations
 //!
 //! Updates are assembled as `Vec<u8>` and could be transformed into:
 //!
 //! - `png` QR codes, static or dynamic multiframe depending on the data size
-//! - hex-encoded string (used mostly for tests)
+//! - hex-encoded string (for tests)
 //!
 //! Information in `add_specs`, `load_metadata` and `load_types` could be either
-//! signed or unsigned. Information in `derivations` could only be unsigned.
+//! signed or unsigned. Using signed updates is strongly encouraged.
 //!
-//! Signed updates contain public key of the payload verifier and its
-//! signature for the payload data.
+//! Update has following general structure:
 //!
-//! Unsigned updates have no public key or signature, and in place of code for
-//! encryption algorithm have a special indicator that payload is unsigned (`ff`
-//! in hex-encoded string).
+//! <table>
+//!     <tr>
+//!         <td>prelude <code>[0x53, 0x<encryption code>, 0x<payload code>]</code></td>
+//!         <td>verifier public key (if signed)</td>
+//!         <td>update payload</td>
+//!         <td>signature (if signed)</td>
+//!         <td>reserved tail, currently empty</td>
+//!     </tr>
+//! </table>
 //!
-//! Updates `add_specs`, `load_metadata`, `load_types` all are build from the
-//! following elements:
-//! - prelude `53xxyy` (in hex format) where `xx` is the encryption type, and
-//! `yy` is the message type  
-//! - verifier public key (if the QR code is signed by verifier)  
-//! - content  
-//! - verifier signature (if the QR code is signed by verifier)
+//! `<encryption code>` indicates encryption algorithm that was used
+//! to sign the update:
 //!
-//! Content of the updates is described in [definitions::qr_transfers].
+//! <table>
+//!     <tr>
+//!         <td><code>0x00</code></td>
+//!         <td>Ed25519</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>0x01</code></td>
+//!         <td>Sr25519</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>0x02</code></td>
+//!         <td>Ecdsa</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>0xff</code></td>
+//!         <td>unsigned</td>
+//!     </tr>
+//! </table>
 //!
-//! Note that the signable payloads are build in such a way that the length of
-//! the payload is always easily found in the update content. This is done to
-//! future-proof the updates if the multi-signing is ever implemented for them.
+//! Update payloads content is described in [definitions::qr_transfers].
 //!
-//! # Networks and verifiers in Signer
+//! <table>
+//!     <tr>
+//!         <th>update payload</th>
+//!         <th>update content type</th>
+//!         <th>data signed, <code>to_sign</code> form</th>
+//!         <th>data in payload, <code>to_transfer</code> form</th>
+//!     </tr>
+//!     <tr>
+//!         <td><code>add_specs</code></td>
+//!         <td><code>ContentAddSpecs</code></td>
+//!         <td>SCALE encoded <code>NetworkSpecsToSend</code></td>
+//!         <td>double SCALE encoded <code>NetworkSpecsToSend</code></td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>load_metadata</code></td>
+//!         <td><code>ContentLoadMeta</code></td>
+//!         <td>concatenated SCALE encoded metadata vector and network genesis hash</td>
+//!         <td>concatenated SCALE encoded metadata vector and network genesis hash</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>load_types</code></td>
+//!         <td><code>ContentLoadTypes</code></td>
+//!         <td>SCALE encoded <code>Vec&ltTypeEntry&gt</code></td>
+//!         <td>double SCALE encoded <code>Vec&ltTypeEntry&gt</code></td>
+//!     </tr>
+//! </table>
 //!
-//! Signer operates only with the networks for which it has
-//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) in the database:
-//! only for these networks it is possible to upload the metadata and parse
-//! transactions.
+//! Note that the update payloads are build in such a way that the length of
+//! the payload always could be easily found, thus allowing to separate update
+//! payload, signature and reserved tail in Signer when accepting the update.
+//! The tail is reserved to future-proof the updates if the multi-signing is
+//! ever implemented for them. Currently the tail is empty.
 //!
-//! By default, Signer supports networks Polkadot, Kusama, and Westend. Any
-//! other Substrate-based network could be added to Signer by scanning and
-//! accepting QR code with `add_specs` payload.
+//! # Updates generation
 //!
-//! Each network has an associated verifier, i.e. some entity that user
-//! trusts to produce valid payloads. Verifier could be anything from more or
-//! less centralized source to individual users themselves.
+//! Updates are generated in following stages:
 //!
-//! Verifier gets set as soon as the `add_specs` payload is accepted by Signer.
-//! Signer keeps track of what verifier has been used for the network, and does
-//! not support verifier downgrades, i.e. using a verifier weaker than the one
-//! used before.
+//! 1. make update payload
+//! 2. (optional) make signature for update payload
+//! 3. make update QR code (optionally signed), that could be scanned into
+//! Signer
 //!
-//! Network metadata (`load_metadata`) updates could be accepted only if they
-//! have exactly same verifier as the one already in the database for that
-//! network.
+//! Steps (1) and (3) are done in `generate_message`, the signature is produced
+//! in other tools, except the test "signed" updates with Alice as a verifier,
+//! when the signature is produced while making QR code during step (3).
 //!
-//! It is possible to accept `add_specs` with stronger verifier, in which case
-//! all previously known network matadata will be removed, `NetworkSpecs` entry
-//! will get updated, and the verifier will be changed.
+//! Signature could be produced with Subkey or with Signer. For update signing
+//! it is recommended to use a dedicated key, not used for transactions. This
+//! way, if the signed data was not really the update data, but something else
+//! posing as the update data, the signature produced could not do any damage.
 //!
-//! Users should practice caution when removing the networks.
+//! If the Signer is used to produce the signature, it should be a dedicated
+//! Signer with no verifier or weak key verifier for the network: before the
+//! signature is produced, an unsigned or easily signed update must be loaded
+//! into Signer.
 //!
-//! Removing the network verified previously by the general verifier will not
-//! change the fact that the expected verifier is the general one, should the
-//! network be added back to Signer.
+//! # Derivations import
 //!
-//! Removing the network verified previously by custom verifier with `Some(_)`
-//! value will cause the network to be **blocked** in Signer until the Signer is
-//! reset. This is a security measure.
+//! Crate `generate_message` can generate derivations import for bulk import of
+//! password-free derivations.
 //!
-//! # Verifiers and payload signing
+//! Derivations import has following structure:
 //!
-//! In Signer, network verifiers, i.e. the verifiers for `add_specs` and
-//! `load_metadata` updates could be general or custom. Update `load_types` can
-//! be verified only by the general verifier.
+//! <table>
+//!     <tr>
+//!         <td>prelude</td>
+//!         <td>derivations import payload</td>
+//!     </tr>
+//! </table>
 //!
-//! General verifier is the strongest and the most reliable verifier known to
-//! the Signer. By default it is set to Parity-associated key, but users can
-//! remove it and set their own. There could be only one general verifier at any
-//! time. Resetting general verifier to a different value (with trust on first
-//! use basis), would remove all the data verified by the previous general
-//! verifier.
+//! Derivations imports are unsigned, and always have the same prelude,
+//! `53ffde`. The payload content is
+//! [`ContentDerivations`](definitions::qr_transfers::ContentDerivations) in
+//! `to_transfer` form.
 //!
-//! Custom verifier is a verifier used specifically for a given network,
-//! different from the general verifier. There could be as many custom verifiers
-//! for different networks as needed.
+//! Derivations import data is assembled as `Vec<u8>` and could be transformed
+//! into:
 //!
-//! Internal verifier-related Signer logic is described in more detail in
-//! [definitions::network_specs].
+//! - `png` QR code, static or dynamic multiframe depending on the data size
+//! - hex-encoded string (for tests)
 //!
-//! Any of the verifiers could be `None` or `Some(_)` with public key of the
-//! trusted entity inside. Although keeping verifiers `None` is dangerous, it
-//! is certainly possible.
+//! Derivations imports are generated from user-provided derivations list and
+//! network information. User provides network address book title when
+//! generating the update, the update itself contains network genesis hash and
+//! [`Encryption`](definitions::crypto::Encryption).
 //!
-//! Verifier `None` originates from unsigned updates, verifier `Some(_)` - from
-//! signed updates. If Signer has `None` for the general verifier, it sets up
-//! `Some(_)` value from first of the accepted signed updates as the general
-//! verifier. After the general verifier is set, without its removal, only
-//! custom verifiers could be set for the networks.
+//! Only password-free derivation are getting in the update. On generation the
+//! user-provided derivation list is searched for valid derivations: each line
+//! is a separate derivation, only soft (`/`) and hard (`//`) derivations are
+//! allowed, any incorrectly formatted or passworded (with `///<password>` part)
+//! derivations are skipped. `generate_message` prints the suitable derivations
+//! found.
 //!
-//! # Signing the payloads
+//! When the update is scanned into the Signer, only password-free valid
+//! derivations are expected to be found in the derivations set, otherwise the
+//! Signer will produce an error. If derivations set gets accepted for a certain
+//! seed, Signer tries to create derived keys for all derivations.
 //!
-//! ## With signatures produced by `subkey`
+//! If a derivation produces exactly same public key with exactly same
+//! derivation path as already in the database or in the import, it get ignored
+//! causing no error. If a derivation produces same public key as already in the
+//! database or in the import, but with **different** derivation path, it causes
+//! an error and all derivations set gets rejected. Note that currently the
+//! checking happens only after the seed is already fed into the Signer.
 //!
+//! # Available commands
 //!
-//! ## With special dedicated Signer
+//! ## Display content of the metadata `METATREE` tree of the hot database
 //!
-//! # Adding a network to the Signer and `add_specs` payload
+//! `$ cargo run show -metadata`
 //!
-//! (purpose, verifiers)
-//! (commands, keys, signing or send to manual?)
+//! Prints for each entry in hot database [`METATREE`](constants::METATREE)
+//! tree:
 //!
-//! # Encryption override
+//! - network name
+//! - network metadata version
+//! - hexadecimal metadata hash
+//! - hexadecimal block hash for the block at which the metadata was fetched
 //!
+//! Note that for each network a maximum of 2 metadata entries is stored in the
+//! hot database at any time.
+//!
+//! ## Display content of the address book `ADDRESS_BOOK` tree of the hot database
+//!
+//! `$ cargo run show -networks`
+//!
+//! Prints for each entry in hot database
+//! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree:
+//!
+//! - address book title for the network `<network_name>-<network_encryption>`,
+//! used only to distinguish between address book entries
+//! - url address at which rpc calls are made for the network
+//! - network encryption
+//! - additional marker that the network is a default one, i.e. entry has not
+//! changed since the database generation
+//! - network title as it will be displayed in Signer, from
 //! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
-//! contains field `encryption`, specifying the encryption supported by the
-//! network.
 //!
-//! This information could not be acquired through rpc call and always must
-//! be provided for non-default networks.
+//! ## Show network specs for a network, as they are recorded in the hot database
 //!
-//! Network encryption is defined with encryption override key: `-ed25519`,
-//! `-sr25519`, or `-ecdsa`.
+//! `$ cargo run show -specs <network_address_book_title>`
 //!
-//! Command `add_specs` **requires** crypto key for key combinations:
+//! Prints network address book title and corresponding
+//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+//! from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree of the hot
+//! database.
 //!
-//! - `-d -u`, not update database, use url address
-//! - `-p -n`, update database, do not print anything, use network address
-//! book title
-//! - `-p -u`, update database, do not print anything, use url address
-//! - `-t -n` (same as `-n`), update database, print data, use network
-//! address book title
-//! - `-t -u` (same as `-u`), update database, print data, use url address
+//! ### Example
 //!
-//! Command `add_specs` **may accept** crypto key for key combinations:
+//! `$ cargo run show -specs westend-sr25519`
 //!
-//! - `-f -n`, with data only from the database, i.e. without rpc calls,
-//! update database with new specs entry, use network address book title as
-//! an identifier
-//! - `-f -u`, with data only from the database, i.e. without rpc calls,
-//! update database with new specs entry, use network url address as
-//! an identifier
+//! ## Check external file with hex-encoded metadata
 //!
-//! # Loading network metadata into the Signer and `load_metadata` payload
+//! `$ cargo run check_file <path>`
 //!
+//! Asserts that:
 //!
-// TODO add some notes here on the language. "update" is whole qr thing that
-// could be read by the Signer. "payload" is the un-husked content part, without
-// prelude, public key, signature. If I mess them up now, reader surely will.
-// QR or text = output format
+//! - the file contains valid metadata, with retrievable network name and
+//! version
+//! - if the metadata for same network name and version is in the hot
+//! database, it completely matches the one from the file
 //!
-//! # Add this somewhere visible probably
+//! ### Example
 //!
+//! `$ cargo run check_file "../defaults/release_metadata/kusama9230"`
 //!
-//! Signer updates with payload `add_specs` are used to add networks into the
-//! Signer.
+//! ## Show metadata fetch block history from `META_HISTORY` tree of the hot database
 //!
-//! `add_specs` updates could be signed or unsigned. For the networks not yet
-//! known to the Signer, `add_specs` signature author becomes the network
-//! verifier in the Signer database. If `add_specs` payload is unsigned,
-//! verifier is set to `None`.
+//! `$ cargo run show -block_history`
 //!
-//! If the network is already known to the Signer, the network information could
-//! be accepted if signed by same or stronger verifier, details are described in
-//! [definitions::network_specs].
+//! Prints block hashes at which the network metadata was fetched as it first
+//! got in the database. If the metadata is from `.wasm` file, there is no entry
+//! until a proper metadata fetch from a node is done with some associated block
+//! hash.
 //!
-//! Updates `add_specs` for a known network (as determined by genesis hash),
-//! including network with known genesis hash and different
-//! [`Encryption`](definitions::crypto::Encryption), could be accepted if signed
-//! by already established verifier or the stronger one. Updates `load_metadata`
-//! for a known network could be accepted only if signed by already established
-//! verifier.
+//! [`META_HISTORY`](constants::META_HISTORY) tree stores all block hashes that
+//! were ever encountered on successful new metadata fetch, and clears only on
+//! the database reset.
+//!
+//! Block hashes could be useful should silent metadata updates (metadata change
+//! with no version bump) happen again.
+//!
+//! ## Prepare `add_specs` update payload
+//!
+//! `$ cargo run add_specs <keys> <argument(s)> <overrides>`
+//!
+//! A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
+//! (optionally) be signed and later be transformed into `add_specs` update
+//! QR. Output file name is `sign_me_add_specs_<name>_<encryption>`.
+//!
+//! Setting keys that could be used in command line (maximum one):
+//!
+//! - `-d`: do **not** update the database, make rpc calls, and produce
+//! output files
+//! - `-f`: do **not** run rpc calls, produce output files using data already in
+//! the database
+//! - `-p`: update or check database through rpc calls, do **not** produce any
+//! output files
+//! - `-t` (no setting key defaults here): update or check database through rpc
+//! calls, produce output files
+//!
+//! <table>
+//!     <tr>
+//!         <th>setting key</th>
+//!         <th>hot database update</th>
+//!         <th>rpc calls</th>
+//!         <th>output update payload</th>
+//!     </tr>
+//!     <tr>
+//!         <td><code>-d</code></td>
+//!         <td>-</td>
+//!         <td>+</td>
+//!         <td>+</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>-f</code></td>
+//!         <td>-</td>
+//!         <td>-</td>
+//!         <td>+</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>-p</code></td>
+//!         <td>+</td>
+//!         <td>+</td>
+//!         <td>-</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>-t</code></td>
+//!         <td>+</td>
+//!         <td>+</td>
+//!         <td>+</td>
+//!     </tr>
+//! </table>
+//!
+//! Reference keys (exactly only one has to be used):
+//!
+//! - `-a`: all networks with entries in the
+//! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
+//! - `-n` followed by single network address book title: for a network with
+//! existing record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+//! - `-u` followed by single url address: reserved for networks with no
+//! record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+//!
+//! `-a` key could be used with `-s` key, to stop processing after first
+//! error.
+//!
+//! Override key specifying encryption algorithm supported by the network is
+//! optional for `-n` reference key (since there is already an entry in the
+//! database with specified encryption) and mandatory for `-u` reference key.
+//! Supported variants are:
+//!
+//! - `-ed25519`
+//! - `-sr25519`
+//! - `-ecdsa`
+//!
+//! Sequence invoking token override could be used when processing an
+//! individual network that has multiple allowed decimals and unit values
+//! retrieved as arrays of equal size. To override token, key `-token` followed
+//! by `u8` decimals value and `String` unit value is used. By default, if no
+//! token override in provided, such networks have `0u8` decimals and `UNIT`
+//! unit set up.
+//!
+//! Title override could be used when processing an individual network, to set
+//! the title under which the network will be displayed in Signer, should the
+//! `add_specs` payload be accepted. Non-default networks, if the title override
+//! is not specified, have title `<network_name>-<network_encryption>`.
+//!
+//! Not all setting and reference key combinations are compatible, and not all
+//! overrides are supported. Users are encouraged to comment if they need some
+//! other than current key combinations available.
+//!
+//! <table>
+//!     <tr>
+//!         <th>setting key</th>
+//!         <th>reference key</th>
+//!         <th>encryption override</th>
+//!         <th>token override</th>
+//!         <th>title override</th>
+//!         <th>comment</th>
+//!     </tr>
+//!     <tr>
+//!         <td><code>-d</code></td>
+//!         <td><code>-u network_url_address</code></td>
+//!         <td>mandatory</td>
+//!         <td>possible, if token array fetched</td>
+//!         <td>possible</td>
+//!         <td>agnostic towards the database</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>-f</code></td>
+//!         <td><code>-a</code></td>
+//!         <td colspan="3">blocked</td>
+//!         <td>uses only the data from the database</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>-f</code></td>
+//!         <td><code>-n network_address_book_title</code></td>
+//!         <td>possible</td>
+//!         <td>blocked</td>
+//!         <td>possible</td>
+//!         <td>no way to check that the token override is reasonable for the network</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>-p</code></td>
+//!         <td><code>-n network_address_book_title</code></td>
+//!         <td>possible</td>
+//!         <td>possible, if token array fetched</td>
+//!         <td>possible</td>
+//!         <td></td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>-p</code></td>
+//!         <td><code>-u network_url_address</code></td>
+//!         <td>mandatory</td>
+//!         <td>possible, if token array fetched</td>
+//!         <td>possible</td>
+//!         <td>reserved for networks with no entries in the database</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>-t</code> or none declared</td>
+//!         <td><code>-n network_address_book_title</code></td>
+//!         <td>possible</td>
+//!         <td>possible, if token array fetched</td>
+//!         <td>possible</td>
+//!         <td></td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>-t</code> or none declared</td>
+//!         <td><code>-u network_url_address</code></td>
+//!         <td>mandatory</td>
+//!         <td>possible, if token array fetched</td>
+//!         <td>possible</td>
+//!         <td>reserved for networks with no entries in the database</td>
+//!     </tr>
+//! </table>
+//!
 #![deny(unused_crate_dependencies)]
 
 use constants::{COLD_DB_NAME_RELEASE, HOT_DB_NAME, TYLO};
@@ -247,9 +445,9 @@ pub fn full_run(command: Command) -> Result<(), ErrorActive> {
             Show::CheckFile(path) => check_file(path),
             Show::BlockHistory => show_block_history(),
         },
-        Command::Types => prep_types::<Active>(HOT_DB_NAME)?.write(TYLO),
-        Command::Load(instruction) => gen_load_meta(instruction),
         Command::Specs(instruction) => gen_add_specs(instruction),
+        Command::Load(instruction) => gen_load_meta(instruction),
+        Command::Types => prep_types::<Active>(HOT_DB_NAME)?.write(TYLO),
         Command::Make(make) => make_message(make),
         Command::Remove(info) => remove_info(info),
         Command::RestoreDefaults => default_hot(),

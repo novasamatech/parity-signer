@@ -16,61 +16,10 @@ use std::{env, path::PathBuf};
 /// Commands to execute
 pub enum Command {
     /// Execute [`Show`] command.
-    ///
-    /// # Display content of the metadata [`METATREE`](constants::METATREE) tree of the hot database
-    ///
-    /// `$ cargo run show -metadata`
-    ///
-    /// Function prints for each entry in hot database
-    /// [`METATREE`](constants::METATREE) tree:
-    ///
-    /// - network name
-    /// - network version
-    /// - hexadecimal metadata hash
-    ///
-    /// # Display content of the address book [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
-    ///
-    /// `$ cargo run show -networks`
-    ///
-    /// Function prints for each entry in hot database
-    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree:
-    ///
-    /// - address book title for the network, used only to distinguish between
-    /// address book entries
-    /// - url address at which rpc calls are made for the network
-    /// - network encryption
-    /// - additional marker that the network is a default one
-    /// - network title as it will be displayed in Signer, from
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
-    ///
-    /// # Show network specs for a network, as they are recorded in the hot database
-    ///
-    /// `$ cargo run show -specs <network address book title>`
-    ///
-    /// Function prints network address book title and corresponding
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
-    /// from [`SPECSTREEPREP`] tree of the hot database.
-    ///
-    /// # Check external file with hex-encoded metadata
-    ///
-    /// `$ cargo run check_file <path>`
-    ///
-    /// Function asserts that:
-    ///
-    /// - the file contains valid metadata, with retrievable network name and
-    /// version
-    /// - if the metadata for same network name and version is in the hot
-    /// database, it completely matches the one from the file
     Show(Show),
 
-    /// # Prepare payload for `load_types` update
-    ///
-    /// `$ cargo run load_types`
-    ///
-    /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
-    /// (optionally) be signed and later be transformed into `load_types` update
-    /// QR. Output file name is `sign_me_load_types`.
-    Types,
+    /// Prepare payload for `add_specs` update according to [`InstructionSpecs`]
+    Specs(InstructionSpecs),
 
     /// # Prepare payload for `load_metadata` update according to
     /// [`InstructionMeta`]
@@ -107,52 +56,14 @@ pub enum Command {
     /// error.
     Load(InstructionMeta),
 
-    /// # Prepare payload for `add_specs` update according to
-    /// [`InstructionSpecs`]
+    /// # Prepare payload for `load_types` update
     ///
-    /// `$ cargo run add_specs <keys> <argument(s)>`
+    /// `$ cargo run load_types`
     ///
     /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
-    /// (optionally) be signed and later be transformed into `add_specs` update
-    /// QR. Output file name is `sign_me_add_specs_<name>_<encryption>`.
-    ///
-    /// Setting keys that could be used in command line (maximum one):
-    ///
-    /// - `-d`: do **not** update the database, make rpc calls, and produce
-    /// output files
-    /// - `-f`: do **not** run rpc calls, produce output files
-    /// - `-p`: update database through rpc calls, do **not** produce any output
-    /// files
-    /// - `-t` (no setting key defaults here): update database through rpc
-    /// calls, produce output files
-    ///
-    /// Reference keys (exactly only one has to be used):
-    ///
-    /// - `-a`: all networks with entries in the
-    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
-    /// - `-n` followed by single network address book title: for a network with
-    /// existing record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-    /// - `-u` followed by single url address: reserved for networks with no
-    /// record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-    ///
-    /// `-a` key could be used with `-s` key, to stop processing after first
-    /// error.
-    ///
-    /// Key specifying encryption algorithm supported by the network is optional
-    /// for `-n` reference key (since there is already an entry in the database
-    /// with specified encryption) and mandatory for `-u` reference key.
-    /// Supported variants are:
-    ///
-    /// - `-ed25519`
-    /// - `-sr25519`
-    /// - `-ecdsa`
-    ///
-    /// Sequence invoking token override could be used when processing
-    /// individual network that (1) has no database record yet and (2) has
-    /// multiple allowed decimals and unit values retrieved as arrays of equal
-    /// size. To override token, key `-token` followed by `u8` decimals value
-    /// and `String` unit value is used.
-    Specs(InstructionSpecs),
+    /// (optionally) be signed and later be transformed into `load_types` update
+    /// QR. Output file name is `sign_me_load_types`.
+    Types,
 
     /// Complete update QR generation, either signed or unsigned
     ///

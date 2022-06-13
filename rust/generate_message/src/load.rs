@@ -405,10 +405,8 @@ fn meta_kpt_a_element(
         )
     } else {
         println!(
-            "Fetched previously known metadata {}{} at block hash {}",
-            meta_fetched.meta_values.name,
-            meta_fetched.meta_values.version,
-            hex::encode(meta_fetched.block_hash)
+            "Fetched previously known metadata {}{}",
+            meta_fetched.meta_values.name, meta_fetched.meta_values.version,
         )
     }
     Ok(())
