@@ -27,6 +27,7 @@ use definitions::{
         ErrorSigner, ExtraAddressKeySourceSigner, InputSigner, InterfaceSigner, Signer,
     },
     keyring::{AddressKey, NetworkSpecsKey},
+    network_specs::Verifier,
     users::AddressDetails,
 };
 
@@ -1617,18 +1618,32 @@ impl State {
             }
             Screen::Settings => {
                 // for now has same content as Screen::Verifier
-                let f = db_handling::helpers::get_general_verifier(dbname)?;
-                // TODO: this code is ugly.
-                let f = if let Some(vv) = f.v {
-                    let card = vv.show_card();
-                    MSettings {
-                        public_key: Some(card.public_key),
-                        identicon: Some(card.identicon),
-                        encryption: Some(card.encryption),
-                        error: None,
+                //
+                // IMPORTANT: this screen should never fail. Ever.
+                // There is no error handling beyond this point,
+                // if this fails - user is stuck here forever.
+                //
+                // Please don't fall into error modal from here,
+                // you have `error` field for that.
+                //
+                // Don't ignore this on refactor like everyone else before you.
+                let f = match db_handling::helpers::get_general_verifier(dbname) {
+                    Ok(Verifier { v: Some(vv) }) => {
+                        let card = vv.show_card();
+                        MSettings {
+                            public_key: Some(card.public_key),
+                            identicon: Some(card.identicon),
+                            encryption: Some(card.encryption),
+                            error: None,
+                        }
                     }
-                } else {
-                    Default::default()
+                    Ok(Verifier { v: None }) => Default::default(),
+                    Err(e) => MSettings {
+                        public_key: None,
+                        identicon: None,
+                        encryption: None,
+                        error: Some(<Signer>::show(&e)),
+                    },
                 };
                 ScreenData::Settings { f }
             }
@@ -1885,7 +1900,9 @@ impl State {
                 Ok(sd) => sd,
                 Err(e) => {
                     errorline.push_str(&<Signer>::show(&e));
-                    new_navstate.alert = Alert::Error;
+                    new_navstate.alert = Alert::ErrorDisplay; //This is special error used only
+                                                              //here; please do not change it to
+                                                              //`Alert::Error` or app may get stuck
                     ScreenData::Settings {
                         f: MSettings::default(),
                     }

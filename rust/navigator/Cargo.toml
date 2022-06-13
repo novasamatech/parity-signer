@@ -22,7 +22,7 @@ image = { version = "0.24.2", default-features = false, features = ["ico"] }
 parser = { path = "../parser", default-features = false }
 quircs = { version = "0.10.0" }
 regex = { version = "1.5.6" }
-db_handling = {path = "../db_handling", default-features = false, features = ["signer", "test"]}
+db_handling = {path = "../db_handling"}
 
 pretty_assertions = "1"
 
