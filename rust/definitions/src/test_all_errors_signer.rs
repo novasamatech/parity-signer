@@ -787,6 +787,12 @@ pub fn error_signer() -> Vec<ErrorSigner> {
         time::error::Format::InvalidComponent("distance"),
     ));
 
+    // `SeedPhraseEmpty` error.
+    out.push(ErrorSigner::SeedPhraseEmpty);
+
+    // `SeedNameEmpty` error.
+    out.push(ErrorSigner::SeedNameEmpty);
+
     out
 }
 
@@ -1178,6 +1184,8 @@ mod tests {
 "Wrong password."
 "No networks available. Please load networks information to proceed."
 "Unable to produce timestamp. The distance component cannot be formatted into the requested format."
+"Signer expected seed phrase, but the seed phrase is empty. Please report this bug."
+"Signer expected seed name, but the seed name is empty. Please report this bug."
 "#;
         assert!(print == print_expected, "\nReceived: {}", print);
     }
