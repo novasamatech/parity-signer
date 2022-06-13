@@ -2942,7 +2942,9 @@ fn flow_test_1() {
 
     do_action(Action::NewKey, "", "").unwrap().unwrap();
     // trying to create the missing root
-    let action = do_action(Action::GoForward, "", "").unwrap().unwrap();
+    let action = do_action(Action::GoForward, "", ALICE_SEED_PHRASE)
+        .unwrap()
+        .unwrap();
 
     let expected_action = ActionResult {
         screen_label: String::new(),
@@ -3733,7 +3735,9 @@ fn flow_test_1() {
     )
     .unwrap();
     // increment swiped `//westend`
-    let action = do_action(Action::Increment, "2", "").unwrap().unwrap();
+    let action = do_action(Action::Increment, "2", ALICE_SEED_PHRASE)
+        .unwrap()
+        .unwrap();
     let mut expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
@@ -3849,7 +3853,9 @@ fn flow_test_1() {
         "",
     )
     .unwrap();
-    let action = do_action(Action::Increment, "1", "").unwrap().unwrap();
+    let action = do_action(Action::Increment, "1", ALICE_SEED_PHRASE)
+        .unwrap()
+        .unwrap();
 
     if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
         f.set.insert(
