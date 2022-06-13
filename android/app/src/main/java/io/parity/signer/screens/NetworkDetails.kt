@@ -7,52 +7,66 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import io.parity.signer.ButtonID
+import io.parity.signer.components.Identicon
 import io.parity.signer.components.MetadataCard
 import io.parity.signer.components.NetworkCard
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
-import org.json.JSONObject
+import io.parity.signer.models.encodeHex
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MNetworkDetails
+import io.parity.signer.uniffi.MscNetworkInfo
 
 @Composable
-fun NetworkDetails(signerDataModel: SignerDataModel) {
-	val content = signerDataModel.screenData.value ?: JSONObject()
-
+fun NetworkDetails(
+	networkDetails: MNetworkDetails,
+	button: (Action, String) -> Unit
+) {
 	Column {
-		NetworkCard(network = content)
+		NetworkCard(
+			network = MscNetworkInfo(
+				networkTitle = networkDetails.title,
+				networkLogo = networkDetails.logo
+			)
+		)
+
 		Row {
 			Text("Network name:")
-			Text(content.optString("name"))
+			Text(networkDetails.name)
 		}
 		Row {
 			Text("base58 prefix:")
-			Text(content.optString("base58prefix"))
+			Text(networkDetails.base58prefix.toString())
 		}
 		Row {
 			Text("decimals:")
-			Text(content.optString("decimals"))
+			Text(networkDetails.decimals.toString())
 		}
 		Row {
 			Text("unit:")
-			Text(content.optString("unit"))
+			Text(networkDetails.unit)
 		}
 		Row {
 			Text("genesis hash:")
-			Text(content.optString("genesis_hash"))
+			Text(
+				networkDetails.genesisHash.toUByteArray()
+					.toByteArray().encodeHex()
+			)
 		}
 		Row {
 			Text("Verifier certificate:")
-			when (content.optJSONObject("current_verifier")?.optString("type") ?: "") {
+			when (networkDetails.currentVerifier.ttype) {
 				"general" -> {
 					Text("general")
 				}
-				"network" -> {
-					Column {
-						Text("custom")
-						Text(
-							content.optJSONObject("current_verifier")?.optString("details")
-								?: ""
-						)
+				"custom" -> {
+					Row {
+						Identicon(identicon = networkDetails.currentVerifier.details.identicon)
+						Column {
+							Text("custom")
+							Text(
+								networkDetails.currentVerifier.details.publicKey
+							)
+							Text("encryption: " + networkDetails.currentVerifier.details.encryption)
+						}
 					}
 				}
 				"none" -> {
@@ -65,17 +79,17 @@ fun NetworkDetails(signerDataModel: SignerDataModel) {
 		}
 		Text("Metadata available:")
 		LazyColumn {
-			items(content.getJSONArray("meta").length()) { index ->
-				val meta = content.getJSONArray("meta").getJSONObject(index)
+			items(networkDetails.meta.size) { index ->
+				val metadataRecord = networkDetails.meta[index]
 				Row(
 					Modifier.clickable {
-						signerDataModel.pushButton(
-							ButtonID.ManageMetadata,
-							details = meta.optString("spec_version")
+						button(
+							Action.MANAGE_METADATA,
+							metadataRecord.specsVersion
 						)
 					}
 				) {
-					MetadataCard(meta = meta)
+					MetadataCard(metadataRecord)
 				}
 			}
 		}

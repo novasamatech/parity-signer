@@ -1,9 +1,9 @@
 package io.parity.signer.components.transactionCards
 
 import androidx.compose.runtime.Composable
-import org.json.JSONObject
+import io.parity.signer.uniffi.MscNameVersion
 
 @Composable
-fun TCNameVersion(payload: JSONObject) {
-	TCNameValueTemplate(name = payload.optString("name"), value = payload.optString("version"))
+fun TCNameVersion(nameVersion: MscNameVersion) {
+	TCNameValueTemplate(name = nameVersion.name, value = nameVersion.name)
 }

@@ -1,5 +1,8 @@
+#![deny(unused_crate_dependencies)]
+
 use anyhow::anyhow;
-use constants::{BACK_COLOR, BORDER, MAIN_COLOR, SCALING};
+use bitvec::prelude::{BitVec, Msb0};
+use constants::{qr_palette, BORDER, SCALING};
 use qrcodegen::{QrCode, QrCodeEcc};
 
 struct QrContent {
@@ -19,13 +22,12 @@ fn prepare_qr_png_data(input: &[u8]) -> anyhow::Result<QrContent> {
     let size: u32 = (qr_code.size() as u32) * (SCALING as u32) + 2 * border_size as u32;
     let mut out: Vec<u8> = Vec::new();
     for y in 0..size {
+        let mut pixels: BitVec<u8, Msb0> = BitVec::with_capacity(size as usize);
         for x in 0..size {
-            if qr_code.get_module(x as i32 / SCALING - BORDER, y as i32 / SCALING - BORDER) {
-                out.push(MAIN_COLOR)
-            } else {
-                out.push(BACK_COLOR)
-            }
+            pixels
+                .push(!qr_code.get_module(x as i32 / SCALING - BORDER, y as i32 / SCALING - BORDER))
         }
+        out.extend_from_slice(&pixels.into_vec());
     }
     Ok(QrContent { content: out, size })
 }
@@ -37,8 +39,9 @@ pub fn png_qr(input: &[u8]) -> anyhow::Result<Vec<u8>> {
     let mut out: Vec<u8> = Vec::new();
 
     let mut encoder = png::Encoder::new(&mut out, qr_content.size, qr_content.size);
-    encoder.set_color(png::ColorType::Grayscale);
-    encoder.set_depth(png::BitDepth::Eight);
+    encoder.set_color(png::ColorType::Indexed);
+    encoder.set_palette(qr_palette());
+    encoder.set_depth(png::BitDepth::One);
 
     let mut writer = match encoder.write_header() {
         Ok(x) => x,

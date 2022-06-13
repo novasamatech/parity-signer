@@ -4,20 +4,20 @@ use definitions::{
     history::MetaValuesDisplay,
     keyring::VerifierKey,
     metadata::MetaValues,
+    navigation::{TransactionCard, TransactionCardSet},
     network_specs::{NetworkSpecs, VerifierValue},
     qr_transfers::ContentLoadTypes,
     test_all_errors_signer::error_signer,
     users::AddressDetails,
 };
-use hex;
 use parser::cards::ParserCard;
-use sp_core::crypto::AccountId32;
+use sp_core::{crypto::AccountId32, H256};
 use sp_runtime::{generic::Era, MultiSigner};
-use std::convert::TryInto;
+use std::str::FromStr;
 
 use crate::cards::{Card, Warning};
 use crate::holds::{GeneralHold, Hold};
-use crate::Action;
+use crate::TransactionAction;
 
 const PUBLIC: [u8; 32] = [
     142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201,
@@ -25,27 +25,26 @@ const PUBLIC: [u8; 32] = [
 ];
 
 fn verifier_value_sr25519() -> VerifierValue {
-    VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(
-        PUBLIC,
-    )))
+    VerifierValue::Standard {
+        m: MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)),
+    }
 }
 
 /// Function to pring all types of cards.
 /// Should be used to check how the cards are printed in the app.
 
-pub fn make_all_cards() -> Action {
+pub fn make_all_cards() -> TransactionAction {
     let mut index = 0;
-    let mut all_cards: Vec<String> = Vec::new();
+    let mut all_cards: Vec<TransactionCard> = Vec::new();
+    let mut warning: Vec<TransactionCard> = Vec::new();
     let network_specs_westend = NetworkSpecs {
         base58prefix: 42,
         color: String::from("#660D35"),
         decimals: 12,
         encryption: Encryption::Sr25519,
-        genesis_hash: hex::decode(
+        genesis_hash: H256::from_str(
             "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         )
-        .expect("known value")
-        .try_into()
         .expect("known value"),
         logo: String::from("westend"),
         name: String::from("westend"),
@@ -130,9 +129,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     all_cards.push(Card::ParserCard(&ParserCard::Nonce("15".to_string())).card(&mut index, 0));
     all_cards.push(
         Card::ParserCard(&ParserCard::BlockHash(
-            hex::decode("a8dfb73a4b44e6bf84affe258954c12db1fe8e8cf00b965df2af2f49c1ec11cd")
-                .expect("checked value")
-                .try_into()
+            H256::from_str("a8dfb73a4b44e6bf84affe258954c12db1fe8e8cf00b965df2af2f49c1ec11cd")
                 .expect("checked value"),
         ))
         .card(&mut index, 0),
@@ -188,8 +185,9 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     all_cards.push(Card::TypesInfo(ContentLoadTypes::from_slice(&[])).card(&mut index, 0));
     all_cards.push(Card::NewSpecs(&network_specs_westend.to_send()).card(&mut index, 0));
     all_cards.push(Card::NetworkInfo(&network_specs_westend).card(&mut index, 0));
-    all_cards
-        .push(Card::NetworkGenesisHash(&network_specs_westend.genesis_hash).card(&mut index, 0));
+    all_cards.push(
+        Card::NetworkGenesisHash(network_specs_westend.genesis_hash.as_bytes()).card(&mut index, 0),
+    );
     all_cards.push(
         Card::Derivations(&[
             "//Alice".to_string(),
@@ -199,19 +197,19 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         .card(&mut index, 0),
     );
 
-    all_cards.push(Card::Warning(Warning::AuthorNotFound).card(&mut index, 0));
-    all_cards.push(
+    warning.push(Card::Warning(Warning::AuthorNotFound).card(&mut index, 0));
+    warning.push(
         Card::Warning(Warning::NewerVersion {
             used_version: 50,
             latest_version: 9010,
         })
         .card(&mut index, 0),
     );
-    all_cards.push(Card::Warning(Warning::NoNetworkID).card(&mut index, 0));
-    all_cards.push(Card::Warning(Warning::NotVerified).card(&mut index, 0));
-    all_cards.push(Card::Warning(Warning::UpdatingTypes).card(&mut index, 0));
-    all_cards.push(Card::Warning(Warning::TypesNotVerified).card(&mut index, 0));
-    all_cards.push(
+    warning.push(Card::Warning(Warning::NoNetworkID).card(&mut index, 0));
+    warning.push(Card::Warning(Warning::NotVerified).card(&mut index, 0));
+    warning.push(Card::Warning(Warning::UpdatingTypes).card(&mut index, 0));
+    warning.push(Card::Warning(Warning::TypesNotVerified).card(&mut index, 0));
+    warning.push(
         Card::Warning(Warning::GeneralVerifierAppeared(&GeneralHold {
             metadata_set: Vec::new(),
             network_specs_set: Vec::new(),
@@ -219,9 +217,9 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         }))
         .card(&mut index, 0),
     );
-    all_cards.push(
+    warning.push(
         Card::Warning(Warning::VerifierChangingToGeneral {
-            verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash),
+            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash),
             hold: &Hold {
                 metadata_set: Vec::new(),
                 network_specs_set: Vec::new(),
@@ -229,9 +227,9 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         })
         .card(&mut index, 0),
     );
-    all_cards.push(
+    warning.push(
         Card::Warning(Warning::VerifierChangingToCustom {
-            verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash),
+            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash),
             hold: &Hold {
                 metadata_set: Vec::new(),
                 network_specs_set: Vec::new(),
@@ -239,9 +237,9 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         })
         .card(&mut index, 0),
     );
-    all_cards.push(
+    warning.push(
         Card::Warning(Warning::VerifierGeneralSuper {
-            verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash),
+            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash),
             hold: &Hold {
                 metadata_set: Vec::new(),
                 network_specs_set: Vec::new(),
@@ -249,28 +247,26 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         })
         .card(&mut index, 0),
     );
-    all_cards.push(Card::Warning(Warning::TypesAlreadyThere).card(&mut index, 0));
-    all_cards.push(
+    warning.push(Card::Warning(Warning::TypesAlreadyThere).card(&mut index, 0));
+    warning.push(
         Card::Warning(Warning::NetworkSpecsAlreadyThere(
             &network_specs_westend.title,
         ))
         .card(&mut index, 0),
     );
-    all_cards.push(Card::Warning(Warning::MetadataExtensionsIncomplete).card(&mut index, 0));
+    warning.push(Card::Warning(Warning::MetadataExtensionsIncomplete).card(&mut index, 0));
 
-    for e in error_signer().into_iter() {
-        all_cards.push(Card::Error(e).card(&mut index, 0));
+    let errors = error_signer()
+        .into_iter()
+        .map(|e| Card::Error(e).card(&mut index, 0))
+        .collect();
+
+    TransactionAction::Read {
+        r: TransactionCardSet {
+            meta: Some(all_cards),
+            error: Some(errors),
+            warning: Some(warning),
+            ..Default::default()
+        },
     }
-
-    let mut output_cards = String::from("\"method\":[");
-
-    for (i, x) in all_cards.iter().enumerate() {
-        if i > 0 {
-            output_cards.push(',')
-        }
-        output_cards.push_str(x);
-    }
-
-    output_cards.push(']');
-    Action::Read(output_cards)
 }

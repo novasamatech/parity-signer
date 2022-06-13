@@ -45,8 +45,11 @@ pub fn pass_crypto(
                 None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
             };
             if ed25519::Pair::verify(&signature, &message, &pubkey) {
-                let verifier =
-                    Verifier(Some(VerifierValue::Standard(MultiSigner::Ed25519(pubkey))));
+                let verifier = Verifier {
+                    v: Some(VerifierValue::Standard {
+                        m: MultiSigner::Ed25519(pubkey),
+                    }),
+                };
                 Ok(InfoPassedCrypto {
                     verifier,
                     message,
@@ -79,8 +82,11 @@ pub fn pass_crypto(
                 None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
             };
             if sr25519::Pair::verify(&signature, &message, &pubkey) {
-                let verifier =
-                    Verifier(Some(VerifierValue::Standard(MultiSigner::Sr25519(pubkey))));
+                let verifier = Verifier {
+                    v: Some(VerifierValue::Standard {
+                        m: MultiSigner::Sr25519(pubkey),
+                    }),
+                };
                 Ok(InfoPassedCrypto {
                     verifier,
                     message,
@@ -113,7 +119,11 @@ pub fn pass_crypto(
                 None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
             };
             if ecdsa::Pair::verify(&signature, &message, &pubkey) {
-                let verifier = Verifier(Some(VerifierValue::Standard(MultiSigner::Ecdsa(pubkey))));
+                let verifier = Verifier {
+                    v: Some(VerifierValue::Standard {
+                        m: MultiSigner::Ecdsa(pubkey),
+                    }),
+                };
                 Ok(InfoPassedCrypto {
                     verifier,
                     message,
@@ -130,7 +140,7 @@ pub fn pass_crypto(
                 None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
             };
             let (message, tail) = cut_data(data, content)?;
-            let verifier = Verifier(None);
+            let verifier = Verifier { v: None };
             Ok(InfoPassedCrypto {
                 verifier,
                 message,

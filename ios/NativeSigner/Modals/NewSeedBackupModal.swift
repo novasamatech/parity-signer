@@ -16,10 +16,10 @@ struct NewSeedBackupModal: View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg200"))
             VStack {
-                HeaderBar(line1: "Backup Seed Phrase", line2: content.seed.decode64())
+                HeaderBar(line1: "Backup Seed Phrase", line2: content.seed)
                 ZStack {
                     //RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Crypto100")).frame(height: 200)
-                    Text(content.seed_phrase)
+                    Text(content.seedPhrase)
                         .font(.system(size: 16, weight: .semibold, design: .monospaced))
                         .foregroundColor(Color("Crypto400"))
                         .padding(8)
@@ -50,7 +50,7 @@ struct NewSeedBackupModal: View {
                     BigButton(
                         text: "Next",
                         action: {
-                            data.restoreSeed(seedName: content.seed, seedPhrase: content.seed_phrase, createRoots: createRoots)
+                            data.restoreSeed(seedName: content.seed, seedPhrase: content.seedPhrase, createRoots: createRoots)
                         },
                         isDisabled: !confirmBackup
                     )

@@ -1,8 +1,7 @@
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES, VERIFIERS};
 use db_handling::{
     db_transactions::TrDbColdStub,
-    helpers::{get_general_verifier, open_db, open_tree},
-    prep_messages::prep_types,
+    helpers::{get_general_verifier, open_db, open_tree, prep_types},
 };
 use definitions::{
     error::ErrorSource,
@@ -55,7 +54,7 @@ fn collect_set(
     let mut name_found: Option<String> = None;
     for x in chainspecs.iter().flatten() {
         let network_specs = NetworkSpecs::from_entry_checked::<Signer>(x)?;
-        if network_specs.genesis_hash == genesis_hash[..] {
+        if network_specs.genesis_hash.as_bytes() == &genesis_hash[..] {
             name_found = match name_found {
                 Some(n) => {
                     if n != network_specs.name {
@@ -63,7 +62,7 @@ fn collect_set(
                             DatabaseSigner::DifferentNamesSameGenesisHash {
                                 name1: n,
                                 name2: network_specs.name,
-                                genesis_hash,
+                                genesis_hash: network_specs.genesis_hash,
                             },
                         ));
                     }
@@ -113,7 +112,7 @@ impl GeneralHold {
         let settings = open_tree::<Signer>(&database, SETTREE)?;
         let verifiers = open_tree::<Signer>(&database, VERIFIERS)?;
         for (verifier_key_vec, current_verifier_encoded) in verifiers.iter().flatten() {
-            let verifier_key = VerifierKey::from_ivec(&verifier_key_vec);
+            let verifier_key = VerifierKey::from_ivec::<Signer>(&verifier_key_vec)?;
             let current_verifier =
                 match <CurrentVerifier>::decode(&mut &current_verifier_encoded[..]) {
                     Ok(a) => a,
@@ -153,9 +152,9 @@ impl GeneralHold {
     ) -> Result<TrDbColdStub, ErrorSigner> {
         let former_general_verifier = get_general_verifier(database_name)?;
         let mut out = stub;
-        out = out.new_history_entry(Event::Warning(
-            Warning::GeneralVerifierAppeared(self).show(),
-        ));
+        out = out.new_history_entry(Event::Warning {
+            warning: Warning::GeneralVerifierAppeared(self).show(),
+        });
         for x in self.metadata_set.iter() {
             out = out.remove_metadata(x)
         }
@@ -229,14 +228,16 @@ impl Hold {
             }
             .show(),
         };
-        out = out.new_history_entry(Event::Warning(warning));
+        out = out.new_history_entry(Event::Warning { warning });
         for x in self.metadata_set.iter() {
             out = out.remove_metadata(x)
         }
         for x in self.network_specs_set.iter() {
             out = out.remove_network_specs(
                 x,
-                &ValidCurrentVerifier::Custom(former_verifier.to_owned()),
+                &ValidCurrentVerifier::Custom {
+                    v: former_verifier.to_owned(),
+                },
                 &general_verifier,
             )
         }

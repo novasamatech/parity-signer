@@ -11,10 +11,10 @@ import SwiftUI
  * Parse identicon from backend into picture
  */
 struct Identicon: View {
-    let identicon: String
-    let rowHeight: CGFloat = 28
+    let identicon: [UInt8]
+    var rowHeight: CGFloat = 28
     var body: some View {
-        Image(uiImage: UIImage(data: Data(fromHexEncodedString: identicon) ?? Data()) ?? UIImage())
+        Image(uiImage: UIImage(data: Data(identicon)) ?? UIImage())
             .resizable(resizingMode: .stretch)
             .frame(width: rowHeight, height: rowHeight)
     }

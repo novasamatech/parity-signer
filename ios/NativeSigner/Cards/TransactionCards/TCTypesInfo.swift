@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct TCTypesInfo: View {
-    var content: TypesInfo
+    var content: MTypesInfo
     var body: some View {
         HStack {
-            Identicon(identicon: content.types_id_pic)
-            TCNameValueTemplate(name: "Types hash:", value: content.types_hash)
+            Identicon(identicon: content.typesIdPic ?? [])
+            TCNameValueTemplate(name: "Types hash:", value: content.typesHash ?? "")
         }
     }
 }

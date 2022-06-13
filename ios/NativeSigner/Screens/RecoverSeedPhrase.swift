@@ -11,7 +11,7 @@ struct RecoverSeedPhrase: View {
     @EnvironmentObject var data: SignerDataModel
     @State private var userInput: String = " "
     @State private var createRoots: Bool = true
-    @State private var errorMessage: String? = ""
+    @State private var shadowUserInput: String = " "
     @FocusState private var focus: Bool
     var content: MRecoverSeedPhrase
     
@@ -20,7 +20,7 @@ struct RecoverSeedPhrase: View {
             ScrollView {
                 VStack {
                     //SeedNameCardOfSomeKind
-                    Text(content.seed_name.decode64())
+                    Text(content.seedName)
                     VStack(alignment: .leading) {
                         Text("SEED PHRASE").font(FBase(style: .overline))
                         VStack {
@@ -46,15 +46,19 @@ struct RecoverSeedPhrase: View {
                                     .keyboardType(.asciiCapable)
                                     .submitLabel(.done)
                                     .onChange(of: userInput, perform: { word in
-                                        data.pushButton(buttonID: .TextEntry, details: word)
+                                        data.pushButton(action: .textEntry, details: word)
+                                        shadowUserInput = word
                                     })
                                     .onSubmit {
                                     }
+                                    .onChange(of: shadowUserInput, perform: { word in
+                                        userInput = " " + content.userInput
+                                    })
                                     .onChange(of: content, perform: { input in
-                                        userInput = input.user_input
+                                        userInput = " " + input.userInput // TODO: this in rust
                                     })
                                     .onAppear(perform: {
-                                        userInput = content.user_input
+                                        userInput = " " + content.userInput
                                         focus = content.keyboard
                                     })
                                     .padding(.horizontal, 12)
@@ -66,10 +70,10 @@ struct RecoverSeedPhrase: View {
                         
                         ScrollView(.horizontal) {
                             LazyHStack {
-                                ForEach(content.guess_set, id: \.self) { guess in
+                                ForEach(content.guessSet, id: \.self) { guess in
                                     VStack {
                                         Button(action: {
-                                            data.pushButton(buttonID: .PushWord, details: guess)
+                                            data.pushButton(action: .pushWord, details: guess)
                                         }) {
                                             Text(guess)
                                                 .foregroundColor(Color("Crypto400"))
@@ -102,9 +106,9 @@ struct RecoverSeedPhrase: View {
                                 BigButton(
                                     text: "Next",
                                     action: {
-                                        data.restoreSeed(seedName: content.seed_name, seedPhrase: content.ready_seed ?? "", createRoots: createRoots)
+                                        data.restoreSeed(seedName: content.seedName, seedPhrase: content.readySeed ?? "", createRoots: createRoots)
                                     },
-                                    isDisabled: content.ready_seed == nil
+                                    isDisabled: content.readySeed == nil
                                 )
                                     .padding(.top, 16.0)
                             }

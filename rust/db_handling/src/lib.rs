@@ -27,10 +27,13 @@
 
 #![deny(unused_crate_dependencies)]
 
+// possibly TODO: rename all database_name into database_path or whatever,
+// currently it is quite confusing
+
 #[cfg(feature = "active")]
-use constants::{COLD_DB_NAME, COLD_DB_NAME_RELEASE, HOT_DB_NAME};
+use constants::{COLD_DB_NAME_RELEASE, HOT_DB_NAME};
 #[cfg(feature = "active")]
-use definitions::{error_active::ErrorActive, network_specs::Verifier};
+use definitions::error_active::ErrorActive;
 #[cfg(feature = "active")]
 use std::path::PathBuf;
 
@@ -50,37 +53,25 @@ pub mod interface_signer;
 
 pub mod manage_history;
 
-#[cfg(feature = "active")]
-pub mod metadata;
-
-pub mod network_details;
-
-pub mod prep_messages;
-
-#[cfg(feature = "signer")]
-pub mod remove_network;
-
-#[cfg(feature = "signer")]
-pub mod remove_types;
-
 #[cfg(feature = "test")]
 #[cfg(test)]
 pub mod tests;
 
 #[cfg(feature = "active")]
-use cold_default::{populate_cold, populate_cold_release};
+use cold_default::populate_cold_release;
 #[cfg(feature = "active")]
 use hot_default::reset_hot_database;
 
-/// Generate "cold" database with default values, **for release build**.
+/// Generate or restore "cold" database with default values, **for release
+/// build**.
 ///
 /// Resulting database should be copied verbatim into Signer files during the
 /// build.
 ///
-/// The location of the generated database is either optional user-provided path,
-/// or default `../database/database_cold_release` folder.
+/// The location of the generated database is either optional user-provided
+/// path, or default [`COLD_DB_NAME_RELEASE`] folder.
 ///
-/// The cold release database contains:
+/// The cold release database, as generated, contains:
 ///
 /// - network specs for default networks (Polkadot, Kusama, Westend)
 /// - verifier information for default networks, with verifiers set to the
@@ -88,8 +79,7 @@ use hot_default::reset_hot_database;
 /// - two latest metadata versions for default networks
 /// - default types information
 ///
-/// Also during the cold release database generation the trees `ADDRTREE`,
-/// `HISTORY`, and `TRANSACTION` are cleared.
+/// The trees `ADDRTREE`, `HISTORY`, and `TRANSACTION` are cleared.
 ///
 /// Note that resulting database history is not initialized and general
 /// verifier is not set.
@@ -105,36 +95,17 @@ pub fn default_cold_release(path: Option<PathBuf>) -> Result<(), ErrorActive> {
     populate_cold_release(database_name)
 }
 
-/// Generate "cold" database with default values and Alice identities, **for
-/// tests**.
+/// Generate or restore "hot" database with default values.
 ///
-/// This was previously used for tests in Signer, may go obsolete.
+/// The location of the generated database is default [`HOT_DB_NAME`] folder.
 ///
-/// The location of the generated database is `../database/database_cold` folder.
+/// The hot database, as generated, contains:
 ///
-/// The test cold database contains:
-///
-/// - network specs for default networks (Polkadot, Kusama, Westend)
-/// - verifier information for default networks, with verifiers set to the
-/// general one
-/// - test metadata entries for default networks (old ones)
+/// - address book entries for default networks (Polkadot, Kusama, Westend)
+/// - network specs for default networks
 /// - default types information
-/// - addressed for Alice in test networks
-/// - initiated history
-/// - general verifier value set to `None`
-///
-/// `TRANSACTION` tree is cleared.
-///
-/// This operation is performed **not** on Signer device, and is governed by
-/// the active side.
-#[cfg(feature = "active")]
-pub fn default_cold() -> Result<(), ErrorActive> {
-    let database_name = COLD_DB_NAME;
-    populate_cold(database_name, Verifier(None))
-}
-
-/// Function to reset default "hot" database.
-/// Active side operation, ErrorActive is used
+/// - **no** metadata entries; the `METATREE` is cleared - all metadata in the
+/// hot database is received only through rpc calls.
 #[cfg(feature = "active")]
 pub fn default_hot() -> Result<(), ErrorActive> {
     let database_name = HOT_DB_NAME;

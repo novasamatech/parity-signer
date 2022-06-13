@@ -225,7 +225,7 @@ pub fn process_indices(
 }
 
 /// Function to search through chainspecs tree of the database for the given genesis hash
-pub fn genesis_hash_in_hot_db(genesis_hash: [u8; 32]) -> Result<bool, ErrorActive> {
+pub fn genesis_hash_in_hot_db(genesis_hash: sp_core::H256) -> Result<bool, ErrorActive> {
     let database = open_db::<Active>(HOT_DB_NAME)?;
     let chainspecs = open_tree::<Active>(&database, SPECSTREEPREP)?;
     let mut out = false;

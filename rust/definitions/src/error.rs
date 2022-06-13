@@ -1,6 +1,6 @@
 //! Trait [`ErrorSource`] and error-related types shared by Signer and active
 //! sides
-use sp_core::crypto::SecretStringError;
+use sp_core::{crypto::SecretStringError, H256};
 use sp_runtime::MultiSigner;
 #[cfg(feature = "test")]
 use variant_count::VariantCount;
@@ -15,10 +15,10 @@ use crate::{
 /// Error trait for Signer and Signer-ecosystem tools
 ///
 /// [`ErrorSource`] is implemented for:
-/// - [`Active`](crate::error_active::Active) (errors on the active side -
-/// either hot database errors or errors while preparing cold database
-/// before its moving into Signer)
-/// - [`Signer`](crate::error_signer::Signer) (errors on the Signer side)
+///
+/// - `Active`, errors on the active side: either hot database errors or errors
+/// while preparing cold database before its moving into Signer
+/// - `Signer`, errors on the Signer side
 pub trait ErrorSource {
     /// Enum listing all possible errors
     type Error;
@@ -111,7 +111,7 @@ pub trait ErrorSource {
     /// `Error` when there is genesis hash mismatch between stored
     /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) contents and the
     /// [`NetworkSpecsKey`]
-    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: Vec<u8>) -> Self::Error;
+    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: H256) -> Self::Error;
 
     /// `Error` when there is encryption mismatch between stored
     /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) contents and the
@@ -156,6 +156,9 @@ pub trait ErrorSource {
     /// `Error` when metadata for the network with given name and version was
     /// expected to be in the database, but was not found
     fn metadata_not_found(name: String, version: u32) -> Self::Error;
+
+    /// `Error` when time could not be formatted for history record
+    fn timestamp_format(error: time::error::Format) -> Self::Error;
 
     /// Print `Error` as a `String`
     ///
@@ -222,7 +225,7 @@ pub enum AddressGeneration<T: ErrorSource + ?Sized> {
 #[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum AddressGenerationCommon {
     /// Same public key was produced for a different seed phrase and/or
-    /// derivation path
+    /// derivation path, as already existing in the database.
     ///
     /// Address is generated within a network using seed phrase and derivation
     /// path.
@@ -243,6 +246,17 @@ pub enum AddressGenerationCommon {
     ///
     /// This is called here `KeyCollision`, and results in error.
     KeyCollision { seed_name: String },
+
+    /// Same public key was produced for a different seed phrase and/or
+    /// derivation path, during database transaction preparation (not yet in
+    /// the database).
+    KeyCollisionBatch {
+        seed_name_existing: String,
+        seed_name_new: String,
+        cropped_path_existing: String,
+        cropped_path_new: String,
+        in_this_network: bool,
+    },
 
     /// Error in [`SecretString`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/type.SecretString.html).
     ///
@@ -282,6 +296,19 @@ impl AddressGenerationCommon {
         match &self {
             AddressGenerationCommon::KeyCollision { seed_name } => {
                 format!("Address key collision for seed name {}", seed_name)
+            }
+            AddressGenerationCommon::KeyCollisionBatch {
+                seed_name_existing,
+                seed_name_new,
+                cropped_path_existing,
+                cropped_path_new,
+                in_this_network,
+            } => {
+                if *in_this_network {
+                    format!("Tried to create colliding addresses within same network. Address for seed name {} and path {} has same public key as address for seed name {} and path {}.", seed_name_new, cropped_path_new, seed_name_existing, cropped_path_existing)
+                } else {
+                    format!("Tried to create colliding addresses within different networks. Address for seed name {} and path {} has same public key as address for seed name {} and path {}.", seed_name_new, cropped_path_new, seed_name_existing, cropped_path_existing)
+                }
             }
             AddressGenerationCommon::SecretString(e) => {
                 format!("Bad secret string: {}.", bad_secret_string(e))

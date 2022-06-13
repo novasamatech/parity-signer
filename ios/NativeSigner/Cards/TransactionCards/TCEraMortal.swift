@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TCEraMortal: View {
-    var eraMortal: EraMortal
+    var eraMortal: MscEraMortal
     var body: some View {
         VStack {
             TCNameValueTemplate(name: "phase", value: eraMortal.phase)

@@ -8,9 +8,12 @@
 //! and to make sure no entries are left missing in case of [`ErrorSigner`]
 //! updating.
 
+use std::str::FromStr;
+
 use anyhow::anyhow;
 use sled::{transaction::TransactionError, IVec};
 use sp_core::crypto::SecretStringError;
+use sp_core::H256;
 use sp_runtime::MultiSigner;
 
 use crate::crypto::Encryption;
@@ -32,21 +35,23 @@ const PUBLIC: [u8; 32] = [
 
 /// `Verifier` mock value.
 fn verifier_sr25519() -> Verifier {
-    Verifier(Some(verifier_value_sr25519()))
+    Verifier {
+        v: Some(verifier_value_sr25519()),
+    }
 }
 
 /// `VerifierValue` mock value.
 fn verifier_value_sr25519() -> VerifierValue {
-    VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(
-        PUBLIC,
-    )))
+    VerifierValue::Standard {
+        m: MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)),
+    }
 }
 
 /// Another `VerifierValue` mock value.
 fn verifier_value_ed25519() -> VerifierValue {
-    VerifierValue::Standard(MultiSigner::Ed25519(sp_core::ed25519::Public::from_raw(
-        PUBLIC,
-    )))
+    VerifierValue::Standard {
+        m: MultiSigner::Ed25519(sp_core::ed25519::Public::from_raw(PUBLIC)),
+    }
 }
 
 /// Mock non-hexadecimal `String`.
@@ -90,16 +95,13 @@ fn meta_key() -> MetaKey {
 /// `VerifierKey` mock value.
 fn verifier_key() -> VerifierKey {
     VerifierKey::from_parts(
-        &hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").unwrap(),
+        H256::from_str("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").unwrap(),
     )
 }
 
 /// `[u8; 32]` genesis hash mock value.
-fn genesis_hash() -> [u8; 32] {
-    hex::decode("e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
-        .unwrap()
-        .try_into()
-        .unwrap()
+fn genesis_hash() -> H256 {
+    H256::from_str("e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap()
 }
 
 /// Possible `sled::Error` errors (https://docs.rs/sled/0.34.6/sled/enum.Error.html).
@@ -272,7 +274,7 @@ fn mismatch_signer() -> Vec<MismatchSigner> {
         },
         MismatchSigner::SpecsGenesisHash {
             key: network_specs_key_good(),
-            genesis_hash: genesis_hash().to_vec(),
+            genesis_hash: genesis_hash(),
         },
         MismatchSigner::SpecsEncryption {
             key: network_specs_key_good(),
@@ -347,8 +349,8 @@ fn database_signer() -> Vec<DatabaseSigner> {
     // All remaining [`DatabaseSigner`] errors.
     out.append(&mut vec![
         DatabaseSigner::UnexpectedGenesisHash {
-            verifier_key: VerifierKey::from_parts(&genesis_hash()),
-            network_specs_key: network_specs_key_good(),
+            name: String::from("westend"),
+            genesis_hash: genesis_hash(),
         },
         DatabaseSigner::SpecsCollision {
             name: String::from("westend"),
@@ -357,7 +359,7 @@ fn database_signer() -> Vec<DatabaseSigner> {
         DatabaseSigner::DifferentNamesSameGenesisHash {
             name1: String::from("westend"),
             name2: String::from("WeStEnD"),
-            genesis_hash: genesis_hash().to_vec(),
+            genesis_hash: genesis_hash(),
         },
         DatabaseSigner::CustomVerifierIsGeneral(verifier_key()),
         DatabaseSigner::TwoRootKeys {
@@ -416,10 +418,16 @@ fn input_signer() -> Vec<InputSigner> {
             version: 9122,
         },
         InputSigner::ImportantSpecsChanged(network_specs_key_good()),
-        InputSigner::DifferentBase58 {
+        InputSigner::AddSpecsDifferentBase58 {
             genesis_hash: genesis_hash(),
+            name: String::from("westend"),
             base58_database: 42,
             base58_input: 104,
+        },
+        InputSigner::AddSpecsDifferentName {
+            genesis_hash: genesis_hash(),
+            name_database: String::from("westend"),
+            name_input: String::from("WeStEnD"),
         },
         InputSigner::EncryptionNotSupported(String::from("03")),
         InputSigner::BadSignature,
@@ -430,6 +438,11 @@ fn input_signer() -> Vec<InputSigner> {
             name: String::from("westend"),
             valid_current_verifier: ValidCurrentVerifier::General,
             general_verifier: verifier_sr25519(),
+        },
+        InputSigner::LoadMetaWrongGenesisHash {
+            name_metadata: String::from("acala"),
+            name_specs: String::from("westend"),
+            genesis_hash: genesis_hash(),
         },
         InputSigner::NeedVerifier {
             name: String::from("kulupu"),
@@ -487,7 +500,7 @@ fn input_signer() -> Vec<InputSigner> {
         InputSigner::TypesKnown,
         InputSigner::MessageNotReadable,
         InputSigner::UnknownNetwork {
-            genesis_hash: genesis_hash().to_vec(),
+            genesis_hash: genesis_hash(),
             encryption: Encryption::Sr25519,
         },
         InputSigner::NoMetadata {
@@ -549,9 +562,18 @@ fn not_found_signer() -> Vec<NotFoundSigner> {
 /// Collecting all [`AddressGenerationCommon`] errors.
 fn address_generation_common() -> Vec<AddressGenerationCommon> {
     // `KeyCollision` error.
-    let mut out = vec![AddressGenerationCommon::KeyCollision {
-        seed_name: String::from("Alice"),
-    }];
+    let mut out = vec![
+        AddressGenerationCommon::KeyCollision {
+            seed_name: String::from("Alice"),
+        },
+        AddressGenerationCommon::KeyCollisionBatch {
+            seed_name_existing: String::from("Alice"),
+            seed_name_new: String::from("Alice"),
+            cropped_path_existing: String::from("//1"),
+            cropped_path_new: String::from("//01"),
+            in_this_network: true,
+        },
+    ];
 
     // `AddressGenerationCommon` errors.
     out.append(
@@ -759,6 +781,11 @@ pub fn error_signer() -> Vec<ErrorSigner> {
 
     // `NoNetworksAvailable` error.
     out.push(ErrorSigner::NoNetworksAvailable);
+
+    // `TimeFormat` error.
+    out.push(ErrorSigner::TimeFormat(
+        time::error::Format::InvalidComponent("distance"),
+    ));
 
     out
 }
@@ -1027,11 +1054,11 @@ mod tests {
 "Database error. Bad metadata for westend9000. Base58 prefix 104 from system pallet constants does not match the base58 prefix from network specs 42."
 "Database error. Bad metadata for westend9000. Metadata vector does not start with 0x6d657461."
 "Database error. Bad metadata for westend9000. Runtime metadata could not be decoded."
-"Database error. No verifier information found for network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e, however genesis hash is encountered in network specs entry with key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
+"Database error. Network westend with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e has some network specs entries, while there is no verifier entry."
 "Database error. More than one entry for network specs with name westend and encryption sr25519."
 "Database error. Different network names (westend, WeStEnD) in database for same genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
 "Database error. Network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd verifier is set as a custom one. This custom verifier coinsides the database general verifier and not None. This should not have happened and likely indicates database corruption."
-"Database error. More than one root key (i.e. with empty path and without password) found for seed name Alice and encryption sr25519."
+"Database error. More than one seed key (i.e. with empty path and without password) found for seed name Alice and encryption sr25519."
 "Database error. More than one base58 prefix in network specs database entries for network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: 42 and 104."
 "Bad input data. Payload could not be decoded as `add_specs`."
 "Bad input data. Payload could not be decoded as `load_meta`."
@@ -1051,11 +1078,13 @@ mod tests {
 "Bad input data. Metadata for kusama9110 is already in the database and is different from the one in received payload."
 "Bad input data. Metadata for westend9122 is already in the database."
 "Bad input data. Similar network specs are already stored in the database under key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e. Network specs in received payload have different unchangeable values (base58 prefix, decimals, encryption, network name, unit)."
-"Bad input data. Network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e already has entries in the database with base58 prefix 42. Received network specs have different base58 prefix 104."
+"Bad input data. Network westend with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e already has entries in the database with base58 prefix 42. Received network specs have same genesis hash and different base58 prefix 104."
+"Bad input data. Network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e has name westend in the database. Received network specs have same genesis hash and name WeStEnD."
 "Bad input data. Payload with encryption 0x03 is not supported."
 "Bad input data. Received payload has bad signature."
 "Bad input data. Network kulupu is not in the database. Add network specs before loading the metadata."
 "Bad input data. Network westend was previously known to the database with verifier public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519 (general verifier). However, no network specs are in the database at the moment. Add network specs before loading the metadata."
+"Bad input data. Update payload contains metadata for network acala. Genesis hash in payload (e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e) matches database genesis hash for another network, westend."
 "Bad input data. Saved network kulupu information was signed by verifier public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519. Received information is not signed."
 "Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received unsigned westend network information could be accepted only if signed by the general verifier."
 "Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received unsigned types information could be accepted only if signed by the general verifier."
@@ -1092,6 +1121,7 @@ mod tests {
 "Unable to import derivations for network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e and encryption sr25519. Network is unknown. Please add corresponding network specs."
 "Network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd is disabled. It could be enabled again only after complete wipe and re-installation of Signer."
 "Error generating address. Address key collision for seed name Alice"
+"Error generating address. Tried to create colliding addresses within same network. Address for seed name Alice and path //01 has same public key as address for seed name Alice and path //1."
 "Error generating address. Bad secret string: invalid overall format."
 "Error generating address. Bad secret string: invalid bip39 phrase."
 "Error generating address. Bad secret string: invalid password."
@@ -1147,6 +1177,7 @@ mod tests {
 "Wrong password."
 "Wrong password."
 "No networks available. Please load networks information to proceed."
+"Unable to produce timestamp. The distance component cannot be formatted into the requested format."
 "#;
         assert!(print == print_expected, "\nReceived: {}", print);
     }

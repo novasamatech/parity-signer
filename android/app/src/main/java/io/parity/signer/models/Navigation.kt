@@ -2,52 +2,21 @@ package io.parity.signer.models
 
 import android.util.Log
 import android.widget.Toast
-import io.parity.signer.*
-import org.json.JSONObject
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.backendAction
 
 /**
  * This pretty much offloads all navigation to backend!
  */
 fun SignerDataModel.pushButton(
-	button: ButtonID,
+	button: Action,
 	details: String = "",
 	seedPhrase: String = ""
 ) {
-	val actionResult =
-		backendAction(button.name, details, seedPhrase)
-	//Here we just list all possible arguments coming from backend
 	try {
-		val actionResultObject = JSONObject(actionResult)
-		actionResultObject.optString("screen").let { screen ->
-			_screen.value = SignerScreen.valueOf(screen)
-			actionResultObject.getString("screenLabel").let {
-				_screenLabel.value = it
-			}
-			actionResultObject.getBoolean("back").let {
-				_back.value = it
-			}
-			actionResultObject.getBoolean("footer").let {
-				_footer.value = it
-			}
-			actionResultObject.getString("footerButton").let {
-				_footerButton.value = it
-			}
-			actionResultObject.getString("rightButton").let {
-				_rightButton.value = it
-			}
-			actionResultObject.getString("screenNameType").let {
-				_screenNameType.value = it
-			}
-		}
-		_modal.value = SignerModal.valueOf(actionResultObject.getString("modal"))
-		_alert.value = SignerAlert.valueOf(actionResultObject.getString("alert"))
-		_screenData.value = actionResultObject.getJSONObject("screenData")
-		_modalData.value = actionResultObject.getJSONObject("modalData")
-		_alertData.value = actionResultObject.getJSONObject("alertData")
-		Log.d("screen", _screenData.value.toString())
-		Log.d("modal", _modalData.value.toString())
+		_actionResult.value = backendAction(button, details, seedPhrase)
 	} catch (e: java.lang.Exception) {
 		Log.e("Navigation error", e.toString())
-		Toast.makeText(context, actionResult, Toast.LENGTH_SHORT).show()
+		Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
 	}
 }

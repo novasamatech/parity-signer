@@ -295,6 +295,7 @@ mod tests {
     // times could not be called).
     // Argh?
     #[test]
+    #[ignore]
     fn mass_fetch() {
         let address_set = [
             "wss://rpc.polkadot.io",

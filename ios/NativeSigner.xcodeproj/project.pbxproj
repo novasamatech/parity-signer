@@ -17,63 +17,36 @@
 		0452BC542762679F00C6DD37 /* Inter-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC502762679F00C6DD37 /* Inter-Medium.otf */; };
 		0452BC552762679F00C6DD37 /* Inter-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC512762679F00C6DD37 /* Inter-Regular.otf */; };
 		0452BC572767B26600C6DD37 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0452BC562767B26600C6DD37 /* Buttons.swift */; };
-		2D424532279AEDB900E76961 /* MSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D424531279AEDB900E76961 /* MSettings.swift */; };
 		2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F35027609CDE004B27BE /* HistoryCard.swift */; };
 		2D48F3532760A2D8004B27BE /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3522760A2D8004B27BE /* Fonts.swift */; };
-		2D48F3552760AF9D004B27BE /* MSeeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3542760AF9D004B27BE /* MSeeds.swift */; };
 		2D48F3572760BBEC004B27BE /* RecoverSeedName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3562760BBEC004B27BE /* RecoverSeedName.swift */; };
 		2D48F35B2760E5DF004B27BE /* RecoverSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F35A2760E5DF004B27BE /* RecoverSeedPhrase.swift */; };
-		2D48F35D2760ED38004B27BE /* MKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F35C2760ED38004B27BE /* MKeys.swift */; };
 		2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36027620F49004B27BE /* SeedKeyCard.swift */; };
-		2D48F36327622C54004B27BE /* MNetworkMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36227622C54004B27BE /* MNetworkMenu.swift */; };
-		2D48F3652762407A004B27BE /* MKeyDetais.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3642762407A004B27BE /* MKeyDetais.swift */; };
 		2D48F36927636036004B27BE /* SeedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36827636036004B27BE /* SeedMenu.swift */; };
 		2D48F36B2763604F004B27BE /* Backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36A2763604F004B27BE /* Backup.swift */; };
-		2D48F36D27636092004B27BE /* MBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36C27636092004B27BE /* MBackup.swift */; };
 		2D48F36F2767419D004B27BE /* PasswordConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36E2767419D004B27BE /* PasswordConfirm.swift */; };
-		2D48F3712767514B004B27BE /* MPasswordConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3702767514B004B27BE /* MPasswordConfirm.swift */; };
-		2D48F373276793D3004B27BE /* MDeriveKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F372276793D3004B27BE /* MDeriveKey.swift */; };
 		2D48F38127691C05004B27BE /* AlertSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38027691C05004B27BE /* AlertSelector.swift */; };
 		2D48F38327691C0A004B27BE /* ConfirmAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38227691C0A004B27BE /* ConfirmAlert.swift */; };
 		2D48F38527691C0F004B27BE /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38427691C0F004B27BE /* ErrorAlert.swift */; };
-		2D48F38727691C12004B27BE /* ShieldAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38627691C12004B27BE /* ShieldAlert.swift */; };
-		2D48F38A27691C3B004B27BE /* MError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38927691C3B004B27BE /* MError.swift */; };
-		2D48F390276A1527004B27BE /* MTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38F276A1527004B27BE /* MTransaction.swift */; };
-		2D48F392276A1D12004B27BE /* MSignatureReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F391276A1D12004B27BE /* MSignatureReady.swift */; };
-		2D48F394276A1D20004B27BE /* MEnterPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F393276A1D20004B27BE /* MEnterPassword.swift */; };
 		2D48F396276A2003004B27BE /* SignatureReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F395276A2003004B27BE /* SignatureReady.swift */; };
 		2D48F398276A200F004B27BE /* EnterPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F397276A200F004B27BE /* EnterPassword.swift */; };
-		2D48F39A276B5916004B27BE /* MNewSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F399276B5916004B27BE /* MNewSeed.swift */; };
-		2D48F39C276B5C0C004B27BE /* MRecoverSeedName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F39B276B5C0C004B27BE /* MRecoverSeedName.swift */; };
-		2D48F39E276B5C1A004B27BE /* MRecoverSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F39D276B5C1A004B27BE /* MRecoverSeedPhrase.swift */; };
 		2D48F3A0276C8D5E004B27BE /* LogMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F39F276C8D5E004B27BE /* LogMenu.swift */; };
-		2D48F3A2276CA49D004B27BE /* MConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A1276CA49D004B27BE /* MConfirm.swift */; };
-		2D48F3A427708091004B27BE /* MManageNetworks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A327708091004B27BE /* MManageNetworks.swift */; };
 		2D48F3A62770828B004B27BE /* ManageNetworks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A52770828B004B27BE /* ManageNetworks.swift */; };
 		2D48F3A827708670004B27BE /* NetworkDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A727708670004B27BE /* NetworkDetails.swift */; };
-		2D48F3AA27708A3F004B27BE /* MNetworkDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A927708A3F004B27BE /* MNetworkDetails.swift */; };
 		2D48F3AC277092FD004B27BE /* MetadataCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3AB277092FD004B27BE /* MetadataCard.swift */; };
 		2D48F3AE2770AD6B004B27BE /* NetworkDetailsMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3AD2770AD6B004B27BE /* NetworkDetailsMenu.swift */; };
 		2D48F3B02770AD83004B27BE /* ManageMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3AF2770AD83004B27BE /* ManageMetadata.swift */; };
-		2D48F3B22770B29C004B27BE /* MManageMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B12770B29C004B27BE /* MManageMetadata.swift */; };
 		2D48F3B42770C164004B27BE /* VerifierScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B32770C164004B27BE /* VerifierScreen.swift */; };
-		2D48F3B62771D046004B27BE /* MSignSufficientCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B52771D046004B27BE /* MSignSufficientCrypto.swift */; };
 		2D48F3B82771D250004B27BE /* SignSufficientCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B72771D250004B27BE /* SignSufficientCrypto.swift */; };
-		2D48F3BA2771DD66004B27BE /* MSufficientCryptoReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B92771DD66004B27BE /* MSufficientCryptoReady.swift */; };
 		2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */; };
 		2D48F3BE27720345004B27BE /* KeyMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3BD27720345004B27BE /* KeyMenu.swift */; };
-		2D48F3C027720B7E004B27BE /* MSeedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3BF27720B7E004B27BE /* MSeedMenu.swift */; };
-		2D48F3C227749138004B27BE /* MTypesInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C127749138004B27BE /* MTypesInfo.swift */; };
 		2D48F3C4277492D3004B27BE /* TypesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C3277492D3004B27BE /* TypesMenu.swift */; };
 		2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C52774AEE7004B27BE /* SelectSeedForBackup.swift */; };
 		2D48F3C82774CC64004B27BE /* SearchKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C72774CC64004B27BE /* SearchKeys.swift */; };
-		2D48F3CE2777A7EA004B27BE /* MNewSeedBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3CD2777A7EA004B27BE /* MNewSeedBackup.swift */; };
 		2D48F3D02777A823004B27BE /* NewSeedBackupModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */; };
 		2D48F3D2277A0AB2004B27BE /* HistoryCardExtended.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */; };
-		2D48F3D4277A5A0E004B27BE /* MLogDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D3277A5A0E004B27BE /* MLogDetails.swift */; };
 		2D48F3D6277B94C4004B27BE /* Identicon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D5277B94C4004B27BE /* Identicon.swift */; };
 		2D48F3D8277B95A3004B27BE /* TransactionBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D7277B95A3004B27BE /* TransactionBlock.swift */; };
-		2D48F3DA277E3719004B27BE /* MLogRight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D9277E3719004B27BE /* MLogRight.swift */; };
 		2D48F3DC277E3CAA004B27BE /* MultiselectBottomControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */; };
 		2D48F3DE277E4BEC004B27BE /* SmallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DD277E4BEC004B27BE /* SmallButton.swift */; };
 		2D48F3E0278305AE004B27BE /* LogComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DF278305AE004B27BE /* LogComment.swift */; };
@@ -82,6 +55,9 @@
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
+		2D75EFA1280F163700C48FAF /* signer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D75EFA0280F163700C48FAF /* signer.swift */; };
+		2D7803232819BE7700E4D01E /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D7803222819BE7600E4D01E /* libsigner.a */; };
+		2D78032528294D4C00E4D01E /* ShieldAlertComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D78032428294D4C00E4D01E /* ShieldAlertComponent.swift */; };
 		2D7A7BCE26BBC5690053C1E0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */; };
 		2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BD326BBEAF00053C1E0 /* Canary.swift */; };
 		2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BD526C1126C0053C1E0 /* Utils.swift */; };
@@ -98,9 +74,7 @@
 		2DA5F82F2756635A00D8DD29 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F82E2756635A00D8DD29 /* HistoryScreen.swift */; };
 		2DA5F8312756652600D8DD29 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8302756652600D8DD29 /* CameraView.swift */; };
 		2DA5F8332756653B00D8DD29 /* CameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8322756653B00D8DD29 /* CameraPreview.swift */; };
-		2DA5F8372756657600D8DD29 /* TransactionTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8362756657600D8DD29 /* TransactionTypes.swift */; };
 		2DA5F8392756666C00D8DD29 /* EventDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8382756666C00D8DD29 /* EventDetails.swift */; };
-		2DA5F83D275667AC00D8DD29 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F83C275667AC00D8DD29 /* History.swift */; };
 		2DA5F83F275667CF00D8DD29 /* HistoryCardTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F83E275667CF00D8DD29 /* HistoryCardTemplate.swift */; };
 		2DA5F8412756687200D8DD29 /* TransactionCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8402756687200D8DD29 /* TransactionCardView.swift */; };
 		2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F84227566BE300D8DD29 /* TransactionCardSelector.swift */; };
@@ -140,12 +114,10 @@
 		2DA5F88E2757694A00D8DD29 /* LandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F88D2757694A00D8DD29 /* LandingView.swift */; };
 		2DA5F89027590B3A00D8DD29 /* DocumentModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F88F27590B3A00D8DD29 /* DocumentModal.swift */; };
 		2DA5F89227590B4F00D8DD29 /* Documents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F89127590B4F00D8DD29 /* Documents.swift */; };
-		2DA5F8962759576B00D8DD29 /* MLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8952759576B00D8DD29 /* MLog.swift */; };
 		2DA5F898275F865400D8DD29 /* ModalSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F897275F865400D8DD29 /* ModalSelector.swift */; };
 		2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */; };
 		2DA5F89F275F885400D8DD29 /* NewSeedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F89E275F885400D8DD29 /* NewSeedMenu.swift */; };
 		2DA5F8A1275F889400D8DD29 /* Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8A0275F889400D8DD29 /* Headers.swift */; };
-		2DAA828F2786406D002917C0 /* MKeyDetailsMulti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA828E2786406D002917C0 /* MKeyDetailsMulti.swift */; };
 		2DAA82912786FA4B002917C0 /* KeyDetailsMulti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82902786FA4B002917C0 /* KeyDetailsMulti.swift */; };
 		2DAA829327873027002917C0 /* TCDerivations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829227873027002917C0 /* TCDerivations.swift */; };
 		2DAA8299278738C0002917C0 /* SelectSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA8298278738C0002917C0 /* SelectSeed.swift */; };
@@ -168,7 +140,6 @@
 		2DE72BD426A588C9002BB752 /* NativeSignerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BD326A588C9002BB752 /* NativeSignerTests.swift */; };
 		2DE72BDF26A588C9002BB752 /* NativeSignerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BDE26A588C9002BB752 /* NativeSignerUITests.swift */; };
 		2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BFF26A6ADC5002BB752 /* CameraService.swift */; };
-		2DE72C0926A98FE9002BB752 /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DE72C0826A98FE9002BB752 /* libsigner.a */; };
 		2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72C0E26A99885002BB752 /* RustNative.swift */; };
 /* End PBXBuildFile section */
 
@@ -200,63 +171,36 @@
 		0452BC502762679F00C6DD37 /* Inter-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.otf"; sourceTree = "<group>"; };
 		0452BC512762679F00C6DD37 /* Inter-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.otf"; sourceTree = "<group>"; };
 		0452BC562767B26600C6DD37 /* Buttons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
-		2D424531279AEDB900E76961 /* MSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSettings.swift; sourceTree = "<group>"; };
 		2D48F35027609CDE004B27BE /* HistoryCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCard.swift; sourceTree = "<group>"; };
 		2D48F3522760A2D8004B27BE /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
-		2D48F3542760AF9D004B27BE /* MSeeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSeeds.swift; sourceTree = "<group>"; };
 		2D48F3562760BBEC004B27BE /* RecoverSeedName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverSeedName.swift; sourceTree = "<group>"; };
 		2D48F35A2760E5DF004B27BE /* RecoverSeedPhrase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecoverSeedPhrase.swift; sourceTree = "<group>"; };
-		2D48F35C2760ED38004B27BE /* MKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKeys.swift; sourceTree = "<group>"; };
 		2D48F36027620F49004B27BE /* SeedKeyCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeedKeyCard.swift; sourceTree = "<group>"; };
-		2D48F36227622C54004B27BE /* MNetworkMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MNetworkMenu.swift; sourceTree = "<group>"; };
-		2D48F3642762407A004B27BE /* MKeyDetais.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKeyDetais.swift; sourceTree = "<group>"; };
 		2D48F36827636036004B27BE /* SeedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedMenu.swift; sourceTree = "<group>"; };
 		2D48F36A2763604F004B27BE /* Backup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backup.swift; sourceTree = "<group>"; };
-		2D48F36C27636092004B27BE /* MBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MBackup.swift; sourceTree = "<group>"; };
 		2D48F36E2767419D004B27BE /* PasswordConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordConfirm.swift; sourceTree = "<group>"; };
-		2D48F3702767514B004B27BE /* MPasswordConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPasswordConfirm.swift; sourceTree = "<group>"; };
-		2D48F372276793D3004B27BE /* MDeriveKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MDeriveKey.swift; sourceTree = "<group>"; };
 		2D48F38027691C05004B27BE /* AlertSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertSelector.swift; sourceTree = "<group>"; };
 		2D48F38227691C0A004B27BE /* ConfirmAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfirmAlert.swift; sourceTree = "<group>"; };
 		2D48F38427691C0F004B27BE /* ErrorAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorAlert.swift; sourceTree = "<group>"; };
-		2D48F38627691C12004B27BE /* ShieldAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShieldAlert.swift; sourceTree = "<group>"; };
-		2D48F38927691C3B004B27BE /* MError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MError.swift; sourceTree = "<group>"; };
-		2D48F38F276A1527004B27BE /* MTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTransaction.swift; sourceTree = "<group>"; };
-		2D48F391276A1D12004B27BE /* MSignatureReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSignatureReady.swift; sourceTree = "<group>"; };
-		2D48F393276A1D20004B27BE /* MEnterPassword.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MEnterPassword.swift; sourceTree = "<group>"; };
 		2D48F395276A2003004B27BE /* SignatureReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignatureReady.swift; sourceTree = "<group>"; };
 		2D48F397276A200F004B27BE /* EnterPassword.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterPassword.swift; sourceTree = "<group>"; };
-		2D48F399276B5916004B27BE /* MNewSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MNewSeed.swift; sourceTree = "<group>"; };
-		2D48F39B276B5C0C004B27BE /* MRecoverSeedName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MRecoverSeedName.swift; sourceTree = "<group>"; };
-		2D48F39D276B5C1A004B27BE /* MRecoverSeedPhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MRecoverSeedPhrase.swift; sourceTree = "<group>"; };
 		2D48F39F276C8D5E004B27BE /* LogMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogMenu.swift; sourceTree = "<group>"; };
-		2D48F3A1276CA49D004B27BE /* MConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MConfirm.swift; sourceTree = "<group>"; };
-		2D48F3A327708091004B27BE /* MManageNetworks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MManageNetworks.swift; sourceTree = "<group>"; };
 		2D48F3A52770828B004B27BE /* ManageNetworks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageNetworks.swift; sourceTree = "<group>"; };
 		2D48F3A727708670004B27BE /* NetworkDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDetails.swift; sourceTree = "<group>"; };
-		2D48F3A927708A3F004B27BE /* MNetworkDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MNetworkDetails.swift; sourceTree = "<group>"; };
 		2D48F3AB277092FD004B27BE /* MetadataCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetadataCard.swift; sourceTree = "<group>"; };
 		2D48F3AD2770AD6B004B27BE /* NetworkDetailsMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDetailsMenu.swift; sourceTree = "<group>"; };
 		2D48F3AF2770AD83004B27BE /* ManageMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageMetadata.swift; sourceTree = "<group>"; };
-		2D48F3B12770B29C004B27BE /* MManageMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MManageMetadata.swift; sourceTree = "<group>"; };
 		2D48F3B32770C164004B27BE /* VerifierScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifierScreen.swift; sourceTree = "<group>"; };
-		2D48F3B52771D046004B27BE /* MSignSufficientCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSignSufficientCrypto.swift; sourceTree = "<group>"; };
 		2D48F3B72771D250004B27BE /* SignSufficientCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSufficientCrypto.swift; sourceTree = "<group>"; };
-		2D48F3B92771DD66004B27BE /* MSufficientCryptoReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSufficientCryptoReady.swift; sourceTree = "<group>"; };
 		2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SufficientCryptoReady.swift; sourceTree = "<group>"; };
 		2D48F3BD27720345004B27BE /* KeyMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyMenu.swift; sourceTree = "<group>"; };
-		2D48F3BF27720B7E004B27BE /* MSeedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSeedMenu.swift; sourceTree = "<group>"; };
-		2D48F3C127749138004B27BE /* MTypesInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTypesInfo.swift; sourceTree = "<group>"; };
 		2D48F3C3277492D3004B27BE /* TypesMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypesMenu.swift; sourceTree = "<group>"; };
 		2D48F3C52774AEE7004B27BE /* SelectSeedForBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSeedForBackup.swift; sourceTree = "<group>"; };
 		2D48F3C72774CC64004B27BE /* SearchKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchKeys.swift; sourceTree = "<group>"; };
-		2D48F3CD2777A7EA004B27BE /* MNewSeedBackup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MNewSeedBackup.swift; sourceTree = "<group>"; };
 		2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSeedBackupModal.swift; sourceTree = "<group>"; };
 		2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCardExtended.swift; sourceTree = "<group>"; };
-		2D48F3D3277A5A0E004B27BE /* MLogDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLogDetails.swift; sourceTree = "<group>"; };
 		2D48F3D5277B94C4004B27BE /* Identicon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identicon.swift; sourceTree = "<group>"; };
 		2D48F3D7277B95A3004B27BE /* TransactionBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionBlock.swift; sourceTree = "<group>"; };
-		2D48F3D9277E3719004B27BE /* MLogRight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLogRight.swift; sourceTree = "<group>"; };
 		2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiselectBottomControl.swift; sourceTree = "<group>"; };
 		2D48F3DD277E4BEC004B27BE /* SmallButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallButton.swift; sourceTree = "<group>"; };
 		2D48F3DF278305AE004B27BE /* LogComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogComment.swift; sourceTree = "<group>"; };
@@ -265,6 +209,11 @@
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
+		2D75EF9C280EC3B000C48FAF /* NativeSigner-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NativeSigner-Bridging-Header.h"; sourceTree = "<group>"; };
+		2D75EFA0280F163700C48FAF /* signer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = signer.swift; sourceTree = "<group>"; };
+		2D75EFA2280F164000C48FAF /* signerFFI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = signerFFI.h; sourceTree = "<group>"; };
+		2D7803222819BE7600E4D01E /* libsigner.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsigner.a; sourceTree = "<group>"; };
+		2D78032428294D4C00E4D01E /* ShieldAlertComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldAlertComponent.swift; sourceTree = "<group>"; };
 		2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LaunchScreen.xib; path = NativeSigner/LaunchScreen.xib; sourceTree = "<group>"; };
 		2D7A7BD326BBEAF00053C1E0 /* Canary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Canary.swift; path = NativeSigner/Components/Canary.swift; sourceTree = SOURCE_ROOT; };
 		2D7A7BD526C1126C0053C1E0 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
@@ -281,9 +230,7 @@
 		2DA5F82E2756635A00D8DD29 /* HistoryScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
 		2DA5F8302756652600D8DD29 /* CameraView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		2DA5F8322756653B00D8DD29 /* CameraPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
-		2DA5F8362756657600D8DD29 /* TransactionTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionTypes.swift; sourceTree = "<group>"; };
 		2DA5F8382756666C00D8DD29 /* EventDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventDetails.swift; sourceTree = "<group>"; };
-		2DA5F83C275667AC00D8DD29 /* History.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		2DA5F83E275667CF00D8DD29 /* HistoryCardTemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCardTemplate.swift; sourceTree = "<group>"; };
 		2DA5F8402756687200D8DD29 /* TransactionCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionCardView.swift; sourceTree = "<group>"; };
 		2DA5F84227566BE300D8DD29 /* TransactionCardSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionCardSelector.swift; sourceTree = "<group>"; };
@@ -323,12 +270,10 @@
 		2DA5F88D2757694A00D8DD29 /* LandingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LandingView.swift; sourceTree = "<group>"; };
 		2DA5F88F27590B3A00D8DD29 /* DocumentModal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentModal.swift; sourceTree = "<group>"; };
 		2DA5F89127590B4F00D8DD29 /* Documents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Documents.swift; sourceTree = "<group>"; };
-		2DA5F8952759576B00D8DD29 /* MLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLog.swift; sourceTree = "<group>"; };
 		2DA5F897275F865400D8DD29 /* ModalSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalSelector.swift; sourceTree = "<group>"; };
 		2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		2DA5F89E275F885400D8DD29 /* NewSeedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSeedMenu.swift; sourceTree = "<group>"; };
 		2DA5F8A0275F889400D8DD29 /* Headers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Headers.swift; sourceTree = "<group>"; };
-		2DAA828E2786406D002917C0 /* MKeyDetailsMulti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKeyDetailsMulti.swift; sourceTree = "<group>"; };
 		2DAA82902786FA4B002917C0 /* KeyDetailsMulti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsMulti.swift; sourceTree = "<group>"; };
 		2DAA829227873027002917C0 /* TCDerivations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCDerivations.swift; sourceTree = "<group>"; };
 		2DAA8298278738C0002917C0 /* SelectSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSeed.swift; sourceTree = "<group>"; };
@@ -357,10 +302,7 @@
 		2DE72BDE26A588C9002BB752 /* NativeSignerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerUITests.swift; sourceTree = "<group>"; };
 		2DE72BE026A588C9002BB752 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2DE72BFF26A6ADC5002BB752 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraService.swift; sourceTree = "<group>"; };
-		2DE72C0826A98FE9002BB752 /* libsigner.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsigner.a; sourceTree = "<group>"; };
-		2DE72C0A26A99029002BB752 /* signer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = signer.h; sourceTree = "<group>"; };
 		2DE72C0C26A992D9002BB752 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
-		2DE72C0D26A99334002BB752 /* NativeSigner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NativeSigner-Bridging-Header.h"; sourceTree = "<group>"; };
 		2DE72C0E26A99885002BB752 /* RustNative.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RustNative.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -369,7 +311,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2DE72C0926A98FE9002BB752 /* libsigner.a in Frameworks */,
+				2D7803232819BE7700E4D01E /* libsigner.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -390,13 +332,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2D48F38827691C3B004B27BE /* AlertModels */ = {
+		2D75EF9E280F02B900C48FAF /* Generated */ = {
 			isa = PBXGroup;
 			children = (
-				2D48F38927691C3B004B27BE /* MError.swift */,
-				2D48F3A1276CA49D004B27BE /* MConfirm.swift */,
+				2D75EFA2280F164000C48FAF /* signerFFI.h */,
+				2D75EFA0280F163700C48FAF /* signer.swift */,
 			);
-			path = AlertModels;
+			path = Generated;
 			sourceTree = "<group>";
 		};
 		2D7A7BC526BA96D00053C1E0 /* Cards */ = {
@@ -546,53 +488,13 @@
 			path = TransactionCards;
 			sourceTree = "<group>";
 		};
-		2DA5F8932759573800D8DD29 /* ScreenModels */ = {
-			isa = PBXGroup;
-			children = (
-				2DA5F8952759576B00D8DD29 /* MLog.swift */,
-				2D48F399276B5916004B27BE /* MNewSeed.swift */,
-				2D48F372276793D3004B27BE /* MDeriveKey.swift */,
-				2D424531279AEDB900E76961 /* MSettings.swift */,
-				2D48F39B276B5C0C004B27BE /* MRecoverSeedName.swift */,
-				2D48F3D3277A5A0E004B27BE /* MLogDetails.swift */,
-				2D48F39D276B5C1A004B27BE /* MRecoverSeedPhrase.swift */,
-				2D48F3642762407A004B27BE /* MKeyDetais.swift */,
-				2DAA828E2786406D002917C0 /* MKeyDetailsMulti.swift */,
-				2D48F3A327708091004B27BE /* MManageNetworks.swift */,
-				2D48F3B52771D046004B27BE /* MSignSufficientCrypto.swift */,
-				2D48F3A927708A3F004B27BE /* MNetworkDetails.swift */,
-				2D48F38F276A1527004B27BE /* MTransaction.swift */,
-				2D48F35C2760ED38004B27BE /* MKeys.swift */,
-				2D48F3542760AF9D004B27BE /* MSeeds.swift */,
-			);
-			path = ScreenModels;
-			sourceTree = "<group>";
-		};
-		2DA5F8942759575300D8DD29 /* ModalModels */ = {
-			isa = PBXGroup;
-			children = (
-				2D48F36227622C54004B27BE /* MNetworkMenu.swift */,
-				2D48F36C27636092004B27BE /* MBackup.swift */,
-				2D48F391276A1D12004B27BE /* MSignatureReady.swift */,
-				2D48F3C127749138004B27BE /* MTypesInfo.swift */,
-				2D48F3B92771DD66004B27BE /* MSufficientCryptoReady.swift */,
-				2D48F3D9277E3719004B27BE /* MLogRight.swift */,
-				2D48F393276A1D20004B27BE /* MEnterPassword.swift */,
-				2D48F3BF27720B7E004B27BE /* MSeedMenu.swift */,
-				2D48F3B12770B29C004B27BE /* MManageMetadata.swift */,
-				2D48F3702767514B004B27BE /* MPasswordConfirm.swift */,
-				2D48F3CD2777A7EA004B27BE /* MNewSeedBackup.swift */,
-			);
-			path = ModalModels;
-			sourceTree = "<group>";
-		};
 		2DA5F899275F86B600D8DD29 /* Alerts */ = {
 			isa = PBXGroup;
 			children = (
-				2D48F38627691C12004B27BE /* ShieldAlert.swift */,
 				2D48F38427691C0F004B27BE /* ErrorAlert.swift */,
 				2D48F38227691C0A004B27BE /* ConfirmAlert.swift */,
 				2D48F38027691C05004B27BE /* AlertSelector.swift */,
+				2D78032428294D4C00E4D01E /* ShieldAlertComponent.swift */,
 			);
 			path = Alerts;
 			sourceTree = "<group>";
@@ -615,6 +517,7 @@
 		2DE72BB526A588C7002BB752 = {
 			isa = PBXGroup;
 			children = (
+				2D75EF9C280EC3B000C48FAF /* NativeSigner-Bridging-Header.h */,
 				2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */,
 				2DE72BC026A588C7002BB752 /* NativeSigner */,
 				2DE72BD226A588C9002BB752 /* NativeSignerTests */,
@@ -637,22 +540,21 @@
 		2DE72BC026A588C7002BB752 /* NativeSigner */ = {
 			isa = PBXGroup;
 			children = (
+				2D7803222819BE7600E4D01E /* libsigner.a */,
 				2DA5F899275F86B600D8DD29 /* Alerts */,
 				2D7A7BE126C3FB680053C1E0 /* Docs */,
 				2D7A7BC826BA97AE0053C1E0 /* Components */,
 				2D7A7BC726BA97A50053C1E0 /* Modals */,
 				2D7A7BC626BA974E0053C1E0 /* Screens */,
 				2D7A7BC526BA96D00053C1E0 /* Cards */,
-				2DE72C0826A98FE9002BB752 /* libsigner.a */,
-				2DE72C0A26A99029002BB752 /* signer.h */,
 				2DE72BEF26A5981C002BB752 /* Models */,
 				2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */,
 				2DE72C1226AACB25002BB752 /* Database */,
 				2DE72BC526A588C9002BB752 /* Assets.xcassets */,
 				2DB037BD270F12BB00A318B2 /* Fonts */,
 				2DE72BCA26A588C9002BB752 /* Info.plist */,
+				2D75EF9E280F02B900C48FAF /* Generated */,
 				2DE72BC726A588C9002BB752 /* Preview Content */,
-				2DE72C0D26A99334002BB752 /* NativeSigner-Bridging-Header.h */,
 			);
 			path = NativeSigner;
 			sourceTree = "<group>";
@@ -687,17 +589,12 @@
 			isa = PBXGroup;
 			children = (
 				2DA5F80C2756304B00D8DD29 /* Camera.swift */,
-				2D48F38827691C3B004B27BE /* AlertModels */,
 				2DE72BFF26A6ADC5002BB752 /* CameraService.swift */,
 				2D7A7BD326BBEAF00053C1E0 /* Canary.swift */,
-				2DA5F8942759575300D8DD29 /* ModalModels */,
-				2DA5F8932759573800D8DD29 /* ScreenModels */,
 				2DE72C0E26A99885002BB752 /* RustNative.swift */,
 				2D7A7BD526C1126C0053C1E0 /* Utils.swift */,
 				2D72B4F526EF3BC50081E879 /* Navigator.swift */,
 				2DA5F8832756A37800D8DD29 /* Address.swift */,
-				2DA5F8362756657600D8DD29 /* TransactionTypes.swift */,
-				2DA5F83C275667AC00D8DD29 /* History.swift */,
 				2D72B4F926EF7D1C0081E879 /* Seeds.swift */,
 				2DA5F89127590B4F00D8DD29 /* Documents.swift */,
 			);
@@ -727,6 +624,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2DE72BE326A588C9002BB752 /* Build configuration list for PBXNativeTarget "NativeSigner" */;
 			buildPhases = (
+				2D75EF99280EACC800C48FAF /* Run Script */,
 				2DE72BBA26A588C7002BB752 /* Sources */,
 				2DE72BBB26A588C7002BB752 /* Frameworks */,
 				2DE72BBC26A588C7002BB752 /* Resources */,
@@ -855,6 +753,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2D75EF99280EACC800C48FAF /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n#$SRCROOT/../scripts/build.sh ios\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		2DE72BBA26A588C7002BB752 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -862,27 +781,20 @@
 			files = (
 				2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */,
 				2D48F3DE277E4BEC004B27BE /* SmallButton.swift in Sources */,
-				2D48F38727691C12004B27BE /* ShieldAlert.swift in Sources */,
-				2D48F39C276B5C0C004B27BE /* MRecoverSeedName.swift in Sources */,
-				2D48F3A427708091004B27BE /* MManageNetworks.swift in Sources */,
 				2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */,
-				2D48F3C227749138004B27BE /* MTypesInfo.swift in Sources */,
 				2DAA82AF278874F3002917C0 /* NetworkLogo.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
-				2D424532279AEDB900E76961 /* MSettings.swift in Sources */,
-				2D48F3712767514B004B27BE /* MPasswordConfirm.swift in Sources */,
+				2D78032528294D4C00E4D01E /* ShieldAlertComponent.swift in Sources */,
 				2D48F3D8277B95A3004B27BE /* TransactionBlock.swift in Sources */,
 				2DA5F86827566C3600D8DD29 /* TCAuthor.swift in Sources */,
 				2DA5F87427566C3600D8DD29 /* TCEraMortal.swift in Sources */,
 				2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */,
-				2D48F390276A1527004B27BE /* MTransaction.swift in Sources */,
 				2D48F3B42770C164004B27BE /* VerifierScreen.swift in Sources */,
 				2D48F36927636036004B27BE /* SeedMenu.swift in Sources */,
 				2DA5F86327566C3600D8DD29 /* TCCall.swift in Sources */,
-				2DA5F8372756657600D8DD29 /* TransactionTypes.swift in Sources */,
 				2D48F3A0276C8D5E004B27BE /* LogMenu.swift in Sources */,
-				2D48F36D27636092004B27BE /* MBackup.swift in Sources */,
 				2DAA82A127885BAF002917C0 /* TCDefault.swift in Sources */,
+				2D75EFA1280F163700C48FAF /* signer.swift in Sources */,
 				2DAA82A327885C2E002917C0 /* TCIdentityField.swift in Sources */,
 				2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */,
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
@@ -892,7 +804,6 @@
 				2DA5F88E2757694A00D8DD29 /* LandingView.swift in Sources */,
 				2DA5F8782756749B00D8DD29 /* SeedManager.swift in Sources */,
 				2DA5F8822756A2DE00D8DD29 /* AddressCard.swift in Sources */,
-				2D48F39E276B5C1A004B27BE /* MRecoverSeedPhrase.swift in Sources */,
 				2DA5F8252756624000D8DD29 /* NavbarShield.swift in Sources */,
 				2D48F3572760BBEC004B27BE /* RecoverSeedName.swift in Sources */,
 				2D48F3D6277B94C4004B27BE /* Identicon.swift in Sources */,
@@ -907,15 +818,11 @@
 				2DAA829B2788596C002917C0 /* TCNonce.swift in Sources */,
 				2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */,
 				2D6A9F84278C8275000DAE64 /* TCNetworkInfo.swift in Sources */,
-				2D48F3CE2777A7EA004B27BE /* MNewSeedBackup.swift in Sources */,
 				04197D2B276BA40C003485D2 /* MenuElements.swift in Sources */,
-				2D48F3B22770B29C004B27BE /* MManageMetadata.swift in Sources */,
-				2D48F3652762407A004B27BE /* MKeyDetais.swift in Sources */,
 				2DA5F86927566C3600D8DD29 /* TCEraImmortal.swift in Sources */,
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
 				2DA5F88A2757692F00D8DD29 /* NewSeedScreen.swift in Sources */,
 				2DA5F86727566C3600D8DD29 /* TCVerifier.swift in Sources */,
-				2DAA828F2786406D002917C0 /* MKeyDetailsMulti.swift in Sources */,
 				2DA5F8392756666C00D8DD29 /* EventDetails.swift in Sources */,
 				2DA5F8292756630900D8DD29 /* TransactionScreen.swift in Sources */,
 				2DA5F89F275F885400D8DD29 /* NewSeedMenu.swift in Sources */,
@@ -926,21 +833,16 @@
 				2DA5F86B27566C3600D8DD29 /* TCTip.swift in Sources */,
 				2DA5F8272756629600D8DD29 /* ScreenSelector.swift in Sources */,
 				2DA5F87E2756A28B00D8DD29 /* NetworkCard.swift in Sources */,
-				2D48F36327622C54004B27BE /* MNetworkMenu.swift in Sources */,
 				2DA5F8332756653B00D8DD29 /* CameraPreview.swift in Sources */,
-				2D48F38A27691C3B004B27BE /* MError.swift in Sources */,
 				2DA5F8862756A44600D8DD29 /* AddressCardControls.swift in Sources */,
 				2DAA82AB27886734002917C0 /* TCGenesisHash.swift in Sources */,
-				2DA5F8962759576B00D8DD29 /* MLog.swift in Sources */,
 				2DA5F82F2756635A00D8DD29 /* HistoryScreen.swift in Sources */,
 				2DAA82A727885E73002917C0 /* TCNameValueTemplate.swift in Sources */,
 				2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */,
 				2DA5F8232756621F00D8DD29 /* Header.swift in Sources */,
-				2D48F3BA2771DD66004B27BE /* MSufficientCryptoReady.swift in Sources */,
 				2D48F3C82774CC64004B27BE /* SearchKeys.swift in Sources */,
 				2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */,
 				2D48F3DC277E3CAA004B27BE /* MultiselectBottomControl.swift in Sources */,
-				2D48F35D2760ED38004B27BE /* MKeys.swift in Sources */,
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,
 				2D59B9FD278F1D930088057A /* InstructionsSquare.swift in Sources */,
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
@@ -956,13 +858,10 @@
 				2D48F3B02770AD83004B27BE /* ManageMetadata.swift in Sources */,
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,
 				2DAA8299278738C0002917C0 /* SelectSeed.swift in Sources */,
-				2DA5F83D275667AC00D8DD29 /* History.swift in Sources */,
-				2D48F373276793D3004B27BE /* MDeriveKey.swift in Sources */,
 				2D48F3E0278305AE004B27BE /* LogComment.swift in Sources */,
 				2D48F3B82771D250004B27BE /* SignSufficientCrypto.swift in Sources */,
 				2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */,
 				2DAA82A927885FCF002917C0 /* TCTXSpecPlain.swift in Sources */,
-				2D48F3DA277E3719004B27BE /* MLogRight.swift in Sources */,
 				2D48F3A62770828B004B27BE /* ManageNetworks.swift in Sources */,
 				2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */,
 				2DA5F86D27566C3600D8DD29 /* TCAuthorPlain.swift in Sources */,
@@ -973,8 +872,6 @@
 				2DA5F82B2756631D00D8DD29 /* KeyManager.swift in Sources */,
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
 				2D48F3AE2770AD6B004B27BE /* NetworkDetailsMenu.swift in Sources */,
-				2D48F39A276B5916004B27BE /* MNewSeed.swift in Sources */,
-				2D48F394276A1D20004B27BE /* MEnterPassword.swift in Sources */,
 				2DA5F86127566C3600D8DD29 /* TCBalance.swift in Sources */,
 				2DA5F87127566C3600D8DD29 /* TCVarName.swift in Sources */,
 				2D48F398276A200F004B27BE /* EnterPassword.swift in Sources */,
@@ -990,22 +887,15 @@
 				2D48F35B2760E5DF004B27BE /* RecoverSeedPhrase.swift in Sources */,
 				2DA5F87C2756A21200D8DD29 /* ExportAddress.swift in Sources */,
 				2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */,
-				2D48F392276A1D12004B27BE /* MSignatureReady.swift in Sources */,
-				2D48F3552760AF9D004B27BE /* MSeeds.swift in Sources */,
-				2D48F3D4277A5A0E004B27BE /* MLogDetails.swift in Sources */,
-				2D48F3A2276CA49D004B27BE /* MConfirm.swift in Sources */,
 				2DA5F821275652EE00D8DD29 /* Footer.swift in Sources */,
 				2D48F38327691C0A004B27BE /* ConfirmAlert.swift in Sources */,
-				2D48F3AA27708A3F004B27BE /* MNetworkDetails.swift in Sources */,
 				2DAA82912786FA4B002917C0 /* KeyDetailsMulti.swift in Sources */,
 				2D48F3BE27720345004B27BE /* KeyMenu.swift in Sources */,
 				2DA5F88C2757693600D8DD29 /* NewAddressScreen.swift in Sources */,
 				2D48F36B2763604F004B27BE /* Backup.swift in Sources */,
 				2DAA82A527885D4A002917C0 /* TCTipPlain.swift in Sources */,
 				2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */,
-				2D48F3C027720B7E004B27BE /* MSeedMenu.swift in Sources */,
 				2DA5F83F275667CF00D8DD29 /* HistoryCardTemplate.swift in Sources */,
-				2D48F3B62771D046004B27BE /* MSignSufficientCrypto.swift in Sources */,
 				2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1185,7 +1075,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner/NativeSigner-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 arm64e x86_64";
@@ -1218,7 +1108,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner/NativeSigner-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 arm64e x86_64";

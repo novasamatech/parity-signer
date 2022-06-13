@@ -10,48 +10,44 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.SeedCard
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg200
-import org.json.JSONArray
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MSeeds
 
 /**
- * Select seed for creating derivations
- *
- * TODO: really replace this with seedmanager element?
+ * Select seed for backup
  */
 @Composable
-fun SelectSeedForBackup(signerDataModel: SignerDataModel) {
-	val cards = signerDataModel.screenData.value?.getJSONArray("seedNameCards")
-		?: JSONArray()
+fun SelectSeedForBackup(
+	seeds: MSeeds,
+	pushButton: (Action, String) -> Unit
+) {
+	val cards = seeds.seedNameCards
 
 	LazyColumn(
 		contentPadding = PaddingValues(horizontal = 12.dp),
 		verticalArrangement = Arrangement.spacedBy(10.dp)
 	) {
-		items(cards.length()) { item ->
+		items(cards.size) { item ->
 			Row(
 				Modifier
-					//.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+					// .padding(top = 3.dp, start = 12.dp, end = 12.dp)
 					.background(MaterialTheme.colors.Bg200)
 			) {
 				Row(
 					Modifier
 						.clickable {
-							signerDataModel.pushButton(
-								ButtonID.BackupSeed,
-								details = cards
-									.getJSONObject(item)
-									.getString("seed_name")
+							pushButton(
+								Action.BACKUP_SEED,
+								cards[item].seedName
 							)
 						}
 						.weight(1f, true)
 				) {
 					SeedCard(
-						seedName = cards.getJSONObject(item).getString("seed_name"),
-						identicon = cards.getJSONObject(item).getString("identicon")
+						seedName = cards[item].seedName,
+						identicon = cards[item].identicon,
 					)
 				}
 			}

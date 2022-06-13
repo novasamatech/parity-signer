@@ -25,7 +25,7 @@ struct KeyMenu: View {
             }
         }
         .alert(isPresented: $removeConfirm, content: {
-            Alert(title: Text("Forget this key?"), message: Text("This key will be removed for this network. Are you sure?"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove key"), action: {data.pushButton(buttonID: .RemoveKey)}))
+            Alert(title: Text("Forget this key?"), message: Text("This key will be removed for this network. Are you sure?"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove key"), action: {data.pushButton(action: .removeKey)}))
         })
     }
 }

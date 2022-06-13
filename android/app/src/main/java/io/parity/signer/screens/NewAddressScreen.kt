@@ -9,35 +9,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.*
-import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Text600
-import org.json.JSONObject
+import io.parity.signer.uniffi.*
 
 @Composable
-fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
-	val screenData = signerDataModel.screenData.value ?: JSONObject()
+fun NewAddressScreen(
+	deriveKey: MDeriveKey,
+	button: (Action, String) -> Unit,
+	addKey: (String, String) -> Unit,
+	checkPath: (String, String, String) -> DerivationCheck
+) {
 	val derivationPath = remember { mutableStateOf("") }
-	val buttonGood = remember { mutableStateOf(false) }
-	val whereTo = remember { mutableStateOf<DeriveDestination?>(null) }
-	val collision = remember { mutableStateOf<JSONObject?>(null) }
-	val seedName = signerDataModel.screenData.value?.optString("seed_name") ?: ""
-	val networkSpecKey =
-		signerDataModel.screenData.value?.optString("network_specs_key") ?: ""
-	var derivationState by remember(buttonGood, whereTo, collision) {
-		mutableStateOf(DerivationCheck(
-			buttonGood,
-			whereTo,
-			collision
-		) {
-			signerDataModel.substratePathCheck(
-				seedName,
-				it,
-				networkSpecKey,
-				signerDataModel.dbName
+	val seedName = deriveKey.seedName
+	val networkSpecKey = deriveKey.networkSpecsKey
+	var derivationState by remember {
+		mutableStateOf(
+			DerivationCheck(
+				false,
+				null,
+				null,
+				null,
 			)
-		})
+		)
 	}
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
@@ -50,19 +44,32 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 			.fillMaxSize()
 	) {
 		Row {
-			HeaderBar(line1 = "Create new key", line2 = "For seed $seedName")
+			HeaderBar(
+				line1 = "Create new key",
+				line2 = "For seed $seedName"
+			)
 			Spacer(Modifier.weight(1f))
 		}
-		NetworkCard(network = screenData)
+		NetworkCard(
+			network = MscNetworkInfo(
+				networkTitle = deriveKey.networkTitle,
+				networkLogo = deriveKey.networkLogo
+			)
+		)
 		SingleTextInput(
 			content = derivationPath,
 			update = {
 				derivationPath.value = it
-				derivationState.check(it)
+				derivationState =
+					checkPath(
+						seedName,
+						it,
+						networkSpecKey
+					)
 			},
 			prefix = {
 				Text(
-					seedName.decode64(),
+					seedName,
 					style = MaterialTheme.typography.body2,
 					color = MaterialTheme.colors.Text600
 				)
@@ -72,18 +79,18 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 			capitalize = false,
 			onDone = {
 				focusManager.clearFocus()
-				if (derivationState.buttonGood.value) {
-					when (derivationState.whereTo.value) {
-						DeriveDestination.pin -> {
-							signerDataModel.addKey(
-								path = derivationPath.value,
-								seedName = seedName
+				if (derivationState.buttonGood) {
+					when (derivationState.whereTo) {
+						DerivationDestination.PIN -> {
+							addKey(
+								derivationPath.value,
+								seedName
 							)
 						}
-						DeriveDestination.pwd -> {
-							signerDataModel.pushButton(
-								ButtonID.CheckPassword,
-								details = derivationPath.value
+						DerivationDestination.PWD -> {
+							button(
+								Action.CHECK_PASSWORD,
+								derivationPath.value
 							)
 						}
 						null -> {}
@@ -93,7 +100,7 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 			focusManager = focusManager,
 			focusRequester = focusRequester
 		)
-		collision.value?.let {
+		derivationState.collision?.let {
 			Column(
 				Modifier.fillMaxWidth(1f)
 			) {
@@ -106,34 +113,37 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 			BigButton(
 				text = "Next",
 				action = {
-					when (derivationState.whereTo.value) {
-						DeriveDestination.pin -> {
-							signerDataModel.addKey(
-								path = derivationPath.value,
-								seedName = seedName
+					when (derivationState.whereTo) {
+						DerivationDestination.PIN -> {
+							addKey(
+								derivationPath.value,
+								seedName
 							)
 						}
-						DeriveDestination.pwd -> {
-							signerDataModel.pushButton(
-								ButtonID.CheckPassword,
-								details = derivationPath.value
+						DerivationDestination.PWD -> {
+							button(
+								Action.CHECK_PASSWORD,
+								derivationPath.value
 							)
 						}
 						null -> {}
 					}
 				},
-				isDisabled = !derivationState.buttonGood.value
+				isDisabled = !derivationState.buttonGood
 			)
 		}
 	}
+
+	LaunchedEffect(key1 = deriveKey) {
+		derivationState = deriveKey.derivationCheck
+	}
+
 	DisposableEffect(Unit) {
-		if (signerDataModel.screenData.value?.optBoolean("keyboard") == true) {
+		if (deriveKey.keyboard) {
 			focusRequester.requestFocus()
 		}
-		derivationPath.value =
-			signerDataModel.screenData.value?.optString("suggested_derivation")
-				?: ""
-		derivationState.fromJSON(signerDataModel.screenData.value ?: JSONObject())
+		derivationPath.value = deriveKey.suggestedDerivation
+		derivationState = deriveKey.derivationCheck
 		onDispose { focusManager.clearFocus() }
 	}
 }

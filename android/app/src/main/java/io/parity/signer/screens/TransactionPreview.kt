@@ -11,109 +11,111 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
-import io.parity.signer.ButtonID
 import io.parity.signer.components.*
-import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Text400
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MTransaction
+import io.parity.signer.uniffi.TransactionType
 
 @Composable
 fun TransactionPreview(
-	button: (button: ButtonID, details: String, seedPhrase: String) -> Unit,
-	signerDataModel: SignerDataModel
+	transaction: MTransaction,
+	button: (action: Action, details: String, seedPhrase: String) -> Unit,
+	signTransaction: (comment: String, seedName: String) -> Unit
 ) {
-	val transaction =
-		signerDataModel.screenData.value!!.getJSONObject("content")
-			.parseTransaction()
-	val action =
-		TransactionType.valueOf(signerDataModel.screenData.value!!.getString("type"))
-  val comment = remember{ mutableStateOf("") }
+	val action = transaction.ttype
+	val comment = remember { mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
 	Column(
 		Modifier.verticalScroll(rememberScrollState())
 	) {
-		TransactionPreviewField(transaction = transaction)
-		signerDataModel.screenData.value!!.optJSONObject("author_info")?.let {
+		TransactionPreviewField(
+			cardSet = transaction.content,
+		)
+		transaction.authorInfo?.let {
 			KeyCard(identity = it)
 		}
-		signerDataModel.screenData.value!!.optJSONObject("network_info")?.let {
+		transaction.networkInfo?.let {
 			NetworkCard(network = it)
 		}
 		when (action) {
-			TransactionType.sign -> {
-				Text("LOG NOTE", style = MaterialTheme.typography.overline, color = MaterialTheme.colors.Text400)
+			TransactionType.SIGN -> {
+				Text(
+					"LOG NOTE",
+					style = MaterialTheme.typography.overline,
+					color = MaterialTheme.colors.Text400
+				)
 
 				SingleTextInput(
 					content = comment,
-					update = {comment.value = it},
+					update = { comment.value = it },
 					onDone = { },
 					focusManager = focusManager,
 					focusRequester = focusRequester
 				)
 
-				Text("visible only on this device", style = MaterialTheme.typography.subtitle1, color = MaterialTheme.colors.Text400)
+				Text(
+					"visible only on this device",
+					style = MaterialTheme.typography.subtitle1,
+					color = MaterialTheme.colors.Text400
+				)
 
 				BigButton(
 					text = "Unlock key and sign",
 					action = {
-						signerDataModel.authentication.authenticate(signerDataModel.activity) {
-							val seedPhrase = signerDataModel.getSeed(
-								signerDataModel.screenData.value?.optJSONObject("author_info")
-									?.optString("seed") ?: ""
-							)
-							if (seedPhrase.isNotBlank()) {
-								button(ButtonID.GoForward, comment.value.encode64(), seedPhrase)
-							}
-						}
+						signTransaction(
+							comment.value, transaction.authorInfo?.seedName ?: ""
+						)
 					}
 				)
 				BigButton(
 					text = "Decline",
 					action = {
-						button(ButtonID.GoBack, "", "")
+						button(Action.GO_BACK, "", "")
 					}
 				)
 			}
-			TransactionType.done ->
+			TransactionType.DONE ->
 				BigButton(
 					text = "Done",
 					action = {
-						button(ButtonID.GoBack, "", "")
+						button(Action.GO_BACK, "", "")
 					}
 				)
-			TransactionType.stub -> {
+			TransactionType.STUB -> {
 				BigButton(
 					text = "Approve",
 					action = {
-						button(ButtonID.GoForward, "", "")
+						button(Action.GO_FORWARD, "", "")
 					}
 				)
 				BigButton(
 					text = "Decline",
 					action = {
-						button(ButtonID.GoBack, "", "")
+						button(Action.GO_BACK, "", "")
 					}
 				)
 			}
-			TransactionType.read ->
+			TransactionType.READ ->
 				BigButton(
 					text = "Back",
 					action = {
-						button(ButtonID.GoBack, "", "")
+						button(Action.GO_BACK, "", "")
 					}
 				)
-			TransactionType.import_derivations -> {
+			TransactionType.IMPORT_DERIVATIONS -> {
 				BigButton(
 					text = "Select seed",
 					action = {
-						button(ButtonID.GoForward, "", "")
+						button(Action.GO_FORWARD, "", "")
 					}
 				)
 				BigButton(
 					text = "Decline",
 					action = {
-						button(ButtonID.GoBack, "", "")
+						button(Action.GO_BACK, "", "")
 					}
 				)
 			}
