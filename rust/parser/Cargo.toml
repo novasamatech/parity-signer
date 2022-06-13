@@ -17,7 +17,7 @@ num-bigint = "0.4.3"
 parity-scale-codec = {version = "3.1.2", features = ["derive", "bit-vec"]}
 printing_balance = {path = "../printing_balance"}
 regex = "1.5.4"
-scale-info = "2.0.1"
+scale-info = "2.1.2"
 sp-arithmetic = {git = "https://github.com/paritytech/substrate"}
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
