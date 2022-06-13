@@ -8,7 +8,7 @@ edition = "2018"
 anyhow = "1.0"
 ffi-support = "0.4"
 hex = "0.4.3"
-uniffi = { version="0.17.0", features=["builtin-bindgen"] }
+uniffi = { version = "0.18.0", features=["builtin-bindgen"] }
 
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
@@ -29,7 +29,7 @@ log = "0.4.17"
 [build-dependencies]
 definitions = {path = "../definitions"}
 generate_message = {path = "../generate_message"}
-uniffi_build = { version = "0.17.0", features = ["builtin-bindgen"] }
+uniffi_build = { version = "0.18.0", features = ["builtin-bindgen"] }
 
 [lib]
 crate-type = ["staticlib", "cdylib"]
