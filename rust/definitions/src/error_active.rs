@@ -168,6 +168,12 @@ impl ErrorSource for Active {
     fn timestamp_format(error: time::error::Format) -> Self::Error {
         ErrorActive::TimeFormat(error)
     }
+    fn empty_seed() -> Self::Error {
+        ErrorActive::SeedPhraseEmpty
+    }
+    fn empty_seed_name() -> Self::Error {
+        ErrorActive::SeedNameEmpty
+    }
     fn show(error: &Self::Error) -> String {
         match error {
             ErrorActive::NotHex(a) => {
@@ -421,6 +427,8 @@ impl ErrorSource for Active {
                 }
             },
             ErrorActive::TimeFormat(e) => format!("Unable to produce timestamp. {}", e),
+            ErrorActive::SeedPhraseEmpty => String::from("Seed phrase is empty."),
+            ErrorActive::SeedNameEmpty => String::from("Seed name is empty."),
         }
     }
 }
@@ -511,6 +519,12 @@ pub enum ErrorActive {
 
     /// Time formatting error
     TimeFormat(Format),
+
+    /// Got empty seed phrase
+    SeedPhraseEmpty,
+
+    /// Got empty seed name
+    SeedNameEmpty,
 }
 
 impl std::fmt::Display for ErrorActive {

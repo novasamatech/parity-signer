@@ -160,6 +160,14 @@ pub trait ErrorSource {
     /// `Error` when time could not be formatted for history record
     fn timestamp_format(error: time::error::Format) -> Self::Error;
 
+    /// `Error` when unexpectedly got empty seed phrase: if fed in upstream,
+    /// empty seed phrase is interpreted as Alice seed phrase automatically.
+    fn empty_seed() -> Self::Error;
+
+    /// `Error` when unexpectedly got empty seed name: already forbidden on the
+    /// interface, unlikely to happen in general.
+    fn empty_seed_name() -> Self::Error;
+
     /// Print `Error` as a `String`
     ///
     /// Generated string is used in parsing cards, in Signer side anyhow
