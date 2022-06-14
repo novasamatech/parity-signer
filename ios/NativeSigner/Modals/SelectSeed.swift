@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct SelectSeed: View {
-    @EnvironmentObject var data: SignerDataModel
-    var content: MSeeds
+    let content: MSeeds
+    let sign: (String, String) -> Void
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg100"))
@@ -19,10 +20,7 @@ struct SelectSeed: View {
                         ForEach(content.seedNameCards.sorted(by: {$0.seedName < $1.seedName}), id: \.seedName) {seedNameCard in
                             HStack {
                                 Button(action: {
-                                    let seedPhrase = data.getSeed(seedName: seedNameCard.seedName)
-                                    if seedPhrase != "" {
-                                        data.pushButton(action: .goForward, details: seedNameCard.seedName, seedPhrase: seedPhrase)
-                                    }
+                                    sign(seedNameCard.seedName, seedNameCard.seedName)
                                 }) {
                                     SeedCardForManager(seedNameCard: seedNameCard)
                                     Spacer()

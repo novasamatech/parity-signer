@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct PasswordConfirm: View {
-    @EnvironmentObject var data: SignerDataModel
     var content: MPasswordConfirm
+    let createAddress: (String, String) -> Void
     @State private var passwordCheck: String = ""
     @FocusState private var focused: Bool
     
@@ -46,7 +46,7 @@ struct PasswordConfirm: View {
                 BigButton(
                     text: "Next",
                     action: {
-                        data.createAddress(path: content.croppedPath+"///"+content.pwd, seedName: content.seedName)
+                        createAddress(content.croppedPath+"///"+content.pwd, content.seedName)
                     },
                     isDisabled: passwordCheck != content.pwd
                 )

@@ -9,9 +9,10 @@ import SwiftUI
 import CoreML
 
 struct AlertSelector: View {
-    @EnvironmentObject var data: SignerDataModel
+    let alertData: AlertData?
+    
     var body: some View {
-        switch (data.actionResult.alertData) {
+        switch (alertData) {
         case .none:
             EmptyView()
         case .errorData(let value):

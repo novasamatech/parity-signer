@@ -6503,12 +6503,37 @@ fn flow_test_1() {
 
         let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
 
-        if let Some(AlertData::ErrorData { ref mut f }) = action.alert_data {
-            *f = cut_os_msg(f);
-        } else {
-            panic!("Expected AlertData::ErrorData");
-        }
+        let expected_alert = "Database error. Internal error. IO error: could not acquire lock on \"for_tests/flow_test_1/db\": Os {**}".to_string();
+        let expected_action = ActionResult {
+            screen_label: "".to_string(),
+            back: false,
+            footer: true,
+            footer_button: Some(FooterButton::Settings),
+            right_button: None,
+            screen_name_type: ScreenNameType::H4,
+            screen_data: ScreenData::Settings {
+                f: MSettings {
+                    public_key: None,
+                    identicon: None,
+                    encryption: None,
+                    error: Some(expected_alert),
+                },
+            },
+            modal_data: None,
+            alert_data: None,
+        };
 
+        if let ScreenData::Settings { ref mut f } = action.screen_data {
+            if let Some(ref mut e) = f.error {
+                *e = cut_os_msg(e);
+            } else {
+                panic!("Expected some error on Settings screen");
+            }
+        } else {
+            panic!("Expected Screen::Settings");
+        };
+
+        //Important test! Please check that alert is `None` after going back or we app get stuck
         assert_eq!(
             action, expected_action,
             "GoBack on SeedSelector with ErrorDisplay alert."
@@ -6575,13 +6600,12 @@ fn flow_test_1() {
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Settings {
             f: MSettings {
+                error: Some(String::from("Could not find general verifier.")),
                 ..Default::default()
             },
         },
         modal_data: None,
-        alert_data: Some(AlertData::ErrorData {
-            f: "Could not find general verifier.".to_string(),
-        }),
+        alert_data: None, // None, DO NOT MODIFY THIS
     };
 
     assert_eq!(
