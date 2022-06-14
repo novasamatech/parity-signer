@@ -1903,7 +1903,7 @@ impl State {
                     //This is special error used only
                     //here; please do not change it to
                     //`Alert::Error` or app may get stuck
-                    new_navstate.alert = Alert::ErrorDisplay; 
+                    new_navstate.alert = Alert::ErrorDisplay;
                     ScreenData::Settings {
                         f: MSettings::default(),
                     }
