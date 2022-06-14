@@ -87,6 +87,13 @@ fun SettingsScreen(
 							style = CryptoTypography.body1,
 							color = MaterialTheme.colors.Text400
 						)
+						settings.error?.let {
+							Text(
+								it,
+								style = Typography.body2,
+								color = MaterialTheme.colors.error
+							)
+						}
 					}
 				}
 			}
