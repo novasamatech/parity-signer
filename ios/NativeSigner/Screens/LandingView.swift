@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct LandingView: View {
-    @EnvironmentObject var data: SignerDataModel
     @State var tacAccept = false
     @State var ppAccept = false
     @State var accept = false
+    let onboard: () -> Void
     var body: some View {
         VStack {
             DocumentModal()
@@ -48,7 +48,7 @@ struct LandingView: View {
                     Alert(
                         title: Text("Accept privacy policy?"),
                         primaryButton: .default(Text("Decline")),
-                        secondaryButton: .default(Text("Accept"), action: {data.onboard()})
+                        secondaryButton: .default(Text("Accept"), action: {onboard()})
                     )
                 })
             }

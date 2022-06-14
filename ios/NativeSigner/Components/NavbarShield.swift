@@ -9,34 +9,28 @@ import SwiftUI
 import Network
 
 struct NavbarShield: View {
-    @EnvironmentObject var data: SignerDataModel
+    let canaryDead: Bool
+    let alert: Bool
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
-        if data.canaryDead /*bluetooth detector: `|| data.bsDetector.canaryDead`*/ {
             Button(action: {
-                data.pushButton(action: .shield)
+                pushButton(.shield, "", "")
             }) {
+                if canaryDead /*bluetooth detector: `|| data.bsDetector.canaryDead`*/ {
                 Image(systemName: "shield.slash")
                     .imageScale(.large)
                     .foregroundColor(Color("SignalDanger"))
-            }
-        } else {
-            if data.alert {
-                Button(action: {
-                    data.pushButton(action: .shield)
-                }) {
-                    Image(systemName: "exclamationmark.shield")
-                        .imageScale(.large)
-                        .foregroundColor(Color("SignalWarning"))
+                } else {
+                    if alert {
+                        Image(systemName: "exclamationmark.shield")
+                            .imageScale(.large)
+                            .foregroundColor(Color("SignalWarning"))
+                    } else {
+                        Image(systemName: "lock.shield.fill")
+                            .imageScale(.large)
+                            .foregroundColor(Color("Crypto400"))
+                    }
                 }
-            } else {
-                Button(action: {
-                    data.pushButton(action: .shield)
-                }) {
-                    Image(systemName: "lock.shield.fill")
-                        .imageScale(.large)
-                        .foregroundColor(Color("Crypto400"))
-                }
-            }
         }
     }
 }

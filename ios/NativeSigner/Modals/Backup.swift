@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct Backup: View {
-    @EnvironmentObject var data: SignerDataModel
     let content: MBackup
+    let alert: Bool
+    let getSeedForBackup: (String) -> String
+    let pushButton: (Action, String, String) -> Void
     @State var secret: String = ""
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State var countdown = 60
@@ -24,7 +26,7 @@ struct Backup: View {
                     HStack {
                         Spacer()
                         Button(action: {
-                            data.pushButton(action: .goBack)
+                            pushButton(.goBack, "", "")
                         }) {
                             Image(systemName: "xmark").imageScale(.large).foregroundColor(Color("Text300"))
                         }
@@ -45,11 +47,11 @@ struct Backup: View {
                             Spacer()
                         }
                         .onAppear{
-                            secret = data.getSeed(seedName: content.seedName, backup: true)
+                            secret = getSeedForBackup(content.seedName)
                             if secret == "" {
                                 failure = true
                                 countdown = -1
-                                secret = data.alert ? "Network connected! Seeds are not available now. Please enable airplane mode and disconnect all cables to access the seed phrase." : "Seeds are not available now! Come back again to access them."
+                                secret = alert ? "Network connected! Seeds are not available now. Please enable airplane mode and disconnect all cables to access the seed phrase." : "Seeds are not available now! Come back again to access them."
                             }
                         }
                         .onDisappear{
