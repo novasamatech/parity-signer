@@ -21,39 +21,8 @@ pub enum Command {
     /// Prepare payload for `add_specs` update according to [`InstructionSpecs`]
     Specs(InstructionSpecs),
 
-    /// # Prepare payload for `load_metadata` update according to
+    /// Prepare payload for `load_metadata` update according to
     /// [`InstructionMeta`]
-    ///
-    /// `$ cargo run load_metadata <key(s)> <(argument)>`
-    ///
-    /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
-    /// (optionally) be signed and later be transformed into `load_metadata`
-    /// update QR. Output file name is `sign_me_load_metadata_<name>V<version>`.
-    ///
-    /// Setting keys that could be used in command line (maximum one):
-    ///
-    /// - `-d`: do **not** update the database, make rpc calls, and produce
-    /// output files
-    /// - `-f`: do **not** run rpc calls, produce output files from database as
-    /// it is
-    /// - `-k`: update database through rpc calls, produce output files only for
-    /// **updated** database entries
-    /// - `-p`: update database through rpc calls, do **not** produce any output
-    /// files
-    /// - `-t` (no setting key defaults here): update database through rpc
-    /// calls, produce output files
-    ///
-    /// Reference keys (exactly only one has to be used):
-    ///
-    /// - `-a`: all networks with entries in the
-    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
-    /// - `-n` followed by single network name: for a network with existing
-    /// record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-    /// - `-u` followed by single url address: reserved for networks with no
-    /// record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-    ///
-    /// `-a` key could be used with `-s` key, to stop processing after first
-    /// error.
     Load(InstructionMeta),
 
     /// # Prepare payload for `load_types` update
