@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct EnterPassword: View {
-    @EnvironmentObject var data: SignerDataModel
     var content: MEnterPassword
+    let pushButton: (Action, String, String) -> Void
     @State private var password: String = ""
     @FocusState private var focused: Bool
     var body: some View {
@@ -45,7 +45,7 @@ struct EnterPassword: View {
                     text: "Next",
                     isCrypto: true,
                     action: {
-                    data.pushButton(action: .goForward, details: password)
+                    pushButton(.goForward, password, "")
                 },
                     isDisabled: password == ""
                 )

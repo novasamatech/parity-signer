@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct NewAddressScreen: View {
-    
-    @EnvironmentObject var data: SignerDataModel
     @State var path: String = ""
     @FocusState private var focusedField: Bool
     @State private var derivationCheck: DerivationCheck? = nil
-    
     var content: MDeriveKey
+    let pathCheck: (String, String, String) -> DerivationCheck
+    let createAddress: (String, String) -> Void
+    let pushButton: (Action, String, String) -> Void
     
     var body: some View {
         ZStack {
@@ -36,16 +36,16 @@ struct NewAddressScreen: View {
                                 .keyboardType(.asciiCapable)
                                 .submitLabel(.done)
                                 .onChange(of: path) {pathNew in
-                                    derivationCheck = substratePathCheck(seedName: content.seedName, path: pathNew, network: content.networkSpecsKey, dbname: data.dbName)
+                                    derivationCheck = pathCheck(content.seedName, pathNew, content.networkSpecsKey)
                                     path = pathNew
                                 }
                                 .onSubmit {
                                     switch (derivationCheck?.whereTo) {
                                     case .pin:
-                                        data.createAddress(path: path, seedName: content.seedName)
+                                        createAddress(path, content.seedName)
                                         break
                                     case .pwd:
-                                        data.pushButton(action: .checkPassword, details: path)
+                                        pushButton(.checkPassword, path, "")
                                         break
                                     default:
                                         break
@@ -71,10 +71,10 @@ struct NewAddressScreen: View {
                         action: {
                             switch (derivationCheck?.whereTo) {
                             case .pin:
-                                data.createAddress(path: path, seedName: content.seedName)
+                                createAddress(path, content.seedName)
                                 break
                             case .pwd:
-                                data.pushButton(action: .checkPassword, details: path)
+                                pushButton(.checkPassword, path, "")
                                 break
                             default:
                                 break

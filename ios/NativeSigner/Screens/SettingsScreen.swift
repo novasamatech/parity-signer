@@ -8,23 +8,25 @@
 import SwiftUI
 
 struct SettingsScreen: View {
-    @EnvironmentObject var data: SignerDataModel
     @State var wipe = false
     @State var jailbreak = false
     let content: MSettings
+    let appVersion: String?
+    let doWipe: () -> Void
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         VStack (spacing: 2) {
             Button(action: {
-                data.pushButton(action: .manageNetworks)
+                pushButton(.manageNetworks, "", "")
             }) {
                 SettingsCardTemplate(text: "Networks")
             }
             Button(action: {
-                data.pushButton(action: .backupSeed)
+                pushButton(.backupSeed, "", "")
             }) {
                 SettingsCardTemplate(text: "Backup keys")
             }
-            Button(action: {data.pushButton(action: .viewGeneralVerifier)}) {
+            Button(action: {pushButton(.viewGeneralVerifier, "", "")}) {
             VStack {
                 HStack {
                     Text("Verifier certificate").font(FBase(style: .h1)).foregroundColor(Color("Text600"))
@@ -66,19 +68,19 @@ struct SettingsScreen: View {
                     secondaryButton: .destructive(
                         Text("Wipe"),
                         action: {
-                            data.wipe()
+                            doWipe()
                         }
                     )
                 )
             })
             
             Button(action: {
-                data.pushButton(action: .showDocuments)
+                pushButton(.showDocuments, "", "")
             }) {
                 SettingsCardTemplate(text: "About")
             }
             SettingsCardTemplate(
-                text: "App version: " + (data.appVersion ?? "Unknown!"),
+                text: "App version: " + (appVersion ?? "Unknown!"),
                 withIcon: false,
                 withBackground: false
             )
