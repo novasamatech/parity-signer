@@ -75,8 +75,6 @@ android.applicationVariants.all { variant ->
 apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
 
 cargo {
-	def ndkDir = android.ndkDirectory
-
 	module = "../../rust/signer"
 	targetDirectory = "../../rust/target"
 	libname = "signer"
@@ -84,17 +82,6 @@ cargo {
 	apiLevel = 21
 	profile = 'release'
 	extraCargoBuildArguments = ["--locked"]
-	exec { spec, toolchain ->
-		if (toolchain.target == "x86_64-linux-android") {
-			spec.environment("AR_x86_64-linux-android", "$ndkDir/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar")
-		}
-		if (toolchain.target == "armv7-linux-androideabi") {
-			spec.environment("AR_armv7-linux-androideabi", "$ndkDir/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar")
-		}
-		if (toolchain.target == "aarch64-linux-android") {
-			spec.environment("AR_aarch64-linux-android", "$ndkDir/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar")
-		}
-	}
 }
 
 dependencies {
