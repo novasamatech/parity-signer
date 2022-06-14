@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct TransactionScreen: View {
-    @EnvironmentObject var data: SignerDataModel
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
-        CameraView()
+        CameraView(pushButton: pushButton)
     }
 }
 
