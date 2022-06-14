@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct VerifierScreen: View {
-    @EnvironmentObject var data: SignerDataModel
     @State var jailbreak = false
     let content: MVerifierDetails
+    let doJailbreak: () -> Void
     var body: some View {
         VStack {
             HStack {
@@ -38,7 +38,7 @@ struct VerifierScreen: View {
                     secondaryButton: .destructive(
                         Text("I understand"),
                         action: {
-                            data.jailbreak()
+                            doJailbreak()
                         }
                     )
                 )

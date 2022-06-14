@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct TypesMenu: View {
-    @EnvironmentObject var data: SignerDataModel
     var content: MTypesInfo
+    
+    let pushButton: (Action, String, String) -> Void
     @State var removeTypesAlert = false
     var body: some View {
         MenuStack {
@@ -27,7 +28,7 @@ struct TypesMenu: View {
                     text: "Sign types",
                     isShaded: true,
                     isCrypto: true,
-                    action:{data.pushButton(action: .signTypes)}
+                    action:{pushButton(.signTypes, "", "")}
                 )
                 BigButton(
                     text: "Delete types",
@@ -39,7 +40,7 @@ struct TypesMenu: View {
         }
         .gesture(DragGesture().onEnded{drag in
             if drag.translation.height > 40 {
-                data.pushButton(action: .goBack)
+                pushButton(.goBack, "", "")
             }
         })
         .alert(isPresented: $removeTypesAlert, content: {
@@ -47,7 +48,7 @@ struct TypesMenu: View {
                   message: Text("Types information needed for support of pre-v14 metadata will be removed. Are you sure?"),
                   primaryButton: .cancel(Text("Cancel")),
                   secondaryButton: .destructive(Text("Remove types"),
-                                                action: {data.pushButton(action: .removeTypes)}))
+                                                action: {pushButton(.removeTypes, "", "")}))
         })
     }
 }

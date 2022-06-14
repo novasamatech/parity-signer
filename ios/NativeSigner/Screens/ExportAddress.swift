@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct ExportAddress: View {
-    @EnvironmentObject var data: SignerDataModel
     @State var showDetails = false
     var content: MKeyDetails
     var body: some View {
