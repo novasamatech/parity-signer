@@ -1900,9 +1900,10 @@ impl State {
                 Ok(sd) => sd,
                 Err(e) => {
                     errorline.push_str(&<Signer>::show(&e));
-                    new_navstate.alert = Alert::ErrorDisplay; //This is special error used only
-                                                              //here; please do not change it to
-                                                              //`Alert::Error` or app may get stuck
+                    //This is special error used only
+                    //here; please do not change it to
+                    //`Alert::Error` or app may get stuck
+                    new_navstate.alert = Alert::ErrorDisplay; 
                     ScreenData::Settings {
                         f: MSettings::default(),
                     }
