@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SufficientCryptoReady: View {
-    @EnvironmentObject var data: SignerDataModel
     @GestureState private var dragOffset = CGSize.zero
     @State var offset: CGFloat = 0
     @State var oldOffset: CGFloat = 0

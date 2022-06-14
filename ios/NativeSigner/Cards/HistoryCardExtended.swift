@@ -173,7 +173,7 @@ struct HistoryCardExtended: View {
                 Text("in network")
                 Text(value.networkName)
                 Text("Comment :")
-                Text(String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self))
+                Text(value.userComment)
             }
             case .transactionSigned(let value):
                 VStack {
@@ -189,7 +189,7 @@ struct HistoryCardExtended: View {
                     Text("in network")
                     Text(value.networkName)
                     Text("Comment :")
-                    Text(String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self))
+                    Text(value.userComment)
                 }
             case .typesAdded(_): HistoryCardTemplate(
                 image: "plus.viewfinder",
@@ -238,7 +238,7 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Generated signature for message",
-                line2: String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self)
+                line2: value.userComment
             )
             }
         }

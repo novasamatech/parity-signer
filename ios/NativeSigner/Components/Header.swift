@@ -8,41 +8,41 @@
 import SwiftUI
 
 struct Header: View {
-    @EnvironmentObject var data: SignerDataModel
+    let back: Bool
+    let screenLabel: String
+    let screenNameType: ScreenNameType?
+    let rightButton: RightButton?
+    let alert: Bool
+    let canaryDead: Bool
+    let alertShow: () -> Void
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         VStack {
             Spacer()
             HStack {
                 HStack(spacing: 8.0) {
-                    if data.actionResult.back {
+                    if back {
                         Button(action: {
-                            data.pushButton(action: .goBack)
+                            pushButton(.goBack, "", "")
                         }) {
-                            Image(systemName: data.actionResult.rightButton == .multiSelect ? "xmark" : "chevron.left")
+                            Image(systemName: rightButton == .multiSelect ? "xmark" : "chevron.left")
                                 .imageScale(.large)
                                 .foregroundColor(Color("Text500"))
                         }
                     }
-                    /*if data.actionResult.back {
-                     Button(action: {
-                     data.pushButton(buttonID: .GoBack)
-                     }) {
-                     SmallButton(text: "Cancel")
-                     }
-                     } else {*/
                     Spacer()
                 }
                 .frame(width: 72.0)
                 
                 Spacer()
-                Text(data.actionResult.screenLabel)
+                Text(screenLabel)
                     .foregroundColor(Color("Text600"))
-                    .font(data.actionResult.screenNameType == .h1 ? FBase(style: .h2) : FBase(style: .h4))
+                    .font(screenNameType == .h1 ? FBase(style: .h2) : FBase(style: .h4))
                     .tracking(0.1)
                 
-                if data.actionResult.rightButton == .multiSelect {
+                if rightButton == .multiSelect {
                     Button(action: {
-                        data.pushButton(action: .selectAll)
+                        pushButton(.selectAll, "", "")
                     }) {
                         SmallButton(text: "Select all")
                     }
@@ -52,14 +52,14 @@ struct Header: View {
                 HStack(spacing: 8.0) {
                     Spacer()
                     Button(action: {
-                        if data.alert && data.actionResult.rightButton == .newSeed {
-                            data.alertShow = true
+                        if alert && rightButton == .newSeed {
+                            alertShow()
                         } else {
-                            data.pushButton(action: .rightButtonAction)
+                            pushButton(.rightButtonAction, "", "")
                         }
                     }) {
                         switch(
-                            data.actionResult.rightButton
+                            rightButton
                         ) {
                         case .newSeed:
                             Image(systemName: "plus.circle")
@@ -83,7 +83,10 @@ struct Header: View {
                                 .foregroundColor(Color("Action400"))
                         }
                     }
-                    NavbarShield()
+                    NavbarShield(
+                        canaryDead: canaryDead,
+                        alert: alert,
+                        pushButton: pushButton)
                 }
                 .frame(width: 72.0)
             }

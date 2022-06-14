@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct NetworkDetailsMenu: View {
-    @EnvironmentObject var data: SignerDataModel
     @State var removeNetworkAlert = false
+    
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         MenuStack {
             HeaderBar(line1: "MANAGE NETWORK", line2: "Select action").padding(.top, 10)
@@ -18,7 +19,7 @@ struct NetworkDetailsMenu: View {
                     text: "Sign network specs",
                     isShaded: true,
                     isCrypto: true,
-                    action:{data.pushButton(action: .signNetworkSpecs)}
+                    action:{pushButton(.signNetworkSpecs, "", "")}
                 )
                 BigButton(
                     text: "Delete network",
@@ -31,11 +32,11 @@ struct NetworkDetailsMenu: View {
         }
         .gesture(DragGesture().onEnded{drag in
             if drag.translation.height > 40 {
-                data.pushButton(action: .goBack)
+                pushButton(.goBack, "", "")
             }
         })
         .alert(isPresented: $removeNetworkAlert, content: {
-            Alert(title: Text("Remove network?"), message: Text("This network will be removed for whole device"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove network"), action: {data.pushButton(action: .removeNetwork)}))
+            Alert(title: Text("Remove network?"), message: Text("This network will be removed for whole device"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove network"), action: {pushButton(.removeNetwork, "", "")}))
         })
     }
 }
