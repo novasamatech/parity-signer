@@ -13,9 +13,9 @@ definitions = {path = "../definitions", default-features = false, features = ["a
 hex = "0.4.3"
 jsonrpsee = {version = "0.9.0", features = ["ws-client"]}
 lazy_static = "1.4.0"
-parity-scale-codec = "3.1.2"
+parity-scale-codec = "3.1.5"
 qrcode_rtx = {path = "../qrcode_rtx"}
-regex = "1.5.4"
+regex = "1.5.6"
 serde_json = "1.0.81"
 sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
