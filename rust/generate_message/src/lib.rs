@@ -71,7 +71,7 @@ pub fn full_run(command: Command) -> Result<(), ErrorActive> {
         Command::Specs(instruction) => gen_add_specs(instruction),
         Command::Make(make) => make_message(make),
         Command::Remove(info) => remove_info(info),
-        Command::RestoreDefaults => default_hot(),
+        Command::RestoreDefaults => default_hot(None),
         Command::MakeColdRelease(opt_path) => default_cold_release(opt_path),
         Command::TransferMetaRelease => {
             transfer_metadata_to_cold(HOT_DB_NAME, COLD_DB_NAME_RELEASE)

@@ -78,11 +78,10 @@ use crate::{
 /// Default metadata is loaded into the cold database for default networks:
 /// Polkadot, Kusama, Westend. `Purpose` determines the metadata source folder
 /// and the versions to be loaded.
-#[cfg(any(feature = "active", feature = "test"))]
+#[cfg(feature = "active")]
 enum Purpose {
     /// Two (or fewer) latest released versions of the metadata for each of the
     /// default networks
-    #[cfg(feature = "active")]
     Release,
 
     /// Old metadata set, used mostly in `transaction_parsing` tests
@@ -99,11 +98,10 @@ enum Purpose {
 ///
 /// - Purge all existing entries
 /// - Add default metadata entries, according to [`Purpose`]
-#[cfg(any(feature = "active", feature = "test"))]
+#[cfg(feature = "active")]
 fn default_cold_metadata(database_name: &str, purpose: Purpose) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, METATREE)?;
     let metadata_set = match purpose {
-        #[cfg(feature = "active")]
         Purpose::Release => release_metadata()?,
 
         #[cfg(feature = "test")]
