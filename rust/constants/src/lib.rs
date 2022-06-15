@@ -157,17 +157,23 @@ pub const SECONDARY_COLOR: &str = "#262626";
 /// Common part of the file names for `load_metadata` payloads ready for signing,
 /// for `generate_message` crate
 #[cfg(feature = "active")]
-pub const LOAD: &str = "../files/for_signing/sign_me_load_metadata";
+pub fn load_metadata() -> String {
+    format!("{}/sign_me_load_metadata", FOLDER)
+}
 
 /// File name for `load_types` payload ready for signing, for `generate_message`
 /// crate
 #[cfg(feature = "active")]
-pub const TYLO: &str = "../files/for_signing/sign_me_load_types";
+pub fn load_types() -> String {
+    format!("{}/sign_me_load_types", FOLDER)
+}
 
 /// Common part of the file names for `add_specs` payloads ready for signing,
 /// for `generate_message` crate
 #[cfg(feature = "active")]
-pub const SPECS: &str = "../files/for_signing/sign_me_add_specs";
+pub fn add_specs() -> String {
+    format!("{}/sign_me_add_specs", FOLDER)
+}
 
 /// Folder to save payloads ready for signing, for `generate_message` crate
 #[cfg(feature = "active")]

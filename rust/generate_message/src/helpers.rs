@@ -6,8 +6,8 @@ use sp_core::H256;
 use std::{cmp::Ordering, convert::TryInto};
 
 use constants::{
-    ADDRESS_BOOK, COLOR, EXPORT_FOLDER, HOT_DB_NAME, LOAD, METATREE, META_HISTORY, SECONDARY_COLOR,
-    SPECS, SPECSTREEPREP,
+    add_specs, load_metadata, ADDRESS_BOOK, COLOR, EXPORT_FOLDER, HOT_DB_NAME, METATREE,
+    META_HISTORY, SECONDARY_COLOR, SPECSTREEPREP,
 };
 use db_handling::{
     db_transactions::TrDbHot,
@@ -956,7 +956,9 @@ fn get_hash(fetched_hash: &str, what: Hash) -> Result<H256, ErrorActive> {
 pub fn load_meta_print(shortcut: &MetaShortCut) -> Result<(), ErrorActive> {
     let filename = format!(
         "{}_{}V{}",
-        LOAD, shortcut.meta_values.name, shortcut.meta_values.version
+        load_metadata(),
+        shortcut.meta_values.name,
+        shortcut.meta_values.version
     );
     let content = ContentLoadMeta::generate(&shortcut.meta_values.meta, &shortcut.genesis_hash);
     content.write(&filename)
@@ -969,7 +971,7 @@ pub fn load_meta_print(shortcut: &MetaShortCut) -> Result<(), ErrorActive> {
 pub fn print_specs(network_specs: &NetworkSpecsToSend) -> Result<(), ErrorActive> {
     let filename = format!(
         "{}_{}_{}",
-        SPECS,
+        add_specs(),
         network_specs.name,
         network_specs.encryption.show()
     );
