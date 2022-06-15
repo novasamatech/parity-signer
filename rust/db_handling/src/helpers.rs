@@ -4,6 +4,8 @@ use parity_scale_codec::Decode;
 #[cfg(any(feature = "active", feature = "signer"))]
 use parity_scale_codec::Encode;
 use sled::{open, Batch, Db, Tree};
+#[cfg(feature = "signer")]
+use sp_core::H256;
 
 #[cfg(feature = "signer")]
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, VERIFIERS};
@@ -139,11 +141,13 @@ pub fn try_get_valid_current_verifier(
             // added at the same time.
             // If the genesis hash is found in network specs, but no verifier
             // entry exists, it indicated that the database is corrupted.
-            if let Some((network_specs_key, _)) = genesis_hash_in_specs(verifier_key, &database)? {
+            if let Some(specs_invariants) =
+                genesis_hash_in_specs(verifier_key.genesis_hash(), &database)?
+            {
                 return Err(ErrorSigner::Database(
                     DatabaseSigner::UnexpectedGenesisHash {
-                        verifier_key: verifier_key.to_owned(),
-                        network_specs_key,
+                        name: specs_invariants.name,
+                        genesis_hash: specs_invariants.genesis_hash,
                     },
                 ));
             }
@@ -169,6 +173,20 @@ pub fn get_valid_current_verifier(
     })
 }
 
+/// Specs invariants that are expected to stay unchanged for the network over
+/// time and can not be different for same genesis hash and different encryption
+/// algorithms.
+#[cfg(feature = "signer")]
+pub struct SpecsInvariants {
+    pub base58prefix: u16,
+
+    /// network with lowest order, for correct navigation when updating the
+    /// network metadata
+    pub first_network_specs_key: NetworkSpecsKey,
+    pub genesis_hash: H256,
+    pub name: String,
+}
+
 /// Search for network genesis hash in [`NetworkSpecs`] entries in [`SPECSTREE`]
 /// of the Signer database.
 ///
@@ -181,28 +199,17 @@ pub fn get_valid_current_verifier(
 /// outputs network specs key for the network with the lowest order.
 ///
 /// If there are several entries with same genesis hash, all of them must have
-/// identical base58 prefix. Base58 prefix from found network specs is used in
-/// `add_specs` module of `transaction_parsing` crate directly, and therefore is
-/// checked here.
-///
-/// When the entries are added in the database, only the entries with same
-/// base58 prefix are allowed for a given network, as identified by genesis
-/// hash. This is done to keep consistency between the network specs and
-/// network metadata, that potentially also can contain the base58 prefix, but
-/// has no specified associated [`Encryption`](definitions::crypto::Encryption),
-/// i.e. could be used with any [`NetworkSpecs`] containing given genesis hash.
-///
-/// If later on different values are found, it indicates the database
-/// corruption.
+/// identical base58 prefix and network name. Network name is, and base58 prefix
+/// could be a part of the network metadata, and therefore must not depend on
+/// encryption used.
 #[cfg(feature = "signer")]
 pub fn genesis_hash_in_specs(
-    verifier_key: &VerifierKey,
+    genesis_hash: H256,
     database: &Db,
-) -> Result<Option<(NetworkSpecsKey, NetworkSpecs)>, ErrorSigner> {
-    let genesis_hash = verifier_key.genesis_hash();
+) -> Result<Option<SpecsInvariants>, ErrorSigner> {
     let chainspecs = open_tree::<Signer>(database, SPECSTREE)?;
     let mut specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
-    let mut found_base58prefix = None;
+    let mut found_permanent_specs: Option<(u16, String)> = None;
     for (network_specs_key_vec, network_specs_encoded) in chainspecs.iter().flatten() {
         let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
         let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(
@@ -210,10 +217,20 @@ pub fn genesis_hash_in_specs(
             network_specs_encoded,
         )?;
         if network_specs.genesis_hash.as_bytes() == &genesis_hash[..] {
-            found_base58prefix = match found_base58prefix {
-                Some(base58prefix) => {
+            found_permanent_specs = match found_permanent_specs {
+                Some((base58prefix, name)) => {
                     if base58prefix == network_specs.base58prefix {
-                        Some(base58prefix)
+                        if name == network_specs.name {
+                            Some((base58prefix, name))
+                        } else {
+                            return Err(ErrorSigner::Database(
+                                DatabaseSigner::DifferentNamesSameGenesisHash {
+                                    name1: name,
+                                    name2: network_specs.name.to_string(),
+                                    genesis_hash: network_specs.genesis_hash,
+                                },
+                            ));
+                        }
                     } else {
                         return Err(ErrorSigner::Database(
                             DatabaseSigner::DifferentBase58Specs {
@@ -224,14 +241,19 @@ pub fn genesis_hash_in_specs(
                         ));
                     }
                 }
-                None => Some(network_specs.base58prefix),
+                None => Some((network_specs.base58prefix, network_specs.name.to_string())),
             };
             specs_set.push((network_specs_key, network_specs))
         }
     }
     specs_set.sort_by(|a, b| a.1.order.cmp(&b.1.order));
     match specs_set.get(0) {
-        Some(a) => Ok(Some(a.to_owned())),
+        Some(a) => Ok(Some(SpecsInvariants {
+            base58prefix: a.1.base58prefix,
+            first_network_specs_key: a.0.to_owned(),
+            genesis_hash,
+            name: a.1.name.to_string(),
+        })),
         None => Ok(None),
     }
 }
@@ -520,7 +542,7 @@ pub fn remove_network(
     let general_verifier = get_general_verifier(database_name)?;
     let network_specs = get_network_specs(database_name, network_specs_key)?;
 
-    let verifier_key = VerifierKey::from_parts(network_specs.genesis_hash.as_bytes());
+    let verifier_key = VerifierKey::from_parts(network_specs.genesis_hash);
     let valid_current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
 
     // modify verifier as needed

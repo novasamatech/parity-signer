@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct TransactionPreview: View {
-    @EnvironmentObject var data: SignerDataModel
     @State private var comment = ""
     @State var offset: CGFloat = 0
     @State var offsetOld: CGFloat = 0
     @FocusState private var focus: Bool
     let content: MTransaction
+    let sign: (String, String) -> Void
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         VStack {
             TransactionBlock(cards: content.content.assemble())
@@ -58,14 +59,8 @@ struct TransactionPreview: View {
                             isCrypto: true,
                             action: {
                                 focus = false
-                                if data.alert {
-                                    data.alertShow = true
-                                } else {
-                                    data.pushButton(
-                                        action: .goForward,
-                                        details: Data(comment.utf8).base64EncodedString(),
-                                        seedPhrase: data.getSeed(seedName: content.authorInfo?.seedName ?? "")
-                                    )
+                                if let seedName = content.authorInfo?.seedName {
+                                    sign(seedName, comment)
                                 }
                             }
                         )
@@ -73,7 +68,7 @@ struct TransactionPreview: View {
                         BigButton(
                             text: "Approve",
                             action: {
-                                data.pushButton(action: .goForward)
+                                pushButton(.goForward, "", "")
                             })
                     case .read:
                         EmptyView()
@@ -82,7 +77,7 @@ struct TransactionPreview: View {
                             text: "Select seed",
                             isCrypto: true,
                             action: {
-                                data.pushButton(action: .goForward)
+                                pushButton(.goForward, "", "")
                             })
                     case .done:
                         EmptyView()
@@ -94,7 +89,7 @@ struct TransactionPreview: View {
                             isDangerous: true,
                             action: {
                                 focus = false
-                                data.pushButton(action: .goBack)})
+                                pushButton(.goBack, "", "")})
                     }
                 }
             }

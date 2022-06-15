@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct NetworkDetails: View {
-    @EnvironmentObject var data: SignerDataModel
-    var content: MNetworkDetails
+    let content: MNetworkDetails
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         ZStack {
             VStack {
@@ -33,7 +33,7 @@ struct NetworkDetails: View {
                     }
                     HStack {
                         Text("genesis hash:")
-                        Text(content.genesisHash).fixedSize(horizontal: false, vertical: true)
+                        Text(content.genesisHash.map{String(format: "%02X", $0)}.joined()).fixedSize(horizontal: false, vertical: true)
                     }
                     HStack {
                         Text("Verifier certificate: ").fixedSize(horizontal: false, vertical: true)
@@ -61,7 +61,7 @@ struct NetworkDetails: View {
                             metaEntry in
                             Button(
                                 action: {
-                                    data.pushButton(action: .manageMetadata, details: metaEntry.specsVersion)
+                                    pushButton(.manageMetadata, metaEntry.specsVersion, "")
                                 }
                             ){
                             MetadataCard(meta: metaEntry)

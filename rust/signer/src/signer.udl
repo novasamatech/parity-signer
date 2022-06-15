@@ -87,7 +87,7 @@ dictionary NetworkSpecsExport {
 };
 
 dictionary NetworkVerifierDisplay {
-    sequence<u8> genesis_hash;
+    H256 genesis_hash;
     ValidCurrentVerifier valid_current_verifier;
     Verifier general_verifier;
 };
@@ -450,7 +450,7 @@ dictionary MNetworkDetails {
     string color;
     u8 decimals;
     Encryption encryption;
-    string genesis_hash;
+    H256 genesis_hash;
     string logo;
     string name;
     string order;
@@ -747,7 +747,7 @@ dictionary MSCTip {
 };
 
 dictionary MSCTxSpecPlain {
-    string network_genesis_hash;
+    H256 network_genesis_hash;
     string version;
     string tx_version;
 };

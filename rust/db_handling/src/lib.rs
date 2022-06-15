@@ -25,8 +25,7 @@
 //! Feature `"test"` includes both `"signer"` and `"active"` features, along
 //! with some testing, and is the default one.  
 
-// this is a fix for `log` crate unused in ios
-// #![deny(unused_crate_dependencies)]
+#![deny(unused_crate_dependencies)]
 
 // possibly TODO: rename all database_name into database_path or whatever,
 // currently it is quite confusing
@@ -108,7 +107,10 @@ pub fn default_cold_release(path: Option<PathBuf>) -> Result<(), ErrorActive> {
 /// - **no** metadata entries; the `METATREE` is cleared - all metadata in the
 /// hot database is received only through rpc calls.
 #[cfg(feature = "active")]
-pub fn default_hot() -> Result<(), ErrorActive> {
-    let database_name = HOT_DB_NAME;
+pub fn default_hot(path: Option<PathBuf>) -> Result<(), ErrorActive> {
+    let database_name = match path {
+        Some(ref path) => path.to_str().unwrap_or(HOT_DB_NAME),
+        None => HOT_DB_NAME,
+    };
     reset_hot_database(database_name)
 }

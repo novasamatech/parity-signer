@@ -1109,7 +1109,7 @@ pub fn full_run(command: Command) -> Result<(), ErrorActive> {
         Command::Types => prep_types::<Active>(HOT_DB_NAME)?.write(&load_types()),
         Command::Make(make) => make_message(make),
         Command::Remove(info) => remove_info(info),
-        Command::RestoreDefaults => default_hot(),
+        Command::RestoreDefaults => default_hot(None),
         Command::MakeColdRelease(opt_path) => default_cold_release(opt_path),
         Command::TransferMetaRelease(opt_path) => {
             let cold_database_path = match opt_path {

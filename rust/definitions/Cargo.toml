@@ -10,7 +10,7 @@ anyhow = {version = "1.0.55", optional = true}
 blake2-rfc = "0.2.18"
 frame-metadata = {version = "15.0.0", features = ["std", "legacy"]}
 hex = "0.4.3"
-parity-scale-codec = {version = "3.1.2", features = ["derive"]}
+parity-scale-codec = {version = "3.1.5", features = ["derive"]}
 plot_icon = {version = "0.2.0", default-features = false, features = ["pix"], optional = true}
 sc-executor-common = {git = "https://github.com/paritytech/substrate", optional = true}
 sc-executor-wasmi = {git = "https://github.com/paritytech/substrate", optional = true}
@@ -20,6 +20,7 @@ sp-io = {git = "https://github.com/paritytech/substrate", optional = true}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 sp-version = {git = "https://github.com/paritytech/substrate"}
 sp-wasm-interface = {git = "https://github.com/paritytech/substrate", optional = true}
+time = {version = "0.3.9", features = ["formatting"]}
 variant_count = {version = "1.1.0", optional = true}
 
 [features]

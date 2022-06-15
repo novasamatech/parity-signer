@@ -1,3 +1,5 @@
+use sp_core::H256;
+
 use crate::{
     crypto::Encryption, history::Event, keyring::NetworkSpecsKey, network_specs::NetworkSpecs,
 };
@@ -354,7 +356,7 @@ pub struct MNetworkDetails {
     pub color: String,
     pub decimals: u8,
     pub encryption: Encryption,
-    pub genesis_hash: String,
+    pub genesis_hash: H256,
     pub logo: String,
     pub name: String,
     pub order: String,
@@ -614,7 +616,7 @@ pub struct MSCTip {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct MSCTxSpecPlain {
-    pub network_genesis_hash: String,
+    pub network_genesis_hash: H256,
     pub version: String,
     pub tx_version: String,
 }

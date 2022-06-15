@@ -13,7 +13,7 @@ db_handling = {path = "../db_handling", default-features = false, features = ["s
 definitions = {path = "../definitions", default-features = false, features = ["signer"]}
 frame-metadata = {version = "15.0.0", default-features = false}
 hex = "0.4.3"
-parity-scale-codec = "3.1.2"
+parity-scale-codec = "3.1.5"
 parser = {path = "../parser", default-features = false}
 plot_icon = {version = "0.2.0", default-features = false, features = ["pix"]}
 sled = "0.34.6"
@@ -22,13 +22,6 @@ sp-runtime = {git = "https://github.com/paritytech/substrate", default-features 
 
 [dev-dependencies]
 pretty_assertions = "1"
-
-[features]
-default = ["test"]
-test = [
-	"constants/test",
-	"db_handling/test",
-]
 
 [lib]
 name = "transaction_parsing"

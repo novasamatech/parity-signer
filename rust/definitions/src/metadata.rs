@@ -26,6 +26,7 @@ use sc_executor_common::{
 #[cfg(feature = "active")]
 use sc_executor_wasmi::create_runtime;
 use sled::IVec;
+#[cfg(feature = "active")]
 use sp_core::H256;
 #[cfg(feature = "active")]
 use sp_io::SubstrateHostFunctions;

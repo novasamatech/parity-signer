@@ -11,7 +11,6 @@
 // TODO: substantial part of this will go obsolete with interface updates;
 // some functions are not called at the moment from the user interface - kept
 // for now in case they make a return, commented.
-use chrono::Utc;
 #[cfg(feature = "signer")]
 use parity_scale_codec::Decode;
 use parity_scale_codec::Encode;
@@ -146,15 +145,19 @@ pub(crate) fn events_in_batch<T: ErrorSource>(
             Order::from_number(history.len() as u32)
         }
     };
-    let timestamp = Utc::now().to_string();
+    let timestamp = time::OffsetDateTime::now_utc()
+        .format(&time::macros::format_description!(
+            "[year]-[month]-[day] [hour]:[minute]:[second].[subsecond]"
+        ))
+        .map_err(|e| <T>::timestamp_format(e))?;
     let history_entry = Entry { timestamp, events };
     out_prep.insert(order.store(), history_entry.encode());
     Ok(out_prep)
 }
 
 /// Enter [`Event`] set into the database as a single database transaction.
-#[cfg(any(feature = "signer", feature = "test"))]
-pub(crate) fn enter_events<T: ErrorSource>(
+#[cfg(feature = "signer")]
+pub fn enter_events<T: ErrorSource>(
     database_name: &str,
     events: Vec<Event>,
 ) -> Result<(), T::Error> {

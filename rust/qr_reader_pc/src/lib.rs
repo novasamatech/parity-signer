@@ -1,3 +1,4 @@
+#![deny(unused_crate_dependencies)]
 #![deny(missing_docs)]
 
 //! # QR reader crate for PC

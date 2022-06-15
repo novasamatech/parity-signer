@@ -7,29 +7,21 @@ edition = "2021"
 
 [dependencies]
 blake2-rfc = "0.2.18"
-constants = {path = "../constants", optional = true}
-definitions = {path = "../definitions", default-features = false, features = ["signer"]}
-db_handling = {path = "../db_handling", default-features = false, features = ["signer"]}
 hex = "0.4.3"
-parity-scale-codec = "3.1.2"
-qrcode_static = {path = "../qrcode_static"}
-sled = {version = "0.34.6", optional = true}
-sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
-sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
-transaction_parsing = {path = "../transaction_parsing", default-features = false, optional = true}
-zeroize = "1.5.3"
+parity-scale-codec = "3.1.5"
+zeroize = "1.5.5"
+
+definitions = { path = "../definitions", default-features = false, features = ["signer"] }
+db_handling = { path = "../db_handling", default-features = false, features = ["signer"] }
+qrcode_static = { path = "../qrcode_static" }
+sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
+sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
 
 [dev-dependencies]
 pretty_assertions = "1"
-
-[features]
-default = ["test"]
-test = [
-	"constants/test",
-	"db_handling/test",
-	"sled",
-	"transaction_parsing"
-]
+sled = "0.34.6"
+constants = { path = "../constants" }
+transaction_parsing = { path = "../transaction_parsing", default-features = false }
 
 [lib]
 name = "transaction_signing"

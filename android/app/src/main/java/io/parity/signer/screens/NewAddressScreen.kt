@@ -23,7 +23,7 @@ fun NewAddressScreen(
 	val derivationPath = remember { mutableStateOf("") }
 	val seedName = deriveKey.seedName
 	val networkSpecKey = deriveKey.networkSpecsKey
-	var derivationState by remember() {
+	var derivationState by remember {
 		mutableStateOf(
 			DerivationCheck(
 				false,

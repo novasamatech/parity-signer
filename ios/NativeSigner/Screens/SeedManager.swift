@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct SeedManager: View {
-    @EnvironmentObject var data: SignerDataModel
-    var content: MSeeds
+    let content: MSeeds
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         VStack {
             ScrollView {
@@ -17,7 +17,7 @@ struct SeedManager: View {
                     ForEach(content.seedNameCards.sorted(by: {$0.seedName < $1.seedName}), id: \.seedName) {seedNameCard in
                         HStack {
                             Button(action: {
-                                data.pushButton(action: .selectSeed, details: seedNameCard.seedName)
+                                pushButton(.selectSeed, seedNameCard.seedName, "")
                             }) {
                                 SeedCardForManager(seedNameCard: seedNameCard)
                                 Spacer()

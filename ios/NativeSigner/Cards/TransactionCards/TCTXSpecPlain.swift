@@ -13,7 +13,7 @@ struct TCTXSpecPlain: View {
         HStack{
             VStack{
                 Text("Unknown network")
-                TCNameValueTemplate(name: "Genesis hash", value: content.networkGenesisHash)
+                TCNameValueTemplate(name: "Genesis hash", value: content.networkGenesisHash.map{String(format: "%02X", $0)}.joined())
                 TCNameValueTemplate(name: "Version", value: content.version)
                 TCNameValueTemplate(name: "Tx version", value: content.txVersion)
             }
