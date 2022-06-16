@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct NewSeedMenu: View {
-    @EnvironmentObject var data: SignerDataModel
+    let alert: Bool
+    let alertShow: () -> Void
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         VStack {
             Spacer()
@@ -18,8 +20,8 @@ struct NewSeedMenu: View {
                     BigButton(
                         text: "New seed",
                         action: {
-                            if data.alert { data.alertShow = true } else {
-                                data.pushButton(buttonID: .NewSeed)
+                            if alert { alertShow() } else {
+                                pushButton(.newSeed, "", "")
                             }
                         }
                     )
@@ -27,8 +29,8 @@ struct NewSeedMenu: View {
                         text: "Recover seed",
                         isShaded: true,
                         action: {
-                            if data.alert { data.alertShow = true } else {
-                                data.pushButton(buttonID: .RecoverSeed)
+                            if alert { alertShow() } else {
+                                pushButton(.recoverSeed, "", "")
                             }
                         }
                     )

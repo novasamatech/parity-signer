@@ -30,6 +30,7 @@
 //!
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
+use sp_core::H256;
 use sp_runtime::MultiSigner;
 
 #[cfg(feature = "active")]
@@ -63,19 +64,19 @@ pub struct NetworkSpecsKey(Vec<u8>);
 /// genesis hash inside
 #[derive(Decode, Encode)]
 enum NetworkSpecsKeyContent {
-    Ed25519(Vec<u8>),
-    Sr25519(Vec<u8>),
-    Ecdsa(Vec<u8>),
+    Ed25519(H256),
+    Sr25519(H256),
+    Ecdsa(H256),
 }
 
 impl NetworkSpecsKey {
     /// Generate [`NetworkSpecsKey`] from parts: network genesis hash and
     /// [`Encryption`]
-    pub fn from_parts(genesis_hash: &[u8], encryption: &Encryption) -> Self {
+    pub fn from_parts(genesis_hash: &H256, encryption: &Encryption) -> Self {
         let network_key_content = match encryption {
-            Encryption::Ed25519 => NetworkSpecsKeyContent::Ed25519(genesis_hash.to_vec()),
-            Encryption::Sr25519 => NetworkSpecsKeyContent::Sr25519(genesis_hash.to_vec()),
-            Encryption::Ecdsa => NetworkSpecsKeyContent::Ecdsa(genesis_hash.to_vec()),
+            Encryption::Ed25519 => NetworkSpecsKeyContent::Ed25519(*genesis_hash),
+            Encryption::Sr25519 => NetworkSpecsKeyContent::Sr25519(*genesis_hash),
+            Encryption::Ecdsa => NetworkSpecsKeyContent::Ecdsa(*genesis_hash),
         };
         Self(network_key_content.encode())
     }
@@ -103,11 +104,11 @@ impl NetworkSpecsKey {
         )?))
     }
 
-    /// Get genesis hash as `Vec<u8>` and [`Encryption`] from [`NetworkSpecsKey`]
+    /// Get genesis hash as `H256` and [`Encryption`] from [`NetworkSpecsKey`]
     pub fn genesis_hash_encryption<T: ErrorSource>(
         &self,
         source: SpecsKeySource<T>,
-    ) -> Result<(Vec<u8>, Encryption), T::Error> {
+    ) -> Result<(H256, Encryption), T::Error> {
         match <NetworkSpecsKeyContent>::decode(&mut &self.0[..]) {
             Ok(a) => match a {
                 NetworkSpecsKeyContent::Ed25519(b) => Ok((b, Encryption::Ed25519)),
@@ -136,27 +137,31 @@ impl NetworkSpecsKey {
 /// - network specs, for any encryption algorithm  
 /// - network metadata
 #[derive(Decode, Encode, Debug, Clone, PartialEq)]
-pub struct VerifierKey(Vec<u8>);
+pub struct VerifierKey(H256);
 
 impl VerifierKey {
     /// Generate [`VerifierKey`] from network genesis hash
-    pub fn from_parts(genesis_hash: &[u8]) -> Self {
-        Self(genesis_hash.to_vec())
+    pub fn from_parts(genesis_hash: H256) -> Self {
+        Self(genesis_hash)
     }
 
     /// Transform database `IVec` key into [`VerifierKey`]  
-    pub fn from_ivec(ivec: &IVec) -> Self {
-        Self(ivec.to_vec())
+    pub fn from_ivec<T: ErrorSource>(ivec: &IVec) -> Result<Self, T::Error> {
+        let bytes: [u8; 32] = ivec
+            .to_vec()
+            .try_into()
+            .map_err(|_| <T>::faulty_database_types())?;
+        Ok(Self(bytes.into()))
     }
 
     /// Get genesis hash from the [`VerifierKey`]
-    pub fn genesis_hash(&self) -> Vec<u8> {
-        self.0.to_vec()
+    pub fn genesis_hash(&self) -> H256 {
+        self.0
     }
 
     /// Transform [`VerifierKey`] into `Vec<u8>` database key  
     pub fn key(&self) -> Vec<u8> {
-        self.0.to_vec()
+        self.0.as_bytes().to_vec()
     }
 }
 

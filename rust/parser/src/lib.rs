@@ -5,6 +5,7 @@ use frame_metadata::v14::RuntimeMetadataV14;
 use frame_metadata::RuntimeMetadata;
 use parity_scale_codec::{Decode, DecodeAll, Encode};
 use printing_balance::convert_balance_pretty;
+use sp_core::H256;
 use sp_runtime::generic::Era;
 
 #[cfg(feature = "test")]
@@ -75,8 +76,8 @@ struct ExtValues {
     tip: u128,
     metadata_version: u32,
     tx_version: u32,
-    genesis_hash: [u8; 32],
-    block_hash: [u8; 32],
+    genesis_hash: H256,
+    block_hash: H256,
 }
 
 pub fn parse_extensions(

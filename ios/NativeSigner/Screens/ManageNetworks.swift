@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct ManageNetworks: View {
-    @EnvironmentObject var data: SignerDataModel
-    var content: MManageNetworks
+    let content: MManageNetworks
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         ScrollView {
             LazyVStack {
                 ForEach(content.networks.sorted(by: {$0.order < $1.order}), id: \.key) { network in
-                    Button(action: {data.pushButton(buttonID: .GoForward, details: network.key)}) {
+                    Button(action: {pushButton(.goForward, network.key, "")}) {
                         NetworkCard(title: network.title, logo: network.logo, fancy: true)
                     }
                 }

@@ -27,6 +27,8 @@ use sc_executor_common::{
 use sc_executor_wasmi::create_runtime;
 use sled::IVec;
 #[cfg(feature = "active")]
+use sp_core::H256;
+#[cfg(feature = "active")]
 use sp_io::SubstrateHostFunctions;
 use sp_version::RuntimeVersion;
 #[cfg(feature = "active")]
@@ -77,7 +79,7 @@ pub struct MetaInfo {
 /// Metadata values: name, version, optional base58 prefix, warning about
 /// extensions incompatible with transaction parsing for RuntimeMetadata with
 /// version 14 and above, and metadata itself as raw `Vec<u8>`
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct MetaValues {
     /// Network name, from metadata `Version` constant  
     pub name: String,
@@ -516,7 +518,7 @@ pub struct AddressBookEntry {
     ///
     /// If network data is queried through rpc call, retrieved version must
     /// be same as the one in address book  
-    pub genesis_hash: [u8; 32],
+    pub genesis_hash: H256,
 
     /// Url address for rpc calls, with or without preferred port  
     pub address: String,

@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct LogMenu: View {
-    @EnvironmentObject var data: SignerDataModel
     @State var clearConfirm = false
     var content: MLogRight
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         VStack {
             Spacer()
@@ -20,7 +20,7 @@ struct LogMenu: View {
                     BigButton(
                         text: "Add note",
                         action: {
-                            data.pushButton(buttonID: .CreateLogComment)
+                            pushButton(.createLogComment, "", "")
                         }
                     )
                     BigButton(
@@ -37,7 +37,7 @@ struct LogMenu: View {
             .padding(.bottom, 24)
             .background(Color("Bg000"))
             .alert(isPresented: $clearConfirm, content: {
-                Alert(title: Text("Clear log?"), message: Text("Do you want this Signer to forget all logged events? This is not reversible."), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Clear log"), action: {data.pushButton(buttonID: .ClearLog)}))
+                Alert(title: Text("Clear log?"), message: Text("Do you want this Signer to forget all logged events? This is not reversible."), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Clear log"), action: {pushButton(.clearLog, "", "")}))
             })
         }
     }

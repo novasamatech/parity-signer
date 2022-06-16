@@ -8,21 +8,19 @@
 import SwiftUI
 
 struct SelectSeed: View {
-    @EnvironmentObject var data: SignerDataModel
-    var content: MSeeds
+    let content: MSeeds
+    let sign: (String, String) -> Void
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg100"))
             VStack {
                 ScrollView {
                     LazyVStack {
-                        ForEach(content.seedNameCards.sorted(by: {$0.seed_name < $1.seed_name}), id: \.seed_name) {seedNameCard in
+                        ForEach(content.seedNameCards.sorted(by: {$0.seedName < $1.seedName}), id: \.seedName) {seedNameCard in
                             HStack {
                                 Button(action: {
-                                    let seedPhrase = data.getSeed(seedName: seedNameCard.seed_name)
-                                    if seedPhrase != "" {
-                                        data.pushButton(buttonID: .GoForward, details: seedNameCard.seed_name, seedPhrase: seedPhrase)
-                                    }
+                                    sign(seedNameCard.seedName, seedNameCard.seedName)
                                 }) {
                                     SeedCardForManager(seedNameCard: seedNameCard)
                                     Spacer()

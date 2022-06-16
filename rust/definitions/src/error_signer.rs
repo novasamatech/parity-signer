@@ -14,7 +14,8 @@
 //! This module gathers all possible [`ErrorSigner`] errors in one place, so that
 //! error management is easier.
 use anyhow::anyhow;
-use sp_core::crypto::SecretStringError;
+use sp_core::{crypto::SecretStringError, H256};
+use time::error::Format;
 #[cfg(feature = "test")]
 use variant_count::VariantCount;
 
@@ -115,7 +116,7 @@ impl ErrorSource for Signer {
             EntryDecodingSigner::NetworkSpecs(key),
         ))
     }
-    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: Vec<u8>) -> Self::Error {
+    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: H256) -> Self::Error {
         ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::SpecsGenesisHash {
             key,
             genesis_hash,
@@ -168,6 +169,15 @@ impl ErrorSource for Signer {
     }
     fn metadata_not_found(name: String, version: u32) -> Self::Error {
         ErrorSigner::NotFound(NotFoundSigner::Metadata { name, version })
+    }
+    fn timestamp_format(error: time::error::Format) -> Self::Error {
+        ErrorSigner::TimeFormat(error)
+    }
+    fn empty_seed() -> Self::Error {
+        ErrorSigner::SeedPhraseEmpty
+    }
+    fn empty_seed_name() -> Self::Error {
+        ErrorSigner::SeedNameEmpty
     }
     fn show(error: &Self::Error) -> String {
         match error {
@@ -240,7 +250,7 @@ impl ErrorSource for Signer {
                         format!("Mismatch found. {}", insert)
                     },
                     DatabaseSigner::FaultyMetadata{name, version, error} => format!("Bad metadata for {}{}. {}", name, version, error.show()),
-                    DatabaseSigner::UnexpectedGenesisHash{verifier_key, network_specs_key} => format!("No verifier information found for network with genesis hash {}, however genesis hash is encountered in network specs entry with key {}.", hex::encode(verifier_key.genesis_hash()), hex::encode(network_specs_key.key())),
+                    DatabaseSigner::UnexpectedGenesisHash{name, genesis_hash} => format!("Network {} with genesis hash {} has some network specs entries, while there is no verifier entry.", name, hex::encode(genesis_hash)),
                     DatabaseSigner::SpecsCollision{name, encryption} => format!("More than one entry for network specs with name {} and encryption {}.", name, encryption.show()),
                     DatabaseSigner::DifferentNamesSameGenesisHash{name1, name2, genesis_hash} => format!("Different network names ({}, {}) in database for same genesis hash {}.", name1, name2, hex::encode(genesis_hash)),
                     DatabaseSigner::CustomVerifierIsGeneral(key) => format!("Network with genesis hash {} verifier is set as a custom one. This custom verifier coinsides the database general verifier and not None. This should not have happened and likely indicates database corruption.", hex::encode(key.genesis_hash())),
@@ -260,17 +270,19 @@ impl ErrorSource for Signer {
                     InputSigner::SameNameVersionDifferentMeta{name, version} => format!("Metadata for {}{} is already in the database and is different from the one in received payload.", name, version),
                     InputSigner::MetadataKnown{name, version} => format!("Metadata for {}{} is already in the database.", name, version),
                     InputSigner::ImportantSpecsChanged(key) => format!("Similar network specs are already stored in the database under key {}. Network specs in received payload have different unchangeable values (base58 prefix, decimals, encryption, network name, unit).", hex::encode(key.key())),
-                    InputSigner::DifferentBase58{genesis_hash, base58_database, base58_input} => format!("Network with genesis hash {} already has entries in the database with base58 prefix {}. Received network specs have different base58 prefix {}.", hex::encode(genesis_hash), base58_database, base58_input),
+                    InputSigner::AddSpecsDifferentBase58{genesis_hash, name, base58_database, base58_input} => format!("Network {} with genesis hash {} already has entries in the database with base58 prefix {}. Received network specs have same genesis hash and different base58 prefix {}.", name, hex::encode(genesis_hash), base58_database, base58_input),
+                    InputSigner::AddSpecsDifferentName{genesis_hash, name_database, name_input} => format!("Network with genesis hash {} has name {} in the database. Received network specs have same genesis hash and name {}.", hex::encode(genesis_hash), name_database, name_input),
                     InputSigner::EncryptionNotSupported(code) => format!("Payload with encryption 0x{} is not supported.", code),
                     InputSigner::BadSignature => String::from("Received payload has bad signature."),
                     InputSigner::LoadMetaUnknownNetwork{name} => format!("Network {} is not in the database. Add network specs before loading the metadata.", name),
                     InputSigner::LoadMetaNoSpecs{name, valid_current_verifier, general_verifier} => {
                         let insert = match valid_current_verifier {
                             ValidCurrentVerifier::General => format!("{} (general verifier)", general_verifier.show_error()),
-                            ValidCurrentVerifier::Custom(a) => format!("{} (custom verifier)", a.show_error()),
+                            ValidCurrentVerifier::Custom{v} => format!("{} (custom verifier)", v.show_error()),
                         };
                         format!("Network {} was previously known to the database with verifier {}. However, no network specs are in the database at the moment. Add network specs before loading the metadata.", name, insert)
                     },
+                    InputSigner::LoadMetaWrongGenesisHash {name_metadata, name_specs, genesis_hash} => format!("Update payload contains metadata for network {}. Genesis hash in payload ({}) matches database genesis hash for another network, {}.", name_metadata, hex::encode(genesis_hash), name_specs),
                     InputSigner::NeedVerifier{name, verifier_value} => format!("Saved network {} information was signed by verifier {}. Received information is not signed.", name, verifier_value.show_error()),
                     InputSigner::NeedGeneralVerifier{content, verifier_value} => {
                         let insert = match content {
@@ -345,6 +357,9 @@ impl ErrorSource for Signer {
             ErrorSigner::WrongPassword => String::from("Wrong password."),
             ErrorSigner::WrongPasswordNewChecksum(_) => String::from("Wrong password."),
             ErrorSigner::NoNetworksAvailable => String::from("No networks available. Please load networks information to proceed."),
+            ErrorSigner::TimeFormat(e) => format!("Unable to produce timestamp. {}", e),
+            ErrorSigner::SeedPhraseEmpty => String::from("Signer expected seed phrase, but the seed phrase is empty. Please report this bug."),
+            ErrorSigner::SeedNameEmpty => String::from("Signer expected seed name, but the seed name is empty. Please report this bug."),
         }
     }
 }
@@ -436,6 +451,15 @@ pub enum ErrorSigner {
     /// Signer has attempted an operation that requires at least one network to
     /// be loaded into Signer.
     NoNetworksAvailable,
+
+    /// Time formatting error
+    TimeFormat(Format),
+
+    /// Signer tried to use empty seed phrase, likely a bug on the interface
+    SeedPhraseEmpty,
+
+    /// Signer got empty seed name, likely a bug on the interface
+    SeedNameEmpty,
 }
 
 impl ErrorSigner {
@@ -452,9 +476,9 @@ impl ErrorSigner {
 /// [`InterfaceSigner`] error means that rust backend can not process the
 /// information sent by the frontend.
 ///
-/// Signer rust backend sends data into frontend as `json` strings. Frontend
-/// parses these `json` strings, displays them, and can send back into rust
-/// some parts of the data that the user has, for example, selected.
+/// Signer rust backend sends data into frontend as [`ActionResult`]s. Frontend
+/// displays them, and can send back into rust some parts of the data of
+/// the user input.
 ///
 /// Data that user can type from keyboard is processed as is, it does not
 /// cause errors on the interface.
@@ -664,12 +688,11 @@ pub enum DatabaseSigner {
     /// entry, and the verifier could not be removed while network specs still
     /// remain, so this indicates the database got corrupted.
     UnexpectedGenesisHash {
-        /// `VerifierKey` that was not found in the database
-        verifier_key: VerifierKey,
+        /// network name
+        name: String,
 
-        /// `NetworkSpecsKey` for entry that has the genesis hash corresponding
-        /// to not found `verifier_key`
-        network_specs_key: NetworkSpecsKey,
+        /// network genesis hash
+        genesis_hash: H256,
     },
 
     /// More than one entry found for network specs with given `name` and
@@ -685,11 +708,10 @@ pub enum DatabaseSigner {
 
     /// While searching for all networks with same genesis hash, found that
     /// there are networks with same genesis hash, but different names.
-    // TODO: is this really an error? if it is, add error to data loading too.
     DifferentNamesSameGenesisHash {
         name1: String,
         name2: String,
-        genesis_hash: Vec<u8>,
+        genesis_hash: H256,
     },
 
     /// Network [`CurrentVerifier`](crate::network_specs::CurrentVerifier) is
@@ -714,7 +736,7 @@ pub enum DatabaseSigner {
 
     /// Network specs entries have same genesis hash, but different base58 prefix
     DifferentBase58Specs {
-        genesis_hash: [u8; 32],
+        genesis_hash: H256,
         base58_1: u16,
         base58_2: u16,
     },
@@ -867,7 +889,7 @@ pub enum MismatchSigner {
         // TODO: could be [u8; 32] array here; we may want to decide and fix in
         // several places if the genesis hash may at all be something different
         // from [u8;32] array
-        genesis_hash: Vec<u8>,
+        genesis_hash: H256,
     },
 
     /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
@@ -1012,10 +1034,24 @@ pub enum InputSigner {
     /// same encryption, i.e. **possibly different** [`NetworkSpecsKey`],
     /// and base58 prefix in stored network specs is different from the base58
     /// prefix in the received ones.
-    DifferentBase58 {
-        genesis_hash: [u8; 32],
+    AddSpecsDifferentBase58 {
+        genesis_hash: H256,
+        name: String,
         base58_database: u16,
         base58_input: u16,
+    },
+
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// received in `add_specs` payload are for a network that already has
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry in
+    /// the `SPECSTREE` tree of the Signer database with not necessarily
+    /// same encryption, i.e. **possibly different** [`NetworkSpecsKey`],
+    /// and network name in stored network specs is different from the network
+    /// name in the received ones.
+    AddSpecsDifferentName {
+        genesis_hash: H256,
+        name_database: String,
+        name_input: String,
     },
 
     /// There is a limited number of encryption algorithms supported by the
@@ -1079,6 +1115,28 @@ pub enum InputSigner {
 
         /// Signer general verifier
         general_verifier: Verifier,
+    },
+
+    /// User attempted to load into Signer the metadata for the network that
+    /// has a [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry in the
+    /// `SPECSTREE` tree of the Signer database, but specs have a different
+    /// network name.
+    ///
+    /// Most likely, wrong genesis hash was attached to the metadata update.
+    ///
+    /// Since the network metadata in `METATREE` is identified by network name,
+    /// and verifier is identified by the genesis hash, this should be checked
+    /// on `load_metadata`.
+    LoadMetaWrongGenesisHash {
+        /// network name as it is in the received metadata
+        name_metadata: String,
+
+        /// network name as it is in the network specs for genesis hash
+        name_specs: String,
+
+        /// genesis hash from the `load_metadata` payload, that was used to find
+        /// the network specs and verifier information
+        genesis_hash: H256,
     },
 
     /// Received `add_specs` or `load_metadata` update payload is not verified.
@@ -1226,7 +1284,7 @@ pub enum InputSigner {
     /// `SPECSTREE` tree of the database.
     UnknownNetwork {
         /// network genesis hash
-        genesis_hash: Vec<u8>,
+        genesis_hash: H256,
 
         /// encryption algorithm supported by the network
         encryption: Encryption,
@@ -1428,7 +1486,7 @@ pub enum NotFoundSigner {
     /// which the imported derivations are user to create addresses.
     NetworkForDerivationsImport {
         /// network genesis hash
-        genesis_hash: [u8; 32],
+        genesis_hash: H256,
 
         /// network supported encryption
         encryption: Encryption,

@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct RecoverSeedName: View {
-    @EnvironmentObject var data: SignerDataModel
     @State private var seedName: String = ""
     @FocusState private var nameFocused: Bool
-    var content: MRecoverSeedName
+    let content: MRecoverSeedName
+    let checkSeedCollision: (String) -> Bool
+    let pushButton: (Action, String, String) -> Void
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -28,29 +29,25 @@ struct RecoverSeedName: View {
                     .disableAutocorrection(true)
                     .keyboardType(.asciiCapable)
                     .submitLabel(.done)
-                    .onChange(of: seedName, perform: { newName in
-                        data.lastError = ""
-                    })
                     .onSubmit {
-                        if (seedName != "") && !data.checkSeedCollision(seedName: seedName.encode64()) {
-                            data.pushButton(buttonID: .GoForward, details: seedName.encode64())
+                        if (seedName != "") && !checkSeedCollision(seedName) {
+                            pushButton(.goForward, seedName, "")
                         }
                     }
                     .onAppear(perform: {
-                        seedName = content.seed_name.decode64()
+                        seedName = content.seedName
                         nameFocused = content.keyboard
                     })
                     .padding(.horizontal, 8)
             }
             Text("Display name visible only to you").font(.callout)
-            Text(data.lastError).foregroundColor(Color("SignalDanger"))
             Spacer()
             BigButton(
                 text: "Next",
                 action: {
-                    data.pushButton(buttonID: .GoForward, details: seedName.encode64())
+                    pushButton(.goForward, seedName, "")
                 },
-                isDisabled: (seedName == "") || data.checkSeedCollision(seedName: seedName.encode64())
+                isDisabled: (seedName == "") || checkSeedCollision(seedName)
             )
             Spacer()
         }.padding()

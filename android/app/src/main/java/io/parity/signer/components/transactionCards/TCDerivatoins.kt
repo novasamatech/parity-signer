@@ -10,9 +10,17 @@ import io.parity.signer.ui.theme.Text600
 @Composable
 fun TCDerivations(payload: List<String>) {
 	Column {
-		Text("Importing derivations:", style = MaterialTheme.typography.h1, color = MaterialTheme.colors.Text600)
+		Text(
+			"Importing derivations:",
+			style = MaterialTheme.typography.h1,
+			color = MaterialTheme.colors.Text600
+		)
 		for (record in payload) {
-			Text(record, style = MaterialTheme.typography.body2, color = MaterialTheme.colors.Crypto400)
+			Text(
+				record,
+				style = MaterialTheme.typography.body2,
+				color = MaterialTheme.colors.Crypto400
+			)
 		}
 	}
 }

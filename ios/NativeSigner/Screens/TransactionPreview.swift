@@ -8,23 +8,24 @@
 import SwiftUI
 
 struct TransactionPreview: View {
-    @EnvironmentObject var data: SignerDataModel
     @State private var comment = ""
     @State var offset: CGFloat = 0
     @State var offsetOld: CGFloat = 0
     @FocusState private var focus: Bool
     let content: MTransaction
+    let sign: (String, String) -> Void
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         VStack {
             TransactionBlock(cards: content.content.assemble())
             VStack {
-                if let address = content.author_info {
-                    AddressCard(address: address.intoAddress())
+                if let address = content.authorInfo {
+                    AddressCard(address: address)
                 }
-                if let network = content.network_info {
-                    NetworkCard(title: network.network_title, logo: network.network_logo)
+                if let network = content.networkInfo {
+                    NetworkCard(title: network.networkTitle, logo: network.networkLogo)
                 }
-                if (content.type == .sign) {
+                if (content.ttype == .sign) {
                     HStack {
                         Text("LOG NOTE").font(FBase(style: .overline)).foregroundColor(Color("Text400"))
                         Spacer()
@@ -50,7 +51,7 @@ struct TransactionPreview: View {
                 }
                 Spacer()
                 VStack {
-                    switch content.type {
+                    switch content.ttype {
                     case .sign:
                         BigButton(
                             text: "Unlock key and sign",
@@ -58,14 +59,8 @@ struct TransactionPreview: View {
                             isCrypto: true,
                             action: {
                                 focus = false
-                                if data.alert {
-                                    data.alertShow = true
-                                } else {
-                                    data.pushButton(
-                                        buttonID: .GoForward,
-                                        details: Data(comment.utf8).base64EncodedString(),
-                                        seedPhrase: data.getSeed(seedName: content.author_info?.seed ?? "")
-                                    )
+                                if let seedName = content.authorInfo?.seedName {
+                                    sign(seedName, comment)
                                 }
                             }
                         )
@@ -73,28 +68,28 @@ struct TransactionPreview: View {
                         BigButton(
                             text: "Approve",
                             action: {
-                                data.pushButton(buttonID: .GoForward)
+                                pushButton(.goForward, "", "")
                             })
                     case .read:
                         EmptyView()
-                    case .import_derivations:
+                    case .importDerivations:
                         BigButton(
                             text: "Select seed",
                             isCrypto: true,
                             action: {
-                                data.pushButton(buttonID: .GoForward)
+                                pushButton(.goForward, "", "")
                             })
                     case .done:
                         EmptyView()
                     }
-                    if content.type != .done {
+                    if content.ttype != .done {
                         BigButton(
                             text: "Decline",
                             isShaded: true,
                             isDangerous: true,
                             action: {
                                 focus = false
-                                data.pushButton(buttonID: .GoBack)})
+                                pushButton(.goBack, "", "")})
                     }
                 }
             }

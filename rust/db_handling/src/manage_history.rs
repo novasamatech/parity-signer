@@ -11,7 +11,6 @@
 // TODO: substantial part of this will go obsolete with interface updates;
 // some functions are not called at the moment from the user interface - kept
 // for now in case they make a return, commented.
-use chrono::Utc;
 #[cfg(feature = "signer")]
 use parity_scale_codec::Decode;
 use parity_scale_codec::Encode;
@@ -29,37 +28,19 @@ use definitions::{
 #[cfg(feature = "signer")]
 use definitions::{
     danger::DangerRecord,
-    error_signer::{
-        DatabaseSigner, EntryDecodingSigner, ErrorSigner,
-        /* InterfaceSigner,*/ NotFoundSigner, Signer,
-    },
-    print::export_complex_vector,
+    error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, NotFoundSigner, Signer},
 };
 
 use crate::helpers::{open_db, open_tree};
 #[cfg(feature = "signer")]
 use crate::{db_transactions::TrDbCold, helpers::make_batch_clear_tree};
 
-/// Print history log contents into json.
-#[cfg(feature = "signer")]
-pub fn print_history(database_name: &str) -> Result<String, ErrorSigner> {
-    let history = get_history(database_name)?;
-    Ok(format!(
-        "\"log\":{},\"total_entries\":{}",
-        export_complex_vector(&history, |(order, entry)| format!(
-            "\"order\":{},{}",
-            order.stamp(),
-            entry.show(|b| format!("\"{}\"", hex::encode(b.transaction())))
-        )),
-        history.len()
-    ))
-}
-
-/*
 /// Print total number of pages, for maximum [`HISTORY_PAGE_SIZE`] number of
 /// entries per page.
 #[cfg(feature = "signer")]
 pub fn history_total_pages(database_name: &str) -> Result<u32, ErrorSigner> {
+    use constants::HISTORY_PAGE_SIZE;
+
     let history = get_history(database_name)?;
     let total_pages = {
         if history.len() % HISTORY_PAGE_SIZE == 0 {
@@ -71,43 +52,9 @@ pub fn history_total_pages(database_name: &str) -> Result<u32, ErrorSigner> {
     Ok(total_pages as u32)
 }
 
-/// Print page with given number from the history log.
-///
-/// Maximum number of entries per page is [`HISTORY_PAGE_SIZE`].
-#[cfg(feature = "signer")]
-pub fn print_history_page(page_number: u32, database_name: &str) -> Result<String, ErrorSigner> {
-    let history = get_history(database_name)?;
-    let total_pages = history_total_pages(database_name)?;
-    let n = page_number as usize;
-    let history_subset = match history.get(n * HISTORY_PAGE_SIZE..(n + 1) * HISTORY_PAGE_SIZE) {
-        Some(a) => a.to_vec(),
-        None => match history.get(n * HISTORY_PAGE_SIZE..) {
-            Some(a) => a.to_vec(),
-            None => {
-                return Err(ErrorSigner::Interface(
-                    InterfaceSigner::HistoryPageOutOfRange {
-                        page_number,
-                        total_pages,
-                    },
-                ))
-            }
-        },
-    };
-    Ok(format!(
-        "\"log\":{},\"total_entries\":{}",
-        export_complex_vector(&history_subset, |(order, entry)| format!(
-            "\"order\":{},{}",
-            order.stamp(),
-            entry.show(|b| format!("\"{}\"", hex::encode(b.transaction())))
-        )),
-        history.len()
-    ))
-}
-*/
-
 /// Get history log contents from the database.
 #[cfg(feature = "signer")]
-fn get_history(database_name: &str) -> Result<Vec<(Order, Entry)>, ErrorSigner> {
+pub fn get_history(database_name: &str) -> Result<Vec<(Order, Entry)>, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let history = open_tree::<Signer>(&database, HISTORY)?;
     let mut out: Vec<(Order, Entry)> = Vec::new();
@@ -157,25 +104,6 @@ pub fn get_history_entry_by_order(order: u32, database_name: &str) -> Result<Ent
     }
 }
 
-/*
-/// Print history [`Entry`] as a json by `u32` order identifier received from
-/// the frontend without transaction decodings.
-///
-/// Transactions are represented here as hex encoded raw data, without parsing.
-#[cfg(feature = "signer")]
-pub fn print_history_entry_by_order(
-    order: u32,
-    database_name: &str,
-) -> Result<String, ErrorSigner> {
-    let entry = get_history_entry_by_order(order, database_name)?;
-    Ok(format!(
-        "\"order\":{},{}",
-        order,
-        entry.show(|b| format!("\"{}\"", hex::encode(b.transaction())))
-    ))
-}
-*/
-
 /// Clear Signer history and make a log [`Entry`] that history was cleared.
 #[cfg(feature = "signer")]
 pub fn clear_history(database_name: &str) -> Result<(), ErrorSigner> {
@@ -217,15 +145,19 @@ pub(crate) fn events_in_batch<T: ErrorSource>(
             Order::from_number(history.len() as u32)
         }
     };
-    let timestamp = Utc::now().to_string();
+    let timestamp = time::OffsetDateTime::now_utc()
+        .format(&time::macros::format_description!(
+            "[year]-[month]-[day] [hour]:[minute]:[second].[subsecond]"
+        ))
+        .map_err(|e| <T>::timestamp_format(e))?;
     let history_entry = Entry { timestamp, events };
     out_prep.insert(order.store(), history_entry.encode());
     Ok(out_prep)
 }
 
 /// Enter [`Event`] set into the database as a single database transaction.
-#[cfg(any(feature = "signer", feature = "test"))]
-pub(crate) fn enter_events<T: ErrorSource>(
+#[cfg(feature = "signer")]
+pub fn enter_events<T: ErrorSource>(
     database_name: &str,
     events: Vec<Event>,
 ) -> Result<(), T::Error> {
@@ -237,18 +169,18 @@ pub(crate) fn enter_events<T: ErrorSource>(
 /// Enter user-generated [`Event`] into the database.
 #[cfg(feature = "signer")]
 pub fn history_entry_user(database_name: &str, string_from_user: &str) -> Result<(), ErrorSigner> {
-    let events = vec![Event::UserEntry(string_from_user.to_string())];
+    let events = vec![Event::UserEntry {
+        user_entry: string_from_user.to_string(),
+    }];
     enter_events::<Signer>(database_name, events)
 }
 
 /// Enter system-generated [`Event`] into the database.
 // TODO possibly obsolete
 #[cfg(feature = "signer")]
-pub fn history_entry_system(
-    database_name: &str,
-    string_from_system: String,
-) -> Result<(), ErrorSigner> {
-    let events = vec![Event::SystemEntry(string_from_system)];
+pub fn history_entry_system(database_name: &str, event: Event) -> Result<(), ErrorSigner> {
+    // let events = vec![Event::SystemEntry(string_from_system)];
+    let events = vec![event];
     enter_events::<Signer>(database_name, events)
 }
 
@@ -296,7 +228,12 @@ pub fn reset_danger_status_to_safe(database_name: &str) -> Result<(), ErrorSigne
 ///
 /// Seeds are distinguished by the seed name.
 #[cfg(feature = "signer")]
-pub fn seed_name_was_shown(database_name: &str, seed_name: String) -> Result<(), ErrorSigner> {
-    let events = vec![Event::SeedNameWasShown(seed_name)];
+pub fn seed_name_was_shown(
+    database_name: &str,
+    seed_name_was_shown: String,
+) -> Result<(), ErrorSigner> {
+    let events = vec![Event::SeedNameWasShown {
+        seed_name_was_shown,
+    }];
     enter_events::<Signer>(database_name, events)
 }

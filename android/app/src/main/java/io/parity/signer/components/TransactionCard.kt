@@ -1,7 +1,6 @@
 package io.parity.signer.components
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -11,131 +10,66 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.transactionCards.*
 import io.parity.signer.models.decodeHex
-import io.parity.signer.models.toListOfStrings
 import io.parity.signer.ui.theme.Text600
-import org.json.JSONObject
+import io.parity.signer.uniffi.Card
+import io.parity.signer.uniffi.MscNetworkInfo
+import io.parity.signer.uniffi.TransactionCard
 
 /**
  * Selector for transaction card appearance
  */
 @Composable
-fun TransactionCard(card: JSONObject) {
-	val payload = card.optJSONObject("payload")?: JSONObject()
+fun TransactionCard(card: TransactionCard) {
 	Box(
 		modifier = Modifier
-			.padding(start = (card.getInt("indent") * 10).dp)
+			.padding(start = (card.indent.toInt() * 10).dp)
 			.fillMaxWidth()
 	) {
-		when (card.getString("type")) {
-			"author" -> {
-				TCAuthor(payload = payload)}
-			"author_plain" -> {
-				TCAuthorPlain(payload = payload)
-			}
-			"author_public_key" -> {
-				TCAuthorPublicKey(payload = payload)
-			}
-			"balance" -> {
-				TCBalance(currency = payload)
-			}
-			"bitvec" -> {
-				TCBitVec(payload = payload)
-			}
-			"blockhash" -> {
-				TCBlockHash(text = card.optString("payload"))
-			}
-			"default" -> {
-				Text(card.getString("payload"), style = MaterialTheme.typography.body2, color = MaterialTheme.colors.Text600)
-			}
-			"derivations" -> {
-				TCDerivations(payload = card.optJSONArray("payload")?.toListOfStrings() ?: listOf())
-			}
-			"enum_variant_name" -> {
-				TCEnumVariantName(payload = payload)
-			}
-			"era" -> {
-				if (payload.optString("era") == "Mortal") {
-					TCEra(payload = payload)
-				} else {
-					TCEraImmortal()
-				}
-			}
-			"error" -> {
-				TCError(card.getString("payload"))
-			}
-			"field_name" -> {
-				TCFieldName(payload = payload)
-			}
-			"field_number" -> {
-				TCFieldNumber(payload = payload)
-			}
-			"Id" -> {
-				TCID(payload = payload)
-			}
-			"identity_field" -> {
-				TCIdentityField(text = card.optString("payload"))
-			}
-			"meta" -> {
-				TCMeta(payload = payload)
-			}
-			"method" -> {
-				TCMethod(card.getJSONObject("payload"))
-			}
-			"name_version" -> {
-				TCNameVersion(payload = payload)
-			}
-			"network_genesis_hash" -> {
-				TCGenesisHash(payload = card.optString("payload"))
-			}
-			"network_info" -> {
-				NetworkCard(network = payload)
-			}
-			"network_name" -> {
-				TCNetworkName(text = card.optString("payload"))
-			}
-			"new_specs" -> {
-				TCNewSpecs(payload = payload)
-			}
-			"nonce" -> {
-				TCNonce(text = card.optString("payload"))
-			}
-			"none" -> {}
-			"pallet" -> {
-				TCPallet(card.getString("payload"))
-			}
-			"text" -> {
-				Text(String(card.getString("payload").decodeHex()))
-			}
-			"tip" -> {
-				TCTip(card.getJSONObject("payload"))
-			}
-			"tip_plain" -> {
-				TCTipPlain(text = card.optString("payload"))
-			}
-			"tx_spec_plain" -> {
-				TCTXSpecPlain(payload = payload)
-			}
-			"tx_version" -> {
-				TCTXSpec(text = card.optString("payload"))
-			}
-			"types" -> {
-				TCTypesInfo(payload = payload)
-			}
-			"varname" -> {
-				TCVarName(card.optString("payload"))
-			}
-			"verifier" -> {
-				TCVerifier(payload = payload)
-			}
-			"warning" -> {
-				TCWarning(card.getString("payload"))
-			}
-			else -> {
-				Row {
-					Text(card.getString("type") + ": ")
-					Text(card.optString("payload"))
-				}
-			}
+		when (val txCard = card.card) {
+			is Card.AuthorCard -> TCAuthor(author = txCard.f)
+			is Card.AuthorPlainCard -> TCAuthorPlain(author = txCard.f)
+			is Card.AuthorPublicKeyCard -> TCAuthorPublicKey(key = txCard.f)
+			is Card.BalanceCard -> TCBalance(currency = txCard.f)
+			is Card.BitVecCard -> TCBitVec(bitVec = txCard.f)
+			is Card.BlockHashCard -> TCBlockHash(text = txCard.f)
+			is Card.CallCard -> TCMethod(payload = txCard.f)
+			is Card.DefaultCard -> Text(
+				txCard.f,
+				style = MaterialTheme.typography.body2,
+				color = MaterialTheme.colors.Text600
+			)
+			is Card.DerivationsCard -> TCDerivations(payload = txCard.f)
+			is Card.EnumVariantNameCard -> TCEnumVariantName(name = txCard.f)
+			Card.EraImmortalCard -> TCEraImmortal()
+			is Card.EraMortalCard -> TCEra(era = txCard.f)
+			is Card.ErrorCard -> TCError(error = txCard.f)
+			is Card.FieldNameCard -> TCFieldName(fieldName = txCard.f)
+			is Card.FieldNumberCard -> TCFieldNumber(fieldNumber = txCard.f)
+			is Card.IdCard -> TCID(txCard.f)
+			is Card.IdentityFieldCard -> TCIdentityField(text = txCard.f)
+			is Card.MetaCard -> TCMeta(meta = txCard.f)
+			is Card.NameVersionCard -> TCNameVersion(nameVersion = txCard.f)
+			is Card.NetworkGenesisHashCard -> TCGenesisHash(payload = txCard.f)
+			is Card.NetworkInfoCard -> NetworkCard(
+				network = MscNetworkInfo(
+					networkTitle = txCard.f.networkTitle,
+					networkLogo = txCard.f.networkLogo
+				)
+			)
+			is Card.NetworkNameCard -> TCNetworkName(text = txCard.f)
+			is Card.NewSpecsCard -> TCNewSpecs(specs = txCard.f)
+			is Card.NonceCard -> TCNonce(text = txCard.f)
+			Card.NoneCard -> Text("None")
+			is Card.PalletCard -> TCPallet(text = txCard.f)
+			is Card.TextCard -> Text(String(txCard.f.decodeHex()))
+			is Card.TipCard -> TCTip(txCard.f)
+			is Card.TipPlainCard -> TCTipPlain(txCard.f)
+			is Card.TxSpecCard -> TCTXSpec(txCard.f)
+			is Card.TxSpecPlainCard -> TCTXSpecPlain(txCard.f)
+			is Card.TypesInfoCard -> TCTypesInfo(txCard.f)
+			is Card.VarNameCard -> TCVarName(txCard.f)
+			is Card.VerifierCard -> TCVerifier(txCard.f)
+			is Card.WarningCard -> TCWarning(txCard.f)
 		}
 	}
 }

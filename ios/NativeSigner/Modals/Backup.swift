@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct Backup: View {
-    @EnvironmentObject var data: SignerDataModel
     let content: MBackup
+    let alert: Bool
+    let getSeedForBackup: (String) -> String
+    let pushButton: (Action, String, String) -> Void
     @State var secret: String = ""
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State var countdown = 60
@@ -20,11 +22,11 @@ struct Backup: View {
             RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg200"))
             VStack{
                 ZStack {
-                    HeaderBar(line1: "Backup", line2: content.seed_name.decode64())
+                    HeaderBar(line1: "Backup", line2: content.seedName)
                     HStack {
                         Spacer()
                         Button(action: {
-                            data.pushButton(buttonID: .GoBack)
+                            pushButton(.goBack, "", "")
                         }) {
                             Image(systemName: "xmark").imageScale(.large).foregroundColor(Color("Text300"))
                         }
@@ -45,11 +47,11 @@ struct Backup: View {
                             Spacer()
                         }
                         .onAppear{
-                            secret = data.getSeed(seedName: content.seed_name, backup: true)
+                            secret = getSeedForBackup(content.seedName)
                             if secret == "" {
                                 failure = true
                                 countdown = -1
-                                secret = data.alert ? "Network connected! Seeds are not available now. Please enable airplane mode and disconnect all cables to access the seed phrase." : "Seeds are not available now! Come back again to access them."
+                                secret = alert ? "Network connected! Seeds are not available now. Please enable airplane mode and disconnect all cables to access the seed phrase." : "Seeds are not available now! Come back again to access them."
                             }
                         }
                         .onDisappear{
@@ -61,20 +63,20 @@ struct Backup: View {
                             Spacer()
                         }
                         LazyVStack {
-                            ForEach(content.derivations.sorted(by: {$0.network_order < $1.network_order}), id: \.network_order) {
+                            ForEach(content.derivations.sorted(by: {$0.networkOrder < $1.networkOrder}), id: \.networkOrder) {
                                 pack in
                                 VStack {
                                     HStack {
-                                        NetworkCard(title: pack.network_title, logo: pack.network_logo, fancy: true).padding(.top, 10)
+                                        NetworkCard(title: pack.networkTitle, logo: pack.networkLogo, fancy: true).padding(.top, 10)
                                         Spacer()
                                     }
-                                    ForEach(pack.id_set.sorted(by: {$0.path < $1.path}), id: \.self) {
+                                    ForEach(pack.idSet.sorted(by: {$0.path < $1.path}), id: \.self) {
                                         record in
                                         HStack{
-                                            Text((record.path == "" && !record.has_pwd) ? "seed key" : record.path)
+                                            Text((record.path == "" && !record.hasPwd) ? "seed key" : record.path)
                                                 .foregroundColor(Color("Crypto400"))
                                                 .font(FCrypto(style: .body2))
-                                            if record.has_pwd {
+                                            if record.hasPwd {
                                                 Text("///").foregroundColor(Color("Crypto400"))
                                                     .font(FCrypto(style: .body2))
                                                 Image(systemName: "lock").foregroundColor(Color("Crypto400"))
@@ -106,18 +108,6 @@ struct Backup: View {
                                 secret = "Time out\n\nCome back again\nto see the seed phrase!"
                             }
                         }.padding(.horizontal, 16)
-                        /*
-                         RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg300")).frame(height: 40)
-                         Text("Hide seed phrase in " + String(countdown) + "s")
-                         .onReceive(timer) { input in
-                         countdown -= 1
-                         if countdown == 0 {
-                         secret = "Time out\n\nCome back again\nto see the seed phrase!"
-                         }
-                         }
-                         .foregroundColor(Color("Action400"))
-                         .font(FBase(style: .button))
-                         */
                     }.padding(.bottom, 75)
                 }
             }

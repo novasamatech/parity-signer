@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct AddressCardControls: View {
-    @EnvironmentObject var data: SignerDataModel
-    var seed_name: String
+    let seed_name: String
+    let increment: (String) -> Void
+    let pushButton: (Action, String, String) -> Void
     var rowHeight: CGFloat = 39
     @State private var delete = false
     @State private var count: CGFloat = 1
@@ -17,10 +18,7 @@ struct AddressCardControls: View {
         HStack {
             Spacer()
             Button(action: {
-                let seed_phrase = data.getSeed(seedName: seed_name)
-                if seed_phrase != "" {
-                    data.pushButton(buttonID: .Increment, details: "1", seedPhrase: seed_phrase)
-                }
+                increment("1")
             }) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 6).foregroundColor(Color("Crypto100"))
@@ -32,10 +30,7 @@ struct AddressCardControls: View {
                     count = exp(abs(drag.translation.height)/50)
                 }
                             .onEnded{_ in
-                    let seed_phrase = data.getSeed(seedName: seed_name)
-                    if seed_phrase != "" {
-                        data.pushButton(buttonID: .Increment, details: String(Int(count)), seedPhrase: seed_phrase)
-                    }
+                    increment(String(Int(count)))
                 })
                 .onAppear {
                     count = 1
@@ -56,8 +51,7 @@ struct AddressCardControls: View {
                         primaryButton: .cancel(),
                         secondaryButton: .destructive(
                             Text("Delete"),
-                            action: { data.pushButton(buttonID: .RemoveKey)
-                            }
+                            action: { pushButton(.removeKey, "", "") }
                         )
                     )
                 })

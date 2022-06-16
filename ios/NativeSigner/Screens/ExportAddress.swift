@@ -8,22 +8,20 @@
 import SwiftUI
 
 struct ExportAddress: View {
-    @EnvironmentObject var data: SignerDataModel
     @State var showDetails = false
     var content: MKeyDetails
     var body: some View {
         ScrollView {
             VStack {
-                AddressCard(address: content.intoAddress())
-                NetworkCard(title: content.network_title, logo: content.network_logo)
-                Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.qr) ?? Data()) ?? UIImage())
+                AddressCard(address: content.address)
+                Image(uiImage: UIImage(data: Data(content.qr)) ?? UIImage())
                     .resizable()
                     .aspectRatio(contentMode: .fit).padding(12)
                 HeaderBar(line1: "KEY DETAILS", line2: "").padding(.horizontal, 8)
                 VStack {
                     HStack {
                         Text("Base58 key: ")
-                        Text(content.base58)
+                        Text(content.address.base58)
                     }.padding().foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2))
                     HStack {
                         Text("Hex key: ")
@@ -31,7 +29,7 @@ struct ExportAddress: View {
                     }.padding().foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2))
                     HStack {
                         Text("Seed name: ")
-                        Text(content.seed_name.decode64())
+                        Text(content.address.seedName)
                     }.padding().foregroundColor(Color("Text400")).font(FBase(style: .body2))
                 }
                 

@@ -9,6 +9,7 @@ use definitions::{
     metadata::MetaValues,
     network_specs::NetworkSpecsToSend,
 };
+use sp_core::H256;
 use std::convert::TryInto;
 
 use crate::fetch_metadata::{fetch_info, fetch_info_with_network_specs};
@@ -19,7 +20,7 @@ use crate::parser::TokenOverride;
 /// Struct to store MetaValues and genesis hash for network
 pub struct MetaShortCut {
     pub meta_values: MetaValues,
-    pub genesis_hash: [u8; 32],
+    pub genesis_hash: H256,
 }
 
 /// Function to process address as &str, fetch metadata and genesis hash for it,
@@ -172,7 +173,7 @@ pub fn meta_specs_shortcut(
 }
 
 /// Helper function to interpret freshly fetched genesis hash
-fn get_genesis_hash(address: &str, fetched_genesis_hash: &str) -> Result<[u8; 32], ErrorActive> {
+fn get_genesis_hash(address: &str, fetched_genesis_hash: &str) -> Result<H256, ErrorActive> {
     let genesis_hash_vec = unhex::<Active>(
         fetched_genesis_hash,
         NotHexActive::FetchedGenesisHash {
@@ -189,5 +190,5 @@ fn get_genesis_hash(address: &str, fetched_genesis_hash: &str) -> Result<[u8; 32
             ))
         }
     };
-    Ok(out)
+    Ok(out.into())
 }

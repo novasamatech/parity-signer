@@ -24,11 +24,12 @@ struct WrenchSymbol: View {
 }
 
 struct Footer: View {
-    @EnvironmentObject var data: SignerDataModel
+    let footerButton: FooterButton?
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         HStack {
             Button(action: {
-                data.pushButton(buttonID: ButtonID.NavbarLog)
+                pushButton(.navbarLog, "", "")
             }) {
                 VStack(alignment: .center) {
                     Image(systemName: "rectangle.grid.1x2.fill").imageScale(.medium)
@@ -37,11 +38,11 @@ struct Footer: View {
                     Text("Log")
                         
                 }
-                .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Log"))
+                .foregroundColor(buttonColor(active: footerButton == .log))
             }
             Spacer()
             Button(action: {
-                data.pushButton(buttonID: ButtonID.NavbarScan)
+                pushButton(.navbarScan, "", "")
             }) {
                 VStack {
                     Image(systemName: "viewfinder").imageScale(.medium)
@@ -49,21 +50,21 @@ struct Footer: View {
                         .padding(.bottom, 1.0)
                     Text("Scanner")
                 }
-                .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Scan"))
+                .foregroundColor(buttonColor(active: footerButton == .scan))
             }
             Spacer()
             Button(action: {
-                data.pushButton(buttonID: ButtonID.NavbarKeys)
+                pushButton(.navbarKeys, "", "")
             }) {
                 VStack{
                     KeySymbol()
                     Text("Keys")
                 }
-                .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Keys"))
+                .foregroundColor(buttonColor(active: footerButton == .keys))
             }
             Spacer()
             Button(action: {
-                data.pushButton(buttonID: ButtonID.NavbarSettings)
+                pushButton(.navbarSettings, "", "")
             }) {
                 VStack {
                     WrenchSymbol()
@@ -71,7 +72,7 @@ struct Footer: View {
                         .padding(.bottom, 1.0)
                     Text("Settings")
                 }
-                .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Settings"))
+                .foregroundColor(buttonColor(active: footerButton == .settings))
             }
         }.font(.footnote)
     }

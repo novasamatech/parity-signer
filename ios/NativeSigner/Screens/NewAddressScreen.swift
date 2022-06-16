@@ -8,26 +8,26 @@
 import SwiftUI
 
 struct NewAddressScreen: View {
-    
-    @EnvironmentObject var data: SignerDataModel
     @State var path: String = ""
     @FocusState private var focusedField: Bool
-    @State var derivationCheck: DerivationCheck? = nil
-    
+    @State private var derivationCheck: DerivationCheck? = nil
     var content: MDeriveKey
+    let pathCheck: (String, String, String) -> DerivationCheck
+    let createAddress: (String, String) -> Void
+    let pushButton: (Action, String, String) -> Void
     
     var body: some View {
         ZStack {
             ScrollView {
-                HeaderBar(line1: "Create new key", line2: "For seed " + content.seed_name)
+                HeaderBar(line1: "Create new key", line2: "For seed " + content.seedName)
                 //SeedCardForManager(seedName: data.selectedSeed)
-                NetworkCard(title: content.network_title, logo: content.network_logo)
+                NetworkCard(title: content.networkTitle, logo: content.networkLogo)
                 VStack (alignment: .leading) {
                     //Text("DERIVATION PATH").foregroundColor(Color("Text500")).font(.footnote)
                     ZStack {
                         RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).frame(height: 39)
                         HStack {
-                            Text(content.seed_name.decode64())
+                            Text(content.seedName)
                             TextField("Path", text: $path, prompt: Text("//<network>//input"))
                                 .foregroundColor(Color("Crypto400"))
                                 .font(FCrypto(style: .body2))
@@ -36,16 +36,16 @@ struct NewAddressScreen: View {
                                 .keyboardType(.asciiCapable)
                                 .submitLabel(.done)
                                 .onChange(of: path) {pathNew in
-                                    derivationCheck = content.updateDerivationCheck(path: pathNew, dbName: data.dbName)
+                                    derivationCheck = pathCheck(content.seedName, pathNew, content.networkSpecsKey)
                                     path = pathNew
                                 }
                                 .onSubmit {
-                                    switch (derivationCheck?.where_to) {
+                                    switch (derivationCheck?.whereTo) {
                                     case .pin:
-                                        data.createAddress(path: path, seedName: content.seed_name)
+                                        createAddress(path, content.seedName)
                                         break
                                     case .pwd:
-                                        data.pushButton(buttonID: .CheckPassword, details: path)
+                                        pushButton(.checkPassword, path, "")
                                         break
                                     default:
                                         break
@@ -69,30 +69,30 @@ struct NewAddressScreen: View {
                     BigButton(
                         text: "Next",
                         action: {
-                            switch (derivationCheck?.where_to) {
+                            switch (derivationCheck?.whereTo) {
                             case .pin:
-                                data.createAddress(path: path, seedName: content.seed_name)
+                                createAddress(path, content.seedName)
                                 break
                             case .pwd:
-                                data.pushButton(buttonID: .CheckPassword, details: path)
+                                pushButton(.checkPassword, path, "")
                                 break
                             default:
                                 break
                             }
                         },
-                        isDisabled: derivationCheck?.button_good != true)
+                        isDisabled: derivationCheck?.buttonGood != true)
                 }
             }.padding(.horizontal)
         }
         .onAppear {
-            path = content.suggested_derivation
-            derivationCheck = content.derivation_check
+            path = content.suggestedDerivation
+            derivationCheck = content.derivationCheck
             focusedField = content.keyboard
         }
-        .onChange(of: content) { newContent in
-            path = newContent.suggested_derivation
-            derivationCheck = newContent.derivation_check
-            focusedField = newContent.keyboard
+        .onChange(of: content) { _ in
+            path = content.suggestedDerivation
+            derivationCheck = content.derivationCheck
+            focusedField = content.keyboard
         }
     }
 }

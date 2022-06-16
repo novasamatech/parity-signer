@@ -8,19 +8,20 @@
 import SwiftUI
 
 struct RecoverSeedPhrase: View {
-    @EnvironmentObject var data: SignerDataModel
     @State private var userInput: String = " "
     @State private var createRoots: Bool = true
-    @State private var errorMessage: String? = ""
+    @State private var shadowUserInput: String = " "
     @FocusState private var focus: Bool
-    var content: MRecoverSeedPhrase
+    let content: MRecoverSeedPhrase
+    let restoreSeed: (String, String, Bool) -> Void
+    let pushButton: (Action, String, String) -> Void
     
     var body: some View {
         ZStack {
             ScrollView {
                 VStack {
                     //SeedNameCardOfSomeKind
-                    Text(content.seed_name.decode64())
+                    Text(content.seedName)
                     VStack(alignment: .leading) {
                         Text("SEED PHRASE").font(FBase(style: .overline))
                         VStack {
@@ -46,15 +47,19 @@ struct RecoverSeedPhrase: View {
                                     .keyboardType(.asciiCapable)
                                     .submitLabel(.done)
                                     .onChange(of: userInput, perform: { word in
-                                        data.pushButton(buttonID: .TextEntry, details: word)
+                                        pushButton(.textEntry, word, "")
+                                        shadowUserInput = word
                                     })
                                     .onSubmit {
                                     }
+                                    .onChange(of: shadowUserInput, perform: { word in
+                                        userInput = " " + content.userInput
+                                    })
                                     .onChange(of: content, perform: { input in
-                                        userInput = input.user_input
+                                        userInput = " " + input.userInput // TODO: this in rust
                                     })
                                     .onAppear(perform: {
-                                        userInput = content.user_input
+                                        userInput = " " + content.userInput
                                         focus = content.keyboard
                                     })
                                     .padding(.horizontal, 12)
@@ -66,10 +71,10 @@ struct RecoverSeedPhrase: View {
                         
                         ScrollView(.horizontal) {
                             LazyHStack {
-                                ForEach(content.guess_set, id: \.self) { guess in
+                                ForEach(content.guessSet, id: \.self) { guess in
                                     VStack {
                                         Button(action: {
-                                            data.pushButton(buttonID: .PushWord, details: guess)
+                                            pushButton(.pushWord, guess, "")
                                         }) {
                                             Text(guess)
                                                 .foregroundColor(Color("Crypto400"))
@@ -85,13 +90,12 @@ struct RecoverSeedPhrase: View {
                         }.frame(height: 23)
                         
                         Spacer()
-                        Text(data.lastError).foregroundColor(.red)
                         Button(action: {
                             createRoots.toggle()
                         }) {
                             HStack {
                                 Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
-                                Text("Create seed keys")
+                                Text("Create root keys")
                                     .multilineTextAlignment(.leading)
                                 Spacer()
                             }
@@ -102,9 +106,9 @@ struct RecoverSeedPhrase: View {
                                 BigButton(
                                     text: "Next",
                                     action: {
-                                        data.restoreSeed(seedName: content.seed_name, seedPhrase: content.ready_seed ?? "", createRoots: createRoots)
+                                        restoreSeed(content.seedName, content.readySeed ?? "", createRoots)
                                     },
-                                    isDisabled: content.ready_seed == nil
+                                    isDisabled: content.readySeed == nil
                                 )
                                     .padding(.top, 16.0)
                             }

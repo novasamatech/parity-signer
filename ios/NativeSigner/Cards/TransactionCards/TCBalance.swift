@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TCBalance: View {
-    var value: Currency
+    var value: MscCurrency
     var body: some View {
         HStack {
             Text(value.amount)

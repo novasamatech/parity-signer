@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SufficientCryptoReady: View {
-    @EnvironmentObject var data: SignerDataModel
     @GestureState private var dragOffset = CGSize.zero
     @State var offset: CGFloat = 0
     @State var oldOffset: CGFloat = 0
@@ -18,11 +17,20 @@ struct SufficientCryptoReady: View {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000"))
             VStack {
                 HeaderBar(line1: "Your Signature", line2: "Scan it into your application")
-                 Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.sufficient) ?? Data()) ?? UIImage())
+                 Image(uiImage: UIImage(data: Data(content.sufficient)) ?? UIImage())
                  .resizable()
                  .aspectRatio(contentMode: .fit).padding(12)
-                AddressCard(address: content.author_info.intoAddress())
-                Text("Payload: " + content.content.type)
+                AddressCard(address: content.authorInfo)
+                switch(content.content) {
+                case .addSpecs(let network):
+                    Text("Signature for network specs")
+                    NetworkCard(title: network.networkTitle, logo: network.networkLogo)
+                case .loadTypes(types: _, pic: _):
+                    Text("Signature for types")
+                case .loadMetadata(name: let name, version: let version):
+                    Text("Signature for metadata update" )
+                    Text(name + " version " + String(version))
+                }
             }
         }
     }

@@ -50,11 +50,10 @@
 
 #![deny(unused_crate_dependencies)]
 
+#[cfg(feature = "active")]
+use sp_core::H256;
 #[cfg(feature = "signer")]
 use sp_runtime::MultiSigner;
-
-#[cfg(feature = "active")]
-use std::convert::TryInto;
 
 #[cfg(feature = "active")]
 use std::fs;
@@ -64,6 +63,9 @@ use regex::Regex;
 
 #[cfg(feature = "active")]
 use lazy_static::lazy_static;
+
+#[cfg(feature = "active")]
+use std::str::FromStr;
 
 #[cfg(feature = "active")]
 use definitions::{
@@ -97,9 +99,11 @@ pub const DEFAULT_VERIFIER_PUBLIC: [u8; 32] = [
 /// inside.
 #[cfg(feature = "signer")]
 pub fn default_general_verifier() -> Verifier {
-    Verifier(Some(VerifierValue::Standard(MultiSigner::Sr25519(
-        sp_core::sr25519::Public::from_raw(DEFAULT_VERIFIER_PUBLIC),
-    ))))
+    Verifier {
+        v: Some(VerifierValue::Standard {
+            m: MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(DEFAULT_VERIFIER_PUBLIC)),
+        }),
+    }
 }
 
 /// Network information that is not expected to change, source for network specs
@@ -111,7 +115,7 @@ struct DefaultNetworkInfo {
     color: String,
     decimals: u8,
     encryption: Encryption,
-    genesis_hash: [u8; 32],
+    genesis_hash: H256,
     logo: String,
     name: String,
     order: u8,
@@ -131,11 +135,9 @@ fn default_network_info() -> [DefaultNetworkInfo; 3] {
             color: String::from("#000"),
             decimals: 12,
             encryption: Encryption::Sr25519,
-            genesis_hash: hex::decode(
+            genesis_hash: H256::from_str(
                 "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
             )
-            .expect("known value")
-            .try_into()
             .expect("known value"),
             logo: String::from("kusama"),
             name: String::from("kusama"),
@@ -151,11 +153,9 @@ fn default_network_info() -> [DefaultNetworkInfo; 3] {
             color: String::from("#E6027A"),
             decimals: 10,
             encryption: Encryption::Sr25519,
-            genesis_hash: hex::decode(
+            genesis_hash: H256::from_str(
                 "91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
             )
-            .expect("known value")
-            .try_into()
             .expect("known value"),
             logo: String::from("polkadot"),
             name: String::from("polkadot"),
@@ -171,11 +171,9 @@ fn default_network_info() -> [DefaultNetworkInfo; 3] {
             color: String::from("#660D35"),
             decimals: 12,
             encryption: Encryption::Sr25519,
-            genesis_hash: hex::decode(
+            genesis_hash: H256::from_str(
                 "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
             )
-            .expect("known value")
-            .try_into()
             .expect("known value"),
             logo: String::from("westend"),
             name: String::from("westend"),
@@ -219,7 +217,7 @@ pub fn default_verifiers() -> Vec<(VerifierKey, CurrentVerifier)> {
     let mut out: Vec<(VerifierKey, CurrentVerifier)> = Vec::new();
     for x in default_network_info() {
         out.push((
-            VerifierKey::from_parts(&x.genesis_hash),
+            VerifierKey::from_parts(x.genesis_hash),
             CurrentVerifier::Valid(ValidCurrentVerifier::General),
         ));
     }

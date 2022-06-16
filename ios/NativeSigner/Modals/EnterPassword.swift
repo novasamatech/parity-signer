@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct EnterPassword: View {
-    @EnvironmentObject var data: SignerDataModel
     var content: MEnterPassword
+    let pushButton: (Action, String, String) -> Void
     @State private var password: String = ""
     @FocusState private var focused: Bool
     var body: some View {
@@ -17,7 +17,7 @@ struct EnterPassword: View {
             RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
             VStack {
                 HeaderBar(line1: "SECRET PATH", line2: "///password")
-                AddressCard(address: content.author_info.intoAddress())
+                AddressCard(address: content.authorInfo)
                 if (content.counter>0) {
                     Text("Attempt " + String(content.counter) + " of 3")
                 }
@@ -45,7 +45,7 @@ struct EnterPassword: View {
                     text: "Next",
                     isCrypto: true,
                     action: {
-                    data.pushButton(buttonID: .GoForward, details: password)
+                    pushButton(.goForward, password, "")
                 },
                     isDisabled: password == ""
                 )

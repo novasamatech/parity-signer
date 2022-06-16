@@ -8,29 +8,35 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.NetworkCard
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
-import org.json.JSONArray
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MManageNetworks
+import io.parity.signer.uniffi.MscNetworkInfo
 
 @Composable
-fun ManageNetworks(signerDataModel: SignerDataModel) {
-	val networks =
-		signerDataModel.screenData.value?.optJSONArray("networks") ?: JSONArray()
+fun ManageNetworks(
+	manageNetworks: MManageNetworks,
+	button: (Action, String) -> Unit
+) {
+	val networks = manageNetworks.networks
 	LazyColumn(
 		contentPadding = PaddingValues(horizontal = 8.dp),
 		verticalArrangement = Arrangement.spacedBy(10.dp)
 	) {
-		items(networks.length()) { index ->
-			val thisNetwork = networks.getJSONObject(index)
+		items(networks.size) { index ->
+			val thisNetwork = networks[index]
 			Row(Modifier.clickable {
-				signerDataModel.pushButton(
-					ButtonID.GoForward,
-					details = thisNetwork.optString("key")
+				button(
+					Action.GO_FORWARD,
+					thisNetwork.key
 				)
 			}) {
-				NetworkCard(network = thisNetwork)
+				NetworkCard(
+					network = MscNetworkInfo(
+						networkTitle = thisNetwork.title,
+						networkLogo = thisNetwork.logo
+					)
+				)
 			}
 		}
 	}

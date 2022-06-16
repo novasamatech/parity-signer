@@ -211,33 +211,24 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                     stitcherQueue.async {
                         if !self.bucket.contains(payloadStr) {
                             if self.total == nil { //init new collection of frames
-                                var err = ExternError()
-                                withUnsafeMutablePointer(to: &err) {err_ptr in
-                                    let res = get_packets_total(err_ptr, payloadStr, 0)
-                                    if err_ptr.pointee.code == 0 {
-                                        let proposeTotal = Int(res)
-                                        if proposeTotal == 1 { //Special handling for 1-frame payloads
-                                            let process = "[\"" + payloadStr + "\"]" //Decoder expects JSON array
-                                            let res2 = try_decode_qr_sequence(err_ptr, process, 0)
-                                            if err_ptr.pointee.code == 0 {
-                                                DispatchQueue.main.async {
-                                                    self.payload = String(cString: res2!)
-                                                    self.stop()
-                                                }
-                                            } else {
-                                                print(String(cString: err_ptr.pointee.message))
-                                                signer_destroy_string(err_ptr.pointee.message)
-                                            }
-                                        } else {
-                                            DispatchQueue.main.async {
-                                                self.bucket.append(payloadStr)
-                                                self.total = proposeTotal
-                                            }
+                                do {
+                                    let res = try qrparserGetPacketsTotal(data: payloadStr, cleaned: false)
+                                    let proposeTotal = Int(res)
+                                    if proposeTotal == 1 { //Special handling for 1-frame payloads
+                                        let process = "[\"" + payloadStr + "\"]" //Decoder expects JSON array
+                                        let res2 = try qrparserTryDecodeQrSequence(data: process, cleaned: false)
+                                        DispatchQueue.main.async {
+                                            self.payload = res2
+                                            self.stop()
                                         }
                                     } else {
-                                        //TODO: reset camera on failure
-                                        signer_destroy_string(err_ptr.pointee.message)
+                                        DispatchQueue.main.async {
+                                            self.bucket.append(payloadStr)
+                                            self.total = proposeTotal
+                                        }
                                     }
+                                } catch {
+                                    //TODO: reset camera on failure
                                 }
                             } else { //collect frames and attempt to decode if it seems that enough are collected
                                 self.bucket.append(payloadStr)
@@ -245,21 +236,16 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                                     self.captured = self.bucket.count
                                 }
                                 if (self.bucket.count + 1) >= self.total ?? 0 {
-                                    var err = ExternError()
-                                    withUnsafeMutablePointer(to: &err) {err_ptr in
+                                    do {
                                         let process = "[\"" +  self.bucket.joined(separator: "\",\"") + "\"]" //Decoder expects JSON array
-                                        let res = try_decode_qr_sequence(err_ptr, process, 0)
-                                        if err_ptr.pointee.code == 0 {
-                                            DispatchQueue.main.async {
-                                                self.payload = String(cString: res!)
-                                                signer_destroy_string(res!)
-                                                self.stop()
-                                            }
-                                        } else {
-                                            //TODO: give up when things go badly?
-                                            print(String(cString: err_ptr.pointee.message))
-                                            signer_destroy_string(err_ptr.pointee.message)
+                                        let res = try qrparserTryDecodeQrSequence(data: process, cleaned: false)
+                                        DispatchQueue.main.async {
+                                            self.payload = res
+                                            self.stop()
                                         }
+                                    } catch {
+                                        //TODO: give up when things go badly?
+                                        
                                     }
                                 }
                             }

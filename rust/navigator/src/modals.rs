@@ -1,6 +1,6 @@
 //! List of all modals
 
-use definitions::keyring::NetworkSpecsKey;
+use definitions::{keyring::NetworkSpecsKey, navigation::MSCContent};
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum Modal {
@@ -10,13 +10,13 @@ pub enum Modal {
     SeedMenu,
     NetworkSelector(NetworkSpecsKey),
     PasswordConfirm,
-    SignatureReady(String),
+    SignatureReady(Vec<u8>),
     EnterPassword,
     LogComment,
     LogRight,
     NetworkDetailsMenu,
     ManageMetadata(u32),
-    SufficientCryptoReady(String),
+    SufficientCryptoReady((Vec<u8>, MSCContent)),
     KeyDetailsAction,
     TypesInfo,
     SelectSeed,

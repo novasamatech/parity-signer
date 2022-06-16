@@ -8,22 +8,22 @@
 import SwiftUI
 
 struct SignatureReady: View {
-    @EnvironmentObject var data: SignerDataModel
     @GestureState private var dragOffset = CGSize.zero
     @State var offset: CGFloat = 0
     @State var oldOffset: CGFloat = UIScreen.main.bounds.size.width
     var content: MSignatureReady
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         ZStack{
             RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000"))
             VStack {
                 HeaderBar(line1: "Your Signature", line2: "Scan it into your application")
-                Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.signature) ?? Data()) ?? UIImage())
+                Image(uiImage: UIImage(data: Data(content.signature)) ?? UIImage())
                     .resizable()
                     .aspectRatio(contentMode: .fit).padding(12)
                 Spacer()
                 BigButton(text: "Done", action: {
-                    data.pushButton(buttonID: .GoBack)
+                    pushButton(.goBack, "", "")
                 })
             }.padding(16)
         }//.background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000")))

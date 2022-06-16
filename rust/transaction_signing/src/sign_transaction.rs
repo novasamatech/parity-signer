@@ -68,7 +68,7 @@ pub fn create_signature_png(
     user_comment: &str,
     database_name: &str,
     checksum: u32,
-) -> Result<String, ErrorSigner> {
+) -> Result<Vec<u8>, ErrorSigner> {
     let hex_result = hex::encode(
         create_signature(
             seed_phrase,
@@ -83,5 +83,5 @@ pub fn create_signature_png(
         Ok(a) => a,
         Err(e) => return Err(ErrorSigner::Qr(e.to_string())),
     };
-    Ok(hex::encode(qr_data))
+    Ok(qr_data)
 }

@@ -1,190 +1,220 @@
 package io.parity.signer
 
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.State
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.alerts.ShieldAlert
 import io.parity.signer.components.Documents
 import io.parity.signer.modals.*
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.increment
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.*
 import io.parity.signer.screens.*
-import org.json.JSONObject
-
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
-@Composable
-fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
-	val screenData by signerDataModel.screenData.observeAsState()
-	val alertState by signerDataModel.alertState.observeAsState()
-	when (screen) {
-		SignerScreen.Scan -> {
-			ScanScreen(
-				signerDataModel = signerDataModel
-			)
-		}
-		SignerScreen.Keys -> {
-			KeyManager(
-				signerDataModel::pushButton,
-				signerDataModel::increment,
-				screenData ?: JSONObject(),
-				alertState
-			)
-		}
-		SignerScreen.Settings -> {
-			SettingsScreen(signerDataModel = signerDataModel)
-		}
-		SignerScreen.Log -> {
-			HistoryScreen(signerDataModel = signerDataModel)
-		}
-		SignerScreen.LogDetails -> LogDetails(signerDataModel = signerDataModel)
-		SignerScreen.Transaction -> {
-			TransactionPreview(
-				signerDataModel::pushButton,
-				signerDataModel = signerDataModel
-			)
-		}
-		SignerScreen.SeedSelector -> {
-			SeedManager(signerDataModel = signerDataModel)
-		}
-		SignerScreen.KeyDetails -> {
-			ExportPublicKey(signerDataModel = signerDataModel)
-		}
-		SignerScreen.NewSeed -> {
-			NewSeedScreen(
-				signerDataModel::pushButton,
-				signerDataModel = signerDataModel
-			)
-		}
-		SignerScreen.RecoverSeedName -> {
-			RecoverSeedName(
-				signerDataModel::pushButton,
-				signerDataModel = signerDataModel
-			)
-		}
-		SignerScreen.RecoverSeedPhrase -> {
-			RecoverSeedPhrase(
-				signerDataModel::pushButton,
-				signerDataModel = signerDataModel
-			)
-		}
-		SignerScreen.DeriveKey -> {
-			NewAddressScreen(signerDataModel = signerDataModel, increment = false)
-		}
-		SignerScreen.Verifier -> VerifierScreen(signerDataModel)
-		null -> WaitingScreen()
-		SignerScreen.ManageNetworks -> ManageNetworks(signerDataModel = signerDataModel)
-		SignerScreen.NetworkDetails -> NetworkDetails(signerDataModel = signerDataModel)
-		SignerScreen.SignSufficientCrypto -> SignSufficientCrypto(signerDataModel = signerDataModel)
-		SignerScreen.SelectSeedForBackup -> SelectSeedForBackup(signerDataModel = signerDataModel)
-		SignerScreen.Documents -> Documents()
-		SignerScreen.KeyDetailsMultiSelect -> KeyDetailsMulti(signerDataModel = signerDataModel)
-	}
-}
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.AlertData
+import io.parity.signer.uniffi.ModalData
+import io.parity.signer.uniffi.ScreenData
 
 @Composable
-fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
-	when (modal) {
-		SignerModal.Empty -> {}
-		SignerModal.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
-		SignerModal.SeedMenu -> SeedMenu(signerDataModel = signerDataModel)
-		SignerModal.NetworkSelector -> NetworkSelector(signerDataModel = signerDataModel)
-		SignerModal.Backup -> SeedBackup(signerDataModel = signerDataModel)
-		SignerModal.PasswordConfirm -> PasswordConfirm(signerDataModel = signerDataModel)
-		SignerModal.SignatureReady -> SignatureReady(signerDataModel = signerDataModel)
-		SignerModal.EnterPassword -> EnterPassword(signerDataModel = signerDataModel)
-		SignerModal.LogRight -> LogMenu(signerDataModel = signerDataModel)
-		SignerModal.NetworkDetailsMenu -> NetworkDetailsMenu(signerDataModel = signerDataModel)
-		SignerModal.ManageMetadata -> ManageMetadata(signerDataModel = signerDataModel)
-		SignerModal.SufficientCryptoReady -> SufficientCryptoReady(signerDataModel = signerDataModel)
-		SignerModal.KeyDetailsAction -> KeyDetailsAction(signerDataModel = signerDataModel)
-		SignerModal.TypesInfo -> TypesInfo(signerDataModel = signerDataModel)
-		SignerModal.NewSeedBackup -> NewSeedBackup(signerDataModel = signerDataModel)
-		SignerModal.LogComment -> LogComment(signerDataModel = signerDataModel)
-		SignerModal.SelectSeed -> SelectSeed(signerDataModel = signerDataModel)
-	}
-}
+fun ScreenSelector(
+	screenData: ScreenData,
+	alertState: State<AlertState?>,
+	progress: State<Float?>,
+	captured: State<Int?>,
+	total: State<Int?>,
+	button: (Action, String, String) -> Unit,
+	signerDataModel: SignerDataModel
+) {
+	val button1: (Action) -> Unit = { action -> button(action, "", "") }
+	val button2: (Action, String) -> Unit =
+		{ action, details -> button(action, details, "") }
+	val seedNames = signerDataModel.seedNames.value ?: emptyArray()
 
-@Composable
-fun AlertSelector(alert: SignerAlert, signerDataModel: SignerDataModel) {
-	when (alert) {
-		SignerAlert.Empty -> {}
-		SignerAlert.Error -> ErrorModal(
-			error = signerDataModel.alertData.value?.optString(
-				"error"
-			) ?: "unknown error", signerDataModel = signerDataModel
+	when (screenData) {
+		is ScreenData.DeriveKey -> NewAddressScreen(
+			screenData.f,
+			button = button2,
+			addKey = signerDataModel::addKey,
+			checkPath = signerDataModel::checkPath,
 		)
-		SignerAlert.Shield -> ShieldAlert(signerDataModel)
-		SignerAlert.Confirm -> Confirm(signerDataModel = signerDataModel)
+		ScreenData.Documents -> Documents()
+		is ScreenData.KeyDetails -> ExportPublicKey(screenData.f)
+		is ScreenData.KeyDetailsMulti -> KeyDetailsMulti(
+			screenData.f,
+			button1,
+		)
+		is ScreenData.Keys -> KeyManager(
+			button = button2,
+			signerDataModel::increment,
+			screenData.f,
+			alertState
+		)
+		is ScreenData.Log -> HistoryScreen(screenData.f, button2)
+		is ScreenData.LogDetails -> LogDetails(screenData.f)
+		is ScreenData.ManageNetworks -> ManageNetworks(
+			screenData.f,
+			button2,
+		)
+		is ScreenData.NNetworkDetails -> NetworkDetails(
+			screenData.f,
+			button2
+		)
+		is ScreenData.NewSeed -> NewSeedScreen(
+			screenData.f,
+			signerDataModel::pushButton,
+			seedNames
+		)
+		is ScreenData.RecoverSeedName -> RecoverSeedName(
+			screenData.f,
+			signerDataModel::pushButton,
+			seedNames
+		)
+		is ScreenData.RecoverSeedPhrase -> RecoverSeedPhrase(
+			recoverSeedPhrase = screenData.f,
+			button = signerDataModel::pushButton,
+			addSeed = signerDataModel::addSeed
+		)
+		ScreenData.Scan -> ScanScreen(
+			progress = progress,
+			captured = captured,
+			total = total,
+			button = signerDataModel::pushButton,
+			handleCameraPermissions = signerDataModel::handleCameraPermissions,
+			processFrame = signerDataModel::processFrame,
+			resetScanValues = signerDataModel::resetScanValues,
+		)
+		is ScreenData.SeedSelector -> SeedManager(
+			screenData.f,
+			button2
+		)
+		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
+			screenData.f,
+			button2
+		)
+		is ScreenData.Settings -> SettingsScreen(
+			screenData.f,
+			button1 = button1,
+			isStrongBoxProtected = signerDataModel::isStrongBoxProtected,
+			getAppVersion = signerDataModel::getAppVersion,
+			wipeToFactory = signerDataModel::wipeToFactory,
+			alertState = alertState,
+		)
+		is ScreenData.SignSufficientCrypto -> SignSufficientCrypto(
+			screenData.f,
+			signerDataModel::signSufficientCrypto
+		)
+		is ScreenData.Transaction -> TransactionPreview(
+			screenData.f,
+			signerDataModel::pushButton,
+			signerDataModel::signTransaction
+		)
+		is ScreenData.VVerifier -> VerifierScreen(
+			screenData.f,
+			signerDataModel::wipeToJailbreak
+		)
 	}
 }
 
-
-/**
- * All screens metadata for navigation
- */
-enum class SignerScreen {
-	Scan,
-	Keys,
-	Settings,
-	Log,
-	LogDetails,
-	Transaction,
-	SeedSelector,
-	KeyDetails,
-	NewSeed,
-	RecoverSeedName,
-	RecoverSeedPhrase,
-	DeriveKey,
-	Verifier,
-	ManageNetworks,
-	NetworkDetails,
-	SignSufficientCrypto,
-	SelectSeedForBackup,
-	Documents,
-	KeyDetailsMultiSelect;
+@Composable
+fun ModalSelector(
+	modalData: ModalData?,
+	alertState: State<AlertState?>,
+	button: (Action, String, String) -> Unit,
+	signerDataModel: SignerDataModel
+) {
+	val button1: (Action) -> Unit = { action -> button(action, "", "") }
+	val button2: (Action, String) -> Unit =
+		{ action, details -> button(action, details, "") }
+	when (modalData) {
+		is ModalData.NewSeedMenu ->
+			NewSeedMenu(
+				alertState = alertState,
+				button = button1
+			)
+		is ModalData.SeedMenu -> SeedMenu(
+			modalData.f,
+			alertState,
+			button1,
+			signerDataModel::removeSeed
+		)
+		is ModalData.NetworkSelector -> NetworkSelector(
+			modalData.f,
+			button2
+		)
+		is ModalData.Backup -> SeedBackup(
+			modalData.f,
+			getSeedForBackup = signerDataModel::getSeedForBackup
+		)
+		is ModalData.PasswordConfirm -> PasswordConfirm(
+			modalData.f,
+			signerDataModel = signerDataModel
+		)
+		is ModalData.SignatureReady -> SignatureReady(
+			modalData.f,
+			signerDataModel = signerDataModel
+		)
+		is ModalData.EnterPassword -> EnterPassword(
+			modalData.f,
+			button2,
+		)
+		is ModalData.LogRight -> LogMenu(
+			modalData.f,
+			signerDataModel = signerDataModel
+		)
+		is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(
+			signerDataModel = signerDataModel
+		)
+		is ModalData.ManageMetadata -> {
+			ManageMetadata(modalData.f, signerDataModel = signerDataModel)
+		}
+		is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
+			modalData.f,
+		)
+		is ModalData.KeyDetailsAction -> KeyDetailsAction(
+			signerDataModel = signerDataModel
+		)
+		is ModalData.TypesInfo -> TypesInfo(
+			modalData.f,
+			signerDataModel = signerDataModel
+		)
+		is ModalData.NewSeedBackup -> NewSeedBackup(
+			modalData.f,
+			signerDataModel = signerDataModel
+		)
+		is ModalData.LogComment -> LogComment(signerDataModel = signerDataModel)
+		is ModalData.SelectSeed -> {
+			SelectSeed(modalData.f, signerDataModel = signerDataModel)
+		}
+		null -> {}
+	}
 }
 
-enum class SignerModal {
-	Empty,
-	NewSeedMenu,
-	NetworkSelector,
-	SeedMenu,
-	Backup,
-	PasswordConfirm,
-	SignatureReady,
-	EnterPassword,
-	LogRight,
-	NetworkDetailsMenu,
-	ManageMetadata,
-	SufficientCryptoReady,
-	KeyDetailsAction,
-	TypesInfo,
-	NewSeedBackup,
-	LogComment,
-	SelectSeed;
-}
+@Composable
+fun AlertSelector(
+	alert: AlertData?,
+	alertState: State<AlertState?>,
+	button: (Action, String, String) -> Unit,
+	acknowledgeWarning: () -> Unit
+) {
+	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 
-enum class SignerAlert {
-	Empty,
-	Error,
-	Shield,
-	Confirm;
+	when (alert) {
+		AlertData.Confirm -> Confirm(button = button1)
+		is AlertData.ErrorData -> ErrorModal(
+			error = alert.f,
+			button = button1
+		)
+		is AlertData.Shield -> ShieldAlert(
+			// alert.f, // TODO: use this instead
+			alertState = alertState,
+			button = button1,
+			acknowledgeWarning = acknowledgeWarning
+		)
+		null -> {}
+	}
 }
 
 enum class OnBoardingState {
 	InProgress,
 	No,
 	Yes;
-}
-
-enum class ShieldAlert {
-	None,
-	Active,
-	Past
 }

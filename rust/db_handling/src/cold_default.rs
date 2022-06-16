@@ -78,11 +78,10 @@ use crate::{
 /// Default metadata is loaded into the cold database for default networks:
 /// Polkadot, Kusama, Westend. `Purpose` determines the metadata source folder
 /// and the versions to be loaded.
-#[cfg(any(feature = "active", feature = "test"))]
+#[cfg(feature = "active")]
 enum Purpose {
     /// Two (or fewer) latest released versions of the metadata for each of the
     /// default networks
-    #[cfg(feature = "active")]
     Release,
 
     /// Old metadata set, used mostly in `transaction_parsing` tests
@@ -99,11 +98,10 @@ enum Purpose {
 ///
 /// - Purge all existing entries
 /// - Add default metadata entries, according to [`Purpose`]
-#[cfg(any(feature = "active", feature = "test"))]
+#[cfg(feature = "active")]
 fn default_cold_metadata(database_name: &str, purpose: Purpose) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, METATREE)?;
     let metadata_set = match purpose {
-        #[cfg(feature = "active")]
         Purpose::Release => release_metadata()?,
 
         #[cfg(feature = "test")]
@@ -218,7 +216,9 @@ pub fn init_db<T: ErrorSource>(
     let clear_history_batch = make_batch_clear_tree::<T>(database_name, HISTORY)?;
     let events = vec![
         Event::DatabaseInitiated,
-        Event::GeneralVerifierSet(general_verifier),
+        Event::GeneralVerifierSet {
+            verifier: general_verifier,
+        },
     ];
     let start_zero = true;
     let history_batch =
@@ -245,7 +245,7 @@ pub fn signer_init_with_cert(database_name: &str) -> Result<(), ErrorSigner> {
 /// Function is applied during `Remove general certificate` procedure.
 #[cfg(feature = "signer")]
 pub fn signer_init_no_cert(database_name: &str) -> Result<(), ErrorSigner> {
-    init_db::<Signer>(database_name, Verifier(None))
+    init_db::<Signer>(database_name, Verifier { v: None })
 }
 
 /// Generate initiated test cold database with no network-associated data.

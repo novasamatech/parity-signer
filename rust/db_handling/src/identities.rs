@@ -38,6 +38,8 @@ use parity_scale_codec::Encode;
 use regex::Regex;
 #[cfg(feature = "signer")]
 use sled::Batch;
+#[cfg(feature = "active")]
+use sp_core::H256;
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
 #[cfg(any(feature = "active", feature = "signer"))]
@@ -201,6 +203,16 @@ pub(crate) fn create_address<T: ErrorSource>(
     seed_name: &str,
     seed_phrase: &str,
 ) -> Result<PrepData, T::Error> {
+    // Check that the seed phrase is not empty.
+    // In upstream, empty seed phrase means default Alice seed phrase.
+    if seed_phrase.is_empty() {
+        return Err(<T>::empty_seed());
+    }
+
+    // Check that the seed name is not empty.
+    if seed_name.is_empty() {
+        return Err(<T>::empty_seed_name());
+    }
     let mut address_prep = input_batch_prep.to_vec();
     let network_specs_key =
         NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
@@ -271,9 +283,9 @@ pub(crate) fn create_address<T: ErrorSource>(
         &network_specs.encryption,
         &public_key,
         cropped_path,
-        &network_specs.genesis_hash,
+        network_specs.genesis_hash.as_bytes(),
     );
-    let history_prep = vec![Event::IdentityAdded(identity_history)];
+    let history_prep = vec![Event::IdentityAdded { identity_history }];
 
     // check if the same address key already participates in current database
     // transaction
@@ -513,7 +525,10 @@ pub fn try_create_seed(
     make_seed_keys: bool,
     database_name: &str,
 ) -> Result<(), ErrorSigner> {
-    let mut events: Vec<Event> = vec![Event::SeedCreated(seed_name.to_string())];
+    let mut events: Vec<Event> = vec![Event::SeedCreated {
+        seed_created: seed_name.to_string(),
+    }];
+
     let prep_data =
         populate_addresses::<Signer>(database_name, seed_name, seed_phrase, make_seed_keys)?;
     events.extend_from_slice(&prep_data.history_prep);
@@ -569,9 +584,9 @@ pub fn remove_keys_set(
             &network_specs.encryption,
             &public_key,
             &address_details.path,
-            &network_specs.genesis_hash,
+            network_specs.genesis_hash.as_bytes(),
         );
-        events.push(Event::IdentityRemoved(identity_history));
+        events.push(Event::IdentityRemoved { identity_history });
         address_details.network_id = address_details
             .network_id
             .into_iter()
@@ -752,7 +767,7 @@ pub enum DerivationCheck {
 /// of password-free valid derivation. Bad format of the derivation is **not**
 /// an error, UI just does not allow to proceed.
 #[cfg(feature = "signer")]
-pub(crate) fn derivation_check(
+pub fn derivation_check(
     seed_name: &str,
     path: &str,
     network_specs_key: &NetworkSpecsKey,
@@ -969,11 +984,10 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSign
                 &address_details.encryption,
                 &public_key,
                 &address_details.path,
-                &genesis_hash_vec,
+                genesis_hash_vec.as_ref(),
             );
-
             // separate `Event` for each `NetworkSpecsKey` from `network_id` set
-            events.push(Event::IdentityRemoved(identity_history));
+            events.push(Event::IdentityRemoved { identity_history });
         }
     }
     TrDbCold::new()
@@ -1104,7 +1118,7 @@ pub fn check_derivation_set(derivations: &[String]) -> Result<(), ErrorSigner> {
 #[cfg(feature = "active")]
 pub fn prepare_derivations_export(
     encryption: &Encryption,
-    genesis_hash: &[u8; 32],
+    genesis_hash: &H256,
     content: &str,
 ) -> Result<ContentDerivations, ErrorActive> {
     let mut derivations: Vec<String> = Vec::new();

@@ -275,22 +275,25 @@ use parity_scale_codec::{Decode, Encode};
 #[cfg(feature = "signer")]
 use plot_icon::EMPTY_PNG;
 use sled::IVec;
+use sp_core::H256;
 use sp_runtime::MultiSigner;
 
 #[cfg(feature = "active")]
 use crate::error_active::{
     Active, DatabaseActive, EntryDecodingActive, ErrorActive, MismatchActive,
 };
+#[cfg(feature = "signer")]
+use crate::helpers::{
+    make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public,
+};
 use crate::{
     crypto::Encryption,
     error::{ErrorSource, SpecsKeySource},
     keyring::NetworkSpecsKey,
 };
+
 #[cfg(feature = "signer")]
-use crate::{
-    helpers::{make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public},
-    print::export_complex_single,
-};
+use crate::navigation::MVerifierDetails;
 
 /// Network parameters stored SCALE-encoded in the **cold** database
 /// `SPECSTREE` tree under [`NetworkSpecsKey`]
@@ -315,7 +318,7 @@ pub struct NetworkSpecs {
     pub encryption: Encryption,
 
     /// Network genesis hash
-    pub genesis_hash: [u8; 32],
+    pub genesis_hash: H256,
 
     /// Network associated logo
     pub logo: String,
@@ -363,7 +366,7 @@ pub struct NetworkSpecsToSend {
     pub encryption: Encryption,
 
     /// Network genesis hash  
-    pub genesis_hash: [u8; 32],
+    pub genesis_hash: H256,
 
     /// Network associated logo  
     pub logo: String,
@@ -397,7 +400,7 @@ pub struct ShortSpecs {
     pub decimals: u8,
 
     /// Network genesis hash  
-    pub genesis_hash: [u8; 32],
+    pub genesis_hash: H256,
 
     /// Network name, as it appears in network metadata  
     pub name: String,
@@ -407,16 +410,6 @@ pub struct ShortSpecs {
 }
 
 impl NetworkSpecs {
-    /// Prints network specs in json format
-    #[cfg(feature = "signer")]
-    pub fn show(
-        &self,
-        valid_current_verifier: &ValidCurrentVerifier,
-        general_verifier: &Verifier,
-    ) -> String {
-        format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"encryption\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"order\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"current_verifier\":{}", &self.base58prefix, &self.color, &self.decimals, &self.encryption.show(), hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.order, &self.path_id, &self.secondary_color, &self.title, &self.unit, export_complex_single(valid_current_verifier, |a| a.show(general_verifier)))
-    }
-
     /// Makes [`NetworkSpecsToSend`] from [`NetworkSpecs`]
     #[cfg(feature = "signer")]
     pub fn to_send(&self) -> NetworkSpecsToSend {
@@ -462,10 +455,10 @@ impl NetworkSpecs {
             Ok(a) => a,
             Err(_) => return Err(<T>::specs_decoding(network_specs_key.to_owned())),
         };
-        if genesis_hash_vec[..] != network_specs.genesis_hash {
+        if &genesis_hash_vec[..] != network_specs.genesis_hash.as_bytes() {
             return Err(<T>::specs_genesis_hash_mismatch(
                 network_specs_key.to_owned(),
-                network_specs.genesis_hash.to_vec(),
+                network_specs.genesis_hash,
             ));
         }
         if encryption != network_specs.encryption {
@@ -491,12 +484,6 @@ impl NetworkSpecs {
 }
 
 impl NetworkSpecsToSend {
-    /// Prints network specs in json format
-    #[cfg(feature = "signer")]
-    pub fn show(&self) -> String {
-        format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"encryption\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\"", &self.base58prefix, &self.color, &self.decimals, &self.encryption.show(), hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.path_id, &self.secondary_color, &self.title, &self.unit)
-    }
-
     /// Makes [`NetworkSpecs`] from [`NetworkSpecsToSend`],
     /// needs `order` input
     ///
@@ -541,11 +528,11 @@ impl NetworkSpecsToSend {
                 )))
             }
         };
-        if genesis_hash_vec[..] != network_specs_to_send.genesis_hash {
+        if &genesis_hash_vec[..] != network_specs_to_send.genesis_hash.as_bytes() {
             return Err(ErrorActive::Database(DatabaseActive::Mismatch(
                 MismatchActive::SpecsToSendGenesisHash {
                     key: network_specs_key.to_owned(),
-                    genesis_hash: network_specs_to_send.genesis_hash.to_vec(),
+                    genesis_hash: network_specs_to_send.genesis_hash,
                 },
             )));
         }
@@ -588,7 +575,9 @@ pub struct NetworkProperties {
 ///
 /// Either real verifier or information that there is no verifier.
 #[derive(Decode, Encode, PartialEq, Debug, Clone)]
-pub struct Verifier(pub Option<VerifierValue>);
+pub struct Verifier {
+    pub v: Option<VerifierValue>,
+}
 
 /// Information on known and existing verifier  
 ///
@@ -596,25 +585,26 @@ pub struct Verifier(pub Option<VerifierValue>);
 #[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub enum VerifierValue {
     /// public key for standard substrate-compatible encryption algorithms  
-    Standard(MultiSigner),
+    Standard { m: MultiSigner },
 }
 
 #[cfg(feature = "signer")]
 impl Verifier {
-    /// Display [`Verifier`] in json-like format, for json exports  
-    pub fn show_card(&self) -> String {
-        match &self.0 {
+    /// Get the [`MVerifierDetails`] for UI to show.
+    pub fn show_card(&self) -> MVerifierDetails {
+        match &self.v {
             Some(a) => a.show_card(),
-            None => format!(
-                "\"public_key\":\"\",\"identicon\":\"{}\",\"encryption\":\"none\"",
-                hex::encode(EMPTY_PNG)
-            ),
+            None => MVerifierDetails {
+                public_key: String::new(),
+                identicon: EMPTY_PNG.to_vec(),
+                encryption: String::new(),
+            },
         }
     }
 
     /// Display [`Verifier`] in human-readable format, for errors  
     pub fn show_error(&self) -> String {
-        match &self.0 {
+        match &self.v {
             Some(a) => a.show_error(),
             None => String::from("none"),
         }
@@ -623,19 +613,19 @@ impl Verifier {
 
 #[cfg(feature = "signer")]
 impl VerifierValue {
-    /// Display [`VerifierValue`] in json-like format, for json exports  
-    pub fn show_card(&self) -> String {
+    /// Get the [`MVerifierDetails`] for UI to show.
+    pub fn show_card(&self) -> MVerifierDetails {
         match &self {
-            VerifierValue::Standard(m) => {
-                let hex_public = hex::encode(multisigner_to_public(m));
-                let encryption = multisigner_to_encryption(m);
-                let hex_identicon = hex::encode(make_identicon_from_multisigner(m));
-                format!(
-                    "\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"",
-                    hex_public,
-                    hex_identicon,
-                    encryption.show()
-                )
+            VerifierValue::Standard { m } => {
+                let public_key = hex::encode(multisigner_to_public(m));
+                let encryption = multisigner_to_encryption(m).show();
+                let identicon = make_identicon_from_multisigner(m);
+
+                MVerifierDetails {
+                    public_key,
+                    identicon,
+                    encryption,
+                }
             }
         }
     }
@@ -643,13 +633,19 @@ impl VerifierValue {
     /// Display [`VerifierValue`] in human-readable format, for errors  
     pub fn show_error(&self) -> String {
         match &self {
-            VerifierValue::Standard(MultiSigner::Ed25519(x)) => {
+            VerifierValue::Standard {
+                m: MultiSigner::Ed25519(x),
+            } => {
                 format!("public key: {}, encryption: ed25519", hex::encode(x.0))
             }
-            VerifierValue::Standard(MultiSigner::Sr25519(x)) => {
+            VerifierValue::Standard {
+                m: MultiSigner::Sr25519(x),
+            } => {
                 format!("public key: {}, encryption: sr25519", hex::encode(x.0))
             }
-            VerifierValue::Standard(MultiSigner::Ecdsa(x)) => {
+            VerifierValue::Standard {
+                m: MultiSigner::Ecdsa(x),
+            } => {
                 format!("public key: {}, encryption: ecdsa", hex::encode(x.0))
             }
         }
@@ -677,22 +673,5 @@ pub enum ValidCurrentVerifier {
     General,
 
     /// Network has some other verifier, different from the general one
-    Custom(Verifier),
-}
-
-#[cfg(feature = "signer")]
-impl ValidCurrentVerifier {
-    /// Display [`ValidCurrentVerifier`] in json-like format, for json exports  
-    pub fn show(&self, general_verifier: &Verifier) -> String {
-        match &self {
-            ValidCurrentVerifier::General => format!(
-                "\"type\":\"general\",\"details\":{}",
-                export_complex_single(general_verifier, |a| a.show_card())
-            ),
-            ValidCurrentVerifier::Custom(a) => format!(
-                "\"type\":\"custom\",\"details\":{}",
-                export_complex_single(a, |a| a.show_card())
-            ),
-        }
-    }
+    Custom { v: Verifier },
 }

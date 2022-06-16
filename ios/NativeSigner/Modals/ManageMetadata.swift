@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct ManageMetadata: View {
-    @EnvironmentObject var data: SignerDataModel
     var content: MManageMetadata
+    let pushButton: (Action, String, String) -> Void
     @State var removeMetadataAlert = false
     @State var offset: CGFloat = 0
     var body: some View {
         MenuStack {
             HeaderBar(line1: "MANAGE METADATA", line2: "Select action").padding(.top, 10)
-            MetadataCard(meta: content.forCard())
+            MetadataCard(meta: MMetadataRecord(specname: content.name, specsVersion: content.version, metaHash: content.metaHash, metaIdPic: content.metaIdPic))
             HStack{
             Text("Used for:")
                 VStack{
@@ -24,12 +24,13 @@ struct ManageMetadata: View {
                     }), id: \.order) {
                         network in
                         ZStack {
-                            if network.current_on_screen {
+                            if network.currentOnScreen {
                                 RoundedRectangle(cornerRadius: 4).stroke().frame(height: 30)
                             }
                         NetworkCard(title: network.title, logo: network.logo)
                         }
                     }
+                    EmptyView()
                 }
             }
             MenuButtonsStack {
@@ -37,7 +38,7 @@ struct ManageMetadata: View {
                     text: "Sign this metadata",
                     isShaded: true,
                     isCrypto: true,
-                    action:{data.pushButton(buttonID: .SignMetadata)}
+                    action:{pushButton(.signMetadata, "", "")}
                 )
                 BigButton(
                     text: "Delete this metadata",
@@ -55,11 +56,11 @@ struct ManageMetadata: View {
                     .onEnded{drag in
             if drag.translation.height > 40 {
                 self.offset = UIScreen.main.bounds.size.height
-                data.pushButton(buttonID: .GoBack)
+                pushButton(.goBack, "", "")
             }
         })
         .alert(isPresented: $removeMetadataAlert, content: {
-            Alert(title: Text("Remove metadata?"), message: Text("This metadata will be removed for all networks"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove metadata"), action: {data.pushButton(buttonID: .RemoveMetadata)}))
+            Alert(title: Text("Remove metadata?"), message: Text("This metadata will be removed for all networks"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove metadata"), action: {pushButton(.removeMetadata, "", "")}))
         })
     }
 }

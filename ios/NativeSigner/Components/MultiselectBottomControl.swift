@@ -11,9 +11,9 @@ import SwiftUI
  * Panel with actions for multiselect
  */
 struct MultiselectBottomControl: View {
-    @EnvironmentObject var data: SignerDataModel
     @State var delete = false
     var selectedCount: String
+    var pushButton: (Action, String, String) -> Void
     var body: some View {
         ZStack {
             HStack {
@@ -31,14 +31,14 @@ struct MultiselectBottomControl: View {
                         secondaryButton: .destructive(
                             Text("Delete"),
                             action: {
-                                data.pushButton(buttonID: .RemoveKey)
+                                pushButton(.removeKey, "", "")
                             }
                         )
                     )
                 })
                 Spacer()
                 Button(action: {
-                    data.pushButton(buttonID: .ExportMultiSelect)
+                    pushButton(.exportMultiSelect, "", "")
                 }) {
                     SmallButton(text: "Export")
                 }.disabled(selectedCount == "0")
