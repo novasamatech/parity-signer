@@ -173,6 +173,12 @@ impl ErrorSource for Signer {
     fn timestamp_format(error: time::error::Format) -> Self::Error {
         ErrorSigner::TimeFormat(error)
     }
+    fn empty_seed() -> Self::Error {
+        ErrorSigner::SeedPhraseEmpty
+    }
+    fn empty_seed_name() -> Self::Error {
+        ErrorSigner::SeedNameEmpty
+    }
     fn show(error: &Self::Error) -> String {
         match error {
             ErrorSigner::Interface(a) => {
@@ -353,6 +359,8 @@ impl ErrorSource for Signer {
             ErrorSigner::NoNetworksAvailable => String::from("No networks available. Please load networks information to proceed."),
             ErrorSigner::TimeFormat(e) => format!("Unable to produce timestamp. {}", e),
             ErrorSigner::NoKnownSeeds => String::from("There are no seeds. Please create a seed first."),
+            ErrorSigner::SeedPhraseEmpty => String::from("Signer expected seed phrase, but the seed phrase is empty. Please report this bug."),
+            ErrorSigner::SeedNameEmpty => String::from("Signer expected seed name, but the seed name is empty. Please report this bug."),
         }
     }
 }
@@ -451,6 +459,12 @@ pub enum ErrorSigner {
     /// Signer has no seeds in storage. User tried an action that needs at least
     /// one seed.
     NoKnownSeeds,
+
+    /// Signer tried to use empty seed phrase, likely a bug on the interface
+    SeedPhraseEmpty,
+
+    /// Signer got empty seed name, likely a bug on the interface
+    SeedNameEmpty,
 }
 
 impl ErrorSigner {

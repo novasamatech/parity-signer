@@ -11,7 +11,7 @@ fun ErrorModal(error: String, button: (Action) -> Unit) {
 		header = "Error!",
 		text = error,
 		back = { button(Action.GO_BACK) },
-		forward = {  },
+		forward = { },
 		backText = "Dismiss",
 		showForward = false
 	)

@@ -107,7 +107,10 @@ pub fn default_cold_release(path: Option<PathBuf>) -> Result<(), ErrorActive> {
 /// - **no** metadata entries; the `METATREE` is cleared - all metadata in the
 /// hot database is received only through rpc calls.
 #[cfg(feature = "active")]
-pub fn default_hot() -> Result<(), ErrorActive> {
-    let database_name = HOT_DB_NAME;
+pub fn default_hot(path: Option<PathBuf>) -> Result<(), ErrorActive> {
+    let database_name = match path {
+        Some(ref path) => path.to_str().unwrap_or(HOT_DB_NAME),
+        None => HOT_DB_NAME,
+    };
     reset_hot_database(database_name)
 }

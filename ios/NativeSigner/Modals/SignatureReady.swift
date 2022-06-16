@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct SignatureReady: View {
-    @EnvironmentObject var data: SignerDataModel
     @GestureState private var dragOffset = CGSize.zero
     @State var offset: CGFloat = 0
     @State var oldOffset: CGFloat = UIScreen.main.bounds.size.width
     var content: MSignatureReady
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         ZStack{
             RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000"))
@@ -23,7 +23,7 @@ struct SignatureReady: View {
                     .aspectRatio(contentMode: .fit).padding(12)
                 Spacer()
                 BigButton(text: "Done", action: {
-                    data.pushButton(action: .goBack)
+                    pushButton(.goBack, "", "")
                 })
             }.padding(16)
         }//.background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000")))

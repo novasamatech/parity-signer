@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct LogComment: View {
-    @EnvironmentObject var data: SignerDataModel
+    
+    let pushButton: (Action, String, String) -> Void
     @State private var comment: String = ""
     @FocusState private var focused: Bool
     var body: some View {
@@ -35,7 +36,7 @@ struct LogComment: View {
                                 focused = true
                             }
                             .onSubmit {
-                                data.pushButton(action: .goForward, details: comment)
+                                pushButton(.goForward, comment, "")
                             }
                     }
                 }

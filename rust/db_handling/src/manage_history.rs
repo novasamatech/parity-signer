@@ -156,8 +156,8 @@ pub(crate) fn events_in_batch<T: ErrorSource>(
 }
 
 /// Enter [`Event`] set into the database as a single database transaction.
-#[cfg(any(feature = "signer", feature = "test"))]
-pub(crate) fn enter_events<T: ErrorSource>(
+#[cfg(feature = "signer")]
+pub fn enter_events<T: ErrorSource>(
     database_name: &str,
     events: Vec<Event>,
 ) -> Result<(), T::Error> {

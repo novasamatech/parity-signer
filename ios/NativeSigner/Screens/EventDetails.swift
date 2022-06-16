@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct EventDetails: View {
-    @EnvironmentObject var data: SignerDataModel
     let content: MLogDetails
     var body: some View {
         VStack {

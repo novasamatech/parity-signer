@@ -10,9 +10,10 @@ import AVFoundation
 
 struct CameraView: View {
     @StateObject var model = CameraViewModel()
-    @EnvironmentObject var data: SignerDataModel
     @State var total: Int? = 0
     @State var captured: Int? = 0
+    @State var resetCameraTrigger: Bool = false
+    let pushButton: (Action, String, String) -> Void
     let size = UIScreen.main.bounds.size.width
     var body: some View {
         ZStack {
@@ -29,14 +30,14 @@ struct CameraView: View {
                     .onReceive(model.$payload, perform: { payload in
                         if payload != nil {
                             DispatchQueue.main.async {
-                                data.pushButton(action: .transactionFetched, details: payload ?? "")
+                                pushButton(.transactionFetched, payload ?? "", "")
                             }
                         }
                     })
-                    .onReceive(data.$resetCamera, perform: { resetCamera in
-                        if resetCamera {
+                    .onChange(of: resetCameraTrigger, perform: { newResetCameraTrigger in
+                        if newResetCameraTrigger {
                             model.reset()
-                            data.resetCamera = false
+                            resetCameraTrigger = false
                         }
                     })
                     .onReceive(model.$total, perform: {rTotal in
