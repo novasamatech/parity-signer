@@ -16,10 +16,8 @@ use sled::{Batch, Transactional};
 use sp_runtime::MultiSigner;
 
 #[cfg(feature = "active")]
-use constants::{ADDRESS_BOOK, SPECSTREEPREP};
-use constants::{
-    ADDRTREE, HISTORY, METATREE, META_HISTORY, SETTREE, SPECSTREE, TRANSACTION, VERIFIERS,
-};
+use constants::{ADDRESS_BOOK, META_HISTORY, SPECSTREEPREP};
+use constants::{ADDRTREE, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, VERIFIERS};
 #[cfg(feature = "signer")]
 use constants::{DRV, GENERALVERIFIER, SIGN, STUB, TYPES};
 

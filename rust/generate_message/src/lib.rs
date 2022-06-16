@@ -1093,7 +1093,7 @@ use show::{check_file, show_block_history, show_metadata, show_networks, show_sp
 mod specs;
 use specs::gen_add_specs;
 
-/// Function to process incoming command as interpreted by parser
+/// Process incoming command as interpreted by parser
 
 pub fn full_run(command: Command) -> Result<(), ErrorActive> {
     match command {

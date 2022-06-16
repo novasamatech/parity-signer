@@ -1,26 +1,64 @@
 //! Fetch network information from a node using rpc calls
 //!
-//! Preparing `add_specs` and `load_metadata` updates for Signer may require
+//! Preparing `add_specs` and `load_metadata` update payload may require
 //! gathering network information from a node.
 //!
-//! For `add_specs` update, fetched information and corresponding rpc calls are:
+//! For `add_specs` update payload:
 //!
-//! - latest network metadata, to get network name and, optionally, base58
-//! prefix (call `state_getMetadata`)
-//! - network genesis hash (call `chain_getBlockHash`, for 0th block)
-//! - network properties, to get base58 prefix, decimals, and units (call
-//! `system_properties`)
+//! <table>
+//!     <tr>
+//!         <th>call</th>
+//!         <th>fetched information</th>
+//!     </tr>
+//!     <tr>
+//!         <td><code>state_getMetadata</code>, for current block</td>
+//!         <td>current block network metadata, that will be used to get:<br>
+//!             - network name<br>
+//!             - base58 prefix from metadata
+//!         </td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>chain_getBlockHash</code>, for 0th block</td>
+//!         <td>network genesis hash</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>system_properties</code></td>
+//!         <td>- base58 prefix<br>
+//!             - decimals<br>
+//!             - unit<br>
+//!         </td>
+//!     </tr>
+//! </table>
 //!
-//! Note that the only way to get network name is from the network metadata
-//! `Version` constant. It is expected that as the network metadata versions are
-//! bumped up, the network name remains the same.
+//! Network name expected to remain the same for the network over time. The only
+//! way to get network name is from the network metadata `Version` constant.
 //!
-//! For `load_metadata` update, fetched information and corresponding rpc calls
-//! are:
+//! For `load_metadata` update:
 //!
-//! - latest network metadata, to get metadata itself, network name and version
-//! (call `state_getMetadata`)
-//! - network genesis hash (call `chain_getBlockHash`, for 0th block)
+//! <table>
+//!     <tr>
+//!         <th>call</th>
+//!         <th>fetched information</th>
+//!     </tr>
+//!     <tr>
+//!         <td><code>chain_getBlockHash</code>, for current block</td>
+//!         <td>current block hash</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>state_getMetadata</code>, for just fetched block hash</td>
+//!         <td>latest network metadata</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>chain_getBlockHash</code>, for 0th block</td>
+//!         <td>network genesis hash</td>
+//!     </tr>
+//! </table>
+//!
+//! Block hash is fetched first to always have network metadata matching the
+//! block hash, even if the two rpc calls were done during block switching.
+//!
+//! Addresses for rpc calls in different networks could be found
+//! [here](https://github.com/polkadot-js/apps/tree/master/packages/apps-config/src/endpoints)
 //!
 //! This module deals only with the rpc calls part and does **no processing**
 //! of the fetched data.
@@ -35,25 +73,26 @@ use serde_json::{
 };
 use sp_core::H256;
 
-/// Data from rpc calls for `load_metadata` update.
+/// Data from rpc calls for `load_metadata` update payload.
 ///
-/// Note that this data is sufficient for update generation, i.e. nothing else
-/// has to be known about the network beforehand to produce an update.
+/// This data is **sufficient** for `load_metadata` update payload generation,
+/// i.e. nothing else has to be known about the network beforehand to produce an
+/// update payload.
 pub struct FetchedInfo {
     /// Fetched metadata, as a hexadecimal string
     pub meta: String,
 
-    /// Block hash, at which the metadata was fetched
+    /// Block hash, at which the metadata was fetched, as a hexadecimal string
     pub block_hash: String,
 
     /// Fetched genesis hash, as a hexadecimal string
     pub genesis_hash: String,
 }
 
-/// Data from rpc calls for `add_specs` update.
+/// Data from rpc calls for `add_specs` update payload.
 ///
-/// Note that this data is **not** sufficient for update generation. At least
-/// network encryption is needed additionally.
+/// Note that this data is **not sufficient** for `add_specs` update payload
+/// generation. At least network encryption is needed additionally.
 pub struct FetchedInfoWithNetworkSpecs {
     /// Fetched metadata, as a hexadecimal string
     pub meta: String,
@@ -80,13 +119,14 @@ lazy_static! {
 /// Transform address as it is displayed to user in <https://polkadot.js.org/>
 /// to address with port added if necessary that could be fed to `jsonrpsee`
 /// client.
+///
+/// The port is set here to default 443 if there is no port specified in
+/// address itself, since default port in `jsonrpsee` is unavailable for now.
+///
+/// See for details <https://github.com/paritytech/jsonrpsee/issues/554`>
+///
+/// Some addresses have port specified, and should be left as is.
 fn address_with_port(str_address: &str) -> String {
-    // The port is set here to default 443 if there is no port specified in
-    // address itself, since default port in `jsonrpsee` is unavailable for now.
-    //
-    // See for details <https://github.com/paritytech/jsonrpsee/issues/554`>
-    //
-    // Some addresses have port specified, and should be left as is.
     match PORT.captures(str_address) {
         Some(caps) => {
             if caps.name("port").is_some() {
@@ -102,8 +142,15 @@ fn address_with_port(str_address: &str) -> String {
     }
 }
 
-/// Fetch network metadata and genesis hash as hexadecimal strings from given
-/// url address.
+/// Fetch data for `load_metadata` update payload through rpc calls.
+///
+/// Function inputs address at which rpc calls are made.
+///
+/// Data fetched:
+///
+/// 1. current block hash
+/// 2. metadata at this block hash
+/// 3. network genesis hash
 #[tokio::main]
 pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::error::Error>> {
     let client = WsClientBuilder::default()
@@ -138,7 +185,11 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
     })
 }
 
-/// Fetch network metadata from given url address at given block
+/// Fetch network metadata from given url address at given block through rpc
+/// call.
+///
+/// Function inputs address at which rpc call is made and block hash in [`H256`]
+/// format. Outputs hexadecimal metadata.
 #[tokio::main]
 pub async fn fetch_meta_at_block(
     str_address: &str,
@@ -159,8 +210,15 @@ pub async fn fetch_meta_at_block(
     }
 }
 
-/// Fetch network metadata and genesis hash as hexadecimal strings, and network
-/// properties from given url address.
+/// Fetch data for `add_specs` update payload through rpc calls.
+///
+/// Function inputs address at which rpc calls are made.
+///
+/// Data fetched:
+///
+/// 1. current network metadata
+/// 2. network genesis hash
+/// 3. network system properties (could contain base58 prefix, decimals, unit)
 #[tokio::main]
 pub async fn fetch_info_with_network_specs(
     str_address: &str,

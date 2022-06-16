@@ -21,10 +21,10 @@ use definitions::{
 };
 
 use crate::helpers::{
-    address_book_content, error_occured, filter_address_book_by_url, genesis_hash_in_hot_db,
-    get_address_book_entry, network_specs_from_entry, network_specs_from_title, print_specs,
-    specs_agnostic, try_get_network_specs_to_send, update_db, update_known_specs,
-    update_modify_encryption_specs,
+    address_book_content, db_upd_network, error_occured, filter_address_book_by_url,
+    genesis_hash_in_hot_db, get_address_book_entry, network_specs_from_entry,
+    network_specs_from_title, print_specs, specs_agnostic, try_get_network_specs_to_send,
+    update_known_specs, update_modify_encryption_specs,
 };
 use crate::parser::{Content, InstructionSpecs, Override, Set, Token};
 
@@ -394,7 +394,7 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<(), ErrorAc
     };
 
     if make_update {
-        update_db(&address_book_entry.address, &network_specs_to_change)?;
+        db_upd_network(&address_book_entry.address, &network_specs_to_change)?;
         if printing {
             print_specs(&network_specs_to_change)
         } else {
@@ -405,7 +405,7 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<(), ErrorAc
     } else {
         Err(ErrorActive::Fetch(Fetch::SpecsInDb {
             name: address_book_entry.name,
-            encryption: address_book_entry.encryption,
+            encryption: network_specs_to_change.encryption,
         }))
     }
 }
@@ -455,7 +455,7 @@ fn specs_pt_u(
             url: address.to_string(),
         })),
         None => {
-            update_db(address, &specs)?;
+            db_upd_network(address, &specs)?;
             if printing {
                 print_specs(&specs)?
             }

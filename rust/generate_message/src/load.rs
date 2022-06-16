@@ -56,9 +56,9 @@ use definitions::{
 };
 
 use crate::helpers::{
-    add_new, address_book_content, error_occured, load_meta_print, meta_fetch,
-    network_specs_from_entry, prepare_metadata, write_metadata, MetaFetched, MetaShortCut,
-    MetaValuesStamped, SortedMetaValues, Write,
+    add_new, address_book_content, db_upd_metadata, error_occured, load_meta_print, meta_fetch,
+    network_specs_from_entry, prepare_metadata, MetaFetched, MetaShortCut, MetaValuesStamped,
+    SortedMetaValues, Write,
 };
 use crate::parser::{Content, InstructionMeta, Set};
 
@@ -365,7 +365,7 @@ fn meta_kpt_a(write: &Write, pass_errors: bool) -> Result<(), ErrorActive> {
             Err(e) => error_occured(e, pass_errors)?,
         };
     }
-    write_metadata(sorted_meta_values)
+    db_upd_metadata(sorted_meta_values)
 }
 
 /// `load_metadata <-k/-p/-t> -a` for individual [`AddressSpecs`] value
@@ -429,7 +429,7 @@ fn meta_kpt_a_element(
 fn meta_kpt_n(name: &str, write: &Write) -> Result<(), ErrorActive> {
     let mut sorted_meta_values = prepare_metadata()?;
     meta_kpt_a_element(&search_name(name)?, write, &mut sorted_meta_values)?;
-    write_metadata(sorted_meta_values)
+    db_upd_metadata(sorted_meta_values)
 }
 
 /// Network information from [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) and
@@ -618,7 +618,7 @@ pub fn unwasm(filename: &str, update_db: bool) -> Result<(), ErrorActive> {
                 meta_values.name, meta_values.version
             )
         }
-        write_metadata(sorted_meta_values)?;
+        db_upd_metadata(sorted_meta_values)?;
     }
     let shortcut = MetaShortCut {
         meta_values,

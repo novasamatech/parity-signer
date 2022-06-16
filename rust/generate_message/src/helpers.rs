@@ -1,4 +1,4 @@
-//! Hot database helpers
+//! Helpers
 use parity_scale_codec::Encode;
 use serde_json::{map::Map, value::Value};
 use sled::Batch;
@@ -44,13 +44,12 @@ pub fn get_address_book_entry(title: &str) -> Result<AddressBookEntry, ErrorActi
     }
 }
 
-/// Get [`NetworkSpecsToSend`] from the database for given address book title
+/// Get [`NetworkSpecsToSend`] from the database for given address book title.
 pub fn network_specs_from_title(title: &str) -> Result<NetworkSpecsToSend, ErrorActive> {
     network_specs_from_entry(&get_address_book_entry(title)?)
 }
 
-/// Get [`NetworkSpecsToSend`] corresponding to the given entry in
-/// [`ADDRESS_BOOK`] tree.
+/// Get [`NetworkSpecsToSend`] corresponding to the given [`AddressBookEntry`].
 ///
 /// Entries in [`ADDRESS_BOOK`] and [`SPECSTREEPREP`] trees for any network can
 /// be added and removed only simultaneously.
@@ -94,7 +93,7 @@ pub fn try_get_network_specs_to_send(
     }
 }
 
-/// Get network specs [`NetworkSpecsToSend`] from the hot database
+/// Get network specs [`NetworkSpecsToSend`] from the hot database.
 ///
 /// Network specs here are expected to be found, not finding them results in an
 /// error.
@@ -109,17 +108,20 @@ pub fn get_network_specs_to_send(
     }
 }
 
-/// Update the database when introducing a new network.
+/// Update the database after `add_specs` run.
 ///
-/// Inputs `&str` url address that was used for rpc calls and already prepared
+/// Inputs `&str` url address that was used for rpc calls and already completed
 /// [`NetworkSpecsToSend`].
 ///
 /// Adds simultaneously [`AddressBookEntry`] to [`ADDRESS_BOOK`] and
 /// [`NetworkSpecsToSend`] to [`SPECSTREEPREP`].
 ///
 /// Key for [`AddressBookEntry`] is the network address book title. It always
-/// has format <network name>-<network encryption>.
-pub fn update_db(address: &str, network_specs: &NetworkSpecsToSend) -> Result<(), ErrorActive> {
+/// has format <network_name>-<network_encryption>.
+pub fn db_upd_network(
+    address: &str,
+    network_specs: &NetworkSpecsToSend,
+) -> Result<(), ErrorActive> {
     let mut network_specs_prep_batch = Batch::default();
     network_specs_prep_batch.insert(
         NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption).key(),
@@ -146,7 +148,7 @@ pub fn update_db(address: &str, network_specs: &NetworkSpecsToSend) -> Result<()
         .apply(HOT_DB_NAME)
 }
 
-/// Process error depending on `pass_errors` flag.
+/// Process error depending on pass errors flag `-s`.
 pub fn error_occured(e: ErrorActive, pass_errors: bool) -> Result<(), ErrorActive> {
     if pass_errors {
         println!("Error encountered. {} Skipping it.", e);
@@ -156,19 +158,19 @@ pub fn error_occured(e: ErrorActive, pass_errors: bool) -> Result<(), ErrorActiv
     }
 }
 
-/// Content to print in `load_metadata` messages.
+/// Content to print during `load_metadata <-k/-p/-t>` processing.
 pub enum Write {
-    /// print all payloads, `-t` key or no setting key was used
+    /// all payloads, `-t` key or no setting key was used
     All,
 
-    /// print only new payloads, `-k` setting key was used
+    /// only new payloads, `-k` setting key was used
     OnlyNew,
 
-    /// print no payloads, `-p` setting key was used    
+    /// no payloads, `-p` setting key was used    
     None,
 }
 
-/// Get all entries with address book titles from `ADDRESS_BOOK`.
+/// Get all [`ADDRESS_BOOK`] entries with address book titles.
 pub fn address_book_content() -> Result<Vec<(String, AddressBookEntry)>, ErrorActive> {
     let database = open_db::<Active>(HOT_DB_NAME)?;
     let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
@@ -179,7 +181,7 @@ pub fn address_book_content() -> Result<Vec<(String, AddressBookEntry)>, ErrorAc
     Ok(out)
 }
 
-/// Get [`ADDRESS_BOOK`] all entries with address book titles, for given url
+/// Get all [`ADDRESS_BOOK`] entries with address book titles, for given url
 /// address.
 pub fn filter_address_book_by_url(
     address: &str,
@@ -206,7 +208,7 @@ pub fn filter_address_book_by_url(
     Ok(out)
 }
 
-/// Search through [`ADDRESS_BOOK`] entries for the one with given genesis hash.
+/// Search for any [`ADDRESS_BOOK`] entry with given genesis hash.
 pub fn genesis_hash_in_hot_db(genesis_hash: H256) -> Result<Option<AddressBookEntry>, ErrorActive> {
     let mut out = None;
     for (_, address_book_entry) in address_book_content()?.into_iter() {
@@ -245,14 +247,16 @@ pub fn meta_history_content() -> Result<Vec<MetaHistoryEntry>, ErrorActive> {
     Ok(out)
 }
 
-/// `MetaValues` from the `METATREE` with block hash at the time of fetch
+/// [`MetaValues`] with block hash at the time of fetch, if available.
+///
+/// Block hash may be missing if the metadata was extracted from `.wasm` file.
 #[derive(Clone)]
 pub struct MetaValuesStamped {
     pub meta_values: MetaValues,
     pub at_block_hash: Option<H256>,
 }
 
-/// Read all network metadata entries from the database.
+/// Collect all [`MetaValuesStamped`] from the hot database.
 pub fn read_metadata_database() -> Result<Vec<MetaValuesStamped>, ErrorActive> {
     let database = open_db::<Active>(HOT_DB_NAME)?;
     let metadata = open_tree::<Active>(&database, METATREE)?;
@@ -283,7 +287,7 @@ pub fn read_metadata_database() -> Result<Vec<MetaValuesStamped>, ErrorActive> {
     Ok(out)
 }
 
-/// Sorted metadata entries
+/// Sorted [`MetaValuesStamped`] from the hot database.
 pub struct SortedMetaValues {
     /// Set of the metadata entries with latest version known to the database.
     pub newer: Vec<MetaValuesStamped>,
@@ -293,8 +297,11 @@ pub struct SortedMetaValues {
     pub older: Vec<MetaValuesStamped>,
 }
 
-/// Sort the metadata entries form the database into sets of newer and older, by
-/// metadata version.
+/// Sort [`MetaValuesStamped`] into sets of newer and older, by metadata
+/// version.
+///
+/// Database contains maximum two metadata entries for each network name, both
+/// newer and older sets can contain at most one metadata [`MetaValuesStamped`].
 fn sort_metavalues(meta_values: Vec<MetaValuesStamped>) -> Result<SortedMetaValues, ErrorActive> {
     // newer metadata set, i.e. with higher version for given network
     let mut newer: Vec<MetaValuesStamped> = Vec::new();
@@ -371,7 +378,9 @@ fn sort_metavalues(meta_values: Vec<MetaValuesStamped>) -> Result<SortedMetaValu
     Ok(SortedMetaValues { newer, older })
 }
 
-/// Add new [`MetaValues`] entry to [`SortedMetaValues`]
+/// Try updating [`SortedMetaValues`] with new [`MetaValuesStamped`].
+///
+/// Outputs flag to indicate that the [`SortedMetaValues`] got updated.
 ///
 /// If the fetched metadata is good and has later version than the ones in
 /// [`SortedMetaValues`], it is added to `newer` set, any previous value from
@@ -498,17 +507,19 @@ pub fn add_new(
     }
 }
 
-/// Collect and sort metadata from [`METATREE`] tree of the hot database
+/// Collect and sort [`MetaValuesStamped`] from the hot database
 pub fn prepare_metadata() -> Result<SortedMetaValues, ErrorActive> {
     let known_metavalues = read_metadata_database()?;
     sort_metavalues(known_metavalues)
 }
 
-/// Clear [`METATREE`] tree of the hot database and write
-/// new sorted metadata into it.
+/// Update the database after `load_metadata` run.
+///
+/// Clear [`METATREE`] tree of the hot database and write new metadata set in
+/// it.
 ///
 /// Update [`META_HISTORY`] tree.
-pub fn write_metadata(sorted_meta_values: SortedMetaValues) -> Result<(), ErrorActive> {
+pub fn db_upd_metadata(sorted_meta_values: SortedMetaValues) -> Result<(), ErrorActive> {
     let mut metadata_batch = make_batch_clear_tree::<Active>(HOT_DB_NAME, METATREE)?;
     let mut meta_history_batch = Batch::default();
     let mut all_meta = sorted_meta_values.newer;
@@ -526,13 +537,14 @@ pub fn write_metadata(sorted_meta_values: SortedMetaValues) -> Result<(), ErrorA
         .apply(HOT_DB_NAME)
 }
 
-/// Data for `load_metadata` payload
+/// Data needed to output `load_metadata` update payload file.
 pub struct MetaShortCut {
     pub meta_values: MetaValues,
     pub genesis_hash: H256,
 }
 
-/// Fetched data for `load_metadata` payload and database update
+/// Fetched and interpreted data for `load_metadata` payload and database
+/// update.
 pub struct MetaFetched {
     pub meta_values: MetaValues,
     pub block_hash: H256,
@@ -554,8 +566,8 @@ impl MetaFetched {
     }
 }
 
-/// Get data needed for `load_metadata` payload [`MetaShortCut`] from given url
-/// address
+/// Get network information through rpc calls at `address` and interpret it into
+/// [`MetaFetched`].
 pub fn meta_fetch(address: &str) -> Result<MetaFetched, ErrorActive> {
     let new_info = fetch_info(address).map_err(|e| {
         ErrorActive::Fetch(Fetch::Failed {
@@ -590,11 +602,19 @@ pub fn meta_fetch(address: &str) -> Result<MetaFetched, ErrorActive> {
     })
 }
 
-/// `meta_at_block -u <network_url_address> -block <block_hash>`
-///
-/// Get metadata for specific block and produce output file.
+/// Get network metadata file from given url address at specified block.
 ///
 /// For investigating silent metadata update cases.
+///
+/// Inputs `&str` address and hexadecimal `&str` block hash.
+///
+/// Fetched network metadata, processes it, and outputs file
+/// `<network_name><metadata_version>_<block_hash>` with hexadecimal
+/// metadata in [`EXPORT_FOLDER`].
+///
+/// Command line to get metadata at block:
+///
+/// `meta_at_block -u <network_url_address> -block <block_hash>`
 pub fn debug_meta_at_block(address: &str, hex_block_hash: &str) -> Result<(), ErrorActive> {
     let block_hash = get_hash(hex_block_hash, Hash::BlockEntered)?;
     let meta_fetched = fetch_meta_at_block(address, block_hash).map_err(|e| {
@@ -623,7 +643,7 @@ pub fn debug_meta_at_block(address: &str, hex_block_hash: &str) -> Result<(), Er
     }
 }
 
-/// Prepare [`NetworkSpecsToSend`] using only url address and user-entered data
+/// Prepare [`NetworkSpecsToSend`] with only url address and user-entered data.
 ///
 /// Database is not addressed. For `-d` content key.
 pub fn specs_agnostic(
@@ -721,14 +741,19 @@ pub fn update_modify_encryption_specs(
     Ok(())
 }
 
-/// Interpreted metadata and genesis hash and raw properties.
+/// Fetched network information: metadata and genesis hash are interpreted,
+/// properties remain raw.
 struct CommonSpecsFetch {
     genesis_hash: H256,
     meta_values: MetaValues,
     properties: Map<String, Value>,
 }
 
-/// Fetch network information and process metadata and genesis hash.
+/// Fetch network information for `add_specs` update payload, process metadata
+/// and genesis hash.
+///
+/// Properties processing depends on what is done to the fetch results and what
+/// is in the database.
 fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch, ErrorActive> {
     // actual fetch
     let new_info = fetch_info_with_network_specs(address).map_err(|e| {
@@ -763,11 +788,20 @@ fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch, ErrorActive> {
     })
 }
 
-/// Check if existing [`NetworkSpecsToSend`] match fetched network information.
+/// Check and modify [`NetworkSpecsToSend`] entry with the network information
+/// fetched and user token override.
 ///
-/// Function inputs url `address` to make rpc calls from, existing network
-/// `NetworkSpecsToSend` from the database, and user-entered optional override
-/// for `Token`.
+/// This is a helper function for `add_specs` runs with `-n` reference key, i.e.
+/// for cases when *some* network specs entry already exists in the database.
+///
+/// Input [`NetworkSpecsToSend`] may be the entry from the database or the
+/// entry from the database modified with encryption override.
+///
+/// Function inputs `address` at which rpc calls are made, network specs
+/// `NetworkSpecsToSend` from the database, and user-entered optional
+/// override for `Token`.
+///
+/// Output is flag indicating if the network specs have been changed.
 fn common_specs_processing(
     address: &str,
     specs: &mut NetworkSpecsToSend,
