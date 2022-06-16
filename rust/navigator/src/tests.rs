@@ -76,12 +76,9 @@ lazy_static! {
     static ref OS_MSG: Regex = Regex::new(r#"Os \{[^}]*\}"#).expect("checked_construction");
 }
 
-// TODO uncomment this when message signing is returned
-/*
 fn cut_os_msg(error: &str) -> String {
     OS_MSG.replace_all(error, r#"Os {**}"#).to_string()
 }
-*/
 
 fn cut_seed_remove_identicon(data: &mut Option<ModalData>) -> String {
     if let Some(ModalData::NewSeedBackup { f }) = data {
@@ -6519,59 +6516,6 @@ fn flow_test_1() {
 
         do_action(Action::GoBack, "", "").unwrap().unwrap();
 
-        {
-            // database got unavailable for some reason
-            let _database = db_handling::helpers::open_db::<Signer>(dbname).unwrap();
-
-            let mut action = do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
-            let expected_alert = "Database error. Internal error. IO error: could not acquire lock on \"for_tests/flow_test_1/db\": Os {**}".to_string();
-            let expected_action = ActionResult {
-                screen_label: "Select seed".to_string(),
-                back: false,
-                footer: true,
-                footer_button: Some(FooterButton::Keys),
-                right_button: Some(RightButton::NewSeed),
-                screen_name_type: ScreenNameType::H1,
-                modal_data: None,
-                alert_data: Some(AlertData::ErrorData { f: expected_alert }),
-                screen_data: ScreenData::Settings {
-                    f: MSettings {
-                        ..Default::default()
-                    },
-                },
-            };
-            if let Some(AlertData::ErrorData { ref mut f }) = action.alert_data {
-                *f = cut_os_msg(f);
-            } else {
-                panic!("Expected AlertData::ErrorData");
-            }
-
-            assert_eq!(
-                action, expected_action,
-                "Tried to switch from Log to Keys with unavailable database."
-            );
-
-            let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
-
-            if let Some(AlertData::ErrorData { ref mut f }) = action.alert_data {
-                *f = cut_os_msg(f);
-            } else {
-                panic!("Expected AlertData::ErrorData");
-            }
-
-            assert_eq!(
-                action, expected_action,
-                "GoBack on SeedSelector with ErrorDisplay alert."
-            );
-        }
-
-        // Aaand, we are back
-        let action = do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
-        assert_eq!(
-            action, current_settings_action,
-            "Reload Settings. Expected known Settings screen with no errors.",
-        );
-
         let mut action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
         erase_log_timestamps(&mut action.screen_data);
         let expected_action = ActionResult {
@@ -6615,6 +6559,59 @@ fn flow_test_1() {
 
     */
 
+    {
+        // database got unavailable for some reason
+        let _database = db_handling::helpers::open_db::<Signer>(dbname).unwrap();
+
+        let mut action = do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
+        let expected_alert = "Database error. Internal error. IO error: could not acquire lock on \"for_tests/flow_test_1/db\": Os {**}".to_string();
+        let expected_action = ActionResult {
+            screen_label: "Select seed".to_string(),
+            back: false,
+            footer: true,
+            footer_button: Some(FooterButton::Keys),
+            right_button: Some(RightButton::NewSeed),
+            screen_name_type: ScreenNameType::H1,
+            modal_data: None,
+            alert_data: Some(AlertData::ErrorData { f: expected_alert }),
+            screen_data: ScreenData::Settings {
+                f: MSettings {
+                    ..Default::default()
+                },
+            },
+        };
+        if let Some(AlertData::ErrorData { ref mut f }) = action.alert_data {
+            *f = cut_os_msg(f);
+        } else {
+            panic!("Expected AlertData::ErrorData");
+        }
+
+        assert_eq!(
+            action, expected_action,
+            "Tried to switch from Log to Keys with unavailable database."
+        );
+
+        let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+
+        if let Some(AlertData::ErrorData { ref mut f }) = action.alert_data {
+            *f = cut_os_msg(f);
+        } else {
+            panic!("Expected AlertData::ErrorData");
+        }
+
+        assert_eq!(
+            action, expected_action,
+            "GoBack on SeedSelector with ErrorDisplay alert."
+        );
+    }
+
+    // Aaand, we are back
+    let action = do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
+    assert_eq!(
+        action, current_settings_action,
+        "Reload Settings. Expected known Settings screen with no errors.",
+    );
+	
     // no init after population
     populate_cold_nav_test(dbname).unwrap();
     let action = do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
