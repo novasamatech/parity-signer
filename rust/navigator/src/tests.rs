@@ -6611,7 +6611,7 @@ fn flow_test_1() {
         action, current_settings_action,
         "Reload Settings. Expected known Settings screen with no errors.",
     );
-	
+
     // no init after population
     populate_cold_nav_test(dbname).unwrap();
     let action = do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
