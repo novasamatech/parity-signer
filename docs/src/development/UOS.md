@@ -45,6 +45,7 @@ reset or connecting to the network.
 QR code envelope has following structure:
 
 | QR code prefix | content | endign spacer | padding |
+|:-|:-|:-|:-|
 | 4 bits | byte-aligned content | 4 bits | remainder |
 
 QR code prefix always starts with `0x4` symbol indicating "raw" encoding.
