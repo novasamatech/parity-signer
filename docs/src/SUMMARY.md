@@ -13,7 +13,7 @@
 
 - [Development](./development/Development.md)
     - [Build](./development/Build.md)
-    - [Signer ecosystem](./development/Signer-Structure.md)
+    - [Signer structure](./development/Signer-Structure.md)
     - [Troubleshooting](./development/Troubleshooting.md)
-    - [Changelog](./about/Changelog.md)
     - [Rust docs](./development/Rustdocs.md)
+    - [Signer ecosystem](./development/Ecosystem.md)

@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.1
+
+Android version release, minor fixes
+
 ## New in version 5.0.0
 
 ### Architecture
