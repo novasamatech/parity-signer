@@ -42,7 +42,68 @@ reset or connecting to the network.
 
 # QR code structure
 
-(padding, length indicator, shift)
+QR code envelope has following structure:
+
+| QR code prefix | content | endign spacer | padding |
+| 4 bits | byte-aligned content | 4 bits | remainder |
+
+QR code prefix always starts with `0x4` symbol indicating "raw" encoding.
+
+Subsequent 2 bytes encode content length. Using this number, QR code parser can
+instantly extract content and disregard the rest of QR code.
+
+Actual content is shifted by half-byte, otherwise it is a normal byte sequence.
+
+## Multiframe QR
+
+The information transfered through QR channel into Signer is always enveloped in multiframe packages (although minimal number of multiframe packages is 1). There are two standards for the multiframe: RaptorQ erasure coding and legacy non-erasure multiframe. The type of envelope is determined by the first bit of the QR code data: `0` indicates legacy multiframe, `1` indicates RaptorQ
+
+##### *RaptorQ multipart payload*
+
+[RaptorQ](https://en.wikipedia.org/wiki/Raptor_code#RaptorQ_code) (RFC6330) is a variable rate (fountain) erasure code protocol with [reference implementation in Rust](https://github.com/cberner/raptorq)
+
+Wrapping content in RaptorQ protocol allows for arbitrary amounts of data to be tranferred reliably within reasonable time. It is recommended to wrap all payloads into this type of envelope.
+
+Each QR code in RaptorQ encoded multipart payload contains following parts:
+
+| bytes `[0..4]` | bytes `[4..]` |
+|:-|:-|
+| `80000000 || payload_size` | `RaptorQ serialized packet` |
+
++ `payload_size` **MUST** contain payload size in bytes, represented as big-endian 32-bit unsigned integer.
++ `payload_size` **MUST NOT** exceed `7FFFFFFF`
++ `payload_size` **MUST** be identical in all codes encoding the payload
++ `payload_size` and `RaptorQ serialized packet` **MUST** be stored by the Cold Signer, in no particular order, until their amount is sufficient to decode the payload.
++ Hot Wallet **MUST** continuously loop through all the frames showing each frame for at least 1/30 seconds (recommended frame rate: 4 FPS).
++ Cold Signer **MUST** be able to start scanning the Multipart Payload _at any frame_.
++ Cold Signer **MUST NOT** expect the frames to come in any particular order.
++ Cold Signer **SHOULD** show a progress indicator of how many frames it has successfully scanned out of the estimated minimum required amount.
++ Hot Wallet **SHOULD** generate sufficient number of recovery frames (recommended overhead: 100%; minimal reasonable overhead: square root of number of packets).
++ Payloads fitting in 1 frame **SHOULD** be shown without recovery frames as static image.
+
+Once sufficient number of frames is collected, they could be processed into
+single payload and treated as data vector ("QR code content").
+
+##### *Legacy Multipart Payload*
+
+In real implementation, the Parity Signer ecosystem generalized all payloads as multipart messages. 
+
+| bytes position | `[0]`  | `[1..3]` | `[3..5]`      | `[5..]`     |
+|:-|:-|:-|:-|:-|
+| content | `00`   | `frame_count`  | `frame_index` | `data` |
+
++ `frame` **MUST** the number of current frame, '0000' represented as big-endian 16-bit unsigned integer.
++ `frame_count` **MUST** the total number of frames, represented as big-endian 16-bit unsigned integer.
++ `part_data` **MUST** be stored by the Cold Signer, ordered by `frame` number, until all frames are scanned.
++ Hot Wallet **MUST** continuously loop through all the frames showing each frame for about 2 seconds.
++ Cold Signer **MUST** be able to start scanning the Multipart Payload _at any frame_.
++ Cold Signer **MUST NOT** expect the frames to come in any particular order.
++ Cold Signer **SHOULD** show a progress indicator of how many frames it has successfully scanned out of the total count.
+
+Once all frames are combined, the `part_data` must be concatenated into a single
+binary blob and treated as data vector ("QR code content").
+
+## Informative content of QR code
 
 Every QR code content starts with a prelude `[0x53, 0x<encryption code>,
 0x<payload code>]`.
