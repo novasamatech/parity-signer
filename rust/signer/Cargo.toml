@@ -29,7 +29,7 @@ log = "0.4.17"
 [build-dependencies]
 definitions = {path = "../definitions"}
 generate_message = {path = "../generate_message"}
-uniffi_build = { version = "0.18.0", features = ["builtin-bindgen"] }
+uniffi_build = { version = "0.19.1", features = ["builtin-bindgen"] }
 
 [lib]
 crate-type = ["staticlib", "cdylib"]
