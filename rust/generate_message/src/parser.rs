@@ -13,7 +13,7 @@ use sp_core::{ecdsa, ed25519, sr25519};
 use std::convert::TryInto;
 use std::{env, path::PathBuf};
 
-/// Commands to execute
+/// Commands to execute.
 pub enum Command {
     /// Execute [`Show`] command.
     Show(Show),
@@ -58,7 +58,7 @@ pub enum Command {
     MetaAtBlock { url: String, block_hash: String },
 }
 
-/// Display data commands
+/// Display data commands.
 pub enum Show {
     /// Show all hot database [`METATREE`](constants::METATREE) entries
     Metadata,
@@ -79,7 +79,7 @@ pub enum Show {
     BlockHistory,
 }
 
-/// Command details for `load_metadata`
+/// Command details for `load_metadata`.
 pub struct InstructionMeta {
     /// Setting key, as read from command line
     pub set: Set,
@@ -88,7 +88,7 @@ pub struct InstructionMeta {
     pub content: Content,
 }
 
-/// Command details for `add_specs`
+/// Command details for `add_specs`.
 pub struct InstructionSpecs {
     /// Setting key, as read from command line
     pub set: Set,
@@ -100,7 +100,7 @@ pub struct InstructionSpecs {
     pub over: Override,
 }
 
-/// Reference key for `load_metadata` and `add_specs` commands
+/// Reference key for `load_metadata` and `add_specs` commands.
 pub enum Content {
     /// Key `-a`: deal with all relevant database entries
     ///
@@ -120,7 +120,7 @@ pub enum Content {
     Address(String),
 }
 
-/// Setting key for `load_metadata` and `add_specs` commands
+/// Setting key for `load_metadata` and `add_specs` commands.
 pub enum Set {
     /// Key `-d`: do **not** update the database, make rpc calls, and produce
     /// output files
@@ -143,7 +143,7 @@ pub enum Set {
     T,
 }
 
-/// Data to process `make` and `sign` commands
+/// Data to process `make` and `sign` commands.
 pub struct Make {
     /// Target output format
     pub goal: Goal,
@@ -158,7 +158,7 @@ pub struct Make {
     pub name: Option<String>,
 }
 
-/// Target output format for `derivations`, `make` and `sign` commands
+/// Target output format for `derivations`, `make` and `sign` commands.
 pub enum Goal {
     /// Only QR code
     Qr,
@@ -170,7 +170,7 @@ pub enum Goal {
     Both,
 }
 
-/// Verifier-to-be, for `make` and `sign` commands
+/// Verifier-to-be, for `make` and `sign` commands.
 pub enum Crypto {
     /// Alice key, with well-known [seed phrase](constants::ALICE_SEED_PHRASE)
     /// and derivation `//Alice`, to generate test updating payloads.
@@ -186,7 +186,7 @@ pub enum Crypto {
     Sufficient(SufficientCrypto),
 }
 
-/// Payload for `make` and `sign` commands
+/// Payload for `make` and `sign` commands.
 ///
 /// Associated data is `Vec<u8>` blob that becomes part of the update.
 ///
@@ -202,7 +202,7 @@ pub enum Msg {
     AddSpecs(Vec<u8>),
 }
 
-/// Argument for `-crypto` key in `make` command
+/// Argument for `-crypto` key in `make` command.
 enum CryptoType {
     /// `ed25519` argument
     Ed25519,
@@ -217,7 +217,7 @@ enum CryptoType {
     None,
 }
 
-/// Argument for `-msgtype` key in `make` and `sign` commands
+/// Argument for `-msgtype` key in `make` and `sign` commands.
 enum MsgType {
     /// `load_types` argument
     LoadTypes,
@@ -229,7 +229,7 @@ enum MsgType {
     AddSpecs,
 }
 
-/// Argument for `-verifier` key in `make` command
+/// Argument for `-verifier` key in `make` command.
 enum VerKey {
     /// Hexadecimal string input, entered with `-hex` key.
     ///
@@ -245,7 +245,7 @@ enum VerKey {
     Alice,
 }
 
-/// Argument for `-signature` key in `make` command
+/// Argument for `-signature` key in `make` command.
 enum Entry {
     /// Hexadecimal string input, entered with `-hex` key.
     ///
@@ -258,7 +258,7 @@ enum Entry {
     File(String),
 }
 
-/// Data to process `remove` command
+/// Data to process `remove` command.
 pub enum Remove {
     /// Removing all network data by network address book title.
     ///
@@ -271,7 +271,7 @@ pub enum Remove {
     SpecNameVersion { name: String, version: u32 },
 }
 
-/// Data to process `derivations` command
+/// Data to process `derivations` command.
 pub struct Derivations {
     /// Target output format
     pub goal: Goal,
@@ -284,7 +284,7 @@ pub struct Derivations {
     pub derivations: String,
 }
 
-/// Overrides for `add_specs` command
+/// Overrides for `add_specs` command.
 pub struct Override {
     /// [`Encryption`] override to specify encryption algorithm used by a new
     /// network or to add another encryption algorithm in known network.
@@ -307,19 +307,20 @@ pub struct Override {
 }
 
 impl Override {
+    /// Flag to indicate that no overrides were invoked.
     pub fn all_empty(&self) -> bool {
         self.encryption.is_none() && self.title.is_none() && self.token.is_none()
     }
 }
 
-/// Data from command line for token override
+/// Data from command line for token override.
 pub struct Token {
     pub decimals: u8,
     pub unit: String,
 }
 
 impl Command {
-    /// Interpret command line input into `Command`
+    /// Interpret command line input into `Command`.
     pub fn new(mut args: env::Args) -> Result<Command, ErrorActive> {
         args.next();
 
@@ -1530,7 +1531,7 @@ impl Command {
     }
 }
 
-/// Get verifier infortmation from command line arguments
+/// Get verifier infortmation from command line arguments.
 fn process_verifier_and_signature(
     verifier_found: Option<VerKey>,
     signature_found: Option<Entry>,
@@ -1573,7 +1574,7 @@ fn process_verifier_and_signature(
     }
 }
 
-/// Get `Vec<u8>` signature draft from command line entry into
+/// Get `Vec<u8>` signature draft from command line entry into.
 fn get_needed_signature(signature_found: Option<Entry>) -> Result<Vec<u8>, ErrorActive> {
     match signature_found {
         Some(Entry::Hex(t)) => Ok(unhex::<Active>(&t, NotHexActive::InputSignature)?),
@@ -1590,7 +1591,7 @@ fn get_needed_signature(signature_found: Option<Entry>) -> Result<Vec<u8>, Error
     }
 }
 
-/// Fit public key and signature drafts into [`SufficientCrypto`]
+/// Fit public key and signature drafts into [`SufficientCrypto`].
 fn into_sufficient(
     verifier_public_key: Vec<u8>,
     signature: Vec<u8>,

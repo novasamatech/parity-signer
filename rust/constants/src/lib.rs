@@ -177,11 +177,11 @@ pub fn add_specs() -> String {
 
 /// Folder to save payloads ready for signing, for `generate_message` crate
 #[cfg(feature = "active")]
-pub const FOLDER: &str = "../files/for_signing";
+pub const FOLDER: &str = "../files/in_progress";
 
 /// Folder to save completed update messages, for `generate_message` crate
 #[cfg(feature = "active")]
-pub const EXPORT_FOLDER: &str = "../files/signed";
+pub const EXPORT_FOLDER: &str = "../files/completed";
 
 /// Alice seed phrase
 pub const ALICE_SEED_PHRASE: &str =

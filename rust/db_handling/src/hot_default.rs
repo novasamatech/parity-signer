@@ -10,6 +10,8 @@
 //! - [`METATREE`](constants::METATREE) with network metadata fetched through
 //! rpc calls, maximum two entries are allowed for each network, empty by
 //! default
+//! - [`META_HISTORY`](constants::META_HISTORY) with block hashes for metadata
+//! fetched through rpc calls, empty by default
 //! - [`SETTREE`](constants::SETTREE) with types information
 //! - [`SPECSTREEPREP`](constants::SPECSTREEPREP) with network specs entries
 //! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
@@ -76,7 +78,7 @@ fn default_hot_settings() -> Result<Batch, ErrorActive> {
 /// - network verifiers
 ///
 /// Note that no metadata entries are loaded. It is intended that all metadata
-/// is received only through rpc calls.
+/// entries appear during the database use.
 pub fn reset_hot_database(database_name: &str) -> Result<(), ErrorActive> {
     if std::fs::remove_dir_all(database_name).is_ok() {}
     TrDbHot::new()

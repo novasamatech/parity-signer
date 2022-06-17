@@ -247,7 +247,8 @@ pub fn meta_history_content() -> Result<Vec<MetaHistoryEntry>, ErrorActive> {
     Ok(out)
 }
 
-/// [`MetaValues`] with block hash at the time of fetch, if available.
+/// [`MetaValues`] with corresponding block hash at the time of fetch, if
+/// available.
 ///
 /// Block hash may be missing if the metadata was extracted from `.wasm` file.
 #[derive(Clone)]
@@ -287,7 +288,8 @@ pub fn read_metadata_database() -> Result<Vec<MetaValuesStamped>, ErrorActive> {
     Ok(out)
 }
 
-/// Sorted [`MetaValuesStamped`] from the hot database.
+/// [`MetaValuesStamped`] sorted into sets of newer and older, by metadata
+/// version.
 pub struct SortedMetaValues {
     /// Set of the metadata entries with latest version known to the database.
     pub newer: Vec<MetaValuesStamped>,
@@ -389,7 +391,7 @@ fn sort_metavalues(meta_values: Vec<MetaValuesStamped>) -> Result<SortedMetaValu
 ///
 /// If there was no block hash in hot database and the metadata did not change,
 /// a new block hash could be added if it is known.
-pub fn add_new(
+pub fn add_new_metadata(
     new: &MetaValuesStamped,
     sorted: &mut SortedMetaValues,
 ) -> Result<bool, ErrorActive> {
@@ -643,7 +645,8 @@ pub fn debug_meta_at_block(address: &str, hex_block_hash: &str) -> Result<(), Er
     }
 }
 
-/// Prepare [`NetworkSpecsToSend`] with only url address and user-entered data.
+/// Fetch data and assemble [`NetworkSpecsToSend`] with only url address and
+/// user-entered data.
 ///
 /// Database is not addressed. For `-d` content key.
 pub fn specs_agnostic(
@@ -690,21 +693,21 @@ pub fn specs_agnostic(
     })
 }
 
-/// Update [`NetworkSpecsToSend`] already existing in the database with exactly
-/// same encryption.
+/// Update [`NetworkSpecsToSend`] already existing in the database with
+/// **exactly same** encryption.
 ///
 /// Could be used to overwrite token (if possible for the network) or the Signer
-/// display title.
+/// display title. If no title override is used, the title remains as it was.
 ///
-/// Output flag indicates if the value has changed, and a new database entry
-/// should be created.
+/// Output flag indicates if the value has changed, and the database entry
+/// should be updated.
 pub fn update_known_specs(
     address: &str,
     specs: &mut NetworkSpecsToSend,
     optional_signer_title_override: Option<String>,
     optional_token_override: Option<Token>,
 ) -> Result<bool, ErrorActive> {
-    let mut update_done = common_specs_processing(address, specs, optional_token_override)?;
+    let mut update_done = known_specs_processing(address, specs, optional_token_override)?;
 
     if let Some(title) = optional_signer_title_override {
         if specs.title != title {
@@ -715,15 +718,20 @@ pub fn update_known_specs(
     Ok(update_done)
 }
 
-/// Make [`NetworkSpecsToSend`] from the known database with different
-/// [`Encryption`].
+/// Modify [`NetworkSpecsToSend`] existing in the database **only** with
+/// different encryption.
 ///
-/// Requires new `encryption`.
+/// New data always will be added to the database unless errors occur.
 ///
-/// Accepts changes in token (if possible for the network) or the Signer
-/// display title.
+/// Function inputs:
 ///
-/// A new database entry is created in any case.
+/// - `&str` address to make rpc calls
+/// - `NetworkSpecsToSend` as they were found in the database, to be modified
+/// here
+/// - new `Encryption` to apply to `encryption` and `title` (if no title
+/// override was entered) fields of the `NetworkSpecsToSend`
+/// - optional title override
+/// - optional token override
 pub fn update_modify_encryption_specs(
     address: &str,
     specs: &mut NetworkSpecsToSend,
@@ -731,7 +739,7 @@ pub fn update_modify_encryption_specs(
     optional_signer_title_override: Option<String>,
     optional_token_override: Option<Token>,
 ) -> Result<(), ErrorActive> {
-    common_specs_processing(address, specs, optional_token_override)?;
+    known_specs_processing(address, specs, optional_token_override)?;
 
     specs.title =
         optional_signer_title_override.unwrap_or(format!("{}-{}", specs.name, encryption.show()));
@@ -741,19 +749,20 @@ pub fn update_modify_encryption_specs(
     Ok(())
 }
 
-/// Fetched network information: metadata and genesis hash are interpreted,
-/// properties remain raw.
+/// `add_specs` payload data, after processing similar for entirely new and
+/// partially known data.
+///
+/// Metadata and genesis hash are interpreted, properties remain raw.
 struct CommonSpecsFetch {
     genesis_hash: H256,
     meta_values: MetaValues,
     properties: Map<String, Value>,
 }
 
-/// Fetch network information for `add_specs` update payload, process metadata
-/// and genesis hash.
+/// Fetch `add_specs` update payload data, process metadata and genesis hash.
 ///
-/// Properties processing depends on what is done to the fetch results and what
-/// is in the database.
+/// Processing of propertoes depends on what is done to the fetch results and
+/// the contents of the database.
 fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch, ErrorActive> {
     // actual fetch
     let new_info = fetch_info_with_network_specs(address).map_err(|e| {
@@ -788,21 +797,23 @@ fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch, ErrorActive> {
     })
 }
 
-/// Check and modify [`NetworkSpecsToSend`] entry with the network information
-/// fetched and user token override.
+/// Check known [`NetworkSpecsToSend`] with network data fetched and apply token
+/// override.
 ///
 /// This is a helper function for `add_specs` runs with `-n` reference key, i.e.
 /// for cases when *some* network specs entry already exists in the database.
 ///
-/// Input [`NetworkSpecsToSend`] may be the entry from the database or the
-/// entry from the database modified with encryption override.
+/// Input [`NetworkSpecsToSend`] is the entry from the database to which the
+/// encryption and title overrides could be applied.
 ///
 /// Function inputs `address` at which rpc calls are made, network specs
-/// `NetworkSpecsToSend` from the database, and user-entered optional
-/// override for `Token`.
+/// `NetworkSpecsToSend` from the database, and user-entered optional override
+/// for `Token`.
 ///
-/// Output is flag indicating if the network specs have been changed.
-fn common_specs_processing(
+/// Output is flag indicating if the network specs have been changed. This flag
+/// would be needed only in case the encryption is not modified outside of this
+/// function.
+fn known_specs_processing(
     address: &str,
     specs: &mut NetworkSpecsToSend,
     optional_token_override: Option<Token>,
@@ -937,19 +948,18 @@ fn common_specs_processing(
     Ok(update_done)
 }
 
-/// The kind of hash processed. Determines the error.
+/// The type of hash processed. Determines the error.
 enum Hash {
     BlockEntered,
     BlockFetched { url: String },
     Genesis { url: String },
 }
 
-/// Transform hash from fetched hexadecimal string into `H256` format
+/// Transform hash from hexadecimal string into `H256` format
 ///
-/// Inputs url `address` from which the data was fetched, hexadecimal
-/// `fetched_hash` and `Hash` used to produce correct error in case the format
-/// is incorrect.
-fn get_hash(fetched_hash: &str, what: Hash) -> Result<H256, ErrorActive> {
+/// Inputs hexadecimal `input_hash` and hash type/source `Hash` (used to
+/// produce error in case the `input_hash` format is incorrect).
+fn get_hash(input_hash: &str, what: Hash) -> Result<H256, ErrorActive> {
     let not_hex = match what {
         Hash::BlockEntered => NotHexActive::EnteredBlockHash,
         Hash::BlockFetched { ref url } => NotHexActive::FetchedBlockHash {
@@ -959,7 +969,7 @@ fn get_hash(fetched_hash: &str, what: Hash) -> Result<H256, ErrorActive> {
             url: url.to_string(),
         },
     };
-    let hash_vec = unhex::<Active>(fetched_hash, not_hex)?;
+    let hash_vec = unhex::<Active>(input_hash, not_hex)?;
     let out: [u8; 32] = match hash_vec.try_into() {
         Ok(a) => a,
         Err(_) => match what {
@@ -967,14 +977,14 @@ fn get_hash(fetched_hash: &str, what: Hash) -> Result<H256, ErrorActive> {
             Hash::BlockFetched { url: _ } => {
                 return Err(ErrorActive::Fetch(
                     Fetch::UnexpectedFetchedBlockHashFormat {
-                        value: fetched_hash.to_string(),
+                        value: input_hash.to_string(),
                     },
                 ))
             }
             Hash::Genesis { url: _ } => {
                 return Err(ErrorActive::Fetch(
                     Fetch::UnexpectedFetchedGenesisHashFormat {
-                        value: fetched_hash.to_string(),
+                        value: input_hash.to_string(),
                     },
                 ))
             }
@@ -983,11 +993,11 @@ fn get_hash(fetched_hash: &str, what: Hash) -> Result<H256, ErrorActive> {
     Ok(out.into())
 }
 
-/// Write to file raw bytes payload of `load_metadata` update
+/// Write to file `load_metadata` update payload as raw bytes.
 ///
 /// Resulting file, located in dedicated [`FOLDER`](constants::FOLDER), could be
 /// used to generate data signature and to produce updates.
-pub fn load_meta_print(shortcut: &MetaShortCut) -> Result<(), ErrorActive> {
+pub fn load_metadata_print(shortcut: &MetaShortCut) -> Result<(), ErrorActive> {
     let filename = format!(
         "{}_{}V{}",
         load_metadata(),
@@ -998,11 +1008,11 @@ pub fn load_meta_print(shortcut: &MetaShortCut) -> Result<(), ErrorActive> {
     content.write(&filename)
 }
 
-/// Write to file raw bytes payload of `add_specs` update
+/// Write to file `add_specs` update payload as raw bytes.
 ///
 /// Resulting file, located in dedicated [`FOLDER`](constants::FOLDER), could be
 /// used to generate data signature and to produce updates.
-pub fn print_specs(network_specs: &NetworkSpecsToSend) -> Result<(), ErrorActive> {
+pub fn add_specs_print(network_specs: &NetworkSpecsToSend) -> Result<(), ErrorActive> {
     let filename = format!(
         "{}_{}_{}",
         add_specs(),

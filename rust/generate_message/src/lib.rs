@@ -10,7 +10,7 @@
 //! derivations import QR codes, to be scanned into Signer
 //! - maintain the `hot` database on the network-connected device, to store and
 //! manage the data that went into update QR codes
-//! - maintain Signer default network metadata set in `default` crate and
+//! - maintain Signer default network metadata set in `defaults` crate and
 //! prepare the `cold` database for the Signer release
 //!
 //! # Supported Signer updates
@@ -1027,7 +1027,7 @@
 //! A raw bytes update payload file is generated in dedicated
 //! [`FOLDER`](constants::FOLDER) to (optionally) be signed and later be
 //! transformed into `load_metadata` update QR. Update payload file name is
-//! `sign_me_load_metadata_<name>V<version>`.
+//! `sign_me_load_metadata_<network_name>V<version>`.
 //!
 //! By default, metadata extracted from `.wasm` file is added to the database.
 //! Optional `-d` key could be used is database should **not** be updated.
@@ -1037,7 +1037,7 @@
 //!
 //! ## Make metadata file for `defaults` release metadata set
 //!
-//! `$ cargo run meta_default_file -name <network name> -version
+//! `$ cargo run meta_default_file -name <network_name> -version
 //! <network_version>`
 //!
 //! Produces file with hex-encoded network metadata from the hot database
@@ -1093,8 +1093,7 @@ use show::{check_file, show_block_history, show_metadata, show_networks, show_sp
 mod specs;
 use specs::gen_add_specs;
 
-/// Process incoming command as interpreted by parser
-
+/// Process incoming command as interpreted by parser.
 pub fn full_run(command: Command) -> Result<(), ErrorActive> {
     match command {
         Command::Show(x) => match x {

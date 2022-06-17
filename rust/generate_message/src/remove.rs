@@ -7,24 +7,30 @@
 //!
 //! ### Command line
 //!
-//! `$ cargo run remove -name <network name> -version <network version>`
+//! `$ cargo run remove -name <network_name> -version <network_version>`
 //!
 //! ### Example
 //!
 //! `$ cargo run remove -name westend -version 9200`
 //!
 //! Note that this will remove only the selected metadata from [`METATREE`] tree
-//! and will not affect [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) or
-//! [`SPECSTREEPREP`](constants::SPECSTREEPREP) trees of the database.
+//! and will not affect [`ADDRESS_BOOK`](constants::ADDRESS_BOOK),
+//! [`META_HISTORY`] or [`SPECSTREEPREP`](constants::SPECSTREEPREP) trees of the
+//! database.
+//!
+//! If the same version of the network metadata is loaded again, the
+//! [`META_HISTORY`] entry get rewritten, so that the metadata and block hash
+//! are always matching in the database.
 //!
 //! ## Remove all data associated with a network
 //!
 //! ### Command line
 //!
-//! `$ cargo run remove -title <network address book title>`
+//! `$ cargo run remove -title <address_book_title>`
 //!
 //! Network title in the address book is unique identifier for a network with
-//! given encryption.
+//! given encryption. It always is constructed as
+//! `<network_name>-<network_encryption>`.
 //!
 //! Removed data associated with the address book title consists of:
 //!
@@ -45,13 +51,7 @@
 //!
 //! ### Example
 //!
-//! Removing default Westend network:
-//!
-//! `$ cargo run remove -title westend`
-//!
-//! Removing user-generated Westend network with Ed25519 encryption:
-//!
-//! `$ cargo run remove -title westend-ed25519`
+//! `$ cargo run remove -title westend-sr25519`
 //!
 //! If one of the default networks gets removed, it could be added back,
 //! however, it will not be marked as default anymore.
@@ -69,12 +69,13 @@ use sled::Batch;
 use crate::helpers::{get_address_book_entry, is_specname_in_db};
 use crate::parser::Remove;
 
-/// Remove information from the database
+/// Remove information from the database.
 pub fn remove_info(info: Remove) -> Result<(), ErrorActive> {
     match info {
         // network data by the address book title
         Remove::Title(network_title) => {
-            // init `Batch` for `ADDRESS_BOOK`, `SPECSTREEPREP`, `METADATA`
+            // init `Batch` for `ADDRESS_BOOK`, `SPECSTREEPREP`, `METADATA` and
+            // `META_HISTORY`
             let mut address_book_batch = Batch::default();
             let mut metadata_batch = Batch::default();
             let mut meta_history_batch = Batch::default();
@@ -96,7 +97,8 @@ pub fn remove_info(info: Remove) -> Result<(), ErrorActive> {
             network_specs_prep_batch.remove(network_specs_key.key());
 
             // if the address book has no more entries with same network name,
-            // except the one currently being removed, the metadata gets removed
+            // except the one currently being removed, the metadata and
+            // the block history entries get removed
             if !is_specname_in_db(&address_book_entry.name, &network_title)? {
                 let database = open_db::<Active>(HOT_DB_NAME)?;
                 let metadata = open_tree::<Active>(&database, METATREE)?;
@@ -119,7 +121,7 @@ pub fn remove_info(info: Remove) -> Result<(), ErrorActive> {
                 .apply(HOT_DB_NAME)
         }
 
-        // network metadata by ntework name and version
+        // network metadata by network name and version
         Remove::SpecNameVersion { name, version } => {
             let mut metadata_batch = Batch::default();
             get_meta_values_by_name_version::<Active>(HOT_DB_NAME, &name, version)?;

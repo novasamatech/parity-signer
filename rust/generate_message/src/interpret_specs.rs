@@ -14,45 +14,41 @@
 //!
 //! There could be base58 prefix information in network metadata. If base58
 //! prefix is fetched via `system_properties` rpc call and the metadata contains
-//! `SS58Prefix` constant, they **must** be matching for the network to be
+//! `SS58Prefix` constant, they must be matching for the network to be
 //! suitable for use in the Signer. If no base58 prefix is encountered at all,
 //! network is not suitable for use in Signer either.
 //!
-//! Some networks support more than one token, in this case rpc call returns an
-//! array of decimals and an array of units, of equal length. No mechanism to
-//! automatically choose a token from the fetched set is currently present.
+//! Some networks support more than one token, in this case rpc returns an array
+//! of decimals and an array of units, that must have equal length. No mechanism
+//! to automatically choose a token from the fetched set is currently present.
 //!
 //! Some other networks have no token at all.
 //!
 //! For networks with token set or no token, decimals default to `0` and units
-//! default to `UNIT`. There could be a token override applied by user in
-//! command line sequence, setting the decimals and units manually. Token
-//! override is not supported for networks that have a single token, or for the
-//! networks that are already in the hot database with some other token.
+//! default to `UNIT`. For networks with token set there could be a token
+//! override applied by user in command line sequence, to set the decimals and
+//! units manually. Token override is not supported for networks that have a
+//! single token or no token.
 //!
-//! Example command line with token override:
+//! Command line with token override:
 //!
-//! `$ cargo run add_specs -d -u wss://network.my -sr25519 -token 10 AU`
-//!
-//! Note that the network could be removed from the hot database, if, for
-//! example, the erroneous token was entered as an override, by running:
-//!
-//! `$ cargo run remove -title <network address book title>`
+//! `$ cargo run add_specs -d -u <url_address> -sr25519 -token <decimals> <unit>`
 use definitions::{error_active::SpecsError, network_specs::NetworkProperties};
 use serde_json::{map::Map, value::Value};
 use std::convert::TryInto;
 
 use crate::parser::Token;
 
-/// Transfrom the rpc call results into [`NetworkProperties`].
+/// Transform `system_properties` rpc call results into [`NetworkProperties`].
+///
+/// This function is only used if the network properties are used as is, i.e.
+/// without checking with existing database entries.
 ///
 /// Function inputs:
 ///
 /// - `&Map<String, Value>` received via `system_properties` rpc call,
 /// - optional base58 prefix from the network metadata
-/// - optional token override for cases when such override if allowed
-///
-/// In case of success, function outputs [`NetworkProperties`].
+/// - optional token override to be applied if allowed
 pub fn interpret_properties(
     x: &Map<String, Value>,
     optional_prefix_from_meta: Option<u16>,
@@ -74,8 +70,7 @@ pub fn interpret_properties(
                 println!("Network supports several tokens. An array of tokenDecimals {} and an array of tokenSymbol {} were fetched. Through override, the decimals value will be set to {} and unit value will be set to {}. To improve this behavior, please file a ticket.", decimals, unit, token_override.decimals, token_override.unit);
                 (token_override.decimals, token_override.unit)
             } else {
-                // token override is possible, but not called
-                // for by the user
+                // token override is possible, but not called for by the user
                 println!("Network supports several tokens. An array of tokenDecimals {} and an array of tokenSymbol {} were fetched. By default, decimals value will be set to 0, and unit value will be set to UNIT. To override, use -token <value_decimals> <value_unit>. To improve this behavior, please file a ticket.", decimals, unit);
                 (0, String::from("UNIT"))
             }
@@ -378,8 +373,21 @@ fn token(x: &Map<String, Value>) -> Result<TokenFetch, SpecsError> {
     }
 }
 
-/// Process results of `system_properties` rpc call to get network base58 prefix
-/// and [`TokenFetch`]
+/// Get from `system_properties` rpc call results the network data to be
+/// compared with already known data.
+///
+/// This function is used if the fetch results are used to check already
+/// existing database entry.
+///
+/// Function inputs:
+///
+/// - `&Map<String, Value>` received via `system_properties` rpc call,
+/// - optional base58 prefix from the network metadata
+///
+/// Function outputs:
+///
+/// - network base58 prefix
+/// - [`TokenFetch`]
 pub fn check_specs(
     x: &Map<String, Value>,
     optional_prefix_from_meta: Option<u16>,

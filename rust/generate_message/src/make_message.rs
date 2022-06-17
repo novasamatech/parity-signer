@@ -12,12 +12,12 @@ use sp_core::{ecdsa, ed25519, sr25519, Pair};
 use crate::parser::{Crypto, Goal, Make, Msg};
 
 /// Alice seed phrase and derivation `//Alice`, for making updates signed with
-/// test verifier
+/// test verifier.
 fn alice_secret() -> String {
     [ALICE_SEED_PHRASE, "//Alice"].concat()
 }
 
-/// Generate and export update based on keys used in command line
+/// Generate and export update based on keys used in command line.
 ///
 /// Checks that message content is the one expected and the signature is valid
 /// for provided public key and [`Encryption`]. Generates prelude and assembles

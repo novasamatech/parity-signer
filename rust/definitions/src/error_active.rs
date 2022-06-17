@@ -1778,12 +1778,12 @@ pub enum CommandNeedArgument {
     VerifierHex,
 
     /// Key sequence `-verifier -file` in `make` command must be followed by a
-    /// filename of the file in `../files/for_signing/` with verifier public
-    /// key as `&[u8]`.
+    /// filename of the file in dedicated `FOLDER` with verifier public key as
+    /// `&[u8]`.
     VerifierFile,
 
     /// Key `-payload` must be followed by a filename of the file:
-    /// - in `../files/for_signing/` for `make` and `sign` commands
+    /// - in dedicated `FOLDER` for `make` and `sign` commands
     /// - in `../generate_message/` for `derivations` and `unwasm` commands
     Payload,
 
@@ -1807,8 +1807,7 @@ pub enum CommandNeedArgument {
     SignatureHex,
 
     /// Key sequence `-signature -file` in `make` command must be followed by a
-    /// filename of the file in `../files/for_signing/` with signature
-    /// as `&[u8]`.
+    /// filename of the file in dedicated `FOLDER` with signature as `&[u8]`.
     SignatureFile,
 
     /// Key `-name` in `make` and `sign` commands, if used, must be followed by
@@ -1827,7 +1826,7 @@ pub enum CommandNeedArgument {
     SufficientCryptoHex,
 
     /// Key sequence `-sufficient -file` in `sign` command must be followed by a
-    /// filename of the file in `../files/for_signing/` with SCALE-encoded
+    /// filename of the file in dedicated `FOLDER` with SCALE-encoded
     /// `SufficientCrypto` as `&[u8]`.
     SufficientCryptoFile,
 
@@ -1904,7 +1903,7 @@ pub enum CommandBadArgument {
     /// Signature may be entered from a file or as a hexadecimal string.
     /// Key `-signature` may be followed by:
     ///
-    /// `-file` followed by the name of the file in `../files/for_signing/` with
+    /// `-file` followed by the name of the file in dedicated `FOLDER` with
     /// signature as `&[u8]`
     /// `-hex` followed by hexadecimal signature
     Signature,
@@ -1913,15 +1912,15 @@ pub enum CommandBadArgument {
     /// from a file or as a hexadecimal string.
     /// Key `-sufficient` may be followed by:
     ///
-    /// `-file` followed by the name of the file in `../files/for_signing/` with
+    /// `-file` followed by the name of the file in dedicated `FOLDER` with
     /// SCALE-encoded `SufficientCrypto` as `&[u8]`
     /// `-hex` followed by hexadecimal SCALE-encoded `SufficientCrypto` string
     SufficientCrypto,
 
     /// Verifier entered after key `-verifier` may be:
     ///
-    /// `-file` followed by name of the file in `../files/for_signing/` with
-    /// verifier public key as `&[u8]`
+    /// `-file` followed by name of the file in dedicated `FOLDER` with verifier
+    /// public key as `&[u8]`
     /// `-hex` followed by hexadecimal verifier public key
     /// `Alice`
     Verifier,

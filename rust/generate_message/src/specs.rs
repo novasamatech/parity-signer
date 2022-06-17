@@ -1,18 +1,8 @@
-//! `add_specs` payloads and updating
-//! [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree of the hot database
+//! `add_specs` payloads and specs related hot database updates
 //!
-//! This module deals with processing command:
+//! This module deals with processing command
 //!
 //! `$ cargo run add_specs <keys> <argument(s)>`
-//!
-// TODO add direct link to keys and agruments so that they are not repeated
-// here, again
-//!
-//! Data could be either from the rpc calls or from the hot database itself.
-//!
-//! Payload `add_specs` is exported in dedicated [`FOLDER`](constants::FOLDER)
-//! to (optionally) be signed and later be transformed into `add_specs` update
-//! QR. Output file name is `sign_me_add_specs_<name>_<encryption>`.
 use definitions::{
     crypto::Encryption,
     error_active::{DatabaseActive, ErrorActive, Fetch},
@@ -21,15 +11,15 @@ use definitions::{
 };
 
 use crate::helpers::{
-    address_book_content, db_upd_network, error_occured, filter_address_book_by_url,
-    genesis_hash_in_hot_db, get_address_book_entry, network_specs_from_entry,
-    network_specs_from_title, print_specs, specs_agnostic, try_get_network_specs_to_send,
-    update_known_specs, update_modify_encryption_specs,
+    add_specs_print, address_book_content, db_upd_network, error_occured,
+    filter_address_book_by_url, genesis_hash_in_hot_db, get_address_book_entry,
+    network_specs_from_entry, network_specs_from_title, specs_agnostic,
+    try_get_network_specs_to_send, update_known_specs, update_modify_encryption_specs,
 };
 use crate::parser::{Content, InstructionSpecs, Override, Set, Token};
 
 /// Process `add_specs` command according to the [`InstructionSpecs`] received
-/// from the command line
+/// from the command line.
 pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
     match instruction.set {
         // `-f` setting key: produce `add_specs` payload files from existing
@@ -61,19 +51,17 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
                 Ok(())
             }
 
-            // `$ cargo run add_specs -f -n network_address_book_title
+            // `$ cargo run add_specs -f -n <address_book_title>
             // <optional encryption override> <optional signer title override>`
             //
-            // Make `add_specs` payload for single specs entry **already in the
-            // database**, referred to by network address book title.
+            // Make `add_specs` payload for single specs entry from the
+            // database, referred to by network address book title.
             //
             // Entry with encryption override and/or signer title override
             // **will not** be added to the database.
             Content::Name(name) => {
-                // entry is expected to be in the database, meaning the token is
-                // already set up
-                //
-                // should not change it
+                // no fetch is done, there is no way to check the override is
+                // allowed
                 if instruction.over.token.is_some() {
                     return Err(ErrorActive::NotSupported);
                 }
@@ -137,8 +125,9 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
 
         // `-p` setting key: update the database
         Set::P => match instruction.content {
-            // Network specs are expected to remain constant over time,
-            // this command seems to be of no use.
+            // Network specs are expected to remain constant over time, mass
+            // override should not be possible, this command seems to be of no
+            // use.
             Content::All { pass_errors: _ } => Err(ErrorActive::NotSupported),
 
             // `$ cargo run add_specs -p -n network_address_book_title
@@ -245,13 +234,15 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
 /// - Output raw bytes payload file
 fn specs_f_a_element(entry: &AddressBookEntry) -> Result<(), ErrorActive> {
     let network_specs = network_specs_from_entry(entry)?;
-    print_specs(&network_specs)
+    add_specs_print(&network_specs)
 }
 
-/// `add_specs -f -n network_address_book_title <optional encryption override>
-/// <optional signer title override>`
+/// `add_specs -f -n <address_book_title> <override(s)>`
 ///
-/// - Get address book entry for the network using `network_address_book_title`
+/// Token override is not allowed. Encryption and title override are optional.
+/// Overrides are used to modify the entry for specified address book title.
+///
+/// - Get address book entry for the network using network address book `title`
 /// - Get network specs
 /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) from
 /// the database using information in address book entry
@@ -268,7 +259,7 @@ fn specs_f_n(
                 if let Some(new_title) = optional_signer_title_override {
                     network_specs.title = new_title
                 }
-                print_specs(&network_specs)
+                add_specs_print(&network_specs)
             } else {
                 network_specs.title = optional_signer_title_override.unwrap_or(format!(
                     "{}-{}",
@@ -276,15 +267,17 @@ fn specs_f_n(
                     encryption.show()
                 ));
                 network_specs.encryption = encryption;
-                print_specs(&network_specs)
+                add_specs_print(&network_specs)
             }
         }
-        None => print_specs(&network_specs),
+        None => add_specs_print(&network_specs),
     }
 }
 
-/// `add_specs -d -u network_url_address <encryption override> <optional token
-/// override>`
+/// `add_specs -d -u <url_address> <override(s)>`
+///
+/// Encryption override is mandatory. Title override is optional. Token override
+/// is possible if token set is fetched.
 ///
 /// - Fetch network information using rpc calls and interpret it
 /// - Construct
@@ -303,41 +296,36 @@ fn specs_d_u(
         optional_token_override,
         optional_signer_title_override,
     )?;
-    print_specs(&specs)
+    add_specs_print(&specs)
 }
 
-/// `add_specs <-p/-t> -n network_address_book_title <optional encryption
-/// override> <optional title override> <optional token override>`
+/// `add_specs <-p/-t> -n <address_book_title> <override(s)>`
 ///
-/// Inputs network address book title, override set [`Override`], and `printing`
-/// flag indicating if payload file should be made.
+/// Encryption and title overrides are possible. Token override is possible if
+/// network has token set.
 ///
-/// - Search for an address book entry with exactly same address book title and
-/// get corresponding
+/// Function inputs network address book title, override set [`Override`], and
+/// `printing` flag indicating if payload file should be made.
+///
+/// - Search for an address book entry by address book title and get
+/// corresponding
 /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
-/// - If encryption in specs matches with the one in encryption override, **do
-/// not** update the database and print the raw bytes payload file if requested
-/// - If encryption in specs does not match the one in encryption override,
-/// construct new [`NetworkSpecsKey`] and new
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
-/// entry with correct `encryption` and `title`. If new network specs key is
-/// known to the database (unlikely), **do not** update the database and print
-/// the raw bytes payload file if requested. If new network specs key is not
-/// known to the database, construct also
-/// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) and add
-/// `NetworkSpecsToSend` and `AddressBookEntry` into the database and print the
-/// raw bytes payload file if requested.
+/// - Fetch network specs through rpc calls and check that the network specs
+/// from the database are still valid
+/// - Modify network specs according to the overrides requested
+/// - Update database as needed: [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) and
+/// [`SPECSTREEPREP`](constants::SPECSTREEPREP) are updated if the encryption
+/// was not previously in the database for this network,
+/// [`SPECSTREEPREP`](constants::SPECSTREEPREP) alone is updated if the
+/// overrides modified network specs entry
+/// - Print payload files if requested
 ///
-/// Network address book title is the key in
-/// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree, it is built as
-/// `<network name>-<encryption>` for non-default networks. Default networks
-/// have `<network name>` as an address book title.
-///
-/// Field `title` in network specs
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) is
-/// also `<network name>-<encryption>` for non-default networks unless
-/// overridden by the user. Default networks have `<Network name>` as `title`
-/// field.
+/// Network address book title for new address book entries is constructed as
+/// `<network_name>-<encryption>`. Field `title` in network specs
+/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend), i.e.
+/// the title under which Signer displays the network, is also constructed as
+/// `<network_name>-<encryption>` for non-default networks, unless overridden by
+/// the user.
 fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<(), ErrorActive> {
     // address book entry for `title`
     let address_book_entry = get_address_book_entry(title)?;
@@ -354,13 +342,20 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<(), ErrorAc
                     over.token,
                 )?
             }
-            // encryption is actually updated
+            // encryption in override is different from encryption in title
             else {
+                // construct `NetworkSpecsKey` with encryption from override and
+                // known genesis hash
                 let network_specs_key_possible =
                     NetworkSpecsKey::from_parts(&address_book_entry.genesis_hash, &encryption);
-                // check if this new network specs key has an entry in the database
+
+                // check if this new network specs key has an entry in the
+                // database
                 match try_get_network_specs_to_send(&network_specs_key_possible)? {
-                    // user entered override that already has an entry in the database
+                    // user entered encryption override that already has an
+                    // entry in the database, only with wrong address book title
+                    //
+                    // try applying other overrides
                     Some(network_specs_found) => {
                         network_specs_to_change = network_specs_found;
                         update_known_specs(
@@ -371,7 +366,8 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<(), ErrorAc
                         )?
                     }
 
-                    // user has actually entered override that is new to the database
+                    // user has actually entered encryption override that is new
+                    // to the database
                     None => {
                         update_modify_encryption_specs(
                             &address_book_entry.address,
@@ -396,12 +392,12 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<(), ErrorAc
     if make_update {
         db_upd_network(&address_book_entry.address, &network_specs_to_change)?;
         if printing {
-            print_specs(&network_specs_to_change)
+            add_specs_print(&network_specs_to_change)
         } else {
             Ok(())
         }
     } else if printing {
-        print_specs(&network_specs_to_change)
+        add_specs_print(&network_specs_to_change)
     } else {
         Err(ErrorActive::Fetch(Fetch::SpecsInDb {
             name: address_book_entry.name,
@@ -410,16 +406,20 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<(), ErrorAc
     }
 }
 
-/// `add_specs <-p/-t> -u network_url_address <encryption override> <optional
-/// token override>`
+/// `add_specs <-p/-t> -u <url_address> <override(s)>`
 ///
-/// Inputs `&str` url address that could be used for rpc calls in given network,
-/// encryption [`Encryption`] requested in the override, and `printing` flag
-/// indicating if payload file should be made.
+/// Encryption override is mandatory. Title override is optional. Token override
+/// is possible if token set is fetched.
+///
+/// Function inputs `&str` url address that could be used for rpc calls,
+/// encryption supported by the network [`Encryption`], optional token and
+/// title overrides and `printing` flag indicating if payload file should be
+/// made.
 ///
 /// - Check that the url address is unknown to the database
 /// - Fetch network information using rpc calls and interpret it
-/// - Check that there is no entries with same genesis hash in the database
+/// - Check that there is no entries with same genesis hash as was just fetched
+/// in the database
 /// - Construct
 /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) with
 /// fetched values, user overrides and defaults
@@ -457,7 +457,7 @@ fn specs_pt_u(
         None => {
             db_upd_network(address, &specs)?;
             if printing {
-                print_specs(&specs)?
+                add_specs_print(&specs)?
             }
             Ok(())
         }
@@ -471,165 +471,15 @@ mod tests {
     use constants::FOLDER;
 
     // The aim is to check that rpc calls are going through for "officially
-    // approved" networks.
-    // Also, mass fetcher is neat, and it is nice to have all addresses in one
-    // place.
-    // However, the fetching results are constantly changing (some networks at
-    // times could not be called).
-    // So, this is currently limited to three default networks that must be
-    // working always.
+    // approved" networks. Although the blanket fetch test was nice, not all
+    // networks could be reached at all the times, therefore this is currently
+    // limited to three default networks that must be working always.
     #[test]
     fn mass_fetch() {
         let address_set = [
             "wss://rpc.polkadot.io",
-            /*            "wss://statemint-rpc.polkadot.io",
-                        "wss://acala-polkadot.api.onfinality.io/public-ws",
-            //            "wss://wss.odyssey.aresprotocol.io", // error502
-                        "wss://rpc.astar.network",
-                        "wss://fullnode.parachain.centrifuge.io",
-                        "wss://rpc-para.clover.finance",
-                        "wss://rpc.efinity.io",
-                        "wss://rpc-01.hydradx.io",
-            //            "wss://api.interlay.io/parachain", // Base58PrefixMismatch { specs: 2032, meta: 42 }
-                        "wss://wss.api.moonbeam.network",
-            //            "wss://node-6907995778982338560.sz.onfinality.io/ws?apikey=b5324589-1447-4699-92a6-025bc2cc2ac1", // error500
-                        "wss://rpc.parallel.fi",
-                        "wss://mainnet.polkadex.trade",
-                        "wss://ws.unique.network/",
-            */
             "wss://kusama-rpc.polkadot.io",
-            /*            "wss://statemine-rpc.polkadot.io",
-            //            "wss://encointer.api.onfinality.io/public-ws", // Base58PrefixMismatch { specs: 2, meta: 42 }
-                        "wss://fullnode.altair.centrifuge.io",
-                        "wss://rpc-01.basilisk.hydradx.io",
-                        "wss://bifrost-rpc.liebi.com/ws",
-                        "wss://pioneer-1-rpc.bit.country",
-            //            "wss://falafel.calamari.systems", // error502
-            //            "wss://rpc-shadow.crust.network", //error500
-                        "wss://crab-parachain-rpc.darwinia.network/",
-                        "wss://kusama.api.integritee.network",
-                        "wss://karura.api.onfinality.io/public-ws",
-                        "wss://khala-api.phala.network/ws",
-            //            "wss://rpc.api.kico.dico.io", // Base58PrefixMismatch { specs: 51, meta: 42 }
-                        "wss://spiritnet.kilt.io",
-                        "wss://kintsugi.api.onfinality.io/public-ws",
-                        "wss://rpc.litmus-parachain.litentry.io",
-            //            "wss://wss.mars.aresprotocol.io", // error502
-                        "wss://wss.moonriver.moonbeam.network",
-                        "wss://heiko-rpc.parallel.fi",
-                        "wss://picasso-rpc.composable.finance",
-            //            "wss://kusama.kylin-node.co.uk", // Networking or low-level protocol error: Error in the WebSocket handshake: i/o error: unexpected end of file
-                        "wss://quartz.unique.network",
-                        "wss://kusama.rpc.robonomics.network/",
-                        "wss://rpc.shiden.astar.network",
-                        "wss://ws.parachain-collator-1.c1.sora2.soramitsu.co.jp",
-            //            "wss://gamma.subgame.org/", // error502
-                        "wss://para.subsocial.network",
-                        "wss://rpc.kusama.standard.tech",
-                        "wss://rpc-0.zeitgeist.pm",
-            */
             "wss://westend-rpc.polkadot.io",
-            /*            "wss://westmint-rpc.polkadot.io",
-                        "wss://fullnode-collator.charcoal.centrifuge.io",
-                        "wss://teerw1.integritee.network",
-                        "wss://westend.kylin-node.co.uk",
-                        "wss://rpc.westend.standard.tech",
-                        "wss://westend.kilt.io:9977",
-                        "wss://rococo-rpc.polkadot.io",
-                        "wss://rococo-statemint-rpc.polkadot.io",
-                        "wss://rococo-canvas-rpc.polkadot.io",
-                        "wss://rococo.api.encointer.org",
-                        "wss://rpc-01.basilisk-rococo.hydradx.io",
-                        "wss://rpc.rococo.efinity.io",
-                        "wss://moonsama-testnet-rpc.moonsama.com",
-                        "wss://rococo.kilt.io",
-                        "wss://spreehafen.datahighway.com",
-                        "wss://ws.azero.dev",
-                        "wss://api.ata.network",
-            //            "wss://fullnode.centrifuge.io", // metadata below V12
-                        "wss://mainnet.chainx.org/ws",
-                        "wss://node0.competitors.club/wss",
-                        "wss://blockchain.crownsterling.io",
-                        "wss://crust.api.onfinality.io/public-ws",
-                        "wss://rpc.darwinia.network",
-                        "wss://crab-rpc.darwinia.network",
-                        "wss://mainnet-node.dock.io",
-            //            "wss://edgeware.api.onfinality.io/public-ws", // no version block in metadata
-            //            "wss://node.equilibrium.io", // decimals [9,9,9,9,9,9,9] vs units ["Unknown","USD","EQ","ETH","BTC","EOS","DOT","CRV"]
-                        "wss://node.genshiro.io",
-                        "wss://rpc-01.snakenet.hydradx.io",
-                        "wss://api.solo.integritee.io",
-                        "wss://rpc.kulupu.corepaper.org/ws",
-                        "wss://ws.kusari.network",
-                        "wss://mathchain-asia.maiziqianbao.net/ws",
-                        "wss://rpc.neatcoin.org/ws",
-                        "wss://mainnet.nftmart.io/rpc/ws",
-                        "wss://main3.nodleprotocol.io",
-            //            "wss://rpc.plasmnet.io", // metadata below V12
-                        "wss://mainnet.polkadex.trade",
-                        "wss://mainnet-rpc.polymesh.network",
-            //            "wss://node.v1.riochain.io", // no version block in metadata
-                        "wss://mainnet.sherpax.io",
-                        "wss://mof2.sora.org",
-                        "wss://mainnet.subgame.org/",
-                        "wss://rpc.subsocial.network",
-                        "wss://ws.swapdex.network",
-            //            "wss://mainnet.uniarts.vip:9443", // Base58PrefixMismatch { specs: 2, meta: 42 }
-            //            "wss://westlake.datahighway.com", // error502
-                        "wss://rpc-test.ajuna.network",
-            //            "wss://ws.test.azero.dev", // units TZERO, no decimals
-            //            "wss://fullnode.amber.centrifuge.io", // metadata below 12
-                        "wss://arcadia1.nodleprotocol.io",
-                        "wss://gladios.aresprotocol.io",
-                        "wss://cf-api.ata.network",
-            //            "wss://beresheet.edgewa.re", // Base58PrefixMismatch { specs: 42, meta: 7 }
-            //            "wss://asgard-rpc.liebi.com/ws", // error502
-            //            "wss://tewai-rpc.bit.country", // Base58PrefixMismatch { specs: 28, meta: 42 }
-                        "wss://api.crust.network/",
-                        "wss://trillian.dolphin.red",
-                        "wss://mogiway-01.dotmog.com",
-                        "wss://gesell.encointer.org",
-                        "wss://galois-hk.maiziqianbao.net/ws",
-            //            "wss://gamepower.io", // Networking or low-level protocol error: Connection timeout exceeded: 10s
-                        "wss://testnet.geekcash.org",
-            //            "wss://api.interlay.io/parachain", // Base58PrefixMismatch { specs: 2032, meta: 42 }
-            //            "wss://ws.jupiter-poa.patract.cn", // Error when opening the TCP socket: Connection reset by peer (os error 104)
-                        "wss://full-nodes.kilt.io:9944/",
-                        "wss://peregrine.kilt.io/parachain-public-ws/",
-                        "wss://klugdossier.net/",
-            //            "wss://testnet.litentry.io", // error502
-                        "wss://mandala.polkawallet.io",
-                        "wss://minichain.coming.chat/ws",
-                        "wss://wss.api.moonbase.moonbeam.network",
-                        "wss://neumann.api.onfinality.io/public-ws",
-            //            "wss://staging-ws.nftmart.io", // Error when opening the TCP socket: invalid peer certificate contents: invalid peer certificate: CertExpired
-                        "wss://opal.unique.network",
-                        "wss://rpc.opportunity.standard.tech",
-            //            "wss://parachain-rpc.origin-trail.network", // decimals 18, no units
-                        "wss://pangolin-rpc.darwinia.network",
-                        "wss://pangoro-rpc.darwinia.network",
-                        "wss://poc5.phala.network/ws",
-            //            "wss://blockchain.polkadex.trade", // Error when opening the TCP socket: invalid peer certificate contents: invalid peer certificate: CertExpired
-                        "wss://testnet-rpc.polymesh.live",
-                        "wss://testnet.pontem.network/ws",
-            //            "wss://testnet.psm.link", // error502
-                        "wss://rpc.realis.network/",
-                        "wss://sherpax-testnet.chainx.org",
-                        "wss://rpc.shibuya.astar.network",
-                        "wss://parachain-rpc.snowbridge.network",
-                        "wss://alpha.subdao.org",
-                        "wss://staging.subgame.org",
-                        "wss://farm-rpc.subspace.network",
-                        "wss://test-rpc.subspace.network",
-                        "wss://testnet.ternoa.com/",
-            //            "wss://testnet-node-1.laminar-chain.laminar.one/ws", // no version block in metadata
-            //            "wss://testnet.uniarts.network", // Base58PrefixMismatch { specs: 2, meta: 45 }
-                        "wss://testnet2.unique.network",
-                        "wss://vodka.rpc.neatcoin.org/ws",
-                        "wss://testnet.web3games.org",
-            //            "wss://test1.zcloak.network", // error502
-                        "wss://bsr.zeitgeist.pm",
-            //            "wss://alphaville.zero.io", // error502*/
         ];
         let mut all_clear = true;
         for address in address_set {

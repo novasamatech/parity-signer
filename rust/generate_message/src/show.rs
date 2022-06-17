@@ -14,7 +14,7 @@ use crate::helpers::{
     read_metadata_database,
 };
 
-/// Display all metadata currenty stored in the hot database
+/// Display all metadata currenty stored in the hot database.
 ///
 /// Function prints for each entry in hot database
 /// [`METATREE`](constants::METATREE) tree:
@@ -22,15 +22,23 @@ use crate::helpers::{
 /// - network name
 /// - network version
 /// - hexadecimal metadata hash
+/// - block hash at which the metadata was fetched if on record, from
+/// [`META_HISTORY`](constants::META_HISTORY) tree
 ///
 /// It could be called by:
 ///
 /// `$ cargo run show -metadata`
 ///
 /// When generated, hot database has no metadata entries. All entries are
-/// expected to appear as a result of rpc calls. Network name and version
-/// combination is unique identifier of the metadata. Hashes could be used to
-/// compare metadata contents.
+/// expected to appear as a result of the database use, either from rpc calls or
+/// `wasm` files processing.
+///
+/// Network name and version combination is unique identifier of the metadata.
+///
+/// Metadata hashes could be used to compare metadata contents.
+///
+/// Block hash could be used to retrieve later the metadata from exactly same
+/// block if there is a need to compare metadata from different blocks.
 pub fn show_metadata() -> Result<(), ErrorActive> {
     let meta_values_stamped_set = read_metadata_database()?;
     if meta_values_stamped_set.is_empty() {
@@ -59,13 +67,13 @@ pub fn show_metadata() -> Result<(), ErrorActive> {
 /// Function prints for each entry in hot database
 /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree:
 ///
-/// - address book title for the network, used only to distinguish between
-/// address book entries
+/// - address book title for the network
 /// - url address at which rpc calls are made for the network
 /// - network encryption
 /// - additional marker that the network is a default one
 /// - network title as it will be displayed in Signer, from
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) in
+/// [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
 ///
 /// It could be called by:
 ///
@@ -73,8 +81,12 @@ pub fn show_metadata() -> Result<(), ErrorActive> {
 ///
 /// When generated, hot database has address book entries for Polkadot, Kusama,
 /// and Westend. Other entries appear as a result of the database usage.
-/// Address book title is `<network name>` for default network and
-/// `<network name>-<encryption>` for non-default networks.
+///
+/// Address book title is `<network_name>-<network_encryption>` and does not
+/// necessarily coincide with network title as displayed by the Signer.
+///
+/// Address book title is used to address networks when making `add_specs`
+/// update payloads or inspecting existing network specs.
 pub fn show_networks() -> Result<(), ErrorActive> {
     let address_book_set = address_book_content()?;
     if address_book_set.is_empty() {
@@ -118,7 +130,7 @@ pub fn show_networks() -> Result<(), ErrorActive> {
     Ok(())
 }
 
-/// Check metadata file
+/// Check metadata file.
 ///
 /// Function asserts that:
 ///
@@ -185,12 +197,12 @@ pub fn check_file(path: String) -> Result<(), ErrorActive> {
     Ok(())
 }
 
-/// Hash metadata and produce hash hexadecimal string
+/// Hash metadata and produce hash hexadecimal string.
 fn hash_string(meta: &[u8]) -> String {
     hex::encode(blake2b(32, &[], meta).as_bytes())
 }
 
-/// Show network specs for user-entered address book title
+/// Show network specs for user-entered address book title.
 pub fn show_specs(title: String) -> Result<(), ErrorActive> {
     let specs = network_specs_from_title(&title)?;
     println!(
@@ -211,7 +223,8 @@ pub fn show_specs(title: String) -> Result<(), ErrorActive> {
     Ok(())
 }
 
-/// Show metadata fetch history from `META_HISTORY` tree
+/// Show metadata block hash history from
+/// [`META_HISTORY`](constants::META_HISTORY) tree.
 pub fn show_block_history() -> Result<(), ErrorActive> {
     let meta_history_set = meta_history_content()?;
     if meta_history_set.is_empty() {
