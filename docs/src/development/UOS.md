@@ -1,5 +1,15 @@
 # Scope
 
+This is interpretation of UOS format used by Parity Signer. Since upstream
+version of the published format diverges from actually implemented too much,
+this document was produced as repreesntation of current state of UOS format
+compatible with Parity Signer. This document only covers networks compatible
+with Parity Signer (i.e. Substrate-based networks). This document also describes
+special payloads that are used for maintaining Parity Signer instance.
+
+Thus, effectively, this document describes input and output format for QR codes
+used by Parity Signer.
+
 # Terminology
 
 Signer receives information over the air-gap as QR codes. QR codes are read as
