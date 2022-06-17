@@ -15,7 +15,7 @@ This crate is mainly used to:
 
 ## Crate documentation
 
-Please refer to the crate documentation [here](link).
+Please refer to the crate documentation [here](https://paritytech.github.io/parity-signer/rustdocs/generate_message/index.html).
 
 Documents could be built locally:
 
@@ -27,8 +27,8 @@ Program is run by
 
 `$ cargo run COMMAND [KEY(s)]`
 
-Available commands, keys and arguments are listed in crate documentation [here](link)
+Available commands, keys and arguments are listed in crate documentation [here](https://paritytech.github.io/parity-signer/rustdocs/generate_message/index.html)
 
 ## Usage tutorial
 
-Please refer to the manual [here](link).
+Please refer to the manual [here](https://paritytech.github.io/parity-signer/user-docs/tutorials/Add-New-Network.html).
