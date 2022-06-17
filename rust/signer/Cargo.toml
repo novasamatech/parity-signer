@@ -8,7 +8,7 @@ edition = "2018"
 anyhow = "1.0"
 ffi-support = "0.4"
 hex = "0.4.3"
-uniffi = { version = "0.18.0", features=["builtin-bindgen"] }
+uniffi = { version = "0.19.1", features=["builtin-bindgen"] }
 
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }

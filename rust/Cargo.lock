@@ -254,14 +254,26 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "bitvec"
+version = "0.19.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "55f93d0ef3363c364d5976646a38f04cf67cfe1d4c8d160cdea02cab2c116b33"
+dependencies = [
+ "funty 1.1.0",
+ "radium 0.5.3",
+ "tap",
+ "wyz 0.2.0",
+]
+
+[[package]]
+name = "bitvec"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1489fcb93a5bb47da0462ca93ad252ad6af2145cce58d10d46a83931ba9f016b"
 dependencies = [
- "funty",
- "radium",
+ "funty 2.0.0",
+ "radium 0.7.0",
  "tap",
- "wyz",
+ "wyz 0.5.0",
 ]
 
 [[package]]
@@ -360,9 +372,9 @@ checksum = "c4872d67bab6358e59559027aa3b9157c53d9358c51423c17554809a8858e0f8"
 
 [[package]]
 name = "camino"
-version = "1.0.7"
+version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6f3132262930b0522068049f5870a856ab8affc80c70d08b6ecb785771a6fc23"
+checksum = "869119e97797867fd90f5e22af7d0bd274bd4635ebb9eb68c04f3f513ae6c412"
 dependencies = [
  "serde",
 ]
@@ -386,6 +398,19 @@ dependencies = [
  "cargo-platform",
  "semver 0.11.0",
  "semver-parser",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "cargo_metadata"
+version = "0.14.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4acbb09d9ee8e23699b9634375c72795d095bf268439da88562cf9b501f181fa"
+dependencies = [
+ "camino",
+ "cargo-platform",
+ "semver 1.0.7",
  "serde",
  "serde_json",
 ]
@@ -979,6 +1004,12 @@ dependencies = [
  "libc",
  "winapi",
 ]
+
+[[package]]
+name = "funty"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fed34cd105917e91daa4da6b3728c47b068749d6a62c59811f06ed2ac71d9da7"
 
 [[package]]
 name = "funty"
@@ -1786,6 +1817,18 @@ dependencies = [
 
 [[package]]
 name = "nom"
+version = "6.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e7413f999671bd4745a7b624bd370a569fb6bc574b23c83a3c5ed2e453f3d5e2"
+dependencies = [
+ "bitvec 0.19.6",
+ "funty 1.1.0",
+ "memchr",
+ "version_check",
+]
+
+[[package]]
+name = "nom"
 version = "7.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8903e5a29a317527874d0402f867152a3d21c908bb0b933e416c65e301d4c36"
@@ -2038,7 +2081,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9182e4a71cae089267ab03e67c99368db7cd877baf50f931e5d6d4b71e195ac0"
 dependencies = [
  "arrayvec 0.7.2",
- "bitvec",
+ "bitvec 1.0.0",
  "byte-slice-cast",
  "impl-trait-for-tuples",
  "parity-scale-codec-derive",
@@ -2141,7 +2184,7 @@ dependencies = [
 name = "parser"
 version = "0.1.0"
 dependencies = [
- "bitvec",
+ "bitvec 1.0.0",
  "defaults",
  "definitions",
  "frame-metadata",
@@ -2373,7 +2416,7 @@ dependencies = [
 name = "qrcode_rtx"
 version = "0.1.0"
 dependencies = [
- "bitvec",
+ "bitvec 1.0.0",
  "constants",
  "hex",
  "png",
@@ -2387,7 +2430,7 @@ name = "qrcode_static"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "bitvec",
+ "bitvec 1.0.0",
  "constants",
  "hex",
  "png",
@@ -2419,6 +2462,12 @@ checksum = "632d02bff7f874a36f33ea8bb416cd484b90cc66c1194b1a1110d067a7013f58"
 dependencies = [
  "proc-macro2",
 ]
+
+[[package]]
+name = "radium"
+version = "0.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "941ba9d78d8e2f7ce474c015eea4d9c6d25b6a3327f9832ee29a4de27f91bbb8"
 
 [[package]]
 name = "radium"
@@ -2715,7 +2764,7 @@ version = "2.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c46be926081c9f4dd5dd9b6f1d3e3229f2360bc6502dd8836f84a93b7c75e99a"
 dependencies = [
- "bitvec",
+ "bitvec 1.0.0",
  "cfg-if",
  "derive_more",
  "parity-scale-codec",
@@ -2856,6 +2905,9 @@ name = "semver"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d65bd28f48be7196d222d95b9243287f48d27aca604e08497513019ff0502cc4"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "semver-parser"
@@ -3789,7 +3841,7 @@ dependencies = [
 name = "transaction_parsing"
 version = "0.1.0"
 dependencies = [
- "bitvec",
+ "bitvec 1.0.0",
  "constants",
  "db_handling",
  "definitions",
@@ -3907,18 +3959,19 @@ checksum = "8ccb82d61f80a663efe1f787a51b16b5a51e3314d6ac365b08639f52387b33f3"
 
 [[package]]
 name = "uniffi"
-version = "0.18.0"
+version = "0.19.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d0fe14882ae6ea89f31ac922ad8e6f76b3f346f07965791a60ade60cc3bcdd60"
+checksum = "aa1b1632740724d1bbc9b54ae4925b02d6585a55a62b72f5b3811d819f018a59"
 dependencies = [
  "anyhow",
  "bytes",
- "cargo_metadata",
+ "camino",
+ "cargo_metadata 0.14.2",
  "lazy_static",
  "log",
  "paste",
  "static_assertions",
- "uniffi_bindgen",
+ "uniffi_bindgen 0.19.1",
 ]
 
 [[package]]
@@ -3929,13 +3982,32 @@ checksum = "49a9810482e988792ed22fc6747d872bd32600f7e3bfc11fe93019d155d7e89c"
 dependencies = [
  "anyhow",
  "askama",
- "cargo_metadata",
+ "cargo_metadata 0.13.1",
  "clap",
  "heck",
  "paste",
  "serde",
  "toml",
- "weedle2",
+ "weedle2 2.0.1",
+]
+
+[[package]]
+name = "uniffi_bindgen"
+version = "0.19.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "718dd8a729422c05380d9e9fa94e2954ea98f646340ee8409b02cdfb8ac81117"
+dependencies = [
+ "anyhow",
+ "askama",
+ "camino",
+ "cargo_metadata 0.14.2",
+ "clap",
+ "fs-err",
+ "heck",
+ "paste",
+ "serde",
+ "toml",
+ "weedle2 3.0.0",
 ]
 
 [[package]]
@@ -3945,7 +4017,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bcb7401cfd8da93541c23a0683c1dab3c782d2a118254536106b0aa4d9b30607"
 dependencies = [
  "anyhow",
- "uniffi_bindgen",
+ "uniffi_bindgen 0.18.0",
 ]
 
 [[package]]
@@ -4127,6 +4199,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "weedle2"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d730d941cf471131c40a64cf2e8a595822009f51e64c05c5afdbc85af155857"
+dependencies = [
+ "fs-err",
+ "nom 6.1.2",
+]
+
+[[package]]
 name = "weezl"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4205,6 +4287,12 @@ name = "windows_x86_64_msvc"
 version = "0.34.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d19538ccc21819d01deaf88d6a17eae6596a12e9aafdbb97916fb49896d89de9"
+
+[[package]]
+name = "wyz"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "85e60b0d1b5f99db2556934e21937020776a5d31520bf169e851ac44e6420214"
 
 [[package]]
 name = "wyz"
