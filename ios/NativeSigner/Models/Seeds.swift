@@ -83,18 +83,15 @@ extension SignerDataModel {
         guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
             print("Access flags could not be allocated")
             print(error ?? "no error code")
-            self.lastError = "iOS key manager error, report a bug"
             return
         }
         if checkSeedPhraseCollision(seedPhrase: seedPhrase) {
             print("Key collision")
-            self.lastError = "This seed phrase already exists"
             return
         }
         if !authenticated { return }
         guard let finalSeedPhrase = seedPhrase.data(using: .utf8) else {
             print("could not encode seed phrase")
-            self.lastError = "Seed phrase contains non-0unicode symbols"
             return
         }
         let query: [String: Any] = [
@@ -109,8 +106,8 @@ extension SignerDataModel {
         guard status == errSecSuccess else {
             print("key add failure")
             print(status)
-            self.lastError = SecCopyErrorMessageString(status, nil)! as String
-            print(self.lastError)
+            let lastError = SecCopyErrorMessageString(status, nil)! as String
+            print(lastError)
             return
         }
         self.seedNames.append(seedName)
@@ -133,7 +130,6 @@ extension SignerDataModel {
         var item: AnyObject?
         guard let finalSeedPhrase = seedPhrase.data(using: .utf8) else {
             print("could not encode seed phrase")
-            self.lastError = "Seed phrase contains non-unicode symbols"
             return true
         }
         let query: [String: Any] = [
@@ -216,9 +212,24 @@ extension SignerDataModel {
                 updateSeedNames(seedNames: self.seedNames)
                 pushButton(action: .removeSeed)
             } else {
-                self.lastError = SecCopyErrorMessageString(status, nil)! as String
-                print("remove seed from secure storage error: " + self.lastError)
+                let lastError = SecCopyErrorMessageString(status, nil)! as String
+                print("remove seed from secure storage error: " + lastError)
             }
+        }
+    }
+    
+    /**
+     * Wrapper for signing with use of seed material
+     */
+    func sign(seedName: String, comment: String) {
+        if self.alert {
+            self.alertShow = true
+        } else {
+            self.pushButton(
+                action: .goForward,
+                details: comment,
+                seedPhrase: self.getSeed(seedName: seedName)
+            )
         }
     }
 }

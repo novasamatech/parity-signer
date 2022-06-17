@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct KeyDetailsMulti: View {
-    @EnvironmentObject var data: SignerDataModel
     @GestureState private var dragOffset = CGSize.zero
     @State var offset: CGFloat = 0
     @State var showDetails = false
     var content: MKeyDetailsMulti
+    let pushButton: (Action, String, String) -> Void
     var body: some View {
         ScrollView {
             VStack {
@@ -39,10 +39,10 @@ struct KeyDetailsMulti: View {
                         showDetails.toggle()
                     } else {
                         if drag.translation.width > 20 {
-                            data.pushButton(action: .nextUnit)
+                            pushButton(.nextUnit, "", "")
                         }
                         if drag.translation.width < -20 {
-                            data.pushButton(action: .previousUnit)
+                            pushButton(.previousUnit, "", "")
                         }
                     }
                 }

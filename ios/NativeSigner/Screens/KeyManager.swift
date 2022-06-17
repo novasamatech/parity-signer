@@ -8,29 +8,33 @@
 import SwiftUI
 
 struct KeyManager: View {
-    @EnvironmentObject var data: SignerDataModel
     @GestureState private var dragOffset = CGSize.zero
-    var content: MKeys
+    let content: MKeys
+    //TODO: move two below things to Rust
+    let alert: Bool
+    let alertShow: () -> Void
+    let increment: (String, String) -> Void
+    let pushButton: (Action, String, String) -> Void
     @State var searchString: String = "" // This is supposed to be used with search, which is disabled now
     var body: some View {
         ZStack {
             VStack {
                 ZStack{
                     Button(action: {
-                        data.pushButton(action: .selectKey, details: content.root.addressKey)
+                        pushButton(.selectKey, content.root.addressKey, "")
                     }){
                         SeedKeyCard(seedCard: content.root, multiselectMode: content.multiselectMode).gesture(DragGesture()
                                                                                                                 .onEnded {drag in
                             if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
                                 if content.root.addressKey != "" {
-                                    data.pushButton(action: .swipe, details: content.root.addressKey)
+                                    pushButton(.swipe, content.root.addressKey, "")
                                 }
                             }
                         })
                             .gesture(LongPressGesture()
                                         .onEnded {_ in
                                 if content.root.addressKey != "" {
-                                    data.pushButton(action: .longTap, details: content.root.addressKey)
+                                    pushButton(.longTap, content.root.addressKey, "")
                                 }
                             }
                             )
@@ -38,10 +42,16 @@ struct KeyManager: View {
                     .disabled(content.root.addressKey == "")
                     .padding(2)
                     if content.root.swiped {
-                        AddressCardControls(seed_name: content.root.seedName)
+                        AddressCardControls(
+                            seed_name: content.root.seedName,
+                            increment: { details in
+                                increment(content.root.seedName, details)
+                            },
+                            pushButton: pushButton
+                        )
                     }
                 }
-                Button(action: {data.pushButton(action: .networkSelector)}) {
+                Button(action: {pushButton(.networkSelector, "", "")}) {
                     HStack {
                         NetworkCard(title: content.network.title, logo: content.network.logo)
                         Image(systemName: "chevron.down")
@@ -52,10 +62,10 @@ struct KeyManager: View {
                     Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))
                     Spacer()
                     Button(action: {
-                        if data.alert {
-                            data.alertShow = true
+                        if alert {
+                            alertShow()
                         } else {
-                            data.pushButton(action: .newKey)
+                            pushButton(.newKey, "", "")
                         }
                     }) {
                         Image(systemName: "plus.circle").imageScale(.large).foregroundColor(Color("Action400"))
@@ -69,22 +79,28 @@ struct KeyManager: View {
                             address in
                             ZStack {
                                 Button(action: {
-                                    data.pushButton(action: .selectKey, details: address.addressKey)
+                                    pushButton(.selectKey, address.addressKey, "")
                                 }){
                                     AddressCard(address: Address(base58: address.base58 , path: address.path, hasPwd: address.hasPwd, identicon: address.identicon, seedName: "", multiselect: address.multiselect), multiselectMode: content.multiselectMode).gesture(DragGesture()
                                                                                                                                     .onEnded {drag in
                                         if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
-                                            data.pushButton(action: .swipe, details: address.addressKey)
+                                            pushButton(.swipe, address.addressKey, "")
                                         }
                                     })
                                         .gesture(LongPressGesture()
                                                     .onEnded {_ in
-                                            data.pushButton(action: .longTap, details: address.addressKey)
+                                            pushButton(.longTap, address.addressKey, "")
                                         }
                                         )
                                 }.padding(2)
                                 if address.swiped {
-                                    AddressCardControls(seed_name: content.root.seedName)
+                                    AddressCardControls(
+                                        seed_name: content.root.seedName,
+                                        increment: { details in
+                                            increment(content.root.seedName, details)
+                                        },
+                                        pushButton: pushButton
+                                    )
                                 }
                             }
                         }
@@ -92,7 +108,10 @@ struct KeyManager: View {
                 }.padding(.bottom, -20)
                 Spacer()
                 if (content.multiselectMode) {
-                    MultiselectBottomControl(selectedCount: content.multiselectCount)
+                    MultiselectBottomControl(
+                        selectedCount: content.multiselectCount,
+                        pushButton: pushButton
+                    )
                 } else {
                     //SearchKeys(searchString: $searchString)
                     EmptyView()

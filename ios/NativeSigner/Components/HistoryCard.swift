@@ -152,14 +152,14 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: true,
                 line1: "Signing failure",
-                line2: String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self)
+                line2: value.userComment
             )
             case .transactionSigned(let value): HistoryCardTemplate(
                 image: "signature",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Generated signature",
-                line2: String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self)
+                line2: value.userComment
             )
             case .typesAdded(_): HistoryCardTemplate(
                 image: "plus.viewfinder",
@@ -208,7 +208,7 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Generated signature for message",
-                line2: String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self)
+                line2: value.userComment
             )
             }
         }
