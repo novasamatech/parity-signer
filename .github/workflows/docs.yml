@@ -38,7 +38,8 @@ jobs:
       - name:                 Generate cargo doc
         run:                  |
           cd rust
-          cargo doc --all-features --verbose
+          echo "Generating rustdocs to the user-docs dir so it's possible to check the links"
+          cargo doc --all-features --verbose --target-dir ../docs/book/html/rustdocs/
 
       # user-docs
       # they are generated after rustdocs to check the relative links
@@ -67,11 +68,11 @@ jobs:
         # executed only on master so PRs can use cache
         if:                   ${{ github.ref == 'refs/heads/master' }}
         run:                  |
-          mv ./rust/target/doc ./rustdocs
-          mv ./docs/book/html/ ./user-docs
           echo "Removing everything but the docs dirs"
           shopt -s extglob
-          rm -vrf !("rustdocs"|"user-docs")
+          rm -vrf !("./docs/book/html/")
+          echo "Hosting user-docs from root and rustdocs from ./rustdocs/"
+          mv ./docs/book/html/ ./
 
       - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
