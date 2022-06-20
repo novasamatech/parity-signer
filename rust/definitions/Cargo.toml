@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = {version = "1.0.55", optional = true}
+anyhow = {version = "1.0.58", optional = true}
 blake2-rfc = "0.2.18"
 frame-metadata = {version = "15.0.0", features = ["std", "legacy"]}
 hex = "0.4.3"
