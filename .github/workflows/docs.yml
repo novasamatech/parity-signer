@@ -11,7 +11,7 @@ on:
 
 jobs:
   rustdocs_user_docs:
-    name:                     Build rustdoc
+    name:                     Build rustdocs, user-docs and check links
     runs-on:                  ubuntu-latest
     steps:
 
@@ -41,7 +41,7 @@ jobs:
       - name:                 Generate cargo doc
         run:                  |
           cd rust
-          RUSTFLAGS="-Dwarnings" cargo doc --all-features --verbose
+          cargo doc --all-features --verbose
 
       # user-docs
       # they are generated after rustdocs to check the relative links
