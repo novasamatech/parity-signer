@@ -70,13 +70,14 @@ jobs:
         run:                  |
           echo "Removing everything but the docs dir"
           mv -v ./docs/book/html/ /tmp/html/
-          rm -rf *
+          rm -vrf *
           echo "Hosting user-docs from root and rustdocs from ./rustdocs/"
           mv -v /tmp/html/* ./
 
       - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
-        # if:                   ${{ github.ref == 'refs/heads/master' }}
+        # published only from master
+        if:                   ${{ github.ref == 'refs/heads/master' }}
         with:
           github_token:       ${{ github.token }}
           force_orphan:       true
