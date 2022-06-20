@@ -16,6 +16,6 @@
     - [Signer structure](./development/Signer-Structure.md)
     - [Troubleshooting](./development/Troubleshooting.md)
     - [Rust docs](./development/Rustdocs.md)
-    - [Universal offline signature](.development/UOS.md)
+    - [Universal offline signature](./development/UOS.md)
     - [Signer ecosystem](./development/Ecosystem.md)
 
