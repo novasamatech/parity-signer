@@ -10,8 +10,8 @@ on:
       - 'docs/**'
 
 jobs:
-  user-docs:
-    name:                     User docs
+  rustdocs_user_docs:
+    name:                     Build rustdoc
     runs-on:                  ubuntu-latest
     steps:
 
@@ -20,14 +20,32 @@ jobs:
         with:
           access_token:       ${{ github.token }}
 
-      - name:                 Checkout repository
-        uses:                 actions/checkout@v3.0.2
-
-      - name:                 Use Rust toolchain
-        uses:                 actions-rs/toolchain@v1
+      - name:                 Checkout sources
+        uses:                 actions/checkout@v3
         with:
-          toolchain:          stable
+          fetch-depth:        1
+          submodules:         recursive
 
+      # rustdocs
+      # docs source dir ./rust/target/doc
+      - name:                 Install rustdocs dependencies
+        run:                  |
+          sudo apt update
+          sudo apt install -y clang libclang-dev libopencv-dev
+
+      - name:                 Rust Cache
+        uses:                 Swatinem/rust-cache@v1.3.0
+        with:
+          working-directory:  rust
+
+      - name:                 Generate cargo doc
+        run:                  |
+          cd rust
+          cargo doc -Dwarnings --all-features --verbose
+
+      # user-docs
+      # they are generated after rustdocs to check the relative links
+      # docs source dir ./docs/book/html/
       - name:                 Setup mdBook
         uses:                 peaceiris/actions-mdbook@v1.1.14
         with:
@@ -47,49 +65,19 @@ jobs:
         run:                  |
           mdbook build docs
 
-      - name:                 Deploy user documentation
-        uses:                 peaceiris/actions-gh-pages@v3
-        if:                 ${{ github.ref == 'refs/heads/master' }}
-        with:
-          github_token:       ${{ github.token }}
-          publish_dir:        ./docs/book/html/
-          destination_dir:    ./user-docs
-
-  rustdocs:
-    name:                     Build rustdoc
-    runs-on:                  ubuntu-latest
-    steps:
-
-      - name:                 Cancel Previous Runs
-        uses:                 styfle/cancel-workflow-action@0.9.1
-        with:
-          access_token:       ${{ github.token }}
-
-      - name:                 Checkout sources
-        uses:                 actions/checkout@v3
-        with:
-          fetch-depth:        1
-          submodules:         recursive
-
-      - name:                 Install system dependancies
+      - name:                 Cleanup
         run:                  |
-          sudo apt update
-          sudo apt install -y clang libclang-dev libopencv-dev
+          mv ./rust/target/doc ./rustdocs
+          mv ./docs/book/html/ ./user-docs
+          echo "Removing everything but the docs dirs"
+          shopt -s extglob
+          rm -v !("rustdocs"|"user-docs")
+          ls -la
 
-      - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@v1.3.0
-        with:
-          working-directory:  rust
-
-      - name:                 cargo doc
-        run:                  |
-          cd rust
-          cargo doc --all-features --verbose
-
+      # deploy
       - name:                 Deploy rustdoc
         uses:                 peaceiris/actions-gh-pages@v3
         if:                   ${{ github.ref == 'refs/heads/master' }}
         with:
           github_token:       ${{ github.token }}
-          publish_dir:        ./rust/target/doc
-          destination_dir:    ./rustdocs
+          publish_dir:        ./
