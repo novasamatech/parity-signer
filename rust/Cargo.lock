@@ -1095,6 +1095,7 @@ dependencies = [
 name = "generate_message"
 version = "0.1.0"
 dependencies = [
+ "blake2-rfc",
  "constants",
  "db_handling",
  "definitions",
