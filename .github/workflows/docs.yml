@@ -66,7 +66,7 @@ jobs:
       # deploy
       - name:                 Cleanup before pushing
         # executed only on master so PRs can use cache
-        # if:                   ${{ github.ref == 'refs/heads/master' }}
+        if:                   ${{ github.ref == 'refs/heads/master' }}
         run:                  |
           echo "Removing everything but the docs dir"
           mv -v ./docs/book/html/ /tmp/html/
