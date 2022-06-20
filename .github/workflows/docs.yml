@@ -65,7 +65,10 @@ jobs:
         run:                  |
           mdbook build docs
 
-      - name:                 Cleanup
+      # deploy
+      - name:                 Cleanup before pushing
+        # executed only on master so PRs can use cache
+        if:                   ${{ github.ref == 'refs/heads/master' }}
         run:                  |
           mv ./rust/target/doc ./rustdocs
           mv ./docs/book/html/ ./user-docs
@@ -73,8 +76,7 @@ jobs:
           shopt -s extglob
           rm -vrf !("rustdocs"|"user-docs")
 
-      # deploy
-      - name:                 Deploy rustdoc
+      - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
         if:                   ${{ github.ref == 'refs/heads/master' }}
         with:
