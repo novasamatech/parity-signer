@@ -66,17 +66,17 @@ jobs:
       # deploy
       - name:                 Cleanup before pushing
         # executed only on master so PRs can use cache
-        if:                   ${{ github.ref == 'refs/heads/master' }}
+        # if:                   ${{ github.ref == 'refs/heads/master' }}
         run:                  |
-          echo "Removing everything but the docs dirs"
-          shopt -s extglob
-          rm -vrf !("./docs/book/html/")
+          echo "Removing everything but the docs dir"
+          mv -v ./docs/book/html/ /tmp/html/
+          rm -rf *
           echo "Hosting user-docs from root and rustdocs from ./rustdocs/"
-          mv ./docs/book/html/ ./
+          mv -v /tmp/html/* ./
 
       - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
-        if:                   ${{ github.ref == 'refs/heads/master' }}
+        # if:                   ${{ github.ref == 'refs/heads/master' }}
         with:
           github_token:       ${{ github.token }}
           force_orphan:       true
