@@ -4763,7 +4763,7 @@ fn flow_test_1() {
             "Produced sufficient crypto did not work. {}.",
             String::from_utf8(command.stderr).unwrap()
         );
-        std::env::set_current_dir("../files/signed").unwrap();
+        std::env::set_current_dir("../files/completed").unwrap();
         std::fs::remove_file("add_specs_westend-sr25519").unwrap();
         std::env::set_current_dir("../../navigator").unwrap();
     }
@@ -5022,7 +5022,7 @@ fn flow_test_1() {
             "Produced sufficient crypto did not work. {}.",
             String::from_utf8(command.stderr).unwrap()
         );
-        std::env::set_current_dir("../files/signed").unwrap();
+        std::env::set_current_dir("../files/completed").unwrap();
         std::fs::remove_file("load_metadata_westendV9150.txt").unwrap();
         std::env::set_current_dir("../../navigator").unwrap();
     }
@@ -5135,7 +5135,7 @@ fn flow_test_1() {
             "Produced sufficient crypto did not work. {}.",
             String::from_utf8(command.stderr).unwrap()
         );
-        std::env::set_current_dir("../files/signed").unwrap();
+        std::env::set_current_dir("../files/completed").unwrap();
         std::fs::remove_file("load_types.txt").unwrap();
         std::env::set_current_dir("../../navigator").unwrap();
     }
