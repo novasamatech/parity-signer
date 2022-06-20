@@ -66,8 +66,10 @@ and forth between `Kotlin` and `Rust` code. Here is why.
 Suppose the application needs to pass a following structure through FFI from
 `Kotlin` to `Rust` or back:
 
-```rust,noplaypen #[derive(Serialize, Deserialize)] struct Address { street:
-String, city: String, } ```
+```rust,noplaypen 
+#[derive(Serialize, Deserialize)]
+ struct Address { street:String, city: String, }
+```
 
 This would mean that on the `Kotlin` side of the FFI there would have to be some
 way of turning this type from JSON into a `Kotlin` type. It may be some sort of
@@ -75,8 +77,10 @@ scheme or even a manual JSON value-by-key data extraction.
 
 Now suppose this struct is changed by adding and removing some fields:
 
-```rust,noplaypen #[derive(Serialize, Deserialize)] struct Address { country:
-String, city: String, index: usize, } ```
+```rust,noplaypen
+#[derive(Serialize, Deserialize)]
+ struct Address { country: String, city: String, index: usize, }
+```
 
 After this change on a Rust-side the developer would have to _remember_ to
 reflect these changes on the `Kotlin` and `Swift` sides and if that is no done
@@ -116,7 +120,7 @@ there at lower computational cost for CI pipelines.
 For storage of all data except secrets, a sled database is used. Choice of db
 was based on its lightweightness, reliability, portability.
 
-**TODO db structure here**
+[Signer database structure](https://paritytech.github.io/parity-signer/rustdocs/db_handling/cold_default/index.html)
 
 ## Functional structure
 
@@ -173,7 +177,7 @@ attack is countered by authorization on seed removal.
 
 Thus, secret seeds source of truth is KMS. To synchronize the rest of the app,
 list of seed identifiers is sent to backend on app startup and on all events
-related to changes in this list by calling **TODO corresponding function**.
+related to changes in this list by calling `update_seed_names(Vec<String>)`.
 
 Randopm seed generator and seed recovery tools are implemented in Rust. These
 are the only 2 cases where seed originates not in KMS.
@@ -207,7 +211,13 @@ is just another network added to the list of networks.
 **TODO here should be more discussion on key management features and/or links to
 rustdocs**
 
-**TODO bulk key import**
+Keys could be imported through QR code created by `generate_message` tool
+([instructions](./rustdocs/generate_message/derivations/index.html)). A
+plaintext newline-separated list of derivations should be supplied to the tool
+along with network identifier; the import thus is bound to certain network,
+however, it is not bound to any particular seed - user can select any of
+created seeds and, after authorization, create keys with given paths. Bulk
+import of password-protected keys is forbidden at the moment.
 
 #### Optional password
 
