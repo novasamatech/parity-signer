@@ -17,9 +17,8 @@
 //! User can clear history log at any time. This indeed will remove all history
 //! entries, and the log will then start with `Entry` containing
 //! `Event::HistoryCleared`.
-use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec::{Decode, Encode};
-use sp_core::H256;
+use sp_core::{blake2_256, H256};
 use sp_runtime::MultiSigner;
 #[cfg(feature = "signer")]
 use std::convert::TryInto;
@@ -43,11 +42,11 @@ use crate::{
 pub struct MetaValuesDisplay {
     pub name: String,
     pub version: u32,
-    pub meta_hash: Vec<u8>,
+    pub meta_hash: H256,
 }
 
 impl MetaValuesDisplay {
-    pub fn new(name: String, version: u32, meta_hash: Vec<u8>) -> Self {
+    pub fn new(name: String, version: u32, meta_hash: H256) -> Self {
         Self {
             name,
             version,
@@ -60,7 +59,7 @@ impl MetaValuesDisplay {
         Self {
             name: meta_values.name.to_string(),
             version: meta_values.version,
-            meta_hash: blake2b(32, &[], &meta_values.meta).as_bytes().to_vec(),
+            meta_hash: blake2_256(&meta_values.meta).into(),
         }
     }
 }
@@ -75,12 +74,12 @@ impl MetaValuesDisplay {
 pub struct MetaValuesExport {
     pub name: String,
     pub version: u32,
-    pub meta_hash: Vec<u8>,
+    pub meta_hash: H256,
     pub signed_by: VerifierValue,
 }
 
 impl MetaValuesExport {
-    pub fn new(name: String, version: u32, meta_hash: Vec<u8>, signed_by: VerifierValue) -> Self {
+    pub fn new(name: String, version: u32, meta_hash: H256, signed_by: VerifierValue) -> Self {
         Self {
             name,
             version,
@@ -95,7 +94,7 @@ impl MetaValuesExport {
         Self {
             name: meta_values.name.to_string(),
             version: meta_values.version,
-            meta_hash: blake2b(32, &[], &meta_values.meta).as_bytes().to_vec(),
+            meta_hash: blake2_256(&meta_values.meta).into(),
             signed_by: signed_by.to_owned(),
         }
     }
@@ -179,12 +178,12 @@ impl NetworkVerifierDisplay {
 /// Contains hash of SCALE-encoded types data and types information [`Verifier`].
 #[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct TypesDisplay {
-    pub types_hash: Vec<u8>,
+    pub types_hash: H256,
     pub verifier: Verifier,
 }
 
 impl TypesDisplay {
-    pub fn new(types_hash: Vec<u8>, verifier: Verifier) -> Self {
+    pub fn new(types_hash: H256, verifier: Verifier) -> Self {
         Self {
             types_hash,
             verifier,
@@ -195,7 +194,7 @@ impl TypesDisplay {
     /// [`Verifier`]  
     pub fn get(types_content: &ContentLoadTypes, verifier: &Verifier) -> Self {
         Self {
-            types_hash: blake2b(32, &[], &types_content.store()).as_bytes().to_vec(),
+            types_hash: blake2_256(&types_content.store()).into(),
             verifier: verifier.to_owned(),
         }
     }
@@ -209,13 +208,13 @@ impl TypesDisplay {
 #[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct TypesExport {
     /// Hash of SCALE-encoded types data
-    pub types_hash: Vec<u8>,
+    pub types_hash: H256,
     /// [`VerifierValue`] of address
     pub signed_by: VerifierValue,
 }
 
 impl TypesExport {
-    pub fn new(types_hash: Vec<u8>, signed_by: VerifierValue) -> Self {
+    pub fn new(types_hash: H256, signed_by: VerifierValue) -> Self {
         Self {
             types_hash,
             signed_by,
@@ -226,7 +225,7 @@ impl TypesExport {
     /// of address used for `SufficientCrypto` generation  
     pub fn get(types_content: &ContentLoadTypes, signed_by: &VerifierValue) -> Self {
         Self {
-            types_hash: blake2b(32, &[], &types_content.store()).as_bytes().to_vec(),
+            types_hash: blake2_256(&types_content.store()).into(),
             signed_by: signed_by.to_owned(),
         }
     }

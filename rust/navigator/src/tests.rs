@@ -1012,7 +1012,7 @@ fn flow_test_1() {
                     timestamp: String::new(),
                     events: vec![Event::TypesRemoved {
                         types_display: TypesDisplay {
-                            types_hash: hex::decode(
+                            types_hash: H256::from_str(
                                 "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb",
                             )
                             .unwrap(),
@@ -1057,7 +1057,7 @@ fn flow_test_1() {
                     events: vec![Event::MetadataRemoved { meta_values_display: MetaValuesDisplay {
                         name: "kusama".to_string(),
                         version: 9130,
-                        meta_hash: hex::decode("3e6bf025743e5cc550883170d91c8275fb238762b214922b41d64f9feba23987").unwrap() } }],
+                        meta_hash: H256::from_str("3e6bf025743e5cc550883170d91c8275fb238762b214922b41d64f9feba23987").unwrap() } }],
                 },
               History {
                   order: 0,
@@ -1520,7 +1520,7 @@ fn flow_test_1() {
                         meta_values_display: MetaValuesDisplay {
                             name: "kusama".to_string(),
                             version: 9151,
-                            meta_hash: hex::decode(
+                            meta_hash: H256::from_str(
                                 "9a179da92949dd3ab3829177149ec83dc46fb009af10a45f955949b2a6693b46",
                             )
                             .unwrap(),
@@ -1660,7 +1660,7 @@ fn flow_test_1() {
                         },
                         Event::TypesAdded {
                             types_display: TypesDisplay {
-                                types_hash: hex::decode(hex_3).unwrap(),
+                                types_hash: H256::from_str(hex_3).unwrap(),
                                 verifier: Verifier {
                                     v: Some(VerifierValue::Standard {
                                         m: sr_multisigner_from_hex(hex_4),
@@ -1677,7 +1677,7 @@ fn flow_test_1() {
                         meta_values_display: MetaValuesDisplay {
                             name: "kusama".to_string(),
                             version: 9151,
-                            meta_hash: hex::decode(
+                            meta_hash: H256::from_str(
                                 "9a179da92949dd3ab3829177149ec83dc46fb009af10a45f955949b2a6693b46",
                             )
                             .unwrap(),
@@ -5036,7 +5036,7 @@ fn flow_test_1() {
                 meta_values_export: MetaValuesExport {
                     name: "westend".to_string(),
                     version: 9150,
-                    meta_hash: hex::decode(
+                    meta_hash: H256::from_str(
                         "b5d422b92f0183c192cbae5e63811bffcabbef22b6f9e05a85ba7b738e91d44a"
                     )
                     .unwrap(),
@@ -5147,7 +5147,7 @@ fn flow_test_1() {
             f.log[0].events[0],
             Event::TypesSigned {
                 types_export: TypesExport {
-                    types_hash: hex::decode(
+                    types_hash: H256::from_str(
                         "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"
                     )
                     .unwrap(),

@@ -703,7 +703,7 @@ fn types_status_and_history() {
     let history_printed = get_history(dbname).unwrap();
     let expected_element = Event::TypesRemoved {
         types_display: TypesDisplay {
-            types_hash: hex::decode(
+            types_hash: H256::from_str(
                 "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb",
             )
             .unwrap(),
@@ -1648,7 +1648,7 @@ fn test_all_events() {
             meta_values_display: MetaValuesDisplay {
                 name: "westend".to_string(),
                 version: 9000,
-                meta_hash: hex::decode(
+                meta_hash: H256::from_str(
                     "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
                 )
                 .unwrap()
@@ -1662,7 +1662,7 @@ fn test_all_events() {
             meta_values_display: MetaValuesDisplay {
                 name: "westend".to_string(),
                 version: 9000,
-                meta_hash: hex::decode(
+                meta_hash: H256::from_str(
                     "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
                 )
                 .unwrap()
@@ -1676,7 +1676,7 @@ fn test_all_events() {
             meta_values_export: MetaValuesExport {
                 name: "westend".to_string(),
                 version: 9000,
-                meta_hash: hex::decode(
+                meta_hash: H256::from_str(
                     "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
                 )
                 .unwrap(),
@@ -1854,7 +1854,7 @@ fn test_all_events() {
         &entries,
         &Event::TypesAdded {
             types_display: TypesDisplay {
-                types_hash: hex::decode(
+                types_hash: H256::from_str(
                     "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
                 )
                 .unwrap(),
@@ -1875,7 +1875,7 @@ fn test_all_events() {
         &entries,
         &Event::TypesRemoved {
             types_display: TypesDisplay {
-                types_hash: hex::decode(
+                types_hash: H256::from_str(
                     "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
                 )
                 .unwrap(),
@@ -1896,7 +1896,7 @@ fn test_all_events() {
         &entries,
         &Event::TypesSigned {
             types_export: TypesExport {
-                types_hash: hex::decode(
+                types_hash: H256::from_str(
                     "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
                 )
                 .unwrap(),
@@ -2197,7 +2197,7 @@ fn remove_all_westend() {
             meta_values_display: MetaValuesDisplay {
                 name: "westend".to_string(),
                 version: 9000,
-                meta_hash: hex::decode(
+                meta_hash: H256::from_str(
                     "e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce"
                 )
                 .unwrap(),
@@ -2211,7 +2211,7 @@ fn remove_all_westend() {
             meta_values_display: MetaValuesDisplay {
                 name: "westend".to_string(),
                 version: 9010,
-                meta_hash: hex::decode(
+                meta_hash: H256::from_str(
                     "70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf"
                 )
                 .unwrap(),

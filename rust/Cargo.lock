@@ -699,7 +699,6 @@ name = "definitions"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "blake2-rfc",
  "frame-metadata",
  "hex",
  "parity-scale-codec",

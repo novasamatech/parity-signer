@@ -6,7 +6,7 @@ interface ErrorDisplayed {
 dictionary MetaValuesDisplay {
     string name;
     u32 version;
-    sequence<u8> meta_hash;
+    H256 meta_hash;
 };
 
 [Custom]
@@ -93,12 +93,12 @@ dictionary NetworkVerifierDisplay {
 };
 
 dictionary TypesDisplay {
-    sequence<u8> types_hash;
+    H256 types_hash;
     Verifier verifier;
 };
 
 dictionary TypesExport {
-    sequence<u8> types_hash;
+    H256 types_hash;
     VerifierValue signed_by;
 };
 
@@ -127,7 +127,7 @@ dictionary IdentityHistory {
 dictionary MetaValuesExport {
     string name;
     u32 version;
-    sequence<u8> meta_hash;
+    H256 meta_hash;
     VerifierValue signed_by;
 };
 

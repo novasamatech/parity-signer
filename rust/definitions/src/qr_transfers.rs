@@ -21,8 +21,6 @@
 //!
 //! This module deals with content part of QR codes.  
 
-#[cfg(feature = "signer")]
-use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec::{Decode, Encode};
 
 use crate::crypto::Encryption;
@@ -74,7 +72,7 @@ impl ContentLoadMeta {
         }
     }
 
-    /// Get genesis hash `[u8; 32]` from [`ContentLoadMeta`].
+    /// Get genesis hash `H256` from [`ContentLoadMeta`].
     pub fn genesis_hash<T: ErrorSource>(&self) -> Result<H256, T::Error> {
         match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.genesis_hash),
@@ -82,7 +80,7 @@ impl ContentLoadMeta {
         }
     }
 
-    /// Get metadata `Vec<u8>` and genesis hash `[u8; 32]` from [`ContentLoadMeta`] as a tuple.
+    /// Get metadata `Vec<u8>` and genesis hash `H256` from [`ContentLoadMeta`] as a tuple.
     pub fn meta_genhash<T: ErrorSource>(&self) -> Result<(Vec<u8>, H256), T::Error> {
         match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
             Ok(a) => Ok((a.meta, a.genesis_hash)),
@@ -251,7 +249,9 @@ impl ContentLoadTypes {
     /// as it would be stored in the database  
     #[cfg(feature = "signer")]
     pub fn show(&self) -> (String, Vec<u8>) {
-        let types_hash = blake2b(32, &[], &self.store()).as_bytes().to_vec();
+        use sp_core::blake2_256;
+
+        let types_hash = blake2_256(&self.store()).as_ref().to_vec();
         let types_id_pic = pic_types(&types_hash);
         (hex::encode(types_hash), types_id_pic)
     }
@@ -280,7 +280,7 @@ struct DecodedContentDerivations {
 
 impl ContentDerivations {
     /// Generate [`ContentDerivations`] from network encryption [`Encryption`],
-    /// genesis hash `[u8; 32]`, and set of derivations `&[String]`.  
+    /// genesis hash `H256`, and set of derivations `&[String]`.  
     pub fn generate(encryption: &Encryption, genesis_hash: &H256, derivations: &[String]) -> Self {
         Self(
             DecodedContentDerivations {
@@ -297,7 +297,7 @@ impl ContentDerivations {
         Self(slice.to_vec())
     }
 
-    /// Get encryption [`Encryption`], genesis hash `[u8; 32]` and derivations `Vec<String>`
+    /// Get encryption [`Encryption`], genesis hash `H256` and derivations `Vec<String>`
     /// from [`ContentDerivations`] as a tuple.
     #[cfg(feature = "signer")]
     pub fn encryption_genhash_derivations(

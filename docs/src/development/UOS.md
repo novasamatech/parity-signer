@@ -275,7 +275,7 @@ Thus, the transaction structure could also be represented as:
 
 Bold-marked transaction pieces are used in the blob for which the signature is
 produced. If the blob is short, 257 bytes or below, the signature is produced
-for it as is. For blobs longer than 257 bytes, 32 byte hash (`blake2-rfc`) is
+for it as is. For blobs longer than 257 bytes, 32 byte hash (`blake2_256`) is
 signed instead. This is inherited from earlier Signer versions, and is currently
 compatible with polkadot-js.
 

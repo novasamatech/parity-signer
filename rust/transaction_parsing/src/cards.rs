@@ -245,7 +245,7 @@ impl<'a> Card<'a> {
                     specname: x.name.clone(),
                     specs_version: x.version.to_string(),
                     meta_hash: hex::encode(&x.meta_hash),
-                    meta_id_pic: pic_meta(&x.meta_hash),
+                    meta_id_pic: pic_meta(x.meta_hash.as_bytes()),
                 },
             },
             Card::TypesInfo(x) => {
