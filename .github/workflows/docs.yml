@@ -5,13 +5,10 @@ on:
   push:
     branches:
       - master
-    paths:
-      - '.github/workflows/docs.yml'
-      - 'docs/**'
 
 jobs:
-  user-docs:
-    name:                     User docs
+  rustdocs_user_docs:
+    name:                     Build rustdocs, user-docs and check links
     runs-on:                  ubuntu-latest
     steps:
 
@@ -20,14 +17,33 @@ jobs:
         with:
           access_token:       ${{ github.token }}
 
-      - name:                 Checkout repository
-        uses:                 actions/checkout@v3.0.2
-
-      - name:                 Use Rust toolchain
-        uses:                 actions-rs/toolchain@v1
+      - name:                 Checkout sources
+        uses:                 actions/checkout@v3
         with:
-          toolchain:          stable
+          fetch-depth:        1
+          submodules:         recursive
 
+      # rustdocs
+      # docs source dir ./rust/target/doc
+      - name:                 Install rustdocs dependencies
+        run:                  |
+          sudo apt update
+          sudo apt install -y clang libclang-dev libopencv-dev
+
+      - name:                 Rust Cache
+        uses:                 Swatinem/rust-cache@v1.3.0
+        with:
+          working-directory:  rust
+
+      - name:                 Generate cargo doc
+        run:                  |
+          cd rust
+          echo "Generating rustdocs to the user-docs dir so it's possible to check the links"
+          cargo doc --all-features --verbose --target-dir ../docs/book/html/rustdocs/
+
+      # user-docs
+      # they are generated after rustdocs to check the relative links
+      # docs source dir ./docs/book/html/
       - name:                 Setup mdBook
         uses:                 peaceiris/actions-mdbook@v1.1.14
         with:
@@ -43,53 +59,25 @@ jobs:
         with:
           crate:              mdbook-mermaid
 
-      - name:                 Build docs
+      - name:                 Build user-docs
         run:                  |
           mdbook build docs
 
-      - name:                 Deploy user documentation
-        uses:                 peaceiris/actions-gh-pages@v3
-        if:                 ${{ github.ref == 'refs/heads/master' }}
-        with:
-          github_token:       ${{ github.token }}
-          publish_dir:        ./docs/book/html/
-          destination_dir:    ./user-docs
-
-  rustdocs:
-    name:                     Build rustdoc
-    runs-on:                  ubuntu-latest
-    steps:
-
-      - name:                 Cancel Previous Runs
-        uses:                 styfle/cancel-workflow-action@0.9.1
-        with:
-          access_token:       ${{ github.token }}
-
-      - name:                 Checkout sources
-        uses:                 actions/checkout@v3
-        with:
-          fetch-depth:        1
-          submodules:         recursive
-
-      - name:                 Install system dependancies
+      # deploy
+      - name:                 Cleanup before pushing
+        # executed only on master so PRs can use cache
+        if:                   ${{ github.ref == 'refs/heads/master' }}
         run:                  |
-          sudo apt update
-          sudo apt install -y clang libclang-dev libopencv-dev
+          echo "Removing everything but the docs dirs"
+          shopt -s extglob
+          rm -vrf !("./docs/book/html/")
+          echo "Hosting user-docs from root and rustdocs from ./rustdocs/"
+          mv ./docs/book/html/ ./
 
-      - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@v1.3.0
-        with:
-          working-directory:  rust
-
-      - name:                 cargo doc
-        run:                  |
-          cd rust
-          cargo doc --all-features --verbose
-
-      - name:                 Deploy rustdoc
+      - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
         if:                   ${{ github.ref == 'refs/heads/master' }}
         with:
           github_token:       ${{ github.token }}
-          publish_dir:        ./rust/target/doc
-          destination_dir:    ./rustdocs
+          force_orphan:       true
+          publish_dir:        ./
