@@ -71,8 +71,7 @@ jobs:
           mv ./docs/book/html/ ./user-docs
           echo "Removing everything but the docs dirs"
           shopt -s extglob
-          rm -vrf !("rustdocs"|"user-docs"|"README.md")
-          ls -la
+          rm -vrf !("rustdocs"|"user-docs")
 
       # deploy
       - name:                 Deploy rustdoc
