@@ -41,7 +41,7 @@ jobs:
       - name:                 Generate cargo doc
         run:                  |
           cd rust
-          cargo doc -Dwarnings --all-features --verbose
+          RUSTFLAGS="-Dwarnings" cargo doc --all-features --verbose
 
       # user-docs
       # they are generated after rustdocs to check the relative links
@@ -61,7 +61,7 @@ jobs:
         with:
           crate:              mdbook-mermaid
 
-      - name:                 Build docs
+      - name:                 Build user-docs
         run:                  |
           mdbook build docs
 
