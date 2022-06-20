@@ -1,6 +1,6 @@
 //! This crate is part of transcation parsing in the
 //! [Signer](https://github.com/paritytech/parity-signer).
-//! 
+//!
 //! This crate is used to represent numbers as balance values in given network.
 //! Every network introduced to Signer has characteristic network specs. Among
 //! other parameters, network specs contain decimals and unit, that are used
@@ -10,7 +10,7 @@
 //! Decimals indicate the order of magnitude, by which the token `unit`
 //! exceeds the integer representing unit. All symbols from the input number
 //! except leading zeroes must end up in the representation.
-//! 
+//!
 //! <table>
 //!     <tr>
 //!         <th>decoded integer</th>
