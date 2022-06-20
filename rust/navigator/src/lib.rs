@@ -2,6 +2,7 @@
 //! Ideally it should replace almost everything and become the only interface
 
 #![deny(unused_crate_dependencies)]
+#![deny(rustdoc::broken_intra_doc_links)]
 
 //do we support mutex?
 use lazy_static::lazy_static;

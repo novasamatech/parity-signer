@@ -15,6 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 #![deny(unused_crate_dependencies)]
+#![deny(rustdoc::broken_intra_doc_links)]
 
 mod ffi_types;
 

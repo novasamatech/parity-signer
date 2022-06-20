@@ -12,6 +12,7 @@
 //! with some testing, and is the default one.  
 
 #![deny(unused_crate_dependencies)]
+#![deny(rustdoc::broken_intra_doc_links)]
 
 pub mod crypto;
 

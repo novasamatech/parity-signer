@@ -26,6 +26,7 @@
 //! with some testing, and is the default one.  
 
 #![deny(unused_crate_dependencies)]
+#![deny(rustdoc::broken_intra_doc_links)]
 
 // possibly TODO: rename all database_name into database_path or whatever,
 // currently it is quite confusing
