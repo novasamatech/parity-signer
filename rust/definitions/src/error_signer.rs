@@ -476,7 +476,7 @@ impl ErrorSigner {
 /// [`InterfaceSigner`] error means that rust backend can not process the
 /// information sent by the frontend.
 ///
-/// Signer rust backend sends data into frontend as [`ActionResult`]s. Frontend
+/// Signer rust backend sends data into frontend as [`ActionResult`](crate::navigation::ActionResult)s. Frontend
 /// displays them, and can send back into rust some parts of the data of
 /// the user input.
 ///
