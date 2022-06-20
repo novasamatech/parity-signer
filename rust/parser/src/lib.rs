@@ -4,7 +4,7 @@ use frame_metadata::v14::RuntimeMetadataV14;
 #[cfg(feature = "test")]
 use frame_metadata::RuntimeMetadata;
 use parity_scale_codec::{Decode, DecodeAll, Encode};
-use printing_balance::convert_balance_pretty;
+use printing_balance::AsBalance;
 use sp_core::H256;
 use sp_runtime::generic::Era;
 
@@ -108,11 +108,8 @@ pub fn parse_extensions(
                     in_metadata: network_version.to_owned(),
                 });
             }
-            let tip = convert_balance_pretty(
-                &ext.tip.to_string(),
-                short_specs.decimals,
-                &short_specs.unit,
-            );
+            let tip =
+                <u128>::convert_balance_pretty(ext.tip, short_specs.decimals, &short_specs.unit);
             let cards = vec![
                 OutputCard {
                     card: ParserCard::Era(ext.era),

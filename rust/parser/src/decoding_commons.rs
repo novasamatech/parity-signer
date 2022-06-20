@@ -7,7 +7,7 @@ use definitions::{
     error_signer::{ParserDecodingError, ParserError, ParserMetadataError},
     network_specs::ShortSpecs,
 };
-use printing_balance::convert_balance_pretty;
+use printing_balance::AsBalance;
 
 use crate::cards::ParserCard;
 use crate::decoding_sci_ext::{Ext, SpecialExt};
@@ -198,7 +198,7 @@ pub(crate) fn decode_primitive_with_flags<T>(
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut, ParserError>
 where
-    T: Decode + HasCompact + std::fmt::Display,
+    T: Decode + AsBalance + HasCompact + std::fmt::Display,
     Compact<T>: Decode,
 {
     let balance_flag = {
@@ -216,8 +216,8 @@ where
         let compact_found = get_compact::<T>(data)?;
         let fancy_out = {
             if balance_flag {
-                process_balance(
-                    &compact_found.compact_found.to_string(),
+                process_balance::<T>(
+                    compact_found.compact_found,
                     possible_ext,
                     indent,
                     short_specs,
@@ -249,7 +249,7 @@ where
             Ok(x) => {
                 let fancy_out = {
                     if balance_flag {
-                        process_balance(&x.to_string(), possible_ext, indent, short_specs)?
+                        process_balance::<T>(x, possible_ext, indent, short_specs)?
                     } else {
                         process_number(x.to_string(), possible_ext, indent, short_specs)?
                     }
@@ -267,13 +267,14 @@ where
     }
 }
 
-fn process_balance(
-    balance: &str,
+fn process_balance<T: AsBalance>(
+    balance: T,
     possible_ext: &mut Option<&mut Ext>,
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<Vec<OutputCard>, ParserError> {
-    let balance_output = convert_balance_pretty(balance, short_specs.decimals, &short_specs.unit);
+    let balance_output =
+        <T>::convert_balance_pretty(balance, short_specs.decimals, &short_specs.unit);
     let out_balance = vec![OutputCard {
         card: ParserCard::Balance {
             number: balance_output.number.to_string(),

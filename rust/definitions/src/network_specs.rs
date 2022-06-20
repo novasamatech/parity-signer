@@ -269,7 +269,7 @@
 //!
 //! Balance (`u64`) from transaction is decoded as `10000000`.
 //! Network `decimals` value is `12`, network `unit` is `WND`.
-//! The balance should be therefore represented as `10 uWND`.  
+//! The balance should be therefore represented as `10.000000 uWND`.  
 
 use parity_scale_codec::{Decode, Encode};
 #[cfg(feature = "signer")]
