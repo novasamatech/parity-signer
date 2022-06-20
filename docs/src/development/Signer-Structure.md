@@ -212,7 +212,7 @@ is just another network added to the list of networks.
 rustdocs**
 
 Keys could be imported through QR code created by `generate_message` tool
-([instructions](./rustdocs/generate_message/derivations/index.html)). A
+([instructions](../rustdocs/generate_message/derivations/index.html)). A
 plaintext newline-separated list of derivations should be supplied to the tool
 along with network identifier; the import thus is bound to certain network,
 however, it is not bound to any particular seed - user can select any of
@@ -370,7 +370,7 @@ Signer can sign network and metadata updates that could be used for other
 signers. User can select any update component present in Signer and any key
 available for any network and generate a qr code which, upon decoding, can be
 used by `generate_message` or similar tool to generate over-the-airgap update.
-[See detailed documentation](./development/UOS.md)
+[See detailed documentation](./UOS.md)
 
 This feature was designed for elegance, but it is quite useful to maintain
 update signing key for large update distribution centers, for it allows to
