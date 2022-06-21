@@ -68,18 +68,16 @@ jobs:
         # executed only on master so PRs can use cache
         # if:                   ${{ github.ref == 'refs/heads/master' }}
         run:                  |
-          echo "_____Removing everything but the docs dir_____"
-          rm -rf /tmp/book/
-          mv -v ./docs/book/ /tmp/book/
-          rm -vrf *
           echo "_____Hosting user-docs from root and rustdocs from ./rustdocs/_____"
-          mv -v /tmp/book/html/* ./
+          mv ./docs/book/html ./public
           echo "_____ls ./"
           ls ./
           echo "_____du -sh ./*"
           du -sh ./*
-          echo "_____du -sh ./rustdocs/*"
-          du -sh ./rustdocs/* || exit 0
+          echo "_____du -sh ./docs/book/html/*"
+          du -sh ./public/* || exit 0
+          echo "_____du -sh ./docs/book/html/rustdocs/*"
+          du -sh ./public/rustdocs/* || exit 0
 
       - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
@@ -88,4 +86,4 @@ jobs:
         with:
           github_token:       ${{ github.token }}
           force_orphan:       true
-          publish_dir:        ./
+          publish_dir:        ./public
