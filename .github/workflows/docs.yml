@@ -69,6 +69,7 @@ jobs:
         if:                   ${{ github.ref == 'refs/heads/master' }}
         run:                  |
           echo "Removing everything but the docs dir"
+          rm -rf /tmp/html/
           mv -v ./docs/book/html/ /tmp/html/
           rm -vrf *
           echo "Hosting user-docs from root and rustdocs from ./rustdocs/"
