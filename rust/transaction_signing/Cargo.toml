@@ -6,7 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-blake2-rfc = "0.2.18"
 hex = "0.4.3"
 parity-scale-codec = "3.1.5"
 zeroize = "1.5.5"

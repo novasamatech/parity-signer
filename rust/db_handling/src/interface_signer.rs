@@ -1,10 +1,9 @@
 //! Utils to communicate with the Signer frontend
 use bip39::{Language, Mnemonic};
-use blake2_rfc::blake2b::blake2b;
 use hex;
 use parity_scale_codec::Encode;
 use plot_icon::EMPTY_PNG;
-use sp_core::{sr25519, Pair};
+use sp_core::{blake2_256, sr25519, Pair};
 use sp_runtime::MultiSigner;
 use std::collections::HashMap;
 use zeroize::{Zeroize, ZeroizeOnDrop};
@@ -578,7 +577,7 @@ pub fn network_details_by_key(
     let meta: Vec<_> = get_meta_values_by_name(database_name, &name)?
         .into_iter()
         .map(|m| {
-            let meta_hash = blake2b(32, &[], &m.meta).as_bytes().to_vec();
+            let meta_hash = blake2_256(&m.meta);
             let meta_id_pic = pic_meta(&meta_hash);
 
             MMetadataRecord {
@@ -641,7 +640,7 @@ pub fn metadata_details(
         })
         .collect();
 
-    let meta_hash = blake2b(32, &[], &meta_values.meta).as_bytes().to_vec();
+    let meta_hash = blake2_256(&meta_values.meta);
     let meta_id_pic = pic_meta(&meta_hash);
     Ok(MManageMetadata {
         name: network_specs.name,

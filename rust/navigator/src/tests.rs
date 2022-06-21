@@ -1,8 +1,7 @@
-use blake2_rfc::blake2b::blake2b;
 use image::{GenericImageView, GrayImage, ImageBuffer, Pixel};
 use lazy_static::lazy_static;
 use regex::Regex;
-use sp_core::{Pair, H256};
+use sp_core::{blake2_256, Pair, H256};
 use sp_runtime::MultiSigner;
 use std::{convert::TryInto, str::FromStr};
 
@@ -131,7 +130,7 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
             };
             let message = {
                 if message.len() > 257 {
-                    blake2b(32, &[], &message).as_bytes().to_vec()
+                    blake2_256(&message).to_vec()
                 } else {
                     message
                 }
@@ -164,7 +163,7 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
             };
             let message = {
                 if message.len() > 257 {
-                    blake2b(32, &[], &message).as_bytes().to_vec()
+                    blake2_256(&message).to_vec()
                 } else {
                     message
                 }
@@ -197,7 +196,7 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
             };
             let message = {
                 if message.len() > 257 {
-                    blake2b(32, &[], &message).as_bytes().to_vec()
+                    blake2_256(&message).to_vec()
                 } else {
                     message
                 }

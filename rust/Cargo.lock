@@ -664,7 +664,6 @@ dependencies = [
 name = "db_handling"
 version = "0.1.0"
 dependencies = [
- "blake2-rfc",
  "constants",
  "defaults",
  "definitions",
@@ -1094,7 +1093,6 @@ dependencies = [
 name = "generate_message"
 version = "0.1.0"
 dependencies = [
- "blake2-rfc",
  "constants",
  "db_handling",
  "definitions",
@@ -1750,7 +1748,6 @@ dependencies = [
 name = "navigator"
 version = "0.1.0"
 dependencies = [
- "blake2-rfc",
  "constants",
  "db_handling",
  "definitions",
@@ -3808,7 +3805,6 @@ dependencies = [
 name = "transaction_signing"
 version = "0.1.0"
 dependencies = [
- "blake2-rfc",
  "constants",
  "db_handling",
  "definitions",
