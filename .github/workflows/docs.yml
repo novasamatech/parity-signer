@@ -24,7 +24,6 @@ jobs:
           submodules:         recursive
 
       # rustdocs
-      # docs source dir ./rust/target/doc
       - name:                 Install rustdocs dependencies
         run:                  |
           sudo apt update
@@ -33,13 +32,14 @@ jobs:
       - name:                 Rust Cache
         uses:                 Swatinem/rust-cache@v1.3.0
         with:
-          working-directory:  rust
+          # must match with cargo ... --target-dir
+          working-directory:  docs/book/src/rustdocs/
 
       - name:                 Generate cargo doc
         run:                  |
           cd rust
-          echo "Generating rustdocs to the user-docs dir so it's possible to check the links"
-          cargo doc --all-features --verbose --target-dir ../docs/book/rustdocs/
+          echo "_____Generating rustdocs to the book/src dir so it's published to check the links_____"
+          cargo doc --all-features --verbose --target-dir ../docs/book/src/rustdocs/
 
       # user-docs
       # they are generated after rustdocs to check the relative links
@@ -68,19 +68,20 @@ jobs:
         # executed only on master so PRs can use cache
         # if:                   ${{ github.ref == 'refs/heads/master' }}
         run:                  |
-          echo "Removing everything but the docs dir"
-          rm -rf /tmp/html/ /tmp/rustdocs/
+          echo "_____Removing everything but the docs dir_____"
+          rm -rf /tmp/html/
           mv -v ./docs/book/html/ /tmp/html/
-          mv -v ./docs/book/rustdocs/ /tmp/rustdocs/
           rm -vrf *
-          echo "Hosting user-docs from ./html/ and rustdocs from ./rustdocs/"
-          mv -v /tmp/html/ ./
-          mv -v /tmp/rustdocs/ ./
+          echo "_____Hosting user-docs from root and rustdocs from ./rustdocs/_____"
+          mv -v /tmp/html/* ./
+          echo "_____ls ./"
           ls ./
+          echo "_____ls ./rustdocs"
           ls ./rustdocs
+          echo "_____du -sh ./rustdocs/*"
           du -sh ./rustdocs/*
-          ls ./html
-          du -sh ./html/*
+          echo "_____du -sh ./*"
+          du -sh ./*
 
       - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
