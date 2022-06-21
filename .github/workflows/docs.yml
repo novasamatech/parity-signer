@@ -39,7 +39,7 @@ jobs:
           cd rust
           echo "_____Generating rustdocs to the book/src dir so it's published to check the links_____"
           cargo doc --all-features --verbose
-          mv ./target/doc/ ../docs/book/src/rustdocs/
+          mv ./target/doc/ ../docs/src/rustdocs/
 
       # user-docs
       # they are generated after rustdocs to check the relative links
