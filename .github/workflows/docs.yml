@@ -37,13 +37,13 @@ jobs:
       - name:                 Generate cargo doc
         run:                  |
           cd rust
-          echo "_____Generating rustdocs to the book/src dir so it's published to check the links_____"
+          echo "_____Generating rustdocs to ./docs/book/src dir so it's published from ./rustdocs/"
+          echo "_____And to check the relative links to the rustdoc while mdbook build_____"
           cargo doc --all-features --verbose --no-deps
           mv ./target/doc/ ../docs/src/rustdocs/
 
       # user-docs
       # they are generated after rustdocs to check the relative links
-      # docs source dir ./docs/book/html/
       - name:                 Setup mdBook
         uses:                 peaceiris/actions-mdbook@v1.1.14
         with:
@@ -60,30 +60,21 @@ jobs:
           crate:              mdbook-mermaid
 
       - name:                 Build user-docs
+        # docs source dir ./docs/book/html/
         run:                  |
           mdbook build docs
+          echo "_____Hosting user-docs from root and rustdocs from ./rustdocs/_____"
+          echo "_____gh-pages branch would be the size of_____"
+          du -sh ./docs/book/html/
+          du -sh ./docs/book/html/*
 
       # deploy
-      - name:                 Cleanup before pushing
-        # executed only on master so PRs can use cache
-        # if:                   ${{ github.ref == 'refs/heads/master' }}
-        run:                  |
-          echo "_____Hosting user-docs from root and rustdocs from ./rustdocs/_____"
-          mv ./docs/book/html ./public
-          echo "_____ls ./"
-          ls ./
-          echo "_____du -sh ./*"
-          du -sh ./*
-          echo "_____du -sh ./docs/book/html/*"
-          du -sh ./public/* || exit 0
-          echo "_____du -sh ./docs/book/html/rustdocs/*"
-          du -sh ./public/rustdocs/* || exit 0
-
       - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
         # published only from master
-        # if:                   ${{ github.ref == 'refs/heads/master' }}
+        if:                   ${{ github.ref == 'refs/heads/master' }}
         with:
           github_token:       ${{ github.token }}
           force_orphan:       true
-          publish_dir:        ./public
+          # this is the only dir that's pushed to gh-pages branch
+          publish_dir:        ./docs/book/html
