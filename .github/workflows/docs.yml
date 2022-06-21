@@ -38,7 +38,7 @@ jobs:
         run:                  |
           cd rust
           echo "_____Generating rustdocs to the book/src dir so it's published to check the links_____"
-          cargo doc --all-features --verbose
+          cargo doc --all-features --verbose --no-deps
           mv ./target/doc/ ../docs/src/rustdocs/
 
       # user-docs
