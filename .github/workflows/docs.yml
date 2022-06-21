@@ -73,13 +73,13 @@ jobs:
           mv -v ./docs/book/ /tmp/book/
           rm -vrf *
           echo "_____Hosting user-docs from root and rustdocs from ./rustdocs/_____"
-          mv -v /tmp/book/* ./
+          mv -v /tmp/book/html/* ./
           echo "_____ls ./"
           ls ./
           echo "_____du -sh ./*"
           du -sh ./*
-          echo "_____du -sh ./src/rustdocs/*"
-          du -sh ./src/rustdocs/* || exit 0
+          echo "_____du -sh ./rustdocs/*"
+          du -sh ./rustdocs/* || exit 0
 
       - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
