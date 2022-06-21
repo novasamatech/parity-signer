@@ -120,7 +120,7 @@ there at lower computational cost for CI pipelines.
 For storage of all data except secrets, a sled database is used. Choice of db
 was based on its lightweightness, reliability, portability.
 
-[Signer database structure](https://paritytech.github.io/parity-signer/rustdocs/db_handling/cold_default/index.html)
+[Signer database structure](../rustdocs/db_handling/cold_default/index.html)
 
 ## Functional structure
 
