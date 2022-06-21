@@ -20,7 +20,6 @@
 
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
-#![deny(missing_docs)]
 
 mod ffi_types;
 
@@ -32,7 +31,11 @@ use std::fmt::Display;
 /// TODO: implement properly or remove completely
 #[derive(Debug)]
 pub enum ErrorDisplayed {
-    Str { s: String },
+    /// String description of error
+    Str {
+        /// Error description
+        s: String,
+    },
 }
 
 impl From<anyhow::Error> for ErrorDisplayed {
