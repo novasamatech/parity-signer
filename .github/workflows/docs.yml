@@ -32,14 +32,14 @@ jobs:
       - name:                 Rust Cache
         uses:                 Swatinem/rust-cache@v1.3.0
         with:
-          # must match with cargo ... --target-dir
-          working-directory:  docs/book/src/rustdocs/
+          working-directory:  rust
 
       - name:                 Generate cargo doc
         run:                  |
           cd rust
           echo "_____Generating rustdocs to the book/src dir so it's published to check the links_____"
-          cargo doc --all-features --verbose --target-dir ../docs/book/src/rustdocs/
+          cargo doc --all-features --verbose
+          mv ./target/doc/ ../docs/book/src/rustdocs/
 
       # user-docs
       # they are generated after rustdocs to check the relative links
@@ -68,8 +68,6 @@ jobs:
         # executed only on master so PRs can use cache
         # if:                   ${{ github.ref == 'refs/heads/master' }}
         run:                  |
-          echo "_____Removing cargo debug info_____"
-          rm -rf ./docs/book/rustdocs/debug
           echo "_____Removing everything but the docs dir_____"
           rm -rf /tmp/book/
           mv -v ./docs/book/ /tmp/book/
@@ -82,8 +80,6 @@ jobs:
           du -sh ./*
           echo "_____du -sh ./src/rustdocs/*"
           du -sh ./src/rustdocs/* || exit 0
-          echo "_____du -sh ./src/rustdocs/doc/*"
-          du -sh ./src/rustdocs/doc/* || exit 0
 
       - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
