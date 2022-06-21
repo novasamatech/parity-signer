@@ -24,7 +24,6 @@ jobs:
           submodules:         recursive
 
       # rustdocs
-      # docs source dir ./rust/target/doc
       - name:                 Install rustdocs dependencies
         run:                  |
           sudo apt update
@@ -38,12 +37,13 @@ jobs:
       - name:                 Generate cargo doc
         run:                  |
           cd rust
-          echo "Generating rustdocs to the user-docs dir so it's possible to check the links"
-          cargo doc --all-features --verbose --target-dir ../docs/book/html/rustdocs/
+          echo "_____Generating rustdocs to ./docs/book/src dir so it's published from ./rustdocs/"
+          echo "_____And to check the relative links to the rustdoc while mdbook build_____"
+          cargo doc --all-features --verbose --no-deps
+          mv ./target/doc/ ../docs/src/rustdocs/
 
       # user-docs
       # they are generated after rustdocs to check the relative links
-      # docs source dir ./docs/book/html/
       - name:                 Setup mdBook
         uses:                 peaceiris/actions-mdbook@v1.1.14
         with:
@@ -60,21 +60,15 @@ jobs:
           crate:              mdbook-mermaid
 
       - name:                 Build user-docs
+        # docs source dir ./docs/book/html/
         run:                  |
           mdbook build docs
+          echo "_____Hosting user-docs from root and rustdocs from ./rustdocs/_____"
+          echo "_____gh-pages branch would be the size of_____"
+          du -sh ./docs/book/html/
+          du -sh ./docs/book/html/*
 
       # deploy
-      - name:                 Cleanup before pushing
-        # executed only on master so PRs can use cache
-        if:                   ${{ github.ref == 'refs/heads/master' }}
-        run:                  |
-          echo "Removing everything but the docs dir"
-          rm -rf /tmp/html/
-          mv -v ./docs/book/html/ /tmp/html/
-          rm -vrf *
-          echo "Hosting user-docs from root and rustdocs from ./rustdocs/"
-          mv -v /tmp/html/* ./
-
       - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
         # published only from master
@@ -82,4 +76,5 @@ jobs:
         with:
           github_token:       ${{ github.token }}
           force_orphan:       true
-          publish_dir:        ./
+          # this is the only dir that's pushed to gh-pages branch
+          publish_dir:        ./docs/book/html
