@@ -5,7 +5,7 @@ use definitions::{
     network_specs::{Verifier, VerifierValue},
 };
 use parser::decoding_commons::get_compact;
-use sp_core::{ecdsa, ed25519, sr25519, Pair, H256};
+use sp_core::{ecdsa, ed25519, sr25519, Pair};
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 
@@ -26,10 +26,9 @@ pub fn pass_crypto(
             // Ed25519 crypto was used by the verifier
             let (pubkey, data) = match data.get(3..35) {
                 Some(a) => {
-                    let into_pubkey = H256::from(
-                        TryInto::<[u8; 32]>::try_into(a).expect("fixed size should fit in array"),
-                    );
-                    (ed25519::Public::from_h256(into_pubkey), &data[35..])
+                    let into_pubkey: [u8; 32] =
+                        a.try_into().expect("fixed size should fit in array");
+                    (ed25519::Public::from_raw(into_pubkey), &data[35..])
                 }
                 None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
             };
