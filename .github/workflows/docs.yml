@@ -69,19 +69,23 @@ jobs:
         # if:                   ${{ github.ref == 'refs/heads/master' }}
         run:                  |
           echo "_____Removing everything but the docs dir_____"
-          rm -rf /tmp/html/
-          mv -v ./docs/book/html/ /tmp/html/
+          rm -rf /tmp/book/
+          mv -v ./docs/book/ /tmp/book/
           rm -vrf *
           echo "_____Hosting user-docs from root and rustdocs from ./rustdocs/_____"
-          mv -v /tmp/html/* ./
+          mv -v /tmp/book/* ./
           echo "_____ls ./"
           ls ./
-          echo "_____ls ./rustdocs"
-          ls ./rustdocs
-          echo "_____du -sh ./rustdocs/*"
-          du -sh ./rustdocs/*
           echo "_____du -sh ./*"
           du -sh ./*
+          echo "_____ls ./rustdocs"
+          ls ./rustdocs || exit 0
+          echo "_____find . -name "rustdocs"
+          find . -name "rustdocs" || exit 0
+          echo "_____find . -name "rustdocs" -exec "ls" {} \;"
+          find . -name "rustdocs" -exec "ls" {} \; || exit 0
+          echo "_____du -sh ./rustdocs/*"
+          du -sh ./rustdocs/* || exit 0
 
       - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
