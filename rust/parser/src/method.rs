@@ -147,7 +147,10 @@ impl_find_method!(RuntimeMetadataV12, RuntimeMetadataV13);
 /// Function to find method for current call for metadata in v12 or v13
 /// Outputs NextDecode value.
 
-pub(crate) fn what_next_old(data: &mut Vec<u8>, meta: &OlderMeta) -> Result<MethodOld, ParserError> {
+pub(crate) fn what_next_old(
+    data: &mut Vec<u8>,
+    meta: &OlderMeta,
+) -> Result<MethodOld, ParserError> {
     if data.len() < 2 {
         return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
     }

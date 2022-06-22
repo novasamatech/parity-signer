@@ -84,9 +84,7 @@ where
     if compact_flag {
         let compact_found = get_compact::<T>(data)?;
         let out = vec![OutputCard {
-            card: ParserCard::Default(
-                compact_found.compact_found.deconstruct().into().to_string(),
-            ),
+            card: ParserCard::Default(compact_found.compact_found.deconstruct().into().to_string()),
             indent,
         }];
         *data = match compact_found.start_next_unit {
@@ -109,11 +107,9 @@ where
                 *data = data[length..].to_vec();
                 Ok(out)
             }
-            Err(_) => {
-                Err(ParserError::Decoding(
-                    ParserDecodingError::PrimitiveFailure(found_ty.to_string()),
-                ))
-            }
+            Err(_) => Err(ParserError::Decoding(
+                ParserDecodingError::PrimitiveFailure(found_ty.to_string()),
+            )),
         }
     }
 }

@@ -92,7 +92,7 @@ pub(crate) fn parse_transaction(
 
             let short_specs = network_specs.short();
             let (method, extensions) =
-        cut_method_extensions(&parser_data).map_err(ErrorSigner::Parser)?;
+                cut_method_extensions(&parser_data).map_err(ErrorSigner::Parser)?;
 
             let meta_set = find_meta_set(&short_specs, database_name)?;
             if meta_set.is_empty() {
@@ -151,10 +151,7 @@ pub(crate) fn parse_transaction(
                                 found_solution = match cards_prep {
                                     CardsPrep::SignProceed(address_details, possible_warning) => {
                                         let sign = TrDbColdSign::generate(
-                                            SignContent::Transaction {
-                                                method,
-                                                extensions,
-                                            },
+                                            SignContent::Transaction { method, extensions },
                                             &network_specs.name,
                                             &address_details.path,
                                             address_details.has_pwd,
@@ -371,12 +368,7 @@ pub(crate) fn decode_signable_from_history(
         let used_version = x.version();
         let metadata_bundle = bundle_from_meta_set_element(x, database_name)?;
 
-        match parse_extensions(
-            &mut extensions_data,
-            &metadata_bundle,
-            &short_specs,
-            None,
-        ) {
+        match parse_extensions(&mut extensions_data, &metadata_bundle, &short_specs, None) {
             Ok(extensions_cards) => {
                 match parse_method(&mut method_data, &metadata_bundle, &short_specs) {
                     Ok(a) => {

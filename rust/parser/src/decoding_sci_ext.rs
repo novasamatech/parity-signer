@@ -195,12 +195,10 @@ pub(crate) fn special_case_era(
     match Era::decode(&mut &era_data[..]) {
         Ok(a) => {
             found_ext.era = Some(a);
-            Ok(
-                vec![OutputCard {
-                    card: ParserCard::Era(a),
-                    indent,
-                }]
-            )
+            Ok(vec![OutputCard {
+                card: ParserCard::Era(a),
+                indent,
+            }])
         }
         Err(_) => Err(ParserError::Decoding(ParserDecodingError::Era)),
     }

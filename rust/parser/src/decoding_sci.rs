@@ -271,7 +271,11 @@ fn decode_str(data: &mut Vec<u8>, indent: u32) -> Result<Vec<OutputCard>, Parser
 /// - indent used for creating properly formatted output cards.
 ///
 /// The function outputs the DecodedOut value in case of success.
-fn decode_big256(data: &mut Vec<u8>, signed: bool, indent: u32) -> Result<Vec<OutputCard>, ParserError> {
+fn decode_big256(
+    data: &mut Vec<u8>,
+    signed: bool,
+    indent: u32,
+) -> Result<Vec<OutputCard>, ParserError> {
     match data.get(0..32) {
         Some(slice_to_big256) => {
             let out = {
@@ -284,7 +288,6 @@ fn decode_big256(data: &mut Vec<u8>, signed: bool, indent: u32) -> Result<Vec<Ou
                         indent,
                     }]
                 }
-
                 // U256
                 else {
                     vec![OutputCard {
@@ -607,7 +610,7 @@ fn decode_type_def_sequence(
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<Vec<OutputCard>, ParserError> {
-    let pre_vector = get_compact::<u32>(&data)?;
+    let pre_vector = get_compact::<u32>(data)?;
     let mut out: Vec<OutputCard> = Vec::new();
     let elements_of_vector = pre_vector.compact_found;
     match pre_vector.start_next_unit {
@@ -635,12 +638,10 @@ fn decode_type_def_sequence(
                 Err(ParserError::Decoding(ParserDecodingError::DataTooShort))
             } else {
                 *data = Vec::new();
-                Ok(
-                    vec![OutputCard {
-                        card: ParserCard::Default(String::new()),
-                        indent,
-                    }]
-                )
+                Ok(vec![OutputCard {
+                    card: ParserCard::Default(String::new()),
+                    indent,
+                }])
             }
         }
     }
@@ -1020,7 +1021,7 @@ fn decode_type_def_bit_sequence(
     meta_v14: &RuntimeMetadataV14,
     indent: u32,
 ) -> Result<Vec<OutputCard>, ParserError> {
-    let pre_bitvec = get_compact::<u32>(&data)?;
+    let pre_bitvec = get_compact::<u32>(data)?;
     let actual_length = match pre_bitvec.compact_found % 8 {
         0 => (pre_bitvec.compact_found / 8),
         _ => (pre_bitvec.compact_found / 8) + 1,
@@ -1099,12 +1100,10 @@ fn decode_type_def_bit_sequence(
                 return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
             }
             *data = Vec::new();
-            Ok(
-                vec![OutputCard {
-                    card: ParserCard::Default(String::new()),
-                    indent,
-                }]
-            )
+            Ok(vec![OutputCard {
+                card: ParserCard::Default(String::new()),
+                indent,
+            }])
         }
     }
 }

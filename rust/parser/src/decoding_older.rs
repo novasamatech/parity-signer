@@ -196,7 +196,7 @@ fn decode_complex(
             process_as_call(data, meta, type_database, indent, short_specs)
         }
         "Vec<<T as Config>::Call>" => {
-            let pre_vector = get_compact::<u32>(&data)?;
+            let pre_vector = get_compact::<u32>(data)?;
             let number_of_calls = pre_vector.compact_found;
             let mut out: Vec<OutputCard> = Vec::new();
             match pre_vector.start_next_unit {
@@ -355,16 +355,22 @@ fn deal_with_option(
             }
         };
         *data = {
-            if data.len() > 1 {data[1..].to_vec()}
-            else {Vec::new()}
+            if data.len() > 1 {
+                data[1..].to_vec()
+            } else {
+                Vec::new()
+            }
         };
         Ok(out)
     } else {
         match &data[0] {
             0 => {
                 *data = {
-                    if data.len() > 1 {data[1..].to_vec()}
-                    else {Vec::new()}
+                    if data.len() > 1 {
+                        data[1..].to_vec()
+                    } else {
+                        Vec::new()
+                    }
                 };
                 let out = vec![OutputCard {
                     card: ParserCard::None,
@@ -415,14 +421,15 @@ fn deal_with_vector(
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<Vec<OutputCard>, ParserError> {
-    let pre_vector = get_compact::<u32>(&data)?;
+    let pre_vector = get_compact::<u32>(data)?;
     let mut out: Vec<OutputCard> = Vec::new();
     let elements_of_vector = pre_vector.compact_found;
     match pre_vector.start_next_unit {
         Some(start) => {
             *data = data[start..].to_vec();
             for _i in 0..elements_of_vector {
-                let out_addition = decode_simple(inner_ty, data, type_database, indent, short_specs)?;
+                let out_addition =
+                    decode_simple(inner_ty, data, type_database, indent, short_specs)?;
                 out.extend_from_slice(&out_addition);
             }
             Ok(out)
@@ -432,12 +439,10 @@ fn deal_with_vector(
                 Err(ParserError::Decoding(ParserDecodingError::DataTooShort))
             } else {
                 *data = Vec::new();
-                Ok(
-                    vec![OutputCard {
-                        card: ParserCard::Default(String::new()),
-                        indent,
-                    }]
-                )
+                Ok(vec![OutputCard {
+                    card: ParserCard::Default(String::new()),
+                    indent,
+                }])
             }
         }
     }
@@ -510,8 +515,11 @@ fn special_case_identity_fields(
     };
 
     *data = {
-        if data.len() > 8 {data[8..].to_vec()}
-        else {Vec::new()}
+        if data.len() > 8 {
+            data[8..].to_vec()
+        } else {
+            Vec::new()
+        }
     };
 
     // make correct Bitvec
@@ -562,7 +570,7 @@ fn special_case_identity_fields(
 /// Resulting BitVec is added to fancy_out on js card "bitvec".
 fn special_case_bitvec(data: &mut Vec<u8>, indent: u32) -> Result<Vec<OutputCard>, ParserError> {
     // the data is preluded by compact indicating the number of BitVec elements
-    let pre_bitvec = get_compact::<u32>(&data)?;
+    let pre_bitvec = get_compact::<u32>(data)?;
     let actual_length = match pre_bitvec.compact_found % 8 {
         0 => (pre_bitvec.compact_found / 8),
         _ => (pre_bitvec.compact_found / 8) + 1,
@@ -593,12 +601,10 @@ fn special_case_bitvec(data: &mut Vec<u8>, indent: u32) -> Result<Vec<OutputCard
                 return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
             }
             *data = Vec::new();
-            Ok(
-                vec![OutputCard {
-                    card: ParserCard::Default(String::new()),
-                    indent,
-                }],
-            )
+            Ok(vec![OutputCard {
+                card: ParserCard::Default(String::new()),
+                indent,
+            }])
         }
     }
 }
@@ -715,7 +721,8 @@ fn deal_with_struct(
             },
         };
         out.push(out_addition);
-        let out_addition = decode_simple(&y.field_type, data, type_database, indent + 1, short_specs)?;
+        let out_addition =
+            decode_simple(&y.field_type, data, type_database, indent + 1, short_specs)?;
         out.extend_from_slice(&out_addition);
     }
     Ok(out)
@@ -783,7 +790,8 @@ fn deal_with_enum(
                 },
                 indent,
             }];
-            let out_addition = decode_simple(inner_ty, data, type_database, indent + 1, short_specs)?;
+            let out_addition =
+                decode_simple(inner_ty, data, type_database, indent + 1, short_specs)?;
             out.extend_from_slice(&out_addition);
             Ok(out)
         }
