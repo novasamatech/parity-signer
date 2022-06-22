@@ -212,7 +212,7 @@ is just another network added to the list of networks.
 rustdocs**
 
 Keys could be imported through QR code created by `generate_message` tool
-([instructions](../rustdocs/generate_message/derivations/index.html)). A
+([instructions](../rustdocs/generate_message/index.html#derivations-import)). A
 plaintext newline-separated list of derivations should be supplied to the tool
 along with network identifier; the import thus is bound to certain network,
 however, it is not bound to any particular seed - user can select any of
