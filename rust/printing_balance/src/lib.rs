@@ -140,11 +140,11 @@ const MAG_LOWEST_NEG: u8 = 4;
 ///
 /// Outputs components for [`CutNumber`].
 fn assist(balance: &str, zeroes_after_point_before_value: u8) -> (String, Option<String>, i8) {
-    let mut out = String::new();
-    for _i in 0..zeroes_after_point_before_value {
-        out.push('0');
-    }
-    out.push_str(balance);
+    let out = format!(
+        "{}{}",
+        "0".repeat(zeroes_after_point_before_value as usize),
+        balance
+    );
     (String::from("0"), Some(out), MAG_HIGHEST_POS as i8)
 }
 

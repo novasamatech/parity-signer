@@ -91,10 +91,8 @@ pub(crate) fn parse_transaction(
             };
 
             let short_specs = network_specs.short();
-            let (method_data, extensions_data) = match cut_method_extensions(&parser_data) {
-                Ok(a) => a,
-                Err(_) => return Err(ErrorSigner::Parser(ParserError::SeparateMethodExtensions)),
-            };
+            let (method, extensions) =
+        cut_method_extensions(&parser_data).map_err(ErrorSigner::Parser)?;
 
             let meta_set = find_meta_set(&short_specs, database_name)?;
             if meta_set.is_empty() {
@@ -109,7 +107,7 @@ pub(crate) fn parse_transaction(
                 let used_version = x.version();
                 let metadata_bundle = bundle_from_meta_set_element(x, database_name)?;
                 match parse_extensions(
-                    extensions_data.to_vec(),
+                    &mut extensions.to_vec(),
                     &metadata_bundle,
                     &short_specs,
                     optional_mortal_flag,
@@ -148,14 +146,14 @@ pub(crate) fn parse_transaction(
                                 }
                             };
                         }
-                        match parse_method(method_data.to_vec(), &metadata_bundle, &short_specs) {
+                        match parse_method(&mut method.to_vec(), &metadata_bundle, &short_specs) {
                             Ok(a) => {
                                 found_solution = match cards_prep {
                                     CardsPrep::SignProceed(address_details, possible_warning) => {
                                         let sign = TrDbColdSign::generate(
                                             SignContent::Transaction {
-                                                method: method_data,
-                                                extensions: extensions_data,
+                                                method,
+                                                extensions,
                                             },
                                             &network_specs.name,
                                             &address_details.path,
@@ -361,7 +359,7 @@ pub(crate) fn decode_signable_from_history(
         }));
     }
 
-    let (method_data, extensions_data) =
+    let (mut method_data, mut extensions_data) =
         cut_method_extensions(&parser_data).map_err(ErrorSigner::Parser)?;
 
     let mut found_solution = None;
@@ -374,13 +372,13 @@ pub(crate) fn decode_signable_from_history(
         let metadata_bundle = bundle_from_meta_set_element(x, database_name)?;
 
         match parse_extensions(
-            extensions_data.to_vec(),
+            &mut extensions_data,
             &metadata_bundle,
             &short_specs,
             None,
         ) {
             Ok(extensions_cards) => {
-                match parse_method(method_data, &metadata_bundle, &short_specs) {
+                match parse_method(&mut method_data, &metadata_bundle, &short_specs) {
                     Ok(a) => {
                         let method = into_cards(&a, &mut index);
                         let extensions = into_cards(&extensions_cards, &mut index);

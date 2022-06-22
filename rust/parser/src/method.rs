@@ -18,12 +18,6 @@ pub(crate) struct Argument {
     pub(crate) ty: String,
 }
 
-/// Struct to store current method and remaining data
-pub(crate) struct NextDecodeOld {
-    pub(crate) method: MethodOld,
-    pub(crate) data: Vec<u8>,
-}
-
 /// Enum to transfer around older metadata (V12 and V13)
 pub enum OlderMeta<'a> {
     V12(&'a RuntimeMetadataV12),
@@ -153,22 +147,19 @@ impl_find_method!(RuntimeMetadataV12, RuntimeMetadataV13);
 /// Function to find method for current call for metadata in v12 or v13
 /// Outputs NextDecode value.
 
-pub(crate) fn what_next_old(data: Vec<u8>, meta: &OlderMeta) -> Result<NextDecodeOld, ParserError> {
+pub(crate) fn what_next_old(data: &mut Vec<u8>, meta: &OlderMeta) -> Result<MethodOld, ParserError> {
     if data.len() < 2 {
         return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
     }
     let pallet_index = data[0];
     let method_index = data[1];
-    let method = match meta {
+    *data = data[2..].to_vec();
+    match meta {
         OlderMeta::V12(meta_v12) => {
-            <RuntimeMetadataV12>::find_method(meta_v12, pallet_index, method_index)?
+            <RuntimeMetadataV12>::find_method(meta_v12, pallet_index, method_index)
         }
         OlderMeta::V13(meta_v13) => {
-            <RuntimeMetadataV13>::find_method(meta_v13, pallet_index, method_index)?
+            <RuntimeMetadataV13>::find_method(meta_v13, pallet_index, method_index)
         }
-    };
-    Ok(NextDecodeOld {
-        method,
-        data: data[2..].to_vec(),
-    })
+    }
 }

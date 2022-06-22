@@ -1,3 +1,21 @@
+//! This crate is a transaction parser used by
+//! [Signer](https://github.com/paritytech/parity-signer).
+//!
+//! Signer allows to sign only the transactions that were successfully parsed
+//! and were approved by user after checking the transaction contents.
+//!
+//! Transactions are read by the Signer as QR codes having following structure:
+//!
+//! <table>
+//!     <tr>
+//!         <td>prelude</td>
+//!         <td>public key</td>
+//!         <td>SCALE-encoded call data</td>
+//!         <td>SCALE-encoded extensions</td>
+//!         <td>network genesis hash</td>
+//!     </tr>
+//! </table>
+
 #![deny(unused_crate_dependencies)]
 
 use frame_metadata::v14::RuntimeMetadataV14;
@@ -42,12 +60,12 @@ mod tests;
 /// network metadata and network specs.
 ///
 pub fn parse_method(
-    method_data: Vec<u8>,
+    method_data: &mut Vec<u8>,
     metadata_bundle: &MetadataBundle,
     short_specs: &ShortSpecs,
 ) -> Result<Vec<OutputCard>, ParserError> {
     let start_indent = 0;
-    let method_decoded = match metadata_bundle {
+    let out = match metadata_bundle {
         MetadataBundle::Older {
             older_meta,
             types,
@@ -58,12 +76,12 @@ pub fn parse_method(
             network_version: _,
         } => decoding_sci_entry_point(method_data, meta_v14, start_indent, short_specs)?,
     };
-    if !method_decoded.remaining_vector.is_empty() {
+    if !method_data.is_empty() {
         return Err(ParserError::Decoding(
             ParserDecodingError::SomeDataNotUsedMethod,
         ));
     }
-    Ok(method_decoded.fancy_out)
+    Ok(out)
 }
 
 /// Struct to decode pre-determined extensions for transactions with V12 and V13 metadata
@@ -81,7 +99,7 @@ struct ExtValues {
 }
 
 pub fn parse_extensions(
-    extensions_data: Vec<u8>,
+    extensions_data: &mut Vec<u8>,
     metadata_bundle: &MetadataBundle,
     short_specs: &ShortSpecs,
     optional_mortal_flag: Option<bool>,
@@ -150,7 +168,7 @@ pub fn parse_extensions(
         } => {
             let mut ext = Ext::init();
             let extensions_decoded =
-                decode_ext_attempt(&extensions_data, &mut ext, meta_v14, indent, short_specs)?;
+                decode_ext_attempt(extensions_data, &mut ext, meta_v14, indent, short_specs)?;
             if let Some(genesis_hash) = ext.found_ext.genesis_hash {
                 if genesis_hash != short_specs.genesis_hash {
                     return Err(ParserError::Decoding(
@@ -189,12 +207,12 @@ pub fn parse_extensions(
                     ))
                 }
             }
-            if !extensions_decoded.remaining_vector.is_empty() {
+            if !extensions_data.is_empty() {
                 return Err(ParserError::Decoding(
                     ParserDecodingError::SomeDataNotUsedExtensions,
                 ));
             }
-            (era, block_hash, extensions_decoded.fancy_out)
+            (era, block_hash, extensions_decoded)
         }
     };
     if let Era::Immortal = era {
@@ -252,17 +270,17 @@ pub fn parse_set(
     ParserError,
 > {
     // if unable to separate method date and extensions, then some fundamental flaw is in transaction itself
-    let (method_data, extensions_data) = cut_method_extensions(data)?;
+    let (mut method_data, mut extensions_data) = cut_method_extensions(data)?;
 
     // try parsing extensions, if is works, the version and extensions are correct
     let extensions_cards = parse_extensions(
-        extensions_data.to_vec(),
+        &mut extensions_data,
         metadata_bundle,
         short_specs,
         optional_mortal_flag,
     )?;
     // try parsing method
-    let method_cards_result = parse_method(method_data.to_vec(), metadata_bundle, short_specs);
+    let method_cards_result = parse_method(&mut method_data, metadata_bundle, short_specs);
     Ok((
         method_cards_result,
         extensions_cards,

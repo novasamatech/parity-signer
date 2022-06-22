@@ -1,3 +1,7 @@
+//! Decoding transactions made with metadata [`RuntimeMetadataV14`]
+//!
+//! Metadata [`RuntimeMetadataV14`] contains types description inside, that gets
+//! used for the decoding.
 use bitvec::{
     order::BitOrder,
     prelude::{BitVec, Lsb0, Msb0},
@@ -19,7 +23,7 @@ use definitions::{
 use crate::cards::ParserCard;
 use crate::decoding_commons::{
     decode_known_length, decode_primitive_with_flags, get_compact, special_case_account_id,
-    DecodedOut, OutputCard,
+    OutputCard,
 };
 use crate::decoding_sci_ext::{special_case_era, special_case_hash, Ext, Hash, SpecialExt};
 
@@ -61,10 +65,10 @@ fn decode_type_def_primitive(
     possible_ext: &mut Option<&mut Ext>,
     compact_flag: bool,
     balance_flag: bool,
-    data: &[u8],
+    data: &mut Vec<u8>,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<Vec<OutputCard>, ParserError> {
     match found_ty {
         TypeDefPrimitive::Bool => {
             reject_flags(compact_flag, balance_flag)?;
@@ -179,20 +183,17 @@ fn reject_flags(compact_flag: bool, balance_flag: bool) -> Result<(), ParserErro
 /// - indent used for creating properly formatted output cards.
 ///
 /// The function outputs the DecodedOut value in case of success.
-fn decode_char(data: &[u8], indent: u32) -> Result<DecodedOut, ParserError> {
+fn decode_char(data: &mut Vec<u8>, indent: u32) -> Result<Vec<OutputCard>, ParserError> {
     match data.get(0..4) {
         Some(mut slice_to_char) => match <u32>::decode(&mut slice_to_char) {
             Ok(a) => match char::from_u32(a) {
                 Some(b) => {
-                    let fancy_out = vec![OutputCard {
+                    let out = vec![OutputCard {
                         card: ParserCard::Default(b.to_string()),
                         indent,
                     }];
-                    let remaining_vector = (data[4..]).to_vec();
-                    Ok(DecodedOut {
-                        remaining_vector,
-                        fancy_out,
-                    })
+                    *data = data[4..].to_vec();
+                    Ok(out)
                 }
                 None => Err(ParserError::Decoding(
                     ParserDecodingError::PrimitiveFailure("char".to_string()),
@@ -218,7 +219,7 @@ fn decode_char(data: &[u8], indent: u32) -> Result<DecodedOut, ParserError> {
 /// - indent used for creating properly formatted output cards.
 ///
 /// The function outputs the DecodedOut value in case of success.
-fn decode_str(data: &[u8], indent: u32) -> Result<DecodedOut, ParserError> {
+fn decode_str(data: &mut Vec<u8>, indent: u32) -> Result<Vec<OutputCard>, ParserError> {
     let pre_str = get_compact::<u32>(data)?;
     let str_length = pre_str.compact_found as usize;
     match pre_str.start_next_unit {
@@ -232,15 +233,12 @@ fn decode_str(data: &[u8], indent: u32) -> Result<DecodedOut, ParserError> {
                         ))
                     }
                 };
-                let fancy_out = vec![OutputCard {
+                let out = vec![OutputCard {
                     card: ParserCard::Text(text),
                     indent,
                 }];
-                let remaining_vector = data[start + str_length..].to_vec();
-                Ok(DecodedOut {
-                    remaining_vector,
-                    fancy_out,
-                })
+                *data = data[start + str_length..].to_vec();
+                Ok(out)
             }
             None => Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
         },
@@ -248,15 +246,12 @@ fn decode_str(data: &[u8], indent: u32) -> Result<DecodedOut, ParserError> {
             if str_length != 0 {
                 Err(ParserError::Decoding(ParserDecodingError::DataTooShort))
             } else {
-                let fancy_out = vec![OutputCard {
+                let out = vec![OutputCard {
                     card: ParserCard::Text(String::new()),
                     indent,
                 }];
-                let remaining_vector = Vec::new();
-                Ok(DecodedOut {
-                    remaining_vector,
-                    fancy_out,
-                })
+                *data = Vec::new();
+                Ok(out)
             }
         }
     }
@@ -276,10 +271,11 @@ fn decode_str(data: &[u8], indent: u32) -> Result<DecodedOut, ParserError> {
 /// - indent used for creating properly formatted output cards.
 ///
 /// The function outputs the DecodedOut value in case of success.
-fn decode_big256(data: &[u8], signed: bool, indent: u32) -> Result<DecodedOut, ParserError> {
+fn decode_big256(data: &mut Vec<u8>, signed: bool, indent: u32) -> Result<Vec<OutputCard>, ParserError> {
     match data.get(0..32) {
         Some(slice_to_big256) => {
-            let fancy_out = {
+            let out = {
+                // I256
                 if signed {
                     vec![OutputCard {
                         card: ParserCard::Default(
@@ -288,7 +284,8 @@ fn decode_big256(data: &[u8], signed: bool, indent: u32) -> Result<DecodedOut, P
                         indent,
                     }]
                 }
-                // I256
+
+                // U256
                 else {
                     vec![OutputCard {
                         card: ParserCard::Default(
@@ -296,13 +293,10 @@ fn decode_big256(data: &[u8], signed: bool, indent: u32) -> Result<DecodedOut, P
                         ),
                         indent,
                     }]
-                } // U256
+                }
             };
-            let remaining_vector = (data[32..]).to_vec();
-            Ok(DecodedOut {
-                remaining_vector,
-                fancy_out,
-            })
+            *data = data[32..].to_vec();
+            Ok(out)
         }
         None => Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     }
@@ -347,11 +341,11 @@ pub(crate) fn decoding_sci_complete(
     compact_flag: bool,
     balance_flag: bool,
     call_expectation: &CallExpectation,
-    data: Vec<u8>,
+    data: &mut Vec<u8>,
     meta_v14: &RuntimeMetadataV14,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<Vec<OutputCard>, ParserError> {
     if let Some(ext) = possible_ext {
         ext.check_special(current_type)
     }
@@ -501,7 +495,7 @@ pub(crate) fn decoding_sci_complete(
                     possible_ext,
                     compact_flag,
                     balance_flag,
-                    &data,
+                    data,
                     indent,
                     short_specs,
                 ),
@@ -538,11 +532,11 @@ pub(crate) fn decoding_sci_complete(
 }
 
 pub(crate) fn decoding_sci_entry_point(
-    mut data: Vec<u8>,
+    data: &mut Vec<u8>,
     meta_v14: &RuntimeMetadataV14,
     mut indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<Vec<OutputCard>, ParserError> {
     let pallet_index: u8 = match data.get(0) {
         Some(x) => *x,
         None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
@@ -577,16 +571,16 @@ pub(crate) fn decoding_sci_entry_point(
     };
     let (current_type, _, _) = type_path_docs(meta_v14, type_id)?;
 
-    let mut fancy_out = vec![OutputCard {
+    let mut out = vec![OutputCard {
         card: ParserCard::Pallet(pallet_name),
         indent,
     }];
     indent += 1;
-    data = data[1..].to_vec();
+    *data = data[1..].to_vec();
 
     let compact_flag = false;
     let balance_flag = false;
-    let decoded_out = decoding_sci_complete(
+    let out_addition = decoding_sci_complete(
         &current_type,
         &mut None,
         compact_flag,
@@ -597,12 +591,9 @@ pub(crate) fn decoding_sci_entry_point(
         indent,
         short_specs,
     )?;
-    fancy_out.extend_from_slice(&decoded_out.fancy_out);
+    out.extend_from_slice(&out_addition);
 
-    Ok(DecodedOut {
-        remaining_vector: decoded_out.remaining_vector,
-        fancy_out,
-    })
+    Ok(out)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -611,20 +602,20 @@ fn decode_type_def_sequence(
     possible_ext: &mut Option<&mut Ext>,
     balance_flag: bool,
     call_expectation: &CallExpectation,
-    mut data: Vec<u8>,
+    data: &mut Vec<u8>,
     meta_v14: &RuntimeMetadataV14,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<Vec<OutputCard>, ParserError> {
     let pre_vector = get_compact::<u32>(&data)?;
-    let mut fancy_output_prep: Vec<OutputCard> = Vec::new();
+    let mut out: Vec<OutputCard> = Vec::new();
     let elements_of_vector = pre_vector.compact_found;
     match pre_vector.start_next_unit {
         Some(start) => {
-            data = data[start..].to_vec();
+            *data = data[start..].to_vec();
             for _i in 0..elements_of_vector {
                 let compact_flag = false;
-                let after_run = decoding_sci_complete(
+                let out_addition = decoding_sci_complete(
                     inner_type,
                     possible_ext,
                     compact_flag,
@@ -635,25 +626,21 @@ fn decode_type_def_sequence(
                     indent,
                     short_specs,
                 )?;
-                fancy_output_prep.extend_from_slice(&after_run.fancy_out);
-                data = after_run.remaining_vector;
+                out.extend_from_slice(&out_addition);
             }
-            Ok(DecodedOut {
-                remaining_vector: data,
-                fancy_out: fancy_output_prep,
-            })
+            Ok(out)
         }
         None => {
             if elements_of_vector != 0 {
                 Err(ParserError::Decoding(ParserDecodingError::DataTooShort))
             } else {
-                Ok(DecodedOut {
-                    remaining_vector: Vec::new(),
-                    fancy_out: vec![OutputCard {
+                *data = Vec::new();
+                Ok(
+                    vec![OutputCard {
                         card: ParserCard::Default(String::new()),
                         indent,
-                    }],
-                })
+                    }]
+                )
             }
         }
     }
@@ -665,15 +652,15 @@ fn decode_type_def_array(
     len: u32,
     possible_ext: &mut Option<&mut Ext>,
     balance_flag: bool,
-    mut data: Vec<u8>,
+    data: &mut Vec<u8>,
     meta_v14: &RuntimeMetadataV14,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
-    let mut fancy_out: Vec<OutputCard> = Vec::new();
+) -> Result<Vec<OutputCard>, ParserError> {
+    let mut out: Vec<OutputCard> = Vec::new();
     for _i in 0..len {
         let compact_flag = false;
-        let after_run = decoding_sci_complete(
+        let out_addition = decoding_sci_complete(
             inner_type,
             possible_ext,
             compact_flag,
@@ -684,28 +671,24 @@ fn decode_type_def_array(
             indent,
             short_specs,
         )?;
-        fancy_out.extend_from_slice(&after_run.fancy_out);
-        data = after_run.remaining_vector;
+        out.extend_from_slice(&out_addition);
     }
-    Ok(DecodedOut {
-        remaining_vector: data,
-        fancy_out,
-    })
+    Ok(out)
 }
 
 fn decode_type_def_tuple(
     id_set: Vec<u32>,
     possible_ext: &mut Option<&mut Ext>,
     balance_flag: bool,
-    mut data: Vec<u8>,
+    data: &mut Vec<u8>,
     meta_v14: &RuntimeMetadataV14,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
-    let mut fancy_out: Vec<OutputCard> = Vec::new();
+) -> Result<Vec<OutputCard>, ParserError> {
+    let mut out: Vec<OutputCard> = Vec::new();
     for (i, type_id) in id_set.iter().enumerate() {
         let (inner_type, path, docs) = type_path_docs(meta_v14, *type_id)?;
-        fancy_out.push(OutputCard {
+        out.push(OutputCard {
             card: ParserCard::FieldNumber {
                 number: i + 1,
                 docs_field_number: String::new(),
@@ -715,7 +698,7 @@ fn decode_type_def_tuple(
             indent,
         });
         let compact_flag = false;
-        let after_run = decoding_sci_complete(
+        let out_addition = decoding_sci_complete(
             &inner_type,
             possible_ext,
             compact_flag,
@@ -726,13 +709,9 @@ fn decode_type_def_tuple(
             indent,
             short_specs,
         )?;
-        fancy_out.extend_from_slice(&after_run.fancy_out);
-        data = after_run.remaining_vector;
+        out.extend_from_slice(&out_addition);
     }
-    Ok(DecodedOut {
-        remaining_vector: data,
-        fancy_out,
-    })
+    Ok(out)
 }
 
 struct IsOptionBool {
@@ -785,11 +764,11 @@ fn decode_type_def_variant(
     found_ty: &TypeDefVariant<PortableForm>,
     possible_ext: &mut Option<&mut Ext>,
     call_expectation: &CallExpectation,
-    mut data: Vec<u8>,
+    data: &mut Vec<u8>,
     meta_v14: &RuntimeMetadataV14,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<Vec<OutputCard>, ParserError> {
     let enum_index = match data.get(0) {
         Some(x) => *x,
         None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
@@ -798,7 +777,7 @@ fn decode_type_def_variant(
     let check = is_option_bool(found_ty, meta_v14);
     if check.is_option {
         if check.is_bool {
-            let fancy_out = match enum_index {
+            let out = match enum_index {
                 0 => vec![OutputCard {
                     card: ParserCard::None,
                     indent,
@@ -817,29 +796,23 @@ fn decode_type_def_variant(
                     ))
                 }
             };
-            let remaining_vector = data[1..].to_vec();
-            Ok(DecodedOut {
-                remaining_vector,
-                fancy_out,
-            })
+            *data = data[1..].to_vec();
+            Ok(out)
         } else {
             match enum_index {
                 0 => {
-                    let fancy_out = vec![OutputCard {
+                    let out = vec![OutputCard {
                         card: ParserCard::None,
                         indent,
                     }];
-                    let remaining_vector = data[1..].to_vec();
-                    Ok(DecodedOut {
-                        remaining_vector,
-                        fancy_out,
-                    })
+                    *data = data[1..].to_vec();
+                    Ok(out)
                 }
                 1 => {
                     if data.len() == 1 {
                         return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
                     }
-                    data = data[1..].to_vec();
+                    *data = data[1..].to_vec();
                     let found_variant = &found_ty.variants()[1];
                     let compact_flag = false;
                     let balance_flag = false;
@@ -883,7 +856,7 @@ fn decode_type_def_variant(
             }
             variant_docs.push_str(x);
         }
-        let mut fancy_out = match call_expectation {
+        let mut out = match call_expectation {
             CallExpectation::None => vec![OutputCard {
                 card: ParserCard::EnumVariantName {
                     name: found_variant.name().to_string(),
@@ -903,11 +876,11 @@ fn decode_type_def_variant(
                 indent,
             }],
         };
-        data = data[1..].to_vec();
+        *data = data[1..].to_vec();
 
         let compact_flag = false;
         let balance_flag = false;
-        let fields_processed = process_fields(
+        let out_addition = process_fields(
             found_variant.fields(),
             possible_ext,
             call_expectation,
@@ -918,13 +891,9 @@ fn decode_type_def_variant(
             indent + 1,
             short_specs,
         )?;
-        fancy_out.extend_from_slice(&fields_processed.fancy_out);
-        data = fields_processed.remaining_vector;
+        out.extend_from_slice(&out_addition);
 
-        Ok(DecodedOut {
-            remaining_vector: data,
-            fancy_out,
-        })
+        Ok(out)
     }
 }
 
@@ -935,14 +904,14 @@ fn process_fields(
     call_expectation: &CallExpectation,
     compact_flag: bool,
     mut balance_flag: bool,
-    mut data: Vec<u8>,
+    data: &mut Vec<u8>,
     meta_v14: &RuntimeMetadataV14,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<Vec<OutputCard>, ParserError> {
     let mut indent_skipped = false;
     let mut field_is_str = false;
-    let mut fancy_out: Vec<OutputCard> = Vec::new();
+    let mut out: Vec<OutputCard> = Vec::new();
     for (i, x) in fields.iter().enumerate() {
         let mut field_docs = String::new();
         for (j, y) in x.docs().iter().enumerate() {
@@ -954,7 +923,7 @@ fn process_fields(
         let (inner_type, path_type, docs_type) = type_path_docs(meta_v14, x.ty().id())?;
         match x.name() {
             Some(field_name) => {
-                fancy_out.push(OutputCard {
+                out.push(OutputCard {
                     card: ParserCard::FieldName {
                         name: field_name.to_string(),
                         docs_field_name: field_docs,
@@ -969,7 +938,7 @@ fn process_fields(
             }
             None => {
                 if fields.len() > 1 {
-                    fancy_out.push(OutputCard {
+                    out.push(OutputCard {
                         card: ParserCard::FieldNumber {
                             number: i,
                             docs_field_number: field_docs,
@@ -994,9 +963,9 @@ fn process_fields(
                 indent + 1
             }
         };
-        let after_run = {
+        let out_addition = {
             if field_is_str {
-                decode_str(&data, indent)?
+                decode_str(data, indent)?
             } else {
                 decoding_sci_complete(
                     &inner_type,
@@ -1011,13 +980,9 @@ fn process_fields(
                 )?
             }
         };
-        fancy_out.extend_from_slice(&after_run.fancy_out);
-        data = after_run.remaining_vector;
+        out.extend_from_slice(&out_addition);
     }
-    Ok(DecodedOut {
-        remaining_vector: data,
-        fancy_out,
-    })
+    Ok(out)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1026,11 +991,11 @@ fn decode_type_def_composite(
     possible_ext: &mut Option<&mut Ext>,
     compact_flag: bool,
     balance_flag: bool,
-    data: Vec<u8>,
+    data: &mut Vec<u8>,
     meta_v14: &RuntimeMetadataV14,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<Vec<OutputCard>, ParserError> {
     if compact_flag && (composite_ty.fields().len() > 1) {
         return Err(ParserError::Decoding(
             ParserDecodingError::UnexpectedCompactInsides,
@@ -1051,10 +1016,10 @@ fn decode_type_def_composite(
 
 fn decode_type_def_bit_sequence(
     bit_ty: &TypeDefBitSequence<PortableForm>,
-    data: Vec<u8>,
+    data: &mut Vec<u8>,
     meta_v14: &RuntimeMetadataV14,
     indent: u32,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<Vec<OutputCard>, ParserError> {
     let pre_bitvec = get_compact::<u32>(&data)?;
     let actual_length = match pre_bitvec.compact_found % 8 {
         0 => (pre_bitvec.compact_found / 8),
@@ -1122,27 +1087,24 @@ fn decode_type_def_bit_sequence(
                 _ => return Err(ParserError::Decoding(ParserDecodingError::NotBitStoreType)),
             };
 
-            let fancy_out = vec![OutputCard {
+            let out = vec![OutputCard {
                 card: ParserCard::BitVec(card_prep),
                 indent,
             }];
-            let remaining_vector = data[fin..].to_vec();
-            Ok(DecodedOut {
-                remaining_vector,
-                fancy_out,
-            })
+            *data = data[fin..].to_vec();
+            Ok(out)
         }
         None => {
             if actual_length != 0 {
                 return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
             }
-            Ok(DecodedOut {
-                remaining_vector: Vec::new(),
-                fancy_out: vec![OutputCard {
+            *data = Vec::new();
+            Ok(
+                vec![OutputCard {
                     card: ParserCard::Default(String::new()),
                     indent,
-                }],
-            })
+                }]
+            )
         }
     }
 }

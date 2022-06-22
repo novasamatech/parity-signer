@@ -12,15 +12,6 @@ use printing_balance::AsBalance;
 use crate::cards::ParserCard;
 use crate::decoding_sci_ext::{Ext, SpecialExt};
 
-/// Struct to store the decoded data, used for data storage between decoding iterations.
-/// decoded_string is short json-like format,
-/// fancy_out is format used for js output cards (the one really going out at this point)
-/// and remaining vector contains the input data not yet used after the last decoding iteration.
-pub(crate) struct DecodedOut {
-    pub(crate) remaining_vector: Vec<u8>,
-    pub(crate) fancy_out: Vec<OutputCard>,
-}
-
 #[derive(Clone)]
 pub struct OutputCard {
     pub card: ParserCard,
@@ -81,56 +72,50 @@ where
 ///
 /// The function outputs the DecodedOut value in case of success.
 pub(crate) fn decode_perthing<T>(
-    data: &[u8],
+    data: &mut Vec<u8>,
     compact_flag: bool,
     found_ty: &str,
     indent: u32,
-) -> Result<DecodedOut, ParserError>
+) -> Result<Vec<OutputCard>, ParserError>
 where
     T: PerThing + Decode + HasCompact,
     Compact<T>: Decode,
 {
-    let (fancy_out, remaining_vector) = {
-        if compact_flag {
-            let compact_found = get_compact::<T>(data)?;
-            let fancy_out = vec![OutputCard {
-                card: ParserCard::Default(
-                    compact_found.compact_found.deconstruct().into().to_string(),
-                ),
-                indent,
-            }];
-            let remaining_vector = match compact_found.start_next_unit {
-                Some(x) => (data[x..]).to_vec(),
-                None => Vec::new(),
-            };
-            (fancy_out, remaining_vector)
-        } else {
-            let length = size_of::<T>();
-            if data.len() < length {
-                return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+    if compact_flag {
+        let compact_found = get_compact::<T>(data)?;
+        let out = vec![OutputCard {
+            card: ParserCard::Default(
+                compact_found.compact_found.deconstruct().into().to_string(),
+            ),
+            indent,
+        }];
+        *data = match compact_found.start_next_unit {
+            Some(x) => (data[x..]).to_vec(),
+            None => Vec::new(),
+        };
+        Ok(out)
+    } else {
+        let length = size_of::<T>();
+        if data.len() < length {
+            return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+        }
+        let decoded_data = <T>::decode(&mut &data[..length]);
+        match decoded_data {
+            Ok(x) => {
+                let out = vec![OutputCard {
+                    card: ParserCard::Default(x.deconstruct().into().to_string()),
+                    indent,
+                }];
+                *data = data[length..].to_vec();
+                Ok(out)
             }
-            let decoded_data = <T>::decode(&mut &data[..length]);
-            match decoded_data {
-                Ok(x) => {
-                    let fancy_out = vec![OutputCard {
-                        card: ParserCard::Default(x.deconstruct().into().to_string()),
-                        indent,
-                    }];
-                    let remaining_vector = data[length..].to_vec();
-                    (fancy_out, remaining_vector)
-                }
-                Err(_) => {
-                    return Err(ParserError::Decoding(
-                        ParserDecodingError::PrimitiveFailure(found_ty.to_string()),
-                    ))
-                }
+            Err(_) => {
+                Err(ParserError::Decoding(
+                    ParserDecodingError::PrimitiveFailure(found_ty.to_string()),
+                ))
             }
         }
-    };
-    Ok(DecodedOut {
-        remaining_vector,
-        fancy_out,
-    })
+    }
 }
 
 /// Function to decode a displayable type of known length (i.e. length stable with respect to mem::size_of).
@@ -146,10 +131,10 @@ where
 ///
 /// The function outputs the DecodedOut value in case of success.
 pub(crate) fn decode_known_length<T: Decode + std::fmt::Display>(
-    data: &[u8],
+    data: &mut Vec<u8>,
     found_ty: &str,
     indent: u32,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<Vec<OutputCard>, ParserError> {
     let length = size_of::<T>();
     if data.len() < length {
         return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
@@ -157,15 +142,12 @@ pub(crate) fn decode_known_length<T: Decode + std::fmt::Display>(
     let decoded_data = <T>::decode(&mut &data[..length]);
     match decoded_data {
         Ok(x) => {
-            let fancy_out = vec![OutputCard {
+            let out = vec![OutputCard {
                 card: ParserCard::Default(x.to_string()),
                 indent,
             }];
-            let remaining_vector = data[length..].to_vec();
-            Ok(DecodedOut {
-                remaining_vector,
-                fancy_out,
-            })
+            *data = data[length..].to_vec();
+            Ok(out)
         }
         Err(_) => Err(ParserError::Decoding(
             ParserDecodingError::PrimitiveFailure(found_ty.to_string()),
@@ -189,14 +171,14 @@ pub(crate) fn decode_known_length<T: Decode + std::fmt::Display>(
 ///
 /// The function outputs the DecodedOut value in case of success.
 pub(crate) fn decode_primitive_with_flags<T>(
-    data: &[u8],
+    data: &mut Vec<u8>,
     possible_ext: &mut Option<&mut Ext>,
     compact_flag: bool,
     balance_flag: bool,
     found_ty: &str,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError>
+) -> Result<Vec<OutputCard>, ParserError>
 where
     T: Decode + AsBalance + HasCompact + std::fmt::Display,
     Compact<T>: Decode,
@@ -214,7 +196,7 @@ where
     };
     if compact_flag {
         let compact_found = get_compact::<T>(data)?;
-        let fancy_out = {
+        let out = {
             if balance_flag {
                 process_balance::<T>(
                     compact_found.compact_found,
@@ -231,14 +213,11 @@ where
                 )?
             }
         };
-        let remaining_vector = match compact_found.start_next_unit {
+        *data = match compact_found.start_next_unit {
             Some(x) => (data[x..]).to_vec(),
             None => Vec::new(),
         };
-        Ok(DecodedOut {
-            remaining_vector,
-            fancy_out,
-        })
+        Ok(out)
     } else {
         let length = size_of::<T>();
         if data.len() < length {
@@ -247,18 +226,15 @@ where
         let decoded_data = <T>::decode(&mut &data[..length]);
         match decoded_data {
             Ok(x) => {
-                let fancy_out = {
+                let out = {
                     if balance_flag {
                         process_balance::<T>(x, possible_ext, indent, short_specs)?
                     } else {
                         process_number(x.to_string(), possible_ext, indent, short_specs)?
                     }
                 };
-                let remaining_vector = data[length..].to_vec();
-                Ok(DecodedOut {
-                    remaining_vector,
-                    fancy_out,
-                })
+                *data = data[length..].to_vec();
+                Ok(out)
             }
             Err(_) => Err(ParserError::Decoding(
                 ParserDecodingError::PrimitiveFailure(found_ty.to_string()),
@@ -362,26 +338,23 @@ fn process_number(
 ///
 /// Resulting AccountId in base58 form is added to fancy_out on js card "Id".
 pub(crate) fn special_case_account_id(
-    data: Vec<u8>,
+    data: &mut Vec<u8>,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<Vec<OutputCard>, ParserError> {
     match data.get(0..32) {
         Some(a) => {
             let array_decoded: [u8; 32] = a.try_into().expect("constant length, always fits");
-            let remaining_vector = data[32..].to_vec();
+            *data = data[32..].to_vec();
             let account_id = AccountId32::new(array_decoded);
-            let fancy_out = vec![OutputCard {
+            let out = vec![OutputCard {
                 card: ParserCard::Id {
                     id: account_id,
                     base58prefix: short_specs.base58prefix,
                 },
                 indent,
             }];
-            Ok(DecodedOut {
-                remaining_vector,
-                fancy_out,
-            })
+            Ok(out)
         }
         None => Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     }
