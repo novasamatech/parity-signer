@@ -513,7 +513,12 @@ impl State {
                                 }
                             }
                             Modal::Empty => {
-                                new_navstate.modal = Modal::SelectSeed;
+                                if self.seed_names.is_empty() {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&ErrorSigner::NoKnownSeeds));
+                                } else {
+                                    new_navstate.modal = Modal::SelectSeed;
+                                }
                             }
                             _ => println!("GoForward does nothing here"),
                         }
