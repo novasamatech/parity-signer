@@ -1,4 +1,6 @@
 #![deny(unused_crate_dependencies)]
+#![deny(rustdoc::broken_intra_doc_links)]
+
 struct CutNumber {
     before_point: String,
     after_point: Option<String>,

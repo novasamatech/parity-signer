@@ -12,7 +12,10 @@
     - [Recover-Account-Polkadotjs](./tutorials/Recover-Account-Polkadotjs.md)
 
 - [Development](./development/Development.md)
-    - [Building-And-Publishing](./development/Building-And-Publishing.md)
-    - [QA Checking List](./development/QA-Checking-List.md)
+    - [Build](./development/Build.md)
+    - [Signer structure](./development/Signer-Structure.md)
     - [Troubleshooting](./development/Troubleshooting.md)
-    - [Changelog](./about/Changelog.md)
+    - [Rust docs](./development/Rustdocs.md)
+    - [Universal offline signature](./development/UOS.md)
+    - [Signer ecosystem](./development/Ecosystem.md)
+
