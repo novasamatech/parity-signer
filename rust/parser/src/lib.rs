@@ -1,4 +1,5 @@
 #![deny(unused_crate_dependencies)]
+#![deny(rustdoc::broken_intra_doc_links)]
 
 use frame_metadata::v14::RuntimeMetadataV14;
 #[cfg(feature = "test")]

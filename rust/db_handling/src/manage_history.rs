@@ -35,7 +35,7 @@ use crate::helpers::{open_db, open_tree};
 #[cfg(feature = "signer")]
 use crate::{db_transactions::TrDbCold, helpers::make_batch_clear_tree};
 
-/// Print total number of pages, for maximum [`HISTORY_PAGE_SIZE`] number of
+/// Print total number of pages, for maximum [`HISTORY_PAGE_SIZE`](constants::HISTORY_PAGE_SIZE) number of
 /// entries per page.
 #[cfg(feature = "signer")]
 pub fn history_total_pages(database_name: &str) -> Result<u32, ErrorSigner> {
