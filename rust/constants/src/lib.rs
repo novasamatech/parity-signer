@@ -60,6 +60,8 @@
 //! recurring data for integration testing, such as known identicons and known
 //! export QR codes.
 
+#![deny(rustdoc::broken_intra_doc_links)]
+
 #[cfg(feature = "test")]
 pub mod test_values;
 
