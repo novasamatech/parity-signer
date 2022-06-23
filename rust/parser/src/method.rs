@@ -1,3 +1,8 @@
+//! Get method information from metadata [`RuntimeMetadataV12`] or
+//! [`RuntimeMetadataV13`]
+//!
+//!
+
 use frame_metadata::{
     decode_different::DecodeDifferent, v12::RuntimeMetadataV12, v13::RuntimeMetadataV13,
 };

@@ -1,3 +1,5 @@
+//! Decoder elements common for all metadata versions
+//!
 use parity_scale_codec::{Compact, Decode, HasCompact};
 use sp_arithmetic::PerThing;
 use sp_core::crypto::AccountId32;

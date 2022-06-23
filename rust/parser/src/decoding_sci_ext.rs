@@ -1,3 +1,5 @@
+//! Decode extensions using metadata [`RuntimeMetadataV14`]
+//!
 use frame_metadata::v14::RuntimeMetadataV14;
 use parity_scale_codec::Decode;
 use scale_info::{form::PortableForm, Type};

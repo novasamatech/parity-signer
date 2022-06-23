@@ -1,4 +1,4 @@
-//! Decoding transactions made with metadata [`RuntimeMetadataV14`]
+//! Decode call data using metadata [`RuntimeMetadataV14`]
 //!
 //! Metadata [`RuntimeMetadataV14`] contains types description inside, that gets
 //! used for the decoding.

@@ -1,3 +1,5 @@
+//! Errors in standalone parser
+//!
 use definitions::{error::MetadataError, error_signer::ParserError};
 
 pub enum Error {

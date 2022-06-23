@@ -1,3 +1,6 @@
+//! Decode call data using
+//! [`RuntimeMetadataV12`](frame_metadata::v12::RuntimeMetadataV12) or
+//! [`RuntimeMetadataV13`](frame_metadata::v13::RuntimeMetadataV13)
 use bitvec::prelude::{BitVec, Lsb0};
 use lazy_static::lazy_static;
 use regex::Regex;

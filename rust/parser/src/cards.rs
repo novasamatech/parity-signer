@@ -1,3 +1,5 @@
+//! Parsed cards to display decoded call and extensions data
+
 use sp_core::{
     crypto::{AccountId32, Ss58AddressFormat, Ss58Codec},
     H256,

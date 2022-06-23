@@ -23,8 +23,8 @@ sp-core = {git = "https://github.com/paritytech/substrate", default-features = f
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 
 [features]
-default = ["test"]
-test = ["defaults/active"]
+default = ["standalone"]
+standalone = ["defaults/active"]
 
 [lib]
 name = "parser"
