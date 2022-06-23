@@ -191,14 +191,21 @@ impl MetaValues {
         source: IncomingMetadataSourceActiveStr,
     ) -> Result<Self, ErrorActive> {
         let what = match &source {
-            IncomingMetadataSourceActiveStr::Fetch { url } => NotHexActive::FetchedMetadata {
+            IncomingMetadataSourceActiveStr::Fetch {
+                url,
+                optional_block,
+            } => NotHexActive::FetchedMetadata {
                 url: url.to_string(),
+                optional_block: *optional_block,
             },
             IncomingMetadataSourceActiveStr::Default { filename } => {
                 NotHexActive::DefaultMetadata {
                     filename: filename.to_string(),
                 }
             }
+            IncomingMetadataSourceActiveStr::Check { filename } => NotHexActive::CheckedMetadata {
+                filename: filename.to_string(),
+            },
         };
         let meta_vec = unhex::<Active>(meta, what)?;
         match Self::from_slice_metadata(&meta_vec) {
@@ -505,7 +512,7 @@ impl MetaSetElement {
 ///
 /// `ADDRESS_BOOK` tree stores SCALE-encoded [`AddressBookEntry`] entries under
 /// keys [`AddressBookKey`]
-#[derive(Decode, Encode, PartialEq)]
+#[derive(Debug, Decode, Encode, PartialEq)]
 #[cfg(feature = "active")]
 pub struct AddressBookEntry {
     /// Network name, as it appears in `Version` constant in metadata  
@@ -573,6 +580,53 @@ impl AddressBookEntry {
                 },
             ))),
         }
+    }
+}
+
+/// `META_HISTORY` tree entry
+#[derive(Debug, PartialEq)]
+#[cfg(feature = "active")]
+pub struct MetaHistoryEntry {
+    /// network name, from key
+    pub name: String,
+
+    /// network metadata version, from key
+    pub version: u32,
+
+    /// block hash at which the metadata was fetched, from value
+    pub block_hash: H256,
+}
+
+#[cfg(feature = "active")]
+impl MetaHistoryEntry {
+    /// From the whole entry
+    pub fn from_entry((meta_key_vec, hash_encoded): (IVec, IVec)) -> Result<Self, ErrorActive> {
+        let (name, version) = MetaKey::from_ivec(&meta_key_vec).name_version::<Active>()?;
+        Self::from_entry_with_key_parts(&name, version, &hash_encoded)
+    }
+
+    /// From the entry with already known key parts
+    pub fn from_entry_with_key_parts(
+        name: &str,
+        version: u32,
+        hash_encoded: &IVec,
+    ) -> Result<Self, ErrorActive> {
+        let block_hash = match H256::decode(&mut &hash_encoded[..]) {
+            Ok(b) => b,
+            Err(_) => {
+                return Err(ErrorActive::Database(DatabaseActive::EntryDecoding(
+                    EntryDecodingActive::BlockHash {
+                        name: name.to_string(),
+                        version,
+                    },
+                )))
+            }
+        };
+        Ok(MetaHistoryEntry {
+            name: name.to_string(),
+            version,
+            block_hash,
+        })
     }
 }
 

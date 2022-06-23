@@ -26,6 +26,7 @@
 //! with some testing, and is the default one.  
 
 #![deny(unused_crate_dependencies)]
+#![deny(rustdoc::broken_intra_doc_links)]
 
 // possibly TODO: rename all database_name into database_path or whatever,
 // currently it is quite confusing
@@ -77,9 +78,9 @@ use hot_default::reset_hot_database;
 /// - verifier information for default networks, with verifiers set to the
 /// general one
 /// - two latest metadata versions for default networks
-/// - default types information
+/// - default types information and clean danger status
 ///
-/// The trees `ADDRTREE`, `HISTORY`, and `TRANSACTION` are cleared.
+/// The trees `ADDRTREE`, `HISTORY`, and `TRANSACTION` are empty.
 ///
 /// Note that resulting database history is not initialized and general
 /// verifier is not set.
@@ -104,8 +105,10 @@ pub fn default_cold_release(path: Option<PathBuf>) -> Result<(), ErrorActive> {
 /// - address book entries for default networks (Polkadot, Kusama, Westend)
 /// - network specs for default networks
 /// - default types information
-/// - **no** metadata entries; the `METATREE` is cleared - all metadata in the
-/// hot database is received only through rpc calls.
+/// - **no** metadata entries
+/// - **no** metadata block history entries
+///
+/// All metadata-related entries get in the hot database only through rpc calls.
 #[cfg(feature = "active")]
 pub fn default_hot(path: Option<PathBuf>) -> Result<(), ErrorActive> {
     let database_name = match path {

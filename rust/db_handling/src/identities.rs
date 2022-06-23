@@ -1102,13 +1102,13 @@ pub fn check_derivation_set(derivations: &[String]) -> Result<(), ErrorSigner> {
     Ok(())
 }
 
-/// Prepare derivations bulk export content [`ContentDerivations`].
+/// Prepare derivations import content [`ContentDerivations`].
 ///
 /// Function is used on the active side. It inputs information about network in
-/// which the derivations would be created if the export is successful
-/// (genesis hash and `Encryption`), and the plaintext user derivations set.
+/// which the derivations would be created (genesis hash and `Encryption`), and
+/// the plaintext user derivations set.
 ///
-/// Derivations allowed in the export set must be valid and must have no
+/// Derivations allowed in the import set must be valid and must have no
 /// password (i.e. no `///<password>`) part. The derivations source file must
 /// have derivations as a list with each new derivation on the new line.
 ///
@@ -1116,7 +1116,7 @@ pub fn check_derivation_set(derivations: &[String]) -> Result<(), ErrorSigner> {
 /// all invalid derivations are ignored. Function prints found valid
 /// password-free derivations as well.
 #[cfg(feature = "active")]
-pub fn prepare_derivations_export(
+pub fn prepare_derivations_import(
     encryption: &Encryption,
     genesis_hash: &H256,
     content: &str,

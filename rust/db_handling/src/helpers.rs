@@ -278,8 +278,9 @@ pub fn get_general_verifier(database_name: &str) -> Result<Verifier, ErrorSigner
     }
 }
 
-/// Function to try and get types information from the database
-/// Applicable to both Active side and Signer side
+/// Try to get types information from the database.
+///
+/// If no types information is found, result is `Ok(None)`.
 pub fn try_get_types<T: ErrorSource>(
     database_name: &str,
 ) -> Result<Option<Vec<TypeEntry>>, T::Error> {
@@ -420,6 +421,29 @@ pub(crate) fn get_meta_values_by_name(
     Ok(out)
 }
 
+/// Try to get [`MetaValues`], corresponding to given network name and version
+/// from the database.
+///
+/// If no entry is found, the result is `Ok(None)`.
+pub fn try_get_meta_values_by_name_version<T: ErrorSource>(
+    database_name: &str,
+    network_name: &str,
+    network_version: u32,
+) -> Result<Option<MetaValues>, T::Error> {
+    let database = open_db::<T>(database_name)?;
+    let metadata = open_tree::<T>(&database, METATREE)?;
+    let meta_key = MetaKey::from_parts(network_name, network_version);
+    match metadata.get(meta_key.key()) {
+        Ok(Some(meta)) => Ok(Some(MetaValues::from_entry_name_version_checked::<T>(
+            network_name,
+            network_version,
+            meta,
+        )?)),
+        Ok(None) => Ok(None),
+        Err(e) => Err(<T>::db_internal(e)),
+    }
+}
+
 /// Get [`MetaValues`], corresponding to given network name and version, from
 /// the database.
 ///
@@ -430,19 +454,8 @@ pub fn get_meta_values_by_name_version<T: ErrorSource>(
     network_name: &str,
     network_version: u32,
 ) -> Result<MetaValues, T::Error> {
-    let database = open_db::<T>(database_name)?;
-    let metadata = open_tree::<T>(&database, METATREE)?;
-    let meta_key = MetaKey::from_parts(network_name, network_version);
-    match metadata.get(meta_key.key()) {
-        Ok(Some(meta)) => {
-            MetaValues::from_entry_name_version_checked::<T>(network_name, network_version, meta)
-        }
-        Ok(None) => Err(<T>::metadata_not_found(
-            network_name.to_string(),
-            network_version,
-        )),
-        Err(e) => Err(<T>::db_internal(e)),
-    }
+    try_get_meta_values_by_name_version::<T>(database_name, network_name, network_version)?
+        .ok_or_else(|| <T>::metadata_not_found(network_name.to_string(), network_version))
 }
 
 /// Transfer metadata from the hot database into the cold one.

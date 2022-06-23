@@ -24,6 +24,7 @@ use crate::{
         MetadataSource, SpecsKeySource, TransferContent,
     },
     keyring::{AddressBookKey, AddressKey, MetaKey, NetworkSpecsKey},
+    metadata::AddressBookEntry,
 };
 
 /// Enum-marker indicating that error originates on the Active side
@@ -93,11 +94,24 @@ impl ErrorSource for Active {
                 })
             }
             MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
-                IncomingMetadataSourceActiveStr::Fetch { url },
-            )) => ErrorActive::Fetch(Fetch::FaultyMetadata { url, error }),
+                IncomingMetadataSourceActiveStr::Fetch {
+                    url,
+                    optional_block,
+                },
+            )) => ErrorActive::Fetch(Fetch::FaultyMetadata {
+                url,
+                optional_block,
+                error,
+            }),
             MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
                 IncomingMetadataSourceActiveStr::Default { filename },
             )) => ErrorActive::DefaultLoading(DefaultLoading::FaultyMetadata { filename, error }),
+            MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
+                IncomingMetadataSourceActiveStr::Check { filename },
+            )) => ErrorActive::Check {
+                filename,
+                check: Check::FaultyMetadata(error),
+            },
             MetadataSource::Incoming(IncomingMetadataSourceActive::Wasm { filename }) => {
                 ErrorActive::Wasm {
                     filename,
@@ -178,12 +192,18 @@ impl ErrorSource for Active {
         match error {
             ErrorActive::NotHex(a) => {
                 let insert = match a {
-                    NotHexActive::FetchedMetadata {url} => format!("Network metadata fetched from url {}", url),
+                    NotHexActive::FetchedMetadata {url, optional_block} => match optional_block{
+                        Some(hash) => format!("Network metadata fetched from url {} at block {}", url, hex::encode(hash)),
+                        None => format!("Network metadata fetched from url {}", url),
+                    },
                     NotHexActive::FetchedGenesisHash {url} => format!("Network genesis hash fetched from url {}", url),
+                    NotHexActive::FetchedBlockHash {url} => format!("Network block hash fetched from url {}", url),
                     NotHexActive::InputSufficientCrypto => String::from("Input sufficient crypto data"),
                     NotHexActive::InputPublicKey => String::from("Input public key"),
                     NotHexActive::InputSignature => String::from("Input signature"),
                     NotHexActive::DefaultMetadata {filename} => format!("Default network metadata from file {}", filename),
+                    NotHexActive::CheckedMetadata {filename} => format!("Checked metadata from file {}", filename),
+                    NotHexActive::EnteredBlockHash => String::from("Input block hash"),
                 };
                 format!("{} is not in hexadecimal format.", insert)
             },
@@ -209,6 +229,7 @@ impl ErrorSource for Active {
                             EntryDecodingActive::NetworkSpecs(x) => format!("network specs (NetworkSpecs) entry for key {}.", hex::encode(x.key())),
                             EntryDecodingActive::NetworkSpecsToSend(x) => format!("network specs (NetworkSpecsToSend) entry for key {}.", hex::encode(x.key())),
                             EntryDecodingActive::Types => String::from("types information."),
+                            EntryDecodingActive::BlockHash {name, version} => format!("fetch block hash for metadata {}{}", name, version),
                         };
                         format!("Unable to decode {}", insert)
                     },
@@ -230,7 +251,6 @@ impl ErrorSource for Active {
                     DatabaseActive::TwoDefaultsAddress{url} => format!("Hot database contains two default entries for network with url {}.", url),
                     DatabaseActive::HotDatabaseMetadataOverTwoEntries{name} => format!("More than two entries for network {} in hot database.", name),
                     DatabaseActive::HotDatabaseMetadataSameVersionTwice{name, version} => format!("Two entries for {} version {}.", name, version),
-                    DatabaseActive::NewAddressKnownGenesisHash{url, genesis_hash} => format!("Url address {} is not encountered in the hot database entries, however, fetched genesis hash {} is present in hot database entries. To change the network url, delete old entry.", url, hex::encode(genesis_hash)),
                     DatabaseActive::TwoGenesisHashVariantsForName{name} => format!("Two different genesis hash entries for network {} in address book.", name),
                     DatabaseActive::TwoUrlVariantsForName{name} => format!("Two different url entries for network {} in address book.", name),
                     DatabaseActive::TwoNamesForUrl{url} => format!("Two different network names in entries for url address {} in address book.", url),
@@ -241,9 +261,22 @@ impl ErrorSource for Active {
             },
             ErrorActive::Fetch(a) => {
                 let insert = match a {
-                    Fetch::FaultyMetadata{url, error} => format!("Metadata from {} is not suitable. {}", url, error.show()),
+                    Fetch::FaultyMetadata{url, optional_block, error} => match optional_block {
+                        Some(hash) => format!("Metadata from {} at block hash {} is not suitable. {}", url, hex::encode(hash), error.show()),
+                        None => format!("Metadata from {} is not suitable. {}", url, error.show()),
+                    },
                     Fetch::EarlierVersion{name, old_version, new_version} => format!("For {} the newly received version ({}) is lower than the latest version in the hot database ({}).", name, new_version, old_version),
-                    Fetch::SameVersionDifferentMetadata{name, version} => format!("Fetched metadata for {}{} differs from the one in the hot database.", name, version),
+                    Fetch::SameVersionDifferentMetadata{name, version, block_hash_in_db, block_hash_in_fetch} => {
+                        let db_block_insert = match block_hash_in_db {
+                            Some(a) => hex::encode(a),
+                            None => String::from("unknown"),
+                        };
+                        let fetch_block_insert = match block_hash_in_fetch {
+                            Some(a) => hex::encode(a),
+                            None => String::from("unknown"),
+                        };
+                        format!("Metadata {}{} fetched now at block hash {} differs from the one in the hot database, block hash {}.", name, version, fetch_block_insert, db_block_insert)
+                    },
                     Fetch::FaultySpecs{url, error} => {
                         let insert = match error {
                             SpecsError::NoBase58Prefix => String::from("No base58 prefix."),
@@ -256,7 +289,8 @@ impl ErrorSource for Active {
                             SpecsError::DecimalsArrayUnitsNot => String::from("Unexpected result for multi-token network. Decimals are fetched as an array with more than one element, whereas units are not."),
                             SpecsError::DecimalsUnitsArrayLength{decimals, unit} => format!("Unexpected result for multi-token network. Length of decimals array {} does not match the length of units array {}.", decimals, unit),
                             SpecsError::UnitsArrayDecimalsNot => String::from("Unexpected result for multi-token network. Units are fetched as an array with more than one element, whereas decimals are not."),
-                            SpecsError::OverrideIgnored => String::from("Fetched single value for token decimals and unit. Token override is not possible."),
+                            SpecsError::OverrideIgnoredSingle => String::from("Fetched single value for token decimals and unit. Token override is not possible."),
+                            SpecsError::OverrideIgnoredNone => String::from("Network has no value for token decimals and unit. Token override is not possible."),
                         };
                         format!("Problem with network specs from {}. {}", url, insert)
                     },
@@ -266,13 +300,18 @@ impl ErrorSource for Active {
                             Changed::Base58Prefix{old, new} => ("base58 prefix", old.to_string(), new.to_string()),
                             Changed::GenesisHash{old, new} => ("genesis hash", hex::encode(old), hex::encode(new)),
                             Changed::Decimals{old, new} => ("decimals value", old.to_string(), new.to_string()),
+                            Changed::DecimalsBecameNone{old} => ("decimals value", old.to_string(), "no value".to_string()),
                             Changed::Name{old, new} => ("name", old.to_string(), new.to_string()),
                             Changed::Unit{old, new} => ("unit", old.to_string(), new.to_string()),
+                            Changed::UnitBecameNone{old} => ("unit", old.to_string(), "no value".to_string()),
                         };
                         format!("Network {} fetched from {} differs from the one in the hot database. Old: {}. New: {}.", insert, url, old, new)
                     },
                     Fetch::UnexpectedFetchedGenesisHashFormat{value} => format!("Fetched genesis hash {} has unexpected format and does not fit into [u8;32] array.", value),
+                    Fetch::UnexpectedFetchedBlockHashFormat{value} => format!("Fetched block hash {} has unexpected format and does not fit into [u8;32] array.", value),
                     Fetch::SpecsInDb{name, encryption} => format!("Network specs entry for {} and encryption {} is already in database.", name, encryption.show()),
+                    Fetch::UKeyUrlInDb {title, url} => format!("There is already an entry with address {} for network {}. Known networks should be processed with `-n` content key.", url, title),
+                    Fetch::UKeyHashInDb{address_book_entry, url} => format!("Fetch at {} resulted in data already known to the hot database. Network {} with genesis hash {} has address set to {}. To change the url, delete old entry.", url, address_book_entry.name, hex::encode(address_book_entry.genesis_hash), address_book_entry.address),
                 };
                 format!("Fetching error. {}", insert)
             },
@@ -324,6 +363,8 @@ impl ErrorSource for Active {
                             CommandNeedKey::DerivationsTitle => "'-title'",
                             CommandNeedKey::MetaDefaultFileName => "`-name`",
                             CommandNeedKey::MetaDefaultFileVersion => "`-version`",
+                            CommandNeedKey::MetaAtBlockUrl => "`-u`",
+                            CommandNeedKey::MetaAtBlockHash => "`-block`",
                         };
                         format!("Expected {} key to be used.", insert)
                     },
@@ -333,6 +374,7 @@ impl ErrorSource for Active {
                             CommandDoubleKey::Set => "set",
                             CommandDoubleKey::CryptoOverride => "encryption override",
                             CommandDoubleKey::TokenOverride => "token override",
+                            CommandDoubleKey::TitleOverride => "title override",
                             CommandDoubleKey::CryptoKey => "`-crypto`",
                             CommandDoubleKey::MsgType => "`-msgtype`",
                             CommandDoubleKey::Verifier => "`-verifier`",
@@ -344,6 +386,8 @@ impl ErrorSource for Active {
                             CommandDoubleKey::DerivationsTitle => "'-title'",
                             CommandDoubleKey::MetaDefaultFileName => "`-name`",
                             CommandDoubleKey::MetaDefaultFileVersion => "`-version`",
+                            CommandDoubleKey::MetaAtBlockUrl => "`-u`",
+                            CommandDoubleKey::MetaAtBlockHash => "`-block`",
                         };
                         format!("More than one entry for {} key is not allowed.", insert)
                     },
@@ -351,6 +395,7 @@ impl ErrorSource for Active {
                         let insert = match b {
                             CommandNeedArgument::TokenUnit => "`-token ***'",
                             CommandNeedArgument::TokenDecimals => "'-token'",
+                            CommandNeedArgument::TitleOverride => "'-title'",
                             CommandNeedArgument::NetworkName => "`-n`",
                             CommandNeedArgument::NetworkUrl => "`-u`",
                             CommandNeedArgument::CryptoKey => "`-crypto`",
@@ -375,6 +420,10 @@ impl ErrorSource for Active {
                             CommandNeedArgument::DerivationsTitle => "'-title'",
                             CommandNeedArgument::MetaDefaultFileName => "`-name`",
                             CommandNeedArgument::MetaDefaultFileVersion => "`-version`",
+                            CommandNeedArgument::CheckFile => "check_file",
+                            CommandNeedArgument::ShowSpecsTitle => "`show -specs`",
+                            CommandNeedArgument::MetaAtBlockUrl => "`-u`",
+                            CommandNeedArgument::MetaAtBlockHash => "`-block`",
                         };
                         format!("{} must be followed by an agrument.", insert)
                     },
@@ -410,6 +459,7 @@ impl ErrorSource for Active {
                     InputActive::FaultyMetadataInPayload(e) => format!("Metadata in the message to sign is not suitable. {}", e.show()),
                     InputActive::BadSignature => String::from("Bad signature."),
                     InputActive::NoValidDerivationsToExport => String::from("No valid password-free derivations found to generate ContentDerivations."),
+                    InputActive::BlockHashLength => String::from("Provided block hash has wrong length."),
                 }
             },
             ErrorActive::Qr(e) => format!("Error generating qr code. {}", e),
@@ -424,6 +474,12 @@ impl ErrorSource for Active {
                     Wasm::RuntimeBlob(e) => format!("Error processing .wasm file {}. Unable to generate RuntimeBlob. {}", filename, e),
                     Wasm::WasmiInstance(e) => format!("Error processing .wasm file {}. Unable to generate WasmiInstance. {}", filename, e),
                     Wasm::WasmiRuntime(e) => format!("Error processing .wasm file {}. Unable to generate WasmiRuntime. {}", filename, e),
+                }
+            },
+            ErrorActive::Check{filename, check} => {
+                match check {
+                    Check::FaultyMetadata(e) => format!("Metadata error in file {}. {}", filename, e.show()),
+                    Check::MetadataFile(e) => format!("Error processing file {}. Unable to load file. {}", filename, e),
                 }
             },
             ErrorActive::TimeFormat(e) => format!("Unable to produce timestamp. {}", e),
@@ -517,6 +573,15 @@ pub enum ErrorActive {
         wasm: Wasm,
     },
 
+    /// Error processing the metadata file that user tried to check
+    Check {
+        /// path of the file being checked
+        filename: String,
+
+        /// error details
+        check: Check,
+    },
+
     /// Time formatting error
     TimeFormat(Format),
 
@@ -542,12 +607,20 @@ pub enum NotHexActive {
     /// Network metadata, fetched through rpc call.
     ///
     /// Associated data is the url address used for the fetching.
-    FetchedMetadata { url: String },
+    FetchedMetadata {
+        url: String,
+        optional_block: Option<H256>,
+    },
 
     /// Network genesis hash, fetched through rpc call.
     ///
     /// Associated data is the url address used for the fetching.
     FetchedGenesisHash { url: String },
+
+    /// Network block hash, fetched through rpc call.
+    ///
+    /// Associated data is the url address used for the fetching.
+    FetchedBlockHash { url: String },
 
     /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) received in
     /// command line in `generate_message` client.
@@ -566,8 +639,14 @@ pub enum NotHexActive {
     InputSignature,
 
     /// Default network metadata, used to generate cold database, with filename
-    /// as an associated data.
+    /// as associated data.
     DefaultMetadata { filename: String },
+
+    /// Network metadata user tries to check, with filename as associated data
+    CheckedMetadata { filename: String },
+
+    /// User-entered block hash for metadata fetching
+    EnteredBlockHash,
 }
 
 /// Source of unsuitable metadata on the Active side
@@ -583,11 +662,18 @@ pub enum IncomingMetadataSourceActive {
 /// Source of unsuitable hexadecimal string metadata on the Active side
 #[derive(Debug)]
 pub enum IncomingMetadataSourceActiveStr {
-    /// Metadata was fetched, associated data is url used for rpc call.
-    Fetch { url: String },
+    /// Metadata was fetched, associated data is url used for rpc call and block
+    /// hash, if the metadata was fetched for specific block hash.
+    Fetch {
+        url: String,
+        optional_block: Option<H256>,
+    },
 
     /// Metadata is the default one, associated data is the filename.
     Default { filename: String },
+
+    /// Metadata is from the metadata file that must be checked
+    Check { filename: String },
 }
 
 /// Source of damaged [`NetworkSpecsKey`], exclusive for the active side.
@@ -703,27 +789,6 @@ pub enum DatabaseActive {
 
         /// network version
         version: u32,
-    },
-
-    /// Fetched through rpc call network genesis hash is known to the hot
-    /// database, although the url address used for rpc call is not.
-    ///
-    /// Hot database does not allow to store more than one trusted url address
-    /// for rpc calls for same network.
-    ///
-    /// Alternative url address could be used if the database is not updated
-    /// (`-d` key is used).
-    ///
-    /// To update the address in the database in case the old one is no longer
-    /// acceptable, one should remove old entry, and only then add the new one.
-    NewAddressKnownGenesisHash {
-        /// new for database url address used for rpc call, for which a known
-        /// genesis hash was retrieved
-        url: String,
-
-        /// network genesis hash that was fetched through rpc call and found in
-        /// the database
-        genesis_hash: H256,
     },
 
     /// `ADDRESS_BOOK` tree of the hot database contains
@@ -855,6 +920,9 @@ pub enum EntryDecodingActive {
     /// Types information from hot database, i.e. encoded `Vec<TypeEntry>`
     /// stored in `SETTREE` under the key `TYPES`, could not be decoded.
     Types,
+
+    /// Block hash from `META_HISTORY` tree entry
+    BlockHash { name: String, version: u32 },
 }
 
 /// Mismatch errors within database on active side
@@ -998,6 +1066,10 @@ pub enum Fetch {
         /// url address used for rpc call
         url: String,
 
+        /// optional block hash: `None` for standard fetch, `Some(_)` for debug
+        /// fetch at specified block
+        optional_block: Option<H256>,
+
         /// what exactly is wrong with the metadata
         error: MetadataError,
     },
@@ -1023,6 +1095,13 @@ pub enum Fetch {
 
         /// network version
         version: u32,
+
+        /// optionally recorded block hash for which the metadata was fetched
+        ///when recorded in the database
+        block_hash_in_db: Option<H256>,
+
+        /// block hash for which the metadata is fetched now
+        block_hash_in_fetch: Option<H256>,
     },
 
     /// Fetched network specs are not suitable for use in Signer.
@@ -1058,6 +1137,12 @@ pub enum Fetch {
         value: String,
     },
 
+    /// Fetched block hash could not be transformed in expected [u8; 32] value.
+    UnexpectedFetchedBlockHashFormat {
+        /// block hash value as received through rpc call
+        value: String,
+    },
+
     /// Network specs are already in the database
     SpecsInDb {
         /// network name
@@ -1066,10 +1151,41 @@ pub enum Fetch {
         /// network supported encryption
         encryption: Encryption,
     },
+
+    /// Tried to fetch with `-u` key using address already known to the database
+    UKeyUrlInDb {
+        /// network address book title
+        title: String,
+
+        /// url address
+        url: String,
+    },
+
+    /// Tried to fetch with `-u` key using address not known to the database,
+    /// but got genesis hash that is already known.
+    ///
+    /// Likely tried to fetch with different address when one already is in the
+    /// database.
+    ///
+    /// Hot database does not allow to store more than one trusted url address
+    /// for rpc calls for same network.
+    ///
+    /// Alternative url address could be used if the database is not updated
+    /// (`-d` key is used).
+    ///
+    /// To update the address in the database in case the old one is no longer
+    /// acceptable, one should remove old entry, and only then add the new one.
+    UKeyHashInDb {
+        /// address book entry with exactly matching genesis hash
+        address_book_entry: AddressBookEntry,
+
+        /// url address used for fetch
+        url: String,
+    },
 }
 
 /// Errors on the active side with network specs received through rpc call
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum SpecsError {
     /// Network base58 prefix information is not found neither in results of
     /// the `system_properties` rpc call, nor in `System` pallet of the metadata
@@ -1104,8 +1220,8 @@ pub enum SpecsError {
     /// Network unit information **is not found** in the results if the
     /// `system_properties` rpc call, but the decimals information **is found**.
     ///
-    /// Associated data is the fetched decimals value.
-    DecimalsNoUnit(u8),
+    /// Associated data is the fetched decimals value, could be array too.
+    DecimalsNoUnit(String),
 
     /// Network unit information received through `system_properties`
     /// rpc call could not be transformed into expected `String` value.
@@ -1129,7 +1245,8 @@ pub enum SpecsError {
     /// through `system_properties` rpc call. Received decimals are not an array.
     UnitsArrayDecimalsNot,
 
-    /// Unit and decimal override is not allowed.
+    /// Unit and decimal override is not allowed, when network has a single
+    /// token.
     ///
     /// The only case when the decimals and unit override is permitted is when
     /// the network has a matching set of decimals and units, and user has to
@@ -1138,7 +1255,10 @@ pub enum SpecsError {
     /// If the network has a single decimals value and a single unit value, i.e.
     /// the values that would be suitable on their own, and user attempts to
     /// override it, this error appears.
-    OverrideIgnored,
+    OverrideIgnoredSingle,
+
+    /// Unit and decimal override is not allowed, when network has no token.
+    OverrideIgnoredNone,
 }
 
 /// Data received through rpc call is different from the data in hot database
@@ -1176,6 +1296,15 @@ pub enum Changed {
     /// Network decimals value is expected to be permanent.
     Decimals { old: u8, new: u8 },
 
+    /// Network decimals value in
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// stored in `SPECSTREEPREP` tree of the hot database has some value,
+    /// freshly fetched specs have no decimals.
+    ///
+    /// Network decimals value is expected to be permanent. Override for no
+    /// decimals at the moment is blocked.
+    DecimalsBecameNone { old: u8 },
+
     /// Network name is stored in multiple places in the hot database:
     ///
     /// - in `name` field of network specs
@@ -1201,6 +1330,15 @@ pub enum Changed {
     ///
     /// Network unit value is expected to be permanent.
     Unit { old: String, new: String },
+
+    /// Network unit value in
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// stored in `SPECSTREEPREP` tree of the hot database has some value,
+    /// freshly fetched specs have no unit.
+    ///
+    /// Network unit value is expected to be permanent. Override for no
+    /// unit at the moment is blocked.
+    UnitBecameNone { old: String },
 }
 
 /// Error loading of the defaults
@@ -1459,6 +1597,13 @@ pub enum CommandNeedKey {
     /// Command `meta_default_file` must have `-version` key followed by the
     /// network metadata version to specify the metadata being exported.
     MetaDefaultFileVersion,
+
+    /// Command `meta_at_block` must have `-u` key followed by the network url.
+    MetaAtBlockUrl,
+
+    /// Command `meta_at_block` must have `-block` key followed by the
+    /// hexadecimal block hash.
+    MetaAtBlockHash,
 }
 
 /// Key in `generate_message` command encountered twice
@@ -1497,12 +1642,18 @@ pub enum CommandDoubleKey {
     CryptoOverride,
 
     /// Command `add_specs`, when used for networks without network specs
-    /// entries in `SPECSTREEPREP` and with mora than one token supported,
+    /// entries in `SPECSTREEPREP` and with more than one token supported,
     /// could use token override. For this, key `-token` followed by `u8`
     /// decimals and `String` unit arguments is used.
     ///
     /// Token override key may be used only once.
     TokenOverride,
+
+    /// Command `add_specs` could use network title override to set up the
+    /// network title displayed in Signer.
+    ///
+    /// Title override key may be used only once.
+    TitleOverride,
 
     /// Command `make` must have exactly one `-crypto` key, followed by the
     /// encryption argument.
@@ -1554,6 +1705,14 @@ pub enum CommandDoubleKey {
     /// Command `meta_default_file` must have exactly one `-version` key followed
     /// by the network version.
     MetaDefaultFileVersion,
+
+    /// Command `meta_at_block` must have exactly one `-u` key followed by the
+    /// network url.
+    MetaAtBlockUrl,
+
+    /// Command `meta_at_block` must have exactly one `-block` key followed by
+    /// the hexadecimal block hash.
+    MetaAtBlockHash,
 }
 
 /// Missing argument for the key in `generate_message` command
@@ -1583,6 +1742,10 @@ pub enum CommandNeedArgument {
     /// sequence. Otherwise the parser will try to interpret as `u8` decimals
     /// the next key and complain that it is not `u8`.
     TokenDecimals,
+
+    /// Key `-title` in `add_specs` command was supposed to be followed by
+    /// `String` argument, which was not provided.
+    TitleOverride,
 
     /// Commands `add_specs` and `load_metadata` with content key `-n` require
     /// network identifier: network address book title for `add_specs` and
@@ -1615,12 +1778,12 @@ pub enum CommandNeedArgument {
     VerifierHex,
 
     /// Key sequence `-verifier -file` in `make` command must be followed by a
-    /// filename of the file in `../files/for_signing/` with verifier public
-    /// key as `&[u8]`.
+    /// filename of the file in dedicated `FOLDER` with verifier public key as
+    /// `&[u8]`.
     VerifierFile,
 
     /// Key `-payload` must be followed by a filename of the file:
-    /// - in `../files/for_signing/` for `make` and `sign` commands
+    /// - in dedicated `FOLDER` for `make` and `sign` commands
     /// - in `../generate_message/` for `derivations` and `unwasm` commands
     Payload,
 
@@ -1644,8 +1807,7 @@ pub enum CommandNeedArgument {
     SignatureHex,
 
     /// Key sequence `-signature -file` in `make` command must be followed by a
-    /// filename of the file in `../files/for_signing/` with signature
-    /// as `&[u8]`.
+    /// filename of the file in dedicated `FOLDER` with signature as `&[u8]`.
     SignatureFile,
 
     /// Key `-name` in `make` and `sign` commands, if used, must be followed by
@@ -1664,7 +1826,7 @@ pub enum CommandNeedArgument {
     SufficientCryptoHex,
 
     /// Key sequence `-sufficient -file` in `sign` command must be followed by a
-    /// filename of the file in `../files/for_signing/` with SCALE-encoded
+    /// filename of the file in dedicated `FOLDER` with SCALE-encoded
     /// `SufficientCrypto` as `&[u8]`.
     SufficientCryptoFile,
 
@@ -1696,9 +1858,22 @@ pub enum CommandNeedArgument {
     /// name.
     MetaDefaultFileName,
 
-    /// Key `-version` in `meta_Default_file` command must be followed by
+    /// Key `-version` in `meta_default_file` command must be followed by
     /// network version.
     MetaDefaultFileVersion,
+
+    /// Command `check_file` must be followed by the file path
+    CheckFile,
+
+    /// Command `show -specs` must be followed by the network address book title
+    ShowSpecsTitle,
+
+    /// Key `-u` in `meta_at_block` command must be followed by the network url.
+    MetaAtBlockUrl,
+
+    /// Key `-block` in `meta_at_block` command must be followed by the
+    /// hexadecimal block hash.
+    MetaAtBlockHash,
 }
 
 /// Unsuitable argument for the key in `generate_message` command
@@ -1728,7 +1903,7 @@ pub enum CommandBadArgument {
     /// Signature may be entered from a file or as a hexadecimal string.
     /// Key `-signature` may be followed by:
     ///
-    /// `-file` followed by the name of the file in `../files/for_signing/` with
+    /// `-file` followed by the name of the file in dedicated `FOLDER` with
     /// signature as `&[u8]`
     /// `-hex` followed by hexadecimal signature
     Signature,
@@ -1737,15 +1912,15 @@ pub enum CommandBadArgument {
     /// from a file or as a hexadecimal string.
     /// Key `-sufficient` may be followed by:
     ///
-    /// `-file` followed by the name of the file in `../files/for_signing/` with
+    /// `-file` followed by the name of the file in dedicated `FOLDER` with
     /// SCALE-encoded `SufficientCrypto` as `&[u8]`
     /// `-hex` followed by hexadecimal SCALE-encoded `SufficientCrypto` string
     SufficientCrypto,
 
     /// Verifier entered after key `-verifier` may be:
     ///
-    /// `-file` followed by name of the file in `../files/for_signing/` with
-    /// verifier public key as `&[u8]`
+    /// `-file` followed by name of the file in dedicated `FOLDER` with verifier
+    /// public key as `&[u8]`
     /// `-hex` followed by hexadecimal verifier public key
     /// `Alice`
     Verifier,
@@ -1805,6 +1980,9 @@ pub enum InputActive {
     /// Provided file contains no valid password-free derivations that could be
     /// exported
     NoValidDerivationsToExport,
+
+    /// User-entered block hash has invalid length
+    BlockHashLength,
 }
 
 /// Errors with `wasm` files processing
@@ -1837,4 +2015,18 @@ pub enum Wasm {
 
     /// Error generating `WasmiRuntime`.
     WasmiRuntime(sc_executor_common::error::WasmError),
+}
+
+/// Error checking metadata file
+#[derive(Debug)]
+pub enum Check {
+    /// Metadata extracted from the metadata file is not suitable to be used in
+    /// Signer.
+    ///
+    /// Associated data is [`MetadataError`] specifying what exactly is wrong
+    /// with the metadata.
+    FaultyMetadata(MetadataError),
+
+    /// Unable to read directory with default metadata
+    MetadataFile(std::io::Error),
 }

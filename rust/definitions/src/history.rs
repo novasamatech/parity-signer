@@ -201,7 +201,7 @@ impl TypesDisplay {
     }
 }
 
-/// Event content for generating [`SufficientCrypto`]
+/// Event content for generating [`SufficientCrypto`](crate::crypto::SufficientCrypto)
 /// QR code for `load_types` message  
 ///
 /// Effectively records that types information was signed by user.
@@ -241,7 +241,7 @@ pub struct IdentityHistory {
     pub encryption: Encryption,
     /// Public key.
     pub public_key: Vec<u8>,
-    /// - path with soft (`/`) and hard (`//`) derivatinos only, **without** password  
+    /// - path with soft (`/`) and hard (`//`) derivations only, **without** password  
     pub path: String,
     /// - genesis hash of the network within which the address is  
     pub network_genesis_hash: Vec<u8>,

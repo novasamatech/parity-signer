@@ -1,3 +1,67 @@
+//! Fetch network information from a node using rpc calls
+//!
+//! Preparing `add_specs` and `load_metadata` update payload may require
+//! gathering network information from a node.
+//!
+//! For `add_specs` update payload:
+//!
+//! <table>
+//!     <tr>
+//!         <th>call</th>
+//!         <th>fetched information</th>
+//!     </tr>
+//!     <tr>
+//!         <td><code>state_getMetadata</code>, for current block</td>
+//!         <td>current block network metadata, that will be used to get:<br>
+//!             - network name<br>
+//!             - base58 prefix from metadata
+//!         </td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>chain_getBlockHash</code>, for 0th block</td>
+//!         <td>network genesis hash</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>system_properties</code></td>
+//!         <td>- base58 prefix<br>
+//!             - decimals<br>
+//!             - unit<br>
+//!         </td>
+//!     </tr>
+//! </table>
+//!
+//! Network name expected to remain the same for the network over time. The only
+//! way to get network name is from the network metadata `Version` constant.
+//!
+//! For `load_metadata` update:
+//!
+//! <table>
+//!     <tr>
+//!         <th>call</th>
+//!         <th>fetched information</th>
+//!     </tr>
+//!     <tr>
+//!         <td><code>chain_getBlockHash</code>, for current block</td>
+//!         <td>current block hash</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>state_getMetadata</code>, for just fetched block hash</td>
+//!         <td>latest network metadata</td>
+//!     </tr>
+//!     <tr>
+//!         <td><code>chain_getBlockHash</code>, for 0th block</td>
+//!         <td>network genesis hash</td>
+//!     </tr>
+//! </table>
+//!
+//! Block hash is fetched first to always have network metadata matching the
+//! block hash, even if the two rpc calls were done during block switching.
+//!
+//! Addresses for rpc calls in different networks could be found
+//! [here](https://github.com/polkadot-js/apps/tree/master/packages/apps-config/src/endpoints)
+//!
+//! This module deals only with the rpc calls part and does **no processing**
+//! of the fetched data.
 use jsonrpsee::core::client::ClientT;
 use jsonrpsee::rpc_params;
 use jsonrpsee::ws_client::WsClientBuilder;
@@ -7,29 +71,62 @@ use serde_json::{
     map::Map,
     value::{Number, Value},
 };
+use sp_core::H256;
 
+/// Data from rpc calls for `load_metadata` update payload.
+///
+/// This data is **sufficient** for `load_metadata` update payload generation,
+/// i.e. nothing else has to be known about the network beforehand to produce an
+/// update payload.
 pub struct FetchedInfo {
+    /// Fetched metadata, as a hexadecimal string
     pub meta: String,
+
+    /// Block hash, at which the metadata was fetched, as a hexadecimal string
+    pub block_hash: String,
+
+    /// Fetched genesis hash, as a hexadecimal string
     pub genesis_hash: String,
 }
 
+/// Data from rpc calls for `add_specs` update payload.
+///
+/// Note that this data is **not sufficient** for `add_specs` update payload
+/// generation. At least network encryption is needed additionally.
 pub struct FetchedInfoWithNetworkSpecs {
+    /// Fetched metadata, as a hexadecimal string
     pub meta: String,
+
+    /// Fetched genesis hash, as a hexadecimal string
     pub genesis_hash: String,
+
+    /// Fetched network properties, as a `Map`
+    ///
+    /// Properties are expected to contain base58 prefix, decimals, and units,
+    /// but in some cases some data may be missing.
     pub properties: Map<String, Value>,
 }
 
 lazy_static! {
-// stolen from sp_core
-// removed seed phrase part
-// last '+' used to be '*', but empty password is an error
+    /// Regex to add port to addresses that have no port specified.
+    ///
+    /// See tests for behavior examples.
     static ref PORT: Regex = Regex::new(r"^(?P<body>wss://[^/]*?)(?P<port>:[0-9]+)?(?P<tail>/.*)?$").expect("known value");
 }
 
+/// Supply address with port if needed.
+///
+/// Transform address as it is displayed to user in <https://polkadot.js.org/>
+/// to address with port added if necessary that could be fed to `jsonrpsee`
+/// client.
+///
+/// The port is set here to default 443 if there is no port specified in
+/// address itself, since default port in `jsonrpsee` is unavailable for now.
+///
+/// See for details <https://github.com/paritytech/jsonrpsee/issues/554`>
+///
+/// Some addresses have port specified, and should be left as is.
 fn address_with_port(str_address: &str) -> String {
-    // note: here the port is set to 443 if there is no default, since default port is unavailable for now;
-    // see for details `https://github.com/paritytech/jsonrpsee/issues/554`
-    // some addresses already have port specified, and should be left as is
     match PORT.captures(str_address) {
         Some(caps) => {
             if caps.name("port").is_some() {
@@ -45,15 +142,28 @@ fn address_with_port(str_address: &str) -> String {
     }
 }
 
-/// Function to fetch the metadata as String and genesis hash as String from given address,
-/// actually fetches stuff, is slow
-
+/// Fetch data for `load_metadata` update payload through rpc calls.
+///
+/// Function inputs address at which rpc calls are made.
+///
+/// Data fetched:
+///
+/// 1. current block hash
+/// 2. metadata at this block hash
+/// 3. network genesis hash
 #[tokio::main]
 pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::error::Error>> {
     let client = WsClientBuilder::default()
-        .build(address_with_port(str_address))
+        .build(address_with_port(str_address)) // port supplied if needed
         .await?;
-    let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
+    let response: Value = client.request("chain_getBlockHash", rpc_params![]).await?;
+    let block_hash = match response {
+        Value::String(x) => x,
+        _ => return Err(Box::from("Unexpected block hash format")),
+    };
+    let response: Value = client
+        .request("state_getMetadata", rpc_params![&block_hash])
+        .await?;
     let meta = match response {
         Value::String(x) => x,
         _ => return Err(Box::from("Unexpected metadata format")),
@@ -68,18 +178,53 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
         Value::String(x) => x,
         _ => return Err(Box::from("Unexpected genesis hash format")),
     };
-    Ok(FetchedInfo { meta, genesis_hash })
+    Ok(FetchedInfo {
+        meta,
+        block_hash,
+        genesis_hash,
+    })
 }
 
-/// Function to fetch the metadata as String, genesis hash as String, and network specs from given address,
-/// actually fetches stuff, is slow
+/// Fetch network metadata from given url address at given block through rpc
+/// call.
+///
+/// Function inputs address at which rpc call is made and block hash in [`H256`]
+/// format. Outputs hexadecimal metadata.
+#[tokio::main]
+pub async fn fetch_meta_at_block(
+    str_address: &str,
+    block_hash: H256,
+) -> Result<String, Box<dyn std::error::Error>> {
+    let client = WsClientBuilder::default()
+        .build(address_with_port(str_address)) // port supplied if needed
+        .await?;
+    let response: Value = client
+        .request(
+            "state_getMetadata",
+            rpc_params![Value::String(format!("0x{}", hex::encode(block_hash)))],
+        )
+        .await?;
+    match response {
+        Value::String(x) => Ok(x),
+        _ => Err(Box::from("Unexpected metadata format")),
+    }
+}
 
+/// Fetch data for `add_specs` update payload through rpc calls.
+///
+/// Function inputs address at which rpc calls are made.
+///
+/// Data fetched:
+///
+/// 1. current network metadata
+/// 2. network genesis hash
+/// 3. network system properties (could contain base58 prefix, decimals, unit)
 #[tokio::main]
 pub async fn fetch_info_with_network_specs(
     str_address: &str,
 ) -> Result<FetchedInfoWithNetworkSpecs, Box<dyn std::error::Error>> {
     let client = WsClientBuilder::default()
-        .build(address_with_port(str_address))
+        .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
     let meta = match response {

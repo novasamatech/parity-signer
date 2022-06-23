@@ -1,4 +1,5 @@
 #![deny(unused_crate_dependencies)]
+#![deny(rustdoc::broken_intra_doc_links)]
 
 use anyhow::anyhow;
 use bitvec::prelude::{BitVec, Msb0};

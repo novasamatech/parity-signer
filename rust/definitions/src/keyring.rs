@@ -24,6 +24,8 @@
 //! entries, with keys [`NetworkSpecsKey`]  
 //! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and
 //! prefix search with [`MetaKeyPrefix`]  
+//! - `META_HISTORY`, for [`H256`] block hash entries, with keys [`MetaKey`] and
+//! prefix search with [`MetaKeyPrefix`]
 //! - `SETTREE`, for types information  
 //! - `ADDRESS_BOOK` for `AddressBookEntry` data needed to maintain hot database
 //! and send rpc calls to fetch network information, with keys `AddressBookKey`
@@ -270,9 +272,11 @@ impl AddressKey {
     }
 }
 
-/// Key in `METATREE` tree (cold and hot database)  
+/// Key in `METATREE` (cold and hot database) and in `META_HISTORY` tree (hot
+/// database)
 ///
-/// [`MetaKey`] is used to retrieve raw `Vec<u8>` metadata.  
+/// [`MetaKey`] is used to retrieve raw `Vec<u8>` metadata from `METATREE` and
+/// relevant block hash entries from `META_HISTORY`.  
 ///
 /// Key is derived from network name as it appears in the metadata and network
 /// version.  
@@ -331,10 +335,12 @@ impl MetaKey {
     }
 }
 
-/// Prefix for searching in `METATREE` tree (cold and hot database)  
+/// Prefix for searching in `METATREE` (cold and hot database) and in
+/// `META_HISTORY` tree (hot database)
 ///
 /// [`MetaKeyPrefix`] is used to retrieve all available `Vec<u8>` metadata
-/// for a given network name.  
+/// for a given network name from `METATREE` and all relevant block hash entries
+/// from `META_HISTORY`.  
 ///
 /// Prefix is derived from network name as it appears in the metadata.  
 ///
