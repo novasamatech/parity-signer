@@ -148,7 +148,7 @@
 //! parse the transaction. In this case users are encouraged to update the types
 //! information.
 //!
-//! For each argument an [`OutputCard`] is produces and added to the output set. 
+//! For each argument an [`OutputCard`] is produces and added to the output set.
 #![deny(unused_crate_dependencies)]
 
 use frame_metadata::v14::RuntimeMetadataV14;
