@@ -1078,7 +1078,7 @@ use definitions::error_active::{Active, ErrorActive};
 mod derivations;
 use derivations::process_derivations;
 pub mod fetch_metadata;
-mod helpers;
+pub mod helpers;
 use helpers::debug_meta_at_block;
 pub mod interpret_specs;
 mod load;
