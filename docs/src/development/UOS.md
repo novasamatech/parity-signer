@@ -1052,10 +1052,10 @@ Derivations imports are unsigned, and always have the same prelude, `53ffde`.
 
 Update payload is `ContentDerivations` in `to_transfer()` form. 
 
-`ContentDerivations` includes derivation path set to be imported (with password-
-free derivations only), network genesis hash and encryption for the network in
-which the import would be made. User, if approving the derivations import, is
-specifying the seed, for which the derivations are applied.
+`ContentDerivations` includes derivation paths set to be imported, network
+genesis hash and encryption for the network in which the import would be made.
+User, if approving the derivations import, is specifying the seed, for which the
+derivations are applied.
 
 When processing derivations import, all data after prelude is transformed into
 `ContentDerivations`. Network genesis hash, encryption and derivations set are
@@ -1065,9 +1065,8 @@ import payload is corrupted.
 Signer checks that the network for which the derivations are imported has
 network specs in the Signer database. If not, an error is produced.
 
-Signer checks that the derivation set contains only valid, password-free
-derivations. If any derivation is unsuitable, an error is produced indicating
-this.
+Signer checks that the derivation set contains only valid derivations. If any
+derivation is unsuitable, an error is produced indicating this.
 
 If the user accepts the derivations import for some seed, Signer generates a key
 for each derivation for user-provided seed.

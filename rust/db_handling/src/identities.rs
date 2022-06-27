@@ -996,7 +996,7 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSign
         .apply::<Signer>(database_name)
 }
 
-/// Create a set of addresses with password-free derivations for user-selected
+/// Create a set of addresses using imported derivations set for user-selected
 /// seed.
 ///
 /// Function creates addresses in the Signer database for the derivations
@@ -1071,8 +1071,9 @@ pub fn import_derivations(
 
 /// Check derivations before offering user to import them.
 ///
-/// Signer allows bulk import only for valid derivations without password (i.e.
-/// without `///<password>` part).
+/// Signer allows bulk import only for valid derivations, with or without
+/// password. For passworded derivations no password is ever confirmed, as the
+/// user presumably has the derivations already recorded somewhere.
 ///
 /// This function is used in `transaction_parsing::derivations` to check the
 /// incoming derivations once they are received in `derivations` qr code
@@ -1086,17 +1087,10 @@ pub fn import_derivations(
 #[cfg(feature = "signer")]
 pub fn check_derivation_set(derivations: &[String]) -> Result<(), ErrorSigner> {
     for path in derivations.iter() {
-        match REG_PATH.captures(path) {
-            Some(caps) => {
-                if caps.name("password").is_some() {
-                    return Err(ErrorSigner::Input(InputSigner::OnlyNoPwdDerivations));
-                }
-            }
-            None => {
-                return Err(ErrorSigner::Input(InputSigner::InvalidDerivation(
-                    path.to_string(),
-                )))
-            }
+        if REG_PATH.captures(path).is_none() {
+            return Err(ErrorSigner::Input(InputSigner::InvalidDerivation(
+                path.to_string(),
+            )));
         }
     }
     Ok(())
@@ -1108,38 +1102,46 @@ pub fn check_derivation_set(derivations: &[String]) -> Result<(), ErrorSigner> {
 /// which the derivations would be created (genesis hash and `Encryption`), and
 /// the plaintext user derivations set.
 ///
-/// Derivations allowed in the import set must be valid and must have no
-/// password (i.e. no `///<password>`) part. The derivations source file must
-/// have derivations as a list with each new derivation on the new line.
+/// Derivations allowed in the import set must be valid, with or without
+/// password. The derivations source file must have derivations as a list with
+/// each new derivation on the new line.
 ///
 /// The source plaintext is cut in lines and each line is processes using regex,
 /// all invalid derivations are ignored. Function prints found valid
-/// password-free derivations as well.
+/// password-free derivations as is and passworded with only public part
+/// visible (e.g. `//alice///<password>`).
 #[cfg(feature = "active")]
 pub fn prepare_derivations_import(
     encryption: &Encryption,
-    genesis_hash: &H256,
+    genesis_hash: H256,
     content: &str,
 ) -> Result<ContentDerivations, ErrorActive> {
     let mut derivations: Vec<String> = Vec::new();
+    let mut display_derivations: Vec<String> = Vec::new();
     let content_set: Vec<&str> = content.trim().split('\n').collect();
     for path in content_set.iter() {
         if let Some(caps) = REG_PATH.captures(path) {
             if let Some(p) = caps.name("path") {
-                if caps.name("password").is_none() {
-                    derivations.push(p.as_str().to_string())
-                }
+                derivations.push(path.to_string());
+                let display = {
+                    if caps.name("password").is_none() {
+                        p.as_str().to_string()
+                    } else {
+                        format!("{}///<password>", p.as_str())
+                    }
+                };
+                display_derivations.push(display);
             }
         }
     }
-    if derivations.is_empty() {
+    if display_derivations.is_empty() {
         return Err(ErrorActive::Input(InputActive::NoValidDerivationsToExport));
     } else {
         println!(
-            "Found and used {} valid password-free derivations:",
-            derivations.len()
+            "Found and used {} valid derivations:",
+            display_derivations.len()
         );
-        for x in derivations.iter() {
+        for x in display_derivations.iter() {
             println!("\"{}\"", x);
         }
     }
