@@ -77,13 +77,6 @@ fun TransactionPreview(
 					}
 				)
 			}
-			TransactionType.DONE ->
-				BigButton(
-					text = "Done",
-					action = {
-						button(Action.GO_BACK, "", "")
-					}
-				)
 			TransactionType.STUB -> {
 				BigButton(
 					text = "Approve",

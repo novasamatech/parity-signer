@@ -77,9 +77,6 @@ struct TransactionPreview: View {
                             action: {
                                 pushButton(.goForward, "", "")
                             })
-                    case .done:
-                        EmptyView()
-                    }
                     if content.ttype != .done {
                         BigButton(
                             text: "Decline",
