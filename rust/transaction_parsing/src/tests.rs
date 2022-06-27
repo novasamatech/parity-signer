@@ -2481,3 +2481,44 @@ fn import_derivations() {
     }
     fs::remove_dir_all(dbname).unwrap();
 }
+
+#[test]
+fn import_derivations_some_passworded() {
+    let dbname = "for_tests/import_derivations_some_passworded";
+    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let line = "53ffde01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e1c1c2f2f416c6963653c2f2f416c6963652f77657374656e64582f2f416c6963652f7365637265742f2f7365637265740c2f2f300c2f2f31702f2f416c6963652f2f2f6d795f7365637265745f70617373776f7264182f2f2f303030";
+    let set_expected = TransactionCardSet {
+        importing_derivations: Some(vec![TransactionCard {
+            index: 0,
+            indent: 0,
+            card: Card::DerivationsCard {
+                f: vec![
+                    "//Alice".to_string(),
+                    "//Alice/westend".to_string(),
+                    "//Alice/secret//secret".to_string(),
+                    "//0".to_string(),
+                    "//1".to_string(),
+                    "//Alice///my_secret_password".to_string(),
+                    "///000".to_string(),
+                ],
+            },
+        }]),
+        ..Default::default()
+    };
+
+    let network_info_known = westend_spec();
+    let action = produce_output(line, dbname);
+    if let TransactionAction::Derivations {
+        content: set,
+        network_info,
+        checksum: _,
+        network_specs_key: _,
+    } = action
+    {
+        assert_eq!(set, set_expected);
+        assert_eq!(network_info, network_info_known);
+    } else {
+        panic!("Wrong action {:?}", action)
+    }
+    fs::remove_dir_all(dbname).unwrap();
+}
