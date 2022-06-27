@@ -516,7 +516,6 @@ fn input_signer() -> Vec<InputSigner> {
             new_verifier_value: verifier_value_ed25519(),
         },
         InputSigner::InvalidDerivation(String::from("//")),
-        InputSigner::OnlyNoPwdDerivations,
         InputSigner::SeedNameExists(String::from("Alice")),
     ]);
 
@@ -1110,7 +1109,6 @@ mod tests {
 "Bad input data. Exactly same network specs for network westend with encryption sr25519 are already in the database."
 "Bad input data. Network kulupu current verifier is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received add_specs message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519, which is neither current network verifier not the general verifier. Changing the network verifier to another non-general one would require wipe and reset of Signer."
 "Bad input data. Derivation // has invalid format."
-"Bad input data. Only derivations without passwords are allowed in bulk import."
 "Bad input data. Seed name Alice already exists."
 "Could not find current verifier for network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd."
 "Could not find general verifier."

@@ -1030,7 +1030,7 @@ impl TrDbColdSign {
 
 /// Temporary storage for derivations import data.
 ///
-/// Signer can import **password-free** derivations in bulk using
+/// Signer can import derivations in bulk using
 /// [`ContentDerivations`](definitions::qr_transfers::ContentDerivations)
 /// payloads.
 ///
@@ -1051,8 +1051,7 @@ impl TrDbColdSign {
 #[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 pub struct TrDbColdDerivations {
-    /// set of password-free derivation path strings, from received
-    /// `derivations` payload
+    /// set of derivation path strings, from received `derivations` payload
     checked_derivations: Vec<String>,
 
     /// network specs for the network in which to generate the derivations,

@@ -129,7 +129,7 @@
 //! # Derivations import
 //!
 //! Crate `generate_message` can generate derivations import for bulk import of
-//! password-free derivations.
+//! derivations, either password-free or passworded.
 //!
 //! Derivations import has following structure:
 //!
@@ -156,17 +156,18 @@
 //! generating the update, the update itself contains network genesis hash and
 //! [`Encryption`](definitions::crypto::Encryption).
 //!
-//! Only password-free derivation are getting in the update. On generation the
+//! Only valid derivation are getting in the update. On generation the
 //! user-provided derivation list is searched for valid derivations: each line
-//! is a separate derivation, only soft (`/`) and hard (`//`) derivations are
-//! allowed, any incorrectly formatted or passworded (with `///<password>` part)
+//! is a separate derivation, soft (`/`) and hard (`//`) derivations are
+//! allowed, with or without `///<password>` part, any incorrectly formatted
 //! derivations are skipped. `generate_message` prints the suitable derivations
-//! found.
+//! found: password-free as is, and passworded with `///<password>` instead of
+//! the real password.
 //!
-//! When the update is scanned into the Signer, only password-free valid
-//! derivations are expected to be found in the derivations set, otherwise the
-//! Signer will produce an error. If derivations set gets accepted for a certain
-//! seed, Signer tries to create derived keys for all derivations.
+//! When the update is scanned into the Signer, only valid derivations are
+//! expected to be found in the derivations set, otherwise the Signer will
+//! produce an error. If derivations set gets accepted for a certain seed,
+//! Signer tries to create derived keys for all derivations.
 //!
 //! If a derivation produces exactly same public key with exactly same
 //! derivation path as already in the database or in the import, it get ignored
@@ -998,9 +999,9 @@
 //! immediately following the key.
 //!
 //! - Key `-payload` followed by file path in `/generate_message/` folder.
-//! File with derivations contains password-free derivations, each on its own
-//! line. Only suitable derivations will be processed. Processed derivations are
-//! also printed for user to check.
+//! File with derivations contains valid derivations, each on its own line. Only
+//! suitable derivations will be processed. Processed derivations are also
+//! printed for user to check.
 //!
 //! - Key `-title` followed by network address book title, to indicate to
 //! which network the derivations belong.

@@ -260,8 +260,7 @@ impl ContentLoadTypes {
 /// Derivations import QR code content  
 ///
 /// Derivations import could be used to generate or to restore a set of
-/// **password-free** derivations in Signer avoiding manual adding of multiple
-/// derivations.  
+/// derivations in Signer avoiding manual adding.  
 ///
 /// Popular request.  
 ///
@@ -281,11 +280,11 @@ struct DecodedContentDerivations {
 impl ContentDerivations {
     /// Generate [`ContentDerivations`] from network encryption [`Encryption`],
     /// genesis hash `[u8; 32]`, and set of derivations `&[String]`.  
-    pub fn generate(encryption: &Encryption, genesis_hash: &H256, derivations: &[String]) -> Self {
+    pub fn generate(encryption: &Encryption, genesis_hash: H256, derivations: &[String]) -> Self {
         Self(
             DecodedContentDerivations {
                 encryption: encryption.to_owned(),
-                genesis_hash: genesis_hash.to_owned(),
+                genesis_hash,
                 derivations: derivations.to_vec(),
             }
             .encode(),
