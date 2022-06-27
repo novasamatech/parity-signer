@@ -222,7 +222,6 @@ pub enum TransactionType {
     Stub,
     Read,
     ImportDerivations,
-    Done,
 }
 
 #[derive(Clone, Debug, PartialEq)]
