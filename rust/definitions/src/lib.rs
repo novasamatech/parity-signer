@@ -30,6 +30,9 @@ pub mod helpers;
 
 pub mod history;
 
+#[cfg(feature = "signer")]
+pub mod holds;
+
 pub mod keyring;
 
 pub mod metadata;
