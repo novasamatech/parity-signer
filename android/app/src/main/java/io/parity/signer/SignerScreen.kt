@@ -111,6 +111,10 @@ fun ScreenSelector(
 			screenData.f,
 			signerDataModel::wipeToJailbreak
 		)
+		is ScreenData.SignatureReady -> SignatureReady(
+			screenData.f,
+			signerDataModel::pushButton
+		)
 	}
 }
 
@@ -145,10 +149,6 @@ fun ModalSelector(
 			getSeedForBackup = signerDataModel::getSeedForBackup
 		)
 		is ModalData.PasswordConfirm -> PasswordConfirm(
-			modalData.f,
-			signerDataModel = signerDataModel
-		)
-		is ModalData.SignatureReady -> SignatureReady(
 			modalData.f,
 			signerDataModel = signerDataModel
 		)
