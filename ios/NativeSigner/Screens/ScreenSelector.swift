@@ -121,14 +121,19 @@ struct ScreenSelector: View {
                 content: value,
                 pushButton: pushButton
             )
+        case .signatureReady(let value):
+            SignatureReady(
+                content: value,
+                pushButton: pushButton
+            )
         }
     }
 }
 
 /*
-struct ScreenSelector_Previews: PreviewProvider {
-    static var previews: some View {
-        ScreenSelector()
-    }
-}
-*/
+ struct ScreenSelector_Previews: PreviewProvider {
+ static var previews: some View {
+ ScreenSelector()
+ }
+ }
+ */

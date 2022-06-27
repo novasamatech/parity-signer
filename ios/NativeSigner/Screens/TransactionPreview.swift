@@ -9,14 +9,12 @@ import SwiftUI
 
 struct TransactionPreview: View {
     @State private var comment = ""
-    @State var offset: CGFloat = 0
-    @State var offsetOld: CGFloat = 0
     @FocusState private var focus: Bool
     let content: MTransaction
     let sign: (String, String) -> Void
     let pushButton: (Action, String, String) -> Void
     var body: some View {
-        VStack {
+        ScrollView {
             TransactionBlock(cards: content.content.assemble())
             VStack {
                 if let address = content.authorInfo {
@@ -96,15 +94,6 @@ struct TransactionPreview: View {
             .padding(.top, -10)
             .padding(.horizontal, 16)
         }
-        .offset(x:0, y: offset+offsetOld)
-        .gesture(DragGesture()
-                    .onChanged{ drag in
-            self.offset = drag.translation.height
-        }
-                    .onEnded { drag in
-            self.offsetOld += drag.translation.height
-            self.offset = 0
-        })
     }
 }
 
