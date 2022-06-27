@@ -47,9 +47,6 @@ struct ModalSelector: View {
         case .passwordConfirm(let value):
             PasswordConfirm(content: value,
                             createAddress: createAddress)
-        case .signatureReady(let value):
-            SignatureReady(content: value,
-                           pushButton: pushButton)
         case .enterPassword(let value):
             EnterPassword(content: value,
                           pushButton: pushButton)
