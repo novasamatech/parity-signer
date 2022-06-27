@@ -458,7 +458,7 @@ impl ErrorSource for Active {
                     InputActive::SignatureLength => String::from("Provided signature has wrong length."),
                     InputActive::FaultyMetadataInPayload(e) => format!("Metadata in the message to sign is not suitable. {}", e.show()),
                     InputActive::BadSignature => String::from("Bad signature."),
-                    InputActive::NoValidDerivationsToExport => String::from("No valid password-free derivations found to generate ContentDerivations."),
+                    InputActive::NoValidDerivationsToExport => String::from("No valid derivations found to generate ContentDerivations."),
                     InputActive::BlockHashLength => String::from("Provided block hash has wrong length."),
                 }
             },
@@ -1977,8 +1977,7 @@ pub enum InputActive {
     /// for given public key and data.
     BadSignature,
 
-    /// Provided file contains no valid password-free derivations that could be
-    /// exported
+    /// Provided file contains no valid derivations that could be exported
     NoValidDerivationsToExport,
 
     /// User-entered block hash has invalid length
