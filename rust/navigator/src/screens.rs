@@ -11,7 +11,7 @@ use definitions::{
     error_signer::{ErrorSigner, ExtraAddressKeySourceSigner, Signer},
     helpers::{make_identicon_from_multisigner, multisigner_to_public},
     keyring::{AddressKey, NetworkSpecsKey},
-    navigation::{Address, TransactionCardSet},
+    navigation::{Address, MSignatureReady, TransactionCardSet},
     network_specs::NetworkSpecs,
     users::AddressDetails,
 };
@@ -27,6 +27,7 @@ pub enum Screen {
     LogDetails(u32),
     Scan,
     Transaction(Box<TransactionState>),
+    SignatureReady(MSignatureReady),
     SeedSelector,
     Keys(KeysState),
     KeyDetails(AddressState),
@@ -552,6 +553,7 @@ impl Screen {
             Screen::LogDetails(_) => Some(String::from("LogDetails")),
             Screen::Scan => Some(String::from("Scan")),
             Screen::Transaction(_) => Some(String::from("Transaction")),
+            Screen::SignatureReady(_) => Some(String::from("Signature ready")),
             Screen::SeedSelector => Some(String::from("SeedSelector")),
             Screen::Keys(_) => Some(String::from("Keys")),
             Screen::KeyDetails(_) => Some(String::from("KeyDetails")),
@@ -577,6 +579,7 @@ impl Screen {
             Screen::LogDetails(_) => "Event details",
             Screen::Scan => "",
             Screen::Transaction(_) => "",
+            Screen::SignatureReady(_) => "",
             Screen::SeedSelector => "Select seed",
             Screen::Keys(_) => "",
             Screen::KeyDetails(_) => "Key",
@@ -605,6 +608,7 @@ impl Screen {
             | Screen::SeedSelector
             | Screen::Nowhere => false,
             Screen::Transaction(_)
+            | Screen::SignatureReady(_)
             | Screen::LogDetails(_)
             | Screen::Keys(_)
             | Screen::KeyDetails(_)

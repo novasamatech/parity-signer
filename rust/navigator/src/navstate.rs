@@ -142,6 +142,15 @@ impl State {
                                 }
                             }
                         }
+                        Screen::SignatureReady(_) => {
+                            match db_handling::interface_signer::purge_transactions(dbname) {
+                                Ok(()) => new_navstate = Navstate::clean_screen(Screen::Log),
+                                Err(e) => {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&e));
+                                }
+                            }
+                        }
                         Screen::Keys(ref keys_state) => {
                             match keys_state.get_specialty() {
                                 SpecialtyKeysState::MultiSelect(_) => {
@@ -400,7 +409,19 @@ impl State {
                                     ) {
                                         Ok(a) => {
                                             seed.zeroize();
-                                            new_navstate.modal = Modal::SignatureReady(a);
+                                            let m_signature_ready = MSignatureReady {
+                                                author_info,
+                                                content,
+                                                network_info: MSCNetworkInfo {
+                                                    network_title: network_info.title,
+                                                    network_logo: network_info.logo,
+                                                },
+                                                signature: a,
+                                                user_comment: t.get_comment(),
+                                            };
+                                            new_navstate = Navstate::clean_screen(
+                                                Screen::SignatureReady(m_signature_ready),
+                                            );
                                         }
                                         Err(e) => {
                                             seed.zeroize();
@@ -441,7 +462,19 @@ impl State {
                                 dbname,
                             ) {
                                 Ok(a) => {
-                                    new_navstate.modal = Modal::SignatureReady(a);
+                                    let m_signature_ready = MSignatureReady {
+                                        author_info,
+                                        content,
+                                        network_info: MSCNetworkInfo {
+                                            network_title: network_info.title,
+                                            network_logo: network_info.logo,
+                                        },
+                                        signature: a,
+                                        user_comment: details_str.to_string(),
+                                    };
+                                    new_navstate = Navstate::clean_screen(Screen::SignatureReady(
+                                        m_signature_ready,
+                                    ));
                                 }
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
@@ -1510,6 +1543,9 @@ impl State {
                     },
                 }
             }
+            Screen::SignatureReady(ref m_signature_ready) => ScreenData::SignatureReady {
+                f: m_signature_ready.clone(),
+            },
             Screen::SeedSelector => {
                 let seed_name_cards =
                     db_handling::interface_signer::get_all_seed_names_with_identicons(
@@ -1729,11 +1765,6 @@ impl State {
                 }
                 _ => None,
             },
-            Modal::SignatureReady(ref a) => Some(ModalData::SignatureReady {
-                f: MSignatureReady {
-                    signature: a.to_vec(),
-                },
-            }),
             Modal::EnterPassword => match new_navstate.screen {
                 Screen::Transaction(ref t) => {
                     if let transaction_parsing::TransactionAction::Sign {
@@ -1989,6 +2020,7 @@ impl State {
             Screen::LogDetails(_) => true,
             Screen::Scan => true,
             Screen::Transaction(_) => false,
+            Screen::SignatureReady(_) => false,
             Screen::SeedSelector => true,
             Screen::Keys(_) => true,
             Screen::KeyDetails(_) => false,
@@ -2012,7 +2044,9 @@ impl State {
     fn get_active_navbutton(&self) -> Option<FooterButton> {
         match self.navstate.screen {
             Screen::Log | Screen::LogDetails(_) => Some(FooterButton::Log),
-            Screen::Scan | Screen::Transaction(_) => Some(FooterButton::Scan),
+            Screen::Scan | Screen::Transaction(_) | Screen::SignatureReady(_) => {
+                Some(FooterButton::Scan)
+            }
             Screen::SeedSelector
             | Screen::Keys(_)
             | Screen::KeyDetails(_)
@@ -2055,6 +2089,7 @@ impl State {
             | Screen::LogDetails(_)
             | Screen::Scan
             | Screen::Transaction(_)
+            | Screen::SignatureReady(_)
             | Screen::Documents
             | Screen::Nowhere
             | Screen::Verifier
@@ -2086,6 +2121,7 @@ impl State {
             | Screen::DeriveKey(_)
             | Screen::Scan
             | Screen::Transaction(_)
+            | Screen::SignatureReady(_)
             | Screen::SeedSelector
             | Screen::SignSufficientCrypto(_) => ScreenNameType::H1,
         }

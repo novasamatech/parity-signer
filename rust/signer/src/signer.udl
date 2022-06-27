@@ -512,6 +512,7 @@ interface ScreenData {
     Log(MLog f);
     LogDetails(MLogDetails f);
     Transaction(MTransaction f);
+    SignatureReady(MSignatureReady f);
     SeedSelector(MSeeds f);
     KeyDetails(MKeyDetails f);
     NewSeed(MNewSeed f);
@@ -633,7 +634,11 @@ dictionary MPasswordConfirm {
 };
 
 dictionary MSignatureReady {
+    Address author_info;
+    TransactionCardSet content;
+    MSCNetworkInfo network_info;
     sequence<u8> signature;
+    string user_comment;
 };
 
 dictionary MEnterPassword {
@@ -674,7 +679,6 @@ interface ModalData {
     NewSeedBackup(MNewSeedBackup f);
     NetworkSelector(MNetworkMenu f);
     PasswordConfirm(MPasswordConfirm f);
-    SignatureReady(MSignatureReady f);
     EnterPassword(MEnterPassword f);
     LogRight(MLogRight f);
     TypesInfo(MTypesInfo f);

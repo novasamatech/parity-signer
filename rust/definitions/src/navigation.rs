@@ -117,6 +117,7 @@ pub enum ScreenData {
     Log { f: MLog },
     LogDetails { f: MLogDetails },
     Transaction { f: MTransaction },
+    SignatureReady { f: MSignatureReady },
     SeedSelector { f: MSeeds },
     KeyDetails { f: MKeyDetails },
     NewSeed { f: MNewSeed },
@@ -252,6 +253,15 @@ pub struct MTransaction {
     pub ttype: TransactionType,
     pub author_info: Option<Address>,
     pub network_info: Option<MSCNetworkInfo>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct MSignatureReady {
+    pub author_info: Address,
+    pub content: TransactionCardSet,
+    pub network_info: MSCNetworkInfo,
+    pub signature: Vec<u8>,
+    pub user_comment: String,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -484,11 +494,6 @@ pub struct MPasswordConfirm {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct MSignatureReady {
-    pub signature: Vec<u8>,
-}
-
-#[derive(Clone, Debug, PartialEq)]
 pub struct MEnterPassword {
     pub author_info: Address,
     pub counter: u32,
@@ -531,7 +536,6 @@ pub enum ModalData {
     NewSeedBackup { f: MNewSeedBackup },
     NetworkSelector { f: MNetworkMenu },
     PasswordConfirm { f: MPasswordConfirm },
-    SignatureReady { f: MSignatureReady },
     EnterPassword { f: MEnterPassword },
     LogRight { f: MLogRight },
     TypesInfo { f: MTypesInfo },

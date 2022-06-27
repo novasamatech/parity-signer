@@ -5407,15 +5407,22 @@ fn flow_test_1() {
     )
     .unwrap()
     .unwrap();
-    let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { signature },
-    }) = action.modal_data
+    let signature_hex = if let ScreenData::SignatureReady {
+        f:
+            MSignatureReady {
+                author_info: _,
+                content: _,
+                network_info: _,
+                signature,
+                user_comment: _,
+            },
+    } = action.screen_data
     {
         String::from_utf8(qr_payload(&signature)).unwrap()
     } else {
         panic!(
-            "Expected ModalData::SigantureReady, got {:?}",
-            action.modal_data
+            "Expected ScreenData::SigantureReady, got {:?}",
+            action.screen_data
         );
     };
 
@@ -5553,15 +5560,22 @@ fn flow_test_1() {
     let action = do_action(Action::GoForward, "text test", ALICE_SEED_PHRASE)
         .unwrap()
         .unwrap();
-    let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { ref signature },
-    }) = action.modal_data
+    let signature_hex = if let ScreenData::SignatureReady {
+        f:
+            MSignatureReady {
+                author_info: _,
+                content: _,
+                network_info: _,
+                signature,
+                user_comment: _,
+            },
+    } = action.screen_data
     {
-        String::from_utf8(qr_payload(signature)).unwrap()
+        String::from_utf8(qr_payload(&signature)).unwrap()
     } else {
         panic!(
-            "Expected ModalData::SigantureReady, got {:?}",
-            action.modal_data
+            "Expected ScreenData::SigantureReady, got {:?}",
+            action.screen_data
         );
     };
 
@@ -5836,6 +5850,144 @@ fn flow_test_1() {
         .unwrap();
 
     let block_hash = "538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33".to_string();
+    let expected_content = TransactionCardSet {
+        method: Some(vec![
+            TransactionCard {
+                index: 0,
+                indent: 0,
+                card: Card::PalletCard {
+                    f: "Balances".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 1,
+                indent: 1,
+                card: Card::CallCard {
+                    f: MSCCall {
+                        method_name: "transfer_keep_alive".to_string(),
+                        docs,
+                    },
+                },
+            },
+            TransactionCard {
+                index: 2,
+                indent: 2,
+                card: Card::FieldNameCard {
+                    f: MSCFieldName {
+                        name: "dest".to_string(),
+                        docs_field_name: String::new(),
+                        path_type: "sp_runtime >> multiaddress >> MultiAddress".to_string(),
+                        docs_type: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 3,
+                indent: 3,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Id".to_string(),
+                        docs_enum_variant: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 4,
+                indent: 4,
+                card: Card::IdCard {
+                    f: MSCId {
+                        base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
+                        identicon: bob().to_vec(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 5,
+                indent: 2,
+                card: Card::FieldNameCard {
+                    f: MSCFieldName {
+                        name: "value".to_string(),
+                        docs_field_name: String::new(),
+                        path_type: String::new(),
+                        docs_type: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 6,
+                indent: 3,
+                card: Card::BalanceCard {
+                    f: MSCCurrency {
+                        amount: "100.000000000".to_string(),
+                        units: "mWND".to_string(),
+                    },
+                },
+            },
+        ]),
+        extensions: Some(vec![
+            TransactionCard {
+                index: 7,
+                indent: 0,
+                card: Card::EraMortalCard {
+                    f: MSCEraMortal {
+                        era: "Mortal".to_string(),
+                        phase: "27".to_string(),
+                        period: "64".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 8,
+                indent: 0,
+                card: Card::NonceCard {
+                    f: "46".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 9,
+                indent: 0,
+                card: Card::TipCard {
+                    f: MSCCurrency {
+                        amount: "0".to_string(),
+                        units: "pWND".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 10,
+                indent: 0,
+                card: Card::NameVersionCard {
+                    f: MSCNameVersion {
+                        name: "westend".to_string(),
+                        version: "9150".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 11,
+                indent: 0,
+                card: Card::TxSpecCard { f: "5".to_string() },
+            },
+            TransactionCard {
+                index: 12,
+                indent: 0,
+                card: Card::BlockHashCard { f: block_hash },
+            },
+        ]),
+        ..Default::default()
+    };
+    let expected_author_info = Address {
+        base58: pepper_westend_base58,
+        identicon: pepper_westend_identicon,
+        seed_name: "Pepper".to_string(),
+        path: "//westend".to_string(),
+        has_pwd: false,
+        multiselect: None,
+    };
+    let expected_network_info = MSCNetworkInfo {
+        network_title: "Westend".to_string(),
+        network_logo: "westend".to_string(),
+    };
     let mut expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
@@ -5845,147 +5997,10 @@ fn flow_test_1() {
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
             f: MTransaction {
-                content: TransactionCardSet {
-                    method: Some(vec![
-                        TransactionCard {
-                            index: 0,
-                            indent: 0,
-                            card: Card::PalletCard {
-                                f: "Balances".to_string(),
-                            },
-                        },
-                        TransactionCard {
-                            index: 1,
-                            indent: 1,
-                            card: Card::CallCard {
-                                f: MSCCall {
-                                    method_name: "transfer_keep_alive".to_string(),
-                                    docs,
-                                },
-                            },
-                        },
-                        TransactionCard {
-                            index: 2,
-                            indent: 2,
-                            card: Card::FieldNameCard {
-                                f: MSCFieldName {
-                                    name: "dest".to_string(),
-                                    docs_field_name: String::new(),
-                                    path_type: "sp_runtime >> multiaddress >> MultiAddress"
-                                        .to_string(),
-                                    docs_type: String::new(),
-                                },
-                            },
-                        },
-                        TransactionCard {
-                            index: 3,
-                            indent: 3,
-                            card: Card::EnumVariantNameCard {
-                                f: MSCEnumVariantName {
-                                    name: "Id".to_string(),
-                                    docs_enum_variant: String::new(),
-                                },
-                            },
-                        },
-                        TransactionCard {
-                            index: 4,
-                            indent: 4,
-                            card: Card::IdCard {
-                                f: MSCId {
-                                    base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"
-                                        .to_string(),
-                                    identicon: bob().to_vec(),
-                                },
-                            },
-                        },
-                        TransactionCard {
-                            index: 5,
-                            indent: 2,
-                            card: Card::FieldNameCard {
-                                f: MSCFieldName {
-                                    name: "value".to_string(),
-                                    docs_field_name: String::new(),
-                                    path_type: String::new(),
-                                    docs_type: String::new(),
-                                },
-                            },
-                        },
-                        TransactionCard {
-                            index: 6,
-                            indent: 3,
-                            card: Card::BalanceCard {
-                                f: MSCCurrency {
-                                    amount: "100.000000000".to_string(),
-                                    units: "mWND".to_string(),
-                                },
-                            },
-                        },
-                    ]),
-                    extensions: Some(vec![
-                        TransactionCard {
-                            index: 7,
-                            indent: 0,
-                            card: Card::EraMortalCard {
-                                f: MSCEraMortal {
-                                    era: "Mortal".to_string(),
-                                    phase: "27".to_string(),
-                                    period: "64".to_string(),
-                                },
-                            },
-                        },
-                        TransactionCard {
-                            index: 8,
-                            indent: 0,
-                            card: Card::NonceCard {
-                                f: "46".to_string(),
-                            },
-                        },
-                        TransactionCard {
-                            index: 9,
-                            indent: 0,
-                            card: Card::TipCard {
-                                f: MSCCurrency {
-                                    amount: "0".to_string(),
-                                    units: "pWND".to_string(),
-                                },
-                            },
-                        },
-                        TransactionCard {
-                            index: 10,
-                            indent: 0,
-                            card: Card::NameVersionCard {
-                                f: MSCNameVersion {
-                                    name: "westend".to_string(),
-                                    version: "9150".to_string(),
-                                },
-                            },
-                        },
-                        TransactionCard {
-                            index: 11,
-                            indent: 0,
-                            card: Card::TxSpecCard { f: "5".to_string() },
-                        },
-                        TransactionCard {
-                            index: 12,
-                            indent: 0,
-                            card: Card::BlockHashCard { f: block_hash },
-                        },
-                    ]),
-                    ..Default::default()
-                },
+                content: expected_content.clone(),
                 ttype: TransactionType::Sign,
-                author_info: Some(Address {
-                    base58: pepper_westend_base58,
-                    identicon: pepper_westend_identicon,
-                    seed_name: "Pepper".to_string(),
-                    path: "//westend".to_string(),
-                    has_pwd: false,
-                    multiselect: None,
-                }),
-                network_info: Some(MSCNetworkInfo {
-                    network_title: "Westend".to_string(),
-                    network_logo: "westend".to_string(),
-                }),
+                author_info: Some(expected_author_info.clone()),
+                network_info: Some(expected_network_info.clone()),
             },
         },
         modal_data: None,
@@ -6007,27 +6022,37 @@ fn flow_test_1() {
     )
     .unwrap()
     .unwrap();
-    let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { ref signature },
-    }) = action.modal_data
-    {
-        expected_action.modal_data = Some(ModalData::SignatureReady {
-            f: MSignatureReady {
-                signature: signature.clone(),
+    let signature_hex = if let ScreenData::SignatureReady {
+        f:
+            MSignatureReady {
+                author_info: _,
+                content: _,
+                network_info: _,
+                ref signature,
+                user_comment: _,
             },
-        });
-
+    } = action.screen_data
+    {
+        expected_action.screen_data = ScreenData::SignatureReady {
+            f: MSignatureReady {
+                author_info: expected_author_info,
+                content: expected_content,
+                network_info: expected_network_info.clone(),
+                signature: signature.clone(),
+                user_comment: String::from("Pepper also sends some cash"),
+            },
+        };
         String::from_utf8(qr_payload(signature)).unwrap()
     } else {
         panic!(
-            "Expected ModalData::SigantureReady, got {:?}",
-            action.modal_data
+            "Expected ScreenData::SignatureReady, got {:?}",
+            action.screen_data
         );
     };
 
     assert_eq!(
         action, expected_action,
-        "GoForward on parsed transaction. Expected modal SignatureReady",
+        "GoForward on parsed transaction. Expected screen SignatureReady",
     );
 
     assert!(
@@ -6180,6 +6205,24 @@ fn flow_test_1() {
     let action = do_action(Action::TransactionFetched, &message_hex, "")
         .unwrap()
         .unwrap();
+    let expected_text_content = TransactionCardSet {
+        message: Some(vec![TransactionCard {
+            index: 0,
+            indent: 0,
+            card: Card::TextCard {
+                f: card_text.clone(),
+            },
+        }]),
+        ..Default::default()
+    };
+    let expected_author_info = Address {
+        base58: pepper_key0_base58.clone(),
+        identicon: pepper_key0_identicon.clone(),
+        seed_name: "Pepper".to_string(),
+        path: "//0".to_string(),
+        has_pwd: true,
+        multiselect: None,
+    };
     let mut expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
@@ -6189,29 +6232,10 @@ fn flow_test_1() {
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
             f: MTransaction {
-                content: TransactionCardSet {
-                    message: Some(vec![TransactionCard {
-                        index: 0,
-                        indent: 0,
-                        card: Card::TextCard {
-                            f: card_text.clone(),
-                        },
-                    }]),
-                    ..Default::default()
-                },
+                content: expected_text_content.clone(),
                 ttype: TransactionType::Sign,
-                author_info: Some(Address {
-                    base58: pepper_key0_base58.clone(),
-                    identicon: pepper_key0_identicon.clone(),
-                    seed_name: "Pepper".to_string(),
-                    path: "//0".to_string(),
-                    has_pwd: true,
-                    multiselect: None,
-                }),
-                network_info: Some(MSCNetworkInfo {
-                    network_title: "Westend".to_string(),
-                    network_logo: "westend".to_string(),
-                }),
+                author_info: Some(expected_author_info.clone()),
+                network_info: Some(expected_network_info.clone()),
             },
         },
         modal_data: None,
@@ -6435,21 +6459,31 @@ fn flow_test_1() {
     )
     .unwrap();
     let action = do_action(Action::GoForward, "secret", "").unwrap().unwrap();
-    let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { ref signature },
-    }) = action.modal_data
-    {
-        text_sign_action.modal_data = Some(ModalData::SignatureReady {
-            f: MSignatureReady {
-                signature: signature.clone(),
+    let signature_hex = if let ScreenData::SignatureReady {
+        f:
+            MSignatureReady {
+                author_info: _,
+                content: _,
+                network_info: _,
+                ref signature,
+                user_comment: _,
             },
-        });
-
+    } = action.screen_data
+    {
+        text_sign_action.screen_data = ScreenData::SignatureReady {
+            f: MSignatureReady {
+                author_info: expected_author_info,
+                content: expected_text_content,
+                network_info: expected_network_info,
+                signature: signature.clone(),
+                user_comment: String::from("Pepper tries better"),
+            },
+        };
         String::from_utf8(qr_payload(signature)).unwrap()
     } else {
         panic!(
-            "Expected ModalData::SigantureReady, got {:?}",
-            action.modal_data
+            "Expected ScreenData::SignatureReady, got {:?}",
+            action.screen_data
         );
     };
 
