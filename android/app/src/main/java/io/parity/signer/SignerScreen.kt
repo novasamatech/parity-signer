@@ -29,6 +29,13 @@ fun ScreenSelector(
 		{ action, details -> button(action, details, "") }
 	val seedNames = signerDataModel.seedNames.value ?: emptyArray()
 
+	/* Don't do this.
+	This is an excessive use of compose.
+	Compose helps in designing the UI, not to replace the Android navigation system.
+	This approach makes it difficult to maintain as the project scales;
+	This class will keep growing and become more spagetti.
+	See https://developer.android.com/guide/navigation/navigation-getting-started.
+	*/
 	when (screenData) {
 		is ScreenData.DeriveKey -> NewAddressScreen(
 			screenData.f,

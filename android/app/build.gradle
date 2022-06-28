@@ -1,7 +1,7 @@
 plugins {
 	id 'com.android.application'
 	id 'kotlin-android'
-	id 'org.mozilla.rust-android-gradle.rust-android'
+	id 'org.mozilla.rust-android-gradle.rust-android' // thumbs up!
 	id 'idea'
 }
 

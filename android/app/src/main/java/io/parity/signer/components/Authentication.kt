@@ -8,32 +8,38 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 
 
+//This class shouldn't live here. I'd expect the component folder to have only compose classes.
+//Instead Authentication should live on the core layer.
 class Authentication(val setAuth: (Boolean) -> Unit) {
+	// Consider isStrongCredential naming
 	var strongCredentials: Boolean = false
 
 
 	private lateinit var biometricPrompt: BiometricPrompt
 	lateinit var context: Context
 
+	//Why is this a FragmentActivity when there's no fragment in the project?
 	fun authenticate(activity: FragmentActivity, onSuccess: () -> Unit) {
 		val biometricManager = BiometricManager.from(context)
 
 		val promptInfo =
 			if (strongCredentials) {
 				BiometricPrompt.PromptInfo.Builder()
-					.setTitle("UNLOCK SIGNER")
-					.setSubtitle("Please authenticate yourself")
+					.setTitle("UNLOCK SIGNER") // Use StringRes
+					.setSubtitle("Please authenticate yourself") // Use StringRes
 					.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
 					.build()
 			} else {
 				BiometricPrompt.PromptInfo.Builder()
-					.setTitle("UNLOCK SIGNER")
-					.setSubtitle("Please authenticate yourself")
-					.setNegativeButtonText("Cancel")
+					.setTitle("UNLOCK SIGNER") // Use StringRes
+					.setSubtitle("Please authenticate yourself") // Use StringRes
+					.setNegativeButtonText("Cancel") // Use StringRes
 					.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
 					.build()
 			}
 
+		//This function is too long and very spagetti. Can it be cleaned ?
+		//Strings should be plain, consider StringRes
 		when (biometricManager.canAuthenticate(if (strongCredentials) BiometricManager.Authenticators.DEVICE_CREDENTIAL else BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
 			BiometricManager.BIOMETRIC_SUCCESS -> {
 

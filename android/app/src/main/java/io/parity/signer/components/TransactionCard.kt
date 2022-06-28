@@ -18,6 +18,8 @@ import io.parity.signer.uniffi.TransactionCard
 /**
  * Selector for transaction card appearance
  */
+
+//This is a good use of compose.
 @Composable
 fun TransactionCard(card: TransactionCard) {
 	Box(

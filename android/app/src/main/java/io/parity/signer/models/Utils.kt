@@ -5,6 +5,9 @@ import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 
+
+//This shouldn't be in the model folder.
+
 /**
  * Decodes from hex string into number array
  */

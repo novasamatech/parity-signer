@@ -25,6 +25,8 @@ import java.io.FileOutputStream
 /**
  * This is single object to handle all interactions with backend
  */
+
+//Is this a DataModel or a SignerViewModel?
 class SignerDataModel : ViewModel() {
 	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 	private val REQUEST_CODE_PERMISSIONS = 10
@@ -67,6 +69,7 @@ class SignerDataModel : ViewModel() {
 
 	// Navigator
 	// TODO: consider extracting components as separate livedata
+	// I agree.
 	internal val _actionResult = MutableLiveData(
 		ActionResult(
 			screenLabel = "",
@@ -249,6 +252,8 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Checks if airplane mode was off
 	 */
+
+	//What's the essense of checking for Airplane mode?
 	private fun isAirplaneOn() {
 		if (Settings.Global.getInt(
 				context.contentResolver,
@@ -296,6 +301,8 @@ class SignerDataModel : ViewModel() {
 	 * on all "back"-like events and new screen spawns just in case
 	 */
 	fun totalRefresh() {
+		//totalRefresh is leading name that implies there's another type of refresh, but I can't find that in this class.
+		//checkRefresh probably needs a better naming. Example: shouldRefresh.
 		val checkRefresh = File(dbName).exists()
 		if (checkRefresh) _onBoardingDone.value =
 			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No
@@ -354,8 +361,10 @@ class SignerDataModel : ViewModel() {
 }
 
 /**
- * Describes current state of network detection alertness
+ * Describes current state of network detection alertness //I dont understand what it means.
  */
+
+//This naming still needs some improvments. If the name was descriptive enough, there wouldn't be a need to write a comment on top.
 enum class AlertState {
 	None,
 	Active,

@@ -2,6 +2,7 @@ package io.parity.signer.models
 
 import io.parity.signer.uniffi.Action
 
+//This is not a model, this is a function extension.
 fun SignerDataModel.signTransaction(
 	comment: String,
 	seedName: String

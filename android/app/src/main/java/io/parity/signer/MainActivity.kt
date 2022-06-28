@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity() {
 /**
  * Main app component - hosts navhost, Rust-based source of truth, etc.
  */
+
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable

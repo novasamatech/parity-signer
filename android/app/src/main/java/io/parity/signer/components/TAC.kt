@@ -8,6 +8,8 @@ import com.halilibo.richtext.ui.material.MaterialRichText
 /**
  * Terms and conditions content.
  */
+
+//Consider using StringRes so that it can support multi-language.
 @Composable
 fun TAC() {
 	MaterialRichText {
