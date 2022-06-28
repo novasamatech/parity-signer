@@ -21,8 +21,7 @@ jobs:
       - name:                 Install Rust stable toolchain
         uses:                 actions-rs/toolchain@v1.0.7
         with:
-          profile:            minimal
-          toolchain:          stable
+          toolchain:          nightly
           override:           true
 
       - name:                 Install system dependancies
