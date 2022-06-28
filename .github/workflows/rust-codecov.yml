@@ -1,0 +1,57 @@
+name:                         CodeCov
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  coverage:
+    name:                     codecov
+    runs-on:                  ubuntu-latest
+    steps:
+
+      - name:                 Checkout sources
+        uses:                 actions/checkout@v3.0.2
+        with:
+          fetch-depth:        50
+          submodules:         'recursive'
+
+      - name:                 Install Rust stable toolchain
+        uses:                 actions-rs/toolchain@v1.0.7
+        with:
+          profile:            minimal
+          toolchain:          stable
+          override:           true
+
+      - name:                 Install system dependancies
+        run:                  |
+          sudo apt update
+          sudo apt install -y clang libclang-dev libopencv-dev
+
+      - name:                 Install grcov
+        run:                  cargo install grcov
+
+      - name:                 Install uniffi_bindgen
+        uses:                 actions-rs/install@v0.1
+        with:
+          crate:              uniffi_bindgen
+          version:            0.18.0 # Must be in sync with version in Cargo.toml
+          use-tool-cache:     true
+
+      - name:                 Execute tests
+        run:                  |
+          cd rust
+          cargo test --no-fail-fast --locked --all-targets --verbose --features signer active
+        env:
+          CARGO_INCREMENTAL:  '0'
+          RUSTC_WRAPPER:      ''
+          RUSTFLAGS:          '-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off'
+
+      - name:                 Generate coverage data
+        id:                   coverage
+        shell:                bash
+        run:                  |
+          cd rust
+          ls -l target/debug/lcov.info
