@@ -29,7 +29,7 @@ use crate::db_transactions::TrDbHot;
 
 /// Make [`Batch`] with default
 /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) values, for
-/// [`ADDRESS_BOOK`] tree, in purged database.
+/// `ADDRESS_BOOK` tree, in purged database.
 ///
 /// - Add default `AddressBookEntry` values
 fn default_hot_address_book() -> Result<Batch, ErrorActive> {
@@ -44,7 +44,7 @@ fn default_hot_address_book() -> Result<Batch, ErrorActive> {
 
 /// Make [`Batch`] with default
 /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
-/// values, for [`SPECSTREEPREP`] tree, in purged database.
+/// values, for `SPECSTREEPREP` tree, in purged database.
 ///
 /// - Add default `NetworkSpecsToSend` values
 fn default_hot_network_specs_prep() -> Result<Batch, ErrorActive> {
@@ -56,7 +56,7 @@ fn default_hot_network_specs_prep() -> Result<Batch, ErrorActive> {
     Ok(batch)
 }
 
-/// Make [`Batch`] with default settings, for [`SETTREE`] tree, in purged
+/// Make [`Batch`] with default settings, for `SETTREE` tree, in purged
 /// database.
 ///
 /// Adds default types information

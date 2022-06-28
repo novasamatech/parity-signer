@@ -60,6 +60,7 @@ pub fn make_all_cards() -> TransactionAction {
         has_pwd: false,
         network_id: Vec::new(),
         encryption: Encryption::Sr25519,
+        secret_exposed: false,
     };
     let bv: BitVec<u8, Lsb0> = BitVec::from_vec(vec![32, 4, 155]);
 

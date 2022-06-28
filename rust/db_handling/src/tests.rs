@@ -4,7 +4,7 @@ use pretty_assertions::assert_eq;
 use constants::ALICE_SEED_PHRASE;
 
 use crate::{
-    identities::{check_derivation_set, generate_random_phrase, is_passworded},
+    identities::{check_derivation_set, generate_random_phrase, is_passworded, mark_as_exposed},
     interface_signer::{guess, SeedDraft},
 };
 
@@ -206,4 +206,16 @@ fn checking_derivation_set() {
     assert!(check_derivation_set(&["//remarkably///ugly".to_string()]).is_ok());
     assert!(check_derivation_set(&["no_path_at_all".to_string()]).is_err());
     assert!(check_derivation_set(&["///".to_string()]).is_err());
+}
+
+#[test]
+fn finds_exposed_parent() {
+    assert!(!mark_as_exposed("//Alice", false, "//Ali", false));
+    assert!(mark_as_exposed("//Alice//1", false, "//Alice", false));
+    assert!(mark_as_exposed("//Alice", true, "//Alice", false));
+    assert!(mark_as_exposed("//Alice//1", true, "//Alice", false));
+    assert!(!mark_as_exposed("//Alice", false, "//Alice", true));
+    assert!(!mark_as_exposed("//Alice//1", false, "//Alice", true));
+    assert!(mark_as_exposed("//Alice", true, "//Alice", true));
+    assert!(mark_as_exposed("//Alice//1", true, "//Alice", true));
 }

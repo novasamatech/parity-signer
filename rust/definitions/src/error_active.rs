@@ -15,6 +15,7 @@
 //! error management is easier.
 
 use sp_core::H256;
+use sp_runtime::MultiSigner;
 use time::error::Format;
 
 use crate::{
@@ -23,8 +24,10 @@ use crate::{
         AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSource, MetadataError,
         MetadataSource, SpecsKeySource, TransferContent,
     },
+    helpers::multisigner_to_public,
     keyring::{AddressBookKey, AddressKey, MetaKey, NetworkSpecsKey},
     metadata::AddressBookEntry,
+    users::AddressDetails,
 };
 
 /// Enum-marker indicating that error originates on the Active side
@@ -161,6 +164,15 @@ impl ErrorSource for Active {
     fn address_generation_common(error: AddressGenerationCommon) -> Self::Error {
         ErrorActive::TestAddressGeneration(AddressGeneration::Common(error))
     }
+    fn secret_exposed_mismatch(
+        multisigner: MultiSigner,
+        address_details: AddressDetails,
+    ) -> Self::Error {
+        ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::SecretExposed {
+            multisigner,
+            address_details,
+        }))
+    }
     fn transfer_content_error(transfer_content: TransferContent) -> Self::Error {
         ErrorActive::TransferContent(transfer_content)
     }
@@ -242,6 +254,14 @@ impl ErrorSource for Active {
                             MismatchActive::SpecsToSendEncryption{key, encryption} => format!("Network specs (NetworkSpecsToSend) entry with network specs key {} has wrong encryption {}.", hex::encode(key.key()), encryption.show()),
                             MismatchActive::AddressDetailsEncryption{key, encryption} => format!("Address details entry with address key {} has not matching encryption {}.", hex::encode(key.key()), encryption.show()),
                             MismatchActive::AddressDetailsSpecsEncryption{address_key, network_specs_key} => format!("Address details entry with address key {} has associated network specs key {} with wrong encryption.", hex::encode(address_key.key()), hex::encode(network_specs_key.key())),
+                            MismatchActive::SecretExposed {multisigner, address_details} => {
+                                let public = multisigner_to_public(multisigner);
+                                let path_print = {
+                                    if address_details.has_pwd {format!("{}///<password>", address_details.path)}
+                                    else {address_details.path.to_string()}
+                                };
+                                format!("Address details entry with public key {} (seed {}, path {}) is not marked as potentially exposed, when it should be.", hex::encode(public), address_details.seed_name, path_print)
+                            },
                             MismatchActive::AddressBookSpecsName{address_book_name, specs_name} => format!("Address book name {} does not match the name in corresponding network specs {}", address_book_name, specs_name),
                         };
                         format!("Mismatch found. {}", insert)
@@ -1035,6 +1055,14 @@ pub enum MismatchActive {
         /// [`NetworkSpecsKey`] having `Encryption` different from the one
         /// associated with `AddressKey`
         network_specs_key: NetworkSpecsKey,
+    },
+
+    /// Address details entry in the cold database is not marked as potentially
+    /// exposed (same or parent had secret key exported), but it is found that
+    /// it should have been.
+    SecretExposed {
+        multisigner: MultiSigner,
+        address_details: AddressDetails,
     },
 
     /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) in hot database

@@ -1886,6 +1886,7 @@ fn flow_test_1() {
                     path: "//polkadot".to_string(),
                     swiped: false,
                     multiselect: false,
+                    secret_exposed: false,
                 }],
                 root: MSeedKeyCard {
                     seed_name: "Portia".to_string(),
@@ -1894,6 +1895,7 @@ fn flow_test_1() {
                     base58: String::new(),
                     swiped: false,
                     multiselect: false,
+                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
@@ -2663,12 +2665,14 @@ fn flow_test_1() {
                     path: "//polkadot".to_string(),
                     swiped: false,
                     multiselect: false,
+                    secret_exposed: false,
                 }],
                 // since root == 'false' in do_action above.
                 // TODO: This has to be wrapped with Option<_>.
                 root: MSeedKeyCard {
                     seed_name: "Alice".to_string(),
                     identicon: empty_png().to_vec(),
+                    secret_exposed: false,
                     ..Default::default()
                 },
                 network: MNetworkCard {
@@ -2765,7 +2769,7 @@ fn flow_test_1() {
                     seed_name: "Alice".to_string(),
                     path: "//polkadot".to_string(),
                     has_pwd: false,
-                    multiselect: None,
+                    secret_exposed: false,
                 },
                 network_info: MSCNetworkInfo {
                     network_title: "Polkadot".to_string(),
@@ -2900,6 +2904,7 @@ fn flow_test_1() {
                         path: "//secret//path".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -2911,6 +2916,7 @@ fn flow_test_1() {
                         path: "//polkadot".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                 ],
                 // since root == 'false' in do_action above.
@@ -2966,6 +2972,7 @@ fn flow_test_1() {
                         path: "//secret//path".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -2977,6 +2984,7 @@ fn flow_test_1() {
                         path: "//polkadot".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                 ],
                 root: MSeedKeyCard {
@@ -2988,6 +2996,7 @@ fn flow_test_1() {
                     base58: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_string(),
                     swiped: false,
                     multiselect: false,
+                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
@@ -3067,6 +3076,7 @@ fn flow_test_1() {
                         path: "//secret//path".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3078,6 +3088,7 @@ fn flow_test_1() {
                         path: "//polkadot".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                 ],
                 root: MSeedKeyCard {
@@ -3089,6 +3100,7 @@ fn flow_test_1() {
                     base58: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_string(),
                     swiped: false,
                     multiselect: false,
+                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
@@ -3433,10 +3445,12 @@ fn flow_test_1() {
                     path: "//westend".to_string(),
                     swiped: false,
                     multiselect: false,
+                    secret_exposed: false,
                 }],
                 root: MSeedKeyCard {
                     seed_name: "Alice".to_string(),
                     identicon: empty_png().to_vec(),
+                    secret_exposed: false,
                     ..Default::default()
                 },
                 network: MNetworkCard {
@@ -3543,6 +3557,7 @@ fn flow_test_1() {
                         path: "//0".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3554,6 +3569,7 @@ fn flow_test_1() {
                         path: "//westend".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3565,6 +3581,7 @@ fn flow_test_1() {
                         path: "//Alice/secret//secret".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3576,6 +3593,7 @@ fn flow_test_1() {
                         path: "//Alice/westend".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3587,6 +3605,7 @@ fn flow_test_1() {
                         path: "//1".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3598,6 +3617,7 @@ fn flow_test_1() {
                         path: "//Alice".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                 ],
                 root: MSeedKeyCard {
@@ -3607,6 +3627,7 @@ fn flow_test_1() {
                     base58: String::new(),
                     swiped: false,
                     multiselect: false,
+                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Westend".to_string(),
@@ -3758,6 +3779,7 @@ fn flow_test_1() {
                         path: "//westend//1".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3769,6 +3791,7 @@ fn flow_test_1() {
                         path: "//0".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3780,6 +3803,7 @@ fn flow_test_1() {
                         path: "//westend".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3791,6 +3815,7 @@ fn flow_test_1() {
                         path: "//Alice/secret//secret".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3802,6 +3827,7 @@ fn flow_test_1() {
                         path: "//1".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3813,6 +3839,7 @@ fn flow_test_1() {
                         path: "//Alice".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3824,11 +3851,13 @@ fn flow_test_1() {
                         path: "//westend//0".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                 ],
                 root: MSeedKeyCard {
                     seed_name: "Alice".to_string(),
                     identicon: empty_png().to_vec(),
+                    secret_exposed: false,
                     ..Default::default()
                 },
                 network: MNetworkCard {
@@ -3869,6 +3898,7 @@ fn flow_test_1() {
                 path: "//westend//2".to_string(),
                 swiped: false,
                 multiselect: false,
+                secret_exposed: false,
             },
         );
     }
@@ -4087,7 +4117,7 @@ fn flow_test_1() {
                         seed_name: "Alice".to_string(),
                         path: "//westend".to_string(),
                         has_pwd: false,
-                        multiselect: None,
+                        secret_exposed: false,
                     },
                     network_info: MSCNetworkInfo {
                         network_title: "Westend".to_string(),
@@ -4131,7 +4161,7 @@ fn flow_test_1() {
                         seed_name: "Alice".to_string(),
                         path: "//Alice/secret//secret".to_string(),
                         has_pwd: false,
-                        multiselect: None,
+                        secret_exposed: false,
                     },
                     network_info: MSCNetworkInfo {
                         network_title: "Westend".to_string(),
@@ -4176,7 +4206,7 @@ fn flow_test_1() {
                         seed_name: "Alice".to_string(),
                         path: "//Alice".to_string(),
                         has_pwd: false,
-                        multiselect: None,
+                        secret_exposed: false,
                     },
                     network_info: MSCNetworkInfo {
                         network_title: "Westend".to_string(),
@@ -4293,6 +4323,7 @@ fn flow_test_1() {
                         path: "//westend".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4304,6 +4335,7 @@ fn flow_test_1() {
                         path: "//Alice/secret//secret".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4315,6 +4347,7 @@ fn flow_test_1() {
                         path: "//Alice".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                 ],
                 root: MSeedKeyCard {
@@ -4326,6 +4359,7 @@ fn flow_test_1() {
                     base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
                     swiped: false,
                     multiselect: false,
+                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Westend".to_string(),
@@ -4398,7 +4432,7 @@ fn flow_test_1() {
                     seed_name: "Alice".to_string(),
                     path: String::new(),
                     has_pwd: false,
-                    multiselect: None,
+                    secret_exposed: false,
                 },
                 network_info: MSCNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -4468,6 +4502,7 @@ fn flow_test_1() {
                         path: "//secret//path".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4479,6 +4514,7 @@ fn flow_test_1() {
                         path: "//polkadot".to_string(),
                         swiped: false,
                         multiselect: false,
+                        secret_exposed: false,
                     },
                 ],
                 root: MSeedKeyCard {
@@ -4490,6 +4526,7 @@ fn flow_test_1() {
                     base58: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_string(),
                     swiped: false,
                     multiselect: false,
+                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
@@ -4605,6 +4642,7 @@ fn flow_test_1() {
                         identicon: alice_sr_westend().to_vec(),
                         has_pwd: false,
                         path: "//westend".to_string(),
+                        secret_exposed: false,
                     },
                     MRawKey {
                         seed_name: "Alice".to_string(),
@@ -4617,6 +4655,7 @@ fn flow_test_1() {
                         identicon: alice_sr_root().to_vec(),
                         has_pwd: false,
                         path: "".to_string(),
+                        secret_exposed: false,
                     },
                     MRawKey {
                         seed_name: "Alice".to_string(),
@@ -4629,6 +4668,7 @@ fn flow_test_1() {
                         identicon: alice_sr_kusama().to_vec(),
                         has_pwd: false,
                         path: "//kusama".to_string(),
+                        secret_exposed: false,
                     },
                     MRawKey {
                         seed_name: "Alice".to_string(),
@@ -4641,6 +4681,7 @@ fn flow_test_1() {
                         identicon: alice_sr_alice_secret_secret().to_vec(),
                         has_pwd: false,
                         path: "//Alice/secret//secret".to_string(),
+                        secret_exposed: false,
                     },
                     MRawKey {
                         seed_name: "Alice".to_string(),
@@ -4653,6 +4694,7 @@ fn flow_test_1() {
                         identicon: alice_sr_alice().to_vec(),
                         has_pwd: false,
                         path: "//Alice".to_string(),
+                        secret_exposed: false,
                     },
                     MRawKey {
                         seed_name: "Alice".to_string(),
@@ -4665,6 +4707,7 @@ fn flow_test_1() {
                         identicon: alice_sr_secret_path_multipass().to_vec(),
                         has_pwd: true,
                         path: "//secret//path".to_string(),
+                        secret_exposed: false,
                     },
                     MRawKey {
                         seed_name: "Alice".to_string(),
@@ -4677,6 +4720,7 @@ fn flow_test_1() {
                         identicon: alice_sr_polkadot().to_vec(),
                         has_pwd: false,
                         path: "//polkadot".to_string(),
+                        secret_exposed: false,
                     },
                 ],
             },
@@ -4709,7 +4753,7 @@ fn flow_test_1() {
                 seed_name: "Alice".to_string(),
                 path: String::new(),
                 has_pwd: false,
-                multiselect: None,
+                secret_exposed: false,
             },
             sufficient: vec![],
             content: MSCContent::AddSpecs {
@@ -4884,6 +4928,7 @@ fn flow_test_1() {
                         identicon: alice_sr_westend().to_vec(),
                         has_pwd: false,
                         path: "//westend".to_string(),
+                        secret_exposed: false,
                     },
                     MRawKey {
                         seed_name: "Alice".to_string(),
@@ -4896,6 +4941,7 @@ fn flow_test_1() {
                         identicon: alice_sr_root().to_vec(),
                         has_pwd: false,
                         path: "".to_string(),
+                        secret_exposed: false,
                     },
                     MRawKey {
                         seed_name: "Alice".to_string(),
@@ -4908,6 +4954,7 @@ fn flow_test_1() {
                         identicon: alice_sr_kusama().to_vec(),
                         has_pwd: false,
                         path: "//kusama".to_string(),
+                        secret_exposed: false,
                     },
                     MRawKey {
                         seed_name: "Alice".to_string(),
@@ -4920,6 +4967,7 @@ fn flow_test_1() {
                         identicon: alice_sr_alice_secret_secret().to_vec(),
                         has_pwd: false,
                         path: "//Alice/secret//secret".to_string(),
+                        secret_exposed: false,
                     },
                     MRawKey {
                         seed_name: "Alice".to_string(),
@@ -4932,6 +4980,7 @@ fn flow_test_1() {
                         identicon: alice_sr_alice().to_vec(),
                         has_pwd: false,
                         path: "//Alice".to_string(),
+                        secret_exposed: false,
                     },
                     MRawKey {
                         seed_name: "Alice".to_string(),
@@ -4944,6 +4993,7 @@ fn flow_test_1() {
                         identicon: alice_sr_secret_path_multipass().to_vec(),
                         has_pwd: true,
                         path: "//secret//path".to_string(),
+                        secret_exposed: false,
                     },
                     MRawKey {
                         seed_name: "Alice".to_string(),
@@ -4956,6 +5006,7 @@ fn flow_test_1() {
                         identicon: alice_sr_polkadot().to_vec(),
                         has_pwd: false,
                         path: "//polkadot".to_string(),
+                        secret_exposed: false,
                     },
                 ],
             },
@@ -4969,7 +5020,7 @@ fn flow_test_1() {
                     seed_name: "Alice".to_string(),
                     path: String::new(),
                     has_pwd: false,
-                    multiselect: None,
+                    secret_exposed: false,
                 },
                 sufficient: vec![],
                 content: MSCContent::LoadMetadata {
@@ -5094,7 +5145,7 @@ fn flow_test_1() {
                 seed_name: "Alice".to_string(),
                 path: String::new(),
                 has_pwd: false,
-                multiselect: None,
+                secret_exposed: false,
             },
             sufficient: vec![],
             content: MSCContent::LoadTypes {
@@ -5380,7 +5431,7 @@ fn flow_test_1() {
                     seed_name: "Alice".to_string(),
                     path: "//Alice/secret//secret".to_string(),
                     has_pwd: false,
-                    multiselect: None,
+                    secret_exposed: false,
                 }),
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -5530,7 +5581,7 @@ fn flow_test_1() {
                     seed_name: "Alice".to_string(),
                     path: "//westend".to_string(),
                     has_pwd: false,
-                    multiselect: None,
+                    secret_exposed: false,
                 }),
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -5735,6 +5786,7 @@ fn flow_test_1() {
                     path: "//polkadot".to_string(),
                     swiped: false,
                     multiselect: false,
+                    secret_exposed: false,
                 }],
                 root: MSeedKeyCard {
                     seed_name: "Pepper".to_string(),
@@ -5743,6 +5795,7 @@ fn flow_test_1() {
                     base58: String::new(),
                     swiped: false,
                     multiselect: false,
+                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
@@ -5792,9 +5845,11 @@ fn flow_test_1() {
                     path: "//westend".to_string(),
                     swiped: false,
                     multiselect: false,
+                    secret_exposed: false,
                 }],
                 root: MSeedKeyCard {
                     seed_name: "Pepper".to_string(),
+                    secret_exposed: false,
                     ..Default::default()
                 },
                 network: MNetworkCard {
@@ -5980,7 +6035,7 @@ fn flow_test_1() {
                     seed_name: "Pepper".to_string(),
                     path: "//westend".to_string(),
                     has_pwd: false,
-                    multiselect: None,
+                    secret_exposed: false,
                 }),
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -6148,9 +6203,11 @@ fn flow_test_1() {
                     path: "//0".to_string(),
                     swiped: false,
                     multiselect: false,
+                    secret_exposed: false,
                 }],
                 root: MSeedKeyCard {
                     seed_name: "Pepper".to_string(),
+                    secret_exposed: false,
                     ..Default::default()
                 },
                 network: MNetworkCard {
@@ -6206,7 +6263,7 @@ fn flow_test_1() {
                     seed_name: "Pepper".to_string(),
                     path: "//0".to_string(),
                     has_pwd: true,
-                    multiselect: None,
+                    secret_exposed: false,
                 }),
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -6241,7 +6298,7 @@ fn flow_test_1() {
                 seed_name: "Pepper".to_string(),
                 path: "//0".to_string(),
                 has_pwd: true,
-                multiselect: None,
+                secret_exposed: false,
             },
             counter: 1,
         },
@@ -6265,7 +6322,7 @@ fn flow_test_1() {
                 seed_name: "Pepper".to_string(),
                 path: "//0".to_string(),
                 has_pwd: true,
-                multiselect: None,
+                secret_exposed: false,
             },
             counter: 2,
         },
@@ -6294,7 +6351,7 @@ fn flow_test_1() {
                 seed_name: "Pepper".to_string(),
                 path: "//0".to_string(),
                 has_pwd: true,
-                multiselect: None,
+                secret_exposed: false,
             },
             counter: 3,
         },

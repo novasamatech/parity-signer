@@ -292,7 +292,10 @@ impl State {
                 }
             }
             Screen::RecoverSeedName(_) => {
-                match db_handling::identities::get_addresses_by_seed_name(dbname, details_str) {
+                match db_handling::identities::get_addresses_by_seed_name::<Signer>(
+                    dbname,
+                    details_str,
+                ) {
                     Ok(a) => {
                         if a.is_empty() {
                             new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(
@@ -1794,7 +1797,7 @@ impl State {
                                 seed_name: author_info.seed_name,
                                 path: author_info.path,
                                 has_pwd: author_info.has_pwd,
-                                multiselect: None,
+                                secret_exposed: author_info.secret_exposed,
                             };
                             let f = MSufficientCryptoReady {
                                 author_info,

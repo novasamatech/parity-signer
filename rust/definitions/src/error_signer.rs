@@ -15,6 +15,7 @@
 //! error management is easier.
 use anyhow::anyhow;
 use sp_core::{crypto::SecretStringError, H256};
+use sp_runtime::MultiSigner;
 use time::error::Format;
 #[cfg(feature = "test")]
 use variant_count::VariantCount;
@@ -25,8 +26,10 @@ use crate::{
         bad_secret_string, AddressGeneration, AddressGenerationCommon, AddressKeySource,
         ErrorSource, MetadataError, MetadataSource, SpecsKeySource, TransferContent,
     },
+    helpers::multisigner_to_public,
     keyring::{AddressKey, MetaKey, NetworkSpecsKey, Order, VerifierKey},
     network_specs::{ValidCurrentVerifier, Verifier, VerifierValue},
+    users::AddressDetails,
 };
 
 /// Enum-marker indicating that error originates on the Signer side
@@ -152,6 +155,15 @@ impl ErrorSource for Signer {
     fn address_generation_common(error: AddressGenerationCommon) -> Self::Error {
         ErrorSigner::AddressGeneration(AddressGeneration::Common(error))
     }
+    fn secret_exposed_mismatch(
+        multisigner: MultiSigner,
+        address_details: AddressDetails,
+    ) -> Self::Error {
+        ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::SecretExposed {
+            multisigner,
+            address_details,
+        }))
+    }
     fn transfer_content_error(transfer_content: TransferContent) -> Self::Error {
         ErrorSigner::Input(InputSigner::TransferContent(transfer_content))
     }
@@ -246,6 +258,14 @@ impl ErrorSource for Signer {
                             MismatchSigner::SpecsEncryption{key, encryption} => format!("Network specs (NetworkSpecs) entry with network specs key {} has not matching encryption {}.", hex::encode(key.key()), encryption.show()),
                             MismatchSigner::AddressDetailsEncryption{key, encryption} => format!("Address details entry with address key {} has not matching encryption {}.", hex::encode(key.key()), encryption.show()),
                             MismatchSigner::AddressDetailsSpecsEncryption{address_key, network_specs_key} => format!("Address details entry with address key {} has associated network specs key {} with wrong encryption.", hex::encode(address_key.key()), hex::encode(network_specs_key.key())),
+                            MismatchSigner::SecretExposed {multisigner, address_details} => {
+                                let public = multisigner_to_public(multisigner);
+                                let path_print = {
+                                    if address_details.has_pwd {format!("{}///<password>", address_details.path)}
+                                    else {address_details.path.to_string()}
+                                };
+                                format!("Address details entry with public key {} (seed {}, path {}) is not marked as potentially exposed, when it should be.", hex::encode(public), address_details.seed_name, path_print)
+                            }
                         };
                         format!("Mismatch found. {}", insert)
                     },
@@ -937,6 +957,14 @@ pub enum MismatchSigner {
         /// [`NetworkSpecsKey`] having `Encryption` different from the one
         /// associated with `AddressKey`
         network_specs_key: NetworkSpecsKey,
+    },
+
+    /// Address details entry in the database is not marked as potentially
+    /// exposed (same or parent had secret key exported), but it is found that
+    /// it should have been.
+    SecretExposed {
+        multisigner: MultiSigner,
+        address_details: AddressDetails,
     },
 }
 

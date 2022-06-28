@@ -288,6 +288,17 @@ fn mismatch_signer() -> Vec<MismatchSigner> {
             address_key: address_key_good(),
             network_specs_key: network_specs_key_bad(),
         },
+        MismatchSigner::SecretExposed {
+            multisigner: MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)),
+            address_details: AddressDetails {
+                seed_name: String::from("Alice"),
+                path: String::from("//Alice"),
+                has_pwd: false,
+                network_id: Vec::new(),
+                encryption: Encryption::Sr25519,
+                secret_exposed: false,
+            },
+        },
     ]
 }
 
@@ -591,6 +602,7 @@ fn address_generation_common() -> Vec<AddressGenerationCommon> {
             has_pwd: false,
             network_id: vec![network_specs_key_good()],
             encryption: Encryption::Sr25519,
+            secret_exposed: false,
         },
         network_specs_key_good(),
     ));
@@ -1054,6 +1066,7 @@ mod tests {
 "Database error. Mismatch found. Network specs (NetworkSpecs) entry with network specs key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e has not matching encryption ecdsa."
 "Database error. Mismatch found. Address details entry with address key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779 has not matching encryption ecdsa."
 "Database error. Mismatch found. Address details entry with address key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779 has associated network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e with wrong encryption."
+"Database error. Mismatch found. Address details entry with public key 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48 (seed Alice, path //Alice) is not marked as potentially exposed, when it should be."
 "Database error. Bad metadata for westend9000. Runtime metadata version is incompatible. Currently supported are v12, v13, and v14."
 "Database error. Bad metadata for westend9000. No system pallet in runtime metadata."
 "Database error. Bad metadata for westend9000. No runtime version in system pallet constants."

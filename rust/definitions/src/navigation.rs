@@ -6,12 +6,6 @@ use crate::{
 
 pub use crate::network_specs::NetworkSpecsToSend;
 
-#[derive(PartialEq, Clone)]
-pub struct SeedNameWithIdenticon {
-    pub seed_name: String,
-    pub identicon: Vec<u8>,
-}
-
 /// Enum containing card sets for four different outcomes:
 /// importing derivations (Derivations), signing (Sign),
 /// accepting (Stub) and reading, for example, in case of an error (Read)
@@ -132,18 +126,6 @@ pub enum ScreenData {
     KeyDetailsMulti { f: MKeyDetailsMulti },
 }
 
-#[derive(Clone, PartialEq)]
-pub struct Identity {
-    pub seed_name: String,
-    pub address_key: String,
-    pub public_key: String,
-    pub identicon: Vec<u8>,
-    pub has_pwd: bool,
-    pub path: String,
-    pub is_multiselect: bool,
-    pub base58: String,
-}
-
 #[derive(Clone, Debug, PartialEq)]
 pub struct MKeysCard {
     pub address_key: String,
@@ -153,6 +135,7 @@ pub struct MKeysCard {
     pub path: String,
     pub swiped: bool,
     pub multiselect: bool,
+    pub secret_exposed: bool,
 }
 
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -170,6 +153,7 @@ pub struct MSeedKeyCard {
     pub base58: String,
     pub swiped: bool,
     pub multiselect: bool,
+    pub secret_exposed: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -299,6 +283,7 @@ pub struct DerivationCheck {
     pub button_good: bool,
     pub where_to: Option<DerivationDestination>,
     pub collision: Option<Address>,
+    //    pub secret_exposed: bool,
     pub error: Option<String>,
 }
 
@@ -309,7 +294,7 @@ pub struct Address {
     pub has_pwd: bool,
     pub identicon: Vec<u8>,
     pub seed_name: String,
-    pub multiselect: Option<bool>,
+    pub secret_exposed: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -376,6 +361,7 @@ pub struct MRawKey {
     pub identicon: Vec<u8>,
     pub has_pwd: bool,
     pub path: String,
+    pub secret_exposed: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]

@@ -28,7 +28,7 @@ use definitions::{
     qr_transfers::ContentLoadTypes,
     users::AddressDetails,
 };
-use qrcode_static::png_qr_from_string;
+use qrcode_static::{png_qr_from_string, DataType};
 
 use crate::helpers::{
     get_address_details, get_all_networks, get_general_verifier, get_meta_values_by_name,
@@ -58,7 +58,7 @@ pub fn get_all_seed_names_with_identicons(
     names_phone_knows: &[String],
 ) -> Result<Vec<SeedNameCard>, ErrorSigner> {
     let mut data_set: HashMap<String, Vec<MultiSigner>> = HashMap::new();
-    for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
+    for (multisigner, address_details) in get_all_addresses::<Signer>(database_name)?.into_iter() {
         if address_details.is_root() {
             // found a seed key; could be any of the supported encryptions;
             match data_set.get(&address_details.seed_name) {
@@ -142,7 +142,7 @@ fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> Vec<u8> {
 /// [`SufficientCrypto`](definitions::crypto::SufficientCrypto) for signing
 /// updates with the Signer.
 pub fn print_all_identities(database_name: &str) -> Result<Vec<MRawKey>, ErrorSigner> {
-    Ok(get_all_addresses(database_name)?
+    Ok(get_all_addresses::<Signer>(database_name)?
         .into_iter()
         .map(|(multisigner, address_details)| {
             let address_key = AddressKey::from_multisigner(&multisigner); // to click
@@ -155,6 +155,7 @@ pub fn print_all_identities(database_name: &str) -> Result<Vec<MRawKey>, ErrorSi
                 identicon,
                 has_pwd: address_details.has_pwd,
                 path: address_details.path,
+                secret_exposed: address_details.secret_exposed,
             }
         })
         .collect())
@@ -205,6 +206,7 @@ pub fn print_identities_for_seed_name_and_network(
                 base58,
                 swiped,
                 multiselect,
+                secret_exposed: address_details.secret_exposed,
             });
         } else {
             other_id.push((multisigner, address_details, identicon, swiped, multiselect))
@@ -226,6 +228,7 @@ pub fn print_identities_for_seed_name_and_network(
                 path: address_details.path,
                 swiped,
                 multiselect,
+                secret_exposed: address_details.secret_exposed,
             },
         )
         .collect();
@@ -240,10 +243,12 @@ pub fn addresses_set_seed_name_network(
     seed_name: &str,
     network_specs_key: &NetworkSpecsKey,
 ) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
-    Ok(get_addresses_by_seed_name(database_name, seed_name)?
-        .into_iter()
-        .filter(|(_, address_details)| address_details.network_id.contains(network_specs_key))
-        .collect())
+    Ok(
+        get_addresses_by_seed_name::<Signer>(database_name, seed_name)?
+            .into_iter()
+            .filter(|(_, address_details)| address_details.network_id.contains(network_specs_key))
+            .collect(),
+    )
 }
 
 /// Return `Vec` with network information for all networks in the Signer database,
@@ -333,11 +338,14 @@ pub fn export_key(
     let identicon = make_identicon_from_multisigner(multisigner);
     let qr = {
         if address_details.network_id.contains(network_specs_key) {
-            match png_qr_from_string(&format!(
-                "substrate:{}:0x{}",
-                base58,
-                hex::encode(&network_specs.genesis_hash)
-            )) {
+            match png_qr_from_string(
+                &format!(
+                    "substrate:{}:0x{}",
+                    base58,
+                    hex::encode(&network_specs.genesis_hash)
+                ),
+                DataType::Regular,
+            ) {
                 Ok(a) => a,
                 Err(e) => return Err(ErrorSigner::Qr(e.to_string())),
             }
@@ -356,7 +364,7 @@ pub fn export_key(
         has_pwd: address_details.has_pwd,
         identicon,
         seed_name: address_details.seed_name,
-        multiselect: None,
+        secret_exposed: address_details.secret_exposed,
     };
 
     let network_info = MSCNetworkInfo {
@@ -448,7 +456,7 @@ pub fn derive_prep(
                 has_pwd,
                 identicon,
                 seed_name,
-                multiselect: None,
+                secret_exposed: address_details.secret_exposed,
             };
 
             NavDerivationCheck {
@@ -531,7 +539,7 @@ fn dynamic_path_check_unhexed(
                         has_pwd: address_details.has_pwd,
                         identicon,
                         seed_name: seed_name.to_string(),
-                        multiselect: None,
+                        secret_exposed: address_details.secret_exposed,
                     };
                     NavDerivationCheck {
                         button_good: false,

@@ -9,10 +9,12 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0.58"
 bitvec = "1.0.0"
-constants = {path = "../constants"}
-hex = "0.4.3"
+constants = {path = "../constants", default-features = false, features = ["active", "signer"]}
 png = "0.17.3"
 qrcodegen = "1.8.0"
+
+[dev-dependencies]
+hex = "0.4.3"
 
 [lib]
 name = "qrcode_static"

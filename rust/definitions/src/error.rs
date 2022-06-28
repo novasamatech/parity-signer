@@ -137,6 +137,13 @@ pub trait ErrorSource {
     /// variants
     fn address_generation_common(error: AddressGenerationCommon) -> Self::Error;
 
+    /// Found `secret_exposed` flag mismatch in the database: address is not
+    /// marked as potentially exposed when it must have been.
+    fn secret_exposed_mismatch(
+        multisigner: MultiSigner,
+        address_details: AddressDetails,
+    ) -> Self::Error;
+
     /// `Error` corresponding to faulty [`TransferContent`]
     fn transfer_content_error(transfer_content: TransferContent) -> Self::Error;
 

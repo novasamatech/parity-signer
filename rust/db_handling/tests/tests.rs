@@ -129,6 +129,7 @@ fn print_all_ids() {
             identicon: alice_sr_westend().to_vec(),
             has_pwd: false,
             path: "//westend".to_string(),
+            secret_exposed: false,
         },
         MRawKey {
             seed_name: "Alice".to_string(),
@@ -139,6 +140,7 @@ fn print_all_ids() {
             identicon: alice_sr_root().to_vec(),
             has_pwd: false,
             path: "".to_string(),
+            secret_exposed: false,
         },
         MRawKey {
             seed_name: "Alice".to_string(),
@@ -149,6 +151,7 @@ fn print_all_ids() {
             identicon: alice_sr_kusama().to_vec(),
             has_pwd: false,
             path: "//kusama".to_string(),
+            secret_exposed: false,
         },
         MRawKey {
             seed_name: "Alice".to_string(),
@@ -159,6 +162,7 @@ fn print_all_ids() {
             identicon: alice_sr_alice().to_vec(),
             has_pwd: false,
             path: "//Alice".to_string(),
+            secret_exposed: false,
         },
         MRawKey {
             seed_name: "Alice".to_string(),
@@ -169,6 +173,7 @@ fn print_all_ids() {
             identicon: alice_sr_polkadot().to_vec(),
             has_pwd: false,
             path: "//polkadot".to_string(),
+            secret_exposed: false,
         },
     ];
 
@@ -202,6 +207,7 @@ fn print_ids_seed_name_network() {
             base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
             swiped: false,
             multiselect: false,
+            secret_exposed: false,
         },
         vec![
             MKeysCard {
@@ -213,6 +219,7 @@ fn print_ids_seed_name_network() {
                 path: "//westend".to_string(),
                 swiped: false,
                 multiselect: false,
+                secret_exposed: false,
             },
             MKeysCard {
                 address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
@@ -223,6 +230,7 @@ fn print_ids_seed_name_network() {
                 path: "//Alice".to_string(),
                 swiped: false,
                 multiselect: false,
+                secret_exposed: false,
             },
         ],
     );
@@ -347,7 +355,7 @@ fn export_alice_westend() {
             seed_name: "Alice".to_string(),
             path: "".to_string(),
             has_pwd: false,
-            multiselect: None,
+            secret_exposed: false,
         },
         network_info: MSCNetworkInfo {
             network_title: "Westend".to_string(),
@@ -509,7 +517,7 @@ fn derive_prep_alice_collided() {
                 has_pwd: false,
                 identicon: alice_sr_alice().to_vec(),
                 seed_name: "Alice".to_string(),
-                multiselect: None,
+                secret_exposed: false,
             }),
             error: None,
         },
@@ -577,7 +585,7 @@ fn derive_prep_alice_collided_with_password() {
                 has_pwd: true,
                 identicon: alice_sr_secret_abracadabra().to_vec(),
                 seed_name: "Alice".to_string(),
-                multiselect: None,
+                secret_exposed: false,
             }),
             error: None,
         },
@@ -737,7 +745,7 @@ fn path_is_known() {
             has_pwd: false,
             identicon: alice_sr_alice().to_vec(),
             seed_name: "Alice".to_string(),
-            multiselect: None,
+            secret_exposed: false,
         }),
         error: None,
     };
@@ -921,6 +929,7 @@ fn test_generate_default_addresses_for_alice() {
                     .unwrap(),
                 ],
                 encryption: Encryption::Sr25519,
+                secret_exposed: false,
             },
         ),
         (
@@ -942,6 +951,7 @@ fn test_generate_default_addresses_for_alice() {
                 ]))
                 .unwrap()],
                 encryption: Encryption::Sr25519,
+                secret_exposed: false,
             },
         ),
     ];
@@ -999,7 +1009,7 @@ fn test_derive() {
     let both_networks = vec![network_id_0.to_owned(), network_id_1];
     let only_one_network = vec![network_id_0];
 
-    let identities = get_addresses_by_seed_name(dbname, seed_name).unwrap();
+    let identities = get_addresses_by_seed_name::<Signer>(dbname, seed_name).unwrap();
     println!("{:?}", identities);
     let mut flag0 = false;
     let mut flag1 = false;
@@ -2020,7 +2030,7 @@ fn test_all_events() {
                     "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
                 )
                 .unwrap(),
-                path: "//".to_string(),
+                path: "//1".to_string(),
                 network_genesis_hash: hex::decode(
                     "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 )
@@ -2039,7 +2049,7 @@ fn test_all_events() {
                     "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
                 )
                 .unwrap(),
-                path: "//".to_string(),
+                path: "//1".to_string(),
                 network_genesis_hash: hex::decode(
                     "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 )
@@ -2063,6 +2073,26 @@ fn test_all_events() {
             seed_name_was_shown: "AliceSecretSeed".to_string()
         }
     ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::SecretWasExported {
+            identity_history: IdentityHistory {
+                seed_name: "Alice".to_string(),
+                encryption: Encryption::Sr25519,
+                public_key: hex::decode(
+                    "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                )
+                .unwrap(),
+                path: "//1".to_string(),
+                network_genesis_hash: hex::decode(
+                    "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                )
+                .unwrap()
+            }
+        }
+    ));
+
     assert!(entries_contain_event(
         &entries,
         &Event::Warning {

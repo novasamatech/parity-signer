@@ -349,7 +349,7 @@ fn can_sign_transaction_1() {
         seed_name: "Alice".to_string(),
         path: "//Alice".to_string(),
         has_pwd: false,
-        multiselect: None,
+        secret_exposed: false,
     };
 
     let network_info_known = NetworkSpecs {
@@ -589,7 +589,7 @@ fn can_sign_message_1() {
         seed_name: "Alice".to_string(),
         path: "//Alice".to_string(),
         has_pwd: false,
-        multiselect: None,
+        secret_exposed: false,
     };
 
     let network_info_known = NetworkSpecs {
@@ -2465,7 +2465,7 @@ Identities:
         seed_name: "Alice".to_string(),
         path: "//Alice".to_string(),
         has_pwd: false,
-        multiselect: None,
+        secret_exposed: false,
     };
     // TODO: let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
@@ -2767,7 +2767,7 @@ Identities:
         seed_name: "Alice".to_string(),
         path: String::new(),
         has_pwd: false,
-        multiselect: None,
+        secret_exposed: false,
     };
     // TODO let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
@@ -2972,7 +2972,7 @@ fn parse_transaction_alice_remarks_westend9122() {
         seed_name: "Alice".to_string(),
         path: String::new(),
         has_pwd: false,
-        multiselect: None,
+        secret_exposed: false,
     };
     // TODO let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 

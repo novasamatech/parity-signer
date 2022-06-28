@@ -94,7 +94,7 @@ enum Purpose {
     TestNavigator,
 }
 
-/// Make [`Batch`] with default networks metadata, for [`METATREE`] tree, in
+/// Make [`Batch`] with default networks metadata, for `METATREE` tree, in
 /// purged database.
 ///
 /// Adds default metadata entries, according to [`Purpose`].
@@ -119,7 +119,7 @@ fn default_cold_metadata(purpose: Purpose) -> Result<Batch, ErrorActive> {
 
 /// Make [`Batch`] with default networks
 /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs), for
-/// [`SPECSTREE`] tree, in purged database.
+/// `SPECSTREE` tree, in purged database.
 ///
 /// Adds default network specs entries.
 #[cfg(feature = "active")]
@@ -132,7 +132,7 @@ fn default_cold_network_specs() -> Batch {
     batch
 }
 
-/// Make [`Batch`] with default settings, for [`SETTREE`] tree, in purged
+/// Make [`Batch`] with default settings, for `SETTREE` tree, in purged
 /// database.
 ///
 /// Adds default entries: types information
@@ -142,7 +142,7 @@ fn default_cold_network_specs() -> Batch {
 /// Note that the general verifier is **not** set up here.
 ///
 /// General verifier is set up separately, during the database initiation
-/// [`init_db`]. Without general verifier (i.e. a value in the [`SETTREE`] tree
+/// [`init_db`]. Without general verifier (i.e. a value in the `SETTREE` tree
 /// under the key [`GENERALVERIFIER`]) the database is not usable by the Signer.
 #[cfg(feature = "active")]
 fn default_cold_settings_init_later() -> Result<Batch, ErrorActive> {
@@ -153,7 +153,7 @@ fn default_cold_settings_init_later() -> Result<Batch, ErrorActive> {
     Ok(batch)
 }
 
-/// Make [`Batch`] with default networks verifiers, for [`VERIFIERS`] tree, in
+/// Make [`Batch`] with default networks verifiers, for `VERIFIERS` tree, in
 /// purged database.
 ///
 /// Adds default

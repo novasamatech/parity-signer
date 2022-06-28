@@ -5,7 +5,7 @@ use zeroize::Zeroize;
 
 use db_handling::db_transactions::{SignContent, TrDbColdSign};
 use definitions::error_signer::ErrorSigner;
-use qrcode_static::png_qr_from_string;
+use qrcode_static::{png_qr_from_string, DataType};
 
 use crate::sign_message::sign_as_address_key;
 
@@ -79,7 +79,7 @@ pub fn create_signature_png(
         )?
         .encode(),
     );
-    let qr_data = match png_qr_from_string(&hex_result) {
+    let qr_data = match png_qr_from_string(&hex_result, DataType::Regular) {
         Ok(a) => a,
         Err(e) => return Err(ErrorSigner::Qr(e.to_string())),
     };

@@ -484,7 +484,12 @@ pub enum Event {
 
     /// User opened seed backup, and seed phrase for shortly shown as a plain
     /// text on screen (stored value here is the seed name)
-    SeedNameWasShown { seed_name_was_shown: String }, // for individual seed_name
+    ///
+    /// For individual seed_name
+    SeedNameWasShown { seed_name_was_shown: String },
+
+    /// User has generated QR code for secret key export
+    SecretWasExported { identity_history: IdentityHistory },
 
     /// A warning was produces and displayed to user
     Warning { warning: String },
@@ -646,7 +651,7 @@ pub fn all_events_preview() -> Vec<Event> {
                 "Alice",
                 &Encryption::Sr25519,
                 &public,
-                "//",
+                "//1",
                 network_specs.genesis_hash.as_bytes(),
             ),
         },
@@ -655,7 +660,7 @@ pub fn all_events_preview() -> Vec<Event> {
                 "Alice",
                 &Encryption::Sr25519,
                 &public,
-                "//",
+                "//1",
                 network_specs.genesis_hash.as_bytes(),
             ),
         },
@@ -667,6 +672,15 @@ pub fn all_events_preview() -> Vec<Event> {
         },
         Event::SeedNameWasShown {
             seed_name_was_shown: String::from("AliceSecretSeed"),
+        },
+        Event::SecretWasExported {
+            identity_history: IdentityHistory::get(
+                "Alice",
+                &Encryption::Sr25519,
+                &public,
+                "//1",
+                network_specs.genesis_hash.as_bytes(),
+            ),
         },
         Event::Warning {
             warning: String::from("Received network information is not verified."),
@@ -681,4 +695,16 @@ pub fn all_events_preview() -> Vec<Event> {
         Event::HistoryCleared,
         Event::DatabaseInitiated,
     ]
+}
+
+#[cfg(feature = "test")]
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// check that no `Event` variants are missed
+    #[test]
+    fn event_set_check() {
+        assert_eq!(Event::VARIANT_COUNT, all_events_preview().len());
+    }
 }

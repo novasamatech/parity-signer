@@ -212,6 +212,7 @@ interface Event {
     ResetDangerRecord();
     SeedCreated(string seed_created);
     SeedNameWasShown(string seed_name_was_shown);
+    SecretWasExported(IdentityHistory identity_history);
     Warning(string warning);
     WrongPassword();
     UserEntry(string user_entry);
@@ -267,17 +268,6 @@ enum Action {
     "Nothing",
 };
 
-dictionary Identity {
-    string seed_name;
-    string address_key;
-    string public_key;
-    sequence<u8> identicon;
-    boolean has_pwd;
-    string path;
-    boolean is_multiselect;
-    string base58;
-};
-
 dictionary MSeedKeyCard {
     string seed_name;
     sequence<u8> identicon;
@@ -285,6 +275,7 @@ dictionary MSeedKeyCard {
     string base58;
     boolean swiped;
     boolean multiselect;
+    boolean secret_exposed;
 };
 
 dictionary MNetworkCard {
@@ -308,6 +299,7 @@ dictionary MKeysCard {
     string path;
     boolean swiped;
     boolean multiselect;
+    boolean secret_exposed;
 };
 
 dictionary MSettings {
@@ -431,7 +423,7 @@ dictionary Address {
     boolean has_pwd;
     sequence<u8> identicon;
     string seed_name;
-    boolean? multiselect;
+    boolean secret_exposed;
 };
 
 enum DerivationDestination {
@@ -481,6 +473,7 @@ dictionary MRawKey {
     sequence<u8> identicon;
     boolean has_pwd;
     string path;
+    boolean secret_exposed;
 };
 
 dictionary MSignSufficientCrypto {
