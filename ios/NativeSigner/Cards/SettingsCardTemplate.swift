@@ -12,14 +12,14 @@ struct SettingsCardTemplate: View {
     var danger: Bool = false
     var withIcon: Bool = true
     var withBackground: Bool = true
-    
+
     var body: some View {
         HStack {
             Text(text)
                 .font(FBase(style: .body1))
                 .foregroundColor(Color(danger ? "SignalDanger" : "Text400"))
             Spacer()
-            if (withIcon) {
+            if withIcon {
                 Image(systemName: "chevron.forward")
                     .imageScale(.medium)
                     .foregroundColor(Color("Border400"))

@@ -13,7 +13,7 @@ struct MenuButtonsStack<Content: View>: View {
         self.content = content()
     }
     var body: some View {
-        VStack (spacing: 12) {
+        VStack(spacing: 12) {
             self.content
         }
         .padding(.top, 10)
@@ -28,7 +28,7 @@ struct MenuStack<Content: View>: View {
     var body: some View {
         VStack {
             Spacer()
-            VStack (alignment: .leading) {
+            VStack(alignment: .leading) {
                 self.content
             }
             .padding(.top, 6.0)

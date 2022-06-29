@@ -15,17 +15,28 @@ struct SignSufficientCrypto: View {
         VStack {
             Text("Select key for signing")
             ScrollView {
-                
                 LazyVStack {
                     ForEach(content.identities, id: \.addressKey) {keyrecord in
-                        Button(action: {
-                            let seedPhrase = getSeed(keyrecord.seedName)
-                            if seedPhrase != "" {
-                                pushButton(.goForward, keyrecord.addressKey, seedPhrase)
+                        Button(
+                            action: {
+                                let seedPhrase = getSeed(keyrecord.seedName)
+                                if seedPhrase != "" {
+                                    pushButton(.goForward, keyrecord.addressKey, seedPhrase)
+                                }
+                            },
+                            label: {
+                                AddressCard(
+                                    address: Address(
+                                        base58: keyrecord.publicKey,
+                                        path: keyrecord.path,
+                                        hasPwd: keyrecord.hasPwd,
+                                        identicon: keyrecord.identicon,
+                                        seedName: keyrecord.seedName,
+                                        multiselect: nil
+                                    )
+                                )
                             }
-                        }) {
-                            AddressCard(address: Address(base58: keyrecord.publicKey, path: keyrecord.path, hasPwd: keyrecord.hasPwd, identicon: keyrecord.identicon, seedName: keyrecord.seedName, multiselect: nil))
-                        }
+                        )
                     }
                 }
             }

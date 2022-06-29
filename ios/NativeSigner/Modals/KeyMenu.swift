@@ -9,7 +9,7 @@ import SwiftUI
 
 struct KeyMenu: View {
     @State var removeConfirm = false
-    
+
     let pushButton: (Action, String, String) -> Void
     var body: some View {
         MenuStack {
@@ -26,15 +26,23 @@ struct KeyMenu: View {
             }
         }
         .alert(isPresented: $removeConfirm, content: {
-            Alert(title: Text("Forget this key?"), message: Text("This key will be removed for this network. Are you sure?"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove key"), action: {pushButton(.removeKey, "", "")}))
+            Alert(
+                title: Text("Forget this key?"),
+                message: Text("This key will be removed for this network. Are you sure?"),
+                primaryButton: .cancel(Text("Cancel")),
+                secondaryButton: .destructive(
+                    Text("Remove key"),
+                    action: {pushButton(.removeKey, "", "")}
+                )
+            )
         })
     }
 }
 
 /*
-struct KeyMenu_Previews: PreviewProvider {
-    static var previews: some View {
-        KeyMenu()
-    }
-}
-*/
+ struct KeyMenu_Previews: PreviewProvider {
+ static var previews: some View {
+ KeyMenu()
+ }
+ }
+ */

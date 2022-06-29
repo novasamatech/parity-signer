@@ -10,20 +10,18 @@ import SwiftUI
 struct NewAddressScreen: View {
     @State var path: String = ""
     @FocusState private var focusedField: Bool
-    @State private var derivationCheck: DerivationCheck? = nil
+    @State private var derivationCheck: DerivationCheck?
     var content: MDeriveKey
     let pathCheck: (String, String, String) -> DerivationCheck
     let createAddress: (String, String) -> Void
     let pushButton: (Action, String, String) -> Void
-    
+
     var body: some View {
         ZStack {
             ScrollView {
                 HeaderBar(line1: "Create new key", line2: "For seed " + content.seedName)
-                //SeedCardForManager(seedName: data.selectedSeed)
                 NetworkCard(title: content.networkTitle, logo: content.networkLogo)
-                VStack (alignment: .leading) {
-                    //Text("DERIVATION PATH").foregroundColor(Color("Text500")).font(.footnote)
+                VStack(alignment: .leading) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).frame(height: 39)
                         HStack {
@@ -40,13 +38,11 @@ struct NewAddressScreen: View {
                                     path = pathNew
                                 }
                                 .onSubmit {
-                                    switch (derivationCheck?.whereTo) {
+                                    switch derivationCheck?.whereTo {
                                     case .pin:
                                         createAddress(path, content.seedName)
-                                        break
                                     case .pwd:
                                         pushButton(.checkPassword, path, "")
-                                        break
                                     default:
                                         break
                                     }
@@ -69,13 +65,11 @@ struct NewAddressScreen: View {
                     BigButton(
                         text: "Next",
                         action: {
-                            switch (derivationCheck?.whereTo) {
+                            switch derivationCheck?.whereTo {
                             case .pin:
                                 createAddress(path, content.seedName)
-                                break
                             case .pwd:
                                 pushButton(.checkPassword, path, "")
-                                break
                             default:
                                 break
                             }

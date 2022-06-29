@@ -12,7 +12,7 @@ struct TCMeta: View {
     var body: some View {
         HStack {
             Identicon(identicon: content.metaIdPic)
-            VStack{
+            VStack {
                 Text("Add metadata").foregroundColor(Color("Text600"))
                 HStack {
                     Text(content.specname)

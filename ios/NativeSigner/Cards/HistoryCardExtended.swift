@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// swiftlint:disable:next type_body_length
 struct HistoryCardExtended: View {
     var event: MEventMaybeDecoded
     let timestamp = ""
@@ -53,14 +54,16 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key created",
-                line2: value.seedName + value.path + " in network with hash " +  value.networkGenesisHash.map{String(format: "%02X", $0)}.joined()
+                line2: value.seedName + value.path + " in network with hash " +
+                    value.networkGenesisHash.map {String(format: "%02X", $0)}.joined()
             )
             case .identityRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key removed",
-                line2: value.seedName + value.path + " in network with hash " +  value.networkGenesisHash.map{String(format: "%02X", $0)}.joined()
+                line2: value.seedName + value.path + " in network with hash " +
+                    value.networkGenesisHash.map {String(format: "%02X", $0)}.joined()
             )
             case .metadataAdded(let value): HistoryCardTemplate(
                 image: "plus.viewfinder",
@@ -91,14 +94,15 @@ struct HistoryCardExtended: View {
                 line2: value.specs.title
             )
             case .networkVerifierSet(let value):
-                switch(value.validCurrentVerifier) {
+                switch value.validCurrentVerifier {
                 case .general:
                     HistoryCardTemplate(
                     image: "checkmark.shield",
                     timestamp: timestamp,
                     danger: false,
                     line1: "Network verifier set",
-                    line2: value.generalVerifier.show() + " for network with genesis hash " + value.genesisHash.map{String(format: "%02X", $0)}.joined()
+                    line2: value.generalVerifier.show() + " for network with genesis hash " +
+                        value.genesisHash.map {String(format: "%02X", $0)}.joined()
                 )
                 case .custom(let verifier):
                     HistoryCardTemplate(
@@ -106,7 +110,8 @@ struct HistoryCardExtended: View {
                     timestamp: timestamp,
                     danger: false,
                     line1: "Network verifier set",
-                    line2: verifier.show() + " for network with genesis hash " + value.genesisHash.map{String(format: "%02X", $0)}.joined()
+                    line2: verifier.show() + " for network with genesis hash " +
+                        value.genesisHash.map {String(format: "%02X", $0)}.joined()
                 )
                 }
             case .resetDangerRecord: HistoryCardTemplate(
@@ -150,7 +155,7 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Types signed",
-                line2: value.typesHash.map{String(format: "%02X", $0)}.joined()
+                line2: value.typesHash.map {String(format: "%02X", $0)}.joined()
             )
             case .systemEntry(let text): HistoryCardTemplate(
                 image: "eye.trianglebadge.exclamationmark.fill",
@@ -191,14 +196,14 @@ struct HistoryCardExtended: View {
                     Text("Comment :")
                     Text(value.userComment)
                 }
-            case .typesAdded(_): HistoryCardTemplate(
+            case .typesAdded: HistoryCardTemplate(
                 image: "plus.viewfinder",
                 timestamp: timestamp,
                 danger: false,
                 line1: "New types info loaded",
                 line2: ""
             )
-            case .typesRemoved(_): HistoryCardTemplate(
+            case .typesRemoved: HistoryCardTemplate(
                 image: "minus.square",
                 timestamp: timestamp,
                 danger: true,
