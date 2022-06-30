@@ -75,9 +75,16 @@ payloads into this type of envelope.
 
 Each QR code in RaptorQ encoded multipart payload contains following parts:
 
-| bytes `[0..4]` | bytes `[4..]` |
-|:-|:-|
-| `80000000 || payload_size` | `RaptorQ serialized packet` |
+<table>
+    <tr>
+        <td>bytes <code>[0..4]</code></td>
+        <td>bytes <code>[0..4]</code></td>
+    </tr>
+    <tr>
+        <td><code>80000000 || payload_size</code></td>
+        <td><code>RaptorQ serialized packet</code></td>
+    </tr>
+</table>
 
 + `payload_size` **MUST** contain payload size in bytes, represented as
   big-endian 32-bit unsigned integer.
