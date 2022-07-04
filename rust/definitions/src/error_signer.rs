@@ -15,6 +15,7 @@
 //! error management is easier.
 use anyhow::anyhow;
 use sp_core::{crypto::SecretStringError, H256};
+use std::fmt::Write as _;
 use time::error::Format;
 #[cfg(feature = "test")]
 use variant_count::VariantCount;
@@ -348,7 +349,7 @@ impl ErrorSource for Signer {
                 let mut insert = String::new();
                 for (i,(version, parser_error)) in errors.iter().enumerate() {
                     if i>0 {insert.push(' ')}
-                    insert.push_str(&format!("Parsing with {}{} metadata: {}", network_name, version, parser_error.show()));
+                    let _ = write!(insert, "Parsing with {}{} metadata: {}", network_name, version, parser_error.show());
                 }
                 format!("Failed to decode extensions. Please try updating metadata for {} network. {}", network_name, insert)
             },

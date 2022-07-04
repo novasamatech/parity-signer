@@ -10,6 +10,9 @@
 
 use std::str::FromStr;
 
+#[cfg(test)]
+use std::fmt::Write as _;
+
 use anyhow::anyhow;
 use sled::{transaction::TransactionError, IVec};
 use sp_core::crypto::SecretStringError;
@@ -1006,7 +1009,7 @@ mod tests {
     fn print_signer_errors_nicely() {
         let mut print = String::from("\n");
         for e in error_signer().iter() {
-            print.push_str(&format!("\"{}\"", <Signer>::show(e)));
+            let _ = write!(print, "\"{}\"", <Signer>::show(e));
             print.push('\n');
         }
         let print_expected = r#"
