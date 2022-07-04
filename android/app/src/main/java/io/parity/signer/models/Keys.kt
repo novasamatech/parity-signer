@@ -26,7 +26,7 @@ fun SignerDataModel.increment(number: Int, seedName: String) {
 		try {
 			val seedPhrase = getSeed(seedName)
 			if (seedPhrase.isNotBlank()) {
-				pushButton(Action.INCREMENT, number.toString())
+				pushButton(Action.INCREMENT, number.toString(), seedPhrase)
 			}
 		} catch (e: java.lang.Exception) {
 			Log.e("Add key error", e.toString())
