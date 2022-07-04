@@ -31,7 +31,7 @@ import io.parity.signer.uniffi.MPasswordConfirm
 @Composable
 fun PasswordConfirm(
 	passwordConfirm: MPasswordConfirm,
-	signerDataModel: SignerDataModel
+	addKey: (String, String) -> Unit
 ) {
 	val passwordCheck = remember { mutableStateOf("") }
 	val pwd = passwordConfirm.pwd
@@ -61,9 +61,9 @@ fun PasswordConfirm(
 				},
 				onDone = {
 					if (passwordCheck.value == pwd) {
-						signerDataModel.addKey(
-							path = "$croppedPath///$pwd",
-							seedName = seedName
+						addKey(
+							"$croppedPath///$pwd",
+							seedName
 						)
 					}
 				},
@@ -74,9 +74,9 @@ fun PasswordConfirm(
 
 			BigButton(
 				text = "Next", action = {
-					signerDataModel.addKey(
-						path = "$croppedPath///$pwd",
-						seedName = seedName
+					addKey(
+						"$croppedPath///$pwd",
+						seedName
 					)
 				},
 				isDisabled = passwordCheck.value != pwd

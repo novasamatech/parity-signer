@@ -19,7 +19,10 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MLogRight
 
 @Composable
-fun LogMenu(logRight: MLogRight, signerDataModel: SignerDataModel) {
+fun LogMenu(
+	logRight: MLogRight,
+	button: (Action) -> Unit
+) {
 	val checksum = logRight.checksum
 	var confirm by remember { mutableStateOf(false) }
 
@@ -33,9 +36,10 @@ fun LogMenu(logRight: MLogRight, signerDataModel: SignerDataModel) {
 				modifier = Modifier.padding(20.dp)
 			) {
 				HeaderBar(line1 = "LOG", line2 = "Checksum: $checksum")
-				BigButton(text = "Add note",
+				BigButton(
+					text = "Add note",
 					action = {
-						signerDataModel.pushButton(Action.CREATE_LOG_COMMENT)
+						button(Action.CREATE_LOG_COMMENT)
 					})
 				BigButton(
 					text = "Clear log",
@@ -51,5 +55,5 @@ fun LogMenu(logRight: MLogRight, signerDataModel: SignerDataModel) {
 		show = confirm,
 		header = "Clear log?",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(Action.CLEAR_LOG) })
+		forward = { button(Action.CLEAR_LOG) })
 }

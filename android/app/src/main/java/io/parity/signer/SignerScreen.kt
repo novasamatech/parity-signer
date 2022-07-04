@@ -8,6 +8,7 @@ import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.alerts.ShieldAlert
 import io.parity.signer.components.Documents
+import io.parity.signer.components.SeedBoxStatus
 import io.parity.signer.modals.*
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
@@ -129,8 +130,12 @@ fun ScreenSelector(
 fun ModalSelector(
 	modalData: ModalData?,
 	alertState: State<AlertState?>,
-	button: (Action, String, String) -> Unit,
-	signerDataModel: SignerDataModel
+	removeSeed: (String) -> Unit,
+	getSeedForBackup: (String, (String) -> Unit, (SeedBoxStatus) -> Unit) -> Unit,
+	addKey: (String, String) -> Unit,
+	addSeed: (String, String, Boolean) -> Unit,
+	selectSeed: (String) -> Unit,
+	button: (Action, String, String) -> Unit
 ) {
 	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 	val button2: (Action, String) -> Unit =
@@ -145,7 +150,7 @@ fun ModalSelector(
 			modalData.f,
 			alertState,
 			button1,
-			signerDataModel::removeSeed
+			removeSeed
 		)
 		is ModalData.NetworkSelector -> NetworkSelector(
 			modalData.f,
@@ -153,15 +158,15 @@ fun ModalSelector(
 		)
 		is ModalData.Backup -> SeedBackup(
 			modalData.f,
-			getSeedForBackup = signerDataModel::getSeedForBackup
+			getSeedForBackup = getSeedForBackup
 		)
 		is ModalData.PasswordConfirm -> PasswordConfirm(
 			modalData.f,
-			signerDataModel = signerDataModel
+			addKey = addKey
 		)
 		is ModalData.SignatureReady -> SignatureReady(
 			modalData.f,
-			signerDataModel = signerDataModel
+			button1
 		)
 		is ModalData.EnterPassword -> EnterPassword(
 			modalData.f,
@@ -169,31 +174,36 @@ fun ModalSelector(
 		)
 		is ModalData.LogRight -> LogMenu(
 			modalData.f,
-			signerDataModel = signerDataModel
+			button1
 		)
 		is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(
-			signerDataModel = signerDataModel
+			button1
 		)
 		is ModalData.ManageMetadata -> {
-			ManageMetadata(modalData.f, signerDataModel = signerDataModel)
+			ManageMetadata(
+				modalData.f,
+				button1
+			)
 		}
 		is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
 			modalData.f,
 		)
 		is ModalData.KeyDetailsAction -> KeyDetailsAction(
-			signerDataModel = signerDataModel
+			button1
 		)
 		is ModalData.TypesInfo -> TypesInfo(
 			modalData.f,
-			signerDataModel = signerDataModel
+			button1
 		)
 		is ModalData.NewSeedBackup -> NewSeedBackup(
 			modalData.f,
-			signerDataModel = signerDataModel
+			addSeed
 		)
-		is ModalData.LogComment -> LogComment(signerDataModel = signerDataModel)
+		is ModalData.LogComment -> LogComment(
+			button2
+		)
 		is ModalData.SelectSeed -> {
-			SelectSeed(modalData.f, signerDataModel = signerDataModel)
+			SelectSeed(modalData.f, selectSeed)
 		}
 		null -> {}
 	}

@@ -117,8 +117,12 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							ModalSelector(
 								modalData = actionResult.value?.modalData,
 								alertState = shieldAlert,
-								button = signerDataModel::pushButton,
-								signerDataModel = signerDataModel,
+								removeSeed = signerDataModel::removeSeed,
+								getSeedForBackup = signerDataModel::getSeedForBackup,
+								addKey = signerDataModel::addKey,
+								addSeed = signerDataModel::addSeed,
+								selectSeed = signerDataModel::selectSeed,
+								button = signerDataModel::pushButton
 							)
 							AlertSelector(
 								alert = actionResult.value?.alertData,
