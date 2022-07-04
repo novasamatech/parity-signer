@@ -1,7 +1,9 @@
 package io.parity.signer
 
+import androidx.camera.core.ImageProxy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import com.google.mlkit.vision.barcode.BarcodeScanner
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.alerts.ShieldAlert
@@ -9,10 +11,7 @@ import io.parity.signer.components.Documents
 import io.parity.signer.modals.*
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.AlertData
-import io.parity.signer.uniffi.ModalData
-import io.parity.signer.uniffi.ScreenData
+import io.parity.signer.uniffi.*
 
 @Composable
 fun ScreenSelector(
@@ -21,20 +20,32 @@ fun ScreenSelector(
 	progress: State<Float?>,
 	captured: State<Int?>,
 	total: State<Int?>,
-	button: (Action, String, String) -> Unit,
-	signerDataModel: SignerDataModel
+	seedNames: Array<String>,
+	isStrongBoxProtected: () -> Boolean,
+	addKey: (String, String) -> Unit,
+	checkPath: (String, String, String) -> DerivationCheck,
+	increment: (Int, String) -> Unit,
+	addSeed: (String, String, Boolean) -> Unit,
+	handleCameraPermissions: () -> Unit,
+	processFrame: (BarcodeScanner, ImageProxy) -> Unit,
+	resetScanValues: () -> Unit,
+	getAppVersion: () -> String,
+	wipeToFactory: () -> Unit,
+	signSufficientCrypto: (String, String) -> Unit,
+	signTransaction: (String, String) -> Unit,
+	wipeToJailbreak: () -> Unit,
+	button: (Action, String, String) -> Unit
 ) {
 	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 	val button2: (Action, String) -> Unit =
 		{ action, details -> button(action, details, "") }
-	val seedNames = signerDataModel.seedNames.value ?: emptyArray()
 
 	when (screenData) {
 		is ScreenData.DeriveKey -> NewAddressScreen(
 			screenData.f,
 			button = button2,
-			addKey = signerDataModel::addKey,
-			checkPath = signerDataModel::checkPath,
+			addKey = addKey,
+			checkPath = checkPath,
 		)
 		ScreenData.Documents -> Documents()
 		is ScreenData.KeyDetails -> ExportPublicKey(screenData.f)
@@ -44,7 +55,7 @@ fun ScreenSelector(
 		)
 		is ScreenData.Keys -> KeyManager(
 			button = button2,
-			signerDataModel::increment,
+			increment,
 			screenData.f,
 			alertState
 		)
@@ -60,27 +71,27 @@ fun ScreenSelector(
 		)
 		is ScreenData.NewSeed -> NewSeedScreen(
 			screenData.f,
-			signerDataModel::pushButton,
+			button2,
 			seedNames
 		)
 		is ScreenData.RecoverSeedName -> RecoverSeedName(
 			screenData.f,
-			signerDataModel::pushButton,
+			button2,
 			seedNames
 		)
 		is ScreenData.RecoverSeedPhrase -> RecoverSeedPhrase(
 			recoverSeedPhrase = screenData.f,
-			button = signerDataModel::pushButton,
-			addSeed = signerDataModel::addSeed
+			button = button2,
+			addSeed = addSeed
 		)
 		ScreenData.Scan -> ScanScreen(
 			progress = progress,
 			captured = captured,
 			total = total,
-			button = signerDataModel::pushButton,
-			handleCameraPermissions = signerDataModel::handleCameraPermissions,
-			processFrame = signerDataModel::processFrame,
-			resetScanValues = signerDataModel::resetScanValues,
+			button = button,
+			handleCameraPermissions = handleCameraPermissions,
+			processFrame = processFrame,
+			resetScanValues = resetScanValues,
 		)
 		is ScreenData.SeedSelector -> SeedManager(
 			screenData.f,
@@ -93,23 +104,23 @@ fun ScreenSelector(
 		is ScreenData.Settings -> SettingsScreen(
 			screenData.f,
 			button1 = button1,
-			isStrongBoxProtected = signerDataModel::isStrongBoxProtected,
-			getAppVersion = signerDataModel::getAppVersion,
-			wipeToFactory = signerDataModel::wipeToFactory,
+			isStrongBoxProtected = isStrongBoxProtected,
+			getAppVersion = getAppVersion,
+			wipeToFactory = wipeToFactory,
 			alertState = alertState,
 		)
 		is ScreenData.SignSufficientCrypto -> SignSufficientCrypto(
 			screenData.f,
-			signerDataModel::signSufficientCrypto
+			signSufficientCrypto
 		)
 		is ScreenData.Transaction -> TransactionPreview(
 			screenData.f,
-			signerDataModel::pushButton,
-			signerDataModel::signTransaction
+			button,
+			signTransaction
 		)
 		is ScreenData.VVerifier -> VerifierScreen(
 			screenData.f,
-			signerDataModel::wipeToJailbreak
+			wipeToJailbreak
 		)
 	}
 }
