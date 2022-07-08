@@ -802,6 +802,8 @@ pub fn error_signer() -> Vec<ErrorSigner> {
 #[rustfmt::skip]
 #[cfg(test)]
 mod tests {
+    use std::fmt::Write;
+
     use super::*;
     use crate::error::ErrorSource;
     use crate::error_signer::Signer;
@@ -1006,7 +1008,7 @@ mod tests {
     fn print_signer_errors_nicely() {
         let mut print = String::from("\n");
         for e in error_signer().iter() {
-            print.push_str(&format!("\"{}\"", <Signer>::show(e)));
+            write!(&mut print, "\"{}\"", <Signer>::show(e)).unwrap();
             print.push('\n');
         }
         let print_expected = r#"
