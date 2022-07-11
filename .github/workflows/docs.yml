@@ -71,8 +71,9 @@ jobs:
       # deploy
       - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
-        # published only from master
-        if:                   ${{ github.ref == 'refs/heads/master' }}
+        # published only from master AND if the triggerer is not dependabot
+        # https://github.com/dependabot/dependabot-core/issues/3253#issuecomment-797125425
+        if:                   ${{ github.ref == 'refs/heads/master' && github.actor != 'dependabot[bot]' }}
         with:
           github_token:       ${{ github.token }}
           force_orphan:       true
