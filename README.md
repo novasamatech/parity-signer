@@ -126,8 +126,6 @@ However, we strongly recommend that you use a real device for development, as so
 
 ## Android
 
-> ⚠️ Android build has only been tested on Linux. If you manage by some miracle to run this on a Mac, please add the steps to this Readme
-
 **3.** Install necessary rust targets (this set may vary depending on the target architecture
    you are building for be it android studio emulators or hardware devices):
 
@@ -148,7 +146,11 @@ random errors like "NDK not found".
 
 **7.** Connect your device or create a virtual one. Open `Tools -> Device Manager` and create a new phone simulator with the latest Android.
 
-**8.** Run the project (Ctrl+R). It should build the Rust core library automatically.
+**8. (MacOS)** Specify path to `python` in `local.properties`.
+
+`rust.pythonCommand=python3`
+
+**9.** Run the project (Ctrl+R). It should build the Rust core library automatically.
 
 # Tests
 
