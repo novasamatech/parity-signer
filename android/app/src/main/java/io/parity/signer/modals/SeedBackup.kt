@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.*
 import io.parity.signer.ui.theme.Bg200
@@ -19,6 +20,17 @@ import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.MBackup
 import io.parity.signer.uniffi.MscNetworkInfo
 import kotlinx.coroutines.delay
+
+@Composable
+fun KeepScreenOn() {
+	val currentView = LocalView.current
+	DisposableEffect(Unit) {
+		currentView.keepScreenOn = true
+		onDispose {
+			currentView.keepScreenOn = false
+		}
+	}
+}
 
 /**
  * Modal to show seed phrase. Dangerous place.
@@ -33,6 +45,8 @@ fun SeedBackup(
 	var seedBoxStatus by remember { mutableStateOf(SeedBoxStatus.Locked) }
 	val derivations = backup.derivations.sortedBy { it.networkOrder }
 	val time = remember { mutableStateOf(60000L) } // Countdown time in ms
+
+	KeepScreenOn()
 
 	Surface(
 		color = MaterialTheme.colors.Bg200,
