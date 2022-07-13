@@ -1,4 +1,4 @@
-name:                         E2E Test
+name:                         iOS build
 
 on:
   pull_request:
