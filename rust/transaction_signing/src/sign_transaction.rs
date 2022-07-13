@@ -31,7 +31,7 @@ pub(crate) fn create_signature(
         SignContent::Transaction { method, extensions } => {
             [method.to_vec(), extensions.to_vec()].concat()
         }
-        SignContent::Message(a) => a.encode(),
+        SignContent::Message(a) => format!("<Bytes>{}</Bytes>", a).into_bytes(),
     };
 
     // For larger transactions, their hash should be signed instead; this is not implemented

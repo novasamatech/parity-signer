@@ -501,7 +501,8 @@ fn input_signer() -> Vec<InputSigner> {
     // More [`InputSigner`] errors.
     out.append(&mut vec![
         InputSigner::TypesKnown,
-        InputSigner::MessageNotReadable,
+        InputSigner::MessageNoWrapper,
+        InputSigner::MessageNotValidUtf8,
         InputSigner::UnknownNetwork {
             genesis_hash: genesis_hash(),
             encryption: Encryption::Sr25519,
@@ -1106,7 +1107,8 @@ mod tests {
 "Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received network westend specs could be accepted only if verified by the same general verifier. Current message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519."
 "Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received types information could be accepted only if verified by the same general verifier. Current message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519."
 "Bad input data. Exactly same types information is already in the database."
-"Bad input data. Received message could not be read."
+"Bad input data. Received message has no `<Bytes></Bytes>` wrapper."
+"Bad input data. Received message could not be represented as valid utf8 sequence."
 "Bad input data. Input generated within unknown network and could not be processed. Add network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e and encryption sr25519."
 "Bad input data. Input transaction is generated in network westend. Currently there are no metadata entries for it, and transaction could not be processed. Add network metadata."
 "Bad input data. Exactly same network specs for network westend with encryption sr25519 are already in the database."
