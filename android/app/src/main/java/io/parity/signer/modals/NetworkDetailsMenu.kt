@@ -18,7 +18,7 @@ import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 
 @Composable
-fun NetworkDetailsMenu(signerDataModel: SignerDataModel) {
+fun NetworkDetailsMenu(button: (Action) -> Unit) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Column {
@@ -35,7 +35,7 @@ fun NetworkDetailsMenu(signerDataModel: SignerDataModel) {
 					text = "Sign network specs",
 					isShaded = true,
 					isCrypto = true,
-					action = { signerDataModel.pushButton(Action.SIGN_NETWORK_SPECS) })
+					action = { button(Action.SIGN_NETWORK_SPECS) })
 				BigButton(
 					text = "Delete network",
 					isShaded = true,
@@ -52,7 +52,7 @@ fun NetworkDetailsMenu(signerDataModel: SignerDataModel) {
 		header = "Remove network?",
 		text = "This network will be removed for whole device",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(Action.REMOVE_NETWORK) },
+		forward = { button(Action.REMOVE_NETWORK) },
 		backText = "Cancel",
 		forwardText = "Remove network"
 	)

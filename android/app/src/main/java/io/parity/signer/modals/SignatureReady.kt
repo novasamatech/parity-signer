@@ -26,7 +26,7 @@ import io.parity.signer.uniffi.MSignatureReady
 @Composable
 fun SignatureReady(
 	signatureReady: MSignatureReady,
-	signerDataModel: SignerDataModel
+	button: (Action) -> Unit
 ) {
 	val height = LocalConfiguration.current.screenHeightDp
 	val width = LocalConfiguration.current.screenWidthDp
@@ -42,7 +42,6 @@ fun SignatureReady(
 				state = rememberDraggableState { delta ->
 					offset += delta
 					if (offset < 0) offset = 0f
-					//if (offset > ) offset = height.toFloat()
 				},
 			)
 
@@ -64,7 +63,7 @@ fun SignatureReady(
 			BigButton(
 				text = "Done",
 				action = {
-					signerDataModel.pushButton(Action.GO_BACK, "", "")
+					button(Action.GO_BACK)
 				}
 			)
 		}

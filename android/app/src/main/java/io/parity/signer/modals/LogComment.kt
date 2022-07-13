@@ -24,7 +24,9 @@ import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 
 @Composable
-fun LogComment(signerDataModel: SignerDataModel) {
+fun LogComment(
+	button: (Action, String) -> Unit
+) {
 	val comment = remember { mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
@@ -46,7 +48,7 @@ fun LogComment(signerDataModel: SignerDataModel) {
 					comment.value = it
 				},
 				onDone = {
-					signerDataModel.pushButton(Action.GO_FORWARD, comment.value)
+					button(Action.GO_FORWARD, comment.value)
 				},
 				focusManager = focusManager,
 				focusRequester = focusRequester

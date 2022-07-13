@@ -132,3 +132,19 @@ fun SignerDataModel.getSeedForBackup(
 		setSeedBoxStatus(SeedBoxStatus.Network)
 	}
 }
+
+/**
+ * Select seed and go forward
+ */
+fun SignerDataModel.selectSeed(seedName: String) {
+	authentication.authenticate(activity) {
+		val seedPhrase = getSeed(seedName)
+		if (seedPhrase.isNotBlank()) {
+			pushButton(
+				Action.GO_FORWARD,
+				seedName,
+				seedPhrase
+			)
+		}
+	}
+}
