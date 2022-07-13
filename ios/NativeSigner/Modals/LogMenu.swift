@@ -37,7 +37,14 @@ struct LogMenu: View {
             .padding(.bottom, 24)
             .background(Color("Bg000"))
             .alert(isPresented: $clearConfirm, content: {
-                Alert(title: Text("Clear log?"), message: Text("Do you want this Signer to forget all logged events? This is not reversible."), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Clear log"), action: {pushButton(.clearLog, "", "")}))
+                Alert(
+                    title: Text("Clear log?"),
+                    message: Text("Do you want this Signer to forget all logged events? This is not reversible."),
+                    primaryButton: .cancel(Text("Cancel")),
+                    secondaryButton: .destructive(
+                        Text("Clear log"),
+                        action: {pushButton(.clearLog, "", "")})
+                )
             })
         }
     }

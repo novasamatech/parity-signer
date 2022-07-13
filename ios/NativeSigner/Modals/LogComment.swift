@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct LogComment: View {
-    
     let pushButton: (Action, String, String) -> Void
     @State private var comment: String = ""
     @FocusState private var focused: Bool

@@ -24,7 +24,6 @@ struct EventDetails: View {
     }
 }
 
-
 /*
  struct EventDetails_Previews: PreviewProvider {
  static var previews: some View {

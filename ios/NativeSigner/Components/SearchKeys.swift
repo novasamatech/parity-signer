@@ -16,18 +16,21 @@ struct SearchKeys: View {
     var body: some View {
         HStack {
             ZStack {
-                RoundedRectangle(cornerRadius: 8).stroke(Color(searchString == "" ? "Action100" : "Action400")).frame(height: 39)
-            TextField("find keys", text: $searchString)
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-                .font(.system(size: 12, design: .monospaced))
-                .foregroundColor(Color("Text400"))
-                .padding(8)
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color(searchString == "" ? "Action100" : "Action400")).frame(height: 39)
+                TextField("find keys", text: $searchString)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundColor(Color("Text400"))
+                    .padding(8)
             }
-            if (searchString != "") {
-                Button(action:{searchString = ""}) {
-                    Image(systemName: "clear").imageScale(.large)
-                }
+            if searchString != "" {
+                Button(
+                    action: {searchString = ""},
+                    label: {
+                        Image(systemName: "clear").imageScale(.large)
+                    })
             } else {
                 Image(systemName: "doc.text.magnifyingglass").imageScale(.large).foregroundColor(Color("Action400"))
             }

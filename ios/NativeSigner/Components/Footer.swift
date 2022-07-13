@@ -9,7 +9,7 @@ import SwiftUI
 
 struct KeySymbol: View {
     var body: some View {
-        VStack{
+        VStack {
             Text("accounts").font(Font.custom("Web3-Regular", size: 20))
         }
     }
@@ -17,7 +17,7 @@ struct KeySymbol: View {
 
 struct WrenchSymbol: View {
     var body: some View {
-        VStack{
+        VStack {
             Image(systemName: "gearshape.fill").imageScale(.medium)
         }
     }
@@ -28,52 +28,59 @@ struct Footer: View {
     let pushButton: (Action, String, String) -> Void
     var body: some View {
         HStack {
-            Button(action: {
-                pushButton(.navbarLog, "", "")
-            }) {
-                VStack(alignment: .center) {
-                    Image(systemName: "rectangle.grid.1x2.fill").imageScale(.medium)
-                        .padding(.top, 4.0)
-                        .padding(.bottom, 1.0)
-                    Text("Log")
-                        
-                }
-                .foregroundColor(buttonColor(active: footerButton == .log))
-            }
+            Button(
+                action: {
+                    pushButton(.navbarLog, "", "")
+                },
+                label: {
+                    VStack(alignment: .center) {
+                        Image(systemName: "rectangle.grid.1x2.fill").imageScale(.medium)
+                            .padding(.top, 4.0)
+                            .padding(.bottom, 1.0)
+                        Text("Log")
+                    }
+                    .foregroundColor(buttonColor(active: footerButton == .log))
+                })
             Spacer()
-            Button(action: {
-                pushButton(.navbarScan, "", "")
-            }) {
-                VStack {
-                    Image(systemName: "viewfinder").imageScale(.medium)
-                        .padding(.top, 4.0)
-                        .padding(.bottom, 1.0)
-                    Text("Scanner")
-                }
-                .foregroundColor(buttonColor(active: footerButton == .scan))
-            }
+            Button(
+                action: {
+                    pushButton(.navbarScan, "", "")
+                },
+                label: {
+                    VStack {
+                        Image(systemName: "viewfinder").imageScale(.medium)
+                            .padding(.top, 4.0)
+                            .padding(.bottom, 1.0)
+                        Text("Scanner")
+                    }
+                    .foregroundColor(buttonColor(active: footerButton == .scan))
+                })
             Spacer()
-            Button(action: {
-                pushButton(.navbarKeys, "", "")
-            }) {
-                VStack{
-                    KeySymbol()
-                    Text("Keys")
-                }
-                .foregroundColor(buttonColor(active: footerButton == .keys))
-            }
+            Button(
+                action: {
+                    pushButton(.navbarKeys, "", "")
+                },
+                label: {
+                    VStack {
+                        KeySymbol()
+                        Text("Keys")
+                    }
+                    .foregroundColor(buttonColor(active: footerButton == .keys))
+                })
             Spacer()
-            Button(action: {
-                pushButton(.navbarSettings, "", "")
-            }) {
-                VStack {
-                    WrenchSymbol()
-                        .padding(.top, 4.0)
-                        .padding(.bottom, 1.0)
-                    Text("Settings")
-                }
-                .foregroundColor(buttonColor(active: footerButton == .settings))
-            }
+            Button(
+                action: {
+                    pushButton(.navbarSettings, "", "")
+                },
+                label: {
+                    VStack {
+                        WrenchSymbol()
+                            .padding(.top, 4.0)
+                            .padding(.bottom, 1.0)
+                        Text("Settings")
+                    }
+                    .foregroundColor(buttonColor(active: footerButton == .settings))
+                })
         }.font(.footnote)
     }
 }
@@ -83,9 +90,9 @@ func buttonColor(active: Bool) -> Color {
 }
 
 /*
-func buttonLabelColor(active: Bool) -> Color {
-    return active ? Color("Text600") : Color("Text300")
-}
+ func buttonLabelColor(active: Bool) -> Color {
+ return active ? Color("Text600") : Color("Text300")
+ }
  */
 
 /*
