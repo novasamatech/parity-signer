@@ -1,3 +1,5 @@
+use std::fmt::Write as _;
+
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES, VERIFIERS};
 use db_handling::{
     db_transactions::TrDbColdStub,
@@ -23,7 +25,7 @@ fn print_affected(metadata_set: &[MetaValues], network_specs_set: &[NetworkSpecs
         if i > 0 {
             out_metadata.push_str(", ");
         }
-        out_metadata.push_str(&format!("{}{}", x.name, x.version));
+        let _ = write!(out_metadata, "{}{}", x.name, x.version);
     }
     for (i, x) in network_specs_set.iter().enumerate() {
         if i > 0 {
