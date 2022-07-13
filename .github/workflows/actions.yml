@@ -26,6 +26,7 @@ jobs:
       - name:                 Install dependencies
         run:                  |
           brew tap wix/brew
+          brew update
           brew install applesimutils
           gem install xcpretty
 
