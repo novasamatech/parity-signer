@@ -16,26 +16,30 @@ struct LandingView: View {
         VStack {
             DocumentModal()
             VStack(spacing: 16) {
-                Button(action: {
-                    tacAccept.toggle()
-                }) {
-                    HStack {
-                        Image(systemName: tacAccept ? "checkmark.square" : "square").imageScale(.large)
-                        Text("I agree to the terms and conditions")
-                            .multilineTextAlignment(.leading)
-                        Spacer()
-                    }
-                }
-                Button(action: {
-                    ppAccept.toggle()
-                }) {
-                    HStack {
-                        Image(systemName: ppAccept ? "checkmark.square" : "square").imageScale(.large)
-                        Text("I agree to the privacy policy")
-                            .multilineTextAlignment(.leading)
-                        Spacer()
-                    }
-                }
+                Button(
+                    action: {
+                        tacAccept.toggle()
+                    },
+                    label: {
+                        HStack {
+                            Image(systemName: tacAccept ? "checkmark.square" : "square").imageScale(.large)
+                            Text("I agree to the terms and conditions")
+                                .multilineTextAlignment(.leading)
+                            Spacer()
+                        }
+                    })
+                Button(
+                    action: {
+                        ppAccept.toggle()
+                    },
+                    label: {
+                        HStack {
+                            Image(systemName: ppAccept ? "checkmark.square" : "square").imageScale(.large)
+                            Text("I agree to the privacy policy")
+                                .multilineTextAlignment(.leading)
+                            Spacer()
+                        }
+                    })
                 BigButton(
                     text: "Next",
                     action: {
@@ -43,14 +47,14 @@ struct LandingView: View {
                     },
                     isDisabled: !(tacAccept && ppAccept)
                 )
-                .padding(.top, 16.0)
-                .alert(isPresented: $accept, content: {
-                    Alert(
-                        title: Text("Accept privacy policy?"),
-                        primaryButton: .default(Text("Decline")),
-                        secondaryButton: .default(Text("Accept"), action: {onboard()})
-                    )
-                })
+                    .padding(.top, 16.0)
+                    .alert(isPresented: $accept, content: {
+                        Alert(
+                            title: Text("Accept privacy policy?"),
+                            primaryButton: .default(Text("Decline")),
+                            secondaryButton: .default(Text("Accept"), action: {onboard()})
+                        )
+                    })
             }
         }
         .padding()

@@ -95,7 +95,10 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network verifier set",
-                line2: value.validCurrentVerifier == .general ? "general" : "custom" + " for network with genesis hash " + value.genesisHash.map{String(format: "%02X", $0)}.joined()
+                line2: value.validCurrentVerifier == .general ?
+                "general" :
+                    "custom" + " for network with genesis hash " +
+                value.genesisHash.map {String(format: "%02X", $0)}.joined()
             )
             case .resetDangerRecord: HistoryCardTemplate(
                 image: "checkmark.shield",
@@ -133,7 +136,7 @@ struct HistoryCard: View {
                 line1: "Metadata signed",
                 line2: value.name + String(value.version)
             )
-            case .typesSigned(_): HistoryCardTemplate(
+            case .typesSigned: HistoryCardTemplate(
                 image: "signature",
                 timestamp: timestamp,
                 danger: false,
@@ -161,14 +164,14 @@ struct HistoryCard: View {
                 line1: "Generated signature",
                 line2: value.userComment
             )
-            case .typesAdded(_): HistoryCardTemplate(
+            case .typesAdded: HistoryCardTemplate(
                 image: "plus.viewfinder",
                 timestamp: timestamp,
                 danger: false,
                 line1: "New types info loaded",
                 line2: ""
             )
-            case .typesRemoved(_): HistoryCardTemplate(
+            case .typesRemoved: HistoryCardTemplate(
                 image: "minus.square",
                 timestamp: timestamp,
                 danger: true,

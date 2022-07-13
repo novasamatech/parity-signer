@@ -7,7 +7,7 @@
 
 import Foundation
 
-import Security //for keyring
+import Security // for keyring
 import SwiftUI
 
 /**
@@ -41,16 +41,16 @@ extension SignerDataModel {
             kSecReturnData as String: false
         ]
         let status = SecItemCopyMatching(query as CFDictionary, &item)
-        switch (status) {
+        switch status {
         case errSecSuccess: do {
-            guard let itemFound = item as? [[String : Any]]
+            guard let itemFound = item as? [[String: Any]]
             else {
                 print("no seeds available")
                 self.seedNames = []
                 updateSeedNames(seedNames: seedNames)
                 return
             }
-            let seedNames = itemFound.map{item -> String in
+            let seedNames = itemFound.map {item -> String in
                 guard let seedName = item[kSecAttrAccount as String] as? String
                 else {
                     print("seed name decoding error")
@@ -73,14 +73,19 @@ extension SignerDataModel {
             self.authenticated = false
         }
     }
-    
+
     /**
      * Creates seed; this is the only way to create seed.
      * createRoots: choose whether empty derivations for every network should be created
      */
     func restoreSeed(seedName: String, seedPhrase: String, createRoots: Bool) {
         var error: Unmanaged<CFError>?
-        guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
+        guard let accessFlags = SecAccessControlCreateWithFlags(
+            kCFAllocatorDefault,
+            kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
+            .devicePasscode,
+            &error
+        ) else {
             print("Access flags could not be allocated")
             print(error ?? "no error code")
             return
@@ -115,14 +120,14 @@ extension SignerDataModel {
         updateSeedNames(seedNames: self.seedNames)
         self.pushButton(action: .goForward, details: createRoots ? "true" : "false", seedPhrase: seedPhrase)
     }
-    
+
     /**
      * Each seed name should be unique, obviously. We do not want to overwrite old seeds.
      */
     func checkSeedCollision(seedName: String) -> Bool {
         return self.seedNames.contains(seedName)
     }
-    
+
     /**
      * Check if proposed seed phrase is already saved. But mostly require auth on seed creation.
      */
@@ -143,11 +148,11 @@ extension SignerDataModel {
         }
         if status == errSecItemNotFound { return false }
         if item == nil {return false} else {
-            let found = item as! NSArray
+            let found = item as! NSArray // swiftlint:disable:this force_cast
             return found.contains(finalSeedPhrase)
         }
     }
-    
+
     /**
      * Gets seed by seedName from keyring
      * Calls auth screen automatically; no need to call it specially or wrap
@@ -172,10 +177,13 @@ extension SignerDataModel {
                     try historySeedNameWasShown(seedName: seedName, dbname: self.dbName)
                 } catch {
                     print("Seed access logging error! This system is broken and should not be used anymore.")
-                    //Attempt to log this anyway one last time;
-                    //if this fails too - complain to joulu pukki
+                    // Attempt to log this anyway one last time;
+                    // if this fails too - complain to joulu pukki
                     do {
-                        try historyEntrySystem(event: .systemEntry(systemEntry: "Seed access logging failed!"), dbname: dbName)
+                        try historyEntrySystem(
+                            event: .systemEntry(systemEntry: "Seed access logging failed!"),
+                            dbname: dbName
+                        )
                     } catch {
                         logSuccess = false
                         authenticated = false
@@ -183,16 +191,21 @@ extension SignerDataModel {
                     }
                     logSuccess = false
                 }
-                return logSuccess ? String(data: (item as! CFData) as Data, encoding: .utf8) ?? "" : ""
+                return logSuccess ? String(
+                    data: (item as! CFData) as Data, // swiftlint:disable:this force_cast
+                    encoding: .utf8
+                ) ?? "" : ""
             }
-            return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
+            return String(
+                data: (item as! CFData) as Data, // swiftlint:disable:this force_cast
+                encoding: .utf8
+            ) ?? ""
         } else {
             authenticated = false
             return ""
         }
     }
-    
-    
+
     /**
      * Removes seed and all derived keys
      */
@@ -217,7 +230,7 @@ extension SignerDataModel {
             }
         }
     }
-    
+
     /**
      * Wrapper for signing with use of seed material
      */

@@ -15,12 +15,11 @@ struct RecoverSeedPhrase: View {
     let content: MRecoverSeedPhrase
     let restoreSeed: (String, String, Bool) -> Void
     let pushButton: (Action, String, String) -> Void
-    
+
     var body: some View {
         ZStack {
             ScrollView {
                 VStack {
-                    //SeedNameCardOfSomeKind
                     Text(content.seedName)
                     VStack(alignment: .leading) {
                         Text("SEED PHRASE").font(FBase(style: .overline))
@@ -40,7 +39,6 @@ struct RecoverSeedPhrase: View {
                                 TextField("Seed", text: $userInput, prompt: Text("Seed name"))
                                     .focused($focus)
                                     .foregroundColor(Color("Text600"))
-                                //.background(Color("backgroundColor"))
                                     .font(FBase(style: .body2))
                                     .disableAutocorrection(true)
                                     .textInputAutocapitalization(.never)
@@ -52,7 +50,7 @@ struct RecoverSeedPhrase: View {
                                     })
                                     .onSubmit {
                                     }
-                                    .onChange(of: shadowUserInput, perform: { word in
+                                    .onChange(of: shadowUserInput, perform: { _ in
                                         userInput = " " + content.userInput
                                     })
                                     .onChange(of: content, perform: { input in
@@ -68,40 +66,41 @@ struct RecoverSeedPhrase: View {
                             }
                         }
                         .background(RoundedRectangle(cornerRadius: 8).stroke(Color("Border400")))
-                        
                         ScrollView(.horizontal) {
                             LazyHStack {
                                 ForEach(content.guessSet, id: \.self) { guess in
                                     VStack {
-                                        Button(action: {
-                                            pushButton(.pushWord, guess, "")
-                                        }) {
-                                            Text(guess)
-                                                .foregroundColor(Color("Crypto400"))
-                                                .font(FCrypto(style: .body2))
-                                                .padding(.horizontal, 12)
-                                                .padding(.vertical, 4)
-                                                .background(RoundedRectangle(cornerRadius: 4)
-                                                                .foregroundColor(Color("Crypto100")))
-                                        }
+                                        Button(
+                                            action: {
+                                                pushButton(.pushWord, guess, "")
+                                            },
+                                            label: {
+                                                Text(guess)
+                                                    .foregroundColor(Color("Crypto400"))
+                                                    .font(FCrypto(style: .body2))
+                                                    .padding(.horizontal, 12)
+                                                    .padding(.vertical, 4)
+                                                    .background(RoundedRectangle(cornerRadius: 4)
+                                                                    .foregroundColor(Color("Crypto100")))
+                                            })
                                     }
                                 }
                             }
                         }.frame(height: 23)
-                        
                         Spacer()
-                        Button(action: {
-                            createRoots.toggle()
-                        }) {
-                            HStack {
-                                Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
-                                Text("Create root keys")
-                                    .multilineTextAlignment(.leading)
-                                Spacer()
-                            }
-                        }
-                        
-                        if (!focus) {
+                        Button(
+                            action: {
+                                createRoots.toggle()
+                            },
+                            label: {
+                                HStack {
+                                    Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
+                                    Text("Create root keys")
+                                        .multilineTextAlignment(.leading)
+                                    Spacer()
+                                }
+                            })
+                        if !focus {
                             HStack {
                                 BigButton(
                                     text: "Next",
@@ -114,7 +113,6 @@ struct RecoverSeedPhrase: View {
                             }
                         }
                     }.padding(.horizontal)
-                    
                 }
             }
         }

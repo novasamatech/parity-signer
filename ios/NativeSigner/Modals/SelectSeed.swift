@@ -17,14 +17,19 @@ struct SelectSeed: View {
             VStack {
                 ScrollView {
                     LazyVStack {
-                        ForEach(content.seedNameCards.sorted(by: {$0.seedName < $1.seedName}), id: \.seedName) {seedNameCard in
+                        ForEach(
+                            content.seedNameCards.sorted(by: {$0.seedName < $1.seedName}),
+                            id: \.seedName
+                        ) {seedNameCard in
                             HStack {
-                                Button(action: {
-                                    sign(seedNameCard.seedName, seedNameCard.seedName)
-                                }) {
-                                    SeedCardForManager(seedNameCard: seedNameCard)
-                                    Spacer()
-                                }
+                                Button(
+                                    action: {
+                                        sign(seedNameCard.seedName, seedNameCard.seedName)
+                                    },
+                                    label: {
+                                        SeedCardForManager(seedNameCard: seedNameCard)
+                                        Spacer()
+                                    })
                             }
                         }
                     }

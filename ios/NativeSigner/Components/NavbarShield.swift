@@ -13,13 +13,15 @@ struct NavbarShield: View {
     let alert: Bool
     let pushButton: (Action, String, String) -> Void
     var body: some View {
-            Button(action: {
+        Button(
+            action: {
                 pushButton(.shield, "", "")
-            }) {
+            },
+            label: {
                 if canaryDead /*bluetooth detector: `|| data.bsDetector.canaryDead`*/ {
-                Image(systemName: "shield.slash")
-                    .imageScale(.large)
-                    .foregroundColor(Color("SignalDanger"))
+                    Image(systemName: "shield.slash")
+                        .imageScale(.large)
+                        .foregroundColor(Color("SignalDanger"))
                 } else {
                     if alert {
                         Image(systemName: "exclamationmark.shield")
@@ -31,7 +33,7 @@ struct NavbarShield: View {
                             .foregroundColor(Color("Crypto400"))
                     }
                 }
-        }
+            })
     }
 }
 
