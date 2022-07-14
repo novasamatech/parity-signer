@@ -188,7 +188,6 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
     /**
      * Callback for receiving buffer - payload assembly is fed from here
      */
-    // TODO: move this to Rust
     // swiftlint:disable:next cyclomatic_complexity function_body_length
     public func captureOutput(
         _ output: AVCaptureOutput,
