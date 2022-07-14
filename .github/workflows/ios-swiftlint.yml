@@ -1,0 +1,34 @@
+name:                         Ios swiftlint
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - stable
+
+jobs:
+  swiftlint:
+    name:                     Cargo test on macOS
+    runs-on:                  macos-latest
+    steps:
+
+      - name:                 Cancel Previous Runs
+        uses:                 styfle/cancel-workflow-action@0.10.0
+        with:
+          access_token:       ${{ github.token }}
+
+      - name:                 Checkout sources
+        uses:                 actions/checkout@v3.0.2
+        with:
+          fetch-depth:        50
+          submodules:         'recursive'
+
+      - name:                 Install dependencies
+        run:                  |
+          brew install swiftlint
+
+      - name:                 Run swiftlint
+        shell:                bash
+        run:                  |
+          swiftlint lint --strict ios

@@ -54,7 +54,7 @@ struct RecoverSeedPhrase: View {
                                         userInput = " " + content.userInput
                                     })
                                     .onChange(of: content, perform: { input in
-                                        userInput = " " + input.userInput // TODO: this in rust
+                                        userInput = " " + input.userInput
                                     })
                                     .onAppear(perform: {
                                         userInput = " " + content.userInput
