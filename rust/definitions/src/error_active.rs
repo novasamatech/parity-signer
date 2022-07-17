@@ -188,7 +188,9 @@ impl ErrorSource for Active {
     fn empty_seed_name() -> Self::Error {
         ErrorActive::SeedNameEmpty
     }
-    fn show(error: &Self::Error) -> String {
+    fn show(_error: &Self::Error) -> String {
+        "TODO".to_string()
+        /*
         match error {
             ErrorActive::NotHex(a) => {
                 let insert = match a {
@@ -486,6 +488,7 @@ impl ErrorSource for Active {
             ErrorActive::SeedPhraseEmpty => String::from("Seed phrase is empty."),
             ErrorActive::SeedNameEmpty => String::from("Seed name is empty."),
         }
+        */
     }
 }
 
@@ -1987,13 +1990,15 @@ pub enum InputActive {
 /// Errors with `wasm` files processing
 // TODO add links to external errors and definitions, when the `sc-...` crates
 // are published
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum Wasm {
     /// Failed to make "Metadata_metadata" call on data extracted from `wasm`
     /// file.
-    Call(sc_executor_common::error::Error),
+    #[error(transparent)]
+    Executor(#[from] sc_executor_common::error::Error),
 
     /// Metadata extracted from `wasm` file could not be decoded.
+    #[error("metadata from file could not be decoded")]
     DecodingMetadata,
 
     /// Metadata extracted from `wasm` file is not suitable to be used in
@@ -2001,19 +2006,15 @@ pub enum Wasm {
     ///
     /// Associated data is [`MetadataError`] specifying what exactly is wrong
     /// with the metadata.
-    FaultyMetadata(MetadataError),
+    #[error(transparent)]
+    FaultyMetadata(#[from] MetadataError),
 
     /// Error reading `wasm` file.
-    File(std::io::Error),
+    #[error(transparent)]
+    File(#[from] std::io::Error),
 
-    /// Error generating `RuntimeBlob`.
-    RuntimeBlob(sc_executor_common::error::WasmError),
-
-    /// Error generating `WasmiInstance`.
-    WasmiInstance(sc_executor_common::error::Error),
-
-    /// Error generating `WasmiRuntime`.
-    WasmiRuntime(sc_executor_common::error::WasmError),
+    #[error(transparent)]
+    WasmError(#[from] sc_executor_common::error::WasmError),
 }
 
 /// Error checking metadata file
