@@ -8,18 +8,20 @@
 import SwiftUI
 
 struct ShieldAlertComponent: View {
-    @EnvironmentObject var data: SignerDataModel
     @State var show = true
+    let resetAlert: () -> Void
+    let pushButton: (Action, String, String) -> Void
+    let canaryDead: Bool
     let content: ShieldAlert?
     var body: some View {
         ZStack {
-            if (data.canaryDead) {
+            if (canaryDead) {
                 Text("")
                     .alert(
                         "Network connected!",
                         isPresented: $show,
                         actions: {
-                            Button("Ok") {data.pushButton(action: .goBack)}
+                            Button("Ok") {pushButton(.goBack, "", "")}
                         },
                         message: {
                             Text("Signer detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.")
@@ -32,9 +34,9 @@ struct ShieldAlertComponent: View {
                             "Network was connected!",
                             isPresented: $show,
                             actions: {
-                                Button("Back") {data.pushButton(action: .goBack)}
+                                Button("Back") {pushButton(.goBack, "", "")}
                                 Button("Acknowledge and reset") {
-                                    data.resetAlert()
+                                    resetAlert()
                                 }
                             },
                             message: {
@@ -47,7 +49,7 @@ struct ShieldAlertComponent: View {
                             "Signer is secure",
                             isPresented: $show,
                             actions: {
-                                Button("Ok") {data.pushButton(action: .goBack)}
+                                Button("Ok") {pushButton(.goBack, "", "")}
                             },
                             message: {
                                 Text("Please proceed")
