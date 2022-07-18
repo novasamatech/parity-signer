@@ -71,11 +71,6 @@ use std::str::FromStr;
 #[cfg(feature = "active")]
 use definitions::{
     crypto::Encryption,
-    error::{ErrorSource, MetadataError, MetadataSource},
-    error_active::{
-        Active, DefaultLoading, ErrorActive, IncomingMetadataSourceActive,
-        IncomingMetadataSourceActiveStr,
-    },
     keyring::VerifierKey,
     metadata::{AddressBookEntry, MetaValues},
     network_specs::{CurrentVerifier, NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier},
@@ -95,6 +90,23 @@ pub const DEFAULT_VERIFIER_PUBLIC: [u8; 32] = [
     0xc4, 0x6a, 0x22, 0xb9, 0xda, 0x19, 0x54, 0x0a, 0x77, 0xcb, 0xde, 0x23, 0x19, 0x7e, 0x5f, 0xd9,
     0x04, 0x85, 0xc7, 0x2b, 0x4e, 0xcf, 0x3c, 0x59, 0x9e, 0xcc, 0xa6, 0x99, 0x8f, 0x39, 0xbd, 0x57,
 ];
+
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error(transparent)]
+    IoError(#[from] std::io::Error),
+
+    #[error("base58 prefi mismatch: specs: {}, meta: {}", .specs, .meta)]
+    Base58PrefixSpecsMismatch { specs: u16, meta: u16 },
+
+    #[error(transparent)]
+    DefinitionsError(#[from] definitions::error::Error),
+
+    #[error("orphan metadata {} {}", .name, .filename)]
+    OrphanMetadata { name: String, filename: String },
+}
+
+pub type Result<T> = std::result::Result<T, Error>;
 
 /// Generate default general verifier [`Verifier`], with Parity public key
 /// inside.
@@ -269,57 +281,33 @@ pub fn default_address_book() -> Vec<AddressBookEntry> {
 /// Read metadata files from given directory. Is used to populate different
 /// variants of cold database (release and tests)
 #[cfg(feature = "active")]
-fn metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
+fn metadata(dir: &str) -> Result<Vec<MetaValues>> {
     let mut out: Vec<MetaValues> = Vec::new();
-    let path_set = match std::fs::read_dir(dir) {
-        Ok(a) => a,
-        Err(e) => {
-            return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFolder(
-                e,
-            )))
-        }
-    };
+    let path_set = std::fs::read_dir(dir)?;
     for x in path_set.flatten() {
         if let Some(filename) = x.path().to_str() {
-            let meta_str = match std::fs::read_to_string(x.path()) {
-                Ok(a) => a,
-                Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFile(e))),
-            };
-            let new = MetaValues::from_str_metadata(
-                meta_str.trim(),
-                IncomingMetadataSourceActiveStr::Default {
-                    filename: filename.to_string(),
-                },
-            )?;
+            let meta_str = std::fs::read_to_string(x.path())?;
+            let new = MetaValues::from_str_metadata(meta_str.trim())?;
             let mut found = false;
             for a in default_network_info() {
                 if new.name == a.name {
                     found = true;
                     if let Some(prefix_from_meta) = new.optional_base58prefix {
                         if prefix_from_meta != a.base58prefix {
-                            return Err(<Active>::faulty_metadata(
-                                MetadataError::Base58PrefixSpecsMismatch {
-                                    specs: a.base58prefix,
-                                    meta: prefix_from_meta,
-                                },
-                                MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
-                                    IncomingMetadataSourceActiveStr::Default {
-                                        filename: filename.to_string(),
-                                    },
-                                )),
-                            ));
+                            return Err(Error::Base58PrefixSpecsMismatch {
+                                specs: a.base58prefix,
+                                meta: prefix_from_meta,
+                            });
                         }
                     }
                     break;
                 }
             }
             if !found {
-                return Err(ErrorActive::DefaultLoading(
-                    DefaultLoading::OrphanMetadata {
-                        name: new.name,
-                        filename: filename.to_string(),
-                    },
-                ));
+                return Err(Error::OrphanMetadata {
+                    name: new.name,
+                    filename: filename.to_string(),
+                });
             }
             out.push(new)
         }
@@ -329,20 +317,20 @@ fn metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
 
 /// Read metadata set for test cold database from `test_metadata` folder
 #[cfg(feature = "active")]
-pub fn test_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
+pub fn test_metadata() -> Result<Vec<MetaValues>> {
     metadata("../defaults/test_metadata")
 }
 
 /// Read metadata set for navigation test cold database from `nav_test_metadata`
 /// folder
 #[cfg(feature = "active")]
-pub fn nav_test_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
+pub fn nav_test_metadata() -> Result<Vec<MetaValues>> {
     metadata("../defaults/nav_test_metadata")
 }
 
 /// Read metadata set for release cold database from `release_metadata` folder
 #[cfg(feature = "active")]
-pub fn release_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
+pub fn release_metadata() -> Result<Vec<MetaValues>> {
     metadata("../defaults/release_metadata")
 }
 
@@ -381,12 +369,9 @@ lazy_static! {
 /// description could be added into types file by user, and types update could
 /// be generated by user.
 #[cfg(feature = "active")]
-pub fn default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
+pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
     let filename = "../defaults/default_types/full_types_information";
-    let type_info = match fs::read_to_string(filename) {
-        Ok(x) => x,
-        Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::TypesFile(e))),
-    };
+    let type_info = fs::read_to_string(filename)?;
 
     let mut types_prep: Vec<TypeEntry> = Vec::new();
 
@@ -480,7 +465,7 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
 
 /// Generate default types as [`ContentLoadTypes`]
 #[cfg(feature = "active")]
-pub fn default_types_content() -> Result<ContentLoadTypes, ErrorActive> {
+pub fn default_types_content() -> Result<ContentLoadTypes> {
     Ok(ContentLoadTypes::generate(&default_types_vec()?))
 }
 

@@ -21,13 +21,12 @@ use constants::{
     ADDRTREE, ALICE_SEED_PHRASE, METATREE, SPECSTREE,
 };
 #[cfg(feature = "test")]
+use db_handling::Error;
+#[cfg(feature = "test")]
 use defaults::default_chainspecs;
 #[cfg(feature = "test")]
 use definitions::{
     crypto::Encryption,
-    error::ErrorSource,
-    error_active::{Active, IncomingMetadataSourceActiveStr},
-    error_signer::Signer,
     history::{
         all_events_preview, Entry, Event, IdentityHistory, MetaValuesDisplay, MetaValuesExport,
         NetworkSpecsDisplay, NetworkSpecsExport, NetworkVerifierDisplay, SignDisplay,
@@ -864,7 +863,7 @@ fn not_find_mock_verifier() {
     match try_get_valid_current_verifier(&verifier_key, dbname) {
         Ok(Some(_)) => panic!("Found network key that should not be in database."),
         Ok(None) => (),
-        Err(e) => panic!("Error looking for mock verifier: {}", <Signer>::show(&e)),
+        Err(e) => panic!("Error looking for mock verifier: {}", e),
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -876,8 +875,8 @@ fn test_generate_default_addresses_for_alice() {
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
     {
-        let database = open_db::<Signer>(dbname).unwrap();
-        let addresses = open_tree::<Signer>(&database, ADDRTREE).unwrap();
+        let database = open_db(dbname).unwrap();
+        let addresses = open_tree(&database, ADDRTREE).unwrap();
         assert_eq!(addresses.len(), 4);
     }
     let chainspecs = default_chainspecs();
@@ -1207,12 +1206,11 @@ fn history_with_identities() {
 
 #[cfg(feature = "test")]
 fn get_multisigner_path_set(dbname: &str) -> Vec<(MultiSigner, String)> {
-    let db = open_db::<Signer>(dbname).unwrap();
-    let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
+    let db = open_db(dbname).unwrap();
+    let identities = open_tree(&db, ADDRTREE).unwrap();
     let mut multisigner_path_set: Vec<(MultiSigner, String)> = Vec::new();
     for a in identities.iter().flatten() {
-        let (multisigner, address_details) =
-            AddressDetails::process_entry_checked::<Signer>(a).unwrap();
+        let (multisigner, address_details) = AddressDetails::process_entry_checked(a).unwrap();
         multisigner_path_set.push((multisigner, address_details.path.to_string()))
     }
     multisigner_path_set
@@ -1224,8 +1222,8 @@ fn increment_identities_1() {
     let dbname = "for_tests/increment_identities_1";
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     {
-        let db = open_db::<Signer>(dbname).unwrap();
-        let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
+        let db = open_db(dbname).unwrap();
+        let identities = open_tree(&db, ADDRTREE).unwrap();
         assert!(identities.is_empty());
     }
     let chainspecs = default_chainspecs();
@@ -1270,8 +1268,8 @@ fn increment_identities_2() {
     let dbname = "for_tests/increment_identities_2";
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     {
-        let db = open_db::<Signer>(dbname).unwrap();
-        let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
+        let db = open_db(dbname).unwrap();
+        let identities = open_tree(&db, ADDRTREE).unwrap();
         assert!(identities.is_empty());
     }
     let chainspecs = default_chainspecs();
@@ -1326,8 +1324,8 @@ fn increment_identities_3() {
     let dbname = "for_tests/increment_identities_3";
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     {
-        let db = open_db::<Signer>(dbname).unwrap();
-        let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
+        let db = open_db(dbname).unwrap();
+        let identities = open_tree(&db, ADDRTREE).unwrap();
         assert!(identities.is_empty());
     }
     let chainspecs = default_chainspecs();
@@ -1396,9 +1394,31 @@ fn creating_derivation_1() {
         panic!("Derivation should already exist.");
     }
     match try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname) {
-            Ok(()) => panic!("Should NOT be able to create //Alice derivation again."),
-            Err(e) => assert_eq!(<Signer>::show(&e), "Error generating address. Seed Alice already has derivation //Alice for network specs key 01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe, public key d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d.".to_string()),
+        Ok(()) => panic!("Should NOT be able to create //Alice derivation again."),
+        Err(e) => {
+            if let Error::DerivationExists {
+                ref multisigner,
+                ref address_details,
+                ref network_specs_key,
+            } = e
+            {
+                assert_eq!(address_details.seed_name, "Alice".to_string());
+
+                assert_eq!(
+                    hex::encode(multisigner.as_ref()),
+                    "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d".to_string()
+                );
+
+                assert_eq!(
+                    hex::encode(network_specs_key.key()),
+                    "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+                        .to_string()
+                );
+            } else {
+                panic!("expected Error::DerivationExists, got {:?}", e);
+            }
         }
+    }
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -1538,23 +1558,45 @@ fn creating_derivation_5() {
     } else {
         panic!("Derivation exists, but has password.");
     }
-    match try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice///secret", &network_id_0, dbname) {
-            Ok(()) => panic!("Should NOT be able to create //Alice///secret derivation again."),
-            Err(e) => assert_eq!(<Signer>::show(&e), "Error generating address. Seed Alice already has derivation //Alice///<password> for network specs key 01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe, public key 08a5e583f74f54f3811cb5f7d74e686d473e3a466fd0e95738707a80c3183b15.".to_string()),
+    match try_create_address(
+        "Alice",
+        ALICE_SEED_PHRASE,
+        "//Alice///secret",
+        &network_id_0,
+        dbname,
+    ) {
+        Ok(()) => panic!("Should NOT be able to create //Alice///secret derivation again."),
+        Err(e) => {
+            if let Error::DerivationExists {
+                ref multisigner,
+                ref address_details,
+                ref network_specs_key,
+            } = e
+            {
+                assert_eq!(address_details.seed_name, "Alice".to_string());
+
+                assert_eq!(
+                    hex::encode(multisigner.as_ref()),
+                    "08a5e583f74f54f3811cb5f7d74e686d473e3a466fd0e95738707a80c3183b15".to_string(),
+                );
+
+                assert_eq!(
+                    hex::encode(network_specs_key.key()),
+                    "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+                        .to_string()
+                );
+            } else {
+                panic!("expected Error::DerivationExists, got {:?}", e);
+            }
         }
+    }
     fs::remove_dir_all(dbname).unwrap();
 }
 
 #[cfg(feature = "test")]
 fn insert_metadata_from_file(database_name: &str, filename: &str) {
     let meta_str = std::fs::read_to_string(filename).unwrap();
-    let meta_values = MetaValues::from_str_metadata(
-        meta_str.trim(),
-        IncomingMetadataSourceActiveStr::Default {
-            filename: filename.to_string(),
-        },
-    )
-    .unwrap();
+    let meta_values = MetaValues::from_str_metadata(meta_str.trim()).unwrap();
     let mut meta_batch = Batch::default();
     meta_batch.insert(
         MetaKey::from_parts(&meta_values.name, meta_values.version).key(),
@@ -1562,26 +1604,24 @@ fn insert_metadata_from_file(database_name: &str, filename: &str) {
     );
     TrDbCold::new()
         .set_metadata(meta_batch)
-        .apply::<Active>(database_name)
+        .apply(database_name)
         .unwrap();
 }
 
 #[cfg(feature = "test")]
 fn metadata_len(database_name: &str) -> usize {
-    let database = open_db::<Active>(database_name).unwrap();
-    let metadata = open_tree::<Active>(&database, METATREE).unwrap();
+    let database = open_db(database_name).unwrap();
+    let metadata = open_tree(&database, METATREE).unwrap();
     metadata.len()
 }
 
 #[cfg(feature = "test")]
 fn metadata_contents(database_name: &str) -> Vec<(String, u32)> {
-    let database = open_db::<Active>(database_name).unwrap();
-    let metadata = open_tree::<Active>(&database, METATREE).unwrap();
+    let database = open_db(database_name).unwrap();
+    let metadata = open_tree(&database, METATREE).unwrap();
     let mut out: Vec<(String, u32)> = Vec::new();
     for (meta_key_vec, _) in metadata.iter().flatten() {
-        let new = MetaKey::from_ivec(&meta_key_vec)
-            .name_version::<Active>()
-            .unwrap();
+        let new = MetaKey::from_ivec(&meta_key_vec).name_version().unwrap();
         out.push(new);
     }
     out
@@ -1635,7 +1675,7 @@ fn test_all_events() {
     let dbname = "for_tests/test_all_events";
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let events = all_events_preview();
-    enter_events::<Signer>(dbname, events).unwrap();
+    enter_events(dbname, events).unwrap();
     let entries: Vec<_> = get_history(dbname)
         .unwrap()
         .into_iter()
@@ -2146,7 +2186,7 @@ fn remove_all_westend() {
         );
         let identities: Tree = database.open_tree(ADDRTREE).unwrap();
         for a in identities.iter().flatten() {
-            let (_, address_details) = AddressDetails::process_entry_checked::<Signer>(a).unwrap();
+            let (_, address_details) = AddressDetails::process_entry_checked(a).unwrap();
             assert!(
                 !address_details.network_id.contains(&network_specs_key),
                 "Some westend identities still remain."

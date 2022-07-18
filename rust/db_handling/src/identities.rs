@@ -54,27 +54,16 @@ use constants::ALICE_SEED_PHRASE;
 #[cfg(feature = "signer")]
 use constants::TRANSACTION;
 
+#[cfg(feature = "active")]
+use definitions::qr_transfers::ContentDerivations;
 #[cfg(any(feature = "active", feature = "signer"))]
 use definitions::{
     crypto::Encryption,
-    error::{AddressGenerationCommon, ErrorSource},
     helpers::multisigner_to_public,
     history::{Event, IdentityHistory},
     keyring::{AddressKey, NetworkSpecsKey},
     network_specs::NetworkSpecs,
     users::AddressDetails,
-};
-#[cfg(feature = "signer")]
-use definitions::{
-    error::{AddressGeneration, SpecsKeySource},
-    error_signer::{
-        ErrorSigner, ExtraAddressGenerationSigner, InputSigner, InterfaceSigner, Signer,
-    },
-};
-#[cfg(feature = "active")]
-use definitions::{
-    error_active::{Active, ErrorActive, InputActive},
-    qr_transfers::ContentDerivations,
 };
 
 #[cfg(any(feature = "active", feature = "signer"))]
@@ -89,6 +78,7 @@ use crate::{
     helpers::{get_address_details, get_network_specs},
     interface_signer::addresses_set_seed_name_network,
 };
+use crate::{Error, Result};
 
 lazy_static! {
 // stolen from sp_core
@@ -99,16 +89,14 @@ lazy_static! {
 
 /// Get all existing addresses from the database.
 #[cfg(feature = "signer")]
-pub(crate) fn get_all_addresses(
-    database_name: &str,
-) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
-    let database = open_db::<Signer>(database_name)?;
-    let identities = open_tree::<Signer>(&database, ADDRTREE)?;
+pub(crate) fn get_all_addresses(database_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>> {
+    let database = open_db(database_name)?;
+    let identities = open_tree(&database, ADDRTREE)?;
     let mut out: Vec<(MultiSigner, AddressDetails)> = Vec::new();
     for (address_key_vec, address_entry) in identities.iter().flatten() {
         let address_key = AddressKey::from_ivec(&address_key_vec);
         let (multisigner, address_details) =
-            AddressDetails::process_entry_with_key_checked::<Signer>(&address_key, address_entry)?;
+            AddressDetails::process_entry_with_key_checked(&address_key, address_entry)?;
         out.push((multisigner, address_details));
     }
     Ok(out)
@@ -119,7 +107,7 @@ pub(crate) fn get_all_addresses(
 pub fn get_addresses_by_seed_name(
     database_name: &str,
     seed_name: &str,
-) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
+) -> Result<Vec<(MultiSigner, AddressDetails)>> {
     Ok(get_all_addresses(database_name)?
         .into_iter()
         .filter(|(_, address_details)| address_details.seed_name == seed_name)
@@ -132,15 +120,8 @@ pub fn get_addresses_by_seed_name(
 ///
 /// Its zeroization and safe handling are delegated to hardware.
 #[cfg(feature = "signer")]
-pub fn generate_random_phrase(words_number: u32) -> Result<String, ErrorSigner> {
-    let mnemonic_type = match MnemonicType::for_word_count(words_number as usize) {
-        Ok(a) => a,
-        Err(e) => {
-            return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(
-                ExtraAddressGenerationSigner::RandomPhraseGeneration(e),
-            )))
-        }
-    };
+pub fn generate_random_phrase(words_number: u32) -> Result<String> {
+    let mnemonic_type = MnemonicType::for_word_count(words_number as usize)?;
     let mnemonic = Mnemonic::new(mnemonic_type, Language::English);
     Ok(mnemonic.into_phrase())
 }
@@ -195,23 +176,23 @@ pub(crate) struct PrepData {
 /// [`sp_core::crypto`]. Combined secret string is then zeroized here regardless
 /// of the address generation success.
 #[cfg(any(feature = "active", feature = "signer"))]
-pub(crate) fn create_address<T: ErrorSource>(
+pub(crate) fn create_address(
     database_name: &str,
     input_batch_prep: &[(AddressKey, AddressDetails)],
     path: &str,
     network_specs: &NetworkSpecs,
     seed_name: &str,
     seed_phrase: &str,
-) -> Result<PrepData, T::Error> {
+) -> Result<PrepData> {
     // Check that the seed phrase is not empty.
     // In upstream, empty seed phrase means default Alice seed phrase.
     if seed_phrase.is_empty() {
-        return Err(<T>::empty_seed());
+        return Err(Error::EmptySeed);
     }
 
     // Check that the seed name is not empty.
     if seed_name.is_empty() {
-        return Err(<T>::empty_seed_name());
+        return Err(Error::EmptySeedName);
     }
     let mut address_prep = input_batch_prep.to_vec();
     let network_specs_key =
@@ -230,9 +211,7 @@ pub(crate) fn create_address<T: ErrorSource>(
             }
             Err(e) => {
                 full_address.zeroize();
-                return Err(<T>::address_generation_common(
-                    AddressGenerationCommon::SecretString(e),
-                ));
+                return Err(Error::SecretStringError(e));
             }
         },
         Encryption::Sr25519 => match sr25519::Pair::from_string(&full_address, None) {
@@ -242,9 +221,7 @@ pub(crate) fn create_address<T: ErrorSource>(
             }
             Err(e) => {
                 full_address.zeroize();
-                return Err(<T>::address_generation_common(
-                    AddressGenerationCommon::SecretString(e),
-                ));
+                return Err(Error::SecretStringError(e));
             }
         },
         Encryption::Ecdsa => match ecdsa::Pair::from_string(&full_address, None) {
@@ -254,9 +231,7 @@ pub(crate) fn create_address<T: ErrorSource>(
             }
             Err(e) => {
                 full_address.zeroize();
-                return Err(<T>::address_generation_common(
-                    AddressGenerationCommon::SecretString(e),
-                ));
+                return Err(Error::SecretStringError(e));
             }
         },
     };
@@ -308,15 +283,13 @@ pub(crate) fn create_address<T: ErrorSource>(
             // updating would be effectively overwritten, with only one,
             // undefined, staying in the database.
             if x_address_details.path != cropped_path {
-                return Err(<T>::address_generation_common(
-                    AddressGenerationCommon::KeyCollisionBatch {
-                        seed_name_existing: x_address_details.seed_name.to_string(),
-                        seed_name_new: seed_name.to_string(),
-                        cropped_path_existing: x_address_details.path.to_string(),
-                        cropped_path_new: cropped_path.to_string(),
-                        in_this_network,
-                    },
-                ));
+                return Err(Error::KeyCollisionBatch {
+                    seed_name_existing: x_address_details.seed_name.to_string(),
+                    seed_name_new: seed_name.to_string(),
+                    cropped_path_existing: x_address_details.path.to_string(),
+                    cropped_path_new: cropped_path.to_string(),
+                    in_this_network,
+                });
             }
 
             // Note that no error would be caused if two identical addresses
@@ -344,15 +317,13 @@ pub(crate) fn create_address<T: ErrorSource>(
         // `AddressKey` is not yet in the transaction
         None => {
             // check if the `AddressKey` is already in the database
-            let database = open_db::<T>(database_name)?;
-            let identities = open_tree::<T>(&database, ADDRTREE)?;
+            let database = open_db(database_name)?;
+            let identities = open_tree(&database, ADDRTREE)?;
             match identities.get(address_key.key()) {
                 // `AddressKey` is in the database
                 Ok(Some(address_entry)) => {
-                    let mut address_details = AddressDetails::from_entry_with_key_checked::<T>(
-                        &address_key,
-                        address_entry,
-                    )?;
+                    let mut address_details =
+                        AddressDetails::from_entry_with_key_checked(&address_key, address_entry)?;
 
                     // Even though the public key and `Encryption` are same
                     // (resulting in the same `AddressKey`), the path in
@@ -368,11 +339,9 @@ pub(crate) fn create_address<T: ErrorSource>(
                     // created.
                     // TODO more descriptive error may be better
                     if address_details.path != cropped_path {
-                        return Err(<T>::address_generation_common(
-                            AddressGenerationCommon::KeyCollision {
-                                seed_name: address_details.seed_name,
-                            },
-                        ));
+                        return Err(Error::KeyCollision {
+                            seed_name: address_details.seed_name,
+                        });
                     }
 
                     // Check if the address already exists for the network.
@@ -388,13 +357,11 @@ pub(crate) fn create_address<T: ErrorSource>(
                             history_prep,
                         })
                     } else {
-                        Err(<T>::address_generation_common(
-                            AddressGenerationCommon::DerivationExists(
-                                multisigner,
-                                address_details,
-                                network_specs_key,
-                            ),
-                        ))
+                        Err(Error::DerivationExists {
+                            multisigner,
+                            address_details,
+                            network_specs_key,
+                        })
                     }
                 }
 
@@ -416,7 +383,7 @@ pub(crate) fn create_address<T: ErrorSource>(
                 }
 
                 // database error
-                Err(e) => Err(<T>::db_internal(e)),
+                Err(e) => Err(e.into()),
             }
         }
     }
@@ -448,12 +415,12 @@ pub(crate) fn create_address<T: ErrorSource>(
 /// This function inputs secret seed phrase as `&str`. It is passed as `&str`
 /// into `create_address` and used there.
 #[cfg(any(feature = "active", feature = "signer"))]
-fn populate_addresses<T: ErrorSource>(
+fn populate_addresses(
     database_name: &str,
     seed_name: &str,
     seed_phrase: &str,
     make_seed_keys: bool,
-) -> Result<PrepData, T::Error> {
+) -> Result<PrepData> {
     // Set of `(AddressKey, AddressDetails)` to be added into the database.
     // Set is updated and is used on each iteration of `create_address` to check
     // for collisions.
@@ -466,14 +433,14 @@ fn populate_addresses<T: ErrorSource>(
     // Collect all networks known to Signer.
     // Note: networks with all `Encryption` variants are used here if they are
     // in the Signer database.
-    let specs_set = get_all_networks::<T>(database_name)?;
+    let specs_set = get_all_networks(database_name)?;
 
     for network_specs in specs_set.iter() {
         // Make seed keys if requested.
         // Seed keys **must** be possible to generate,
         // if a seed key has a collision with some other key, it is an error
         if make_seed_keys {
-            let prep_data = create_address::<T>(
+            let prep_data = create_address(
                 database_name,
                 &address_prep,
                 "",
@@ -488,7 +455,7 @@ fn populate_addresses<T: ErrorSource>(
         // make keys with default derivation if possible;
         // key with default derivation may collide with some other key,
         // this should not prevent generating a seed;
-        if let Ok(prep_data) = create_address::<T>(
+        if let Ok(prep_data) = create_address(
             database_name,
             &address_prep,
             &network_specs.path_id,
@@ -524,18 +491,17 @@ pub fn try_create_seed(
     seed_phrase: &str,
     make_seed_keys: bool,
     database_name: &str,
-) -> Result<(), ErrorSigner> {
+) -> Result<()> {
     let mut events: Vec<Event> = vec![Event::SeedCreated {
         seed_created: seed_name.to_string(),
     }];
 
-    let prep_data =
-        populate_addresses::<Signer>(database_name, seed_name, seed_phrase, make_seed_keys)?;
+    let prep_data = populate_addresses(database_name, seed_name, seed_phrase, make_seed_keys)?;
     events.extend_from_slice(&prep_data.history_prep);
     TrDbCold::new()
         .set_addresses(upd_id_batch(Batch::default(), prep_data.address_prep)) // add addresses just made in populate_addresses
-        .set_history(events_to_batch::<Signer>(database_name, events)?) // add corresponding history
-        .apply::<Signer>(database_name)
+        .set_history(events_to_batch(database_name, events)?) // add corresponding history
+        .apply(database_name)
 }
 
 /// Remove address from the Signer database.
@@ -552,7 +518,7 @@ pub fn remove_key(
     database_name: &str,
     multisigner: &MultiSigner,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<(), ErrorSigner> {
+) -> Result<()> {
     remove_keys_set(database_name, &[multisigner.to_owned()], network_specs_key)
 }
 
@@ -571,7 +537,7 @@ pub fn remove_keys_set(
     database_name: &str,
     multiselect: &[MultiSigner],
     network_specs_key: &NetworkSpecsKey,
-) -> Result<(), ErrorSigner> {
+) -> Result<()> {
     let mut id_batch = Batch::default();
     let mut events: Vec<Event> = Vec::new();
     let network_specs = get_network_specs(database_name, network_specs_key)?;
@@ -600,8 +566,8 @@ pub fn remove_keys_set(
     }
     TrDbCold::new()
         .set_addresses(id_batch) // modify existing address entries
-        .set_history(events_to_batch::<Signer>(database_name, events)?) // add corresponding history
-        .apply::<Signer>(database_name)
+        .set_history(events_to_batch(database_name, events)?) // add corresponding history
+        .apply(database_name)
 }
 
 /// Add a set of new derived addresses: N+1, N+2, etc into Signer database.
@@ -666,7 +632,7 @@ pub fn create_increment_set(
     network_specs_key: &NetworkSpecsKey,
     seed_phrase: &str,
     database_name: &str,
-) -> Result<(), ErrorSigner> {
+) -> Result<()> {
     let address_details =
         get_address_details(database_name, &AddressKey::from_multisigner(multisigner))?;
     let existing_identities = addresses_set_seed_name_network(
@@ -689,7 +655,7 @@ pub fn create_increment_set(
     let mut current_events: Vec<Event> = Vec::new();
     for i in 0..increment {
         let path = address_details.path.to_string() + "//" + &(last_index + i).to_string();
-        let prep_data = create_address::<Signer>(
+        let prep_data = create_address(
             database_name,
             &identity_adds,
             &path,
@@ -703,8 +669,8 @@ pub fn create_increment_set(
     let id_batch = upd_id_batch(Batch::default(), identity_adds);
     TrDbCold::new()
         .set_addresses(id_batch) // add created addresses
-        .set_history(events_to_batch::<Signer>(database_name, current_events)?) // add corresponding history
-        .apply::<Signer>(database_name)
+        .set_history(events_to_batch(database_name, current_events)?) // add corresponding history
+        .apply(database_name)
 }
 
 /// Check derivation format and determine if it has a password.
@@ -714,13 +680,13 @@ pub fn create_increment_set(
 ///
 // TODO regex and secrets, see `create_address` comments.
 #[cfg(feature = "signer")]
-pub(crate) fn is_passworded(path: &str) -> Result<bool, ErrorSigner> {
-    match REG_PATH.captures(path) {
-        Some(caps) => Ok(caps.name("password").is_some()),
-        None => Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(
-            ExtraAddressGenerationSigner::InvalidDerivation,
-        ))),
-    }
+pub(crate) fn is_passworded(path: &str) -> Result<bool> {
+    let passworded = REG_PATH
+        .captures(path)
+        .map(|caps| caps.name("password").is_some())
+        .ok_or(Error::InvalidDerivation)?;
+
+    Ok(passworded)
 }
 
 /// Proposed derivation status.
@@ -772,7 +738,7 @@ pub fn derivation_check(
     path: &str,
     network_specs_key: &NetworkSpecsKey,
     database_name: &str,
-) -> Result<DerivationCheck, ErrorSigner> {
+) -> Result<DerivationCheck> {
     match is_passworded(path) {
         // Proposed derivation has password, no checks could be made, proceed.
         Ok(true) => Ok(DerivationCheck::Password),
@@ -814,21 +780,15 @@ pub fn derivation_check(
 ///
 // TODO regex and secrets, see `create_address` comments.
 #[cfg(feature = "signer")]
-pub fn cut_path(path: &str) -> Result<(String, String), ErrorSigner> {
-    match REG_PATH.captures(path) {
-        Some(caps) => {
-            let cropped_path = match caps.name("path") {
-                Some(a) => a.as_str().to_string(),
-                None => "".to_string(),
-            };
-            match caps.name("password") {
-                Some(pwd) => Ok((cropped_path, pwd.as_str().to_string())),
-                None => Err(ErrorSigner::Interface(InterfaceSigner::LostPwd)),
-            }
-        }
-        None => Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(
-            ExtraAddressGenerationSigner::InvalidDerivation,
-        ))),
+pub fn cut_path(path: &str) -> Result<(String, String)> {
+    let caps = REG_PATH.captures(path).ok_or(Error::InvalidDerivation)?;
+    let cropped_path = caps
+        .name("path")
+        .map(|a| a.as_str().to_string())
+        .ok_or(Error::InvalidDerivation)?;
+    match caps.name("password") {
+        Some(pwd) => Ok((cropped_path, pwd.as_str().to_string())),
+        None => Err(Error::LostPwd),
     }
 }
 
@@ -853,23 +813,21 @@ pub fn try_create_address(
     path: &str,
     network_specs_key: &NetworkSpecsKey,
     database_name: &str,
-) -> Result<(), ErrorSigner> {
+) -> Result<()> {
     match derivation_check(seed_name, path, network_specs_key, database_name)? {
         // UI should prevent user from getting into `try_create_address` if
         // derivation has a bad format
-        DerivationCheck::BadFormat => Err(ErrorSigner::AddressGeneration(
-            AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation),
-        )),
+        DerivationCheck::BadFormat => Err(Error::InvalidDerivation),
 
         // UI should prevent user from getting into `try_create_address` if
         // derivation already exists
-        DerivationCheck::NoPassword(Some((multisigner, address_details))) => Err(
-            <Signer>::address_generation_common(AddressGenerationCommon::DerivationExists(
+        DerivationCheck::NoPassword(Some((multisigner, address_details))) => {
+            Err(Error::DerivationExists {
                 multisigner,
                 address_details,
-                network_specs_key.to_owned(),
-            )),
-        ),
+                network_specs_key: network_specs_key.to_owned(),
+            })
+        }
 
         // Valid derivation:
         // - without a password and not in the database
@@ -879,7 +837,7 @@ pub fn try_create_address(
         // preliminarily and would result in `create_address` errors here.
         _ => {
             let network_specs = get_network_specs(database_name, network_specs_key)?;
-            let prep_data = create_address::<Signer>(
+            let prep_data = create_address(
                 database_name,
                 &Vec::new(), // a single address is created, no data to check against here
                 path,
@@ -890,11 +848,8 @@ pub fn try_create_address(
             let id_batch = upd_id_batch(Batch::default(), prep_data.address_prep);
             TrDbCold::new()
                 .set_addresses(id_batch) // add created address
-                .set_history(events_to_batch::<Signer>(
-                    database_name,
-                    prep_data.history_prep,
-                )?) // add corresponding history
-                .apply::<Signer>(database_name)
+                .set_history(events_to_batch(database_name, prep_data.history_prep)?) // add corresponding history
+                .apply(database_name)
         }
     }
 }
@@ -908,15 +863,15 @@ pub fn try_create_address(
 /// - addresses with default derivation path in each default network
 /// - address with `//Alice` derivation path in Westend network
 #[cfg(feature = "active")]
-pub fn generate_test_identities(database_name: &str) -> Result<(), ErrorActive> {
+pub fn generate_test_identities(database_name: &str) -> Result<()> {
     // clear the tree
-    let entry_batch = make_batch_clear_tree::<Active>(database_name, ADDRTREE)?;
+    let entry_batch = make_batch_clear_tree(database_name, ADDRTREE)?;
 
     // make a record that the tree was wiped
     let mut events = vec![Event::IdentitiesWiped];
 
     // data for adding seed addresses and addresses with default derivation path
-    let prep_data = populate_addresses::<Active>(database_name, "Alice", ALICE_SEED_PHRASE, true)?;
+    let prep_data = populate_addresses(database_name, "Alice", ALICE_SEED_PHRASE, true)?;
 
     // Address preparation set, to be used as following `create_address` input.
     // Alice addresses are known and good, so checking them for collisions is
@@ -926,11 +881,11 @@ pub fn generate_test_identities(database_name: &str) -> Result<(), ErrorActive> 
     // update events
     events.extend_from_slice(&prep_data.history_prep);
 
-    for network_specs in get_all_networks::<Active>(database_name)?.iter() {
+    for network_specs in get_all_networks(database_name)?.iter() {
         if (network_specs.name == "westend") && (network_specs.encryption == Encryption::Sr25519) {
             // data for adding address with `//Alice` derivation path in Westend
             // network
-            let prep_data = create_address::<Active>(
+            let prep_data = create_address(
                 database_name,
                 &address_prep, // address
                 "//Alice",
@@ -945,8 +900,8 @@ pub fn generate_test_identities(database_name: &str) -> Result<(), ErrorActive> 
 
     TrDbCold::new()
         .set_addresses(upd_id_batch(entry_batch, address_prep)) // add created addresses
-        .set_history(events_to_batch::<Active>(database_name, events)?) // add corresponding history
-        .apply::<Active>(database_name)
+        .set_history(events_to_batch(database_name, events)?) // add corresponding history
+        .apply(database_name)
 }
 
 /// Remove all addresses associated with given seed name from the Signer
@@ -958,7 +913,7 @@ pub fn generate_test_identities(database_name: &str) -> Result<(), ErrorActive> 
 // TODO remove seed must have an associated log entry; decide who emits it -
 // front or back - and add.
 #[cfg(feature = "signer")]
-pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSigner> {
+pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<()> {
     // `Batch` to use
     let mut identity_batch = Batch::default();
 
@@ -976,9 +931,7 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSign
 
         let public_key = multisigner_to_public(multisigner);
         for network_specs_key in address_details.network_id.iter() {
-            let (genesis_hash_vec, _) = network_specs_key.genesis_hash_encryption::<Signer>(
-                SpecsKeySource::AddrTree(address_key.to_owned()),
-            )?;
+            let (genesis_hash_vec, _) = network_specs_key.genesis_hash_encryption()?;
             let identity_history = IdentityHistory::get(
                 seed_name,
                 &address_details.encryption,
@@ -992,8 +945,8 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSign
     }
     TrDbCold::new()
         .set_addresses(identity_batch) // modify addresses
-        .set_history(events_to_batch::<Signer>(database_name, events)?) // add corresponding history
-        .apply::<Signer>(database_name)
+        .set_history(events_to_batch(database_name, events)?) // add corresponding history
+        .apply(database_name)
 }
 
 /// Create a set of addresses using imported derivations set for user-selected
@@ -1023,7 +976,7 @@ pub fn import_derivations(
     seed_name: &str,
     seed_phrase: &str,
     database_name: &str,
-) -> Result<(), ErrorSigner> {
+) -> Result<()> {
     // derivations data retrieved from the database
     let content_derivations = TrDbColdDerivations::from_storage(database_name, checksum)?;
 
@@ -1039,7 +992,7 @@ pub fn import_derivations(
 
     for path in content_derivations.checked_derivations().iter() {
         // try creating address for each of the derivations
-        match create_address::<Signer>(
+        match create_address(
             database_name,
             &adds,
             path,
@@ -1054,9 +1007,7 @@ pub fn import_derivations(
             }
 
             // exactly same address already exists, ignoring it
-            Err(ErrorSigner::AddressGeneration(AddressGeneration::Common(
-                AddressGenerationCommon::DerivationExists(_, _, _),
-            ))) => (),
+            Err(Error::DerivationExists { .. }) => (),
 
             // some other error, processed as a real error
             Err(e) => return Err(e),
@@ -1064,9 +1015,9 @@ pub fn import_derivations(
     }
     TrDbCold::new()
         .set_addresses(upd_id_batch(Batch::default(), adds)) // modify addresses data
-        .set_history(events_to_batch::<Signer>(database_name, events)?) // add corresponding history
-        .set_transaction(make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?) // clear transaction tree
-        .apply::<Signer>(database_name)
+        .set_history(events_to_batch(database_name, events)?) // add corresponding history
+        .set_transaction(make_batch_clear_tree(database_name, TRANSACTION)?) // clear transaction tree
+        .apply(database_name)
 }
 
 /// Check derivations before offering user to import them.
@@ -1085,12 +1036,10 @@ pub fn import_derivations(
 /// database temporary storage in `TRANSACTION` tree, same data is recovered as
 /// ensured by the checksum matching.
 #[cfg(feature = "signer")]
-pub fn check_derivation_set(derivations: &[String]) -> Result<(), ErrorSigner> {
+pub fn check_derivation_set(derivations: &[String]) -> Result<()> {
     for path in derivations.iter() {
         if REG_PATH.captures(path).is_none() {
-            return Err(ErrorSigner::Input(InputSigner::InvalidDerivation(
-                path.to_string(),
-            )));
+            return Err(Error::InvalidDerivation);
         }
     }
     Ok(())
@@ -1115,7 +1064,7 @@ pub fn prepare_derivations_import(
     encryption: &Encryption,
     genesis_hash: H256,
     content: &str,
-) -> Result<ContentDerivations, ErrorActive> {
+) -> Result<ContentDerivations> {
     let mut derivations: Vec<String> = Vec::new();
     let mut display_derivations: Vec<String> = Vec::new();
     let content_set: Vec<&str> = content.trim().split('\n').collect();
@@ -1135,7 +1084,7 @@ pub fn prepare_derivations_import(
         }
     }
     if display_derivations.is_empty() {
-        return Err(ErrorActive::Input(InputActive::NoValidDerivationsToExport));
+        return Err(Error::NoValidDerivationToExport);
     } else {
         println!(
             "Found and used {} valid derivations:",
