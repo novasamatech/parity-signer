@@ -30,7 +30,7 @@ jobs:
           sudo apt install -y clang libclang-dev libopencv-dev
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@v1.3.0
+        uses:                 Swatinem/rust-cache@v2.0.0
         with:
           working-directory:  rust
 
