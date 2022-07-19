@@ -954,19 +954,19 @@ pub fn generate_test_identities(database_name: &str) -> Result<(), ErrorActive> 
 ///
 /// Complementary action in frontend is removal of the seed data from the device
 /// key management system.
-///
-// TODO remove seed must have an associated log entry; decide who emits it -
-// front or back - and add.
 #[cfg(feature = "signer")]
 pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSigner> {
     // `Batch` to use
     let mut identity_batch = Batch::default();
 
     // Associated `Event` set
-    let mut events: Vec<Event> = Vec::new();
+    let mut events = vec![Event::SeedRemoved { seed_name: seed_name.to_owned() }];
 
     // All addresses with given seed name from the database
     let id_set = get_addresses_by_seed_name(database_name, seed_name)?;
+    if id_set.is_empty() {
+        return Err(ErrorSigner::NoKnownSeeds);
+    }
 
     for (multisigner, address_details) in id_set.iter() {
         let address_key = AddressKey::from_multisigner(multisigner);
