@@ -3,7 +3,7 @@ use pretty_assertions::assert_eq;
 use sled::{open, Db, Tree};
 use sp_core::H256;
 use sp_runtime::MultiSigner;
-use std::{fs, io::Write, str::FromStr};
+use std::{fmt::Write as _, fs, io::Write, str::FromStr};
 
 use constants::{
     test_values::{
@@ -90,7 +90,7 @@ fn print_db_content(dbname: &str) -> String {
     metadata_set.sort();
     let mut metadata_str = String::new();
     for x in metadata_set.iter() {
-        metadata_str.push_str(&format!("\n    {}", x))
+        let _ = write!(&mut metadata_str, "\n    {}", x);
     }
 
     let mut network_specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
@@ -107,13 +107,14 @@ fn print_db_content(dbname: &str) -> String {
     network_specs_set.sort_by(|(_, a), (_, b)| a.title.cmp(&b.title));
     let mut network_specs_str = String::new();
     for (network_specs_key, network_specs) in network_specs_set.iter() {
-        network_specs_str.push_str(&format!(
+        let _ = write!(
+            &mut network_specs_str,
             "\n    {}: {} ({} with {})",
             hex::encode(network_specs_key.key()),
             network_specs.title,
             network_specs.name,
             network_specs.encryption.show()
-        ))
+        );
     }
 
     let settings: Tree = database.open_tree(SETTREE).unwrap();
@@ -172,7 +173,7 @@ fn print_db_content(dbname: &str) -> String {
     verifiers_set.sort();
     let mut verifiers_str = String::new();
     for x in verifiers_set.iter() {
-        verifiers_str.push_str(&format!("\n    {}", x))
+        let _ = write!(&mut verifiers_str, "\n    {}", x);
     }
 
     let mut identities_set: Vec<String> = Vec::new();
@@ -191,7 +192,7 @@ fn print_db_content(dbname: &str) -> String {
         networks_set.sort();
         let mut networks_str = String::new();
         for y in networks_set.iter() {
-            networks_str.push_str(&format!("\n        {}", y))
+            let _ = write!(&mut networks_str, "\n        {}", y);
         }
 
         identities_set.push(format!(
@@ -205,7 +206,7 @@ fn print_db_content(dbname: &str) -> String {
     identities_set.sort();
     let mut identities_str = String::new();
     for x in identities_set.iter() {
-        identities_str.push_str(&format!("\n    {}", x))
+        let _ = write!(&mut identities_str, "\n    {}", x);
     }
 
     format!("Database contents:\nMetadata:{}\nNetwork Specs:{}\nVerifiers:{}\nGeneral Verifier: {}\nIdentities:{}", metadata_str, network_specs_str, verifiers_str, general_verifier.show_error(), identities_str)

@@ -56,9 +56,11 @@ struct Backup: View {
                                 "Please enable airplane mode and disconnect all cables to access the seed phrase." :
                                 "Seeds are not available now! Come back again to access them."
                             }
+                            UIApplication.shared.isIdleTimerDisabled = true
                         }
                         .onDisappear {
                             secret = ""
+                            UIApplication.shared.isIdleTimerDisabled = false
                         }
                         .background(RoundedRectangle(cornerRadius: 8)
                                         .foregroundColor(Color(countdown>0 ? "Crypto100" :

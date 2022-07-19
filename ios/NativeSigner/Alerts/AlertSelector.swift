@@ -10,18 +10,21 @@ import CoreML
 
 struct AlertSelector: View {
     let alertData: AlertData?
+    let canaryDead: Bool
+    let resetAlert: () -> Void
+    let pushButton: (Action, String, String) -> Void
 
     var body: some View {
         switch alertData {
         case .none:
             EmptyView()
         case .errorData(let value):
-            ErrorAlert(content: value)
+            ErrorAlert(pushButton: pushButton, content: value)
         case .shield(let value):
-            ShieldAlertComponent(content: value)
+            ShieldAlertComponent(resetAlert: resetAlert, pushButton: pushButton, canaryDead: canaryDead, content: value)
         case .confirm:// (let value):
             let value = "TODO"
-            ConfirmAlert(content: value)
+            ConfirmAlert(pushButton: pushButton, content: value)
         }
     }
 }

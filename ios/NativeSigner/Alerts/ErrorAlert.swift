@@ -8,22 +8,19 @@
 import SwiftUI
 
 struct ErrorAlert: View {
-    @EnvironmentObject var data: SignerDataModel
+    let pushButton: (Action, String, String) -> Void
     let content: String
     var body: some View {
         ZStack {
             Rectangle().foregroundColor(Color("BgDanger")).opacity(0.3).gesture(TapGesture().onEnded {_ in
-                data.pushButton(action: .goBack)
-            })
+                pushButton(.goBack, "", "")
+                })
             VStack {
                 Text("Error!").font(FBase(style: .h1)).foregroundColor(Color("SignalDanger"))
                 Text(content).foregroundColor(Color("SignalDanger"))
-                Button(
-                    action: {
-                        data.pushButton(action: .goBack)
-                    },
-                    label: {Text("Ok")}
-                )
+                Button("Ok", action: {
+                    pushButton(.goBack, "", "")
+                })
             }.padding().background(RoundedRectangle(cornerRadius: 20).foregroundColor(Color("BgDanger")))
         }
     }
