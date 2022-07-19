@@ -59,7 +59,7 @@ use db_handling::{
     },
     identities::{
         create_increment_set, derivation_check, get_addresses_by_seed_name, remove_key,
-        try_create_address, try_create_seed, DerivationCheck,
+        remove_seed, try_create_address, try_create_seed, DerivationCheck,
     },
     interface_signer::{
         addresses_set_seed_name_network, backup_prep, derive_prep, dynamic_path_check, export_key,
@@ -1202,6 +1202,31 @@ fn history_with_identities() {
         );
     }
 
+    fs::remove_dir_all(dbname).unwrap();
+}
+
+#[cfg(feature = "test")]
+#[test]
+fn remove_seed_history() {
+    let dbname = "for_tests/remove_seed_history";
+    let seed_name = "Alice";
+    default_cold_release(Some(PathBuf::from(dbname))).unwrap();
+
+    try_create_seed(seed_name, ALICE_SEED_PHRASE, true, dbname).unwrap();
+    assert!(remove_seed(dbname, "Wrong seed name").is_err());
+    remove_seed(dbname, seed_name).unwrap();
+
+    let history_printed: Vec<_> = get_history(dbname)
+        .unwrap()
+        .into_iter()
+        .map(|e| e.1)
+        .collect();
+    assert!(entries_contain_event(
+        &history_printed,
+        &Event::SeedRemoved {
+            seed_name: seed_name.to_string(),
+        }
+    ));
     fs::remove_dir_all(dbname).unwrap();
 }
 

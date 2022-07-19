@@ -124,6 +124,13 @@ struct HistoryCardExtended: View {
                     line1: "Seed created",
                     line2: text
                 )
+            case .seedRemoved(let text): HistoryCardTemplate(
+                image: "xmark.rectangle.portrait.fill",
+                timestamp: timestamp,
+                danger: false,
+                line1: "Seed removed",
+                line2: text
+            )
             case .seedNameWasShown(let text): HistoryCardTemplate(
                 image: "eye.trianglebadge.exclamationmark.fill",
                 timestamp: timestamp,

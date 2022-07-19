@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.Composable
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.encodeHex
@@ -189,6 +190,14 @@ fun HistoryCardExtended(
 				line1 = timestamp,
 				line2 = "Seed created",
 				line3 = eventVal.seedCreated
+			)
+		}
+		is Event.SeedRemoved -> {
+			HistoryCardTemplate(
+				image = Icons.Outlined.Delete,
+				line1 = timestamp,
+				line2 = "Seed removed",
+				line3 = eventVal.seedName
 			)
 		}
 		is Event.SeedNameWasShown -> {
