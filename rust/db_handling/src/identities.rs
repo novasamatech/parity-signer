@@ -959,14 +959,16 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSign
     // `Batch` to use
     let mut identity_batch = Batch::default();
 
-    // Associated `Event` set
-    let mut events = vec![Event::SeedRemoved { seed_name: seed_name.to_owned() }];
-
     // All addresses with given seed name from the database
     let id_set = get_addresses_by_seed_name(database_name, seed_name)?;
     if id_set.is_empty() {
         return Err(ErrorSigner::NoKnownSeeds);
     }
+
+    // Associated `Event` set
+    let mut events = vec![Event::SeedRemoved {
+        seed_name: seed_name.to_owned(),
+    }];
 
     for (multisigner, address_details) in id_set.iter() {
         let address_key = AddressKey::from_multisigner(multisigner);

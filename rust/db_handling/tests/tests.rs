@@ -59,7 +59,7 @@ use db_handling::{
     },
     identities::{
         create_increment_set, derivation_check, get_addresses_by_seed_name, remove_key,
-        try_create_address, try_create_seed, DerivationCheck, remove_seed,
+        remove_seed, try_create_address, try_create_seed, DerivationCheck,
     },
     interface_signer::{
         addresses_set_seed_name_network, backup_prep, derive_prep, dynamic_path_check, export_key,
@@ -1216,7 +1216,11 @@ fn remove_seed_history() {
     assert!(remove_seed(dbname, "Wrong seed name").is_err());
     remove_seed(dbname, seed_name).unwrap();
 
-    let history_printed: Vec<_> = get_history(dbname).unwrap().into_iter().map(|e| e.1).collect();
+    let history_printed: Vec<_> = get_history(dbname)
+        .unwrap()
+        .into_iter()
+        .map(|e| e.1)
+        .collect();
     assert!(entries_contain_event(
         &history_printed,
         &Event::SeedRemoved {
