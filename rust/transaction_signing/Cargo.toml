@@ -9,7 +9,7 @@ edition = "2021"
 blake2-rfc = "0.2.18"
 hex = "0.4.3"
 parity-scale-codec = "3.1.5"
-zeroize = "1.5.5"
+zeroize = "1.5.6"
 
 definitions = { path = "../definitions", default-features = false, features = ["signer"] }
 db_handling = { path = "../db_handling", default-features = false, features = ["signer"] }
