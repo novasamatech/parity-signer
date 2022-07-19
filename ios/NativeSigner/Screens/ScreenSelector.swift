@@ -22,9 +22,9 @@ struct ScreenSelector: View {
     let doWipe: () -> Void
     let alertShow: () -> Void
     let increment: (String, String) -> Void
-    
+
     var body: some View {
-        switch (screenData) {
+        switch screenData {
         case .scan :
             TransactionScreen(
                 pushButton: pushButton

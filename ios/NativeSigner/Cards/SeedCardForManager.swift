@@ -15,7 +15,7 @@ struct SeedCardForManager: View {
             RoundedRectangle(cornerRadius: 4).foregroundColor(Color("Bg200")).frame(height: 47)
             HStack {
                 Identicon(identicon: seedNameCard.identicon)
-                VStack (alignment: .leading) {
+                VStack(alignment: .leading) {
                     Text(seedNameCard.seedName)
                         .foregroundColor(Color("Text600"))
                         .font(FBase(style: .subtitle1))

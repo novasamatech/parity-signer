@@ -33,7 +33,8 @@ struct NetworkDetails: View {
                     }
                     HStack {
                         Text("genesis hash:")
-                        Text(content.genesisHash.map{String(format: "%02X", $0)}.joined()).fixedSize(horizontal: false, vertical: true)
+                        Text(content.genesisHash.map {String(format: "%02X", $0)}.joined())
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     HStack {
                         Text("Verifier certificate: ").fixedSize(horizontal: false, vertical: true)
@@ -44,7 +45,8 @@ struct NetworkDetails: View {
                             Identicon(identicon: content.currentVerifier.details.identicon)
                             VStack {
                                 Text("custom")
-                                Text(content.currentVerifier.details.publicKey).fixedSize(horizontal: false, vertical: true)
+                                Text(content.currentVerifier.details.publicKey)
+                                    .fixedSize(horizontal: false, vertical: true)
                                 Text("encryption: " + content.currentVerifier.details.encryption)
                             }
                         case "none":
@@ -57,15 +59,15 @@ struct NetworkDetails: View {
                 Text("Metadata available:")
                 ScrollView {
                     LazyVStack {
-                        ForEach(content.meta, id: \.metaHash) {
-                            metaEntry in
+                        ForEach(content.meta, id: \.metaHash) { metaEntry in
                             Button(
                                 action: {
                                     pushButton(.manageMetadata, metaEntry.specsVersion, "")
+                                },
+                                label: {
+                                    MetadataCard(meta: metaEntry)
                                 }
-                            ){
-                            MetadataCard(meta: metaEntry)
-                            }
+                            )
                         }
                     }
                 }
@@ -76,9 +78,9 @@ struct NetworkDetails: View {
 }
 
 /*
-struct NetworkDetails_Previews: PreviewProvider {
-    static var previews: some View {
-        NetworkDetails()
-    }
-}
-*/
+ struct NetworkDetails_Previews: PreviewProvider {
+ static var previews: some View {
+ NetworkDetails()
+ }
+ }
+ */

@@ -14,9 +14,11 @@ struct ManageNetworks: View {
         ScrollView {
             LazyVStack {
                 ForEach(content.networks.sorted(by: {$0.order < $1.order}), id: \.key) { network in
-                    Button(action: {pushButton(.goForward, network.key, "")}) {
+                    Button(
+                        action: {pushButton(.goForward, network.key, "")},
+                        label: {
                         NetworkCard(title: network.title, logo: network.logo, fancy: true)
-                    }
+                    })
                 }
             }
         }

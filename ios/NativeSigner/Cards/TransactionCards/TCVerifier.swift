@@ -12,7 +12,7 @@ struct TCVerifier: View {
     var body: some View {
         VStack {
             Text("VERIFIER CERTIFICATE").foregroundColor(Color("Text600"))
-            HStack{
+            HStack {
                 Identicon(identicon: value.identicon)
                 VStack(alignment: .leading) {
                     HStack {

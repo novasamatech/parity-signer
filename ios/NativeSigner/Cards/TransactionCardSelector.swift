@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-//TODO: all cards should be pretty
 struct TransactionCardSelector: View {
     var card: TransactionCard
     var body: some View {

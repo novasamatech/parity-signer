@@ -17,18 +17,18 @@ struct SeedKeyCard: View {
             HStack {
                 ZStack {
                     Identicon(identicon: seedCard.identicon)
-                    if (multiselectMode && seedCard.base58 != "") {
-                        VStack{
+                    if multiselectMode && seedCard.base58 != "" {
+                        VStack {
                             Spacer()
-                            HStack{
-                        Spacer()
-                        Image(systemName: seedCard.multiselect ? "checkmark.circle.fill" : "circle").imageScale(.large)
+                            HStack {
+                                Spacer()
+                                Image(systemName: seedCard.multiselect ? "checkmark.circle.fill" : "circle")
+                                    .imageScale(.large)
                             }
-                            
                         }
                     }
                 }.frame(width: 30, height: 30)
-                VStack (alignment: .leading) {
+                VStack(alignment: .leading) {
                     Text(seedCard.seedName)
                         .foregroundColor(Color("Text600"))
                         .font(FBase(style: .subtitle1))
@@ -44,9 +44,9 @@ struct SeedKeyCard: View {
 }
 
 /*
-struct SeedKeyCard_Previews: PreviewProvider {
-    static var previews: some View {
-        SeedKeyCard()
-    }
-}
-*/
+ struct SeedKeyCard_Previews: PreviewProvider {
+ static var previews: some View {
+ SeedKeyCard()
+ }
+ }
+ */

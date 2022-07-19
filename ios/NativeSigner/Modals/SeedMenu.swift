@@ -28,7 +28,7 @@ struct SeedMenu: View {
                     text: "Derive new key",
                     isShaded: true,
                     isCrypto: true,
-                    action:{
+                    action: {
                         if alert { alertShow() } else {
                             pushButton(.newKey, "", "")
                         }
@@ -45,7 +45,15 @@ struct SeedMenu: View {
             }
         }
         .alert(isPresented: $removeConfirm, content: {
-            Alert(title: Text("Forget this seed?"), message: Text("This seed will be removed for all networks. This is not reversible. Are you sure?"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove seed"), action: {removeSeed(content.seed)}))
+            Alert(
+                title: Text("Forget this seed?"),
+                message: Text("This seed will be removed for all networks. This is not reversible. Are you sure?"),
+                primaryButton: .cancel(Text("Cancel")),
+                secondaryButton: .destructive(
+                    Text("Remove seed"),
+                    action: {removeSeed(content.seed)}
+                )
+            )
         })
     }
 }

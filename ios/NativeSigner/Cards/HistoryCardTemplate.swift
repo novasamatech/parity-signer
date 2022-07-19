@@ -13,11 +13,11 @@ struct HistoryCardTemplate: View {
     var danger: Bool
     var line1: String
     var line2: String
-    
+
     var body: some View {
         HStack {
-            VStack (alignment: .leading, spacing: 2) {
-                if (timestamp != "") {
+            VStack(alignment: .leading, spacing: 2) {
+                if timestamp != "" {
                     Text(timestamp)
                         .foregroundColor(Color("Text400"))
                         .font(FBase(style: .subtitle2))

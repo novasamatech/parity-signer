@@ -12,15 +12,15 @@ struct ErrorAlert: View {
     let content: String
     var body: some View {
         ZStack {
-            Rectangle().foregroundColor(Color("BgDanger")).opacity(0.3).gesture(TapGesture().onEnded{_ in
+            Rectangle().foregroundColor(Color("BgDanger")).opacity(0.3).gesture(TapGesture().onEnded {_ in
                 pushButton(.goBack, "", "")
                 })
-            VStack{
+            VStack {
                 Text("Error!").font(FBase(style: .h1)).foregroundColor(Color("SignalDanger"))
                 Text(content).foregroundColor(Color("SignalDanger"))
-                Button(action: {
+                Button("Ok", action: {
                     pushButton(.goBack, "", "")
-                }) {Text("Ok")}
+                })
             }.padding().background(RoundedRectangle(cornerRadius: 20).foregroundColor(Color("BgDanger")))
         }
     }

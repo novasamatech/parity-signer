@@ -26,26 +26,30 @@ struct NewSeedBackupModal: View {
                 }
                 .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Crypto100")))
                 VStack(spacing: 16) {
-                    Button(action: {
-                        confirmBackup.toggle()
-                    }) {
-                        HStack {
-                            Image(systemName: confirmBackup ? "checkmark.square" : "square").imageScale(.large)
-                            Text("I have written down my seed phrase")
-                                .multilineTextAlignment(.leading).foregroundColor(Color("Text500"))
-                            Spacer()
-                        }
-                    }
-                    Button(action: {
-                        createRoots.toggle()
-                    }) {
-                        HStack {
-                            Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
-                            Text("Create root keys")
-                                .multilineTextAlignment(.leading).foregroundColor(Color("Text500"))
-                            Spacer()
-                        }
-                    }
+                    Button(
+                        action: {
+                            confirmBackup.toggle()
+                        },
+                        label: {
+                            HStack {
+                                Image(systemName: confirmBackup ? "checkmark.square" : "square").imageScale(.large)
+                                Text("I have written down my seed phrase")
+                                    .multilineTextAlignment(.leading).foregroundColor(Color("Text500"))
+                                Spacer()
+                            }
+                        })
+                    Button(
+                        action: {
+                            createRoots.toggle()
+                        },
+                        label: {
+                            HStack {
+                                Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
+                                Text("Create root keys")
+                                    .multilineTextAlignment(.leading).foregroundColor(Color("Text500"))
+                                Spacer()
+                            }
+                        })
                     Spacer()
                     BigButton(
                         text: "Next",

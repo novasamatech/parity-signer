@@ -13,7 +13,7 @@ struct SufficientCryptoReady: View {
     @State var oldOffset: CGFloat = 0
     var content: MSufficientCryptoReady
     var body: some View {
-        ZStack{
+        ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000"))
             VStack {
                 HeaderBar(line1: "Your Signature", line2: "Scan it into your application")
@@ -21,7 +21,7 @@ struct SufficientCryptoReady: View {
                  .resizable()
                  .aspectRatio(contentMode: .fit).padding(12)
                 AddressCard(address: content.authorInfo)
-                switch(content.content) {
+                switch content.content {
                 case .addSpecs(let network):
                     Text("Signature for network specs")
                     NetworkCard(title: network.networkTitle, logo: network.networkLogo)

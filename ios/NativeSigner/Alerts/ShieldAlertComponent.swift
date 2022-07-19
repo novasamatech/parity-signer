@@ -15,7 +15,7 @@ struct ShieldAlertComponent: View {
     let content: ShieldAlert?
     var body: some View {
         ZStack {
-            if (canaryDead) {
+            if canaryDead {
                 Text("")
                     .alert(
                         "Network connected!",
@@ -24,11 +24,15 @@ struct ShieldAlertComponent: View {
                             Button("Ok") {pushButton(.goBack, "", "")}
                         },
                         message: {
-                            Text("Signer detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.")
+                            Text(
+                                "Signer detects currently connected network;" +
+                                " please enable airplane mode, disconnect all cables" +
+                                " and handle security breach according with your security protocol."
+                            )
                         }
                     )
             } else {
-                if (content == .past) {
+                if content == .past {
                     Text("")
                         .alert(
                             "Network was connected!",
@@ -40,7 +44,12 @@ struct ShieldAlertComponent: View {
                                 }
                             },
                             message: {
-                                Text("Your Signer device has connected to a WiFi, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use. Please follow your security protocol")
+                                Text(
+                                    "Your Signer device has connected to a WiFi," +
+                                    " tether or Bluetooth network since your last acknowledgement" +
+                                    " and should be considered unsafe to use." +
+                                    " Please follow your security protocol"
+                                )
                             }
                         )
                 } else {
