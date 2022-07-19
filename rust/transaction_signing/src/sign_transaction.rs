@@ -29,8 +29,8 @@ pub(crate) fn create_signature(
     };
     let content_vec = match sign.content() {
         SignContent::Transaction { method, extensions } => {
-        // For larger transactions, their hash should be signed instead; this is not 
-        // implemented upstream so we put it here
+            // For larger transactions, their hash should be signed instead; this is not
+            // implemented upstream so we put it here
             let whole_vec = [method.to_vec(), extensions.to_vec()].concat();
             if whole_vec.len() > 257 {
                 blake2b(32, &[], &whole_vec).as_bytes().to_vec()
