@@ -2,6 +2,7 @@ package io.parity.signer.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.Composable
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.encodeHex
@@ -178,6 +179,14 @@ fun HistoryCard(card: Event, timestamp: String) {
 				line1 = timestamp,
 				line2 = "Seed created",
 				line3 = card.seedCreated
+			)
+		}
+		is Event.SeedRemoved -> {
+			HistoryCardTemplate(
+				image = Icons.Outlined.Delete,
+				line1 = timestamp,
+				line2 = "Seed removed",
+				line3 = card.seedName
 			)
 		}
 		is Event.SeedNameWasShown -> {
