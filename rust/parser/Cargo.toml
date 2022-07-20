@@ -21,6 +21,7 @@ scale-info = "2.1.2"
 sp-arithmetic = {git = "https://github.com/paritytech/substrate"}
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
+thiserror = "1.0.31"
 
 [features]
 default = ["test"]
@@ -29,3 +30,6 @@ test = ["defaults/active"]
 [lib]
 name = "parser"
 crate-type = ["lib"]
+
+[dev-dependencies]
+pretty_assertions = "1.2.1"

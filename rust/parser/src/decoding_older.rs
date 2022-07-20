@@ -4,7 +4,6 @@ use regex::Regex;
 use sp_arithmetic::{PerU16, Perbill, Percent};
 
 use definitions::{
-    error_signer::{ParserDecodingError, ParserError},
     network_specs::ShortSpecs,
     types::{Description, EnumVariant, EnumVariantType, StructField, TypeEntry},
 };
@@ -14,6 +13,7 @@ use crate::decoding_commons::{
     decode_known_length, decode_perthing, decode_primitive_with_flags, get_compact,
     special_case_account_id, DecodedOut, OutputCard,
 };
+use crate::error::{Error, ParserDecodingError, Result};
 use crate::method::{what_next_old, OlderMeta};
 
 /// Function to decode primitive types (fixed-width or compact form), and Percent,
@@ -188,7 +188,7 @@ fn decode_complex(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     match found_ty {
         "Box<<T as Config<I>>::Proposal>"
         | "Box<<T as Config>::Call>"
@@ -202,7 +202,7 @@ fn decode_complex(
             match pre_vector.start_next_unit {
                 Some(start) => {
                     if data.len() < start + 2 * (number_of_calls as usize) {
-                        return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                        return Err(Error::Decoding(ParserDecodingError::DataTooShort));
                     }
                     data = data[start..].to_vec();
                     for _i in 0..number_of_calls {
@@ -214,7 +214,7 @@ fn decode_complex(
                 }
                 None => {
                     if number_of_calls != 0 {
-                        return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                        return Err(Error::Decoding(ParserDecodingError::DataTooShort));
                     }
                 }
             }
@@ -259,7 +259,7 @@ pub(crate) fn process_as_call(
     type_database: &[TypeEntry],
     mut indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     let call_in_processing = what_next_old(data, meta)?;
     data = call_in_processing.data;
 
@@ -342,7 +342,7 @@ fn deal_with_option(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     if inner_ty == "bool" {
         let fancy_out = match &data[0] {
             0 => vec![OutputCard {
@@ -358,7 +358,7 @@ fn deal_with_option(
                 indent,
             }],
             _ => {
-                return Err(ParserError::Decoding(
+                return Err(Error::Decoding(
                     ParserDecodingError::UnexpectedOptionVariant,
                 ))
             }
@@ -395,12 +395,12 @@ fn deal_with_option(
             }
             1 => {
                 if data.len() == 1 {
-                    return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                    return Err(Error::Decoding(ParserDecodingError::DataTooShort));
                 }
                 data = data[1..].to_vec();
                 decode_simple(inner_ty, data, type_database, indent, short_specs)
             }
-            _ => Err(ParserError::Decoding(
+            _ => Err(Error::Decoding(
                 ParserDecodingError::UnexpectedOptionVariant,
             )),
         }
@@ -435,7 +435,7 @@ fn deal_with_vector(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     let pre_vector = get_compact::<u32>(&data)?;
     let mut fancy_output_prep: Vec<OutputCard> = Vec::new();
     let elements_of_vector = pre_vector.compact_found;
@@ -454,7 +454,7 @@ fn deal_with_vector(
         }
         None => {
             if elements_of_vector != 0 {
-                Err(ParserError::Decoding(ParserDecodingError::DataTooShort))
+                Err(Error::Decoding(ParserDecodingError::DataTooShort))
             } else {
                 Ok(DecodedOut {
                     remaining_vector: Vec::new(),
@@ -494,7 +494,7 @@ fn deal_with_array(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     let mut fancy_output_prep: Vec<OutputCard> = Vec::new();
     for _i in 0..number_of_elements {
         let after_run = decode_simple(inner_ty, data, type_database, indent, short_specs)?;
@@ -531,10 +531,10 @@ fn special_case_identity_fields(
     data: Vec<u8>,
     type_database: &[TypeEntry],
     indent: u32,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     // at the moment, the length is known: 8 units in Vec<u8>
     if data.len() < 8 {
-        return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+        return Err(Error::Decoding(ParserDecodingError::DataTooShort));
     }
     let remaining_vector = {
         if data.len() > 8 {
@@ -565,7 +565,7 @@ fn special_case_identity_fields(
         }
     }
     if !found {
-        return Err(ParserError::Decoding(ParserDecodingError::IdFields));
+        return Err(Error::Decoding(ParserDecodingError::IdFields));
     }
     Ok(DecodedOut {
         remaining_vector,
@@ -593,7 +593,7 @@ fn special_case_identity_fields(
 /// The function outputs the DecodedOut value in case of success.
 ///
 /// Resulting BitVec is added to fancy_out on js card "bitvec".
-fn special_case_bitvec(data: Vec<u8>, indent: u32) -> Result<DecodedOut, ParserError> {
+fn special_case_bitvec(data: Vec<u8>, indent: u32) -> Result<DecodedOut> {
     // the data is preluded by compact indicating the number of BitVec elements - info from js documentation, decode not implemented for BitVec as is
     let pre_bitvec = get_compact::<u32>(&data)?;
     let actual_length = match pre_bitvec.compact_found % 8 {
@@ -604,7 +604,7 @@ fn special_case_bitvec(data: Vec<u8>, indent: u32) -> Result<DecodedOut, ParserE
         Some(start) => {
             let fin = start + (actual_length as usize);
             if data.len() < fin {
-                return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                return Err(Error::Decoding(ParserDecodingError::DataTooShort));
             }
             let into_bv = data[start..fin].to_vec();
             let bv: BitVec<u8, Lsb0> = BitVec::from_vec(into_bv);
@@ -626,7 +626,7 @@ fn special_case_bitvec(data: Vec<u8>, indent: u32) -> Result<DecodedOut, ParserE
         }
         None => {
             if actual_length != 0 {
-                return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                return Err(Error::Decoding(ParserDecodingError::DataTooShort));
             }
             Ok(DecodedOut {
                 remaining_vector: Vec::new(),
@@ -671,7 +671,7 @@ fn special_case_balance(
     data: Vec<u8>,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     match found_ty {
         "Balance" | "T::Balance" | "BalanceOf<T>" | "BalanceOf<T, I>" => {
             decode_primitive_with_flags::<u128>(
@@ -696,9 +696,7 @@ fn special_case_balance(
             indent,
             short_specs,
         ),
-        _ => Err(ParserError::Decoding(
-            ParserDecodingError::BalanceNotDescribed,
-        )),
+        _ => Err(Error::Decoding(ParserDecodingError::BalanceNotDescribed)),
     }
 }
 
@@ -727,7 +725,7 @@ fn deal_with_struct(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     let mut fancy_out: Vec<OutputCard> = Vec::new();
     for (i, y) in v1.iter().enumerate() {
         let fancy_output_prep = match &y.field_name {
@@ -785,12 +783,10 @@ fn deal_with_enum(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     let enum_index = data[0] as usize;
     if enum_index >= v1.len() {
-        return Err(ParserError::Decoding(
-            ParserDecodingError::UnexpectedEnumVariant,
-        ));
+        return Err(Error::Decoding(ParserDecodingError::UnexpectedEnumVariant));
     }
     let found_variant = &v1[enum_index];
     match &found_variant.variant_type {
@@ -816,7 +812,7 @@ fn deal_with_enum(
         }
         EnumVariantType::Type(inner_ty) => {
             if data.len() == 1 {
-                return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                return Err(Error::Decoding(ParserDecodingError::DataTooShort));
             }
             data = data[1..].to_vec();
             let mut fancy_output_prep = vec![OutputCard {
@@ -836,7 +832,7 @@ fn deal_with_enum(
         }
         EnumVariantType::Struct(v2) => {
             if data.len() == 1 {
-                return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                return Err(Error::Decoding(ParserDecodingError::DataTooShort));
             }
             data = data[1..].to_vec();
             let mut fancy_out: Vec<OutputCard> = Vec::new();
@@ -898,9 +894,9 @@ fn decode_simple(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     if data.is_empty() {
-        return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+        return Err(Error::Decoding(ParserDecodingError::DataTooShort));
     }
     match decode_primitive(found_ty, &data, indent, short_specs) {
         Some(a) => Ok(a),
@@ -991,7 +987,7 @@ fn decode_simple(
                                                             if x.name == inner_ty {
                                                                 new_inner_ty = match &x.description {
                                                                     Description::Type(a) => Some(a),
-                                                                    _ => return Err(ParserError::Decoding(ParserDecodingError::UnexpectedCompactInsides)),
+                                                                    _ => return Err(Error::Decoding(ParserDecodingError::UnexpectedCompactInsides)),
                                                                 };
                                                                 break;
                                                             }
@@ -1001,7 +997,7 @@ fn decode_simple(
                                                                 let new_ty = found_ty.replace(inner_ty, a);
                                                                 decode_simple(&new_ty, data, type_database, indent, short_specs)
                                                             },
-                                                            None => Err(ParserError::Decoding(ParserDecodingError::UnexpectedCompactInsides)),
+                                                            None => Err(Error::Decoding(ParserDecodingError::UnexpectedCompactInsides)),
                                                         }
                                                     }
                                                     None => {
@@ -1043,7 +1039,7 @@ fn decode_simple(
                                                                     }
                                                                     match found_solution {
                                                                         Some(x) => Ok(x),
-                                                                        None => Err(ParserError::Decoding(ParserDecodingError::UnknownType(found_ty.to_string()))),
+                                                                        None => Err(Error::Decoding(ParserDecodingError::UnknownType(found_ty.to_string()))),
                                                                     }
                                                                 }
                                                             }

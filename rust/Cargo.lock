@@ -2154,12 +2154,14 @@ dependencies = [
  "lazy_static",
  "num-bigint 0.4.3",
  "parity-scale-codec",
+ "pretty_assertions",
  "printing_balance",
  "regex",
  "scale-info",
  "sp-arithmetic",
  "sp-core",
  "sp-runtime",
+ "thiserror",
 ]
 
 [[package]]
