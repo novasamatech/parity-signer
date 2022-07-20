@@ -11,7 +11,7 @@ struct MetadataCard: View {
     var meta: MMetadataRecord
     var body: some View {
         HStack {
-            Identicon(identicon: meta.metaIdPic) //TODO: this is potentially different from identicon
+            Identicon(identicon: meta.metaIdPic) // this is potentially different from identicon
             VStack {
                 Text("version")
                 Text(meta.specsVersion)

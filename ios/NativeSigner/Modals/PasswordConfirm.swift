@@ -12,7 +12,7 @@ struct PasswordConfirm: View {
     let createAddress: (String, String) -> Void
     @State private var passwordCheck: String = ""
     @FocusState private var focused: Bool
-    
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))

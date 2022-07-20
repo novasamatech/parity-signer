@@ -482,6 +482,9 @@ pub enum Event {
     /// New seed was created (stored value here is the seed name)
     SeedCreated { seed_created: String },
 
+    /// User removed a seed
+    SeedRemoved { seed_name: String },
+
     /// User opened seed backup, and seed phrase for shortly shown as a plain
     /// text on screen (stored value here is the seed name)
     SeedNameWasShown { seed_name_was_shown: String }, // for individual seed_name

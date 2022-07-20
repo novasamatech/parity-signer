@@ -218,6 +218,7 @@ interface Event {
     SystemEntry(string system_entry);
     HistoryCleared();
     DatabaseInitiated();
+    SeedRemoved(string seed_name);
 };
 
 enum Action {

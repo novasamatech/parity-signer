@@ -5,10 +5,7 @@
 //  Created by Alexander Slesarev on 7.1.2022.
 //
 
-/**
- * This should eventually hold logic to handle png network logos.
- */
-//TODO: png?
+// This should eventually hold logic to handle png network logos.
 import SwiftUI
 
 struct NetworkLogo: View {

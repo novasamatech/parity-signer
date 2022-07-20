@@ -45,7 +45,7 @@ struct CameraView: View {
                     })
                     .onReceive(model.$captured, perform: {rCaptured in
                         captured = rCaptured
-                        if (rCaptured ?? 0 > 0) {
+                        if rCaptured ?? 0 > 0 {
                             UIApplication.shared.isIdleTimerDisabled = true
                         } else {
                             UIApplication.shared.isIdleTimerDisabled = false
@@ -56,20 +56,21 @@ struct CameraView: View {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 8).padding(12)
                             }
-                            .frame(width:size, height: size)
+                            .frame(width: size, height: size)
                             Spacer()
                         }
                     )
                     .overlay(
                         VStack {
-                            RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).padding(12).frame(width: size, height: size)
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color("Crypto400"))
+                                .padding(12)
+                                .frame(width: size, height: size)
                             Spacer()
                         }
                     )
                 Spacer()
-                
                 if model.total ?? 0 > 0 {
-                    
                     MenuStack {
                         HeadingOverline(text: "PARSING MULTIPART DATA").padding(.top, 12)
                         ProgressView(value: min(Float(captured ?? 0)/(Float(total ?? -1) + 2), 1))
