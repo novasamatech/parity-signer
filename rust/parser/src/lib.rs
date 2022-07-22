@@ -26,7 +26,6 @@ mod decoding_sci;
 use decoding_sci::decoding_sci_entry_point;
 mod decoding_sci_ext;
 use decoding_sci_ext::{decode_ext_attempt, Ext};
-#[cfg(feature = "test")]
 mod error;
 pub mod method;
 use method::OlderMeta;

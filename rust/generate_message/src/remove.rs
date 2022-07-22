@@ -66,11 +66,12 @@ use definitions::{
 };
 use sled::Batch;
 
+use crate::error::{Error, Result};
 use crate::helpers::{get_address_book_entry, is_specname_in_db};
 use crate::parser::Remove;
 
 /// Remove information from the database.
-pub fn remove_info(info: Remove) -> Result<(), ErrorActive> {
+pub fn remove_info(info: Remove) -> Result<()> {
     match info {
         // network data by the address book title
         Remove::Title(network_title) => {

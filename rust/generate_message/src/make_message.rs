@@ -9,6 +9,7 @@ use definitions::{
 use qrcode_rtx::make_pretty_qr;
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
 
+use crate::error::{Error, Result};
 use crate::parser::{Crypto, Goal, Make, Msg};
 
 /// Alice seed phrase and derivation `//Alice`, for making updates signed with
@@ -23,7 +24,7 @@ fn alice_secret() -> String {
 /// for provided public key and [`Encryption`]. Generates prelude and assembles
 /// complete update message, then exports it as a QR code or text file with
 /// hex-encoded bytes.
-pub fn make_message(make: Make) -> Result<(), ErrorActive> {
+pub fn make_message(make: Make) -> Result<()> {
     // check message content for consistency
     //
     // note that bytes signed and bytes added into concatenated update are not

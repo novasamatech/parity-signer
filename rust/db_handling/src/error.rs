@@ -161,6 +161,9 @@ pub enum Error {
 
     #[error(transparent)]
     Other(#[from] anyhow::Error),
+
+    #[error("no known seeds")]
+    NoKnownSeeds,
 }
 
 pub type Result<T> = result::Result<T, Error>;

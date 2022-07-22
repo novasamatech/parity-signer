@@ -37,6 +37,7 @@ use definitions::{error_active::SpecsError, network_specs::NetworkProperties};
 use serde_json::{map::Map, value::Value};
 use std::convert::TryInto;
 
+use crate::error::{Error, Result};
 use crate::parser::Token;
 
 /// Transform `system_properties` rpc call results into [`NetworkProperties`].
@@ -53,7 +54,7 @@ pub fn interpret_properties(
     x: &Map<String, Value>,
     optional_prefix_from_meta: Option<u16>,
     optional_token_override: Option<Token>,
-) -> Result<NetworkProperties, SpecsError> {
+) -> Result<NetworkProperties> {
     let base58prefix = base58prefix(x, optional_prefix_from_meta)?;
 
     let (decimals, unit) = match token(x)? {
@@ -97,10 +98,7 @@ pub fn interpret_properties(
 ///
 /// - `&Map<String, Value>` received via `system_properties` rpc call,
 /// - optional base58 prefix from the network metadata
-fn base58prefix(
-    x: &Map<String, Value>,
-    optional_prefix_from_meta: Option<u16>,
-) -> Result<u16, SpecsError> {
+fn base58prefix(x: &Map<String, Value>, optional_prefix_from_meta: Option<u16>) -> Result<u16> {
     let base58prefix: u16 = match x.get("ss58Format") {
         // base58 prefix is fetched in `system_properties` rpc call
         Some(a) => match a {
@@ -216,7 +214,7 @@ enum UnitFetch {
 ///
 /// Function inputs only `&Map<String, Value>` received via `system_properties`
 /// rpc call.
-fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch, SpecsError> {
+fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch> {
     match x.get("tokenDecimals") {
         // decimals info is fetched in `system_properties` rpc call
         Some(a) => match a {
@@ -299,7 +297,7 @@ fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch, SpecsError> {
 ///
 /// Function inputs only `&Map<String, Value>` received via `system_properties`
 /// rpc call.
-fn unit(x: &Map<String, Value>) -> Result<UnitFetch, SpecsError> {
+fn unit(x: &Map<String, Value>) -> Result<UnitFetch> {
     match x.get("tokenSymbol") {
         // unit info is fetched in `system_properties` rpc call
         Some(a) => match a {
@@ -344,7 +342,7 @@ fn unit(x: &Map<String, Value>) -> Result<UnitFetch, SpecsError> {
 }
 
 /// Combine decimals and unit information
-fn token(x: &Map<String, Value>) -> Result<TokenFetch, SpecsError> {
+fn token(x: &Map<String, Value>) -> Result<TokenFetch> {
     let decimals_fetch = decimals(x)?;
     let unit_fetch = unit(x)?;
 
@@ -391,7 +389,7 @@ fn token(x: &Map<String, Value>) -> Result<TokenFetch, SpecsError> {
 pub fn check_specs(
     x: &Map<String, Value>,
     optional_prefix_from_meta: Option<u16>,
-) -> Result<(u16, TokenFetch), SpecsError> {
+) -> Result<(u16, TokenFetch)> {
     let base58prefix = base58prefix(x, optional_prefix_from_meta)?;
     let token_fetch = token(x)?;
     Ok((base58prefix, token_fetch))

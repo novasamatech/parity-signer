@@ -10,6 +10,7 @@ use definitions::{
     metadata::AddressBookEntry,
 };
 
+use crate::error::{Error, Result};
 use crate::helpers::{
     add_specs_print, address_book_content, db_upd_network, error_occured,
     filter_address_book_by_url, genesis_hash_in_hot_db, get_address_book_entry,
@@ -20,7 +21,7 @@ use crate::parser::{Content, InstructionSpecs, Override, Set, Token};
 
 /// Process `add_specs` command according to the [`InstructionSpecs`] received
 /// from the command line.
-pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
+pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
     match instruction.set {
         // `-f` setting key: produce `add_specs` payload files from existing
         // database entries.
@@ -232,7 +233,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
 /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) from
 /// the database using information in address book entry
 /// - Output raw bytes payload file
-fn specs_f_a_element(entry: &AddressBookEntry) -> Result<(), ErrorActive> {
+fn specs_f_a_element(entry: &AddressBookEntry) -> Result<()> {
     let network_specs = network_specs_from_entry(entry)?;
     add_specs_print(&network_specs)
 }
@@ -251,7 +252,7 @@ fn specs_f_n(
     title: &str,
     optional_encryption_override: Option<Encryption>,
     optional_signer_title_override: Option<String>,
-) -> Result<(), ErrorActive> {
+) -> Result<()> {
     let mut network_specs = network_specs_from_title(title)?;
     match optional_encryption_override {
         Some(encryption) => {
@@ -289,7 +290,7 @@ fn specs_d_u(
     encryption: Encryption,
     optional_token_override: Option<Token>,
     optional_signer_title_override: Option<String>,
-) -> Result<(), ErrorActive> {
+) -> Result<()> {
     let specs = specs_agnostic(
         address,
         encryption,
@@ -326,7 +327,7 @@ fn specs_d_u(
 /// the title under which Signer displays the network, is also constructed as
 /// `<network_name>-<encryption>` for non-default networks, unless overridden by
 /// the user.
-fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<(), ErrorActive> {
+fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<()> {
     // address book entry for `title`
     let address_book_entry = get_address_book_entry(title)?;
     let mut network_specs_to_change = network_specs_from_entry(&address_book_entry)?;
@@ -399,10 +400,10 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<(), ErrorAc
     } else if printing {
         add_specs_print(&network_specs_to_change)
     } else {
-        Err(ErrorActive::Fetch(Fetch::SpecsInDb {
+        Err(Error::SpecsInDb {
             name: address_book_entry.name,
             encryption: network_specs_to_change.encryption,
-        }))
+        })
     }
 }
 
@@ -432,7 +433,7 @@ fn specs_pt_u(
     optional_token_override: Option<Token>,
     optional_signer_title_override: Option<String>,
     printing: bool,
-) -> Result<(), ErrorActive> {
+) -> Result<()> {
     let known_address_set = filter_address_book_by_url(address)?;
 
     if !known_address_set.is_empty() {

@@ -1095,8 +1095,11 @@ use show::{check_file, show_block_history, show_metadata, show_networks, show_sp
 mod specs;
 use specs::gen_add_specs;
 
+mod error;
+pub use error::{Error, Result};
+
 /// Process incoming command as interpreted by parser.
-pub fn full_run(command: Command) -> Result<(), ErrorActive> {
+pub fn full_run(command: Command) -> Result<()> {
     match command {
         Command::Show(x) => match x {
             Show::Metadata => show_metadata(),
@@ -1107,7 +1110,7 @@ pub fn full_run(command: Command) -> Result<(), ErrorActive> {
         },
         Command::Specs(instruction) => gen_add_specs(instruction),
         Command::Load(instruction) => gen_load_meta(instruction),
-        Command::Types => prep_types::<Active>(HOT_DB_NAME)?.write(&load_types()),
+        Command::Types => prep_types(HOT_DB_NAME)?.write(&load_types()),
         Command::Make(make) => make_message(make),
         Command::Remove(info) => remove_info(info),
         Command::RestoreDefaults => default_hot(None),

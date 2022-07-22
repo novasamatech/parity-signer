@@ -3,8 +3,6 @@ use sp_runtime::{generic::Era, MultiSigner};
 
 use definitions::{
     crypto::Encryption,
-    error::ErrorSource,
-    error_signer::{ErrorSigner, Signer},
     helpers::{make_identicon_from_multisigner, pic_meta, print_multisigner_as_base58},
     history::MetaValuesDisplay,
     keyring::VerifierKey,
@@ -20,6 +18,7 @@ use definitions::{
 use parser::cards::ParserCard;
 use plot_icon::generate_png_scaled_default;
 
+use crate::error::Error;
 use crate::holds::{GeneralHold, Hold};
 
 #[allow(clippy::enum_variant_names)]
@@ -43,7 +42,7 @@ pub(crate) enum Card<'a> {
     NetworkGenesisHash(&'a [u8]),
     Derivations(&'a [String]),
     Warning(Warning<'a>),
-    Error(ErrorSigner),
+    Error(Error),
 }
 
 pub(crate) enum Warning<'a> {
@@ -269,7 +268,7 @@ impl<'a> Card<'a> {
             Card::Derivations(x) => NavCard::DerivationsCard { f: x.to_vec() },
             Card::Warning(warn) => NavCard::WarningCard { f: warn.show() },
             Card::Error(err) => NavCard::ErrorCard {
-                f: <Signer>::show(err),
+                f: format!("{}", err),
             },
         };
 

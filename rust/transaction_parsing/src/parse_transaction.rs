@@ -3,7 +3,6 @@ use db_handling::{
     helpers::{try_get_address_details, try_get_network_specs},
 };
 use definitions::{
-    error_signer::{ErrorSigner, InputSigner, NotFoundSigner, ParserError},
     history::{Entry, Event, SignDisplay},
     keyring::{AddressKey, NetworkSpecsKey},
     navigation::{MEventMaybeDecoded, TransactionCard, TransactionCardSet},
@@ -13,6 +12,7 @@ use definitions::{
 use parser::{cut_method_extensions, decoding_commons::OutputCard, parse_extensions, parse_method};
 
 use crate::cards::{make_author_info, Card, Warning};
+use crate::error::{Error, Result};
 use crate::helpers::{
     bundle_from_meta_set_element, find_meta_set, multisigner_msg_genesis_encryption, specs_by_name,
 };
@@ -39,10 +39,7 @@ enum CardsPrep<'a> {
 /// i.e. it starts with 53****, followed by author address, followed by actual transaction piece,
 /// followed by extrinsics, concluded with chain genesis hash
 
-pub(crate) fn parse_transaction(
-    data_hex: &str,
-    database_name: &str,
-) -> Result<TransactionAction, ErrorSigner> {
+pub(crate) fn parse_transaction(data_hex: &str, database_name: &str) -> Result<TransactionAction> {
     let (author_multi_signer, parser_data, genesis_hash, encryption) =
         multisigner_msg_genesis_encryption(data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
@@ -93,17 +90,17 @@ pub(crate) fn parse_transaction(
             let short_specs = network_specs.short();
             let (method_data, extensions_data) = match cut_method_extensions(&parser_data) {
                 Ok(a) => a,
-                Err(_) => return Err(ErrorSigner::Parser(ParserError::SeparateMethodExtensions)),
+                Err(_) => return Err(Error::SeparateMethodExtensions),
             };
 
             let meta_set = find_meta_set(&short_specs, database_name)?;
             if meta_set.is_empty() {
-                return Err(ErrorSigner::Input(InputSigner::NoMetadata {
+                return Err(Error::NoMetadata {
                     name: network_specs.name,
-                }));
+                });
             }
             let mut found_solution = None;
-            let mut error_collection: Vec<(u32, ParserError)> = Vec::new();
+            let mut error_collection = Vec::new();
             let latest_version = meta_set[0].version();
             for (i, x) in meta_set.iter().enumerate() {
                 let used_version = x.version();
@@ -218,8 +215,7 @@ pub(crate) fn parse_transaction(
                                             address_details: &address_details,
                                         }
                                         .card(&mut index, indent);
-                                        let error = Card::Error(ErrorSigner::Parser(e))
-                                            .card(&mut index, indent);
+                                        let error = Card::Error(e.into()).card(&mut index, indent);
                                         let extensions = into_cards(&extensions_cards, &mut index);
                                         let r = TransactionCardSet {
                                             author: Some(vec![author]),
@@ -233,8 +229,9 @@ pub(crate) fn parse_transaction(
                                     CardsPrep::ShowOnly(author_card, warning_card) => {
                                         let author = Some(vec![author_card]);
                                         let warning = Some(vec![*warning_card]);
-                                        let error = Some(vec![Card::Error(ErrorSigner::Parser(e))
-                                            .card(&mut index, indent)]);
+                                        let error = Some(vec![
+                                            Card::Error(e.into()).card(&mut index, indent)
+                                        ]);
                                         let extensions =
                                             Some(into_cards(&extensions_cards, &mut index));
                                         let r = TransactionCardSet {
@@ -256,7 +253,7 @@ pub(crate) fn parse_transaction(
             }
             match found_solution {
                 Some(a) => Ok(a),
-                None => Err(ErrorSigner::AllExtensionsParsingFailed {
+                None => Err(Error::AllExtensionsParsingFailed {
                     network_name: network_specs.name,
                     errors: error_collection,
                 }), // author: [], hint: [], error: []
@@ -265,10 +262,10 @@ pub(crate) fn parse_transaction(
         None => {
             // did not find network with matching genesis hash in database
             let author_card = Card::AuthorPublicKey(&author_multi_signer).card(&mut index, indent);
-            let error_card = Card::Error(ErrorSigner::Input(InputSigner::UnknownNetwork {
+            let error_card = Card::Error(Error::UnknownNetwork {
                 genesis_hash,
                 encryption,
-            }))
+            })
             .card(&mut index, indent);
             let author = Some(vec![author_card]);
             let error = Some(vec![error_card]);
@@ -293,7 +290,7 @@ fn into_cards(set: &[OutputCard], index: &mut u32) -> Vec<TransactionCard> {
 pub fn entry_to_transactions_with_decoding(
     entry: Entry,
     database_name: &str,
-) -> Result<Vec<MEventMaybeDecoded>, ErrorSigner> {
+) -> Result<Vec<MEventMaybeDecoded>> {
     let mut res = Vec::new();
 
     // TODO: insanely bad code.
@@ -350,22 +347,19 @@ pub fn entry_to_transactions_with_decoding(
 pub(crate) fn decode_signable_from_history(
     found_signable: &SignDisplay,
     database_name: &str,
-) -> Result<TransactionCardSet, ErrorSigner> {
+) -> Result<TransactionCardSet> {
     let (parser_data, network_name, encryption) = found_signable.transaction_network_encryption();
 
     let short_specs = specs_by_name(&network_name, &encryption, database_name)?.short();
     let meta_set = find_meta_set(&short_specs, database_name)?;
     if meta_set.is_empty() {
-        return Err(ErrorSigner::NotFound(NotFoundSigner::HistoricalMetadata {
-            name: network_name,
-        }));
+        return Err(Error::HistoricalMetadata { name: network_name });
     }
 
-    let (method_data, extensions_data) =
-        cut_method_extensions(&parser_data).map_err(ErrorSigner::Parser)?;
+    let (method_data, extensions_data) = cut_method_extensions(&parser_data)?;
 
     let mut found_solution = None;
-    let mut error_collection: Vec<(u32, ParserError)> = Vec::new();
+    let mut error_collection = Vec::new();
     let mut index = 0;
     let indent = 0;
 
@@ -391,7 +385,7 @@ pub(crate) fn decode_signable_from_history(
                         });
                     }
                     Err(e) => {
-                        let error = Card::Error(ErrorSigner::Parser(e)).card(&mut index, indent);
+                        let error = Card::Error(e.into()).card(&mut index, indent);
                         let extensions = Some(into_cards(&extensions_cards, &mut index));
                         found_solution = Some(TransactionCardSet {
                             error: Some(vec![error]),
@@ -407,7 +401,7 @@ pub(crate) fn decode_signable_from_history(
     }
     match found_solution {
         Some(a) => Ok(a),
-        None => Err(ErrorSigner::AllExtensionsParsingFailed {
+        None => Err(Error::AllExtensionsParsingFailed {
             network_name,
             errors: error_collection,
         }),

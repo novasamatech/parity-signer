@@ -7,8 +7,6 @@ fn main() -> Result<(), String> {
         Ok(a) => a,
         Err(e) => return Err(<Active>::show(&e)),
     };
-    match full_run(command) {
-        Ok(_) => Ok(()),
-        Err(e) => Err(<Active>::show(&e)),
-    }
+    full_run(command).unwrap();
+    Ok(())
 }

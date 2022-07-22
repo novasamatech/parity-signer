@@ -917,7 +917,7 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<()> {
     // All addresses with given seed name from the database
     let id_set = get_addresses_by_seed_name(database_name, seed_name)?;
     if id_set.is_empty() {
-        return Err(ErrorSigner::NoKnownSeeds);
+        return Err(Error::NoKnownSeeds);
     }
 
     // Associated `Event` set

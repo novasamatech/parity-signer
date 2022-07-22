@@ -11,7 +11,7 @@ blake2-rfc = {version = "0.2.18", optional = true}
 constants = {path = "../constants"}
 defaults = {path = "../defaults", default-features = false, optional = true}
 definitions = {path = "../definitions", default-features = false}
-hex = {version = "0.4.3", optional = true}
+hex = {version = "0.4.3"}
 lazy_static = "1.4.0"
 parity-scale-codec = {version = "3.1.5", features = ["derive"]}
 plot_icon = {version = "0.2.0", default-features = false, features = ["pix"], optional = true}
@@ -22,7 +22,7 @@ sp-core = {git = "https://github.com/paritytech/substrate", default-features = f
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false, optional = true}
 thiserror = "1.0.31"
 time = {version = "0.3.11", features = ["formatting", "macros"]}
-tiny-bip39 = {version = "1.0.0", default-features = false, optional = true}
+tiny-bip39 = {version = "1.0.0", default-features = false}
 zeroize = {version = "1.5.5", optional = true}
 
 [dev-dependencies]
@@ -43,10 +43,8 @@ signer = [
 	"constants/signer",
 	"defaults/signer",
 	"definitions/signer",
-	"hex",
 	"plot_icon",
 	"qrcode_static",
-	"tiny-bip39",
 	"sp-core",
 	"sp-runtime",
 	"zeroize",

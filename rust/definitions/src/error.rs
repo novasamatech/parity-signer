@@ -67,6 +67,9 @@ pub enum Error {
 
     #[error(transparent)]
     Wasm(#[from] crate::error_active::Wasm),
+
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
 }
 
 /// Error trait for Signer and Signer-ecosystem tools
