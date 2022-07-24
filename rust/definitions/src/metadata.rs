@@ -715,17 +715,14 @@ mod tests {
     fn edgeware() {
         let filename = String::from("for_tests/edgeware");
         let meta = read_to_string(&filename).unwrap();
-        let expected_error = Error::WrongPublicKeyLength;
-        /*
-         * FaultyMetadata {
-            filename: filename.to_string(),
-            error: MetadataError::NoVersionInConstants,
-        };
-        */
+
         match MetaValues::from_str_metadata(&meta) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
             Err(e) => {
-                // assert!(e == expected_error);
+                if let Error::WrongPublicKeyLength = e {
+                } else {
+                    panic!("expected Error::WrongPublicKeyLength, got {:?}", e);
+                }
             }
         }
     }
@@ -734,18 +731,14 @@ mod tests {
     fn centrifuge_amber() {
         let filename = String::from("for_tests/centrifugeAmber");
         let meta = read_to_string(&filename).unwrap();
-        let expected_error = Error::WrongPublicKeyLength;
-        /*<Active>::show(&ErrorActive::DefaultLoading(
-            DefaultLoading::FaultyMetadata {
-                filename: filename.to_string(),
-                error: MetadataError::VersionIncompatible,
-            },
-        ));
-        */
+
         match MetaValues::from_str_metadata(meta.trim()) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
             Err(e) => {
-                //assert!(e == expected_error, "Unexpected kind of error, {}", e);
+                if let Error::WrongPublicKeyLength = e {
+                } else {
+                    panic!("expected Error::WrongPublicKeyLength, got {:?}", e);
+                }
             }
         }
     }

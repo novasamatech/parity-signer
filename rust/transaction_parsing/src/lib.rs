@@ -26,7 +26,7 @@ mod error;
 #[cfg(test)]
 mod tests;
 
-use crate::error::{Error, Result};
+pub use crate::error::{Error, Result};
 
 /// Payload in hex format as it arrives into handling contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, ** - transaction type),

@@ -37,7 +37,7 @@ use definitions::{error_active::SpecsError, network_specs::NetworkProperties};
 use serde_json::{map::Map, value::Value};
 use std::convert::TryInto;
 
-use crate::error::{Error, Result};
+use crate::error::Result;
 use crate::parser::Token;
 
 /// Transform `system_properties` rpc call results into [`NetworkProperties`].
@@ -61,7 +61,7 @@ pub fn interpret_properties(
         TokenFetch::Single(token) => {
             // single unit value and single decimals value, override impossible
             if optional_token_override.is_some() {
-                return Err(SpecsError::OverrideIgnoredSingle);
+                return Err(SpecsError::OverrideIgnoredSingle)?;
             }
             (token.decimals, token.unit)
         }
@@ -79,7 +79,7 @@ pub fn interpret_properties(
         TokenFetch::None => {
             // override impossible
             if optional_token_override.is_some() {
-                return Err(SpecsError::OverrideIgnoredNone);
+                return Err(SpecsError::OverrideIgnoredNone)?;
             }
             println!("Network has no token. By default, decimals value will be set to 0, and unit value will be set to UNIT. To improve this behavior, please file a ticket.");
             (0, String::from("UNIT"))
@@ -121,7 +121,7 @@ fn base58prefix(x: &Map<String, Value>, optional_prefix_from_meta: Option<u16>) 
                                 return Err(SpecsError::Base58PrefixMismatch {
                                     specs: d,
                                     meta: prefix_from_meta,
-                                });
+                                })?;
                             }
                         }
 
@@ -134,7 +134,7 @@ fn base58prefix(x: &Map<String, Value>, optional_prefix_from_meta: Option<u16>) 
                     Err(_) => {
                         return Err(SpecsError::Base58PrefixFormatNotSupported {
                             value: a.to_string(),
-                        })
+                        })?;
                     }
                 },
 
@@ -143,7 +143,7 @@ fn base58prefix(x: &Map<String, Value>, optional_prefix_from_meta: Option<u16>) 
                 None => {
                     return Err(SpecsError::Base58PrefixFormatNotSupported {
                         value: a.to_string(),
-                    })
+                    })?;
                 }
             },
 
@@ -151,7 +151,7 @@ fn base58prefix(x: &Map<String, Value>, optional_prefix_from_meta: Option<u16>) 
             _ => {
                 return Err(SpecsError::Base58PrefixFormatNotSupported {
                     value: a.to_string(),
-                })
+                })?;
             }
         },
 
@@ -162,7 +162,7 @@ fn base58prefix(x: &Map<String, Value>, optional_prefix_from_meta: Option<u16>) 
             Some(prefix_from_meta) => prefix_from_meta,
 
             // no base58 prefix at all, this is an error
-            None => return Err(SpecsError::NoBase58Prefix),
+            None => return Err(SpecsError::NoBase58Prefix)?,
         },
     };
     Ok(base58prefix)
@@ -229,13 +229,13 @@ fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch> {
                     // this `u64` does not fit into `u8`, this is an error
                     Err(_) => Err(SpecsError::DecimalsFormatNotSupported {
                         value: a.to_string(),
-                    }),
+                    })?,
                 },
 
                 // number could not be represented as `u64`, this is an error
                 None => Err(SpecsError::DecimalsFormatNotSupported {
                     value: a.to_string(),
-                }),
+                })?,
             },
 
             // fetched decimals is an array
@@ -258,20 +258,20 @@ fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch> {
                                 // error
                                 Err(_) => Err(SpecsError::DecimalsFormatNotSupported {
                                     value: a.to_string(),
-                                }),
+                                })?,
                             },
 
                             // number could not be represented as `u64`, this is
                             // an error
                             None => Err(SpecsError::DecimalsFormatNotSupported {
                                 value: a.to_string(),
-                            }),
+                            })?,
                         }
                     } else {
                         // element is not a number, this is an error
                         Err(SpecsError::DecimalsFormatNotSupported {
                             value: a.to_string(),
-                        })
+                        })?
                     }
                 } else {
                     // decimals are an array with more than one element
@@ -285,7 +285,7 @@ fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch> {
             // unexpected decimals format
             _ => Err(SpecsError::DecimalsFormatNotSupported {
                 value: a.to_string(),
-            }),
+            })?,
         },
 
         // decimals are missing
@@ -319,7 +319,7 @@ fn unit(x: &Map<String, Value>) -> Result<UnitFetch> {
                         // element is not a `String`, this is an error
                         Err(SpecsError::DecimalsFormatNotSupported {
                             value: a.to_string(),
-                        })
+                        })?
                     }
                 } else {
                     // units are an array with more than one element
@@ -333,7 +333,7 @@ fn unit(x: &Map<String, Value>) -> Result<UnitFetch> {
             // unexpected unit format
             _ => Err(SpecsError::UnitFormatNotSupported {
                 value: a.to_string(),
-            }),
+            })?,
         },
 
         // unit missing
@@ -349,23 +349,23 @@ fn token(x: &Map<String, Value>) -> Result<TokenFetch> {
     match decimals_fetch {
         DecimalsFetch::Single(decimals) => match unit_fetch {
             UnitFetch::Single(unit) => Ok(TokenFetch::Single(Token { decimals, unit })),
-            UnitFetch::Array(..) => Err(SpecsError::UnitsArrayDecimalsNot),
-            UnitFetch::None => Err(SpecsError::DecimalsNoUnit(decimals.to_string())),
+            UnitFetch::Array(..) => Err(SpecsError::UnitsArrayDecimalsNot)?,
+            UnitFetch::None => Err(SpecsError::DecimalsNoUnit(decimals.to_string()))?,
         },
         DecimalsFetch::Array(decimals, decimals_array_size) => match unit_fetch {
-            UnitFetch::Single(_) => Err(SpecsError::DecimalsArrayUnitsNot),
+            UnitFetch::Single(_) => Err(SpecsError::DecimalsArrayUnitsNot)?,
             UnitFetch::Array(unit, unit_array_size) => {
                 if decimals_array_size != unit_array_size {
-                    Err(SpecsError::DecimalsUnitsArrayLength { decimals, unit })
+                    Err(SpecsError::DecimalsUnitsArrayLength { decimals, unit })?
                 } else {
                     Ok(TokenFetch::Array { decimals, unit })
                 }
             }
-            UnitFetch::None => Err(SpecsError::DecimalsNoUnit(decimals)),
+            UnitFetch::None => Err(SpecsError::DecimalsNoUnit(decimals))?,
         },
         DecimalsFetch::None => match unit_fetch {
-            UnitFetch::Single(unit) => Err(SpecsError::UnitNoDecimals(unit)),
-            UnitFetch::Array(unit, _) => Err(SpecsError::UnitNoDecimals(unit)),
+            UnitFetch::Single(unit) => Err(SpecsError::UnitNoDecimals(unit))?,
+            UnitFetch::Array(unit, _) => Err(SpecsError::UnitNoDecimals(unit))?,
             UnitFetch::None => Ok(TokenFetch::None),
         },
     }
@@ -397,6 +397,8 @@ pub fn check_specs(
 
 #[cfg(test)]
 mod tests {
+    use crate::Error;
+
     use super::*;
     use serde_json::json;
     #[test]
@@ -422,15 +424,14 @@ mod tests {
         mock_map.insert("tokenDecimals".to_string(), json!(12u8));
         mock_map.insert("tokenSymbol".to_string(), Value::String("WND".to_string()));
         let properties_error = interpret_properties(&mock_map, Some(24u16), None).unwrap_err();
-        assert!(
-            properties_error
-                == SpecsError::Base58PrefixMismatch {
-                    specs: 42,
-                    meta: 24
-                },
-            "Wrong error in mock specs:\n{:?}",
-            properties_error
-        );
+        if let Error::Specs(SpecsError::Base58PrefixMismatch {
+            specs: 42,
+            meta: 24,
+        }) = properties_error
+        {
+        } else {
+            panic!("Wrong error in mock specs:\n{:?}", properties_error);
+        }
     }
 
     #[test]
@@ -449,11 +450,10 @@ mod tests {
             }),
         )
         .unwrap_err();
-        assert!(
-            properties_error == SpecsError::OverrideIgnoredSingle,
-            "Wrong error in mock specs:\n{:?}",
-            properties_error
-        );
+        if let Error::Specs(SpecsError::OverrideIgnoredSingle) = properties_error {
+        } else {
+            panic!("Wrong error in mock specs:\n{:?}", properties_error);
+        }
     }
 
     #[test]
@@ -564,15 +564,14 @@ mod tests {
             json!(["Unknown".to_string(), "WND".to_string(), "NWND".to_string()]),
         );
         let properties_error = interpret_properties(&mock_map, None, None).unwrap_err();
-        assert!(
+        if let Error::Specs(SpecsError::DecimalsUnitsArrayLength { decimals, unit }) =
             properties_error
-                == SpecsError::DecimalsUnitsArrayLength {
-                    decimals: "[8,8]".to_string(),
-                    unit: "[\"Unknown\",\"WND\",\"NWND\"]".to_string()
-                },
-            "Wrong error in mock specs:\n{:?}",
-            properties_error
-        );
+        {
+            assert_eq!(decimals, "[8,8]");
+            assert_eq!(unit, "[\"Unknown\",\"WND\",\"NWND\"]");
+        } else {
+            panic!("Wrong error in mock specs:\n{:?}", properties_error);
+        }
     }
 
     #[test]
@@ -613,10 +612,9 @@ mod tests {
             }),
         )
         .unwrap_err();
-        assert!(
-            properties_error == SpecsError::OverrideIgnoredNone,
-            "Wrong error in mock specs:\n{:?}",
-            properties_error
-        );
+        if let Error::Specs(SpecsError::OverrideIgnoredNone) = properties_error {
+        } else {
+            panic!("Wrong error in mock specs:\n{:?}", properties_error);
+        }
     }
 }

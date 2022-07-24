@@ -1770,6 +1770,7 @@ dependencies = [
  "regex",
  "sp-core",
  "sp-runtime",
+ "thiserror",
  "transaction_parsing",
  "transaction_signing",
  "zeroize",
@@ -3001,7 +3002,6 @@ dependencies = [
  "qr_reader_phone",
  "sp-core",
  "sp-runtime",
- "transaction_parsing",
  "uniffi",
  "uniffi_build",
 ]

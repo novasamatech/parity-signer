@@ -28,7 +28,7 @@ pub enum Error {
     /// For `RuntimeMetadataV12` and `RuntimeMetadataV13` the extensions set
     /// is a fixed one, whereas for `RuntimeMetadataV14` is may vary and is
     /// determined by the metadata itself.
-    #[error("network spec version decoded from extensions ({as_decoded}) differs from the version in metadata ({in_metadata})")]
+    #[error("Network spec version decoded from extensions ({as_decoded}) differs from the version in metadata ({in_metadata}).")]
     WrongNetworkVersion {
         /// metadata version from transaction extensions, as found through
         /// parsing process

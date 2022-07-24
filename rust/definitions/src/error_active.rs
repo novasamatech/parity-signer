@@ -189,306 +189,7 @@ impl ErrorSource for Active {
         ErrorActive::SeedNameEmpty
     }
     fn show(_error: &Self::Error) -> String {
-        "TODO".to_string()
-        /*
-        match error {
-            ErrorActive::NotHex(a) => {
-                let insert = match a {
-                    NotHexActive::FetchedMetadata {url, optional_block} => match optional_block{
-                        Some(hash) => format!("Network metadata fetched from url {} at block {}", url, hex::encode(hash)),
-                        None => format!("Network metadata fetched from url {}", url),
-                    },
-                    NotHexActive::FetchedGenesisHash {url} => format!("Network genesis hash fetched from url {}", url),
-                    NotHexActive::FetchedBlockHash {url} => format!("Network block hash fetched from url {}", url),
-                    NotHexActive::InputSufficientCrypto => String::from("Input sufficient crypto data"),
-                    NotHexActive::InputPublicKey => String::from("Input public key"),
-                    NotHexActive::InputSignature => String::from("Input signature"),
-                    NotHexActive::DefaultMetadata {filename} => format!("Default network metadata from file {}", filename),
-                    NotHexActive::CheckedMetadata {filename} => format!("Checked metadata from file {}", filename),
-                    NotHexActive::EnteredBlockHash => String::from("Input block hash"),
-                };
-                format!("{} is not in hexadecimal format.", insert)
-            },
-            ErrorActive::TransferContent(a) => a.show(),
-            ErrorActive::Database(a) => {
-                let insert = match a {
-                    DatabaseActive::KeyDecoding(b) => {
-                        let insert = match b {
-                            KeyDecodingActive::AddressBookKey(x) => format!("address book key {}", hex::encode(x.key())),
-                            KeyDecodingActive::AddressKey(x) => format!("address key {}", hex::encode(x.key())),
-                            KeyDecodingActive::MetaKey(x) => format!("meta key {}", hex::encode(x.key())),
-                            KeyDecodingActive::NetworkSpecsKey(x) => format!("network specs key {}", hex::encode(x.key())),
-                            KeyDecodingActive::NetworkSpecsKeyAddressDetails{address_key, network_specs_key} => format!("network specs key {} from network id set of address book entry with key {}", hex::encode(network_specs_key.key()), hex::encode(address_key.key())),
-                        };
-                        format!("Unable to parse {} from the database.", insert)
-                    },
-                    DatabaseActive::Internal(e) => format!("Internal error. {}", e),
-                    DatabaseActive::Transaction(e) => format!("Transaction error. {}", e),
-                    DatabaseActive::EntryDecoding(b) => {
-                        let insert = match b {
-                            EntryDecodingActive::AddressBookEntry{title} => format!("address book entry for title {}.", title),
-                            EntryDecodingActive::AddressDetails(x) => format!("address details entry for key {}.", hex::encode(x.key())),
-                            EntryDecodingActive::NetworkSpecs(x) => format!("network specs (NetworkSpecs) entry for key {}.", hex::encode(x.key())),
-                            EntryDecodingActive::NetworkSpecsToSend(x) => format!("network specs (NetworkSpecsToSend) entry for key {}.", hex::encode(x.key())),
-                            EntryDecodingActive::Types => String::from("types information."),
-                            EntryDecodingActive::BlockHash {name, version} => format!("fetch block hash for metadata {}{}", name, version),
-                        };
-                        format!("Unable to decode {}", insert)
-                    },
-                    DatabaseActive::Mismatch(b) => {
-                        let insert = match b {
-                            MismatchActive::Metadata{name_key, version_key, name_inside, version_inside} => format!("Meta key corresponds to {}{}. Stored metadata is {}{}.", name_key, version_key, name_inside, version_inside),
-                            MismatchActive::SpecsGenesisHash{key, genesis_hash} => format!("Network specs (NetworkSpecs) entry with network specs key {} has wrong genesis hash {}.", hex::encode(key.key()), hex::encode(genesis_hash)),
-                            MismatchActive::SpecsEncryption{key, encryption} => format!("Network specs (NetworkSpecs) entry with network specs key {} has wrong encryption {}.", hex::encode(key.key()), encryption.show()),
-                            MismatchActive::SpecsToSendGenesisHash{key, genesis_hash} => format!("Network specs (NetworkSpecsToSend) entry with network specs key {} has wrong genesis hash {}.", hex::encode(key.key()), hex::encode(genesis_hash)),
-                            MismatchActive::SpecsToSendEncryption{key, encryption} => format!("Network specs (NetworkSpecsToSend) entry with network specs key {} has wrong encryption {}.", hex::encode(key.key()), encryption.show()),
-                            MismatchActive::AddressDetailsEncryption{key, encryption} => format!("Address details entry with address key {} has not matching encryption {}.", hex::encode(key.key()), encryption.show()),
-                            MismatchActive::AddressDetailsSpecsEncryption{address_key, network_specs_key} => format!("Address details entry with address key {} has associated network specs key {} with wrong encryption.", hex::encode(address_key.key()), hex::encode(network_specs_key.key())),
-                            MismatchActive::AddressBookSpecsName{address_book_name, specs_name} => format!("Address book name {} does not match the name in corresponding network specs {}", address_book_name, specs_name),
-                        };
-                        format!("Mismatch found. {}", insert)
-                    },
-                    DatabaseActive::FaultyMetadata{name, version, error} => format!("Bad metadata for {}{}. {}", name, version, error.show()),
-                    DatabaseActive::TwoEntriesAddressEncryption{url, encryption} => format!("Hot database contains two entries for network with url {} and encryption {}.", url, encryption.show()),
-                    DatabaseActive::TwoDefaultsAddress{url} => format!("Hot database contains two default entries for network with url {}.", url),
-                    DatabaseActive::HotDatabaseMetadataOverTwoEntries{name} => format!("More than two entries for network {} in hot database.", name),
-                    DatabaseActive::HotDatabaseMetadataSameVersionTwice{name, version} => format!("Two entries for {} version {}.", name, version),
-                    DatabaseActive::TwoGenesisHashVariantsForName{name} => format!("Two different genesis hash entries for network {} in address book.", name),
-                    DatabaseActive::TwoUrlVariantsForName{name} => format!("Two different url entries for network {} in address book.", name),
-                    DatabaseActive::TwoNamesForUrl{url} => format!("Two different network names in entries for url address {} in address book.", url),
-                    DatabaseActive::TwoBase58ForName{name} => format!("Two different base58 entries for network {}.", name),
-                    DatabaseActive::AddressBookEmpty => String::from("Address book is empty"),
-                };
-                format!("Database error. {}", insert)
-            },
-            ErrorActive::Fetch(a) => {
-                let insert = match a {
-                    Fetch::FaultyMetadata{url, optional_block, error} => match optional_block {
-                        Some(hash) => format!("Metadata from {} at block hash {} is not suitable. {}", url, hex::encode(hash), error.show()),
-                        None => format!("Metadata from {} is not suitable. {}", url, error.show()),
-                    },
-                    Fetch::EarlierVersion{name, old_version, new_version} => format!("For {} the newly received version ({}) is lower than the latest version in the hot database ({}).", name, new_version, old_version),
-                    Fetch::SameVersionDifferentMetadata{name, version, block_hash_in_db, block_hash_in_fetch} => {
-                        let db_block_insert = match block_hash_in_db {
-                            Some(a) => hex::encode(a),
-                            None => String::from("unknown"),
-                        };
-                        let fetch_block_insert = match block_hash_in_fetch {
-                            Some(a) => hex::encode(a),
-                            None => String::from("unknown"),
-                        };
-                        format!("Metadata {}{} fetched now at block hash {} differs from the one in the hot database, block hash {}.", name, version, fetch_block_insert, db_block_insert)
-                    },
-                    Fetch::FaultySpecs{url, error} => {
-                        let insert = match error {
-                            SpecsError::NoBase58Prefix => String::from("No base58 prefix."),
-                            SpecsError::Base58PrefixMismatch{specs, meta} => format!("Base58 prefix from fetched properties {} does not match base58 prefix in fetched metadata {}.", specs, meta),
-                            SpecsError::Base58PrefixFormatNotSupported{value} => format!("Base58 prefix {} does not fit into u16.", value),
-                            SpecsError::UnitNoDecimals(x) => format!("Network has units declared: {}, but no decimals.", x),
-                            SpecsError::DecimalsFormatNotSupported{value} => format!("Decimals value {} does not fit into u8.", value),
-                            SpecsError::DecimalsNoUnit(x) => format!("Network has decimals declared: {}, but no units.", x),
-                            SpecsError::UnitFormatNotSupported{value} => format!("Units {} are not String.", value),
-                            SpecsError::DecimalsArrayUnitsNot => String::from("Unexpected result for multi-token network. Decimals are fetched as an array with more than one element, whereas units are not."),
-                            SpecsError::DecimalsUnitsArrayLength{decimals, unit} => format!("Unexpected result for multi-token network. Length of decimals array {} does not match the length of units array {}.", decimals, unit),
-                            SpecsError::UnitsArrayDecimalsNot => String::from("Unexpected result for multi-token network. Units are fetched as an array with more than one element, whereas decimals are not."),
-                            SpecsError::OverrideIgnoredSingle => String::from("Fetched single value for token decimals and unit. Token override is not possible."),
-                            SpecsError::OverrideIgnoredNone => String::from("Network has no value for token decimals and unit. Token override is not possible."),
-                        };
-                        format!("Problem with network specs from {}. {}", url, insert)
-                    },
-                    Fetch::Failed{url, error} => format!("Could not make rpc call at {}. {}", url, error),
-                    Fetch::ValuesChanged{url, what} => {
-                        let (insert, old, new) = match what {
-                            Changed::Base58Prefix{old, new} => ("base58 prefix", old.to_string(), new.to_string()),
-                            Changed::GenesisHash{old, new} => ("genesis hash", hex::encode(old), hex::encode(new)),
-                            Changed::Decimals{old, new} => ("decimals value", old.to_string(), new.to_string()),
-                            Changed::DecimalsBecameNone{old} => ("decimals value", old.to_string(), "no value".to_string()),
-                            Changed::Name{old, new} => ("name", old.to_string(), new.to_string()),
-                            Changed::Unit{old, new} => ("unit", old.to_string(), new.to_string()),
-                            Changed::UnitBecameNone{old} => ("unit", old.to_string(), "no value".to_string()),
-                        };
-                        format!("Network {} fetched from {} differs from the one in the hot database. Old: {}. New: {}.", insert, url, old, new)
-                    },
-                    Fetch::UnexpectedFetchedGenesisHashFormat{value} => format!("Fetched genesis hash {} has unexpected format and does not fit into [u8;32] array.", value),
-                    Fetch::UnexpectedFetchedBlockHashFormat{value} => format!("Fetched block hash {} has unexpected format and does not fit into [u8;32] array.", value),
-                    Fetch::SpecsInDb{name, encryption} => format!("Network specs entry for {} and encryption {} is already in database.", name, encryption.show()),
-                    Fetch::UKeyUrlInDb {title, url} => format!("There is already an entry with address {} for network {}. Known networks should be processed with `-n` content key.", url, title),
-                    Fetch::UKeyHashInDb{address_book_entry, url} => format!("Fetch at {} resulted in data already known to the hot database. Network {} with genesis hash {} has address set to {}. To change the url, delete old entry.", url, address_book_entry.name, hex::encode(address_book_entry.genesis_hash), address_book_entry.address),
-                };
-                format!("Fetching error. {}", insert)
-            },
-            ErrorActive::DefaultLoading(a) => {
-                let insert = match a {
-                    DefaultLoading::FaultyMetadata{filename, error} => format!("Default metadata from {} is not suitable. {}", filename, error.show()),
-                    DefaultLoading::MetadataFolder(e) => format!("Error with default metadata folder. {}", e),
-                    DefaultLoading::MetadataFile(e) => format!("Error with default metadata file. {}", e),
-                    DefaultLoading::TypesFile(e) => format!("Error with default types information file. {}", e),
-                    DefaultLoading::OrphanMetadata{name, filename} => format!("Default metadata for {} from {} does not have corresponding default network specs.", name, filename),
-                };
-                format!("Error on loading defaults. {}", insert)
-            },
-            ErrorActive::Output(e) => format!("Output error. {}", e),
-            ErrorActive::NotFound(a) => {
-                let insert = match a {
-                    NotFoundActive::Types => String::from("types information"),
-                    NotFoundActive::Metadata{name, version} => format!("metadata entry for {}{}", name, version),
-                    NotFoundActive::AddressBookEntry{title} => format!("address book for title {}", title),
-                    NotFoundActive::NetworkSpecsToSend(key) => format!("network specs (NetworkSpecsToSend) entry for key {}", hex::encode(key.key())),
-                    NotFoundActive::AddressBookEntryWithName{name} => format!("address book entry for network name {}", name),
-                    NotFoundActive::AddressBookEntryWithUrl{url} => format!("address book entry with url address {}", url),
-                };
-                format!("Could not find {}.", insert)
-            },
-            ErrorActive::TestAddressGeneration(a) => {
-                let insert = match a {
-                    AddressGeneration::Common(a) => a.show(),
-                    AddressGeneration::Extra(_) => unreachable!(),
-                };
-                format!("Error generating test address. {}", insert)
-            },
-            ErrorActive::CommandParser(a) => {
-                match a {
-                    CommandParser::UnexpectedKeyArgumentSequence => String::from("Unexpected key and argument sequence."),
-                    CommandParser::OnlyOneNetworkId => String::from("Only one network identifier is allowed."),
-                    CommandParser::NeedKey(b) => {
-                        let insert = match b {
-                            CommandNeedKey::Show => "`show`",
-                            CommandNeedKey::Content => "content",
-                            CommandNeedKey::Crypto => "`-crypto`",
-                            CommandNeedKey::Payload => "`-payload`",
-                            CommandNeedKey::MsgType => "`-msgtype`",
-                            CommandNeedKey::SufficientCrypto => "`-sufficient`",
-                            CommandNeedKey::Signature => "`-signature`",
-                            CommandNeedKey::Verifier => "`-verifier`",
-                            CommandNeedKey::Remove => "`-title` or `-name`",
-                            CommandNeedKey::RemoveVersion => "`-version`",
-                            CommandNeedKey::DerivationsTitle => "'-title'",
-                            CommandNeedKey::MetaDefaultFileName => "`-name`",
-                            CommandNeedKey::MetaDefaultFileVersion => "`-version`",
-                            CommandNeedKey::MetaAtBlockUrl => "`-u`",
-                            CommandNeedKey::MetaAtBlockHash => "`-block`",
-                        };
-                        format!("Expected {} key to be used.", insert)
-                    },
-                    CommandParser::DoubleKey(b) => {
-                        let insert = match b {
-                            CommandDoubleKey::Content => "content",
-                            CommandDoubleKey::Set => "set",
-                            CommandDoubleKey::CryptoOverride => "encryption override",
-                            CommandDoubleKey::TokenOverride => "token override",
-                            CommandDoubleKey::TitleOverride => "title override",
-                            CommandDoubleKey::CryptoKey => "`-crypto`",
-                            CommandDoubleKey::MsgType => "`-msgtype`",
-                            CommandDoubleKey::Verifier => "`-verifier`",
-                            CommandDoubleKey::Payload => "`-payload`",
-                            CommandDoubleKey::Signature => "`-signature`",
-                            CommandDoubleKey::Name => "`-name`",
-                            CommandDoubleKey::SufficientCrypto => "`-sufficient`",
-                            CommandDoubleKey::Remove => "`-remove`",
-                            CommandDoubleKey::DerivationsTitle => "'-title'",
-                            CommandDoubleKey::MetaDefaultFileName => "`-name`",
-                            CommandDoubleKey::MetaDefaultFileVersion => "`-version`",
-                            CommandDoubleKey::MetaAtBlockUrl => "`-u`",
-                            CommandDoubleKey::MetaAtBlockHash => "`-block`",
-                        };
-                        format!("More than one entry for {} key is not allowed.", insert)
-                    },
-                    CommandParser::NeedArgument(b) => {
-                        let insert = match b {
-                            CommandNeedArgument::TokenUnit => "`-token ***'",
-                            CommandNeedArgument::TokenDecimals => "'-token'",
-                            CommandNeedArgument::TitleOverride => "'-title'",
-                            CommandNeedArgument::NetworkName => "`-n`",
-                            CommandNeedArgument::NetworkUrl => "`-u`",
-                            CommandNeedArgument::CryptoKey => "`-crypto`",
-                            CommandNeedArgument::MsgType => "`-msgtype`",
-                            CommandNeedArgument::Verifier => "`-verifier`",
-                            CommandNeedArgument::VerifierHex => "`-verifier -hex`",
-                            CommandNeedArgument::VerifierFile => "`-verifier -file`",
-                            CommandNeedArgument::Payload => "`-payload`",
-                            CommandNeedArgument::Signature => "`-signature`",
-                            CommandNeedArgument::SignatureHex => "`-signature -hex`",
-                            CommandNeedArgument::SignatureFile => "`-signature -file`",
-                            CommandNeedArgument::Name => "`-name`",
-                            CommandNeedArgument::SufficientCrypto => "`-sufficient`",
-                            CommandNeedArgument::SufficientCryptoHex => "`-sufficient -hex`",
-                            CommandNeedArgument::SufficientCryptoFile => "`-sufficient -file`",
-                            CommandNeedArgument::Make => "'make'",
-                            CommandNeedArgument::Sign => "'sign'",
-                            CommandNeedArgument::RemoveTitle => "`remove -title`",
-                            CommandNeedArgument::RemoveName => "`remove -name`",
-                            CommandNeedArgument::RemoveVersion => "`remove -name *** -version`",
-                            CommandNeedArgument::Derivations => "'derivations'",
-                            CommandNeedArgument::DerivationsTitle => "'-title'",
-                            CommandNeedArgument::MetaDefaultFileName => "`-name`",
-                            CommandNeedArgument::MetaDefaultFileVersion => "`-version`",
-                            CommandNeedArgument::CheckFile => "check_file",
-                            CommandNeedArgument::ShowSpecsTitle => "`show -specs`",
-                            CommandNeedArgument::MetaAtBlockUrl => "`-u`",
-                            CommandNeedArgument::MetaAtBlockHash => "`-block`",
-                        };
-                        format!("{} must be followed by an agrument.", insert)
-                    },
-                    CommandParser::BadArgument(b) => {
-                        match b {
-                            CommandBadArgument::CryptoKey => String::from("Invalid argument after `-crypto` key."),
-                            CommandBadArgument::DecimalsFormat => String::from("Key `-token` should be followed by u8 decimals value."),
-                            CommandBadArgument::MsgType => String::from("Invalid argument after `-msgtype` key."),
-                            CommandBadArgument::Signature => String::from("Invalid argument after `-signature` key."),
-                            CommandBadArgument::SufficientCrypto => String::from("Invalid argument after `-sufficient` key."),
-                            CommandBadArgument::Verifier => String::from("Invalid argument after `-verifier` key."),
-                            CommandBadArgument::VersionFormat => String::from("Unexpected version format."),
-                        }
-                    },
-                    CommandParser::Unexpected(b) => {
-                        match b {
-                            CommandUnexpected::AliceSignature => String::from("No signature was expected for verifier Alice."),
-                            CommandUnexpected::KeyAContent => String::from("Key `-a` is used to process all, name or url was not expected."),
-                            CommandUnexpected::SignatureNoCrypto => String::from("No singature entry was expected for `-crypto none` sequence."),
-                            CommandUnexpected::VerifierNoCrypto => String::from("No verifier entry was expected for `-crypto none` sequence."),
-                        }
-                    },
-                    CommandParser::UnknownCommand => String::from("Unknown command."),
-                    CommandParser::NoCommand => String::from("No command."),
-                }
-            },
-            ErrorActive::Input(a) => {
-                match a {
-                    InputActive::File(e) => format!("Error with input file. {}", e),
-                    InputActive::DecodingSufficientCrypto => String::from("Unable to decode input sufficient crypto"),
-                    InputActive::PublicKeyLength => String::from("Provided verifier public key has wrong length."),
-                    InputActive::SignatureLength => String::from("Provided signature has wrong length."),
-                    InputActive::FaultyMetadataInPayload(e) => format!("Metadata in the message to sign is not suitable. {}", e.show()),
-                    InputActive::BadSignature => String::from("Bad signature."),
-                    InputActive::NoValidDerivationsToExport => String::from("No valid derivations found to generate ContentDerivations."),
-                    InputActive::BlockHashLength => String::from("Provided block hash has wrong length."),
-                }
-            },
-            ErrorActive::Qr(e) => format!("Error generating qr code. {}", e),
-            ErrorActive::NotSupported => String::from("Key combination is not supported. Please file a ticket if you need it."),
-            ErrorActive::NoTokenOverrideKnownNetwork{url} => format!("Network with corresponding url {} has database records. Token override is not supported.", url),
-            ErrorActive::Wasm{filename, wasm} => {
-                match wasm {
-                    Wasm::Call(e) => format!("Error processing .wasm file {}. Unable to process call on wasmi instance. {}", filename, e),
-                    Wasm::DecodingMetadata => format!("Error processing .wasm file {}. Unable to decode metadata.", filename),
-                    Wasm::FaultyMetadata(e) => format!("Metadata error in .wasm file {}. {}", filename, e.show()),
-                    Wasm::File(e) => format!("Error processing .wasm file {}. Unable to load file. {}", filename, e),
-                    Wasm::RuntimeBlob(e) => format!("Error processing .wasm file {}. Unable to generate RuntimeBlob. {}", filename, e),
-                    Wasm::WasmiInstance(e) => format!("Error processing .wasm file {}. Unable to generate WasmiInstance. {}", filename, e),
-                    Wasm::WasmiRuntime(e) => format!("Error processing .wasm file {}. Unable to generate WasmiRuntime. {}", filename, e),
-                }
-            },
-            ErrorActive::Check{filename, check} => {
-                match check {
-                    Check::FaultyMetadata(e) => format!("Metadata error in file {}. {}", filename, e.show()),
-                    Check::MetadataFile(e) => format!("Error processing file {}. Unable to load file. {}", filename, e),
-                }
-            },
-            ErrorActive::TimeFormat(e) => format!("Unable to produce timestamp. {}", e),
-            ErrorActive::SeedPhraseEmpty => String::from("Seed phrase is empty."),
-            ErrorActive::SeedNameEmpty => String::from("Seed name is empty."),
-        }
-        */
+        todo!()
     }
 }
 
@@ -1188,11 +889,12 @@ pub enum Fetch {
 }
 
 /// Errors on the active side with network specs received through rpc call
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, thiserror::Error)]
 pub enum SpecsError {
     /// Network base58 prefix information is not found neither in results of
     /// the `system_properties` rpc call, nor in `System` pallet of the metadata
     /// fetched with `state_getMetadata` rpc call.
+    #[error("no base58 prefix")]
     NoBase58Prefix,
 
     /// Network base58 prefix information found through `system_properties` rpc
@@ -1200,40 +902,47 @@ pub enum SpecsError {
     /// with "state_getMetadata" rpc call.
     ///
     /// Associated data is corresponding base58 prefixes.
+    #[error("base58 prefix mismatch {specs}:{meta}")]
     Base58PrefixMismatch { specs: u16, meta: u16 },
 
     /// Network base58 prefix information received through `system_properties`
     /// rpc call could not be transformed into expected `u16` prefix.
     ///
     /// Associated data is base58 prefix as received.
+    #[error("base58 prefix format not supported {value}")]
     Base58PrefixFormatNotSupported { value: String },
 
     /// Network decimals information **is not found** in the results if the
     /// `system_properties` rpc call, but the unit information **is found**.
     ///
     /// Associated data is the fetched unit value.
+    #[error("unit no decimals {0}")]
     UnitNoDecimals(String),
 
     /// Network decimals information received through `system_properties`
     /// rpc call could not be transformed into expected `u8` value.
     ///
     /// Associated data is decimals information as received.
+    #[error("decimals format not supported {value}")]
     DecimalsFormatNotSupported { value: String },
 
     /// Network unit information **is not found** in the results if the
     /// `system_properties` rpc call, but the decimals information **is found**.
     ///
     /// Associated data is the fetched decimals value, could be array too.
+    #[error("decimals no unit {0}")]
     DecimalsNoUnit(String),
 
     /// Network unit information received through `system_properties`
     /// rpc call could not be transformed into expected `String` value.
     ///
     /// Associated data is unit information as received.
+    #[error("unit format not supported {value}")]
     UnitFormatNotSupported { value: String },
 
     /// An array with more than one element is received for network decimals
     /// through `system_properties` rpc call. Received units are not an array.
+    #[error("decimals array units not")]
     DecimalsArrayUnitsNot,
 
     /// Both the network decimals and network units are received as arrays,
@@ -1242,10 +951,12 @@ pub enum SpecsError {
     ///
     /// Associated data are the printed sets as they are received through the
     /// `system_properties` rpc call.
+    #[error("decimals units array length {decimals} {unit}")]
     DecimalsUnitsArrayLength { decimals: String, unit: String },
 
     /// An array with more than one element is received for network units
     /// through `system_properties` rpc call. Received decimals are not an array.
+    #[error("units array decimals not")]
     UnitsArrayDecimalsNot,
 
     /// Unit and decimal override is not allowed, when network has a single
@@ -1258,9 +969,11 @@ pub enum SpecsError {
     /// If the network has a single decimals value and a single unit value, i.e.
     /// the values that would be suitable on their own, and user attempts to
     /// override it, this error appears.
+    #[error("override ignored single")]
     OverrideIgnoredSingle,
 
     /// Unit and decimal override is not allowed, when network has no token.
+    #[error("override ignored none")]
     OverrideIgnoredNone,
 }
 
@@ -1466,9 +1179,10 @@ pub enum NotFoundActive {
 ///
 /// Commands may have keys (starting with `-`), keys may be followed by the
 /// arguments.
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum CommandParser {
     /// Agrument sequence could not be processed.
+    #[error("argument sequence could not be processed")]
     UnexpectedKeyArgumentSequence,
 
     /// Received more than one network identifier.
@@ -1484,48 +1198,57 @@ pub enum CommandParser {
     ///
     /// This error appears if the parser has recognized more than one command
     /// element as a network identifier.
+    #[error("only one network id")]
     OnlyOneNetworkId,
 
     /// A key needed to run the command was not provided.
     ///
     /// Associated data is [`CommandNeedKey`] with more details.
-    NeedKey(CommandNeedKey),
+    #[error(transparent)]
+    NeedKey(#[from] CommandNeedKey),
 
     /// Same key was encountered more than once.
     ///
     /// Associated data is [`CommandDoubleKey`] with more details.
-    DoubleKey(CommandDoubleKey),
+    #[error(transparent)]
+    DoubleKey(#[from] CommandDoubleKey),
 
     /// A key must have been followed by some argument, but was not.
     ///
     /// Associated data is [`CommandNeedArgument`] with more details.
-    NeedArgument(CommandNeedArgument),
+    #[error(transparent)]
+    NeedArgument(#[from] CommandNeedArgument),
 
     /// An argument following the key is unsuitable.
     ///
     /// Associated data is [`CommandBadArgument`] with more details.
-    BadArgument(CommandBadArgument),
+    #[error(transparent)]
+    BadArgument(#[from] CommandBadArgument),
 
     /// Unexpected excessive entry in the command.
     ///
     /// Associated data is [`CommandUnexpected`] with more details.
-    Unexpected(CommandUnexpected),
+    #[error(transparent)]
+    Unexpected(#[from] CommandUnexpected),
 
     /// Command is not known.
+    #[error("unknown command")]
     UnknownCommand,
 
     /// No command provided.
+    #[error("no command provided")]
     NoCommand,
 }
 
 /// Missing key in `generate_message` command
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum CommandNeedKey {
     /// Command `show` needs key:
     ///
     /// - `-address_book` to show the contents of the hot database `ADDRESS_BOOK`
     /// tree
     /// - `-database` to show the contents of the hot database `METATREE` tree
+    #[error("show needs key")]
     Show,
 
     /// Commands `add_specs` and `load_metadata` need key specifying content:
@@ -1534,6 +1257,7 @@ pub enum CommandNeedKey {
     /// - `-n` to process network by provided network name (in case of
     /// `load_metadata`) or network address book title (in case of `add_specs`)
     /// - `-u` to process network by provided url address
+    #[error("content needs key")]
     Content,
 
     /// Command `make` requires `-crypto` key, followed by the encryption to be
@@ -1545,23 +1269,28 @@ pub enum CommandNeedKey {
     /// - `ecdsa`
     ///
     /// Entered encryption must match entered verifier and signature data.
+    #[error("crypto key required")]
     Crypto,
 
     /// Commands `derivations`, `make`, `sign`, `unwasm` require `-payload` key
     /// to be used, followed by the name of the file to process.
+    #[error("payload key required")]
     Payload,
 
     /// Commands `make` and `sign` require `-msgtype` key, followed by what is
     /// contained in the payload: `add_specs`, `load_metadata` or `load_types`.
+    #[error("msgtype key required")]
     MsgType,
 
     /// Command `sign` requires `-sufficient` key, followed by
     /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) input, matching
     /// the payload content.
+    #[error("sufficient key required")]
     SufficientCrypto,
 
     /// Command `make` requires signature if the message is to be signed by
     /// real verifier.
+    #[error("signature required")]
     Signature,
 
     /// Command `make` requires public key of the verifier if the message is to
@@ -1571,6 +1300,7 @@ pub enum CommandNeedKey {
     /// - custom (real user, with own public key), in this case a real signature
     /// would be required
     /// - test verifier (Alice), no signature
+    #[error("verifier public key required")]
     Verifier,
 
     /// Command `remove` needs one of these keys:
@@ -1581,36 +1311,43 @@ pub enum CommandNeedKey {
     /// - `-name`, followed by network name argument, key `-version`, and
     /// network version argument, to remove specific metadata entry from
     /// `METATREE` by name and version
+    #[error("remove needs a key")]
     Remove,
 
     /// If command `remove` is processed with the key `-name`, it requires also
     /// a key `-version` followed by the metadata version, to specify the
     /// version to be deleted.
+    #[error("remove version")]
     RemoveVersion,
 
     /// Transaction with derivation import is generated for a specific network,
     /// this network is addressed by `-title` key followed by network address
     /// book title.
+    #[error("derivations title")]
     DerivationsTitle,
 
     /// Command `meta_default_file` must have `-name` key followed by the
     /// network name to specify the metadata being exported.
+    #[error("meta default filename")]
     MetaDefaultFileName,
 
     /// Command `meta_default_file` must have `-version` key followed by the
     /// network metadata version to specify the metadata being exported.
+    #[error("meta default file version")]
     MetaDefaultFileVersion,
 
     /// Command `meta_at_block` must have `-u` key followed by the network url.
+    #[error("meta at block url")]
     MetaAtBlockUrl,
 
     /// Command `meta_at_block` must have `-block` key followed by the
     /// hexadecimal block hash.
+    #[error("meta at block hash")]
     MetaAtBlockHash,
 }
 
 /// Key in `generate_message` command encountered twice
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum CommandDoubleKey {
     /// Commands `add_specs` and `load_metadata` allow only one content key:
     ///
@@ -1618,6 +1355,7 @@ pub enum CommandDoubleKey {
     /// - `-n` to process network by provided network name (in case of
     /// `load_metadata`) or network address book title (in case of `add_specs`)
     /// - `-u` to process network by provided url address
+    #[error("content")]
     Content,
 
     /// Commands `add_specs` and `load_metadata` allow at most one set key,
@@ -1632,6 +1370,7 @@ pub enum CommandDoubleKey {
     /// - `-t` (the default one, is done when the set key is not specified as
     /// well), to make rpc calls, update the database, and save all files for
     /// signing
+    #[error("set")]
     Set,
 
     /// Command `add_specs` may use encryption override key to specify the
@@ -1642,6 +1381,7 @@ pub enum CommandDoubleKey {
     ///
     /// Encryption override key (`-ed25519`, `-sr25519`, `-ecdsa`) could not be
     /// used more than once.
+    #[error("crypto override")]
     CryptoOverride,
 
     /// Command `add_specs`, when used for networks without network specs
@@ -1650,40 +1390,49 @@ pub enum CommandDoubleKey {
     /// decimals and `String` unit arguments is used.
     ///
     /// Token override key may be used only once.
+    #[error("token override")]
     TokenOverride,
 
     /// Command `add_specs` could use network title override to set up the
     /// network title displayed in Signer.
     ///
     /// Title override key may be used only once.
+    #[error("title override")]
     TitleOverride,
 
     /// Command `make` must have exactly one `-crypto` key, followed by the
     /// encryption argument.
+    #[error("crypto key")]
     CryptoKey,
 
     /// Commands `make` and `sign` must have exactly one `-msgtype` key,
     /// followed by the message type argument.
+    #[error("msg type")]
     MsgType,
 
     /// Command `make` can have at most one `-verifier` key.
+    #[error("verifier")]
     Verifier,
 
     /// Commands `derivations`, `make`, `sign`, `unwasm` must have exactly one
     /// `-payload` key, followed by the name of the file to process.
+    #[error("payload")]
     Payload,
 
     /// Command `make` can have at most one `-signeture` key.
+    #[error("signature")]
     Signature,
 
     /// Commands `make` and `sign` can have at most one `-name` key,
     /// followed by the custom name of the export file in `../files/signed/`
     /// folder.
+    #[error("name")]
     Name,
 
     /// Command `sign` must have exactly one `-sufficient` key, followed by the
     /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) input, matching
     /// the payload content.
+    #[error("sufficient")]
     SufficientCrypto,
 
     /// Command `remove` must have exactly one content key:
@@ -1694,32 +1443,38 @@ pub enum CommandDoubleKey {
     /// - `-name`, followed by network name argument, key `-version`, and
     /// network version argument, to remove specific metadata entry from
     /// `METATREE` by name and version
+    #[error("remove")]
     Remove,
 
     /// Command `derivations` must have exactly one `-title` key followed by
     /// network address book title for network in which the derivation export
     /// is generated.
+    #[error("derivations title")]
     DerivationsTitle,
 
     /// Command `meta_default_file` must have exactly one `-name` key followed
     /// by the network name.
+    #[error("meta default file name")]
     MetaDefaultFileName,
 
     /// Command `meta_default_file` must have exactly one `-version` key followed
     /// by the network version.
+    #[error("meta default file version")]
     MetaDefaultFileVersion,
 
     /// Command `meta_at_block` must have exactly one `-u` key followed by the
     /// network url.
+    #[error("meta at block url")]
     MetaAtBlockUrl,
 
     /// Command `meta_at_block` must have exactly one `-block` key followed by
     /// the hexadecimal block hash.
+    #[error("meta at block hash")]
     MetaAtBlockHash,
 }
 
 /// Missing argument for the key in `generate_message` command
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum CommandNeedArgument {
     /// Key `-token` in `add_specs` command was supposed to be followed by `u8`
     /// decimals and `String` unit agruments.
@@ -1734,6 +1489,7 @@ pub enum CommandNeedArgument {
     /// parser will interpret `-sr25519` part as an attempted unit entry (indeed,
     /// units could be whatever, so no obvious criteria to recognize them),
     /// and will complain that no encryption is provided for an unknown network.
+    #[error("token unit")]
     TokenUnit,
 
     /// Key `-token` in `add_specs` command was supposed to be followed by `u8`
@@ -1744,19 +1500,23 @@ pub enum CommandNeedArgument {
     /// Note: this error can occur only when `-token` is the last key in the
     /// sequence. Otherwise the parser will try to interpret as `u8` decimals
     /// the next key and complain that it is not `u8`.
+    #[error("token decimals")]
     TokenDecimals,
 
     /// Key `-title` in `add_specs` command was supposed to be followed by
     /// `String` argument, which was not provided.
+    #[error("title override")]
     TitleOverride,
 
     /// Commands `add_specs` and `load_metadata` with content key `-n` require
     /// network identifier: network address book title for `add_specs` and
     /// network name for `load_metadata`
+    #[error("network name")]
     NetworkName,
 
     /// Commands `add_specs` and `load_metadata` with content key `-u` require
     /// url address input for rpc calls
+    #[error("network url")]
     NetworkUrl,
 
     /// Key `-crypto` in `make` command was supposed to be followed by an
@@ -1766,6 +1526,7 @@ pub enum CommandNeedArgument {
     /// - `sr25519`
     /// - `ecdsa`
     /// - `none`
+    #[error("crypto key")]
     CryptoKey,
 
     /// Key `-verifier` in `make` command was supposed to be followed by an
@@ -1774,20 +1535,24 @@ pub enum CommandNeedArgument {
     /// - argument `Alice`
     /// - key `-hex` followed by hexadecimal input argument
     /// - key `-file` followed by filename argument
+    #[error("verifier")]
     Verifier,
 
     /// Key sequence `-verifier -hex` in `make` command must be followed by a
     /// hexadecimal verifier public key
+    #[error("verifier hex")]
     VerifierHex,
 
     /// Key sequence `-verifier -file` in `make` command must be followed by a
     /// filename of the file in dedicated `FOLDER` with verifier public key as
     /// `&[u8]`.
+    #[error("verifier file")]
     VerifierFile,
 
     /// Key `-payload` must be followed by a filename of the file:
     /// - in dedicated `FOLDER` for `make` and `sign` commands
     /// - in `../generate_message/` for `derivations` and `unwasm` commands
+    #[error("payload")]
     Payload,
 
     /// Key `-msgtype` in `make` and `sign` must be followed by a valid message
@@ -1796,6 +1561,7 @@ pub enum CommandNeedArgument {
     /// - `add_specs`
     /// - `load_metadata`
     /// - `load_types`
+    #[error("msgtype")]
     MsgType,
 
     /// Key `-signature` in `make` command was supposed to be followed by an
@@ -1803,18 +1569,22 @@ pub enum CommandNeedArgument {
     ///
     /// - key `-hex` followed by hexadecimal input argument
     /// - key `-file` followed by filename argument
+    #[error("signature")]
     Signature,
 
     /// Key sequence `-signature -hex` in `make` command must be followed by a
     /// hexadecimal signature.
+    #[error("signature hex")]
     SignatureHex,
 
     /// Key sequence `-signature -file` in `make` command must be followed by a
     /// filename of the file in dedicated `FOLDER` with signature as `&[u8]`.
+    #[error("signature file")]
     SignatureFile,
 
     /// Key `-name` in `make` and `sign` commands, if used, must be followed by
     /// a filename of target file in `../files/signed`.
+    #[error("name")]
     Name,
 
     /// Key `-sufficient` in `sign` command was supposed to be followed by an
@@ -1822,65 +1592,81 @@ pub enum CommandNeedArgument {
     ///
     /// - key `-hex` followed by hexadecimal input argument
     /// - key `-file` followed by filename argument
+    #[error("sufficient crypto")]
     SufficientCrypto,
 
     /// Key sequence `-sufficient -hex` in `sign` command must be followed by a
     /// hexadecimal SCALE-encoded `SufficientCrypto` string.
+    #[error("sufficient crypto hex")]
     SufficientCryptoHex,
 
     /// Key sequence `-sufficient -file` in `sign` command must be followed by a
     /// filename of the file in dedicated `FOLDER` with SCALE-encoded
     /// `SufficientCrypto` as `&[u8]`.
+    #[error("sufficient crypto file")]
     SufficientCryptoFile,
 
     /// Command `make` must be followed by additional keys.
+    #[error("make")]
     Make,
 
     /// Command `sign` must be followed by additional keys.
+    #[error("sign")]
     Sign,
 
     /// Key `-title` in `remove` command must be followed by network address
     /// book title.
+    #[error("remove title")]
     RemoveTitle,
 
     /// Key `-name` in `remove` command must be followed by network name.
+    #[error("remove name")]
     RemoveName,
 
     /// Key-argument sequence `remove -name <***> -version` in `remove` command
     /// must be followed by network version.
+    #[error("remove version")]
     RemoveVersion,
 
     /// Command `derivations` must be followed by additional keys.
+    #[error("derivations")]
     Derivations,
 
     /// Key `-title` in `derivations` command must be followed by network
     /// address book title.
+    #[error("derivations title")]
     DerivationsTitle,
 
     /// Key `-name` in `meta_default_file` command must be followed by network
     /// name.
+    #[error("meta default file name")]
     MetaDefaultFileName,
 
     /// Key `-version` in `meta_default_file` command must be followed by
     /// network version.
+    #[error("meta default file version")]
     MetaDefaultFileVersion,
 
     /// Command `check_file` must be followed by the file path
+    #[error("checkfile")]
     CheckFile,
 
     /// Command `show -specs` must be followed by the network address book title
+    #[error("show specs title")]
     ShowSpecsTitle,
 
     /// Key `-u` in `meta_at_block` command must be followed by the network url.
+    #[error("meta at block url")]
     MetaAtBlockUrl,
 
     /// Key `-block` in `meta_at_block` command must be followed by the
     /// hexadecimal block hash.
+    #[error("meta at block hash")]
     MetaAtBlockHash,
 }
 
 /// Unsuitable argument for the key in `generate_message` command
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum CommandBadArgument {
     /// The valid arguments for key `-crypto` are:
     ///
@@ -1888,12 +1674,14 @@ pub enum CommandBadArgument {
     /// - `sr25519`
     /// - `ecdsa`
     /// - `none`
+    #[error("crypto key")]
     CryptoKey,
 
     /// Key `-token` must be followed by `u8` decimals and `String` unit values.
     ///
     /// This error appears if the value immediately after `-token` could not be
     /// parsed as `u8`.
+    #[error("decimals format")]
     DecimalsFormat,
 
     /// The valid arguments for key `-msgtype` are:
@@ -1901,6 +1689,7 @@ pub enum CommandBadArgument {
     /// - `add_specs`
     /// - `load_metadata`
     /// - `load_types`
+    #[error("msg type")]
     MsgType,
 
     /// Signature may be entered from a file or as a hexadecimal string.
@@ -1909,6 +1698,7 @@ pub enum CommandBadArgument {
     /// `-file` followed by the name of the file in dedicated `FOLDER` with
     /// signature as `&[u8]`
     /// `-hex` followed by hexadecimal signature
+    #[error("signature")]
     Signature,
 
     /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) may be entered
@@ -1918,6 +1708,7 @@ pub enum CommandBadArgument {
     /// `-file` followed by the name of the file in dedicated `FOLDER` with
     /// SCALE-encoded `SufficientCrypto` as `&[u8]`
     /// `-hex` followed by hexadecimal SCALE-encoded `SufficientCrypto` string
+    #[error("sufficient crypto")]
     SufficientCrypto,
 
     /// Verifier entered after key `-verifier` may be:
@@ -1926,6 +1717,7 @@ pub enum CommandBadArgument {
     /// public key as `&[u8]`
     /// `-hex` followed by hexadecimal verifier public key
     /// `Alice`
+    #[error("verifier")]
     Verifier,
 
     /// Commands `remove` and `meta_default_file` require network version to be
@@ -1933,57 +1725,70 @@ pub enum CommandBadArgument {
     ///
     /// This error appears if the value immediately after `-version` could not be
     /// parsed as `u32`.
+    #[error("version format")]
     VersionFormat,
 }
 
 /// Unexpected content in `generate_message` command
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum CommandUnexpected {
     /// Command `make` with `-verifier Alice` can not accept the signature.
+    #[error("alice signature")]
     AliceSignature,
 
     /// Commands `add_specs` and `load_metadata` can not accept name or url
     /// address if `-a` (process all) content key is used.
+    #[error("key a content")]
     KeyAContent,
 
     /// Command `make` with `-crypto none` can not accept the signature.
+    #[error("signature no crypto")]
     SignatureNoCrypto,
 
     /// Command `make` with `-crypto none` can not accept the verifier public key.
+    #[error("verifier no crypto")]
     VerifierNoCrypto,
 }
 
 /// Errors in `generate_message` input
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum InputActive {
     /// Unable to read the file with input.
-    File(std::io::Error),
+    #[error(transparent)]
+    File(#[from] std::io::Error),
 
     /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) could not be
     /// decoded.
+    #[error("decoding sufficient crypto")]
     DecodingSufficientCrypto,
 
     /// The length of public key does not match the selected encryption
     /// algorithm.
+    #[error("public key length")]
     PublicKeyLength,
 
     /// The length of data signature does not match the selected encryption
     /// algorithm.
+    #[error("signature length")]
     SignatureLength,
 
     /// Tried to apply signature (i.e. used command `make` or `sign`) to
     /// metadata that is not suitable for use in Signer
-    FaultyMetadataInPayload(MetadataError),
+    #[error(transparent)]
+    FaultyMetadataInPayload(#[from] MetadataError),
 
     /// Provided data signature (entered separately or as a part of
     /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) input) is invalid
     /// for given public key and data.
+    #[error("bad signature")]
     BadSignature,
 
     /// Provided file contains no valid derivations that could be exported
+    #[error("no valid derivations to export")]
     NoValidDerivationsToExport,
 
     /// User-entered block hash has invalid length
+    #[error("block hash length")]
     BlockHashLength,
 }
 

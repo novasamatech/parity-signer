@@ -15,11 +15,7 @@ use db_handling::{
 };
 use definitions::{
     crypto::Encryption,
-    error::ErrorSource,
-    error_active::{
-        Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActiveStr,
-        InputActive, MismatchActive, NotFoundActive, NotHexActive, SpecsError,
-    },
+    error_active::{Changed, NotHexActive, SpecsError},
     helpers::unhex,
     keyring::{AddressBookKey, MetaKey, NetworkSpecsKey},
     metadata::{AddressBookEntry, MetaHistoryEntry, MetaValues},
@@ -62,12 +58,10 @@ pub fn network_specs_from_entry(
     );
     let network_specs = get_network_specs_to_send(&network_specs_key)?;
     if network_specs.name != address_book_entry.name {
-        return Err(ErrorActive::Database(DatabaseActive::Mismatch(
-            MismatchActive::AddressBookSpecsName {
-                address_book_name: address_book_entry.name.to_string(),
-                specs_name: network_specs.name,
-            },
-        )));
+        return Err(Error::AddressBookSpecsName {
+            address_book_name: address_book_entry.name.to_string(),
+            specs_name: network_specs.name,
+        });
     }
     Ok(network_specs)
 }
@@ -99,9 +93,7 @@ pub fn get_network_specs_to_send(
 ) -> Result<NetworkSpecsToSend> {
     match try_get_network_specs_to_send(network_specs_key)? {
         Some(a) => Ok(a),
-        None => Err(ErrorActive::NotFound(NotFoundActive::NetworkSpecsToSend(
-            network_specs_key.to_owned(),
-        ))),
+        None => Err(Error::NetworkSpecsToSend(network_specs_key.to_owned())),
     }
 }
 
@@ -139,11 +131,12 @@ pub fn db_upd_network(address: &str, network_specs: &NetworkSpecsToSend) -> Resu
     TrDbHot::new()
         .set_address_book(address_book_batch)
         .set_network_specs_prep(network_specs_prep_batch)
-        .apply(HOT_DB_NAME)
+        .apply(HOT_DB_NAME)?;
+    Ok(())
 }
 
 /// Process error depending on pass errors flag `-s`.
-pub fn error_occured(e: ErrorActive, pass_errors: bool) -> Result<()> {
+pub fn error_occured(e: Error, pass_errors: bool) -> Result<()> {
     if pass_errors {
         println!("Error encountered. {} Skipping it.", e);
         Ok(())
@@ -187,9 +180,9 @@ pub fn filter_address_book_by_url(address: &str) -> Result<Vec<(String, AddressB
                     if name == address_book_entry.name {
                         Some(name)
                     } else {
-                        return Err(ErrorActive::Database(DatabaseActive::TwoNamesForUrl {
+                        return Err(Error::TwoNamesForUrl {
                             url: address.to_string(),
-                        }));
+                        });
                     }
                 }
                 None => Some(address_book_entry.name.to_string()),
@@ -258,10 +251,7 @@ pub fn read_metadata_database() -> Result<Vec<MetaValuesStamped>> {
     for x in metadata.iter().flatten() {
         let meta_values = MetaValues::from_entry_checked(x)?;
         let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
-        let at_block_hash = match meta_history
-            .get(meta_key.key())
-            .map_err(<Active>::db_internal)?
-        {
+        let at_block_hash = match meta_history.get(meta_key.key())? {
             Some(meta_history_entry_encoded) => Some(
                 MetaHistoryEntry::from_entry_with_key_parts(
                     &meta_values.name,
@@ -321,11 +311,9 @@ fn sort_metavalues(meta_values: Vec<MetaValuesStamped>) -> Result<SortedMetaValu
                 // `older` set; should not find any;
                 for z in older.iter() {
                     if x.meta_values.name == z.meta_values.name {
-                        return Err(ErrorActive::Database(
-                            DatabaseActive::HotDatabaseMetadataOverTwoEntries {
-                                name: x.meta_values.name.to_string(),
-                            },
-                        ));
+                        return Err(Error::HotDatabaseMetadataOverTwoEntries {
+                            name: x.meta_values.name.to_string(),
+                        });
                     }
                 }
 
@@ -338,12 +326,10 @@ fn sort_metavalues(meta_values: Vec<MetaValuesStamped>) -> Result<SortedMetaValu
 
                     // same version?!
                     Ordering::Equal => {
-                        return Err(ErrorActive::Database(
-                            DatabaseActive::HotDatabaseMetadataSameVersionTwice {
-                                name: x.meta_values.name.to_string(),
-                                version: x.meta_values.version,
-                            },
-                        ))
+                        return Err(Error::HotDatabaseMetadataSameVersionTwice {
+                            name: x.meta_values.name.to_string(),
+                            version: x.meta_values.version,
+                        })
                     }
 
                     // `x` entry goes to `newer` and replaces `y` entry, `y`
@@ -410,11 +396,11 @@ pub fn add_new_metadata(new: &MetaValuesStamped, sorted: &mut SortedMetaValues) 
                 // earlier metadata could be retrieved from an outdated `.wasm`
                 // file - no reason to accept it either;
                 Ordering::Less => {
-                    return Err(ErrorActive::Fetch(Fetch::EarlierVersion {
+                    return Err(Error::EarlierVersion {
                         name: x.meta_values.name.to_string(),
                         old_version: x.meta_values.version,
                         new_version: new.meta_values.version,
-                    }))
+                    })
                 }
 
                 // same version, no updates;
@@ -438,12 +424,12 @@ pub fn add_new_metadata(new: &MetaValuesStamped, sorted: &mut SortedMetaValues) 
                         }
                         println!("new: {:?}, in db: {:?}", sus1, sus2);
 
-                        return Err(ErrorActive::Fetch(Fetch::SameVersionDifferentMetadata {
+                        return Err(Error::SameVersionDifferentMetadata {
                             name: new.meta_values.name.to_string(),
                             version: new.meta_values.version,
                             block_hash_in_db: x.at_block_hash,
                             block_hash_in_fetch: new.at_block_hash,
-                        }));
+                        });
                     }
                     match x.at_block_hash {
                         Some(_) => Some(Found::DoNothing),
@@ -525,7 +511,9 @@ pub fn db_upd_metadata(sorted_meta_values: SortedMetaValues) -> Result<()> {
     TrDbHot::new()
         .set_metadata(metadata_batch)
         .set_meta_history(meta_history_batch)
-        .apply(HOT_DB_NAME)
+        .apply(HOT_DB_NAME)?;
+
+    Ok(())
 }
 
 /// Data needed to output `load_metadata` update payload file.
@@ -560,12 +548,7 @@ impl MetaFetched {
 /// Get network information through rpc calls at `address` and interpret it into
 /// [`MetaFetched`].
 pub fn meta_fetch(address: &str) -> Result<MetaFetched> {
-    let new_info = fetch_info(address).map_err(|e| {
-        ErrorActive::Fetch(Fetch::Failed {
-            url: address.to_string(),
-            error: e.to_string(),
-        })
-    })?;
+    let new_info = fetch_info(address)?;
 
     let genesis_hash = get_hash(
         &new_info.genesis_hash,
@@ -602,12 +585,7 @@ pub fn meta_fetch(address: &str) -> Result<MetaFetched> {
 /// `meta_at_block -u <network_url_address> -block <block_hash>`
 pub fn debug_meta_at_block(address: &str, hex_block_hash: &str) -> Result<()> {
     let block_hash = get_hash(hex_block_hash, Hash::BlockEntered)?;
-    let meta_fetched = fetch_meta_at_block(address, block_hash).map_err(|e| {
-        ErrorActive::Fetch(Fetch::Failed {
-            url: address.to_string(),
-            error: e.to_string(),
-        })
-    })?;
+    let meta_fetched = fetch_meta_at_block(address, block_hash)?;
     let meta_values = MetaValues::from_str_metadata(&meta_fetched)?;
     let filename = format!(
         "{}/{}{}_{}",
@@ -638,13 +616,7 @@ pub fn specs_agnostic(
         &fetch.properties,
         fetch.meta_values.optional_base58prefix,
         optional_token_override,
-    )
-    .map_err(|error| {
-        ErrorActive::Fetch(Fetch::FaultySpecs {
-            url: address.to_string(),
-            error,
-        })
-    })?;
+    )?;
 
     let title = optional_signer_title_override.unwrap_or(format!(
         "{}-{}",
@@ -741,12 +713,7 @@ struct CommonSpecsFetch {
 /// the contents of the database.
 fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch> {
     // actual fetch
-    let new_info = fetch_info_with_network_specs(address).map_err(|e| {
-        ErrorActive::Fetch(Fetch::Failed {
-            url: address.to_string(),
-            error: e.to_string(),
-        })
-    })?;
+    let new_info = fetch_info_with_network_specs(address)?;
 
     // genesis hash in proper format
     let genesis_hash = get_hash(
@@ -794,46 +761,39 @@ fn known_specs_processing(
     let fetch = common_specs_fetch(address)?;
 
     let (base58prefix, token_fetch) =
-        check_specs(&fetch.properties, fetch.meta_values.optional_base58prefix).map_err(
-            |error| {
-                ErrorActive::Fetch(Fetch::FaultySpecs {
-                    url: address.to_string(),
-                    error,
-                })
-            },
-        )?;
+        check_specs(&fetch.properties, fetch.meta_values.optional_base58prefix)?;
 
     // check that base58 prefix did not change
     if specs.base58prefix != base58prefix {
-        return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+        return Err(Error::ValuesChanged {
             url,
             what: Changed::Base58Prefix {
                 old: specs.base58prefix,
                 new: base58prefix,
             },
-        }));
+        });
     }
 
     // check that genesis hash did not change
     if specs.genesis_hash != fetch.genesis_hash {
-        return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+        return Err(Error::ValuesChanged {
             url,
             what: Changed::GenesisHash {
                 old: specs.genesis_hash,
                 new: fetch.genesis_hash,
             },
-        }));
+        });
     }
 
     // check that name did not change
     if specs.name != fetch.meta_values.name {
-        return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+        return Err(Error::ValuesChanged {
             url,
             what: Changed::Name {
                 old: specs.name.to_string(),
                 new: fetch.meta_values.name,
             },
-        }));
+        });
     }
 
     // check that token did not change or could be overridden
@@ -842,32 +802,32 @@ fn known_specs_processing(
         TokenFetch::Single(token) => {
             // check that decimals value did not change
             if specs.decimals != token.decimals {
-                return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+                return Err(Error::ValuesChanged {
                     url,
                     what: Changed::Decimals {
                         old: specs.decimals,
                         new: token.decimals,
                     },
-                }));
+                });
             }
 
             // check that unit did not change
             if specs.unit != token.unit {
-                return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+                return Err(Error::ValuesChanged {
                     url,
                     what: Changed::Unit {
                         old: specs.unit.to_string(),
                         new: token.unit,
                     },
-                }));
+                });
             }
 
             // override is not allowed
             if optional_token_override.is_some() {
-                return Err(ErrorActive::Fetch(Fetch::FaultySpecs {
+                return Err(Error::FaultySpecs {
                     url,
                     error: SpecsError::OverrideIgnoredSingle,
-                }));
+                });
             }
         }
         TokenFetch::Array { .. } => {
@@ -887,30 +847,30 @@ fn known_specs_processing(
             // only decimals `0` possible, check that decimals value did not
             // change
             if specs.decimals != 0 {
-                return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+                return Err(Error::ValuesChanged {
                     url,
                     what: Changed::DecimalsBecameNone {
                         old: specs.decimals,
                     },
-                }));
+                });
             }
 
             // only unit `UNIT` possible, check that unit did not change
             if specs.unit != "UNIT" {
-                return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+                return Err(Error::ValuesChanged {
                     url,
                     what: Changed::UnitBecameNone {
                         old: specs.unit.to_string(),
                     },
-                }));
+                });
             }
 
             // override is not allowed
             if optional_token_override.is_some() {
-                return Err(ErrorActive::Fetch(Fetch::FaultySpecs {
+                return Err(Error::FaultySpecs {
                     url,
                     error: SpecsError::OverrideIgnoredNone,
-                }));
+                });
             }
         }
     }
@@ -930,7 +890,7 @@ enum Hash {
 /// Inputs hexadecimal `input_hash` and hash type/source `Hash` (used to
 /// produce error in case the `input_hash` format is incorrect).
 fn get_hash(input_hash: &str, what: Hash) -> Result<H256> {
-    let not_hex = match what {
+    let _not_hex = match what {
         Hash::BlockEntered => NotHexActive::EnteredBlockHash,
         Hash::BlockFetched { ref url } => NotHexActive::FetchedBlockHash {
             url: url.to_string(),
@@ -943,20 +903,16 @@ fn get_hash(input_hash: &str, what: Hash) -> Result<H256> {
     let out: [u8; 32] = match hash_vec.try_into() {
         Ok(a) => a,
         Err(_) => match what {
-            Hash::BlockEntered => return Err(ErrorActive::Input(InputActive::BlockHashLength)),
+            Hash::BlockEntered => return Err(Error::BlockHashLength),
             Hash::BlockFetched { url: _ } => {
-                return Err(ErrorActive::Fetch(
-                    Fetch::UnexpectedFetchedBlockHashFormat {
-                        value: input_hash.to_string(),
-                    },
-                ))
+                return Err(Error::UnexpectedFetchedBlockHashFormat {
+                    value: input_hash.to_string(),
+                });
             }
             Hash::Genesis { url: _ } => {
-                return Err(ErrorActive::Fetch(
-                    Fetch::UnexpectedFetchedGenesisHashFormat {
-                        value: input_hash.to_string(),
-                    },
-                ))
+                return Err(Error::UnexpectedFetchedGenesisHashFormat {
+                    value: input_hash.to_string(),
+                })
             }
         },
     };
@@ -975,7 +931,8 @@ pub fn load_metadata_print(shortcut: &MetaShortCut) -> Result<()> {
         shortcut.meta_values.version
     );
     let content = ContentLoadMeta::generate(&shortcut.meta_values.meta, &shortcut.genesis_hash);
-    content.write(&filename)
+    content.write(&filename)?;
+    Ok(())
 }
 
 /// Write to file `add_specs` update payload as raw bytes.
@@ -990,5 +947,6 @@ pub fn add_specs_print(network_specs: &NetworkSpecsToSend) -> Result<()> {
         network_specs.encryption.show()
     );
     let content = ContentAddSpecs::generate(network_specs);
-    content.write(&filename)
+    content.write(&filename)?;
+    Ok(())
 }

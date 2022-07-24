@@ -2,13 +2,12 @@
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
+use crate::error::Result;
 use db_handling::{
     helpers::get_address_details,
     interface_signer::{first_network, SeedDraft},
 };
 use definitions::{
-    error::AddressKeySource,
-    error_signer::{ErrorSigner, ExtraAddressKeySourceSigner, Signer},
     helpers::{make_identicon_from_multisigner, multisigner_to_public},
     keyring::{AddressKey, NetworkSpecsKey},
     navigation::{Address, TransactionCardSet},
@@ -117,7 +116,7 @@ pub struct RecoverSeedPhraseState {
 pub struct EnteredInfo(pub String);
 
 impl KeysState {
-    pub fn new(seed_name: &str, database_name: &str) -> Result<Self, ErrorSigner> {
+    pub fn new(seed_name: &str, database_name: &str) -> Result<Self> {
         let network_specs = first_network(database_name)?;
         Ok(Self {
             seed_name: seed_name.to_string(),
@@ -228,15 +227,9 @@ impl KeysState {
 }
 
 impl AddressState {
-    pub fn new(
-        hex_address_key: &str,
-        keys_state: &KeysState,
-        database_name: &str,
-    ) -> Result<Self, ErrorSigner> {
+    pub fn new(hex_address_key: &str, keys_state: &KeysState, database_name: &str) -> Result<Self> {
         let address_key = AddressKey::from_hex(hex_address_key)?;
-        let multisigner = address_key.multi_signer::<Signer>(AddressKeySource::Extra(
-            ExtraAddressKeySourceSigner::Interface,
-        ))?;
+        let multisigner = address_key.multi_signer()?;
         let is_root =
             get_address_details(database_name, &AddressKey::from_multisigner(&multisigner))?
                 .is_root();
@@ -274,7 +267,7 @@ impl AddressStateMulti {
         network_specs_key: NetworkSpecsKey,
         multiselect: &[MultiSigner],
         database_name: &str,
-    ) -> Result<Self, ErrorSigner> {
+    ) -> Result<Self> {
         let mut set: Vec<(MultiSigner, bool)> = Vec::new();
         for multisigner in multiselect.iter() {
             let address_details =

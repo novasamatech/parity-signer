@@ -10,7 +10,7 @@ use sp_runtime::MultiSigner;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error(transparent)]
+    #[error("Database error. Internal error. {0}")]
     DbError(#[from] sled::Error),
 
     #[error(transparent)]
@@ -131,7 +131,7 @@ pub enum Error {
         genesis_hash: H256,
     },
 
-    #[error("general verifier not found")]
+    #[error("Could not find general verifier.")]
     GeneralVerifierNotFound,
 
     #[error("types were not found")]

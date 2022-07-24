@@ -2,7 +2,6 @@
 use constants::{ALICE_SEED_PHRASE, EXPORT_FOLDER};
 use definitions::{
     crypto::{Encryption, SufficientCrypto},
-    error_active::{Active, ErrorActive, InputActive},
     metadata::MetaValues,
     qr_transfers::{ContentAddSpecs, ContentLoadMeta, ContentLoadTypes},
 };
@@ -32,7 +31,7 @@ pub fn make_message(make: Make) -> Result<()> {
     let (message_to_verify, message_to_transfer, name_stub, msg_type_code) = match make.msg {
         Msg::LoadTypes(vec) => {
             let content = ContentLoadTypes::from_slice(&vec);
-            content.types::<Active>()?;
+            content.types()?;
             (
                 content.to_sign(),
                 content.to_transfer(),
@@ -42,20 +41,18 @@ pub fn make_message(make: Make) -> Result<()> {
         }
         Msg::LoadMetadata(vec) => {
             let content = ContentLoadMeta::from_slice(&vec);
-            let meta = content.meta::<Active>()?;
-            match MetaValues::from_slice_metadata(&meta) {
-                Ok(meta_values) => (
-                    content.to_sign(),
-                    content.to_transfer(),
-                    format!("load_metadata_{}V{}", meta_values.name, meta_values.version),
-                    "80",
-                ),
-                Err(e) => return Err(ErrorActive::Input(InputActive::FaultyMetadataInPayload(e))),
-            }
+            let meta = content.meta()?;
+            let meta_values = MetaValues::from_slice_metadata(&meta)?;
+            (
+                content.to_sign(),
+                content.to_transfer(),
+                format!("load_metadata_{}V{}", meta_values.name, meta_values.version),
+                "80",
+            )
         }
         Msg::AddSpecs(vec) => {
             let content = ContentAddSpecs::from_slice(&vec);
-            let network_specs = content.specs::<Active>()?;
+            let network_specs = content.specs()?;
             (
                 content.to_sign(),
                 content.to_transfer(),
@@ -148,7 +145,7 @@ pub fn make_message(make: Make) -> Result<()> {
                     .concat();
                     (complete_message, name_stub)
                 } else {
-                    return Err(ErrorActive::Input(InputActive::BadSignature));
+                    return Err(Error::BadSignature);
                 }
             }
             SufficientCrypto::Sr25519 { public, signature } => {
@@ -164,7 +161,7 @@ pub fn make_message(make: Make) -> Result<()> {
                     .concat();
                     (complete_message, name_stub)
                 } else {
-                    return Err(ErrorActive::Input(InputActive::BadSignature));
+                    return Err(Error::BadSignature);
                 }
             }
             SufficientCrypto::Ecdsa { public, signature } => {
@@ -180,7 +177,7 @@ pub fn make_message(make: Make) -> Result<()> {
                     .concat();
                     (complete_message, name_stub)
                 } else {
-                    return Err(ErrorActive::Input(InputActive::BadSignature));
+                    return Err(Error::BadSignature);
                 }
             }
         },
@@ -193,28 +190,20 @@ pub fn make_message(make: Make) -> Result<()> {
 
     match make.goal {
         Goal::Qr => {
-            if let Err(e) = make_pretty_qr(&complete_message, &output_name) {
-                return Err(ErrorActive::Qr(e.to_string()));
-            }
+            make_pretty_qr(&complete_message, &output_name).map_err(Error::Qr)?;
         }
         Goal::Text => {
-            if let Err(e) = std::fs::write(
+            std::fs::write(
                 &format!("{}.txt", output_name),
                 &hex::encode(&complete_message),
-            ) {
-                return Err(ErrorActive::Output(e));
-            }
+            )?;
         }
         Goal::Both => {
-            if let Err(e) = std::fs::write(
+            std::fs::write(
                 &format!("{}.txt", output_name),
                 &hex::encode(&complete_message),
-            ) {
-                return Err(ErrorActive::Output(e));
-            }
-            if let Err(e) = make_pretty_qr(&complete_message, &output_name) {
-                return Err(ErrorActive::Qr(e.to_string()));
-            }
+            )?;
+            make_pretty_qr(&complete_message, &output_name).map_err(Error::Qr)?;
         }
     }
 

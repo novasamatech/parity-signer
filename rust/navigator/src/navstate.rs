@@ -10,6 +10,7 @@ use definitions::navigation::{
     RightButton, ScreenData, ScreenNameType, ShieldAlert, TransactionType,
 };
 use sp_runtime::MultiSigner;
+use std::fmt::Write;
 use transaction_parsing::{entry_to_transactions_with_decoding, TransactionAction};
 use zeroize::Zeroize;
 
@@ -22,14 +23,14 @@ use crate::screens::{
 };
 use db_handling::interface_signer::{get_all_seed_names_with_identicons, guess};
 use definitions::{
-    error::{AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSource},
-    error_signer::{
-        ErrorSigner, ExtraAddressKeySourceSigner, InputSigner, InterfaceSigner, Signer,
-    },
+    error::ErrorSource,
+    error_signer::{ErrorSigner, InputSigner, InterfaceSigner, Signer},
     keyring::{AddressKey, NetworkSpecsKey},
     network_specs::Verifier,
     users::AddressDetails,
 };
+
+use crate::error::{Error, Result};
 
 ///State of the app as remembered by backend
 #[derive(Clone)]
@@ -115,7 +116,7 @@ impl State {
             }
             Err(e) => {
                 new_navstate.alert = Alert::Error;
-                errorline.push_str(&<Signer>::show(&e));
+                let _ = write!(&mut errorline, "{}", e);
             }
         }
 
@@ -138,7 +139,7 @@ impl State {
                                 Ok(()) => new_navstate.screen = Screen::Scan,
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
+                                    let _ = write!(&mut errorline, "{}", e);
                                 }
                             }
                         }
@@ -208,7 +209,7 @@ impl State {
                                 Ok(()) => new_navstate = Navstate::clean_screen(Screen::Log),
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
+                                    let _ = write!(&mut errorline, "{}", e);
                                 }
                             }
                         }
@@ -247,7 +248,7 @@ impl State {
                             Ok(()) => new_navstate = Navstate::clean_screen(Screen::Log),
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
-                                errorline.push_str(&<Signer>::show(&e));
+                                let _ = write!(&mut errorline, "{}", e);
                             }
                         }
                     }
@@ -272,12 +273,12 @@ impl State {
                                     Ok(a) => new_navstate = Navstate::clean_screen(Screen::Keys(a)),
                                     Err(e) => {
                                         new_navstate.alert = Alert::Error;
-                                        errorline.push_str(&<Signer>::show(&e));
+                                        let _ = write!(&mut errorline, "{}", e);
                                     }
                                 },
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
+                                    let _ = write!(&mut errorline, "{}", e);
                                 }
                             }
                         }
@@ -307,7 +308,7 @@ impl State {
                     }
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        errorline.push_str(&<Signer>::show(&e));
+                        let _ = write!(&mut errorline, "{}", e);
                     }
                 }
             }
@@ -324,12 +325,12 @@ impl State {
                             Ok(a) => new_navstate = Navstate::clean_screen(Screen::Keys(a)),
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
-                                errorline.push_str(&<Signer>::show(&e));
+                                let _ = write!(&mut errorline, "{}", e);
                             }
                         },
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     },
                     Err(_) => {
@@ -357,23 +358,21 @@ impl State {
                             )))
                     }
                     Err(e) => {
-                        if let ErrorSigner::AddressGeneration(AddressGeneration::Common(
-                            AddressGenerationCommon::DerivationExists(
-                                ref multisigner,
-                                ref address_details,
-                                _,
-                            ),
-                        )) = e
+                        if let db_handling::Error::DerivationExists {
+                            ref multisigner,
+                            ref address_details,
+                            ..
+                        } = e
                         {
                             new_navstate.screen = Screen::DeriveKey(
                                 derive_state.collided_with(multisigner, address_details),
                             );
                             new_navstate.modal = Modal::Empty;
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         } else {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
@@ -404,7 +403,7 @@ impl State {
                                         }
                                         Err(e) => {
                                             seed.zeroize();
-                                            if let ErrorSigner::WrongPasswordNewChecksum(c) = e {
+                                            if let transaction_signing::Error::WrongPasswordNewChecksum(c) = e {
                                                 if t.ok() {
                                                     new_navstate.screen = Screen::Transaction(
                                                         Box::new(t.update_checksum_sign(
@@ -421,7 +420,7 @@ impl State {
                                                 }
                                             }
                                             new_navstate.alert = Alert::Error;
-                                            errorline.push_str(&<Signer>::show(&e));
+                                            let _ = write!(&mut errorline, "{}", e);
                                         }
                                     }
                                 }
@@ -445,7 +444,7 @@ impl State {
                                 }
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
+                                    let _ = write!(&mut errorline, "{}", e);
                                 }
                             }
                         }
@@ -476,7 +475,7 @@ impl State {
                         },
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     },
                     transaction_parsing::TransactionAction::Read { .. } => {
@@ -508,7 +507,7 @@ impl State {
                                     }
                                     Err(e) => {
                                         new_navstate.alert = Alert::Error;
-                                        errorline.push_str(&<Signer>::show(&e));
+                                        let _ = write!(&mut errorline, "{}", e);
                                     }
                                 }
                             }
@@ -531,7 +530,7 @@ impl State {
                 }
                 Err(e) => {
                     new_navstate.alert = Alert::Error;
-                    errorline.push_str(&<Signer>::show(&e));
+                    let _ = write!(&mut errorline, "{}", e);
                 }
             },
             Screen::SignSufficientCrypto(ref s) => {
@@ -555,7 +554,7 @@ impl State {
                                 }
                                 Err(e) => {
                                     seed.zeroize();
-                                    if let ErrorSigner::WrongPassword = e {
+                                    if let transaction_signing::Error::WrongPassword = e {
                                         if s.ok() {
                                             new_navstate.screen =
                                                 Screen::SignSufficientCrypto(s.plus_one());
@@ -564,7 +563,7 @@ impl State {
                                         }
                                     }
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
+                                    let _ = write!(&mut errorline, "{}", e);
                                 }
                             }
                         }
@@ -598,14 +597,14 @@ impl State {
                                         }
                                         Err(e) => {
                                             new_navstate.alert = Alert::Error;
-                                            errorline.push_str(&<Signer>::show(&e));
+                                            let _ = write!(&mut errorline, "{}", e);
                                         }
                                     }
                                 }
                             }
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
-                                errorline.push_str(&<Signer>::show(&e));
+                                let _ = write!(&mut errorline, "{}", e);
                             }
                         }
                     }
@@ -629,7 +628,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {
@@ -656,7 +655,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {
@@ -666,7 +665,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
@@ -776,7 +775,7 @@ impl State {
                     alert: Alert::Empty,
                 },
                 Err(e) => {
-                    errorline.push_str(&<Signer>::show(&e));
+                    let _ = write!(&mut errorline, "{}", e);
                     Navstate {
                         screen: Screen::Log,
                         modal: Modal::Empty,
@@ -848,7 +847,7 @@ impl State {
                     }
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        errorline.push_str(&<Signer>::show(&e));
+                        let _ = write!(&mut errorline, "{}", e);
                     }
                 }
             }
@@ -896,7 +895,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
@@ -925,7 +924,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
@@ -948,7 +947,7 @@ impl State {
                     }
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        errorline.push_str(&<Signer>::show(&e));
+                        let _ = write!(&mut errorline, "{}", e);
                     }
                 },
                 _ => println!("RemoveTypes does nothing here"),
@@ -1089,7 +1088,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
@@ -1108,7 +1107,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
@@ -1126,7 +1125,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {
@@ -1168,7 +1167,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {
@@ -1193,7 +1192,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {
@@ -1239,7 +1238,7 @@ impl State {
                 }
                 Err(e) => {
                     new_navstate.alert = Alert::Error;
-                    errorline.push_str(&<Signer>::show(&e));
+                    let _ = write!(&mut errorline, "{}", e);
                 }
             },
             _ => println!("Swipe does nothing here"),
@@ -1260,7 +1259,7 @@ impl State {
                 }
                 Err(e) => {
                     new_navstate.alert = Alert::Error;
-                    errorline.push_str(&<Signer>::show(&e));
+                    let _ = write!(&mut errorline, "{}", e);
                 }
             },
             _ => println!("LongTap does nothing here"),
@@ -1305,7 +1304,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
@@ -1334,7 +1333,7 @@ impl State {
                         Ok(a) => new_navstate = Navstate::clean_screen(Screen::KeyDetailsMulti(a)),
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {
@@ -1378,7 +1377,7 @@ impl State {
                                 }
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
+                                    let _ = write!(&mut errorline, "{}", e);
                                 }
                             }
                         }
@@ -1448,7 +1447,7 @@ impl State {
         new_navstate: &Navstate,
         details_str: &str,
         dbname: &str,
-    ) -> Result<ScreenData, ErrorSigner> {
+    ) -> Result<ScreenData> {
         let sd = match new_navstate.screen {
             Screen::Log => {
                 let history = db_handling::manage_history::get_history(dbname)?;
@@ -1647,7 +1646,7 @@ impl State {
                         public_key: None,
                         identicon: None,
                         encryption: None,
-                        error: Some(<Signer>::show(&e)),
+                        error: Some(format!("{}", e)),
                     },
                 };
                 ScreenData::Settings { f }
@@ -1683,7 +1682,7 @@ impl State {
         &mut self,
         new_navstate: &mut Navstate,
         dbname: &str,
-    ) -> Result<Option<ModalData>, ErrorSigner> {
+    ) -> Result<Option<ModalData>> {
         let modal = match new_navstate.modal {
             Modal::Backup(ref seed_name) => Some(ModalData::Backup {
                 f: db_handling::interface_signer::backup_prep(dbname, seed_name)?,
@@ -1723,7 +1722,7 @@ impl State {
                         }
                         Err(e) => {
                             path.zeroize();
-                            return Err(e);
+                            return Err(e.into());
                         }
                     }
                 }
@@ -1842,7 +1841,7 @@ impl State {
         action: Action,
         details_str: &str,
         secret_seed_phrase: &str,
-    ) -> Result<ActionResult, String> {
+    ) -> Result<ActionResult> {
         let mut new_navstate = self.navstate.to_owned();
 
         if let Some(ref dbname) = self.dbname.clone() {
@@ -1904,7 +1903,7 @@ impl State {
             let screen_data = match self.get_screen_data(&new_navstate, details_str, dbname) {
                 Ok(sd) => sd,
                 Err(e) => {
-                    errorline.push_str(&<Signer>::show(&e));
+                    let _ = write!(&mut errorline, "{}", e);
                     //This is special error used only
                     //here; please do not change it to
                     //`Alert::Error` or app may get stuck
@@ -1919,7 +1918,7 @@ impl State {
             let modal_data = match self.get_modal_details(&mut new_navstate, dbname) {
                 Ok(md) => md,
                 Err(e) => {
-                    errorline.push_str(&<Signer>::show(&e));
+                    let _ = write!(&mut errorline, "{}", e);
                     new_navstate.alert = Alert::Error;
                     None
                 }
@@ -1936,7 +1935,7 @@ impl State {
                     }),
                     Ok(false) => Some(AlertData::Shield { f: None }),
                     Err(e) => Some(AlertData::ErrorData {
-                        f: e.anyhow().to_string(),
+                        f: format!("{}", e),
                     }),
                 },
             };
@@ -1957,7 +1956,7 @@ impl State {
 
             Ok(action_result)
         } else {
-            Err("db not initialized".to_string())
+            Err(Error::DbNotInitialized)
         }
     }
 
@@ -2126,20 +2125,16 @@ impl Navstate {
 fn process_hex_address_key_address_details(
     hex_address_key: &str,
     dbname: &str,
-) -> Result<(MultiSigner, AddressDetails), ErrorSigner> {
+) -> Result<(MultiSigner, AddressDetails)> {
     let address_key = AddressKey::from_hex(hex_address_key)?;
-    let multisigner = address_key.multi_signer::<Signer>(AddressKeySource::Extra(
-        ExtraAddressKeySourceSigner::Interface,
-    ))?;
+    let multisigner = address_key.multi_signer()?;
     let address_details = db_handling::helpers::get_address_details(dbname, &address_key)?;
     Ok((multisigner, address_details))
 }
 
-fn process_hex_address_key(hex_address_key: &str) -> Result<MultiSigner, ErrorSigner> {
+fn process_hex_address_key(hex_address_key: &str) -> Result<MultiSigner> {
     let address_key = AddressKey::from_hex(hex_address_key)?;
-    address_key.multi_signer::<Signer>(AddressKeySource::Extra(
-        ExtraAddressKeySourceSigner::Interface,
-    ))
+    Ok(address_key.multi_signer()?)
 }
 
 //TODO: tests should probably be performed here, as static object in lib.rs

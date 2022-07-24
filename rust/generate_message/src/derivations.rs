@@ -21,7 +21,6 @@
 //! `$ cargo run derivations -qr -title westend-sr25519 -payload
 //! my_westend_set.txt`
 use db_handling::identities::prepare_derivations_import;
-use definitions::error_active::ErrorActive;
 use qrcode_rtx::make_pretty_qr;
 
 use crate::error::{Error, Result};
@@ -59,29 +58,17 @@ pub fn process_derivations(x: Derivations) -> Result<()> {
     // output file name in `/generate_message/` folder
     let output_name = format!("derivations-{}", x.title);
     match x.goal {
-        Goal::Qr => {
-            if let Err(e) = make_pretty_qr(&complete_message, &output_name) {
-                return Err(ErrorActive::Qr(e.to_string()));
-            }
-        }
-        Goal::Text => {
-            if let Err(e) = std::fs::write(
-                &format!("{}.txt", output_name),
-                &hex::encode(&complete_message),
-            ) {
-                return Err(ErrorActive::Output(e));
-            }
-        }
+        Goal::Qr => make_pretty_qr(&complete_message, &output_name).map_err(Error::Qr)?,
+        Goal::Text => std::fs::write(
+            &format!("{}.txt", output_name),
+            &hex::encode(&complete_message),
+        )?,
         Goal::Both => {
-            if let Err(e) = std::fs::write(
+            std::fs::write(
                 &format!("{}.txt", output_name),
                 &hex::encode(&complete_message),
-            ) {
-                return Err(ErrorActive::Output(e));
-            }
-            if let Err(e) = make_pretty_qr(&complete_message, &output_name) {
-                return Err(ErrorActive::Qr(e.to_string()));
-            }
+            )?;
+            make_pretty_qr(&complete_message, &output_name).map_err(Error::Qr)?
         }
     }
     Ok(())

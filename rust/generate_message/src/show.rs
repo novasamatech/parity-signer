@@ -4,12 +4,11 @@ use blake2_rfc::blake2b::blake2b;
 use constants::HOT_DB_NAME;
 use db_handling::helpers::try_get_meta_values_by_name_version;
 use definitions::{
-    error_active::{Active, Check, ErrorActive, IncomingMetadataSourceActiveStr},
     metadata::{AddressBookEntry, MetaValues},
     network_specs::NetworkSpecsToSend,
 };
 
-use crate::error::{Error, Result};
+use crate::error::Result;
 use crate::helpers::{
     address_book_content, meta_history_content, network_specs_from_entry, network_specs_from_title,
     read_metadata_database,

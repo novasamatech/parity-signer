@@ -26,11 +26,7 @@ use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec::{Decode, Encode};
 
 use crate::crypto::Encryption;
-use crate::error::{Error, Result};
-#[cfg(feature = "active")]
-use crate::error_active::ErrorActive;
-#[cfg(feature = "signer")]
-use crate::error_signer::{ErrorSigner, InputSigner};
+use crate::error::Result;
 #[cfg(feature = "signer")]
 use crate::helpers::pic_types;
 use crate::network_specs::NetworkSpecsToSend;

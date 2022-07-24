@@ -20,7 +20,6 @@ use constants::{
 use db_handling::cold_default::{init_db, populate_cold_nav_test};
 use definitions::{
     crypto::Encryption,
-    error_signer::Signer,
     history::{
         Event, IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
         NetworkSpecsExport, SignDisplay, SignMessageDisplay, TypesDisplay, TypesExport,
@@ -293,7 +292,7 @@ fn erase_public_keys(m: &mut ScreenData) {
 fn flow_test_1() {
     let dbname = "for_tests/flow_test_1";
     populate_cold_nav_test(dbname).unwrap();
-    init_db::<Signer>(dbname, verifier_alice_sr25519()).unwrap();
+    init_db(dbname, verifier_alice_sr25519()).unwrap();
     init_navigation(dbname, Vec::new());
 
     let action = do_action(Action::Start, "", "").unwrap().unwrap();
@@ -6471,7 +6470,7 @@ fn flow_test_1() {
 
     {
         // database got unavailable for some reason
-        let _database = db_handling::helpers::open_db::<Signer>(dbname).unwrap();
+        let _database = db_handling::helpers::open_db(dbname).unwrap();
 
         let mut action = do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
         let expected_alert = "Database error. Internal error. IO error: could not acquire lock on \"for_tests/flow_test_1/db\": Os {**}".to_string();
