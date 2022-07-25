@@ -2,7 +2,6 @@ use crate::{parse_and_display_set, Error};
 use definitions::network_specs::ShortSpecs;
 use frame_metadata::RuntimeMetadata;
 use parity_scale_codec::Decode;
-use pretty_assertions::assert_eq;
 
 fn metadata(filename: &str) -> RuntimeMetadata {
     let metadata_hex = std::fs::read_to_string(&filename).unwrap();

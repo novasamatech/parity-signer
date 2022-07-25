@@ -23,8 +23,6 @@ use crate::screens::{
 };
 use db_handling::interface_signer::{get_all_seed_names_with_identicons, guess};
 use definitions::{
-    error::ErrorSource,
-    error_signer::{ErrorSigner, InputSigner, InterfaceSigner, Signer},
     keyring::{AddressKey, NetworkSpecsKey},
     network_specs::Verifier,
     users::AddressDetails,
@@ -282,11 +280,9 @@ impl State {
                                 }
                             }
                         }
-                        Err(_) => {
+                        Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(
-                                InterfaceSigner::FlagNotBool(details_str.to_string()),
-                            )));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     },
                     _ => println!("GoForward does nothing here"),
@@ -301,9 +297,11 @@ impl State {
                             ))
                         } else {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&ErrorSigner::Input(
-                                InputSigner::SeedNameExists(details_str.to_string()),
-                            )));
+                            let _ = write!(
+                                &mut errorline,
+                                "Bad input data. Seed name {} already exists.",
+                                details_str
+                            );
                         }
                     }
                     Err(e) => {
@@ -333,11 +331,9 @@ impl State {
                             let _ = write!(&mut errorline, "{}", e);
                         }
                     },
-                    Err(_) => {
+                    Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(
-                            InterfaceSigner::FlagNotBool(details_str.to_string()),
-                        )));
+                        let _ = write!(&mut errorline, "{}", e);
                     }
                 }
             }
@@ -514,7 +510,8 @@ impl State {
                             Modal::Empty => {
                                 if self.seed_names.is_empty() {
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&ErrorSigner::NoKnownSeeds));
+
+                                    let _ = write!(&mut errorline, "No known seeds");
                                 } else {
                                     new_navstate.modal = Modal::SelectSeed;
                                 }
@@ -1055,11 +1052,9 @@ impl State {
                 Ok(version) => {
                     new_navstate.modal = Modal::ManageMetadata(version);
                 }
-                Err(_) => {
+                Err(e) => {
                     new_navstate.alert = Alert::Error;
-                    errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(
-                        InterfaceSigner::VersionNotU32(details_str.to_string()),
-                    )));
+                    let _ = write!(&mut errorline, "{}", e);
                 }
             },
             _ => println!("ManageMetadata does nothing here"),
@@ -1213,11 +1208,9 @@ impl State {
                 // details_str is u32 order which will be shown
                 match details_str.parse::<u32>() {
                     Ok(order) => new_navstate = Navstate::clean_screen(Screen::LogDetails(order)),
-                    Err(_) => {
+                    Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(
-                            InterfaceSigner::OrderNotU32(details_str.to_string()),
-                        )));
+                        let _ = write!(&mut errorline, "{}", e);
                     }
                 }
             }
@@ -1381,11 +1374,10 @@ impl State {
                                 }
                             }
                         }
-                        Err(_) => {
+                        Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(
-                                InterfaceSigner::IncNotU32(details_str.to_string()),
-                            )));
+
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {

@@ -30,6 +30,3 @@ test = ["defaults/active"]
 [lib]
 name = "parser"
 crate-type = ["lib"]
-
-[dev-dependencies]
-pretty_assertions = "1.2.1"
