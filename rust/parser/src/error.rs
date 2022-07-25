@@ -6,7 +6,7 @@ pub enum Error {
     SeparateMethodExtensions,
 
     /// Errors occuring during the decoding procedure.
-    #[error(transparent)]
+    #[error("Error parsing incoming transaction content. {0}")]
     Decoding(#[from] ParserDecodingError),
 
     /// Errors occuring because the metadata
@@ -176,17 +176,19 @@ pub enum ParserMetadataError {
 pub enum ParserDecodingError {
     /// Transaction was announced by the prelude to be mortal (`53xx00`),
     /// but has `Era::Immortal` in extensions
-    #[error("transaction was announced by the prelude to be mortal")]
+    #[error("Expected mortal transaction due to prelude format. Found immortal transaction.")]
     UnexpectedImmortality,
 
     /// Transaction was announced by the prelude to be immortal (`53xx02`),
     /// but has `Era::Mortal(_, _)` in extensions
-    #[error("transaction was announced by the prelude to be immortal")]
+    #[error("Expected immortal transaction due to prelude format. Found mortal transaction.")]
     UnexpectedMortality,
 
     /// Genesis hash cut from the end of the transaction doen not match the one
     /// found in the extensions
-    #[error("genesis hash mismatch")]
+    #[error(
+        "Genesis hash values from decoded extensions and from used network specs do not match."
+    )]
     GenesisHashMismatch,
 
     /// In immortal transaction the block hash from the extensions is the
@@ -194,18 +196,18 @@ pub enum ParserDecodingError {
     ///
     /// This error happens when block hash is different with the genesis hash
     /// cut from the end of the transaction.
-    #[error("immortal hash mismatch")]
+    #[error("Block hash for immortal transaction not matching genesis hash for the network.")]
     ImmortalHashMismatch,
 
     /// Error decoding the extensions using metadata with `RuntimeMetadataV12`
     /// or `RuntimeMetadataV13`, with default extensions set.
-    #[error("decoding older metadata")]
+    #[error("Unable to decode extensions for V12/V13 metadata using standard extensions set.")]
     ExtensionsOlder,
 
     /// Used only for `RuntimeMetadataV12` or `RuntimeMetadataV13`,
     /// indicates that method index (second byte of the call data) is not valid
     /// for the pallet with found name.
-    #[error("method not found {method_index} {pallet_name}")]
+    #[error("Method number {method_index} not found in pallet {pallet_name}.")]
     MethodNotFound {
         /// index of the method, second byte of the call data
         method_index: u8,
@@ -219,45 +221,45 @@ pub enum ParserDecodingError {
     /// call data is not a valid pallet index.
     ///
     /// Associated data is what was thought to be a pallet index.
-    #[error("pallet not found {0}")]
+    #[error("Pallet with index {0} not found.")]
     PalletNotFound(u8),
 
     /// Only for entry call in `RuntimeMetadataV14`. Pallet found via first byte
     /// of the call has no associated calls.
     ///
     /// Associated data is the pallet name.
-    #[error("no calls in pallet {0}")]
+    #[error("No calls found in pallet {0}.")]
     NoCallsInPallet(String),
 
     /// Only for `RuntimeMetadataV14`. Found type index could not be resolved
     /// in types registry
-    #[error("type not resolved")]
+    #[error("Referenced type could not be resolved in v14 metadata.")]
     V14TypeNotResolved,
 
     /// Only for `RuntimeMetadataV12` and `RuntimeMetadataV13`. Argument type
     /// could not be taken out of `DecodeDifferent` construction.
-    #[error("argument type error")]
+    #[error("Argument type error.")]
     ArgumentTypeError,
 
     /// Only for `RuntimeMetadataV12` and `RuntimeMetadataV13`. Argument name
     /// could not be taken out of `DecodeDifferent` construction.
-    #[error("argument name error")]
+    #[error("Argument name error.")]
     ArgumentNameError,
 
     /// Parser was trying to find an encoded
     /// [`compact`](https://docs.rs/parity-scale-codec/latest/parity_scale_codec/struct.Compact.html),
     /// in the bytes sequence, but was unable to.
-    #[error("no encoded found")]
+    #[error("Expected compact. Not found it.")]
     NoCompact,
 
     /// Parser was expecting more data.
-    #[error("data too short")]
+    #[error("Data too short for expected content.")]
     DataTooShort,
 
     /// Parser was unable to decode the data piece into a primitive type.
     ///
     /// Associated data is primitive identifier.
-    #[error("decoding primitive error {0}")]
+    #[error("Unable to decode part of data as {0}.")]
     PrimitiveFailure(String),
 
     /// SCALE-encoded `Option<_>` can have as a first byte:
@@ -268,7 +270,7 @@ pub enum ParserDecodingError {
     ///
     /// This error appears if the parser encounters something unexpected in the
     /// first byte of encoded `Option<_>` instead.
-    #[error("unexpected option variant")]
+    #[error("Encountered unexpected Option<_> variant.")]
     UnexpectedOptionVariant,
 
     /// Only for `RuntimeMetadataV12` and `RuntimeMetadataV13`.
@@ -278,7 +280,7 @@ pub enum ParserDecodingError {
     /// [`IdentityField`](https://docs.substrate.io/rustdocs/latest/pallet_identity/enum.IdentityField.html)
     /// in types information. If types information has no entry for
     /// `IdentityFields` or it is not an enum, this error appears.
-    #[error("no identityfield found")]
+    #[error("IdentityField description error.")]
     IdFields,
 
     /// Parser processes certain types as balance (i.e. transforms the data
@@ -286,20 +288,20 @@ pub enum ParserDecodingError {
     /// For some types the balance representation is not possible, this error
     /// occurs if the parser tried to process as a balance some type not
     /// suitable for it.
-    #[error("balance not described")]
+    #[error("Unexpected type encountered for Balance.")]
     BalanceNotDescribed,
 
     /// SCALE-encoded enum can have as a first byte only correct index of the
     /// variant used.
     ///
     /// This error appears if the first byte is an invalid variant index.
-    #[error("unexpected enum variant")]
+    #[error("Encountered unexpected enum variant.")]
     UnexpectedEnumVariant,
 
     /// Parser found that type declared as a
     /// [`compact`](https://docs.rs/parity-scale-codec/latest/parity_scale_codec/struct.Compact.html)
     /// has inner type that could not be encoded as a `compact`
-    #[error("unexpected compact insides")]
+    #[error("Unexpected type inside comact.")]
     UnexpectedCompactInsides,
 
     /// Only for `RuntimeMetadataV12` and `RuntimeMetadataV13`.
@@ -308,7 +310,7 @@ pub enum ParserDecodingError {
     ///
     /// Associated data is the type description as it was received by parser
     /// from the metadata.
-    #[error("unknown type {0}")]
+    #[error("No description found for type {0}.")]
     UnknownType(String),
 
     /// Only for `RuntimeMetadataV14`.
@@ -316,7 +318,7 @@ pub enum ParserDecodingError {
     /// [`BitVec<T,O>`](https://docs.rs/bitvec/1.0.0/bitvec/vec/struct.BitVec.html),
     /// parser encountered `T` type not implementing
     /// [`BitStore`](https://docs.rs/bitvec/1.0.0/bitvec/store/trait.BitStore.html).
-    #[error("not bit store type")]
+    #[error("Declared type is not suitable BitStore type for BitVec.")]
     NotBitStoreType,
 
     /// Only for `RuntimeMetadataV14`.
@@ -324,30 +326,30 @@ pub enum ParserDecodingError {
     /// [`BitVec<T,O>`](https://docs.rs/bitvec/1.0.0/bitvec/vec/struct.BitVec.html),
     /// parser encountered `O` type not implementing
     /// [`BitOrder`](https://docs.rs/bitvec/1.0.0/bitvec/order/trait.BitOrder.html).
-    #[error("not bit order type")]
+    #[error("Declared type is not suitable BitOrder type for BitVec.")]
     NotBitOrderType,
 
     /// Only for `RuntimeMetadataV14`.
     /// Parser failed to decode
     /// [`BitVec<T,O>`](https://docs.rs/bitvec/1.0.0/bitvec/vec/struct.BitVec.html),
     /// even though `T` and `O` types were suitable.
-    #[error("bit vec failure")]
+    #[error("Could not decode BitVec.")]
     BitVecFailure,
 
     /// Only for `RuntimeMetadataV14`.
     /// Parser failed to decode data slice as
     /// [`Era`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/generic/enum.Era.html).
-    #[error("failed to decode as era")]
+    #[error("Could not decode Era.")]
     Era,
 
     /// Parser expects to use all data in decoding. This error appears if some
     /// data was not used in parsing of the method.
-    #[error("some data was not used in decoding")]
+    #[error("After decoding the method some data remained unused.")]
     SomeDataNotUsedMethod,
 
     /// Only for `RuntimeMetadataV14`.
     /// Parser expects to use all data in decoding. This error appears if some
     /// data from extensions is not used in the decoding.
-    #[error("some data not used extensions")]
+    #[error("After decoding the extensions some data remained unused.")]
     SomeDataNotUsedExtensions,
 }

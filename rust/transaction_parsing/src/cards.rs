@@ -268,7 +268,7 @@ impl<'a> Card<'a> {
             Card::Derivations(x) => NavCard::DerivationsCard { f: x.to_vec() },
             Card::Warning(warn) => NavCard::WarningCard { f: warn.show() },
             Card::Error(err) => NavCard::ErrorCard {
-                f: format!("{}", err),
+                f: format!("Bad input data. {}", err),
             },
         };
 

@@ -3253,7 +3253,7 @@ Identities:
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt")
             .unwrap();
-    let error = "Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
+    let error = "Bad input data. Database error. Internal error. Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
 
     let output = produce_output(line.trim(), dbname);
     let reply_known = TransactionCardSet {
@@ -3276,7 +3276,7 @@ Identities:
             .unwrap();
     let output = produce_output(line.trim(), dbname);
 
-    let error = "Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
+    let error = "Bad input data. Database error. Internal error. Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
     let reply_known = TransactionCardSet {
         error: Some(vec![TransactionCard {
             index: 0,

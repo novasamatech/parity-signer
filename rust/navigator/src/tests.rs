@@ -5189,7 +5189,7 @@ fn flow_test_1() {
                         indent: 0,
                         card: Card::ErrorCard {
                             f: concat!(
-                                "Failed to decode extensions. ",
+                                "Bad input data. Failed to decode extensions. ",
                                 "Please try updating metadata for westend network. ",
                                 "Parsing with westend9150 metadata: Network spec version ",
                                 "decoded from extensions (9010) differs from the version ",

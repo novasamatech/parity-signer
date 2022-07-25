@@ -25,7 +25,10 @@ pub enum Error {
     #[error("custom verifier is general")]
     CustomVerifierIsGeneral(VerifierKey),
 
-    #[error("verifier is dead")]
+    #[error(
+        "Network with genesis hash {} is disabled. It could be enabled again only after complete wipe and re-installation of Signer.",
+        hex::encode(.0.genesis_hash()),
+    )]
     DeadVerifier(VerifierKey),
 
     #[error("network {name} has no entry but the genesis {genesis_hash} exists")]

@@ -437,21 +437,10 @@ mod tests {
             "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
         let network_specs_key = NetworkSpecsKey::from_hex(network_specs_key_hex).unwrap();
         let error = network_specs_key.genesis_hash_encryption().unwrap_err();
-        let error_print = format!("{}", error);
-        let expected_error_print = "Error on the interface. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e passed through the interface.";
-        assert!(
-            error_print == expected_error_print,
-            "Received: \n{}",
-            error_print
-        );
-        let error = network_specs_key.genesis_hash_encryption().unwrap_err();
-        let error_print = format!("{}", error);
-        let expected_error_print = "Database error. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e from the database.";
-        assert!(
-            error_print == expected_error_print,
-            "Received: \n{}",
-            error_print
-        );
+        if let Error::CodecError(_) = error {
+        } else {
+            panic!("Expected codec error, received {:?}", error);
+        }
     }
 
     #[test]
@@ -461,12 +450,9 @@ mod tests {
         let network_specs_key =
             NetworkSpecsKey::from_ivec(&IVec::from(hex::decode(network_specs_key_hex).unwrap()));
         let error = network_specs_key.genesis_hash_encryption().unwrap_err();
-        let error_print = format!("{}", error);
-        let expected_error_print = "Database error. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e from the database.";
-        assert!(
-            error_print == expected_error_print,
-            "Received: \n{}",
-            error_print
-        );
+        if let Error::CodecError(_) = error {
+        } else {
+            panic!("Expected codec error, received {:?}", error);
+        }
     }
 }

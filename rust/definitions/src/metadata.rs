@@ -716,10 +716,10 @@ mod tests {
         let filename = String::from("for_tests/edgeware");
         let meta = read_to_string(&filename).unwrap();
 
-        match MetaValues::from_str_metadata(&meta) {
+        match MetaValues::from_str_metadata(meta.trim()) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
             Err(e) => {
-                if let Error::WrongPublicKeyLength = e {
+                if let Error::MetadataError(MetadataError::NoVersionInConstants) = e {
                 } else {
                     panic!("expected Error::WrongPublicKeyLength, got {:?}", e);
                 }
@@ -735,7 +735,7 @@ mod tests {
         match MetaValues::from_str_metadata(meta.trim()) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
             Err(e) => {
-                if let Error::WrongPublicKeyLength = e {
+                if let Error::MetadataError(MetadataError::VersionIncompatible) = e {
                 } else {
                     panic!("expected Error::WrongPublicKeyLength, got {:?}", e);
                 }
