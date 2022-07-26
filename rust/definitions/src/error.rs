@@ -1,5 +1,3 @@
-//! Trait [`ErrorSource`] and error-related types shared by Signer and active
-//! sides
 use hex::FromHexError;
 use sp_core::H256;
 #[cfg(feature = "test")]

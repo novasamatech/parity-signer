@@ -113,10 +113,10 @@ pub enum Error {
 
     #[error("address book specs name")]
     AddressBookSpecsName {
-        /// name in [`AddressBookEntry`](crate::metadata::AddressBookEntry)
+        /// name in [`AddressBookEntry`](definitions::metadata::AddressBookEntry)
         address_book_name: String,
 
-        /// name in [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+        /// name in [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
         specs_name: String,
     },
 
@@ -227,7 +227,7 @@ pub enum Error {
     Input(#[from] InputActive),
 
     /// Provided data signature (entered separately or as a part of
-    /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) input) is invalid
+    /// [`SufficientCrypto`](definitions::crypto::SufficientCrypto) input) is invalid
     /// for given public key and data.
     #[error("bad signature")]
     BadSignature,

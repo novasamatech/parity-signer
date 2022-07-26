@@ -69,7 +69,7 @@ pub enum Error {
         encryption: Encryption,
     },
 
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) needed to parse
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) needed to parse
     /// historical transactions saved into history log, searched by network
     /// name and encryption.
     #[error(
@@ -84,9 +84,9 @@ pub enum Error {
     #[error(transparent)]
     Sled(#[from] sled::Error),
 
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
     /// received in `add_specs` payload are for a network that already has
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry in
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
     /// the `SPECSTREE` tree of the Signer database with **same**
     /// [`NetworkSpecsKey`], and the permanent components of the network
     /// specs stores and received are different.
@@ -176,7 +176,7 @@ pub enum Error {
 
     /// Received signable transaction (with prelude `53xx00`, `53xx02` or
     /// `53xx03`) is generated in the network that has no corresponding
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry in the
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in the
     /// `SPECSTREE` tree of the database.
     #[error(
         "Input generated within unknown network and could not be processed. Add network with genesis hash {} and encryption {}.",
@@ -192,9 +192,9 @@ pub enum Error {
     #[error("Received message could not be read.")]
     Codec(#[from] parity_scale_codec::Error),
 
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
     /// received in `add_specs` payload are for a network that already has
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry in
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
     /// the `SPECSTREE` tree of the Signer database with not necessarily
     /// same encryption, i.e. **possibly different** [`NetworkSpecsKey`],
     /// and base58 prefix in stored network specs is different from the base58
@@ -210,9 +210,9 @@ pub enum Error {
         base58_input: u16,
     },
 
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
     /// received in `add_specs` payload are for a network that already has
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry in
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
     /// the `SPECSTREE` tree of the Signer database with not necessarily
     /// same encryption, i.e. **possibly different** [`NetworkSpecsKey`],
     /// and network name in stored network specs is different from the network
@@ -224,7 +224,7 @@ pub enum Error {
         name_input: String,
     },
 
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecs) from the
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecs) from the
     /// received `add_specs` payload already have an entry in `SPECSTREE` tree
     /// of the database.
     ///
@@ -269,7 +269,7 @@ pub enum Error {
     /// `new_verifier_value` is not the general verifier.
     ///
     /// Custom verifier could be upgraded only to general one, see
-    /// [here](crate::network_specs).
+    /// [here](definitions::network_specs).
     #[error("Network {name} current verifier is {}. Received add_specs message is verified by {}, which is neither current network verifier not the general verifier. Changing the network verifier to another non-general one would require wipe and reset of Signer.",
         .old_verifier_value.show_error(),
         .new_verifier_value.show_error(),
@@ -335,7 +335,7 @@ pub enum Error {
     TypesKnown,
 
     /// User attempted to load into Signer the metadata for the network that
-    /// has no [`CurrentVerifier`](crate::network_specs::CurrentVerifier) entry
+    /// has no [`CurrentVerifier`](definitions::network_specs::CurrentVerifier) entry
     /// in the `VERIFIERS` tree of the Signer database.
     #[error(
         "Network {name} is not in the database. Add network specs before loading the metadata."
@@ -346,10 +346,10 @@ pub enum Error {
     },
 
     /// User attempted to load into Signer the metadata for the network that
-    /// has no associated [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
+    /// has no associated [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
     /// entries in the `SPECSTREE` tree of the Signer database, although it has
     /// an associated
-    /// [`ValidCurrentVerifier`](crate::network_specs::ValidCurrentVerifier),
+    /// [`ValidCurrentVerifier`](definitions::network_specs::ValidCurrentVerifier),
     /// i.e. it was known to user at some point and never disabled.
     #[error(
         "Network {name} was previously known to the database with verifier {}. However, no network specs are in the database at the moment. Add network specs before loading the metadata.",
@@ -360,7 +360,7 @@ pub enum Error {
         name: String,
 
         /// network-associated
-        /// [`ValidCurrentVerifier`](crate::network_specs::ValidCurrentVerifier)
+        /// [`ValidCurrentVerifier`](definitions::network_specs::ValidCurrentVerifier)
         valid_current_verifier: ValidCurrentVerifier,
 
         /// Signer general verifier
@@ -368,7 +368,7 @@ pub enum Error {
     },
 
     /// User attempted to load into Signer the metadata for the network that
-    /// has a [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry in the
+    /// has a [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in the
     /// `SPECSTREE` tree of the Signer database, but specs have a different
     /// network name.
     ///
@@ -420,7 +420,7 @@ pub enum Error {
     /// `new_verifier_value` is not the general verifier.
     ///
     /// Custom verifier could be upgraded only to general one, see
-    /// [here](crate::network_specs), and during that network specs must be
+    /// [here](definitions::network_specs), and during that network specs must be
     /// updated prior to loading the metadata.
     #[error(
         "Network {name} current verifier is {}. Received load_metadata message is verified by {}. Changing verifier for the network would require wipe and reset of Signer.",
@@ -507,7 +507,7 @@ pub enum Error {
         version: u32,
     },
 
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) for network in
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) for network in
     /// which the imported derivations are user to create addresses.
     #[error(
         "Unable to import derivations for network with genesis hash {} and encryption {}. Network is unknown. Please add corresponding network specs.",

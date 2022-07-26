@@ -1,4 +1,4 @@
-//! Errors occuring on the active side, i.e. while operating `generate_message`
+//! Errors occurring on the active side, i.e. while operating `generate_message`
 //! client
 //!
 //! Active side deals with both preparation of cold database that would be
@@ -6,13 +6,10 @@
 //! could be the *release* cold database (the actual one for Signer build) or
 //! the *test* cold database (with test Alice identities, used for tests).
 //!
-//! All errors [`ErrorActive`] could be displayed to user as error messages in
+//! All errors could be displayed to user as error messages in
 //! `generate_message` client, and are implementing `Display` trait.
 //!
 //! Exact error wording will be refined eventually.
-//!
-//! This module gathers all possible [`ErrorActive`] errors in one place, so that
-//! error management is easier.
 
 use sp_core::H256;
 
@@ -23,7 +20,7 @@ use crate::{
     metadata::AddressBookEntry,
 };
 
-/// NotHex errors occuring on the Active side
+/// NotHex errors occurring on the Active side
 ///
 /// Expected to receive data in hexadecimal format, got something different.
 /// [`NotHexActive`] specifies what was expected.
@@ -121,9 +118,6 @@ pub enum ExtraAddressGenerationActive {}
 /// Describes errors with already existing database content (e.g. damaged keys,
 /// damaged values, various mismatches, data that could not have been added to
 /// the database in the first place etc).
-///
-/// Note that [`NotFoundActive`] is a separate set of errors. Things **not
-/// found** are kept separately here from things **damaged**.
 #[derive(Debug)]
 pub enum DatabaseActive {
     /// Key used in one of the database trees has invalid content, and could

@@ -5,11 +5,11 @@ pub enum Error {
     #[error("can not separate method from extensions, bad transaction")]
     SeparateMethodExtensions,
 
-    /// Errors occuring during the decoding procedure.
+    /// Errors occurring during the decoding procedure.
     #[error("Error parsing incoming transaction content. {0}")]
     Decoding(#[from] ParserDecodingError),
 
-    /// Errors occuring because the metadata
+    /// Errors occurring because the metadata
     /// [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
     /// has extensions not acceptable in existing safety paradigm for
     /// signable transactions.

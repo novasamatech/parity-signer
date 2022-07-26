@@ -32,7 +32,7 @@ pub enum Error {
     #[error(transparent)]
     Codec(#[from] parity_scale_codec::Error),
 
-    /// Network [`CurrentVerifier`](crate::network_specs::CurrentVerifier) is
+    /// Network [`CurrentVerifier`](definitions::network_specs::CurrentVerifier) is
     /// `ValidCurrentVerifier::Custom(_)`, but the custom verifier value
     /// coincides with the general verifier.
     ///
@@ -57,10 +57,10 @@ pub enum Error {
     DeadVerifier(VerifierKey),
 
     /// Network has no entry for
-    /// [`CurrentVerifier`](crate::network_specs::CurrentVerifier) under
+    /// [`CurrentVerifier`](definitions::network_specs::CurrentVerifier) under
     /// `verifier_key` in `VERIFIERS` tree of the database, however, the
     /// corresponding genesis hash is encountered in a
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry under
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry under
     /// `network_specs_key` in `SPECSTREE` tree of the database.
     /// No network specs record can get into database without the verifier
     /// entry, and the verifier could not be removed while network specs still
@@ -75,11 +75,11 @@ pub enum Error {
     #[error(transparent)]
     DefinitionsError(#[from] definitions::error::Error),
 
-    /// History log [`Entry`](crate::history::Entry) stored in `HISTORY` tree
-    /// of the Signer database under the key [`Order`](crate::keyring::Order)
+    /// History log [`Entry`](definitions::history::Entry) stored in `HISTORY` tree
+    /// of the Signer database under the key [`Order`](definitions::keyring::Order)
     /// could not be decoded.
     ///
-    /// Associated data is the corresponding [`Order`].
+    /// Associated data is the corresponding [`Order`](definitions::keyring::Order).
     #[error("Unable to decode history entry for order {0}")]
     HistoryEntryNotFound(u32),
 
@@ -114,7 +114,7 @@ pub enum Error {
     /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
     /// from the navigation state `Navstate`.
     /// `MultiSigner` gets transformed into [`AddressKey`] and corresponds to
-    /// [`AddressDetails`](crate::users::AddressDetails) that are exported.
+    /// [`AddressDetails`](definitions::users::AddressDetails) that are exported.
     /// `AddressDetails` also contain `seed_name` field, that must coincide
     /// with the one received directly from the navigator.
     /// This error appears if the seed names are different.
@@ -138,7 +138,7 @@ pub enum Error {
     Qr(String),
 
     /// [`NetworkSpecsKey`] of a network in `network_id` field of the
-    /// [`AddressDetails`](crate::users::AddressDetails) corresponding to
+    /// [`AddressDetails`](definitions::users::AddressDetails) corresponding to
     /// [`AddressKey`].
     ///
     /// This happens when the derivation is created in some other network(s), but
@@ -283,21 +283,21 @@ pub enum Error {
         genesis_hash: H256,
     },
 
-    /// General verifier [`Verifier`](crate::network_specs::Verifier) information
+    /// General verifier [`Verifier`](definitions::network_specs::Verifier) information
     /// stored in `SETTREE` tree of the database under key `GENERALVERIFIER`.
     ///
     /// Missing general verifier always indicates the database corruption.
     #[error("Could not find general verifier.")]
     GeneralVerifierNotFound,
 
-    /// [`DangerRecord`](crate::danger::DangerRecord) information
+    /// [`DangerRecord`](definitions::danger::DangerRecord) information
     /// stored in `SETTREE` tree of the database under key `DANGER`.
     ///
     /// Missing `DangerRecord` always indicates the database corruption.
     #[error("Types not found.")]
     TypesNotFound,
 
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) for a network
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) for a network
     /// in `SPECSTREE` tree of the Signer database, searched by
     /// [`NetworkSpecsKey`].
     ///
@@ -305,7 +305,7 @@ pub enum Error {
     #[error("Could not find network specs for network specs key {}.", hex::encode(.0.key()))]
     NetworkSpecsNotFound(NetworkSpecsKey),
 
-    /// [`AddressDetails`](crate::users::AddressDetails) for [`AddressKey`] in
+    /// [`AddressDetails`](definitions::users::AddressDetails) for [`AddressKey`] in
     /// `ADDRTREE` tree of the Signer database.
     ///
     /// Associated data is the `AddressKey` used for search.
@@ -329,7 +329,7 @@ pub enum Error {
     #[error("Checksum mismatch.")]
     ChecksumMismatch,
 
-    /// [`DangerRecord`](crate::danger::DangerRecord) information
+    /// [`DangerRecord`](definitions::danger::DangerRecord) information
     /// stored in `SETTREE` tree of the database under key `DANGER`.
     ///
     /// Missing `DangerRecord` always indicates the database corruption.

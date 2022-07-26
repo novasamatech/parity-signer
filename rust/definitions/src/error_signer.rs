@@ -1,8 +1,8 @@
-//! Errors occuring in Signer
+//! Errors occurring in Signer
 //!
 //! Signer works with cold database only.
 //!
-//! All errors [`ErrorSigner`] could be displayed to user:
+//! All errors could be displayed to user:
 //! - as part of card set, generated during transaction parsing  
 //! - as individual text errors through `Error` modal in `navigator`
 //! - as `anyhow` errors produced by the Signer device
@@ -11,7 +11,7 @@
 //! must clearly indicate what happened and what user can try to do to fix the
 //! issue. Error wording must be yet polished extensively.
 //!
-//! This module gathers all possible [`ErrorSigner`] errors in one place, so that
+//! This module gathers all possible errors in one place, so that
 //! error management is easier.
 
 #[cfg(feature = "test")]
@@ -35,10 +35,10 @@ pub enum GeneralVerifierForContent {
 pub enum ParserError {
     SeparateMethodExtensions,
 
-    /// Errors occuring during the decoding procedure.
+    /// Errors occurring during the decoding procedure.
     Decoding(ParserDecodingError),
 
-    /// Errors occuring because the metadata
+    /// Errors occurring because the metadata
     /// [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
     /// has extensions not acceptable in existing safety paradigm for
     /// signable transactions.
@@ -307,7 +307,7 @@ pub enum ParserDecodingError {
     SomeDataNotUsedExtensions,
 }
 
-/// Errors occuring because the network metadata
+/// Errors occurring because the network metadata
 /// [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
 /// has extensions not compatible with Signer.
 ///
