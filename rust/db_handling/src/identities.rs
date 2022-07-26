@@ -684,7 +684,7 @@ pub(crate) fn is_passworded(path: &str) -> Result<bool> {
     let passworded = REG_PATH
         .captures(path)
         .map(|caps| caps.name("password").is_some())
-        .ok_or(Error::InvalidDerivation)?;
+        .ok_or(Error::InvalidDerivation(path.to_string()))?;
 
     Ok(passworded)
 }
@@ -781,11 +781,13 @@ pub fn derivation_check(
 // TODO regex and secrets, see `create_address` comments.
 #[cfg(feature = "signer")]
 pub fn cut_path(path: &str) -> Result<(String, String)> {
-    let caps = REG_PATH.captures(path).ok_or(Error::InvalidDerivation)?;
+    let caps = REG_PATH
+        .captures(path)
+        .ok_or(Error::InvalidDerivation(path.to_string()))?;
     let cropped_path = caps
         .name("path")
         .map(|a| a.as_str().to_string())
-        .ok_or(Error::InvalidDerivation)?;
+        .ok_or(Error::InvalidDerivation(path.to_string()))?;
     match caps.name("password") {
         Some(pwd) => Ok((cropped_path, pwd.as_str().to_string())),
         None => Err(Error::LostPwd),
@@ -817,7 +819,7 @@ pub fn try_create_address(
     match derivation_check(seed_name, path, network_specs_key, database_name)? {
         // UI should prevent user from getting into `try_create_address` if
         // derivation has a bad format
-        DerivationCheck::BadFormat => Err(Error::InvalidDerivation),
+        DerivationCheck::BadFormat => Err(Error::InvalidDerivation(path.to_string())),
 
         // UI should prevent user from getting into `try_create_address` if
         // derivation already exists
@@ -1041,7 +1043,7 @@ pub fn import_derivations(
 pub fn check_derivation_set(derivations: &[String]) -> Result<()> {
     for path in derivations.iter() {
         if REG_PATH.captures(path).is_none() {
-            return Err(Error::InvalidDerivation);
+            return Err(Error::InvalidDerivation(path.to_string()));
         }
     }
     Ok(())

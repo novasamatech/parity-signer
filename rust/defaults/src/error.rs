@@ -5,12 +5,21 @@ pub enum Error {
     #[error(transparent)]
     IoError(#[from] std::io::Error),
 
-    #[error("base58 prefi mismatch: specs: {}, meta: {}", .specs, .meta)]
-    Base58PrefixSpecsMismatch { specs: u16, meta: u16 },
-
     #[error(transparent)]
     DefinitionsError(#[from] definitions::error::Error),
 
-    #[error("orphan metadata {} {}", .name, .filename)]
+    /// Base58 prefix from metadata (`meta`) does not match base58 prefix in specs (`specs`)
+    #[error(
+        "Base58 prefix {specs} from system pallet constants does \
+        not match the base58 prefix from network specs {meta}."
+    )]
+    Base58PrefixSpecsMismatch { specs: u16, meta: u16 },
+
+    /// Default metadata set contains metadata files that have no corresponding
+    /// default network specs and address book entries.
+    #[error(
+        "Default metadata for {name} from {filename} \
+        does not have corresponding default network specs."
+    )]
     OrphanMetadata { name: String, filename: String },
 }

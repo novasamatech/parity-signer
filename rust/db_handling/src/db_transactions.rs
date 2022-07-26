@@ -12,7 +12,6 @@
 #[cfg(feature = "signer")]
 use parity_scale_codec::{Decode, Encode};
 use sled::{transaction::TransactionResult, Batch, Transactional};
-
 #[cfg(feature = "signer")]
 use sp_runtime::MultiSigner;
 
@@ -477,10 +476,7 @@ impl TrDbColdStub {
             let database = open_db(database_name)?;
             verify_checksum(&database, checksum)?;
             let transaction = open_tree(&database, TRANSACTION)?;
-            match transaction.get(STUB)? {
-                Some(a) => a,
-                None => return Err(Error::StubNotFound),
-            }
+            transaction.get(STUB)?.ok_or(Error::Stub)?
         };
         TrDbCold::new()
             .set_transaction(make_batch_clear_tree(database_name, TRANSACTION)?) // clear transaction tree

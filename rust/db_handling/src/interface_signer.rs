@@ -337,7 +337,7 @@ pub fn export_key(
             ))
             .map_err(|e| Error::Qr(e.to_string()))?
         } else {
-            return Err(Error::NetworkSpecsForAddressNotFound {
+            return Err(Error::NetworkSpecsKeyForAddressNotFound {
                 network_specs_key: network_specs_key.to_owned(),
                 address_key,
             });
