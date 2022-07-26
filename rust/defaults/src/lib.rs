@@ -81,6 +81,9 @@ use definitions::{
 #[cfg(feature = "signer")]
 use definitions::network_specs::{Verifier, VerifierValue};
 
+mod error;
+pub use error::{Error, Result};
+
 /// Real Parity public key, with Sr25519 encryption
 ///
 /// To be used in [`VerifierValue`] for general verifier in default cold
@@ -90,23 +93,6 @@ pub const DEFAULT_VERIFIER_PUBLIC: [u8; 32] = [
     0xc4, 0x6a, 0x22, 0xb9, 0xda, 0x19, 0x54, 0x0a, 0x77, 0xcb, 0xde, 0x23, 0x19, 0x7e, 0x5f, 0xd9,
     0x04, 0x85, 0xc7, 0x2b, 0x4e, 0xcf, 0x3c, 0x59, 0x9e, 0xcc, 0xa6, 0x99, 0x8f, 0x39, 0xbd, 0x57,
 ];
-
-#[derive(Debug, thiserror::Error)]
-pub enum Error {
-    #[error(transparent)]
-    IoError(#[from] std::io::Error),
-
-    #[error("base58 prefi mismatch: specs: {}, meta: {}", .specs, .meta)]
-    Base58PrefixSpecsMismatch { specs: u16, meta: u16 },
-
-    #[error(transparent)]
-    DefinitionsError(#[from] definitions::error::Error),
-
-    #[error("orphan metadata {} {}", .name, .filename)]
-    OrphanMetadata { name: String, filename: String },
-}
-
-pub type Result<T> = std::result::Result<T, Error>;
 
 /// Generate default general verifier [`Verifier`], with Parity public key
 /// inside.
