@@ -14,14 +14,9 @@
 //! This module gathers all possible [`ErrorSigner`] errors in one place, so that
 //! error management is easier.
 
-use sp_core::H256;
 #[cfg(feature = "test")]
 use variant_count::VariantCount;
 
-use crate::{
-    crypto::Encryption,
-    keyring::{AddressKey, NetworkSpecsKey, Order, VerifierKey},
-};
 /// Content that should have been verified by the general verifier
 #[derive(Debug)]
 #[cfg_attr(feature = "test", derive(VariantCount))]
@@ -32,138 +27,6 @@ pub enum GeneralVerifierForContent {
 
     /// Types information.
     Types,
-}
-
-/// Errors when something was needed from the Signer database and was not found
-///
-/// Not necessarily the database failure, could be just not updated Signer
-/// as well.
-#[derive(Debug)]
-#[cfg_attr(feature = "test", derive(VariantCount))]
-pub enum NotFoundSigner {
-    /// [`CurrentVerifier`](crate::network_specs::CurrentVerifier) for a
-    /// network in `VERIFIERS` tree of the Signer database.
-    ///
-    /// Associated data is the [`VerifierKey`] used for the search.
-    CurrentVerifier(VerifierKey),
-
-    /// General verifier [`Verifier`](crate::network_specs::Verifier) information
-    /// stored in `SETTREE` tree of the database under key `GENERALVERIFIER`.
-    ///
-    /// Missing general verifier always indicates the database corruption.
-    GeneralVerifier,
-
-    /// Types information stored in `SETTREE` tree of the database under key
-    /// `TYPES`.
-    ///
-    /// Could be missing if user has deleted it.
-    Types,
-
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) for a network
-    /// in `SPECSTREE` tree of the Signer database, searched by
-    /// [`NetworkSpecsKey`].
-    ///
-    /// Associated data is the `NetworkSpecsKey` used for the search.
-    NetworkSpecs(NetworkSpecsKey),
-
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) for a network
-    /// in `SPECSTREE` tree of the Signer database, searched by
-    /// network name.
-    ///
-    /// Associated data is the network name.
-    NetworkSpecsForName(String),
-
-    /// [`NetworkSpecsKey`] of a network in `network_id` field of the
-    /// [`AddressDetails`](crate::users::AddressDetails) corresponding to
-    /// [`AddressKey`].
-    ///
-    /// This happens when the derivation is created in some other network(s), but
-    /// not in the given network. This way the `AddressKey` is in the database,
-    /// but the address in the network is not.
-    NetworkSpecsKeyForAddress {
-        /// [`NetworkSpecsKey`] of the network that is not available
-        network_specs_key: NetworkSpecsKey,
-
-        /// [`AddressKey`] for which the address in the network was expected to
-        /// exist
-        address_key: AddressKey,
-    },
-
-    /// [`AddressDetails`](crate::users::AddressDetails) for [`AddressKey`] in
-    /// `ADDRTREE` tree of the Signer database.
-    ///
-    /// Associated data is the `AddressKey` used for search.
-    AddressDetails(AddressKey),
-
-    /// Network metadata in `METATREE` tree of the Signer database, for network
-    /// name and version combination.
-    Metadata {
-        /// network name
-        name: String,
-
-        /// network version
-        version: u32,
-    },
-
-    /// [`DangerRecord`](crate::danger::DangerRecord) information
-    /// stored in `SETTREE` tree of the database under key `DANGER`.
-    ///
-    /// Missing `DangerRecord` always indicates the database corruption.
-    DangerStatus,
-
-    /// Temporary database entry in `TRANSACTION` tree of the Signer database
-    /// under the key `STUB`, used to store the update data awaiting for the
-    /// user approval.
-    ///
-    /// Missing `Stub` when it is expected always indicates the database
-    /// corruption.
-    Stub,
-
-    /// Temporary database entry in `TRANSACTION` tree of the Signer database
-    /// under the key `SIGN`, used to store the signable transaction data
-    /// awaiting for the user approval.
-    ///
-    /// Missing `Sign` when it is expected always indicates the database
-    /// corruption.
-    Sign,
-
-    /// Temporary database entry in `TRANSACTION` tree of the Signer database
-    /// under the key `DRV`, used to store the derivation import data.
-    ///
-    /// Missing `Derivations` when it is expected always indicates the database
-    /// corruption.
-    Derivations,
-
-    /// History log [`Entry`](crate::history::Entry) from `HISTORY` tree of the
-    /// Signer database.
-    ///
-    /// Associated data is the [`Order`] used for search.
-    HistoryEntry(Order),
-
-    HistoryNetworkSpecs {
-        /// network name
-        name: String,
-
-        /// network supported [`Encryption`]
-        encryption: Encryption,
-    },
-
-    /// Network metadata needed to parse historical transaction, no entries at
-    /// all for a given network name.
-    HistoricalMetadata {
-        /// network name used for the search
-        name: String,
-    },
-
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) for network in
-    /// which the imported derivations are user to create addresses.
-    NetworkForDerivationsImport {
-        /// network genesis hash
-        genesis_hash: H256,
-
-        /// network supported encryption
-        encryption: Encryption,
-    },
 }
 
 /// Errors in transaction parsing
