@@ -684,7 +684,7 @@ pub(crate) fn is_passworded(path: &str) -> Result<bool> {
     let passworded = REG_PATH
         .captures(path)
         .map(|caps| caps.name("password").is_some())
-        .ok_or(Error::InvalidDerivation(path.to_string()))?;
+        .ok_or_else(|| Error::InvalidDerivation(path.to_string()))?;
 
     Ok(passworded)
 }
@@ -783,11 +783,11 @@ pub fn derivation_check(
 pub fn cut_path(path: &str) -> Result<(String, String)> {
     let caps = REG_PATH
         .captures(path)
-        .ok_or(Error::InvalidDerivation(path.to_string()))?;
+        .ok_or_else(|| Error::InvalidDerivation(path.to_string()))?;
     let cropped_path = caps
         .name("path")
         .map(|a| a.as_str().to_string())
-        .ok_or(Error::InvalidDerivation(path.to_string()))?;
+        .ok_or_else(|| Error::InvalidDerivation(path.to_string()))?;
     match caps.name("password") {
         Some(pwd) => Ok((cropped_path, pwd.as_str().to_string())),
         None => Err(Error::LostPwd),

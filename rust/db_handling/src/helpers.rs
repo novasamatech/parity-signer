@@ -152,7 +152,7 @@ pub fn get_valid_current_verifier(
     database_name: &str,
 ) -> Result<ValidCurrentVerifier> {
     try_get_valid_current_verifier(verifier_key, database_name)?
-        .ok_or(Error::NoValidCurrentVerifier(verifier_key.clone()))
+        .ok_or_else(|| Error::NoValidCurrentVerifier(verifier_key.clone()))
 }
 
 /// Specs invariants that are expected to stay unchanged for the network over
@@ -315,7 +315,7 @@ pub fn get_network_specs(
     network_specs_key: &NetworkSpecsKey,
 ) -> Result<NetworkSpecs> {
     try_get_network_specs(database_name, network_specs_key)?
-        .ok_or(Error::NetworkSpecsNotFound(network_specs_key.clone()))
+        .ok_or_else(|| Error::NetworkSpecsNotFound(network_specs_key.clone()))
 }
 
 /// Try to get [`AddressDetails`] from the Signer database, using
@@ -350,7 +350,7 @@ pub fn get_address_details(
     address_key: &AddressKey,
 ) -> Result<AddressDetails> {
     try_get_address_details(database_name, address_key)?
-        .ok_or(Error::AddressNotFound(address_key.clone()))
+        .ok_or_else(|| Error::AddressNotFound(address_key.clone()))
 }
 
 /// Get [`MetaValues`] set from Signer database, for networks with a given name.
