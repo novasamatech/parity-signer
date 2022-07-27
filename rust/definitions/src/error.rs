@@ -12,38 +12,77 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("wrong public key length supplied")]
-    WrongPublicKeyLength,
-
     #[error(transparent)]
     HexDecodingError(#[from] FromHexError),
 
     #[error(transparent)]
     CodecError(#[from] parity_scale_codec::Error),
 
-    #[error("address details encryption mismatch")]
+    #[error(transparent)]
+    Wasm(#[from] crate::error_active::Wasm),
+
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
+
+    /// Received public key length is different from the one expected for
+    /// given encryption algorithm.
+    #[error("Public key length does not match the encryption.")]
+    WrongPublicKeyLength,
+
+    /// `Error` when there is encryption mismatch between one of
+    /// [`NetworkSpecsKey`] in `network_id` field of [`AddressDetails`] and the
+    /// `encryption` field of [`AddressDetails`]
+    ///
+    /// [`AddressDetails`]: crate::users::AddressDetails
+    #[error(
+        "Address details entry with address key {} has not matching encryption {}.",
+        hex::encode(address_key.key()),
+        encryption.show(),
+    )]
     EncryptionMismatch {
         address_key: AddressKey,
         encryption: Encryption,
     },
 
-    #[error("specs genesis hash mismatch")]
+    /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry stored under
+    /// this `NetworkSpecsKey` in `SPECSTREE` tree of the cold database
+    /// contains `genesis_hash` field with a different genesis hash.
+    #[error(
+        "Network specs (NetworkSpecs) entry with network specs key {} \
+        has not matching genesis hash {}.",
+        hex::encode(network_specs_key.key()),
+        hex::encode(genesis_hash),
+    )]
     SpecsGenesisHashMismatch {
         network_specs_key: NetworkSpecsKey,
         genesis_hash: H256,
     },
 
+    /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) entry
+    /// stored under this `NetworkSpecsKey` in `SPECSTREEPREP` tree of the hot
+    /// database contains `encryption` field with a different [`Encryption`].
     #[error(
         "specs encryption mismatch {} {}`",
-        hex::encode(.network_specs_key.key()),
-        .encryption.show()
+        hex::encode(network_specs_key.key()),
+        encryption.show()
     )]
     SpecsToSendEncryptionMismatch {
         network_specs_key: NetworkSpecsKey,
         encryption: Encryption,
     },
 
-    #[error("specs to send genesis hash mismatch")]
+    /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) entry
+    /// stored under this `NetworkSpecsKey` in `SPECSTREEPREP` tree of the hot
+    /// database contains `genesis_hash` field with a different genesis hash.
+    #[error(
+        "Network specs (NetworkSpecsToSend) entry with network specs key {} \
+        has wrong genesis hash {}.",
+        hex::encode(network_specs_key.key()),
+        hex::encode(genesis_hash),
+    )]
     SpecsToSendGenesisHash {
         network_specs_key: NetworkSpecsKey,
         genesis_hash: H256,
@@ -52,19 +91,23 @@ pub enum Error {
     #[error(transparent)]
     MetadataError(#[from] MetadataError),
 
-    #[error("metadata mismatch")]
+    /// Network name and/or network version in [`MetaKey`] do not match the
+    /// network name and network version from `Version` constant, `System`
+    /// pallet of the metadata stored under this [`MetaKey`].
+    ///
+    /// Error could be encountered only in the hot database.
+    ///
+    /// [`MetaKey`]: crate::keyring::MetaKey
+    #[error(
+        "Meta key corresponds to {this_name}{this_version}. \
+        Stored metadata is {that_name}{that_version}."
+    )]
     MetadataMismatch {
         this_name: String,
         this_version: u32,
         that_name: String,
         that_version: u32,
     },
-
-    #[error(transparent)]
-    Wasm(#[from] crate::error_active::Wasm),
-
-    #[error(transparent)]
-    Io(#[from] std::io::Error),
 }
 
 /// Error decoding transfer content

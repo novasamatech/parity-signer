@@ -5,20 +5,10 @@
 //! loaded in Signer on build and with hot database operations. Cold database
 //! could be the *release* cold database (the actual one for Signer build) or
 //! the *test* cold database (with test Alice identities, used for tests).
-//!
-//! All errors could be displayed to user as error messages in
-//! `generate_message` client, and are implementing `Display` trait.
-//!
-//! Exact error wording will be refined eventually.
 
 use sp_core::H256;
 
-use crate::{
-    crypto::Encryption,
-    error::MetadataError,
-    keyring::{AddressBookKey, AddressKey, MetaKey, NetworkSpecsKey},
-    metadata::AddressBookEntry,
-};
+use crate::{crypto::Encryption, error::MetadataError, metadata::AddressBookEntry};
 
 /// NotHex errors occurring on the Active side
 ///
@@ -69,411 +59,6 @@ pub enum NotHexActive {
 
     /// User-entered block hash for metadata fetching
     EnteredBlockHash,
-}
-
-/// Source of unsuitable metadata on the Active side
-#[derive(Debug)]
-pub enum IncomingMetadataSourceActive {
-    /// Bad metadata was in a hexadecimal string
-    Str(IncomingMetadataSourceActiveStr),
-
-    /// Bad metadata was contained in `wasm` file, associated data is the filename.
-    Wasm { filename: String },
-}
-
-/// Source of unsuitable hexadecimal string metadata on the Active side
-#[derive(Debug)]
-pub enum IncomingMetadataSourceActiveStr {
-    /// Metadata was fetched, associated data is url used for rpc call and block
-    /// hash, if the metadata was fetched for specific block hash.
-    Fetch {
-        url: String,
-        optional_block: Option<H256>,
-    },
-
-    /// Metadata is the default one, associated data is the filename.
-    Default { filename: String },
-
-    /// Metadata is from the metadata file that must be checked
-    Check { filename: String },
-}
-
-/// Source of damaged [`NetworkSpecsKey`], exclusive for the active side.
-/// Is empty.
-#[derive(Debug)]
-pub enum ExtraSpecsKeySourceActive {}
-
-/// Source of damaged [`AddressKey`], exclusive for the active side.
-/// Is empty.
-#[derive(Debug)]
-pub enum ExtraAddressKeySourceActive {}
-
-/// Errors in generating address, exclusive for the active side.
-/// Is empty.
-#[derive(Debug)]
-pub enum ExtraAddressGenerationActive {}
-
-/// Errors in the database content on the active side
-///
-/// Describes errors with already existing database content (e.g. damaged keys,
-/// damaged values, various mismatches, data that could not have been added to
-/// the database in the first place etc).
-#[derive(Debug)]
-pub enum DatabaseActive {
-    /// Key used in one of the database trees has invalid content, and could
-    /// not be decoded.
-    ///
-    /// Associated data is [`KeyDecodingActive`] with more details.
-    KeyDecoding(KeyDecodingActive),
-
-    /// Value found in one of the database trees has invalid content, and could
-    /// not be decoded.
-    ///
-    /// Associated data is [`EntryDecodingActive`] with more details.
-    EntryDecoding(EntryDecodingActive),
-
-    /// Database [`Error`](https://docs.rs/sled/0.34.6/sled/enum.Error.html).
-    ///
-    /// Could happen, for example, when opening the database, loading trees,
-    /// reading values etc.
-    Internal(sled::Error),
-
-    /// Database
-    /// [`TransactionError`](https://docs.rs/sled/0.34.6/sled/transaction/enum.TransactionError.html).
-    ///
-    /// Could happen when making transactions in multiple trees simultaneously.
-    Transaction(sled::transaction::TransactionError),
-
-    /// Data retrieved from the database contains some internal contradictions,
-    /// could not have been written in the database this way, and is therefore
-    /// likely indicating the database corruption.
-    ///
-    /// Associated data is [`MismatchActive`] with more details.
-    Mismatch(MismatchActive),
-
-    /// Network metadata that already is in the database, is damaged.
-    ///
-    /// Unsuitable metadata could not be put in the database in the first place,
-    /// finding one would mean the database got corrupted.
-    FaultyMetadata {
-        /// network name, from [`MetaKey`]
-        name: String,
-
-        /// network version, from [`MetaKey`]
-        version: u32,
-
-        /// what exactly is wrong with the metadata
-        error: MetadataError,
-    },
-
-    /// `ADDRESS_BOOK` tree of the hot database contains more than one
-    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) with same
-    /// `address` and `encryption` fields values.
-    TwoEntriesAddressEncryption {
-        /// url address of the entries
-        url: String,
-
-        /// [`Encryption`] of the entries
-        encryption: Encryption,
-    },
-
-    /// `ADDRESS_BOOK` tree of the hot database contains more than one
-    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) with same
-    /// `address` field value, for which `def` field is `true`, i.e. two
-    /// entries for the same network are default ones.
-    TwoDefaultsAddress {
-        /// url address of the entries
-        url: String,
-    },
-
-    /// `METATREE` of the hot database shoud contain at most two latest
-    /// metadata versions for each network, with the older entries being
-    /// deleted as the new ones appear.
-    ///
-    /// This error appears if during the processing more than two metadata
-    /// entries for the network are found.
-    HotDatabaseMetadataOverTwoEntries {
-        /// network name
-        name: String,
-    },
-
-    /// `METATREE` of the hot database has two entries for a network with the
-    /// same metadata version.
-    ///
-    /// Note: at this moment should be unreachable, since the entries are
-    /// getting checked for consistency with [`MetaKey`].
-    HotDatabaseMetadataSameVersionTwice {
-        /// network name
-        name: String,
-
-        /// network version
-        version: u32,
-    },
-
-    /// `ADDRESS_BOOK` tree of the hot database contains
-    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) entries with same
-    /// `name` field and different `genesis_hash` values.
-    ///
-    /// This is not allowed, as it would cause uncertainty in `load_metadata`
-    /// message generation, which is build using metadata and genesis hash.
-    TwoGenesisHashVariantsForName {
-        /// network name
-        name: String,
-    },
-
-    /// `ADDRESS_BOOK` tree of the hot database contains
-    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) entries with same
-    /// `name` field and different `address` values.
-    ///
-    /// Hot database does not allow to store more than one trusted url address
-    /// for rpc calls for same network.
-    ///
-    /// Alternative url address could be used if the database is not updated
-    /// (`-d` key is used).
-    ///
-    /// To update the address in the database in case the old one is no longer
-    /// acceptable, one should remove old entry, and only then add the new one.
-    TwoUrlVariantsForName {
-        /// network name
-        name: String,
-    },
-
-    /// `ADDRESS_BOOK` tree of the hot database contains
-    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) entries with same
-    /// `address` field and different `name` fields.
-    ///
-    /// Name in address book is taken from the metadata, metadata is fetched
-    /// using rpc call, so one url address can correspond to only one network
-    /// name.
-    TwoNamesForUrl {
-        /// url address, for which two condlicting names were found
-        url: String,
-    },
-
-    /// `SPECSTREEPREP` tree of the hot database contains
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) entries
-    /// with same network name, but different base58 prefix.
-    TwoBase58ForName {
-        /// network name
-        name: String,
-    },
-
-    /// `ADDRESS_BOOK` tree of the hot database has no entries to process.
-    AddressBookEmpty,
-}
-
-/// Errors decoding database keys on the active side
-///
-/// `IVec` value of the database key could be unfallably transformed into the
-/// contents of the corresponding key from the [`keyring`](crate::keyring)
-/// module. All these keys were, however, generated using certain information,
-/// and if this information could not be extracted from the key, it indicates
-/// that the database is damaged and results in [`KeyDecodingActive`] error.
-#[derive(Debug)]
-pub enum KeyDecodingActive {
-    /// [`AddressBookKey`] from the hot database could not be processed.
-    ///
-    /// Associated data is the damaged `AddressBookKey`.
-    AddressBookKey(AddressBookKey),
-
-    /// [`AddressKey`] from the test cold database could not be processed.
-    ///
-    /// Associated data is the damaged `AddressKey`.
-    AddressKey(AddressKey),
-
-    /// [`MetaKey`] from the hot database could not be processed.
-    ///
-    /// Associated data is the damaged `MetaKey`.
-    MetaKey(MetaKey),
-
-    /// [`NetworkSpecsKey`] from the database (hot or cold one) could not
-    /// be processed.
-    ///
-    /// Associated data is the damaged `NetworkSpecsKey`.
-    NetworkSpecsKey(NetworkSpecsKey),
-
-    /// [`NetworkSpecsKey`] encountered as one of the entries in `network_id`
-    /// field of the [`AddressDetails`](crate::users::AddressDetails) in test
-    /// cold database could not be processed.
-    NetworkSpecsKeyAddressDetails {
-        /// [`AddressKey`] corresponding to `AddressDetails` that contain the
-        /// damaged `NetworkSpecsKey`
-        address_key: AddressKey,
-
-        /// damaged `NetworkSpecsKey`
-        network_specs_key: NetworkSpecsKey,
-    },
-}
-
-/// Errors decoding database entry content on the active side
-///
-/// Database stores most of the values SCALE-encoded, and to be used they must
-/// be decoded. If the decoding fails, it indicates that the database is
-/// damaged.
-#[derive(Debug)]
-pub enum EntryDecodingActive {
-    /// Hot database entry could not be decoded as
-    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry).
-    ///
-    /// Associated data is the corresponding address book title.
-    AddressBookEntry { title: String },
-
-    /// Test cold database entry could not be decoded as
-    /// [`AddressDetails`](crate::users::AddressDetails).
-    ///
-    /// Associated data is the corresponding [`AddressKey`].
-    AddressDetails(AddressKey),
-
-    /// Cold database entry could not be decoded as
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs).
-    ///
-    /// Associated data is the corresponding [`NetworkSpecsKey`].
-    NetworkSpecs(NetworkSpecsKey),
-
-    /// Hot database entry could not be decoded as
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend).
-    ///
-    /// Associated data is the corresponding [`NetworkSpecsKey`].
-    NetworkSpecsToSend(NetworkSpecsKey),
-
-    /// Types information from hot database, i.e. encoded `Vec<TypeEntry>`
-    /// stored in `SETTREE` under the key `TYPES`, could not be decoded.
-    Types,
-
-    /// Block hash from `META_HISTORY` tree entry
-    BlockHash { name: String, version: u32 },
-}
-
-/// Mismatch errors within database on active side
-///
-/// Data could be recorded in both hot database and cold database only
-/// in ordered fasion, i.e. with keys corresponding to the data stored in the
-/// encoded values etc.
-///
-/// If the data retrieved from the database contains some internal
-/// contradictions, it indicates the database corruption.
-#[derive(Debug)]
-pub enum MismatchActive {
-    /// Network name and/or network version in [`MetaKey`] do not match the
-    /// network name and network version from `Version` constant, `System`
-    /// pallet of the metadata stored under this `MetaKey`.
-    ///
-    /// Error could be encountered only in the hot database.
-    Metadata {
-        /// network name as it is in the key
-        name_key: String,
-
-        /// network version as it is in the key
-        version_key: u32,
-
-        /// network name as it is in the metadata
-        name_inside: String,
-
-        /// network version as it is in the metadata
-        version_inside: u32,
-    },
-
-    /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry stored under
-    /// this `NetworkSpecsKey` in `SPECSTREE` tree of the cold database
-    /// contains `genesis_hash` field with a different genesis hash.
-    SpecsGenesisHash {
-        /// [`NetworkSpecsKey`] corresponding to mismatching data
-        key: NetworkSpecsKey,
-
-        /// genesis hash as it is in the `NetworkSpecs`
-        genesis_hash: H256,
-    },
-
-    /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry stored under
-    /// this `NetworkSpecsKey` in `SPECSTREE` tree of the cold database
-    /// contains `encryption` field with a different [`Encryption`].
-    SpecsEncryption {
-        /// [`NetworkSpecsKey`] corresponding to mismatching data
-        key: NetworkSpecsKey,
-
-        /// [`Encryption`] as it is in the `NetworkSpecs`
-        encryption: Encryption,
-    },
-
-    /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) entry
-    /// stored under this `NetworkSpecsKey` in `SPECSTREEPREP` tree of the hot
-    /// database contains `genesis_hash` field with a different genesis hash.
-    SpecsToSendGenesisHash {
-        /// [`NetworkSpecsKey`] corresponding to mismatching data
-        key: NetworkSpecsKey,
-
-        /// genesis hash as it is in the `NetworkSpecsToSend`
-        genesis_hash: H256,
-    },
-
-    /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) entry
-    /// stored under this `NetworkSpecsKey` in `SPECSTREEPREP` tree of the hot
-    /// database contains `encryption` field with a different [`Encryption`].
-    SpecsToSendEncryption {
-        /// [`NetworkSpecsKey`] corresponding to mismatching data
-        key: NetworkSpecsKey,
-
-        /// [`Encryption`] as it is in the `NetworkSpecsToSend`
-        encryption: Encryption,
-    },
-
-    /// [`AddressKey`] has an associated [`Encryption`].
-    /// [`AddressDetails`](crate::users::AddressDetails) entry stored under
-    /// this `AddressKey` contains `encryption` field with a different
-    /// [`Encryption`].
-    ///
-    /// Error could be encountered only in the test cold database.
-    AddressDetailsEncryption {
-        /// [`AddressKey`] corresponding to mismatching data
-        key: AddressKey,
-
-        /// [`Encryption`] as it is in the `AddressDetails`
-        encryption: Encryption,
-    },
-
-    /// [`AddressKey`] has an associated [`Encryption`].
-    /// [`AddressDetails`](crate::users::AddressDetails) entry stored under
-    /// this `AddressKey` contains `network_id` field with a set of
-    /// [`NetworkSpecsKey`] values corresponding to networks in which this
-    /// address exists. [`NetworkSpecsKey`] is built using network genesis hash
-    /// and `Encryption`.
-    ///
-    /// If the `Encryption` value from one of `NetworkSpecsKey` values is
-    /// different from `Encryption` assocaited with `AddressKey`, this error
-    /// appears.
-    ///
-    /// Error could be encountered only in the test cold database.
-    AddressDetailsSpecsEncryption {
-        /// [`AddressKey`] corresponding to mismatching data
-        address_key: AddressKey,
-
-        /// [`NetworkSpecsKey`] having `Encryption` different from the one
-        /// associated with `AddressKey`
-        network_specs_key: NetworkSpecsKey,
-    },
-
-    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) in hot database
-    /// contains `encryption` and `genesis_hash` fields, from which the
-    /// corresponding [`NetworkSpecsKey`] could be built.
-    ///
-    /// `NetworkSpecsKey` has an associated
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) value
-    /// stored in `SPECSTREEPREP` tree of the hot database. `NetworkSpecsToSend`
-    /// has field `name` with network name.
-    ///
-    /// This error appears if the `name` from `NetworkSpecsToSend` differs from
-    /// the `name` in `AddressBookEntry`.
-    AddressBookSpecsName {
-        /// name in [`AddressBookEntry`](crate::metadata::AddressBookEntry)
-        address_book_name: String,
-
-        /// name in [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
-        specs_name: String,
-    },
 }
 
 /// Errors on the active side related to data fetched (or not fetched) through
@@ -752,6 +337,8 @@ pub enum Changed {
     ///
     /// Network name is expected to be permanent. This error appears if the
     /// name derived from metadata fetched through a new rpc call is different.
+    ///
+    /// [`MetaKey`]: crate::keyring::MetaKey
     Name { old: String, new: String },
 
     /// Network unit value in
@@ -770,6 +357,32 @@ pub enum Changed {
     /// Network unit value is expected to be permanent. Override for no
     /// unit at the moment is blocked.
     UnitBecameNone { old: String },
+}
+
+impl std::fmt::Display for Changed {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let (insert, old, new) = match self {
+            Changed::Base58Prefix { old, new } => {
+                ("base58 prefix", old.to_string(), new.to_string())
+            }
+            Changed::GenesisHash { old, new } => {
+                ("genesis hash", hex::encode(old), hex::encode(new))
+            }
+            Changed::Decimals { old, new } => ("decimals value", old.to_string(), new.to_string()),
+            Changed::DecimalsBecameNone { old } => {
+                ("decimals value", old.to_string(), "no value".to_string())
+            }
+            Changed::Name { old, new } => ("name", old.to_string(), new.to_string()),
+            Changed::Unit { old, new } => ("unit", old.to_string(), new.to_string()),
+            Changed::UnitBecameNone { old } => ("unit", old.to_string(), "no value".to_string()),
+        };
+
+        write!(
+            f,
+            "Network {} differs from the one in the hot database. Old: {}. New: {}.",
+            insert, old, new
+        )
+    }
 }
 
 /// Command line parser errors from the `generate_message` crate

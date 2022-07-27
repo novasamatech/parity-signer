@@ -11,6 +11,6 @@ pub enum Error {
     #[error(transparent)]
     TransactionParsing(#[from] transaction_parsing::Error),
 
-    #[error("db not initialized")]
+    #[error("DB not initialized.")]
     DbNotInitialized,
 }

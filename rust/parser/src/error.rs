@@ -1,8 +1,18 @@
 use definitions::error::MetadataError;
 
+/// Parse error.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("can not separate method from extensions, bad transaction")]
+    #[error(transparent)]
+    Metadata(#[from] MetadataError),
+
+    #[error(transparent)]
+    DefinitionsError(#[from] definitions::error::Error),
+
+    #[error(transparent)]
+    Codec(#[from] parity_scale_codec::Error),
+
+    #[error("Can not separate method from extensions, bad transaction.")]
     SeparateMethodExtensions,
 
     /// Errors occurring during the decoding procedure.
@@ -28,7 +38,10 @@ pub enum Error {
     /// For `RuntimeMetadataV12` and `RuntimeMetadataV13` the extensions set
     /// is a fixed one, whereas for `RuntimeMetadataV14` is may vary and is
     /// determined by the metadata itself.
-    #[error("Network spec version decoded from extensions ({as_decoded}) differs from the version in metadata ({in_metadata}).")]
+    #[error(
+        "Network spec version decoded from extensions ({as_decoded}) \
+        differs from the version in metadata ({in_metadata})."
+    )]
     WrongNetworkVersion {
         /// metadata version from transaction extensions, as found through
         /// parsing process
@@ -38,29 +51,31 @@ pub enum Error {
         /// constant in `System` pallet of the metadata
         in_metadata: u32,
     },
-    #[error(transparent)]
-    Metadata(#[from] MetadataError),
 
     //
-    #[error("metadata mismatch {name_metadata} {name_network_specs}")]
+    #[error(
+        "Network name mismatch. In metadata: {name_metadata}, \
+        in network specs: {name_network_specs}"
+    )]
     NetworkNameMismatch {
         name_metadata: String,
         name_network_specs: String,
     },
 
-    #[error("no types")]
+    #[error(
+        "Decoding transactions with metadata V12 and V13 uses pre-existing \
+        types info. Loaded default types info is empty."
+    )]
     NoTypes,
 
-    #[error("default types")]
+    #[error(
+        "Decoding transactions with metadata V12 and V13 uses \
+        pre-existing types info. Error generating default types info."
+    )]
     DefaultTypes,
-
-    #[error(transparent)]
-    DefinitionsError(#[from] definitions::error::Error),
-
-    #[error(transparent)]
-    Codec(#[from] parity_scale_codec::Error),
 }
 
+/// Parse result.
 pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, thiserror::Error)]

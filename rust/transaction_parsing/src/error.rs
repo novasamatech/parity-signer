@@ -9,12 +9,23 @@ use definitions::{
 };
 use sp_core::H256;
 
+/// Transaction parsing result.
 pub type Result<T> = std::result::Result<T, Error>;
 
+/// Transaction parsing error.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error(transparent)]
     Definitions(#[from] definitions::error::Error),
+
+    #[error(transparent)]
+    Sled(#[from] sled::Error),
+
+    #[error(transparent)]
+    Metadata(#[from] MetadataError),
+
+    #[error(transparent)]
+    Parser(#[from] parser::Error),
 
     /// Received transaction is unexpectedly short, more bytes were expected.
     #[error("Input is too short.")]
@@ -25,12 +36,15 @@ pub enum Error {
     ///
     /// Associated data is the first two elements of the hexadecimal string in
     /// received transaction.
-    #[error("Only Substrate transaction are supported. Transaction is expected to start with 0x53, this one starts with 0x{0}")]
+    #[error(
+        "Only Substrate transaction are supported. \
+        Transaction is expected to start with 0x53, this one starts with 0x{0}"
+    )]
     NotSubstrate(String),
 
     /// Update payload signature is invalid for given public key, encryption
     /// algorithm and payload content
-    #[error("bad signature")]
+    #[error("Bad signature.")]
     BadSignature,
 
     /// There is a limited number of payloads supported by the Signer. Payload
@@ -52,12 +66,17 @@ pub enum Error {
     #[error("Payload type with code 0x{0} is not supported.")]
     PayloadNotSupported(String),
 
+    /// DB error.
     #[error("Database error. Internal error. {0}")]
     DbError(#[from] db_handling::Error),
 
     /// Network metadata needed to parse historical transaction, no entries at
     /// all for a given network name.
-    #[error("Historical transaction was generated in network {name} and processed. Currently there are no metadata entries for the network, and transaction could not be processed again. Add network metadata.")]
+    #[error(
+        "Historical transaction was generated in network {name} and processed. \
+        Currently there are no metadata entries for the network, and \
+        transaction could not be processed again. Add network metadata."
+    )]
     HistoricalMetadata { name: String },
 
     /// More than one entry found for network specs with given `name` and
@@ -69,20 +88,20 @@ pub enum Error {
         encryption: Encryption,
     },
 
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) needed to parse
+    /// [`NetworkSpecs`] needed to parse
     /// historical transactions saved into history log, searched by network
     /// name and encryption.
+    ///
+    /// [`NetworkSpecs`]: definitions::network_specs::NetworkSpecs
     #[error(
-        "Could not find network specs for {name} with encryption {} needed to decode historical transaction.",
-        .encryption.show()
+        "Could not find network specs for {name} with encryption {} \
+        needed to decode historical transaction.",
+        encryption.show()
     )]
     HistoryNetworkSpecs {
         name: String,
         encryption: Encryption,
     },
-
-    #[error(transparent)]
-    Sled(#[from] sled::Error),
 
     /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
     /// received in `add_specs` payload are for a network that already has
@@ -99,7 +118,9 @@ pub enum Error {
     /// - `name`, network name, as it appears in the network metadata  
     /// - `unit`
     #[error(
-        "Similar network specs are already stored in the database under key {}. Network specs in received payload have different unchangeable values (base58 prefix, decimals, encryption, network name, unit).",
+        "Similar network specs are already stored in the database under key {}. \
+        Network specs in received payload have different unchangeable values \
+        (base58 prefix, decimals, encryption, network name, unit).",
         hex::encode(.0.key())
     )]
     ImportantSpecsChanged(NetworkSpecsKey),
@@ -108,11 +129,11 @@ pub enum Error {
     /// message already have a corresponding entry in `METATREE` tree of the
     /// Signer database. However, the received metadata is different from
     /// the one already stored in the database.
-    #[error("Metadata for {name}{version} is already in the database and is different from the one in received payload.")]
+    #[error(
+        "Metadata for {name}{version} is already in the database and is \
+        different from the one in received payload."
+    )]
     SameNameVersionDifferentMeta { name: String, version: u32 },
-
-    #[error(transparent)]
-    Metadata(#[from] MetadataError),
 
     /// There is a limited number of encryption algorithms supported by the
     /// Signer. Encryption algorithm is declared in the transaction prelude
@@ -151,16 +172,14 @@ pub enum Error {
     /// Error parsing extensions of a signable transaction with all available
     /// versions of metadata for given network.
     #[error(
-        "Failed to decode extensions. Please try updating metadata for {network_name} network. {}",
-        display_parsing_errors(.network_name, .errors)
+        "Failed to decode extensions. Please try updating metadata for \
+        {network_name} network. {}",
+        display_parsing_errors(network_name, errors)
     )]
     AllExtensionsParsingFailed {
         network_name: String,
         errors: Vec<(u32, parser::Error)>,
     },
-
-    #[error(transparent)]
-    Parser(#[from] parser::Error),
 
     /// Can not separate method from extensions, bad transaction.
     #[error("Unable to separate transaction method and extensions.")]
@@ -171,7 +190,11 @@ pub enum Error {
     /// metadata entries in the `METATREE` tree of the database.
     ///
     /// Without metadata the transaction could not be decoded.
-    #[error("Input transaction is generated in network {name}. Currently there are no metadata entries for it, and transaction could not be processed. Add network metadata.")]
+    #[error(
+        "Input transaction is generated in network {name}. \
+        Currently there are no metadata entries for it, and \
+        transaction could not be processed. Add network metadata."
+    )]
     NoMetadata { name: String },
 
     /// Received signable transaction (with prelude `53xx00`, `53xx02` or
@@ -179,9 +202,10 @@ pub enum Error {
     /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in the
     /// `SPECSTREE` tree of the database.
     #[error(
-        "Input generated within unknown network and could not be processed. Add network with genesis hash {} and encryption {}.",
-        hex::encode(.genesis_hash),
-        .encryption.show()
+        "Input generated within unknown network and could not be processed. \
+        Add network with genesis hash {} and encryption {}.",
+        hex::encode(genesis_hash),
+        encryption.show()
     )]
     UnknownNetwork {
         genesis_hash: H256,
@@ -189,7 +213,7 @@ pub enum Error {
         encryption: Encryption,
     },
 
-    #[error("Received message could not be read.")]
+    #[error("Received message could not be read. {0}")]
     Codec(#[from] parity_scale_codec::Error),
 
     /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
@@ -200,8 +224,10 @@ pub enum Error {
     /// and base58 prefix in stored network specs is different from the base58
     /// prefix in the received ones.
     #[error(
-        "Network {name} with genesis hash {} already has entries in the database with base58 prefix {base58_database}. Received network specs have same genesis hash and different base58 prefix {base58_input}.",
-        hex::encode(.genesis_hash),
+        "Network {name} with genesis hash {} already has entries in \
+        the database with base58 prefix {base58_database}. Received \
+        network specs have same genesis hash and different base58 prefix {base58_input}.",
+        hex::encode(genesis_hash)
     )]
     AddSpecsDifferentBase58 {
         genesis_hash: H256,
@@ -217,7 +243,11 @@ pub enum Error {
     /// same encryption, i.e. **possibly different** [`NetworkSpecsKey`],
     /// and network name in stored network specs is different from the network
     /// name in the received ones.
-    #[error("Network with genesis hash {} has name {name_database} in the database. Received network specs have same genesis hash and name {name_input}.", hex::encode(.genesis_hash))]
+    #[error(
+        "Network with genesis hash {} has name {name_database} in the database. \
+        Received network specs have same genesis hash and name {name_input}.",
+        hex::encode(genesis_hash)
+    )]
     AddSpecsDifferentName {
         genesis_hash: H256,
         name_database: String,
@@ -230,8 +260,9 @@ pub enum Error {
     ///
     /// Not exactly an error, but Signer can't do anything and complains.
     #[error(
-        "Exactly same network specs for network {name} with encryption {} are already in the database.",
-        .encryption.show()
+        "Exactly same network specs for network {name} with encryption {} \
+        are already in the database.",
+        encryption.show()
     )]
     SpecsKnown {
         /// network name
@@ -250,8 +281,9 @@ pub enum Error {
     ///
     /// Signer does not allow downgrading the verifiers.
     #[error(
-        "Saved network {name} information was signed by verifier {}. Received information is not signed.",
-        .verifier_value.show_error(),
+        "Saved network {name} information was signed by verifier {}. \
+        Received information is not signed.",
+        verifier_value.show_error(),
     )]
     NeedVerifier {
         /// network name
@@ -270,9 +302,14 @@ pub enum Error {
     ///
     /// Custom verifier could be upgraded only to general one, see
     /// [here](definitions::network_specs).
-    #[error("Network {name} current verifier is {}. Received add_specs message is verified by {}, which is neither current network verifier not the general verifier. Changing the network verifier to another non-general one would require wipe and reset of Signer.",
-        .old_verifier_value.show_error(),
-        .new_verifier_value.show_error(),
+
+    #[error(
+        "Network {name} current verifier is {}. Received add_specs message \
+        is verified by {}, which is neither current network verifier not the \
+        general verifier. Changing the network verifier to another non-general \
+        one would require wipe and reset of Signer.",
+        old_verifier_value.show_error(),
+        new_verifier_value.show_error(),
     )]
     AddSpecsVerifierChanged {
         /// network name
@@ -292,9 +329,10 @@ pub enum Error {
     /// Network has entry in `VERIFIERS` tree of the database with
     /// `CurrentVerifier::Valid(ValidCurrentVerifier::General)`.
     #[error(
-        "General verifier in the database is {}. Received unsigned {} could be accepted only if signed by the general verifier.",
-        .verifier_value.show_error(),
-        display_general_verifier_for_content(.content),
+        "General verifier in the database is {}. Received unsigned {} \
+        could be accepted only if signed by the general verifier.",
+        verifier_value.show_error(),
+        display_general_verifier_for_content(content),
     )]
     NeedGeneralVerifier {
         /// payload that requires general verifier
@@ -310,7 +348,9 @@ pub enum Error {
     // TODO: maybe combine with the LoadMetaGeneralVerifierChanged,
     // modify GeneralVerifierForContent into 3 variants
     #[error(
-        "General verifier in the database is {}. Received {} could be accepted only if verified by the same general verifier. Current message is verified by {}.",
+        "General verifier in the database is {}. Received {} could be \
+        accepted only if verified by the same general verifier. \
+        Current message is verified by {}.",
         .old_general_verifier_value.show_error(),
         display_general_verifier_for_content(.content),
         .new_general_verifier_value.show_error(),
@@ -352,8 +392,10 @@ pub enum Error {
     /// [`ValidCurrentVerifier`](definitions::network_specs::ValidCurrentVerifier),
     /// i.e. it was known to user at some point and never disabled.
     #[error(
-        "Network {name} was previously known to the database with verifier {}. However, no network specs are in the database at the moment. Add network specs before loading the metadata.",
-        show_verifier(.valid_current_verifier, .general_verifier),
+        "Network {name} was previously known to the database with verifier {}. \
+        However, no network specs are in the database at the moment. Add network \
+        specs before loading the metadata.",
+        show_verifier(valid_current_verifier, general_verifier)
     )]
     LoadMetaNoSpecs {
         /// network name as it is in the received metadata
@@ -378,8 +420,10 @@ pub enum Error {
     /// and verifier is identified by the genesis hash, this should be checked
     /// on `load_metadata`.
     #[error(
-        "Update payload contains metadata for network {name_metadata}. Genesis hash in payload({}) matches database genesis hash for another network, {name_specs}.",
-        hex::encode(.genesis_hash)
+        "Update payload contains metadata for network {name_metadata}. \
+        Genesis hash in payload({}) matches database genesis hash for another \
+        network, {name_specs}.",
+        hex::encode(genesis_hash)
     )]
     LoadMetaWrongGenesisHash {
         /// network name as it is in the received metadata
@@ -401,8 +445,10 @@ pub enum Error {
     ///
     /// Verified `add_specs` must be loaded before any verified `load_metadata`.
     #[error(
-        "Network {name} currently has no verifier set up. Received load_metadata message is verifier by {}. In order to accept verified metadata, first download properly verified network specs.",
-        .new_verifier_value.show_error()
+        "Network {name} currently has no verifier set up. Received load_metadata \
+        message is verifier by {}. In order to accept verified metadata, first \
+        download properly verified network specs.",
+        new_verifier_value.show_error()
     )]
     LoadMetaSetVerifier {
         /// network name
@@ -423,9 +469,11 @@ pub enum Error {
     /// [here](definitions::network_specs), and during that network specs must be
     /// updated prior to loading the metadata.
     #[error(
-        "Network {name} current verifier is {}. Received load_metadata message is verified by {}. Changing verifier for the network would require wipe and reset of Signer.",
-        .old_verifier_value.show_error(),
-        .new_verifier_value.show_error(),
+        "Network {name} current verifier is {}. Received load_metadata message \
+        is verified by {}. Changing verifier for the network would require wipe \
+        and reset of Signer.",
+        old_verifier_value.show_error(),
+        new_verifier_value.show_error(),
     )]
     LoadMetaVerifierChanged {
         /// network name
@@ -448,8 +496,11 @@ pub enum Error {
     ///
     /// Verified `add_specs` must be loaded before any verified `load_metadata`.
     #[error(
-        "Network {name} is set to be verified by the general verifier, however, general verifier is not yet established. Received load_metadata message is verified by {}. In order to accept verified metadata and set up the general verifier, first download properly verified network specs.",
-        .new_general_verifier_value.show_error(),
+        "Network {name} is set to be verified by the general verifier, however, \
+        general verifier is not yet established. Received load_metadata message \
+        is verified by {}. In order to accept verified metadata and set up the \
+        general verifier, first download properly verified network specs.",
+        new_general_verifier_value.show_error(),
     )]
     LoadMetaSetGeneralVerifier {
         /// network name
@@ -478,9 +529,12 @@ pub enum Error {
     /// general verifier already has an associated `VerifierValue`, loading
     /// verified `add_specs` would result in the network having custom verifier.
     #[error(
-        "Network {name} is verified by the general verifier which currently is {}. Received load_metadata message is verified by {}. Changing the general verifier or changing the network verifier to custom would require wipe and reset of Signer.",
-        .old_general_verifier_value.show_error(),
-        .new_general_verifier_value.show_error(),
+        "Network {name} is verified by the general verifier which currently is {}. \
+        Received load_metadata message is verified by {}. Changing the general \
+        verifier or changing the network verifier to custom would require wipe \
+        and reset of Signer.",
+        old_general_verifier_value.show_error(),
+        new_general_verifier_value.show_error(),
     )]
     LoadMetaGeneralVerifierChanged {
         /// network name
@@ -510,9 +564,11 @@ pub enum Error {
     /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) for network in
     /// which the imported derivations are user to create addresses.
     #[error(
-        "Unable to import derivations for network with genesis hash {} and encryption {}. Network is unknown. Please add corresponding network specs.",
-        hex::encode(.genesis_hash),
-        .encryption.show(),
+        "Unable to import derivations for network with genesis hash {} \
+        and encryption {}. Network is unknown. Please add corresponding \
+        network specs.",
+        hex::encode(genesis_hash),
+        encryption.show(),
     )]
     NetworkForDerivationsImport {
         /// network genesis hash

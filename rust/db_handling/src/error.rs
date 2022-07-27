@@ -9,13 +9,32 @@ use definitions::{
 use sp_core::H256;
 use sp_runtime::MultiSigner;
 
+/// DB handling error type.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("Database error. Internal error. {0}")]
-    DbError(#[from] sled::Error),
-
     #[error(transparent)]
     DbTransactionError(#[from] sled::transaction::TransactionError),
+
+    #[error(transparent)]
+    Defaults(#[from] defaults::Error),
+
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+
+    #[error(transparent)]
+    Codec(#[from] parity_scale_codec::Error),
+
+    #[error(transparent)]
+    TimeFormat(#[from] time::error::Format),
+
+    #[error(transparent)]
+    DefinitionsError(#[from] definitions::error::Error),
+
+    #[error(transparent)]
+    Bip39MnemonicType(#[from] bip39::ErrorKind),
+
+    #[error("Database error. Internal error. {0}")]
+    DbError(#[from] sled::Error),
 
     /// Temporary database entry in `TRANSACTION` tree of the Signer database
     /// under the key `STUB`, used to store the update data awaiting for the
@@ -28,9 +47,6 @@ pub enum Error {
         needed for accepting approved information."
     )]
     Stub,
-
-    #[error(transparent)]
-    Codec(#[from] parity_scale_codec::Error),
 
     /// Network [`CurrentVerifier`](definitions::network_specs::CurrentVerifier) is
     /// `ValidCurrentVerifier::Custom(_)`, but the custom verifier value
@@ -72,19 +88,15 @@ pub enum Error {
     )]
     UnexpectedGenesisHash { name: String, genesis_hash: H256 },
 
-    #[error(transparent)]
-    DefinitionsError(#[from] definitions::error::Error),
-
     /// History log [`Entry`](definitions::history::Entry) stored in `HISTORY` tree
-    /// of the Signer database under the key [`Order`](definitions::keyring::Order)
+    /// of the Signer database under the key [`Order`]
     /// could not be decoded.
     ///
-    /// Associated data is the corresponding [`Order`](definitions::keyring::Order).
+    /// Associated data is the corresponding [`Order`].
+    ///
+    /// [`Order`]: definitions::keyring::Order
     #[error("Unable to decode history entry for order {0}")]
     HistoryEntryNotFound(u32),
-
-    #[error(transparent)]
-    TimeFormat(#[from] time::error::Format),
 
     /// Database has two seed addresses (i.e. with empty derivation path and no
     /// password) for same seed name and [`Encryption`]
@@ -134,6 +146,7 @@ pub enum Error {
         real_seed_name: String,
     },
 
+    /// QR handling error.
     #[error("QR error {0}.")]
     Qr(String),
 
@@ -168,7 +181,7 @@ pub enum Error {
     ///
     /// Associated error content is
     /// [`SecretStringError`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/enum.SecretStringError.html).
-    #[error("Secret string error")]
+    #[error("Secret string error: {}", format!("{:?}", .0))]
     SecretStringError(sp_core::crypto::SecretStringError),
 
     /// Same public key was produced for a different seed phrase and/or
@@ -234,16 +247,15 @@ pub enum Error {
         address_details: AddressDetails,
         network_specs_key: NetworkSpecsKey,
     },
-
-    #[error(transparent)]
-    Bip39MnemonicType(#[from] bip39::ErrorKind),
-
     /// Received `derivations` update payload contains an invalid derivation.
     ///
     /// Associated data is the derivation that could not be used as a `String`.
     #[error("Derivation {0} has invalid format.")]
     InvalidDerivation(String),
 
+    /// User was creating the derivation with password, and thus moved into
+    /// `PasswordConfirm` modal, however, the password was not found when
+    /// cutting password from the path.
     #[error("Derivation had password, then lost it.")]
     LostPwd,
 
@@ -251,10 +263,24 @@ pub enum Error {
     #[error("No valid derivations found to generate ContentDerivations.")]
     NoValidDerivationToExport,
 
+    /// Temporary database entry in `TRANSACTION` tree of the Signer database
+    /// under the key `DRV`, used to store the derivation import data.
+    ///
+    /// Missing `Derivations` when it is expected always indicates the database
+    /// corruption.
     #[error("Derivations not found.")]
     DerivationsNotFound,
 
-    #[error("sign not found")]
+    /// Temporary database entry in `TRANSACTION` tree of the Signer database
+    /// under the key `SIGN`, used to store the signable transaction data
+    /// awaiting for the user approval.
+    ///
+    /// Missing `Sign` when it is expected always indicates the database
+    /// corruption.
+    #[error(
+        "Could not find database temporary entry with information \
+        needed for signing approved transaction."
+    )]
     Sign,
 
     #[error("Unable to decode current verifier entry for key {}.", hex::encode(.0.key()))]
@@ -336,14 +362,9 @@ pub enum Error {
     #[error("Danger status not found.")]
     DangerStatusNotFound,
 
-    #[error(transparent)]
-    Defaults(#[from] defaults::Error),
-
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
-
     #[error("There are no seeds. Please create a seed first.")]
     NoKnownSeeds,
 }
 
+/// DB handling result.
 pub type Result<T> = result::Result<T, Error>;

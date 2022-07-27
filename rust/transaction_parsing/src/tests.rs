@@ -2429,7 +2429,7 @@ fn parse_msg_2() {
             index: 0,
             indent: 0,
             card: Card::ErrorCard {
-                f: "Bad input data. Received message could not be read.".to_string(),
+                f: "Bad input data. Received message could not be read. Input buffer has still data left after decoding!".to_string(),
             },
         }]),
         ..Default::default()

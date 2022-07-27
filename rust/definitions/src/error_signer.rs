@@ -1,19 +1,4 @@
-//! Errors occurring in Signer
-//!
-//! Signer works with cold database only.
-//!
-//! All errors could be displayed to user:
-//! - as part of card set, generated during transaction parsing  
-//! - as individual text errors through `Error` modal in `navigator`
-//! - as `anyhow` errors produced by the Signer device
-//!
-//! For all this, the text representation of the error is needed. Error text
-//! must clearly indicate what happened and what user can try to do to fix the
-//! issue. Error wording must be yet polished extensively.
-//!
-//! This module gathers all possible errors in one place, so that
-//! error management is easier.
-
+//! Errors occuring in Signer
 #[cfg(feature = "test")]
 use variant_count::VariantCount;
 

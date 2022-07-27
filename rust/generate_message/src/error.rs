@@ -7,8 +7,10 @@ use definitions::{
 };
 use sp_core::H256;
 
+/// Generate Message result.
 pub type Result<T> = std::result::Result<T, Error>;
 
+/// Generate Message error.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error(transparent)]
@@ -26,11 +28,29 @@ pub enum Error {
     #[error(transparent)]
     JsonRPC(#[from] jsonrpsee::core::error::Error),
 
+    #[error(transparent)]
+    CommandParser(#[from] CommandParser),
+
+    #[error(transparent)]
+    Codec(#[from] parity_scale_codec::Error),
+
+    #[error(transparent)]
+    Input(#[from] InputActive),
+
+    #[error(transparent)]
+    Specs(#[from] SpecsError),
+
+    #[error(transparent)]
+    Metadata(#[from] MetadataError),
+
     #[error("qr error {0}")]
     Qr(Box<dyn std::error::Error>),
 
     /// Network specs are already in the database
-    #[error("specs in db")]
+    #[error(
+        "Network specs entry for {name} and encryption {} is already in database.",
+        .encryption.show(),
+    )]
     SpecsInDb {
         /// network name
         name: String,
@@ -42,32 +62,58 @@ pub enum Error {
     #[error("not found {0}")]
     NotFound(String),
 
-    #[error("not supported")]
+    #[error("Not supported.")]
     NotSupported,
 
-    #[error("two genesis hash variants for name")]
+    /// `ADDRESS_BOOK` tree of the hot database contains
+    /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) entries with same
+    /// `name` field and different `genesis_hash` values.
+    ///
+    /// This is not allowed, as it would cause uncertainty in `load_metadata`
+    /// message generation, which is build using metadata and genesis hash.
+    #[error("Two different genesis hash entries for network {name} in address book.")]
     TwoGenesisHashVariantsForName {
         /// network name
         name: String,
     },
 
-    #[error("two url variants for name")]
+    /// `ADDRESS_BOOK` tree of the hot database contains
+    /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) entries with same
+    /// `name` field and different `address` values.
+    ///
+    /// Hot database does not allow to store more than one trusted url address
+    /// for rpc calls for same network.
+    ///
+    /// Alternative url address could be used if the database is not updated
+    /// (`-d` key is used).
+    ///
+    /// To update the address in the database in case the old one is no longer
+    /// acceptable, one should remove old entry, and only then add the new one.
+    #[error("Two different url entries for network {name} in address book.")]
     TwoUrlVariantsForName {
         /// network name
         name: String,
     },
 
-    #[error("two base58 for name")]
+    /// `SPECSTREEPREP` tree of the hot database contains
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) entries
+    /// with same network name, but different base58 prefix.
+    #[error("Two different base58 entries for network {name}.")]
     TwoBase58ForName {
         /// network name
         name: String,
     },
 
-    #[error("address book empty")]
+    /// `ADDRESS_BOOK` tree of the hot database has no entries to process.
+    #[error("Address book is empty")]
     AddressBookEmpty,
 
     /// Tried to fetch with `-u` key using address already known to the database
-    #[error("url in db")]
+    #[error(
+        "There is already an entry with address {url} \
+            for network {title}. Known networks should be processed \
+            with `-n` content key."
+    )]
     UKeyUrlInDb {
         /// network address book title
         title: String,
@@ -90,7 +136,14 @@ pub enum Error {
     ///
     /// To update the address in the database in case the old one is no longer
     /// acceptable, one should remove old entry, and only then add the new one.
-    #[error("hash in db")]
+    #[error(
+        "Fetch at {url} resulted in data already known to the hot database. \
+        Network {} with genesis hash {} \
+        has address set to {}. To change the url, delete old entry.",
+        .address_book_entry.name,
+        hex::encode(.address_book_entry.genesis_hash),
+        .address_book_entry.address,
+    )]
     UKeyHashInDb {
         /// address book entry with exactly matching genesis hash
         address_book_entry: AddressBookEntry,
@@ -99,19 +152,33 @@ pub enum Error {
         url: String,
     },
 
-    #[error("unexpected metadata format")]
+    #[error("Unexpected metadata format.")]
     UnexpectedMetadataFormat,
 
-    #[error("unexpected genesis hash format")]
+    #[error("Unexpected genesis hash format.")]
     UnexpectedGenesisHashFormat,
 
-    #[error("unexpected system properties format")]
+    #[error("Unexpected system properties format.")]
     UnexpectedSystemPropertiesFormat,
 
-    #[error("unexpected block hash format")]
+    #[error("Unexpected block hash format.")]
     UnexpectedBlockHashFormat,
 
-    #[error("address book specs name")]
+    /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) in hot database
+    /// contains `encryption` and `genesis_hash` fields, from which the
+    /// corresponding [`NetworkSpecsKey`] could be built.
+    ///
+    /// `NetworkSpecsKey` has an associated
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) value
+    /// stored in `SPECSTREEPREP` tree of the hot database. `NetworkSpecsToSend`
+    /// has field `name` with network name.
+    ///
+    /// This error appears if the `name` from `NetworkSpecsToSend` differs from
+    /// the `name` in `AddressBookEntry`.
+    #[error(
+        "Address book name {address_book_name} does not match the \
+        name in corresponding network specs {specs_name}"
+    )]
     AddressBookSpecsName {
         /// name in [`AddressBookEntry`](definitions::metadata::AddressBookEntry)
         address_book_name: String,
@@ -123,19 +190,39 @@ pub enum Error {
     #[error("network specs to send")]
     NetworkSpecsToSend(NetworkSpecsKey),
 
-    #[error("two names for url")]
+    /// `ADDRESS_BOOK` tree of the hot database contains
+    /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) entries with same
+    /// `address` field and different `name` fields.
+    ///
+    /// Name in address book is taken from the metadata, metadata is fetched
+    /// using rpc call, so one url address can correspond to only one network
+    /// name.
+    #[error("Two different network names in entries for url address {url} in address book.")]
     TwoNamesForUrl {
         /// url address, for which two condlicting names were found
         url: String,
     },
 
-    #[error("hot database metadata over two entries")]
+    /// `METATREE` of the hot database shoud contain at most two latest
+    /// metadata versions for each network, with the older entries being
+    /// deleted as the new ones appear.
+    ///
+    /// This error appears if during the processing more than two metadata
+    /// entries for the network are found.
+    #[error("More than two entries for network {name} in hot database.")]
     HotDatabaseMetadataOverTwoEntries {
         /// network name
         name: String,
     },
 
-    #[error("a")]
+    /// `METATREE` of the hot database has two entries for a network with the
+    /// same metadata version.
+    ///
+    /// Note: at this moment should be unreachable, since the entries are
+    /// getting checked for consistency with [`MetaKey`].
+    ///
+    /// [`MetaKey`]: definitions::keyring::MetaKey
+    #[error("Two entries for {name} version {version}.")]
     HotDatabaseMetadataSameVersionTwice {
         /// network name
         name: String,
@@ -146,7 +233,10 @@ pub enum Error {
 
     /// Fetched network metadata version is lower than the one already in the
     /// hot database.
-    #[error("earlier version")]
+    #[error(
+        "For {name} the newly received version ({new_version}) is lower \
+        than the latest version in the hot database ({old_version})."
+    )]
     EarlierVersion {
         /// network name
         name: String,
@@ -160,7 +250,12 @@ pub enum Error {
 
     /// Fetched network metadata is different from the one already in the hot
     /// database, with the same network name and network version.
-    #[error("same version different metadata")]
+    #[error(
+        "Metadata {name}{version} fetched now at block hash {} \
+        differs from the one in the hot database, block hash {}.",
+        .block_hash_in_db.map(hex::encode).unwrap_or_else(|| String::from("unknown")),
+        .block_hash_in_fetch.map(hex::encode).unwrap_or_else(|| String::from("unknown")),
+    )]
     SameVersionDifferentMetadata {
         /// network name
         name: String,
@@ -177,7 +272,7 @@ pub enum Error {
     },
 
     /// Fetched data is different from the one already in the hot database.
-    #[error("values changed")]
+    #[error("Network from {url} error: {what}")]
     ValuesChanged {
         /// url address used for rpc call
         url: String,
@@ -187,7 +282,7 @@ pub enum Error {
     },
 
     /// Fetched network specs are not suitable for use in Signer.
-    #[error("faulty specs")]
+    #[error("Problem with network specs from {url}. {error}")]
     FaultySpecs {
         /// url address used for rpc cal
         url: String,
@@ -197,50 +292,44 @@ pub enum Error {
     },
 
     /// Fetched genesis hash could not be transformed in expected [u8; 32] value.
-    #[error("unexpected fetched genesis hash format")]
+    #[error(
+        "Fetched genesis hash {value} has unexpected format and does not fit into [u8;32] array."
+    )]
     UnexpectedFetchedGenesisHashFormat {
         /// genesis hash value as received through rpc call
         value: String,
     },
 
     /// Fetched block hash could not be transformed in expected [u8; 32] value.
-    #[error("unexpected fetched block hash format {value}")]
+    #[error(
+        "Fetched block hash {value} has unexpected format \
+        and does not fit into [u8;32] array."
+    )]
     UnexpectedFetchedBlockHashFormat {
         /// block hash value as received through rpc call
         value: String,
     },
 
     /// User-entered block hash has invalid length
-    #[error("block hash length")]
+    #[error("Provided block hash has wrong length.")]
     BlockHashLength,
 
-    #[error(transparent)]
-    Specs(#[from] SpecsError),
-
-    #[error(transparent)]
-    Metadata(#[from] MetadataError),
-
-    #[error("address book entry with name {name}")]
+    /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) searched in
+    /// `ADDRESS_BOOK` tree of the hot database by matching the `name` field.
+    ///
+    /// Associated data is the network name used for searching.
+    #[error("Could not find address book entry for network name {name}")]
     AddressBookEntryWithName { name: String },
-
-    #[error(transparent)]
-    Input(#[from] InputActive),
 
     /// Provided data signature (entered separately or as a part of
     /// [`SufficientCrypto`](definitions::crypto::SufficientCrypto) input) is invalid
     /// for given public key and data.
-    #[error("bad signature")]
+    #[error("Bad signature.")]
     BadSignature,
 
     /// A key needed to run the command was not provided.
     ///
     /// Associated data is [`CommandNeedKey`] with more details.
-    #[error("need key")]
-    NeedKey(CommandNeedKey),
-
-    #[error(transparent)]
-    CommandParser(#[from] CommandParser),
-
-    #[error(transparent)]
-    Codec(#[from] parity_scale_codec::Error),
+    #[error("Key needs to be used {0}")]
+    NeedKey(#[from] CommandNeedKey),
 }
