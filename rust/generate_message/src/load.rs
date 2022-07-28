@@ -17,11 +17,9 @@ use sp_core::H256;
 
 use constants::{EXPORT_FOLDER, HOT_DB_NAME, METATREE};
 use db_handling::helpers::{get_meta_values_by_name_version, open_db, open_tree};
-use definitions::{
-    error::MetadataError, error_active::Changed, keyring::MetaKeyPrefix, metadata::MetaValues,
-};
+use definitions::{error::MetadataError, keyring::MetaKeyPrefix, metadata::MetaValues};
 
-use crate::error::{Error, Result};
+use crate::error::{Changed, Error, Result};
 use crate::helpers::{
     add_new_metadata, address_book_content, db_upd_metadata, error_occured, load_metadata_print,
     meta_fetch, network_specs_from_entry, prepare_metadata, MetaFetched, MetaShortCut,

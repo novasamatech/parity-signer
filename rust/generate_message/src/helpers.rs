@@ -15,7 +15,6 @@ use db_handling::{
 };
 use definitions::{
     crypto::Encryption,
-    error_active::{Changed, NotHexActive, SpecsError},
     helpers::unhex,
     keyring::{AddressBookKey, MetaKey, NetworkSpecsKey},
     metadata::{AddressBookEntry, MetaHistoryEntry, MetaValues},
@@ -23,7 +22,7 @@ use definitions::{
     qr_transfers::{ContentAddSpecs, ContentLoadMeta},
 };
 
-use crate::error::{Error, Result};
+use crate::error::{Changed, Error, NotHexActive, Result, SpecsError};
 use crate::fetch_metadata::{fetch_info, fetch_info_with_network_specs, fetch_meta_at_block};
 use crate::interpret_specs::{check_specs, interpret_properties, TokenFetch};
 use crate::parser::Token;
@@ -891,11 +890,11 @@ enum Hash {
 /// produce error in case the `input_hash` format is incorrect).
 fn get_hash(input_hash: &str, what: Hash) -> Result<H256> {
     let _not_hex = match what {
-        Hash::BlockEntered => NotHexActive::EnteredBlockHash,
-        Hash::BlockFetched { ref url } => NotHexActive::FetchedBlockHash {
+        Hash::BlockEntered => NotHexActive::EnteredBlock,
+        Hash::BlockFetched { ref url } => NotHexActive::FetchedBlock {
             url: url.to_string(),
         },
-        Hash::Genesis { ref url } => NotHexActive::FetchedGenesisHash {
+        Hash::Genesis { ref url } => NotHexActive::FetchedGenesis {
             url: url.to_string(),
         },
     };

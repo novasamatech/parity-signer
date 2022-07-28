@@ -2,10 +2,6 @@
 use constants::FOLDER;
 use definitions::{
     crypto::{Encryption, SufficientCrypto},
-    error_active::{
-        CommandBadArgument, CommandDoubleKey, CommandNeedArgument, CommandNeedKey, CommandParser,
-        CommandUnexpected, InputActive,
-    },
     helpers::unhex,
 };
 use parity_scale_codec::Decode;
@@ -13,7 +9,10 @@ use sp_core::{ecdsa, ed25519, sr25519};
 use std::convert::TryInto;
 use std::{env, path::PathBuf};
 
-use crate::error::{Error, Result};
+use crate::error::{
+    CommandBadArgument, CommandDoubleKey, CommandNeedArgument, CommandNeedKey, CommandParser,
+    CommandUnexpected, Error, InputActive, Result,
+};
 
 /// Commands to execute.
 pub enum Command {

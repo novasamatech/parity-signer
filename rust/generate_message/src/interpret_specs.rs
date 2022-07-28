@@ -33,11 +33,11 @@
 //! Command line with token override:
 //!
 //! `$ cargo run add_specs -d -u <url_address> -sr25519 -token <decimals> <unit>`
-use definitions::{error_active::SpecsError, network_specs::NetworkProperties};
+use definitions::network_specs::NetworkProperties;
 use serde_json::{map::Map, value::Value};
 use std::convert::TryInto;
 
-use crate::error::Result;
+use crate::error::{Result, SpecsError};
 use crate::parser::Token;
 
 /// Transform `system_properties` rpc call results into [`NetworkProperties`].
