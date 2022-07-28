@@ -14,8 +14,7 @@ use parity_scale_codec::{Decode, Encode};
 #[cfg(feature = "signer")]
 use sled::IVec;
 
-#[cfg(feature = "signer")]
-use crate::error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner};
+use crate::error::Result;
 
 /// Danger status in the Signer database
 ///
@@ -70,13 +69,8 @@ impl DangerRecord {
     ///
     /// Could result in error if the `DangerRecord` content is corrupted.  
     #[cfg(feature = "signer")]
-    pub fn device_was_online(&self) -> Result<bool, ErrorSigner> {
-        match <DecodedDangerRecord>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok(a.device_was_online),
-            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-                EntryDecodingSigner::DangerStatus,
-            ))),
-        }
+    pub fn device_was_online(&self) -> Result<bool> {
+        Ok(<DecodedDangerRecord>::decode(&mut &self.0[..])?.device_was_online)
     }
 
     /// Transform `DangerRecord` into `Vec<u8>` to put in the database.  

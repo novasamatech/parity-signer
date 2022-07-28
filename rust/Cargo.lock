@@ -664,6 +664,7 @@ dependencies = [
 name = "db_handling"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "blake2-rfc",
  "constants",
  "defaults",
@@ -678,6 +679,7 @@ dependencies = [
  "sled",
  "sp-core",
  "sp-runtime",
+ "thiserror",
  "time",
  "tiny-bip39 1.0.0",
  "zeroize",
@@ -692,13 +694,13 @@ dependencies = [
  "regex",
  "sp-core",
  "sp-runtime",
+ "thiserror",
 ]
 
 [[package]]
 name = "definitions"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "blake2-rfc",
  "frame-metadata",
  "hex",
@@ -712,7 +714,7 @@ dependencies = [
  "sp-runtime",
  "sp-version",
  "sp-wasm-interface",
- "time",
+ "thiserror",
  "variant_count",
 ]
 
@@ -1108,6 +1110,7 @@ dependencies = [
  "serde_json",
  "sled",
  "sp-core",
+ "thiserror",
  "tokio",
 ]
 
@@ -1765,6 +1768,7 @@ dependencies = [
  "regex",
  "sp-core",
  "sp-runtime",
+ "thiserror",
  "transaction_parsing",
  "transaction_signing",
  "zeroize",
@@ -2146,6 +2150,7 @@ dependencies = [
  "sp-arithmetic",
  "sp-core",
  "sp-runtime",
+ "thiserror",
 ]
 
 [[package]]
@@ -2994,7 +2999,6 @@ dependencies = [
  "qr_reader_phone",
  "sp-core",
  "sp-runtime",
- "transaction_parsing",
  "uniffi",
  "uniffi_build",
 ]
@@ -3791,7 +3795,6 @@ dependencies = [
 name = "transaction_parsing"
 version = "0.1.0"
 dependencies = [
- "bitvec",
  "constants",
  "db_handling",
  "definitions",
@@ -3804,12 +3807,14 @@ dependencies = [
  "sled",
  "sp-core",
  "sp-runtime",
+ "thiserror",
 ]
 
 [[package]]
 name = "transaction_signing"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "blake2-rfc",
  "constants",
  "db_handling",
@@ -3821,6 +3826,7 @@ dependencies = [
  "sled",
  "sp-core",
  "sp-runtime",
+ "thiserror",
  "transaction_parsing",
  "zeroize",
 ]

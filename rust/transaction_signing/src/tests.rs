@@ -20,8 +20,6 @@ use db_handling::{
 };
 use definitions::{
     crypto::Encryption,
-    error::{AddressKeySource, ErrorSource},
-    error_signer::{DatabaseSigner, ErrorSigner, Signer},
     history::{Entry, Event, SignDisplay, SignMessageDisplay},
     keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey},
     navigation::{
@@ -36,7 +34,7 @@ use transaction_parsing::{
     entry_to_transactions_with_decoding, produce_output, StubNav, TransactionAction,
 };
 
-use crate::{handle_stub, sign_transaction::create_signature};
+use crate::{handle_stub, sign_transaction::create_signature, Error, Result};
 
 const PWD: &str = "";
 const USER_COMMENT: &str = "";
@@ -59,7 +57,7 @@ fn sign_action_test(
     pwd_entry: &str,
     user_comment: &str,
     dbname: &str,
-) -> Result<String, ErrorSigner> {
+) -> Result<String> {
     Ok(hex::encode(
         create_signature(seed_phrase, pwd_entry, user_comment, dbname, checksum)?.encode(),
     ))
@@ -84,7 +82,7 @@ fn print_db_content(dbname: &str) -> String {
     let metadata: Tree = database.open_tree(METATREE).unwrap();
     for (meta_key_vec, _) in metadata.iter().flatten() {
         let meta_key = MetaKey::from_ivec(&meta_key_vec);
-        let (name, version) = meta_key.name_version::<Signer>().unwrap();
+        let (name, version) = meta_key.name_version().unwrap();
         metadata_set.push(format!("{}{}", name, version));
     }
     metadata_set.sort();
@@ -97,11 +95,9 @@ fn print_db_content(dbname: &str) -> String {
     let chainspecs: Tree = database.open_tree(SPECSTREE).unwrap();
     for (network_specs_key_vec, network_specs_encoded) in chainspecs.iter().flatten() {
         let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
-        let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(
-            &network_specs_key,
-            network_specs_encoded,
-        )
-        .unwrap();
+        let network_specs =
+            NetworkSpecs::from_entry_with_key_checked(&network_specs_key, network_specs_encoded)
+                .unwrap();
         network_specs_set.push((network_specs_key, network_specs));
     }
     network_specs_set.sort_by(|(_, a), (_, b)| a.title.cmp(&b.title));
@@ -124,7 +120,7 @@ fn print_db_content(dbname: &str) -> String {
     let mut verifiers_set: Vec<String> = Vec::new();
     let verifiers: Tree = database.open_tree(VERIFIERS).unwrap();
     for (verifier_key_vec, current_verifier_encoded) in verifiers.iter().flatten() {
-        let verifier_key = VerifierKey::from_ivec::<Signer>(&verifier_key_vec).unwrap();
+        let verifier_key = VerifierKey::from_ivec(&verifier_key_vec).unwrap();
         let current_verifier = CurrentVerifier::decode(&mut &current_verifier_encoded[..]).unwrap();
         match current_verifier {
             CurrentVerifier::Valid(a) => {
@@ -181,9 +177,7 @@ fn print_db_content(dbname: &str) -> String {
     for (address_key_vec, address_details_encoded) in identities.iter().flatten() {
         let address_key = AddressKey::from_ivec(&address_key_vec);
         let address_details = AddressDetails::decode(&mut &address_details_encoded[..]).unwrap();
-        let (public_key, encryption) = address_key
-            .public_key_encryption::<Signer>(AddressKeySource::AddrTree)
-            .unwrap();
+        let (public_key, encryption) = address_key.public_key_encryption().unwrap();
 
         let mut networks_set: Vec<String> = Vec::new();
         for y in address_details.network_id.iter() {
@@ -425,8 +419,8 @@ fn can_sign_transaction_1() {
 
         let result = sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname);
         if let Err(e) = result {
-            let expected_err = ErrorSigner::Database(DatabaseSigner::ChecksumMismatch);
-            if <Signer>::show(&e) != <Signer>::show(&expected_err) {
+            if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
+            } else {
                 panic!("Expected wrong checksum. Got error: {:?}.", e)
             }
         } else {
@@ -669,8 +663,8 @@ fn can_sign_message_1() {
 
         let result = sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname);
         if let Err(e) = result {
-            let expected_err = ErrorSigner::Database(DatabaseSigner::ChecksumMismatch);
-            if <Signer>::show(&e) != <Signer>::show(&expected_err) {
+            if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
+            } else {
                 panic!("Expected wrong checksum. Got error: {:?}.", e)
             }
         } else {
@@ -3259,7 +3253,7 @@ Identities:
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt")
             .unwrap();
-    let error = "Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
+    let error = "Bad input data. Database error. Internal error. Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
 
     let output = produce_output(line.trim(), dbname);
     let reply_known = TransactionCardSet {
@@ -3282,7 +3276,7 @@ Identities:
             .unwrap();
     let output = produce_output(line.trim(), dbname);
 
-    let error = "Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
+    let error = "Bad input data. Database error. Internal error. Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
     let reply_known = TransactionCardSet {
         error: Some(vec![TransactionCard {
             index: 0,

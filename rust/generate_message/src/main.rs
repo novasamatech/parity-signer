@@ -1,14 +1,8 @@
-use definitions::{error::ErrorSource, error_active::Active};
-use generate_message::{full_run, parser::Command};
+use generate_message::{full_run, parser::Command, Error};
 use std::env;
 
-fn main() -> Result<(), String> {
-    let command = match Command::new(env::args()) {
-        Ok(a) => a,
-        Err(e) => return Err(<Active>::show(&e)),
-    };
-    match full_run(command) {
-        Ok(_) => Ok(()),
-        Err(e) => Err(<Active>::show(&e)),
-    }
+fn main() -> Result<(), Error> {
+    let command = Command::new(env::args())?;
+    full_run(command).unwrap();
+    Ok(())
 }

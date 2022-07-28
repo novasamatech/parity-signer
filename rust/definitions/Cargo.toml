@@ -6,7 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = {version = "1.0.58", optional = true}
 blake2-rfc = "0.2.18"
 frame-metadata = {version = "15.0.0", features = ["std", "legacy"]}
 hex = "0.4.3"
@@ -20,7 +19,7 @@ sp-io = {git = "https://github.com/paritytech/substrate", optional = true}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 sp-version = {git = "https://github.com/paritytech/substrate"}
 sp-wasm-interface = {git = "https://github.com/paritytech/substrate", optional = true}
-time = {version = "0.3.11", features = ["formatting"]}
+thiserror = "1.0.31"
 variant_count = {version = "1.1.0", optional = true}
 
 [features]
@@ -32,7 +31,6 @@ active = [
 	"sp-wasm-interface",
 ]
 signer = [
-	"anyhow",
 	"plot_icon",
 ]
 test = [

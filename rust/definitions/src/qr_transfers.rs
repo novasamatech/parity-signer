@@ -26,11 +26,7 @@ use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec::{Decode, Encode};
 
 use crate::crypto::Encryption;
-use crate::error::{ErrorSource, TransferContent};
-#[cfg(feature = "active")]
-use crate::error_active::ErrorActive;
-#[cfg(feature = "signer")]
-use crate::error_signer::{ErrorSigner, InputSigner};
+use crate::error::Result;
 #[cfg(feature = "signer")]
 use crate::helpers::pic_types;
 use crate::network_specs::NetworkSpecsToSend;
@@ -67,36 +63,25 @@ impl ContentLoadMeta {
     }
 
     /// Get metadata `Vec<u8>` from [`ContentLoadMeta`].
-    pub fn meta<T: ErrorSource>(&self) -> Result<Vec<u8>, T::Error> {
-        match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok(a.meta),
-            Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
-        }
+    pub fn meta(&self) -> Result<Vec<u8>> {
+        Ok(<DecodedContentLoadMeta>::decode(&mut &self.0[..])?.meta)
     }
 
     /// Get genesis hash `[u8; 32]` from [`ContentLoadMeta`].
-    pub fn genesis_hash<T: ErrorSource>(&self) -> Result<H256, T::Error> {
-        match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok(a.genesis_hash),
-            Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
-        }
+    pub fn genesis_hash(&self) -> Result<H256> {
+        Ok(<DecodedContentLoadMeta>::decode(&mut &self.0[..])?.genesis_hash)
     }
 
     /// Get metadata `Vec<u8>` and genesis hash `[u8; 32]` from [`ContentLoadMeta`] as a tuple.
-    pub fn meta_genhash<T: ErrorSource>(&self) -> Result<(Vec<u8>, H256), T::Error> {
-        match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok((a.meta, a.genesis_hash)),
-            Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
-        }
+    pub fn meta_genhash(&self) -> Result<(Vec<u8>, H256)> {
+        let a = <DecodedContentLoadMeta>::decode(&mut &self.0[..])?;
+        Ok((a.meta, a.genesis_hash))
     }
 
     /// Write [`ContentLoadMeta`] into file that could be signed by the verifier.
     #[cfg(feature = "active")]
-    pub fn write(&self, filename: &str) -> Result<(), ErrorActive> {
-        match std::fs::write(&filename, &self.to_sign()) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(ErrorActive::Output(e)),
-        }
+    pub fn write(&self, filename: &str) -> Result<()> {
+        Ok(std::fs::write(&filename, &self.to_sign())?)
     }
 
     /// Transform [`ContentLoadMeta`] into `Vec<u8>` that could be signed by the verifier.
@@ -141,20 +126,14 @@ impl ContentAddSpecs {
     }
 
     /// Get network specs [`NetworkSpecsToSend`] from [`ContentAddSpecs`].
-    pub fn specs<T: ErrorSource>(&self) -> Result<NetworkSpecsToSend, T::Error> {
-        match <DecodedContentAddSpecs>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok(a.specs),
-            Err(_) => Err(<T>::transfer_content_error(TransferContent::AddSpecs)),
-        }
+    pub fn specs(&self) -> Result<NetworkSpecsToSend> {
+        Ok(<DecodedContentAddSpecs>::decode(&mut &self.0[..])?.specs)
     }
 
     /// Write [`ContentAddSpecs`] into file that could be signed by the verifier.
     #[cfg(feature = "active")]
-    pub fn write(&self, filename: &str) -> Result<(), ErrorActive> {
-        match std::fs::write(&filename, &self.to_sign()) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(ErrorActive::Output(e)),
-        }
+    pub fn write(&self, filename: &str) -> Result<()> {
+        Ok(std::fs::write(&filename, &self.to_sign())?)
     }
 
     /// Transform [`ContentAddSpecs`] into `Vec<u8>` that could be signed by the verifier.
@@ -208,20 +187,14 @@ impl ContentLoadTypes {
     }
 
     /// Get types information `Vec<TypeEntry>` from [`ContentLoadTypes`].  
-    pub fn types<T: ErrorSource>(&self) -> Result<Vec<TypeEntry>, T::Error> {
-        match <DecodedContentLoadTypes>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok(a.types),
-            Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadTypes)),
-        }
+    pub fn types(&self) -> Result<Vec<TypeEntry>> {
+        Ok(<DecodedContentLoadTypes>::decode(&mut &self.0[..])?.types)
     }
 
     /// Write [`ContentLoadTypes`] into file that could be signed by the verifier.  
     #[cfg(feature = "active")]
-    pub fn write(&self, filename: &str) -> Result<(), ErrorActive> {
-        match std::fs::write(&filename, &self.to_sign()) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(ErrorActive::Output(e)),
-        }
+    pub fn write(&self, filename: &str) -> Result<()> {
+        Ok(std::fs::write(&filename, &self.to_sign())?)
     }
 
     /// Transform [`ContentLoadTypes`] into `Vec<u8>` to be put in the database.  
@@ -299,13 +272,9 @@ impl ContentDerivations {
     /// Get encryption [`Encryption`], genesis hash `[u8; 32]` and derivations `Vec<String>`
     /// from [`ContentDerivations`] as a tuple.
     #[cfg(feature = "signer")]
-    pub fn encryption_genhash_derivations(
-        &self,
-    ) -> Result<(Encryption, H256, Vec<String>), ErrorSigner> {
-        match <DecodedContentDerivations>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok((a.encryption, a.genesis_hash, a.derivations)),
-            Err(_) => Err(ErrorSigner::Input(InputSigner::TransferDerivations)),
-        }
+    pub fn encryption_genhash_derivations(&self) -> Result<(Encryption, H256, Vec<String>)> {
+        let a = <DecodedContentDerivations>::decode(&mut &self.0[..])?;
+        Ok((a.encryption, a.genesis_hash, a.derivations))
     }
 
     /// Transform [`ContentDerivations`] into `Vec<u8>` that is concatenated with

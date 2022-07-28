@@ -4,14 +4,12 @@ use scale_info::{form::PortableForm, Type};
 use sp_core::H256;
 use sp_runtime::generic::Era;
 
-use definitions::{
-    error_signer::{ParserDecodingError, ParserError},
-    network_specs::ShortSpecs,
-};
+use definitions::network_specs::ShortSpecs;
 
 use crate::cards::ParserCard;
 use crate::decoding_commons::{DecodedOut, OutputCard};
 use crate::decoding_sci::{decoding_sci_complete, CallExpectation};
+use crate::error::{Error, ParserDecodingError, Result};
 
 pub(crate) fn decode_ext_attempt(
     data: &[u8],
@@ -19,18 +17,14 @@ pub(crate) fn decode_ext_attempt(
     meta_v14: &RuntimeMetadataV14,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     let mut data = data.to_vec();
     let mut fancy_out: Vec<OutputCard> = Vec::new();
     for x in meta_v14.extrinsic.signed_extensions.iter() {
         ext.identifier = x.identifier.to_string();
         let current_type = match meta_v14.types.resolve(x.ty.id()) {
             Some(a) => a,
-            None => {
-                return Err(ParserError::Decoding(
-                    ParserDecodingError::V14TypeNotResolved,
-                ))
-            }
+            None => return Err(Error::Decoding(ParserDecodingError::V14TypeNotResolved)),
         };
         let decoded_out = decoding_sci_complete(
             current_type,
@@ -50,11 +44,7 @@ pub(crate) fn decode_ext_attempt(
         ext.identifier = x.identifier.to_string();
         let current_type = match meta_v14.types.resolve(x.additional_signed.id()) {
             Some(a) => a,
-            None => {
-                return Err(ParserError::Decoding(
-                    ParserDecodingError::V14TypeNotResolved,
-                ))
-            }
+            None => return Err(Error::Decoding(ParserDecodingError::V14TypeNotResolved)),
         };
         let decoded_out = decoding_sci_complete(
             current_type,
@@ -155,7 +145,7 @@ pub(crate) fn special_case_hash(
     indent: u32,
     short_specs: &ShortSpecs,
     hash: &Hash,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     match data.get(0..32) {
         Some(a) => {
             let decoded_hash = H256::from_slice(a);
@@ -164,9 +154,7 @@ pub(crate) fn special_case_hash(
                 Hash::GenesisHash => {
                     found_ext.genesis_hash = Some(decoded_hash);
                     if decoded_hash != short_specs.genesis_hash {
-                        return Err(ParserError::Decoding(
-                            ParserDecodingError::GenesisHashMismatch,
-                        ));
+                        return Err(Error::Decoding(ParserDecodingError::GenesisHashMismatch));
                     }
                     Vec::new()
                 }
@@ -183,7 +171,7 @@ pub(crate) fn special_case_hash(
                 fancy_out,
             })
         }
-        None => Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
+        None => Err(Error::Decoding(ParserDecodingError::DataTooShort)),
     }
 }
 
@@ -191,14 +179,14 @@ pub(crate) fn special_case_era(
     data: Vec<u8>,
     found_ext: &mut FoundExt,
     indent: u32,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     let (era_data, remaining_vector) = match data.get(0) {
         Some(0) => (data[0..1].to_vec(), data[1..].to_vec()),
         Some(_) => match data.get(0..2) {
             Some(a) => (a.to_vec(), data[2..].to_vec()),
-            None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
+            None => return Err(Error::Decoding(ParserDecodingError::DataTooShort)),
         },
-        None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
+        None => return Err(Error::Decoding(ParserDecodingError::DataTooShort)),
     };
     match Era::decode(&mut &era_data[..]) {
         Ok(a) => {
@@ -211,6 +199,6 @@ pub(crate) fn special_case_era(
                 }],
             })
         }
-        Err(_) => Err(ParserError::Decoding(ParserDecodingError::Era)),
+        Err(_) => Err(Error::Decoding(ParserDecodingError::Era)),
     }
 }

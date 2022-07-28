@@ -12,9 +12,7 @@ use std::convert::TryInto;
 use plot_icon::generate_png_scaled_default;
 
 use crate::crypto::Encryption;
-use crate::error::ErrorSource;
-#[cfg(feature = "signer")]
-use crate::error_signer::{ErrorSigner, InterfaceSigner};
+use crate::error::{Error, Result};
 
 /// Decode hexadecimal `&str` into `Vec<u8>`, with descriptive error  
 ///
@@ -23,7 +21,7 @@ use crate::error_signer::{ErrorSigner, InterfaceSigner};
 /// In addition to encoded `&str` required is input of `T::NotHex`, to produce
 /// error with details on what exactly turned out to be invalid hexadecimal
 /// string.  
-pub fn unhex<T: ErrorSource>(hex_entry: &str, what: T::NotHex) -> Result<Vec<u8>, T::Error> {
+pub fn unhex(hex_entry: &str) -> Result<Vec<u8>> {
     let hex_entry = {
         if let Some(a) = hex_entry.strip_prefix("0x") {
             a
@@ -31,10 +29,7 @@ pub fn unhex<T: ErrorSource>(hex_entry: &str, what: T::NotHex) -> Result<Vec<u8>
             hex_entry
         }
     };
-    match hex::decode(hex_entry) {
-        Ok(x) => Ok(x),
-        Err(_) => Err(<T>::hex_to_error(what)),
-    }
+    Ok(hex::decode(hex_entry)?)
 }
 
 /// Get `Vec<u8>` public key from
@@ -67,27 +62,27 @@ pub fn make_identicon_from_multisigner(multisigner: &MultiSigner) -> Vec<u8> {
 /// Get [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
 /// from public key and [`Encryption`](crate::crypto::Encryption)
 #[cfg(feature = "signer")]
-pub fn get_multisigner(public: &[u8], encryption: &Encryption) -> Result<MultiSigner, ErrorSigner> {
+pub fn get_multisigner(public: &[u8], encryption: &Encryption) -> Result<MultiSigner> {
     match encryption {
         Encryption::Ed25519 => {
-            let into_pubkey: [u8; 32] = match public.to_vec().try_into() {
-                Ok(a) => a,
-                Err(_) => return Err(ErrorSigner::Interface(InterfaceSigner::PublicKeyLength)),
-            };
+            let into_pubkey: [u8; 32] = public
+                .to_vec()
+                .try_into()
+                .map_err(|_| Error::WrongPublicKeyLength)?;
             Ok(MultiSigner::Ed25519(ed25519::Public::from_raw(into_pubkey)))
         }
         Encryption::Sr25519 => {
-            let into_pubkey: [u8; 32] = match public.to_vec().try_into() {
-                Ok(a) => a,
-                Err(_) => return Err(ErrorSigner::Interface(InterfaceSigner::PublicKeyLength)),
-            };
+            let into_pubkey: [u8; 32] = public
+                .to_vec()
+                .try_into()
+                .map_err(|_| Error::WrongPublicKeyLength)?;
             Ok(MultiSigner::Sr25519(sr25519::Public::from_raw(into_pubkey)))
         }
         Encryption::Ecdsa => {
-            let into_pubkey: [u8; 33] = match public.to_vec().try_into() {
-                Ok(a) => a,
-                Err(_) => return Err(ErrorSigner::Interface(InterfaceSigner::PublicKeyLength)),
-            };
+            let into_pubkey: [u8; 33] = public
+                .to_vec()
+                .try_into()
+                .map_err(|_| Error::WrongPublicKeyLength)?;
             Ok(MultiSigner::Ecdsa(ecdsa::Public::from_raw(into_pubkey)))
         }
     }

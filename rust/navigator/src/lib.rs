@@ -8,7 +8,9 @@
 use lazy_static::lazy_static;
 use std::sync::{Mutex, TryLockError};
 
-use definitions::{error_signer::Signer, keyring::NetworkSpecsKey, navigation::ActionResult};
+use definitions::{keyring::NetworkSpecsKey, navigation::ActionResult};
+
+mod error;
 
 mod actions;
 pub use actions::Action;
@@ -52,7 +54,8 @@ pub fn do_action(
     match guard {
         Ok(mut state) => state
             .perform(action, details_str, secret_seed_phrase)
-            .map(Some),
+            .map(Some)
+            .map_err(|e| format!("{}", e)),
         Err(TryLockError::Poisoned(_)) => {
             //TODO: maybe more grace here?
             //Maybe just silently restart navstate? But is it safe?
@@ -70,7 +73,7 @@ pub fn init_navigation(dbname: &str, seed_names: Vec<String>) {
         Ok(mut navstate) => {
             (*navstate).dbname = Some(dbname.to_string());
             (*navstate).seed_names = seed_names;
-            match db_handling::helpers::get_all_networks::<Signer>(dbname) {
+            match db_handling::helpers::get_all_networks(dbname) {
                 Ok(a) => {
                     for x in a.iter() {
                         (*navstate)

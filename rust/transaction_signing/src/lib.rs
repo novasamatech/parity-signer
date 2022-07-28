@@ -4,10 +4,7 @@
 use sp_runtime::MultiSigner;
 
 use db_handling::db_transactions::TrDbColdStub;
-use definitions::{
-    error_signer::ErrorSigner, keyring::NetworkSpecsKey, navigation::MSCContent,
-    users::AddressDetails,
-};
+use definitions::{keyring::NetworkSpecsKey, navigation::MSCContent, users::AddressDetails};
 
 mod sign_message;
 use sign_message::{
@@ -18,8 +15,11 @@ use sign_transaction::create_signature_png;
 #[cfg(test)]
 mod tests;
 
-pub fn handle_stub(checksum: u32, database_name: &str) -> Result<(), ErrorSigner> {
-    TrDbColdStub::from_storage(database_name, checksum)?.apply(database_name)
+mod error;
+pub use error::{Error, Result};
+
+pub fn handle_stub(checksum: u32, database_name: &str) -> Result<()> {
+    Ok(TrDbColdStub::from_storage(database_name, checksum)?.apply(database_name)?)
 }
 
 pub fn handle_sign(
@@ -28,7 +28,7 @@ pub fn handle_sign(
     pwd_entry: &str,
     user_comment: &str,
     database_name: &str,
-) -> Result<Vec<u8>, ErrorSigner> {
+) -> Result<Vec<u8>> {
     create_signature_png(
         seed_phrase,
         pwd_entry,
@@ -53,7 +53,7 @@ pub fn sign_content(
     database_name: &str,
     seed_phrase: &str,
     pwd_entry: &str,
-) -> Result<(Vec<u8>, MSCContent), ErrorSigner> {
+) -> Result<(Vec<u8>, MSCContent)> {
     match content {
         SufficientContent::AddSpecs(network_specs_key) => sufficient_crypto_add_specs(
             &network_specs_key,

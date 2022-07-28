@@ -1,4 +1,4 @@
-use crate::parse_and_display_set;
+use crate::{parse_and_display_set, Error};
 use definitions::network_specs::ShortSpecs;
 use frame_metadata::RuntimeMetadata;
 use parity_scale_codec::Decode;
@@ -74,13 +74,16 @@ fn tr_2() {
     let data = hex::decode("4d0210020806000046ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a07001b2c3ef70006050c0008264834504a64ace1373f0c8ed5d57381ddf54a2f67a318fa42b1352681606d00aebb0211dbb07b4d335a657257b8ac5e53794c901e4f616d4a254f2490c43934009ae581fef1fc06828723715731adcf810e42ce4dadad629b1b7fa5c3c144a81d550008009723000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff").unwrap();
     let reply =
         parse_and_display_set(&data, &metadata("for_tests/westend9120"), &specs()).unwrap_err();
-    let reply_known = "Network spec version decoded from extensions (9111) differs from the version in metadata (9120).";
-    assert!(
-        reply == reply_known,
-        "Expected: {}\nReceived: {}",
-        reply_known,
-        reply
-    );
+    if let Error::WrongNetworkVersion {
+        as_decoded,
+        in_metadata,
+    } = reply
+    {
+        assert_eq!(as_decoded, "9111".to_string());
+        assert_eq!(in_metadata, 9120);
+    } else {
+        panic!("Expected Error::WrongNetworkVersion, got {:?}", reply);
+    }
 }
 
 #[test]

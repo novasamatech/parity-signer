@@ -3,24 +3,20 @@
 //! This module deals with processing command
 //!
 //! `$ cargo run add_specs <keys> <argument(s)>`
-use definitions::{
-    crypto::Encryption,
-    error_active::{DatabaseActive, ErrorActive, Fetch},
-    keyring::NetworkSpecsKey,
-    metadata::AddressBookEntry,
-};
+use definitions::{crypto::Encryption, keyring::NetworkSpecsKey, metadata::AddressBookEntry};
 
+use crate::error::{Error, Result};
 use crate::helpers::{
-    add_specs_print, address_book_content, db_upd_network, error_occured,
-    filter_address_book_by_url, genesis_hash_in_hot_db, get_address_book_entry,
-    network_specs_from_entry, network_specs_from_title, specs_agnostic,
-    try_get_network_specs_to_send, update_known_specs, update_modify_encryption_specs,
+    add_specs_print, address_book_content, db_upd_network, filter_address_book_by_url,
+    genesis_hash_in_hot_db, get_address_book_entry, network_specs_from_entry,
+    network_specs_from_title, specs_agnostic, try_get_network_specs_to_send, update_known_specs,
+    update_modify_encryption_specs,
 };
 use crate::parser::{Content, InstructionSpecs, Override, Set, Token};
 
 /// Process `add_specs` command according to the [`InstructionSpecs`] received
 /// from the command line.
-pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
+pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
     match instruction.set {
         // `-f` setting key: produce `add_specs` payload files from existing
         // database entries.
@@ -28,25 +24,22 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
             // `$ cargo run add_specs -f -a`
             //
             // Make `add_specs` payloads for all specs entries in the database.
-            Content::All { pass_errors } => {
+            Content::All { pass_errors: _ } => {
                 // makes no sense to override encryption, or token, or title
                 // for all entries at once
                 if !instruction.over.all_empty() {
-                    return Err(ErrorActive::NotSupported);
+                    return Err(Error::NotSupported);
                 }
 
                 // collect `ADDRESS_BOOK` entries
                 let address_book_set = address_book_content()?;
                 if address_book_set.is_empty() {
-                    return Err(ErrorActive::Database(DatabaseActive::AddressBookEmpty));
+                    return Err(Error::AddressBookEmpty);
                 }
 
                 // process each entry
                 for (_, address_book_entry) in address_book_set.iter() {
-                    match specs_f_a_element(address_book_entry) {
-                        Ok(()) => (),
-                        Err(e) => error_occured(e, pass_errors)?,
-                    }
+                    specs_f_a_element(address_book_entry)?;
                 }
                 Ok(())
             }
@@ -63,7 +56,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
                 // no fetch is done, there is no way to check the override is
                 // allowed
                 if instruction.over.token.is_some() {
-                    return Err(ErrorActive::NotSupported);
+                    return Err(Error::NotSupported);
                 }
                 specs_f_n(&name, instruction.over.encryption, instruction.over.title)
             }
@@ -73,7 +66,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
             // the combination seems of no use.
             // To address a specific network from the database, `-f -n` key
             // combination is suggested.
-            Content::Address(_) => Err(ErrorActive::NotSupported),
+            Content::Address(_) => Err(Error::NotSupported),
         },
 
         // `-d` setting key: produce `add_specs` payloads through rpc calls,
@@ -81,10 +74,10 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
         Set::D => match instruction.content {
             // `-d` does not write in the database, so fetching specs for known
             // networks without checking the database seems of no use.
-            Content::All { pass_errors: _ } => Err(ErrorActive::NotSupported),
+            Content::All { pass_errors: _ } => Err(Error::NotSupported),
 
             // Same as `-d -a` combination, of no use.
-            Content::Name(_) => Err(ErrorActive::NotSupported),
+            Content::Name(_) => Err(Error::NotSupported),
 
             // `$ cargo run add_specs -d -u network_url_address
             // <encryption override> <optional token override> <optional signer
@@ -111,7 +104,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
                         instruction.over.title,
                     )
                 } else {
-                    Err(ErrorActive::NotSupported)
+                    Err(Error::NotSupported)
                 }
             }
         },
@@ -121,14 +114,14 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
         //
         // Since network specs are expected to remain constant over time,
         // these commands seem to be of no use.
-        Set::K => Err(ErrorActive::NotSupported),
+        Set::K => Err(Error::NotSupported),
 
         // `-p` setting key: update the database
         Set::P => match instruction.content {
             // Network specs are expected to remain constant over time, mass
             // override should not be possible, this command seems to be of no
             // use.
-            Content::All { pass_errors: _ } => Err(ErrorActive::NotSupported),
+            Content::All { pass_errors: _ } => Err(Error::NotSupported),
 
             // `$ cargo run add_specs -p -n network_address_book_title
             // <encryption override> <optional title override>
@@ -170,7 +163,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
                         false,
                     )
                 } else {
-                    Err(ErrorActive::NotSupported)
+                    Err(Error::NotSupported)
                 }
             }
         },
@@ -180,7 +173,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
         Set::T => match instruction.content {
             // Network specs are expected to remain constant over time,
             // this command seems to be of no use.
-            Content::All { pass_errors: _ } => Err(ErrorActive::NotSupported),
+            Content::All { pass_errors: _ } => Err(Error::NotSupported),
 
             // `$ cargo run add_specs -n network_address_book_title
             // <encryption override>`
@@ -219,7 +212,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
                         true,
                     )
                 } else {
-                    Err(ErrorActive::NotSupported)
+                    Err(Error::NotSupported)
                 }
             }
         },
@@ -232,7 +225,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
 /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) from
 /// the database using information in address book entry
 /// - Output raw bytes payload file
-fn specs_f_a_element(entry: &AddressBookEntry) -> Result<(), ErrorActive> {
+fn specs_f_a_element(entry: &AddressBookEntry) -> Result<()> {
     let network_specs = network_specs_from_entry(entry)?;
     add_specs_print(&network_specs)
 }
@@ -251,7 +244,7 @@ fn specs_f_n(
     title: &str,
     optional_encryption_override: Option<Encryption>,
     optional_signer_title_override: Option<String>,
-) -> Result<(), ErrorActive> {
+) -> Result<()> {
     let mut network_specs = network_specs_from_title(title)?;
     match optional_encryption_override {
         Some(encryption) => {
@@ -289,7 +282,7 @@ fn specs_d_u(
     encryption: Encryption,
     optional_token_override: Option<Token>,
     optional_signer_title_override: Option<String>,
-) -> Result<(), ErrorActive> {
+) -> Result<()> {
     let specs = specs_agnostic(
         address,
         encryption,
@@ -326,7 +319,7 @@ fn specs_d_u(
 /// the title under which Signer displays the network, is also constructed as
 /// `<network_name>-<encryption>` for non-default networks, unless overridden by
 /// the user.
-fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<(), ErrorActive> {
+fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<()> {
     // address book entry for `title`
     let address_book_entry = get_address_book_entry(title)?;
     let mut network_specs_to_change = network_specs_from_entry(&address_book_entry)?;
@@ -399,10 +392,10 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<(), ErrorAc
     } else if printing {
         add_specs_print(&network_specs_to_change)
     } else {
-        Err(ErrorActive::Fetch(Fetch::SpecsInDb {
+        Err(Error::SpecsInDb {
             name: address_book_entry.name,
             encryption: network_specs_to_change.encryption,
-        }))
+        })
     }
 }
 
@@ -432,14 +425,14 @@ fn specs_pt_u(
     optional_token_override: Option<Token>,
     optional_signer_title_override: Option<String>,
     printing: bool,
-) -> Result<(), ErrorActive> {
+) -> Result<()> {
     let known_address_set = filter_address_book_by_url(address)?;
 
     if !known_address_set.is_empty() {
-        return Err(ErrorActive::Fetch(Fetch::UKeyUrlInDb {
+        return Err(Error::UKeyUrlInDb {
             title: known_address_set[0].0.to_string(),
             url: address.to_string(),
-        }));
+        });
     }
 
     let specs = specs_agnostic(
@@ -450,10 +443,10 @@ fn specs_pt_u(
     )?;
 
     match genesis_hash_in_hot_db(specs.genesis_hash)? {
-        Some(address_book_entry) => Err(ErrorActive::Fetch(Fetch::UKeyHashInDb {
+        Some(address_book_entry) => Err(Error::UKeyHashInDb {
             address_book_entry,
             url: address.to_string(),
-        })),
+        }),
         None => {
             db_upd_network(address, &specs)?;
             if printing {

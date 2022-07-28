@@ -1,10 +1,7 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use definitions::{
-    error_signer::{ErrorSigner, InputSigner},
-    navigation::TransactionCardSet,
-};
+use definitions::navigation::TransactionCardSet;
 
 pub use definitions::navigation::{StubNav, TransactionAction};
 mod add_specs;
@@ -25,10 +22,11 @@ use message::process_message;
 mod parse_transaction;
 pub use parse_transaction::entry_to_transactions_with_decoding;
 use parse_transaction::parse_transaction;
-pub mod test_all_cards;
-use test_all_cards::make_all_cards;
+mod error;
 #[cfg(test)]
 mod tests;
+
+pub use crate::error::{Error, Result};
 
 /// Payload in hex format as it arrives into handling contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, ** - transaction type),
@@ -36,7 +34,7 @@ mod tests;
 /// - actual content (differs between transaction types, could be even empty)
 /// actual content is handled individually depending on prelude
 
-fn handle_scanner_input(payload: &str, dbname: &str) -> Result<TransactionAction, ErrorSigner> {
+fn handle_scanner_input(payload: &str, dbname: &str) -> Result<TransactionAction> {
     let data_hex = {
         if let Some(a) = payload.strip_prefix("0x") {
             a
@@ -46,13 +44,11 @@ fn handle_scanner_input(payload: &str, dbname: &str) -> Result<TransactionAction
     };
 
     if data_hex.len() < 6 {
-        return Err(ErrorSigner::Input(InputSigner::TooShort));
+        return Err(Error::TooShort);
     }
 
     if &data_hex[..2] != "53" {
-        return Err(ErrorSigner::Input(InputSigner::NotSubstrate(
-            data_hex[..2].to_string(),
-        )));
+        return Err(Error::NotSubstrate(data_hex[..2].to_string()));
     }
 
     match &data_hex[4..6] {
@@ -62,10 +58,7 @@ fn handle_scanner_input(payload: &str, dbname: &str) -> Result<TransactionAction
         "81" => load_types(data_hex, dbname),
         "c1" => add_specs(data_hex, dbname),
         "de" => process_derivations(data_hex, dbname),
-        "f0" => Ok(make_all_cards()),
-        _ => Err(ErrorSigner::Input(InputSigner::PayloadNotSupported(
-            data_hex[4..6].to_string(),
-        ))),
+        _ => Err(Error::PayloadNotSupported(data_hex[4..6].to_string())),
     }
 }
 
