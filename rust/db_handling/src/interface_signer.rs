@@ -11,8 +11,6 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
 use definitions::{
-    error::{AddressGenerationCommon, ErrorSource},
-    error_signer::{DatabaseSigner, ErrorSigner, InterfaceSigner, NotFoundSigner, Signer},
     helpers::{
         make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public,
         pic_meta, print_multisigner_as_base58,
@@ -40,6 +38,7 @@ use crate::identities::{
     DerivationCheck,
 };
 use crate::{db_transactions::TrDbCold, helpers::get_valid_current_verifier};
+use crate::{Error, Result};
 
 /// Return a `Vec` with all seed names with seed key identicons if seed key is
 /// available.
@@ -56,7 +55,7 @@ use crate::{db_transactions::TrDbCold, helpers::get_valid_current_verifier};
 pub fn get_all_seed_names_with_identicons(
     database_name: &str,
     names_phone_knows: &[String],
-) -> Result<Vec<SeedNameCard>, ErrorSigner> {
+) -> Result<Vec<SeedNameCard>> {
     let mut data_set: HashMap<String, Vec<MultiSigner>> = HashMap::new();
     for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
         if address_details.is_root() {
@@ -65,10 +64,10 @@ pub fn get_all_seed_names_with_identicons(
                 Some(root_set) => {
                     for id in root_set.iter() {
                         if multisigner_to_encryption(id) == address_details.encryption {
-                            return Err(ErrorSigner::Database(DatabaseSigner::TwoRootKeys {
+                            return Err(Error::TwoRootKeys {
                                 seed_name: address_details.seed_name.to_string(),
                                 encryption: address_details.encryption.to_owned(),
-                            }));
+                            });
                         }
                     }
                     let mut new_root_set = root_set.to_vec();
@@ -141,7 +140,7 @@ fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> Vec<u8> {
 /// address to generate
 /// [`SufficientCrypto`](definitions::crypto::SufficientCrypto) for signing
 /// updates with the Signer.
-pub fn print_all_identities(database_name: &str) -> Result<Vec<MRawKey>, ErrorSigner> {
+pub fn print_all_identities(database_name: &str) -> Result<Vec<MRawKey>> {
     Ok(get_all_addresses(database_name)?
         .into_iter()
         .map(|(multisigner, address_details)| {
@@ -174,7 +173,7 @@ pub fn print_identities_for_seed_name_and_network(
     network_specs_key: &NetworkSpecsKey,
     swiped_key: Option<MultiSigner>,
     multiselect: Vec<MultiSigner>,
-) -> Result<(MSeedKeyCard, Vec<MKeysCard>, String, String), ErrorSigner> {
+) -> Result<(MSeedKeyCard, Vec<MKeysCard>, String, String)> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let identities = addresses_set_seed_name_network(database_name, seed_name, network_specs_key)?;
     let mut root_id = None;
@@ -193,10 +192,10 @@ pub fn print_identities_for_seed_name_and_network(
         let multiselect = multiselect.contains(&multisigner);
         if address_details.is_root() {
             if root_id.is_some() {
-                return Err(ErrorSigner::Database(DatabaseSigner::TwoRootKeys {
+                return Err(Error::TwoRootKeys {
                     seed_name: seed_name.to_string(),
                     encryption: network_specs.encryption,
-                }));
+                });
             }
             root_id = Some(MSeedKeyCard {
                 seed_name: seed_name.to_string(),
@@ -239,7 +238,7 @@ pub fn addresses_set_seed_name_network(
     database_name: &str,
     seed_name: &str,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
+) -> Result<Vec<(MultiSigner, AddressDetails)>> {
     Ok(get_addresses_by_seed_name(database_name, seed_name)?
         .into_iter()
         .filter(|(_, address_details)| address_details.network_id.contains(network_specs_key))
@@ -251,8 +250,8 @@ pub fn addresses_set_seed_name_network(
 pub fn show_all_networks_with_flag(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<MNetworkMenu, ErrorSigner> {
-    let mut networks: Vec<_> = get_all_networks::<Signer>(database_name)?
+) -> Result<MNetworkMenu> {
+    let mut networks: Vec<_> = get_all_networks(database_name)?
         .into_iter()
         .map(|network| {
             let network_specs_key_current =
@@ -269,8 +268,8 @@ pub fn show_all_networks_with_flag(
 
 /// Make `Vec` with network information for all networks in the Signer database,
 /// without any selection.
-pub fn show_all_networks(database_name: &str) -> Result<Vec<MMNetwork>, ErrorSigner> {
-    let networks = get_all_networks::<Signer>(database_name)?;
+pub fn show_all_networks(database_name: &str) -> Result<Vec<MMNetwork>> {
+    let networks = get_all_networks(database_name)?;
     let mut networks = networks
         .into_iter()
         .map(|n| MMNetwork {
@@ -291,10 +290,10 @@ pub fn show_all_networks(database_name: &str) -> Result<Vec<MMNetwork>, ErrorSig
 /// If there are no networks in the system, throws error.
 // TODO: should be an option, not an error. Forbid getting to this point from ui
 // for the seed making process, allow backups.
-pub fn first_network(database_name: &str) -> Result<NetworkSpecs, ErrorSigner> {
-    let mut networks = get_all_networks::<Signer>(database_name)?;
+pub fn first_network(database_name: &str) -> Result<NetworkSpecs> {
+    let mut networks = get_all_networks(database_name)?;
     if networks.is_empty() {
-        return Err(ErrorSigner::NoNetworksAvailable);
+        return Err(Error::NoNetworksAvailable);
     }
     networks.sort_by(|a, b| a.order.cmp(&b.order));
     Ok(networks.remove(0))
@@ -315,39 +314,33 @@ pub fn export_key(
     multisigner: &MultiSigner,
     expected_seed_name: &str,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<MKeyDetails, ErrorSigner> {
+) -> Result<MKeyDetails> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let address_key = AddressKey::from_multisigner(multisigner);
     let address_details = get_address_details(database_name, &address_key)?;
     if address_details.seed_name != expected_seed_name {
-        return Err(ErrorSigner::Interface(
-            InterfaceSigner::SeedNameNotMatching {
-                address_key,
-                expected_seed_name: expected_seed_name.to_string(),
-                real_seed_name: address_details.seed_name,
-            },
-        ));
+        return Err(Error::SeedNameNotMatching {
+            address_key,
+            expected_seed_name: expected_seed_name.to_string(),
+            real_seed_name: address_details.seed_name,
+        });
     }
     let base58 = print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix));
     let public_key = multisigner_to_public(multisigner);
     let identicon = make_identicon_from_multisigner(multisigner);
     let qr = {
         if address_details.network_id.contains(network_specs_key) {
-            match png_qr_from_string(&format!(
+            png_qr_from_string(&format!(
                 "substrate:{}:0x{}",
                 base58,
                 hex::encode(&network_specs.genesis_hash)
-            )) {
-                Ok(a) => a,
-                Err(e) => return Err(ErrorSigner::Qr(e.to_string())),
-            }
+            ))
+            .map_err(|e| Error::Qr(e.to_string()))?
         } else {
-            return Err(ErrorSigner::NotFound(
-                NotFoundSigner::NetworkSpecsKeyForAddress {
-                    network_specs_key: network_specs_key.to_owned(),
-                    address_key,
-                },
-            ));
+            return Err(Error::NetworkSpecsKeyForAddressNotFound {
+                network_specs_key: network_specs_key.to_owned(),
+                address_key,
+            });
         }
     };
     let address = Address {
@@ -376,10 +369,10 @@ pub fn export_key(
 ///
 /// Function inputs seed name, outputs `Vec` with all known derivations in all
 /// networks.
-pub fn backup_prep(database_name: &str, seed_name: &str) -> Result<MBackup, ErrorSigner> {
-    let networks = get_all_networks::<Signer>(database_name)?;
+pub fn backup_prep(database_name: &str, seed_name: &str) -> Result<MBackup> {
+    let networks = get_all_networks(database_name)?;
     if networks.is_empty() {
-        return Err(ErrorSigner::NoNetworksAvailable);
+        return Err(Error::NoNetworksAvailable);
     }
     let mut derivations = Vec::new();
     for network in networks.into_iter() {
@@ -431,7 +424,7 @@ pub fn derive_prep(
     collision: Option<(MultiSigner, AddressDetails)>,
     suggest: &str,
     keyboard: bool,
-) -> Result<MDeriveKey, ErrorSigner> {
+) -> Result<MDeriveKey> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
 
     let derivation_check = match collision {
@@ -492,7 +485,7 @@ pub fn dynamic_path_check(
     match NetworkSpecsKey::from_hex(network_specs_key_hex) {
         Ok(key) => dynamic_path_check_unhexed(database_name, seed_name, path, &key),
         Err(e) => NavDerivationCheck {
-            error: Some(<Signer>::show(&e)),
+            error: Some(e.to_string()),
             ..Default::default()
         },
     }
@@ -540,13 +533,13 @@ fn dynamic_path_check_unhexed(
                     }
                 }
                 Err(e) => NavDerivationCheck {
-                    error: Some(<Signer>::show(&e)),
+                    error: Some(e.to_string()),
                     ..Default::default()
                 },
             }
         }
         Err(e) => NavDerivationCheck {
-            error: Some(<Signer>::show(&e)),
+            error: Some(e.to_string()),
             ..Default::default()
         },
     }
@@ -557,7 +550,7 @@ fn dynamic_path_check_unhexed(
 pub fn network_details_by_key(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<MNetworkDetails, ErrorSigner> {
+) -> Result<MNetworkDetails> {
     let NetworkSpecs {
         base58prefix,
         color,
@@ -620,14 +613,11 @@ pub fn metadata_details(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
     network_version: u32,
-) -> Result<MManageMetadata, ErrorSigner> {
+) -> Result<MManageMetadata> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
-    let meta_values = get_meta_values_by_name_version::<Signer>(
-        database_name,
-        &network_specs.name,
-        network_version,
-    )?;
-    let networks: Vec<_> = get_all_networks::<Signer>(database_name)?
+    let meta_values =
+        get_meta_values_by_name_version(database_name, &network_specs.name, network_version)?;
+    let networks: Vec<_> = get_all_networks(database_name)?
         .into_iter()
         .filter(|a| a.name == network_specs.name)
         .map(|network| MMMNetwork {
@@ -653,8 +643,8 @@ pub fn metadata_details(
 }
 
 /// Make types status display.
-pub fn show_types_status(database_name: &str) -> Result<MTypesInfo, ErrorSigner> {
-    match try_get_types::<Signer>(database_name)? {
+pub fn show_types_status(database_name: &str) -> Result<MTypesInfo> {
+    match try_get_types(database_name)? {
         Some(a) => {
             let (types_hash, types_id_pic) = ContentLoadTypes::generate(&a).show();
             Ok(MTypesInfo {
@@ -673,16 +663,10 @@ pub fn show_types_status(database_name: &str) -> Result<MTypesInfo, ErrorSigner>
 
 /// Generate new random seed phrase, make identicon for `sr25519` public key,
 /// and send to Signer screen.
-pub fn print_new_seed(seed_name: &str) -> Result<MNewSeedBackup, ErrorSigner> {
+pub fn print_new_seed(seed_name: &str) -> Result<MNewSeedBackup> {
     let seed_phrase = generate_random_phrase(24)?;
-    let sr25519_pair = match sr25519::Pair::from_string(&seed_phrase, None) {
-        Ok(x) => x,
-        Err(e) => {
-            return Err(<Signer>::address_generation_common(
-                AddressGenerationCommon::SecretString(e),
-            ))
-        }
-    };
+    let sr25519_pair =
+        sr25519::Pair::from_string(&seed_phrase, None).map_err(Error::SecretStringError)?;
     let identicon = make_identicon_from_multisigner(&MultiSigner::Sr25519(sr25519_pair.public()));
     Ok(MNewSeedBackup {
         seed: seed_name.to_string(),
@@ -692,12 +676,10 @@ pub fn print_new_seed(seed_name: &str) -> Result<MNewSeedBackup, ErrorSigner> {
 }
 
 /// Get database history tree checksum to be displayed in log screen.
-pub fn history_hex_checksum(database_name: &str) -> Result<String, ErrorSigner> {
-    let database = open_db::<Signer>(database_name)?;
-    let history = open_tree::<Signer>(&database, HISTORY)?;
-    let checksum = history
-        .checksum()
-        .map_err(|e| ErrorSigner::Database(DatabaseSigner::Internal(e)))?;
+pub fn history_hex_checksum(database_name: &str) -> Result<String> {
+    let database = open_db(database_name)?;
+    let history = open_tree(&database, HISTORY)?;
+    let checksum = history.checksum()?;
     Ok(hex::encode(checksum.encode()).to_uppercase())
 }
 
@@ -705,10 +687,10 @@ pub fn history_hex_checksum(database_name: &str) -> Result<String, ErrorSigner> 
 ///
 /// Function is intended for cases when transaction is declined by the user
 /// (e.g. user has scanned something, read it, clicked `back` or `decline`)
-pub fn purge_transactions(database_name: &str) -> Result<(), ErrorSigner> {
+pub fn purge_transactions(database_name: &str) -> Result<()> {
     TrDbCold::new()
-        .set_transaction(make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?) // clear transaction
-        .apply::<Signer>(database_name)
+        .set_transaction(make_batch_clear_tree(database_name, TRANSACTION)?) // clear transaction
+        .apply(database_name)
 }
 
 /// Get possible options of English `bip39` words that start with user-entered

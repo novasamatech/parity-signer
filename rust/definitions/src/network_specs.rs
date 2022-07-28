@@ -278,19 +278,13 @@ use sled::IVec;
 use sp_core::H256;
 use sp_runtime::MultiSigner;
 
-#[cfg(feature = "active")]
-use crate::error_active::{
-    Active, DatabaseActive, EntryDecodingActive, ErrorActive, MismatchActive,
-};
+use crate::error::{Error, Result};
+
 #[cfg(feature = "signer")]
 use crate::helpers::{
     make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public,
 };
-use crate::{
-    crypto::Encryption,
-    error::{ErrorSource, SpecsKeySource},
-    keyring::NetworkSpecsKey,
-};
+use crate::{crypto::Encryption, keyring::NetworkSpecsKey};
 
 #[cfg(feature = "signer")]
 use crate::navigation::MVerifierDetails;
@@ -445,27 +439,23 @@ impl NetworkSpecs {
     ///
     /// Checks that there is no genesis hash or encryption mismatch between
     /// key and specs content.  
-    pub fn from_entry_with_key_checked<T: ErrorSource>(
+    pub fn from_entry_with_key_checked(
         network_specs_key: &NetworkSpecsKey,
         network_specs_encoded: IVec,
-    ) -> Result<Self, T::Error> {
-        let (genesis_hash_vec, encryption) =
-            network_specs_key.genesis_hash_encryption::<T>(SpecsKeySource::SpecsTree)?;
-        let network_specs = match Self::decode(&mut &network_specs_encoded[..]) {
-            Ok(a) => a,
-            Err(_) => return Err(<T>::specs_decoding(network_specs_key.to_owned())),
-        };
+    ) -> Result<Self> {
+        let (genesis_hash_vec, encryption) = network_specs_key.genesis_hash_encryption()?;
+        let network_specs = Self::decode(&mut &network_specs_encoded[..])?;
         if &genesis_hash_vec[..] != network_specs.genesis_hash.as_bytes() {
-            return Err(<T>::specs_genesis_hash_mismatch(
-                network_specs_key.to_owned(),
-                network_specs.genesis_hash,
-            ));
+            return Err(Error::SpecsGenesisHashMismatch {
+                network_specs_key: network_specs_key.to_owned(),
+                genesis_hash: network_specs.genesis_hash,
+            });
         }
         if encryption != network_specs.encryption {
-            return Err(<T>::specs_encryption_mismatch(
-                network_specs_key.to_owned(),
-                network_specs.encryption,
-            ));
+            return Err(Error::SpecsToSendEncryptionMismatch {
+                network_specs_key: network_specs_key.to_owned(),
+                encryption: network_specs.encryption,
+            });
         }
         Ok(network_specs)
     }
@@ -475,11 +465,11 @@ impl NetworkSpecs {
     ///
     /// Checks that there is no genesis hash or encryption mismatch between
     /// key and specs content.  
-    pub fn from_entry_checked<T: ErrorSource>(
+    pub fn from_entry_checked(
         (network_specs_key_vec, network_specs_encoded): (IVec, IVec),
-    ) -> Result<Self, T::Error> {
+    ) -> Result<Self> {
         let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
-        Self::from_entry_with_key_checked::<T>(&network_specs_key, network_specs_encoded)
+        Self::from_entry_with_key_checked(&network_specs_key, network_specs_encoded)
     }
 }
 
@@ -517,32 +507,20 @@ impl NetworkSpecsToSend {
     pub fn from_entry_with_key_checked(
         network_specs_key: &NetworkSpecsKey,
         network_specs_to_send_encoded: IVec,
-    ) -> Result<Self, ErrorActive> {
-        let (genesis_hash_vec, encryption) =
-            network_specs_key.genesis_hash_encryption::<Active>(SpecsKeySource::SpecsTree)?;
-        let network_specs_to_send = match Self::decode(&mut &network_specs_to_send_encoded[..]) {
-            Ok(a) => a,
-            Err(_) => {
-                return Err(ErrorActive::Database(DatabaseActive::EntryDecoding(
-                    EntryDecodingActive::NetworkSpecsToSend(network_specs_key.to_owned()),
-                )))
-            }
-        };
+    ) -> Result<Self> {
+        let (genesis_hash_vec, encryption) = network_specs_key.genesis_hash_encryption()?;
+        let network_specs_to_send = Self::decode(&mut &network_specs_to_send_encoded[..])?;
         if &genesis_hash_vec[..] != network_specs_to_send.genesis_hash.as_bytes() {
-            return Err(ErrorActive::Database(DatabaseActive::Mismatch(
-                MismatchActive::SpecsToSendGenesisHash {
-                    key: network_specs_key.to_owned(),
-                    genesis_hash: network_specs_to_send.genesis_hash,
-                },
-            )));
+            return Err(Error::SpecsToSendGenesisHash {
+                network_specs_key: network_specs_key.to_owned(),
+                genesis_hash: network_specs_to_send.genesis_hash,
+            });
         }
         if encryption != network_specs_to_send.encryption {
-            return Err(ErrorActive::Database(DatabaseActive::Mismatch(
-                MismatchActive::SpecsToSendEncryption {
-                    key: network_specs_key.to_owned(),
-                    encryption: network_specs_to_send.encryption,
-                },
-            )));
+            return Err(Error::SpecsToSendEncryptionMismatch {
+                network_specs_key: network_specs_key.to_owned(),
+                encryption: network_specs_to_send.encryption,
+            });
         }
         Ok(network_specs_to_send)
     }
@@ -555,7 +533,7 @@ impl NetworkSpecsToSend {
     #[cfg(feature = "active")]
     pub fn from_entry_checked(
         (network_specs_key_vec, network_specs_to_send_encoded): (IVec, IVec),
-    ) -> Result<Self, ErrorActive> {
+    ) -> Result<Self> {
         let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
         Self::from_entry_with_key_checked(&network_specs_key, network_specs_to_send_encoded)
     }

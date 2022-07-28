@@ -567,10 +567,6 @@ namespace signer {
     [Throws=ErrorDisplayed]
     void history_seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
 
-    TransactionCardSet get_all_tx_cards();
-
-    string get_all_log_cards();
-
     void init_logging(string tag);
 };
 

@@ -61,9 +61,9 @@ checksum = "85965b6739a430150bdd138e2374a98af0c3ee0d030b3bb7fc3bddff58d0102e"
 
 [[package]]
 name = "android_logger"
-version = "0.11.0"
+version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b74b7ddf197de32e415d197aa21c1c0cb36e01e4794fd801302280ac7847ee02"
+checksum = "b5e9dd62f37dea550caf48c77591dc50bd1a378ce08855be1a0c42a97b7550fb"
 dependencies = [
  "android_log-sys",
  "env_logger",
@@ -664,6 +664,7 @@ dependencies = [
 name = "db_handling"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "blake2-rfc",
  "constants",
  "defaults",
@@ -678,6 +679,7 @@ dependencies = [
  "sled",
  "sp-core",
  "sp-runtime",
+ "thiserror",
  "time",
  "tiny-bip39 1.0.0",
  "zeroize",
@@ -692,13 +694,13 @@ dependencies = [
  "regex",
  "sp-core",
  "sp-runtime",
+ "thiserror",
 ]
 
 [[package]]
 name = "definitions"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "blake2-rfc",
  "frame-metadata",
  "hex",
@@ -712,7 +714,7 @@ dependencies = [
  "sp-runtime",
  "sp-version",
  "sp-wasm-interface",
- "time",
+ "thiserror",
  "variant_count",
 ]
 
@@ -1108,6 +1110,7 @@ dependencies = [
  "serde_json",
  "sled",
  "sp-core",
+ "thiserror",
  "tokio",
 ]
 
@@ -1436,9 +1439,9 @@ dependencies = [
 
 [[package]]
 name = "jsonrpsee"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11e017217fcd18da0a25296d3693153dd19c8a6aadab330b3595285d075385d1"
+checksum = "1d966710cd10f992b87107c3b54f9301738892cf5692a5730a362957cc927e3c"
 dependencies = [
  "jsonrpsee-core",
  "jsonrpsee-types",
@@ -1447,9 +1450,9 @@ dependencies = [
 
 [[package]]
 name = "jsonrpsee-client-transport"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce395539a14d3ad4ec1256fde105abd36a2da25d578a291cabe98f45adfdb111"
+checksum = "57bc7b8506b6f313ec2915e2205f72015a55827d6fc4fbf6f485f45c802843a6"
 dependencies = [
  "futures-util",
  "http",
@@ -1468,9 +1471,9 @@ dependencies = [
 
 [[package]]
 name = "jsonrpsee-core"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "16efcd4477de857d4a2195a45769b2fe9ebb54f3ef5a4221d3b014a4fe33ec0b"
+checksum = "411236b4379b4d9e252b557ba3a9137c7fad5fdc944f2a29347db7c9edc929ee"
 dependencies = [
  "anyhow",
  "async-lock",
@@ -1486,13 +1489,14 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
+ "tracing-futures",
 ]
 
 [[package]]
 name = "jsonrpsee-types"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3bcf76cd316f5d3ad48138085af1f45e2c58c98e02f0779783dbb034d43f7c86"
+checksum = "f1e88f208ac5004389f0063e87bd7463f5e864ff1ac40484f80e8432976ffa0a"
 dependencies = [
  "anyhow",
  "beef",
@@ -1504,10 +1508,11 @@ dependencies = [
 
 [[package]]
 name = "jsonrpsee-ws-client"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee043cb5dd0d51d3eb93432e998d5bae797691a7b10ec4a325e036bcdb48c48a"
+checksum = "e2eb1980ee67ecbc150d9bf4be734c3a548480af186fe1f170100cde222f76ad"
 dependencies = [
+ "http",
  "jsonrpsee-client-transport",
  "jsonrpsee-core",
  "jsonrpsee-types",
@@ -1763,6 +1768,7 @@ dependencies = [
  "regex",
  "sp-core",
  "sp-runtime",
+ "thiserror",
  "transaction_parsing",
  "transaction_signing",
  "zeroize",
@@ -2144,6 +2150,7 @@ dependencies = [
  "sp-arithmetic",
  "sp-core",
  "sp-runtime",
+ "thiserror",
 ]
 
 [[package]]
@@ -2992,7 +2999,6 @@ dependencies = [
  "qr_reader_phone",
  "sp-core",
  "sp-runtime",
- "transaction_parsing",
  "uniffi",
  "uniffi_build",
 ]
@@ -3635,9 +3641,9 @@ checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
 
 [[package]]
 name = "tokio"
-version = "1.20.0"
+version = "1.20.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "57aec3cfa4c296db7255446efb4928a6be304b431a806216105542a67b6ca82e"
+checksum = "7a8325f63a7d4774dd041e363b2409ed1c5cbbd0f867795e661df066b2b0a581"
 dependencies = [
  "autocfg",
  "bytes",
@@ -3701,9 +3707,9 @@ dependencies = [
 
 [[package]]
 name = "tracing"
-version = "0.1.32"
+version = "0.1.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a1bdf54a7c28a2bbf701e1d2233f6c77f473486b94bee4f9678da5a148dca7f"
+checksum = "a400e31aa60b9d44a52a8ee0343b5b18566b03a8321e0d321f695cf56e940160"
 dependencies = [
  "cfg-if",
  "pin-project-lite",
@@ -3724,12 +3730,22 @@ dependencies = [
 
 [[package]]
 name = "tracing-core"
-version = "0.1.24"
+version = "0.1.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90442985ee2f57c9e1b548ee72ae842f4a9a20e3f417cc38dbc5dc684d9bb4ee"
+checksum = "7b7358be39f2f274f322d2aaed611acc57f382e8eb1e5b48cb9ae30933495ce7"
 dependencies = [
- "lazy_static",
+ "once_cell",
  "valuable",
+]
+
+[[package]]
+name = "tracing-futures"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97d095ae15e245a057c8e8451bab9b3ee1e1f68e9ba2b4fbc18d0ac5237835f2"
+dependencies = [
+ "pin-project",
+ "tracing",
 ]
 
 [[package]]
@@ -3779,7 +3795,6 @@ dependencies = [
 name = "transaction_parsing"
 version = "0.1.0"
 dependencies = [
- "bitvec",
  "constants",
  "db_handling",
  "definitions",
@@ -3792,12 +3807,14 @@ dependencies = [
  "sled",
  "sp-core",
  "sp-runtime",
+ "thiserror",
 ]
 
 [[package]]
 name = "transaction_signing"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "blake2-rfc",
  "constants",
  "db_handling",
@@ -3809,6 +3826,7 @@ dependencies = [
  "sled",
  "sp-core",
  "sp-runtime",
+ "thiserror",
  "transaction_parsing",
  "zeroize",
 ]
@@ -4207,9 +4225,9 @@ dependencies = [
 
 [[package]]
 name = "zeroize"
-version = "1.5.5"
+version = "1.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "94693807d016b2f2d2e14420eb3bfcca689311ff775dcf113d74ea624b7cdf07"
+checksum = "c394b5bd0c6f669e7275d9c20aa90ae064cb22e75a1cad54e1b34088034b149f"
 dependencies = [
  "zeroize_derive",
 ]

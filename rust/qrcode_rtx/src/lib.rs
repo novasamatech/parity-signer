@@ -26,7 +26,7 @@ fn make_data_packs(input: &[u8]) -> Result<Vec<Vec<u8>>, &'static str> {
     };
     // making `raptorq` Encoder, with defaults
     let raptor_encoder = raptorq::Encoder::with_defaults(input, CHUNK_SIZE);
-    // making EncodingPacket and deserializing each into Vec<u8>
+    // making EncodingPacket and deserializing each into `Vec<u8>`
     let out: Vec<Vec<u8>> = raptor_encoder
         .get_encoded_packets(repair_packets_per_block)
         .iter()

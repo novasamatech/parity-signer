@@ -3,28 +3,22 @@ use db_handling::{
     helpers::{get_general_verifier, try_get_types},
 };
 use definitions::{
-    error::TransferContent,
-    error_signer::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer},
-    history::Event,
-    navigation::TransactionCardSet,
-    network_specs::Verifier,
-    qr_transfers::ContentLoadTypes,
+    error::TransferContent, error_signer::GeneralVerifierForContent, history::Event,
+    navigation::TransactionCardSet, network_specs::Verifier, qr_transfers::ContentLoadTypes,
     types::TypeEntry,
 };
 
 use crate::cards::{Card, Warning};
 use crate::check_signature::pass_crypto;
+use crate::error::{Error, Result};
 use crate::holds::GeneralHold;
 use crate::{StubNav, TransactionAction};
 
-pub fn load_types(data_hex: &str, database_name: &str) -> Result<TransactionAction, ErrorSigner> {
+pub fn load_types(data_hex: &str, database_name: &str) -> Result<TransactionAction> {
     let checked_info = pass_crypto(data_hex, TransferContent::LoadTypes)?;
     let content_new_types = ContentLoadTypes::from_slice(&checked_info.message);
-    let new_types = content_new_types.types::<Signer>()?;
-    let old_types: Vec<TypeEntry> = match try_get_types::<Signer>(database_name)? {
-        Some(a) => a,
-        None => Vec::new(),
-    };
+    let new_types = content_new_types.types()?;
+    let old_types: Vec<TypeEntry> = try_get_types(database_name)?.unwrap_or_default();
     let general_verifier = get_general_verifier(database_name)?;
     let mut stub = TrDbColdStub::new();
     let mut index = 0;
@@ -32,7 +26,7 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<TransactionActi
         Verifier { v: None } => match general_verifier {
             Verifier { v: None } => {
                 if new_types == old_types {
-                    Err(ErrorSigner::Input(InputSigner::TypesKnown))
+                    Err(Error::TypesKnown)
                 } else {
                     stub = stub.new_history_entry(Event::Warning {
                         warning: Warning::TypesNotVerified.show(),
@@ -59,10 +53,10 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<TransactionActi
             }
             Verifier {
                 v: Some(old_general_verifier_value),
-            } => Err(ErrorSigner::Input(InputSigner::NeedGeneralVerifier {
+            } => Err(Error::NeedGeneralVerifier {
                 content: GeneralVerifierForContent::Types,
                 verifier_value: old_general_verifier_value,
-            })),
+            }),
         },
         Verifier {
             v: Some(ref new_general_verifier_value),
@@ -70,7 +64,7 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<TransactionActi
             let verifier_card = Card::Verifier(new_general_verifier_value).card(&mut index, 0);
             if general_verifier == checked_info.verifier {
                 if new_types == old_types {
-                    Err(ErrorSigner::Input(InputSigner::TypesKnown))
+                    Err(Error::TypesKnown)
                 } else {
                     stub = stub.new_history_entry(Event::Warning {
                         warning: Warning::UpdatingTypes.show(),
@@ -128,11 +122,11 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<TransactionActi
                     }
                     Verifier {
                         v: Some(old_general_verifier_value),
-                    } => Err(ErrorSigner::Input(InputSigner::GeneralVerifierChanged {
+                    } => Err(Error::GeneralVerifierChanged {
                         content: GeneralVerifierForContent::Types,
                         old_general_verifier_value,
                         new_general_verifier_value: new_general_verifier_value.to_owned(),
-                    })),
+                    }),
                 }
             }
         }

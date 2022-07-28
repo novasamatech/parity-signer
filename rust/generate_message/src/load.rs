@@ -17,16 +17,9 @@ use sp_core::H256;
 
 use constants::{EXPORT_FOLDER, HOT_DB_NAME, METATREE};
 use db_handling::helpers::{get_meta_values_by_name_version, open_db, open_tree};
-use definitions::{
-    error::{ErrorSource, MetadataError, MetadataSource},
-    error_active::{
-        Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActive,
-        IncomingMetadataSourceActiveStr, NotFoundActive,
-    },
-    keyring::MetaKeyPrefix,
-    metadata::MetaValues,
-};
+use definitions::{error::MetadataError, keyring::MetaKeyPrefix, metadata::MetaValues};
 
+use crate::error::{Changed, Error, Result};
 use crate::helpers::{
     add_new_metadata, address_book_content, db_upd_metadata, error_occured, load_metadata_print,
     meta_fetch, network_specs_from_entry, prepare_metadata, MetaFetched, MetaShortCut,
@@ -36,7 +29,7 @@ use crate::parser::{Content, InstructionMeta, Set};
 
 /// Process `load_metadata` command according to the [`InstructionMeta`]
 /// received from the command line.
-pub fn gen_load_meta(instruction: InstructionMeta) -> Result<(), ErrorActive> {
+pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
     match instruction.set {
         // `-f` setting key: produce payload files from existing database
         // entries.
@@ -67,7 +60,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<(), ErrorActive> {
             // `-u` content key is to provide the URL address for RPC calls;
             // since `-f` indicates the data is taken from the database, the
             // the combination seems of no use.
-            Content::Address(_) => Err(ErrorActive::NotSupported),
+            Content::Address(_) => Err(Error::NotSupported),
         },
 
         // `-d` setting key: get network data using RPC calls, **do not**
@@ -150,7 +143,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<(), ErrorActive> {
                 // database, its metadata can not be added before its specs. If
                 // network has an entry in the database, it is simpler to
                 // address it with `-n <network_name>` combination.
-                Content::Address(_) => Err(ErrorActive::NotSupported),
+                Content::Address(_) => Err(Error::NotSupported),
             }
         }
 
@@ -183,7 +176,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<(), ErrorActive> {
                 // database, its metadata can not be added before its specs. If
                 // network has an entry in the database, it is simpler to
                 // address it with `-n <network_name>` combination.
-                Content::Address(_) => Err(ErrorActive::NotSupported),
+                Content::Address(_) => Err(Error::NotSupported),
             }
         }
 
@@ -216,7 +209,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<(), ErrorActive> {
                 // database, its metadata can not be added before its specs. If
                 // network has an entry in the database, it is simpler to
                 // address it with `-n <network_name>` combination.
-                Content::Address(_) => Err(ErrorActive::NotSupported),
+                Content::Address(_) => Err(Error::NotSupported),
             }
         }
     }
@@ -228,27 +221,21 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<(), ErrorActive> {
 /// generated with network name. At most two entries are expected.
 /// - Check the metadata integrity
 /// - Output raw bytes payload file
-fn meta_f_a_element(set_element: &AddressSpecs) -> Result<(), ErrorActive> {
+fn meta_f_a_element(set_element: &AddressSpecs) -> Result<()> {
     let meta_key_prefix = MetaKeyPrefix::from_name(&set_element.name);
-    let database = open_db::<Active>(HOT_DB_NAME)?;
-    let metadata = open_tree::<Active>(&database, METATREE)?;
+    let database = open_db(HOT_DB_NAME)?;
+    let metadata = open_tree(&database, METATREE)?;
     for x in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
-        let meta_values = MetaValues::from_entry_checked::<Active>(x)?;
+        let meta_values = MetaValues::from_entry_checked(x)?;
         if meta_values.warn_incomplete_extensions {
             warn(&meta_values.name, meta_values.version);
         }
         if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
             if prefix_from_meta != set_element.base58prefix {
-                return Err(<Active>::faulty_metadata(
-                    MetadataError::Base58PrefixSpecsMismatch {
-                        specs: set_element.base58prefix,
-                        meta: prefix_from_meta,
-                    },
-                    MetadataSource::Database {
-                        name: meta_values.name.to_string(),
-                        version: meta_values.version,
-                    },
-                ));
+                return Err(MetadataError::Base58PrefixSpecsMismatch {
+                    specs: set_element.base58prefix,
+                    meta: prefix_from_meta,
+                })?;
             }
         }
         let shortcut = MetaShortCut {
@@ -268,7 +255,7 @@ fn meta_f_a_element(set_element: &AddressSpecs) -> Result<(), ErrorActive> {
 /// generated with `name`. At most two entries are expected.
 /// - Check the metadata integrity
 /// - Output raw bytes payload file
-fn meta_f_n(name: &str) -> Result<(), ErrorActive> {
+fn meta_f_n(name: &str) -> Result<()> {
     meta_f_a_element(&search_name(name)?)
 }
 
@@ -278,7 +265,7 @@ fn meta_f_n(name: &str) -> Result<(), ErrorActive> {
 /// and interpret it
 /// - Check the metadata integrity with the data on record in the database
 /// - Output raw bytes payload file
-fn meta_d_a_element(set_element: &AddressSpecs) -> Result<(), ErrorActive> {
+fn meta_d_a_element(set_element: &AddressSpecs) -> Result<()> {
     let meta_fetch = fetch_set_element(set_element)?;
     load_metadata_print(&meta_fetch.cut())
 }
@@ -291,7 +278,7 @@ fn meta_d_a_element(set_element: &AddressSpecs) -> Result<(), ErrorActive> {
 /// and interpret it
 /// - Check the metadata integrity with the data on record in the database
 /// - Output raw bytes payload file
-fn meta_d_n(name: &str) -> Result<(), ErrorActive> {
+fn meta_d_n(name: &str) -> Result<()> {
     meta_d_a_element(&search_name(name)?)
 }
 
@@ -310,7 +297,7 @@ fn meta_d_n(name: &str) -> Result<(), ErrorActive> {
 /// error here. The Signer, if such contradicting metadata update is scanned,
 /// will produce an error, since the Signer must have matching network specs to
 /// accept the metadata.
-fn meta_d_u(address: &str) -> Result<(), ErrorActive> {
+fn meta_d_u(address: &str) -> Result<()> {
     let meta_fetched = meta_fetch(address)?;
     if meta_fetched.meta_values.warn_incomplete_extensions {
         warn(
@@ -330,7 +317,7 @@ fn meta_d_u(address: &str) -> Result<(), ErrorActive> {
 /// process. Input [`Write`] indicates if the payload file should be created.
 /// - Rewrite the database [`METATREE`] with updated metadata set and update
 /// [`META_HISTORY`](constants::META_HISTORY)
-fn meta_kpt_a(write: &Write, pass_errors: bool) -> Result<(), ErrorActive> {
+fn meta_kpt_a(write: &Write, pass_errors: bool) -> Result<()> {
     let set = address_specs_set()?;
     let mut sorted_meta_values = prepare_metadata()?;
     for x in set.iter() {
@@ -357,7 +344,7 @@ fn meta_kpt_a_element(
     set_element: &AddressSpecs,
     write: &Write,
     sorted_meta_values: &mut SortedMetaValues,
-) -> Result<(), ErrorActive> {
+) -> Result<()> {
     let meta_fetched = fetch_set_element(set_element)?;
     let got_meta_update = add_new_metadata(&meta_fetched.stamped(), sorted_meta_values)?;
     match write {
@@ -401,7 +388,7 @@ fn meta_kpt_a_element(
 ///
 /// Inputs user-entered network name and [`Write`] indicating if the
 /// `load_metadata` payload should be created.
-fn meta_kpt_n(name: &str, write: &Write) -> Result<(), ErrorActive> {
+fn meta_kpt_n(name: &str, write: &Write) -> Result<()> {
     let mut sorted_meta_values = prepare_metadata()?;
     meta_kpt_a_element(&search_name(name)?, write, &mut sorted_meta_values)?;
     db_upd_metadata(sorted_meta_values)
@@ -421,10 +408,10 @@ struct AddressSpecs {
 }
 
 /// Collect all unique [`AddressSpecs`] from the hot database.
-fn address_specs_set() -> Result<Vec<AddressSpecs>, ErrorActive> {
+fn address_specs_set() -> Result<Vec<AddressSpecs>> {
     let set = address_book_content()?;
     if set.is_empty() {
-        return Err(ErrorActive::Database(DatabaseActive::AddressBookEmpty));
+        return Err(Error::AddressBookEmpty);
     }
     let mut out: Vec<AddressSpecs> = Vec::new();
     for (_, x) in set.iter() {
@@ -432,23 +419,19 @@ fn address_specs_set() -> Result<Vec<AddressSpecs>, ErrorActive> {
         for y in out.iter() {
             if y.name == specs.name {
                 if y.genesis_hash != specs.genesis_hash {
-                    return Err(ErrorActive::Database(
-                        DatabaseActive::TwoGenesisHashVariantsForName {
-                            name: x.name.to_string(),
-                        },
-                    ));
+                    return Err(Error::TwoGenesisHashVariantsForName {
+                        name: x.name.to_string(),
+                    });
                 }
                 if y.address != x.address {
-                    return Err(ErrorActive::Database(
-                        DatabaseActive::TwoUrlVariantsForName {
-                            name: x.name.to_string(),
-                        },
-                    ));
+                    return Err(Error::TwoUrlVariantsForName {
+                        name: x.name.to_string(),
+                    });
                 }
                 if y.base58prefix != specs.base58prefix {
-                    return Err(ErrorActive::Database(DatabaseActive::TwoBase58ForName {
+                    return Err(Error::TwoBase58ForName {
                         name: x.name.to_string(),
-                    }));
+                    });
                 }
             }
         }
@@ -466,7 +449,7 @@ fn address_specs_set() -> Result<Vec<AddressSpecs>, ErrorActive> {
 }
 
 /// Find [`AddressSpecs`] with certain `name`.
-fn search_name(name: &str) -> Result<AddressSpecs, ErrorActive> {
+fn search_name(name: &str) -> Result<AddressSpecs> {
     let set = address_specs_set()?;
     let mut found = None;
     for x in set.into_iter() {
@@ -477,11 +460,9 @@ fn search_name(name: &str) -> Result<AddressSpecs, ErrorActive> {
     }
     match found {
         Some(a) => Ok(a),
-        None => Err(ErrorActive::NotFound(
-            NotFoundActive::AddressBookEntryWithName {
-                name: name.to_string(),
-            },
-        )),
+        None => Err(Error::AddressBookEntryWithName {
+            name: name.to_string(),
+        }),
     }
 }
 
@@ -494,40 +475,32 @@ fn search_name(name: &str) -> Result<AddressSpecs, ErrorActive> {
 ///
 /// Outputs [`MetaFetched`], the data sufficient to produce `load_metadata`
 /// payload and update the database.
-fn fetch_set_element(set_element: &AddressSpecs) -> Result<MetaFetched, ErrorActive> {
+fn fetch_set_element(set_element: &AddressSpecs) -> Result<MetaFetched> {
     let meta_fetched = meta_fetch(&set_element.address)?;
     if meta_fetched.meta_values.name != set_element.name {
-        return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+        return Err(Error::ValuesChanged {
             url: set_element.address.to_string(),
             what: Changed::Name {
                 old: set_element.name.to_string(),
                 new: meta_fetched.meta_values.name,
             },
-        }));
+        });
     }
     if meta_fetched.genesis_hash != set_element.genesis_hash {
-        return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+        return Err(Error::ValuesChanged {
             url: set_element.address.to_string(),
             what: Changed::GenesisHash {
                 old: set_element.genesis_hash,
                 new: meta_fetched.genesis_hash,
             },
-        }));
+        });
     }
     if let Some(prefix_from_meta) = meta_fetched.meta_values.optional_base58prefix {
         if prefix_from_meta != set_element.base58prefix {
-            return Err(<Active>::faulty_metadata(
-                MetadataError::Base58PrefixSpecsMismatch {
-                    specs: set_element.base58prefix,
-                    meta: prefix_from_meta,
-                },
-                MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
-                    IncomingMetadataSourceActiveStr::Fetch {
-                        url: set_element.address.to_string(),
-                        optional_block: None,
-                    },
-                )),
-            ));
+            return Err(MetadataError::Base58PrefixSpecsMismatch {
+                specs: set_element.base58prefix,
+                meta: prefix_from_meta,
+            })?;
         }
     }
     if meta_fetched.meta_values.warn_incomplete_extensions {
@@ -558,20 +531,15 @@ fn warn(name: &str, version: u32) {
 ///
 /// Optional key `-d`, if used, indicates that the metadata entry should **not**
 /// be added to the [`METATREE`] of the hot database.
-pub fn unwasm(filename: &str, update_db: bool) -> Result<(), ErrorActive> {
+pub fn unwasm(filename: &str, update_db: bool) -> Result<()> {
     let meta_values = MetaValues::from_wasm_file(filename)?;
     let set_element = search_name(&meta_values.name)?;
     if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
         if prefix_from_meta != set_element.base58prefix {
-            return Err(<Active>::faulty_metadata(
-                MetadataError::Base58PrefixSpecsMismatch {
-                    specs: set_element.base58prefix,
-                    meta: prefix_from_meta,
-                },
-                MetadataSource::Incoming(IncomingMetadataSourceActive::Wasm {
-                    filename: filename.to_string(),
-                }),
-            ));
+            return Err(MetadataError::Base58PrefixSpecsMismatch {
+                specs: set_element.base58prefix,
+                meta: prefix_from_meta,
+            })?;
         }
     }
     let genesis_hash = set_element.genesis_hash;
@@ -606,11 +574,9 @@ pub fn unwasm(filename: &str, update_db: bool) -> Result<(), ErrorActive> {
 ///
 /// Generate text file with hex string metadata, from a hot database
 /// [`METATREE`] entry, for `defaults` crate.
-pub fn meta_default_file(name: &str, version: u32) -> Result<(), ErrorActive> {
-    let meta_values = get_meta_values_by_name_version::<Active>(HOT_DB_NAME, name, version)?;
+pub fn meta_default_file(name: &str, version: u32) -> Result<()> {
+    let meta_values = get_meta_values_by_name_version(HOT_DB_NAME, name, version)?;
     let filename = format!("{}/{}{}", EXPORT_FOLDER, name, version);
-    match std::fs::write(&filename, hex::encode(meta_values.meta)) {
-        Ok(_) => Ok(()),
-        Err(e) => Err(ErrorActive::Output(e)),
-    }
+    std::fs::write(&filename, hex::encode(meta_values.meta))?;
+    Ok(())
 }

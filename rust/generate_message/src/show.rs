@@ -4,11 +4,11 @@ use blake2_rfc::blake2b::blake2b;
 use constants::HOT_DB_NAME;
 use db_handling::helpers::try_get_meta_values_by_name_version;
 use definitions::{
-    error_active::{Active, Check, ErrorActive, IncomingMetadataSourceActiveStr},
     metadata::{AddressBookEntry, MetaValues},
     network_specs::NetworkSpecsToSend,
 };
 
+use crate::error::Result;
 use crate::helpers::{
     address_book_content, meta_history_content, network_specs_from_entry, network_specs_from_title,
     read_metadata_database,
@@ -39,7 +39,7 @@ use crate::helpers::{
 ///
 /// Block hash could be used to retrieve later the metadata from exactly same
 /// block if there is a need to compare metadata from different blocks.
-pub fn show_metadata() -> Result<(), ErrorActive> {
+pub fn show_metadata() -> Result<()> {
     let meta_values_stamped_set = read_metadata_database()?;
     if meta_values_stamped_set.is_empty() {
         println!("Database has no metadata entries.");
@@ -87,7 +87,7 @@ pub fn show_metadata() -> Result<(), ErrorActive> {
 ///
 /// Address book title is used to address networks when making `add_specs`
 /// update payloads or inspecting existing network specs.
-pub fn show_networks() -> Result<(), ErrorActive> {
+pub fn show_networks() -> Result<()> {
     let address_book_set = address_book_content()?;
     if address_book_set.is_empty() {
         println!("Address book is empty.");
@@ -140,28 +140,13 @@ pub fn show_networks() -> Result<(), ErrorActive> {
 /// it completely matches the one from the file
 ///
 /// Function could be used to check release metadata files in `defaults` crate.
-pub fn check_file(path: String) -> Result<(), ErrorActive> {
-    let meta_str = match std::fs::read_to_string(&path) {
-        Ok(a) => a,
-        Err(e) => {
-            return Err(ErrorActive::Check {
-                filename: path,
-                check: Check::MetadataFile(e),
-            })
-        }
-    };
+pub fn check_file(path: String) -> Result<()> {
+    let meta_str = std::fs::read_to_string(&path)?;
 
     // `MetaValues` from metadata in file
-    let from_file = MetaValues::from_str_metadata(
-        meta_str.trim(),
-        IncomingMetadataSourceActiveStr::Check { filename: path },
-    )?;
+    let from_file = MetaValues::from_str_metadata(meta_str.trim())?;
 
-    match try_get_meta_values_by_name_version::<Active>(
-        HOT_DB_NAME,
-        &from_file.name,
-        from_file.version,
-    )? {
+    match try_get_meta_values_by_name_version(HOT_DB_NAME, &from_file.name, from_file.version)? {
         // network metadata for same network name and version is in the database
         Some(from_database) => {
             if from_database.meta == from_file.meta {
@@ -203,7 +188,7 @@ fn hash_string(meta: &[u8]) -> String {
 }
 
 /// Show network specs for user-entered address book title.
-pub fn show_specs(title: String) -> Result<(), ErrorActive> {
+pub fn show_specs(title: String) -> Result<()> {
     let specs = network_specs_from_title(&title)?;
     println!(
         "address book title: {}\nbase58 prefix: {}\ncolor: {}\ndecimals: {}\nencryption: {}\ngenesis_hash: {}\nlogo: {}\nname: {}\npath_id: {}\nsecondary_color: {}\ntitle: {}\nunit: {}",
@@ -225,7 +210,7 @@ pub fn show_specs(title: String) -> Result<(), ErrorActive> {
 
 /// Show metadata block hash history from
 /// [`META_HISTORY`](constants::META_HISTORY) tree.
-pub fn show_block_history() -> Result<(), ErrorActive> {
+pub fn show_block_history() -> Result<()> {
     let meta_history_set = meta_history_content()?;
     if meta_history_set.is_empty() {
         println!("Database has no metadata fetch history entries on record.");

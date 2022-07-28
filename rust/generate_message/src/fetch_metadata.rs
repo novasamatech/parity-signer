@@ -73,6 +73,8 @@ use serde_json::{
 };
 use sp_core::H256;
 
+use crate::error::{Error, Result};
+
 /// Data from RPC calls for `load_metadata` update payload.
 ///
 /// This data is **sufficient** for `load_metadata` update payload generation,
@@ -152,21 +154,21 @@ fn address_with_port(str_address: &str) -> String {
 /// 2. metadata at this block hash
 /// 3. network genesis hash
 #[tokio::main]
-pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::error::Error>> {
+pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo> {
     let client = WsClientBuilder::default()
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client.request("chain_getBlockHash", rpc_params![]).await?;
     let block_hash = match response {
         Value::String(x) => x,
-        _ => return Err(Box::from("Unexpected block hash format")),
+        _ => return Err(Error::UnexpectedBlockHashFormat),
     };
     let response: Value = client
         .request("state_getMetadata", rpc_params![&block_hash])
         .await?;
     let meta = match response {
         Value::String(x) => x,
-        _ => return Err(Box::from("Unexpected metadata format")),
+        _ => return Err(Error::UnexpectedMetadataFormat),
     };
     let response: Value = client
         .request(
@@ -176,7 +178,7 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
         .await?;
     let genesis_hash = match response {
         Value::String(x) => x,
-        _ => return Err(Box::from("Unexpected genesis hash format")),
+        _ => return Err(Error::UnexpectedGenesisHashFormat),
     };
     Ok(FetchedInfo {
         meta,
@@ -191,10 +193,7 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
 /// Function inputs address at which RPC call is made and block hash in [`H256`]
 /// format. Outputs hexadecimal metadata.
 #[tokio::main]
-pub async fn fetch_meta_at_block(
-    str_address: &str,
-    block_hash: H256,
-) -> Result<String, Box<dyn std::error::Error>> {
+pub async fn fetch_meta_at_block(str_address: &str, block_hash: H256) -> Result<String> {
     let client = WsClientBuilder::default()
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
@@ -206,7 +205,7 @@ pub async fn fetch_meta_at_block(
         .await?;
     match response {
         Value::String(x) => Ok(x),
-        _ => Err(Box::from("Unexpected metadata format")),
+        _ => Err(Error::UnexpectedMetadataFormat),
     }
 }
 
@@ -222,14 +221,14 @@ pub async fn fetch_meta_at_block(
 #[tokio::main]
 pub async fn fetch_info_with_network_specs(
     str_address: &str,
-) -> Result<FetchedInfoWithNetworkSpecs, Box<dyn std::error::Error>> {
+) -> Result<FetchedInfoWithNetworkSpecs> {
     let client = WsClientBuilder::default()
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
     let meta = match response {
         Value::String(x) => x,
-        _ => return Err(Box::from("Unexpected metadata format")),
+        _ => return Err(Error::UnexpectedMetadataFormat),
     };
     let response: Value = client
         .request(
@@ -239,12 +238,12 @@ pub async fn fetch_info_with_network_specs(
         .await?;
     let genesis_hash = match response {
         Value::String(x) => x,
-        _ => return Err(Box::from("Unexpected genesis hash format")),
+        _ => return Err(Error::UnexpectedGenesisHashFormat),
     };
     let response: Value = client.request("system_properties", rpc_params![]).await?;
     let properties = match response {
         Value::Object(x) => x,
-        _ => return Err(Box::from("Unexpected system properties format")),
+        _ => return Err(Error::UnexpectedSystemPropertiesFormat),
     };
     Ok(FetchedInfoWithNetworkSpecs {
         meta,

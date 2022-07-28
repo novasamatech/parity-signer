@@ -5,10 +5,8 @@ use db_handling::{
     },
 };
 use definitions::{
-    error::{ErrorSource, MetadataError, MetadataSource, TransferContent},
-    error_signer::{
-        ErrorSigner, GeneralVerifierForContent, IncomingMetadataSourceSigner, InputSigner, Signer,
-    },
+    error::TransferContent,
+    error_signer::GeneralVerifierForContent,
     history::{Event, MetaValuesDisplay},
     keyring::VerifierKey,
     metadata::MetaValues,
@@ -19,6 +17,7 @@ use definitions::{
 
 use crate::cards::{Card, Warning};
 use crate::check_signature::pass_crypto;
+use crate::error::{Error, Result};
 use crate::helpers::accept_meta_values;
 use crate::{StubNav, TransactionAction};
 
@@ -27,60 +26,39 @@ enum FirstCard {
     VerifierCard(TransactionCard),
 }
 
-pub fn load_metadata(
-    data_hex: &str,
-    database_name: &str,
-) -> Result<TransactionAction, ErrorSigner> {
+pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<TransactionAction> {
     let checked_info = pass_crypto(data_hex, TransferContent::LoadMeta)?;
-    let (meta, genesis_hash) =
-        ContentLoadMeta::from_slice(&checked_info.message).meta_genhash::<Signer>()?;
-    let meta_values = match MetaValues::from_slice_metadata(&meta) {
-        Ok(a) => a,
-        Err(e) => {
-            return Err(<Signer>::faulty_metadata(
-                e,
-                MetadataSource::Incoming(IncomingMetadataSourceSigner::ReceivedData),
-            ))
-        }
-    };
+    let (meta, genesis_hash) = ContentLoadMeta::from_slice(&checked_info.message).meta_genhash()?;
+    let meta_values = MetaValues::from_slice_metadata(&meta)?;
     let general_verifier = get_general_verifier(database_name)?;
     let verifier_key = VerifierKey::from_parts(genesis_hash);
-    let valid_current_verifier = match try_get_valid_current_verifier(&verifier_key, database_name)?
-    {
-        Some(a) => a,
-        None => {
-            return Err(ErrorSigner::Input(InputSigner::LoadMetaUnknownNetwork {
-                name: meta_values.name,
-            }))
-        }
-    };
-    let specs_invariants =
-        match genesis_hash_in_specs(genesis_hash, &open_db::<Signer>(database_name)?)? {
-            Some(a) => a,
-            None => {
-                return Err(ErrorSigner::Input(InputSigner::LoadMetaNoSpecs {
-                    name: meta_values.name,
-                    valid_current_verifier,
-                    general_verifier,
-                }))
-            }
-        };
+    let valid_current_verifier = try_get_valid_current_verifier(&verifier_key, database_name)?
+        .ok_or(Error::LoadMetaUnknownNetwork {
+            name: meta_values.name.clone(),
+        })?;
+    let specs_invariants = genesis_hash_in_specs(genesis_hash, &open_db(database_name)?)?.ok_or(
+        Error::LoadMetaNoSpecs {
+            name: meta_values.name.clone(),
+            valid_current_verifier: valid_current_verifier.clone(),
+            general_verifier: general_verifier.clone(),
+        },
+    )?;
     if meta_values.name != specs_invariants.name {
-        return Err(ErrorSigner::Input(InputSigner::LoadMetaWrongGenesisHash {
+        return Err(Error::LoadMetaWrongGenesisHash {
             name_metadata: meta_values.name,
             name_specs: specs_invariants.name,
             genesis_hash,
-        }));
+        });
     }
     if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
         if prefix_from_meta != specs_invariants.base58prefix {
-            return Err(<Signer>::faulty_metadata(
-                MetadataError::Base58PrefixSpecsMismatch {
+            return Err(
+                definitions::error::MetadataError::Base58PrefixSpecsMismatch {
                     specs: specs_invariants.base58prefix,
                     meta: prefix_from_meta,
-                },
-                MetadataSource::Incoming(IncomingMetadataSourceSigner::ReceivedData),
-            ));
+                }
+                .into(),
+            );
         }
     }
     let mut stub = TrDbColdStub::new();
@@ -111,22 +89,22 @@ pub fn load_metadata(
                             v: Some(verifier_value),
                         },
                 } => {
-                    return Err(ErrorSigner::Input(InputSigner::NeedVerifier {
+                    return Err(Error::NeedVerifier {
                         name: meta_values.name,
                         verifier_value,
-                    }))
+                    })
                 }
                 ValidCurrentVerifier::General => match general_verifier {
                     Verifier { v: None } => (),
                     Verifier {
                         v: Some(verifier_value),
                     } => {
-                        return Err(ErrorSigner::Input(InputSigner::NeedGeneralVerifier {
+                        return Err(Error::NeedGeneralVerifier {
                             content: GeneralVerifierForContent::Network {
                                 name: meta_values.name,
                             },
                             verifier_value,
-                        }))
+                        })
                     }
                 },
             }
@@ -140,21 +118,19 @@ pub fn load_metadata(
                     if checked_info.verifier != a {
                         match a {
                             Verifier { v: None } => {
-                                return Err(ErrorSigner::Input(InputSigner::LoadMetaSetVerifier {
+                                return Err(Error::LoadMetaSetVerifier {
                                     name: meta_values.name,
                                     new_verifier_value: new_verifier_value.to_owned(),
-                                }))
+                                })
                             }
                             Verifier {
                                 v: Some(old_verifier_value),
                             } => {
-                                return Err(ErrorSigner::Input(
-                                    InputSigner::LoadMetaVerifierChanged {
-                                        name: meta_values.name,
-                                        old_verifier_value,
-                                        new_verifier_value: new_verifier_value.to_owned(),
-                                    },
-                                ))
+                                return Err(Error::LoadMetaVerifierChanged {
+                                    name: meta_values.name,
+                                    old_verifier_value,
+                                    new_verifier_value: new_verifier_value.to_owned(),
+                                })
                             }
                         }
                     }
@@ -163,23 +139,19 @@ pub fn load_metadata(
                     if checked_info.verifier != general_verifier {
                         match general_verifier {
                             Verifier { v: None } => {
-                                return Err(ErrorSigner::Input(
-                                    InputSigner::LoadMetaSetGeneralVerifier {
-                                        name: meta_values.name,
-                                        new_general_verifier_value: new_verifier_value.to_owned(),
-                                    },
-                                ))
+                                return Err(Error::LoadMetaSetGeneralVerifier {
+                                    name: meta_values.name,
+                                    new_general_verifier_value: new_verifier_value.to_owned(),
+                                })
                             }
                             Verifier {
                                 v: Some(old_general_verifier_value),
                             } => {
-                                return Err(ErrorSigner::Input(
-                                    InputSigner::LoadMetaGeneralVerifierChanged {
-                                        name: meta_values.name,
-                                        old_general_verifier_value,
-                                        new_general_verifier_value: new_verifier_value.to_owned(),
-                                    },
-                                ))
+                                return Err(Error::LoadMetaGeneralVerifierChanged {
+                                    name: meta_values.name,
+                                    old_general_verifier_value,
+                                    new_general_verifier_value: new_verifier_value.to_owned(),
+                                })
                             }
                         }
                     }
@@ -245,9 +217,9 @@ pub fn load_metadata(
             },
         }
     } else {
-        Err(ErrorSigner::Input(InputSigner::MetadataKnown {
+        Err(Error::MetadataKnown {
             name: meta_values.name,
             version: meta_values.version,
-        }))
+        })
     }
 }

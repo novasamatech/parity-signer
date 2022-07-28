@@ -35,20 +35,10 @@ use sp_version::RuntimeVersion;
 use sp_wasm_interface::HostFunctions;
 use std::collections::HashMap;
 
-#[cfg(feature = "signer")]
-use crate::error_signer::{ErrorSigner, Signer};
 #[cfg(feature = "active")]
+use crate::{crypto::Encryption, error_active::Wasm, helpers::unhex, keyring::AddressBookKey};
 use crate::{
-    crypto::Encryption,
-    error_active::{
-        Active, DatabaseActive, EntryDecodingActive, ErrorActive, IncomingMetadataSourceActive,
-        IncomingMetadataSourceActiveStr, NotHexActive, Wasm,
-    },
-    helpers::unhex,
-    keyring::AddressBookKey,
-};
-use crate::{
-    error::{ErrorSource, MetadataError, MetadataSource},
+    error::{Error, MetadataError, Result},
     keyring::MetaKey,
 };
 
@@ -110,30 +100,19 @@ impl MetaValues {
     ///
     /// Checks that input name and version match the ones in metadata `Version`
     /// constant.  
-    pub fn from_entry_name_version_checked<T: ErrorSource>(
+    pub fn from_entry_name_version_checked(
         name: &str,
         version: u32,
         meta_encoded: IVec,
-    ) -> Result<Self, T::Error> {
-        let meta_values = match Self::from_slice_metadata(&meta_encoded) {
-            Ok(a) => a,
-            Err(e) => {
-                return Err(<T>::faulty_metadata(
-                    e,
-                    MetadataSource::Database {
-                        name: name.to_string(),
-                        version,
-                    },
-                ))
-            }
-        };
+    ) -> Result<Self> {
+        let meta_values = Self::from_slice_metadata(&meta_encoded)?;
         if (meta_values.name != name) || (meta_values.version != version) {
-            return Err(<T>::metadata_mismatch(
-                name.to_string(),
-                version,
-                meta_values.name.to_string(),
-                meta_values.version,
-            ));
+            return Err(Error::MetadataMismatch {
+                this_name: name.to_string(),
+                this_version: version,
+                that_name: meta_values.name.to_string(),
+                that_version: meta_values.version,
+            });
         }
         Ok(meta_values)
     }
@@ -143,18 +122,16 @@ impl MetaValues {
     ///
     /// Checks that name and version from [`MetaKey`] match the ones in metadata
     /// `Version` constant.  
-    pub fn from_entry_checked<T: ErrorSource>(
-        (meta_key_vec, meta_encoded): (IVec, IVec),
-    ) -> Result<Self, T::Error> {
-        let (name, version) = MetaKey::from_ivec(&meta_key_vec).name_version::<T>()?;
-        Self::from_entry_name_version_checked::<T>(&name, version, meta_encoded)
+    pub fn from_entry_checked((meta_key_vec, meta_encoded): (IVec, IVec)) -> Result<Self> {
+        let (name, version) = MetaKey::from_ivec(&meta_key_vec).name_version()?;
+        Self::from_entry_name_version_checked(&name, version, meta_encoded)
     }
 
     /// Gets [`MetaValues`] from raw metadata in `Vec<u8>` format
     ///
     /// Produces [`MetadataError`] if the metadata is somehow not suitable for
     /// use in Signer.
-    pub fn from_slice_metadata(meta_slice: &[u8]) -> Result<Self, MetadataError> {
+    pub fn from_slice_metadata(meta_slice: &[u8]) -> Result<Self> {
         let meta_info = info_from_metadata(&runtime_metadata_from_slice(meta_slice)?)?;
         Ok(Self {
             name: meta_info.name.to_string(),
@@ -169,15 +146,9 @@ impl MetaValues {
     ///
     /// Could be used to generate metadata updates before metadata release.
     #[cfg(feature = "active")]
-    pub fn from_wasm_file(filename: &str) -> Result<Self, ErrorActive> {
-        let metadata = convert_wasm_into_metadata(filename).map_err(|e| ErrorActive::Wasm {
-            filename: filename.to_string(),
-            wasm: e,
-        })?;
-        Self::from_slice_metadata(&metadata).map_err(|e| ErrorActive::Wasm {
-            filename: filename.to_string(),
-            wasm: Wasm::FaultyMetadata(e),
-        })
+    pub fn from_wasm_file(filename: &str) -> Result<Self> {
+        let metadata = convert_wasm_into_metadata(filename)?;
+        Self::from_slice_metadata(&metadata)
     }
 
     /// Gets [`MetaValues`] from raw hexadecimal metadata
@@ -186,35 +157,9 @@ impl MetaValues {
     /// (a) default and test metadata loading;
     /// (b) decoding and evaluating fetched metadata;
     #[cfg(feature = "active")]
-    pub fn from_str_metadata(
-        meta: &str,
-        source: IncomingMetadataSourceActiveStr,
-    ) -> Result<Self, ErrorActive> {
-        let what = match &source {
-            IncomingMetadataSourceActiveStr::Fetch {
-                url,
-                optional_block,
-            } => NotHexActive::FetchedMetadata {
-                url: url.to_string(),
-                optional_block: *optional_block,
-            },
-            IncomingMetadataSourceActiveStr::Default { filename } => {
-                NotHexActive::DefaultMetadata {
-                    filename: filename.to_string(),
-                }
-            }
-            IncomingMetadataSourceActiveStr::Check { filename } => NotHexActive::CheckedMetadata {
-                filename: filename.to_string(),
-            },
-        };
-        let meta_vec = unhex::<Active>(meta, what)?;
-        match Self::from_slice_metadata(&meta_vec) {
-            Ok(a) => Ok(a),
-            Err(e) => Err(<Active>::faulty_metadata(
-                e,
-                MetadataSource::Incoming(IncomingMetadataSourceActive::Str(source)),
-            )),
-        }
+    pub fn from_str_metadata(meta: &str) -> Result<Self> {
+        let meta_vec = unhex(meta)?;
+        Self::from_slice_metadata(&meta_vec)
     }
 }
 
@@ -223,21 +168,21 @@ impl MetaValues {
 /// Is used only on Active side, to generate metadata updates before metadata
 /// release.
 #[cfg(feature = "active")]
-pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>, Wasm> {
+pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>> {
     let buffer = std::fs::read(filename).map_err(Wasm::File)?;
-    let runtime_blob = RuntimeBlob::uncompress_if_needed(&buffer).map_err(Wasm::RuntimeBlob)?;
+    let runtime_blob = RuntimeBlob::uncompress_if_needed(&buffer).map_err(Wasm::WasmError)?;
     let wasmi_runtime = create_runtime(
         runtime_blob,
         64,
         SubstrateHostFunctions::host_functions(),
         false,
     )
-    .map_err(Wasm::WasmiRuntime)?;
-    let mut wasmi_instance = wasmi_runtime.new_instance().map_err(Wasm::WasmiInstance)?;
+    .map_err(Wasm::WasmError)?;
+    let mut wasmi_instance = wasmi_runtime.new_instance().map_err(Wasm::Executor)?;
     let data = wasmi_instance
         .call(InvokeMethod::Export("Metadata_metadata"), &[])
-        .map_err(Wasm::Call)?;
-    <Vec<u8>>::decode(&mut &data[..]).map_err(|_| Wasm::DecodingMetadata)
+        .map_err(Wasm::Executor)?;
+    Ok(<Vec<u8>>::decode(&mut &data[..]).map_err(|_| Wasm::DecodingMetadata)?)
 }
 
 /// Get [`MetaInfo`] from
@@ -259,7 +204,7 @@ pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>, Wasm> {
 ///
 /// Additionally, for [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
 /// the extensions set must be decoding-compatible for any signable transaction.  
-pub fn info_from_metadata(runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo, MetadataError> {
+pub fn info_from_metadata(runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo> {
     let mut runtime_version_encoded: Option<&[u8]> = None;
     let mut base58_prefix_encoded: Option<&[u8]> = None;
     let mut warn_incomplete_extensions = false;
@@ -330,25 +275,25 @@ pub fn info_from_metadata(runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo
             }
             warn_incomplete_extensions = need_v14_warning(metadata_v14);
         }
-        _ => return Err(MetadataError::VersionIncompatible),
+        _ => return Err(MetadataError::VersionIncompatible.into()),
     }
     if !system_block {
-        return Err(MetadataError::NoSystemPallet);
+        return Err(MetadataError::NoSystemPallet.into());
     }
     let runtime_version = match runtime_version_encoded {
         Some(mut x) => match RuntimeVersion::decode(&mut x) {
             Ok(a) => a,
-            Err(_) => return Err(MetadataError::RuntimeVersionNotDecodeable),
+            Err(_) => return Err(MetadataError::RuntimeVersionNotDecodeable.into()),
         },
-        None => return Err(MetadataError::NoVersionInConstants),
+        None => return Err(MetadataError::NoVersionInConstants.into()),
     };
     let optional_base58prefix = match base58_prefix_encoded {
         Some(mut x) => match <u16>::decode(&mut x) {
             Ok(a) => Some(a),
             Err(_) => match <u8>::decode(&mut x) {
-                // in some older metadata u8 is used for base58 prefix, likely a legacy thing
+                // in some older metadata `u8` is used for base58 prefix, likely a legacy thing
                 Ok(a) => Some(a as u16),
-                Err(_) => return Err(MetadataError::Base58PrefixNotDecodeable),
+                Err(_) => return Err(MetadataError::Base58PrefixNotDecodeable.into()),
             },
         },
         None => None,
@@ -368,20 +313,17 @@ pub fn info_from_metadata(runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo
 ///
 /// - must begin with b"meta"  
 /// - after that must be SCALE-encoded `RuntimeMetadata` with runtime version `V12` or above
-pub fn runtime_metadata_from_slice(meta: &[u8]) -> Result<RuntimeMetadata, MetadataError> {
+pub fn runtime_metadata_from_slice(meta: &[u8]) -> Result<RuntimeMetadata> {
     if !meta.starts_with(&[109, 101, 116, 97]) {
-        return Err(MetadataError::NotMeta);
+        return Err(MetadataError::NotMeta.into());
     }
     if meta[4] < 12 {
-        return Err(MetadataError::VersionIncompatible);
+        return Err(MetadataError::VersionIncompatible.into());
     }
-    match RuntimeMetadata::decode(&mut &meta[4..]) {
-        Ok(x) => Ok(x),
-        Err(_) => Err(MetadataError::UnableToDecode),
-    }
+    Ok(RuntimeMetadata::decode(&mut &meta[4..]).map_err(|_| MetadataError::UnableToDecode)?)
 }
 
-/// Checks if the `V14` metadata has all signed extensions required for transaction decoding.
+/// Checks if the `v14` metadata has all signed extensions required for transaction decoding.
 /// True if extensions are incomplete.
 ///
 /// Currently, the decoding of the transaction demands that metadata version, network genesis hash,
@@ -438,42 +380,20 @@ impl MetaSetElement {
     /// Also checks that the metadata is suitable for use in Signer. Since the
     /// metadata already was accepted in the database at some point, errors here
     /// are very unlikely to happen and would indicate the database corruption
-    pub fn from_entry((meta_key_vec, meta_encoded): (IVec, IVec)) -> Result<Self, ErrorSigner> {
-        let (network_name, network_version) =
-            MetaKey::from_ivec(&meta_key_vec).name_version::<Signer>()?;
-        let runtime_metadata = match runtime_metadata_from_slice(&meta_encoded) {
-            Ok(a) => a,
-            Err(e) => {
-                return Err(<Signer>::faulty_metadata(
-                    e,
-                    MetadataSource::Database {
-                        name: network_name,
-                        version: network_version,
-                    },
-                ))
+    pub fn from_entry((meta_key_vec, meta_encoded): (IVec, IVec)) -> Result<Self> {
+        let (network_name, network_version) = MetaKey::from_ivec(&meta_key_vec).name_version()?;
+        let runtime_metadata = runtime_metadata_from_slice(&meta_encoded)?;
+        let (name, version, optional_base58prefix) = {
+            let a = info_from_metadata(&runtime_metadata)?;
+            if (a.version != network_version) || (a.name != network_name) {
+                return Err(Error::MetadataMismatch {
+                    this_name: network_name,
+                    this_version: network_version,
+                    that_name: a.name.to_string(),
+                    that_version: a.version,
+                });
             }
-        };
-        let (name, version, optional_base58prefix) = match info_from_metadata(&runtime_metadata) {
-            Ok(a) => {
-                if (a.version != network_version) || (a.name != network_name) {
-                    return Err(<Signer>::metadata_mismatch(
-                        network_name,
-                        network_version,
-                        a.name.to_string(),
-                        a.version,
-                    ));
-                }
-                (a.name, a.version, a.optional_base58prefix)
-            }
-            Err(e) => {
-                return Err(<Signer>::faulty_metadata(
-                    e,
-                    MetadataSource::Database {
-                        name: network_name,
-                        version: network_version,
-                    },
-                ))
-            }
+            (a.name, a.version, a.optional_base58prefix)
         };
         Ok(Self {
             name,
@@ -498,7 +418,7 @@ impl MetaSetElement {
         self.optional_base58prefix
     }
 
-    /// Gets runtime metadata, to be used in transaction decoding
+    /// Gets runtime metadata, to be used in transcation decoding
     pub fn runtime_metadata(&self) -> &RuntimeMetadata {
         &self.runtime_metadata
     }
@@ -546,7 +466,7 @@ impl AddressBookEntry {
     /// (key, value) entry.  
     pub fn from_entry(
         (address_book_key_encoded, address_book_entry_encoded): (IVec, IVec),
-    ) -> Result<AddressBookEntry, ErrorActive> {
+    ) -> Result<AddressBookEntry> {
         let title = AddressBookKey::from_ivec(&address_book_key_encoded).title()?;
         AddressBookEntry::from_entry_with_title(&title, &address_book_entry_encoded)
     }
@@ -559,7 +479,7 @@ impl AddressBookEntry {
     /// anywhere else.  
     pub fn process_entry(
         (address_book_key_encoded, address_book_entry_encoded): (IVec, IVec),
-    ) -> Result<(String, AddressBookEntry), ErrorActive> {
+    ) -> Result<(String, AddressBookEntry)> {
         let title = AddressBookKey::from_ivec(&address_book_key_encoded).title()?;
         let address_book_entry =
             AddressBookEntry::from_entry_with_title(&title, &address_book_entry_encoded)?;
@@ -569,17 +489,12 @@ impl AddressBookEntry {
     /// Gets [`AddressBookEntry`] from network address book title and associated
     /// value from hot database tree `ADDRESS_BOOK`.  
     pub fn from_entry_with_title(
-        title: &str,
+        _title: &str,
         address_book_entry_encoded: &IVec,
-    ) -> Result<AddressBookEntry, ErrorActive> {
-        match <AddressBookEntry>::decode(&mut &address_book_entry_encoded[..]) {
-            Ok(a) => Ok(a),
-            Err(_) => Err(ErrorActive::Database(DatabaseActive::EntryDecoding(
-                EntryDecodingActive::AddressBookEntry {
-                    title: title.to_string(),
-                },
-            ))),
-        }
+    ) -> Result<AddressBookEntry> {
+        Ok(<AddressBookEntry>::decode(
+            &mut &address_book_entry_encoded[..],
+        )?)
     }
 }
 
@@ -600,8 +515,8 @@ pub struct MetaHistoryEntry {
 #[cfg(feature = "active")]
 impl MetaHistoryEntry {
     /// From the whole entry
-    pub fn from_entry((meta_key_vec, hash_encoded): (IVec, IVec)) -> Result<Self, ErrorActive> {
-        let (name, version) = MetaKey::from_ivec(&meta_key_vec).name_version::<Active>()?;
+    pub fn from_entry((meta_key_vec, hash_encoded): (IVec, IVec)) -> Result<Self> {
+        let (name, version) = MetaKey::from_ivec(&meta_key_vec).name_version()?;
         Self::from_entry_with_key_parts(&name, version, &hash_encoded)
     }
 
@@ -610,18 +525,8 @@ impl MetaHistoryEntry {
         name: &str,
         version: u32,
         hash_encoded: &IVec,
-    ) -> Result<Self, ErrorActive> {
-        let block_hash = match H256::decode(&mut &hash_encoded[..]) {
-            Ok(b) => b,
-            Err(_) => {
-                return Err(ErrorActive::Database(DatabaseActive::EntryDecoding(
-                    EntryDecodingActive::BlockHash {
-                        name: name.to_string(),
-                        version,
-                    },
-                )))
-            }
-        };
+    ) -> Result<Self> {
+        let block_hash = H256::decode(&mut &hash_encoded[..])?;
         Ok(MetaHistoryEntry {
             name: name.to_string(),
             version,
@@ -634,18 +539,13 @@ impl MetaHistoryEntry {
 #[cfg(feature = "test")]
 mod tests {
     use super::*;
-    use crate::error_active::DefaultLoading;
     use std::fs::read_to_string;
 
     #[test]
     fn westend9070() {
         let filename = String::from("for_tests/westend9070");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        )
-        .unwrap();
+        let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"westend",
             "Unexpected network name: {}",
@@ -662,11 +562,7 @@ mod tests {
     fn westend9033() {
         let filename = String::from("for_tests/westend9033");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        )
-        .unwrap();
+        let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"westend",
             "Unexpected network name: {}",
@@ -683,11 +579,7 @@ mod tests {
     fn westend9030() {
         let filename = String::from("for_tests/westend9030");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        )
-        .unwrap();
+        let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"westend",
             "Unexpected network name: {}",
@@ -704,11 +596,7 @@ mod tests {
     fn rococo9004() {
         let filename = String::from("for_tests/rococo9004");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        )
-        .unwrap();
+        let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"rococo",
             "Unexpected network name: {}",
@@ -725,11 +613,7 @@ mod tests {
     fn rococo9002() {
         let filename = String::from("for_tests/rococo9002");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        )
-        .unwrap();
+        let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"rococo",
             "Unexpected network name: {}",
@@ -746,11 +630,7 @@ mod tests {
     fn polkadot9080() {
         let filename = String::from("for_tests/polkadot9080");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        )
-        .unwrap();
+        let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"polkadot",
             "Unexpected network name: {}",
@@ -767,11 +647,7 @@ mod tests {
     fn polkadot30() {
         let filename = String::from("for_tests/polkadot30");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        )
-        .unwrap();
+        let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"polkadot",
             "Unexpected network name: {}",
@@ -788,11 +664,7 @@ mod tests {
     fn polkadot29() {
         let filename = String::from("for_tests/polkadot29");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        )
-        .unwrap();
+        let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"polkadot",
             "Unexpected network name: {}",
@@ -809,11 +681,7 @@ mod tests {
     fn kusama9040() {
         let filename = String::from("for_tests/kusama9040");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        )
-        .unwrap();
+        let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"kusama",
             "Unexpected network name: {}",
@@ -830,11 +698,7 @@ mod tests {
     fn kusama9010() {
         let filename = String::from("for_tests/kusama9010");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        )
-        .unwrap();
+        let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"kusama",
             "Unexpected network name: {}",
@@ -851,23 +715,14 @@ mod tests {
     fn edgeware() {
         let filename = String::from("for_tests/edgeware");
         let meta = read_to_string(&filename).unwrap();
-        let expected_error = <Active>::show(&ErrorActive::DefaultLoading(
-            DefaultLoading::FaultyMetadata {
-                filename: filename.to_string(),
-                error: MetadataError::NoVersionInConstants,
-            },
-        ));
-        match MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        ) {
+
+        match MetaValues::from_str_metadata(meta.trim()) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
             Err(e) => {
-                assert!(
-                    <Active>::show(&e) == expected_error,
-                    "Unexpected kind of error, {}",
-                    <Active>::show(&e)
-                );
+                if let Error::MetadataError(MetadataError::NoVersionInConstants) = e {
+                } else {
+                    panic!("expected Error::WrongPublicKeyLength, got {:?}", e);
+                }
             }
         }
     }
@@ -876,23 +731,14 @@ mod tests {
     fn centrifuge_amber() {
         let filename = String::from("for_tests/centrifugeAmber");
         let meta = read_to_string(&filename).unwrap();
-        let expected_error = <Active>::show(&ErrorActive::DefaultLoading(
-            DefaultLoading::FaultyMetadata {
-                filename: filename.to_string(),
-                error: MetadataError::VersionIncompatible,
-            },
-        ));
-        match MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        ) {
+
+        match MetaValues::from_str_metadata(meta.trim()) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
             Err(e) => {
-                assert!(
-                    <Active>::show(&e) == expected_error,
-                    "Unexpected kind of error, {}",
-                    <Active>::show(&e)
-                );
+                if let Error::MetadataError(MetadataError::VersionIncompatible) = e {
+                } else {
+                    panic!("expected Error::WrongPublicKeyLength, got {:?}", e);
+                }
             }
         }
     }
@@ -901,11 +747,7 @@ mod tests {
     fn westend9150() {
         let filename = String::from("for_tests/westend9150");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        )
-        .unwrap();
+        let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"westend",
             "Unexpected network name: {}",
@@ -926,11 +768,7 @@ mod tests {
     fn shell200() {
         let filename = String::from("for_tests/shell200");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(
-            meta.trim(),
-            IncomingMetadataSourceActiveStr::Default { filename },
-        )
-        .unwrap();
+        let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"shell",
             "Unexpected network name: {}",

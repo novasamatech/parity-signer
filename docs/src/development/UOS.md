@@ -384,12 +384,12 @@ into the error set.
     Metadata `V14` has extensions with both identifiers and properly described
 types, and Signer decodes extensions as they are recorded in the metadata. For
 this,
-[`ExtrinsicMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.ExtrinsicMetadata.html)
+[`ExtrinsicMetadata`](https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.ExtrinsicMetadata.html)
 part of the metadata
-[`RuntimeMetadataV14`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.RuntimeMetadataV14.html)
+[`RuntimeMetadataV14`](https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.RuntimeMetadataV14.html)
 is used. Vector `signed_extensions` in `ExtrinsicMetadata` is scanned twice,
 first for types in `ty` of the
-[`SignedExtensionMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.SignedExtensionMetadata.html)
+[`SignedExtensionMetadata`](https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.SignedExtensionMetadata.html)
 and then for types in `additional_signed` of the `SignedExtensionMetadata`. The
 types, when resolved through the types database from the metadata, allow to cut
 correct length blobs from the whole SCALE-encoded extensions blob and decode
@@ -401,7 +401,7 @@ extensions are scanned, some part of extensions blob remains unused.
 
     There are some special extensions that must be treated separately. The
 `identifier` in `SignedExtensionMetadata` and `ident` segment of the type
-[`Path`](https://paritytech.github.io/substrate/master/scale_info/struct.Path.html)
+[`Path`](https://docs.rs/scale-info/latest/scale_info/struct.Path.html)
 are used to trigger types interpretation as specially treated extensions. Each
 `identifier` is encountered twice, once for `ty` scan, and once for
 `additional_signed` scan. In some cases only one of those types has non-empty
@@ -474,11 +474,11 @@ decoding entry point.
 
     For `V14` metadata the correct pallet is found in the set of available ones
 in `pallets` field of
-[`RuntimeMetadataV14`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.RuntimeMetadataV14.html),
+[`RuntimeMetadataV14`](https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.RuntimeMetadataV14.html),
 by `index` field in corresponding
-[`PalletMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.PalletMetadata.html).
+[`PalletMetadata`](https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.PalletMetadata.html).
 The `calls` field of this `PalletMetadata`, if it is `Some(_)`, contains
-[`PalletCallMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.PalletCallMetadata.html)
+[`PalletCallMetadata`](https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.PalletCallMetadata.html)
 that provides the available calls enum described in `types` registry of the
 `RuntimeMetadataV14`. For each type in the registry, including this calls enum,
 encoded data size is determined, and the decoding is done according to the type.
@@ -503,14 +503,14 @@ decoding is done according to the argument type.
     - numbers that are processed as the balances
 
     Calls in `V14` parsing are distinguished by `Call` in `ident` segment of the
-type [`Path`](https://paritytech.github.io/substrate/master/scale_info/struct.Path.html).
+type [`Path`](https://docs.rs/scale-info/latest/scale_info/struct.Path.html).
 Calls in `V12` and `V13` metadata are distinguished by any element of the set
 of calls type identifiers in string argument type.
 
     At the moment the numbers that should be displayed as balance in
 transacrtions with `V14` metadata are determined by the type name `type_name` of
 the corresponding
-[`Field`](https://paritytech.github.io/substrate/master/scale_info/struct.Field.html)
+[`Field`](https://docs.rs/scale-info/latest/scale_info/struct.Field.html)
 being:
 
     - `Balance`
@@ -757,7 +757,7 @@ Network metadata that can get into Signer and can be used by Signer only if it
 complies with following requirements:
 
 - metadata vector starts with `b"meta"` prelude
-- part of the metadata vector after `b"meta"` prelude is decodeable as [`RuntimeMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/enum.RuntimeMetadata.html)
+- part of the metadata vector after `b"meta"` prelude is decodeable as [`RuntimeMetadata`](https://docs.rs/frame-metadata/latest/frame_metadata/enum.RuntimeMetadata.html)
 - `RuntimeMetadata` version of the metadata is `V12`, `V13` or `V14`
 - Metadata has `System` pallet
 - There is `Version` constant in `System` pallet

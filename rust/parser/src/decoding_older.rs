@@ -4,7 +4,6 @@ use regex::Regex;
 use sp_arithmetic::{PerU16, Perbill, Percent};
 
 use definitions::{
-    error_signer::{ParserDecodingError, ParserError},
     network_specs::ShortSpecs,
     types::{Description, EnumVariant, EnumVariantType, StructField, TypeEntry},
 };
@@ -14,19 +13,20 @@ use crate::decoding_commons::{
     decode_known_length, decode_perthing, decode_primitive_with_flags, get_compact,
     special_case_account_id, DecodedOut, OutputCard,
 };
+use crate::error::{Error, ParserDecodingError, Result};
 use crate::method::{what_next_old, OlderMeta};
 
-/// Function to decode primitive types (fixed-width or compact form), and Percent,
+/// Function to decode primitive types (fixed-width or compact form), and `Percent`,
 /// `Permill`, and `PerU16` structs (also fixed-width or compact form).
-/// All those types have stable length by `std::mem::size_of()` and also are serializable.
+/// All those types have stable length by `std::mem::size_of()` and also are serializeable.
 ///
-/// The function decodes only `found_ty`, removes already decoded part of input data `Vec<u8>`,
+/// The function decodes only found_ty, removes already decoded part of input data `Vec<u8>`,
 /// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
 /// - `found_ty` (type of the argument found in the previous iteration, to be interpreted on run)
-/// - data (remaining `Vec<u8>` of data),
-/// - indent used for creating properly formatted js cards.
+/// - `data` (remaining `Vec<u8>` of data),
+/// - `indent` used for creating properly formatted js cards.
 ///
 /// The function outputs the `DecodedOut` value in case of success.
 fn decode_primitive(
@@ -160,20 +160,20 @@ fn decode_primitive(
 }
 
 /// Function to decode any type, including calls and vectors of calls.
-/// Here starts the decoding of argument with type `found_ty`.
+/// Here starts the decoding of argument with type found_ty.
 ///
 /// This function is recursive, i.e. it could call itself later if needed with changed input data.
-/// The function decodes only `found_ty`, removes already decoded part of input data `Vec<u8>`,
+/// The function decodes only found_ty, removes already decoded part of input data `Vec<u8>`,
 /// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
 /// - `found_ty` (type of the argument found in the previous iteration, to be interpreted on run)
-/// - data (remaining `Vec<u8>` of data),
-/// - meta (metadata for the network used),
+/// - `data` (remaining `Vec<u8>` of data),
+/// - `meta` (metadata for the network used),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
 /// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
-/// - indent used for creating properly formatted js cards,
+/// - `indent` used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
@@ -188,7 +188,7 @@ fn decode_complex(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     match found_ty {
         "Box<<T as Config<I>>::Proposal>"
         | "Box<<T as Config>::Call>"
@@ -202,7 +202,7 @@ fn decode_complex(
             match pre_vector.start_next_unit {
                 Some(start) => {
                     if data.len() < start + 2 * (number_of_calls as usize) {
-                        return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                        return Err(Error::Decoding(ParserDecodingError::DataTooShort));
                     }
                     data = data[start..].to_vec();
                     for _i in 0..number_of_calls {
@@ -214,7 +214,7 @@ fn decode_complex(
                 }
                 None => {
                     if number_of_calls != 0 {
-                        return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                        return Err(Error::Decoding(ParserDecodingError::DataTooShort));
                     }
                 }
             }
@@ -235,12 +235,12 @@ fn decode_complex(
 /// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - data (call itself),
-/// - meta (metadata for the network used),
+/// - `data` (call itself),
+/// - `meta` (metadata for the network used),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
 /// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
-/// - indent used for creating properly formatted js cards,
+/// - `indent` used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
@@ -251,7 +251,7 @@ fn decode_complex(
 /// The card "call" containing pallet name and method name is added to `fancy_out`.
 /// Each argument is then processed in a sequence, the name of the argument
 /// and the type of the argument are found in the network metadata during the run.
-/// For each argument the card `varname` with argument name is added to `fancy_out`,
+/// For each argument the card "varname" with argument name is added to `fancy_out`,
 /// followed by card(s) of actual decoded argument values.
 pub(crate) fn process_as_call(
     mut data: Vec<u8>,
@@ -259,7 +259,7 @@ pub(crate) fn process_as_call(
     type_database: &[TypeEntry],
     mut indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     let call_in_processing = what_next_old(data, meta)?;
     data = call_in_processing.data;
 
@@ -298,7 +298,7 @@ pub(crate) fn process_as_call(
 
 // Making regular expressions for analysing any type encountered except calls and Vec<calls>.
 // The type to be parsed is found in network metadata on the run.
-// In some cases the type could be Option<arg>, Vec<arg>, tuple such as (arg1, arg2, arg3)
+// In some cases the type could be `Option<arg>`, `Vec<arg>`, tuple such as (arg1, arg2, arg3)
 // (currently among types are found tuples of up to 4 elements, could change at any point),
 // array such as [arg; num], and compact such as Compact<arg>.
 // To reduce the number of types in `type_database` and to simplify and
@@ -324,11 +324,11 @@ lazy_static! {
 ///
 /// The function takes as arguments
 /// - `inner_ty` (type inside Option, found using regular expressions)
-/// - data (remaining `Vec<u8>` of data),
+/// - `data` (remaining `Vec<u8>` of data),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
 /// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
-/// - indent used for creating properly formatted js cards,
+/// - `indent` used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
@@ -342,7 +342,7 @@ fn deal_with_option(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     if inner_ty == "bool" {
         let fancy_out = match &data[0] {
             0 => vec![OutputCard {
@@ -358,7 +358,7 @@ fn deal_with_option(
                 indent,
             }],
             _ => {
-                return Err(ParserError::Decoding(
+                return Err(Error::Decoding(
                     ParserDecodingError::UnexpectedOptionVariant,
                 ))
             }
@@ -395,12 +395,12 @@ fn deal_with_option(
             }
             1 => {
                 if data.len() == 1 {
-                    return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                    return Err(Error::Decoding(ParserDecodingError::DataTooShort));
                 }
                 data = data[1..].to_vec();
                 decode_simple(inner_ty, data, type_database, indent, short_specs)
             }
-            _ => Err(ParserError::Decoding(
+            _ => Err(Error::Decoding(
                 ParserDecodingError::UnexpectedOptionVariant,
             )),
         }
@@ -420,11 +420,11 @@ fn deal_with_option(
 ///
 /// The function takes as arguments
 /// - `inner_ty` (type inside `Vec`, found using regular expressions)
-/// - data (remaining `Vec<u8>` of data),
+/// - `data` (remaining `Vec<u8>` of data),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
 /// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
-/// - indent used for creating properly formatted js cards,
+/// - `indent` used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
@@ -435,7 +435,7 @@ fn deal_with_vector(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     let pre_vector = get_compact::<u32>(&data)?;
     let mut fancy_output_prep: Vec<OutputCard> = Vec::new();
     let elements_of_vector = pre_vector.compact_found;
@@ -454,7 +454,7 @@ fn deal_with_vector(
         }
         None => {
             if elements_of_vector != 0 {
-                Err(ParserError::Decoding(ParserDecodingError::DataTooShort))
+                Err(Error::Decoding(ParserDecodingError::DataTooShort))
             } else {
                 Ok(DecodedOut {
                     remaining_vector: Vec::new(),
@@ -494,7 +494,7 @@ fn deal_with_array(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     let mut fancy_output_prep: Vec<OutputCard> = Vec::new();
     for _i in 0..number_of_elements {
         let after_run = decode_simple(inner_ty, data, type_database, indent, short_specs)?;
@@ -507,7 +507,7 @@ fn deal_with_array(
     })
 }
 
-/// Function to decode `IdentityFields` special case.
+/// Function to decode IdentityFields special case.
 /// `IdentityFields` is a struct from `pallet_identity::IdentityFields`,
 /// which is wrapper type for `BitFlags<IdentityField>`.
 /// To avoid output complications arising from private non-printable fields
@@ -518,11 +518,11 @@ fn deal_with_array(
 /// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - `data` (remaining `Vec<u8>` of data),
+/// - data (remaining `Vec<u8>` of data),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
 /// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
-/// - `indent` used for creating properly formatted js cards.
+/// - indent used for creating properly formatted js cards.
 ///
 /// The function outputs the `DecodedOut` value in case of success.
 ///
@@ -531,10 +531,10 @@ fn special_case_identity_fields(
     data: Vec<u8>,
     type_database: &[TypeEntry],
     indent: u32,
-) -> Result<DecodedOut, ParserError> {
-    // at the moment, the length is known: 8 units in Vec<u8>
+) -> Result<DecodedOut> {
+    // at the moment, the length is known: 8 units in `Vec<u8>`
     if data.len() < 8 {
-        return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+        return Err(Error::Decoding(ParserDecodingError::DataTooShort));
     }
     let remaining_vector = {
         if data.len() > 8 {
@@ -544,7 +544,7 @@ fn special_case_identity_fields(
         }
     };
     let into_bv = data[..8].to_vec();
-    // make correct Bitvec
+    // make correct `BitVec`
     let bv: BitVec<u8, Lsb0> = BitVec::from_vec(into_bv);
     let mut found = false;
     let mut fancy_out: Vec<OutputCard> = Vec::new();
@@ -565,7 +565,7 @@ fn special_case_identity_fields(
         }
     }
     if !found {
-        return Err(ParserError::Decoding(ParserDecodingError::IdFields));
+        return Err(Error::Decoding(ParserDecodingError::IdFields));
     }
     Ok(DecodedOut {
         remaining_vector,
@@ -577,9 +577,9 @@ fn special_case_identity_fields(
 ///
 /// The function decodes only a single `BitVec` type entry,
 /// removes already decoded part of input data `Vec<u8>`,
-/// and returns whatever remains as `DecodedOut` field ``remaining_vector``, which is processed later separately.
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
-/// Trait `Decode` is not implemented for `BitVec` type.
+/// Trait Decode is not implemented for `BitVec` type.
 /// Existing signer documentation in js suggests that the encoded `BitVec` is preluded by the number
 /// of `BitVec` elements as compact, and each 8 of those form an `u8` element in input data.
 /// So, the function first searches for compact to determine the number of `BitVec` elements
@@ -587,13 +587,13 @@ fn special_case_identity_fields(
 /// and gets `BitVec` from it.
 ///
 /// The function takes as arguments
-/// - `data` (remaining `Vec<u8>` of data),
-/// - `indent` used for creating properly formatted js cards.
+/// - data (remaining `Vec<u8>` of data),
+/// - indent used for creating properly formatted js cards.
 ///
 /// The function outputs the `DecodedOut` value in case of success.
 ///
 /// Resulting `BitVec` is added to `fancy_out` on js card `bitvec`.
-fn special_case_bitvec(data: Vec<u8>, indent: u32) -> Result<DecodedOut, ParserError> {
+fn special_case_bitvec(data: Vec<u8>, indent: u32) -> Result<DecodedOut> {
     // the data is preluded by compact indicating the number of `BitVec` elements - info from js documentation, decode not implemented for `BitVec` as is
     let pre_bitvec = get_compact::<u32>(&data)?;
     let actual_length = match pre_bitvec.compact_found % 8 {
@@ -604,7 +604,7 @@ fn special_case_bitvec(data: Vec<u8>, indent: u32) -> Result<DecodedOut, ParserE
         Some(start) => {
             let fin = start + (actual_length as usize);
             if data.len() < fin {
-                return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                return Err(Error::Decoding(ParserDecodingError::DataTooShort));
             }
             let into_bv = data[start..fin].to_vec();
             let bv: BitVec<u8, Lsb0> = BitVec::from_vec(into_bv);
@@ -626,7 +626,7 @@ fn special_case_bitvec(data: Vec<u8>, indent: u32) -> Result<DecodedOut, ParserE
         }
         None => {
             if actual_length != 0 {
-                return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                return Err(Error::Decoding(ParserDecodingError::DataTooShort));
             }
             Ok(DecodedOut {
                 remaining_vector: Vec::new(),
@@ -659,8 +659,8 @@ fn goto_balance(found_ty: &str) -> bool {
 /// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - `data` (remaining `Vec<u8>` of data),
-/// - `indent` used for creating properly formatted js cards.
+/// - data (remaining `Vec<u8>` of data),
+/// - indent used for creating properly formatted js cards.
 /// - `short_specs` (taking currency units and decimals from there).
 ///
 /// The function outputs the `DecodedOut` value in case of success.
@@ -671,7 +671,7 @@ fn special_case_balance(
     data: Vec<u8>,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     match found_ty {
         "Balance" | "T::Balance" | "BalanceOf<T>" | "BalanceOf<T, I>" => {
             decode_primitive_with_flags::<u128>(
@@ -696,9 +696,7 @@ fn special_case_balance(
             indent,
             short_specs,
         ),
-        _ => Err(ParserError::Decoding(
-            ParserDecodingError::BalanceNotDescribed,
-        )),
+        _ => Err(Error::Decoding(ParserDecodingError::BalanceNotDescribed)),
     }
 }
 
@@ -711,12 +709,12 @@ fn special_case_balance(
 /// This function is recursive, i.e. it could call itself later if needed with changed input data.
 ///
 /// The function takes as arguments
-/// - `vector` of `StructField` of currently processed type, as found in `type_database`
-/// - `data` (remaining `Vec<u8>` of data),
+/// - vector of `StructField` of currently processed type, as found in `type_database`
+/// - data (remaining `Vec<u8>` of data),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
 /// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
-/// - `indent` used for creating properly formatted js cards,
+/// - indent used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
@@ -727,7 +725,7 @@ fn deal_with_struct(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     let mut fancy_out: Vec<OutputCard> = Vec::new();
     for (i, y) in v1.iter().enumerate() {
         let fancy_output_prep = match &y.field_name {
@@ -769,12 +767,12 @@ fn deal_with_struct(
 /// This function is recursive, i.e. it could call itself later if needed with changed input data.
 ///
 /// The function takes as arguments
-/// - `vector` of `EnumVariant` of currently processed type, as found in `type_database`
-/// - `data` (remaining `Vec<u8>` of data),
+/// - vector of `EnumVariant` of currently processed type, as found in `type_database`
+/// - data (remaining `Vec<u8>` of data),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
 /// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
-/// - `indent` used for creating properly formatted js cards,
+/// - indent used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
@@ -785,12 +783,10 @@ fn deal_with_enum(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     let enum_index = data[0] as usize;
     if enum_index >= v1.len() {
-        return Err(ParserError::Decoding(
-            ParserDecodingError::UnexpectedEnumVariant,
-        ));
+        return Err(Error::Decoding(ParserDecodingError::UnexpectedEnumVariant));
     }
     let found_variant = &v1[enum_index];
     match &found_variant.variant_type {
@@ -816,7 +812,7 @@ fn deal_with_enum(
         }
         EnumVariantType::Type(inner_ty) => {
             if data.len() == 1 {
-                return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                return Err(Error::Decoding(ParserDecodingError::DataTooShort));
             }
             data = data[1..].to_vec();
             let mut fancy_output_prep = vec![OutputCard {
@@ -836,7 +832,7 @@ fn deal_with_enum(
         }
         EnumVariantType::Struct(v2) => {
             if data.len() == 1 {
-                return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                return Err(Error::Decoding(ParserDecodingError::DataTooShort));
             }
             data = data[1..].to_vec();
             let mut fancy_out: Vec<OutputCard> = Vec::new();
@@ -878,16 +874,16 @@ fn deal_with_enum(
 /// Function to decode any type, except calls.
 ///
 /// This function is recursive, i.e. it could call itself later if needed with changed input data.
-/// The function decodes only `found_ty`, removes already decoded part of input data `Vec<u8>`,
-/// and returns whatever remains as `DecodedOut` field ``remaining_vector``, which is processed later separately.
+/// The function decodes only found_ty, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - `found_ty` (type of the argument found in the previous iteration, to be interpreted on run)
-/// - `data` (remaining `Vec<u8>` of data),
+/// - found_ty (type of the argument found in the previous iteration, to be interpreted on run)
+/// - data (remaining `Vec<u8>` of data),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
 /// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
-/// - `indent` used for creating properly formatted js cards,
+/// - indent used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
@@ -898,9 +894,9 @@ fn decode_simple(
     type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     if data.is_empty() {
-        return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+        return Err(Error::Decoding(ParserDecodingError::DataTooShort));
     }
     match decode_primitive(found_ty, &data, indent, short_specs) {
         Some(a) => Ok(a),
@@ -991,7 +987,7 @@ fn decode_simple(
                                                             if x.name == inner_ty {
                                                                 new_inner_ty = match &x.description {
                                                                     Description::Type(a) => Some(a),
-                                                                    _ => return Err(ParserError::Decoding(ParserDecodingError::UnexpectedCompactInsides)),
+                                                                    _ => return Err(Error::Decoding(ParserDecodingError::UnexpectedCompactInsides)),
                                                                 };
                                                                 break;
                                                             }
@@ -1001,7 +997,7 @@ fn decode_simple(
                                                                 let new_ty = found_ty.replace(inner_ty, a);
                                                                 decode_simple(&new_ty, data, type_database, indent, short_specs)
                                                             },
-                                                            None => Err(ParserError::Decoding(ParserDecodingError::UnexpectedCompactInsides)),
+                                                            None => Err(Error::Decoding(ParserDecodingError::UnexpectedCompactInsides)),
                                                         }
                                                     }
                                                     None => {
@@ -1017,7 +1013,7 @@ fn decode_simple(
                                                             if found_ty == "BitVec" {
                                                                 special_case_bitvec(data, indent)
                                                             } else {
-                                                                // special case of `AccountId` type
+                                                                // special case of AccountId type
                                                                 if (found_ty == "AccountId")
                                                                     || (found_ty == "T::AccountId")
                                                                 {
@@ -1043,7 +1039,7 @@ fn decode_simple(
                                                                     }
                                                                     match found_solution {
                                                                         Some(x) => Ok(x),
-                                                                        None => Err(ParserError::Decoding(ParserDecodingError::UnknownType(found_ty.to_string()))),
+                                                                        None => Err(Error::Decoding(ParserDecodingError::UnknownType(found_ty.to_string()))),
                                                                     }
                                                                 }
                                                             }

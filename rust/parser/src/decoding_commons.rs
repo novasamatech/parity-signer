@@ -3,14 +3,13 @@ use sp_arithmetic::PerThing;
 use sp_core::crypto::AccountId32;
 use std::{convert::TryInto, mem::size_of};
 
-use definitions::{
-    error_signer::{ParserDecodingError, ParserError, ParserMetadataError},
-    network_specs::ShortSpecs,
-};
+use definitions::network_specs::ShortSpecs;
 use printing_balance::convert_balance_pretty;
 
 use crate::cards::ParserCard;
 use crate::decoding_sci_ext::{Ext, SpecialExt};
+use crate::error::{ParserDecodingError, ParserMetadataError};
+use crate::Result;
 
 /// Struct to store the decoded data, used for data storage between decoding iterations.
 /// `decoded_string` is short json-like format,
@@ -36,13 +35,13 @@ pub struct CutCompact<T: HasCompact> {
 
 /// Function to search `&[u8]` for shortest compact <T> by brute force.
 /// Outputs `CutCompact` value in case of success.
-pub fn get_compact<T>(data: &[u8]) -> Result<CutCompact<T>, ParserError>
+pub fn get_compact<T>(data: &[u8]) -> Result<CutCompact<T>>
 where
     T: HasCompact,
     Compact<T>: Decode,
 {
     if data.is_empty() {
-        return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+        return Err(ParserDecodingError::DataTooShort.into());
     }
     let mut out = None;
     for i in 1..data.len() + 1 {
@@ -62,12 +61,12 @@ where
     }
     match out {
         Some(c) => Ok(c),
-        None => Err(ParserError::Decoding(ParserDecodingError::NoCompact)),
+        None => Err(ParserDecodingError::NoCompact.into()),
     }
 }
 
 /// Function to decode types with trait `PerThing` (`Percent`, `Permill`, `Perbill` etc).
-/// Decoding type `T` either as compact or as fixed length type.
+/// Decoding type T either as compact or as fixed length type.
 /// Used only in `decoding_older` module, without `serde`.
 ///
 /// The function decodes only this element, removes already decoded part of input data `Vec<u8>`,
@@ -75,7 +74,7 @@ where
 ///
 /// The function takes as arguments
 /// - `data` (remaining `Vec<u8>` of data),
-/// - `compact_flag` to initiate compact decoding,
+/// - `compact` flag to initiate compact decoding,
 /// - `&str` name of type to be displayed in case of error,
 /// - `indent` used for creating properly formatted js cards,
 ///
@@ -85,7 +84,7 @@ pub(crate) fn decode_perthing<T>(
     compact_flag: bool,
     found_ty: &str,
     indent: u32,
-) -> Result<DecodedOut, ParserError>
+) -> Result<DecodedOut>
 where
     T: PerThing + Decode + HasCompact,
     Compact<T>: Decode,
@@ -107,24 +106,16 @@ where
         } else {
             let length = size_of::<T>();
             if data.len() < length {
-                return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                return Err(ParserDecodingError::DataTooShort.into());
             }
-            let decoded_data = <T>::decode(&mut &data[..length]);
-            match decoded_data {
-                Ok(x) => {
-                    let fancy_out = vec![OutputCard {
-                        card: ParserCard::Default(x.deconstruct().into().to_string()),
-                        indent,
-                    }];
-                    let remaining_vector = data[length..].to_vec();
-                    (fancy_out, remaining_vector)
-                }
-                Err(_) => {
-                    return Err(ParserError::Decoding(
-                        ParserDecodingError::PrimitiveFailure(found_ty.to_string()),
-                    ))
-                }
-            }
+            let decoded_data = <T>::decode(&mut &data[..length])
+                .map_err(|_| ParserDecodingError::PrimitiveFailure(found_ty.to_string()))?;
+            let fancy_out = vec![OutputCard {
+                card: ParserCard::Default(decoded_data.deconstruct().into().to_string()),
+                indent,
+            }];
+            let remaining_vector = data[length..].to_vec();
+            (fancy_out, remaining_vector)
         }
     };
     Ok(DecodedOut {
@@ -141,7 +132,7 @@ where
 ///
 /// The function takes as arguments
 /// - data (remaining `Vec<u8>` of data),
-/// - `found_ty`: name of the type found,
+/// - found_ty: name of the type found,
 /// - indent used for creating properly formatted js cards.
 ///
 /// The function outputs the `DecodedOut` value in case of success.
@@ -149,28 +140,22 @@ pub(crate) fn decode_known_length<T: Decode + std::fmt::Display>(
     data: &[u8],
     found_ty: &str,
     indent: u32,
-) -> Result<DecodedOut, ParserError> {
+) -> Result<DecodedOut> {
     let length = size_of::<T>();
     if data.len() < length {
-        return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+        return Err(ParserDecodingError::DataTooShort.into());
     }
-    let decoded_data = <T>::decode(&mut &data[..length]);
-    match decoded_data {
-        Ok(x) => {
-            let fancy_out = vec![OutputCard {
-                card: ParserCard::Default(x.to_string()),
-                indent,
-            }];
-            let remaining_vector = data[length..].to_vec();
-            Ok(DecodedOut {
-                remaining_vector,
-                fancy_out,
-            })
-        }
-        Err(_) => Err(ParserError::Decoding(
-            ParserDecodingError::PrimitiveFailure(found_ty.to_string()),
-        )),
-    }
+    let decoded_data = <T>::decode(&mut &data[..length])
+        .map_err(|_| ParserDecodingError::PrimitiveFailure(found_ty.to_string()))?;
+    let fancy_out = vec![OutputCard {
+        card: ParserCard::Default(decoded_data.to_string()),
+        indent,
+    }];
+    let remaining_vector = data[length..].to_vec();
+    Ok(DecodedOut {
+        remaining_vector,
+        fancy_out,
+    })
 }
 
 /// Function to decode a displayable type compatible with compact and balance printing.
@@ -181,10 +166,10 @@ pub(crate) fn decode_known_length<T: Decode + std::fmt::Display>(
 /// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - `data` (remaining `Vec<u8>` of data),
-/// - `compact_flag` and balance flag to choose decoding variant,
+/// - data (remaining `Vec<u8>` of data),
+/// - compact flag and balance flag to choose decoding variant,
 /// - `&str` name of type to be displayed in case of error,
-/// - `indent` used for creating properly formatted js cards,
+/// - indent used for creating properly formatted js cards,
 /// - `ShortSpecs` to format the balance properly if the balance is involved.
 ///
 /// The function outputs the `DecodedOut` value in case of success.
@@ -196,7 +181,7 @@ pub(crate) fn decode_primitive_with_flags<T>(
     found_ty: &str,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError>
+) -> Result<DecodedOut>
 where
     T: Decode + HasCompact + std::fmt::Display,
     Compact<T>: Decode,
@@ -242,28 +227,22 @@ where
     } else {
         let length = size_of::<T>();
         if data.len() < length {
-            return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+            return Err(ParserDecodingError::DataTooShort.into());
         }
-        let decoded_data = <T>::decode(&mut &data[..length]);
-        match decoded_data {
-            Ok(x) => {
-                let fancy_out = {
-                    if balance_flag {
-                        process_balance(&x.to_string(), possible_ext, indent, short_specs)?
-                    } else {
-                        process_number(x.to_string(), possible_ext, indent, short_specs)?
-                    }
-                };
-                let remaining_vector = data[length..].to_vec();
-                Ok(DecodedOut {
-                    remaining_vector,
-                    fancy_out,
-                })
+        let decoded_data = <T>::decode(&mut &data[..length])
+            .map_err(|_| ParserDecodingError::PrimitiveFailure(found_ty.to_string()))?;
+        let fancy_out = {
+            if balance_flag {
+                process_balance(&decoded_data.to_string(), possible_ext, indent, short_specs)?
+            } else {
+                process_number(decoded_data.to_string(), possible_ext, indent, short_specs)?
             }
-            Err(_) => Err(ParserError::Decoding(
-                ParserDecodingError::PrimitiveFailure(found_ty.to_string()),
-            )),
-        }
+        };
+        let remaining_vector = data[length..].to_vec();
+        Ok(DecodedOut {
+            remaining_vector,
+            fancy_out,
+        })
     }
 }
 
@@ -272,7 +251,7 @@ fn process_balance(
     possible_ext: &mut Option<&mut Ext>,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<Vec<OutputCard>, ParserError> {
+) -> Result<Vec<OutputCard>> {
     let balance_output = convert_balance_pretty(balance, short_specs.decimals, &short_specs.unit);
     let out_balance = vec![OutputCard {
         card: ParserCard::Balance {
@@ -304,7 +283,7 @@ fn process_number(
     possible_ext: &mut Option<&mut Ext>,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<Vec<OutputCard>, ParserError> {
+) -> Result<Vec<OutputCard>> {
     if let Some(ext) = possible_ext {
         match ext.specialty {
             SpecialExt::Nonce => Ok(vec![OutputCard {
@@ -314,11 +293,7 @@ fn process_number(
             SpecialExt::SpecVersion => {
                 ext.found_ext.network_version_printed = match ext.found_ext.network_version_printed
                 {
-                    Some(_) => {
-                        return Err(ParserError::FundamentallyBadV14Metadata(
-                            ParserMetadataError::SpecVersionTwice,
-                        ))
-                    }
+                    Some(_) => return Err(ParserMetadataError::SpecVersionTwice.into()),
                     None => Some(number.to_string()),
                 };
                 Ok(vec![OutputCard {
@@ -359,29 +334,25 @@ fn process_number(
 ///
 /// The function outputs the `DecodedOut` value in case of success.
 ///
-/// Resulting `AccountId` in base58 form is added to `fancy_out` on js card `Id`.
+/// Resulting `AccountId` in base58 form is added to `fancy_out` on js card "Id".
 pub(crate) fn special_case_account_id(
     data: Vec<u8>,
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
-    match data.get(0..32) {
-        Some(a) => {
-            let array_decoded: [u8; 32] = a.try_into().expect("constant length, always fits");
-            let remaining_vector = data[32..].to_vec();
-            let account_id = AccountId32::new(array_decoded);
-            let fancy_out = vec![OutputCard {
-                card: ParserCard::Id {
-                    id: account_id,
-                    base58prefix: short_specs.base58prefix,
-                },
-                indent,
-            }];
-            Ok(DecodedOut {
-                remaining_vector,
-                fancy_out,
-            })
-        }
-        None => Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
-    }
+) -> Result<DecodedOut> {
+    let a = data.get(0..32).ok_or(ParserDecodingError::DataTooShort)?;
+    let array_decoded: [u8; 32] = a.try_into().expect("constant length, always fits");
+    let remaining_vector = data[32..].to_vec();
+    let account_id = AccountId32::new(array_decoded);
+    let fancy_out = vec![OutputCard {
+        card: ParserCard::Id {
+            id: account_id,
+            base58prefix: short_specs.base58prefix,
+        },
+        indent,
+    }];
+    Ok(DecodedOut {
+        remaining_vector,
+        fancy_out,
+    })
 }
