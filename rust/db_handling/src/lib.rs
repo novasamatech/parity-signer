@@ -108,7 +108,7 @@ pub fn default_cold_release(path: Option<PathBuf>) -> Result<(), ErrorActive> {
 /// - **no** metadata entries
 /// - **no** metadata block history entries
 ///
-/// All metadata-related entries get in the hot database only through rpc calls.
+/// All metadata-related entries get in the hot database only through RPC calls.
 #[cfg(feature = "active")]
 pub fn default_hot(path: Option<PathBuf>) -> Result<(), ErrorActive> {
     let database_name = match path {

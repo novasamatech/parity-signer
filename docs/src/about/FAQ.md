@@ -12,7 +12,7 @@ Signer is an app for an air-gapped device, it turns an offline device — usuall
 
 ### Should I use Signer?
 
-Signer is optimised for the highest security requirements. If you already manage many accounts on multiple networks, Signer is great for you. If you have little experience with blockchain networks but still want good security affordances, you might find the learning curve steep. We strive to make Signer as intuitive as possible; get in touch via [signer@parity.io](mailto:signer@parity.io) or [GitHub Issues](https://github.com/paritytech/parity-signer/issues) if you can help us get there!
+Signer is optimized for the highest security requirements. If you already manage many accounts on multiple networks, Signer is great for you. If you have little experience with blockchain networks but still want good security affordances, you might find the learning curve steep. We strive to make Signer as intuitive as possible; get in touch via [<signer@parity.io>](mailto:signer@parity.io) or [GitHub Issues](https://github.com/paritytech/parity-signer/issues) if you can help us get there!
 
 ### How does an offline device communicate with the outside world?
 
@@ -25,7 +25,7 @@ Signer is a safe way to use your keys. However, that alone won't be enough to ke
 ### How do I know I am not interacting with malicious apps or actors?
 
 Signer does not interact with network. The app itself does not have a way to check if an app or an account you interacting with is malicious. 
-If you use Signer with PolkadotJS Browser Extension, PolkadotJS Apps or Signer Component Browser Extension they will rely on community driven curated list of potentially less-than-honest operators: [https://polkadot.js.org/phishing/#](https://polkadot.js.org/phishing/#) to prevent you from interacting with certain sites and addresses. However, there are no limitations on use of Signer with other tools.
+If you use Signer with PolkadotJS Browser Extension, PolkadotJS Apps or Signer Component Browser Extension they will rely on community driven curated list of potentially less-than-honest operators: [<https://polkadot.js.org/phishing/#>](https://polkadot.js.org/phishing/#) to prevent you from interacting with certain sites and addresses. However, there are no limitations on use of Signer with other tools.
 
 ### I want to play with Signer to get a better feeling of how it works. Is there a way to do it without spending valuable tokens?
 
@@ -43,7 +43,7 @@ From-the-shelf Party Signer supports Polkadot, Kusama and Westend networks. But 
 
 ### How can I update metadata version for a network?
 
-Parity verifies and publishes recent metadata versions on [Metadata Update Portal](https://metadata.parity.io/). With off-the-shelf Signer you can scan one of the multipart QR–"movies" same way you scan transaction QR:\
+Parity verifies and publishes recent metadata versions on [Metadata Update Portal](https://metadata.parity.io/). With off-the-shelf Signer you can scan one of the multipart QR-"movies" same way you scan transaction QR:\
 in Signer open scanner, scan the QR for the respective network and accept new metadata.
 
 Currently [Metadata Update Portal](https://metadata.parity.io/) follows Polkadot, Kusama and Westend network metadata updates. Parity is open for collaboration with participants of other networks and is currently exploring safe and more decentralised ways of publishing verified metadata.
@@ -56,7 +56,7 @@ It's a safety feature. Substrate-based blockchain networks have capacity to be u
 
 ### How can I add a new network to Signer?
 
-Parity verifies and publishes network specs on [Metadata Update Portal](https://metadata.parity.io/). To add one of the listed networks, in [Metadata Update Portal](https://metadata.parity.io/) click "Add to signer", scan the network specs QR same way you scan transaction QR: in Signer open scanner, scan the QR and accept new network spec. Than scan the multipart QR–"movie" containing recent metadata for this network.
+Parity verifies and publishes network specs on [Metadata Update Portal](https://metadata.parity.io/). To add one of the listed networks, in [Metadata Update Portal](https://metadata.parity.io/) click "Add to signer", scan the network specs QR same way you scan transaction QR: in Signer open scanner, scan the QR and accept new network spec. Than scan the multipart QR-"movie" containing recent metadata for this network.
 
 ### Can I add a network that does not have network specs and metadata QR published anywhere?
 
@@ -66,15 +66,15 @@ Currently the process requires you to have [rust](https://www.rust-lang.org/tool
 
 ## Seeds and keys
 	
-### Can I import my keys from polkadot{.js} apps or extension to Parity Signer?
+### Can I import my keys from `polkadot{.js}` apps or extension to Parity Signer?
 
-Yes. Keys are compatible between polkadot{.js} and Parity Signer, except for the keys generated with Ledger (BIP39). To import seed keys into Parity Signer, you need to know:
+Yes. Keys are compatible between `polkadot{.js}` and Parity Signer, except for the keys generated with Ledger (`BIP39`). To import seed keys into Parity Signer, you need to know:
 1. Seed phrase\
 _It should always be backed up in paper!_
 2. Network you are adding address to and whether Parity Signer installed on your device has metadata for the respective network.\
 _If (2) is not one of the default built-in networks, you will need to add network yourself or find a distribution center for adding networks._
 3. Derivation path\
-_Only if you are importing a derived key, usually keys generated with polkadot{.js} are seed keys._
+_Only if you are importing a derived key, usually keys generated with `polkadot{.js}` are seed keys._
 
 In Parity Signer go to Keys, then press "Plus" icon in the top right of the screen, select "Recover seed", enter display name to identify your seed, press "Next", enter the seed phrase. Done, you've got your seed key imported!\
 If you are importing a derived key select the seed from which your key is derived, select account's network, press "Plus" icon next to "Derived keys", enter your derivation path.

@@ -34,6 +34,15 @@ jobs:
         with:
           working-directory:  rust
 
+      - name:                 Install cargo-spellcheck
+        uses:                 baptiste0928/cargo-install@v1
+        with:
+          crate:              cargo-spellcheck
+
+      - name:                 Run spellcheck
+        run:                  |
+          cargo spellcheck check --cfg=.spellcheck/config.toml -m 99
+
       - name:                 Generate cargo doc
         run:                  |
           cd rust

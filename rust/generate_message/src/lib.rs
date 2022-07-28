@@ -4,7 +4,7 @@
 //!
 //! This crate is mainly used to:
 //!
-//! - fetch network data through rpc calls
+//! - fetch network data through RPC calls
 //! - prepare Signer update and derivation import payloads
 //! - generate Signer update QR codes, either signed or unsigned, and
 //! derivations import QR codes, to be scanned into Signer
@@ -24,11 +24,11 @@
 //! database
 //! - `load_types`, to load types information (it is used to support the
 //! transactions parsing in networks with legacy metadata, `RuntimeMetadata`
-//! version below V14)
+//! version below `V14`)
 //!
 //! Updates are assembled as `Vec<u8>` and could be transformed into:
 //!
-//! - `png` QR codes, static or dynamic multiframe depending on the data size
+//! - `PNG` QR codes, static or dynamic multiframe depending on the data size
 //! - hex-encoded string (for tests)
 //!
 //! Information in `add_specs`, `load_metadata` and `load_types` could be either
@@ -148,7 +148,7 @@
 //! Derivations import data is assembled as `Vec<u8>` and could be transformed
 //! into:
 //!
-//! - `png` QR code, static or dynamic multiframe depending on the data size
+//! - `PNG` QR code, static or dynamic multiframe depending on the data size
 //! - hex-encoded string (for tests)
 //!
 //! Derivations imports are generated from user-provided derivations list and
@@ -202,7 +202,7 @@
 //!
 //! - address book title for the network `<network_name>-<network_encryption>`,
 //! used only to distinguish between address book entries
-//! - url address at which rpc calls are made for the network
+//! - URL address at which RPC calls are made for the network
 //! - network encryption
 //! - additional marker that the network is a default one, i.e. entry has not
 //! changed since the database generation
@@ -263,20 +263,20 @@
 //!
 //! Setting keys that could be used in command line (maximum one):
 //!
-//! - `-d`: do **not** update the database, make rpc calls, and produce
+//! - `-d`: do **not** update the database, make RPC calls, and produce
 //! output files
-//! - `-f`: do **not** run rpc calls, produce output files using data already in
+//! - `-f`: do **not** run RPC calls, produce output files using data already in
 //! the database
-//! - `-p`: update or check database through rpc calls, do **not** produce any
+//! - `-p`: update or check database through RPC calls, do **not** produce any
 //! output files
-//! - `-t` (no setting key defaults here): update or check database through rpc
+//! - `-t` (no setting key defaults here): update or check database through RPC
 //! calls, produce output files
 //!
 //! <table>
 //!     <tr>
 //!         <th>setting key</th>
 //!         <th>hot database update</th>
-//!         <th>rpc calls</th>
+//!         <th>RPC calls</th>
 //!         <th>output update payload</th>
 //!     </tr>
 //!     <tr>
@@ -311,7 +311,7 @@
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
 //! - `-n` followed by single network address book title: for a network with
 //! existing record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-//! - `-u` followed by single url address: reserved for networks with no
+//! - `-u` followed by single URL address: reserved for networks with no
 //! record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //!
 //! `-a` key could be used with `-s` key, to stop processing after first
@@ -359,7 +359,7 @@
 //!         <td>mandatory</td>
 //!         <td>possible, if token array fetched</td>
 //!         <td>possible</td>
-//!         <td>- make rpc calls<br>
+//!         <td>- make RPC calls<br>
 //!             - apply overrides<br>
 //!             - make payload file<br>
 //!             Note: database is <b>not</b> used
@@ -398,7 +398,7 @@
 //!         <td>possible</td>
 //!         <td>- get address book entry for <code>address_book_title</code><br>
 //!             - get corresponding network specs entry<br>
-//!             - make rpc calls, check that the entry remains correct<br>
+//!             - make RPC calls, check that the entry remains correct<br>
 //!             - apply overrides<br>
 //!             - update database
 //!         </td>
@@ -410,7 +410,7 @@
 //!         <td>mandatory</td>
 //!         <td>possible, if token array fetched</td>
 //!         <td>possible</td>
-//!         <td>- make rpc calls<br>
+//!         <td>- make RPC calls<br>
 //!             - apply overrides<br>
 //!             - update database<br>
 //!             Note: reserved for networks with no entries in the database
@@ -425,7 +425,7 @@
 //!         <td>possible</td>
 //!         <td>- get address book entry for <code>address_book_title</code><br>
 //!             - get corresponding network specs entry<br>
-//!             - make rpc calls, check that the entry remains correct<br>
+//!             - make RPC calls, check that the entry remains correct<br>
 //!             - apply overrides<br>
 //!             - update database if needed<br>
 //!             - make payload file
@@ -438,7 +438,7 @@
 //!         <td>mandatory</td>
 //!         <td>possible, if token array fetched</td>
 //!         <td>possible</td>
-//!         <td>- make rpc calls<br>
+//!         <td>- make RPC calls<br>
 //!             - apply overrides<br>
 //!             - update database if needed<br>
 //!             - make payload file<br>
@@ -455,7 +455,7 @@
 //!
 //! Make `add_specs` update payload for a new network:
 //!
-//! `$ cargo run add_specs -d -u wss://rococo-rpc.polkadot.io -sr25519 -title Rococo`
+//! `$ cargo run add_specs -d -u wss://rococo-RPC.polkadot.io -sr25519 -title Rococo`
 //!
 //! Make `add_specs` update payload for a new network with token set:
 //!
@@ -472,22 +472,22 @@
 //!
 //! Setting keys that could be used in command line (maximum one):
 //!
-//! - `-d`: do **not** update the database, make rpc calls, and produce
+//! - `-d`: do **not** update the database, make RPC calls, and produce
 //! output files
-//! - `-f`: do **not** run rpc calls, produce output files from database as
+//! - `-f`: do **not** run RPC calls, produce output files from database as
 //! it is
-//! - `-k`: update database through rpc calls, produce output files only for
+//! - `-k`: update database through RPC calls, produce output files only for
 //! **new** database entries
-//! - `-p`: update database through rpc calls, do **not** produce any output
+//! - `-p`: update database through RPC calls, do **not** produce any output
 //! files
-//! - `-t` (no setting key defaults here): update database through rpc
+//! - `-t` (no setting key defaults here): update database through RPC
 //! calls, produce output files
 //!
 //! <table>
 //!     <tr>
 //!         <th>setting key</th>
 //!         <th>hot database update</th>
-//!         <th>rpc calls</th>
+//!         <th>RPC calls</th>
 //!         <th>output update payload</th>
 //!     </tr>
 //!     <tr>
@@ -532,7 +532,7 @@
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
 //! - `-n` followed by single network name: for a network with existing
 //! record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-//! - `-u` followed by single url address: reserved for networks with no
+//! - `-u` followed by single URL address: reserved for networks with no
 //! record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //!
 //! `-a` key could be used with `-s` key, to stop processing after first
@@ -554,29 +554,29 @@
 //!         <td><code>-d</code></td>
 //!         <td><code>-a</code></td>
 //!         <td></td>
-//!         <td>- get all url addresses <b>from the database</b><br>
-//!             - make rpc calls<br>
+//!         <td>- get all URL addresses <b>from the database</b><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - make payload file(s)<br>
-//!             Note: database is needed to get url addresses
+//!             Note: database is needed to get URL addresses
 //!         </td>
 //!     </tr>
 //!     <tr>
 //!         <td><code>-d</code></td>
 //!         <td><code>-n</code></td>
 //!         <td><code>network_name</code></td>
-//!         <td>- get url address <b>from the database</b> for the <code>network_name</code><br>
-//!             - make rpc calls<br>
+//!         <td>- get URL address <b>from the database</b> for the <code>network_name</code><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - make payload file<br>
-//!             Note: database is needed to get url address
+//!             Note: database is needed to get URL address
 //!         </td>
 //!     </tr>
 //!     <tr>
 //!         <td><code>-d</code></td>
 //!         <td><code>-u</code></td>
 //!         <td><code>url_address</code></td>
-//!         <td>- make rpc calls<br>
+//!         <td>- make RPC calls<br>
 //!             - make payload file<br>
 //!             Note: database is <b>not</b> used
 //!         </td>
@@ -601,8 +601,8 @@
 //!         <td><code>-k</code></td>
 //!         <td><code>-a</code></td>
 //!         <td></td>
-//!         <td>- get all url addresses from the database<br>
-//!             - make rpc calls<br>
+//!         <td>- get all URL addresses from the database<br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed<br>
 //!             - make payload file for each new entry
@@ -612,8 +612,8 @@
 //!         <td><code>-k</code></td>
 //!         <td><code>-n</code></td>
 //!         <td><code>network_name</code></td>
-//!         <td>- get url address from the database for the <code>network_name</code><br>
-//!             - make rpc calls<br>
+//!         <td>- get URL address from the database for the <code>network_name</code><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed<br>
 //!             - make payload file if the entry is new
@@ -623,8 +623,8 @@
 //!         <td><code>-p</code></td>
 //!         <td><code>-a</code></td>
 //!         <td></td>
-//!         <td>- get all url addresses from the database<br>
-//!             - make rpc calls<br>
+//!         <td>- get all URL addresses from the database<br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed
 //!         </td>
@@ -633,8 +633,8 @@
 //!         <td><code>-p</code></td>
 //!         <td><code>-n</code></td>
 //!         <td><code>network_name</code></td>
-//!         <td>- get url address from the database for the <code>network_name</code><br>
-//!             - make rpc calls<br>
+//!         <td>- get URL address from the database for the <code>network_name</code><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed
 //!         </td>
@@ -643,8 +643,8 @@
 //!         <td><code>-t</code> or none declared</td>
 //!         <td><code>-a</code></td>
 //!         <td></td>
-//!         <td>- get all url addresses from the database<br>
-//!             - make rpc calls<br>
+//!         <td>- get all URL addresses from the database<br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed<br>
 //!             - make payload file(s)
@@ -654,8 +654,8 @@
 //!         <td><code>-t</code> or none declared</td>
 //!         <td><code>-n</code></td>
 //!         <td><code>network_name</code></td>
-//!         <td>- get url address from the database for the <code>network_name</code><br>
-//!             - make rpc calls<br>
+//!         <td>- get URL address from the database for the <code>network_name</code><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed<br>
 //!             - make payload file
@@ -672,7 +672,7 @@
 //!
 //! Make `load_metadata` update payload for a network not in the database:
 //!
-//! `$ cargo run load_metadata -d -u wss://rococo-rpc.polkadot.io`
+//! `$ cargo run load_metadata -d -u wss://rococo-RPC.polkadot.io`
 //!
 //! ## Prepare `load_types` update payload
 //!
@@ -980,7 +980,7 @@
 //! user-provided path or, if no valid path is given, at default path
 //! [`COLD_DB_NAME_RELEASE`](constants::COLD_DB_NAME_RELEASE).
 //!
-//! Metadata is transfered only for the networks that are known to the cold
+//! Metadata is transferred only for the networks that are known to the cold
 //! database, i.e. the ones having
 //! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
 //! [`SPECSTREE`](constants::SPECSTREE).
@@ -1064,7 +1064,7 @@
 //!
 //! ### Example
 //!
-//! `$ cargo run meta_at_block -u wss://westend-rpc.polkadot.io -block
+//! `$ cargo run meta_at_block -u wss://westend-RPC.polkadot.io -block
 //! 780812df50c4006d1865742269fe4ca339c097e61d6279cce91ebc58f5aebada`
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]

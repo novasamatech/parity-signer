@@ -13,8 +13,8 @@ use crate::cards::ParserCard;
 use crate::decoding_sci_ext::{Ext, SpecialExt};
 
 /// Struct to store the decoded data, used for data storage between decoding iterations.
-/// decoded_string is short json-like format,
-/// fancy_out is format used for js output cards (the one really going out at this point)
+/// `decoded_string` is short json-like format,
+/// `fancy_out` is format used for js output cards (the one really going out at this point)
 /// and remaining vector contains the input data not yet used after the last decoding iteration.
 pub(crate) struct DecodedOut {
     pub(crate) remaining_vector: Vec<u8>,
@@ -27,15 +27,15 @@ pub struct OutputCard {
     pub indent: u32,
 }
 
-/// Struct to store results of searching Vec<u8> for encoded compact:
+/// Struct to store results of searching `Vec<u8>` for encoded compact:
 /// consists of actual number decoded, and, if it exists, the beginning position for data after the compact
 pub struct CutCompact<T: HasCompact> {
     pub compact_found: T,
     pub start_next_unit: Option<usize>,
 }
 
-/// Function to search &[u8] for shortest compact <T> by brute force.
-/// Outputs CutCompact value in case of success.
+/// Function to search `&[u8]` for shortest compact <T> by brute force.
+/// Outputs `CutCompact` value in case of success.
 pub fn get_compact<T>(data: &[u8]) -> Result<CutCompact<T>, ParserError>
 where
     T: HasCompact,
@@ -66,20 +66,20 @@ where
     }
 }
 
-/// Function to decode types with trait PerThing (Percent, Permill, Perbill etc).
-/// Decoding type T either as compact or as fixed length type.
-/// Used only in decoding_older module, without serde.
+/// Function to decode types with trait `PerThing` (`Percent`, `Permill`, `Perbill` etc).
+/// Decoding type `T` either as compact or as fixed length type.
+/// Used only in `decoding_older` module, without `serde`.
 ///
-/// The function decodes only this element, removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only this element, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - data (remaining Vec<u8> of data),
-/// - compact flag to initiate compact decoding,
-/// - &str name of type to be displayed in case of error,
-/// - indent used for creating properly formatted js cards,
+/// - `data` (remaining `Vec<u8>` of data),
+/// - `compact_flag` to initiate compact decoding,
+/// - `&str` name of type to be displayed in case of error,
+/// - `indent` used for creating properly formatted js cards,
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 pub(crate) fn decode_perthing<T>(
     data: &[u8],
     compact_flag: bool,
@@ -133,18 +133,18 @@ where
     })
 }
 
-/// Function to decode a displayable type of known length (i.e. length stable with respect to mem::size_of).
-/// Used in both decoding_older and decoding_sci, for types not compatible with compact or balance printing
+/// Function to decode a displayable type of known length (i.e. length stable with respect to `mem::size_of`).
+/// Used in both `decoding_older` and `decoding_sci`, for types not compatible with compact or balance printing
 ///
-/// The function decodes only this type, removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only this type, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - data (remaining Vec<u8> of data),
-/// - found_ty: name of the type found,
+/// - data (remaining `Vec<u8>` of data),
+/// - `found_ty`: name of the type found,
 /// - indent used for creating properly formatted js cards.
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 pub(crate) fn decode_known_length<T: Decode + std::fmt::Display>(
     data: &[u8],
     found_ty: &str,
@@ -174,20 +174,20 @@ pub(crate) fn decode_known_length<T: Decode + std::fmt::Display>(
 }
 
 /// Function to decode a displayable type compatible with compact and balance printing.
-/// Used in both decoding_older and decoding_sci.
+/// Used in both `decoding_older` and `decoding_sci`.
 /// Decoding type T either as compact or as fixed length type, possibly as a balance.
 ///
-/// The function decodes only this element, removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only this element, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - data (remaining Vec<u8> of data),
-/// - compact flag and balance flag to choose decoding variant,
-/// - &str name of type to be displayed in case of error,
-/// - indent used for creating properly formatted js cards,
-/// - ShortSpecs to format the balance properly if the balance is involved.
+/// - `data` (remaining `Vec<u8>` of data),
+/// - `compact_flag` and balance flag to choose decoding variant,
+/// - `&str` name of type to be displayed in case of error,
+/// - `indent` used for creating properly formatted js cards,
+/// - `ShortSpecs` to format the balance properly if the balance is involved.
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 pub(crate) fn decode_primitive_with_flags<T>(
     data: &[u8],
     possible_ext: &mut Option<&mut Ext>,
@@ -346,20 +346,20 @@ fn process_number(
     }
 }
 
-/// Function to decode of AccountId special case and transform the result into base58 format.
+/// Function to decode of `AccountId` special case and transform the result into base58 format.
 ///
-/// The function decodes only a single AccountId type entry,
-/// removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only a single `AccountId` type entry,
+/// removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - data (remaining Vec<u8> of data),
-/// - indent used for creating properly formatted js cards.
-/// - short_specs (taking base58 prefix from there).
+/// - `data` (remaining `Vec<u8>` of data),
+/// - `indent` used for creating properly formatted js cards.
+/// - `short_specs` (taking base58 prefix from there).
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 ///
-/// Resulting AccountId in base58 form is added to fancy_out on js card "Id".
+/// Resulting `AccountId` in base58 form is added to `fancy_out` on js card `Id`.
 pub(crate) fn special_case_account_id(
     data: Vec<u8>,
     indent: u32,

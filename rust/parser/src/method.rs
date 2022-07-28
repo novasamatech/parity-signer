@@ -24,13 +24,13 @@ pub(crate) struct NextDecodeOld {
     pub(crate) data: Vec<u8>,
 }
 
-/// Enum to transfer around older metadata (V12 and V13)
+/// Enum to transfer around older metadata (`V12` and `V13`)
 pub enum OlderMeta<'a> {
     V12(&'a RuntimeMetadataV12),
     V13(&'a RuntimeMetadataV13),
 }
 
-/// Function to search through metadata version V12 for method with given pallet index and method index,
+/// Function to search through metadata version `V12` for method with given pallet index and method index,
 /// in case of success outputs Method value.
 /// Pallet index is explicitly recorded in network metadata as a number.
 /// Method index is ordinal number in vector of calls within pallet.
@@ -131,7 +131,7 @@ fn find_method_v12(
     }
 }
 
-/// Function to search through metadata version V13 for method with given pallet index and method index,
+/// Function to search through metadata version `V13` for method with given pallet index and method index,
 /// in case of success outputs Method value.
 /// Pallet index is explicitly recorded in network metadata as a number.
 /// Method index is ordinal number in vector of calls within pallet.
@@ -232,8 +232,8 @@ fn find_method_v13(
     }
 }
 
-/// Function to find method for current call for metadata in v12 or v13
-/// Outputs NextDecode value.
+/// Function to find method for current call for metadata in `V12` or `V13`
+/// Outputs `NextDecode` value.
 
 pub(crate) fn what_next_old(data: Vec<u8>, meta: &OlderMeta) -> Result<NextDecodeOld, ParserError> {
     if data.len() < 2 {

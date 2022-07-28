@@ -304,7 +304,7 @@ pub fn try_get_types<T: ErrorSource>(
 ///
 /// - hot database, from which the types data could not be removed using
 /// standard operations
-/// - cold database, when transactions made using RuntimeMetadata V12 or V13 are
+/// - cold database, when transactions made using `RuntimeMetadata` `V12` or `V13` are
 /// being decoded
 ///
 /// Not finding types data results in an error.

@@ -28,7 +28,7 @@ pub trait ErrorSource {
     /// `NotHex` errors may occur both on `Active` and on `Signer` side.
     ///
     /// On `Active` side `NotHex` errors could be related to strings fetched
-    /// form url, input from command line, and processing of the default values.
+    /// form URL, input from command line, and processing of the default values.
     ///
     /// On `Signer` side `NotHex` errors are caused by communication errors
     /// and, since user interface should be sending valid hex strings into rust,
@@ -67,7 +67,7 @@ pub trait ErrorSource {
     /// For Signer side, it could be faulty received metadata update.
     type IncomingMetadataSource;
 
-    /// Address generation errors, unique for given [`ErrorSource`] implementor
+    /// Address generation errors, unique for given [`ErrorSource`] implementer
     type ExtraAddressGeneration;
 
     /// Transform `NotHex` error into `Error`
@@ -171,7 +171,7 @@ pub trait ErrorSource {
     /// Print `Error` as a `String`
     ///
     /// Generated string is used in parsing cards, in Signer side anyhow
-    /// errors, or in active side errors std::fmt::Display implementation.
+    /// errors, or in active side errors `std::fmt::Display` implementation.
     fn show(error: &Self::Error) -> String;
 }
 
@@ -224,7 +224,7 @@ pub enum AddressGeneration<T: ErrorSource + ?Sized> {
     /// Address generation errors common for active and Signer sides
     Common(AddressGenerationCommon),
 
-    /// Address generation errors, unique for given [`ErrorSource`] implementor
+    /// Address generation errors, unique for given [`ErrorSource`] implementer
     Extra(T::ExtraAddressGeneration),
 }
 
@@ -268,13 +268,13 @@ pub enum AddressGenerationCommon {
 
     /// Error in [`SecretString`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/type.SecretString.html).
     ///
-    /// SecretString consists of combined seed phrase and derivation.
+    /// `SecretString` consists of combined seed phrase and derivation.
     ///
     /// Associated error content is
     /// [`SecretStringError`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/enum.SecretStringError.html).
     SecretString(SecretStringError),
 
-    /// Derivaion that user tried to create already exists.
+    /// Derivation that user tried to create already exists.
     ///
     /// Associated error content is:
     /// - [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
@@ -371,7 +371,7 @@ impl TransferContent {
 #[derive(Debug)]
 #[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum MetadataError {
-    /// Supported are V12, V13, and V14 versions of
+    /// Supported are `V12`, `V13`, and `V14` versions of
     /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html).
     ///
     /// Any other version results in error.

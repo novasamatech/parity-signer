@@ -28,8 +28,7 @@ use crate::ffi_types::*;
 use std::fmt::Display;
 
 /// Container for severe error message
-///
-/// TODO: implement properly or remove completely
+/* TODO: implement properly or remove completely */
 #[derive(Debug)]
 pub enum ErrorDisplayed {
     /// String description of error
@@ -72,7 +71,7 @@ fn action_get_name(action: &Action) -> Option<FooterButton> {
 ///
 /// Action tries to acquire lock on app state mutex and is ignored on failure.
 ///
-/// 'seed_phrase' field is zeroized, it is expected to be used for secrets only.
+/// `seed_phrase` field is zeroized, it is expected to be used for secrets only.
 ///
 /// `details` field is not always zeroized.
 ///
@@ -104,7 +103,7 @@ fn qrparser_get_packets_total(data: &str, cleaned: bool) -> anyhow::Result<u32, 
     qr_reader_phone::get_length(data, cleaned).map_err(Into::into)
 }
 
-/// Attempts to convert QR data (transfered as json-like string) into decoded but not parsed UOS
+/// Attempts to convert QR data (transferred as json-like string) into decoded but not parsed UOS
 /// payload
 ///
 /// `cleaned` is platform-specific flag indicating whether QR payloads have QR prefix stripped by
@@ -161,7 +160,8 @@ fn history_acknowledge_warnings(dbname: &str) -> anyhow::Result<(), anyhow::Erro
     db_handling::manage_history::reset_danger_status_to_safe(dbname).map_err(|e| e.anyhow())
 }
 
-/// Allows frontend to send events into log; TODO: maybe this is not needed
+/// Allows frontend to send events into log;
+/* TODO: maybe this is not needed */
 fn history_entry_system(event: Event, dbname: &str) -> anyhow::Result<(), anyhow::Error> {
     db_handling::manage_history::history_entry_system(dbname, event).map_err(|e| e.anyhow())
 }
@@ -209,8 +209,7 @@ fn init_logging(tag: String) {
 }
 
 /// Placeholder to init logging on non-android platforms
-///
-/// TODO: is this used?
+/* TODO: is this used? */
 #[cfg(not(target_os = "android"))]
 fn init_logging(_tag: String) {
     env_logger::init();

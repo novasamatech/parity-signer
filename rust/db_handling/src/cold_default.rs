@@ -20,7 +20,7 @@
 //!
 //! - History log old entries (if any are present) are removed and a new entry
 //! `Event::DatabaseInitiated` is added
-//! - General verifier is set and this event is recorded inthe history log. By
+//! - General verifier is set and this event is recorded in the history log. By
 //! default, Signer sets up Parity-associated key as a general verifier. This
 //! could be later on changed by the user.
 //!

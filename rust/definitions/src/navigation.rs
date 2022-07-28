@@ -42,9 +42,9 @@ pub enum TransactionAction {
 
 /// Enum describing Stub content.
 /// Is used for proper navigation. Variants:
-/// AddSpecs (with associated NetworkSpecsKey), LoadMeta (with associated
-/// NetworkSpecsKey for the first by order network using those metadata),
-/// and LoadTypes
+/// `AddSpecs` (with associated `NetworkSpecsKey`), `LoadMeta` (with associated
+/// `NetworkSpecsKey` for the first by order network using those metadata),
+/// and `LoadTypes`
 #[derive(PartialEq, Debug, Clone)]
 pub enum StubNav {
     AddSpecs { n: NetworkSpecsKey },

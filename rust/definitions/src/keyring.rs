@@ -28,7 +28,7 @@
 //! prefix search with [`MetaKeyPrefix`]
 //! - `SETTREE`, for types information  
 //! - `ADDRESS_BOOK` for `AddressBookEntry` data needed to maintain hot database
-//! and send rpc calls to fetch network information, with keys `AddressBookKey`
+//! and send RPC calls to fetch network information, with keys `AddressBookKey`
 //!
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
@@ -85,7 +85,7 @@ impl NetworkSpecsKey {
 
     /// Transform database `IVec` key into [`NetworkSpecsKey`] prior to processing  
     ///
-    /// Unfallible, no check of encryption validity is done here.  
+    /// Infallible, no check of encryption validity is done here.
     pub fn from_ivec(ivec: &IVec) -> Self {
         Self(ivec.to_vec())
     }
@@ -221,7 +221,7 @@ impl AddressKey {
 
     /// Transform database `IVec` key into [`AddressKey`] prior to processing  
     ///
-    /// Unfallible, the validity of resulting `AddressKey` is not checked.
+    /// Infallible, the validity of resulting `AddressKey` is not checked.
     pub fn from_ivec(ivec: &IVec) -> Self {
         Self(ivec.to_vec())
     }
@@ -314,7 +314,7 @@ impl MetaKey {
 
     /// Transform database `IVec` key into [`MetaKey`] prior to processing  
     ///
-    /// Unfallible, the validity of resulting `MetaKey` is not checked.
+    /// Infallible, the validity of resulting `MetaKey` is not checked.
     pub fn from_ivec(ivec: &IVec) -> Self {
         Self(ivec.to_vec())
     }
@@ -374,7 +374,7 @@ impl MetaKeyPrefix {
 /// [`Order`] is used to retrieve history log entry.  
 ///
 /// History log [`Entry`](crate::history::Entry) contains timestamp and a set
-/// of simultaneously occured events.  
+/// of simultaneously occurred events.
 ///
 /// Order is generated from the number of the history entry in the database
 /// `HISTORY` tree.  
@@ -424,7 +424,7 @@ impl Order {
 ///
 /// Database could have a few entries for related networks, for example,
 /// entry "westend" for default Westend, and entry "westend-ed25519" for
-/// Westend with Ed25519 encryption. Such entries would not conflict.  
+/// Westend with `Ed25519` encryption. Such entries would not conflict.
 #[derive(Debug, Clone)]
 #[cfg(feature = "active")]
 pub struct AddressBookKey(Vec<u8>);
@@ -444,7 +444,7 @@ impl AddressBookKey {
 
     /// Transform database `IVec` key into [`AddressBookKey`] prior to processing  
     ///
-    /// Unfallible, the validity of resulting `AddressBookKey` is not checked.
+    /// Infallible, the validity of resulting `AddressBookKey` is not checked.
     pub fn from_ivec(ivec: &IVec) -> Self {
         Self(ivec.to_vec())
     }

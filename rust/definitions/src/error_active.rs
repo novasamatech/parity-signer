@@ -1,4 +1,4 @@
-//! Errors occuring on the active side, i.e. while operating `generate_message`
+//! Errors occurring on the active side, i.e. while operating `generate_message`
 //! client
 //!
 //! Active side deals with both preparation of cold database that would be
@@ -193,8 +193,8 @@ impl ErrorSource for Active {
             ErrorActive::NotHex(a) => {
                 let insert = match a {
                     NotHexActive::FetchedMetadata {url, optional_block} => match optional_block{
-                        Some(hash) => format!("Network metadata fetched from url {} at block {}", url, hex::encode(hash)),
-                        None => format!("Network metadata fetched from url {}", url),
+                        Some(hash) => format!("Network metadata fetched from URL {} at block {}", url, hex::encode(hash)),
+                        None => format!("Network metadata fetched from URL {}", url),
                     },
                     NotHexActive::FetchedGenesisHash {url} => format!("Network genesis hash fetched from url {}", url),
                     NotHexActive::FetchedBlockHash {url} => format!("Network block hash fetched from url {}", url),
@@ -507,7 +507,7 @@ pub enum ErrorActive {
     /// Associated data is [`TransferContent`] with more details.
     TransferContent(TransferContent),
 
-    /// Error fetching network information through rpc call.
+    /// Error fetching network information through RPC call.
     ///
     /// Associated data is [`Fetch`] with more details.
     Fetch(Fetch),
@@ -544,7 +544,7 @@ pub enum ErrorActive {
     ///
     /// `generate_message` can produce QR codes with updates data for:
     ///
-    /// - network specs: `add_specs` message, usually static `png`
+    /// - network specs: `add_specs` message, usually static `PNG`
     /// - network metadata: `load_metadata` message, usually fountain `apng`
     /// - types information: `load_types` message, usually fountain `apng`
     ///
@@ -561,7 +561,7 @@ pub enum ErrorActive {
     /// It is not allowed to override token in known network, if the fetching
     /// uses or updates the hot database.
     ///
-    /// Associated data is url address used for the fetching.
+    /// Associated data is URL address used for the fetching.
     NoTokenOverrideKnownNetwork { url: String },
 
     /// Error extracting network metadata from `wasm` file.
@@ -598,28 +598,28 @@ impl std::fmt::Display for ErrorActive {
     }
 }
 
-/// NotHex errors occuring on the Active side
+/// `NotHex` errors occurring on the Active side
 ///
 /// Expected to receive data in hexadecimal format, got something different.
 /// [`NotHexActive`] specifies what was expected.
 #[derive(Debug)]
 pub enum NotHexActive {
-    /// Network metadata, fetched through rpc call.
+    /// Network metadata, fetched through RPC call.
     ///
-    /// Associated data is the url address used for the fetching.
+    /// Associated data is the URL address used for the fetching.
     FetchedMetadata {
         url: String,
         optional_block: Option<H256>,
     },
 
-    /// Network genesis hash, fetched through rpc call.
+    /// Network genesis hash, fetched through RPC call.
     ///
-    /// Associated data is the url address used for the fetching.
+    /// Associated data is the URL address used for the fetching.
     FetchedGenesisHash { url: String },
 
-    /// Network block hash, fetched through rpc call.
+    /// Network block hash, fetched through RPC call.
     ///
-    /// Associated data is the url address used for the fetching.
+    /// Associated data is the URL address used for the fetching.
     FetchedBlockHash { url: String },
 
     /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) received in
@@ -662,7 +662,7 @@ pub enum IncomingMetadataSourceActive {
 /// Source of unsuitable hexadecimal string metadata on the Active side
 #[derive(Debug)]
 pub enum IncomingMetadataSourceActiveStr {
-    /// Metadata was fetched, associated data is url used for rpc call and block
+    /// Metadata was fetched, associated data is URL used for RPC call and block
     /// hash, if the metadata was fetched for specific block hash.
     Fetch {
         url: String,
@@ -751,7 +751,7 @@ pub enum DatabaseActive {
     /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) with same
     /// `address` and `encryption` fields values.
     TwoEntriesAddressEncryption {
-        /// url address of the entries
+        /// URL address of the entries
         url: String,
 
         /// [`Encryption`] of the entries
@@ -763,11 +763,11 @@ pub enum DatabaseActive {
     /// `address` field value, for which `def` field is `true`, i.e. two
     /// entries for the same network are default ones.
     TwoDefaultsAddress {
-        /// url address of the entries
+        /// URL address of the entries
         url: String,
     },
 
-    /// `METATREE` of the hot database shoud contain at most two latest
+    /// `METATREE` of the hot database should contain at most two latest
     /// metadata versions for each network, with the older entries being
     /// deleted as the new ones appear.
     ///
@@ -806,10 +806,10 @@ pub enum DatabaseActive {
     /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) entries with same
     /// `name` field and different `address` values.
     ///
-    /// Hot database does not allow to store more than one trusted url address
-    /// for rpc calls for same network.
+    /// Hot database does not allow to store more than one trusted URL address
+    /// for RPC calls for same network.
     ///
-    /// Alternative url address could be used if the database is not updated
+    /// Alternative URL address could be used if the database is not updated
     /// (`-d` key is used).
     ///
     /// To update the address in the database in case the old one is no longer
@@ -824,10 +824,10 @@ pub enum DatabaseActive {
     /// `address` field and different `name` fields.
     ///
     /// Name in address book is taken from the metadata, metadata is fetched
-    /// using rpc call, so one url address can correspond to only one network
+    /// using RPC call, so one URL address can correspond to only one network
     /// name.
     TwoNamesForUrl {
-        /// url address, for which two condlicting names were found
+        /// URL address, for which two conflicting names were found
         url: String,
     },
 
@@ -845,7 +845,7 @@ pub enum DatabaseActive {
 
 /// Errors decoding database keys on the active side
 ///
-/// `IVec` value of the database key could be unfallably transformed into the
+/// `IVec` value of the database key could be infallible transformed into the
 /// contents of the corresponding key from the [`keyring`](crate::keyring)
 /// module. All these keys were, however, generated using certain information,
 /// and if this information could not be extracted from the key, it indicates
@@ -928,7 +928,7 @@ pub enum EntryDecodingActive {
 /// Mismatch errors within database on active side
 ///
 /// Data could be recorded in both hot database and cold database only
-/// in ordered fasion, i.e. with keys corresponding to the data stored in the
+/// in ordered fashion, i.e. with keys corresponding to the data stored in the
 /// encoded values etc.
 ///
 /// If the data retrieved from the database contains some internal
@@ -1024,7 +1024,7 @@ pub enum MismatchActive {
     /// and `Encryption`.
     ///
     /// If the `Encryption` value from one of `NetworkSpecsKey` values is
-    /// different from `Encryption` assocaited with `AddressKey`, this error
+    /// different from `Encryption` associated with `AddressKey`, this error
     /// appears.
     ///
     /// Error could be encountered only in the test cold database.
@@ -1058,12 +1058,12 @@ pub enum MismatchActive {
 }
 
 /// Errors on the active side related to data fetched (or not fetched) through
-/// rpc calls
+/// RPC calls
 #[derive(Debug)]
 pub enum Fetch {
     /// Fetched metadata is not suitable for use in Signer.
     FaultyMetadata {
-        /// url address used for rpc call
+        /// URL address used for RPC call
         url: String,
 
         /// optional block hash: `None` for standard fetch, `Some(_)` for debug
@@ -1106,16 +1106,16 @@ pub enum Fetch {
 
     /// Fetched network specs are not suitable for use in Signer.
     FaultySpecs {
-        /// url address used for rpc cal
+        /// URL address used for RPC cal
         url: String,
 
         /// what exactly is wrong with the network specs
         error: SpecsError,
     },
 
-    /// Rpc call failed.
+    /// RPC call failed.
     Failed {
-        /// url address used for rpc call
+        /// URL address used for RPC call
         url: String,
 
         /// received error message
@@ -1124,22 +1124,22 @@ pub enum Fetch {
 
     /// Fetched data is different from the one already in the hot database.
     ValuesChanged {
-        /// url address used for rpc call
+        /// URL address used for RPC call
         url: String,
 
         /// what exactly has changed
         what: Changed,
     },
 
-    /// Fetched genesis hash could not be transformed in expected [u8; 32] value.
+    /// Fetched genesis hash could not be transformed in expected `[u8; 32]` value.
     UnexpectedFetchedGenesisHashFormat {
-        /// genesis hash value as received through rpc call
+        /// genesis hash value as received through RPC call
         value: String,
     },
 
-    /// Fetched block hash could not be transformed in expected [u8; 32] value.
+    /// Fetched block hash could not be transformed in expected `[u8; 32]` value.
     UnexpectedFetchedBlockHashFormat {
-        /// block hash value as received through rpc call
+        /// block hash value as received through RPC call
         value: String,
     },
 
@@ -1157,7 +1157,7 @@ pub enum Fetch {
         /// network address book title
         title: String,
 
-        /// url address
+        /// URL address
         url: String,
     },
 
@@ -1167,10 +1167,10 @@ pub enum Fetch {
     /// Likely tried to fetch with different address when one already is in the
     /// database.
     ///
-    /// Hot database does not allow to store more than one trusted url address
-    /// for rpc calls for same network.
+    /// Hot database does not allow to store more than one trusted URL address
+    /// for RPC calls for same network.
     ///
-    /// Alternative url address could be used if the database is not updated
+    /// Alternative URL address could be used if the database is not updated
     /// (`-d` key is used).
     ///
     /// To update the address in the database in case the old one is no longer
@@ -1179,58 +1179,58 @@ pub enum Fetch {
         /// address book entry with exactly matching genesis hash
         address_book_entry: AddressBookEntry,
 
-        /// url address used for fetch
+        /// URL address used for fetch
         url: String,
     },
 }
 
-/// Errors on the active side with network specs received through rpc call
+/// Errors on the active side with network specs received through RPC call
 #[derive(Debug, PartialEq)]
 pub enum SpecsError {
     /// Network base58 prefix information is not found neither in results of
-    /// the `system_properties` rpc call, nor in `System` pallet of the metadata
-    /// fetched with `state_getMetadata` rpc call.
+    /// the `system_properties` RPC call, nor in `System` pallet of the metadata
+    /// fetched with `state_getMetadata` RPC call.
     NoBase58Prefix,
 
-    /// Network base58 prefix information found through `system_properties` rpc
+    /// Network base58 prefix information found through `system_properties` RPC
     /// call differs from the one from `System` pallet of the metadata fetched
-    /// with "state_getMetadata" rpc call.
+    /// with `state_getMetadata` RPC call.
     ///
     /// Associated data is corresponding base58 prefixes.
     Base58PrefixMismatch { specs: u16, meta: u16 },
 
     /// Network base58 prefix information received through `system_properties`
-    /// rpc call could not be transformed into expected `u16` prefix.
+    /// RPC call could not be transformed into expected `u16` prefix.
     ///
     /// Associated data is base58 prefix as received.
     Base58PrefixFormatNotSupported { value: String },
 
     /// Network decimals information **is not found** in the results if the
-    /// `system_properties` rpc call, but the unit information **is found**.
+    /// `system_properties` RPC call, but the unit information **is found**.
     ///
     /// Associated data is the fetched unit value.
     UnitNoDecimals(String),
 
     /// Network decimals information received through `system_properties`
-    /// rpc call could not be transformed into expected `u8` value.
+    /// RPC call could not be transformed into expected `u8` value.
     ///
     /// Associated data is decimals information as received.
     DecimalsFormatNotSupported { value: String },
 
     /// Network unit information **is not found** in the results if the
-    /// `system_properties` rpc call, but the decimals information **is found**.
+    /// `system_properties` RPC call, but the decimals information **is found**.
     ///
     /// Associated data is the fetched decimals value, could be array too.
     DecimalsNoUnit(String),
 
     /// Network unit information received through `system_properties`
-    /// rpc call could not be transformed into expected `String` value.
+    /// RPC call could not be transformed into expected `String` value.
     ///
     /// Associated data is unit information as received.
     UnitFormatNotSupported { value: String },
 
     /// An array with more than one element is received for network decimals
-    /// through `system_properties` rpc call. Received units are not an array.
+    /// through `system_properties` RPC call. Received units are not an array.
     DecimalsArrayUnitsNot,
 
     /// Both the network decimals and network units are received as arrays,
@@ -1238,11 +1238,11 @@ pub enum SpecsError {
     /// is going on with the network.
     ///
     /// Associated data are the printed sets as they are received through the
-    /// `system_properties` rpc call.
+    /// `system_properties` RPC call.
     DecimalsUnitsArrayLength { decimals: String, unit: String },
 
     /// An array with more than one element is received for network units
-    /// through `system_properties` rpc call. Received decimals are not an array.
+    /// through `system_properties` RPC call. Received decimals are not an array.
     UnitsArrayDecimalsNot,
 
     /// Unit and decimal override is not allowed, when network has a single
@@ -1261,18 +1261,18 @@ pub enum SpecsError {
     OverrideIgnoredNone,
 }
 
-/// Data received through rpc call is different from the data in hot database
+/// Data received through RPC call is different from the data in hot database
 #[derive(Debug)]
 pub enum Changed {
     /// Network base58 prefix in hot database (consistent between the metadata
     /// in `METATREE` and network specs in `SPECSPREPTREE`) is different from
-    /// the one received through new rpc calls (also consistent).
+    /// the one received through new RPC calls (also consistent).
     ///
     /// Associated data is the base58 prefix values in question.
     Base58Prefix { old: u16, new: u16 },
 
     /// Network genesis hash in hot database is different from the one fetched
-    /// through a new rpc call.
+    /// through a new RPC call.
     ///
     /// Network genesis hash is encountered in `SPECSTREEPREP` and
     /// `ADDRESS_BOOK`.
@@ -1291,7 +1291,7 @@ pub enum Changed {
     /// Network decimals value in
     /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
     /// stored in `SPECSTREEPREP` tree of the hot database is different from
-    /// the one fetched through a new rpc call.
+    /// the one fetched through a new RPC call.
     ///
     /// Network decimals value is expected to be permanent.
     Decimals { old: u8, new: u8 },
@@ -1320,13 +1320,13 @@ pub enum Changed {
     /// part of `Version` constant in `System` pallet of the network metadata.
     ///
     /// Network name is expected to be permanent. This error appears if the
-    /// name derived from metadata fetched through a new rpc call is different.
+    /// name derived from metadata fetched through a new RPC call is different.
     Name { old: String, new: String },
 
     /// Network unit value in
     /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
     /// stored in `SPECSTREEPREP` tree of the hot database is different from
-    /// the one fetched through a new rpc call.
+    /// the one fetched through a new RPC call.
     ///
     /// Network unit value is expected to be permanent.
     Unit { old: String, new: String },
@@ -1343,7 +1343,7 @@ pub enum Changed {
 
 /// Error loading of the defaults
 ///
-/// Could happen during both hot and cold detabase generation.
+/// Could happen during both hot and cold database generation.
 #[derive(Debug)]
 pub enum DefaultLoading {
     /// Default metadata is damaged.
@@ -1365,7 +1365,7 @@ pub enum DefaultLoading {
     /// Unable to read file with default metadata
     MetadataFile(std::io::Error),
 
-    /// Unable to read file with defalt types information
+    /// Unable to read file with default types information
     TypesFile(std::io::Error),
 
     /// Default metadata set contains metadata files that have no corresponding
@@ -1421,7 +1421,7 @@ pub enum NotFoundActive {
     /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) searched in
     /// `ADDRESS_BOOK` tree of the hot database by matching the `address` field.
     ///
-    /// Associated data is the url address used for searching.
+    /// Associated data is the URL address used for searching.
     AddressBookEntryWithUrl { url: String },
 }
 
@@ -1465,7 +1465,7 @@ pub enum NotFoundActive {
 /// arguments.
 #[derive(Debug)]
 pub enum CommandParser {
-    /// Agrument sequence could not be processed.
+    /// Argument sequence could not be processed.
     UnexpectedKeyArgumentSequence,
 
     /// Received more than one network identifier.
@@ -1474,10 +1474,10 @@ pub enum CommandParser {
     ///
     /// - networks specified by network name (as it is recorded in entries in
     /// `ADDRESS_BOOK`), using key `-n`
-    /// - url address to use for rpc call, using key `-u`.
+    /// - URL address to use for RPC call, using key `-u`.
     ///
     /// Both these keys must be used for an individual network, i.e. only one
-    /// network name or one network url address must be provided.
+    /// network name or one network URL address must be provided.
     ///
     /// This error appears if the parser has recognized more than one command
     /// element as a network identifier.
@@ -1530,7 +1530,7 @@ pub enum CommandNeedKey {
     /// - `-a` to process all networks with entries in the `ADDRESS_BOOK` tree
     /// - `-n` to process network by provided network name (in case of
     /// `load_metadata`) or network address book title (in case of `add_specs`)
-    /// - `-u` to process network by provided url address
+    /// - `-u` to process network by provided URL address
     Content,
 
     /// Command `make` requires `-crypto` key, followed by the encryption to be
@@ -1598,7 +1598,7 @@ pub enum CommandNeedKey {
     /// network metadata version to specify the metadata being exported.
     MetaDefaultFileVersion,
 
-    /// Command `meta_at_block` must have `-u` key followed by the network url.
+    /// Command `meta_at_block` must have `-u` key followed by the network URL.
     MetaAtBlockUrl,
 
     /// Command `meta_at_block` must have `-block` key followed by the
@@ -1614,20 +1614,20 @@ pub enum CommandDoubleKey {
     /// - `-a` to process all networks with entries in the `ADDRESS_BOOK` tree
     /// - `-n` to process network by provided network name (in case of
     /// `load_metadata`) or network address book title (in case of `add_specs`)
-    /// - `-u` to process network by provided url address
+    /// - `-u` to process network by provided URL address
     Content,
 
     /// Commands `add_specs` and `load_metadata` allow at most one set key,
     ///
-    /// - `-f` to use the data from the database, without rpc calls, and save
+    /// - `-f` to use the data from the database, without RPC calls, and save
     /// files for signing
-    /// - `-d` to make rpc calls without updating the database, and save files
+    /// - `-d` to make RPC calls without updating the database, and save files
     /// for signing
-    /// - `-k` to make rpc calls, update the database, and save for signing only
+    /// - `-k` to make RPC calls, update the database, and save for signing only
     /// the files with the data **new** to the database
-    /// - `-p` to make rpc calls, update the database, and make no files
+    /// - `-p` to make RPC calls, update the database, and make no files
     /// - `-t` (the default one, is done when the set key is not specified as
-    /// well), to make rpc calls, update the database, and save all files for
+    /// well), to make RPC calls, update the database, and save all files for
     /// signing
     Set,
 
@@ -1707,7 +1707,7 @@ pub enum CommandDoubleKey {
     MetaDefaultFileVersion,
 
     /// Command `meta_at_block` must have exactly one `-u` key followed by the
-    /// network url.
+    /// network URL.
     MetaAtBlockUrl,
 
     /// Command `meta_at_block` must have exactly one `-block` key followed by
@@ -1719,7 +1719,7 @@ pub enum CommandDoubleKey {
 #[derive(Debug)]
 pub enum CommandNeedArgument {
     /// Key `-token` in `add_specs` command was supposed to be followed by `u8`
-    /// decimals and `String` unit agruments.
+    /// decimals and `String` unit arguments.
     ///
     /// Unit argument was not provided.
     ///
@@ -1734,7 +1734,7 @@ pub enum CommandNeedArgument {
     TokenUnit,
 
     /// Key `-token` in `add_specs` command was supposed to be followed by `u8`
-    /// decimals and `String` unit agruments.
+    /// decimals and `String` unit arguments.
     ///
     /// Decimals argument was not provided.
     ///
@@ -1753,11 +1753,11 @@ pub enum CommandNeedArgument {
     NetworkName,
 
     /// Commands `add_specs` and `load_metadata` with content key `-u` require
-    /// url address input for rpc calls
+    /// URL address input for RPC calls
     NetworkUrl,
 
     /// Key `-crypto` in `make` command was supposed to be followed by an
-    /// agrument:
+    /// argument:
     ///
     /// - `ed25519`
     /// - `sr25519`
@@ -1868,7 +1868,7 @@ pub enum CommandNeedArgument {
     /// Command `show -specs` must be followed by the network address book title
     ShowSpecsTitle,
 
-    /// Key `-u` in `meta_at_block` command must be followed by the network url.
+    /// Key `-u` in `meta_at_block` command must be followed by the network URL.
     MetaAtBlockUrl,
 
     /// Key `-block` in `meta_at_block` command must be followed by the
@@ -1939,7 +1939,7 @@ pub enum CommandUnexpected {
     /// Command `make` with `-verifier Alice` can not accept the signature.
     AliceSignature,
 
-    /// Commands `add_specs` and `load_metadata` can not accept name or url
+    /// Commands `add_specs` and `load_metadata` can not accept name or URL
     /// address if `-a` (process all) content key is used.
     KeyAContent,
 
@@ -1989,7 +1989,7 @@ pub enum InputActive {
 // are published
 #[derive(Debug)]
 pub enum Wasm {
-    /// Failed to make "Metadata_metadata" call on data extracted from `wasm`
+    /// Failed to make `Metadata_metadata` call on data extracted from `wasm`
     /// file.
     Call(sc_executor_common::error::Error),
 

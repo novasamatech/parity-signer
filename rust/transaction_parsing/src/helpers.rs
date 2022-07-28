@@ -136,7 +136,7 @@ pub fn accept_meta_values(
     }
 }
 
-/// Function to check if the chaispecs are already in the database
+/// Function to check if the chain specs are already in the database
 pub fn specs_are_new(new: &NetworkSpecsToSend, database_name: &str) -> Result<bool, ErrorSigner> {
     let network_specs_key = NetworkSpecsKey::from_parts(&new.genesis_hash, &new.encryption);
     let database = open_db::<Signer>(database_name)?;
@@ -169,7 +169,7 @@ pub fn specs_are_new(new: &NetworkSpecsToSend, database_name: &str) -> Result<bo
     }
 }
 
-/// function to process hex data and get from it author_public_key, encryption,
+/// function to process hex data and get from it `author_public_key`, encryption,
 /// data to process (either transaction to parse or message to decode),
 /// and network specs key
 pub fn multisigner_msg_genesis_encryption(

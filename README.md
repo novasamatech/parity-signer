@@ -77,18 +77,18 @@ There are 3 actual endpoints in `rust` folder: `signer`, which is source of libr
 Sub-folders of the `rust` folder:
 
 - `constants` — constant values defined for the whole workspace.
-- 🔥 `db_handling` — all database-related operations for Signer and generate_message tool. Most of the business logic is contained here.
+- 🔥 `db_handling` — all database-related operations for Signer and `generate_message` tool. Most of the business logic is contained here.
 - `defaults` — built-in and test data for database
 - `definitions` — objects used across the workspace are defined here
 - `files` — contains test files and is used for build and update generation processes. Most contents are gitignored.
 - `generate_message` — tool to generate over-the-airgap updates and maintain network info database on hot side
 - 🔥 `navigator` — navigation for Signer app; it is realized in rust to unify app behavior across the platforms
-- `parser` - parses signable transactions. This is internal logic for transaction_parsing that is used when signable transaction is identified, but it could be used as a standalone lib for the same purpose.
+- `parser` - parses signable transactions. This is internal logic for `transaction_parsing` that is used when signable transaction is identified, but it could be used as a standalone lib for the same purpose.
 - `printing_balance` — small lib to render tokens with proper units
 - `qr_reader_pc` — small standalone PC app to parse QR codes in Signer ecosystem. Also is capable of parsing multiframe payloads (theoretically, in practice it is not feasible due to PC webcam low performance)
 - `qr_reader_phone` — logic to parse QR payloads in Signer
 - `qrcode_rtx` — multiframe erasure-encoded payload generator for signer update QR animation.
-- `qrcode_static` — generation of static qr codes used all over the qorkspace
+- `qrcode_static` — generation of static qr codes used all over the workspace
 - 🔥 `signer` — FFI interface crate to generate bindings that bridge native code and rust backend
 - `transaction_parsing` — high-level parser for all QR payloads sent into Signer
 - `transaction_signing` — all operations that could be performed when user accepts payload parsed with transaction_parsing
@@ -139,7 +139,7 @@ However, we strongly recommend that you use a real device for development, as so
 
 **6.** Install NDK. Go to `File -> Project Structure -> SDK Location`. Next to the "Android NDK location" section, click "Download Android NDK" button.
 
-⚠️  We hightly recommend you to update all existing plugins and SDK's for Kotlin, Gradle,
+⚠️  We highly recommend you to update all existing plugins and SDK's for Kotlin, Gradle,
 etc even if you just downloaded a fresh Android Studio. It's always a good idea to restart
 Android Studio after that. This can save you many hours on Stackoverflow trying to fix
 random errors like "NDK not found".
@@ -150,7 +150,7 @@ random errors like "NDK not found".
 
 `rust.pythonCommand=python3`
 
-**9.** Run the project (Ctrl+R). It should build the Rust core library automatically.
+**9.** Run the project (`Ctrl+R`). It should build the Rust core library automatically.
 
 # Tests
 
@@ -174,7 +174,7 @@ Try to create bug reports that are:
 - _Unique._ Do not duplicate existing opened issues.
 - _Scoped to a Single Bug._ One bug per report.
 
-Official team email for direct inquiries: signer@parity.io
+Official team email for direct inquiries: <signer@parity.io>
 
 # Contributing
 

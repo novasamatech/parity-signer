@@ -33,7 +33,7 @@ fn prepare_qr_png_data(input: &[u8]) -> anyhow::Result<QrContent> {
     Ok(QrContent { content: out, size })
 }
 
-/// Function to generate static qr code from Vec<u8>
+/// Function to generate static qr code from `Vec<u8>`
 pub fn png_qr(input: &[u8]) -> anyhow::Result<Vec<u8>> {
     let qr_content = prepare_qr_png_data(input)?;
 

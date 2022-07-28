@@ -23,7 +23,7 @@ pub fn pass_crypto(
 
     match &data_hex[2..4] {
         "00" => {
-            // Ed25519 crypto was used by the verifier
+            // `Ed25519` crypto was used by the verifier
             let (pubkey, data) = match data.get(3..35) {
                 Some(a) => {
                     let into_pubkey: [u8; 32] =
@@ -60,7 +60,7 @@ pub fn pass_crypto(
             }
         }
         "01" => {
-            // Sr25519 crypto was used by the verifier
+            // `Sr25519` crypto was used by the verifier
             let (pubkey, data) = match data.get(3..35) {
                 Some(a) => {
                     let into_pubkey: [u8; 32] =
@@ -160,7 +160,7 @@ fn cut_data(data: &[u8], content: TransferContent) -> Result<(Vec<u8>, Vec<u8>),
     };
     match content {
         TransferContent::AddSpecs | TransferContent::LoadTypes => {
-            // AddSpecs and LoadTypes payloads consist of SCALE encoded Vec<u8> of ContentAddSpecs or ContentLoadTypes correspondingly. Encoding of contents is done to have exact length of data easily accessible (to cut data correctly in case multisignatures are implemented). Signature verifies ContentAddSpecs or ContentLoadTypes correspondingly, WITHOUT the length piece from encoding
+            // `AddSpecs` and `LoadTypes` payloads consist of SCALE encoded `Vec<u8>` of ContentAddSpecs or ContentLoadTypes correspondingly. Encoding of contents is done to have exact length of data easily accessible (to cut data correctly in case multisignatures are implemented). Signature verifies ContentAddSpecs or ContentLoadTypes correspondingly, WITHOUT the length piece from encoding
             let data_length = pre_data.compact_found as usize;
             match pre_data.start_next_unit {
                 Some(start) => match data.get(start..start + data_length) {
@@ -171,7 +171,7 @@ fn cut_data(data: &[u8], content: TransferContent) -> Result<(Vec<u8>, Vec<u8>),
             }
         }
         TransferContent::LoadMeta => {
-            // LoadMeta payload consists of SCALE encoded Vec<u8> of metadata and [u8;32] genesis hash; compact announces length of metadata vector, 32 is added to include the genesis hash
+            // LoadMeta payload consists of SCALE encoded `Vec<u8>` of metadata and [u8;32] genesis hash; compact announces length of metadata vector, 32 is added to include the genesis hash
             let data_length = pre_data.compact_found as usize + 32;
             match pre_data.start_next_unit {
                 Some(start) => match data.get(..start + data_length) {

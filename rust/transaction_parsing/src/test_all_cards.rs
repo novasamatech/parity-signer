@@ -30,7 +30,7 @@ fn verifier_value_sr25519() -> VerifierValue {
     }
 }
 
-/// Function to pring all types of cards.
+/// Function to print all types of cards.
 /// Should be used to check how the cards are printed in the app.
 
 pub fn make_all_cards() -> TransactionAction {

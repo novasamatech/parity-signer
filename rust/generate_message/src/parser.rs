@@ -116,29 +116,29 @@ pub enum Content {
     /// - network address book title (in `add_specs` command)
     Name(String),
 
-    /// Key `-u`: process only the network referred to by url address
+    /// Key `-u`: process only the network referred to by URL address
     Address(String),
 }
 
 /// Setting key for `load_metadata` and `add_specs` commands.
 pub enum Set {
-    /// Key `-d`: do **not** update the database, make rpc calls, and produce
+    /// Key `-d`: do **not** update the database, make RPC calls, and produce
     /// output files
     D,
 
-    /// Key `-f`: do **not** run rpc calls, produce output files from database
+    /// Key `-f`: do **not** run RPC calls, produce output files from database
     /// as it is
     F,
 
-    /// Key `-k`: update database through rpc calls, produce output files only
+    /// Key `-k`: update database through RPC calls, produce output files only
     /// for **updated** database entries
     K,
 
-    /// Key `-p`: update database through rpc calls, do **not** produce any
+    /// Key `-p`: update database through RPC calls, do **not** produce any
     /// output files
     P,
 
-    /// Key `-t` (no setting key defaults here): update database through rpc
+    /// Key `-t` (no setting key defaults here): update database through RPC
     /// calls, produce output files
     T,
 }
@@ -190,7 +190,7 @@ pub enum Crypto {
 ///
 /// Associated data is `Vec<u8>` blob that becomes part of the update.
 ///
-/// Payload content details are described in [definitions::qr_transfers].
+/// Payload content details are described in [`definitions::qr_transfers`].
 pub enum Msg {
     /// `load_types` payload
     LoadTypes(Vec<u8>),
@@ -1531,7 +1531,7 @@ impl Command {
     }
 }
 
-/// Get verifier infortmation from command line arguments.
+/// Get verifier information from command line arguments.
 fn process_verifier_and_signature(
     verifier_found: Option<VerKey>,
     signature_found: Option<Entry>,

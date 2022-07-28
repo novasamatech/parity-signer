@@ -17,18 +17,18 @@ use crate::decoding_commons::{
 use crate::method::{what_next_old, OlderMeta};
 
 /// Function to decode primitive types (fixed-width or compact form), and Percent,
-/// Permill, and PerU16 structs (also fixed-width or compact form).
-/// All those types have stable length by std::mem::size_of() and also are serializeable.
+/// `Permill`, and `PerU16` structs (also fixed-width or compact form).
+/// All those types have stable length by `std::mem::size_of()` and also are serializable.
 ///
-/// The function decodes only found_ty, removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only `found_ty`, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - found_ty (type of the argument found in the previous iteration, to be interpreted on run)
-/// - data (remaining Vec<u8> of data),
+/// - `found_ty` (type of the argument found in the previous iteration, to be interpreted on run)
+/// - data (remaining `Vec<u8>` of data),
 /// - indent used for creating properly formatted js cards.
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 fn decode_primitive(
     found_ty: &str,
     data: &[u8],
@@ -160,27 +160,27 @@ fn decode_primitive(
 }
 
 /// Function to decode any type, including calls and vectors of calls.
-/// Here starts the decoding of argument with type found_ty.
+/// Here starts the decoding of argument with type `found_ty`.
 ///
 /// This function is recursive, i.e. it could call itself later if needed with changed input data.
-/// The function decodes only found_ty, removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only `found_ty`, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - found_ty (type of the argument found in the previous iteration, to be interpreted on run)
-/// - data (remaining Vec<u8> of data),
+/// - `found_ty` (type of the argument found in the previous iteration, to be interpreted on run)
+/// - data (remaining `Vec<u8>` of data),
 /// - meta (metadata for the network used),
-/// - type_database (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by decode_primitive function), this database
+/// - `type_database` (it describes all fundamental types that could be encountered in known networks
+/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
 /// - indent used for creating properly formatted js cards,
-/// - short_specs (network parameters, such as base58 prefix, currency units and decimals),
+/// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 ///
 /// Calls and vectors of calls are treated separately here.
-/// All simpler types are processed through decode_simple function.
+/// All simpler types are processed through `decode_simple` function.
 fn decode_complex(
     found_ty: &str,
     mut data: Vec<u8>,
@@ -227,31 +227,31 @@ fn decode_complex(
     }
 }
 
-/// Function to process a single call (essentially, Vec<u8>).
+/// Function to process a single call (essentially, `Vec<u8>`).
 /// This is the place to start when decoding the transaction.
 ///
 /// This function is recursive, i.e. it could call itself later if needed with changed input data.
-/// The function decodes only a single call, removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only a single call, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
 /// - data (call itself),
 /// - meta (metadata for the network used),
-/// - type_database (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by decode_primitive function), this database
+/// - `type_database` (it describes all fundamental types that could be encountered in known networks
+/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
 /// - indent used for creating properly formatted js cards,
-/// - short_specs (network parameters, such as base58 prefix, currency units and decimals),
+/// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 ///
 /// In each encoded call the first two elements denote the numbers of the pallet and the method
 /// in corresponding network metadata, indicating what arguments the call has.
-/// The card "call" containing pallet name and method name is added to fancy_out.
+/// The card "call" containing pallet name and method name is added to `fancy_out`.
 /// Each argument is then processed in a sequence, the name of the argument
 /// and the type of the argument are found in the network metadata during the run.
-/// For each argument the card "varname" with argument name is added to fancy_out,
+/// For each argument the card `varname` with argument name is added to `fancy_out`,
 /// followed by card(s) of actual decoded argument values.
 pub(crate) fn process_as_call(
     mut data: Vec<u8>,
@@ -301,7 +301,7 @@ pub(crate) fn process_as_call(
 // In some cases the type could be Option<arg>, Vec<arg>, tuple such as (arg1, arg2, arg3)
 // (currently among types are found tuples of up to 4 elements, could change at any point),
 // array such as [arg; num], and compact such as Compact<arg>.
-// To reduce the number of types in type_database and to simplify and
+// To reduce the number of types in `type_database` and to simplify and
 // at least a bit generalize the decoding process,
 // the options, vectors, tuples, arrays, and compacts are currently treated specially
 // and first are "husked" to interpret the inner type.
@@ -315,24 +315,24 @@ lazy_static! {
     static ref REGCOMPACT: Regex = Regex::new(r#"(?m)^Compact<(?P<arg>.*)>"#).expect("constructed from checked static value");
 }
 
-/// Function to decode Option<inner_ty>.
+/// Function to decode `Option<inner_ty>`.
 /// Special case of Option<bool> is considered separately.
 ///
 /// This function is recursive, i.e. it could call itself later if needed with changed input data.
-/// The function decodes only a single option, removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only a single option, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - inner_ty (type inside Option, found using regular expressions)
-/// - data (remaining Vec<u8> of data),
-/// - type_database (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by decode_primitive function), this database
+/// - `inner_ty` (type inside Option, found using regular expressions)
+/// - data (remaining `Vec<u8>` of data),
+/// - `type_database` (it describes all fundamental types that could be encountered in known networks
+/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
 /// - indent used for creating properly formatted js cards,
-/// - short_specs (network parameters, such as base58 prefix, currency units and decimals),
+/// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 ///
 /// Js cards are of type "none" if the Option<_> is None.
 /// At this moment no special js card for Some(x) is presented, only the card of x itself.
@@ -407,11 +407,11 @@ fn deal_with_option(
     }
 }
 
-/// Function to decode Vector<inner_ty>.
+/// Function to decode `Vector<inner_ty>`.
 ///
 /// This function is recursive, i.e. it could call itself later if needed with changed input data.
-/// The function decodes only a single vector of type inner_ty, removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only a single vector of type `inner_ty`, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// Encoded vectors are preluded by the number of vector elements as compact,
 /// followed by concatenated individually encoded elements.
@@ -419,16 +419,16 @@ fn deal_with_option(
 /// and then proceeds to decode each element of the vector.
 ///
 /// The function takes as arguments
-/// - inner_ty (type inside Vec, found using regular expressions)
-/// - data (remaining Vec<u8> of data),
-/// - type_database (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by decode_primitive function), this database
+/// - `inner_ty` (type inside `Vec`, found using regular expressions)
+/// - data (remaining `Vec<u8>` of data),
+/// - `type_database` (it describes all fundamental types that could be encountered in known networks
+/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
 /// - indent used for creating properly formatted js cards,
-/// - short_specs (network parameters, such as base58 prefix, currency units and decimals),
+/// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 fn deal_with_vector(
     inner_ty: &str,
     mut data: Vec<u8>,
@@ -468,25 +468,25 @@ fn deal_with_vector(
     }
 }
 
-/// Function to decode an array such as [inner_ty; number_of_elements].
+/// Function to decode an array such as `[inner_ty; number_of_elements]`.
 ///
 /// This function is recursive, i.e. it could call itself later if needed with changed input data.
-/// The function decodes only a single array of type inner_ty and length number_of_elements,
-/// removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only a single array of type `inner_ty` and length `number_of_elements`,
+/// removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - inner_ty (type of array elements, found using regular expressions)
-/// - number_of_elements (number of array elements, found using regular expressions)
-/// - data (remaining Vec<u8> of data),
-/// - type_database (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by decode_primitive function), this database
+/// - `inner_ty` (type of array elements, found using regular expressions)
+/// - `number_of_elements` (number of array elements, found using regular expressions)
+/// - `data` (remaining `Vec<u8>` of data),
+/// - `type_database` (it describes all fundamental types that could be encountered in known networks
+/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
-/// - indent used for creating properly formatted js cards,
-/// - short_specs (network parameters, such as base58 prefix, currency units and decimals),
+/// - `indent` used for creating properly formatted js cards,
+/// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 fn deal_with_array(
     inner_ty: &str,
     number_of_elements: u32,
@@ -507,26 +507,26 @@ fn deal_with_array(
     })
 }
 
-/// Function to decode IdentityFields special case.
-/// IdentityFields is a struct from pallet_identity::IdentityFields,
-/// which is wrapper type for BitFlags<IdentityField>.
+/// Function to decode `IdentityFields` special case.
+/// `IdentityFields` is a struct from `pallet_identity::IdentityFields`,
+/// which is wrapper type for `BitFlags<IdentityField>`.
 /// To avoid output complications arising from private non-printable fields
-/// the type was re-implemented here using BitVec and enum IdentityField from type_database.
+/// the type was re-implemented here using `BitVec` and enum `IdentityField` from `type_database`.
 ///
-/// The function decodes only a single IdentityFields type entry,
-/// removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only a single `IdentityFields` type entry,
+/// removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - data (remaining Vec<u8> of data),
-/// - type_database (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by decode_primitive function), this database
+/// - `data` (remaining `Vec<u8>` of data),
+/// - `type_database` (it describes all fundamental types that could be encountered in known networks
+/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
-/// - indent used for creating properly formatted js cards.
+/// - `indent` used for creating properly formatted js cards.
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 ///
-/// For each identity field an individual js card "identity_field" is added to fancy_out.
+/// For each identity field an individual js card `identity_field` is added to `fancy_out`.
 fn special_case_identity_fields(
     data: Vec<u8>,
     type_database: &[TypeEntry],
@@ -573,28 +573,28 @@ fn special_case_identity_fields(
     })
 }
 
-/// Function to decode BitVec special case.
+/// Function to decode `BitVec` special case.
 ///
-/// The function decodes only a single BitVec type entry,
-/// removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only a single `BitVec` type entry,
+/// removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field ``remaining_vector``, which is processed later separately.
 ///
-/// Trait Decode is not implemented for BitVec type.
-/// Existing signer documentation in js suggests that the encoded BitVec is preluded by the number
-/// of BitVec elements as compact, and each 8 of those form an u8 element in input data.
-/// So, the function first searches for compact to determine the number of BitVec elements
-/// then calculates how many actual u8 elements are used to store those, takes needed length of data
-/// and gets BitVec from it.
+/// Trait `Decode` is not implemented for `BitVec` type.
+/// Existing signer documentation in js suggests that the encoded `BitVec` is preluded by the number
+/// of `BitVec` elements as compact, and each 8 of those form an `u8` element in input data.
+/// So, the function first searches for compact to determine the number of `BitVec` elements
+/// then calculates how many actual `u8` elements are used to store those, takes needed length of data
+/// and gets `BitVec` from it.
 ///
 /// The function takes as arguments
-/// - data (remaining Vec<u8> of data),
-/// - indent used for creating properly formatted js cards.
+/// - `data` (remaining `Vec<u8>` of data),
+/// - `indent` used for creating properly formatted js cards.
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 ///
-/// Resulting BitVec is added to fancy_out on js card "bitvec".
+/// Resulting `BitVec` is added to `fancy_out` on js card `bitvec`.
 fn special_case_bitvec(data: Vec<u8>, indent: u32) -> Result<DecodedOut, ParserError> {
-    // the data is preluded by compact indicating the number of BitVec elements - info from js documentation, decode not implemented for BitVec as is
+    // the data is preluded by compact indicating the number of `BitVec` elements - info from js documentation, decode not implemented for `BitVec` as is
     let pre_bitvec = get_compact::<u32>(&data)?;
     let actual_length = match pre_bitvec.compact_found % 8 {
         0 => (pre_bitvec.compact_found / 8),
@@ -655,17 +655,17 @@ fn goto_balance(found_ty: &str) -> bool {
 /// (both compacts and non-compacts).
 ///
 /// The function decodes only a single balance-related type entry,
-/// removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - data (remaining Vec<u8> of data),
-/// - indent used for creating properly formatted js cards.
-/// - short_specs (taking currency units and decimals from there).
+/// - `data` (remaining `Vec<u8>` of data),
+/// - `indent` used for creating properly formatted js cards.
+/// - `short_specs` (taking currency units and decimals from there).
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 ///
-/// Resulting balance is added to fancy_out on js card "balance".
+/// Resulting balance is added to `fancy_out` on js card "balance".
 fn special_case_balance(
     found_ty: &str,
     data: Vec<u8>,
@@ -702,25 +702,25 @@ fn special_case_balance(
     }
 }
 
-/// Function to decode structs described in type_database.
+/// Function to decode structs described in `type_database`.
 ///
-/// Function iterates over struct fields, for each field it creates js card "field_name"
-/// or "field_number" (if there are no field names),
-/// and card(s) for corresponding content in fancy_out.
+/// Function iterates over struct fields, for each field it creates js card `field_name`
+/// or `field_number` (if there are no field names),
+/// and card(s) for corresponding content in `fancy_out`.
 ///
 /// This function is recursive, i.e. it could call itself later if needed with changed input data.
 ///
 /// The function takes as arguments
-/// - vector of StructField of currently processed type, as found in type_database
-/// - data (remaining Vec<u8> of data),
-/// - type_database (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by decode_primitive function), this database
+/// - `vector` of `StructField` of currently processed type, as found in `type_database`
+/// - `data` (remaining `Vec<u8>` of data),
+/// - `type_database` (it describes all fundamental types that could be encountered in known networks
+/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
-/// - indent used for creating properly formatted js cards,
-/// - short_specs (network parameters, such as base58 prefix, currency units and decimals),
+/// - `indent` used for creating properly formatted js cards,
+/// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 fn deal_with_struct(
     v1: &[StructField],
     mut data: Vec<u8>,
@@ -761,24 +761,24 @@ fn deal_with_struct(
     })
 }
 
-/// Function to decode enums described in type_database.
+/// Function to decode enums described in `type_database`.
 ///
-/// Function determines which enum variant is used, and adds to fancy_out card "enum_variant_name",
+/// Function determines which enum variant is used, and adds to `fancy_out` card `enum_variant_name`,
 /// and, if there is content associated with enum variant, card(s) for this content.
 ///
 /// This function is recursive, i.e. it could call itself later if needed with changed input data.
 ///
 /// The function takes as arguments
-/// - vector of EnumVariant of currently processed type, as found in type_database
-/// - data (remaining Vec<u8> of data),
-/// - type_database (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by decode_primitive function), this database
+/// - `vector` of `EnumVariant` of currently processed type, as found in `type_database`
+/// - `data` (remaining `Vec<u8>` of data),
+/// - `type_database` (it describes all fundamental types that could be encountered in known networks
+/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
-/// - indent used for creating properly formatted js cards,
-/// - short_specs (network parameters, such as base58 prefix, currency units and decimals),
+/// - `indent` used for creating properly formatted js cards,
+/// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 fn deal_with_enum(
     v1: &[EnumVariant],
     mut data: Vec<u8>,
@@ -878,20 +878,20 @@ fn deal_with_enum(
 /// Function to decode any type, except calls.
 ///
 /// This function is recursive, i.e. it could call itself later if needed with changed input data.
-/// The function decodes only found_ty, removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only `found_ty`, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field ``remaining_vector``, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - found_ty (type of the argument found in the previous iteration, to be interpreted on run)
-/// - data (remaining Vec<u8> of data),
-/// - type_database (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by decode_primitive function), this database
+/// - `found_ty` (type of the argument found in the previous iteration, to be interpreted on run)
+/// - `data` (remaining `Vec<u8>` of data),
+/// - `type_database` (it describes all fundamental types that could be encountered in known networks
+/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
 /// currently is retrieved and decoded from the database on device used),
-/// - indent used for creating properly formatted js cards,
-/// - short_specs (network parameters, such as base58 prefix, currency units and decimals),
+/// - `indent` used for creating properly formatted js cards,
+/// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
 /// all those are used in some cases for proper output formatting).
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 fn decode_simple(
     found_ty: &str,
     mut data: Vec<u8>,
@@ -1013,11 +1013,11 @@ fn decode_simple(
                                                                 indent,
                                                             )
                                                         } else {
-                                                            // special case of BitVec type
+                                                            // special case of `BitVec` type
                                                             if found_ty == "BitVec" {
                                                                 special_case_bitvec(data, indent)
                                                             } else {
-                                                                // special case of AccountId type
+                                                                // special case of `AccountId` type
                                                                 if (found_ty == "AccountId")
                                                                     || (found_ty == "T::AccountId")
                                                                 {

@@ -20,7 +20,7 @@
 //! - default types information
 //!
 //! Latest metadata entries get updated as soon as they are published and could
-//! be fetched via rpc calls. For this, new metadata entry is added into
+//! be fetched via RPC calls. For this, new metadata entry is added into
 //! `release_metadata` folder, and older one is removed.
 //!
 //! # Defaults in the hot database
@@ -86,7 +86,7 @@ use definitions::{
 #[cfg(feature = "signer")]
 use definitions::network_specs::{Verifier, VerifierValue};
 
-/// Real Parity public key, with Sr25519 encryption
+/// Real Parity public key, with `Sr25519` encryption
 ///
 /// To be used in [`VerifierValue`] for general verifier in default cold
 /// database
@@ -366,12 +366,12 @@ lazy_static! {
 /// to categorize, and collected as `TypeEntry` set.
 ///
 /// Types information is necessary only to parse transactions produced with
-/// `RuntimeVersion` of the network metadata below V14. Therefore, it is
+/// `RuntimeVersion` of the network metadata below `V14`. Therefore, it is
 /// obsolete for default networks.
 ///
 /// Types information currently on file was collected for older metadata
 /// versions of Westend, Polkadot, Kusama, and Rococo, when they were still
-/// using metadata runtime version V12 and V13. Type definitions were gathered
+/// using metadata runtime version `V12` and `V13`. Type definitions were gathered
 /// (mostly) from substrate crates and in some cases from js client code, when
 /// it was not possible to find explicit descriptions in substrate crates.
 ///

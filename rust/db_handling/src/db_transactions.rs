@@ -152,7 +152,7 @@ impl TrDbCold {
     /// Apply constructed set of batches within [`TrDbCold`] to the database
     /// with a given name, in a single transaction.
     ///
-    /// Note that both ErrorSource variants are available.
+    /// Note that both `ErrorSource` variants are available.
     pub fn apply<T: ErrorSource>(&self, database_name: &str) -> Result<(), T::Error> {
         let database = open_db::<T>(database_name)?;
         let addresses = open_tree::<T>(&database, ADDRTREE)?;
@@ -471,7 +471,7 @@ impl TrDbColdStub {
     ///
     /// Function requires correct checksum to make sure the transaction is
     /// still the one that was shown to the user previously, and no changes to
-    /// the database have occured after the atomic transaction draft was placed
+    /// the database have occurred after the atomic transaction draft was placed
     /// into storage.
     ///
     /// [`TRANSACTION`] tree is cleared in the process.
@@ -890,7 +890,7 @@ impl TrDbColdSign {
     ///
     /// Function requires correct checksum to make sure the signable transaction
     /// is still the one that was shown to the user previously, and no
-    /// changes to the database have occured.
+    /// changes to the database have occurred.
     ///
     /// [`TRANSACTION`] tree is **not** cleared in the process. User is allowed
     /// to try entering password several times, for all this time the
@@ -959,7 +959,7 @@ impl TrDbColdSign {
     /// Possible history log entries are:
     ///
     /// - `Event::TransactionSigned(_)` and `Event::MessageSigned(_)` for the
-    /// cases when the signature was generated and diaplayed through the user
+    /// cases when the signature was generated and displayed through the user
     /// interface
     /// - `Event::TransactionSignError(_)` and `Event::MessageSignError(_)` for
     /// the cases when the user has entered the wrong password and no signature
@@ -1073,7 +1073,7 @@ impl TrDbColdDerivations {
     ///
     /// Function requires correct checksum to make sure the proposed derivations
     /// are the ones approved by the user, and no changes to the database have
-    /// occured.
+    /// occurred.
     ///
     /// [`TRANSACTION`] tree is cleared in the process.
     pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self, ErrorSigner> {

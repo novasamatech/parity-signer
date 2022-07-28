@@ -1,4 +1,4 @@
-//! Errors occuring in Signer
+//! Errors occurring in Signer
 //!
 //! Signer works with cold database only.
 //!
@@ -564,7 +564,7 @@ pub enum InterfaceSigner {
     FlagNotBool(String),
 }
 
-/// `NotHex` errors occuring on the Signer side
+/// `NotHex` errors occurring on the Signer side
 ///
 /// Expected to receive hexadecimal string from the interface, got something
 /// different. [`NotHexSigner`] specifies, what was expected.
@@ -736,7 +736,7 @@ pub enum DatabaseSigner {
     /// Database has two seed addresses (i.e. with empty derivation path and no
     /// password) for same seed name and [`Encryption`]
     ///
-    /// This indicates the database corruption, since the encrypion method,
+    /// This indicates the database corruption, since the encryption method,
     /// seed name and derivation path strictly determine the public key.
     TwoRootKeys {
         /// seed name
@@ -756,7 +756,7 @@ pub enum DatabaseSigner {
 
 /// Errors decoding database keys on the Signer side
 ///
-/// `IVec` value of the database key could be unfallably transformed into the
+/// `IVec` value of the database key could be infallible transformed into the
 /// contents of the corresponding key from the [`keyring`](crate::keyring)
 /// module. All these keys were, however, generated using certain information,
 /// and if this information could not be extracted from the key, it indicates
@@ -865,7 +865,7 @@ pub enum EntryDecodingSigner {
 
 /// Mismatch errors within database on the Signer side
 ///
-/// Data could be recorded in the Signer database only in ordered fasion, i.e.
+/// Data could be recorded in the Signer database only in ordered fashion, i.e.
 /// with keys corresponding to the data stored in the encoded values etc.
 /// If the data retrieved from the database contains some internal
 /// contradictions, it indicates the database corruption.
@@ -898,7 +898,7 @@ pub enum MismatchSigner {
         key: NetworkSpecsKey,
 
         /// genesis hash as it is in the `NetworkSpecs`
-        // TODO: could be [u8; 32] array here; we may want to decide and fix in
+        // TODO: could be `[u8; 32]` array here; we may want to decide and fix in
         // several places if the genesis hash may at all be something different
         // from [u8;32] array
         genesis_hash: H256,
@@ -936,7 +936,7 @@ pub enum MismatchSigner {
     /// and `Encryption`.
     ///
     /// If the `Encryption` value from one of `NetworkSpecsKey` values is
-    /// different from `Encryption` assocaited with `AddressKey`, this error
+    /// different from `Encryption` associated with `AddressKey`, this error
     /// appears.
     AddressDetailsSpecsEncryption {
         /// [`AddressKey`] corresponding to mismatching data
@@ -967,7 +967,7 @@ pub enum InputSigner {
     /// in Signer.
     ///
     /// Associated data is [`MetadataError`] specifying what exactly is
-    /// unacceplable with incoming metadata.
+    /// unacceptable with incoming metadata.
     FaultyMetadata(MetadataError),
 
     /// Received transaction is unexpectedly short, more bytes were expected.
@@ -1153,7 +1153,7 @@ pub enum InputSigner {
 
     /// Received `add_specs` or `load_metadata` update payload is not verified.
     ///
-    /// Network, however, was verified previuosly by verifier with certain
+    /// Network, however, was verified previously by verifier with certain
     /// [`VerifierValue`] and corresponding entry in `VERIFIERS` tree of the
     /// database is
     /// `CurrentVerifier::Valid(ValidCurrentVerifier::Custom(Some(verifier_value)))`.
@@ -1246,7 +1246,7 @@ pub enum InputSigner {
     ///
     /// General verifier with assigned [`VerifierValue`] could not be changed
     /// without Signer wipe. If the Signer is reset with no general verifier,
-    /// and the network in question is the default one (currently Pokadot,
+    /// and the network in question is the default one (currently Polkadot,
     /// Kusama, and Westend), the network will still be recorded as the one
     /// verified by the general verifier and accepting verified `add_specs` for
     /// it would result in setting the general verifier. If the network is not
@@ -1522,10 +1522,10 @@ pub enum ParserError {
     /// Can not separate method from extensions, bad transaction.
     SeparateMethodExtensions,
 
-    /// Errors occuring during the decoding procedure.
+    /// Errors occurring during the decoding procedure.
     Decoding(ParserDecodingError),
 
-    /// Errors occuring because the metadata
+    /// Errors occurring because the metadata
     /// [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
     /// has extensions not acceptable in existing safety paradigm for
     /// signable transactions.
@@ -1569,7 +1569,7 @@ pub enum ParserError {
 /// have the network information (network specs and correct network metadata)
 /// and the public address-associated information in its database.
 ///
-/// `53xx00` and `53xx02` transcations consist of:
+/// `53xx00` and `53xx02` transactions consist of:
 ///
 /// - prelude, `53xx00` or `53xx02`, where `xx` stands for the encryption
 /// algorithm associated with address and network used
@@ -1614,7 +1614,7 @@ pub enum ParserError {
 /// are and how to decode them by using the types information that must be in
 /// Signer database.
 /// For `RuntimeMetadataV12` or `RuntimeMetadataV13` the second byte in call is
-/// the index of the method within the pallet, and thes Signer finds the types
+/// the index of the method within the pallet, and the Signer finds the types
 /// used by the method and proceeds to decode the call data piece by piece.
 ///
 /// Metadata with `RuntimeMetadataV14` has types data in-built in the metadata
@@ -1650,7 +1650,7 @@ pub enum ParserDecodingError {
     /// but has `Era::Mortal(_, _)` in extensions
     UnexpectedMortality,
 
-    /// Genesis hash cut from the end of the transaction doen not match the one
+    /// Genesis hash cut from the end of the transaction does not match the one
     /// found in the extensions
     GenesisHashMismatch,
 
@@ -1794,7 +1794,7 @@ pub enum ParserDecodingError {
     SomeDataNotUsedExtensions,
 }
 
-/// Errors occuring because the network metadata
+/// Errors occurring because the network metadata
 /// [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
 /// has extensions not compatible with Signer.
 ///
@@ -1806,7 +1806,7 @@ pub enum ParserDecodingError {
 /// - metadata version (once)
 /// - network genesis hash (at most, once)
 ///
-/// If the metadata does not follow those criteria, transactons could not be
+/// If the metadata does not follow those criteria, transactions could not be
 /// parsed, and therefore, could not be signed.
 #[derive(Debug)]
 #[cfg_attr(feature = "test", derive(VariantCount))]

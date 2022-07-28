@@ -22,7 +22,7 @@
 //! Damaged network specs or network metadata could result in transactions
 //! being parsed incorrectly.  
 //!
-//! Verifier system is introduced to have important transferrable data signed
+//! Verifier system is introduced to have important transferable data signed
 //! by a trusted party to exclude accidental or intentional errors. It is
 //! especially important in keeping fast-changing network metadata updated.  
 //!
@@ -256,7 +256,7 @@
 //! decoding. For this `decimals` and `unit` values from [`NetworkSpecs`] are used.
 //! `decimals` indicate the order of magnitude, by which the token `unit`
 //! exceeds the integer representing unit (see examples below).
-//! Both `decimals` and `unit` values could be queried through rpc calls for each
+//! Both `decimals` and `unit` values could be queried through RPC calls for each
 //! Signer-compatible network.  
 //! Sometimes the networks have several available decimals and units, or none at all.  
 //! This cases should be dealt with on case-by-case basis.  
@@ -561,7 +561,7 @@ impl NetworkSpecsToSend {
     }
 }
 
-/// Network properties that must be fetched with rpc call for properties
+/// Network properties that must be fetched with RPC call for properties
 /// in each compatible network
 #[derive(Decode, Encode, PartialEq, Debug)]
 #[cfg(feature = "active")]

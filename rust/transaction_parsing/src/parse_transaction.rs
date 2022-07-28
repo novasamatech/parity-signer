@@ -33,11 +33,11 @@ enum CardsPrep<'a> {
 /// Function to parse transaction.
 /// Attempts to decode the transaction, and if completely successful,
 /// produces a set of cards to print the transaction content,
-/// and an action card "sign_transaction" with database entry to be used to
+/// and an action card `sign_transaction` with database entry to be used to
 /// actually sign the transaction later if approved.
 /// Transaction format corresponds to what we get from qr code:
 /// i.e. it starts with 53****, followed by author address, followed by actual transaction piece,
-/// followed by extrinsics, concluded with chain genesis hash
+/// followed by extrinsic, concluded with chain genesis hash
 
 pub(crate) fn parse_transaction(
     data_hex: &str,

@@ -128,7 +128,7 @@ pub fn print_multisigner_as_base58(
 
 /// Print id pic for metadata hash
 ///
-/// Currently uses png identicon generator, could be changed later.
+/// Currently uses PNG identicon generator, could be changed later.
 #[cfg(feature = "signer")]
 pub fn pic_meta(meta_hash: &[u8]) -> Vec<u8> {
     generate_png_scaled_default(meta_hash)
@@ -136,7 +136,7 @@ pub fn pic_meta(meta_hash: &[u8]) -> Vec<u8> {
 
 /// Print id pic for hash of SCALE-encoded types data
 ///
-/// Currently uses png identicon generator, could be changed later.
+/// Currently uses PNG identicon generator, could be changed later.
 #[cfg(feature = "signer")]
 pub fn pic_types(types_hash: &[u8]) -> Vec<u8> {
     generate_png_scaled_default(types_hash)

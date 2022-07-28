@@ -1,4 +1,4 @@
-//! Fit network properties fetched via rpc call into data in expected format
+//! Fit network properties fetched via RPC call into data in expected format
 //!
 //! Fetched network properties contain data needed to make
 //! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend), used
@@ -13,12 +13,12 @@
 //! `String`)
 //!
 //! There could be base58 prefix information in network metadata. If base58
-//! prefix is fetched via `system_properties` rpc call and the metadata contains
+//! prefix is fetched via `system_properties` RPC call and the metadata contains
 //! `SS58Prefix` constant, they must be matching for the network to be
 //! suitable for use in the Signer. If no base58 prefix is encountered at all,
 //! network is not suitable for use in Signer either.
 //!
-//! Some networks support more than one token, in this case rpc returns an array
+//! Some networks support more than one token, in this case RPC returns an array
 //! of decimals and an array of units, that must have equal length. No mechanism
 //! to automatically choose a token from the fetched set is currently present.
 //!
@@ -39,14 +39,14 @@ use std::convert::TryInto;
 
 use crate::parser::Token;
 
-/// Transform `system_properties` rpc call results into [`NetworkProperties`].
+/// Transform `system_properties` RPC call results into [`NetworkProperties`].
 ///
 /// This function is only used if the network properties are used as is, i.e.
 /// without checking with existing database entries.
 ///
 /// Function inputs:
 ///
-/// - `&Map<String, Value>` received via `system_properties` rpc call,
+/// - `&Map<String, Value>` received via `system_properties` RPC call,
 /// - optional base58 prefix from the network metadata
 /// - optional token override to be applied if allowed
 pub fn interpret_properties(
@@ -95,14 +95,14 @@ pub fn interpret_properties(
 ///
 /// Function inputs:
 ///
-/// - `&Map<String, Value>` received via `system_properties` rpc call,
+/// - `&Map<String, Value>` received via `system_properties` RPC call,
 /// - optional base58 prefix from the network metadata
 fn base58prefix(
     x: &Map<String, Value>,
     optional_prefix_from_meta: Option<u16>,
 ) -> Result<u16, SpecsError> {
     let base58prefix: u16 = match x.get("ss58Format") {
-        // base58 prefix is fetched in `system_properties` rpc call
+        // base58 prefix is fetched in `system_properties` RPC call
         Some(a) => match a {
             // base58 prefix value is a number
             Value::Number(b) => match b.as_u64() {
@@ -157,7 +157,7 @@ fn base58prefix(
             }
         },
 
-        // no base58 prefix fetched in `system_properties` rpc call
+        // no base58 prefix fetched in `system_properties` RPC call
         None => match optional_prefix_from_meta {
             // base58 prefix was found in `SS58Prefix` constant of the network
             // metadata
@@ -170,7 +170,7 @@ fn base58prefix(
     Ok(base58prefix)
 }
 
-/// Accepted token from `system_properties` rpc call
+/// Accepted token from `system_properties` RPC call
 pub enum TokenFetch {
     /// Single decimals parameter and single unit.
     Single(Token),
@@ -215,10 +215,10 @@ enum UnitFetch {
 /// Process decimals
 ///
 /// Function inputs only `&Map<String, Value>` received via `system_properties`
-/// rpc call.
+/// RPC call.
 fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch, SpecsError> {
     match x.get("tokenDecimals") {
-        // decimals info is fetched in `system_properties` rpc call
+        // decimals info is fetched in `system_properties` RPC call
         Some(a) => match a {
             // fetched decimals value is a number
             Value::Number(b) => match b.as_u64() {
@@ -298,10 +298,10 @@ fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch, SpecsError> {
 /// Process unit
 ///
 /// Function inputs only `&Map<String, Value>` received via `system_properties`
-/// rpc call.
+/// RPC call.
 fn unit(x: &Map<String, Value>) -> Result<UnitFetch, SpecsError> {
     match x.get("tokenSymbol") {
-        // unit info is fetched in `system_properties` rpc call
+        // unit info is fetched in `system_properties` RPC call
         Some(a) => match a {
             // fetched unit value is a `String`
             Value::String(b) => {
@@ -373,7 +373,7 @@ fn token(x: &Map<String, Value>) -> Result<TokenFetch, SpecsError> {
     }
 }
 
-/// Get from `system_properties` rpc call results the network data to be
+/// Get from `system_properties` RPC call results the network data to be
 /// compared with already known data.
 ///
 /// This function is used if the fetch results are used to check already
@@ -381,7 +381,7 @@ fn token(x: &Map<String, Value>) -> Result<TokenFetch, SpecsError> {
 ///
 /// Function inputs:
 ///
-/// - `&Map<String, Value>` received via `system_properties` rpc call,
+/// - `&Map<String, Value>` received via `system_properties` RPC call,
 /// - optional base58 prefix from the network metadata
 ///
 /// Function outputs:

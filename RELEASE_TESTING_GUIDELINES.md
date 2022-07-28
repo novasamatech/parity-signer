@@ -3,16 +3,16 @@ Basically any method in `src/util` should be unit tested via Jest.
 
 ### E2E Testing (Ethereum Legacy)
 
-1. Recover an account on Kovan with the phrase "this is sparta"
-2. Go to MyCrypto and generate a transaction
+1. Recover an account on Kovan with the phrase `this is sparta`
+2. Go to `MyCrypto` and generate a transaction
 3. Scan transaction QR
-4. Scan the signature back to MyCrypto
+4. Scan the signature back to `MyCrypto`
 5. Make sure the transaction actually succeeds
-6. Go to Sign a Message tab in MyCrypto now
+6. Go to Sign a Message tab in `MyCrypto` now
 7. Type in a message, any message
 8. Repeat steps 3, 4
 9. Expect the message is readable just as you typed it in
-10. Scan the signature back to MyCrypto
+10. Scan the signature back to `MyCrypto`
 11. Verify the message
 
 ### E2E Testing (UOS)

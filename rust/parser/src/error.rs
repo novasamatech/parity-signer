@@ -2,7 +2,7 @@ use definitions::{error::MetadataError, error_signer::ParserError};
 
 pub enum Error {
     Parser(ParserError),
-    Arguments(ArgumentsError), // errors related to metadata and short_specs arguments input by user
+    Arguments(ArgumentsError), // errors related to metadata and `short_specs` arguments input by user
 }
 
 pub enum ArgumentsError {

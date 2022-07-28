@@ -1,8 +1,8 @@
 # Parity Signer Accounts Management
 
-Parity Signer v4 has introduced the Hierarchical Deterministic Key Derivation (HDKD) feature for Substrate networks. This article explains how to use this feature.
+Parity Signer `v4` has introduced the Hierarchical Deterministic Key Derivation (HDKD) feature for Substrate networks. This article explains how to use this feature.
 
-* Notice: The UI maybe variant for different versions, but the functionalities are the same in v4 version.
+* Notice: The UI maybe variant for different versions, but the functionality is the same in `v4` version.
 
 ## Introduction
 
@@ -24,7 +24,7 @@ Key generation also refers to accounts creation, with your created Identity:
 
 ### The form of path
 
-Paths also refer to the Chaincodes which described in [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki/), though it is different from BIP-32 style:
+Paths also refer to the Chain codes which described in [](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki/), though it is different from BIP-32 style:
 * **Soft** derivation starts with a single slash, like: `/soft`
 * **Hard** derivation starts with a double slash, like: `//hard`
 
@@ -38,9 +38,9 @@ Path also could contain optional **password**; in Subkey standard password is pr
 
 ### Further notes
 
-* With the same BIP32 seed users could create keys under different networks.
+* With the same  seed users could create keys under different networks.
 * Each derived account is bound to certain networks, which prevents it to be misused in another network until it is explicitly added for that network as well. Root account is available for all networks by default.
 
 ## References:
-1. [https://github.com/w3f/schnorrkel](https://github.com/w3f/schnorrkel)
-2. [https://wiki.polkadot.network/docs/en/learn-keys](https://wiki.polkadot.network/docs/en/learn-keys)
+1. [<https://github.com/w3f/schnorrkel>](https://github.com/w3f/schnorrkel)
+2. [<https://wiki.polkadot.network/docs/en/learn-keys>](https://wiki.polkadot.network/docs/en/learn-keys)

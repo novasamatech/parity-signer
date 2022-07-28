@@ -1,4 +1,4 @@
-//! This is experimental crossplatform navigation for Signer.
+//! This is experimental cross-platform navigation for Signer.
 //! Ideally it should replace almost everything and become the only interface
 
 #![deny(unused_crate_dependencies)]

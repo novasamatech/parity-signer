@@ -2065,7 +2065,7 @@ impl State {
         }
     }
 
-    ///Determine whether screen name should be h1 or h4
+    ///Determine whether screen name should be `h1` or `h4`
     fn get_screen_name_type(&self) -> ScreenNameType {
         match self.navstate.screen {
             Screen::Log

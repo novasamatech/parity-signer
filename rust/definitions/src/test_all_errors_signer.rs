@@ -104,7 +104,7 @@ fn genesis_hash() -> H256 {
     H256::from_str("e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap()
 }
 
-/// Possible `sled::Error` errors (https://docs.rs/sled/0.34.6/sled/enum.Error.html).
+/// Possible `sled::Error` errors (<https://docs.rs/sled/0.34.6/sled/enum.Error.html>).
 fn db_internal_error_set() -> Vec<sled::Error> {
     vec![
         sled::Error::CollectionNotFound(IVec::from(vec![1])),
@@ -132,7 +132,7 @@ fn metadata_error_set() -> Vec<MetadataError> {
     ]
 }
 
-/// Possible `SecretStringError` errors (https://docs.rs/sp-core/6.0.0/sp_core/crypto/enum.SecretStringError.html).
+/// Possible `SecretStringError` errors (`https://docs.rs/sp-core/6.0.0/sp_core/crypto/enum.SecretStringError.html`).
 fn secret_string_error_set() -> Vec<SecretStringError> {
     vec![
         SecretStringError::InvalidFormat,
