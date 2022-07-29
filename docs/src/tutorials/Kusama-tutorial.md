@@ -64,7 +64,7 @@ If you already have an account created with either Parity Signer or any other wa
 
 - Tap on the top right side user icon, and choose ` + Add Identity`.
 - Input the new identity name and tap the `Recover Identity` button.
-- Type in the recovery phrase, word suggestion helps you prevent any typo. The field will turn red if the recovery phrase is not a .
+- Type in the recovery phrase, word suggestion helps you prevent any typo. The field will turn red if the recovery phrase is not a `bip39`.
 - Tap `Recover Identity`.
 - Select a PIN number and confirm it by typing it again.
 - Identity generated, now you can select the network to create the first account.
@@ -95,15 +95,15 @@ Assuming that your Parity Signer account now has funds, you will be able to send
 
 ![Parity Signer Polkadot send transaction](images/Parity-Signer-apps-tx-workflow.png)
 
-You will now be presented with a QR code that represents the transaction. Since this transaction is sending funds from your Parity Signer mobile app account, only this account (sitting on your phone) can sign and  this transaction. This is what we'll do in the next steps:
+You will now be presented with a QR code that represents the transaction. Since this transaction is sending funds from your Parity Signer mobile app account, only this account (sitting on your phone) can sign and authorize this transaction. This is what we'll do in the next steps:
 
 - From the Parity Signer account overview, tap the scan button on the top right and scan the QR code presented by the Polkadot-js apps website.
-- Review the transaction addresses and the amount to send on your phone. The amount and addresses must match what you've entered in apps. If you got phished, this is where you can  it and reject the transaction.
+- Review the transaction addresses and the amount to send on your phone. The amount and addresses must match what you've entered in apps. If you got phished, this is where you can realize it and reject the transaction.
 - Once you're sure, scroll down and click `Sign Transaction` to enter your pin and get the QR code of the scanned transaction.
 
 ![Sign Polkadot apps transaction](images/Parity-Signer-apps-1.png)
 
-Your phone has now *signed the transaction offline* using your Parity Signer account private key. The QR code that is now displayed on your phone represents a signed transaction that can be . We will do this in the next steps:
+Your phone has now *signed the transaction offline* using your Parity Signer account private key. The QR code that is now displayed on your phone represents a signed transaction that can be broadcasted. We will do this in the next steps:
 
 - On Polkadot-js apps, click on `Scan Signature QR`, this will ask to turn on your webcam again.
 - Face your phone's display to your webcam for the website to be able to read the signed transaction.

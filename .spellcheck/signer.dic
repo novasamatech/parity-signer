@@ -1,4 +1,4 @@
-150
+120
 ”
 “
 —
@@ -40,6 +40,7 @@ deterministically
 encryptions
 enum/S
 ethereum
+extrinsics
 filename/S
 frontend/S
 github
@@ -88,6 +89,7 @@ repo/S
 runtime
 serializable
 signable/S
+signer@parity
 smartphone/SM
 stackoverflow
 startup

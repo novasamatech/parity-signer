@@ -32,7 +32,7 @@ We highly recommend you to update all existing plugins and SDK's for Kotlin, Gra
 
 **4.** Connect your device or create a virtual one. Open `Tools -> Device Manager` and create a new phone simulator with the latest Android.
 
-**5. (MacOS)** Specify path to `python` in `local.properties`.
+**5. (macOS)** Specify path to `python` in `local.properties`.
 
 `rust.pythonCommand=python3`
 

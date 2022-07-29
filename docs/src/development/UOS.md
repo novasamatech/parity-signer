@@ -42,7 +42,7 @@ reset or connecting to the network.
 
 # QR code structure
 
-QR code envelope has following structure:
+QR code envelope has the following structure:
 
 | QR code prefix | content | ending spacer | padding |
 |:-|:-|:-|:-|

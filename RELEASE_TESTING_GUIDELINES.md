@@ -16,18 +16,18 @@ Basically any method in `src/util` should be unit tested via Jest.
 11. Verify the message
 
 ### E2E Testing (UOS)
-There is currently no testnet so we just check that the signature is formatted correctly. 
+There is currently no testnet, so we just check that the signature is formatted correctly. 
 
 1. Clone  https://github.com/polkadot-js/apps
-2. Disable the balance validation in apps so you can construct an extrinsic with 0 balance
+2. Disable the balance validation in apps, so you can construct an extrinsic with 0 balance
 3. Choose Kusama network in Settings Tab
 4. Do any extrinsic of your choice
 5. Scan QR
-5. Go to Settings, and change to Substrate (either the hosted Flaming Fir or a custom chain)
-6. Run the same transaction
-7. Expect the message: "Signer does not currently support a chain with the genesis hash: 0x....."
-8. Go to `constants.js`
-9. Add the appropriate genesis hash
-10. Uncomment the checks for `isSubstrateDev` in `PayloadDetailsCard.js`
-11. Repeat steps 4, 5
-12. Expect the method decoding to be raw bytes.
+6. Go to Settings, and change to Substrate (either the hosted Flaming Fir or a custom chain)
+7. Run the same transaction
+8. Expect the message: "Signer does not currently support a chain with the genesis hash: 0x....."
+9. Go to `constants.js`
+10. Add the appropriate genesis hash
+11. Uncomment the checks for `isSubstrateDev` in `PayloadDetailsCard.js`
+12. Repeat steps 4, 5
+13. Expect the method decoding to be raw bytes.

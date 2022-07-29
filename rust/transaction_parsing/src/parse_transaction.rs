@@ -37,7 +37,7 @@ enum CardsPrep<'a> {
 /// actually sign the transaction later if approved.
 /// Transaction format corresponds to what we get from qr code:
 /// i.e. it starts with 53****, followed by author address, followed by actual transaction piece,
-/// followed by extrinsic, concluded with chain genesis hash
+/// followed by extrinsics, concluded with chain genesis hash
 
 pub(crate) fn parse_transaction(data_hex: &str, database_name: &str) -> Result<TransactionAction> {
     let (author_multi_signer, parser_data, genesis_hash, encryption) =

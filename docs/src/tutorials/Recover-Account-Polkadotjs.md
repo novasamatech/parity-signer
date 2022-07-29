@@ -2,7 +2,7 @@
 
 The default behavior on Parity Signer and [PolkadotJS Apps](https://polkadot.js.org/apps/) is a little different. This tutorial will walk you through recovering an account on Parity Signer from PolkadotJS Apps.
 
-* Notice: The UI maybe variant for different versions, but the functionality is the same in 4` version.
+* Notice: The UI maybe variant for different versions, but the functionality is the same in `v4` version.
 
 ## Get the mnemonic phrase and path
 

@@ -146,7 +146,7 @@ random errors like "NDK not found".
 
 **7.** Connect your device or create a virtual one. Open `Tools -> Device Manager` and create a new phone simulator with the latest Android.
 
-**8. (MacOS)** Specify path to `python` in `local.properties`.
+**8. (macOS)** Specify path to `python` in `local.properties`.
 
 `rust.pythonCommand=python3`
 
@@ -154,13 +154,13 @@ random errors like "NDK not found".
 
 # Tests
 
-Core Rust code is fully covered by tests and they are run in CI on each commit. To run tests on your machine:
+Core Rust code is fully covered by tests, and they run in CI on each commit. To run tests on your machine:
 
 ```
 cd rust && cargo test --locked
 ```
 
-We don't have test for UIs for now (other then navigation which is handled on rust side), which means Swift and Kotlin are not covered. We plan to do it in the future.
+We don't have test for UIs for now (other than navigation which is handled on rust side), which means Swift and Kotlin are not covered. We plan to do it in the future.
 
 
 # Bugs and Feedback

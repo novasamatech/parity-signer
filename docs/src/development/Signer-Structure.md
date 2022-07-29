@@ -124,7 +124,7 @@ was based on its lightweightness, reliability, portability.
 
 ## Functional structure
 
-Signer has following systems:
+Signer has the following systems:
 
 - Secure key management
 - Signing
@@ -140,7 +140,7 @@ Signer has following systems:
 These systems are located in different parts the app and some of them rely on
 hot-side infrastructure. The general design goal was to isolate as much as
 possible in easily maintainable Rust code and keep only necessary functions in
-native side. Currently those include:
+native side. Currently, those include:
 
 - Hardware secret storage: we rely on hardware designer's KMS in accordance with
   best practices
@@ -148,7 +148,7 @@ native side. Currently those include:
   network access permissions for the app to minimum while still maintaining
 simple breach detection
 - Camera: currently image capture and recognition systems implementations in
-  native environments by far surpass 3rd party ones. This might change in
+  native environments by far surpass 3rd party ones. This might change in the
 future, but at least image capture will be managed by OS to maintain platform
 compatibility.
 - UI: we use native frameworks and components for rendering and user interaction
@@ -262,7 +262,7 @@ Signable transaction is decomposed into hierarchical cards for clarity. All
 possible scale-decodable types are assigned to generalized visualization
 patterns ("transaction cards") with some types having special visualizations
 (`balance` formatted with proper decimals and units, identicons added to
-identities, etc). Each card is assigned `order` and `indent` that allow the
+identities, etc.). Each card is assigned `order` and `indent` that allow the
 cards to be shown in a lazy view environment. Thus, any networks that have
 minimal metadata requirements should be decodable and visualizeable.
 

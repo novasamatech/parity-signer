@@ -38,7 +38,7 @@
 //! Signer receives Substrate transactions starting in hexadecimal recording
 //! with `53xxyy` where `xx` corresponds to the encryption type.
 //!
-//! For signable transactions, possible encryption is:
+//! Possible signature schemes are:
 //!
 //! - `00` for `Ed25519`
 //! - `01` for `Sr25519`
