@@ -27,7 +27,7 @@
 //! - [`SPECSTREEPREP`], with network specs in hot database format
 //! - [`METATREE`], with network metadata, at most two versions for each network
 //! - [`META_HISTORY`], with block hash at which the metadata was fetched
-//! - [`ADDRESS_BOOK`], with network information needed to make rpc calls
+//! - [`ADDRESS_BOOK`], with network information needed to make RPC calls
 //! - [`SETTREE`], containing types information
 //!
 //! Common constants are:
@@ -36,7 +36,7 @@
 //! - key names in [`SPECSTREE`] tree of cold database alone or shared between
 //! cold and hot databases
 //! - recurring throughout the Signer seed phrase for Alice
-//! - QR graphic settings, used for both static and animated png QR codes
+//! - QR graphic settings, used for both static and animated PNG QR codes
 //!
 //! # Features
 //! Feature `"signer"` corresponds to everything related exclusively to Signer
@@ -142,7 +142,7 @@ pub const SPECSTREEPREP: &[u8] = b"chainspecs_prep";
 pub const META_HISTORY: &[u8] = b"metadata_history";
 
 /// Tree name for the tree storing the address book in hot database, with data
-/// necessary for rpc calls
+/// necessary for RPC calls
 #[cfg(feature = "active")]
 pub const ADDRESS_BOOK: &[u8] = b"address_book";
 

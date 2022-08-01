@@ -1,4 +1,4 @@
-//! Errors occuring in Signer
+//! Errors occurring in Signer
 #[cfg(feature = "test")]
 use variant_count::VariantCount;
 
@@ -148,7 +148,7 @@ pub enum ParserDecodingError {
     /// but has `Era::Mortal(_, _)` in extensions
     UnexpectedMortality,
 
-    /// Genesis hash cut from the end of the transaction doen not match the one
+    /// Genesis hash cut from the end of the transaction does not match the one
     /// found in the extensions
     GenesisHashMismatch,
 
@@ -304,7 +304,7 @@ pub enum ParserDecodingError {
 /// - metadata version (once)
 /// - network genesis hash (at most, once)
 ///
-/// If the metadata does not follow those criteria, transactons could not be
+/// If the metadata does not follow those criteria, transactions could not be
 /// parsed, and therefore, could not be signed.
 #[derive(Debug)]
 #[cfg_attr(feature = "test", derive(VariantCount))]

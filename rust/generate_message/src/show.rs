@@ -14,7 +14,7 @@ use crate::helpers::{
     read_metadata_database,
 };
 
-/// Display all metadata currenty stored in the hot database.
+/// Display all metadata currently stored in the hot database.
 ///
 /// Function prints for each entry in hot database
 /// [`METATREE`](constants::METATREE) tree:
@@ -30,7 +30,7 @@ use crate::helpers::{
 /// `$ cargo run show -metadata`
 ///
 /// When generated, hot database has no metadata entries. All entries are
-/// expected to appear as a result of the database use, either from rpc calls or
+/// expected to appear as a result of the database use, either from RPC calls or
 /// `wasm` files processing.
 ///
 /// Network name and version combination is unique identifier of the metadata.
@@ -68,7 +68,7 @@ pub fn show_metadata() -> Result<()> {
 /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree:
 ///
 /// - address book title for the network
-/// - url address at which rpc calls are made for the network
+/// - URL address at which RPC calls are made for the network
 /// - network encryption
 /// - additional marker that the network is a default one
 /// - network title as it will be displayed in Signer, from

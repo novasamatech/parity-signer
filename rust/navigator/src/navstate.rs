@@ -486,7 +486,7 @@ impl State {
                         match self.navstate.modal {
                             Modal::SelectSeed => {
                                 // details_str is seed_name
-                                // secret_seed_phrase is seed_phrase
+                                // `secret_seed_phrase` is `seed_phrase`
                                 match db_handling::identities::import_derivations(
                                     checksum,
                                     details_str,
@@ -566,8 +566,8 @@ impl State {
                         }
                     }
                     None => {
-                        // details_str is hex_address_key
-                        // secret_seed_phrase is seed phrase
+                        // `details_str` is `hex_address_key`
+                        // `secret_seed_phrase` is seed phrase
                         match process_hex_address_key_address_details(details_str, dbname) {
                             Ok((multisigner, address_details)) => {
                                 if address_details.has_pwd {
@@ -2056,7 +2056,7 @@ impl State {
         }
     }
 
-    ///Determine whether screen name should be h1 or h4
+    ///Determine whether screen name should be `h1` or `h4`
     fn get_screen_name_type(&self) -> ScreenNameType {
         match self.navstate.screen {
             Screen::Log

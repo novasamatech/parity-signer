@@ -59,7 +59,7 @@ impl DangerRecord {
     /// Get `DangerRecord` with content from the encoded value,
     /// as it is stored in the database.  
     ///
-    /// Unfallible, as the validity of the value is not checked.  
+    /// Infallible, as the validity of the value is not checked.
     #[cfg(feature = "signer")]
     pub fn from_ivec(ivec: &IVec) -> Self {
         Self(ivec.to_vec())

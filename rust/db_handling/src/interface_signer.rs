@@ -98,12 +98,12 @@ pub fn get_all_seed_names_with_identicons(
     Ok(res)
 }
 
-/// Craete a `png` identicon data, for preferred encryption if
+/// Create a `PNG` identicon data, for preferred encryption if
 /// multiple encryption algorithms are supported.
 ///
 /// Output is:
 ///
-/// - empty `png` if no seed key is available
+/// - empty `PNG` if no seed key is available
 /// - the available seed key if there is only one
 /// - preferred seed key, if there are more than one; order of preference:
 /// `Sr25519`, `Ed25519`, `Ecdsa`
@@ -367,7 +367,7 @@ pub fn export_key(
 
 /// Prepare seed backup screen struct [`MBackup`] for given seed name.
 ///
-/// Function inputs seed name, outputs vec with all known derivations in all
+/// Function inputs seed name, outputs `Vec` with all known derivations in all
 /// networks.
 pub fn backup_prep(database_name: &str, seed_name: &str) -> Result<MBackup> {
     let networks = get_all_networks(database_name)?;
@@ -661,7 +661,7 @@ pub fn show_types_status(database_name: &str) -> Result<MTypesInfo> {
     }
 }
 
-/// Generate new random seed phrase, make identicon for sr25519 public key,
+/// Generate new random seed phrase, make identicon for `sr25519` public key,
 /// and send to Signer screen.
 pub fn print_new_seed(seed_name: &str) -> Result<MNewSeedBackup> {
     let seed_phrase = generate_random_phrase(24)?;
@@ -693,10 +693,10 @@ pub fn purge_transactions(database_name: &str) -> Result<()> {
         .apply(database_name)
 }
 
-/// Get possible options of English bip39 words that start with user-entered
+/// Get possible options of English `bip39` words that start with user-entered
 /// word part.
 ///
-/// List lentgh limit is [`MAX_WORDS_DISPLAY`].
+/// List length limit is [`MAX_WORDS_DISPLAY`].
 pub fn guess(word_part: &str) -> Vec<&'static str> {
     let dictionary = Language::English.wordlist();
     let words = dictionary.get_words_by_prefix(word_part);
@@ -707,12 +707,12 @@ pub fn guess(word_part: &str) -> Vec<&'static str> {
     }
 }
 
-/// Maximum word count in bip39 standard.
+/// Maximum word count in `bip39` standard.
 ///
 /// See <https://docs.rs/tiny-bip39/0.8.2/src/bip39/mnemonic_type.rs.html#60>
 pub const BIP_CAP: usize = 24;
 
-/// Maximum word length in bip39 standard.
+/// Maximum word length in `bip39` standard.
 pub const WORD_LENGTH: usize = 8;
 
 /// Zeroizeable seed phrase draft.
@@ -721,23 +721,23 @@ pub struct SeedDraft {
     /// User-entered word part.
     user_input: String,
 
-    /// Already completed bip39 words.
+    /// Already completed `bip39` words.
     saved: Vec<SeedElement>,
 }
 
-/// Zeroizeable wrapper around complete bip39 word entered by user.
+/// Zeroizeable wrapper around complete `bip39` word entered by user.
 #[derive(Debug, Clone, Zeroize, ZeroizeOnDrop)]
 struct SeedElement(String);
 
 impl SeedElement {
-    /// Make `SeedElement` from checked bip39 word.
+    /// Make `SeedElement` from checked `bip39` word.
     fn from_checked_str(word: &str) -> Self {
         let mut new = String::with_capacity(WORD_LENGTH);
         new.push_str(word);
         SeedElement(new)
     }
 
-    /// Get bip39 word from the `SeedElement`.
+    /// Get `bip39` word from the `SeedElement`.
     fn word(&self) -> &str {
         &self.0
     }
@@ -747,8 +747,8 @@ impl SeedDraft {
     /// Start new `SeedDraft`
     pub fn initiate() -> Self {
         Self {
-            user_input: String::with_capacity(WORD_LENGTH), // capacity corresponds to maximum word length in bip39 standard;
-            saved: Vec::with_capacity(BIP_CAP), // capacity corresponds to maximum word count in bip39 standard; set here to avoid reallocation;
+            user_input: String::with_capacity(WORD_LENGTH), // capacity corresponds to maximum word length in `bip39` standard;
+            saved: Vec::with_capacity(BIP_CAP), // capacity corresponds to maximum word count in `bip39` standard; set here to avoid reallocation;
         }
     }
 

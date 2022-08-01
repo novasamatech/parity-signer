@@ -86,7 +86,7 @@ fn action_get_name(action: &Action) -> Option<FooterButton> {
 ///
 /// Action tries to acquire lock on app state mutex and is ignored on failure.
 ///
-/// 'seed_phrase' field is zeroized, it is expected to be used for secrets only.
+/// `seed_phrase` field is zeroized, it is expected to be used for secrets only.
 ///
 /// `details` field is not always zeroized.
 ///

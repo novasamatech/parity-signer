@@ -61,7 +61,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
                 specs_f_n(&name, instruction.over.encryption, instruction.over.title)
             }
 
-            // `-u` content key is to provide the url address for rpc calls;
+            // `-u` content key is to provide the URL address for RPC calls;
             // since `-f` indicates the data is taken from the database, the
             // the combination seems of no use.
             // To address a specific network from the database, `-f -n` key
@@ -69,7 +69,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             Content::Address(_) => Err(Error::NotSupported),
         },
 
-        // `-d` setting key: produce `add_specs` payloads through rpc calls,
+        // `-d` setting key: produce `add_specs` payloads through RPC calls,
         // **do not** interact with the database, export payload files.
         Set::D => match instruction.content {
             // `-d` does not write in the database, so fetching specs for known
@@ -83,7 +83,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // <encryption override> <optional token override> <optional signer
             // title override>`
             //
-            // Produce `add_specs` payload by making rpc calls at
+            // Produce `add_specs` payload by making RPC calls at
             // `network_url_address` and print payload file.
             //
             // Database does not get checked here.
@@ -109,7 +109,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             }
         },
 
-        // `-k` setting key: produce payloads through rpc calls, update the
+        // `-k` setting key: produce payloads through RPC calls, update the
         // database, export payload files only for updated information.
         //
         // Since network specs are expected to remain constant over time,
@@ -143,12 +143,12 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // `$ cargo run add_specs -p -u network_url_address
             // <encryption override> <optional token override>`
             //
-            // Update the database by making rpc calls at `network_url_address`.
+            // Update the database by making RPC calls at `network_url_address`.
             //
             // This command is intended for the networks not introduced to the
             // database, and **must** contain encryption override.
             //
-            // Processing known url or a different url for known network
+            // Processing known URL or a different URL for known network
             // genesis hash results in an error.
             //
             // In some cases the command may contain token override as well.
@@ -191,13 +191,13 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // `$ cargo run add_specs -u network_url_address
             // <encryption override> <optional token override>`
             //
-            // Update the database by making rpc calls at `network_url_address`
+            // Update the database by making RPC calls at `network_url_address`
             // and create `add_specs` payload file.
             //
             // This command is intended for the networks not introduced to the
             // database, and **must** contain encryption override.
             //
-            // Processing known url or a different url for known network
+            // Processing known URL or a different URL for known network
             // genesis hash results in an error.
             //
             // In some cases the command may contain token override as well.
@@ -272,7 +272,7 @@ fn specs_f_n(
 /// Encryption override is mandatory. Title override is optional. Token override
 /// is possible if token set is fetched.
 ///
-/// - Fetch network information using rpc calls and interpret it
+/// - Fetch network information using RPC calls and interpret it
 /// - Construct
 /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) with
 /// fetched values, user overrides and defaults
@@ -303,7 +303,7 @@ fn specs_d_u(
 /// - Search for an address book entry by address book title and get
 /// corresponding
 /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
-/// - Fetch network specs through rpc calls and check that the network specs
+/// - Fetch network specs through RPC calls and check that the network specs
 /// from the database are still valid
 /// - Modify network specs according to the overrides requested
 /// - Update database as needed: [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) and
@@ -404,13 +404,13 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<()> {
 /// Encryption override is mandatory. Title override is optional. Token override
 /// is possible if token set is fetched.
 ///
-/// Function inputs `&str` url address that could be used for rpc calls,
+/// Function inputs `&str` URL address that could be used for RPC calls,
 /// encryption supported by the network [`Encryption`], optional token and
 /// title overrides and `printing` flag indicating if payload file should be
 /// made.
 ///
-/// - Check that the url address is unknown to the database
-/// - Fetch network information using rpc calls and interpret it
+/// - Check that the URL address is unknown to the database
+/// - Fetch network information using RPC calls and interpret it
 /// - Check that there is no entries with same genesis hash as was just fetched
 /// in the database
 /// - Construct
@@ -463,7 +463,7 @@ mod tests {
     use crate::parser::Override;
     use constants::FOLDER;
 
-    // The aim is to check that rpc calls are going through for "officially
+    // The aim is to check that RPC calls are going through for "officially
     // approved" networks. Although the blanket fetch test was nice, not all
     // networks could be reached at all the times, therefore this is currently
     // limited to three default networks that must be working always.

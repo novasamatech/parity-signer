@@ -3,7 +3,7 @@
 //! This module deals with processing commands:
 //!
 //! - `$ cargo run load_metadata <key(s)> <(argument)>` to produce
-//! `load_metadata` update payloads from the database entries and through rpc
+//! `load_metadata` update payloads from the database entries and through RPC
 //! calls and update the hot database
 //!
 //! - `$ cargo run unwasm -payload <wasm_file_path> <optional -d key>` to
@@ -57,18 +57,18 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
             // network with user-entered name.
             Content::Name(name) => meta_f_n(&name),
 
-            // `-u` content key is to provide the url address for rpc calls;
+            // `-u` content key is to provide the URL address for RPC calls;
             // since `-f` indicates the data is taken from the database, the
             // the combination seems of no use.
             Content::Address(_) => Err(Error::NotSupported),
         },
 
-        // `-d` setting key: get network data using rpc calls, **do not**
+        // `-d` setting key: get network data using RPC calls, **do not**
         // update the database, export payload files.
         Set::D => match instruction.content {
             // `$ cargo run load_metadata -d -a`
             //
-            // Make rpc calls for all networks in `ADDRESS_BOOK`, produce
+            // Make RPC calls for all networks in `ADDRESS_BOOK`, produce
             // `load_metadata` payload files.
             Content::All { pass_errors } => {
                 // Collect `AddressSpecs` for each network in `ADDRESS_BOOK`
@@ -86,17 +86,17 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
 
             // `$ cargo run load_metadata -d -n <network_name>`
             //
-            // Make rpc calls for network with user-entered name and produce
+            // Make RPC calls for network with user-entered name and produce
             // `load_metadata` payload file.
             //
             // Network here must already have an entry in `ADDRESS_BOOK`, so
-            // so that the url address at which to make rpc call is made could
+            // so that the URL address at which to make RPC call is made could
             // be found.
             Content::Name(name) => meta_d_n(&name),
 
             // `$ cargo run load_metadata -d -u <url_address>`
             //
-            // Make rpc calls for network at user-entered url address and
+            // Make RPC calls for network at user-entered URL address and
             // produce `load_metadata` payload file.
             //
             // This is intended for the networks that do not have yet entries in
@@ -108,7 +108,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
             Content::Address(address) => meta_d_u(&address),
         },
 
-        // `-k` setting key: get network data using rpc calls, update the
+        // `-k` setting key: get network data using RPC calls, update the
         // database, produce `load_metadata` payload files only if new metadata
         // was fetched.
         Set::K => {
@@ -116,7 +116,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
             match instruction.content {
                 // `$ cargo run load_metadata -k -a`
                 //
-                // Make rpc calls, update the database as needed and produce
+                // Make RPC calls, update the database as needed and produce
                 // payload files if new data is fetched for all networks in
                 // address book.
                 //
@@ -127,7 +127,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
 
                 // `$ cargo run load_metadata -k -n <network_name>`
                 //
-                // Make rpc calls, update the database as needed and produce
+                // Make RPC calls, update the database as needed and produce
                 // payload file if new data is fetched for network with
                 // specified name.
                 //
@@ -139,7 +139,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 // there, fetch and (possibly) payload export is done only once.
                 Content::Name(name) => meta_kpt_n(&name, &write),
 
-                // Key `-u` is for url addresses. If network has no entry in the
+                // Key `-u` is for URL addresses. If network has no entry in the
                 // database, its metadata can not be added before its specs. If
                 // network has an entry in the database, it is simpler to
                 // address it with `-n <network_name>` combination.
@@ -147,14 +147,14 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
             }
         }
 
-        // `-p` setting key: get network data using rpc calls and update the
+        // `-p` setting key: get network data using RPC calls and update the
         // database.
         Set::P => {
             let write = Write::None;
             match instruction.content {
                 // `$ cargo run load_metadata -p -a`
                 //
-                // Make rpc calls and update the database as needed for all
+                // Make RPC calls and update the database as needed for all
                 // networks in address book.
                 //
                 // One fetch for each address.
@@ -162,7 +162,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
 
                 // `$ cargo run load_metadata -p -n <network_name>`
                 //
-                // Make rpc calls and update the database as needed for network
+                // Make RPC calls and update the database as needed for network
                 // with specified name.
                 //
                 // This command is for networks already having at least one
@@ -172,7 +172,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 // One fetch only.
                 Content::Name(name) => meta_kpt_n(&name, &write),
 
-                // Key `-u` is for url addresses. If network has no entry in the
+                // Key `-u` is for URL addresses. If network has no entry in the
                 // database, its metadata can not be added before its specs. If
                 // network has an entry in the database, it is simpler to
                 // address it with `-n <network_name>` combination.
@@ -180,14 +180,14 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
             }
         }
 
-        // `-t` setting key or no setting key: get network data using rpc calls
+        // `-t` setting key or no setting key: get network data using RPC calls
         // and update the database.
         Set::T => {
             let write = Write::All;
             match instruction.content {
                 // `$ cargo run load_metadata -a`
                 //
-                // Make rpc calls, update the database as needed and produce
+                // Make RPC calls, update the database as needed and produce
                 // payload files for all networks in address book.
                 //
                 // One fetch and one payload print for each address.
@@ -195,7 +195,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
 
                 // `$ cargo run load_metadata -n <network_name>`
                 //
-                // Make rpc calls, update the database as needed and produce
+                // Make RPC calls, update the database as needed and produce
                 // payload file for network with specified name.
                 //
                 // This command is for networks already having at least one
@@ -205,7 +205,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 // One fetch and one payload print only.
                 Content::Name(name) => meta_kpt_n(&name, &write),
 
-                // Key `-u` is for url addresses. If network has no entry in the
+                // Key `-u` is for URL addresses. If network has no entry in the
                 // database, its metadata can not be added before its specs. If
                 // network has an entry in the database, it is simpler to
                 // address it with `-n <network_name>` combination.
@@ -261,7 +261,7 @@ fn meta_f_n(name: &str) -> Result<()> {
 
 /// `load_metadata -d -a` for individual [`AddressSpecs`] value.
 ///
-/// - Fetch network information using rpc calls at `address` in [`AddressSpecs`]
+/// - Fetch network information using RPC calls at `address` in [`AddressSpecs`]
 /// and interpret it
 /// - Check the metadata integrity with the data on record in the database
 /// - Output raw bytes payload file
@@ -274,7 +274,7 @@ fn meta_d_a_element(set_element: &AddressSpecs) -> Result<()> {
 ///
 /// - Get all available [`AddressSpecs`] from the database and search for the
 /// one with user-entered network name
-/// - Fetch network information using rpc calls at `address` in [`AddressSpecs`]
+/// - Fetch network information using RPC calls at `address` in [`AddressSpecs`]
 /// and interpret it
 /// - Check the metadata integrity with the data on record in the database
 /// - Output raw bytes payload file
@@ -284,7 +284,7 @@ fn meta_d_n(name: &str) -> Result<()> {
 
 /// `load_metadata -d -u <url_address>`
 ///
-/// - Fetch network information using rpc calls at user-entered `address` and
+/// - Fetch network information using RPC calls at user-entered `address` and
 /// interpret it
 /// - Output raw bytes payload file
 ///
@@ -331,7 +331,7 @@ fn meta_kpt_a(write: &Write, pass_errors: bool) -> Result<()> {
 
 /// `load_metadata <-k/-p/-t> -a` for individual [`AddressSpecs`] value.
 ///
-/// - Fetch network information using rpc calls at `address` in [`AddressSpecs`]
+/// - Fetch network information using RPC calls at `address` in [`AddressSpecs`]
 /// and interpret it
 /// - Check the metadata integrity with the data on record in the database,
 /// insert it into received [`SortedMetaValues`]
@@ -378,7 +378,7 @@ fn meta_kpt_a_element(
 /// data from [`META_HISTORY`](constants::META_HISTORY) if available
 /// - Get all available [`AddressSpecs`] from the database and search for the
 /// one with user-entered network name
-/// - Fetch network information using rpc calls at `address` in [`AddressSpecs`]
+/// - Fetch network information using RPC calls at `address` in [`AddressSpecs`]
 /// and interpret it
 /// - Check the metadata integrity with the data on record in the database,
 /// insert it into [`SortedMetaValues`]
@@ -397,7 +397,7 @@ fn meta_kpt_n(name: &str, write: &Write) -> Result<()> {
 /// Network information from [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) and
 /// [`SPECSTREEPREP`](constants::SPECSTREEPREP).
 ///
-/// This data is sufficient to make rpc calls and check that the metadata is
+/// This data is sufficient to make RPC calls and check that the metadata is
 /// consistent with existing database content.
 #[derive(PartialEq)]
 struct AddressSpecs {
@@ -466,12 +466,12 @@ fn search_name(name: &str) -> Result<AddressSpecs> {
     }
 }
 
-/// Make rpc calls and check the received information for given
+/// Make RPC calls and check the received information for given
 /// [`AddressSpecs`].
 ///
 /// Checks that the network name, genesis hash, and base58 prefix did not
 /// change compared to what is on record in the database. Warns if the metadata
-/// (v14) has incomplete set of signed extensions.
+/// (`v14`) has incomplete set of signed extensions.
 ///
 /// Outputs [`MetaFetched`], the data sufficient to produce `load_metadata`
 /// payload and update the database.
@@ -512,7 +512,7 @@ fn fetch_set_element(set_element: &AddressSpecs) -> Result<MetaFetched> {
     Ok(meta_fetched)
 }
 
-/// Show warning if the metadata (v14) has incomplete set of signed extensions.
+/// Show warning if the metadata (`v14`) has incomplete set of signed extensions.
 fn warn(name: &str, version: u32) {
     println!("Warning. Metadata {}{} has incomplete set of signed extensions, and could cause Signer to fail in parsing signable transactions using this metadata.", name, version);
 }

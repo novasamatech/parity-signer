@@ -2,7 +2,7 @@
 
 This is interpretation of UOS format used by Parity Signer. Since upstream
 version of the published format diverges from actually implemented too much,
-this document was produced as repreesntation of current state of UOS format
+this document was produced as representation of current state of UOS format
 compatible with Parity Signer. This document only covers networks compatible
 with Parity Signer (i.e. Substrate-based networks). This document also describes
 special payloads that are used for maintaining Parity Signer instance.
@@ -42,7 +42,7 @@ reset or connecting to the network.
 
 # QR code structure
 
-QR code envelope has following structure:
+QR code envelope has the following structure:
 
 | QR code prefix | content | ending spacer | padding |
 |:-|:-|:-|:-|
@@ -57,23 +57,23 @@ Actual content is shifted by half-byte, otherwise it is a normal byte sequence.
 
 ## Multiframe QR
 
-The information transfered through QR channel into Signer is always enveloped
+The information transferred through QR channel into Signer is always enveloped
 in multiframe packages (although minimal number of multiframe packages is 1).
-There are two standards for the multiframe: RaptorQ erasure coding and legacy
+There are two standards for the multiframe: `RaptorQ` erasure coding and legacy
 non-erasure multiframe. The type of envelope is determined by the first bit of
-the QR code data: `0` indicates legacy multiframe, `1` indicates RaptorQ
+the QR code data: `0` indicates legacy multiframe, `1` indicates `RaptorQ`
 
 ##### *RaptorQ multipart payload*
 
-[RaptorQ](https://en.wikipedia.org/wiki/Raptor_code#RaptorQ_code) (RFC6330) is
+[RaptorQ](https://en.wikipedia.org/wiki/Raptor_code#RaptorQ_code) (`RFC6330`) is
 a variable rate (fountain) erasure code protocol with [reference implementation
 in Rust](https://github.com/cberner/raptorq)
 
-Wrapping content in RaptorQ protocol allows for arbitrary amounts of data to be
-tranferred reliably within reasonable time. It is recommended to wrap all
+Wrapping content in `RaptorQ` protocol allows for arbitrary amounts of data to be
+transferred reliably within reasonable time. It is recommended to wrap all
 payloads into this type of envelope.
 
-Each QR code in RaptorQ encoded multipart payload contains following parts:
+Each QR code in `RaptorQ` encoded multipart payload contains following parts:
 
 | bytes `[0..4]` | bytes `[4..]` |
 |:-|:-|
@@ -579,9 +579,13 @@ Transaction:
 | `e143..423e`[^5] | Westend genesis hash | 154..=185 |
 
 [^1]: `d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d`
+
 [^2]: `a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817`
+
 [^3]: `0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817`
+
 [^4]: `b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33`
+
 [^5]: `e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e`
 
 #### Call content is parsed using Westend metadata, in this particular case westend9010
@@ -609,6 +613,7 @@ Transaction:
 | `538a..3f33`[^8] | Block hash |
 
 [^7]: `e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e`
+
 [^8]: `538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33`
 
 ## Message
@@ -774,7 +779,7 @@ and would get rejected with an error.
 Loads types information.
 
 Type information is needed to decode transactions made in networks with metadata
-RuntimeMetadata version V12 or V13.
+RuntimeMetadata version `V12` or `V13`.
 
 Most of the networks are already using RuntimeMetadata version V14, which has
 types information incorporated in the metadata itself.

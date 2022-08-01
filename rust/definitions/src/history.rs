@@ -3,7 +3,7 @@
 //! Signer keeps log of all events in `HISTORY` tree of the cold database.
 //!
 //! Every log [`Entry`] consists of timestamp and a set of simultaneously
-//! occured events `Vec<Event>`. [`Entry`] is stored SCALE-encoded under key
+//! occurred events `Vec<Event>`. [`Entry`] is stored SCALE-encoded under key
 //! [`Order`](crate::keyring::Order). `Order` is produced from the order the
 //! event gets in history log when entered. `Order` is an addition to the
 //! timestamp, and normally arranging entries by the timestamp should
@@ -510,7 +510,7 @@ pub enum Event {
 
 /// History log individual entry
 ///
-/// Contains timestamp and set of simultaneously occured events `Vec<Event>`.
+/// Contains timestamp and set of simultaneously occurred events `Vec<Event>`.
 ///
 /// `Entry` is stored SCALE-encoded in the `HISTORY` tree of the cold database,
 /// under key `Order`.

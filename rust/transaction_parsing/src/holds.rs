@@ -172,7 +172,7 @@ impl Hold {
     pub(crate) fn show(&self) -> String {
         print_affected(&self.metadata_set, &self.network_specs_set)
     }
-    /// function to find all entries in the database corresponding to given verifier_key, that was used to store the former verifier
+    /// function to find all entries in the database corresponding to given `verifier_key`, that was used to store the former verifier
     pub(crate) fn get(verifier_key: &VerifierKey, database_name: &str) -> Result<Self> {
         let database = open_db(database_name)?;
         let metadata = open_tree(&database, METATREE)?;

@@ -13,7 +13,7 @@ use crate::error::MetadataError;
 // are published
 #[derive(Debug, thiserror::Error)]
 pub enum Wasm {
-    /// Failed to make "Metadata_metadata" call on data extracted from `wasm`
+    /// Failed to make `Metadata_metadata` call on data extracted from `wasm`
     /// file.
     #[error(transparent)]
     Executor(#[from] sc_executor_common::error::Error),
