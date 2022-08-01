@@ -455,7 +455,7 @@
 //!
 //! Make `add_specs` update payload for a new network:
 //!
-//! `$ cargo run add_specs -d -u wss://rococo-RPC.polkadot.io -sr25519 -title Rococo`
+//! `$ cargo run add_specs -d -u wss://rococo-rpc.polkadot.io -sr25519 -title Rococo`
 //!
 //! Make `add_specs` update payload for a new network with token set:
 //!
@@ -672,7 +672,7 @@
 //!
 //! Make `load_metadata` update payload for a network not in the database:
 //!
-//! `$ cargo run load_metadata -d -u wss://rococo-RPC.polkadot.io`
+//! `$ cargo run load_metadata -d -u wss://rococo-rpc.polkadot.io`
 //!
 //! ## Prepare `load_types` update payload
 //!
@@ -1064,7 +1064,7 @@
 //!
 //! ### Example
 //!
-//! `$ cargo run meta_at_block -u wss://westend-RPC.polkadot.io -block
+//! `$ cargo run meta_at_block -u wss://westend-rpc.polkadot.io -block
 //! 780812df50c4006d1865742269fe4ca339c097e61d6279cce91ebc58f5aebada`
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]

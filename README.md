@@ -174,7 +174,7 @@ Try to create bug reports that are:
 - _Unique._ Do not duplicate existing opened issues.
 - _Scoped to a Single Bug._ One bug per report.
 
-Official team email for direct inquiries: <signer@parity.io>
+Official team email for direct inquiries: signer@parity.io
 
 # Contributing
 

@@ -2,7 +2,7 @@
 
 This tutorial will walk you through setting up a Kusama account with the Parity Signer Android or iOS App and then use this account together with [Polkadot-js apps](https://polkadot.js.org/apps/) to see your balance and transfer funds or perform any extrinsic from this account.
 
-* Notice: The UI maybe variant for different versions, but the functionality is the same in `v4` version.
+* Notice: The UI maybe variant for different versions, but the functionalities are the same in `v4` version.
 
 ## Summary
 
@@ -73,7 +73,7 @@ NOTICE: For `V3` user, after recovering the seed phrase of Kusama account, the a
 
 ## 3. Add Parity Signer's account to Polkadot-js apps
 
-To be able to follow this tutorial and interact with the Blockchain from a freshly created account on Parity Signer, you will need to get some  on this account first. Polkadot-js apps allows you to manage your Signer account seamlessly.
+To be able to follow this tutorial and interact with the Blockchain from a freshly created account on Parity Signer, you will need to get some KSMs on this account first. Polkadot-js apps allows you to manage your Signer account seamlessly.
 
 - Visit [Polkadot-js apps](https://polkadot.js.org/apps/) website.
 - Go to `Accounts` from the left sidebar.
