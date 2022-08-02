@@ -7,9 +7,7 @@
 
 import Foundation
 import UIKit // for converting raw png to UIImage
-import Network // to detect network connection and raise alert
 import LocalAuthentication // to detect if password is set
-// import CoreBluetooth // to check for bluetooth
 
 /**
  * Object to store all data; since the data really is mostly stored in RustNative side,
@@ -46,11 +44,7 @@ class SignerDataModel: ObservableObject {
 
     // Alert indicator
     @Published var canaryDead: Bool = false
-    let monitor = NWPathMonitor()
-    let queue = DispatchQueue.global(qos: .background)
-    // var manager: CBCentralManager
-    // var bsDetector: BluetoothDetector = BluetoothDetector()
-    let queueBT = DispatchQueue.global(qos: .background)
+    private let connectivityMonitor: ConnectivityMonitoring
     @Published var alert: Bool = false
     @Published var alertShow: Bool = false
 
@@ -60,36 +54,25 @@ class SignerDataModel: ObservableObject {
     // did user set up password?
     let protected = LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
 
-    init() {
+    init(
+        connectivityMonitor: ConnectivityMonitoring = ConnectivityMonitoringAssembler().assemble()
+    ) {
+        self.connectivityMonitor = connectivityMonitor
         self.dbName = NSHomeDirectory() + "/Documents/Database"
         self.onboardingDone = FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database")
-        /*
-         manager = CBCentralManager(
-         delegate: bsDetector,
-         queue: queueBT,
-         options: [CBCentralManagerOptionShowPowerAlertKey: false]
-         )
-         */
-        self.monitor.pathUpdateHandler = {path in
-            if path.availableInterfaces.count == 0 {
-                DispatchQueue.main.async {
-                    self.canaryDead = false
+
+        connectivityMonitor.startMonitoring { isConnected in
+            if isConnected, self.onboardingDone {
+                do {
+                    try historyDeviceWasOnline(dbname: self.dbName)
+                } catch {
+                    return
                 }
-            } else {
-                DispatchQueue.main.async {
-                    if self.onboardingDone {
-                        do {
-                            try historyDeviceWasOnline(dbname: self.dbName)
-                        } catch {
-                            return
-                        }
-                        self.alert = true
-                    }
-                    self.canaryDead = true
-                }
+                self.alert = true
             }
+            self.canaryDead = isConnected
         }
-        monitor.start(queue: self.queue)
+
         if self.onboardingDone {
             self.refreshSeeds()
             initNavigation(dbname: dbName, seedNames: seedNames)
@@ -219,51 +202,3 @@ extension ErrorDisplayed {
         }
     }
 }
-
-/*
- /**
-  * An object to monitor for bluetooth
-  * This should not do anything else, of course
-  */
- class BluetoothDetector: NSObject, CBCentralManagerDelegate {
- @Published var canaryDead = false
- 
- /**
-  * Just mark current bluetooth state
-  */
- func centralManagerDidUpdateState(_ central: CBCentralManager) {
- switch central.state {
- case .unknown:
- DispatchQueue.main.async {
- self.canaryDead = true
- }
- case .resetting:
- DispatchQueue.main.async {
- self.canaryDead = false
- }
- case .unsupported:
- DispatchQueue.main.async {
- self.canaryDead = false
- }
- case .unauthorized:
- DispatchQueue.main.async {
- self.canaryDead = true
- }
- case .poweredOff:
- DispatchQueue.main.async {
- self.canaryDead = false
- }
- case .poweredOn:
- DispatchQueue.main.async {
- self.canaryDead = true
- }
- @unknown default:
- DispatchQueue.main.async {
- self.canaryDead = true
- }
- }
- 
- //print(central.state.rawValue)
- }
- }
- */
