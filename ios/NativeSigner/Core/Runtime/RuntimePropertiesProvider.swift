@@ -6,7 +6,6 @@
 //
 import Foundation
 
-
 /// Protocol that provides access to app process properties
 protocol RuntimePropertiesProviding: AnyObject {
     /// Indicates whether application is launched in development mode with stubed data

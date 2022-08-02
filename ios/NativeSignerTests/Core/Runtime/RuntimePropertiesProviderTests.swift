@@ -24,7 +24,8 @@ final class RuntimePropertiesProviderTests: XCTestCase {
 
     func test_isInDevelopmentMode_whenRuntimePropertiesContainsFlagWithTrue_returnsTrue() {
         // Given
-        processInfo.environment = [RuntimePropertiesProvider.Properties.developmentMode.description: RuntimePropertiesProvider.PropertiesValues.true.description]
+        processInfo.environment = [RuntimePropertiesProvider.Properties.developmentMode.description:
+                                    RuntimePropertiesProvider.PropertiesValues.true.description]
 
         // When
         let result = subject.isInDevelopmentMode
@@ -32,10 +33,11 @@ final class RuntimePropertiesProviderTests: XCTestCase {
         // Then
         XCTAssertTrue(result)
     }
-    
+
     func test_isInDevelopmentMode_whenRuntimePropertiesContainsFlagWithFalse_returnsFalse() {
         // Given
-        processInfo.environment = [RuntimePropertiesProvider.Properties.developmentMode.description: RuntimePropertiesProvider.PropertiesValues.false.description]
+        processInfo.environment = [RuntimePropertiesProvider.Properties.developmentMode.description:
+                                    RuntimePropertiesProvider.PropertiesValues.false.description]
 
         // When
         let result = subject.isInDevelopmentMode
