@@ -1103,25 +1103,26 @@ pub fn full_run(command: Command) -> Result<()> {
         Command::Show(x) => match x {
             Show::Metadata => show_metadata(),
             Show::Networks => show_networks(),
-            Show::Specs(title) => show_specs(title),
-            Show::CheckFile(path) => check_file(path),
+            Show::Specs { s: title } => show_specs(title),
+            Show::CheckFile { s: path } => check_file(path),
             Show::BlockHistory => show_block_history(),
         },
-        Command::Specs(instruction) => gen_add_specs(instruction),
+        Command::Specs { s: instruction } => gen_add_specs(instruction),
         Command::Load(instruction) => gen_load_meta(instruction),
         Command::Types => Ok(prep_types(HOT_DB_NAME)?.write(&load_types())?),
-        Command::Make(make) => make_message(make),
+        Command::Sign(make) | Command::Make(make) => make_message(make),
         Command::Remove(info) => remove_info(info),
         Command::RestoreDefaults => Ok(default_hot(None)?),
-        Command::MakeColdRelease(opt_path) => Ok(default_cold_release(opt_path)?),
-        Command::TransferMetaRelease(opt_path) => {
-            let cold_database_path = match opt_path {
+        Command::MakeColdRelease { path } => Ok(default_cold_release(path)?),
+        Command::TransferMetaRelease { path } => {
+            let cold_database_path = match path {
                 Some(ref path) => path.to_str().unwrap_or(COLD_DB_NAME_RELEASE),
                 None => COLD_DB_NAME_RELEASE,
             };
             Ok(transfer_metadata_to_cold(HOT_DB_NAME, cold_database_path)?)
         }
         Command::Derivations(x) => process_derivations(x),
+
         Command::Unwasm {
             filename,
             update_db,

@@ -4746,13 +4746,13 @@ fn flow_test_1() {
             .arg("run")
             .args([
                 "sign",
-                "-qr",
-                "-sufficient",
-                "-hex",
+                "--goal",
+                "qr",
+                "--verifier-hex",
                 &sufficient_hex,
-                "-msgtype",
-                "add_specs",
-                "-payload",
+                "--msg",
+                "add-specs",
+                "--payload",
                 "navigator_test_files/sign_me_add_specs_westend_sr25519",
             ])
             .output()
@@ -5005,13 +5005,13 @@ fn flow_test_1() {
             .arg("run")
             .args([
                 "sign",
-                "-text",
-                "-sufficient",
-                "-hex",
+                "--goal",
+                "text",
+                "--verifier-hex",
                 &sufficient_hex,
-                "-msgtype",
-                "load_metadata",
-                "-payload",
+                "--msg",
+                "load-metadata",
+                "--payload",
                 "navigator_test_files/sign_me_load_metadata_westendV9150",
             ])
             .output()
@@ -5118,13 +5118,13 @@ fn flow_test_1() {
             .arg("run")
             .args([
                 "sign",
-                "-text",
-                "-sufficient",
-                "-hex",
+                "--goal",
+                "text",
+                "--verifier-hex",
                 &sufficient_hex,
-                "-msgtype",
-                "load_types",
-                "-payload",
+                "--msg",
+                "load-types",
+                "--payload",
                 "navigator_test_files/sign_me_load_types",
             ])
             .output()

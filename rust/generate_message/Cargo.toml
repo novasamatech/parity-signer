@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 blake2-rfc = "0.2.18"
+clap = { version = "3.2", features = ["derive"] }
 constants = {path = "../constants", default-features = false, features = ["active"]}
 db_handling = {path = "../db_handling", default-features = false, features = ["active"]}
 definitions = {path = "../definitions", default-features = false, features = ["active"]}

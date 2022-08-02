@@ -104,7 +104,7 @@ impl Encryption {
 ///
 /// Stores no information on what data exactly is signed, supposedly user
 /// keeps track of what they are signing.  
-#[derive(Decode, Encode, PartialEq, Debug)]
+#[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub enum SufficientCrypto {
     /// `Ed25519` encryption algorithm
     Ed25519 {

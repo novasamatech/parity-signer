@@ -1,8 +1,8 @@
-use generate_message::{full_run, parser::Command, Error};
-use std::env;
+use clap::Parser;
+use generate_message::{full_run, parser::Cli, Error};
 
 fn main() -> Result<(), Error> {
-    let command = Command::new(env::args())?;
-    full_run(command).unwrap();
+    let args = Cli::parse();
+    full_run(args.command).unwrap();
     Ok(())
 }
