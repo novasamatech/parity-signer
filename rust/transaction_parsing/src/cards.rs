@@ -294,5 +294,6 @@ pub(crate) fn make_author_info(
         path: address_details.path.clone(),
         has_pwd: address_details.has_pwd,
         multiselect: None,
+        secret_exposed: address_details.secret_exposed,
     }
 }

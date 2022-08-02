@@ -65,6 +65,13 @@ use definitions::{
     network_specs::NetworkSpecs,
     users::AddressDetails,
 };
+#[cfg(feature = "signer")]
+use definitions::{
+    helpers::{make_identicon_from_multisigner, print_multisigner_as_base58},
+    navigation::{Address, MKeyDetails, MSCNetworkInfo},
+};
+#[cfg(feature = "signer")]
+use qrcode_static::{png_qr_from_string, DataType};
 
 #[cfg(any(feature = "active", feature = "signer"))]
 use crate::{
@@ -88,7 +95,7 @@ lazy_static! {
 }
 
 /// Get all existing addresses from the database.
-#[cfg(feature = "signer")]
+#[cfg(any(feature = "active", feature = "signer"))]
 pub(crate) fn get_all_addresses(database_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>> {
     let database = open_db(database_name)?;
     let identities = open_tree(&database, ADDRTREE)?;
@@ -103,7 +110,7 @@ pub(crate) fn get_all_addresses(database_name: &str) -> Result<Vec<(MultiSigner,
 }
 
 /// Get all existing addresses for a given seed name from the database.
-#[cfg(feature = "signer")]
+#[cfg(any(feature = "active", feature = "signer"))]
 pub fn get_addresses_by_seed_name(
     database_name: &str,
     seed_name: &str,
@@ -124,6 +131,92 @@ pub fn generate_random_phrase(words_number: u32) -> Result<String> {
     let mnemonic_type = MnemonicType::for_word_count(words_number as usize)?;
     let mnemonic = Mnemonic::new(mnemonic_type, Language::English);
     Ok(mnemonic.into_phrase())
+}
+
+/// Check that key with a given path should be marked as a progeny of a key with
+/// exposed secret.
+///
+/// There could be false positives here, as the passwords are not stored
+/// anywhere in Signer, therefore if there are two passwords, there is no way to
+/// check if they are different.
+///
+/// <table>
+///     <tr><th>current</th><th>mark current?</th><th>exposed in set</th></tr>
+///     <tr><td><code>//Alice</code></td><td>-</td><td><code>//Ali</code></td></tr>
+///     <tr><td><code>//Alice//1</code></td><td>+</td><td><code>//Alice</code></td></tr>
+///     <tr><td><code>//Alice///&ltpassword&gt</code></td><td>+</td><td><code>//Alice</code></td></tr>
+///     <tr><td><code>//Alice//1///&ltpassword&gt</code></td><td>+</td><td><code>//Alice</code></td></tr>
+///     <tr><td><code>//Alice</code></td><td>-</td><td><code>//Alice///&ltpassword&gt</code></td></tr>
+///     <tr><td><code>//Alice//1</code></td><td>-</td><td><code>//Alice///&ltpassword&gt</code></td></tr>
+///     <tr><td><code>//Alice///&ltpassword1&gt</code></td><td>+</td><td><code>//Alice///&ltpassword0&gt</code></td></tr>
+///     <tr><td><code>//Alice//1///&ltpassword1&gt</code></td><td>+</td><td><code>//Alice///&ltpassword0&gt</code></td></tr>
+///
+/// </table>
+#[cfg(any(feature = "active", feature = "signer"))]
+pub(crate) fn mark_as_exposed(
+    new_cropped_path: &str,
+    new_is_passworded: bool,
+    old_cropped_path: &str,
+    old_is_passworded: bool,
+) -> bool {
+    if (new_cropped_path == old_cropped_path)
+        || new_cropped_path.starts_with(&format!("{}/", old_cropped_path))
+    {
+        new_is_passworded || !old_is_passworded
+    } else {
+        false
+    }
+}
+
+/// Check if given key should be marked as exposed because its parent was
+/// exposed.
+///
+/// Input set is already filtered by seed name elsewhere.
+#[cfg(any(feature = "active", feature = "signer"))]
+fn has_parent_with_exposed_secret(
+    new_cropped_path: &str,
+    new_is_passworded: bool,
+    seed_name: &str,
+    database_name: &str,
+) -> Result<bool> {
+    let mut out = false;
+    for (_, address_details) in get_addresses_by_seed_name(database_name, seed_name)?.iter() {
+        if address_details.secret_exposed
+            && mark_as_exposed(
+                new_cropped_path,
+                new_is_passworded,
+                &address_details.path,
+                address_details.has_pwd,
+            )
+        {
+            out = true;
+            break;
+        }
+    }
+    Ok(out)
+}
+
+/// Find all `(AddressKey, AddressDetails)` that must be marked as exposed
+/// because current key gets exposed.
+///
+/// Input set is already filtered by the seed name elsewhere.
+#[cfg(feature = "signer")]
+fn exposed_set(
+    exposed_cropped_path: &str,
+    exposed_is_passworded: bool,
+    filtered_set: Vec<(MultiSigner, AddressDetails)>,
+) -> Vec<(MultiSigner, AddressDetails)> {
+    filtered_set
+        .into_iter()
+        .filter(|(_, address_details)| {
+            mark_as_exposed(
+                &address_details.path,
+                address_details.has_pwd,
+                exposed_cropped_path,
+                exposed_is_passworded,
+            )
+        })
+        .collect()
 }
 
 /// Data associated with address generation
@@ -316,6 +409,15 @@ pub(crate) fn create_address(
 
         // `AddressKey` is not yet in the transaction
         None => {
+            // The only way to create address with `secret_exposed` marker is if
+            // the parent with exposed secret is in the database.
+            //
+            // If the address key already exists in the database, the
+            // `secret_exposed` flag will not be changed by extending key to
+            // another network.
+            let secret_exposed =
+                has_parent_with_exposed_secret(cropped_path, has_pwd, seed_name, database_name)?;
+
             // check if the `AddressKey` is already in the database
             let database = open_db(database_name)?;
             let identities = open_tree(&database, ADDRTREE)?;
@@ -341,6 +443,15 @@ pub(crate) fn create_address(
                     if address_details.path != cropped_path {
                         return Err(Error::KeyCollision {
                             seed_name: address_details.seed_name,
+                        });
+                    }
+
+                    // Expected `secret_exposed` flag activated. Could indicate
+                    // the database corruption.
+                    if secret_exposed && !address_details.secret_exposed {
+                        return Err(Error::SecretExposedMismatch {
+                            multisigner,
+                            address_details,
                         });
                     }
 
@@ -374,6 +485,7 @@ pub(crate) fn create_address(
                         has_pwd,
                         network_id: vec![network_specs_key],
                         encryption: network_specs.encryption.to_owned(),
+                        secret_exposed,
                     };
                     address_prep.push((address_key, address_details));
                     Ok(PrepData {
@@ -1103,4 +1215,188 @@ pub fn prepare_derivations_import(
         genesis_hash,
         &derivations,
     ))
+}
+
+#[cfg(feature = "signer")]
+pub(crate) fn prepare_secret_key_for_export(
+    multisigner: &MultiSigner,
+    full_address: &str,
+    pwd: Option<&str>,
+) -> Result<[u8; 32]> {
+    match multisigner {
+        MultiSigner::Ed25519(public) => {
+            let ed25519_pair = match ed25519::Pair::from_string(full_address, pwd) {
+                Ok(x) => x,
+                Err(e) => return Err(Error::SecretStringError(e)),
+            };
+            if public != &ed25519_pair.public() {
+                return Err(Error::WrongPassword);
+            }
+            Ok(*ed25519_pair.seed())
+        }
+        MultiSigner::Sr25519(public) => {
+            let (sr25519_pair, seed) = match sr25519::Pair::from_phrase(full_address, pwd) {
+                Ok(x) => x,
+                Err(e) => return Err(Error::SecretStringError(e)),
+            };
+            if public != &sr25519_pair.public() {
+                return Err(Error::WrongPassword);
+            }
+            Ok(seed)
+        }
+        MultiSigner::Ecdsa(public) => {
+            let ecdsa_pair = match ecdsa::Pair::from_string(full_address, pwd) {
+                Ok(x) => x,
+                Err(e) => return Err(Error::SecretStringError(e)),
+            };
+            if public != &ecdsa_pair.public() {
+                return Err(Error::WrongPassword);
+            }
+            Ok(ecdsa_pair.seed())
+        }
+    }
+}
+
+/// Prepare **secret** key export screen struct [`MKeyDetails`].
+///
+/// For QR code the secret key information is put in format
+/// `secret:0x{}:{network genesis hash}` transformed into bytes, to be
+/// compatible with `polkadot-js` interface.
+///
+/// There is no direct mentioning of [`Encryption`] in the QR code. It is
+/// that user knows the key in which network and with what encryption they are
+/// exporting.
+///
+/// The QR code here contains sensitive information, and is made with special
+/// coloration, so that the difference with safe QR codes is immediately visible
+/// on screen.
+#[cfg(feature = "signer")]
+pub fn export_secret_key(
+    database_name: &str,
+    multisigner: &MultiSigner,
+    expected_seed_name: &str,
+    network_specs_key: &NetworkSpecsKey,
+    seed_phrase: &str,
+    pwd: Option<&str>,
+) -> Result<MKeyDetails> {
+    let network_specs = get_network_specs(database_name, network_specs_key)?;
+    let address_key = AddressKey::from_multisigner(multisigner);
+    let address_details = get_address_details(database_name, &address_key)?;
+    if address_details.seed_name != expected_seed_name {
+        return Err(Error::SeedNameNotMatching {
+            address_key,
+            expected_seed_name: expected_seed_name.to_string(),
+            real_seed_name: address_details.seed_name,
+        });
+    }
+    let base58 = print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix));
+    let public_key = multisigner_to_public(multisigner);
+    let identicon = make_identicon_from_multisigner(multisigner);
+
+    let address = Address {
+        base58,
+        path: address_details.path.to_string(),
+        has_pwd: address_details.has_pwd,
+        identicon,
+        seed_name: address_details.seed_name.to_string(),
+        multiselect: None,
+        secret_exposed: true,
+    };
+
+    let network_info = MSCNetworkInfo {
+        network_title: network_specs.title,
+        network_logo: network_specs.logo,
+    };
+
+    let database_addresses = get_addresses_by_seed_name(database_name, expected_seed_name)?;
+
+    let mark_as_exposed = exposed_set(
+        &address_details.path,
+        address_details.has_pwd,
+        database_addresses,
+    );
+
+    let mut identity_batch = Batch::default();
+
+    for (x_multisigner, x_address_details) in mark_as_exposed.into_iter() {
+        let mut new_address_details = x_address_details;
+        new_address_details.secret_exposed = true;
+        identity_batch.insert(
+            AddressKey::from_multisigner(&x_multisigner).key(),
+            new_address_details.encode(),
+        )
+    }
+
+    let history_batch = events_to_batch(
+        database_name,
+        vec![Event::SecretWasExported {
+            identity_history: IdentityHistory::get(
+                &address_details.seed_name,
+                &address_details.encryption,
+                &public_key,
+                &address_details.path,
+                network_specs.genesis_hash.as_bytes(),
+            ),
+        }],
+    )?;
+
+    let mut qr = {
+        if address_details.network_id.contains(network_specs_key) {
+            // create fixed-length string to avoid reallocations
+            let mut full_address =
+                String::with_capacity(seed_phrase.len() + address_details.path.len());
+            full_address.push_str(seed_phrase);
+            full_address.push_str(&address_details.path);
+
+            let mut secret = match prepare_secret_key_for_export(multisigner, &full_address, pwd) {
+                Ok(a) => {
+                    full_address.zeroize();
+                    a
+                }
+                Err(e) => {
+                    full_address.zeroize();
+                    return Err(e);
+                }
+            };
+
+            match png_qr_from_string(
+                &format!(
+                    "secret:0x{}:{}",
+                    hex::encode(secret),
+                    hex::encode(&network_specs.genesis_hash)
+                ),
+                DataType::Sensitive,
+            ) {
+                Ok(a) => {
+                    secret.zeroize();
+                    a
+                }
+                Err(e) => {
+                    secret.zeroize();
+                    return Err(Error::Qr(e.to_string()));
+                }
+            }
+        } else {
+            return Err(Error::NetworkSpecsKeyForAddressNotFound {
+                network_specs_key: network_specs_key.to_owned(),
+                address_key,
+            });
+        }
+    };
+
+    if let Err(e) = TrDbCold::new()
+        .set_addresses(identity_batch) // modify addresses
+        .set_history(history_batch) // add corresponding history
+        .apply(database_name)
+    {
+        qr.zeroize();
+        return Err(e);
+    };
+
+    Ok(MKeyDetails {
+        qr,
+        pubkey: hex::encode(public_key),
+        network_info,
+        address,
+    })
 }

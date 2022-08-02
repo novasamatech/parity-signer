@@ -656,6 +656,7 @@ fn parse_transaction_1() {
         path: "//Alice".to_string(),
         has_pwd: false,
         multiselect: None,
+        secret_exposed: false,
     };
     let network_info_known = NetworkSpecs {
         base58prefix: 42,
@@ -982,6 +983,7 @@ fn parse_transaction_2() {
         path: "//Alice".to_string(),
         has_pwd: false,
         multiselect: None,
+        secret_exposed: false,
     };
     let network_info_known = westend_spec();
 
@@ -1139,6 +1141,7 @@ fn parse_transaction_3() {
         path: "//Alice".to_string(),
         has_pwd: false,
         multiselect: None,
+        secret_exposed: false,
     };
     let network_info_known = westend_spec();
     let output = produce_output(line, dbname);
@@ -2111,6 +2114,7 @@ fn parse_transaction_6_error_on_parsing() {
                     path: "//Alice".to_string(),
                     has_pwd: false,
                     multiselect: None,
+                    secret_exposed: false,
                 },
             },
         }]),
@@ -2204,6 +2208,7 @@ fn parse_transaction_7_error_on_parsing() {
                     path: "//Alice".to_string(),
                     has_pwd: false,
                     multiselect: None,
+                    secret_exposed: false,
                 },
             },
         }]),
@@ -2298,6 +2303,7 @@ fn parse_transaction_8_error_on_parsing() {
                     path: "//Alice".to_string(),
                     has_pwd: false,
                     multiselect: None,
+                    secret_exposed: false,
                 },
             },
         }]),
@@ -2395,6 +2401,7 @@ fn parse_msg_1() {
         path: "//Alice".to_string(),
         has_pwd: false,
         multiselect: None,
+        secret_exposed: false,
     };
 
     let network_info_known = westend_spec();

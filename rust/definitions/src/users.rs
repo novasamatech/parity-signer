@@ -40,6 +40,9 @@ pub struct AddressDetails {
 
     /// encryption algorithm associated with the address key and all its associated networks  
     pub encryption: Encryption,
+
+    /// address, or its parent address, had or could have secret exposed
+    pub secret_exposed: bool,
 }
 
 impl AddressDetails {

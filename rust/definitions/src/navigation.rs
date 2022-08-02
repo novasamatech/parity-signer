@@ -153,6 +153,7 @@ pub struct MKeysCard {
     pub path: String,
     pub swiped: bool,
     pub multiselect: bool,
+    pub secret_exposed: bool,
 }
 
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -170,6 +171,7 @@ pub struct MSeedKeyCard {
     pub base58: String,
     pub swiped: bool,
     pub multiselect: bool,
+    pub secret_exposed: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -310,6 +312,7 @@ pub struct Address {
     pub identicon: Vec<u8>,
     pub seed_name: String,
     pub multiselect: Option<bool>,
+    pub secret_exposed: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -376,6 +379,7 @@ pub struct MRawKey {
     pub identicon: Vec<u8>,
     pub has_pwd: bool,
     pub path: String,
+    pub secret_exposed: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]

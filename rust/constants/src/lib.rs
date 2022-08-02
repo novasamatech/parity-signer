@@ -196,12 +196,22 @@ pub const CHUNK_SIZE: u16 = 1072;
 /// Main color for QR codes (both static and animated ones)
 pub const MAIN_COLOR: [u8; 3] = [0x00, 0x00, 0x00];
 
+/// Main color for **dangerous** QR codes (static only, in Signer)
+#[cfg(feature = "signer")]
+pub const MAIN_COLOR_DANGER: [u8; 3] = [0xff, 0x00, 0x00];
+
 /// Background color for QR codes (both static and animated ones)
 pub const BACK_COLOR: [u8; 3] = [0xff, 0xff, 0xff];
 
 /// Color palette for QR codes (both static and animated ones)
 pub fn qr_palette() -> Vec<u8> {
     [MAIN_COLOR.to_vec(), BACK_COLOR.to_vec()].concat()
+}
+
+/// Color palette for **dangerous** QR codes (static only, in Signer)
+#[cfg(feature = "signer")]
+pub fn qr_palette_danger() -> Vec<u8> {
+    [MAIN_COLOR_DANGER.to_vec(), BACK_COLOR.to_vec()].concat()
 }
 
 /// Scaling factor for QR codes (size of QR code dot, in pixels)

@@ -219,6 +219,7 @@ interface Event {
     HistoryCleared();
     DatabaseInitiated();
     SeedRemoved(string seed_name);
+    SecretWasExported(IdentityHistory identity_history);
 };
 
 enum Action {
@@ -286,6 +287,7 @@ dictionary MSeedKeyCard {
     string base58;
     boolean swiped;
     boolean multiselect;
+    boolean secret_exposed;
 };
 
 dictionary MNetworkCard {
@@ -309,6 +311,7 @@ dictionary MKeysCard {
     string path;
     boolean swiped;
     boolean multiselect;
+    boolean secret_exposed;
 };
 
 dictionary MSettings {
@@ -433,6 +436,7 @@ dictionary Address {
     sequence<u8> identicon;
     string seed_name;
     boolean? multiselect;
+    boolean secret_exposed;
 };
 
 enum DerivationDestination {
@@ -482,6 +486,7 @@ dictionary MRawKey {
     sequence<u8> identicon;
     boolean has_pwd;
     string path;
+    boolean secret_exposed;
 };
 
 dictionary MSignSufficientCrypto {

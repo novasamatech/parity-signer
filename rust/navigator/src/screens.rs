@@ -485,6 +485,7 @@ impl SufficientCryptoState {
             path: address_details.path.clone(),
             has_pwd: address_details.has_pwd,
             multiselect: None,
+            secret_exposed: address_details.secret_exposed,
         };
         Self {
             key_selected: Some((
@@ -636,6 +637,7 @@ mod tests {
             has_pwd: false,
             network_id: Vec::new(),
             encryption: Encryption::Sr25519,
+            secret_exposed: false,
         }
     }
 

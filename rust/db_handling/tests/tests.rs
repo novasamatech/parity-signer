@@ -128,6 +128,7 @@ fn print_all_ids() {
             identicon: alice_sr_westend().to_vec(),
             has_pwd: false,
             path: "//westend".to_string(),
+            secret_exposed: false,
         },
         MRawKey {
             seed_name: "Alice".to_string(),
@@ -138,6 +139,7 @@ fn print_all_ids() {
             identicon: alice_sr_root().to_vec(),
             has_pwd: false,
             path: "".to_string(),
+            secret_exposed: false,
         },
         MRawKey {
             seed_name: "Alice".to_string(),
@@ -148,6 +150,7 @@ fn print_all_ids() {
             identicon: alice_sr_kusama().to_vec(),
             has_pwd: false,
             path: "//kusama".to_string(),
+            secret_exposed: false,
         },
         MRawKey {
             seed_name: "Alice".to_string(),
@@ -158,6 +161,7 @@ fn print_all_ids() {
             identicon: alice_sr_alice().to_vec(),
             has_pwd: false,
             path: "//Alice".to_string(),
+            secret_exposed: false,
         },
         MRawKey {
             seed_name: "Alice".to_string(),
@@ -168,6 +172,7 @@ fn print_all_ids() {
             identicon: alice_sr_polkadot().to_vec(),
             has_pwd: false,
             path: "//polkadot".to_string(),
+            secret_exposed: false,
         },
     ];
 
@@ -201,6 +206,7 @@ fn print_ids_seed_name_network() {
             base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
             swiped: false,
             multiselect: false,
+            secret_exposed: false,
         },
         vec![
             MKeysCard {
@@ -212,6 +218,7 @@ fn print_ids_seed_name_network() {
                 path: "//westend".to_string(),
                 swiped: false,
                 multiselect: false,
+                secret_exposed: false,
             },
             MKeysCard {
                 address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
@@ -222,6 +229,7 @@ fn print_ids_seed_name_network() {
                 path: "//Alice".to_string(),
                 swiped: false,
                 multiselect: false,
+                secret_exposed: false,
             },
         ],
     );
@@ -347,6 +355,7 @@ fn export_alice_westend() {
             path: "".to_string(),
             has_pwd: false,
             multiselect: None,
+            secret_exposed: false,
         },
         network_info: MSCNetworkInfo {
             network_title: "Westend".to_string(),
@@ -509,6 +518,7 @@ fn derive_prep_alice_collided() {
                 identicon: alice_sr_alice().to_vec(),
                 seed_name: "Alice".to_string(),
                 multiselect: None,
+                secret_exposed: false,
             }),
             error: None,
         },
@@ -577,6 +587,7 @@ fn derive_prep_alice_collided_with_password() {
                 identicon: alice_sr_secret_abracadabra().to_vec(),
                 seed_name: "Alice".to_string(),
                 multiselect: None,
+                secret_exposed: false,
             }),
             error: None,
         },
@@ -737,6 +748,7 @@ fn path_is_known() {
             identicon: alice_sr_alice().to_vec(),
             seed_name: "Alice".to_string(),
             multiselect: None,
+            secret_exposed: false,
         }),
         error: None,
     };
@@ -920,6 +932,7 @@ fn test_generate_default_addresses_for_alice() {
                     .unwrap(),
                 ],
                 encryption: Encryption::Sr25519,
+                secret_exposed: false,
             },
         ),
         (
@@ -941,6 +954,7 @@ fn test_generate_default_addresses_for_alice() {
                 ]))
                 .unwrap()],
                 encryption: Encryption::Sr25519,
+                secret_exposed: false,
             },
         ),
     ];

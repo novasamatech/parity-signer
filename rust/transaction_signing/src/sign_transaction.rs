@@ -4,7 +4,7 @@ use sp_runtime::MultiSignature;
 use zeroize::Zeroize;
 
 use db_handling::db_transactions::{SignContent, TrDbColdSign};
-use qrcode_static::png_qr_from_string;
+use qrcode_static::{png_qr_from_string, DataType};
 
 use crate::sign_message::sign_as_address_key;
 use crate::{Error, Result};
@@ -79,6 +79,6 @@ pub fn create_signature_png(
         )?
         .encode(),
     );
-    let qr_data = png_qr_from_string(&hex_result)?;
+    let qr_data = png_qr_from_string(&hex_result, DataType::Regular)?;
     Ok(qr_data)
 }

@@ -2,7 +2,7 @@
 
 use bitvec::prelude::{BitVec, Msb0};
 use constants::{qr_palette, BORDER, CHUNK_SIZE, FPS_DEN, FPS_NOM, SCALING};
-use qrcode_static::png_qr;
+use qrcode_static::{png_qr, DataType};
 use qrcodegen::{QrCode, QrCodeEcc};
 use std::fs;
 
@@ -104,7 +104,7 @@ fn transform_into_qr_apng(
 /// Function to make appropriately sized qr code, apng or static
 pub fn make_pretty_qr(input: &[u8], output_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     if input.len() <= 2953 {
-        let qr = png_qr(input)?;
+        let qr = png_qr(input, DataType::Regular)?;
         match std::fs::write(output_name, &qr) {
             Ok(_) => Ok(()),
             Err(e) => return Err(Box::from(format!("Output error {}", e))),
