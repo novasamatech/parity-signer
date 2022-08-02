@@ -92,10 +92,8 @@ struct NewAddressScreen: View {
     }
 }
 
-/*
- struct NewIdentityScreen_Previews: PreviewProvider {
- static var previews: some View {
- NewIdentityScreen().previewLayout(.sizeThatFits)
- }
- }
- */
+// struct NewIdentityScreen_Previews: PreviewProvider {
+// static var previews: some View {
+// NewIdentityScreen().previewLayout(.sizeThatFits)
+// }
+// }

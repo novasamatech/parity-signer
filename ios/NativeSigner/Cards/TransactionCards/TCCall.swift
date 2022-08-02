@@ -37,10 +37,8 @@ struct TCCall: View {
     }
 }
 
-/*
- struct TCCall_Previews: PreviewProvider {
- static var previews: some View {
- TCCall()
- }
- }
- */
+// struct TCCall_Previews: PreviewProvider {
+// static var previews: some View {
+// TCCall()
+// }
+// }

@@ -41,10 +41,8 @@ struct SelectSeed: View {
     }
 }
 
-/*
- struct SelectSeed_Previews: PreviewProvider {
- static var previews: some View {
- SelectSeed()
- }
- }
- */
+// struct SelectSeed_Previews: PreviewProvider {
+// static var previews: some View {
+// SelectSeed()
+// }
+// }

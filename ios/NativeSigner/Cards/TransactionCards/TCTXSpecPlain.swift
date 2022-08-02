@@ -25,10 +25,8 @@ struct TCTXSpecPlain: View {
     }
 }
 
-/*
- struct TCTXSpecPlain_Previews: PreviewProvider {
- static var previews: some View {
- TCTXSpecPlain()
- }
- }
- */
+// struct TCTXSpecPlain_Previews: PreviewProvider {
+// static var previews: some View {
+// TCTXSpecPlain()
+// }
+// }

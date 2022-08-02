@@ -7,10 +7,8 @@
 
 import SwiftUI
 
-/**
- * Text entry to search for keys in keys menu
- * Gets cleared on button press
- */
+/// Text entry to search for keys in keys menu
+/// Gets cleared on button press
 struct SearchKeys: View {
     @Binding var searchString: String
     var body: some View {
@@ -43,13 +41,11 @@ struct SearchKeys: View {
     }
 }
 
-/*
- struct SearchKeys_Previews: PreviewProvider {
- static let data = SignerDataModel()
- static var previews: some View {
- SearchKeys()
- .environmentObject(data)
- .previewLayout(.sizeThatFits)
- }
- }
- */
+// struct SearchKeys_Previews: PreviewProvider {
+// static let data = SignerDataModel()
+// static var previews: some View {
+// SearchKeys()
+// .environmentObject(data)
+// .previewLayout(.sizeThatFits)
+// }
+// }

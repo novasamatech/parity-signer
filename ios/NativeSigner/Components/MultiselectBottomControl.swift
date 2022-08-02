@@ -7,9 +7,7 @@
 
 import SwiftUI
 
-/**
- * Panel with actions for multiselect
- */
+/// Panel with actions for multiselect
 struct MultiselectBottomControl: View {
     @State var delete = false
     var selectedCount: String
@@ -58,10 +56,8 @@ struct MultiselectBottomControl: View {
     }
 }
 
-/*
- struct MultiselectBottomControl_Previews: PreviewProvider {
- static var previews: some View {
- MultiselectBottomControl()
- }
- }
- */
+// struct MultiselectBottomControl_Previews: PreviewProvider {
+// static var previews: some View {
+// MultiselectBottomControl()
+// }
+// }

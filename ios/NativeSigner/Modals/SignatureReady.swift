@@ -46,10 +46,8 @@ struct SignatureReady: View {
     }
 }
 
-/*
- struct SignatureReady_Previews: PreviewProvider {
- static var previews: some View {
- SignatureReady()
- }
- }
- */
+// struct SignatureReady_Previews: PreviewProvider {
+// static var previews: some View {
+// SignatureReady()
+// }
+// }

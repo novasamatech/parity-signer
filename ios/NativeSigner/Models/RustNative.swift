@@ -9,10 +9,8 @@ import Foundation
 import LocalAuthentication // to detect if password is set
 import UIKit // for converting raw png to UIImage
 
-/**
- * Object to store all data; since the data really is mostly stored in RustNative side,
- * just one object (to describe it) is used here.
- */
+/// Object to store all data; since the data really is mostly stored in RustNative side,
+/// just one object (to describe it) is used here.
 class SignerDataModel: ObservableObject {
     // Action handler
     var actionAvailable = true // debouncer
@@ -79,16 +77,12 @@ class SignerDataModel: ObservableObject {
         }
     }
 
-    /**
-     * Mild refresh for situations when no interaction with data was really performed.
-     * Should not call stuff in signer.h
-     */
+    /// Mild refresh for situations when no interaction with data was really performed.
+    /// Should not call stuff in signer.h
     func refreshUI() {}
 
-    /**
-     * refresh everything except for seedNames
-     * should be called as often as reasonably possible - on flow interrupts, changes, events, etc.
-     */
+    /// refresh everything except for seedNames
+    /// should be called as often as reasonably possible - on flow interrupts, changes, events, etc.
     func totalRefresh() {
         print("heavy reset")
         pushButton(action: .start)
@@ -98,10 +92,8 @@ class SignerDataModel: ObservableObject {
 }
 
 extension SignerDataModel {
-    /**
-     * Should be called once on factory-new state of the app
-     * Populates database with starting values
-     */
+    /// Should be called once on factory-new state of the app
+    /// Populates database with starting values
     func onboard(jailbreak: Bool = false) {
         if !canaryDead {
             do {
@@ -131,10 +123,10 @@ extension SignerDataModel {
                             try historyInitHistoryWithCert(dbname: dbName)
                         }
                         onboardingDone = true
-                        /* Mean app mode:
-                         if self.canaryDead {
-                         device_was_online(nil, self.dbName)
-                         }*/
+                        // Mean app mode:
+                        // if self.canaryDead {
+                        // device_was_online(nil, self.dbName)
+                        // }
                         initNavigation(dbname: dbName, seedNames: seedNames)
                         totalRefresh()
                         refreshSeeds()
@@ -148,10 +140,8 @@ extension SignerDataModel {
         }
     }
 
-    /**
-     * Restores the Signer to factory new state
-     * Should be called before app uninstall/upgrade!
-     */
+    /// Restores the Signer to factory new state
+    /// Should be called before app uninstall/upgrade!
     func wipe() {
         refreshSeeds()
         if authenticated {
@@ -179,9 +169,7 @@ extension SignerDataModel {
         }
     }
 
-    /**
-     * Remove general verifier; wipes everything, obviously
-     */
+    /// Remove general verifier; wipes everything, obviously
     func jailbreak() {
         wipe()
         if !onboardingDone {
@@ -190,9 +178,7 @@ extension SignerDataModel {
     }
 }
 
-/**
- * Maybe this could show errors?
- */
+/// Maybe this could show errors?
 extension ErrorDisplayed {
     func show() {
         if case let .Str(payload) = self {

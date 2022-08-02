@@ -29,10 +29,8 @@ struct AlertSelector: View {
     }
 }
 
-/*
- struct AlertSelector_Previews: PreviewProvider {
-     static var previews: some View {
-         AlertSelector()
-     }
- }
- */
+// struct AlertSelector_Previews: PreviewProvider {
+//    static var previews: some View {
+//        AlertSelector()
+//    }
+// }

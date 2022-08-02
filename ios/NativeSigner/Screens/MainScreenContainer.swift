@@ -144,9 +144,8 @@ struct MainScreenContainer: View {
     }
 }
 
-/*
- struct MainButtonScreen_Previews: PreviewProvider {
- static var previews: some View {
- MainScreenContainer()
- }
- }*/
+// struct MainButtonScreen_Previews: PreviewProvider {
+// static var previews: some View {
+// MainScreenContainer()
+// }
+// }

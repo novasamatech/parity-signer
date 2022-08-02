@@ -150,12 +150,10 @@ struct KeyManager: View {
     }
 }
 
-/*
- struct KeyManager_Previews: PreviewProvider {
- static var previews: some View {
- NavigationView {
- KeyManager()
- }
- }
- }
- */
+// struct KeyManager_Previews: PreviewProvider {
+// static var previews: some View {
+// NavigationView {
+// KeyManager()
+// }
+// }
+// }

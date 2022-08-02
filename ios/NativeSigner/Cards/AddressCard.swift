@@ -7,10 +7,8 @@
 
 import SwiftUI
 
-/**
- * Card for showing any address.
- * Accepts Address object
- */
+/// Card for showing any address.
+/// Accepts Address object
 struct AddressCard: View {
     @EnvironmentObject var data: SignerDataModel
     var address: Address

@@ -10,28 +10,22 @@ import Foundation
 import Security // for keyring
 import SwiftUI
 
-/**
- * Apple's own crypto boilerplate
- */
+/// Apple's own crypto boilerplate
 enum KeychainError: Error {
     case noPassword
     case unexpectedPasswordData
     case unhandledError(status: OSStatus)
 }
 
-/**
- * Seeds management operations - these mostly rely on secure enclave
- *
- *  Seeds are stored in keyring - it has SQL-like api but is backed by secure enclave
- *  IMPORTANT! The keys from keyring are not removed on app uninstall!
- *  Remember to wipe the app with wipe button in settings.
- */
+/// Seeds management operations - these mostly rely on secure enclave
+/// 
+///  Seeds are stored in keyring - it has SQL-like api but is backed by secure enclave
+///  IMPORTANT! The keys from keyring are not removed on app uninstall!
+///  Remember to wipe the app with wipe button in settings.
 extension SignerDataModel {
-    /**
-     * Get all seed names from secure storage
-     *
-     * this is also used as generic auth request operation that will lock the app on failure
-     */
+    /// Get all seed names from secure storage
+    /// 
+    /// this is also used as generic auth request operation that will lock the app on failure
     func refreshSeeds() {
         var item: CFTypeRef?
         let query: [String: Any] = [
@@ -74,10 +68,8 @@ extension SignerDataModel {
         }
     }
 
-    /**
-     * Creates seed; this is the only way to create seed.
-     * createRoots: choose whether empty derivations for every network should be created
-     */
+    /// Creates seed; this is the only way to create seed.
+    /// createRoots: choose whether empty derivations for every network should be created
     func restoreSeed(seedName: String, seedPhrase: String, createRoots: Bool) {
         var error: Unmanaged<CFError>?
         guard let accessFlags = SecAccessControlCreateWithFlags(
@@ -121,16 +113,12 @@ extension SignerDataModel {
         pushButton(action: .goForward, details: createRoots ? "true" : "false", seedPhrase: seedPhrase)
     }
 
-    /**
-     * Each seed name should be unique, obviously. We do not want to overwrite old seeds.
-     */
+    /// Each seed name should be unique, obviously. We do not want to overwrite old seeds.
     func checkSeedCollision(seedName: String) -> Bool {
         seedNames.contains(seedName)
     }
 
-    /**
-     * Check if proposed seed phrase is already saved. But mostly require auth on seed creation.
-     */
+    /// Check if proposed seed phrase is already saved. But mostly require auth on seed creation.
     func checkSeedPhraseCollision(seedPhrase: String) -> Bool {
         var item: AnyObject?
         guard let finalSeedPhrase = seedPhrase.data(using: .utf8) else {
@@ -153,10 +141,8 @@ extension SignerDataModel {
         }
     }
 
-    /**
-     * Gets seed by seedName from keyring
-     * Calls auth screen automatically; no need to call it specially or wrap
-     */
+    /// Gets seed by seedName from keyring
+    /// Calls auth screen automatically; no need to call it specially or wrap
     func getSeed(seedName: String, backup: Bool = false) -> String {
         if alert {
             alertShow = true
@@ -206,9 +192,7 @@ extension SignerDataModel {
         }
     }
 
-    /**
-     * Removes seed and all derived keys
-     */
+    /// Removes seed and all derived keys
     func removeSeed(seedName: String) {
         refreshSeeds()
         if authenticated {
@@ -231,9 +215,7 @@ extension SignerDataModel {
         }
     }
 
-    /**
-     * Wrapper for signing with use of seed material
-     */
+    /// Wrapper for signing with use of seed material
     func sign(seedName: String, comment: String) {
         if alert {
             alertShow = true

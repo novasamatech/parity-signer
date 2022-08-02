@@ -5,11 +5,9 @@
 //  Created by Alexander Slesarev on 20.7.2021.
 //
 
-/**
- * Logic behind the camera - boilerplate, parsing QRs into payloads,
- * collection of payloads and their transfer to Rust decoder
- * Some concurrency
- */
+/// Logic behind the camera - boilerplate, parsing QRs into payloads,
+/// collection of payloads and their transfer to Rust decoder
+/// Some concurrency
 
 import AVKit
 import UIKit
@@ -93,7 +91,8 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                             self.isCameraUnavailable = false
                         }
                     }
-                case .configurationFailed, .notAuthorized:
+                case .configurationFailed,
+                     .notAuthorized:
                     print("Camera configuration invalid")
 
                     DispatchQueue.main.sync {
@@ -186,9 +185,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
         start()
     }
 
-    /**
-     * Callback for receiving buffer - payload assembly is fed from here
-     */
+    /// Callback for receiving buffer - payload assembly is fed from here
     // swiftlint:disable:next cyclomatic_complexity function_body_length
     public func captureOutput(
         _: AVCaptureOutput,
@@ -268,9 +265,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
         }
     }
 
-    /**
-     * Empty bucket
-     */
+    /// Empty bucket
     func emptyBucket() {
         payload = nil
         total = nil
@@ -280,9 +275,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
     }
 }
 
-/**
- * Standard boilerplate for camera init
- */
+/// Standard boilerplate for camera init
 extension CameraService {
     enum SessionSetupResult {
         case success

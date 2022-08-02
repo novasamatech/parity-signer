@@ -52,10 +52,8 @@ struct NetworkManager: View {
     }
 }
 
-/*
- struct NetworkManager_Previews: PreviewProvider {
- static var previews: some View {
- NetworkManager()
- }
- }
- */
+// struct NetworkManager_Previews: PreviewProvider {
+// static var previews: some View {
+// NetworkManager()
+// }
+// }

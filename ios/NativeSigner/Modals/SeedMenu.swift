@@ -58,10 +58,8 @@ struct SeedMenu: View {
     }
 }
 
-/*
- struct SeedMenu_Previews: PreviewProvider {
- static var previews: some View {
- SeedMenu()
- }
- }
- */
+// struct SeedMenu_Previews: PreviewProvider {
+// static var previews: some View {
+// SeedMenu()
+// }
+// }

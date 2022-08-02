@@ -113,10 +113,8 @@ struct TransactionPreview: View {
     }
 }
 
-/*
- struct TransactionPreview_Previews: PreviewProvider {
- static var previews: some View {
- TransactionPreview()
- }
- }
- */
+// struct TransactionPreview_Previews: PreviewProvider {
+// static var previews: some View {
+// TransactionPreview()
+// }
+// }

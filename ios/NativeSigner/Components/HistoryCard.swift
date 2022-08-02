@@ -226,10 +226,8 @@ struct HistoryCard: View {
     }
 }
 
-/*
- struct HistoryCard_Previews: PreviewProvider {
- static var previews: some View {
- HistoryCard()
- }
- }
- */
+// struct HistoryCard_Previews: PreviewProvider {
+// static var previews: some View {
+// HistoryCard()
+// }
+// }

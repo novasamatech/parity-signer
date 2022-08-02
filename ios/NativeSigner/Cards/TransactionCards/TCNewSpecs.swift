@@ -75,9 +75,8 @@ struct TCNewSpecs: View {
     }
 }
 
-/*
- struct TCNewSpecs_Previews: PreviewProvider {
- static var previews: some View {
- TCNewSpecs()
- }
- }*/
+// struct TCNewSpecs_Previews: PreviewProvider {
+// static var previews: some View {
+// TCNewSpecs()
+// }
+// }

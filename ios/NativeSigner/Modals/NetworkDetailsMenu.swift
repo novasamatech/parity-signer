@@ -48,10 +48,8 @@ struct NetworkDetailsMenu: View {
     }
 }
 
-/*
- struct NetworkDetailsMenu_Previews: PreviewProvider {
- static var previews: some View {
- NetworkDetailsMenu()
- }
- }
- */
+// struct NetworkDetailsMenu_Previews: PreviewProvider {
+// static var previews: some View {
+// NetworkDetailsMenu()
+// }
+// }

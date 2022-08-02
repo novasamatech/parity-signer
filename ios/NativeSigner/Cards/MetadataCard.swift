@@ -24,10 +24,8 @@ struct MetadataCard: View {
     }
 }
 
-/*
- struct MetadataCard_Previews: PreviewProvider {
-     static var previews: some View {
-         MetadataCard()
-     }
- }
- */
+// struct MetadataCard_Previews: PreviewProvider {
+//    static var previews: some View {
+//        MetadataCard()
+//    }
+// }

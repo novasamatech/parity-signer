@@ -59,10 +59,8 @@ struct TypesMenu: View {
     }
 }
 
-/*
- struct TypesMenu_Previews: PreviewProvider {
- static var previews: some View {
- TypesMenu()
- }
- }
- */
+// struct TypesMenu_Previews: PreviewProvider {
+// static var previews: some View {
+// TypesMenu()
+// }
+// }

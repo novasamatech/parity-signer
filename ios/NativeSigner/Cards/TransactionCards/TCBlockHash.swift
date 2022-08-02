@@ -14,10 +14,8 @@ struct TCBlockHash: View {
     }
 }
 
-/*
- struct TCBlockHash_Previews: PreviewProvider {
-     static var previews: some View {
-         TCBlockHash()
-     }
- }
- */
+// struct TCBlockHash_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TCBlockHash()
+//    }
+// }

@@ -26,10 +26,8 @@ struct ManageNetworks: View {
     }
 }
 
-/*
- struct ManageNetworks_Previews: PreviewProvider {
-     static var previews: some View {
-         ManageNetworks()
-     }
- }
- */
+// struct ManageNetworks_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ManageNetworks()
+//    }
+// }

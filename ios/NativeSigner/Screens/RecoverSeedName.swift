@@ -53,10 +53,8 @@ struct RecoverSeedName: View {
     }
 }
 
-/*
- struct RecoverSeedName_Previews: PreviewProvider {
- static var previews: some View {
- RecoverSeedName()
- }
- }
- */
+// struct RecoverSeedName_Previews: PreviewProvider {
+// static var previews: some View {
+// RecoverSeedName()
+// }
+// }

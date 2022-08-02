@@ -111,12 +111,10 @@ struct SettingsScreen: View {
     }
 }
 
-/*
- struct SettingsScreen_Previews: PreviewProvider {
- static var previews: some View {
- NavigationView {
- SettingsScreen()
- }
- }
- }
- */
+// struct SettingsScreen_Previews: PreviewProvider {
+// static var previews: some View {
+// NavigationView {
+// SettingsScreen()
+// }
+// }
+// }

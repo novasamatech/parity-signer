@@ -43,10 +43,8 @@ struct NewSeedMenu: View {
     }
 }
 
-/*
- struct NewSeedMenu_Previews: PreviewProvider {
- static var previews: some View {
- NewSeedMenu()
- }
- }
- */
+// struct NewSeedMenu_Previews: PreviewProvider {
+// static var previews: some View {
+// NewSeedMenu()
+// }
+// }

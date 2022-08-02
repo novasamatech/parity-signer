@@ -60,10 +60,8 @@ struct VerifierScreen: View {
     }
 }
 
-/*
- struct VerifierScreen_Previews: PreviewProvider {
- static var previews: some View {
- VerifierScreen()
- }
- }
- */
+// struct VerifierScreen_Previews: PreviewProvider {
+// static var previews: some View {
+// VerifierScreen()
+// }
+// }

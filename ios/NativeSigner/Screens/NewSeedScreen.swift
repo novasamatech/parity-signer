@@ -54,10 +54,8 @@ struct NewSeedScreen: View {
     }
 }
 
-/*
- struct NewSeedScreen_Previews: PreviewProvider {
- static var previews: some View {
- NewSeedScreen().previewLayout(.sizeThatFits)
- }
- }
- */
+// struct NewSeedScreen_Previews: PreviewProvider {
+// static var previews: some View {
+// NewSeedScreen().previewLayout(.sizeThatFits)
+// }
+// }

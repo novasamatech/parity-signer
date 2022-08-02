@@ -18,9 +18,8 @@ struct TransactionCardView: View {
     }
 }
 
-/*
- struct TransactionCardView_Previews: PreviewProvider {
-     static var previews: some View {
-         TransactionCardView(card: TransactionCard(index: 0, indent: 0, card: .error("this is a preview")))
-     }
- }*/
+// struct TransactionCardView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TransactionCardView(card: TransactionCard(index: 0, indent: 0, card: .error("this is a preview")))
+//    }
+// }

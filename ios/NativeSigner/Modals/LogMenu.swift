@@ -51,10 +51,8 @@ struct LogMenu: View {
     }
 }
 
-/*
- struct LogMenu_Previews: PreviewProvider {
- static var previews: some View {
- LogMenu()
- }
- }
- */
+// struct LogMenu_Previews: PreviewProvider {
+// static var previews: some View {
+// LogMenu()
+// }
+// }

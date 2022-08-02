@@ -41,10 +41,8 @@ struct HistoryCardTemplate: View {
     }
 }
 
-/*
- struct HistoryCardTemplate_Previews: PreviewProvider {
- static var previews: some View {
- HistoryCardTemplate()
- }
- }
- */
+// struct HistoryCardTemplate_Previews: PreviewProvider {
+// static var previews: some View {
+// HistoryCardTemplate()
+// }
+// }

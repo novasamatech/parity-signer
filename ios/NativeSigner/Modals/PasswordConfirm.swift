@@ -55,10 +55,8 @@ struct PasswordConfirm: View {
     }
 }
 
-/*
- struct Password_Previews: PreviewProvider {
- static var previews: some View {
- Password()
- }
- }
- */
+// struct Password_Previews: PreviewProvider {
+// static var previews: some View {
+// Password()
+// }
+// }

@@ -126,10 +126,8 @@ struct ScreenSelector: View {
     }
 }
 
-/*
- struct ScreenSelector_Previews: PreviewProvider {
-     static var previews: some View {
-         ScreenSelector()
-     }
- }
- */
+// struct ScreenSelector_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ScreenSelector()
+//    }
+// }

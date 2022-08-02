@@ -93,16 +93,12 @@ func buttonColor(active: Bool) -> Color {
     active ? Color("Text600") : Color("Text300")
 }
 
-/*
- func buttonLabelColor(active: Bool) -> Color {
- return active ? Color("Text600") : Color("Text300")
- }
- */
+// func buttonLabelColor(active: Bool) -> Color {
+// return active ? Color("Text600") : Color("Text300")
+// }
 
-/*
- struct Footer_Previews: PreviewProvider {
- static var previews: some View {
- Footer().previewLayout(.sizeThatFits)
- }
- }
- */
+// struct Footer_Previews: PreviewProvider {
+// static var previews: some View {
+// Footer().previewLayout(.sizeThatFits)
+// }
+// }

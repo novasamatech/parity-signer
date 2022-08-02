@@ -39,10 +39,8 @@ struct TCEnumVariantName: View {
     }
 }
 
-/*
- struct TCEnumVariantName_Previews: PreviewProvider {
- static var previews: some View {
- TCEnumVariantName()
- }
- }
- */
+// struct TCEnumVariantName_Previews: PreviewProvider {
+// static var previews: some View {
+// TCEnumVariantName()
+// }
+// }

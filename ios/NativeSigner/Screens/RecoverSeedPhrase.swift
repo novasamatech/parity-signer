@@ -122,10 +122,8 @@ struct RecoverSeedPhrase: View {
     }
 }
 
-/*
- struct RecoverSeedPhrase_Previews: PreviewProvider {
- static var previews: some View {
- RecoverSeedPhrase()
- }
- }
- */
+// struct RecoverSeedPhrase_Previews: PreviewProvider {
+// static var previews: some View {
+// RecoverSeedPhrase()
+// }
+// }

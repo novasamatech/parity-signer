@@ -8,14 +8,10 @@
 import Foundation
 import Network
 
-/**
- * This is background network indicator. It will paint the shield icon red and write to history
- * NOTE: This might sometimes crash transaction; it is intended although not defined behavior for now
- */
+/// This is background network indicator. It will paint the shield icon red and write to history
+/// NOTE: This might sometimes crash transaction; it is intended although not defined behavior for now
 extension SignerDataModel {
-    /**
-     * Check if alert was triggered
-     */
+    /// Check if alert was triggered
     func checkAlert() {
         if onboardingDone {
             do {
@@ -32,9 +28,7 @@ extension SignerDataModel {
         }
     }
 
-    /**
-     * Acknowledge alert and reset it
-     */
+    /// Acknowledge alert and reset it
     func resetAlert() {
         do {
             try historyAcknowledgeWarnings(dbname: dbName)

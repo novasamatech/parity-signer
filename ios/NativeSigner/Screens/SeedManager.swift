@@ -37,9 +37,7 @@ struct SeedManager: View {
     }
 }
 
-/*
- struct SeedManager_Previews: PreviewProvider {
- static var previews: some View {
- SeedManager()
- }
- */
+// struct SeedManager_Previews: PreviewProvider {
+// static var previews: some View {
+// SeedManager()
+// }

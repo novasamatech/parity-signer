@@ -70,10 +70,8 @@ struct ShieldAlertComponent: View {
     }
 }
 
-/*
- struct ShieldAlert_Previews: PreviewProvider {
- static var previews: some View {
- ShieldAlert()
- }
- }
- */
+// struct ShieldAlert_Previews: PreviewProvider {
+// static var previews: some View {
+// ShieldAlert()
+// }
+// }

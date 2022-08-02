@@ -27,10 +27,8 @@ struct TransactionBlock: View {
     }
 }
 
-/*
- struct TransactionBlock_Previews: PreviewProvider {
- static var previews: some View {
- TransactionBlock()
- }
- }
- */
+// struct TransactionBlock_Previews: PreviewProvider {
+// static var previews: some View {
+// TransactionBlock()
+// }
+// }

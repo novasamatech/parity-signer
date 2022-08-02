@@ -17,10 +17,8 @@ struct SmallButton: View {
     }
 }
 
-/*
- struct SmallButton_Previews: PreviewProvider {
-     static var previews: some View {
-         SmallButton(text: "test")
-     }
- }
- */
+// struct SmallButton_Previews: PreviewProvider {
+//    static var previews: some View {
+//        SmallButton(text: "test")
+//    }
+// }

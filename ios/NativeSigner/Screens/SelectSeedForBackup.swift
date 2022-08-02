@@ -37,10 +37,8 @@ struct SelectSeedForBackup: View {
     }
 }
 
-/*
- struct SelectSeedForBackup_Previews: PreviewProvider {
- static var previews: some View {
- SelectSeedForBackup()
- }
- }
- */
+// struct SelectSeedForBackup_Previews: PreviewProvider {
+// static var previews: some View {
+// SelectSeedForBackup()
+// }
+// }

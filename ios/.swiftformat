@@ -10,6 +10,9 @@
 --exclude NativeSigner/Generated/
 
 # rules
+--enable blockComments
 --enable isEmpty
+--enable wrapEnumCases
+--enable wrapSwitchCases
 --disable redundantType
 --disable wrapMultilineStatementBraces

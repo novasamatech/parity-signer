@@ -77,10 +77,8 @@ struct NetworkDetails: View {
     }
 }
 
-/*
- struct NetworkDetails_Previews: PreviewProvider {
- static var previews: some View {
- NetworkDetails()
- }
- }
- */
+// struct NetworkDetails_Previews: PreviewProvider {
+// static var previews: some View {
+// NetworkDetails()
+// }
+// }

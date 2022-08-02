@@ -5,18 +5,14 @@
 //  Created by Alexander Slesarev on 11.8.2021.
 //
 
-/**
- * Handle decoding of large hardcoded docs
- */
+/// Handle decoding of large hardcoded docs
 
 import Foundation
 
-/**
- * Screen model state for documents screen
- * Since this is hardcoded, we heep it in ios logic at least for now
- * Moving it to backend will of course have benetif of reducing code reuse
- * Let's consider it later as now it just works
- */
+/// Screen model state for documents screen
+/// Since this is hardcoded, we heep it in ios logic at least for now
+/// Moving it to backend will of course have benetif of reducing code reuse
+/// Let's consider it later as now it just works
 enum ShownDocument: String, CaseIterable, Identifiable {
     case toc
     case privacyPolicy
@@ -33,9 +29,7 @@ enum ShownDocument: String, CaseIterable, Identifiable {
     }
 }
 
-/**
- * Fetch and format docs from assets
- */
+/// Fetch and format docs from assets
 func getTaC() -> AttributedString {
     if let path = Bundle.main.path(forResource: "terms-and-conditions", ofType: "txt") {
         do {
@@ -55,9 +49,7 @@ func getTaC() -> AttributedString {
     }
 }
 
-/**
- * Fetch and format privacy policy from assets
- */
+/// Fetch and format privacy policy from assets
 func getPP() -> AttributedString {
     if let path = Bundle.main.path(forResource: "privacy-policy", ofType: "txt") {
         do {

@@ -7,10 +7,8 @@
 
 import Foundation
 
-/**
- * Util: convert hex string spit out by rust code into data
- * uft16 is used for string-native performance
- */
+/// Util: convert hex string spit out by rust code into data
+/// uft16 is used for string-native performance
 extension Data {
     func hexCharValue(character: UInt16) -> UInt8? {
         switch character {
@@ -41,9 +39,7 @@ extension Data {
     }
 }
 
-/**
- * Decode markdown object from hex-encoded string passed in JSON
- */
+/// Decode markdown object from hex-encoded string passed in JSON
 extension AttributedString {
     init?(fromHexDocs string: String) {
         try? self.init(
@@ -57,9 +53,7 @@ extension AttributedString {
 }
 
 extension String {
-    /**
-     * St...ng
-     */
+    /// St...ng
     func truncateMiddle(length: Int) -> String {
         if count > length * 2 {
             return prefix(length) + "..." + suffix(length)

@@ -40,9 +40,8 @@ struct HistoryScreen: View {
     }
 }
 
-/*
- struct HistoryScreen_Previews: PreviewProvider {
- static var previews: some View {
- HistoryScreen()
- }
- }*/
+// struct HistoryScreen_Previews: PreviewProvider {
+// static var previews: some View {
+// HistoryScreen()
+// }
+// }

@@ -14,10 +14,8 @@ struct TCNameVersion: View {
     }
 }
 
-/*
- struct TCNameVersion_Previews: PreviewProvider {
-     static var previews: some View {
-         TCNameVersion()
-     }
- }
- */
+// struct TCNameVersion_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TCNameVersion()
+//    }
+// }

@@ -107,9 +107,8 @@ func constructFrameCountMessage(captured: Int?, total: Int?) -> String {
         + " captured frames"
 }
 
-/*
- struct CameraView_Previews: PreviewProvider {
- static var previews: some View {
- CameraView()
- }
- }*/
+// struct CameraView_Previews: PreviewProvider {
+// static var previews: some View {
+// CameraView()
+// }
+// }

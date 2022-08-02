@@ -34,10 +34,8 @@ struct HeaderBar: View {
     }
 }
 
-/*
- struct HeaderBar_Previews: PreviewProvider {
-     static var previews: some View {
-         HeaderBar()
-     }
- }
- */
+// struct HeaderBar_Previews: PreviewProvider {
+//    static var previews: some View {
+//        HeaderBar()
+//    }
+// }

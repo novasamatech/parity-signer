@@ -67,10 +67,8 @@ struct NewSeedBackupModal: View {
     }
 }
 
-/*
- struct NewSeedBackupModal_Previews: PreviewProvider {
- static var previews: some View {
- NewSeedBackupModal()
- }
- }
- */
+// struct NewSeedBackupModal_Previews: PreviewProvider {
+// static var previews: some View {
+// NewSeedBackupModal()
+// }
+// }

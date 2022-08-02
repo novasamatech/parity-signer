@@ -26,10 +26,8 @@ struct ErrorAlert: View {
     }
 }
 
-/*
- struct ErrorAlert_Previews: PreviewProvider {
- static var previews: some View {
- ErrorAlert()
- }
- }
- */
+// struct ErrorAlert_Previews: PreviewProvider {
+// static var previews: some View {
+// ErrorAlert()
+// }
+// }
