@@ -19,18 +19,17 @@ struct NetworkDetailsMenu: View {
                     text: "Sign network specs",
                     isShaded: true,
                     isCrypto: true,
-                    action: {pushButton(.signNetworkSpecs, "", "")}
+                    action: { pushButton(.signNetworkSpecs, "", "") }
                 )
                 BigButton(
                     text: "Delete network",
                     isShaded: true,
                     isDangerous: true,
-                    action: {removeNetworkAlert = true}
+                    action: { removeNetworkAlert = true }
                 )
             }
-
         }
-        .gesture(DragGesture().onEnded {drag in
+        .gesture(DragGesture().onEnded { drag in
             if drag.translation.height > 40 {
                 pushButton(.goBack, "", "")
             }
@@ -42,7 +41,7 @@ struct NetworkDetailsMenu: View {
                 primaryButton: .cancel(Text("Cancel")),
                 secondaryButton: .destructive(
                     Text("Remove network"),
-                    action: {pushButton(.removeNetwork, "", "")}
+                    action: { pushButton(.removeNetwork, "", "") }
                 )
             )
         })

@@ -17,9 +17,9 @@ struct NetworkLogo: View {
 }
 
 /*
-struct NetworkLogo_Previews: PreviewProvider {
-    static var previews: some View {
-        NetworkLogo()
-    }
-}
-*/
+ struct NetworkLogo_Previews: PreviewProvider {
+     static var previews: some View {
+         NetworkLogo()
+     }
+ }
+ */

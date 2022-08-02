@@ -21,9 +21,9 @@ struct Identicon: View {
 }
 
 /*
-struct Identicon_Previews: PreviewProvider {
-    static var previews: some View {
-        Identicon()
-    }
-}
- */
+ struct Identicon_Previews: PreviewProvider {
+     static var previews: some View {
+         Identicon()
+     }
+ }
+  */

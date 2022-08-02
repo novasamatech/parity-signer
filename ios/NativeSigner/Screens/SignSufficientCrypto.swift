@@ -16,7 +16,7 @@ struct SignSufficientCrypto: View {
             Text("Select key for signing")
             ScrollView {
                 LazyVStack {
-                    ForEach(content.identities, id: \.addressKey) {keyrecord in
+                    ForEach(content.identities, id: \.addressKey) { keyrecord in
                         Button(
                             action: {
                                 let seedPhrase = getSeed(keyrecord.seedName)

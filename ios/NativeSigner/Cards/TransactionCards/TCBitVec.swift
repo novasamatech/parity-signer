@@ -15,9 +15,9 @@ struct TCBitVec: View {
 }
 
 /*
-struct TCBitVec_Previews: PreviewProvider {
-    static var previews: some View {
-        TCBitVec()
-    }
-}
-*/
+ struct TCBitVec_Previews: PreviewProvider {
+     static var previews: some View {
+         TCBitVec()
+     }
+ }
+ */

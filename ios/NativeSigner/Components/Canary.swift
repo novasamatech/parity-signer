@@ -17,17 +17,17 @@ extension SignerDataModel {
      * Check if alert was triggered
      */
     func checkAlert() {
-        if self.onboardingDone {
+        if onboardingDone {
             do {
                 let res = try historyGetWarnings(dbname: dbName)
                 if res {
-                    self.alert = true
+                    alert = true
                 } else {
-                    self.alert = false
+                    alert = false
                 }
             } catch {
                 print("History init failed! This will not do.")
-                self.alert = true
+                alert = true
             }
         }
     }
@@ -38,11 +38,11 @@ extension SignerDataModel {
     func resetAlert() {
         do {
             try historyAcknowledgeWarnings(dbname: dbName)
-            self.checkAlert()
-            self.pushButton(action: .goBack)
+            checkAlert()
+            pushButton(action: .goBack)
         } catch {
             print("History init failed! This will not do.")
-            self.alert = true
+            alert = true
         }
     }
 }

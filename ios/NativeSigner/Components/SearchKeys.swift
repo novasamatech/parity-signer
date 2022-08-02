@@ -27,10 +27,11 @@ struct SearchKeys: View {
             }
             if searchString != "" {
                 Button(
-                    action: {searchString = ""},
+                    action: { searchString = "" },
                     label: {
                         Image(systemName: "clear").imageScale(.large)
-                    })
+                    }
+                )
             } else {
                 Image(systemName: "doc.text.magnifyingglass").imageScale(.large).foregroundColor(Color("Action400"))
             }

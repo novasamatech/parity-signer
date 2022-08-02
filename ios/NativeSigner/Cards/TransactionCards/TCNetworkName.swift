@@ -15,9 +15,9 @@ struct TCNetworkName: View {
 }
 
 /*
-struct TCNetworkName_Previews: PreviewProvider {
-    static var previews: some View {
-        TCNetworkName()
-    }
-}
-*/
+ struct TCNetworkName_Previews: PreviewProvider {
+     static var previews: some View {
+         TCNetworkName()
+     }
+ }
+ */

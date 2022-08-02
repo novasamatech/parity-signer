@@ -15,9 +15,9 @@ struct TCTXSpec: View {
 }
 
 /*
-struct TCTXSpec_Previews: PreviewProvider {
-    static var previews: some View {
-        TCTXSpec()
-    }
-}
-*/
+ struct TCTXSpec_Previews: PreviewProvider {
+     static var previews: some View {
+         TCTXSpec()
+     }
+ }
+ */

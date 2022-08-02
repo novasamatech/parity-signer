@@ -32,7 +32,7 @@ struct KeyMenu: View {
                 primaryButton: .cancel(Text("Cancel")),
                 secondaryButton: .destructive(
                     Text("Remove key"),
-                    action: {pushButton(.removeKey, "", "")}
+                    action: { pushButton(.removeKey, "", "") }
                 )
             )
         })

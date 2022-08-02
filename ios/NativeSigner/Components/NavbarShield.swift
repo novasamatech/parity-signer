@@ -5,8 +5,8 @@
 //  Created by Alexander Slesarev on 27.7.2021.
 //
 
-import SwiftUI
 import Network
+import SwiftUI
 
 struct NavbarShield: View {
     let canaryDead: Bool
@@ -18,7 +18,7 @@ struct NavbarShield: View {
                 pushButton(.shield, "", "")
             },
             label: {
-                if canaryDead /*bluetooth detector: `|| data.bsDetector.canaryDead`*/ {
+                if canaryDead /* bluetooth detector: `|| data.bsDetector.canaryDead` */ {
                     Image(systemName: "shield.slash")
                         .imageScale(.large)
                         .foregroundColor(Color("SignalDanger"))
@@ -33,7 +33,8 @@ struct NavbarShield: View {
                             .foregroundColor(Color("Crypto400"))
                     }
                 }
-            })
+            }
+        )
     }
 }
 

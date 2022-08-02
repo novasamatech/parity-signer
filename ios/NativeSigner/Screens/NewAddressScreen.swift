@@ -33,7 +33,7 @@ struct NewAddressScreen: View {
                                 .autocapitalization(.none)
                                 .keyboardType(.asciiCapable)
                                 .submitLabel(.done)
-                                .onChange(of: path) {pathNew in
+                                .onChange(of: path) { pathNew in
                                     derivationCheck = pathCheck(content.seedName, pathNew, content.networkSpecsKey)
                                     path = pathNew
                                 }
@@ -74,7 +74,8 @@ struct NewAddressScreen: View {
                                 break
                             }
                         },
-                        isDisabled: derivationCheck?.buttonGood != true)
+                        isDisabled: derivationCheck?.buttonGood != true
+                    )
                 }
             }.padding(.horizontal)
         }

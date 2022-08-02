@@ -40,7 +40,8 @@ struct Footer: View {
                         Text("Log")
                     }
                     .foregroundColor(buttonColor(active: footerButton == .log))
-                })
+                }
+            )
             Spacer()
             Button(
                 action: {
@@ -54,7 +55,8 @@ struct Footer: View {
                         Text("Scanner")
                     }
                     .foregroundColor(buttonColor(active: footerButton == .scan))
-                })
+                }
+            )
             Spacer()
             Button(
                 action: {
@@ -66,7 +68,8 @@ struct Footer: View {
                         Text("Keys")
                     }
                     .foregroundColor(buttonColor(active: footerButton == .keys))
-                })
+                }
+            )
             Spacer()
             Button(
                 action: {
@@ -80,13 +83,14 @@ struct Footer: View {
                         Text("Settings")
                     }
                     .foregroundColor(buttonColor(active: footerButton == .settings))
-                })
+                }
+            )
         }.font(.footnote)
     }
 }
 
 func buttonColor(active: Bool) -> Color {
-    return active ? Color("Text600") : Color("Text300")
+    active ? Color("Text600") : Color("Text300")
 }
 
 /*

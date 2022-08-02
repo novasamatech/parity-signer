@@ -33,9 +33,9 @@ struct ConfirmAlert: View {
 }
 
 /*
-struct ConfirmAlert_Previews: PreviewProvider {
-    static var previews: some View {
-        ConfirmAlert()
-    }
-}
-*/
+ struct ConfirmAlert_Previews: PreviewProvider {
+     static var previews: some View {
+         ConfirmAlert()
+     }
+ }
+ */

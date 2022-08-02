@@ -27,8 +27,8 @@ struct ManageMetadata: View {
                 Text("Used for:")
                 VStack {
                     ForEach(content.networks.sorted(by: {
-                        $0.order<$1.order
-                    }), id: \.order) {network in
+                        $0.order < $1.order
+                    }), id: \.order) { network in
                         ZStack {
                             if network.currentOnScreen {
                                 RoundedRectangle(cornerRadius: 4).stroke().frame(height: 30)
@@ -44,27 +44,29 @@ struct ManageMetadata: View {
                     text: "Sign this metadata",
                     isShaded: true,
                     isCrypto: true,
-                    action: {pushButton(.signMetadata, "", "")}
+                    action: { pushButton(.signMetadata, "", "") }
                 )
                 BigButton(
                     text: "Delete this metadata",
                     isShaded: true,
                     isDangerous: true,
-                    action: {removeMetadataAlert = true}
+                    action: { removeMetadataAlert = true }
                 )
             }
         }
         .offset(x: 0, y: offset)
-        .gesture(DragGesture()
-                    .onChanged {drag in
-            self.offset = drag.translation.height
-        }
-                    .onEnded {drag in
-            if drag.translation.height > 40 {
-                self.offset = UIScreen.main.bounds.size.height
-                pushButton(.goBack, "", "")
-            }
-        })
+        .gesture(
+            DragGesture()
+                .onChanged { drag in
+                    self.offset = drag.translation.height
+                }
+                .onEnded { drag in
+                    if drag.translation.height > 40 {
+                        self.offset = UIScreen.main.bounds.size.height
+                        pushButton(.goBack, "", "")
+                    }
+                }
+        )
         .alert(isPresented: $removeMetadataAlert, content: {
             Alert(
                 title: Text("Remove metadata?"),
@@ -72,7 +74,7 @@ struct ManageMetadata: View {
                 primaryButton: .cancel(Text("Cancel")),
                 secondaryButton: .destructive(
                     Text("Remove metadata"),
-                    action: {pushButton(.removeMetadata, "", "")}
+                    action: { pushButton(.removeMetadata, "", "") }
                 )
             )
         })

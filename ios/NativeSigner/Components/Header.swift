@@ -30,7 +30,8 @@ struct Header: View {
                                 Image(systemName: rightButton == .multiSelect ? "xmark" : "chevron.left")
                                     .imageScale(.large)
                                     .foregroundColor(Color("Text500"))
-                            })
+                            }
+                        )
                     }
                     Spacer()
                 }
@@ -47,14 +48,15 @@ struct Header: View {
                         },
                         label: {
                             SmallButton(text: "Select all")
-                        })
+                        }
+                    )
                 }
                 Spacer()
                 HStack(spacing: 8.0) {
                     Spacer()
                     Button(
                         action: {
-                            if alert && rightButton == .newSeed {
+                            if alert, rightButton == .newSeed {
                                 alertShow()
                             } else {
                                 pushButton(.rightButtonAction, "", "")
@@ -83,11 +85,13 @@ struct Header: View {
                                     .imageScale(.large)
                                     .foregroundColor(Color("Action400"))
                             }
-                        })
+                        }
+                    )
                     NavbarShield(
                         canaryDead: canaryDead,
                         alert: alert,
-                        pushButton: pushButton)
+                        pushButton: pushButton
+                    )
                 }
                 .frame(width: 72.0)
             }

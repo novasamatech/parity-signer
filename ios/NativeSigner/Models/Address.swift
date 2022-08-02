@@ -16,7 +16,7 @@ extension SignerDataModel {
      * Creates address in database with checks and features
      */
     func createAddress(path: String, seedName: String) {
-        let seedPhrase = self.getSeed(seedName: seedName)
+        let seedPhrase = getSeed(seedName: seedName)
         if !seedPhrase.isEmpty {
             pushButton(action: .goForward, details: path, seedPhrase: seedPhrase)
         }

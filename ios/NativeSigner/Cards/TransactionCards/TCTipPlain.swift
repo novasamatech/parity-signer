@@ -15,9 +15,9 @@ struct TCTipPlain: View {
 }
 
 /*
-struct TCTipPlain_Previews: PreviewProvider {
-    static var previews: some View {
-        TCTipPlain()
-    }
-}
-*/
+ struct TCTipPlain_Previews: PreviewProvider {
+     static var previews: some View {
+         TCTipPlain()
+     }
+ }
+ */

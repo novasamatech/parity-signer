@@ -22,7 +22,7 @@ struct NetworkCard: View {
             HStack {
                 NetworkLogo(logo: logo)
                 Text(title).font(FBase(style: .h3))
-                if fancy {Spacer()}
+                if fancy { Spacer() }
             }
             .foregroundColor(Color("Text600"))
             .frame(height: 36)

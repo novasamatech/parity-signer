@@ -5,8 +5,8 @@
 //  Created by Alexander Slesarev on 14.12.2021.
 //
 
-import SwiftUI
 import CoreML
+import SwiftUI
 
 struct AlertSelector: View {
     let alertData: AlertData?
@@ -18,11 +18,11 @@ struct AlertSelector: View {
         switch alertData {
         case .none:
             EmptyView()
-        case .errorData(let value):
+        case let .errorData(value):
             ErrorAlert(pushButton: pushButton, content: value)
-        case .shield(let value):
+        case let .shield(value):
             ShieldAlertComponent(resetAlert: resetAlert, pushButton: pushButton, canaryDead: canaryDead, content: value)
-        case .confirm:// (let value):
+        case .confirm: // (let value):
             let value = "TODO"
             ConfirmAlert(pushButton: pushButton, content: value)
         }
@@ -30,9 +30,9 @@ struct AlertSelector: View {
 }
 
 /*
-struct AlertSelector_Previews: PreviewProvider {
-    static var previews: some View {
-        AlertSelector()
-    }
-}
-*/
+ struct AlertSelector_Previews: PreviewProvider {
+     static var previews: some View {
+         AlertSelector()
+     }
+ }
+ */

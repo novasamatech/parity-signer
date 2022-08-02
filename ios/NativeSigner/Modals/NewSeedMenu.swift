@@ -15,7 +15,7 @@ struct NewSeedMenu: View {
         VStack {
             Spacer()
             VStack {
-                HeaderBar(line1: "ADD SEED", line2: "Select seed addition method" )
+                HeaderBar(line1: "ADD SEED", line2: "Select seed addition method")
                 MenuButtonsStack {
                     BigButton(
                         text: "New seed",

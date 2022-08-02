@@ -20,9 +20,9 @@ struct TCNameValueTemplate: View {
 }
 
 /*
-struct TCNameValueTemplate_Previews: PreviewProvider {
-    static var previews: some View {
-        TCNameValueTemplate()
-    }
-}
-*/
+ struct TCNameValueTemplate_Previews: PreviewProvider {
+     static var previews: some View {
+         TCNameValueTemplate()
+     }
+ }
+ */

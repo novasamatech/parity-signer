@@ -27,11 +27,11 @@ struct RecoverSeedPhrase: View {
                             Text(
                                 content.draftPhrase()
                             )
-                                .lineLimit(nil)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                                .foregroundColor(Color("Crypto400"))
-                                .padding(12)
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .font(.system(size: 16, weight: .semibold, design: .monospaced))
+                            .foregroundColor(Color("Crypto400"))
+                            .padding(12)
                             Divider().foregroundColor(Color("Border400"))
                             HStack {
                                 Text(">").foregroundColor(Color("Text400"))
@@ -48,8 +48,7 @@ struct RecoverSeedPhrase: View {
                                         pushButton(.textEntry, word, "")
                                         shadowUserInput = word
                                     })
-                                    .onSubmit {
-                                    }
+                                    .onSubmit {}
                                     .onChange(of: shadowUserInput, perform: { _ in
                                         userInput = " " + content.userInput
                                     })
@@ -80,9 +79,12 @@ struct RecoverSeedPhrase: View {
                                                     .font(FCrypto(style: .body2))
                                                     .padding(.horizontal, 12)
                                                     .padding(.vertical, 4)
-                                                    .background(RoundedRectangle(cornerRadius: 4)
-                                                                    .foregroundColor(Color("Crypto100")))
-                                            })
+                                                    .background(
+                                                        RoundedRectangle(cornerRadius: 4)
+                                                            .foregroundColor(Color("Crypto100"))
+                                                    )
+                                            }
+                                        )
                                     }
                                 }
                             }
@@ -99,7 +101,8 @@ struct RecoverSeedPhrase: View {
                                         .multilineTextAlignment(.leading)
                                     Spacer()
                                 }
-                            })
+                            }
+                        )
                         if !focus {
                             HStack {
                                 BigButton(
@@ -109,7 +112,7 @@ struct RecoverSeedPhrase: View {
                                     },
                                     isDisabled: content.readySeed == nil
                                 )
-                                    .padding(.top, 16.0)
+                                .padding(.top, 16.0)
                             }
                         }
                     }.padding(.horizontal)

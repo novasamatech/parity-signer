@@ -18,7 +18,7 @@ struct EnterPassword: View {
             VStack {
                 HeaderBar(line1: "SECRET PATH", line2: "///password")
                 AddressCard(address: content.authorInfo)
-                if content.counter>0 {
+                if content.counter > 0 {
                     Text("Attempt " + String(content.counter) + " of 3")
                 }
                 ZStack {

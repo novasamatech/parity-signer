@@ -25,9 +25,9 @@ struct TCAuthorPublicKey: View {
 }
 
 /*
-struct TCAuthorPublicKey_Previews: PreviewProvider {
-    static var previews: some View {
-        TCAuthorPublicKey()
-    }
-}
-*/
+ struct TCAuthorPublicKey_Previews: PreviewProvider {
+     static var previews: some View {
+         TCAuthorPublicKey()
+     }
+ }
+ */

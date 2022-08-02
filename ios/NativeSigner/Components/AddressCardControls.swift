@@ -24,15 +24,15 @@ struct AddressCardControls: View {
                 label: {
                     ZStack {
                         RoundedRectangle(cornerRadius: 6).foregroundColor(Color("Crypto100"))
-                        Text("N+"+String(Int(count))).font(FCrypto(style: .body2)).foregroundColor(Color("Crypto400"))
+                        Text("N+" + String(Int(count))).font(FCrypto(style: .body2)).foregroundColor(Color("Crypto400"))
                     }
                     .frame(width: rowHeight, height: rowHeight)
                     .gesture(
                         DragGesture()
-                            .onChanged {drag in
-                                count = exp(abs(drag.translation.height)/50)
+                            .onChanged { drag in
+                                count = exp(abs(drag.translation.height) / 50)
                             }
-                            .onEnded {_ in
+                            .onEnded { _ in
                                 increment(String(Int(count)))
                             }
                     )
@@ -62,7 +62,8 @@ struct AddressCardControls: View {
                             )
                         )
                     })
-                })
+                }
+            )
         }
     }
 }

@@ -15,11 +15,11 @@ struct TransactionScreen: View {
 }
 
 /*
-struct TransactionScreen_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            TransactionScreen()
-        }
-    }
-}
-*/
+ struct TransactionScreen_Previews: PreviewProvider {
+     static var previews: some View {
+         NavigationView {
+             TransactionScreen()
+         }
+     }
+ }
+ */

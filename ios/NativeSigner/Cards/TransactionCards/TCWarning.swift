@@ -21,9 +21,9 @@ struct TCWarning: View {
 }
 
 /*
-struct TCWarning_Previews: PreviewProvider {
-    static var previews: some View {
-        TCWarning()
-    }
-}
-*/
+ struct TCWarning_Previews: PreviewProvider {
+     static var previews: some View {
+         TCWarning()
+     }
+ }
+ */

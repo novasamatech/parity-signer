@@ -28,29 +28,33 @@ struct TypesMenu: View {
                     text: "Sign types",
                     isShaded: true,
                     isCrypto: true,
-                    action: {pushButton(.signTypes, "", "")}
+                    action: { pushButton(.signTypes, "", "") }
                 )
                 BigButton(
                     text: "Delete types",
                     isShaded: true,
                     isDangerous: true,
-                    action: {removeTypesAlert = true}
+                    action: { removeTypesAlert = true }
                 )
             }
         }
-        .gesture(DragGesture().onEnded {drag in
+        .gesture(DragGesture().onEnded { drag in
             if drag.translation.height > 40 {
                 pushButton(.goBack, "", "")
             }
         })
         .alert(isPresented: $removeTypesAlert, content: {
-            Alert(title: Text("Remove types?"),
-                  message: Text(
+            Alert(
+                title: Text("Remove types?"),
+                message: Text(
                     "Types information needed for support of pre-v14 metadata will be removed. Are you sure?"
-                  ),
-                  primaryButton: .cancel(Text("Cancel")),
-                  secondaryButton: .destructive(Text("Remove types"),
-                                                action: {pushButton(.removeTypes, "", "")}))
+                ),
+                primaryButton: .cancel(Text("Cancel")),
+                secondaryButton: .destructive(
+                    Text("Remove types"),
+                    action: { pushButton(.removeTypes, "", "") }
+                )
+            )
         })
     }
 }

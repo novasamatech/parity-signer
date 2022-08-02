@@ -15,9 +15,9 @@ struct TCGenesisHash: View {
 }
 
 /*
-struct TCGenesisHash_Previews: PreviewProvider {
-    static var previews: some View {
-        TCGenesisHash()
-    }
-}
-*/
+ struct TCGenesisHash_Previews: PreviewProvider {
+     static var previews: some View {
+         TCGenesisHash()
+     }
+ }
+ */

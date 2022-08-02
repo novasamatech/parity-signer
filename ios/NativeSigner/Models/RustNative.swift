@@ -6,15 +6,14 @@
 //
 
 import Foundation
-import UIKit // for converting raw png to UIImage
 import LocalAuthentication // to detect if password is set
+import UIKit // for converting raw png to UIImage
 
 /**
  * Object to store all data; since the data really is mostly stored in RustNative side,
  * just one object (to describe it) is used here.
  */
 class SignerDataModel: ObservableObject {
-
     // Action handler
     var actionAvailable = true // debouncer
     @Published var actionResult: ActionResult = ActionResult( // Screen state is stored here
@@ -58,8 +57,8 @@ class SignerDataModel: ObservableObject {
         connectivityMonitor: ConnectivityMonitoring = ConnectivityMonitoringAssembler().assemble()
     ) {
         self.connectivityMonitor = connectivityMonitor
-        self.dbName = NSHomeDirectory() + "/Documents/Database"
-        self.onboardingDone = FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database")
+        dbName = NSHomeDirectory() + "/Documents/Database"
+        onboardingDone = FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database")
 
         connectivityMonitor.startMonitoring { isConnected in
             if isConnected, self.onboardingDone {
@@ -73,10 +72,10 @@ class SignerDataModel: ObservableObject {
             self.canaryDead = isConnected
         }
 
-        if self.onboardingDone {
-            self.refreshSeeds()
+        if onboardingDone {
+            refreshSeeds()
             initNavigation(dbname: dbName, seedNames: seedNames)
-            self.totalRefresh()
+            totalRefresh()
         }
     }
 
@@ -84,8 +83,7 @@ class SignerDataModel: ObservableObject {
      * Mild refresh for situations when no interaction with data was really performed.
      * Should not call stuff in signer.h
      */
-    func refreshUI() {
-    }
+    func refreshUI() {}
 
     /**
      * refresh everything except for seedNames
@@ -94,7 +92,7 @@ class SignerDataModel: ObservableObject {
     func totalRefresh() {
         print("heavy reset")
         pushButton(action: .start)
-        self.checkAlert()
+        checkAlert()
         // self.refreshUI()
     }
 }
@@ -105,16 +103,16 @@ extension SignerDataModel {
      * Populates database with starting values
      */
     func onboard(jailbreak: Bool = false) {
-        if !self.canaryDead {
+        if !canaryDead {
             do {
                 print("onboarding...")
                 wipe()
                 if let source = Bundle.main.url(forResource: "Database", withExtension: "") {
                     var destination = try FileManager.default.url(
                         for: .documentDirectory,
-                           in: .userDomainMask,
-                           appropriateFor: nil,
-                           create: false
+                        in: .userDomainMask,
+                        appropriateFor: nil,
+                        create: false
                     )
                     destination.appendPathComponent("Database")
                     if FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database") {
@@ -132,14 +130,14 @@ extension SignerDataModel {
                         } else {
                             try historyInitHistoryWithCert(dbname: dbName)
                         }
-                        self.onboardingDone = true
+                        onboardingDone = true
                         /* Mean app mode:
                          if self.canaryDead {
                          device_was_online(nil, self.dbName)
                          }*/
                         initNavigation(dbname: dbName, seedNames: seedNames)
-                        self.totalRefresh()
-                        self.refreshSeeds()
+                        totalRefresh()
+                        refreshSeeds()
                     } catch {
                         print("History init failed! This will not do.")
                     }
@@ -166,17 +164,17 @@ extension SignerDataModel {
             do {
                 var destination = try FileManager.default.url(
                     for: .documentDirectory,
-                       in: .userDomainMask,
-                       appropriateFor: nil,
-                       create: false
+                    in: .userDomainMask,
+                    appropriateFor: nil,
+                    create: false
                 )
                 destination.appendPathComponent("Database")
                 try FileManager.default.removeItem(at: destination)
             } catch {
                 print("FileManager failed to delete db")
             }
-            self.onboardingDone = false
-            self.seedNames = []
+            onboardingDone = false
+            seedNames = []
             initNavigation(dbname: dbName, seedNames: seedNames)
         }
     }
@@ -185,9 +183,9 @@ extension SignerDataModel {
      * Remove general verifier; wipes everything, obviously
      */
     func jailbreak() {
-        self.wipe()
+        wipe()
         if !onboardingDone {
-            self.onboard(jailbreak: true)
+            onboard(jailbreak: true)
         }
     }
 }
@@ -197,7 +195,7 @@ extension SignerDataModel {
  */
 extension ErrorDisplayed {
     func show() {
-        if case .Str(let payload) = self {
+        if case let .Str(payload) = self {
             print(payload)
         }
     }

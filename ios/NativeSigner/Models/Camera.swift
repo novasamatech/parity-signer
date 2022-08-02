@@ -9,9 +9,9 @@
  * This contains standard Apple boilerplate to generate basic camera preview
  */
 
-import Foundation
-import Combine
 import AVFoundation
+import Combine
+import Foundation
 
 final class CameraViewModel: ObservableObject {
     private let service = CameraService()
@@ -29,25 +29,25 @@ final class CameraViewModel: ObservableObject {
     private var subscriptions = Set<AnyCancellable>()
 
     init() {
-        self.session = service.session
+        session = service.session
 
-        service.$payload.sink { [weak self] (payload) in
-            guard let value = payload else {return}
+        service.$payload.sink { [weak self] payload in
+            guard let value = payload else { return }
             self?.payload = value
         }
-        .store(in: &self.subscriptions)
+        .store(in: &subscriptions)
 
-        service.$captured.sink { [weak self] (captured) in
-            guard let value = captured else {return}
+        service.$captured.sink { [weak self] captured in
+            guard let value = captured else { return }
             self?.captured = value
         }
-        .store(in: &self.subscriptions)
+        .store(in: &subscriptions)
 
-        service.$total.sink { [weak self] (total) in
-            guard let value = total else {return}
+        service.$total.sink { [weak self] total in
+            guard let value = total else { return }
             self?.total = value
         }
-        .store(in: &self.subscriptions)
+        .store(in: &subscriptions)
     }
 
     func configure() {
@@ -56,7 +56,7 @@ final class CameraViewModel: ObservableObject {
     }
 
     func shutdown() {
-        print(self.payload ?? "No payload catpured by camera")
+        print(payload ?? "No payload catpured by camera")
         service.stop()
     }
 

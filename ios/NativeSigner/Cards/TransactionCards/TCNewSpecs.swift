@@ -40,7 +40,7 @@ struct TCNewSpecs: View {
                 HStack {
                     Text("genesis hash:")
                         .foregroundColor(Color("Text400"))
-                    Text(value.genesisHash.map {String(format: "%02X", $0)}.joined())
+                    Text(value.genesisHash.map { String(format: "%02X", $0) }.joined())
                         .foregroundColor(Color("Text600"))
                 }
                 HStack {
@@ -51,7 +51,7 @@ struct TCNewSpecs: View {
                             value.encryption == .sr25519 ? "sr25519" :
                             value.encryption == .ecdsa ? "ecdsa" : "error"
                     )
-                        .foregroundColor(Color("Text600"))
+                    .foregroundColor(Color("Text600"))
                 }
                 HStack {
                     Text("spec name:")
@@ -75,9 +75,9 @@ struct TCNewSpecs: View {
     }
 }
 
-    /*
-     struct TCNewSpecs_Previews: PreviewProvider {
-     static var previews: some View {
-     TCNewSpecs()
-     }
-     }*/
+/*
+ struct TCNewSpecs_Previews: PreviewProvider {
+ static var previews: some View {
+ TCNewSpecs()
+ }
+ }*/

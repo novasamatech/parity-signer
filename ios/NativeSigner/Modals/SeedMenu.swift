@@ -51,7 +51,7 @@ struct SeedMenu: View {
                 primaryButton: .cancel(Text("Cancel")),
                 secondaryButton: .destructive(
                     Text("Remove seed"),
-                    action: {removeSeed(content.seed)}
+                    action: { removeSeed(content.seed) }
                 )
             )
         })

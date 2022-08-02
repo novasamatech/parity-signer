@@ -46,7 +46,7 @@ struct PasswordConfirm: View {
                 BigButton(
                     text: "Next",
                     action: {
-                        createAddress(content.croppedPath+"///"+content.pwd, content.seedName)
+                        createAddress(content.croppedPath + "///" + content.pwd, content.seedName)
                     },
                     isDisabled: passwordCheck != content.pwd
                 )

@@ -20,9 +20,9 @@ struct TCID: View {
 }
 
 /*
-struct TCID_Previews: PreviewProvider {
-    static var previews: some View {
-        TCID()
-    }
-}
-*/
+ struct TCID_Previews: PreviewProvider {
+     static var previews: some View {
+         TCID()
+     }
+ }
+ */

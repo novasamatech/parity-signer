@@ -22,7 +22,7 @@ enum ShownDocument: String, CaseIterable, Identifiable {
     case privacyPolicy
 
     var id: String {
-        self.rawValue
+        rawValue
     }
 
     var label: String {

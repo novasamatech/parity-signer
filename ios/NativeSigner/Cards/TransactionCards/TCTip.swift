@@ -22,9 +22,9 @@ struct TCTip: View {
 }
 
 /*
-struct TCTip_Previews: PreviewProvider {
-    static var previews: some View {
-        TCTip()
-    }
-}
- */
+ struct TCTip_Previews: PreviewProvider {
+     static var previews: some View {
+         TCTip()
+     }
+ }
+  */

@@ -10,7 +10,6 @@ import Network
 import XCTest
 
 final class ConnectivityMonitoringAdapterTests: XCTestCase {
-
     private var adaptee: PathMonitorProtocolMock!
     private var monitoringQueue: DispatchQueue!
     private var notificationQueue: DispatchQueue!

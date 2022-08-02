@@ -30,7 +30,8 @@ struct Backup: View {
                             },
                             label: {
                                 Image(systemName: "xmark").imageScale(.large).foregroundColor(Color("Text300"))
-                            })
+                            }
+                        )
                     }
                 }
                 ScrollView {
@@ -52,9 +53,9 @@ struct Backup: View {
                                 failure = true
                                 countdown = -1
                                 secret = alert ?
-                                "Network connected! Seeds are not available now. " +
-                                "Please enable airplane mode and disconnect all cables to access the seed phrase." :
-                                "Seeds are not available now! Come back again to access them."
+                                    "Network connected! Seeds are not available now. " +
+                                    "Please enable airplane mode and disconnect all cables to access the seed phrase." :
+                                    "Seeds are not available now! Come back again to access them."
                             }
                             UIApplication.shared.isIdleTimerDisabled = true
                         }
@@ -62,10 +63,13 @@ struct Backup: View {
                             secret = ""
                             UIApplication.shared.isIdleTimerDisabled = false
                         }
-                        .background(RoundedRectangle(cornerRadius: 8)
-                                        .foregroundColor(Color(countdown>0 ? "Crypto100" :
-                                                                failure ? "BgDanger" :
-                                                                "Bg300"))
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .foregroundColor(Color(
+                                    countdown > 0 ? "Crypto100" :
+                                        failure ? "BgDanger" :
+                                        "Bg300"
+                                ))
                         )
                         HStack {
                             Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))
@@ -73,7 +77,7 @@ struct Backup: View {
                         }
                         LazyVStack {
                             ForEach(
-                                content.derivations.sorted(by: {$0.networkOrder < $1.networkOrder}),
+                                content.derivations.sorted(by: { $0.networkOrder < $1.networkOrder }),
                                 id: \.networkOrder
                             ) { pack in
                                 VStack {
@@ -81,11 +85,12 @@ struct Backup: View {
                                         NetworkCard(
                                             title: pack.networkTitle,
                                             logo: pack.networkLogo,
-                                            fancy: true)
-                                            .padding(.top, 10)
+                                            fancy: true
+                                        )
+                                        .padding(.top, 10)
                                         Spacer()
                                     }
-                                    ForEach(pack.idSet.sorted(by: {$0.path < $1.path}), id: \.self) { record in
+                                    ForEach(pack.idSet.sorted(by: { $0.path < $1.path }), id: \.self) { record in
                                         HStack {
                                             Text((record.path == "" && !record.hasPwd) ? "seed key" : record.path)
                                                 .foregroundColor(Color("Crypto400"))
@@ -117,7 +122,7 @@ struct Backup: View {
                             secret = "Time out\n\nCome back again\nto see the seed phrase!"
                         }
                         .onReceive(timer) { _ in
-                            if countdown > 0 {countdown -= 1}
+                            if countdown > 0 { countdown -= 1 }
                             if countdown == 0 {
                                 secret = "Time out\n\nCome back again\nto see the seed phrase!"
                             }

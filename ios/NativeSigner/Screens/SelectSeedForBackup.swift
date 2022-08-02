@@ -15,9 +15,9 @@ struct SelectSeedForBackup: View {
             ScrollView {
                 LazyVStack {
                     ForEach(
-                        content.seedNameCards.sorted(by: {$0.seedName < $1.seedName}),
+                        content.seedNameCards.sorted(by: { $0.seedName < $1.seedName }),
                         id: \.seedName
-                    ) {seedNameCard in
+                    ) { seedNameCard in
                         HStack {
                             Button(
                                 action: {

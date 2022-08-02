@@ -25,9 +25,10 @@ struct TCAuthor: View {
         }
     }
 }
- /*
-struct TCAuthor_Previews: PreviewProvider {
-    static var previews: some View {
-        TCAuthor()
-    }
-}*/
+
+/*
+ struct TCAuthor_Previews: PreviewProvider {
+     static var previews: some View {
+         TCAuthor()
+     }
+ }*/

@@ -21,13 +21,13 @@ struct ShieldAlertComponent: View {
                         "Network connected!",
                         isPresented: $show,
                         actions: {
-                            Button("Ok") {pushButton(.goBack, "", "")}
+                            Button("Ok") { pushButton(.goBack, "", "") }
                         },
                         message: {
                             Text(
                                 "Signer detects currently connected network;" +
-                                " please enable airplane mode, disconnect all cables" +
-                                " and handle security breach according with your security protocol."
+                                    " please enable airplane mode, disconnect all cables" +
+                                    " and handle security breach according with your security protocol."
                             )
                         }
                     )
@@ -38,7 +38,7 @@ struct ShieldAlertComponent: View {
                             "Network was connected!",
                             isPresented: $show,
                             actions: {
-                                Button("Back") {pushButton(.goBack, "", "")}
+                                Button("Back") { pushButton(.goBack, "", "") }
                                 Button("Acknowledge and reset") {
                                     resetAlert()
                                 }
@@ -46,9 +46,9 @@ struct ShieldAlertComponent: View {
                             message: {
                                 Text(
                                     "Your Signer device has connected to a WiFi," +
-                                    " tether or Bluetooth network since your last acknowledgement" +
-                                    " and should be considered unsafe to use." +
-                                    " Please follow your security protocol"
+                                        " tether or Bluetooth network since your last acknowledgement" +
+                                        " and should be considered unsafe to use." +
+                                        " Please follow your security protocol"
                                 )
                             }
                         )
@@ -58,7 +58,7 @@ struct ShieldAlertComponent: View {
                             "Signer is secure",
                             isPresented: $show,
                             actions: {
-                                Button("Ok") {pushButton(.goBack, "", "")}
+                                Button("Ok") { pushButton(.goBack, "", "") }
                             },
                             message: {
                                 Text("Please proceed")

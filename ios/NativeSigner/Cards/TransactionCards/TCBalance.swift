@@ -20,9 +20,9 @@ struct TCBalance: View {
 }
 
 /*
-struct TCBalance_Previews: PreviewProvider {
-    static var previews: some View {
-        TCBalance()
-    }
-}
-*/
+ struct TCBalance_Previews: PreviewProvider {
+     static var previews: some View {
+         TCBalance()
+     }
+ }
+ */

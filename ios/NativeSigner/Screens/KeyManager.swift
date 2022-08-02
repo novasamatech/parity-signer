@@ -28,24 +28,28 @@ struct KeyManager: View {
                                 seedCard: content.root,
                                 multiselectMode: content.multiselectMode
                             )
-                                .gesture(DragGesture()
-                                            .onEnded {drag in
-                                    if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
-                                        if content.root.addressKey != "" {
-                                            pushButton(.swipe, content.root.addressKey, "")
+                            .gesture(
+                                DragGesture()
+                                    .onEnded { drag in
+                                        if abs(drag.translation.height) < 20, abs(drag.translation.width) > 20 {
+                                            if content.root.addressKey != "" {
+                                                pushButton(.swipe, content.root.addressKey, "")
+                                            }
                                         }
                                     }
-                                })
-                                .gesture(LongPressGesture()
-                                            .onEnded {_ in
-                                    if content.root.addressKey != "" {
-                                        pushButton(.longTap, content.root.addressKey, "")
+                            )
+                            .gesture(
+                                LongPressGesture()
+                                    .onEnded { _ in
+                                        if content.root.addressKey != "" {
+                                            pushButton(.longTap, content.root.addressKey, "")
+                                        }
                                     }
-                                }
-                                )
-                        })
-                        .disabled(content.root.addressKey == "")
-                        .padding(2)
+                            )
+                        }
+                    )
+                    .disabled(content.root.addressKey == "")
+                    .padding(2)
                     if content.root.swiped {
                         AddressCardControls(
                             seedName: content.root.seedName,
@@ -57,14 +61,15 @@ struct KeyManager: View {
                     }
                 }
                 Button(
-                    action: {pushButton(.networkSelector, "", "")},
+                    action: { pushButton(.networkSelector, "", "") },
                     label: {
                         HStack {
                             NetworkCard(title: content.network.title, logo: content.network.logo)
                             Image(systemName: "chevron.down")
                             Spacer()
                         }
-                    })
+                    }
+                )
                 HStack {
                     Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))
                     Spacer()
@@ -78,13 +83,14 @@ struct KeyManager: View {
                         },
                         label: {
                             Image(systemName: "plus.circle").imageScale(.large).foregroundColor(Color("Action400"))
-                        })
+                        }
+                    )
                 }.padding(.horizontal, 8)
                 ScrollView {
                     LazyVStack {
-                        ForEach(content.set.sorted(by: {$0.path < $1.path}).filter {card in
-                            return card.path.contains(searchString) || searchString == ""
-                        }, id: \.addressKey) {address in
+                        ForEach(content.set.sorted(by: { $0.path < $1.path }).filter { card in
+                            card.path.contains(searchString) || searchString == ""
+                        }, id: \.addressKey) { address in
                             ZStack {
                                 Button(
                                     action: {
@@ -102,18 +108,20 @@ struct KeyManager: View {
                                             ),
                                             multiselectMode: content.multiselectMode
                                         )
-                                            .gesture(DragGesture().onEnded {drag in
-                                                if abs(drag.translation.height) < 20 &&
-                                                    abs(drag.translation.width) > 20 {
-                                                    pushButton(.swipe, address.addressKey, "")
-                                                }
-                                            })
-                                            .gesture(LongPressGesture()
-                                                        .onEnded {_ in
-                                                pushButton(.longTap, address.addressKey, "")
+                                        .gesture(DragGesture().onEnded { drag in
+                                            if abs(drag.translation.height) < 20,
+                                               abs(drag.translation.width) > 20 {
+                                                pushButton(.swipe, address.addressKey, "")
                                             }
-                                            )
-                                    }).padding(2)
+                                        })
+                                        .gesture(
+                                            LongPressGesture()
+                                                .onEnded { _ in
+                                                    pushButton(.longTap, address.addressKey, "")
+                                                }
+                                        )
+                                    }
+                                ).padding(2)
                                 if address.swiped {
                                     AddressCardControls(
                                         seedName: content.root.seedName,

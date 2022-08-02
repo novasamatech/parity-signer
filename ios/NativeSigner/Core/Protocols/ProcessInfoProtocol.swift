@@ -13,4 +13,4 @@ protocol ProcessInfoProtocol {
     var environment: [String: String] { get }
 }
 
-extension ProcessInfo: ProcessInfoProtocol { }
+extension ProcessInfo: ProcessInfoProtocol {}
