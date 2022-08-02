@@ -1,0 +1,15 @@
+# format options
+--allman false
+--indent 4
+--maxwidth 120
+--commas inline
+--decimalgrouping 3
+--wraparguments before-first
+
+# file options
+--exclude NativeSigner/Generated/
+
+# rules
+--enable isEmpty
+--disable redundantType
+--disable wrapMultilineStatementBraces
