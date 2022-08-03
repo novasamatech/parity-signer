@@ -49,7 +49,7 @@ struct Backup: View {
                         }
                         .onAppear {
                             secret = getSeedForBackup(content.seedName)
-                            if secret == "" {
+                            if secret.isEmpty {
                                 failure = true
                                 countdown = -1
                                 secret = alert ?
@@ -92,7 +92,7 @@ struct Backup: View {
                                     }
                                     ForEach(pack.idSet.sorted(by: { $0.path < $1.path }), id: \.self) { record in
                                         HStack {
-                                            Text((record.path == "" && !record.hasPwd) ? "seed key" : record.path)
+                                            Text((record.path.isEmpty && !record.hasPwd) ? "seed key" : record.path)
                                                 .foregroundColor(Color("Crypto400"))
                                                 .font(FCrypto(style: .body2))
                                             if record.hasPwd {

@@ -54,7 +54,7 @@ struct MainScreenContainer: View {
                                 alertShow: { data.alertShow = true },
                                 increment: { seedName, _ in
                                     let seedPhrase = data.getSeed(seedName: seedName)
-                                    if seedPhrase != "" {
+                                    if !seedPhrase.isEmpty {
                                         data.pushButton(action: .increment, details: "1", seedPhrase: seedPhrase)
                                     }
                                 }

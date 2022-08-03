@@ -186,7 +186,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
     }
 
     /// Callback for receiving buffer - payload assembly is fed from here
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
+    // swiftlint:disable:next function_body_length
     public func captureOutput(
         _: AVCaptureOutput,
         didOutput sampleBuffer: CMSampleBuffer,

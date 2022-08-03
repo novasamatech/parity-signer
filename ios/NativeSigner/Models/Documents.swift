@@ -23,8 +23,10 @@ enum ShownDocument: String, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .toc: return "Terms of service"
-        case .privacyPolicy: return "Privacy policy"
+        case .toc:
+            return "Terms of service"
+        case .privacyPolicy:
+            return "Privacy policy"
         }
     }
 }

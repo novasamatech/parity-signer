@@ -30,7 +30,7 @@ struct NewSeedScreen: View {
                     .submitLabel(.done)
                     .onSubmit {
                         nameFocused = false
-                        if seedName != "", !checkSeedCollision(seedName) {
+                        if !seedName.isEmpty, !checkSeedCollision(seedName) {
                             pushButton(.goForward, seedName, "")
                         }
                     }
@@ -47,7 +47,7 @@ struct NewSeedScreen: View {
                     nameFocused = false
                     pushButton(.goForward, seedName, "")
                 },
-                isDisabled: (seedName == "") || checkSeedCollision(seedName)
+                isDisabled: (seedName.isEmpty) || checkSeedCollision(seedName)
             )
             Spacer()
         }.padding()

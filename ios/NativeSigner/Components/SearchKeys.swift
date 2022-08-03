@@ -15,7 +15,7 @@ struct SearchKeys: View {
         HStack {
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color(searchString == "" ? "Action100" : "Action400")).frame(height: 39)
+                    .stroke(Color(searchString.isEmpty ? "Action100" : "Action400")).frame(height: 39)
                 TextField("find keys", text: $searchString)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
@@ -23,7 +23,7 @@ struct SearchKeys: View {
                     .foregroundColor(Color("Text400"))
                     .padding(8)
             }
-            if searchString != "" {
+            if !searchString.isEmpty {
                 Button(
                     action: { searchString = "" },
                     label: {
