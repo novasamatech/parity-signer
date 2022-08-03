@@ -37,7 +37,8 @@ struct NewSeedBackupModal: View {
                                     .multilineTextAlignment(.leading).foregroundColor(Color("Text500"))
                                 Spacer()
                             }
-                        })
+                        }
+                    )
                     Button(
                         action: {
                             createRoots.toggle()
@@ -49,7 +50,8 @@ struct NewSeedBackupModal: View {
                                     .multilineTextAlignment(.leading).foregroundColor(Color("Text500"))
                                 Spacer()
                             }
-                        })
+                        }
+                    )
                     Spacer()
                     BigButton(
                         text: "Next",
@@ -58,17 +60,15 @@ struct NewSeedBackupModal: View {
                         },
                         isDisabled: !confirmBackup
                     )
-                        .padding(.vertical, 16.0)
+                    .padding(.vertical, 16.0)
                 }
             }.padding(16)
         }
     }
 }
 
-/*
- struct NewSeedBackupModal_Previews: PreviewProvider {
- static var previews: some View {
- NewSeedBackupModal()
- }
- }
- */
+// struct NewSeedBackupModal_Previews: PreviewProvider {
+// static var previews: some View {
+// NewSeedBackupModal()
+// }
+// }

@@ -22,7 +22,7 @@ struct NetworkCard: View {
             HStack {
                 NetworkLogo(logo: logo)
                 Text(title).font(FBase(style: .h3))
-                if fancy {Spacer()}
+                if fancy { Spacer() }
             }
             .foregroundColor(Color("Text600"))
             .frame(height: 36)
@@ -31,11 +31,9 @@ struct NetworkCard: View {
     }
 }
 
-/*
- struct NetworkCard_Previews: PreviewProvider {
- static var network = Network.networkData[0]
- static var previews: some View {
- NetworkCard(network: network).previewLayout(.sizeThatFits)
- }
- }
- */
+// struct NetworkCard_Previews: PreviewProvider {
+// static var network = Network.networkData[0]
+// static var previews: some View {
+// NetworkCard(network: network).previewLayout(.sizeThatFits)
+// }
+// }

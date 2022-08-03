@@ -9,7 +9,6 @@
 import XCTest
 
 final class RuntimePropertiesProviderTests: XCTestCase {
-
     private var processInfo: ProcessInfoProtocolMock!
     private var subject: RuntimePropertiesProvider!
 
@@ -25,7 +24,7 @@ final class RuntimePropertiesProviderTests: XCTestCase {
     func test_isInDevelopmentMode_whenRuntimePropertiesContainsFlagWithTrue_returnsTrue() {
         // Given
         processInfo.environment = [RuntimePropertiesProvider.Properties.developmentMode.description:
-                                    RuntimePropertiesProvider.PropertiesValues.true.description]
+            RuntimePropertiesProvider.PropertiesValues.true.description]
 
         // When
         let result = subject.isInDevelopmentMode
@@ -37,7 +36,7 @@ final class RuntimePropertiesProviderTests: XCTestCase {
     func test_isInDevelopmentMode_whenRuntimePropertiesContainsFlagWithFalse_returnsFalse() {
         // Given
         processInfo.environment = [RuntimePropertiesProvider.Properties.developmentMode.description:
-                                    RuntimePropertiesProvider.PropertiesValues.false.description]
+            RuntimePropertiesProvider.PropertiesValues.false.description]
 
         // When
         let result = subject.isInDevelopmentMode

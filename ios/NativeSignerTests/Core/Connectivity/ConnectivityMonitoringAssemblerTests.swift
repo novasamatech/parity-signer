@@ -9,7 +9,6 @@
 import XCTest
 
 final class ConnectivityMonitoringAssemblerTests: XCTestCase {
-
     private var runtimePropertiesProvider: RuntimePropertiesProvidingMock!
     private var subject: ConnectivityMonitoringAssembler!
 

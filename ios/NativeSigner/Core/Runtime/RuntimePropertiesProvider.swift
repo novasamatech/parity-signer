@@ -17,14 +17,14 @@ final class RuntimePropertiesProvider: RuntimePropertiesProviding {
     enum Properties: String, CustomStringConvertible {
         case developmentMode
 
-        var description: String { return rawValue }
+        var description: String { rawValue }
     }
 
     enum PropertiesValues: String, CustomStringConvertible {
         case `true`
         case `false`
 
-        var description: String { return rawValue }
+        var description: String { rawValue }
     }
 
     private let processInfo: ProcessInfoProtocol

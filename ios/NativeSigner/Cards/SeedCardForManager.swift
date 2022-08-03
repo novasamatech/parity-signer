@@ -27,10 +27,8 @@ struct SeedCardForManager: View {
     }
 }
 
-/*
- struct AddressCardSelector_Previews: PreviewProvider {
- static var previews: some View {
- SeedCardForManager()
- }
- }
- */
+// struct AddressCardSelector_Previews: PreviewProvider {
+// static var previews: some View {
+// SeedCardForManager()
+// }
+// }

@@ -22,16 +22,18 @@ struct SettingsScreen: View {
                 },
                 label: {
                     SettingsCardTemplate(text: "Networks")
-                })
+                }
+            )
             Button(
                 action: {
                     pushButton(.backupSeed, "", "")
                 },
                 label: {
                     SettingsCardTemplate(text: "Backup keys")
-                })
+                }
+            )
             Button(
-                action: {pushButton(.viewGeneralVerifier, "", "")},
+                action: { pushButton(.viewGeneralVerifier, "", "") },
                 label: {
                     VStack {
                         HStack {
@@ -66,7 +68,8 @@ struct SettingsScreen: View {
                         }
                     }
                     .padding()
-                })
+                }
+            )
             Button(
                 action: {
                     wipe = true
@@ -76,27 +79,29 @@ struct SettingsScreen: View {
                         text: "Wipe all data",
                         danger: true
                     )
-                })
-                .alert(isPresented: $wipe, content: {
-                    Alert(
-                        title: Text("Wipe ALL data?"),
-                        message: Text("Factory reset the Signer app. This operation can not be reverted!"),
-                        primaryButton: .cancel(),
-                        secondaryButton: .destructive(
-                            Text("Wipe"),
-                            action: {
-                                doWipe()
-                            }
-                        )
+                }
+            )
+            .alert(isPresented: $wipe, content: {
+                Alert(
+                    title: Text("Wipe ALL data?"),
+                    message: Text("Factory reset the Signer app. This operation can not be reverted!"),
+                    primaryButton: .cancel(),
+                    secondaryButton: .destructive(
+                        Text("Wipe"),
+                        action: {
+                            doWipe()
+                        }
                     )
-                })
+                )
+            })
             Button(
                 action: {
                     pushButton(.showDocuments, "", "")
                 },
                 label: {
                     SettingsCardTemplate(text: "About")
-                })
+                }
+            )
             SettingsCardTemplate(
                 text: "App version: " + (appVersion ?? "Unknown!"),
                 withIcon: false,
@@ -106,12 +111,10 @@ struct SettingsScreen: View {
     }
 }
 
-/*
- struct SettingsScreen_Previews: PreviewProvider {
- static var previews: some View {
- NavigationView {
- SettingsScreen()
- }
- }
- }
- */
+// struct SettingsScreen_Previews: PreviewProvider {
+// static var previews: some View {
+// NavigationView {
+// SettingsScreen()
+// }
+// }
+// }

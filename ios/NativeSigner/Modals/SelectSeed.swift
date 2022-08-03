@@ -18,9 +18,9 @@ struct SelectSeed: View {
                 ScrollView {
                     LazyVStack {
                         ForEach(
-                            content.seedNameCards.sorted(by: {$0.seedName < $1.seedName}),
+                            content.seedNameCards.sorted(by: { $0.seedName < $1.seedName }),
                             id: \.seedName
-                        ) {seedNameCard in
+                        ) { seedNameCard in
                             HStack {
                                 Button(
                                     action: {
@@ -29,7 +29,8 @@ struct SelectSeed: View {
                                     label: {
                                         SeedCardForManager(seedNameCard: seedNameCard)
                                         Spacer()
-                                    })
+                                    }
+                                )
                             }
                         }
                     }
@@ -40,10 +41,8 @@ struct SelectSeed: View {
     }
 }
 
-/*
- struct SelectSeed_Previews: PreviewProvider {
- static var previews: some View {
- SelectSeed()
- }
- }
- */
+// struct SelectSeed_Previews: PreviewProvider {
+// static var previews: some View {
+// SelectSeed()
+// }
+// }

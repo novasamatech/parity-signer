@@ -27,19 +27,20 @@ struct TCEnumVariantName: View {
                         }
                     }
                     if showDoc {
-                        Text(AttributedString(fromHexDocs: value.docsEnumVariant) ??
-                             "docs parsing error in iOS, please refer to other sources")
-                            .foregroundColor(Color("Text600"))
+                        Text(
+                            AttributedString(fromHexDocs: value.docsEnumVariant) ??
+                                "docs parsing error in iOS, please refer to other sources"
+                        )
+                        .foregroundColor(Color("Text600"))
                     }
                 }
-            }).disabled(value.docsEnumVariant == "")
+            }
+        ).disabled(value.docsEnumVariant == "")
     }
 }
 
-/*
- struct TCEnumVariantName_Previews: PreviewProvider {
- static var previews: some View {
- TCEnumVariantName()
- }
- }
- */
+// struct TCEnumVariantName_Previews: PreviewProvider {
+// static var previews: some View {
+// TCEnumVariantName()
+// }
+// }

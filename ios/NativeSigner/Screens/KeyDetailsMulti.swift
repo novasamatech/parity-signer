@@ -33,10 +33,10 @@ struct KeyDetailsMulti: View {
         }
         .gesture(
             DragGesture()
-                .onChanged {drag in
+                .onChanged { drag in
                     self.offset = drag.translation.width
                 }
-                .onEnded {drag in
+                .onEnded { drag in
                     self.offset = 0
                     if abs(drag.translation.height) > 200 {
                         showDetails.toggle()
@@ -53,10 +53,8 @@ struct KeyDetailsMulti: View {
     }
 }
 
-/*
- struct KeyDetailsMulti_Previews: PreviewProvider {
- static var previews: some View {
- KeyDetailsMulti()
- }
- }
- */
+// struct KeyDetailsMulti_Previews: PreviewProvider {
+// static var previews: some View {
+// KeyDetailsMulti()
+// }
+// }

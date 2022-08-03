@@ -32,17 +32,15 @@ struct KeyMenu: View {
                 primaryButton: .cancel(Text("Cancel")),
                 secondaryButton: .destructive(
                     Text("Remove key"),
-                    action: {pushButton(.removeKey, "", "")}
+                    action: { pushButton(.removeKey, "", "") }
                 )
             )
         })
     }
 }
 
-/*
- struct KeyMenu_Previews: PreviewProvider {
- static var previews: some View {
- KeyMenu()
- }
- }
- */
+// struct KeyMenu_Previews: PreviewProvider {
+// static var previews: some View {
+// KeyMenu()
+// }
+// }

@@ -29,7 +29,7 @@ struct RecoverSeedName: View {
                     .keyboardType(.asciiCapable)
                     .submitLabel(.done)
                     .onSubmit {
-                        if (seedName != "") && !checkSeedCollision(seedName) {
+                        if seedName != "", !checkSeedCollision(seedName) {
                             pushButton(.goForward, seedName, "")
                         }
                     }
@@ -53,10 +53,8 @@ struct RecoverSeedName: View {
     }
 }
 
-/*
- struct RecoverSeedName_Previews: PreviewProvider {
- static var previews: some View {
- RecoverSeedName()
- }
- }
- */
+// struct RecoverSeedName_Previews: PreviewProvider {
+// static var previews: some View {
+// RecoverSeedName()
+// }
+// }

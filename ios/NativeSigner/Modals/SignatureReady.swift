@@ -27,28 +27,27 @@ struct SignatureReady: View {
                 })
             }.padding(16)
         }
-        .offset(x: 0, y: offset+oldOffset)
+        .offset(x: 0, y: offset + oldOffset)
         .gesture(
             DragGesture()
-                .onChanged {drag in
+                .onChanged { drag in
                     self.offset = drag.translation.height
                 }
-                .onEnded {drag in
+                .onEnded { drag in
                     self.oldOffset += drag.translation.height
                     self.offset = 0
                 }
         )
         .gesture(
-            TapGesture().onEnded {_ in
+            TapGesture().onEnded { _ in
                 self.oldOffset = 0
-            })
+            }
+        )
     }
 }
 
-/*
- struct SignatureReady_Previews: PreviewProvider {
- static var previews: some View {
- SignatureReady()
- }
- }
- */
+// struct SignatureReady_Previews: PreviewProvider {
+// static var previews: some View {
+// SignatureReady()
+// }
+// }

@@ -33,9 +33,8 @@ struct TCVerifier: View {
     }
 }
 
-/*
- struct TCVerifier_Previews: PreviewProvider {
- static var previews: some View {
- TCVerifier()
- }
- }*/
+// struct TCVerifier_Previews: PreviewProvider {
+// static var previews: some View {
+// TCVerifier()
+// }
+// }

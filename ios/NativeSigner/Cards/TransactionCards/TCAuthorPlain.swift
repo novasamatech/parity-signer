@@ -17,10 +17,8 @@ struct TCAuthorPlain: View {
     }
 }
 
-/*
- struct TCAuthorPlain_Previews: PreviewProvider {
- static var previews: some View {
- TCAuthorPlain(author: AuthorPlain(base58: "111"))
- }
- }
- */
+// struct TCAuthorPlain_Previews: PreviewProvider {
+// static var previews: some View {
+// TCAuthorPlain(author: AuthorPlain(base58: "111"))
+// }
+// }

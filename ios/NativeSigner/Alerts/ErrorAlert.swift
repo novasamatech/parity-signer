@@ -12,9 +12,9 @@ struct ErrorAlert: View {
     let content: String
     var body: some View {
         ZStack {
-            Rectangle().foregroundColor(Color("BgDanger")).opacity(0.3).gesture(TapGesture().onEnded {_ in
+            Rectangle().foregroundColor(Color("BgDanger")).opacity(0.3).gesture(TapGesture().onEnded { _ in
                 pushButton(.goBack, "", "")
-                })
+            })
             VStack {
                 Text("Error!").font(FBase(style: .h1)).foregroundColor(Color("SignalDanger"))
                 Text(content).foregroundColor(Color("SignalDanger"))
@@ -26,10 +26,8 @@ struct ErrorAlert: View {
     }
 }
 
-/*
- struct ErrorAlert_Previews: PreviewProvider {
- static var previews: some View {
- ErrorAlert()
- }
- }
- */
+// struct ErrorAlert_Previews: PreviewProvider {
+// static var previews: some View {
+// ErrorAlert()
+// }
+// }

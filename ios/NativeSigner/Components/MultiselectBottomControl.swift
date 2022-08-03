@@ -7,9 +7,7 @@
 
 import SwiftUI
 
-/**
- * Panel with actions for multiselect
- */
+/// Panel with actions for multiselect
 struct MultiselectBottomControl: View {
     @State var delete = false
     var selectedCount: String
@@ -23,21 +21,22 @@ struct MultiselectBottomControl: View {
                     },
                     label: {
                         SmallButton(text: "Delete")
-                    })
-                    .disabled(selectedCount == "0")
-                    .alert(isPresented: $delete, content: {
-                        Alert(
-                            title: Text("Delete key?"),
-                            message: Text("You are about to delete selected keys"),
-                            primaryButton: .cancel(),
-                            secondaryButton: .destructive(
-                                Text("Delete"),
-                                action: {
-                                    pushButton(.removeKey, "", "")
-                                }
-                            )
+                    }
+                )
+                .disabled(selectedCount == "0")
+                .alert(isPresented: $delete, content: {
+                    Alert(
+                        title: Text("Delete key?"),
+                        message: Text("You are about to delete selected keys"),
+                        primaryButton: .cancel(),
+                        secondaryButton: .destructive(
+                            Text("Delete"),
+                            action: {
+                                pushButton(.removeKey, "", "")
+                            }
                         )
-                    })
+                    )
+                })
                 Spacer()
                 Button(
                     action: {
@@ -45,7 +44,8 @@ struct MultiselectBottomControl: View {
                     },
                     label: {
                         SmallButton(text: "Export")
-                    }).disabled(selectedCount == "0")
+                    }
+                ).disabled(selectedCount == "0")
             }
             HStack {
                 Text(selectedCount)
@@ -56,10 +56,8 @@ struct MultiselectBottomControl: View {
     }
 }
 
-/*
- struct MultiselectBottomControl_Previews: PreviewProvider {
- static var previews: some View {
- MultiselectBottomControl()
- }
- }
- */
+// struct MultiselectBottomControl_Previews: PreviewProvider {
+// static var previews: some View {
+// MultiselectBottomControl()
+// }
+// }

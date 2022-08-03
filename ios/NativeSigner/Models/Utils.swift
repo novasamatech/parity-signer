@@ -7,25 +7,22 @@
 
 import Foundation
 
-/**
- * Util: convert hex string spit out by rust code into data
- * uft16 is used for string-native performance
- */
+/// Util: convert hex string spit out by rust code into data
+/// uft16 is used for string-native performance
 extension Data {
-
     func hexCharValue(character: UInt16) -> UInt8? {
         switch character {
         case 0x30 ... 0x39:
             return UInt8(character - 0x30)
         case 0x61 ... 0x66:
-            return UInt8(character-0x61 + 10)
+            return UInt8(character - 0x61 + 10)
         default:
             return nil
         }
     }
 
     init?(fromHexEncodedString string: String) {
-        self.init(capacity: string.utf16.count/2)
+        self.init(capacity: string.utf16.count / 2)
         var even = true
         var value: UInt8 = 0
         for character in string.utf16 {
@@ -34,7 +31,7 @@ extension Data {
                 value = symbol << 4
             } else {
                 value += symbol
-                self.append(value)
+                append(value)
             }
             even = !even
         }
@@ -42,9 +39,7 @@ extension Data {
     }
 }
 
-/**
- * Decode markdown object from hex-encoded string passed in JSON
- */
+/// Decode markdown object from hex-encoded string passed in JSON
 extension AttributedString {
     init?(fromHexDocs string: String) {
         try? self.init(
@@ -58,12 +53,10 @@ extension AttributedString {
 }
 
 extension String {
-    /**
-     * St...ng
-     */
+    /// St...ng
     func truncateMiddle(length: Int) -> String {
-        if (self.count) > length*2 {
-            return self.prefix(length) + "..." + self.suffix(length)
+        if count > length * 2 {
+            return prefix(length) + "..." + suffix(length)
         } else {
             return self
         }
@@ -73,17 +66,17 @@ extension String {
 extension TransactionCardSet {
     func assemble() -> [TransactionCard] {
         var assembled: [TransactionCard] = []
-        assembled.append(contentsOf: self.author ?? [])
-        assembled.append(contentsOf: self.error ?? [])
-        assembled.append(contentsOf: self.extensions ?? [])
-        assembled.append(contentsOf: self.importingDerivations ?? [])
-        assembled.append(contentsOf: self.message ?? [])
-        assembled.append(contentsOf: self.meta ?? [])
-        assembled.append(contentsOf: self.method ?? [])
-        assembled.append(contentsOf: self.newSpecs ?? [])
-        assembled.append(contentsOf: self.verifier ?? [])
-        assembled.append(contentsOf: self.warning ?? [])
-        assembled.append(contentsOf: self.typesInfo ?? [])
+        assembled.append(contentsOf: author ?? [])
+        assembled.append(contentsOf: error ?? [])
+        assembled.append(contentsOf: extensions ?? [])
+        assembled.append(contentsOf: importingDerivations ?? [])
+        assembled.append(contentsOf: message ?? [])
+        assembled.append(contentsOf: meta ?? [])
+        assembled.append(contentsOf: method ?? [])
+        assembled.append(contentsOf: newSpecs ?? [])
+        assembled.append(contentsOf: verifier ?? [])
+        assembled.append(contentsOf: warning ?? [])
+        assembled.append(contentsOf: typesInfo ?? [])
         return assembled.sorted(by: {
             $0.index < $1.index
         })
@@ -92,14 +85,14 @@ extension TransactionCardSet {
 
 extension MRecoverSeedPhrase {
     func draftPhrase() -> String {
-        return self.draft.joined(separator: " ")
+        draft.joined(separator: " ")
     }
 }
 
 extension Verifier {
     func show() -> String {
-        switch self.v {
-        case .standard(let value):
+        switch v {
+        case let .standard(value):
             return value[0]
         case .none:
             return "None"
@@ -110,7 +103,7 @@ extension Verifier {
 extension VerifierValue {
     func show() -> String {
         switch self {
-        case .standard(let value):
+        case let .standard(value):
             return value[0]
         }
     }

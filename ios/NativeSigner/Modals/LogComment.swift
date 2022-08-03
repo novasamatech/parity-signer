@@ -45,10 +45,8 @@ struct LogComment: View {
     }
 }
 
-/*
- struct LogComment_Previews: PreviewProvider {
- static var previews: some View {
- LogComment()
- }
- }
- */
+// struct LogComment_Previews: PreviewProvider {
+// static var previews: some View {
+// LogComment()
+// }
+// }

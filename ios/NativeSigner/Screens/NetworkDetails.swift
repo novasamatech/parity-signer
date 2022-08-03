@@ -33,7 +33,7 @@ struct NetworkDetails: View {
                     }
                     HStack {
                         Text("genesis hash:")
-                        Text(content.genesisHash.map {String(format: "%02X", $0)}.joined())
+                        Text(content.genesisHash.map { String(format: "%02X", $0) }.joined())
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     HStack {
@@ -77,10 +77,8 @@ struct NetworkDetails: View {
     }
 }
 
-/*
- struct NetworkDetails_Previews: PreviewProvider {
- static var previews: some View {
- NetworkDetails()
- }
- }
- */
+// struct NetworkDetails_Previews: PreviewProvider {
+// static var previews: some View {
+// NetworkDetails()
+// }
+// }

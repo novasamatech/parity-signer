@@ -8,15 +8,11 @@
 import Foundation
 import SwiftUI
 
-/**
- * Address-related operations in data model
- */
+/// Address-related operations in data model
 extension SignerDataModel {
-    /**
-     * Creates address in database with checks and features
-     */
+    /// Creates address in database with checks and features
     func createAddress(path: String, seedName: String) {
-        let seedPhrase = self.getSeed(seedName: seedName)
+        let seedPhrase = getSeed(seedName: seedName)
         if !seedPhrase.isEmpty {
             pushButton(action: .goForward, details: path, seedPhrase: seedPhrase)
         }

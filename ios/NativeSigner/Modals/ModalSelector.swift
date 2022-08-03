@@ -26,12 +26,12 @@ struct ModalSelector: View {
                 alertShow: alertShow,
                 pushButton: pushButton
             )
-        case .networkSelector(let value):
+        case let .networkSelector(value):
             NetworkManager(
                 content: value,
                 pushButton: pushButton
             )
-        case .seedMenu(let value):
+        case let .seedMenu(value):
             SeedMenu(
                 content: value,
                 alert: alert,
@@ -39,45 +39,64 @@ struct ModalSelector: View {
                 removeSeed: removeSeed,
                 pushButton: pushButton
             )
-        case .backup(let value):
-            Backup(content: value,
-                   alert: alert,
-                   getSeedForBackup: getSeedForBackup,
-                   pushButton: pushButton)
-        case .passwordConfirm(let value):
-            PasswordConfirm(content: value,
-                            createAddress: createAddress)
-        case .signatureReady(let value):
-            SignatureReady(content: value,
-                           pushButton: pushButton)
-        case .enterPassword(let value):
-            EnterPassword(content: value,
-                          pushButton: pushButton)
-        case .logRight(let value):
-            LogMenu(content: value,
-                    pushButton: pushButton)
+        case let .backup(value):
+            Backup(
+                content: value,
+                alert: alert,
+                getSeedForBackup: getSeedForBackup,
+                pushButton: pushButton
+            )
+        case let .passwordConfirm(value):
+            PasswordConfirm(
+                content: value,
+                createAddress: createAddress
+            )
+        case let .signatureReady(value):
+            SignatureReady(
+                content: value,
+                pushButton: pushButton
+            )
+        case let .enterPassword(value):
+            EnterPassword(
+                content: value,
+                pushButton: pushButton
+            )
+        case let .logRight(value):
+            LogMenu(
+                content: value,
+                pushButton: pushButton
+            )
         case .networkDetailsMenu:
             NetworkDetailsMenu(
-                               pushButton: pushButton)
-        case .manageMetadata(let value):
-            ManageMetadata(content: value,
-                           pushButton: pushButton)
-        case .sufficientCryptoReady(let value):
+                pushButton: pushButton
+            )
+        case let .manageMetadata(value):
+            ManageMetadata(
+                content: value,
+                pushButton: pushButton
+            )
+        case let .sufficientCryptoReady(value):
             SufficientCryptoReady(content: value)
         case .keyDetailsAction:
             KeyMenu(
-                    pushButton: pushButton)
-        case .typesInfo(let value):
-            TypesMenu(content: value,
-                      pushButton: pushButton)
-        case .newSeedBackup(let value):
-            NewSeedBackupModal(content: value,
-                               restoreSeed: restoreSeed,
-                               pushButton: pushButton)
+                pushButton: pushButton
+            )
+        case let .typesInfo(value):
+            TypesMenu(
+                content: value,
+                pushButton: pushButton
+            )
+        case let .newSeedBackup(value):
+            NewSeedBackupModal(
+                content: value,
+                restoreSeed: restoreSeed,
+                pushButton: pushButton
+            )
         case .logComment:
             LogComment(
-                       pushButton: pushButton)
-        case .selectSeed(let value):
+                pushButton: pushButton
+            )
+        case let .selectSeed(value):
             SelectSeed(
                 content: value,
                 sign: sign,
@@ -89,10 +108,8 @@ struct ModalSelector: View {
     }
 }
 
-/*
- struct ModalSelector_Previews: PreviewProvider {
- static var previews: some View {
- ModalSelector()
- }
- }
- */
+// struct ModalSelector_Previews: PreviewProvider {
+// static var previews: some View {
+// ModalSelector()
+// }
+// }
