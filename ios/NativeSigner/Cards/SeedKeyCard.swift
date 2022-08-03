@@ -17,7 +17,7 @@ struct SeedKeyCard: View {
             HStack {
                 ZStack {
                     Identicon(identicon: seedCard.identicon)
-                    if multiselectMode, seedCard.base58 != "" {
+                    if multiselectMode, !seedCard.base58.isEmpty {
                         VStack {
                             Spacer()
                             HStack {

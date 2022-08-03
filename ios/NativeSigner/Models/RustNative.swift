@@ -94,6 +94,7 @@ class SignerDataModel: ObservableObject {
 extension SignerDataModel {
     /// Should be called once on factory-new state of the app
     /// Populates database with starting values
+    // swiftlint:disable:next function_body_length
     func onboard(jailbreak: Bool = false) {
         if !canaryDead {
             do {

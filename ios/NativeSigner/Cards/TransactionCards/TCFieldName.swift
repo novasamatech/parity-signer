@@ -21,7 +21,7 @@ struct TCFieldName: View {
                         Text(value.name)
                             .foregroundColor(Color("Text600"))
                         Spacer()
-                        if value.docsFieldName + value.pathType + value.docsType != "" {
+                        if (value.docsFieldName + value.pathType + value.docsType).isEmpty {
                             Text("?")
                                 .foregroundColor(Color("Action400"))
                         }
@@ -44,7 +44,7 @@ struct TCFieldName: View {
                 }
             }
         )
-        .disabled(value.docsFieldName + value.pathType + value.docsType == "")
+        .disabled((value.docsFieldName + value.pathType + value.docsType).isEmpty)
     }
 }
 
