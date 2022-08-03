@@ -7,13 +7,11 @@
 
 import Foundation
 import LocalAuthentication // to detect if password is set
-import UIKit // for converting raw png to UIImage
 
 /// Object to store all data; since the data really is mostly stored in RustNative side,
 /// just one object (to describe it) is used here.
-class SignerDataModel: ObservableObject {
+final class SignerDataModel: ObservableObject {
     // Action handler
-    var actionAvailable = true // debouncer
     @Published var actionResult: ActionResult = ActionResult( // Screen state is stored here
         screenLabel: "",
         back: false,
@@ -26,7 +24,6 @@ class SignerDataModel: ObservableObject {
         alertData: .none
     )
     @Published var parsingAlert: Bool = false
-    let debounceTime: Double = 0.2 // Debounce time
 
     // Data state
     @Published var seedNames: [String] = []
@@ -36,45 +33,42 @@ class SignerDataModel: ObservableObject {
     // This just starts camera reset. Could be done cleaner probably.
     @Published var resetCamera: Bool = false
 
-    // internal boilerplate
-    var dbName: String
-
     // Alert indicator
     @Published var canaryDead: Bool = false
-    private let connectivityMonitor: ConnectivityMonitoring
     @Published var alert: Bool = false
     @Published var alertShow: Bool = false
 
-    // version
+    /// internal boilerplate
+    var dbName: String
+    /// debouncer
+    var actionAvailable = true
+    /// Debounce time
+    let debounceTime: Double = 0.2
+    /// version
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-
-    // did user set up password?
+    /// did user set up password?
     let protected = LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
 
+    private let bundle: BundleProtocol
+    private let connectivityMonitor: ConnectivityMonitoring
+    private let databaseMediator: DatabaseMediating
+    private let fileManager: FileManagingProtocol
+
     init(
-        connectivityMonitor: ConnectivityMonitoring = ConnectivityMonitoringAssembler().assemble()
+        bundle: BundleProtocol = Bundle.main,
+        connectivityMonitor: ConnectivityMonitoring = ConnectivityMonitoringAssembler().assemble(),
+        databaseMediator: DatabaseMediating = DatabaseMediator(),
+        fileManager: FileManagingProtocol = FileManager.default
     ) {
+        self.bundle = bundle
         self.connectivityMonitor = connectivityMonitor
-        dbName = NSHomeDirectory() + "/Documents/Database"
-        onboardingDone = FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database")
+        self.databaseMediator = databaseMediator
+        self.fileManager = fileManager
+        dbName = databaseMediator.databaseName
+        onboardingDone = databaseMediator.isDatabaseAvailable()
 
-        connectivityMonitor.startMonitoring { isConnected in
-            if isConnected, self.onboardingDone {
-                do {
-                    try historyDeviceWasOnline(dbname: self.dbName)
-                } catch {
-                    return
-                }
-                self.alert = true
-            }
-            self.canaryDead = isConnected
-        }
-
-        if onboardingDone {
-            refreshSeeds()
-            initNavigation(dbname: dbName, seedNames: seedNames)
-            totalRefresh()
-        }
+        setUpConnectivityMonitoring()
+        finaliseInitialisation()
     }
 
     /// Mild refresh for situations when no interaction with data was really performed.
@@ -89,101 +83,85 @@ class SignerDataModel: ObservableObject {
         checkAlert()
         // self.refreshUI()
     }
-}
 
-extension SignerDataModel {
     /// Should be called once on factory-new state of the app
     /// Populates database with starting values
-    // swiftlint:disable:next function_body_length
     func onboard(jailbreak: Bool = false) {
-        if !canaryDead {
-            do {
-                print("onboarding...")
-                wipe()
-                if let source = Bundle.main.url(forResource: "Database", withExtension: "") {
-                    var destination = try FileManager.default.url(
-                        for: .documentDirectory,
-                        in: .userDomainMask,
-                        appropriateFor: nil,
-                        create: false
-                    )
-                    destination.appendPathComponent("Database")
-                    if FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database") {
-                        do {
-                            try FileManager.default.removeItem(at: destination)
-                        } catch {
-                            print("db exists but could not be removed; please report bug")
-                            return
-                        }
-                    }
-                    try FileManager.default.copyItem(at: source, to: destination)
-                    do {
-                        if jailbreak {
-                            try historyInitHistoryNoCert(dbname: dbName)
-                        } else {
-                            try historyInitHistoryWithCert(dbname: dbName)
-                        }
-                        onboardingDone = true
-                        // Mean app mode:
-                        // if self.canaryDead {
-                        // device_was_online(nil, self.dbName)
-                        // }
-                        initNavigation(dbname: dbName, seedNames: seedNames)
-                        totalRefresh()
-                        refreshSeeds()
-                    } catch {
-                        print("History init failed! This will not do.")
-                    }
-                }
-            } catch {
-                print("DB init failed")
+        guard !canaryDead else { return }
+        print("onboarding...")
+        wipe()
+        guard databaseMediator.recreateDatabaseFile() else {
+            print("Databse could not be recreated")
+            return
+        }
+        do {
+            if jailbreak {
+                try historyInitHistoryNoCert(dbname: dbName)
+            } else {
+                try historyInitHistoryWithCert(dbname: dbName)
             }
+            onboardingDone = true
+            // Mean app mode:
+            // if self.canaryDead {
+            // device_was_online(nil, self.dbName)
+            // }
+            initNavigation(dbname: dbName, seedNames: seedNames)
+            totalRefresh()
+            refreshSeeds()
+        } catch {
+            print("History init failed! This will not do.")
+        }
+    }
+}
+
+private extension SignerDataModel {
+    func setUpConnectivityMonitoring() {
+        connectivityMonitor.startMonitoring { isConnected in
+            if isConnected, self.onboardingDone {
+                do {
+                    try historyDeviceWasOnline(dbname: self.dbName)
+                } catch {
+                    return
+                }
+                self.alert = true
+            }
+            self.canaryDead = isConnected
         }
     }
 
+    func finaliseInitialisation() {
+        guard onboardingDone else { return }
+        refreshSeeds()
+        initNavigation(dbname: dbName, seedNames: seedNames)
+        totalRefresh()
+    }
+}
+
+extension SignerDataModel {
     /// Restores the Signer to factory new state
     /// Should be called before app uninstall/upgrade!
     func wipe() {
         refreshSeeds()
-        if authenticated {
-            // remove secrets first
-            let query = [
-                kSecClass as String: kSecClassGenericPassword
-            ] as CFDictionary
-            SecItemDelete(query)
-            // then everything else
-            do {
-                var destination = try FileManager.default.url(
-                    for: .documentDirectory,
-                    in: .userDomainMask,
-                    appropriateFor: nil,
-                    create: false
-                )
-                destination.appendPathComponent("Database")
-                try FileManager.default.removeItem(at: destination)
-            } catch {
-                print("FileManager failed to delete db")
-            }
-            onboardingDone = false
-            seedNames = []
-            initNavigation(dbname: dbName, seedNames: seedNames)
-        }
+        guard authenticated else { return }
+        // remove secrets first
+        let query = [
+            kSecClass as String: kSecClassGenericPassword
+        ] as CFDictionary
+        SecItemDelete(query)
+        // then everything else
+        databaseMediator.wipeDatabase()
+        onboardingDone = false
+        seedNames = []
+        initNavigation(dbname: dbName, seedNames: seedNames)
     }
+}
 
+extension SignerDataModel {
     /// Remove general verifier; wipes everything, obviously
     func jailbreak() {
         wipe()
         if !onboardingDone {
             onboard(jailbreak: true)
-        }
-    }
-}
-
-/// Maybe this could show errors?
-extension ErrorDisplayed {
-    func show() {
-        if case let .Str(payload) = self {
-            print(payload)
         }
     }
 }

@@ -147,17 +147,17 @@
 		6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */; };
 		6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */; };
 		6D5801E7289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */; };
+		6DBD21F2289A74EE005D539B /* FileManagingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */; };
+		6DBD21F4289A77DE005D539B /* BundleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F3289A77DE005D539B /* BundleProtocol.swift */; };
+		6DBD21F7289A798C005D539B /* ErrorDisplayed+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F6289A798C005D539B /* ErrorDisplayed+Show.swift */; };
+		6DBD21FA289A7A26005D539B /* DatabaseMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F9289A7A26005D539B /* DatabaseMediator.swift */; };
+		6DBD21FD289A83D0005D539B /* DatabaseMediatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21FC289A83D0005D539B /* DatabaseMediatorTests.swift */; };
+		6DBD2200289A8C74005D539B /* URL+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21FF289A8C74005D539B /* URL+Generate.swift */; };
+		6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD2201289A8E1F005D539B /* ErrorMock.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		2DE72BD026A588C9002BB752 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2DE72BB626A588C7002BB752 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 2DE72BBD26A588C7002BB752;
-			remoteInfo = NativeSigner;
-		};
-		2DE72BDB26A588C9002BB752 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2DE72BB626A588C7002BB752 /* Project object */;
 			proxyType = 1;
@@ -303,8 +303,6 @@
 		2DE72BCA26A588C9002BB752 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2DE72BCF26A588C9002BB752 /* NativeSignerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NativeSignerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BD526A588C9002BB752 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2DE72BDA26A588C9002BB752 /* NativeSignerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NativeSignerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2DE72BE026A588C9002BB752 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2DE72BFF26A6ADC5002BB752 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraService.swift; sourceTree = "<group>"; };
 		2DE72C0C26A992D9002BB752 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
 		2DE72C0E26A99885002BB752 /* RustNative.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RustNative.swift; sourceTree = "<group>"; };
@@ -317,6 +315,13 @@
 		6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAdapterTests.swift; sourceTree = "<group>"; };
 		6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAssemblerTests.swift; sourceTree = "<group>"; };
 		6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAssembler.swift; sourceTree = "<group>"; };
+		6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagingProtocol.swift; sourceTree = "<group>"; };
+		6DBD21F3289A77DE005D539B /* BundleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleProtocol.swift; sourceTree = "<group>"; };
+		6DBD21F6289A798C005D539B /* ErrorDisplayed+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ErrorDisplayed+Show.swift"; sourceTree = "<group>"; };
+		6DBD21F9289A7A26005D539B /* DatabaseMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseMediator.swift; sourceTree = "<group>"; };
+		6DBD21FC289A83D0005D539B /* DatabaseMediatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseMediatorTests.swift; sourceTree = "<group>"; };
+		6DBD21FF289A8C74005D539B /* URL+Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Generate.swift"; sourceTree = "<group>"; };
+		6DBD2201289A8E1F005D539B /* ErrorMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorMock.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -329,13 +334,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		2DE72BCC26A588C9002BB752 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2DE72BD726A588C9002BB752 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -534,7 +532,6 @@
 				2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */,
 				2DE72BC026A588C7002BB752 /* NativeSigner */,
 				2DE72BD226A588C9002BB752 /* NativeSignerTests */,
-				2DE72BDD26A588C9002BB752 /* NativeSignerUITests */,
 				2DE72BBF26A588C7002BB752 /* Products */,
 				2DE72C0B26A992D9002BB752 /* Frameworks */,
 			);
@@ -545,7 +542,6 @@
 			children = (
 				2DE72BBE26A588C7002BB752 /* NativeSigner.app */,
 				2DE72BCF26A588C9002BB752 /* NativeSignerTests.xctest */,
-				2DE72BDA26A588C9002BB752 /* NativeSignerUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -553,6 +549,7 @@
 		2DE72BC026A588C7002BB752 /* NativeSigner */ = {
 			isa = PBXGroup;
 			children = (
+				6DBD21F5289A7983005D539B /* Extensions */,
 				2D7803222819BE7600E4D01E /* libsigner.a */,
 				6D5801CE28991301006C41D8 /* Core */,
 				2DA5F899275F86B600D8DD29 /* Alerts */,
@@ -584,19 +581,12 @@
 		2DE72BD226A588C9002BB752 /* NativeSignerTests */ = {
 			isa = PBXGroup;
 			children = (
+				6DBD21FE289A8C67005D539B /* Helpers */,
 				6D5801DC28992375006C41D8 /* NativeSignerTests-Bridging-Header.h */,
 				6D5801DA2899235C006C41D8 /* Core */,
 				2DE72BD526A588C9002BB752 /* Info.plist */,
 			);
 			path = NativeSignerTests;
-			sourceTree = "<group>";
-		};
-		2DE72BDD26A588C9002BB752 /* NativeSignerUITests */ = {
-			isa = PBXGroup;
-			children = (
-				2DE72BE026A588C9002BB752 /* Info.plist */,
-			);
-			path = NativeSignerUITests;
 			sourceTree = "<group>";
 		};
 		2DE72BEF26A5981C002BB752 /* Models */ = {
@@ -634,6 +624,7 @@
 		6D5801CE28991301006C41D8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				6DBD21F8289A7A14005D539B /* Database */,
 				6D5801D528991DA4006C41D8 /* Runtime */,
 				6D5801D22899132C006C41D8 /* Connectivity */,
 				6D5801CF28991306006C41D8 /* Protocols */,
@@ -646,6 +637,8 @@
 			children = (
 				6D5801D02899130E006C41D8 /* PathMonitorProtocol.swift */,
 				6D5801D828991F48006C41D8 /* ProcessInfoProtocol.swift */,
+				6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */,
+				6DBD21F3289A77DE005D539B /* BundleProtocol.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -670,6 +663,7 @@
 		6D5801DA2899235C006C41D8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				6DBD21FB289A83C9005D539B /* Database */,
 				6D5801DF289924A3006C41D8 /* Connectivity */,
 				6D5801DB28992361006C41D8 /* Runtime */,
 			);
@@ -691,6 +685,39 @@
 				6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */,
 			);
 			path = Connectivity;
+			sourceTree = "<group>";
+		};
+		6DBD21F5289A7983005D539B /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				6DBD21F6289A798C005D539B /* ErrorDisplayed+Show.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		6DBD21F8289A7A14005D539B /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				6DBD21F9289A7A26005D539B /* DatabaseMediator.swift */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
+		6DBD21FB289A83C9005D539B /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				6DBD21FC289A83D0005D539B /* DatabaseMediatorTests.swift */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
+		6DBD21FE289A8C67005D539B /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				6DBD21FF289A8C74005D539B /* URL+Generate.swift */,
+				6DBD2201289A8E1F005D539B /* ErrorMock.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -733,24 +760,6 @@
 			productReference = 2DE72BCF26A588C9002BB752 /* NativeSignerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		2DE72BD926A588C9002BB752 /* NativeSignerUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 2DE72BE926A588C9002BB752 /* Build configuration list for PBXNativeTarget "NativeSignerUITests" */;
-			buildPhases = (
-				2DE72BD626A588C9002BB752 /* Sources */,
-				2DE72BD726A588C9002BB752 /* Frameworks */,
-				2DE72BD826A588C9002BB752 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				2DE72BDC26A588C9002BB752 /* PBXTargetDependency */,
-			);
-			name = NativeSignerUITests;
-			productName = NativeSignerUITests;
-			productReference = 2DE72BDA26A588C9002BB752 /* NativeSignerUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -766,10 +775,6 @@
 					2DE72BCE26A588C9002BB752 = {
 						CreatedOnToolsVersion = 12.5.1;
 						LastSwiftMigration = 1340;
-						TestTargetID = 2DE72BBD26A588C7002BB752;
-					};
-					2DE72BD926A588C9002BB752 = {
-						CreatedOnToolsVersion = 12.5.1;
 						TestTargetID = 2DE72BBD26A588C7002BB752;
 					};
 				};
@@ -789,7 +794,6 @@
 			targets = (
 				2DE72BBD26A588C7002BB752 /* NativeSigner */,
 				2DE72BCE26A588C9002BB752 /* NativeSignerTests */,
-				2DE72BD926A588C9002BB752 /* NativeSignerUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -816,13 +820,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		2DE72BCD26A588C9002BB752 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2DE72BD826A588C9002BB752 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -903,6 +900,7 @@
 				6D5801D728991F11006C41D8 /* RuntimePropertiesProvider.swift in Sources */,
 				2DA5F8252756624000D8DD29 /* NavbarShield.swift in Sources */,
 				2D48F3572760BBEC004B27BE /* RecoverSeedName.swift in Sources */,
+				6DBD21FA289A7A26005D539B /* DatabaseMediator.swift in Sources */,
 				2D48F3D6277B94C4004B27BE /* Identicon.swift in Sources */,
 				2D48F3532760A2D8004B27BE /* Fonts.swift in Sources */,
 				2D48F3AC277092FD004B27BE /* MetadataCard.swift in Sources */,
@@ -921,6 +919,7 @@
 				2DA5F88A2757692F00D8DD29 /* NewSeedScreen.swift in Sources */,
 				2DA5F86727566C3600D8DD29 /* TCVerifier.swift in Sources */,
 				2DA5F8392756666C00D8DD29 /* EventDetails.swift in Sources */,
+				6DBD21F4289A77DE005D539B /* BundleProtocol.swift in Sources */,
 				2DA5F8292756630900D8DD29 /* TransactionScreen.swift in Sources */,
 				2DA5F89F275F885400D8DD29 /* NewSeedMenu.swift in Sources */,
 				2DA5F87027566C3600D8DD29 /* TCNameVersion.swift in Sources */,
@@ -936,6 +935,7 @@
 				2DA5F82F2756635A00D8DD29 /* HistoryScreen.swift in Sources */,
 				2DAA82A727885E73002917C0 /* TCNameValueTemplate.swift in Sources */,
 				6D5801E7289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift in Sources */,
+				6DBD21F2289A74EE005D539B /* FileManagingProtocol.swift in Sources */,
 				2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */,
 				2DA5F8232756621F00D8DD29 /* Header.swift in Sources */,
 				2D48F3C82774CC64004B27BE /* SearchKeys.swift in Sources */,
@@ -972,6 +972,7 @@
 				2DA5F82B2756631D00D8DD29 /* KeyManager.swift in Sources */,
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
 				2D48F3AE2770AD6B004B27BE /* NetworkDetailsMenu.swift in Sources */,
+				6DBD21F7289A798C005D539B /* ErrorDisplayed+Show.swift in Sources */,
 				2DA5F86127566C3600D8DD29 /* TCBalance.swift in Sources */,
 				2DA5F87127566C3600D8DD29 /* TCVarName.swift in Sources */,
 				2D48F398276A200F004B27BE /* EnterPassword.swift in Sources */,
@@ -1006,15 +1007,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */,
+				6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */,
+				6DBD2200289A8C74005D539B /* URL+Generate.swift in Sources */,
 				6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */,
 				6D5801DE28992375006C41D8 /* RuntimePropertiesProviderTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2DE72BD626A588C9002BB752 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				6DBD21FD289A83D0005D539B /* DatabaseMediatorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1025,11 +1022,6 @@
 			isa = PBXTargetDependency;
 			target = 2DE72BBD26A588C7002BB752 /* NativeSigner */;
 			targetProxy = 2DE72BD026A588C9002BB752 /* PBXContainerItemProxy */;
-		};
-		2DE72BDC26A588C9002BB752 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 2DE72BBD26A588C7002BB752 /* NativeSigner */;
-			targetProxy = 2DE72BDB26A588C9002BB752 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1266,46 +1258,6 @@
 			};
 			name = Release;
 		};
-		2DE72BEA26A588C9002BB752 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 4GK8JWU7P9;
-				INFOPLIST_FILE = NativeSignerUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSignerUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = NativeSigner;
-			};
-			name = Debug;
-		};
-		2DE72BEB26A588C9002BB752 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 4GK8JWU7P9;
-				INFOPLIST_FILE = NativeSignerUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSignerUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = NativeSigner;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1332,15 +1284,6 @@
 			buildConfigurations = (
 				2DE72BE726A588C9002BB752 /* Debug */,
 				2DE72BE826A588C9002BB752 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		2DE72BE926A588C9002BB752 /* Build configuration list for PBXNativeTarget "NativeSignerUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				2DE72BEA26A588C9002BB752 /* Debug */,
-				2DE72BEB26A588C9002BB752 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
