@@ -3583,7 +3583,7 @@ fn rococo_and_verifiers_1() {
     let dbname = "for_tests/rococo_and_verifiers_1";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with ed25519, custom verifier
+    // added rococo specs with `ed25519`, custom verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-ed25519_Alice-ed25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3597,7 +3597,7 @@ fn rococo_and_verifiers_1() {
         panic!("Wrong action: {:?}", output)
     }
 
-    // added rococo specs with sr25519, custom verifier
+    // added rococo specs with `sr25519`, custom verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-ed25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3652,7 +3652,7 @@ fn rococo_and_verifiers_2() {
     let dbname = "for_tests/rococo_and_verifiers_2";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with sr25519, general verifier, specified one
+    // added rococo specs with `sr25519`, general verifier, specified one
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3708,7 +3708,7 @@ fn rococo_and_verifiers_3() {
     let dbname = "for_tests/rococo_and_verifiers_3";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with sr25519, custom verifier None
+    // added rococo specs with `sr25519`, custom verifier None
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_unverified.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3762,7 +3762,7 @@ fn rococo_and_verifiers_4() {
     let dbname = "for_tests/rococo_and_verifiers_4";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with sr25519, custom verifier None
+    // added rococo specs with `sr25519`, custom verifier None
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_unverified.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3787,7 +3787,7 @@ General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a
 Identities:"#;
     assert_eq!(print, expected_print);
 
-    // added rococo specs with sr25519, general verifier
+    // added rococo specs with `sr25519`, general verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3821,7 +3821,7 @@ fn rococo_and_verifiers_5() {
     let dbname = "for_tests/rococo_and_verifiers_5";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with sr25519, custom verifier
+    // added rococo specs with `sr25519`, custom verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-ed25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3846,7 +3846,7 @@ General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a
 Identities:"#;
     assert_eq!(print, expected_print);
 
-    // added rococo specs with sr25519, general verifier
+    // added rococo specs with `sr25519`, general verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {

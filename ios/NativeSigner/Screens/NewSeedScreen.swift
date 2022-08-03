@@ -30,7 +30,7 @@ struct NewSeedScreen: View {
                     .submitLabel(.done)
                     .onSubmit {
                         nameFocused = false
-                        if (seedName != "") && !checkSeedCollision(seedName) {
+                        if seedName != "", !checkSeedCollision(seedName) {
                             pushButton(.goForward, seedName, "")
                         }
                     }
@@ -54,10 +54,8 @@ struct NewSeedScreen: View {
     }
 }
 
-/*
- struct NewSeedScreen_Previews: PreviewProvider {
- static var previews: some View {
- NewSeedScreen().previewLayout(.sizeThatFits)
- }
- }
- */
+// struct NewSeedScreen_Previews: PreviewProvider {
+// static var previews: some View {
+// NewSeedScreen().previewLayout(.sizeThatFits)
+// }
+// }

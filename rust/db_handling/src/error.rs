@@ -101,7 +101,7 @@ pub enum Error {
     /// Database has two seed addresses (i.e. with empty derivation path and no
     /// password) for same seed name and [`Encryption`]
     ///
-    /// This indicates the database corruption, since the encrypion method,
+    /// This indicates the database corruption, since the encryption method,
     /// seed name and derivation path strictly determine the public key.
     #[error(
         "More than one seed key (i.e. with empty path and without password)
@@ -177,7 +177,7 @@ pub enum Error {
 
     /// Error in [`SecretString`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/type.SecretString.html).
     ///
-    /// SecretString consists of combined seed phrase and derivation.
+    /// `SecretString` consists of combined seed phrase and derivation.
     ///
     /// Associated error content is
     /// [`SecretStringError`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/enum.SecretStringError.html).
@@ -226,7 +226,7 @@ pub enum Error {
     #[error("Address key collision for seed name {seed_name}")]
     KeyCollision { seed_name: String },
 
-    /// Derivaion that user tried to create already exists.
+    /// Derivation that user tried to create already exists.
     ///
     /// Associated error content is:
     /// - [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)

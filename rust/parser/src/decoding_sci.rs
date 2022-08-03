@@ -45,17 +45,17 @@ impl CallExpectation {
     }
 }
 
-/// Function to decode types that are variants of TypeDefPrimitive enum.
+/// Function to decode types that are variants of `TypeDefPrimitive` enum.
 ///
-/// The function decodes only given type found_ty, removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only given type found_ty, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - found_ty (TypeDefPrimitive, found in the previous iteration)
-/// - data (remaining Vec<u8> of data),
-/// - indent used for creating properly formatted js cards.
+/// - `found_ty` (`TypeDefPrimitive`, found in the previous iteration)
+/// - `data` (remaining `Vec<u8>` of data),
+/// - `indent` used for creating properly formatted js cards.
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 fn decode_type_def_primitive(
     found_ty: &TypeDefPrimitive,
     possible_ext: &mut Option<&mut Ext>,
@@ -169,14 +169,14 @@ fn reject_flags(compact_flag: bool, balance_flag: bool) -> Result<()> {
 /// Function to decode `char`.
 /// `char` is always 4 byte element, so the needed length pre-determined.
 ///
-/// The function decodes only `char` part, removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only `char` part, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - data (remaining Vec<u8> of data),
+/// - data (remaining `Vec<u8>` of data),
 /// - indent used for creating properly formatted output cards.
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 fn decode_char(data: &[u8], indent: u32) -> Result<DecodedOut> {
     let mut slice_to_char = data.get(0..4).ok_or(ParserDecodingError::DataTooShort)?;
     let a = <u32>::decode(&mut slice_to_char)
@@ -198,14 +198,14 @@ fn decode_char(data: &[u8], indent: u32) -> Result<DecodedOut> {
 /// `str` is encoded as a vector of utf-converteable elements, and is therefore
 /// preluded by the number of elements as compact.
 ///
-/// The function decodes only `str` part, removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only `str` part, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - data (remaining Vec<u8> of data),
+/// - data (remaining `Vec<u8>` of data),
 /// - indent used for creating properly formatted output cards.
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 fn decode_str(data: &[u8], indent: u32) -> Result<DecodedOut> {
     let pre_str = get_compact::<u32>(data)?;
     let str_length = pre_str.compact_found as usize;
@@ -247,17 +247,17 @@ fn decode_str(data: &[u8], indent: u32) -> Result<DecodedOut> {
 /// Function to decode `U256` and `I256`.
 /// Both `U256` and `I256` are always 32 byte element, so the needed length pre-determined.
 /// Note: both types are marked as non-existing in rust in scale-info.
-/// For decoding the elements, `le` functions from num_bigint crate are used.
+/// For decoding the elements, `le` functions from `num_bigint` crate are used.
 ///
-/// The function decodes only `U256` or `I256` part, removes already decoded part of input data Vec<u8>,
-/// and returns whatever remains as DecodedOut field remaining_vector, which is processed later separately.
+/// The function decodes only `U256` or `I256` part, removes already decoded part of input data `Vec<u8>`,
+/// and returns whatever remains as `DecodedOut` field `remaining_vector`, which is processed later separately.
 ///
 /// The function takes as arguments
-/// - data (remaining Vec<u8> of data),
-/// - boolean flag if the expected value is signed (signed corresponds to I256, unsigned corresponds to U256),
+/// - data (remaining `Vec<u8>` of data),
+/// - boolean flag if the expected value is signed (signed corresponds to `I256`, unsigned corresponds to `U256`),
 /// - indent used for creating properly formatted output cards.
 ///
-/// The function outputs the DecodedOut value in case of success.
+/// The function outputs the `DecodedOut` value in case of success.
 fn decode_big256(data: &[u8], signed: bool, indent: u32) -> Result<DecodedOut> {
     match data.get(0..32) {
         Some(slice_to_big256) => {
@@ -278,7 +278,7 @@ fn decode_big256(data: &[u8], signed: bool, indent: u32) -> Result<DecodedOut> {
                         ),
                         indent,
                     }]
-                } // U256
+                } // `U256`
             };
             let remaining_vector = (data[32..]).to_vec();
             Ok(DecodedOut {
@@ -309,7 +309,7 @@ fn check_special(current_type: &Type<PortableForm>) -> SpecialType {
 }
 
 // TODO Types that should be displayed as Balance can originate not from fields, for example, from tuples.
-// Typical example is (AccountId, Balance) tuple. While AccountId goes through type with "AccountId" in ident,
+// Typical example is (`AccountId`, `Balance`) tuple. While `AccountId` goes through type with `AccountId` in ident,
 // and could be easily detected, Balance is immediately linked to corresponding number.
 // If however, the typeName is searched for word "Balance", numerous false positives are possible.
 fn field_type_name_is_balance(type_name: &str) -> bool {
@@ -1040,7 +1040,7 @@ fn decode_type_def_bit_sequence(
                         TypeDefPrimitive::U16 => process_bitvec::<u16>(bitorder, into_bv_decode)?,
                         TypeDefPrimitive::U32 => process_bitvec::<u32>(bitorder, into_bv_decode)?,
                         // this should not be here, but due to possible architecture limitations u64 will not compile on 32-bit architectures
-                        // ideally, should be patched by `#[repr(C, align(8))]` thing similar to bitvec issue 76
+                        // ideally, should be patched by `#[repr(C, align(8))]` thing similar to `BitVec` issue 76
                         // TypeDefPrimitive::U64 => process_bitvec::<u64> (bitorder, into_bv_decode)?,
                         TypeDefPrimitive::U64 => match bitorder {
                             FoundBitOrder::Lsb0 => ugly_patch_u64::<Lsb0>(into_bv_decode)?,

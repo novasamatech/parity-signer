@@ -115,7 +115,7 @@ pub fn accept_meta_values(meta_values: &MetaValues, database_name: &str) -> Resu
     }
 }
 
-/// Function to check if the chaispecs are already in the database
+/// Function to check if the chain specs are already in the database
 pub fn specs_are_new(new: &NetworkSpecsToSend, database_name: &str) -> Result<bool> {
     let network_specs_key = NetworkSpecsKey::from_parts(&new.genesis_hash, &new.encryption);
     let database = open_db(database_name)?;

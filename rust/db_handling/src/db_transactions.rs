@@ -149,7 +149,7 @@ impl TrDbCold {
     /// Apply constructed set of batches within [`TrDbCold`] to the database
     /// with a given name, in a single transaction.
     ///
-    /// Note that both ErrorSource variants are available.
+    /// Note that both `ErrorSource` variants are available.
     pub fn apply(&self, database_name: &str) -> Result<()> {
         let database = open_db(database_name)?;
         let addresses = open_tree(&database, ADDRTREE)?;
@@ -931,7 +931,7 @@ impl TrDbColdSign {
     /// Possible history log entries are:
     ///
     /// - `Event::TransactionSigned(_)` and `Event::MessageSigned(_)` for the
-    /// cases when the signature was generated and diaplayed through the user
+    /// cases when the signature was generated and displayed through the user
     /// interface
     /// - `Event::TransactionSignError(_)` and `Event::MessageSignError(_)` for
     /// the cases when the user has entered the wrong password and no signature

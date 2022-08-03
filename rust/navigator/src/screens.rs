@@ -110,7 +110,7 @@ pub struct RecoverSeedPhraseState {
     seed_draft: SeedDraft,
 }
 
-///EnteredInfo, path+pwd entered by the user, zeroizeable
+///`EnteredInfo`, `path+pwd` entered by the user, zeroizeable
 #[derive(Debug, Clone, Zeroize)]
 #[zeroize(drop)]
 pub struct EnteredInfo(pub String);
@@ -639,8 +639,8 @@ mod tests {
         }
     }
 
-    /// EnteredInfo holds String with sensitive information arriving either from Signer phone memory or from the user.
-    /// EnteredInto is used in several structs, and should always be zeroized properly.
+    /// `EnteredInfo` holds String with sensitive information arriving either from Signer phone memory or from the user.
+    /// `EnteredInto` is used in several structs, and should always be zeroized properly.
     #[test]
     fn zeroize_entered_info_in_sufficient_crypto_state() {
         let secret_ptr: *const u8;

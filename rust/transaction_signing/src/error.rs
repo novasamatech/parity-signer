@@ -20,7 +20,7 @@ pub enum Error {
 
     /// Error in [`SecretString`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/type.SecretString.html).
     ///
-    /// SecretString consists of combined seed phrase and derivation.
+    /// `SecretString` consists of combined seed phrase and derivation.
     ///
     /// Associated error content is
     /// [`SecretStringError`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/enum.SecretStringError.html).

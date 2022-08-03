@@ -95,7 +95,7 @@ fn sufficient_crypto(
     }
 }
 
-/// Function to generate hex line of qr data corresponding to `sufficient_crypto` for load_types message
+/// Function to generate hex line of qr data corresponding to `sufficient_crypto` for `load_types` message
 pub(crate) fn sufficient_crypto_load_types(
     multisigner: &MultiSigner,
     address_details: &AddressDetails,
@@ -135,7 +135,7 @@ pub(crate) fn sufficient_crypto_load_types(
     Ok((sufficient, MSCContent::LoadTypes { types, pic }))
 }
 
-/// Function to generate hex line of qr data corresponding to `sufficient_crypto` for load_metadata message
+/// Function to generate hex line of qr data corresponding to `sufficient_crypto` for `load_metadata` message
 pub(crate) fn sufficient_crypto_load_metadata(
     network_specs_key: &NetworkSpecsKey,
     network_version: u32,
@@ -189,7 +189,7 @@ pub(crate) fn sufficient_crypto_load_metadata(
     ))
 }
 
-/// Function to generate hex line of qr data corresponding to `sufficient_crypto` for add_specs message
+/// Function to generate hex line of qr data corresponding to `sufficient_crypto` for `add_specs` message
 pub(crate) fn sufficient_crypto_add_specs(
     network_specs_key: &NetworkSpecsKey,
     multisigner: &MultiSigner,

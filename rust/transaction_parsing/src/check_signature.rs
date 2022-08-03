@@ -20,7 +20,7 @@ pub fn pass_crypto(data_hex: &str, content: TransferContent) -> Result<InfoPasse
 
     match &data_hex[2..4] {
         "00" => {
-            // Ed25519 crypto was used by the verifier
+            // `Ed25519` crypto was used by the verifier
             let a = data.get(3..35).ok_or(Error::TooShort)?;
             let into_pubkey: [u8; 32] = a.try_into().expect("fixed size should fit in array");
             let (pubkey, data) = (ed25519::Public::from_raw(into_pubkey), &data[35..]);
@@ -46,7 +46,7 @@ pub fn pass_crypto(data_hex: &str, content: TransferContent) -> Result<InfoPasse
             })
         }
         "01" => {
-            // Sr25519 crypto was used by the verifier
+            // `Sr25519` crypto was used by the verifier
             let a = data.get(3..35).ok_or(Error::TooShort)?;
             let into_pubkey: [u8; 32] = a.try_into().expect("fixed size should fit in array");
             let (pubkey, data) = (sr25519::Public::from_raw(into_pubkey), &data[35..]);
@@ -116,7 +116,7 @@ fn cut_data(data: &[u8], content: TransferContent) -> Result<(Vec<u8>, Vec<u8>)>
     let pre_data = get_compact::<u32>(data)?;
     match content {
         TransferContent::AddSpecs | TransferContent::LoadTypes => {
-            // AddSpecs and LoadTypes payloads consist of SCALE encoded Vec<u8> of ContentAddSpecs or ContentLoadTypes correspondingly. Encoding of contents is done to have exact length of data easily accessible (to cut data correctly in case multisignatures are implemented). Signature verifies ContentAddSpecs or ContentLoadTypes correspondingly, WITHOUT the length piece from encoding
+            // `AddSpecs` and `LoadTypes` payloads consist of SCALE encoded `Vec<u8>` of `ContentAddSpecs` or `ContentLoadTypes` correspondingly. Encoding of contents is done to have exact length of data easily accessible (to cut data correctly in case multisignatures are implemented). Signature verifies `ContentAddSpecs` or `ContentLoadTypes` correspondingly, WITHOUT the length piece from encoding
             let data_length = pre_data.compact_found as usize;
             let start = pre_data.start_next_unit.ok_or(Error::TooShort)?;
             let a = data
@@ -125,7 +125,7 @@ fn cut_data(data: &[u8], content: TransferContent) -> Result<(Vec<u8>, Vec<u8>)>
             Ok((a.to_vec(), data[start + data_length..].to_vec()))
         }
         TransferContent::LoadMeta => {
-            // LoadMeta payload consists of SCALE encoded Vec<u8> of metadata and [u8;32] genesis hash; compact announces length of metadata vector, 32 is added to include the genesis hash
+            // LoadMeta payload consists of SCALE encoded `Vec<u8>` of metadata and `[u8;32]` genesis hash; compact announces length of metadata vector, 32 is added to include the genesis hash
             let data_length = pre_data.compact_found as usize + 32;
             let start = pre_data.start_next_unit.ok_or(Error::TooShort)?;
             let a = data.get(..start + data_length).ok_or(Error::TooShort)?;

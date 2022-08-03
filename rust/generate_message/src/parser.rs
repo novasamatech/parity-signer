@@ -176,23 +176,23 @@ pub enum Content {
 /// Setting key for `load_metadata` and `add_specs` commands.
 #[derive(clap::ValueEnum, Clone, Debug)]
 pub enum Set {
-    /// Key `-d`: do **not** update the database, make rpc calls, and produce
+    /// Key `-d`: do **not** update the database, make RPC calls, and produce
     /// output files
     D,
 
-    /// Key `-f`: do **not** run rpc calls, produce output files from database
+    /// Key `-f`: do **not** run RPC calls, produce output files from database
     /// as it is
     F,
 
-    /// Key `-k`: update database through rpc calls, produce output files only
+    /// Key `-k`: update database through RPC calls, produce output files only
     /// for **updated** database entries
     K,
 
-    /// Key `-p`: update database through rpc calls, do **not** produce any
+    /// Key `-p`: update database through RPC calls, do **not** produce any
     /// output files
     P,
 
-    /// Key `-t` (no setting key defaults here): update database through rpc
+    /// Key `-t` (no setting key defaults here): update database through RPC
     /// calls, produce output files
     T,
 }

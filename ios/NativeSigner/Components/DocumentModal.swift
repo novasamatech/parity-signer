@@ -51,10 +51,8 @@ struct DocumentModal: View {
     }
 }
 
-/*
- struct DocumentModal_Previews: PreviewProvider {
- static var previews: some View {
- DocumentModal()
- }
- }
- */
+// struct DocumentModal_Previews: PreviewProvider {
+// static var previews: some View {
+// DocumentModal()
+// }
+// }

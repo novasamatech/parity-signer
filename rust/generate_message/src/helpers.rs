@@ -98,14 +98,14 @@ pub fn get_network_specs_to_send(
 
 /// Update the database after `add_specs` run.
 ///
-/// Inputs `&str` url address that was used for rpc calls and already completed
+/// Inputs `&str` URL address that was used for RPC calls and already completed
 /// [`NetworkSpecsToSend`].
 ///
 /// Adds simultaneously [`AddressBookEntry`] to [`ADDRESS_BOOK`] and
 /// [`NetworkSpecsToSend`] to [`SPECSTREEPREP`].
 ///
 /// Key for [`AddressBookEntry`] is the network address book title. It always
-/// has format <network_name>-<network_encryption>.
+/// has format `<network_name>-<network_encryption>`.
 pub fn db_upd_network(address: &str, network_specs: &NetworkSpecsToSend) -> Result<()> {
     let mut network_specs_prep_batch = Batch::default();
     network_specs_prep_batch.insert(
@@ -167,7 +167,7 @@ pub fn address_book_content() -> Result<Vec<(String, AddressBookEntry)>> {
     Ok(out)
 }
 
-/// Get all [`ADDRESS_BOOK`] entries with address book titles, for given url
+/// Get all [`ADDRESS_BOOK`] entries with address book titles, for given URL
 /// address.
 pub fn filter_address_book_by_url(address: &str) -> Result<Vec<(String, AddressBookEntry)>> {
     let mut out: Vec<(String, AddressBookEntry)> = Vec::new();
@@ -387,7 +387,7 @@ pub fn add_new_metadata(new: &MetaValuesStamped, sorted: &mut SortedMetaValues) 
     for (i, x) in sorted.newer.iter().enumerate() {
         if new.meta_values.name == x.meta_values.name {
             similar_entries = match new.meta_values.version.cmp(&x.meta_values.version) {
-                // earlier metadata should not be fetched through rpc call;
+                // earlier metadata should not be fetched through RPC call;
                 //
                 // version downgrades happened, but these should always be
                 // double checked before being accepted;
@@ -544,7 +544,7 @@ impl MetaFetched {
     }
 }
 
-/// Get network information through rpc calls at `address` and interpret it into
+/// Get network information through RPC calls at `address` and interpret it into
 /// [`MetaFetched`].
 pub fn meta_fetch(address: &str) -> Result<MetaFetched> {
     let new_info = fetch_info(address)?;
@@ -569,7 +569,7 @@ pub fn meta_fetch(address: &str) -> Result<MetaFetched> {
     })
 }
 
-/// Get network metadata file from given url address at specified block.
+/// Get network metadata file from given URL address at specified block.
 ///
 /// For investigating silent metadata update cases.
 ///
@@ -598,7 +598,7 @@ pub fn debug_meta_at_block(address: &str, hex_block_hash: &str) -> Result<()> {
     Ok(())
 }
 
-/// Fetch data and assemble [`NetworkSpecsToSend`] with only url address and
+/// Fetch data and assemble [`NetworkSpecsToSend`] with only URL address and
 /// user-entered data.
 ///
 /// Database is not addressed. For `-d` content key.
@@ -672,7 +672,7 @@ pub fn update_known_specs(
 ///
 /// Function inputs:
 ///
-/// - `&str` address to make rpc calls
+/// - `&str` address to make RPC calls
 /// - `NetworkSpecsToSend` as they were found in the database, to be modified
 /// here
 /// - new `Encryption` to apply to `encryption` and `title` (if no title
@@ -742,7 +742,7 @@ fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch> {
 /// Input [`NetworkSpecsToSend`] is the entry from the database to which the
 /// encryption and title overrides could be applied.
 ///
-/// Function inputs `address` at which rpc calls are made, network specs
+/// Function inputs `address` at which RPC calls are made, network specs
 /// `NetworkSpecsToSend` from the database, and user-entered optional override
 /// for `Token`.
 ///

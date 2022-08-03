@@ -710,7 +710,7 @@ pub enum DerivationCheck {
     NoPassword(Option<(MultiSigner, AddressDetails)>),
 }
 
-/// Preliminarily checks if the user-proposed derivation could be used to create
+/// Preliminary checks if the user-proposed derivation could be used to create
 /// the address.
 ///
 /// This function **does not** use secret phrase, and only searches the
@@ -1053,13 +1053,13 @@ pub fn check_derivation_set(derivations: &[String]) -> Result<()> {
 ///
 /// Function is used on the active side. It inputs information about network in
 /// which the derivations would be created (genesis hash and `Encryption`), and
-/// the plaintext user derivations set.
+/// the plain text user derivations set.
 ///
 /// Derivations allowed in the import set must be valid, with or without
 /// password. The derivations source file must have derivations as a list with
 /// each new derivation on the new line.
 ///
-/// The source plaintext is cut in lines and each line is processes using regex,
+/// The source plain text is cut in lines and each line is processes using regex,
 /// all invalid derivations are ignored. Function prints found valid
 /// password-free derivations as is and passworded with only public part
 /// visible (e.g. `//alice///<password>`).

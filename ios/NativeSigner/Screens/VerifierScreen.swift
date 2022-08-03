@@ -30,39 +30,38 @@ struct VerifierScreen: View {
                         text: "Remove general certificate",
                         danger: true
                     )
-                })
-                .alert(
-                    isPresented: $jailbreak,
-                    content: {
-                        Alert(
-                            title: Text("Wipe ALL data?"),
-                            message: Text(
-                                """
-                                Remove all data and set general verifier blank so that it could be set later.
-                                This operation can not be reverted.
-                                Do not proceed unless you absolutely know what you are doing,
-                                there is no need to use this procedure in most cases.
-                                Misusing this feature may lead to loss of funds!
-                                """
-                            ),
-                            primaryButton: .cancel(),
-                            secondaryButton: .destructive(
-                                Text("I understand"),
-                                action: {
-                                    doJailbreak()
-                                }
-                            )
+                }
+            )
+            .alert(
+                isPresented: $jailbreak,
+                content: {
+                    Alert(
+                        title: Text("Wipe ALL data?"),
+                        message: Text(
+                            """
+                            Remove all data and set general verifier blank so that it could be set later.
+                            This operation can not be reverted.
+                            Do not proceed unless you absolutely know what you are doing,
+                            there is no need to use this procedure in most cases.
+                            Misusing this feature may lead to loss of funds!
+                            """
+                        ),
+                        primaryButton: .cancel(),
+                        secondaryButton: .destructive(
+                            Text("I understand"),
+                            action: {
+                                doJailbreak()
+                            }
                         )
-                    }
-                )
+                    )
+                }
+            )
         }
     }
 }
 
-/*
- struct VerifierScreen_Previews: PreviewProvider {
- static var previews: some View {
- VerifierScreen()
- }
- }
- */
+// struct VerifierScreen_Previews: PreviewProvider {
+// static var previews: some View {
+// VerifierScreen()
+// }
+// }

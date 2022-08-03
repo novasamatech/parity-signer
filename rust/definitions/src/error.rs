@@ -144,7 +144,7 @@ impl TransferContent {
 #[derive(Debug, thiserror::Error)]
 #[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum MetadataError {
-    /// Supported are V12, V13, and V14 versions of
+    /// Supported are `V12`, `V13`, and `V14` versions of
     /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html).
     ///
     /// Any other version results in error.

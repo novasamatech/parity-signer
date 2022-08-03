@@ -1,4 +1,4 @@
-//! Fetch network information from a node using rpc calls
+//! Fetch network information from a node using RPC calls
 //!
 //! Preparing `add_specs` and `load_metadata` update payload may require
 //! gathering network information from a node.
@@ -55,12 +55,12 @@
 //! </table>
 //!
 //! Block hash is fetched first to always have network metadata matching the
-//! block hash, even if the two rpc calls were done during block switching.
+//! block hash, even if the two RPC calls were done during block switching.
 //!
-//! Addresses for rpc calls in different networks could be found
+//! Addresses for RPC calls in different networks could be found
 //! [here](https://github.com/polkadot-js/apps/tree/master/packages/apps-config/src/endpoints)
 //!
-//! This module deals only with the rpc calls part and does **no processing**
+//! This module deals only with the RPC calls part and does **no processing**
 //! of the fetched data.
 use jsonrpsee::core::client::ClientT;
 use jsonrpsee::rpc_params;
@@ -75,7 +75,7 @@ use sp_core::H256;
 
 use crate::error::{Error, Result};
 
-/// Data from rpc calls for `load_metadata` update payload.
+/// Data from RPC calls for `load_metadata` update payload.
 ///
 /// This data is **sufficient** for `load_metadata` update payload generation,
 /// i.e. nothing else has to be known about the network beforehand to produce an
@@ -91,7 +91,7 @@ pub struct FetchedInfo {
     pub genesis_hash: String,
 }
 
-/// Data from rpc calls for `add_specs` update payload.
+/// Data from RPC calls for `add_specs` update payload.
 ///
 /// Note that this data is **not sufficient** for `add_specs` update payload
 /// generation. At least network encryption is needed additionally.
@@ -144,9 +144,9 @@ fn address_with_port(str_address: &str) -> String {
     }
 }
 
-/// Fetch data for `load_metadata` update payload through rpc calls.
+/// Fetch data for `load_metadata` update payload through RPC calls.
 ///
-/// Function inputs address at which rpc calls are made.
+/// Function inputs address at which RPC calls are made.
 ///
 /// Data fetched:
 ///
@@ -187,10 +187,10 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo> {
     })
 }
 
-/// Fetch network metadata from given url address at given block through rpc
+/// Fetch network metadata from given URL address at given block through RPC
 /// call.
 ///
-/// Function inputs address at which rpc call is made and block hash in [`H256`]
+/// Function inputs address at which RPC call is made and block hash in [`H256`]
 /// format. Outputs hexadecimal metadata.
 #[tokio::main]
 pub async fn fetch_meta_at_block(str_address: &str, block_hash: H256) -> Result<String> {
@@ -209,9 +209,9 @@ pub async fn fetch_meta_at_block(str_address: &str, block_hash: H256) -> Result<
     }
 }
 
-/// Fetch data for `add_specs` update payload through rpc calls.
+/// Fetch data for `add_specs` update payload through RPC calls.
 ///
-/// Function inputs address at which rpc calls are made.
+/// Function inputs address at which RPC calls are made.
 ///
 /// Data fetched:
 ///

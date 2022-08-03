@@ -36,7 +36,7 @@ use sp_core::H256;
 /// `load_metadata` QR code content  
 ///
 /// Messages `load_metadata` are used to update through air-gap the network
-/// matadata for networks already known to the Signer.  
+/// metadata for networks already known to the Signer.
 pub struct ContentLoadMeta(Vec<u8>);
 
 #[derive(Decode, Encode)]
@@ -146,7 +146,7 @@ impl ContentAddSpecs {
     ///
     /// Note that it is different from `.to_sign()` function. Effectively, already
     /// SCALE-encoded [`NetworkSpecsToSend`] are encoded second time as an opaque
-    /// Vec<u8>. This is done to have encoded piece length announced at the
+    /// `Vec<u8>`. This is done to have encoded piece length announced at the
     /// beginning of the `u8` set, to simplify cutting the received message in Signer.
     pub fn to_transfer(&self) -> Vec<u8> {
         self.encode()
@@ -159,7 +159,7 @@ impl ContentAddSpecs {
 ///
 /// Externally acquired types information is needed only for
 /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
-/// V13 and below. After V14 all types information is contained within the metadata.  
+/// `V13` and below. After `V14` all types information is contained within the metadata.
 ///
 /// This kind of messages is expected to be used seldom, if ever.  
 #[derive(Decode, Encode)]
@@ -212,7 +212,7 @@ impl ContentLoadTypes {
     ///
     /// Note that it is different from `.to_sign()` function. Effectively, already
     /// SCALE-encoded `Vec<TypeEntry>` is encoded second time as an opaque
-    /// Vec<u8>. This is done to have encoded piece length announced at the
+    /// `Vec<u8>`. This is done to have encoded piece length announced at the
     /// beginning of the `u8` set, to simplify cutting the received message in Signer.  
     pub fn to_transfer(&self) -> Vec<u8> {
         self.encode()

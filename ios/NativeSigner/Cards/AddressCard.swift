@@ -7,10 +7,8 @@
 
 import SwiftUI
 
-/**
- * Card for showing any address.
- * Accepts Address object
- */
+/// Card for showing any address.
+/// Accepts Address object
 struct AddressCard: View {
     @EnvironmentObject var data: SignerDataModel
     var address: Address
@@ -28,9 +26,11 @@ struct AddressCard: View {
                             Spacer()
                             HStack {
                                 Spacer()
-                                Image(systemName: address.multiselect == true ?
-                                      "checkmark.circle.fill" :
-                                        "circle").imageScale(.large)
+                                Image(
+                                    systemName: address.multiselect == true ?
+                                        "checkmark.circle.fill" :
+                                        "circle"
+                                ).imageScale(.large)
                             }
                         }
                     }

@@ -68,7 +68,8 @@ struct TransactionPreview: View {
                             text: "Approve",
                             action: {
                                 pushButton(.goForward, "", "")
-                            })
+                            }
+                        )
                     case .read:
                         EmptyView()
                     case .importDerivations:
@@ -77,7 +78,8 @@ struct TransactionPreview: View {
                             isCrypto: true,
                             action: {
                                 pushButton(.goForward, "", "")
-                            })
+                            }
+                        )
                     case .done:
                         EmptyView()
                     }
@@ -88,29 +90,31 @@ struct TransactionPreview: View {
                             isDangerous: true,
                             action: {
                                 focus = false
-                                pushButton(.goBack, "", "")})
+                                pushButton(.goBack, "", "")
+                            }
+                        )
                     }
                 }
             }
             .padding(.top, -10)
             .padding(.horizontal, 16)
         }
-        .offset(x: 0, y: offset+offsetOld)
-        .gesture(DragGesture()
-                    .onChanged { drag in
-            self.offset = drag.translation.height
-        }
-                    .onEnded { drag in
-            self.offsetOld += drag.translation.height
-            self.offset = 0
-        })
+        .offset(x: 0, y: offset + offsetOld)
+        .gesture(
+            DragGesture()
+                .onChanged { drag in
+                    self.offset = drag.translation.height
+                }
+                .onEnded { drag in
+                    self.offsetOld += drag.translation.height
+                    self.offset = 0
+                }
+        )
     }
 }
 
-/*
- struct TransactionPreview_Previews: PreviewProvider {
- static var previews: some View {
- TransactionPreview()
- }
- }
- */
+// struct TransactionPreview_Previews: PreviewProvider {
+// static var previews: some View {
+// TransactionPreview()
+// }
+// }

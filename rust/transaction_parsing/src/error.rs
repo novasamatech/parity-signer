@@ -274,7 +274,7 @@ pub enum Error {
 
     /// Received `add_specs` or `load_metadata` update payload is not verified.
     ///
-    /// Network, however, was verified previuosly by verifier with certain
+    /// Network, however, was verified previously by verifier with certain
     /// [`VerifierValue`] and corresponding entry in `VERIFIERS` tree of the
     /// database is
     /// `CurrentVerifier::Valid(ValidCurrentVerifier::Custom(Some(verifier_value)))`.
@@ -521,7 +521,7 @@ pub enum Error {
     ///
     /// General verifier with assigned [`VerifierValue`] could not be changed
     /// without Signer wipe. If the Signer is reset with no general verifier,
-    /// and the network in question is the default one (currently Pokadot,
+    /// and the network in question is the default one (currently Polkadot,
     /// Kusama, and Westend), the network will still be recorded as the one
     /// verified by the general verifier and accepting verified `add_specs` for
     /// it would result in setting the general verifier. If the network is not

@@ -27,7 +27,8 @@ struct LandingView: View {
                                 .multilineTextAlignment(.leading)
                             Spacer()
                         }
-                    })
+                    }
+                )
                 Button(
                     action: {
                         ppAccept.toggle()
@@ -39,7 +40,8 @@ struct LandingView: View {
                                 .multilineTextAlignment(.leading)
                             Spacer()
                         }
-                    })
+                    }
+                )
                 BigButton(
                     text: "Next",
                     action: {
@@ -47,23 +49,22 @@ struct LandingView: View {
                     },
                     isDisabled: !(tacAccept && ppAccept)
                 )
-                    .padding(.top, 16.0)
-                    .alert(isPresented: $accept, content: {
-                        Alert(
-                            title: Text("Accept privacy policy?"),
-                            primaryButton: .default(Text("Decline")),
-                            secondaryButton: .default(Text("Accept"), action: {onboard()})
-                        )
-                    })
+                .padding(.top, 16.0)
+                .alert(isPresented: $accept, content: {
+                    Alert(
+                        title: Text("Accept privacy policy?"),
+                        primaryButton: .default(Text("Decline")),
+                        secondaryButton: .default(Text("Accept"), action: { onboard() })
+                    )
+                })
             }
         }
         .padding()
     }
 }
 
-/*
- struct LandingView_Previews: PreviewProvider {
- static var previews: some View {
- LandingView()
- }
- }*/
+// struct LandingView_Previews: PreviewProvider {
+// static var previews: some View {
+// LandingView()
+// }
+// }

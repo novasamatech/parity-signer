@@ -44,7 +44,7 @@ use crate::{
 
 /// Network information extracted from the metadata: name, version, optional
 /// base58 prefix, warning about extensions incompatible with transaction
-/// parsing for RuntimeMetadata with version 14 and above
+/// parsing for `RuntimeMetadata` with version 14 and above
 #[derive(Decode, Encode, PartialEq)]
 pub struct MetaInfo {
     /// Network name, from metadata `Version` constant  
@@ -67,7 +67,7 @@ pub struct MetaInfo {
 }
 
 /// Metadata values: name, version, optional base58 prefix, warning about
-/// extensions incompatible with transaction parsing for RuntimeMetadata with
+/// extensions incompatible with transaction parsing for `RuntimeMetadata` with
 /// version 14 and above, and metadata itself as raw `Vec<u8>`
 #[derive(PartialEq, Debug, Clone)]
 pub struct MetaValues {
@@ -196,7 +196,7 @@ pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>> {
 ///
 /// `RuntimeMetadata` suitable for use in Signer:  
 ///
-/// - must be of runtime version V12 or above  
+/// - must be of runtime version `V12` or above
 /// - must have 'System' pallet  
 /// - must have `Version` constant in `System` pallet, SCALE-decodeable  
 /// - can have `SS58Prefix` constant in `System` pallet, and if it does, the
@@ -291,7 +291,7 @@ pub fn info_from_metadata(runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo
         Some(mut x) => match <u16>::decode(&mut x) {
             Ok(a) => Some(a),
             Err(_) => match <u8>::decode(&mut x) {
-                // in some older metadata u8 is used for base58 prefix, likely a legacy thing
+                // in some older metadata `u8` is used for base58 prefix, likely a legacy thing
                 Ok(a) => Some(a as u16),
                 Err(_) => return Err(MetadataError::Base58PrefixNotDecodeable.into()),
             },
@@ -312,7 +312,7 @@ pub fn info_from_metadata(runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo
 /// Raw `Vec<u8>` metadata suitable for use in Signer:  
 ///
 /// - must begin with b"meta"  
-/// - after that must be SCALE-encoded `RuntimeMetadata` with runtime version V12 or above
+/// - after that must be SCALE-encoded `RuntimeMetadata` with runtime version `V12` or above
 pub fn runtime_metadata_from_slice(meta: &[u8]) -> Result<RuntimeMetadata> {
     if !meta.starts_with(&[109, 101, 116, 97]) {
         return Err(MetadataError::NotMeta.into());
@@ -323,11 +323,11 @@ pub fn runtime_metadata_from_slice(meta: &[u8]) -> Result<RuntimeMetadata> {
     Ok(RuntimeMetadata::decode(&mut &meta[4..]).map_err(|_| MetadataError::UnableToDecode)?)
 }
 
-/// Checks if the v14 metadata has all signed extensions required for transaction decoding.
+/// Checks if the `v14` metadata has all signed extensions required for transaction decoding.
 /// True if extensions are incomplete.
 ///
 /// Currently, the decoding of the transaction demands that metadata version, network genesis hash,
-/// and era are among signed extensions. Otherwise, a ParserMetadataError would occur on decoding.
+/// and era are among signed extensions. Otherwise, a `ParserMetadataError` would occur on decoding.
 /// However, we can not simply forbid the loading of the metadata without required set of
 /// signed extensions into Signer.
 ///
@@ -424,11 +424,11 @@ impl MetaSetElement {
     }
 }
 
-/// Network information needed for rpc calls in the network and for managing the
+/// Network information needed for RPC calls in the network and for managing the
 /// hot database  
 ///
 /// Hot database contains tree `ADDRESS_BOOK` with information needed to perform
-/// rpc calls in networks and generate `load_metadata` and `add_specs` payloads.
+/// RPC calls in networks and generate `load_metadata` and `add_specs` payloads.
 ///
 /// `ADDRESS_BOOK` tree stores SCALE-encoded [`AddressBookEntry`] entries under
 /// keys [`AddressBookKey`]
@@ -437,17 +437,17 @@ impl MetaSetElement {
 pub struct AddressBookEntry {
     /// Network name, as it appears in `Version` constant in metadata  
     ///
-    /// If network data is queired through rpc call, retrieved metadata must
+    /// If network data is queried through RPC call, retrieved metadata must
     /// have exactly same network name in `Version` constant  
     pub name: String,
 
     /// Network genesis hash  
     ///
-    /// If network data is queried through rpc call, retrieved version must
+    /// If network data is queried through RPC call, retrieved version must
     /// be same as the one in address book  
     pub genesis_hash: H256,
 
-    /// Url address for rpc calls, with or without preferred port  
+    /// URL address for RPC calls, with or without preferred port
     pub address: String,
 
     /// [`Encryption`] that is supported by the network  
@@ -455,7 +455,7 @@ pub struct AddressBookEntry {
 
     /// Address book entry is the default one  
     ///
-    /// Default networks currently are Polkadot, Kusama, Westend with Sr25519
+    /// Default networks currently are Polkadot, Kusama, Westend with `Sr25519`
     /// encryption  
     pub def: bool,
 }

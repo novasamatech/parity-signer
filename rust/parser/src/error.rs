@@ -199,7 +199,7 @@ pub enum ParserDecodingError {
     #[error("Expected immortal transaction due to prelude format. Found mortal transaction.")]
     UnexpectedMortality,
 
-    /// Genesis hash cut from the end of the transaction doen not match the one
+    /// Genesis hash cut from the end of the transaction does not match the one
     /// found in the extensions
     #[error(
         "Genesis hash values from decoded extensions and from used network specs do not match."

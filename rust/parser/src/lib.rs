@@ -35,7 +35,7 @@ mod tests;
 
 pub use error::{Error, Result};
 
-/// Function intakes SCALE encoded method part of transaction as Vec<u8>,
+/// Function intakes SCALE encoded method part of transaction as `Vec<u8>`,
 /// network metadata and network specs.
 ///
 pub fn parse_method(
@@ -61,7 +61,7 @@ pub fn parse_method(
     Ok(method_decoded.fancy_out)
 }
 
-/// Struct to decode pre-determined extensions for transactions with V12 and V13 metadata
+/// Struct to decode pre-determined extensions for transactions with `V12` and `V13` metadata
 #[derive(Debug, Decode, Encode)]
 struct ExtValues {
     era: Era,
