@@ -20,7 +20,7 @@ struct TCFieldNumber: View {
                     Text(value.number)
                         .foregroundColor(Color("Text600"))
                     Spacer()
-                    if value.docsFieldNumber + value.pathType + value.docsType != "" {
+                    if (value.docsFieldNumber + value.pathType + value.docsType).isEmpty {
                         Text("?")
                             .foregroundColor(Color("Text400"))
                     }
@@ -41,7 +41,7 @@ struct TCFieldNumber: View {
                     }
                 }
             }
-        ).disabled(value.docsFieldNumber + value.pathType + value.docsType == "")
+        ).disabled((value.docsFieldNumber + value.pathType + value.docsType).isEmpty)
     }
 }
 

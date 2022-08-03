@@ -18,14 +18,15 @@ enum KeychainError: Error {
 }
 
 /// Seeds management operations - these mostly rely on secure enclave
-/// 
+///
 ///  Seeds are stored in keyring - it has SQL-like api but is backed by secure enclave
 ///  IMPORTANT! The keys from keyring are not removed on app uninstall!
 ///  Remember to wipe the app with wipe button in settings.
 extension SignerDataModel {
     /// Get all seed names from secure storage
-    /// 
+    ///
     /// this is also used as generic auth request operation that will lock the app on failure
+    // swiftlint:disable:next function_body_length
     func refreshSeeds() {
         var item: CFTypeRef?
         let query: [String: Any] = [
@@ -36,7 +37,8 @@ extension SignerDataModel {
         ]
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         switch status {
-        case errSecSuccess: do {
+        case errSecSuccess:
+            do {
                 guard let itemFound = item as? [[String: Any]]
                 else {
                     print("no seeds available")
@@ -56,7 +58,8 @@ extension SignerDataModel {
                 updateSeedNames(seedNames: seedNames)
                 authenticated = true
             }
-        case errSecItemNotFound: do {
+        case errSecItemNotFound:
+            do {
                 print("no seeds available")
                 seedNames = []
                 updateSeedNames(seedNames: seedNames)
@@ -70,6 +73,7 @@ extension SignerDataModel {
 
     /// Creates seed; this is the only way to create seed.
     /// createRoots: choose whether empty derivations for every network should be created
+    // swiftlint:disable:next function_body_length
     func restoreSeed(seedName: String, seedPhrase: String, createRoots: Bool) {
         var error: Unmanaged<CFError>?
         guard let accessFlags = SecAccessControlCreateWithFlags(
@@ -103,7 +107,7 @@ extension SignerDataModel {
         guard status == errSecSuccess else {
             print("key add failure")
             print(status)
-            let lastError = SecCopyErrorMessageString(status, nil)! as String
+            let lastError = SecCopyErrorMessageString(status, nil) as? String ?? ""
             print(lastError)
             return
         }
@@ -143,6 +147,7 @@ extension SignerDataModel {
 
     /// Gets seed by seedName from keyring
     /// Calls auth screen automatically; no need to call it specially or wrap
+    // swiftlint:disable:next function_body_length
     func getSeed(seedName: String, backup: Bool = false) -> String {
         if alert {
             alertShow = true
@@ -209,7 +214,7 @@ extension SignerDataModel {
                 updateSeedNames(seedNames: seedNames)
                 pushButton(action: .removeSeed)
             } else {
-                let lastError = SecCopyErrorMessageString(status, nil)! as String
+                let lastError = SecCopyErrorMessageString(status, nil) as? String ?? ""
                 print("remove seed from secure storage error: " + lastError)
             }
         }

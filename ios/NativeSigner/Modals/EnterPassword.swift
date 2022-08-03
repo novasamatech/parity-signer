@@ -47,7 +47,7 @@ struct EnterPassword: View {
                     action: {
                         pushButton(.goForward, password, "")
                     },
-                    isDisabled: password == ""
+                    isDisabled: password.isEmpty
                 )
             }
         }

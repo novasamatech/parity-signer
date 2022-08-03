@@ -19,7 +19,7 @@ struct TCCall: View {
                 VStack {
                     HStack {
                         TCNameValueTemplate(name: "Method", value: value.methodName)
-                        if value.docs != "" {
+                        if !value.docs.isEmpty {
                             Text("?")
                                 .foregroundColor(Color("Action400"))
                         }
@@ -33,7 +33,7 @@ struct TCCall: View {
                     }
                 }
             }
-        ).disabled(value.docs == "")
+        ).disabled(value.docs.isEmpty)
     }
 }
 

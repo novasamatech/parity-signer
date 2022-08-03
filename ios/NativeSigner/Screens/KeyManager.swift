@@ -32,7 +32,7 @@ struct KeyManager: View {
                                 DragGesture()
                                     .onEnded { drag in
                                         if abs(drag.translation.height) < 20, abs(drag.translation.width) > 20 {
-                                            if content.root.addressKey != "" {
+                                            if !content.root.addressKey.isEmpty {
                                                 pushButton(.swipe, content.root.addressKey, "")
                                             }
                                         }
@@ -41,14 +41,14 @@ struct KeyManager: View {
                             .gesture(
                                 LongPressGesture()
                                     .onEnded { _ in
-                                        if content.root.addressKey != "" {
+                                        if !content.root.addressKey.isEmpty {
                                             pushButton(.longTap, content.root.addressKey, "")
                                         }
                                     }
                             )
                         }
                     )
-                    .disabled(content.root.addressKey == "")
+                    .disabled(content.root.addressKey.isEmpty)
                     .padding(2)
                     if content.root.swiped {
                         AddressCardControls(
@@ -89,7 +89,7 @@ struct KeyManager: View {
                 ScrollView {
                     LazyVStack {
                         ForEach(content.set.sorted(by: { $0.path < $1.path }).filter { card in
-                            card.path.contains(searchString) || searchString == ""
+                            card.path.contains(searchString) || searchString.isEmpty
                         }, id: \.addressKey) { address in
                             ZStack {
                                 Button(
