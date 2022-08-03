@@ -1,0 +1,41 @@
+List of contributors to the paritytech/parity-signer repository:
+(user login, email)
+
+Slesarew, None
+hanwencheng, heawen.cheng@gmail.com
+Tbaut, None
+pmespresso, None
+montekki, fedor.sakharov@gmail.com
+fckt, alexey@fckt.dev
+goldsteinsveta, None
+TriplEight, denis@parity.io
+varovainen, None
+maciejhirsz, None
+sjeohp, None
+debris, None
+TarikGul, None
+prybalko, None
+s3krit, None
+tomusdrw, None
+kosrk, None
+vas3k, me@vas3k.ru
+General-Beck, general.beck@gmail.com
+philipstanislaus, None
+ltfschoen, None
+chevdor, None
+krodak, krodak.konta@gmail.com
+Kriyszig, None
+EgorPopelyaev, None
+sergejparity, None
+dvdplm, dvdplm@gmail.com
+emostov, None
+lvn1, None
+geastwood, liu.feiwood@gmail.com
+ddorgan, None
+jak-pan, None
+NukeManDan, None
+carumusan, None
+axelchalon, None
+gabreal, None
+edisinovcic, edi.sinovcic@gmail.com
+bnvk, None
