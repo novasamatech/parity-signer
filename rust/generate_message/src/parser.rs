@@ -19,10 +19,26 @@ pub struct Cli {
 
 #[derive(Debug, Subcommand)]
 pub enum Command {
+    /// Display content of the a given tree of the hot database
     #[clap(subcommand)]
     Show(Show),
 
     /// Prepare payload for add-specs update
+    ///
+    /// This will remove:
+    /// - address book entry
+    /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
+    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
+    /// - network specs
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
+    /// - all associated metadata entries from [`METATREE`](constants::METATREE)
+    /// if there are no other address book entries this metadata is associated
+    /// with
+    /// - all associated meta block history entries from
+    /// [`META_HISTORY`](constants::META_HISTORY) if there are no other address book
+    /// entries this block history entries are associated with
+    #[clap(name = "add-specs")]
     Specs {
         #[clap(flatten)]
         s: InstructionSpecs,
@@ -40,31 +56,111 @@ pub enum Command {
     /// Sign
     Sign(Make),
 
-    /// Remove data from the hot database
+    /// Remove all data associated with a network
+    ///
+    /// This will remove:
+    /// - address book entry
+    /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
+    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
+    /// - network specs
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
+    /// - all associated metadata entries from [`METATREE`](constants::METATREE)
+    /// if there are no other address book entries this metadata is associated
+    /// with
+    /// - all associated meta block history entries from
+    /// [`META_HISTORY`](constants::META_HISTORY) if there are no other address book
+    /// entries this block history entries are associated with
     #[clap(subcommand)]
     Remove(Remove),
 
     /// Restore hot database to default state
+    ///
+    /// Removes old hot database and generates new one with default values at
+    /// default path [`HOT_DB_NAME`](constants::HOT_DB_NAME).
+    ///
+    /// By default, hot database contains:
+    ///
+    /// - [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) entries for default networks
+    /// - [`SPECSTREEPREP`](constants::SPECSTREEPREP) entries for default networks
+    /// - types information in [`SETTREE`](constants::SETTREE)
+    /// - **no** metadata entries in [`METATREE`](constants::METATREE)
+    /// - **no** meta block history entries in
+    /// [`META_HISTORY`](constants::META_HISTORY)
+    ///
+    /// Default networks are Polkadot, Kusama, and Westend.
     RestoreDefaults,
 
     /// Generate release cold database at optionally provided path
+    ///
+    /// Removes old cold release database and generates new one with default values
+    /// (unitiniated) at user-provided path or, if no valid path is given, at
+    /// default path [`COLD_DB_NAME_RELEASE`](constants::COLD_DB_NAME_RELEASE).
+    ///
+    /// By default, the uninitiated cold release database contains:
+    ///
+    /// - [`SPECSTREE`](constants::SPECSTREE) entries for default networks
+    /// - [`VERIFIERS`](constants::VERIFIERS) entries for default networks, with
+    /// verifiers set to the general one
+    /// - two latest metadata versions for default networks in
+    /// [`METATREE`](constants::METATREE)
+    /// - default types information and clean danger status in
+    /// [`SETTREE`](constants::SETTREE)
+    ///
+    /// Note that the general verifier is not specified and history is not
+    /// started. This will be done only in Signer itself. Before initialization,
+    /// the cold release database could not be used by Signer.
     MakeColdRelease {
-        #[clap(short, long)]
         /// Path to release db
         path: Option<PathBuf>,
     },
 
     /// Transfer metadata from hot database to release cold database
-    TransferMetaRelease {
-        #[clap(short, long)]
+    ///
+    /// Metadata from hot database is transferred to cold release database at
+    /// user-provided path or, if no valid path is given, at default path
+    /// [`COLD_DB_NAME_RELEASE`](constants::COLD_DB_NAME_RELEASE).
+    ///
+    /// Metadata is transferred only for the networks that are known to the cold
+    /// database, i.e. the ones having
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
+    /// [`SPECSTREE`](constants::SPECSTREE).
+    #[clap(name = "transfer-meta")]
+    TransferMetaToColdRelease {
         /// Path to release db
         path: Option<PathBuf>,
     },
 
-    /// Make derivations import
+    /// Make derivations import QR and/or hexadecimal string file
+    ///
+    /// Output file is in `/generate_message/` folder, file name would be
+    /// `derivations-<address_book_title>`.
     Derivations(Derivations),
 
     /// Prepare payload for `load_metadata` update from `.wasm` file
+    ///
+    /// This command extracts metadata from `.wasm` file and uses this metadata to
+    /// produce `load_metadata` update payload. Only networks with network specs
+    /// entries in the hot database could be processed with `unwasm` command, since
+    /// the `load_metadata` update payload in addition to metadata requires also
+    /// network genesis hash. `unwasm` command could be used to generate update QR
+    /// codes before the metadata becomes accessible from the node.
+    ///
+    /// Network name found in the metadata is used to find
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) for
+    /// the network. `NetworkSpecsToSend` are used to get genesis hash and to check
+    /// base58 prefix, it the network metadata has base58 prefix inside.
+    ///
+    /// A raw bytes update payload file is generated in dedicated
+    /// [`FOLDER`](constants::FOLDER) to (optionally) be signed and later be
+    /// transformed into `load_metadata` update QR. Update payload file name is
+    /// `sign_me_load_metadata_<network_name>V<version>`.
+    ///
+    /// By default, metadata extracted from `.wasm` file is added to the database.
+    /// Optional `-d` key could be used is database should **not** be updated.
+    /// If the metadata gets entered in the database (i.e. no `-d` key used),
+    /// [`META_HISTORY`](constants::META_HISTORY) gets no entry. Block hash will be
+    /// added if the same metadata is later fetched from a node.
     Unwasm {
         /// WASM file
         #[clap(long, short)]
@@ -75,19 +171,37 @@ pub enum Command {
         update_db: bool,
     },
 
-    /// Make file with hexadecimal metadata for `defaults` set
+    /// Make file with hexadecimal metadata for defaults release metadata set
+    ///
+    /// Produces file with hex-encoded network metadata from the hot database
+    /// [`METATREE`](constants::METATREE) entry.
+    ///
+    /// Output file named `<network_name><metadata_version>` is generated in
+    /// dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER). It contains
+    /// hexadecimal network metadata.
     MetaDefaultFile {
         /// File name
+        #[clap(long, value_name = "NETWORK NAME")]
         name: String,
+
         /// Version
+        #[clap(long, value_name = "NETWORK VERSION")]
         version: u32,
     },
 
-    /// Make file with hexadecimal metadata from specific block
+    /// Create file with network metadata at block hash
+    ///
+    /// Output file named `<network_name><metadata_version>_<block_hash>` is
+    /// generated in dedicated folder.
+    /// It contains hexadecimal network metadata.
+    /// This command does not address or update the hot database.
     MetaAtBlock {
         /// Url of the chain RPC point
+        #[clap(long, value_name = "RPC URL")]
         url: String,
+
         /// Hash of the block at which meta is asked
+        #[clap(long, value_name = "BLOCK HASH")]
         block_hash: String,
     },
 }

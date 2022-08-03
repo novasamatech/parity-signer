@@ -14,6 +14,7 @@ use parity_scale_codec::{Decode, Encode};
 #[cfg(feature = "signer")]
 use sled::IVec;
 
+#[cfg(feature = "signer")]
 use crate::error::Result;
 
 /// Danger status in the Signer database

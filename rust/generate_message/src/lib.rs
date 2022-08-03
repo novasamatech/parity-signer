@@ -1114,7 +1114,7 @@ pub fn full_run(command: Command) -> Result<()> {
         Command::Remove(info) => remove_info(info),
         Command::RestoreDefaults => Ok(default_hot(None)?),
         Command::MakeColdRelease { path } => Ok(default_cold_release(path)?),
-        Command::TransferMetaRelease { path } => {
+        Command::TransferMetaToColdRelease { path } => {
             let cold_database_path = match path {
                 Some(ref path) => path.to_str().unwrap_or(COLD_DB_NAME_RELEASE),
                 None => COLD_DB_NAME_RELEASE,
