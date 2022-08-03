@@ -36,8 +36,8 @@ struct BigButton: View {
         let fgColor = isDisabled
             ? Color("Text300")
             : isShaded
-                ? isDangerous ? Color("SignalDanger") : accentColor
-                : Color("Action600")
+            ? isDangerous ? Color("SignalDanger") : accentColor
+            : Color("Action600")
 
         Button(action: action) {
             HStack {

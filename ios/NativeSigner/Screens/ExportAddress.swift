@@ -37,10 +37,8 @@ struct ExportAddress: View {
     }
 }
 
-/*
- struct ExportIdentity_Previews: PreviewProvider {
- static var previews: some View {
- ExportAddress()
- }
- }
- */
+// struct ExportIdentity_Previews: PreviewProvider {
+// static var previews: some View {
+// ExportAddress()
+// }
+// }

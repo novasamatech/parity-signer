@@ -14,10 +14,8 @@ struct TCNonce: View {
     }
 }
 
-/*
-struct TCNonce_Previews: PreviewProvider {
-    static var previews: some View {
-        TCNonce()
-    }
-}
-*/
+// struct TCNonce_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TCNonce()
+//    }
+// }

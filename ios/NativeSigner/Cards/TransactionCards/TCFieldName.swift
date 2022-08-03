@@ -29,23 +29,27 @@ struct TCFieldName: View {
                     if showDoc {
                         VStack {
                             Text("Path: " + value.pathType).foregroundColor(Color("Text600"))
-                            Text(AttributedString(fromHexDocs: value.docsFieldName) ??
-                                 "docs parsing error in iOS, please refer to other sources")
-                                .foregroundColor(Color("Text600"))
-                            Text(AttributedString(fromHexDocs: value.docsType) ??
-                                 "docs parsing error in iOS, please refer to other sources")
-                                .foregroundColor(Color("Text600"))
+                            Text(
+                                AttributedString(fromHexDocs: value.docsFieldName) ??
+                                    "docs parsing error in iOS, please refer to other sources"
+                            )
+                            .foregroundColor(Color("Text600"))
+                            Text(
+                                AttributedString(fromHexDocs: value.docsType) ??
+                                    "docs parsing error in iOS, please refer to other sources"
+                            )
+                            .foregroundColor(Color("Text600"))
                         }
                     }
                 }
-            })
-            .disabled(value.docsFieldName + value.pathType + value.docsType == "")
+            }
+        )
+        .disabled(value.docsFieldName + value.pathType + value.docsType == "")
     }
 }
 
-/*
- struct TCFieldName_Previews: PreviewProvider {
- static var previews: some View {
- TCFieldName()
- }
- }*/
+// struct TCFieldName_Previews: PreviewProvider {
+// static var previews: some View {
+// TCFieldName()
+// }
+// }

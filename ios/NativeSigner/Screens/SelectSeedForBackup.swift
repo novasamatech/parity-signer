@@ -15,9 +15,9 @@ struct SelectSeedForBackup: View {
             ScrollView {
                 LazyVStack {
                     ForEach(
-                        content.seedNameCards.sorted(by: {$0.seedName < $1.seedName}),
+                        content.seedNameCards.sorted(by: { $0.seedName < $1.seedName }),
                         id: \.seedName
-                    ) {seedNameCard in
+                    ) { seedNameCard in
                         HStack {
                             Button(
                                 action: {
@@ -37,10 +37,8 @@ struct SelectSeedForBackup: View {
     }
 }
 
-/*
- struct SelectSeedForBackup_Previews: PreviewProvider {
- static var previews: some View {
- SelectSeedForBackup()
- }
- }
- */
+// struct SelectSeedForBackup_Previews: PreviewProvider {
+// static var previews: some View {
+// SelectSeedForBackup()
+// }
+// }

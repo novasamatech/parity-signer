@@ -15,10 +15,8 @@ struct TCPallet: View {
     }
 }
 
-/*
- struct TCPallet_Previews: PreviewProvider {
- static var previews: some View {
- TCPallet()
- }
- }
- */
+// struct TCPallet_Previews: PreviewProvider {
+// static var previews: some View {
+// TCPallet()
+// }
+// }

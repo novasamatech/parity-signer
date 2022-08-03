@@ -43,17 +43,16 @@ struct LogMenu: View {
                     primaryButton: .cancel(Text("Cancel")),
                     secondaryButton: .destructive(
                         Text("Clear log"),
-                        action: {pushButton(.clearLog, "", "")})
+                        action: { pushButton(.clearLog, "", "") }
+                    )
                 )
             })
         }
     }
 }
 
-/*
- struct LogMenu_Previews: PreviewProvider {
- static var previews: some View {
- LogMenu()
- }
- }
- */
+// struct LogMenu_Previews: PreviewProvider {
+// static var previews: some View {
+// LogMenu()
+// }
+// }

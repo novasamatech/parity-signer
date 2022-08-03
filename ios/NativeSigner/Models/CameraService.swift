@@ -5,15 +5,13 @@
 //  Created by Alexander Slesarev on 20.7.2021.
 //
 
-/**
- * Logic behind the camera - boilerplate, parsing QRs into payloads,
- * collection of payloads and their transfer to Rust decoder
- * Some concurrency
- */
+/// Logic behind the camera - boilerplate, parsing QRs into payloads,
+/// collection of payloads and their transfer to Rust decoder
+/// Some concurrency
 
 import AVKit
-import Vision
 import UIKit
+import Vision
 
 public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     @Published public var isCameraUnavailable = true
@@ -35,17 +33,18 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
     private let videoDataOutputQueue = DispatchQueue(label: "qr code detection queue")
 
     private var detectionRequests: [VNDetectBarcodesRequest] = [VNDetectBarcodesRequest(
-        completionHandler: { (request, error) in
+        completionHandler: { request, error in
             if error != nil {
                 print("QR code detection error: \(String(describing: error))")
             }
 
             guard let barcodeDetectionRequest = request as? VNDetectBarcodesRequest,
                   let results = barcodeDetectionRequest.results else {
-                      return
-                  }
+                return
+            }
             barcodeDetectionRequest.symbologies = [VNBarcodeSymbology.qr]
-        })]
+        }
+    )]
 
     private var bucketCount = 0
 
@@ -79,9 +78,9 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
     }
 
     public func start() {
-        self.bucket = []
+        bucket = []
         sessionQueue.async {
-            if !self.isSessionRunning && self.isConfigured {
+            if !self.isSessionRunning, self.isConfigured {
                 switch self.setupResult {
                 case .success:
                     self.session.startRunning()
@@ -92,7 +91,8 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                             self.isCameraUnavailable = false
                         }
                     }
-                case .configurationFailed, .notAuthorized:
+                case .configurationFailed,
+                     .notAuthorized:
                     print("Camera configuration invalid")
 
                     DispatchQueue.main.sync {
@@ -181,18 +181,16 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
 
         session.commitConfiguration()
 
-        self.isConfigured = true
-        self.start()
+        isConfigured = true
+        start()
     }
 
-    /**
-     * Callback for receiving buffer - payload assembly is fed from here
-     */
+    /// Callback for receiving buffer - payload assembly is fed from here
     // swiftlint:disable:next cyclomatic_complexity function_body_length
     public func captureOutput(
-        _ output: AVCaptureOutput,
+        _: AVCaptureOutput,
         didOutput sampleBuffer: CMSampleBuffer,
-        from connection: AVCaptureConnection
+        from _: AVCaptureConnection
     ) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
             print("Failed to obtain pixelbuffer for this frame")
@@ -208,16 +206,16 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
         }
 
         if let result = detectionRequests[0].results {
-            if result.count != 0 {
+            if !result.isEmpty {
                 // uncomment to see how fast qr reader goes brrr
                 // print(String(reflecting: result))
-                if result.count>1 {
+                if result.count > 1 {
                     print("lagging!")
                     print(result.count)
                 }
                 if let descriptor = result[0].barcodeDescriptor as? CIQRCodeDescriptor {
                     // Actual QR handling starts here
-                    let payloadStr = descriptor.errorCorrectedPayload.map {String(format: "%02x", $0)}.joined()
+                    let payloadStr = descriptor.errorCorrectedPayload.map { String(format: "%02x", $0) }.joined()
                     stitcherQueue.async {
                         if !self.bucket.contains(payloadStr) {
                             if self.total == nil { // init new collection of frames
@@ -248,8 +246,8 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                                 if (self.bucket.count + 1) >= self.total ?? 0 {
                                     do {
                                         let process = "[\"" +
-                                        self.bucket.joined(separator: "\",\"") +
-                                        "\"]" // Decoder expects JSON array
+                                            self.bucket.joined(separator: "\",\"") +
+                                            "\"]" // Decoder expects JSON array
                                         let res = try qrparserTryDecodeQrSequence(data: process, cleaned: false)
                                         DispatchQueue.main.async {
                                             self.payload = res
@@ -267,9 +265,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
         }
     }
 
-    /**
-     * Empty bucket
-     */
+    /// Empty bucket
     func emptyBucket() {
         payload = nil
         total = nil
@@ -279,9 +275,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
     }
 }
 
-/**
- * Standard boilerplate for camera init
- */
+/// Standard boilerplate for camera init
 extension CameraService {
     enum SessionSetupResult {
         case success

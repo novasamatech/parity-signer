@@ -16,10 +16,8 @@ struct TCNetworkInfo: View {
     }
 }
 
-/*
-struct TCNetworkInfo_Previews: PreviewProvider {
-    static var previews: some View {
-        TCNetworkInfo()
-    }
-}
-*/
+// struct TCNetworkInfo_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TCNetworkInfo()
+//    }
+// }

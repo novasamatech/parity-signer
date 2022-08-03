@@ -25,19 +25,20 @@ struct TCCall: View {
                         }
                     }
                     if showDoc {
-                        Text(AttributedString(fromHexDocs: value.docs) ??
-                             "docs parsing error in iOS, please refer to other sources")
-                            .foregroundColor(Color("Text600")).multilineTextAlignment(.leading)
+                        Text(
+                            AttributedString(fromHexDocs: value.docs) ??
+                                "docs parsing error in iOS, please refer to other sources"
+                        )
+                        .foregroundColor(Color("Text600")).multilineTextAlignment(.leading)
                     }
                 }
-            }).disabled(value.docs == "")
+            }
+        ).disabled(value.docs == "")
     }
 }
 
-/*
- struct TCCall_Previews: PreviewProvider {
- static var previews: some View {
- TCCall()
- }
- }
- */
+// struct TCCall_Previews: PreviewProvider {
+// static var previews: some View {
+// TCCall()
+// }
+// }

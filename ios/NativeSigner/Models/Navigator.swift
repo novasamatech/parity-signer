@@ -10,19 +10,17 @@
 
 import Foundation
 
-/**
- * Slightly non-trivial navigation
- * We should keep this to minimum
- */
+/// Slightly non-trivial navigation
+/// We should keep this to minimum
 extension SignerDataModel {
     func pushButton(action: Action, details: String = "", seedPhrase: String = "") {
         // Poor man's mutex; just because it's really managed by UI abstraction
         if actionAvailable {
-            /** No returns below or things will stall! **/
+            /// No returns below or things will stall! *
             actionAvailable = false
             if let tempActionResult = try? backendAction(action: action, details: details, seedPhrase: seedPhrase) {
                 switch tempActionResult.modalData {
-                case .sufficientCryptoReady(let value):
+                case let .sufficientCryptoReady(value):
                     print(value)
                 default: break
                 }
@@ -32,9 +30,9 @@ extension SignerDataModel {
             Timer.scheduledTimer(
                 withTimeInterval: debounceTime,
                 repeats: false,
-                block: {_ in self.actionAvailable = true}
+                block: { _ in self.actionAvailable = true }
             )
-            /** Return is allowed again **/
+            /// Return is allowed again *
         }
     }
 }

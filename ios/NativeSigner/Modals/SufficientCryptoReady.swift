@@ -17,18 +17,18 @@ struct SufficientCryptoReady: View {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000"))
             VStack {
                 HeaderBar(line1: "Your Signature", line2: "Scan it into your application")
-                 Image(uiImage: UIImage(data: Data(content.sufficient)) ?? UIImage())
-                 .resizable()
-                 .aspectRatio(contentMode: .fit).padding(12)
+                Image(uiImage: UIImage(data: Data(content.sufficient)) ?? UIImage())
+                    .resizable()
+                    .aspectRatio(contentMode: .fit).padding(12)
                 AddressCard(address: content.authorInfo)
                 switch content.content {
-                case .addSpecs(let network):
+                case let .addSpecs(network):
                     Text("Signature for network specs")
                     NetworkCard(title: network.networkTitle, logo: network.networkLogo)
                 case .loadTypes(types: _, pic: _):
                     Text("Signature for types")
-                case .loadMetadata(name: let name, version: let version):
-                    Text("Signature for metadata update" )
+                case let .loadMetadata(name: name, version: version):
+                    Text("Signature for metadata update")
                     Text(name + " version " + String(version))
                 }
             }
@@ -36,10 +36,8 @@ struct SufficientCryptoReady: View {
     }
 }
 
-/*
- struct SufficientCryptoReady_Previews: PreviewProvider {
- static var previews: some View {
- SufficientCryptoReady()
- }
- }
- */
+// struct SufficientCryptoReady_Previews: PreviewProvider {
+// static var previews: some View {
+// SufficientCryptoReady()
+// }
+// }
