@@ -104,7 +104,8 @@ struct KeyManager: View {
                                                 hasPwd: address.hasPwd,
                                                 identicon: address.identicon,
                                                 seedName: "",
-                                                multiselect: address.multiselect
+                                                multiselect: address.multiselect,
+                                                secretExposed: address.secretExposed
                                             ),
                                             multiselectMode: content.multiselectMode
                                         )

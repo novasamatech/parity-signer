@@ -65,6 +65,14 @@ struct HistoryCardExtended: View {
                     line2: value.seedName + value.path + " in network with hash " +
                         value.networkGenesisHash.map { String(format: "%02X", $0) }.joined()
                 )
+            case let .secretWasExported(value): HistoryCardTemplate(
+                    image: "eye.trianglebadge.exclamationmark",
+                    timestamp: timestamp,
+                    danger: true,
+                    line1: "Secret was exported",
+                    line2: value.seedName + value.path + " in network with hash " +
+                            value.networkGenesisHash.map { String(format: "%02X", $0) }.joined()
+            )
             case let .metadataAdded(value): HistoryCardTemplate(
                     image: "plus.viewfinder",
                     timestamp: timestamp,

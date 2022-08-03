@@ -62,6 +62,13 @@ struct HistoryCard: View {
                     line1: "Key removed",
                     line2: value.seedName + value.path
                 )
+            case let .secretWasExported(value): HistoryCardTemplate(
+                    image: "eye.trianglebadge.exclamationmark",
+                    timestamp: timestamp,
+                    danger: true,
+                    line1: "Secret was exported",
+                    line2: value.seedName + value.path
+            )
             case let .metadataAdded(value): HistoryCardTemplate(
                     image: "plus.viewfinder",
                     timestamp: timestamp,

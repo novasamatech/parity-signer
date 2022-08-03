@@ -48,7 +48,8 @@ struct SettingsScreen: View {
                                     hasPwd: false,
                                     identicon: content.identicon ?? [],
                                     seedName: "",
-                                    multiselect: false
+                                    multiselect: false,
+                                    secretExposed: false
                                 ))
                             } else {
                                 if let errorMessage = content.error {
@@ -61,7 +62,8 @@ struct SettingsScreen: View {
                                         hasPwd: false,
                                         identicon: [],
                                         seedName: "",
-                                        multiselect: false
+                                        multiselect: false,
+                                        secretExposed: false
                                     ))
                                 }
                             }

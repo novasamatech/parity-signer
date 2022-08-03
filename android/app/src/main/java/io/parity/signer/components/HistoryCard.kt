@@ -79,6 +79,14 @@ fun HistoryCard(card: Event, timestamp: String) {
 				line3 = card.identityHistory.seedName + card.identityHistory.path
 			)
 		}
+		is Event.SecretWasExported -> {
+			HistoryCardTemplate(
+				image = Icons.Default.WbSunny,
+				line1 = timestamp,
+				line2 = "Secret was exported",
+				line3 = card.identityHistory.seedName + card.identityHistory.path
+			)
+		}
 		is Event.MessageSignError -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Warning,

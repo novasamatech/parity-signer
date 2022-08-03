@@ -96,6 +96,16 @@ fun HistoryCardExtended(
 				)
 			}
 		}
+		is Event.SecretWasExported -> {
+			eventVal.identityHistory.let {
+				HistoryCardTemplate(
+					image = Icons.Default.WbSunny,
+					line1 = timestamp,
+					line2 = "Secret was exported",
+					line3 = it.seedName + it.path
+				)
+			}
+		}
 		is Event.MessageSignError -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Warning,
