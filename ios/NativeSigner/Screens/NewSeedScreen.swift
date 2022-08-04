@@ -16,7 +16,7 @@ struct NewSeedScreen: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text("DISPLAY NAME").font(FBase(style: .overline)).foregroundColor(Color("Text500"))
+            Text("DISPLAY NAME").font(Fontstyle.overline.base).foregroundColor(Color("Text500"))
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(Color("Border400"))
@@ -24,7 +24,7 @@ struct NewSeedScreen: View {
                 TextField("Seed", text: $seedName, prompt: Text("Seed name"))
                     .focused($nameFocused)
                     .foregroundColor(Color("Text600"))
-                    .font(FBase(style: .body2))
+                    .font(Fontstyle.body2.base)
                     .disableAutocorrection(true)
                     .keyboardType(.asciiCapable)
                     .submitLabel(.done)

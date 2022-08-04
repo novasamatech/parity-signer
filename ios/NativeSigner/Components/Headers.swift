@@ -12,7 +12,7 @@ struct HeadingOverline: View {
     var body: some View {
         Text(text)
             .foregroundColor(Color("Text600"))
-            .font(FBase(style: .overline))
+            .font(Fontstyle.overline.base)
             .tracking(0.5)
             .textCase(.uppercase)
     }
@@ -26,7 +26,7 @@ struct HeaderBar: View {
             HeadingOverline(text: line1)
             Text(line2)
                 .foregroundColor(Color("Text400"))
-                .font(FBase(style: .subtitle2))
+                .font(Fontstyle.subtitle2.base)
             Divider()
                 .padding(.top, 6)
         }

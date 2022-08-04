@@ -78,10 +78,10 @@ struct CameraView: View {
                             .foregroundColor(Color("Crypto400"))
                             .padding(.vertical, 8)
                         Text(constructFrameCountMessage(captured: model.captured, total: model.total))
-                            .font(FBase(style: .subtitle1))
+                            .font(Fontstyle.subtitle1.base)
                             .foregroundColor(Color("Text600"))
                         Text("Please hold still")
-                            .font(FBase(style: .subtitle2))
+                            .font(Fontstyle.subtitle2.base)
                             .foregroundColor(Color("Text400"))
                         MenuButtonsStack {
                             BigButton(

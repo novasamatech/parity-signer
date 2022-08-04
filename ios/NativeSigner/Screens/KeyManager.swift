@@ -71,7 +71,7 @@ struct KeyManager: View {
                     }
                 )
                 HStack {
-                    Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))
+                    Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(Fontstyle.overline.base)
                     Spacer()
                     Button(
                         action: {

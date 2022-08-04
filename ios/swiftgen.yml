@@ -1,0 +1,13 @@
+input_dir: ./
+output_dir: NativeSigner/Generated/
+
+xcassets:
+  - inputs: ./NativeSigner/Resources/Assets.xcassets
+    outputs:
+      templateName: swift5
+      output: Assets.swift
+fonts:
+  - inputs: ./NativeSigner/Resources/Fonts
+    outputs:
+      templateName: swift5
+      output: Fonts.swift
