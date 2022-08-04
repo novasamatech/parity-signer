@@ -221,7 +221,7 @@ pub enum Show {
 
     /// Show network specs from entry.
     Specs {
-        #[clap(value_name = "address book title")]
+        #[clap(value_name = "ADDRESS BOOK TITLE")]
         /// Address book title
         s: String,
     },
@@ -229,7 +229,7 @@ pub enum Show {
     /// Check that external file is valid network metadata and search for
     /// similar entry in hot database
     CheckFile {
-        #[clap(value_name = "metadata file")]
+        #[clap(value_name = "METADATA FILE")]
         /// Path to metadata file
         s: String,
     },

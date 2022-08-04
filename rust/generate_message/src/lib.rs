@@ -180,7 +180,7 @@
 //!
 //! ## Display content of the metadata `METATREE` tree of the hot database
 //!
-//! `$ cargo run show -metadata`
+//! `$ cargo run show metadata`
 //!
 //! Prints for each entry in hot database [`METATREE`](constants::METATREE)
 //! tree:
@@ -211,7 +211,7 @@
 //!
 //! ## Show network specs for a network, as recorded in the hot database
 //!
-//! `$ cargo run show specs <address_book_title>`
+//! `$ cargo run show specs <ADDRESS BOOK TITLE>`
 //!
 //! Prints network address book title and corresponding
 //! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
@@ -224,7 +224,7 @@
 //!
 //! ## Check external file with hex-encoded metadata
 //!
-//! `$ cargo run check-file <path>`
+//! `$ cargo run show check-file <METADATA FILE>`
 //!
 //! Asserts that:
 //!
@@ -235,7 +235,7 @@
 //!
 //! ### Example
 //!
-//! `$ cargo run check-file "../defaults/release_metadata/kusama9230"`
+//! `$ cargo run show check-file "../defaults/release_metadata/kusama9230"`
 //!
 //! ## Show metadata fetch block history from `META_HISTORY` tree of the hot database
 //!
@@ -255,7 +255,7 @@
 //!
 //! ## Prepare `add_specs` update payload
 //!
-//! `$ cargo run add-specs <keys> <argument(s)> <overrides>`
+//! `$ cargo run add-specs [OPTIONS] <-d|-f|-k|-p|-t> <--all|--name <NAME>|--url <ADDRESS>>`
 //!
 //! A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
 //! (optionally) be signed and later be transformed into `add_specs` update
@@ -307,19 +307,19 @@
 //!
 //! Reference keys (exactly only one has to be used):
 //!
-//! - `-a`: all networks with entries in the
+//! - `--all`: all networks with entries in the
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
-//! - `-n` followed by single network address book title: for a network with
+//! - `--name` followed by single network address book title: for a network with
 //! existing record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-//! - `-u` followed by single URL address: reserved for networks with no
+//! - `--url` followed by single URL address: reserved for networks with no
 //! record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //!
-//! `-a` key could be used with `-s` key, to stop processing after first
+//! `--all` key could be used with `--pass-errors` key, to stop processing after first
 //! error.
 //!
 //! Override key specifying encryption algorithm supported by the network is
-//! optional for `-n` reference key (since there is already an entry in the
-//! database with specified encryption) and mandatory for `-u` reference key.
+//! optional for `--name` reference key (since there is already an entry in the
+//! database with specified encryption) and mandatory for `--url` reference key.
 //! Supported variants are:
 //!
 //! - `-ed25519`
@@ -328,14 +328,14 @@
 //!
 //! Sequence invoking token override could be used when processing an
 //! individual network that has multiple allowed decimals and unit values
-//! retrieved as arrays of equal size. To override token, key `-token` followed
+//! retrieved as arrays of equal size. To override token, key `--token` followed
 //! by `u8` decimals value and `String` unit value is used. By default, if no
 //! token override in provided, such networks have `0u8` decimals and `UNIT`
 //! unit set up.
 //!
 //! Title override could be used when processing an individual network, to set
 //! the title under which the network will be displayed in Signer, should the
-//! `add_specs` payload be accepted. Non-default networks, if the title override
+//! `add-specs` payload be accepted. Non-default networks, if the title override
 //! is not specified, have title `<network_name>-<network_encryption>`.
 //!
 //! Not all setting and reference key combinations are compatible, and not all
@@ -463,7 +463,7 @@
 //!
 //! ## Prepare `load_metadata` update payload
 //!
-//! `$ cargo run load-metadata <key(s)> <(argument)>`
+//! `$ cargo run load-metadata [OPTIONS] <-d|-f|-k|-p|-t>`
 //!
 //! A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
 //! (optionally) be signed and later be transformed into `load_metadata`
@@ -528,14 +528,14 @@
 //!
 //! Reference keys (exactly only one has to be used):
 //!
-//! - `-a`: all networks with entries in the
+//! - `-a,--all`: all networks with entries in the
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
-//! - `-n` followed by single network name: for a network with existing
+//! - `-n,--name` followed by single network name: for a network with existing
 //! record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-//! - `-u` followed by single URL address: reserved for networks with no
+//! - `-u,--url` followed by single URL address: reserved for networks with no
 //! record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //!
-//! `-a` key could be used with `-s` key, to stop processing after first
+//! `-a` key could be used with `--pass-errors` key, to stop processing after first
 //! error.
 //!
 //! `load_metadata` has no overrides available. Not all setting and reference
@@ -1049,11 +1049,11 @@
 //!
 //! ### Example
 //!
-//! `$ cargo run meta_default_file -name westend -version 9230`
+//! `$ cargo run meta-default-file --name westend --version 9230`
 //!
 //! ## Make file with hexadecimal network metadata fetched for specific block hash from provided address
 //!
-//! `$ cargo run meta_at_block -u <url_address> -block <block_hash>`
+//! `$ cargo run meta-at-block --url <RPC URL> --block-hash <BLOCK HASH>`
 //!
 //! Output file named `<network_name><metadata_version>_<block_hash>` is
 //! generated in dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
@@ -1063,7 +1063,7 @@
 //!
 //! ### Example
 //!
-//! `$ cargo run meta_at_block -u wss://westend-rpc.polkadot.io -block
+//! `$ cargo run meta-at-block --url wss://westend-rpc.polkadot.io --block
 //! 780812df50c4006d1865742269fe4ca339c097e61d6279cce91ebc58f5aebada`
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
