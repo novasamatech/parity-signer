@@ -42,7 +42,7 @@ struct BigButton: View {
         Button(action: action) {
             HStack {
                 Spacer()
-                Text(text).font(FBase(style: .button))
+                Text(text).font(Fontstyle.button.base)
                 Spacer()
             }
         }

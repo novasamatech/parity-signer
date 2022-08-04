@@ -28,7 +28,7 @@ struct NewAddressScreen: View {
                             Text(content.seedName)
                             TextField("Path", text: $path, prompt: Text("//<network>//input"))
                                 .foregroundColor(Color("Crypto400"))
-                                .font(FCrypto(style: .body2))
+                                .font(Fontstyle.body2.crypto)
                                 .disableAutocorrection(true)
                                 .autocapitalization(.none)
                                 .keyboardType(.asciiCapable)

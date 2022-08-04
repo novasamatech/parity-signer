@@ -12,8 +12,8 @@ struct TCNameValueTemplate: View {
     let value: String
     var body: some View {
         HStack {
-            Text(name).foregroundColor(Color("Text400")).font(FBase(style: .body2))
-            Text(value).foregroundColor(Color("Text600")).font(FBase(style: .body2))
+            Text(name).foregroundColor(Color("Text400")).font(Fontstyle.body2.base)
+            Text(value).foregroundColor(Color("Text600")).font(Fontstyle.body2.base)
             Spacer()
         }
     }
