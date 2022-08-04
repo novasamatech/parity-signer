@@ -36,7 +36,6 @@ enum SFSymbols: String {
     case xmark
 }
 
-
 /// Possibly available system variants for `SFSymbol`.
 ///
 /// Refer to https://developer.apple.com/sf-symbols/ for currently available combinations
