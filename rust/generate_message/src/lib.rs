@@ -180,7 +180,7 @@
 //!
 //! ## Display content of the metadata `METATREE` tree of the hot database
 //!
-//! `$ cargo run show -metadata`
+//! `$ cargo run show metadata`
 //!
 //! Prints for each entry in hot database [`METATREE`](constants::METATREE)
 //! tree:
@@ -195,7 +195,7 @@
 //!
 //! ## Display content of the address book `ADDRESS_BOOK` tree of the hot database
 //!
-//! `$ cargo run show -networks`
+//! `$ cargo run show networks`
 //!
 //! Prints for each entry in hot database
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree:
@@ -211,7 +211,7 @@
 //!
 //! ## Show network specs for a network, as recorded in the hot database
 //!
-//! `$ cargo run show -specs <address_book_title>`
+//! `$ cargo run show specs <ADDRESS BOOK TITLE>`
 //!
 //! Prints network address book title and corresponding
 //! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
@@ -220,11 +220,11 @@
 //!
 //! ### Example
 //!
-//! `$ cargo run show -specs westend-sr25519`
+//! `$ cargo run show specs westend-sr25519`
 //!
 //! ## Check external file with hex-encoded metadata
 //!
-//! `$ cargo run check_file <path>`
+//! `$ cargo run show check-file <METADATA FILE>`
 //!
 //! Asserts that:
 //!
@@ -235,11 +235,11 @@
 //!
 //! ### Example
 //!
-//! `$ cargo run check_file "../defaults/release_metadata/kusama9230"`
+//! `$ cargo run show check-file "../defaults/release_metadata/kusama9230"`
 //!
 //! ## Show metadata fetch block history from `META_HISTORY` tree of the hot database
 //!
-//! `$ cargo run show -block_history`
+//! `$ cargo run show block-history`
 //!
 //! Prints block hashes at which the network metadata was fetched as it first
 //! got in the database. If the metadata is from `.wasm` file, there is no entry
@@ -255,7 +255,7 @@
 //!
 //! ## Prepare `add_specs` update payload
 //!
-//! `$ cargo run add_specs <keys> <argument(s)> <overrides>`
+//! `$ cargo run add-specs [OPTIONS] <-d|-f|-k|-p|-t> <--all|--name <NAME>|--url <ADDRESS>>`
 //!
 //! A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
 //! (optionally) be signed and later be transformed into `add_specs` update
@@ -307,19 +307,19 @@
 //!
 //! Reference keys (exactly only one has to be used):
 //!
-//! - `-a`: all networks with entries in the
+//! - `--all`: all networks with entries in the
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
-//! - `-n` followed by single network address book title: for a network with
+//! - `--name` followed by single network address book title: for a network with
 //! existing record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-//! - `-u` followed by single URL address: reserved for networks with no
+//! - `--url` followed by single URL address: reserved for networks with no
 //! record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //!
-//! `-a` key could be used with `-s` key, to stop processing after first
+//! `--all` key could be used with `--pass-errors` key, to stop processing after first
 //! error.
 //!
 //! Override key specifying encryption algorithm supported by the network is
-//! optional for `-n` reference key (since there is already an entry in the
-//! database with specified encryption) and mandatory for `-u` reference key.
+//! optional for `--name` reference key (since there is already an entry in the
+//! database with specified encryption) and mandatory for `--url` reference key.
 //! Supported variants are:
 //!
 //! - `-ed25519`
@@ -328,14 +328,14 @@
 //!
 //! Sequence invoking token override could be used when processing an
 //! individual network that has multiple allowed decimals and unit values
-//! retrieved as arrays of equal size. To override token, key `-token` followed
+//! retrieved as arrays of equal size. To override token, key `--token` followed
 //! by `u8` decimals value and `String` unit value is used. By default, if no
 //! token override in provided, such networks have `0u8` decimals and `UNIT`
 //! unit set up.
 //!
 //! Title override could be used when processing an individual network, to set
 //! the title under which the network will be displayed in Signer, should the
-//! `add_specs` payload be accepted. Non-default networks, if the title override
+//! `add-specs` payload be accepted. Non-default networks, if the title override
 //! is not specified, have title `<network_name>-<network_encryption>`.
 //!
 //! Not all setting and reference key combinations are compatible, and not all
@@ -451,19 +451,19 @@
 //!
 //! Make `add_specs` update payload for a known network from the hot database:
 //!
-//! `$ cargo run add_specs -n westend-sr25519`
+//! `$ cargo run add-specs --name westend-sr25519`
 //!
 //! Make `add_specs` update payload for a new network:
 //!
-//! `$ cargo run add_specs -d -u wss://rococo-rpc.polkadot.io -sr25519 -title Rococo`
+//! `$ cargo run add_specs -d -u wss://rococo-rpc.polkadot.io --encryption sr25519 -title Rococo`
 //!
 //! Make `add_specs` update payload for a new network with token set:
 //!
-//! `$ cargo run add_specs -d -u wss://acala.polkawallet.io -sr25519 -token 12 ACA -title Acala`
+//! `$ cargo run add_specs -d -u wss://acala.polkawallet.io --encryption sr25519 --token-decimals 12 --token-unit ACA --title Acala`
 //!
 //! ## Prepare `load_metadata` update payload
 //!
-//! `$ cargo run load_metadata <key(s)> <(argument)>`
+//! `$ cargo run load-metadata [OPTIONS] <-d|-f|-k|-p|-t>`
 //!
 //! A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
 //! (optionally) be signed and later be transformed into `load_metadata`
@@ -528,14 +528,14 @@
 //!
 //! Reference keys (exactly only one has to be used):
 //!
-//! - `-a`: all networks with entries in the
+//! - `-a,--all`: all networks with entries in the
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
-//! - `-n` followed by single network name: for a network with existing
+//! - `-n,--name` followed by single network name: for a network with existing
 //! record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-//! - `-u` followed by single URL address: reserved for networks with no
+//! - `-u,--url` followed by single URL address: reserved for networks with no
 //! record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //!
-//! `-a` key could be used with `-s` key, to stop processing after first
+//! `-a` key could be used with `--pass-errors` key, to stop processing after first
 //! error.
 //!
 //! `load_metadata` has no overrides available. Not all setting and reference
@@ -668,15 +668,15 @@
 //! Check metadata updates and make `load_metadata` update payloads for latest
 //! metadata for all known networks:
 //!
-//! `$ cargo run load_metadata -a`
+//! `$ cargo run load-metadata -a`
 //!
 //! Make `load_metadata` update payload for a network not in the database:
 //!
-//! `$ cargo run load_metadata -d -u wss://rococo-rpc.polkadot.io`
+//! `$ cargo run load-metadata -d -u wss://rococo-rpc.polkadot.io`
 //!
 //! ## Prepare `load_types` update payload
 //!
-//! `$ cargo run load_types`
+//! `$ cargo run load-types`
 //!
 //! A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
 //! (optionally) be signed and later be transformed into `load_types` update QR.
@@ -849,9 +849,9 @@
 //!
 //! Example:
 //!
-//! `$ cargo run make -qr -crypto sr25519 -msgtype load_metadata -verifier -hex
-//! 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a -payload
-//! sign_me_load_metadata_westendV9200 -signature -hex
+//! `$ cargo run make --goal qr --crypto sr25519 --msg load-metadata --verifier-hex
+//! 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a --payload
+//! sign_me_load_metadata_westendV9200 --signature-hex
 //! 125717599cd057bfe6db7b111274cbda796d2543467400110552fa1c62dc087a7acefb53b68716f1e34f8af6bf13ab45d70d50655fd39483c64f3f057418748a`
 //!
 //! #### `make` for test verifier Alice
@@ -860,20 +860,20 @@
 //! in this case is generated automatically and is not supplied in command
 //! line.
 //!
-//! `$ cargo run make -qr -crypto <encryption> -msgtype load_metadata
-//! -verifier Alice -payload sign_me_load_metadata_westendV9200`.
+//! `$ cargo run make --goal qr --crypto <encryption> --msg load-metadata
+//! --verifier Alice --payload sign_me_load_metadata_westendV9200`.
 //!
 //! Output file is `load_metadata_westendV9200_Alice-<encryption>` in
 //! [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
 //!
 //! Example:
 //!
-//! `$ cargo run make -qr -crypto sr25519 -msgtype load_metadata -verifier Alice
-//! -payload sign_me_load_metadata_westendV9200`
+//! `$ cargo run make --goal qr --crypto sr25519 --msg load-metadata --verifier Alice
+//! --payload sign_me_load_metadata_westendV9200`
 //!
 //! #### `make` with no signature
 //!
-//! `$ cargo run make -qr -crypto none -msgtype load_metadata -payload
+//! `$ cargo run make --goal qr --crypto none --msg load-metadata --payload
 //! sign_me_load_metadata_westendV9200`
 //!
 //! Output file is `load_metadata_westendV9200_unverified` in
@@ -881,7 +881,7 @@
 //!
 //! Example:
 //!
-//! `$ cargo run make -qr -crypto none -msgtype load_metadata -payload
+//! `$ cargo run make --goal qr --crypto none --msg load-metadata --payload
 //! sign_me_load_metadata_westendV9200`
 //!
 //! #### `sign`
@@ -890,21 +890,21 @@
 //! [`SufficientCrypto`](definitions::crypto::SufficientCrypto) QR code produced
 //! by the Signer.
 //!
-//! `$ cargo run sign -qr -sufficient -hex <hex_sufficient> -msgtype
-//! load_metadata -payload sign_me_load_metadata_westendV9200`
+//! `$ cargo run sign --goal qr --sufficient-hex <hex_sufficient> --msg
+//! load-metadata --payload sign_me_load_metadata_westendV9200`
 //!
 //! Output file is `load_metadata_westendV9200` in
 //! [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
 //!
 //! Example:
 //!
-//! `$ cargo run sign -qr -sufficient -hex
+//! `$ cargo run sign --goal qr --sufficient-hex
 //! 0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47aceef7c58b5f952b6233b8aba5beb6f0000c8ca7f7cc16b7ada7cd45026fc3f3ec2289dd90dab0dfac38dfe3be843231443ddd30a3f3bbabb5cefcd2bbcef908c
-//! -msgtype load_metadata -payload sign_me_load_metadata_westendV9200`
+//! --msgtype load-metadata --payload sign_me_load_metadata_westendV9200`
 //!
 //! ## Remove a single metadata entry from the `METATREE`
 //!
-//! `$ cargo run remove -name <network_name> -version <metadata_version>`
+//! `$ cargo run remove --name <network_name> --version <metadata_version>`
 //!
 //! Removes only the specified entry from the [`METATREE`](constants::METATREE).
 //!
@@ -916,7 +916,7 @@
 //!
 //! ## Remove all data associated with a network
 //!
-//! `$ cargo run remove -title <address_book_title>`
+//! `$ cargo run remove --title <address_book_title>`
 //!
 //! This will remove:
 //! - address book entry
@@ -934,7 +934,7 @@
 //!
 //! ## Restore hot database to default state
 //!
-//! `$ cargo run restore_defaults`
+//! `$ cargo run restore-defaults`
 //!
 //! Removes old hot database and generates new one with default values at
 //! default path [`HOT_DB_NAME`](constants::HOT_DB_NAME).
@@ -952,7 +952,7 @@
 //!
 //! ## Generate default cold release database
 //!
-//! `$ cargo run make_cold_release <optional path>`
+//! `$ cargo run make-cold-release <optional path>`
 //!
 //! Removes old cold release database and generates new one with default values
 //! (unitiniated) at user-provided path or, if no valid path is given, at
@@ -987,23 +987,23 @@
 
 //! ## Make derivations import QR and/or hexadecimal string file
 //!
-//! `$ cargo run derivations <optional_target_key> <keys> <arguments>`
+//! `$ cargo run derivations --goal <GOAL> --title <TITLE> --derivations <DERIVATIONS>`
 //!
 //! Keys to be used in command line:
 //!
-//! - `<optional_target_key>`: `-qr` will generate only apng QR code, `-text`
+//! - `<GOAL>`: `qr` will generate only apng QR code, `text`
 //! will generate only text file with hex-encoded update. By default, i.e. if
 //! content key is not provided, both QR code and text file are generated.
 //! `<optional_target_key>` is expected immediately after `derivations` command,
 //! if at all; keys to follow could go in any order, but with argument
 //! immediately following the key.
 //!
-//! - Key `-payload` followed by file path in `/generate_message/` folder.
+//! - Key `--derivations` followed by file path in `/generate_message/` folder.
 //! File with derivations contains valid derivations, each on its own line. Only
 //! suitable derivations will be processed. Processed derivations are also
 //! printed for user to check.
 //!
-//! - Key `-title` followed by network address book title, to indicate to
+//! - Key `--title` followed by network address book title, to indicate to
 //! which network the derivations belong.
 //!
 //! Output file is in `/generate_message/` folder, file name would be
@@ -1011,7 +1011,7 @@
 //!
 //! ## Prepare payload for `load_metadata` update from `.wasm` file
 //!
-//! `$ cargo run unwasm -payload <wasm_file_path> <optional -d key>`
+//! `$ cargo run unwasm [OPTIONS] --filename <FILENAME>`
 //!
 //! This command extracts metadata from `.wasm` file and uses this metadata to
 //! produce `load_metadata` update payload. Only networks with network specs
@@ -1038,8 +1038,7 @@
 //!
 //! ## Make metadata file for `defaults` release metadata set
 //!
-//! `$ cargo run meta_default_file -name <network_name> -version
-//! <network_version>`
+//! `$ cargo run  meta-default-file --name <NETWORK NAME> --version <NETWORK VERSION>`
 //!
 //! Produces file with hex-encoded network metadata from the hot database
 //! [`METATREE`](constants::METATREE) entry.
@@ -1050,11 +1049,11 @@
 //!
 //! ### Example
 //!
-//! `$ cargo run meta_default_file -name westend -version 9230`
+//! `$ cargo run meta-default-file --name westend --version 9230`
 //!
 //! ## Make file with hexadecimal network metadata fetched for specific block hash from provided address
 //!
-//! `$ cargo run meta_at_block -u <url_address> -block <block_hash>`
+//! `$ cargo run meta-at-block --url <RPC URL> --block-hash <BLOCK HASH>`
 //!
 //! Output file named `<network_name><metadata_version>_<block_hash>` is
 //! generated in dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
@@ -1064,7 +1063,7 @@
 //!
 //! ### Example
 //!
-//! `$ cargo run meta_at_block -u wss://westend-rpc.polkadot.io -block
+//! `$ cargo run meta-at-block --url wss://westend-rpc.polkadot.io --block
 //! 780812df50c4006d1865742269fe4ca339c097e61d6279cce91ebc58f5aebada`
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
@@ -1103,25 +1102,26 @@ pub fn full_run(command: Command) -> Result<()> {
         Command::Show(x) => match x {
             Show::Metadata => show_metadata(),
             Show::Networks => show_networks(),
-            Show::Specs(title) => show_specs(title),
-            Show::CheckFile(path) => check_file(path),
+            Show::Specs { s: title } => show_specs(title),
+            Show::CheckFile { s: path } => check_file(path),
             Show::BlockHistory => show_block_history(),
         },
-        Command::Specs(instruction) => gen_add_specs(instruction),
+        Command::Specs { s: instruction } => gen_add_specs(instruction),
         Command::Load(instruction) => gen_load_meta(instruction),
         Command::Types => Ok(prep_types(HOT_DB_NAME)?.write(&load_types())?),
-        Command::Make(make) => make_message(make),
+        Command::Sign(make) | Command::Make(make) => make_message(make),
         Command::Remove(info) => remove_info(info),
         Command::RestoreDefaults => Ok(default_hot(None)?),
-        Command::MakeColdRelease(opt_path) => Ok(default_cold_release(opt_path)?),
-        Command::TransferMetaRelease(opt_path) => {
-            let cold_database_path = match opt_path {
+        Command::MakeColdRelease { path } => Ok(default_cold_release(path)?),
+        Command::TransferMetaToColdRelease { path } => {
+            let cold_database_path = match path {
                 Some(ref path) => path.to_str().unwrap_or(COLD_DB_NAME_RELEASE),
                 None => COLD_DB_NAME_RELEASE,
             };
             Ok(transfer_metadata_to_cold(HOT_DB_NAME, cold_database_path)?)
         }
         Command::Derivations(x) => process_derivations(x),
+
         Command::Unwasm {
             filename,
             update_db,

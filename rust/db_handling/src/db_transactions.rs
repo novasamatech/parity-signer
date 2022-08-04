@@ -40,11 +40,13 @@ use definitions::{
 
 use crate::helpers::{open_db, open_tree};
 #[cfg(feature = "signer")]
+use crate::Error;
+use crate::Result;
+#[cfg(feature = "signer")]
 use crate::{
     helpers::{make_batch_clear_tree, verify_checksum},
     manage_history::events_to_batch,
 };
-use crate::{Error, Result};
 
 /// Cold database transaction data containing [`Batch`] elements that will be
 /// applied to each [`Tree`](sled::Tree).
