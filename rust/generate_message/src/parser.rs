@@ -98,7 +98,7 @@ pub enum Command {
     /// Generate release cold database at optionally provided path
     ///
     /// Removes old cold release database and generates new one with default values
-    /// (unitiniated) at user-provided path or, if no valid path is given, at
+    /// (uninitiated) at user-provided path or, if no valid path is given, at
     /// default path [`COLD_DB_NAME_RELEASE`](constants::COLD_DB_NAME_RELEASE).
     ///
     /// By default, the uninitiated cold release database contains:
@@ -200,7 +200,7 @@ pub enum Command {
     /// It contains hexadecimal network metadata.
     /// This command does not address or update the hot database.
     MetaAtBlock {
-        /// Url of the chain RPC point
+        /// URL of the chain RPC point
         #[clap(long, value_name = "RPC URL")]
         url: String,
 
@@ -234,7 +234,7 @@ pub enum Show {
         s: String,
     },
 
-    /// Show all entries from META_HISTORY tree
+    /// Show all entries from `META_HISTORY` tree
     BlockHistory,
 }
 
@@ -291,7 +291,7 @@ pub struct ContentArgs {
     #[clap(long, short)]
     pub name: Option<String>,
 
-    /// Process only the network referred to by url address
+    /// Process only the network referred to by URL address
     #[clap(short = 'u', long = "url")]
     pub address: Option<String>,
 
@@ -330,7 +330,7 @@ pub enum Content {
         s: String,
     },
 
-    /// Process only the network referred to by url address
+    /// Process only the network referred to by URL address
     Address {
         /// Network address
         #[clap(long, short)]
@@ -587,7 +587,7 @@ pub struct Sufficient {
 ///
 /// Associated data is `Vec<u8>` blob that becomes part of the update.
 ///
-/// Payload content details are described in [definitions::qr_transfers].
+/// Payload content details are described in [`definitions::qr_transfers`].
 #[derive(clap::ValueEnum, Clone, Debug)]
 pub enum Msg {
     /// `load_types` payload
