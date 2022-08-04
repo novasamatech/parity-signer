@@ -22,7 +22,8 @@ extension SignerDataModel {
                 switch tempActionResult.modalData {
                 case let .sufficientCryptoReady(value):
                     print(value)
-                default: break
+                default:
+                    break
                 }
                 actionResult = tempActionResult
             }

@@ -20,7 +20,7 @@ struct SignSufficientCrypto: View {
                         Button(
                             action: {
                                 let seedPhrase = getSeed(keyrecord.seedName)
-                                if seedPhrase != "" {
+                                if !seedPhrase.isEmpty {
                                     pushButton(.goForward, keyrecord.addressKey, seedPhrase)
                                 }
                             },

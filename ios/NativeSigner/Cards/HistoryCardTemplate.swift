@@ -17,7 +17,7 @@ struct HistoryCardTemplate: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                if timestamp != "" {
+                if !timestamp.isEmpty {
                     Text(timestamp)
                         .foregroundColor(Color("Text400"))
                         .font(FBase(style: .subtitle2))

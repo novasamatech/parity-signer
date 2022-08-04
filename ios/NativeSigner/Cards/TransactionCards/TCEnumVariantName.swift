@@ -21,7 +21,7 @@ struct TCEnumVariantName: View {
                         Text(value.name)
                             .foregroundColor(Color("Text600"))
                         Spacer()
-                        if value.docsEnumVariant != "" {
+                        if !value.docsEnumVariant.isEmpty {
                             Text("?")
                                 .foregroundColor(Color("Action400"))
                         }
@@ -35,7 +35,7 @@ struct TCEnumVariantName: View {
                     }
                 }
             }
-        ).disabled(value.docsEnumVariant == "")
+        ).disabled(value.docsEnumVariant.isEmpty)
     }
 }
 

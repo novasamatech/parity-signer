@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MenuButtonsStack<Content: View>: View {
     let content: Content
+
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
@@ -23,6 +24,7 @@ struct MenuButtonsStack<Content: View>: View {
 
 struct MenuStack<Content: View>: View {
     let content: Content
+
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }

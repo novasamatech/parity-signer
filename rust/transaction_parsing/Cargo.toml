@@ -18,7 +18,7 @@ plot_icon = {version = "0.2.0", default-features = false, features = ["pix"]}
 sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
-thiserror = "1.0.31"
+thiserror = "1.0.32"
 
 [dev-dependencies]
 pretty_assertions = "1"
