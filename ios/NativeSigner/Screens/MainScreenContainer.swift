@@ -102,7 +102,7 @@ struct MainScreenContainer: View {
                         )
                         .padding(.horizontal)
                         .padding(.vertical, 8)
-                        .background(Color("Bg000"))
+                        .background(Asset.bg000.swiftUIColor)
                     }
                 }
                 .gesture(
@@ -133,12 +133,12 @@ struct MainScreenContainer: View {
                     Text(
                         "Please enable airplane mode, turn off bluetooth and wifi connection" +
                             " and disconnect all cables!"
-                    ).background(Color("Bg000"))
+                    ).background(Asset.bg000.swiftUIColor)
                 } else {
                     LandingView(onboard: { data.onboard() })
                 }
             } else {
-                Text("Please protect device with pin or password!").background(Color("Bg000"))
+                Text("Please protect device with pin or password!").background(Asset.bg000.swiftUIColor)
             }
         }
     }

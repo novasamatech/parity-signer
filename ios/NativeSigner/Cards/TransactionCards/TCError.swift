@@ -12,11 +12,11 @@ struct TCError: View {
     var body: some View {
         HStack {
             Text("Error!")
-                .foregroundColor(Color("SignalDanger")).font(Fontstyle.body2.base)
+                .foregroundColor(Asset.signalDanger.swiftUIColor).font(Fontstyle.body2.base)
             Text(text)
-                .foregroundColor(Color("SignalDanger")).font(Fontstyle.body2.base)
+                .foregroundColor(Asset.signalDanger.swiftUIColor).font(Fontstyle.body2.base)
             Spacer()
-        }.background(Color("BgDanger"))
+        }.background(Asset.bgDanger.swiftUIColor)
     }
 }
 

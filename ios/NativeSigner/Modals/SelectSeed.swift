@@ -13,7 +13,7 @@ struct SelectSeed: View {
     let pushButton: (Action, String, String) -> Void
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg100"))
+            RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg100.swiftUIColor)
             VStack {
                 ScrollView {
                     LazyVStack {

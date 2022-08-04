@@ -23,11 +23,11 @@ struct NewAddressScreen: View {
                 NetworkCard(title: content.networkTitle, logo: content.networkLogo)
                 VStack(alignment: .leading) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).frame(height: 39)
+                        RoundedRectangle(cornerRadius: 8).stroke(Asset.crypto400.swiftUIColor).frame(height: 39)
                         HStack {
                             Text(content.seedName)
                             TextField("Path", text: $path, prompt: Text("//<network>//input"))
-                                .foregroundColor(Color("Crypto400"))
+                                .foregroundColor(Asset.crypto400.swiftUIColor)
                                 .font(Fontstyle.body2.crypto)
                                 .disableAutocorrection(true)
                                 .autocapitalization(.none)
@@ -55,7 +55,7 @@ struct NewAddressScreen: View {
                 if let collision = derivationCheck?.collision {
                     VStack {
                         HStack {
-                            Text("This key already exists:").foregroundColor(Color("Text300"))
+                            Text("This key already exists:").foregroundColor(Asset.text300.swiftUIColor)
                             Spacer()
                         }
                         AddressCard(address: collision)
