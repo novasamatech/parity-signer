@@ -36,6 +36,12 @@ pub enum Error {
     #[error("qr error {0}")]
     Qr(Box<dyn std::error::Error>),
 
+    #[error("Signature wrong length, expected {0}, got {1}")]
+    SignatureWrongLength(usize, usize),
+
+    #[error("Public key wrong length, expected {0}, got {1}")]
+    PublicKeyWrongLength(usize, usize),
+
     /// Network specs are already in the database
     #[error(
         "Network specs entry for {name} and encryption {} is already in database.",

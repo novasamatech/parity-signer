@@ -30,10 +30,10 @@ use crate::parser::{Content, InstructionMeta, Set};
 /// Process `load_metadata` command according to the [`InstructionMeta`]
 /// received from the command line.
 pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
-    match instruction.set {
+    match instruction.set.into() {
         // `-f` setting key: produce payload files from existing database
         // entries.
-        Set::F => match instruction.content {
+        Set::F => match instruction.content.into() {
             // `$ cargo run load_metadata -f -a`
             //
             // Make payloads for all metadata entries in the database.
@@ -65,7 +65,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
 
         // `-d` setting key: get network data using RPC calls, **do not**
         // update the database, export payload files.
-        Set::D => match instruction.content {
+        Set::D => match instruction.content.into() {
             // `$ cargo run load_metadata -d -a`
             //
             // Make RPC calls for all networks in `ADDRESS_BOOK`, produce
@@ -113,7 +113,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
         // was fetched.
         Set::K => {
             let write = Write::OnlyNew;
-            match instruction.content {
+            match instruction.content.into() {
                 // `$ cargo run load_metadata -k -a`
                 //
                 // Make RPC calls, update the database as needed and produce
@@ -151,7 +151,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
         // database.
         Set::P => {
             let write = Write::None;
-            match instruction.content {
+            match instruction.content.into() {
                 // `$ cargo run load_metadata -p -a`
                 //
                 // Make RPC calls and update the database as needed for all
@@ -184,7 +184,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
         // and update the database.
         Set::T => {
             let write = Write::All;
-            match instruction.content {
+            match instruction.content.into() {
                 // `$ cargo run load_metadata -a`
                 //
                 // Make RPC calls, update the database as needed and produce

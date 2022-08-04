@@ -17,10 +17,10 @@ use crate::parser::{Content, InstructionSpecs, Override, Set, Token};
 /// Process `add_specs` command according to the [`InstructionSpecs`] received
 /// from the command line.
 pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
-    match instruction.set {
+    match instruction.set.into() {
         // `-f` setting key: produce `add_specs` payload files from existing
         // database entries.
-        Set::F => match instruction.content {
+        Set::F => match instruction.content.clone().into() {
             // `$ cargo run add_specs -f -a`
             //
             // Make `add_specs` payloads for all specs entries in the database.
@@ -71,7 +71,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
 
         // `-d` setting key: produce `add_specs` payloads through RPC calls,
         // **do not** interact with the database, export payload files.
-        Set::D => match instruction.content {
+        Set::D => match instruction.content.clone().into() {
             // `-d` does not write in the database, so fetching specs for known
             // networks without checking the database seems of no use.
             Content::All { pass_errors: _ } => Err(Error::NotSupported),
@@ -113,11 +113,11 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
         // database, export payload files only for updated information.
         //
         // Since network specs are expected to remain constant over time,
-        // these commands seem to be of no use.
+        // threse commands seem to be of no use.
         Set::K => Err(Error::NotSupported),
 
         // `-p` setting key: update the database
-        Set::P => match instruction.content {
+        Set::P => match instruction.content.clone().into() {
             // Network specs are expected to remain constant over time, mass
             // override should not be possible, this command seems to be of no
             // use.
@@ -170,7 +170,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
 
         // `-t` setting key or no setting key: produce `add_specs` payloads,
         // update the database.
-        Set::T => match instruction.content {
+        Set::T => match instruction.content.clone().into() {
             // Network specs are expected to remain constant over time,
             // this command seems to be of no use.
             Content::All { pass_errors: _ } => Err(Error::NotSupported),
@@ -460,7 +460,7 @@ fn specs_pt_u(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::parser::Override;
+    use crate::parser::{ContentArgs, Override, SetFlags};
     use constants::FOLDER;
 
     // The aim is to check that RPC calls are going through for "officially
@@ -477,9 +477,13 @@ mod tests {
         let mut all_clear = true;
         for address in address_set {
             let instruction = InstructionSpecs {
-                set: Set::D,
-                content: Content::Address {
-                    s: address.to_string(),
+                set: SetFlags {
+                    d: true,
+                    ..Default::default()
+                },
+                content: ContentArgs {
+                    address: Some(address.to_string()),
+                    ..Default::default()
                 },
                 over: Override {
                     encryption: Some(Encryption::Sr25519),

@@ -4,9 +4,11 @@ use definitions::{
     crypto::{Encryption, SufficientCrypto},
     helpers::unhex,
 };
-use std::path::PathBuf;
+use sp_core::{ecdsa, ed25519, sr25519};
+use std::{convert::TryInto, path::PathBuf};
 
-use crate::error::Result;
+use crate::{error::Result, Error};
+use parity_scale_codec::Decode;
 
 use clap::{Args, Parser, Subcommand};
 
@@ -45,9 +47,11 @@ pub enum Command {
     },
 
     /// Prepare payload for load-metadata update
+    #[clap(name = "load-metadata")]
     Load(InstructionMeta),
 
     /// Prepare payload for load-types update
+    #[clap(name = "load-types")]
     Types,
 
     /// Complete update generation according
@@ -217,7 +221,7 @@ pub enum Show {
 
     /// Show network specs from entry.
     Specs {
-        #[clap(short, long, value_name = "specs")]
+        #[clap(value_name = "address book title")]
         /// Address book title
         s: String,
     },
@@ -225,7 +229,7 @@ pub enum Show {
     /// Check that external file is valid network metadata and search for
     /// similar entry in hot database
     CheckFile {
-        #[clap(short, long, value_name = "metadata file")]
+        #[clap(value_name = "metadata file")]
         /// Path to metadata file
         s: String,
     },
@@ -238,28 +242,75 @@ pub enum Show {
 #[derive(clap::Args, Debug)]
 pub struct InstructionMeta {
     /// Setting key, as read from command line
-    #[clap(value_parser)]
-    pub set: Set,
+    #[clap(flatten)]
+    pub set: SetFlags,
 
     /// Reference key, as read from command line
-    #[clap(subcommand)]
-    pub content: Content,
+    #[clap(flatten)]
+    pub content: ContentArgs,
+}
+
+impl From<SetFlags> for Set {
+    fn from(set: SetFlags) -> Self {
+        match (set.d, set.f, set.k, set.p, set.t) {
+            (true, false, false, false, false) => Set::D,
+            (false, true, false, false, false) => Set::F,
+            (false, false, true, false, false) => Set::K,
+            (false, false, false, true, false) => Set::P,
+            (false, false, false, false, true) => Set::T,
+            _ => panic!("mutually exclusive args"),
+        }
+    }
 }
 
 /// Command details for `add_specs`.
 #[derive(clap::Args, Debug)]
+#[clap(group(clap::ArgGroup::new("referencekey")
+                .required(true)
+                .args(&["all", "name", "address"])
+))]
 pub struct InstructionSpecs {
-    /// Reference key, as read from command line
-    #[clap(subcommand)]
-    pub content: Content,
-
-    /// Setting key, as read from command line
-    #[clap(value_parser)]
-    pub set: Set,
+    #[clap(flatten)]
+    pub set: SetFlags,
 
     /// Overrides, relevant only for `add_specs` command
     #[clap(flatten)]
     pub over: Override,
+
+    #[clap(flatten)]
+    pub content: ContentArgs,
+}
+
+#[derive(clap::Args, Debug, Default, Clone)]
+pub struct ContentArgs {
+    /// Deal with all relevant database entries
+    #[clap(long, short)]
+    pub all: bool,
+
+    /// Process only a specified network
+    #[clap(long, short)]
+    pub name: Option<String>,
+
+    /// Process only the network referred to by url address
+    #[clap(short = 'u', long = "url")]
+    pub address: Option<String>,
+
+    /// Skip errors
+    #[clap(long)]
+    pub pass_errors: bool,
+}
+
+impl From<ContentArgs> for Content {
+    fn from(args: ContentArgs) -> Self {
+        match (args.all, &args.name, &args.address) {
+            (true, None, None) => Content::All {
+                pass_errors: args.pass_errors,
+            },
+            (false, Some(name), None) => Content::Name { s: name.clone() },
+            (false, None, Some(address)) => Content::Address { s: address.clone() },
+            _ => panic!("mutually exclusive flags"),
+        }
+    }
 }
 
 /// Reference key for `load_metadata` and `add_specs` commands.
@@ -292,23 +343,63 @@ pub enum Content {
 pub enum Set {
     /// Key `-d`: do **not** update the database, make RPC calls, and produce
     /// output files
+    #[clap(name = "-d")]
     D,
 
     /// Key `-f`: do **not** run RPC calls, produce output files from database
     /// as it is
+    #[clap(name = "-f")]
     F,
 
     /// Key `-k`: update database through RPC calls, produce output files only
     /// for **updated** database entries
+    #[clap(name = "-k")]
     K,
 
     /// Key `-p`: update database through RPC calls, do **not** produce any
     /// output files
+    #[clap(name = "-p")]
     P,
 
     /// Key `-t` (no setting key defaults here): update database through RPC
     /// calls, produce output files
+    #[clap(name = "-t")]
     T,
+}
+
+#[derive(clap::Args, Default, Clone, Debug)]
+#[clap(group(clap::ArgGroup::new("setflags")
+                .required(true)
+                .args(&["d", "f", "k", "p", "t"])
+))]
+pub struct SetFlags {
+    /// do not update the database, make RPC calls, and produce output files
+    #[clap(short = 'd')]
+    pub d: bool,
+
+    /// do not run RPC calls, produce output files from database as it is
+    #[clap(short = 'f')]
+    pub f: bool,
+
+    /// update database through RPC calls, produce output files only
+    /// for updated database entries
+    #[clap(short = 'k')]
+    pub k: bool,
+
+    /// update database through RPC calls, do **not** produce any output files
+    #[clap(short = 'p')]
+    pub p: bool,
+
+    /// (no setting key defaults here): update database through RPC
+    /// calls, produce output files
+    #[clap(short = 't')]
+    pub t: bool,
+}
+
+impl std::fmt::Display for Set {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 /// Data to process `make` and `sign` commands.
@@ -327,6 +418,12 @@ pub struct Make {
 
     #[clap(flatten)]
     pub verifier: Verifier,
+
+    #[clap(flatten)]
+    pub signature: Signature,
+
+    #[clap(flatten)]
+    pub sufficient: Sufficient,
 
     /// who is signing the payload
     #[clap(long, name = "crypto", value_parser = encryption_from_args)]
@@ -347,29 +444,56 @@ impl Make {
     }
 
     pub fn crypto(&self) -> Result<Crypto> {
-        use parity_scale_codec::Decode;
-
-        match (
+        if let Some(s) = match (
+            &self.sufficient.sufficient_hex,
+            &self.sufficient.sufficient_file,
+        ) {
+            (Some(hex), None) => Some(unhex(hex)?),
+            (None, Some(path)) => {
+                let sufficient_filename = format!("{}/{}", FOLDER, path);
+                Some(std::fs::read(&sufficient_filename)?)
+            }
+            _ => None,
+        } {
+            let s = <SufficientCrypto>::decode(&mut &s[..])?;
+            return Ok(Crypto::Sufficient { s });
+        }
+        let verifier_public_key = match (
             &self.verifier.verifier_alice,
             &self.verifier.verifier_hex,
             &self.verifier.verifier_file,
         ) {
-            (Some(e), None, None) => Ok(Crypto::Alice { e: e.clone() }),
-            (None, Some(hex), None) => {
-                let verifier_public_key = unhex(hex)?;
-                let s = <SufficientCrypto>::decode(&mut &verifier_public_key[..])?;
-                Ok(Crypto::Sufficient { s })
-            }
+            (Some(e), None, None) => return Ok(Crypto::Alice { e: e.clone() }),
+            (None, Some(hex), None) => unhex(hex)?,
             (None, None, Some(path)) => {
                 let verifier_filename = format!("{}/{}", FOLDER, path.to_string_lossy());
-                println!("verifier_filename {}", verifier_filename);
-                let verifier_public_key = std::fs::read(&verifier_filename)?;
-                let s = <SufficientCrypto>::decode(&mut &verifier_public_key[..])?;
+                std::fs::read(&verifier_filename)?
+            }
+            f => {
+                if self.signature.signature_file.is_none() && self.signature.signature_hex.is_none()
+                {
+                    return Ok(Crypto::None);
+                } else {
+                    panic!("mutually exclusive flags: {:?}", f);
+                }
+            }
+        };
 
-                Ok(Crypto::Sufficient { s })
+        let signature = match (
+            &self.signature.signature_hex,
+            &self.signature.signature_file,
+        ) {
+            (Some(hex), None) => unhex(hex)?,
+            (None, Some(path)) => {
+                let signature_filename = format!("{}/{}", FOLDER, path);
+                std::fs::read(&signature_filename)?
             }
             f => panic!("mutually exclusive flags: {:?}", f),
-        }
+        };
+
+        Ok(Crypto::Sufficient {
+            s: into_sufficient(verifier_public_key, signature, self.crypto.clone().unwrap())?,
+        })
     }
 }
 
@@ -400,8 +524,7 @@ impl std::fmt::Display for Goal {
 /// Verifier-to-be, for `make` and `sign` commands.
 #[derive(clap::Args, Debug, Clone)]
 #[clap(group(clap::ArgGroup::new("verifier")
-                .required(true)
-                .args(&["alice", "hex", "file"])
+                .args(&["alice", "HEX", "FILE"])
         ))]
 pub struct Verifier {
     /// Use Alice key with a specified encryption scheme
@@ -409,11 +532,11 @@ pub struct Verifier {
     verifier_alice: Option<Encryption>,
 
     /// Specify Verifier as a hex string argument
-    #[clap(long, name = "hex")]
+    #[clap(long, name = "HEX")]
     verifier_hex: Option<String>,
 
     /// Read Verifier from a file
-    #[clap(long, name = "file")]
+    #[clap(long, name = "FILE")]
     verifier_file: Option<PathBuf>,
 }
 
@@ -435,19 +558,31 @@ pub enum Crypto {
 
 #[derive(clap::Args, Debug, Clone)]
 #[clap(group(clap::ArgGroup::new("signature")
-                .required(true)
-                .args(&["hex", "file"])
+                .args(&["signature-hex", "signature-file"])
         ))]
 pub struct Signature {
     /// Supply signature in hex format as command line argument
-    #[clap(long, name = "hex")]
+    #[clap(long, value_name = "HEX")]
     signature_hex: Option<String>,
 
     /// Read signature from a file
-    #[clap(long, name = "file")]
+    #[clap(long, value_name = "FILE")]
     signature_file: Option<String>,
 }
 
+#[derive(clap::Args, Debug, Clone)]
+#[clap(group(clap::ArgGroup::new("sufficient")
+                .args(&["sufficient-hex", "sufficient-file"])
+        ))]
+pub struct Sufficient {
+    /// Supply signature in hex format as command line argument
+    #[clap(long, value_name = "HEX")]
+    sufficient_hex: Option<String>,
+
+    /// Read signature from a file
+    #[clap(long, value_name = "FILE")]
+    sufficient_file: Option<String>,
+}
 /// Payload for `make` and `sign` commands.
 ///
 /// Associated data is `Vec<u8>` blob that becomes part of the update.
@@ -569,4 +704,45 @@ pub struct Token {
 
     /// Units of the token
     pub unit: String,
+}
+
+fn vec_to_pubkey_array<const N: usize>(v: Vec<u8>) -> Result<[u8; N]> {
+    v.try_into()
+        .map_err(|e: Vec<_>| Error::PublicKeyWrongLength(N, e.len()))
+}
+
+fn vec_to_signature_array<const N: usize>(v: Vec<u8>) -> Result<[u8; N]> {
+    v.try_into()
+        .map_err(|e: Vec<_>| Error::SignatureWrongLength(N, e.len()))
+}
+
+/// Fit public key and signature drafts into [`SufficientCrypto`].
+fn into_sufficient(
+    verifier_public_key: Vec<u8>,
+    signature: Vec<u8>,
+    encryption: Encryption,
+) -> Result<SufficientCrypto> {
+    match encryption {
+        Encryption::Ed25519 => {
+            let into_pubkey = vec_to_pubkey_array(verifier_public_key)?;
+            let public = ed25519::Public::from_raw(into_pubkey);
+            let into_sign = vec_to_signature_array(signature)?;
+            let signature = ed25519::Signature::from_raw(into_sign);
+            Ok(SufficientCrypto::Ed25519 { public, signature })
+        }
+        Encryption::Sr25519 => {
+            let into_pubkey = vec_to_pubkey_array(verifier_public_key)?;
+            let public = sr25519::Public::from_raw(into_pubkey);
+            let into_sign = vec_to_signature_array(signature)?;
+            let signature = sr25519::Signature::from_raw(into_sign);
+            Ok(SufficientCrypto::Sr25519 { public, signature })
+        }
+        Encryption::Ecdsa => {
+            let into_pubkey = vec_to_pubkey_array(verifier_public_key)?;
+            let public = ecdsa::Public::from_raw(into_pubkey);
+            let into_sign = vec_to_signature_array(signature)?;
+            let signature = ecdsa::Signature::from_raw(into_sign);
+            Ok(SufficientCrypto::Ecdsa { public, signature })
+        }
+    }
 }

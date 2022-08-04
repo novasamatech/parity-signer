@@ -1,8 +1,9 @@
 use clap::Parser;
-use generate_message::{full_run, parser::Cli, Error};
+use generate_message::{full_run, parser::Cli};
 
-fn main() -> Result<(), Error> {
+fn main() {
     let args = Cli::parse();
-    full_run(args.command).unwrap();
-    Ok(())
+    if let Err(e) = full_run(args.command) {
+        eprintln!("An error occured: {}", e);
+    }
 }
