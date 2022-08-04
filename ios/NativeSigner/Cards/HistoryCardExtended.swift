@@ -16,48 +16,42 @@ struct HistoryCardExtended: View {
             switch event.event {
             case .databaseInitiated:
                 HistoryCardTemplate(
-                    image: "iphone.and.arrow.forward",
-                    timestamp: timestamp,
+                    image: .init(.iphoneArrow, variant: .forward),
                     danger: false,
                     line1: "Database initiated",
                     line2: ""
                 )
             case .deviceWasOnline:
                 HistoryCardTemplate(
-                    image: "xmark.shield.fill",
-                    timestamp: timestamp,
+                    image: .init(.xmark, variants: [.shield, .fill]),
                     danger: true,
                     line1: "Device was connected to network",
                     line2: ""
                 )
             case let .generalVerifierSet(value):
                 HistoryCardTemplate(
-                    image: "checkmark.shield",
-                    timestamp: timestamp,
+                    image: .init(.checkmark, variant: .shield),
                     danger: false,
                     line1: "General verifier set",
                     line2: value.show()
                 )
             case .historyCleared:
                 HistoryCardTemplate(
-                    image: "xmark.rectangle.portrait",
-                    timestamp: timestamp,
+                    image: .init(.xmark, variants: [.rectangle, .portrait]),
                     danger: false,
                     line1: "History cleared",
                     line2: ""
                 )
             case .identitiesWiped:
                 HistoryCardTemplate(
-                    image: "xmark.rectangle.portrait",
-                    timestamp: timestamp,
+                    image: .init(.xmark, variants: [.rectangle, .portrait]),
                     danger: false,
                     line1: "All keys were wiped",
                     line2: ""
                 )
             case let .identityAdded(value):
                 HistoryCardTemplate(
-                    image: "aqi.medium",
-                    timestamp: timestamp,
+                    image: .init(.aqi, variant: .medium),
                     danger: false,
                     line1: "Key created",
                     line2: value.seedName + value.path + " in network with hash " +
@@ -65,8 +59,7 @@ struct HistoryCardExtended: View {
                 )
             case let .identityRemoved(value):
                 HistoryCardTemplate(
-                    image: "xmark.rectangle.portrait",
-                    timestamp: timestamp,
+                    image: .init(.xmark, variants: [.rectangle, .portrait]),
                     danger: false,
                     line1: "Key removed",
                     line2: value.seedName + value.path + " in network with hash " +
@@ -74,32 +67,28 @@ struct HistoryCardExtended: View {
                 )
             case let .metadataAdded(value):
                 HistoryCardTemplate(
-                    image: "plus.viewfinder",
-                    timestamp: timestamp,
+                    image: .init(.plus, variant: .viewfinder),
                     danger: false,
                     line1: "Metadata added",
                     line2: value.name + " version " + String(value.version)
                 )
             case let .metadataRemoved(value):
                 HistoryCardTemplate(
-                    image: "xmark.rectangle.portrait",
-                    timestamp: timestamp,
+                    image: .init(.xmark, variants: [.rectangle, .portrait]),
                     danger: false,
                     line1: "Metadata removed",
                     line2: value.name + " version " + String(value.version)
                 )
             case let .networkSpecsAdded(value):
                 HistoryCardTemplate(
-                    image: "plus.viewfinder",
-                    timestamp: timestamp,
+                    image: .init(.plus, variant: .viewfinder),
                     danger: false,
                     line1: "Network added",
                     line2: value.specs.title
                 )
             case let .networkSpecsRemoved(value):
                 HistoryCardTemplate(
-                    image: "xmark.rectangle.portrait",
-                    timestamp: timestamp,
+                    image: .init(.xmark, variants: [.rectangle, .portrait]),
                     danger: false,
                     line1: "Network removed",
                     line2: value.specs.title
@@ -108,8 +97,7 @@ struct HistoryCardExtended: View {
                 switch value.validCurrentVerifier {
                 case .general:
                     HistoryCardTemplate(
-                        image: "checkmark.shield",
-                        timestamp: timestamp,
+                        image: .init(.checkmark, variant: .shield),
                         danger: false,
                         line1: "Network verifier set",
                         line2: value.generalVerifier.show() + " for network with genesis hash " +
@@ -117,8 +105,7 @@ struct HistoryCardExtended: View {
                     )
                 case let .custom(verifier):
                     HistoryCardTemplate(
-                        image: "checkmark.shield",
-                        timestamp: timestamp,
+                        image: .init(.checkmark, variant: .shield),
                         danger: false,
                         line1: "Network verifier set",
                         line2: verifier.show() + " for network with genesis hash " +
@@ -127,64 +114,56 @@ struct HistoryCardExtended: View {
                 }
             case .resetDangerRecord:
                 HistoryCardTemplate(
-                    image: "checkmark.shield",
-                    timestamp: timestamp,
+                    image: .init(.checkmark, variant: .shield),
                     danger: true,
                     line1: "Warnings acknowledged",
                     line2: ""
                 )
             case let .seedCreated(text):
                 HistoryCardTemplate(
-                    image: "aqi.medium",
-                    timestamp: timestamp,
+                    image: .init(.aqi, variant: .medium),
                     danger: false,
                     line1: "Seed created",
                     line2: text
                 )
             case let .seedRemoved(text):
                 HistoryCardTemplate(
-                    image: "xmark.rectangle.portrait.fill",
-                    timestamp: timestamp,
+                    image: .init(.xmark, variants: [.rectangle, .portrait, .fill]),
                     danger: false,
                     line1: "Seed removed",
                     line2: text
                 )
             case let .seedNameWasShown(text):
                 HistoryCardTemplate(
-                    image: "eye.trianglebadge.exclamationmark.fill",
-                    timestamp: timestamp,
+                    image: .init(.eye, variants: [.trianglebadge, .exclamationmark, .fill]),
                     danger: false,
                     line1: "Seed was shown",
                     line2: text
                 )
             case let .networkSpecsSigned(value):
                 HistoryCardTemplate(
-                    image: "signature",
-                    timestamp: timestamp,
+                    image: .init(.signature),
                     danger: false,
                     line1: "Network specs signed",
                     line2: value.specsToSend.title
                 )
             case let .metadataSigned(value):
                 HistoryCardTemplate(
-                    image: "signature",
-                    timestamp: timestamp,
+                    image: .init(.signature),
                     danger: false,
                     line1: "Metadata signed",
                     line2: value.name + String(value.version)
                 )
             case let .typesSigned(value):
                 HistoryCardTemplate(
-                    image: "signature",
-                    timestamp: timestamp,
+                    image: .init(.signature),
                     danger: false,
                     line1: "Types signed",
                     line2: value.typesHash.map { String(format: "%02X", $0) }.joined()
                 )
             case let .systemEntry(text):
                 HistoryCardTemplate(
-                    image: "eye.trianglebadge.exclamationmark.fill",
-                    timestamp: timestamp,
+                    image: .init(.eye, variants: [.trianglebadge, .exclamationmark, .fill]),
                     danger: false,
                     line1: "System record",
                     line2: text
@@ -224,56 +203,49 @@ struct HistoryCardExtended: View {
                 }
             case .typesAdded:
                 HistoryCardTemplate(
-                    image: "plus.viewfinder",
-                    timestamp: timestamp,
+                    image: .init(.plus, variant: .viewfinder),
                     danger: false,
                     line1: "New types info loaded",
                     line2: ""
                 )
             case .typesRemoved:
                 HistoryCardTemplate(
-                    image: "minus.square",
-                    timestamp: timestamp,
+                    image: .init(.minus, variant: .square),
                     danger: true,
                     line1: "Types info removed",
                     line2: ""
                 )
             case let .userEntry(text):
                 HistoryCardTemplate(
-                    image: "square",
-                    timestamp: timestamp,
+                    image: .init(.square),
                     danger: false,
                     line1: "User record",
                     line2: text
                 )
             case let .warning(text):
                 HistoryCardTemplate(
-                    image: "exclamationmark.triangle.fill",
-                    timestamp: timestamp,
+                    image: .init(.exclamationmark, variants: [.triangle, .fill]),
                     danger: true,
                     line1: "Warning! " + text,
                     line2: ""
                 )
             case .wrongPassword:
                 HistoryCardTemplate(
-                    image: "exclamationmark.triangle.fill",
-                    timestamp: timestamp,
+                    image: .init(.exclamationmark, variants: [.triangle, .fill]),
                     danger: true,
                     line1: "Wrong password entered",
                     line2: "operation was declined"
                 )
             case let .messageSignError(value):
                 HistoryCardTemplate(
-                    image: "exclamationmark.triangle.fill",
-                    timestamp: timestamp,
+                    image: .init(.exclamationmark, variants: [.triangle, .fill]),
                     danger: true,
                     line1: "Message signing error!",
                     line2: value.userComment
                 )
             case let .messageSigned(value):
                 HistoryCardTemplate(
-                    image: "signature",
-                    timestamp: timestamp,
+                    image: .init(.signature),
                     danger: false,
                     line1: "Generated signature for message",
                     line2: value.userComment

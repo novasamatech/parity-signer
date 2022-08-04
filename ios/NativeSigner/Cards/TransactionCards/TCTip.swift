@@ -12,10 +12,10 @@ struct TCTip: View {
     var body: some View {
         HStack {
             Text("Tip")
-                .foregroundColor(Color("Text400"))
+                .foregroundColor(Asset.text400.swiftUIColor)
             Text(value.amount)
-                .foregroundColor(Color("Text600"))
-            Text(value.units).foregroundColor(Color("Text600"))
+                .foregroundColor(Asset.text600.swiftUIColor)
+            Text(value.units).foregroundColor(Asset.text600.swiftUIColor)
             Spacer()
         }
     }

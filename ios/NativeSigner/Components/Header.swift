@@ -27,9 +27,12 @@ struct Header: View {
                                 pushButton(.goBack, "", "")
                             },
                             label: {
-                                Image(systemName: rightButton == .multiSelect ? "xmark" : "chevron.left")
-                                    .imageScale(.large)
-                                    .foregroundColor(Color("Text500"))
+                                Image(
+                                    rightButton == .multiSelect ? .xmark : .chevron,
+                                    variant: rightButton == .multiSelect ? nil : .left
+                                )
+                                .imageScale(.large)
+                                .foregroundColor(Asset.text500.swiftUIColor)
                             }
                         )
                     }
@@ -38,7 +41,7 @@ struct Header: View {
                 .frame(width: 72.0)
                 Spacer()
                 Text(screenLabel)
-                    .foregroundColor(Color("Text600"))
+                    .foregroundColor(Asset.text600.swiftUIColor)
                     .font(screenNameType == .h1 ? Fontstyle.header2.base : Fontstyle.header4.base)
                     .tracking(0.1)
                 if rightButton == .multiSelect {
@@ -65,25 +68,25 @@ struct Header: View {
                         label: {
                             switch rightButton {
                             case .newSeed:
-                                Image(systemName: "plus.circle")
+                                Image(.plus, variant: .circle)
                                     .imageScale(.large)
-                                    .foregroundColor(Color("Action400"))
+                                    .foregroundColor(Asset.action400.swiftUIColor)
                             case .backup:
-                                Image(systemName: "ellipsis")
+                                Image(.ellipsis)
                                     .imageScale(.large)
-                                    .foregroundColor(Color("Action400"))
+                                    .foregroundColor(Asset.action400.swiftUIColor)
                             case .logRight:
-                                Image(systemName: "ellipsis")
+                                Image(.ellipsis)
                                     .imageScale(.large)
-                                    .foregroundColor(Color("Action400"))
+                                    .foregroundColor(Asset.action400.swiftUIColor)
                             case .multiSelect:
                                 EmptyView()
                             case .none:
                                 EmptyView()
                             default:
-                                Image(systemName: "ellipsis")
+                                Image(.ellipsis)
                                     .imageScale(.large)
-                                    .foregroundColor(Color("Action400"))
+                                    .foregroundColor(Asset.action400.swiftUIColor)
                             }
                         }
                     )

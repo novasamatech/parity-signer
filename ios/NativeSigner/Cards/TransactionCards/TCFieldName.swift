@@ -19,26 +19,26 @@ struct TCFieldName: View {
                 VStack {
                     HStack {
                         Text(value.name)
-                            .foregroundColor(Color("Text600"))
+                            .foregroundColor(Asset.text600.swiftUIColor)
                         Spacer()
                         if (value.docsFieldName + value.pathType + value.docsType).isEmpty {
                             Text("?")
-                                .foregroundColor(Color("Action400"))
+                                .foregroundColor(Asset.action400.swiftUIColor)
                         }
                     }
                     if showDoc {
                         VStack {
-                            Text("Path: " + value.pathType).foregroundColor(Color("Text600"))
+                            Text("Path: " + value.pathType).foregroundColor(Asset.text600.swiftUIColor)
                             Text(
                                 AttributedString(fromHexDocs: value.docsFieldName) ??
                                     "docs parsing error in iOS, please refer to other sources"
                             )
-                            .foregroundColor(Color("Text600"))
+                            .foregroundColor(Asset.text600.swiftUIColor)
                             Text(
                                 AttributedString(fromHexDocs: value.docsType) ??
                                     "docs parsing error in iOS, please refer to other sources"
                             )
-                            .foregroundColor(Color("Text600"))
+                            .foregroundColor(Asset.text600.swiftUIColor)
                         }
                     }
                 }

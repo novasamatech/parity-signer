@@ -18,11 +18,11 @@ struct TCFieldNumber: View {
             label: {
                 HStack {
                     Text(value.number)
-                        .foregroundColor(Color("Text600"))
+                        .foregroundColor(Asset.text600.swiftUIColor)
                     Spacer()
                     if (value.docsFieldNumber + value.pathType + value.docsType).isEmpty {
                         Text("?")
-                            .foregroundColor(Color("Text400"))
+                            .foregroundColor(Asset.text400.swiftUIColor)
                     }
                 }
                 if showDoc {
@@ -32,12 +32,12 @@ struct TCFieldNumber: View {
                             AttributedString(fromHexDocs: value.docsFieldNumber) ??
                                 "docs parsing error in iOS, please refer to other sources"
                         )
-                        .foregroundColor(Color("Text600"))
+                        .foregroundColor(Asset.text600.swiftUIColor)
                         Text(
                             AttributedString(fromHexDocs: value.docsType) ??
                                 "docs parsing error in iOS, please refer to other sources"
                         )
-                        .foregroundColor(Color("Text600"))
+                        .foregroundColor(Asset.text600.swiftUIColor)
                     }
                 }
             }

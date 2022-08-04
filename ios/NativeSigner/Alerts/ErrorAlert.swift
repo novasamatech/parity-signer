@@ -12,16 +12,16 @@ struct ErrorAlert: View {
     let content: String
     var body: some View {
         ZStack {
-            Rectangle().foregroundColor(Color("BgDanger")).opacity(0.3).gesture(TapGesture().onEnded { _ in
+            Rectangle().foregroundColor(Asset.bgDanger.swiftUIColor).opacity(0.3).gesture(TapGesture().onEnded { _ in
                 pushButton(.goBack, "", "")
             })
             VStack {
-                Text("Error!").font(Fontstyle.header1.base).foregroundColor(Color("SignalDanger"))
-                Text(content).foregroundColor(Color("SignalDanger"))
+                Text("Error!").font(Fontstyle.header1.base).foregroundColor(Asset.signalDanger.swiftUIColor)
+                Text(content).foregroundColor(Asset.signalDanger.swiftUIColor)
                 Button("Ok", action: {
                     pushButton(.goBack, "", "")
                 })
-            }.padding().background(RoundedRectangle(cornerRadius: 20).foregroundColor(Color("BgDanger")))
+            }.padding().background(RoundedRectangle(cornerRadius: 20).foregroundColor(Asset.bgDanger.swiftUIColor))
         }
     }
 }

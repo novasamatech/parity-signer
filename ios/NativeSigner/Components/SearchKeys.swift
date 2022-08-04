@@ -15,29 +15,31 @@ struct SearchKeys: View {
         HStack {
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color(searchString.isEmpty ? "Action100" : "Action400")).frame(height: 39)
+                    .stroke(searchString.isEmpty ? Asset.action100.swiftUIColor : Asset.action400.swiftUIColor)
+                    .frame(height: 39)
                 TextField("find keys", text: $searchString)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
                     .font(.system(size: 12, design: .monospaced))
-                    .foregroundColor(Color("Text400"))
+                    .foregroundColor(Asset.text400.swiftUIColor)
                     .padding(8)
             }
             if !searchString.isEmpty {
                 Button(
                     action: { searchString = "" },
                     label: {
-                        Image(systemName: "clear").imageScale(.large)
+                        Image(.clear).imageScale(.large)
                     }
                 )
             } else {
-                Image(systemName: "doc.text.magnifyingglass").imageScale(.large).foregroundColor(Color("Action400"))
+                Image(.doc, variants: [.text, .magnifyingglass]).imageScale(.large)
+                    .foregroundColor(Asset.action400.swiftUIColor)
             }
         }
         .onDisappear {
             searchString = ""
         }
-        .background(Color("Bg000"))
+        .background(Asset.bg000.swiftUIColor)
     }
 }
 

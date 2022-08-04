@@ -65,13 +65,13 @@ struct KeyManager: View {
                     label: {
                         HStack {
                             NetworkCard(title: content.network.title, logo: content.network.logo)
-                            Image(systemName: "chevron.down")
+                            Image(.chevron, variant: .down)
                             Spacer()
                         }
                     }
                 )
                 HStack {
-                    Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(Fontstyle.overline.base)
+                    Text("DERIVED KEYS").foregroundColor(Asset.text300.swiftUIColor).font(Fontstyle.overline.base)
                     Spacer()
                     Button(
                         action: {
@@ -82,7 +82,8 @@ struct KeyManager: View {
                             }
                         },
                         label: {
-                            Image(systemName: "plus.circle").imageScale(.large).foregroundColor(Color("Action400"))
+                            Image(.plus, variant: .circle).imageScale(.large)
+                                .foregroundColor(Asset.action400.swiftUIColor)
                         }
                     )
                 }.padding(.horizontal, 8)

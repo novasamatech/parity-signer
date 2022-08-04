@@ -11,64 +11,64 @@ struct TCNewSpecs: View {
     var value: NetworkSpecsToSend
     var body: some View {
         VStack {
-            Text("NEW NETWORK").foregroundColor(Color("Text600"))
+            Text("NEW NETWORK").foregroundColor(Asset.text600.swiftUIColor)
             VStack(alignment: .leading) {
                 HStack {
                     Text("Network name:")
-                        .foregroundColor(Color("Text400"))
+                        .foregroundColor(Asset.text400.swiftUIColor)
                     Text(value.title)
-                        .foregroundColor(Color("Text600"))
+                        .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
                     Text("base58 prefix:")
-                        .foregroundColor(Color("Text400"))
+                        .foregroundColor(Asset.text400.swiftUIColor)
                     Text(String(value.base58prefix))
-                        .foregroundColor(Color("Text600"))
+                        .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
                     Text("decimals:")
-                        .foregroundColor(Color("Text400"))
+                        .foregroundColor(Asset.text400.swiftUIColor)
                     Text(String(value.decimals))
-                        .foregroundColor(Color("Text600"))
+                        .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
                     Text("unit:")
-                        .foregroundColor(Color("Text400"))
+                        .foregroundColor(Asset.text400.swiftUIColor)
                     Text(value.unit)
-                        .foregroundColor(Color("Text600"))
+                        .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
                     Text("genesis hash:")
-                        .foregroundColor(Color("Text400"))
+                        .foregroundColor(Asset.text400.swiftUIColor)
                     Text(value.genesisHash.map { String(format: "%02X", $0) }.joined())
-                        .foregroundColor(Color("Text600"))
+                        .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
                     Text("crypto:")
-                        .foregroundColor(Color("Text400"))
+                        .foregroundColor(Asset.text400.swiftUIColor)
                     Text(
                         value.encryption == .ed25519 ? "ed25519" :
                             value.encryption == .sr25519 ? "sr25519" :
                             value.encryption == .ecdsa ? "ecdsa" : "error"
                     )
-                    .foregroundColor(Color("Text600"))
+                    .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
                     Text("spec name:")
-                        .foregroundColor(Color("Text400"))
+                        .foregroundColor(Asset.text400.swiftUIColor)
                     Text(value.name)
-                        .foregroundColor(Color("Text600"))
+                        .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
                     Text("logo:")
-                        .foregroundColor(Color("Text400"))
+                        .foregroundColor(Asset.text400.swiftUIColor)
                     NetworkLogo(logo: value.logo)
                 }
                 HStack {
                     Text("default path:")
-                        .foregroundColor(Color("Text400"))
+                        .foregroundColor(Asset.text400.swiftUIColor)
                     Text(value.pathId)
-                        .foregroundColor(Color("Text600"))
+                        .foregroundColor(Asset.text600.swiftUIColor)
                 }
             }
         }
