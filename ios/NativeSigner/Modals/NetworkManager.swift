@@ -17,10 +17,10 @@ struct NetworkManager: View {
                     pushButton(.goBack, "", "")
                 })
             ZStack {
-                RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
+                RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg000.swiftUIColor)
                 VStack {
                     Spacer()
-                    Rectangle().foregroundColor(Color("Bg000")).frame(height: 25)
+                    Rectangle().foregroundColor(Asset.bg000.swiftUIColor).frame(height: 25)
                 }
                 VStack {
                     HeaderBar(line1: "NETWORK", line2: "Select network").padding(10)
@@ -39,7 +39,7 @@ struct NetworkManager: View {
                                     HStack {
                                         Spacer()
                                         if network.selected {
-                                            Image(systemName: "checkmark")
+                                            Image(.checkmark)
                                         }
                                     }.padding(.horizontal, 8)
                                 }.padding(.horizontal, 8)

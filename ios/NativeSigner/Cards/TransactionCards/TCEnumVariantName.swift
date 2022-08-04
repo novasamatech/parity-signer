@@ -19,11 +19,11 @@ struct TCEnumVariantName: View {
                 VStack {
                     HStack {
                         Text(value.name)
-                            .foregroundColor(Color("Text600"))
+                            .foregroundColor(Asset.text600.swiftUIColor)
                         Spacer()
                         if !value.docsEnumVariant.isEmpty {
                             Text("?")
-                                .foregroundColor(Color("Action400"))
+                                .foregroundColor(Asset.action400.swiftUIColor)
                         }
                     }
                     if showDoc {
@@ -31,7 +31,7 @@ struct TCEnumVariantName: View {
                             AttributedString(fromHexDocs: value.docsEnumVariant) ??
                                 "docs parsing error in iOS, please refer to other sources"
                         )
-                        .foregroundColor(Color("Text600"))
+                        .foregroundColor(Asset.text600.swiftUIColor)
                     }
                 }
             }

@@ -11,7 +11,7 @@ struct TCEraImmortal: View {
     var body: some View {
         HStack {
             Text("Immortal transaction")
-                .foregroundColor(Color("Text400"))
+                .foregroundColor(Asset.text400.swiftUIColor)
             Spacer()
         }
     }

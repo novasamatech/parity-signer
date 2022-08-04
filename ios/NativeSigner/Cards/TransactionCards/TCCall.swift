@@ -21,7 +21,7 @@ struct TCCall: View {
                         TCNameValueTemplate(name: "Method", value: value.methodName)
                         if !value.docs.isEmpty {
                             Text("?")
-                                .foregroundColor(Color("Action400"))
+                                .foregroundColor(Asset.action400.swiftUIColor)
                         }
                     }
                     if showDoc {
@@ -29,7 +29,7 @@ struct TCCall: View {
                             AttributedString(fromHexDocs: value.docs) ??
                                 "docs parsing error in iOS, please refer to other sources"
                         )
-                        .foregroundColor(Color("Text600")).multilineTextAlignment(.leading)
+                        .foregroundColor(Asset.text600.swiftUIColor).multilineTextAlignment(.leading)
                     }
                 }
             }

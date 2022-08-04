@@ -14,7 +14,7 @@ struct EnterPassword: View {
     @FocusState private var focused: Bool
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
+            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg000.swiftUIColor)
             VStack {
                 HeaderBar(line1: "SECRET PATH", line2: "///password")
                 AddressCard(address: content.authorInfo)
@@ -23,12 +23,12 @@ struct EnterPassword: View {
                 }
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color("Crypto400"))
+                        .stroke(Asset.crypto400.swiftUIColor)
                         .frame(height: 39)
                     HStack {
-                        Text("///").foregroundColor(Color("Crypto400"))
+                        Text("///").foregroundColor(Asset.crypto400.swiftUIColor)
                         TextField("SECRET PATH", text: $password, prompt: Text(""))
-                            .foregroundColor(Color("Crypto400"))
+                            .foregroundColor(Asset.crypto400.swiftUIColor)
                             .font(Fontstyle.body2.crypto)
                             .disableAutocorrection(true)
                             .autocapitalization(.none)

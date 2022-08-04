@@ -17,15 +17,15 @@ struct SettingsCardTemplate: View {
         HStack {
             Text(text)
                 .font(Fontstyle.body1.base)
-                .foregroundColor(Color(danger ? "SignalDanger" : "Text400"))
+                .foregroundColor(danger ? Asset.signalDanger.swiftUIColor : Asset.text400.swiftUIColor)
             Spacer()
             if withIcon {
-                Image(systemName: "chevron.forward")
+                Image(.chevron, variant: .forward)
                     .imageScale(.medium)
-                    .foregroundColor(Color("Border400"))
+                    .foregroundColor(Asset.border400.swiftUIColor)
             }
         }
         .padding()
-        .background(Color(withBackground ? "Bg200" : ""))
+        .background(withBackground ? Asset.bg200.swiftUIColor : Color(""))
     }
 }

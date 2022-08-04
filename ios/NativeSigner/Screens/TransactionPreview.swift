@@ -27,14 +27,14 @@ struct TransactionPreview: View {
                 }
                 if content.ttype == .sign {
                     HStack {
-                        Text("LOG NOTE").font(Fontstyle.overline.base).foregroundColor(Color("Text400"))
+                        Text("LOG NOTE").font(Fontstyle.overline.base).foregroundColor(Asset.text400.swiftUIColor)
                         Spacer()
                     }
                     ZStack {
-                        RoundedRectangle(cornerRadius: 8).stroke(Color("Border400")).frame(height: 39)
+                        RoundedRectangle(cornerRadius: 8).stroke(Asset.border400.swiftUIColor).frame(height: 39)
                         TextField("comment", text: $comment, prompt: Text("Comment (not published)"))
-                            .foregroundColor(Color("Text400"))
-                            .background(Color("Bg100"))
+                            .foregroundColor(Asset.text400.swiftUIColor)
+                            .background(Asset.bg100.swiftUIColor)
                             .font(Fontstyle.body2.base)
                             .focused($focus)
                             .onDisappear {

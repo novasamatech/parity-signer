@@ -30,15 +30,15 @@ struct RecoverSeedPhrase: View {
                             .lineLimit(nil)
                             .fixedSize(horizontal: false, vertical: true)
                             .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                            .foregroundColor(Color("Crypto400"))
+                            .foregroundColor(Asset.crypto400.swiftUIColor)
                             .padding(12)
-                            Divider().foregroundColor(Color("Border400"))
+                            Divider().foregroundColor(Asset.border400.swiftUIColor)
                             HStack {
-                                Text(">").foregroundColor(Color("Text400"))
+                                Text(">").foregroundColor(Asset.text400.swiftUIColor)
                                     .font(Fontstyle.body2.base)
                                 TextField("Seed", text: $userInput, prompt: Text("Seed name"))
                                     .focused($focus)
-                                    .foregroundColor(Color("Text600"))
+                                    .foregroundColor(Asset.text600.swiftUIColor)
                                     .font(Fontstyle.body2.base)
                                     .disableAutocorrection(true)
                                     .textInputAutocapitalization(.never)
@@ -64,7 +64,7 @@ struct RecoverSeedPhrase: View {
                                     .padding(.bottom, 10)
                             }
                         }
-                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color("Border400")))
+                        .background(RoundedRectangle(cornerRadius: 8).stroke(Asset.border400.swiftUIColor))
                         ScrollView(.horizontal) {
                             LazyHStack {
                                 ForEach(content.guessSet, id: \.self) { guess in
@@ -75,13 +75,13 @@ struct RecoverSeedPhrase: View {
                                             },
                                             label: {
                                                 Text(guess)
-                                                    .foregroundColor(Color("Crypto400"))
+                                                    .foregroundColor(Asset.crypto400.swiftUIColor)
                                                     .font(Fontstyle.body2.crypto)
                                                     .padding(.horizontal, 12)
                                                     .padding(.vertical, 4)
                                                     .background(
                                                         RoundedRectangle(cornerRadius: 4)
-                                                            .foregroundColor(Color("Crypto100"))
+                                                            .foregroundColor(Asset.crypto100.swiftUIColor)
                                                     )
                                             }
                                         )
@@ -96,7 +96,8 @@ struct RecoverSeedPhrase: View {
                             },
                             label: {
                                 HStack {
-                                    Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
+                                    (createRoots ? Image(.checkmark, variant: .square) : Image(.square))
+                                        .imageScale(.large)
                                     Text("Create root keys")
                                         .multilineTextAlignment(.leading)
                                     Spacer()

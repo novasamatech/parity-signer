@@ -11,21 +11,21 @@ struct TCVerifier: View {
     var value: MVerifierDetails
     var body: some View {
         VStack {
-            Text("VERIFIER CERTIFICATE").foregroundColor(Color("Text600"))
+            Text("VERIFIER CERTIFICATE").foregroundColor(Asset.text600.swiftUIColor)
             HStack {
                 Identicon(identicon: value.identicon)
                 VStack(alignment: .leading) {
                     HStack {
                         Text("key:")
-                            .foregroundColor(Color("Text600"))
+                            .foregroundColor(Asset.text600.swiftUIColor)
                         Text(value.publicKey)
-                            .foregroundColor(Color("Crypto400"))
+                            .foregroundColor(Asset.crypto400.swiftUIColor)
                     }
                     HStack {
                         Text("crypto:")
-                            .foregroundColor(Color("Text600"))
+                            .foregroundColor(Asset.text600.swiftUIColor)
                         Text(value.encryption)
-                            .foregroundColor(Color("Crypto400"))
+                            .foregroundColor(Asset.crypto400.swiftUIColor)
                     }
                 }
             }
