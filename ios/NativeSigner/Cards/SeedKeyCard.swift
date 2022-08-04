@@ -31,10 +31,10 @@ struct SeedKeyCard: View {
                 VStack(alignment: .leading) {
                     Text(seedCard.seedName)
                         .foregroundColor(Color("Text600"))
-                        .font(FBase(style: .subtitle1))
+                        .font(Fontstyle.subtitle1.base)
                     Text(seedCard.base58.truncateMiddle(length: 8))
                         .foregroundColor(Color("Text400"))
-                        .font(FCrypto(style: .body1))
+                        .font(Fontstyle.body1.crypto)
                 }
                 Spacer()
             }

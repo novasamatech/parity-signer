@@ -20,15 +20,15 @@ struct HistoryCardTemplate: View {
                 if !timestamp.isEmpty {
                     Text(timestamp)
                         .foregroundColor(Color("Text400"))
-                        .font(FBase(style: .subtitle2))
+                        .font(Fontstyle.subtitle2.base)
                 }
                 Text(line1)
                     .foregroundColor(Color("Text600"))
-                    .font(FBase(style: .subtitle1))
+                    .font(Fontstyle.subtitle1.base)
                     .tracking(0.1)
                 Text(line2)
                     .foregroundColor(Color("Crypto400"))
-                    .font(FCrypto(style: .body1))
+                    .font(Fontstyle.body1.crypto)
             }
             Spacer()
             Image(systemName: image)

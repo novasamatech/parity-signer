@@ -29,7 +29,7 @@ struct EnterPassword: View {
                         Text("///").foregroundColor(Color("Crypto400"))
                         TextField("SECRET PATH", text: $password, prompt: Text(""))
                             .foregroundColor(Color("Crypto400"))
-                            .font(FCrypto(style: .body2))
+                            .font(Fontstyle.body2.crypto)
                             .disableAutocorrection(true)
                             .autocapitalization(.none)
                             .keyboardType(.asciiCapable)

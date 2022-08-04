@@ -24,7 +24,7 @@ struct AddressCardControls: View {
                 label: {
                     ZStack {
                         RoundedRectangle(cornerRadius: 6).foregroundColor(Color("Crypto100"))
-                        Text("N+" + String(Int(count))).font(FCrypto(style: .body2)).foregroundColor(Color("Crypto400"))
+                        Text("N+" + String(Int(count))).font(Fontstyle.body2.crypto).foregroundColor(Color("Crypto400"))
                     }
                     .frame(width: rowHeight, height: rowHeight)
                     .gesture(

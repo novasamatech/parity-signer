@@ -39,7 +39,7 @@ struct Header: View {
                 Spacer()
                 Text(screenLabel)
                     .foregroundColor(Color("Text600"))
-                    .font(screenNameType == .h1 ? FBase(style: .h2) : FBase(style: .h4))
+                    .font(screenNameType == .h1 ? Fontstyle.header2.base : Fontstyle.header4.base)
                     .tracking(0.1)
                 if rightButton == .multiSelect {
                     Button(

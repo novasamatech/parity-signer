@@ -21,7 +21,7 @@ struct PasswordConfirm: View {
                 HStack {
                     Text(content.croppedPath + "///")
                     Image(systemName: "lock").foregroundColor(Color("Crypto400"))
-                        .font(FCrypto(style: .body2))
+                        .font(Fontstyle.body2.crypto)
                 }
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
@@ -31,7 +31,7 @@ struct PasswordConfirm: View {
                         Text("///").foregroundColor(Color("Crypto400"))
                         TextField("SECRET PATH", text: $passwordCheck, prompt: Text(""))
                             .foregroundColor(Color("Crypto400"))
-                            .font(FCrypto(style: .body2))
+                            .font(Fontstyle.body2.crypto)
                             .disableAutocorrection(true)
                             .autocapitalization(.none)
                             .keyboardType(.asciiCapable)

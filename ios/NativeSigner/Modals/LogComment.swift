@@ -24,7 +24,7 @@ struct LogComment: View {
                             .frame(height: 39)
                         TextField("COMMENT", text: $comment, prompt: Text(""))
                             .foregroundColor(Color("Crypto400"))
-                            .font(FCrypto(style: .body2))
+                            .font(Fontstyle.body2.crypto)
                             .disableAutocorrection(true)
                             .autocapitalization(.none)
                             .keyboardType(.asciiCapable)

@@ -25,7 +25,7 @@ struct DocumentModal: View {
             VStack {
                 Picker("", selection: $document) {
                     ForEach(ShownDocument.allCases) { doc in
-                        Text(doc.label).tag(doc).font(FBase(style: .button))
+                        Text(doc.label).tag(doc).font(Fontstyle.button.base)
                             .foregroundColor(Color(doc == document ? "Text600" : "Text400"))
                     }
                 }.pickerStyle(.segmented).listItemTint(Color("Bg000"))
@@ -34,14 +34,14 @@ struct DocumentModal: View {
                 case .privacyPolicy:
                     ScrollView {
                         Text(getPP())
-                            .font(FBase(style: .body1))
+                            .font(Fontstyle.body1.base)
                             .foregroundColor(Color("Text600"))
                     }.padding()
                 case .toc:
                     ScrollView {
                         InstructionsSquare().padding(.bottom)
                         Text(getTaC())
-                            .font(FBase(style: .body1))
+                            .font(Fontstyle.body1.base)
                             .foregroundColor(Color("Text600"))
                     }.padding()
                 }

@@ -37,19 +37,19 @@ struct AddressCard: View {
                 }.frame(width: 30, height: 30)
                 VStack(alignment: .leading) {
                     HStack {
-                        Text(address.seedName).foregroundColor(Color("Text600")).font(FBase(style: .subtitle1))
+                        Text(address.seedName).foregroundColor(Color("Text600")).font(Fontstyle.subtitle1.base)
                         Text(address.path)
                         if address.hasPwd {
                             Text("///").foregroundColor(Color("Crypto400"))
-                                .font(FCrypto(style: .body2))
+                                .font(Fontstyle.body2.crypto)
                             Image(systemName: "lock").foregroundColor(Color("Crypto400"))
-                                .font(FCrypto(style: .body2))
+                                .font(Fontstyle.body2.crypto)
                         }
                     }.foregroundColor(Color("Crypto400"))
-                        .font(FCrypto(style: .body2))
+                        .font(Fontstyle.body2.crypto)
                     // Here we could have shortened base58 address when buttons are shown, but we don't need to
                     Text(address.base58.truncateMiddle(length: 8)).foregroundColor(Color("Text400"))
-                        .font(FCrypto(style: .body1))
+                        .font(Fontstyle.body1.crypto)
                 }
                 Spacer()
             }.padding(.horizontal, 8)
