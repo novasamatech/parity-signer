@@ -13,7 +13,7 @@ struct NativeSignerApp: App {
         WindowGroup {
             MainScreenContainer()
                 .font(Fontstyle.body1.base)
-                .background(Color("Bg100"))
+                .background(Asset.bg100.swiftUIColor)
         }
     }
 }

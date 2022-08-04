@@ -19,11 +19,11 @@ struct RecoverSeedName: View {
             Text("DISPLAY NAME").font(Fontstyle.overline.base)
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color("Border400"))
+                    .stroke(Asset.border400.swiftUIColor)
                     .frame(height: 39)
                 TextField("Seed", text: $seedName, prompt: Text("Seed name"))
                     .focused($nameFocused)
-                    .foregroundColor(Color("Text600"))
+                    .foregroundColor(Asset.text600.swiftUIColor)
                     .font(Fontstyle.body2.base)
                     .disableAutocorrection(true)
                     .keyboardType(.asciiCapable)

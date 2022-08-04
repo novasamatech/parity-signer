@@ -15,16 +15,16 @@ struct NewSeedBackupModal: View {
     @State var createRoots = true
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg200"))
+            RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg200.swiftUIColor)
             VStack {
                 HeaderBar(line1: "Backup Seed Phrase", line2: content.seed)
                 ZStack {
                     Text(content.seedPhrase)
                         .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                        .foregroundColor(Color("Crypto400"))
+                        .foregroundColor(Asset.crypto400.swiftUIColor)
                         .padding(8)
                 }
-                .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Crypto100")))
+                .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.crypto100.swiftUIColor))
                 VStack(spacing: 16) {
                     Button(
                         action: {
@@ -32,9 +32,10 @@ struct NewSeedBackupModal: View {
                         },
                         label: {
                             HStack {
-                                Image(systemName: confirmBackup ? "checkmark.square" : "square").imageScale(.large)
+                                (confirmBackup ? Image(.checkmark, variant: .square) : Image(.square))
+                                    .imageScale(.large)
                                 Text("I have written down my seed phrase")
-                                    .multilineTextAlignment(.leading).foregroundColor(Color("Text500"))
+                                    .multilineTextAlignment(.leading).foregroundColor(Asset.text500.swiftUIColor)
                                 Spacer()
                             }
                         }
@@ -45,9 +46,9 @@ struct NewSeedBackupModal: View {
                         },
                         label: {
                             HStack {
-                                Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
+                                (createRoots ? Image(.checkmark, variant: .square) : Image(.square)).imageScale(.large)
                                 Text("Create root keys")
-                                    .multilineTextAlignment(.leading).foregroundColor(Color("Text500"))
+                                    .multilineTextAlignment(.leading).foregroundColor(Asset.text500.swiftUIColor)
                                 Spacer()
                             }
                         }

@@ -18,7 +18,7 @@ struct Backup: View {
     @State var failure = false
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg200"))
+            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg200.swiftUIColor)
             VStack {
                 ZStack {
                     HeaderBar(line1: "Backup", line2: content.seedName)
@@ -29,7 +29,8 @@ struct Backup: View {
                                 pushButton(.goBack, "", "")
                             },
                             label: {
-                                Image(systemName: "xmark").imageScale(.large).foregroundColor(Color("Text300"))
+                                Image(.xmark).imageScale(.large)
+                                    .foregroundColor(Asset.text300.swiftUIColor)
                             }
                         )
                     }
@@ -37,13 +38,17 @@ struct Backup: View {
                 ScrollView {
                     VStack {
                         HStack {
-                            Text("SEED PHRASE").foregroundColor(Color("Text300")).font(Fontstyle.overline.base)
+                            Text("SEED PHRASE").foregroundColor(Asset.text300.swiftUIColor)
+                                .font(Fontstyle.overline.base)
                             Spacer()
                         }
                         HStack {
                             Text(secret)
                                 .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                                .foregroundColor(Color(failure ? "SignalDanger" : "Crypto400"))
+                                .foregroundColor(
+                                    failure ? Asset.signalDanger.swiftUIColor : Asset.crypto400
+                                        .swiftUIColor
+                                )
                                 .padding(8)
                             Spacer()
                         }
@@ -72,7 +77,8 @@ struct Backup: View {
                                 ))
                         )
                         HStack {
-                            Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(Fontstyle.overline.base)
+                            Text("DERIVED KEYS").foregroundColor(Asset.text300.swiftUIColor)
+                                .font(Fontstyle.overline.base)
                             Spacer()
                         }
                         LazyVStack {
@@ -93,12 +99,12 @@ struct Backup: View {
                                     ForEach(pack.idSet.sorted(by: { $0.path < $1.path }), id: \.self) { record in
                                         HStack {
                                             Text((record.path.isEmpty && !record.hasPwd) ? "seed key" : record.path)
-                                                .foregroundColor(Color("Crypto400"))
+                                                .foregroundColor(Asset.crypto400.swiftUIColor)
                                                 .font(Fontstyle.body2.crypto)
                                             if record.hasPwd {
-                                                Text("///").foregroundColor(Color("Crypto400"))
+                                                Text("///").foregroundColor(Asset.crypto400.swiftUIColor)
                                                     .font(Fontstyle.body2.crypto)
-                                                Image(systemName: "lock").foregroundColor(Color("Crypto400"))
+                                                Image(.lock).foregroundColor(Asset.crypto400.swiftUIColor)
                                                     .font(Fontstyle.body2.crypto)
                                             }
                                             Spacer()

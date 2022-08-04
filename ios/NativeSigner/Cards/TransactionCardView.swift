@@ -13,7 +13,7 @@ struct TransactionCardView: View {
         VStack(alignment: .leading) {
             TransactionCardSelector(card: card).padding(4)
         }
-        .border(Color("Border400"))
+        .border(Asset.border400.swiftUIColor)
         .padding(.leading, CGFloat(card.indent) * 10.0)
     }
 }

@@ -63,7 +63,7 @@ struct CameraView: View {
                     .overlay(
                         VStack {
                             RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color("Crypto400"))
+                                .stroke(Asset.crypto400.swiftUIColor)
                                 .padding(12)
                                 .frame(width: size, height: size)
                             Spacer()
@@ -74,15 +74,15 @@ struct CameraView: View {
                     MenuStack {
                         HeadingOverline(text: "PARSING MULTIPART DATA").padding(.top, 12)
                         ProgressView(value: min(Float(captured ?? 0) / (Float(total ?? -1) + 2), 1))
-                            .border(Color("Crypto400"))
-                            .foregroundColor(Color("Crypto400"))
+                            .border(Asset.crypto400.swiftUIColor)
+                            .foregroundColor(Asset.crypto400.swiftUIColor)
                             .padding(.vertical, 8)
                         Text(constructFrameCountMessage(captured: model.captured, total: model.total))
                             .font(Fontstyle.subtitle1.base)
-                            .foregroundColor(Color("Text600"))
+                            .foregroundColor(Asset.text600.swiftUIColor)
                         Text("Please hold still")
                             .font(Fontstyle.subtitle2.base)
-                            .foregroundColor(Color("Text400"))
+                            .foregroundColor(Asset.text400.swiftUIColor)
                         MenuButtonsStack {
                             BigButton(
                                 text: "Start over",
@@ -95,7 +95,7 @@ struct CameraView: View {
                     }.padding(.bottom, -20)
                 }
             }
-        }.background(Color("Bg100"))
+        }.background(Asset.bg100.swiftUIColor)
     }
 }
 

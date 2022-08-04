@@ -37,7 +37,8 @@ struct SettingsScreen: View {
                 label: {
                     VStack {
                         HStack {
-                            Text("Verifier certificate").font(Fontstyle.header1.base).foregroundColor(Color("Text600"))
+                            Text("Verifier certificate").font(Fontstyle.header1.base)
+                                .foregroundColor(Asset.text600.swiftUIColor)
                             Spacer()
                         }
                         VStack {
@@ -52,8 +53,10 @@ struct SettingsScreen: View {
                                 ))
                             } else {
                                 if let errorMessage = content.error {
-                                    Text("Error!").foregroundColor(Color("SignalDanger")).font(Fontstyle.header4.base)
-                                    Text(errorMessage).foregroundColor(Color("SignalDanger")).font(Fontstyle.body2.base)
+                                    Text("Error!").foregroundColor(Asset.signalDanger.swiftUIColor)
+                                        .font(Fontstyle.header4.base)
+                                    Text(errorMessage).foregroundColor(Asset.signalDanger.swiftUIColor)
+                                        .font(Fontstyle.body2.base)
                                 } else {
                                     AddressCard(address: Address(
                                         base58: "",

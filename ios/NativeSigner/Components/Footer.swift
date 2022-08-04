@@ -18,7 +18,7 @@ struct KeySymbol: View {
 struct WrenchSymbol: View {
     var body: some View {
         VStack {
-            Image(systemName: "gearshape.fill").imageScale(.medium)
+            Image(.gearshape, variant: .fill).imageScale(.medium)
         }
     }
 }
@@ -34,7 +34,7 @@ struct Footer: View {
                 },
                 label: {
                     VStack(alignment: .center) {
-                        Image(systemName: "rectangle.grid.1x2.fill").imageScale(.medium)
+                        Image(.rectangle, variants: [.grid, .oneByTwo, .fill]).imageScale(.medium)
                             .padding(.top, 4.0)
                             .padding(.bottom, 1.0)
                         Text("Log")
@@ -49,7 +49,7 @@ struct Footer: View {
                 },
                 label: {
                     VStack {
-                        Image(systemName: "viewfinder").imageScale(.medium)
+                        Image(.viewfinder).imageScale(.medium)
                             .padding(.top, 4.0)
                             .padding(.bottom, 1.0)
                         Text("Scanner")
@@ -90,11 +90,11 @@ struct Footer: View {
 }
 
 func buttonColor(active: Bool) -> Color {
-    active ? Color("Text600") : Color("Text300")
+    active ? Asset.text600.swiftUIColor : Asset.text300.swiftUIColor
 }
 
 // func buttonLabelColor(active: Bool) -> Color {
-// return active ? Color("Text600") : Color("Text300")
+// return active ? Asset.text600.swiftUIColor : Asset.text300.swiftUIColor
 // }
 
 // struct Footer_Previews: PreviewProvider {

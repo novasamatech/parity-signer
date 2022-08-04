@@ -22,7 +22,7 @@ struct LandingView: View {
                     },
                     label: {
                         HStack {
-                            Image(systemName: tacAccept ? "checkmark.square" : "square").imageScale(.large)
+                            (tacAccept ? Image(.checkmark, variant: .square) : Image(.square)).imageScale(.large)
                             Text("I agree to the terms and conditions")
                                 .multilineTextAlignment(.leading)
                             Spacer()
@@ -35,7 +35,7 @@ struct LandingView: View {
                     },
                     label: {
                         HStack {
-                            Image(systemName: ppAccept ? "checkmark.square" : "square").imageScale(.large)
+                            (ppAccept ? Image(.checkmark, variant: .square) : Image(.square)).imageScale(.large)
                             Text("I agree to the privacy policy")
                                 .multilineTextAlignment(.leading)
                             Spacer()
