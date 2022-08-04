@@ -39,6 +39,13 @@ jobs:
         with:
           crate:              cargo-spellcheck
 
+      - name:                 Install uniffi_bindgen
+        uses:                 actions-rs/install@v0.1
+        with:
+          crate:              uniffi_bindgen
+          version:            0.19.3 # Must be in sync with version in Cargo.toml
+          use-tool-cache:     true
+
       - name:                 Run spellcheck
         run:                  |
           cargo spellcheck check --cfg=.spellcheck/config.toml -m 99
