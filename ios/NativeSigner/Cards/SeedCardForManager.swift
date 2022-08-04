@@ -15,7 +15,7 @@ struct SeedCardForManager: View {
             RoundedRectangle(cornerRadius: 4).foregroundColor(Color("Bg200")).frame(height: 47)
             HStack {
                 Identicon(identicon: seedNameCard.identicon)
-                VStack (alignment: .leading) {
+                VStack(alignment: .leading) {
                     Text(seedNameCard.seedName)
                         .foregroundColor(Color("Text600"))
                         .font(FBase(style: .subtitle1))
@@ -27,10 +27,8 @@ struct SeedCardForManager: View {
     }
 }
 
-/*
- struct AddressCardSelector_Previews: PreviewProvider {
- static var previews: some View {
- SeedCardForManager()
- }
- }
- */
+// struct AddressCardSelector_Previews: PreviewProvider {
+// static var previews: some View {
+// SeedCardForManager()
+// }
+// }

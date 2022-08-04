@@ -1,6 +1,7 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
+use error::{ParserDecodingError, ParserMetadataError};
 use frame_metadata::v14::RuntimeMetadataV14;
 #[cfg(feature = "test")]
 use frame_metadata::RuntimeMetadata;
@@ -13,11 +14,7 @@ use sp_runtime::generic::Era;
 use defaults::default_types_vec;
 #[cfg(feature = "test")]
 use definitions::metadata::info_from_metadata;
-use definitions::{
-    error_signer::{ParserDecodingError, ParserError, ParserMetadataError},
-    network_specs::ShortSpecs,
-    types::TypeEntry,
-};
+use definitions::{network_specs::ShortSpecs, types::TypeEntry};
 
 pub mod cards;
 use cards::ParserCard;
@@ -29,24 +26,23 @@ mod decoding_sci;
 use decoding_sci::decoding_sci_entry_point;
 mod decoding_sci_ext;
 use decoding_sci_ext::{decode_ext_attempt, Ext};
-#[cfg(feature = "test")]
 mod error;
-#[cfg(feature = "test")]
-use error::{ArgumentsError, Error};
 pub mod method;
 use method::OlderMeta;
 #[cfg(feature = "test")]
 #[cfg(test)]
 mod tests;
 
-/// Function intakes SCALE encoded method part of transaction as Vec<u8>,
+pub use error::{Error, Result};
+
+/// Function intakes SCALE encoded method part of transaction as `Vec<u8>`,
 /// network metadata and network specs.
 ///
 pub fn parse_method(
     method_data: Vec<u8>,
     metadata_bundle: &MetadataBundle,
     short_specs: &ShortSpecs,
-) -> Result<Vec<OutputCard>, ParserError> {
+) -> Result<Vec<OutputCard>> {
     let start_indent = 0;
     let method_decoded = match metadata_bundle {
         MetadataBundle::Older {
@@ -60,14 +56,12 @@ pub fn parse_method(
         } => decoding_sci_entry_point(method_data, meta_v14, start_indent, short_specs)?,
     };
     if !method_decoded.remaining_vector.is_empty() {
-        return Err(ParserError::Decoding(
-            ParserDecodingError::SomeDataNotUsedMethod,
-        ));
+        return Err(Error::Decoding(ParserDecodingError::SomeDataNotUsedMethod));
     }
     Ok(method_decoded.fancy_out)
 }
 
-/// Struct to decode pre-determined extensions for transactions with V12 and V13 metadata
+/// Struct to decode pre-determined extensions for transactions with `V12` and `V13` metadata
 #[derive(Debug, Decode, Encode)]
 struct ExtValues {
     era: Era,
@@ -86,7 +80,7 @@ pub fn parse_extensions(
     metadata_bundle: &MetadataBundle,
     short_specs: &ShortSpecs,
     optional_mortal_flag: Option<bool>,
-) -> Result<Vec<OutputCard>, ParserError> {
+) -> Result<Vec<OutputCard>> {
     let indent = 0;
     let (era, block_hash, cards) = match metadata_bundle {
         MetadataBundle::Older {
@@ -96,15 +90,13 @@ pub fn parse_extensions(
         } => {
             let ext = match <ExtValues>::decode_all(&mut &extensions_data[..]) {
                 Ok(a) => a,
-                Err(_) => return Err(ParserError::Decoding(ParserDecodingError::ExtensionsOlder)),
+                Err(_) => return Err(Error::Decoding(ParserDecodingError::ExtensionsOlder)),
             };
             if ext.genesis_hash != short_specs.genesis_hash {
-                return Err(ParserError::Decoding(
-                    ParserDecodingError::GenesisHashMismatch,
-                ));
+                return Err(Error::Decoding(ParserDecodingError::GenesisHashMismatch));
             }
             if network_version != &ext.metadata_version {
-                return Err(ParserError::WrongNetworkVersion {
+                return Err(Error::WrongNetworkVersion {
                     as_decoded: ext.metadata_version.to_string(),
                     in_metadata: network_version.to_owned(),
                 });
@@ -157,15 +149,13 @@ pub fn parse_extensions(
                 decode_ext_attempt(&extensions_data, &mut ext, meta_v14, indent, short_specs)?;
             if let Some(genesis_hash) = ext.found_ext.genesis_hash {
                 if genesis_hash != short_specs.genesis_hash {
-                    return Err(ParserError::Decoding(
-                        ParserDecodingError::GenesisHashMismatch,
-                    ));
+                    return Err(Error::Decoding(ParserDecodingError::GenesisHashMismatch));
                 }
             }
             let block_hash = match ext.found_ext.block_hash {
                 Some(a) => a,
                 None => {
-                    return Err(ParserError::FundamentallyBadV14Metadata(
+                    return Err(Error::FundamentallyBadV14Metadata(
                         ParserMetadataError::NoBlockHash,
                     ))
                 }
@@ -173,7 +163,7 @@ pub fn parse_extensions(
             let era = match ext.found_ext.era {
                 Some(a) => a,
                 None => {
-                    return Err(ParserError::FundamentallyBadV14Metadata(
+                    return Err(Error::FundamentallyBadV14Metadata(
                         ParserMetadataError::NoEra,
                     ))
                 }
@@ -181,20 +171,20 @@ pub fn parse_extensions(
             match ext.found_ext.network_version_printed {
                 Some(a) => {
                     if a != network_version.to_string() {
-                        return Err(ParserError::WrongNetworkVersion {
+                        return Err(Error::WrongNetworkVersion {
                             as_decoded: a,
                             in_metadata: network_version.to_owned(),
                         });
                     }
                 }
                 None => {
-                    return Err(ParserError::FundamentallyBadV14Metadata(
+                    return Err(Error::FundamentallyBadV14Metadata(
                         ParserMetadataError::NoVersionExt,
                     ))
                 }
             }
             if !extensions_decoded.remaining_vector.is_empty() {
-                return Err(ParserError::Decoding(
+                return Err(Error::Decoding(
                     ParserDecodingError::SomeDataNotUsedExtensions,
                 ));
             }
@@ -203,37 +193,31 @@ pub fn parse_extensions(
     };
     if let Era::Immortal = era {
         if short_specs.genesis_hash != block_hash {
-            return Err(ParserError::Decoding(
-                ParserDecodingError::ImmortalHashMismatch,
-            ));
+            return Err(Error::Decoding(ParserDecodingError::ImmortalHashMismatch));
         }
         if let Some(true) = optional_mortal_flag {
-            return Err(ParserError::Decoding(
-                ParserDecodingError::UnexpectedImmortality,
-            ));
+            return Err(Error::Decoding(ParserDecodingError::UnexpectedImmortality));
         }
     }
     if let Era::Mortal(_, _) = era {
         if let Some(false) = optional_mortal_flag {
-            return Err(ParserError::Decoding(
-                ParserDecodingError::UnexpectedMortality,
-            ));
+            return Err(Error::Decoding(ParserDecodingError::UnexpectedMortality));
         }
     }
     Ok(cards)
 }
 
-pub fn cut_method_extensions(data: &[u8]) -> Result<(Vec<u8>, Vec<u8>), ParserError> {
-    let pre_method = get_compact::<u32>(data).map_err(|_| ParserError::SeparateMethodExtensions)?;
+pub fn cut_method_extensions(data: &[u8]) -> Result<(Vec<u8>, Vec<u8>)> {
+    let pre_method = get_compact::<u32>(data).map_err(|_| Error::SeparateMethodExtensions)?;
     let method_length = pre_method.compact_found as usize;
     match pre_method.start_next_unit {
         Some(start) => match data.get(start..start + method_length) {
             Some(a) => Ok((a.to_vec(), data[start + method_length..].to_vec())),
-            None => Err(ParserError::SeparateMethodExtensions),
+            None => Err(Error::SeparateMethodExtensions),
         },
         None => {
             if method_length != 0 {
-                return Err(ParserError::SeparateMethodExtensions);
+                return Err(Error::SeparateMethodExtensions);
             }
             Ok((Vec::new(), data.to_vec()))
         }
@@ -246,15 +230,7 @@ pub fn parse_set(
     metadata_bundle: &MetadataBundle,
     short_specs: &ShortSpecs,
     optional_mortal_flag: Option<bool>,
-) -> Result<
-    (
-        Result<Vec<OutputCard>, ParserError>,
-        Vec<OutputCard>,
-        Vec<u8>,
-        Vec<u8>,
-    ),
-    ParserError,
-> {
+) -> Result<(Result<Vec<OutputCard>>, Vec<OutputCard>, Vec<u8>, Vec<u8>)> {
     // if unable to separate method date and extensions, then some fundamental flaw is in transaction itself
     let (method_data, extensions_data) = cut_method_extensions(data)?;
 
@@ -280,17 +256,13 @@ pub fn parse_and_display_set(
     data: &[u8],
     metadata: &RuntimeMetadata,
     short_specs: &ShortSpecs,
-) -> Result<String, String> {
-    let meta_info = match info_from_metadata(metadata) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::Arguments(ArgumentsError::Metadata(e)).show()),
-    };
+) -> Result<String> {
+    let meta_info = info_from_metadata(metadata)?;
     if meta_info.name != short_specs.name {
-        return Err(Error::Arguments(ArgumentsError::NetworkNameMismatch {
+        return Err(Error::NetworkNameMismatch {
             name_metadata: meta_info.name,
             name_network_specs: short_specs.name.to_string(),
-        })
-        .show());
+        });
     }
     let metadata_bundle = match metadata {
         RuntimeMetadata::V12(_) | RuntimeMetadata::V13(_) => {
@@ -302,11 +274,11 @@ pub fn parse_and_display_set(
             let types = match default_types_vec() {
                 Ok(a) => {
                     if a.is_empty() {
-                        return Err(Error::Arguments(ArgumentsError::NoTypes).show());
+                        return Err(Error::NoTypes);
                     }
                     a
                 }
-                Err(_) => return Err(Error::Arguments(ArgumentsError::DefaultTypes).show()),
+                Err(_) => return Err(Error::DefaultTypes),
             };
             MetadataBundle::Older {
                 older_meta,
@@ -320,34 +292,31 @@ pub fn parse_and_display_set(
         },
         _ => unreachable!(), // just checked in the info_from_metadata function if the metadata is acceptable one
     };
-    match parse_set(data, &metadata_bundle, short_specs, None) {
-        Ok((method_cards_result, extensions_cards, _, _)) => {
-            let mut method = String::new();
-            let mut extensions = String::new();
-            match method_cards_result {
-                Ok(method_cards) => {
-                    for (i, x) in method_cards.iter().enumerate() {
-                        if i > 0 {
-                            method.push_str(",\n");
-                        }
-                        method.push_str(&x.card.show_no_docs(x.indent));
-                    }
-                }
-                Err(e) => method = e.show(),
-            }
-            for (i, x) in extensions_cards.iter().enumerate() {
+    let (method_cards_result, extensions_cards, _, _) =
+        parse_set(data, &metadata_bundle, short_specs, None)?;
+    let mut method = String::new();
+    let mut extensions = String::new();
+    match method_cards_result {
+        Ok(method_cards) => {
+            for (i, x) in method_cards.iter().enumerate() {
                 if i > 0 {
-                    extensions.push_str(",\n");
+                    method.push_str(",\n");
                 }
-                extensions.push_str(&x.card.show_no_docs(x.indent));
+                method.push_str(&x.card.show_no_docs(x.indent));
             }
-            Ok(format!(
-                "\nMethod:\n\n{}\n\n\nExtensions:\n\n{}",
-                method, extensions
-            ))
         }
-        Err(e) => Err(Error::Parser(e).show()),
+        Err(e) => method = format!("{}", e),
     }
+    for (i, x) in extensions_cards.iter().enumerate() {
+        if i > 0 {
+            extensions.push_str(",\n");
+        }
+        extensions.push_str(&x.card.show_no_docs(x.indent));
+    }
+    Ok(format!(
+        "\nMethod:\n\n{}\n\n\nExtensions:\n\n{}",
+        method, extensions
+    ))
 }
 
 pub enum MetadataBundle<'a> {

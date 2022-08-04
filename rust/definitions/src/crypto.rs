@@ -38,7 +38,7 @@
 //! Signer receives Substrate transactions starting in hexadecimal recording
 //! with `53xxyy` where `xx` corresponds to the encryption type.
 //!
-//! For signable transactions, possible encryptions are:
+//! Possible signature schemes are:
 //!
 //! - `00` for `Ed25519`
 //! - `01` for `Sr25519`
@@ -77,7 +77,7 @@ use crate::network_specs::VerifierValue;
 /// Encryption algorithm
 ///
 /// Lists all encryption algorithms supported by Substrate
-#[derive(Clone, PartialEq, Debug, Decode, Encode)]
+#[derive(Clone, Debug, Decode, Encode, PartialEq)]
 pub enum Encryption {
     Ed25519,
     Sr25519,

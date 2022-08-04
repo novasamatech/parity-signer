@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ConfirmAlert: View {
-    @EnvironmentObject var data: SignerDataModel
+    let pushButton: (Action, String, String) -> Void
     let content: String
     var body: some View {
         ZStack {
@@ -18,13 +18,13 @@ struct ConfirmAlert: View {
                 BigButton(
                     text: "content.yes",
                     action: {
-                        data.pushButton(action: .goForward)
+                        pushButton(.goForward, "", "")
                     }
                 )
                 BigButton(
                     text: "content.no",
                     action: {
-                        data.pushButton(action: .goBack)
+                        pushButton(.goBack, "", "")
                     }
                 )
             }
@@ -32,10 +32,8 @@ struct ConfirmAlert: View {
     }
 }
 
-/*
-struct ConfirmAlert_Previews: PreviewProvider {
-    static var previews: some View {
-        ConfirmAlert()
-    }
-}
-*/
+// struct ConfirmAlert_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ConfirmAlert()
+//    }
+// }

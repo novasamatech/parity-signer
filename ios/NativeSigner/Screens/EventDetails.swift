@@ -14,7 +14,7 @@ struct EventDetails: View {
             Text(content.timestamp)
             ScrollView {
                 LazyVStack {
-                    ForEach(content.events, id: \.self) {event in
+                    ForEach(content.events, id: \.self) { event in
                         HistoryCardExtended(event: event)
                             .padding(.horizontal, 8)
                     }
@@ -24,11 +24,8 @@ struct EventDetails: View {
     }
 }
 
-
-/*
- struct EventDetails_Previews: PreviewProvider {
- static var previews: some View {
- EventDetails()
- }
- }
- */
+// struct EventDetails_Previews: PreviewProvider {
+// static var previews: some View {
+// EventDetails()
+// }
+// }

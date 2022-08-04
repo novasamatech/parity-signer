@@ -4,7 +4,7 @@
 //!
 //! This crate is mainly used to:
 //!
-//! - fetch network data through rpc calls
+//! - fetch network data through RPC calls
 //! - prepare Signer update and derivation import payloads
 //! - generate Signer update QR codes, either signed or unsigned, and
 //! derivations import QR codes, to be scanned into Signer
@@ -24,11 +24,11 @@
 //! database
 //! - `load_types`, to load types information (it is used to support the
 //! transactions parsing in networks with legacy metadata, `RuntimeMetadata`
-//! version below V14)
+//! version below `V14`)
 //!
 //! Updates are assembled as `Vec<u8>` and could be transformed into:
 //!
-//! - `png` QR codes, static or dynamic multiframe depending on the data size
+//! - `PNG` QR codes, static or dynamic multiframe depending on the data size
 //! - hex-encoded string (for tests)
 //!
 //! Information in `add_specs`, `load_metadata` and `load_types` could be either
@@ -129,7 +129,7 @@
 //! # Derivations import
 //!
 //! Crate `generate_message` can generate derivations import for bulk import of
-//! password-free derivations.
+//! derivations, either password-free or passworded.
 //!
 //! Derivations import has following structure:
 //!
@@ -148,7 +148,7 @@
 //! Derivations import data is assembled as `Vec<u8>` and could be transformed
 //! into:
 //!
-//! - `png` QR code, static or dynamic multiframe depending on the data size
+//! - `PNG` QR code, static or dynamic multiframe depending on the data size
 //! - hex-encoded string (for tests)
 //!
 //! Derivations imports are generated from user-provided derivations list and
@@ -156,17 +156,18 @@
 //! generating the update, the update itself contains network genesis hash and
 //! [`Encryption`](definitions::crypto::Encryption).
 //!
-//! Only password-free derivation are getting in the update. On generation the
+//! Only valid derivation are getting in the update. On generation the
 //! user-provided derivation list is searched for valid derivations: each line
-//! is a separate derivation, only soft (`/`) and hard (`//`) derivations are
-//! allowed, any incorrectly formatted or passworded (with `///<password>` part)
+//! is a separate derivation, soft (`/`) and hard (`//`) derivations are
+//! allowed, with or without `///<password>` part, any incorrectly formatted
 //! derivations are skipped. `generate_message` prints the suitable derivations
-//! found.
+//! found: password-free as is, and passworded with `///<password>` instead of
+//! the real password.
 //!
-//! When the update is scanned into the Signer, only password-free valid
-//! derivations are expected to be found in the derivations set, otherwise the
-//! Signer will produce an error. If derivations set gets accepted for a certain
-//! seed, Signer tries to create derived keys for all derivations.
+//! When the update is scanned into the Signer, only valid derivations are
+//! expected to be found in the derivations set, otherwise the Signer will
+//! produce an error. If derivations set gets accepted for a certain seed,
+//! Signer tries to create derived keys for all derivations.
 //!
 //! If a derivation produces exactly same public key with exactly same
 //! derivation path as already in the database or in the import, it get ignored
@@ -201,7 +202,7 @@
 //!
 //! - address book title for the network `<network_name>-<network_encryption>`,
 //! used only to distinguish between address book entries
-//! - url address at which rpc calls are made for the network
+//! - URL address at which RPC calls are made for the network
 //! - network encryption
 //! - additional marker that the network is a default one, i.e. entry has not
 //! changed since the database generation
@@ -262,20 +263,20 @@
 //!
 //! Setting keys that could be used in command line (maximum one):
 //!
-//! - `-d`: do **not** update the database, make rpc calls, and produce
+//! - `-d`: do **not** update the database, make RPC calls, and produce
 //! output files
-//! - `-f`: do **not** run rpc calls, produce output files using data already in
+//! - `-f`: do **not** run RPC calls, produce output files using data already in
 //! the database
-//! - `-p`: update or check database through rpc calls, do **not** produce any
+//! - `-p`: update or check database through RPC calls, do **not** produce any
 //! output files
-//! - `-t` (no setting key defaults here): update or check database through rpc
+//! - `-t` (no setting key defaults here): update or check database through RPC
 //! calls, produce output files
 //!
 //! <table>
 //!     <tr>
 //!         <th>setting key</th>
 //!         <th>hot database update</th>
-//!         <th>rpc calls</th>
+//!         <th>RPC calls</th>
 //!         <th>output update payload</th>
 //!     </tr>
 //!     <tr>
@@ -310,7 +311,7 @@
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
 //! - `-n` followed by single network address book title: for a network with
 //! existing record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-//! - `-u` followed by single url address: reserved for networks with no
+//! - `-u` followed by single URL address: reserved for networks with no
 //! record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //!
 //! `-a` key could be used with `-s` key, to stop processing after first
@@ -358,7 +359,7 @@
 //!         <td>mandatory</td>
 //!         <td>possible, if token array fetched</td>
 //!         <td>possible</td>
-//!         <td>- make rpc calls<br>
+//!         <td>- make RPC calls<br>
 //!             - apply overrides<br>
 //!             - make payload file<br>
 //!             Note: database is <b>not</b> used
@@ -397,7 +398,7 @@
 //!         <td>possible</td>
 //!         <td>- get address book entry for <code>address_book_title</code><br>
 //!             - get corresponding network specs entry<br>
-//!             - make rpc calls, check that the entry remains correct<br>
+//!             - make RPC calls, check that the entry remains correct<br>
 //!             - apply overrides<br>
 //!             - update database
 //!         </td>
@@ -409,7 +410,7 @@
 //!         <td>mandatory</td>
 //!         <td>possible, if token array fetched</td>
 //!         <td>possible</td>
-//!         <td>- make rpc calls<br>
+//!         <td>- make RPC calls<br>
 //!             - apply overrides<br>
 //!             - update database<br>
 //!             Note: reserved for networks with no entries in the database
@@ -424,7 +425,7 @@
 //!         <td>possible</td>
 //!         <td>- get address book entry for <code>address_book_title</code><br>
 //!             - get corresponding network specs entry<br>
-//!             - make rpc calls, check that the entry remains correct<br>
+//!             - make RPC calls, check that the entry remains correct<br>
 //!             - apply overrides<br>
 //!             - update database if needed<br>
 //!             - make payload file
@@ -437,7 +438,7 @@
 //!         <td>mandatory</td>
 //!         <td>possible, if token array fetched</td>
 //!         <td>possible</td>
-//!         <td>- make rpc calls<br>
+//!         <td>- make RPC calls<br>
 //!             - apply overrides<br>
 //!             - update database if needed<br>
 //!             - make payload file<br>
@@ -471,22 +472,22 @@
 //!
 //! Setting keys that could be used in command line (maximum one):
 //!
-//! - `-d`: do **not** update the database, make rpc calls, and produce
+//! - `-d`: do **not** update the database, make RPC calls, and produce
 //! output files
-//! - `-f`: do **not** run rpc calls, produce output files from database as
+//! - `-f`: do **not** run RPC calls, produce output files from database as
 //! it is
-//! - `-k`: update database through rpc calls, produce output files only for
+//! - `-k`: update database through RPC calls, produce output files only for
 //! **new** database entries
-//! - `-p`: update database through rpc calls, do **not** produce any output
+//! - `-p`: update database through RPC calls, do **not** produce any output
 //! files
-//! - `-t` (no setting key defaults here): update database through rpc
+//! - `-t` (no setting key defaults here): update database through RPC
 //! calls, produce output files
 //!
 //! <table>
 //!     <tr>
 //!         <th>setting key</th>
 //!         <th>hot database update</th>
-//!         <th>rpc calls</th>
+//!         <th>RPC calls</th>
 //!         <th>output update payload</th>
 //!     </tr>
 //!     <tr>
@@ -531,7 +532,7 @@
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
 //! - `-n` followed by single network name: for a network with existing
 //! record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-//! - `-u` followed by single url address: reserved for networks with no
+//! - `-u` followed by single URL address: reserved for networks with no
 //! record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //!
 //! `-a` key could be used with `-s` key, to stop processing after first
@@ -553,29 +554,29 @@
 //!         <td><code>-d</code></td>
 //!         <td><code>-a</code></td>
 //!         <td></td>
-//!         <td>- get all url addresses <b>from the database</b><br>
-//!             - make rpc calls<br>
+//!         <td>- get all URL addresses <b>from the database</b><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - make payload file(s)<br>
-//!             Note: database is needed to get url addresses
+//!             Note: database is needed to get URL addresses
 //!         </td>
 //!     </tr>
 //!     <tr>
 //!         <td><code>-d</code></td>
 //!         <td><code>-n</code></td>
 //!         <td><code>network_name</code></td>
-//!         <td>- get url address <b>from the database</b> for the <code>network_name</code><br>
-//!             - make rpc calls<br>
+//!         <td>- get URL address <b>from the database</b> for the <code>network_name</code><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - make payload file<br>
-//!             Note: database is needed to get url address
+//!             Note: database is needed to get URL address
 //!         </td>
 //!     </tr>
 //!     <tr>
 //!         <td><code>-d</code></td>
 //!         <td><code>-u</code></td>
 //!         <td><code>url_address</code></td>
-//!         <td>- make rpc calls<br>
+//!         <td>- make RPC calls<br>
 //!             - make payload file<br>
 //!             Note: database is <b>not</b> used
 //!         </td>
@@ -600,8 +601,8 @@
 //!         <td><code>-k</code></td>
 //!         <td><code>-a</code></td>
 //!         <td></td>
-//!         <td>- get all url addresses from the database<br>
-//!             - make rpc calls<br>
+//!         <td>- get all URL addresses from the database<br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed<br>
 //!             - make payload file for each new entry
@@ -611,8 +612,8 @@
 //!         <td><code>-k</code></td>
 //!         <td><code>-n</code></td>
 //!         <td><code>network_name</code></td>
-//!         <td>- get url address from the database for the <code>network_name</code><br>
-//!             - make rpc calls<br>
+//!         <td>- get URL address from the database for the <code>network_name</code><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed<br>
 //!             - make payload file if the entry is new
@@ -622,8 +623,8 @@
 //!         <td><code>-p</code></td>
 //!         <td><code>-a</code></td>
 //!         <td></td>
-//!         <td>- get all url addresses from the database<br>
-//!             - make rpc calls<br>
+//!         <td>- get all URL addresses from the database<br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed
 //!         </td>
@@ -632,8 +633,8 @@
 //!         <td><code>-p</code></td>
 //!         <td><code>-n</code></td>
 //!         <td><code>network_name</code></td>
-//!         <td>- get url address from the database for the <code>network_name</code><br>
-//!             - make rpc calls<br>
+//!         <td>- get URL address from the database for the <code>network_name</code><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed
 //!         </td>
@@ -642,8 +643,8 @@
 //!         <td><code>-t</code> or none declared</td>
 //!         <td><code>-a</code></td>
 //!         <td></td>
-//!         <td>- get all url addresses from the database<br>
-//!             - make rpc calls<br>
+//!         <td>- get all URL addresses from the database<br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed<br>
 //!             - make payload file(s)
@@ -653,8 +654,8 @@
 //!         <td><code>-t</code> or none declared</td>
 //!         <td><code>-n</code></td>
 //!         <td><code>network_name</code></td>
-//!         <td>- get url address from the database for the <code>network_name</code><br>
-//!             - make rpc calls<br>
+//!         <td>- get URL address from the database for the <code>network_name</code><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed<br>
 //!             - make payload file
@@ -979,7 +980,7 @@
 //! user-provided path or, if no valid path is given, at default path
 //! [`COLD_DB_NAME_RELEASE`](constants::COLD_DB_NAME_RELEASE).
 //!
-//! Metadata is transfered only for the networks that are known to the cold
+//! Metadata is transferred only for the networks that are known to the cold
 //! database, i.e. the ones having
 //! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
 //! [`SPECSTREE`](constants::SPECSTREE).
@@ -998,9 +999,9 @@
 //! immediately following the key.
 //!
 //! - Key `-payload` followed by file path in `/generate_message/` folder.
-//! File with derivations contains password-free derivations, each on its own
-//! line. Only suitable derivations will be processed. Processed derivations are
-//! also printed for user to check.
+//! File with derivations contains valid derivations, each on its own line. Only
+//! suitable derivations will be processed. Processed derivations are also
+//! printed for user to check.
 //!
 //! - Key `-title` followed by network address book title, to indicate to
 //! which network the derivations belong.
@@ -1073,12 +1074,11 @@ use db_handling::{
     default_cold_release, default_hot,
     helpers::{prep_types, transfer_metadata_to_cold},
 };
-use definitions::error_active::{Active, ErrorActive};
 
 mod derivations;
 use derivations::process_derivations;
 pub mod fetch_metadata;
-mod helpers;
+pub mod helpers;
 use helpers::debug_meta_at_block;
 pub mod interpret_specs;
 mod load;
@@ -1094,8 +1094,11 @@ use show::{check_file, show_block_history, show_metadata, show_networks, show_sp
 mod specs;
 use specs::gen_add_specs;
 
+mod error;
+pub use error::{Error, Result};
+
 /// Process incoming command as interpreted by parser.
-pub fn full_run(command: Command) -> Result<(), ErrorActive> {
+pub fn full_run(command: Command) -> Result<()> {
     match command {
         Command::Show(x) => match x {
             Show::Metadata => show_metadata(),
@@ -1106,17 +1109,17 @@ pub fn full_run(command: Command) -> Result<(), ErrorActive> {
         },
         Command::Specs(instruction) => gen_add_specs(instruction),
         Command::Load(instruction) => gen_load_meta(instruction),
-        Command::Types => prep_types::<Active>(HOT_DB_NAME)?.write(&load_types()),
+        Command::Types => Ok(prep_types(HOT_DB_NAME)?.write(&load_types())?),
         Command::Make(make) => make_message(make),
         Command::Remove(info) => remove_info(info),
-        Command::RestoreDefaults => default_hot(None),
-        Command::MakeColdRelease(opt_path) => default_cold_release(opt_path),
+        Command::RestoreDefaults => Ok(default_hot(None)?),
+        Command::MakeColdRelease(opt_path) => Ok(default_cold_release(opt_path)?),
         Command::TransferMetaRelease(opt_path) => {
             let cold_database_path = match opt_path {
                 Some(ref path) => path.to_str().unwrap_or(COLD_DB_NAME_RELEASE),
                 None => COLD_DB_NAME_RELEASE,
             };
-            transfer_metadata_to_cold(HOT_DB_NAME, cold_database_path)
+            Ok(transfer_metadata_to_cold(HOT_DB_NAME, cold_database_path)?)
         }
         Command::Derivations(x) => process_derivations(x),
         Command::Unwasm {

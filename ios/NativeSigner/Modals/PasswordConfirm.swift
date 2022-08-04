@@ -12,7 +12,7 @@ struct PasswordConfirm: View {
     let createAddress: (String, String) -> Void
     @State private var passwordCheck: String = ""
     @FocusState private var focused: Bool
-    
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
@@ -46,7 +46,7 @@ struct PasswordConfirm: View {
                 BigButton(
                     text: "Next",
                     action: {
-                        createAddress(content.croppedPath+"///"+content.pwd, content.seedName)
+                        createAddress(content.croppedPath + "///" + content.pwd, content.seedName)
                     },
                     isDisabled: passwordCheck != content.pwd
                 )
@@ -55,10 +55,8 @@ struct PasswordConfirm: View {
     }
 }
 
-/*
- struct Password_Previews: PreviewProvider {
- static var previews: some View {
- Password()
- }
- }
- */
+// struct Password_Previews: PreviewProvider {
+// static var previews: some View {
+// Password()
+// }
+// }

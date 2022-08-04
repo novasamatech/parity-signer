@@ -11,36 +11,45 @@ struct TCFieldName: View {
     var value: MscFieldName
     @State private var showDoc = false
     var body: some View {
-        Button (action: {
-            self.showDoc.toggle()
-        }) {
-            VStack {
-                HStack {
-                    Text(value.name)
-                        .foregroundColor(Color("Text600"))
-                    Spacer()
-                    if value.docsFieldName + value.pathType + value.docsType != "" {
-                        Text("?")
-                            .foregroundColor(Color("Action400"))
+        Button(
+            action: {
+                self.showDoc.toggle()
+            },
+            label: {
+                VStack {
+                    HStack {
+                        Text(value.name)
+                            .foregroundColor(Color("Text600"))
+                        Spacer()
+                        if (value.docsFieldName + value.pathType + value.docsType).isEmpty {
+                            Text("?")
+                                .foregroundColor(Color("Action400"))
+                        }
                     }
-                }
-                if showDoc {
-                    VStack {
-                        Text("Path: " + value.pathType).foregroundColor(Color("Text600"))
-                        Text(AttributedString(fromHexDocs: value.docsFieldName) ?? "docs parsing error in iOS, please refer to other sources")
+                    if showDoc {
+                        VStack {
+                            Text("Path: " + value.pathType).foregroundColor(Color("Text600"))
+                            Text(
+                                AttributedString(fromHexDocs: value.docsFieldName) ??
+                                    "docs parsing error in iOS, please refer to other sources"
+                            )
                             .foregroundColor(Color("Text600"))
-                        Text(AttributedString(fromHexDocs: value.docsType) ?? "docs parsing error in iOS, please refer to other sources")
+                            Text(
+                                AttributedString(fromHexDocs: value.docsType) ??
+                                    "docs parsing error in iOS, please refer to other sources"
+                            )
                             .foregroundColor(Color("Text600"))
+                        }
                     }
                 }
             }
-        }.disabled(value.docsFieldName + value.pathType + value.docsType == "")
+        )
+        .disabled((value.docsFieldName + value.pathType + value.docsType).isEmpty)
     }
 }
 
-/*
- struct TCFieldName_Previews: PreviewProvider {
- static var previews: some View {
- TCFieldName()
- }
- }*/
+// struct TCFieldName_Previews: PreviewProvider {
+// static var previews: some View {
+// TCFieldName()
+// }
+// }

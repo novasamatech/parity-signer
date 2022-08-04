@@ -22,14 +22,14 @@ struct ScreenSelector: View {
     let doWipe: () -> Void
     let alertShow: () -> Void
     let increment: (String, String) -> Void
-    
+
     var body: some View {
-        switch (screenData) {
-        case .scan :
+        switch screenData {
+        case .scan:
             TransactionScreen(
                 pushButton: pushButton
             )
-        case .keys(let value):
+        case let .keys(value):
             KeyManager(
                 content: value,
                 alert: alert,
@@ -37,86 +37,87 @@ struct ScreenSelector: View {
                 increment: increment,
                 pushButton: pushButton
             )
-        case .settings(let value) :
+        case let .settings(value):
             SettingsScreen(
                 content: value,
                 appVersion: appVersion,
                 doWipe: doWipe,
                 pushButton: pushButton
             )
-        case .log(let value) :
+        case let .log(value):
             HistoryScreen(
                 content: value,
                 pushButton: pushButton
             )
-        case .logDetails(let value):
+        case let .logDetails(value):
             EventDetails(content: value)
-        case .transaction(let value):
+        case let .transaction(value):
             TransactionPreview(
                 content: value,
                 sign: sign,
                 pushButton: pushButton
             )
-        case .seedSelector(let value):
+        case let .seedSelector(value):
             SeedManager(
                 content: value,
                 pushButton: pushButton
             )
-        case .keyDetails(let value):
+        case let .keyDetails(value):
             ExportAddress(content: value)
-        case .newSeed(let value):
+        case let .newSeed(value):
             NewSeedScreen(
                 content: value,
                 checkSeedCollision: checkSeedCollision,
                 pushButton: pushButton
             )
-        case .recoverSeedName(let value):
+        case let .recoverSeedName(value):
             RecoverSeedName(
                 content: value,
                 checkSeedCollision: checkSeedCollision,
                 pushButton: pushButton
             )
-        case .recoverSeedPhrase(let value):
+        case let .recoverSeedPhrase(value):
             RecoverSeedPhrase(
                 content: value,
                 restoreSeed: restoreSeed,
                 pushButton: pushButton
             )
-        case .deriveKey(let value):
+        case let .deriveKey(value):
             NewAddressScreen(
                 content: value,
                 pathCheck: pathCheck,
                 createAddress: createAddress,
                 pushButton: pushButton
             )
-        case .vVerifier(let value):
+        case let .vVerifier(value):
             VerifierScreen(
                 content: value,
                 doJailbreak: doJailbreak
             )
-        case .manageNetworks(let value):
+        case let .manageNetworks(value):
             ManageNetworks(
                 content: value,
                 pushButton: pushButton
             )
-        case .nNetworkDetails(let value):
+        case let .nNetworkDetails(value):
             NetworkDetails(
                 content: value,
                 pushButton: pushButton
             )
-        case .signSufficientCrypto(let value):
+        case let .signSufficientCrypto(value):
             SignSufficientCrypto(
                 content: value,
                 pushButton: pushButton,
-                getSeed: getSeed)
-        case .selectSeedForBackup(let value):
+                getSeed: getSeed
+            )
+        case let .selectSeedForBackup(value):
             SelectSeedForBackup(
                 content: value,
                 pushButton: pushButton
             )
         case .documents:
             DocumentModal()
-        case .keyDetailsMulti(let value):
+        case let .keyDetailsMulti(value):
             KeyDetailsMulti(
                 content: value,
                 pushButton: pushButton
@@ -125,10 +126,8 @@ struct ScreenSelector: View {
     }
 }
 
-/*
-struct ScreenSelector_Previews: PreviewProvider {
-    static var previews: some View {
-        ScreenSelector()
-    }
-}
-*/
+// struct ScreenSelector_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ScreenSelector()
+//    }
+// }

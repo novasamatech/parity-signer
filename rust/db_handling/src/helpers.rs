@@ -11,19 +11,16 @@ use sp_core::H256;
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, VERIFIERS};
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES};
 
-#[cfg(feature = "active")]
-use definitions::error_active::{Active, ErrorActive};
 #[cfg(feature = "signer")]
 use definitions::{
     danger::DangerRecord,
-    error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, NotFoundSigner, Signer},
     helpers::multisigner_to_public,
     history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, TypesDisplay},
     keyring::{NetworkSpecsKey, VerifierKey},
     network_specs::{CurrentVerifier, ValidCurrentVerifier, Verifier},
 };
 use definitions::{
-    error::ErrorSource, keyring::MetaKey, metadata::MetaValues, network_specs::NetworkSpecs,
+    keyring::MetaKey, metadata::MetaValues, network_specs::NetworkSpecs,
     qr_transfers::ContentLoadTypes, types::TypeEntry,
 };
 #[cfg(any(feature = "active", feature = "signer"))]
@@ -31,6 +28,8 @@ use definitions::{
     keyring::{AddressKey, MetaKeyPrefix},
     users::AddressDetails,
 };
+
+use crate::{Error, Result};
 
 #[cfg(any(feature = "active", feature = "signer"))]
 use crate::db_transactions::TrDbCold;
@@ -40,25 +39,22 @@ use crate::manage_history::events_to_batch;
 /// Open a database.
 ///
 /// Wrapper for [`open`] from [`sled`]. Input is database location path.
-pub fn open_db<T: ErrorSource>(database_name: &str) -> Result<Db, T::Error> {
-    open(database_name).map_err(<T>::db_internal)
+pub fn open_db(database_name: &str) -> Result<Db> {
+    Ok(open(database_name)?)
 }
 
 /// Open a tree in the database.
 ///
 /// Wrapper for `open_tree()` method for database [`Db`] from [`sled`].
 /// Input is `&[u8]` tree identifier.
-pub fn open_tree<T: ErrorSource>(database: &Db, tree_name: &[u8]) -> Result<Tree, T::Error> {
-    database.open_tree(tree_name).map_err(<T>::db_internal)
+pub fn open_tree(database: &Db, tree_name: &[u8]) -> Result<Tree> {
+    Ok(database.open_tree(tree_name)?)
 }
 
 /// Assemble a [`Batch`] that removes all elements from a tree.
-pub fn make_batch_clear_tree<T: ErrorSource>(
-    database_name: &str,
-    tree_name: &[u8],
-) -> Result<Batch, T::Error> {
-    let database = open_db::<T>(database_name)?;
-    let tree = open_tree::<T>(&database, tree_name)?;
+pub fn make_batch_clear_tree(database_name: &str, tree_name: &[u8]) -> Result<Batch> {
+    let database = open_db(database_name)?;
+    let tree = open_tree(&database, tree_name)?;
     let mut out = Batch::default();
     for (key, _) in tree.iter().flatten() {
         out.remove(key)
@@ -70,14 +66,12 @@ pub fn make_batch_clear_tree<T: ErrorSource>(
 ///
 /// Function is used both on active and Signer side, but only for the cold
 /// database.
-pub fn get_all_networks<T: ErrorSource>(
-    database_name: &str,
-) -> Result<Vec<NetworkSpecs>, T::Error> {
-    let database = open_db::<T>(database_name)?;
-    let chainspecs = open_tree::<T>(&database, SPECSTREE)?;
+pub fn get_all_networks(database_name: &str) -> Result<Vec<NetworkSpecs>> {
+    let database = open_db(database_name)?;
+    let chainspecs = open_tree(&database, SPECSTREE)?;
     let mut out: Vec<NetworkSpecs> = Vec::new();
     for x in chainspecs.iter().flatten() {
-        out.push(NetworkSpecs::from_entry_checked::<T>(x)?)
+        out.push(NetworkSpecs::from_entry_checked(x)?)
     }
     Ok(out)
 }
@@ -95,15 +89,14 @@ pub fn get_all_networks<T: ErrorSource>(
 pub fn try_get_valid_current_verifier(
     verifier_key: &VerifierKey,
     database_name: &str,
-) -> Result<Option<ValidCurrentVerifier>, ErrorSigner> {
+) -> Result<Option<ValidCurrentVerifier>> {
     let general_verifier = get_general_verifier(database_name)?;
-    let database = open_db::<Signer>(database_name)?;
-    let verifiers = open_tree::<Signer>(&database, VERIFIERS)?;
-    match verifiers.get(verifier_key.key()) {
+    let database = open_db(database_name)?;
+    let verifiers = open_tree(&database, VERIFIERS)?;
+    match verifiers.get(verifier_key.key())? {
         // verifier entry is found
-        Ok(Some(verifier_encoded)) => match <CurrentVerifier>::decode(&mut &verifier_encoded[..]) {
-            // verifier could be decoded
-            Ok(a) => match a {
+        Some(verifier_encoded) => {
+            match <CurrentVerifier>::decode(&mut &verifier_encoded[..])? {
                 // verifier is a valid one
                 CurrentVerifier::Valid(b) => {
                     // Custom verifier ([`Verifier`]) can never be entered in
@@ -118,23 +111,17 @@ pub fn try_get_valid_current_verifier(
                         if (custom_verifier == &general_verifier)
                             && (general_verifier != Verifier { v: None })
                         {
-                            return Err(ErrorSigner::Database(
-                                DatabaseSigner::CustomVerifierIsGeneral(verifier_key.to_owned()),
-                            ));
+                            return Err(Error::CustomVerifierIsGeneral(verifier_key.to_owned()));
                         }
                     }
                     Ok(Some(b))
                 }
                 // verifier is dead, network could not be used
-                CurrentVerifier::Dead => Err(ErrorSigner::DeadVerifier(verifier_key.to_owned())),
-            },
-            // verifier entry is damaged
-            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-                EntryDecodingSigner::CurrentVerifier(verifier_key.to_owned()),
-            ))),
-        },
+                CurrentVerifier::Dead => Err(Error::DeadVerifier(verifier_key.to_owned())),
+            }
+        }
         // no verifier for network in the database
-        Ok(None) => {
+        None => {
             // `VerifierKey` is formed from network genesis hash.
             // When the entries are added in the database, network specs could
             // be added only if the verifier is already in the database or is
@@ -144,17 +131,13 @@ pub fn try_get_valid_current_verifier(
             if let Some(specs_invariants) =
                 genesis_hash_in_specs(verifier_key.genesis_hash(), &database)?
             {
-                return Err(ErrorSigner::Database(
-                    DatabaseSigner::UnexpectedGenesisHash {
-                        name: specs_invariants.name,
-                        genesis_hash: specs_invariants.genesis_hash,
-                    },
-                ));
+                return Err(Error::UnexpectedGenesisHash {
+                    name: specs_invariants.name,
+                    genesis_hash: specs_invariants.genesis_hash,
+                });
             }
             Ok(None)
         }
-        // database own errors
-        Err(e) => Err(<Signer>::db_internal(e)),
     }
 }
 
@@ -167,10 +150,9 @@ pub fn try_get_valid_current_verifier(
 pub fn get_valid_current_verifier(
     verifier_key: &VerifierKey,
     database_name: &str,
-) -> Result<ValidCurrentVerifier, ErrorSigner> {
-    try_get_valid_current_verifier(verifier_key, database_name)?.ok_or_else(|| {
-        ErrorSigner::NotFound(NotFoundSigner::CurrentVerifier(verifier_key.to_owned()))
-    })
+) -> Result<ValidCurrentVerifier> {
+    try_get_valid_current_verifier(verifier_key, database_name)?
+        .ok_or_else(|| Error::NoValidCurrentVerifier(verifier_key.clone()))
 }
 
 /// Specs invariants that are expected to stay unchanged for the network over
@@ -203,19 +185,14 @@ pub struct SpecsInvariants {
 /// could be a part of the network metadata, and therefore must not depend on
 /// encryption used.
 #[cfg(feature = "signer")]
-pub fn genesis_hash_in_specs(
-    genesis_hash: H256,
-    database: &Db,
-) -> Result<Option<SpecsInvariants>, ErrorSigner> {
-    let chainspecs = open_tree::<Signer>(database, SPECSTREE)?;
+pub fn genesis_hash_in_specs(genesis_hash: H256, database: &Db) -> Result<Option<SpecsInvariants>> {
+    let chainspecs = open_tree(database, SPECSTREE)?;
     let mut specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
     let mut found_permanent_specs: Option<(u16, String)> = None;
     for (network_specs_key_vec, network_specs_encoded) in chainspecs.iter().flatten() {
         let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
-        let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(
-            &network_specs_key,
-            network_specs_encoded,
-        )?;
+        let network_specs =
+            NetworkSpecs::from_entry_with_key_checked(&network_specs_key, network_specs_encoded)?;
         if network_specs.genesis_hash.as_bytes() == &genesis_hash[..] {
             found_permanent_specs = match found_permanent_specs {
                 Some((base58prefix, name)) => {
@@ -223,22 +200,18 @@ pub fn genesis_hash_in_specs(
                         if name == network_specs.name {
                             Some((base58prefix, name))
                         } else {
-                            return Err(ErrorSigner::Database(
-                                DatabaseSigner::DifferentNamesSameGenesisHash {
-                                    name1: name,
-                                    name2: network_specs.name.to_string(),
-                                    genesis_hash: network_specs.genesis_hash,
-                                },
-                            ));
+                            return Err(Error::DifferentNamesSameGenesisHash {
+                                name1: name,
+                                name2: network_specs.name.to_string(),
+                                genesis_hash: network_specs.genesis_hash,
+                            });
                         }
                     } else {
-                        return Err(ErrorSigner::Database(
-                            DatabaseSigner::DifferentBase58Specs {
-                                genesis_hash: network_specs.genesis_hash,
-                                base58_1: base58prefix,
-                                base58_2: network_specs.base58prefix,
-                            },
-                        ));
+                        return Err(Error::DifferentBase58Specs {
+                            genesis_hash: network_specs.genesis_hash,
+                            base58_1: base58prefix,
+                            base58_2: network_specs.base58prefix,
+                        });
                     }
                 }
                 None => Some((network_specs.base58prefix, network_specs.name.to_string())),
@@ -263,39 +236,27 @@ pub fn genesis_hash_in_specs(
 /// Signer works only with an initiated database, i.e. the one with general
 /// verifier set up. Failure to find general verifier is always an error.
 #[cfg(feature = "signer")]
-pub fn get_general_verifier(database_name: &str) -> Result<Verifier, ErrorSigner> {
-    let database = open_db::<Signer>(database_name)?;
-    let settings = open_tree::<Signer>(&database, SETTREE)?;
-    match settings.get(GENERALVERIFIER) {
-        Ok(Some(verifier_encoded)) => match <Verifier>::decode(&mut &verifier_encoded[..]) {
-            Ok(a) => Ok(a),
-            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-                EntryDecodingSigner::GeneralVerifier,
-            ))),
-        },
-        Ok(None) => Err(ErrorSigner::NotFound(NotFoundSigner::GeneralVerifier)),
-        Err(e) => Err(<Signer>::db_internal(e)),
-    }
+pub fn get_general_verifier(database_name: &str) -> Result<Verifier> {
+    let database = open_db(database_name)?;
+    let settings = open_tree(&database, SETTREE)?;
+    let verifier_encoded = settings
+        .get(GENERALVERIFIER)?
+        .ok_or(Error::GeneralVerifierNotFound)?;
+    Ok(<Verifier>::decode(&mut &verifier_encoded[..])?)
 }
 
 /// Try to get types information from the database.
 ///
 /// If no types information is found, result is `Ok(None)`.
-pub fn try_get_types<T: ErrorSource>(
-    database_name: &str,
-) -> Result<Option<Vec<TypeEntry>>, T::Error> {
-    let database = open_db::<T>(database_name)?;
-    let settings = open_tree::<T>(&database, SETTREE)?;
-    match settings.get(TYPES) {
-        Ok(Some(types_info_encoded)) => {
-            match <Vec<TypeEntry>>::decode(&mut &types_info_encoded[..]) {
-                Ok(a) => Ok(Some(a)),
-                Err(_) => Err(<T>::faulty_database_types()),
-            }
-        }
-        Ok(None) => Ok(None),
-        Err(e) => Err(<T>::db_internal(e)),
-    }
+pub fn try_get_types(database_name: &str) -> Result<Option<Vec<TypeEntry>>> {
+    let database = open_db(database_name)?;
+    let settings = open_tree(&database, SETTREE)?;
+    let res = settings
+        .get(TYPES)?
+        .map(|types_info_encoded| <Vec<TypeEntry>>::decode(&mut &types_info_encoded[..]))
+        .transpose()?;
+
+    Ok(res)
 }
 
 /// Get types information as `Vec<TypeEntry>` from the database.
@@ -304,12 +265,12 @@ pub fn try_get_types<T: ErrorSource>(
 ///
 /// - hot database, from which the types data could not be removed using
 /// standard operations
-/// - cold database, when transactions made using RuntimeMetadata V12 or V13 are
+/// - cold database, when transactions made using `RuntimeMetadata` `V12` or `V13` are
 /// being decoded
 ///
 /// Not finding types data results in an error.
-pub fn get_types<T: ErrorSource>(database_name: &str) -> Result<Vec<TypeEntry>, T::Error> {
-    try_get_types::<T>(database_name)?.ok_or_else(|| <T>::types_not_found())
+pub fn get_types(database_name: &str) -> Result<Vec<TypeEntry>> {
+    try_get_types(database_name)?.ok_or(Error::TypesNotFound)
 }
 
 /// Get types information as [`ContentLoadTypes`] from the database.
@@ -321,8 +282,8 @@ pub fn get_types<T: ErrorSource>(database_name: &str) -> Result<Vec<TypeEntry>, 
 /// payload.
 ///
 /// Not finding types data results in an error.
-pub fn prep_types<T: ErrorSource>(database_name: &str) -> Result<ContentLoadTypes, T::Error> {
-    Ok(ContentLoadTypes::generate(&get_types::<T>(database_name)?))
+pub fn prep_types(database_name: &str) -> Result<ContentLoadTypes> {
+    Ok(ContentLoadTypes::generate(&get_types(database_name)?))
 }
 
 /// Try to get network specs [`NetworkSpecs`] from the Signer database.
@@ -333,18 +294,15 @@ pub fn prep_types<T: ErrorSource>(database_name: &str) -> Result<ContentLoadType
 pub fn try_get_network_specs(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<Option<NetworkSpecs>, ErrorSigner> {
-    let database = open_db::<Signer>(database_name)?;
-    let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
-    match chainspecs.get(network_specs_key.key()) {
-        Ok(Some(network_specs_encoded)) => Ok(Some(NetworkSpecs::from_entry_with_key_checked::<
-            Signer,
-        >(
-            network_specs_key, network_specs_encoded
-        )?)),
-        Ok(None) => Ok(None),
-        Err(e) => Err(<Signer>::db_internal(e)),
-    }
+) -> Result<Option<NetworkSpecs>> {
+    let database = open_db(database_name)?;
+    let chainspecs = open_tree(&database, SPECSTREE)?;
+    Ok(chainspecs
+        .get(network_specs_key.key())?
+        .map(|network_specs_encoded| {
+            NetworkSpecs::from_entry_with_key_checked(network_specs_key, network_specs_encoded)
+        })
+        .transpose()?)
 }
 
 /// Get network specs [`NetworkSpecs`] from the Signer database.
@@ -355,10 +313,9 @@ pub fn try_get_network_specs(
 pub fn get_network_specs(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<NetworkSpecs, ErrorSigner> {
-    try_get_network_specs(database_name, network_specs_key)?.ok_or_else(|| {
-        ErrorSigner::NotFound(NotFoundSigner::NetworkSpecs(network_specs_key.to_owned()))
-    })
+) -> Result<NetworkSpecs> {
+    try_get_network_specs(database_name, network_specs_key)?
+        .ok_or_else(|| Error::NetworkSpecsNotFound(network_specs_key.clone()))
 }
 
 /// Try to get [`AddressDetails`] from the Signer database, using
@@ -369,19 +326,18 @@ pub fn get_network_specs(
 pub fn try_get_address_details(
     database_name: &str,
     address_key: &AddressKey,
-) -> Result<Option<AddressDetails>, ErrorSigner> {
-    let database = open_db::<Signer>(database_name)?;
-    let identities = open_tree::<Signer>(&database, ADDRTREE)?;
-    match identities.get(address_key.key()) {
-        Ok(Some(address_details_encoded)) => {
-            Ok(Some(AddressDetails::from_entry_with_key_checked::<Signer>(
+) -> Result<Option<AddressDetails>> {
+    let database = open_db(database_name)?;
+    let identities = open_tree(&database, ADDRTREE)?;
+    identities
+        .get(address_key.key())?
+        .map(|address_details_encoded| -> Result<AddressDetails> {
+            Ok(AddressDetails::from_entry_with_key_checked(
                 address_key,
                 address_details_encoded,
-            )?))
-        }
-        Ok(None) => Ok(None),
-        Err(e) => Err(<Signer>::db_internal(e)),
-    }
+            )?)
+        })
+        .transpose()
 }
 
 /// Get [`AddressDetails`] from the Signer database, using
@@ -392,10 +348,9 @@ pub fn try_get_address_details(
 pub fn get_address_details(
     database_name: &str,
     address_key: &AddressKey,
-) -> Result<AddressDetails, ErrorSigner> {
-    try_get_address_details(database_name, address_key)?.ok_or_else(|| {
-        ErrorSigner::NotFound(NotFoundSigner::AddressDetails(address_key.to_owned()))
-    })
+) -> Result<AddressDetails> {
+    try_get_address_details(database_name, address_key)?
+        .ok_or_else(|| Error::AddressNotFound(address_key.clone()))
 }
 
 /// Get [`MetaValues`] set from Signer database, for networks with a given name.
@@ -407,13 +362,13 @@ pub fn get_address_details(
 pub(crate) fn get_meta_values_by_name(
     database_name: &str,
     network_name: &str,
-) -> Result<Vec<MetaValues>, ErrorSigner> {
-    let database = open_db::<Signer>(database_name)?;
-    let metadata = open_tree::<Signer>(&database, METATREE)?;
+) -> Result<Vec<MetaValues>> {
+    let database = open_db(database_name)?;
+    let metadata = open_tree(&database, METATREE)?;
     let mut out: Vec<MetaValues> = Vec::new();
     let meta_key_prefix = MetaKeyPrefix::from_name(network_name);
     for x in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
-        let meta_values = MetaValues::from_entry_checked::<Signer>(x)?;
+        let meta_values = MetaValues::from_entry_checked(x)?;
         if meta_values.name == network_name {
             out.push(meta_values)
         }
@@ -425,23 +380,25 @@ pub(crate) fn get_meta_values_by_name(
 /// from the database.
 ///
 /// If no entry is found, the result is `Ok(None)`.
-pub fn try_get_meta_values_by_name_version<T: ErrorSource>(
+pub fn try_get_meta_values_by_name_version(
     database_name: &str,
     network_name: &str,
     network_version: u32,
-) -> Result<Option<MetaValues>, T::Error> {
-    let database = open_db::<T>(database_name)?;
-    let metadata = open_tree::<T>(&database, METATREE)?;
+) -> Result<Option<MetaValues>> {
+    let database = open_db(database_name)?;
+    let metadata = open_tree(&database, METATREE)?;
     let meta_key = MetaKey::from_parts(network_name, network_version);
-    match metadata.get(meta_key.key()) {
-        Ok(Some(meta)) => Ok(Some(MetaValues::from_entry_name_version_checked::<T>(
-            network_name,
-            network_version,
-            meta,
-        )?)),
-        Ok(None) => Ok(None),
-        Err(e) => Err(<T>::db_internal(e)),
-    }
+    Ok(metadata
+        .get(meta_key.key())?
+        .map(|meta| -> Result<_> {
+            Ok(Some(MetaValues::from_entry_name_version_checked(
+                network_name,
+                network_version,
+                meta,
+            )?))
+        })
+        .transpose()?
+        .unwrap_or_default())
 }
 
 /// Get [`MetaValues`], corresponding to given network name and version, from
@@ -449,13 +406,17 @@ pub fn try_get_meta_values_by_name_version<T: ErrorSource>(
 ///
 /// Entry is expected to be in the database, error is produced if it is not
 /// found.
-pub fn get_meta_values_by_name_version<T: ErrorSource>(
+pub fn get_meta_values_by_name_version(
     database_name: &str,
     network_name: &str,
     network_version: u32,
-) -> Result<MetaValues, T::Error> {
-    try_get_meta_values_by_name_version::<T>(database_name, network_name, network_version)?
-        .ok_or_else(|| <T>::metadata_not_found(network_name.to_string(), network_version))
+) -> Result<MetaValues> {
+    try_get_meta_values_by_name_version(database_name, network_name, network_version)?.ok_or(
+        Error::MetaValuesNotFound {
+            name: network_name.to_owned(),
+            version: network_version,
+        },
+    )
 }
 
 /// Transfer metadata from the hot database into the cold one.
@@ -467,18 +428,15 @@ pub fn get_meta_values_by_name_version<T: ErrorSource>(
 ///
 /// Applicable only on the active side.
 #[cfg(feature = "active")]
-pub fn transfer_metadata_to_cold(
-    database_name_hot: &str,
-    database_name_cold: &str,
-) -> Result<(), ErrorActive> {
+pub fn transfer_metadata_to_cold(database_name_hot: &str, database_name_cold: &str) -> Result<()> {
     let mut for_metadata = Batch::default();
     {
-        let database_hot = open_db::<Active>(database_name_hot)?;
-        let metadata_hot = open_tree::<Active>(&database_hot, METATREE)?;
-        let database_cold = open_db::<Active>(database_name_cold)?;
-        let chainspecs_cold = open_tree::<Active>(&database_cold, SPECSTREE)?;
+        let database_hot = open_db(database_name_hot)?;
+        let metadata_hot = open_tree(&database_hot, METATREE)?;
+        let database_cold = open_db(database_name_cold)?;
+        let chainspecs_cold = open_tree(&database_cold, SPECSTREE)?;
         for x in chainspecs_cold.iter().flatten() {
-            let network_specs = NetworkSpecs::from_entry_checked::<Active>(x)?;
+            let network_specs = NetworkSpecs::from_entry_checked(x)?;
             for (key, value) in metadata_hot
                 .scan_prefix(MetaKeyPrefix::from_name(&network_specs.name).prefix())
                 .flatten()
@@ -489,7 +447,7 @@ pub fn transfer_metadata_to_cold(
     }
     TrDbCold::new()
         .set_metadata(for_metadata)
-        .apply::<Active>(database_name_cold)
+        .apply(database_name_cold)
 }
 
 /// Remove the network from the database.
@@ -529,10 +487,7 @@ pub fn transfer_metadata_to_cold(
 /// removal of network with one of the encryptions will cause the networks
 /// with other encryptions be removed as well.
 #[cfg(feature = "signer")]
-pub fn remove_network(
-    network_specs_key: &NetworkSpecsKey,
-    database_name: &str,
-) -> Result<(), ErrorSigner> {
+pub fn remove_network(network_specs_key: &NetworkSpecsKey, database_name: &str) -> Result<()> {
     let mut address_batch = Batch::default();
     let mut meta_batch = Batch::default();
     let mut network_specs_batch = Batch::default();
@@ -566,16 +521,16 @@ pub fn remove_network(
     }
 
     {
-        let database = open_db::<Signer>(database_name)?;
-        let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
-        let identities = open_tree::<Signer>(&database, ADDRTREE)?;
+        let database = open_db(database_name)?;
+        let chainspecs = open_tree(&database, SPECSTREE)?;
+        let identities = open_tree(&database, ADDRTREE)?;
 
         // scan through chainspecs tree to mark for removal all networks with target genesis hash
         let mut keys_to_wipe: Vec<NetworkSpecsKey> = Vec::new();
         for (network_specs_key_vec, entry) in chainspecs.iter().flatten() {
             let x_network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
             let mut x_network_specs =
-                NetworkSpecs::from_entry_with_key_checked::<Signer>(&x_network_specs_key, entry)?;
+                NetworkSpecs::from_entry_with_key_checked(&x_network_specs_key, entry)?;
             if x_network_specs.genesis_hash == network_specs.genesis_hash {
                 network_specs_batch.remove(x_network_specs_key.key());
                 events.push(Event::NetworkSpecsRemoved {
@@ -596,7 +551,7 @@ pub fn remove_network(
         for (address_key_vec, entry) in identities.iter().flatten() {
             let address_key = AddressKey::from_ivec(&address_key_vec);
             let (multisigner, mut address_details) =
-                AddressDetails::process_entry_checked::<Signer>((address_key_vec, entry))?;
+                AddressDetails::process_entry_checked((address_key_vec, entry))?;
             for key in keys_to_wipe.iter() {
                 if address_details.network_id.contains(key) {
                     let identity_history = IdentityHistory::get(
@@ -623,11 +578,11 @@ pub fn remove_network(
     }
     TrDbCold::new()
         .set_addresses(address_batch) // upd addresses
-        .set_history(events_to_batch::<Signer>(database_name, events)?) // add corresponding history
+        .set_history(events_to_batch(database_name, events)?) // add corresponding history
         .set_metadata(meta_batch) // upd metadata
         .set_network_specs(network_specs_batch) // upd network_specs
         .set_verifiers(verifiers_batch) // upd network_verifiers
-        .apply::<Signer>(database_name)
+        .apply(database_name)
 }
 
 /// Remove the network metadata entry from the database.
@@ -646,19 +601,16 @@ pub fn remove_metadata(
     network_specs_key: &NetworkSpecsKey,
     network_version: u32,
     database_name: &str,
-) -> Result<(), ErrorSigner> {
+) -> Result<()> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let meta_key = MetaKey::from_parts(&network_specs.name, network_version);
     let mut meta_batch = Batch::default();
     meta_batch.remove(meta_key.key());
 
-    let meta_values = get_meta_values_by_name_version::<Signer>(
-        database_name,
-        &network_specs.name,
-        network_version,
-    )?;
+    let meta_values =
+        get_meta_values_by_name_version(database_name, &network_specs.name, network_version)?;
     let meta_values_display = MetaValuesDisplay::get(&meta_values);
-    let history_batch = events_to_batch::<Signer>(
+    let history_batch = events_to_batch(
         database_name,
         vec![Event::MetadataRemoved {
             meta_values_display,
@@ -667,7 +619,7 @@ pub fn remove_metadata(
     TrDbCold::new()
         .set_metadata(meta_batch) // remove metadata
         .set_history(history_batch) // add corresponding history
-        .apply::<Signer>(database_name)
+        .apply(database_name)
 }
 
 /// User-initiated removal of the types information from the Signer database.
@@ -686,19 +638,21 @@ pub fn remove_metadata(
 /// in **not** related to the `remove_types_info` function and is handled
 /// elsewhere.
 #[cfg(feature = "signer")]
-pub fn remove_types_info(database_name: &str) -> Result<(), ErrorSigner> {
+pub fn remove_types_info(database_name: &str) -> Result<()> {
     let mut settings_batch = Batch::default();
     settings_batch.remove(TYPES);
     let events: Vec<Event> = vec![Event::TypesRemoved {
         types_display: TypesDisplay::get(
-            &ContentLoadTypes::generate(&get_types::<Signer>(database_name)?),
+            &ContentLoadTypes::generate(&get_types(database_name)?),
             &get_general_verifier(database_name)?,
         ),
     }];
     TrDbCold::new()
-        .set_history(events_to_batch::<Signer>(database_name, events)?) // add history
-        .set_settings(settings_batch) // upd settings
-        .apply::<Signer>(database_name)
+        .set_history(events_to_batch(database_name, events)?)
+        // add history
+        .set_settings(settings_batch)
+        // upd settings
+        .apply(database_name)
 }
 
 /// Modify existing batch for [`ADDRTREE`](constants::ADDRTREE) with incoming
@@ -717,13 +671,10 @@ pub(crate) fn upd_id_batch(mut batch: Batch, adds: Vec<(AddressKey, AddressDetai
 /// [`TRANSACTION`](constants::TRANSACTION) tree of the database.
 // TODO Goes obsolete if the temporary storage goes.
 #[cfg(feature = "signer")]
-pub(crate) fn verify_checksum(database: &Db, checksum: u32) -> Result<(), ErrorSigner> {
-    let real_checksum = match database.checksum() {
-        Ok(x) => x,
-        Err(e) => return Err(<Signer>::db_internal(e)),
-    };
+pub(crate) fn verify_checksum(database: &Db, checksum: u32) -> Result<()> {
+    let real_checksum = database.checksum()?;
     if checksum != real_checksum {
-        return Err(ErrorSigner::Database(DatabaseSigner::ChecksumMismatch));
+        return Err(Error::ChecksumMismatch);
     }
     Ok(())
 }
@@ -733,12 +684,9 @@ pub(crate) fn verify_checksum(database: &Db, checksum: u32) -> Result<(), ErrorS
 /// Currently, the only flag contributing to the danger status is whether the
 /// device was online. This may change eventually.
 #[cfg(feature = "signer")]
-pub fn get_danger_status(database_name: &str) -> Result<bool, ErrorSigner> {
-    let database = open_db::<Signer>(database_name)?;
-    let settings = open_tree::<Signer>(&database, SETTREE)?;
-    match settings.get(DANGER) {
-        Ok(Some(a)) => DangerRecord::from_ivec(&a).device_was_online(),
-        Ok(None) => Err(ErrorSigner::NotFound(NotFoundSigner::DangerStatus)),
-        Err(e) => Err(<Signer>::db_internal(e)),
-    }
+pub fn get_danger_status(database_name: &str) -> Result<bool> {
+    let database = open_db(database_name)?;
+    let settings = open_tree(&database, SETTREE)?;
+    let a = settings.get(DANGER)?.ok_or(Error::DangerStatusNotFound)?;
+    Ok(DangerRecord::from_ivec(&a).device_was_online()?)
 }

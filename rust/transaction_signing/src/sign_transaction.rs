@@ -4,10 +4,10 @@ use sp_runtime::MultiSignature;
 use zeroize::Zeroize;
 
 use db_handling::db_transactions::{SignContent, TrDbColdSign};
-use definitions::error_signer::ErrorSigner;
 use qrcode_static::png_qr_from_string;
 
 use crate::sign_message::sign_as_address_key;
+use crate::{Error, Result};
 
 /// Function to create signatures using RN output action line, and user entered pin and password.
 /// Also needs database name to fetch saved transaction and key.
@@ -18,7 +18,7 @@ pub(crate) fn create_signature(
     user_comment: &str,
     database_name: &str,
     checksum: u32,
-) -> Result<MultiSignature, ErrorSigner> {
+) -> Result<MultiSignature> {
     let sign = TrDbColdSign::from_storage(database_name, checksum)?;
     let pwd = {
         if sign.has_pwd() {
@@ -52,9 +52,9 @@ pub(crate) fn create_signature(
         }
         Err(e) => {
             full_address.zeroize();
-            if let ErrorSigner::WrongPassword = e {
+            if let Error::WrongPassword = e {
                 let checksum = sign.apply(true, user_comment, database_name)?;
-                Err(ErrorSigner::WrongPasswordNewChecksum(checksum))
+                Err(Error::WrongPasswordNewChecksum(checksum))
             } else {
                 Err(e)
             }
@@ -68,7 +68,7 @@ pub fn create_signature_png(
     user_comment: &str,
     database_name: &str,
     checksum: u32,
-) -> Result<Vec<u8>, ErrorSigner> {
+) -> Result<Vec<u8>> {
     let hex_result = hex::encode(
         create_signature(
             seed_phrase,
@@ -79,9 +79,6 @@ pub fn create_signature_png(
         )?
         .encode(),
     );
-    let qr_data = match png_qr_from_string(&hex_result) {
-        Ok(a) => a,
-        Err(e) => return Err(ErrorSigner::Qr(e.to_string())),
-    };
+    let qr_data = png_qr_from_string(&hex_result)?;
     Ok(qr_data)
 }

@@ -18,7 +18,7 @@ struct EnterPassword: View {
             VStack {
                 HeaderBar(line1: "SECRET PATH", line2: "///password")
                 AddressCard(address: content.authorInfo)
-                if (content.counter>0) {
+                if content.counter > 0 {
                     Text("Attempt " + String(content.counter) + " of 3")
                 }
                 ZStack {
@@ -27,37 +27,35 @@ struct EnterPassword: View {
                         .frame(height: 39)
                     HStack {
                         Text("///").foregroundColor(Color("Crypto400"))
-                    TextField("SECRET PATH", text: $password, prompt: Text(""))
-                        .foregroundColor(Color("Crypto400"))
-                        .font(FCrypto(style: .body2))
-                        .disableAutocorrection(true)
-                        .autocapitalization(.none)
-                        .keyboardType(.asciiCapable)
-                        .submitLabel(.done)
-                        .focused($focused)
-                        .padding(8)
-                        .onAppear {
-                            focused = true
-                        }
+                        TextField("SECRET PATH", text: $password, prompt: Text(""))
+                            .foregroundColor(Color("Crypto400"))
+                            .font(FCrypto(style: .body2))
+                            .disableAutocorrection(true)
+                            .autocapitalization(.none)
+                            .keyboardType(.asciiCapable)
+                            .submitLabel(.done)
+                            .focused($focused)
+                            .padding(8)
+                            .onAppear {
+                                focused = true
+                            }
                     }
                 }
                 BigButton(
                     text: "Next",
                     isCrypto: true,
                     action: {
-                    pushButton(.goForward, password, "")
-                },
-                    isDisabled: password == ""
+                        pushButton(.goForward, password, "")
+                    },
+                    isDisabled: password.isEmpty
                 )
             }
         }
     }
 }
 
-/*
-struct EnterPassword_Previews: PreviewProvider {
-    static var previews: some View {
-        EnterPassword()
-    }
-}
-*/
+// struct EnterPassword_Previews: PreviewProvider {
+// static var previews: some View {
+// EnterPassword()
+// }
+// }

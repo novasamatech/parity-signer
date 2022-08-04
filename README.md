@@ -77,18 +77,18 @@ There are 3 actual endpoints in `rust` folder: `signer`, which is source of libr
 Sub-folders of the `rust` folder:
 
 - `constants` — constant values defined for the whole workspace.
-- 🔥 `db_handling` — all database-related operations for Signer and generate_message tool. Most of the business logic is contained here.
+- 🔥 `db_handling` — all database-related operations for Signer and `generate_message` tool. Most of the business logic is contained here.
 - `defaults` — built-in and test data for database
 - `definitions` — objects used across the workspace are defined here
 - `files` — contains test files and is used for build and update generation processes. Most contents are gitignored.
 - `generate_message` — tool to generate over-the-airgap updates and maintain network info database on hot side
 - 🔥 `navigator` — navigation for Signer app; it is realized in rust to unify app behavior across the platforms
-- `parser` - parses signable transactions. This is internal logic for transaction_parsing that is used when signable transaction is identified, but it could be used as a standalone lib for the same purpose.
+- `parser` - parses signable transactions. This is internal logic for `transaction_parsing` that is used when signable transaction is identified, but it could be used as a standalone lib for the same purpose.
 - `printing_balance` — small lib to render tokens with proper units
 - `qr_reader_pc` — small standalone PC app to parse QR codes in Signer ecosystem. Also is capable of parsing multiframe payloads (theoretically, in practice it is not feasible due to PC webcam low performance)
 - `qr_reader_phone` — logic to parse QR payloads in Signer
 - `qrcode_rtx` — multiframe erasure-encoded payload generator for signer update QR animation.
-- `qrcode_static` — generation of static qr codes used all over the qorkspace
+- `qrcode_static` — generation of static qr codes used all over the workspace
 - 🔥 `signer` — FFI interface crate to generate bindings that bridge native code and rust backend
 - `transaction_parsing` — high-level parser for all QR payloads sent into Signer
 - `transaction_signing` — all operations that could be performed when user accepts payload parsed with transaction_parsing
@@ -102,10 +102,10 @@ Sub-folders of the `rust` folder:
 If you get errors like `cargo: feature X is required`, it most likely means you have an old version of Rust. Update it by running `rustup update stable`.
 
 **2.** Install `uniffi-bindgen`. Version has to match the version of `uniffi` crates specified
-   in the project (currently it is `0.18.0`):
+   in the project (currently it is `0.19.3`):
 
    ```bash
-   cargo install uniffi_bindgen --version 0.18.0 
+   cargo install uniffi_bindgen --version 0.19.3 
    ```
 
 ## iOS
@@ -118,15 +118,16 @@ If you get errors like `cargo: feature X is required`, it most likely means you 
 cd scripts && ./build.sh ios
 ```
 
-**5.** Open the `NativeSigner.xcodeproj` project from the `ios` folder in your Xcode and click Run (Cmd+R).
+**5.** Open the `NativeSigner.xcodeproj` project from the `ios` folder in your Xcode. Project features two schemes:
+- `NativeSigner` - used for deployments and running production-ready app on your devices
+- `NativeSigner-Dev` - development scheme that can be used to simulate offline mode without turning off WiFi on your Mac if you are using simulator.
+To run project, select one of the schemes and click `Run` (Cmd+R)
 
-**6.** The first time you start the app, you will need to put your device into Airplane Mode. In the iOS simulator, you can do this by turning off WiFi on your Mac (yes, this is an official apple-recommended way).
+**Note:** If you are using `NativeSigner` scheme, the first time you start the app, you will need to put your device into Airplane Mode. In the iOS simulator, you can do this by turning off WiFi on your Mac, hence use of `NativeSigner-Dev` is recommended for both simulator and device development.
 
 However, we strongly recommend that you use a real device for development, as some important parts (e.g. camera) may not work in the simulator.
 
 ## Android
-
-> ⚠️ Android build has only been tested on Linux. If you manage by some miracle to run this on a Mac, please add the steps to this Readme
 
 **3.** Install necessary rust targets (this set may vary depending on the target architecture
    you are building for be it android studio emulators or hardware devices):
@@ -141,24 +142,28 @@ However, we strongly recommend that you use a real device for development, as so
 
 **6.** Install NDK. Go to `File -> Project Structure -> SDK Location`. Next to the "Android NDK location" section, click "Download Android NDK" button.
 
-⚠️  We hightly recommend you to update all existing plugins and SDK's for Kotlin, Gradle,
+⚠️  We highly recommend you to update all existing plugins and SDK's for Kotlin, Gradle,
 etc even if you just downloaded a fresh Android Studio. It's always a good idea to restart
 Android Studio after that. This can save you many hours on Stackoverflow trying to fix
 random errors like "NDK not found".
 
 **7.** Connect your device or create a virtual one. Open `Tools -> Device Manager` and create a new phone simulator with the latest Android.
 
-**8.** Run the project (Ctrl+R). It should build the Rust core library automatically.
+**8. (macOS)** Specify path to `python` in `local.properties`.
+
+`rust.pythonCommand=python3`
+
+**9.** Run the project (`Ctrl+R`). It should build the Rust core library automatically.
 
 # Tests
 
-Core Rust code is fully covered by tests and they are run in CI on each commit. To run tests on your machine:
+Core Rust code is fully covered by tests, and they run in CI on each commit. To run tests on your machine:
 
 ```
 cd rust && cargo test --locked
 ```
 
-We don't have test for UIs for now (other then navigation which is handled on rust side), which means Swift and Kotlin are not covered. We plan to do it in the future.
+We don't have test for UIs for now (other than navigation which is handled on rust side), which means Swift and Kotlin are not covered. We plan to do it in the future.
 
 
 # Bugs and Feedback

@@ -32,16 +32,13 @@ struct ExportAddress: View {
                         Text(content.address.seedName)
                     }.padding().foregroundColor(Color("Text400")).font(FBase(style: .body2))
                 }
-                
             }
         }
     }
 }
 
-/*
- struct ExportIdentity_Previews: PreviewProvider {
- static var previews: some View {
- ExportAddress()
- }
- }
- */
+// struct ExportIdentity_Previews: PreviewProvider {
+// static var previews: some View {
+// ExportAddress()
+// }
+// }

@@ -61,7 +61,7 @@ pub fn get_length(line: &str, cleaned: bool) -> anyhow::Result<u32> {
     let payload = get_payload(line, cleaned)?;
     if payload[0] & 0b10000000 > 0 {
         //        println!("dealing with element of fountain qr");
-        // Decoding algorithm is probabilistic, see documentation of the raptorq crate
+        // Decoding algorithm is probabilistic, see documentation of the `raptorq` crate
         // Rephrasing from there, the probability to decode message with h
         // additional packets is 1 - 1/256^(h+1).
         //

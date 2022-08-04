@@ -509,7 +509,7 @@ fn parse_transaction_westend_50_not_in_db() {
         error: Some(vec![TransactionCard {
             index: 0,
             indent: 0,
-            card: Card::ErrorCard { f: "Failed to decode extensions. Please try updating metadata for westend network. Parsing with westend9010 metadata: Network spec version decoded from extensions (50) differs from the version in metadata (9010). Parsing with westend9000 metadata: Network spec version decoded from extensions (50) differs from the version in metadata (9000).".to_string() },
+            card: Card::ErrorCard { f: "Bad input data. Failed to decode extensions. Please try updating metadata for westend network. Parsing with westend9010 metadata: Network spec version decoded from extensions (50) differs from the version in metadata (9010). Parsing with westend9000 metadata: Network spec version decoded from extensions (50) differs from the version in metadata (9000).".to_string() },
         }]),
         ..Default::default()
     };
@@ -1886,7 +1886,7 @@ fn add_specs_westend_ed25519_both_verified_different() {
     let dbname = "for_tests/add_specs_westend_ed25519_both_verified_different";
     populate_cold(dbname, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_Alice-ed25519.txt").unwrap();
-    let error = "Bad input data. General verifier in the database is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Received network westend specs could be accepted only if verified by the same general verifier. Current message is verified by public key: 88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee, encryption: ed25519.".to_string();
+    let error = "Bad input data. General verifier in the database is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Received westend network information could be accepted only if verified by the same general verifier. Current message is verified by public key: 88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee, encryption: ed25519.".to_string();
     let set_expected = TransactionCardSet {
         error: Some(vec![TransactionCard {
             index: 0,
@@ -2098,7 +2098,7 @@ fn parse_transaction_6_error_on_parsing() {
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403018eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
-    let error = "Error parsing incoming transaction content. After decoding the method some data remained unused.".to_string();
+    let error = "Bad input data. Error parsing incoming transaction content. After decoding the method some data remained unused.".to_string();
     let set_expected = TransactionCardSet {
         author: Some(vec![TransactionCard {
             index: 0,
@@ -2190,7 +2190,7 @@ fn parse_transaction_7_error_on_parsing() {
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403068eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
-    let error = "Error parsing incoming transaction content. Encountered unexpected enum variant."
+    let error = "Bad input data. Error parsing incoming transaction content. Encountered unexpected enum variant."
         .to_string();
     let set_expected = TransactionCardSet {
         author: Some(vec![TransactionCard {
@@ -2283,7 +2283,7 @@ fn parse_transaction_8_error_on_parsing() {
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403028eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
-    let data = "Error parsing incoming transaction content. Data too short for expected content."
+    let data = "Bad input data. Error parsing incoming transaction content. Data too short for expected content."
         .to_string();
 
     let set_expected = TransactionCardSet {
@@ -2429,7 +2429,7 @@ fn parse_msg_2() {
             index: 0,
             indent: 0,
             card: Card::ErrorCard {
-                f: "Bad input data. Received message could not be read.".to_string(),
+                f: "Bad input data. Received message could not be read. Input buffer has still data left after decoding!".to_string(),
             },
         }]),
         ..Default::default()
@@ -2459,6 +2459,47 @@ fn import_derivations() {
                     "//Alice/secret//secret".to_string(),
                     "//0".to_string(),
                     "//1".to_string(),
+                ],
+            },
+        }]),
+        ..Default::default()
+    };
+
+    let network_info_known = westend_spec();
+    let action = produce_output(line, dbname);
+    if let TransactionAction::Derivations {
+        content: set,
+        network_info,
+        checksum: _,
+        network_specs_key: _,
+    } = action
+    {
+        assert_eq!(set, set_expected);
+        assert_eq!(network_info, network_info_known);
+    } else {
+        panic!("Wrong action {:?}", action)
+    }
+    fs::remove_dir_all(dbname).unwrap();
+}
+
+#[test]
+fn import_derivations_some_passworded() {
+    let dbname = "for_tests/import_derivations_some_passworded";
+    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let line = "53ffde01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e1c1c2f2f416c6963653c2f2f416c6963652f77657374656e64582f2f416c6963652f7365637265742f2f7365637265740c2f2f300c2f2f31702f2f416c6963652f2f2f6d795f7365637265745f70617373776f7264182f2f2f303030";
+    let set_expected = TransactionCardSet {
+        importing_derivations: Some(vec![TransactionCard {
+            index: 0,
+            indent: 0,
+            card: Card::DerivationsCard {
+                f: vec![
+                    "//Alice".to_string(),
+                    "//Alice/westend".to_string(),
+                    "//Alice/secret//secret".to_string(),
+                    "//0".to_string(),
+                    "//1".to_string(),
+                    "//Alice///my_secret_password".to_string(),
+                    "///000".to_string(),
                 ],
             },
         }]),

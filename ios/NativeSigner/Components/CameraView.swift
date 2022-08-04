@@ -5,8 +5,8 @@
 //  Created by Alexander Slesarev on 19.7.2021.
 //
 
-import SwiftUI
 import AVFoundation
+import SwiftUI
 
 struct CameraView: View {
     @StateObject var model = CameraViewModel()
@@ -40,12 +40,12 @@ struct CameraView: View {
                             resetCameraTrigger = false
                         }
                     })
-                    .onReceive(model.$total, perform: {rTotal in
+                    .onReceive(model.$total, perform: { rTotal in
                         total = rTotal
                     })
-                    .onReceive(model.$captured, perform: {rCaptured in
+                    .onReceive(model.$captured, perform: { rCaptured in
                         captured = rCaptured
-                        if (rCaptured ?? 0 > 0) {
+                        if rCaptured ?? 0 > 0 {
                             UIApplication.shared.isIdleTimerDisabled = true
                         } else {
                             UIApplication.shared.isIdleTimerDisabled = false
@@ -56,23 +56,24 @@ struct CameraView: View {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 8).padding(12)
                             }
-                            .frame(width:size, height: size)
+                            .frame(width: size, height: size)
                             Spacer()
                         }
                     )
                     .overlay(
                         VStack {
-                            RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).padding(12).frame(width: size, height: size)
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color("Crypto400"))
+                                .padding(12)
+                                .frame(width: size, height: size)
                             Spacer()
                         }
                     )
                 Spacer()
-                
                 if model.total ?? 0 > 0 {
-                    
                     MenuStack {
                         HeadingOverline(text: "PARSING MULTIPART DATA").padding(.top, 12)
-                        ProgressView(value: min(Float(captured ?? 0)/(Float(total ?? -1) + 2), 1))
+                        ProgressView(value: min(Float(captured ?? 0) / (Float(total ?? -1) + 2), 1))
                             .border(Color("Crypto400"))
                             .foregroundColor(Color("Crypto400"))
                             .padding(.vertical, 8)
@@ -99,16 +100,15 @@ struct CameraView: View {
 }
 
 func constructFrameCountMessage(captured: Int?, total: Int?) -> String {
-    return "From "
-         + String(captured ?? 0)
-         + " / "
-         + String(total ?? 0)
-         + " captured frames"
+    "From "
+        + String(captured ?? 0)
+        + " / "
+        + String(total ?? 0)
+        + " captured frames"
 }
 
-/*
- struct CameraView_Previews: PreviewProvider {
- static var previews: some View {
- CameraView()
- }
- }*/
+// struct CameraView_Previews: PreviewProvider {
+// static var previews: some View {
+// CameraView()
+// }
+// }

@@ -14,10 +14,8 @@ struct TCVarName: View {
     }
 }
 
-/*
-struct TCVarName_Previews: PreviewProvider {
-    static var previews: some View {
-        TCVarName()
-    }
-}
-*/
+// struct TCVarName_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TCVarName()
+//    }
+// }

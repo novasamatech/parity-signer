@@ -17,10 +17,8 @@ struct TCTypesInfo: View {
     }
 }
 
-/*
- struct TCTypesInfo_Previews: PreviewProvider {
- static var previews: some View {
- TCTypesInfo()
- }
- }
- */
+// struct TCTypesInfo_Previews: PreviewProvider {
+// static var previews: some View {
+// TCTypesInfo()
+// }
+// }

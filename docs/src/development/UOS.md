@@ -2,7 +2,7 @@
 
 This is interpretation of UOS format used by Parity Signer. Since upstream
 version of the published format diverges from actually implemented too much,
-this document was produced as repreesntation of current state of UOS format
+this document was produced as representation of current state of UOS format
 compatible with Parity Signer. This document only covers networks compatible
 with Parity Signer (i.e. Substrate-based networks). This document also describes
 special payloads that are used for maintaining Parity Signer instance.
@@ -42,7 +42,7 @@ reset or connecting to the network.
 
 # QR code structure
 
-QR code envelope has following structure:
+QR code envelope has the following structure:
 
 | QR code prefix | content | ending spacer | padding |
 |:-|:-|:-|:-|
@@ -57,27 +57,27 @@ Actual content is shifted by half-byte, otherwise it is a normal byte sequence.
 
 ## Multiframe QR
 
-The information transfered through QR channel into Signer is always enveloped
+The information transferred through QR channel into Signer is always enveloped
 in multiframe packages (although minimal number of multiframe packages is 1).
-There are two standards for the multiframe: RaptorQ erasure coding and legacy
+There are two standards for the multiframe: `RaptorQ` erasure coding and legacy
 non-erasure multiframe. The type of envelope is determined by the first bit of
-the QR code data: `0` indicates legacy multiframe, `1` indicates RaptorQ
+the QR code data: `0` indicates legacy multiframe, `1` indicates `RaptorQ`
 
 ##### *RaptorQ multipart payload*
 
-[RaptorQ](https://en.wikipedia.org/wiki/Raptor_code#RaptorQ_code) (RFC6330) is
+[RaptorQ](https://en.wikipedia.org/wiki/Raptor_code#RaptorQ_code) (`RFC6330`) is
 a variable rate (fountain) erasure code protocol with [reference implementation
 in Rust](https://github.com/cberner/raptorq)
 
-Wrapping content in RaptorQ protocol allows for arbitrary amounts of data to be
-tranferred reliably within reasonable time. It is recommended to wrap all
+Wrapping content in `RaptorQ` protocol allows for arbitrary amounts of data to be
+transferred reliably within reasonable time. It is recommended to wrap all
 payloads into this type of envelope.
 
-Each QR code in RaptorQ encoded multipart payload contains following parts:
+Each QR code in `RaptorQ` encoded multipart payload contains following parts:
 
 | bytes `[0..4]` | bytes `[4..]` |
 |:-|:-|
-| `80000000 \|\| payload_size` | `RaptorQ serialized packet` |
+| `80000000 || payload_size` | `RaptorQ serialized packet` |
 
 + `payload_size` **MUST** contain payload size in bytes, represented as
   big-endian 32-bit unsigned integer.
@@ -384,12 +384,12 @@ into the error set.
     Metadata `V14` has extensions with both identifiers and properly described
 types, and Signer decodes extensions as they are recorded in the metadata. For
 this,
-[`ExtrinsicMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.ExtrinsicMetadata.html)
+[`ExtrinsicMetadata`](https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.ExtrinsicMetadata.html)
 part of the metadata
-[`RuntimeMetadataV14`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.RuntimeMetadataV14.html)
+[`RuntimeMetadataV14`](https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.RuntimeMetadataV14.html)
 is used. Vector `signed_extensions` in `ExtrinsicMetadata` is scanned twice,
 first for types in `ty` of the
-[`SignedExtensionMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.SignedExtensionMetadata.html)
+[`SignedExtensionMetadata`](https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.SignedExtensionMetadata.html)
 and then for types in `additional_signed` of the `SignedExtensionMetadata`. The
 types, when resolved through the types database from the metadata, allow to cut
 correct length blobs from the whole SCALE-encoded extensions blob and decode
@@ -401,7 +401,7 @@ extensions are scanned, some part of extensions blob remains unused.
 
     There are some special extensions that must be treated separately. The
 `identifier` in `SignedExtensionMetadata` and `ident` segment of the type
-[`Path`](https://paritytech.github.io/substrate/master/scale_info/struct.Path.html)
+[`Path`](https://docs.rs/scale-info/latest/scale_info/struct.Path.html)
 are used to trigger types interpretation as specially treated extensions. Each
 `identifier` is encountered twice, once for `ty` scan, and once for
 `additional_signed` scan. In some cases only one of those types has non-empty
@@ -474,11 +474,11 @@ decoding entry point.
 
     For `V14` metadata the correct pallet is found in the set of available ones
 in `pallets` field of
-[`RuntimeMetadataV14`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.RuntimeMetadataV14.html),
+[`RuntimeMetadataV14`](https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.RuntimeMetadataV14.html),
 by `index` field in corresponding
-[`PalletMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.PalletMetadata.html).
+[`PalletMetadata`](https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.PalletMetadata.html).
 The `calls` field of this `PalletMetadata`, if it is `Some(_)`, contains
-[`PalletCallMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.PalletCallMetadata.html)
+[`PalletCallMetadata`](https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.PalletCallMetadata.html)
 that provides the available calls enum described in `types` registry of the
 `RuntimeMetadataV14`. For each type in the registry, including this calls enum,
 encoded data size is determined, and the decoding is done according to the type.
@@ -503,14 +503,14 @@ decoding is done according to the argument type.
     - numbers that are processed as the balances
 
     Calls in `V14` parsing are distinguished by `Call` in `ident` segment of the
-type [`Path`](https://paritytech.github.io/substrate/master/scale_info/struct.Path.html).
+type [`Path`](https://docs.rs/scale-info/latest/scale_info/struct.Path.html).
 Calls in `V12` and `V13` metadata are distinguished by any element of the set
 of calls type identifiers in string argument type.
 
     At the moment the numbers that should be displayed as balance in
 transacrtions with `V14` metadata are determined by the type name `type_name` of
 the corresponding
-[`Field`](https://paritytech.github.io/substrate/master/scale_info/struct.Field.html)
+[`Field`](https://docs.rs/scale-info/latest/scale_info/struct.Field.html)
 being:
 
     - `Balance`
@@ -579,9 +579,13 @@ Transaction:
 | `e143..423e`[^5] | Westend genesis hash | 154..=185 |
 
 [^1]: `d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d`
+
 [^2]: `a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817`
+
 [^3]: `0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817`
+
 [^4]: `b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33`
+
 [^5]: `e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e`
 
 #### Call content is parsed using Westend metadata, in this particular case westend9010
@@ -609,6 +613,7 @@ Transaction:
 | `538a..3f33`[^8] | Block hash |
 
 [^7]: `e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e`
+
 [^8]: `538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33`
 
 ## Message
@@ -752,7 +757,7 @@ Network metadata that can get into Signer and can be used by Signer only if it
 complies with following requirements:
 
 - metadata vector starts with `b"meta"` prelude
-- part of the metadata vector after `b"meta"` prelude is decodeable as [`RuntimeMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/enum.RuntimeMetadata.html)
+- part of the metadata vector after `b"meta"` prelude is decodeable as [`RuntimeMetadata`](https://docs.rs/frame-metadata/latest/frame_metadata/enum.RuntimeMetadata.html)
 - `RuntimeMetadata` version of the metadata is `V12`, `V13` or `V14`
 - Metadata has `System` pallet
 - There is `Version` constant in `System` pallet
@@ -774,7 +779,7 @@ and would get rejected with an error.
 Loads types information.
 
 Type information is needed to decode transactions made in networks with metadata
-RuntimeMetadata version V12 or V13.
+RuntimeMetadata version `V12` or `V13`.
 
 Most of the networks are already using RuntimeMetadata version V14, which has
 types information incorporated in the metadata itself.
@@ -1052,10 +1057,10 @@ Derivations imports are unsigned, and always have the same prelude, `53ffde`.
 
 Update payload is `ContentDerivations` in `to_transfer()` form. 
 
-`ContentDerivations` includes derivation path set to be imported (with password-
-free derivations only), network genesis hash and encryption for the network in
-which the import would be made. User, if approving the derivations import, is
-specifying the seed, for which the derivations are applied.
+`ContentDerivations` includes derivation paths set to be imported, network
+genesis hash and encryption for the network in which the import would be made.
+User, if approving the derivations import, is specifying the seed, for which the
+derivations are applied.
 
 When processing derivations import, all data after prelude is transformed into
 `ContentDerivations`. Network genesis hash, encryption and derivations set are
@@ -1065,9 +1070,8 @@ import payload is corrupted.
 Signer checks that the network for which the derivations are imported has
 network specs in the Signer database. If not, an error is produced.
 
-Signer checks that the derivation set contains only valid, password-free
-derivations. If any derivation is unsuitable, an error is produced indicating
-this.
+Signer checks that the derivation set contains only valid derivations. If any
+derivation is unsuitable, an error is produced indicating this.
 
 If the user accepts the derivations import for some seed, Signer generates a key
 for each derivation for user-provided seed.

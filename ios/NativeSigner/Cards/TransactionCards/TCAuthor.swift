@@ -12,7 +12,7 @@ struct TCAuthor: View {
     var body: some View {
         HStack {
             Identicon(identicon: author.identicon)
-            VStack (alignment: .leading) {
+            VStack(alignment: .leading) {
                 Text("From:")
                     .foregroundColor(Color("Text400"))
                 Text(author.seedName + author.path + (author.hasPwd == true ? "///" : ""))
@@ -25,9 +25,9 @@ struct TCAuthor: View {
         }
     }
 }
- /*
-struct TCAuthor_Previews: PreviewProvider {
-    static var previews: some View {
-        TCAuthor()
-    }
-}*/
+
+// struct TCAuthor_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TCAuthor()
+//    }
+// }
