@@ -13,7 +13,7 @@ struct TCID: View {
         HStack {
             Identicon(identicon: value.identicon)
             Text(value.base58)
-                .foregroundColor(Color("Text600")).font(FCrypto(style: .body2))
+                .foregroundColor(Color("Text600")).font(Fontstyle.body2.crypto)
             Spacer()
         }
     }

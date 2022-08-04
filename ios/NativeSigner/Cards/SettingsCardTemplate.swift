@@ -16,7 +16,7 @@ struct SettingsCardTemplate: View {
     var body: some View {
         HStack {
             Text(text)
-                .font(FBase(style: .body1))
+                .font(Fontstyle.body1.base)
                 .foregroundColor(Color(danger ? "SignalDanger" : "Text400"))
             Spacer()
             if withIcon {

@@ -12,9 +12,9 @@ struct TCWarning: View {
     var body: some View {
         HStack {
             Text("Warning!")
-                .foregroundColor(Color("SignalDanger")).font(FBase(style: .body2))
+                .foregroundColor(Color("SignalDanger")).font(Fontstyle.body2.base)
             Text(text)
-                .foregroundColor(Color("SignalDanger")).font(FBase(style: .body2))
+                .foregroundColor(Color("SignalDanger")).font(Fontstyle.body2.base)
             Spacer()
         }.background(Color("BgDanger"))
     }

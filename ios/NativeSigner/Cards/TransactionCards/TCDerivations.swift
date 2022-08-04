@@ -12,10 +12,10 @@ struct TCDerivations: View {
     var body: some View {
         HStack {
             VStack {
-                Text("Importing derivations:").font(FBase(style: .h1)).foregroundColor(Color("Text600"))
+                Text("Importing derivations:").font(Fontstyle.header1.base).foregroundColor(Color("Text600"))
                 ForEach(value, id: \.self) { derivation in
                     HStack {
-                        Text(derivation).font(FCrypto(style: .body2)).foregroundColor(Color("Crypto400"))
+                        Text(derivation).font(Fontstyle.body2.crypto).foregroundColor(Color("Crypto400"))
                         Spacer()
                     }
                 }

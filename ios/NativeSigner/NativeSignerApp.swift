@@ -12,7 +12,7 @@ struct NativeSignerApp: App {
     var body: some Scene {
         WindowGroup {
             MainScreenContainer()
-                .font(FBase(style: .body1))
+                .font(Fontstyle.body1.base)
                 .background(Color("Bg100"))
         }
     }

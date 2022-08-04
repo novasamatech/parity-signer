@@ -16,7 +16,7 @@ struct ErrorAlert: View {
                 pushButton(.goBack, "", "")
             })
             VStack {
-                Text("Error!").font(FBase(style: .h1)).foregroundColor(Color("SignalDanger"))
+                Text("Error!").font(Fontstyle.header1.base).foregroundColor(Color("SignalDanger"))
                 Text(content).foregroundColor(Color("SignalDanger"))
                 Button("Ok", action: {
                     pushButton(.goBack, "", "")

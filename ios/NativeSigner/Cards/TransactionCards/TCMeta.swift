@@ -18,8 +18,8 @@ struct TCMeta: View {
                     Text(content.specname)
                     Text(content.specsVersion)
                 }
-                .foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2))
-                Text(content.metaHash).foregroundColor(Color("Text400")).font(FCrypto(style: .body2))
+                .foregroundColor(Color("Crypto400")).font(Fontstyle.body2.crypto)
+                Text(content.metaHash).foregroundColor(Color("Text400")).font(Fontstyle.body2.crypto)
             }
             Spacer()
         }

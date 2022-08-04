@@ -37,7 +37,7 @@ struct Backup: View {
                 ScrollView {
                     VStack {
                         HStack {
-                            Text("SEED PHRASE").foregroundColor(Color("Text300")).font(FBase(style: .overline))
+                            Text("SEED PHRASE").foregroundColor(Color("Text300")).font(Fontstyle.overline.base)
                             Spacer()
                         }
                         HStack {
@@ -72,7 +72,7 @@ struct Backup: View {
                                 ))
                         )
                         HStack {
-                            Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))
+                            Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(Fontstyle.overline.base)
                             Spacer()
                         }
                         LazyVStack {
@@ -94,12 +94,12 @@ struct Backup: View {
                                         HStack {
                                             Text((record.path.isEmpty && !record.hasPwd) ? "seed key" : record.path)
                                                 .foregroundColor(Color("Crypto400"))
-                                                .font(FCrypto(style: .body2))
+                                                .font(Fontstyle.body2.crypto)
                                             if record.hasPwd {
                                                 Text("///").foregroundColor(Color("Crypto400"))
-                                                    .font(FCrypto(style: .body2))
+                                                    .font(Fontstyle.body2.crypto)
                                                 Image(systemName: "lock").foregroundColor(Color("Crypto400"))
-                                                    .font(FCrypto(style: .body2))
+                                                    .font(Fontstyle.body2.crypto)
                                             }
                                             Spacer()
                                         }.padding(8)

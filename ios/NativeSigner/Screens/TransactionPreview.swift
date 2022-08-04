@@ -27,7 +27,7 @@ struct TransactionPreview: View {
                 }
                 if content.ttype == .sign {
                     HStack {
-                        Text("LOG NOTE").font(FBase(style: .overline)).foregroundColor(Color("Text400"))
+                        Text("LOG NOTE").font(Fontstyle.overline.base).foregroundColor(Color("Text400"))
                         Spacer()
                     }
                     ZStack {
@@ -35,7 +35,7 @@ struct TransactionPreview: View {
                         TextField("comment", text: $comment, prompt: Text("Comment (not published)"))
                             .foregroundColor(Color("Text400"))
                             .background(Color("Bg100"))
-                            .font(FBase(style: .body2))
+                            .font(Fontstyle.body2.base)
                             .focused($focus)
                             .onDisappear {
                                 focus = false
@@ -43,7 +43,7 @@ struct TransactionPreview: View {
                             .padding(.horizontal, 8)
                     }
                     HStack {
-                        Text("visible only on this device").font(FBase(style: .subtitle1))
+                        Text("visible only on this device").font(Fontstyle.subtitle1.base)
                             .padding(.bottom)
                         Spacer()
                     }

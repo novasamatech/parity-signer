@@ -18,7 +18,7 @@ struct SeedCardForManager: View {
                 VStack(alignment: .leading) {
                     Text(seedNameCard.seedName)
                         .foregroundColor(Color("Text600"))
-                        .font(FBase(style: .subtitle1))
+                        .font(Fontstyle.subtitle1.base)
                 }
                 Spacer()
             }

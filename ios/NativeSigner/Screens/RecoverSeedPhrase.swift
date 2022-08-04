@@ -22,7 +22,7 @@ struct RecoverSeedPhrase: View {
                 VStack {
                     Text(content.seedName)
                     VStack(alignment: .leading) {
-                        Text("SEED PHRASE").font(FBase(style: .overline))
+                        Text("SEED PHRASE").font(Fontstyle.overline.base)
                         VStack {
                             Text(
                                 content.draftPhrase()
@@ -35,11 +35,11 @@ struct RecoverSeedPhrase: View {
                             Divider().foregroundColor(Color("Border400"))
                             HStack {
                                 Text(">").foregroundColor(Color("Text400"))
-                                    .font(FBase(style: .body2))
+                                    .font(Fontstyle.body2.base)
                                 TextField("Seed", text: $userInput, prompt: Text("Seed name"))
                                     .focused($focus)
                                     .foregroundColor(Color("Text600"))
-                                    .font(FBase(style: .body2))
+                                    .font(Fontstyle.body2.base)
                                     .disableAutocorrection(true)
                                     .textInputAutocapitalization(.never)
                                     .keyboardType(.asciiCapable)
@@ -76,7 +76,7 @@ struct RecoverSeedPhrase: View {
                                             label: {
                                                 Text(guess)
                                                     .foregroundColor(Color("Crypto400"))
-                                                    .font(FCrypto(style: .body2))
+                                                    .font(Fontstyle.body2.crypto)
                                                     .padding(.horizontal, 12)
                                                     .padding(.vertical, 4)
                                                     .background(

@@ -10,7 +10,7 @@ import SwiftUI
 struct KeySymbol: View {
     var body: some View {
         VStack {
-            Text("accounts").font(Font.custom("Web3-Regular", size: 20))
+            Text("accounts").font(FontFamily.Web3.regular.swiftUIFont(size: 20))
         }
     }
 }
