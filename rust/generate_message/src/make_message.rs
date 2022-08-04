@@ -24,12 +24,13 @@ fn alice_secret() -> String {
 /// complete update message, then exports it as a QR code or text file with
 /// hex-encoded bytes.
 pub fn make_message(make: Make) -> Result<()> {
+    let vec = make.payload()?;
     // check message content for consistency
     //
     // note that bytes signed and bytes added into concatenated update are not
     // necessarily the same
     let (message_to_verify, message_to_transfer, name_stub, msg_type_code) = match make.msg {
-        Msg::LoadTypes(vec) => {
+        Msg::LoadTypes => {
             let content = ContentLoadTypes::from_slice(&vec);
             content.types()?;
             (
@@ -39,7 +40,7 @@ pub fn make_message(make: Make) -> Result<()> {
                 "81",
             )
         }
-        Msg::LoadMetadata(vec) => {
+        Msg::LoadMetadata => {
             let content = ContentLoadMeta::from_slice(&vec);
             let meta = content.meta()?;
             let meta_values = MetaValues::from_slice_metadata(&meta)?;
@@ -50,7 +51,7 @@ pub fn make_message(make: Make) -> Result<()> {
                 "80",
             )
         }
-        Msg::AddSpecs(vec) => {
+        Msg::AddSpecs => {
             let content = ContentAddSpecs::from_slice(&vec);
             let network_specs = content.specs()?;
             (
@@ -67,9 +68,9 @@ pub fn make_message(make: Make) -> Result<()> {
     };
 
     // adding signature (if any) and finalize the message and filename
-    let (complete_message, complete_name) = match make.crypto {
+    let (complete_message, complete_name) = match make.crypto()? {
         // verifier is Alice, make signature here
-        Crypto::Alice(encryption) => match encryption {
+        Crypto::Alice { e: encryption } => match encryption {
             Encryption::Ed25519 => {
                 let crypto_type_code = "00";
                 let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
@@ -131,7 +132,7 @@ pub fn make_message(make: Make) -> Result<()> {
 
         // real verifier with real signature: check that signature is valid
         // first
-        Crypto::Sufficient(sufficient_crypto) => match sufficient_crypto {
+        Crypto::Sufficient { s } => match s {
             SufficientCrypto::Ed25519 { public, signature } => {
                 let crypto_type_code = "00";
                 let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
@@ -184,7 +185,7 @@ pub fn make_message(make: Make) -> Result<()> {
     };
 
     let output_name = match make.name {
-        Some(a) => a,
+        Some(a) => format!("{}", a.to_string_lossy()),
         None => format!("{}/{}", EXPORT_FOLDER, complete_name),
     };
 

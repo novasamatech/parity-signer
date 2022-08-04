@@ -30,10 +30,10 @@ use crate::parser::{Content, InstructionMeta, Set};
 /// Process `load_metadata` command according to the [`InstructionMeta`]
 /// received from the command line.
 pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
-    match instruction.set {
+    match instruction.set.into() {
         // `-f` setting key: produce payload files from existing database
         // entries.
-        Set::F => match instruction.content {
+        Set::F => match instruction.content.into() {
             // `$ cargo run load_metadata -f -a`
             //
             // Make payloads for all metadata entries in the database.
@@ -55,17 +55,17 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
             //
             // Make payload(s) for all metadata entries in the database for
             // network with user-entered name.
-            Content::Name(name) => meta_f_n(&name),
+            Content::Name { s: name } => meta_f_n(&name),
 
             // `-u` content key is to provide the URL address for RPC calls;
             // since `-f` indicates the data is taken from the database, the
             // the combination seems of no use.
-            Content::Address(_) => Err(Error::NotSupported),
+            Content::Address { .. } => Err(Error::NotSupported),
         },
 
         // `-d` setting key: get network data using RPC calls, **do not**
         // update the database, export payload files.
-        Set::D => match instruction.content {
+        Set::D => match instruction.content.into() {
             // `$ cargo run load_metadata -d -a`
             //
             // Make RPC calls for all networks in `ADDRESS_BOOK`, produce
@@ -92,7 +92,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
             // Network here must already have an entry in `ADDRESS_BOOK`, so
             // so that the URL address at which to make RPC call is made could
             // be found.
-            Content::Name(name) => meta_d_n(&name),
+            Content::Name { s: name } => meta_d_n(&name),
 
             // `$ cargo run load_metadata -d -u <url_address>`
             //
@@ -105,7 +105,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
             // This key combination is completely agnostic and will not address
             // the database at all. If there are changes in the base58 prefix or
             // genesis hash, this will not be found here.
-            Content::Address(address) => meta_d_u(&address),
+            Content::Address { s: address } => meta_d_u(&address),
         },
 
         // `-k` setting key: get network data using RPC calls, update the
@@ -113,7 +113,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
         // was fetched.
         Set::K => {
             let write = Write::OnlyNew;
-            match instruction.content {
+            match instruction.content.into() {
                 // `$ cargo run load_metadata -k -a`
                 //
                 // Make RPC calls, update the database as needed and produce
@@ -137,13 +137,13 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 //
                 // Regardless of how many entries with different encryptions are
                 // there, fetch and (possibly) payload export is done only once.
-                Content::Name(name) => meta_kpt_n(&name, &write),
+                Content::Name { s: name } => meta_kpt_n(&name, &write),
 
                 // Key `-u` is for URL addresses. If network has no entry in the
                 // database, its metadata can not be added before its specs. If
                 // network has an entry in the database, it is simpler to
                 // address it with `-n <network_name>` combination.
-                Content::Address(_) => Err(Error::NotSupported),
+                Content::Address { .. } => Err(Error::NotSupported),
             }
         }
 
@@ -151,7 +151,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
         // database.
         Set::P => {
             let write = Write::None;
-            match instruction.content {
+            match instruction.content.into() {
                 // `$ cargo run load_metadata -p -a`
                 //
                 // Make RPC calls and update the database as needed for all
@@ -170,13 +170,13 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 // database.
                 //
                 // One fetch only.
-                Content::Name(name) => meta_kpt_n(&name, &write),
+                Content::Name { s: name } => meta_kpt_n(&name, &write),
 
                 // Key `-u` is for URL addresses. If network has no entry in the
                 // database, its metadata can not be added before its specs. If
                 // network has an entry in the database, it is simpler to
                 // address it with `-n <network_name>` combination.
-                Content::Address(_) => Err(Error::NotSupported),
+                Content::Address { .. } => Err(Error::NotSupported),
             }
         }
 
@@ -184,7 +184,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
         // and update the database.
         Set::T => {
             let write = Write::All;
-            match instruction.content {
+            match instruction.content.into() {
                 // `$ cargo run load_metadata -a`
                 //
                 // Make RPC calls, update the database as needed and produce
@@ -203,13 +203,13 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 // database.
                 //
                 // One fetch and one payload print only.
-                Content::Name(name) => meta_kpt_n(&name, &write),
+                Content::Name { s: name } => meta_kpt_n(&name, &write),
 
                 // Key `-u` is for URL addresses. If network has no entry in the
                 // database, its metadata can not be added before its specs. If
                 // network has an entry in the database, it is simpler to
                 // address it with `-n <network_name>` combination.
-                Content::Address(_) => Err(Error::NotSupported),
+                Content::Address { .. } => Err(Error::NotSupported),
             }
         }
     }

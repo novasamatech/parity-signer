@@ -17,10 +17,10 @@ use crate::parser::{Content, InstructionSpecs, Override, Set, Token};
 /// Process `add_specs` command according to the [`InstructionSpecs`] received
 /// from the command line.
 pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
-    match instruction.set {
+    match instruction.set.into() {
         // `-f` setting key: produce `add_specs` payload files from existing
         // database entries.
-        Set::F => match instruction.content {
+        Set::F => match instruction.content.clone().into() {
             // `$ cargo run add_specs -f -a`
             //
             // Make `add_specs` payloads for all specs entries in the database.
@@ -52,10 +52,10 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             //
             // Entry with encryption override and/or signer title override
             // **will not** be added to the database.
-            Content::Name(name) => {
+            Content::Name { s: name } => {
                 // no fetch is done, there is no way to check the override is
                 // allowed
-                if instruction.over.token.is_some() {
+                if instruction.over.token().is_some() {
                     return Err(Error::NotSupported);
                 }
                 specs_f_n(&name, instruction.over.encryption, instruction.over.title)
@@ -66,18 +66,18 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // the combination seems of no use.
             // To address a specific network from the database, `-f -n` key
             // combination is suggested.
-            Content::Address(_) => Err(Error::NotSupported),
+            Content::Address { .. } => Err(Error::NotSupported),
         },
 
         // `-d` setting key: produce `add_specs` payloads through RPC calls,
         // **do not** interact with the database, export payload files.
-        Set::D => match instruction.content {
+        Set::D => match instruction.content.clone().into() {
             // `-d` does not write in the database, so fetching specs for known
             // networks without checking the database seems of no use.
             Content::All { pass_errors: _ } => Err(Error::NotSupported),
 
             // Same as `-d -a` combination, of no use.
-            Content::Name(_) => Err(Error::NotSupported),
+            Content::Name { .. } => Err(Error::NotSupported),
 
             // `$ cargo run add_specs -d -u network_url_address
             // <encryption override> <optional token override> <optional signer
@@ -94,14 +94,14 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // title that is displayed in Signer.
             //
             // In some cases the command may contain token override as well.
-            Content::Address(address) => {
+            Content::Address { s: address } => {
                 // not allowed to proceed without encryption override defined
-                if let Some(encryption) = instruction.over.encryption {
+                if let Some(ref encryption) = instruction.over.encryption {
                     specs_d_u(
                         &address,
-                        encryption,
-                        instruction.over.token,
-                        instruction.over.title,
+                        encryption.clone(),
+                        instruction.over.token(),
+                        instruction.over.title.clone(),
                     )
                 } else {
                     Err(Error::NotSupported)
@@ -113,11 +113,11 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
         // database, export payload files only for updated information.
         //
         // Since network specs are expected to remain constant over time,
-        // these commands seem to be of no use.
+        // threse commands seem to be of no use.
         Set::K => Err(Error::NotSupported),
 
         // `-p` setting key: update the database
-        Set::P => match instruction.content {
+        Set::P => match instruction.content.clone().into() {
             // Network specs are expected to remain constant over time, mass
             // override should not be possible, this command seems to be of no
             // use.
@@ -135,7 +135,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // displayed network title
             //
             // Payload files are not created.
-            Content::Name(name) => {
+            Content::Name { s: name } => {
                 // using this command makes sense only if there is some override
                 specs_pt_n(&name, instruction.over, false)
             }
@@ -152,13 +152,13 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // genesis hash results in an error.
             //
             // In some cases the command may contain token override as well.
-            Content::Address(address) => {
+            Content::Address { s: address } => {
                 // not allowed to proceed without encryption override defined
-                if let Some(encryption) = instruction.over.encryption {
+                if let Some(ref encryption) = instruction.over.encryption {
                     specs_pt_u(
                         &address,
-                        encryption,
-                        instruction.over.token,
+                        encryption.clone(),
+                        instruction.over.token(),
                         instruction.over.title,
                         false,
                     )
@@ -170,7 +170,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
 
         // `-t` setting key or no setting key: produce `add_specs` payloads,
         // update the database.
-        Set::T => match instruction.content {
+        Set::T => match instruction.content.clone().into() {
             // Network specs are expected to remain constant over time,
             // this command seems to be of no use.
             Content::All { pass_errors: _ } => Err(Error::NotSupported),
@@ -186,7 +186,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // displayed network title
             //
             // Payload files are created.
-            Content::Name(name) => specs_pt_n(&name, instruction.over, true),
+            Content::Name { s: name } => specs_pt_n(&name, instruction.over, true),
 
             // `$ cargo run add_specs -u network_url_address
             // <encryption override> <optional token override>`
@@ -201,13 +201,13 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // genesis hash results in an error.
             //
             // In some cases the command may contain token override as well.
-            Content::Address(address) => {
+            Content::Address { s: address } => {
                 // not allowed to proceed without encryption override defined
-                if let Some(encryption) = instruction.over.encryption {
+                if let Some(ref encryption) = instruction.over.encryption {
                     specs_pt_u(
                         &address,
-                        encryption,
-                        instruction.over.token,
+                        encryption.clone(),
+                        instruction.over.token(),
                         instruction.over.title,
                         true,
                     )
@@ -325,14 +325,14 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<()> {
     let mut network_specs_to_change = network_specs_from_entry(&address_book_entry)?;
     let make_update = match over.encryption {
         // requested encryption override
-        Some(encryption) => {
+        Some(ref encryption) => {
             // encryption is already correct in title entered by user
-            if address_book_entry.encryption == encryption {
+            if address_book_entry.encryption == *encryption {
                 update_known_specs(
                     &address_book_entry.address,
                     &mut network_specs_to_change,
-                    over.title,
-                    over.token,
+                    over.title.clone(),
+                    over.token(),
                 )?
             }
             // encryption in override is different from encryption in title
@@ -340,7 +340,7 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<()> {
                 // construct `NetworkSpecsKey` with encryption from override and
                 // known genesis hash
                 let network_specs_key_possible =
-                    NetworkSpecsKey::from_parts(&address_book_entry.genesis_hash, &encryption);
+                    NetworkSpecsKey::from_parts(&address_book_entry.genesis_hash, encryption);
 
                 // check if this new network specs key has an entry in the
                 // database
@@ -354,8 +354,8 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<()> {
                         update_known_specs(
                             &address_book_entry.address,
                             &mut network_specs_to_change,
-                            over.title,
-                            over.token,
+                            over.title.clone(),
+                            over.token(),
                         )?
                     }
 
@@ -365,9 +365,9 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<()> {
                         update_modify_encryption_specs(
                             &address_book_entry.address,
                             &mut network_specs_to_change,
-                            &encryption,
-                            over.title,
-                            over.token,
+                            encryption,
+                            over.title.clone(),
+                            over.token(),
                         )?;
                         true
                     }
@@ -377,8 +377,8 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<()> {
         None => update_known_specs(
             &address_book_entry.address,
             &mut network_specs_to_change,
-            over.title,
-            over.token,
+            over.title.clone(),
+            over.token(),
         )?,
     };
 
@@ -460,7 +460,7 @@ fn specs_pt_u(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::parser::Override;
+    use crate::parser::{ContentArgs, Override, SetFlags};
     use constants::FOLDER;
 
     // The aim is to check that RPC calls are going through for "officially
@@ -477,12 +477,19 @@ mod tests {
         let mut all_clear = true;
         for address in address_set {
             let instruction = InstructionSpecs {
-                set: Set::D,
-                content: Content::Address(address.to_string()),
+                set: SetFlags {
+                    d: true,
+                    ..Default::default()
+                },
+                content: ContentArgs {
+                    address: Some(address.to_string()),
+                    ..Default::default()
+                },
                 over: Override {
                     encryption: Some(Encryption::Sr25519),
                     title: None,
-                    token: None,
+                    token_unit: None,
+                    token_decimals: None,
                 },
             };
             match gen_add_specs(instruction) {

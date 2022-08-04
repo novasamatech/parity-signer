@@ -8,7 +8,9 @@ fn cold_release() -> Result<(), String> {
     let cold_release_dir =
         Path::new(&manifest_dir).join("../../android/app/src/main/assets/Database/");
     create_dir_all(&cold_release_dir).unwrap();
-    let command = Command::MakeColdRelease(Some(cold_release_dir));
+    let command = Command::MakeColdRelease {
+        path: Some(cold_release_dir),
+    };
 
     full_run(command).map_err(|e| format!("{}", e))?;
 
