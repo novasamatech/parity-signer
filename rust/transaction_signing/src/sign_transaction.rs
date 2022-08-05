@@ -1,5 +1,5 @@
-use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec::Encode;
+use sp_core::blake2_256;
 use sp_runtime::MultiSignature;
 use zeroize::Zeroize;
 
@@ -38,7 +38,7 @@ pub(crate) fn create_signature(
     // upstream so we put it here
     let content_vec = {
         if content_vec.len() > 257 {
-            blake2b(32, &[], &content_vec).as_bytes().to_vec()
+            blake2_256(&content_vec).to_vec()
         } else {
             content_vec
         }

@@ -622,7 +622,6 @@ name = "db_handling"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "blake2-rfc",
  "constants",
  "defaults",
  "definitions",
@@ -658,7 +657,6 @@ dependencies = [
 name = "definitions"
 version = "0.1.0"
 dependencies = [
- "blake2-rfc",
  "frame-metadata",
  "hex",
  "parity-scale-codec",
@@ -1048,7 +1046,6 @@ dependencies = [
 name = "generate_message"
 version = "0.1.0"
 dependencies = [
- "blake2-rfc",
  "clap",
  "constants",
  "db_handling",
@@ -1684,7 +1681,6 @@ dependencies = [
 name = "navigator"
 version = "0.1.0"
 dependencies = [
- "blake2-rfc",
  "constants",
  "db_handling",
  "definitions",
@@ -3699,7 +3695,6 @@ name = "transaction_signing"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "blake2-rfc",
  "constants",
  "db_handling",
  "definitions",
