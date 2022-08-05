@@ -617,7 +617,7 @@ impl TrDbColdStub {
                             &address_details.encryption,
                             &multisigner_to_public(&multisigner),
                             &address_details.path,
-                            network_specs.genesis_hash.as_bytes(),
+                            network_specs.genesis_hash,
                         ),
                     });
                 }

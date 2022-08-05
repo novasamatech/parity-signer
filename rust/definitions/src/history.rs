@@ -243,7 +243,7 @@ pub struct IdentityHistory {
     /// - path with soft (`/`) and hard (`//`) derivations only, **without** password  
     pub path: String,
     /// - genesis hash of the network within which the address is  
-    pub network_genesis_hash: Vec<u8>,
+    pub network_genesis_hash: H256,
 }
 
 impl IdentityHistory {
@@ -252,7 +252,7 @@ impl IdentityHistory {
         encryption: Encryption,
         public_key: Vec<u8>,
         path: String,
-        network_genesis_hash: Vec<u8>,
+        network_genesis_hash: H256,
     ) -> Self {
         Self {
             seed_name,
@@ -269,14 +269,14 @@ impl IdentityHistory {
         encryption: &Encryption,
         public_key: &[u8],
         path: &str,
-        network_genesis_hash: &[u8],
+        network_genesis_hash: H256,
     ) -> Self {
         Self {
             seed_name: seed_name.to_string(),
             encryption: encryption.to_owned(),
             public_key: public_key.to_vec(),
             path: path.to_string(),
-            network_genesis_hash: network_genesis_hash.to_vec(),
+            network_genesis_hash,
         }
     }
 }
@@ -649,7 +649,7 @@ pub fn all_events_preview() -> Vec<Event> {
                 &Encryption::Sr25519,
                 &public,
                 "//",
-                network_specs.genesis_hash.as_bytes(),
+                network_specs.genesis_hash,
             ),
         },
         Event::IdentityRemoved {
@@ -658,7 +658,7 @@ pub fn all_events_preview() -> Vec<Event> {
                 &Encryption::Sr25519,
                 &public,
                 "//",
-                network_specs.genesis_hash.as_bytes(),
+                network_specs.genesis_hash,
             ),
         },
         Event::IdentitiesWiped,

@@ -121,7 +121,7 @@ dictionary IdentityHistory {
     Encryption encryption;
     sequence<u8> public_key;
     string path;
-    sequence<u8> network_genesis_hash;
+    H256 network_genesis_hash;
 };
 
 dictionary MetaValuesExport {
