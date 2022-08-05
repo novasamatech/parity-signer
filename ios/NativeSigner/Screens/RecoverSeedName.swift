@@ -12,7 +12,7 @@ struct RecoverSeedName: View {
     @FocusState private var nameFocused: Bool
     let content: MRecoverSeedName
     let checkSeedCollision: (String) -> Bool
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -30,7 +30,7 @@ struct RecoverSeedName: View {
                     .submitLabel(.done)
                     .onSubmit {
                         if !seedName.isEmpty, !checkSeedCollision(seedName) {
-                            pushButton(.goForward, seedName, "")
+                            navigationRequest(.init(action: .goForward, details: seedName))
                         }
                     }
                     .onAppear(perform: {
@@ -44,7 +44,7 @@ struct RecoverSeedName: View {
             BigButton(
                 text: "Next",
                 action: {
-                    pushButton(.goForward, seedName, "")
+                    navigationRequest(.init(action: .goForward, details: seedName))
                 },
                 isDisabled: seedName.isEmpty || checkSeedCollision(seedName)
             )

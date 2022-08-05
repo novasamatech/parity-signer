@@ -10,7 +10,7 @@ import SwiftUI
 struct NewSeedMenu: View {
     let alert: Bool
     let alertShow: () -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         VStack {
             Spacer()
@@ -21,7 +21,7 @@ struct NewSeedMenu: View {
                         text: "New seed",
                         action: {
                             if alert { alertShow() } else {
-                                pushButton(.newSeed, "", "")
+                                navigationRequest(.init(action: .newSeed))
                             }
                         }
                     )
@@ -30,7 +30,7 @@ struct NewSeedMenu: View {
                         isShaded: true,
                         action: {
                             if alert { alertShow() } else {
-                                pushButton(.recoverSeed, "", "")
+                                navigationRequest(.init(action: .recoverSeed))
                             }
                         }
                     )

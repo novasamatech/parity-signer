@@ -6,10 +6,10 @@ import Foundation
 // might be in a separate module, or it might be compiled inline into
 // this module. This is a bit of light hackery to work with both.
 #if canImport(signerFFI)
-    import signerFFI
+import signerFFI
 #endif
 
-private extension RustBuffer {
+fileprivate extension RustBuffer {
     // Allocate a new buffer, copying the contents of a `UInt8` array.
     init(bytes: [UInt8]) {
         let rbuf = bytes.withUnsafeBufferPointer { ptr in
@@ -29,7 +29,7 @@ private extension RustBuffer {
     }
 }
 
-private extension ForeignBytes {
+fileprivate extension ForeignBytes {
     init(bufferPointer: UnsafeBufferPointer<UInt8>) {
         self.init(len: Int32(bufferPointer.count), data: bufferPointer.baseAddress)
     }
@@ -42,7 +42,7 @@ private extension ForeignBytes {
 // Helper classes/extensions that don't change.
 // Someday, this will be in a libray of its own.
 
-private extension Data {
+fileprivate extension Data {
     init(rustBuffer: RustBuffer) {
         // TODO: This copies the buffer. Can we read directly from a
         // Rust buffer?
@@ -51,20 +51,20 @@ private extension Data {
 }
 
 // A helper class to read values out of a byte buffer.
-private class Reader {
+fileprivate class Reader {
     let data: Data
     var offset: Data.Index
 
     init(data: Data) {
         self.data = data
-        offset = 0
+        self.offset = 0
     }
 
     // Reads an integer at the current offset, in big-endian order, and advances
     // the offset on success. Throws if reading the integer would move the
     // offset past the end of the buffer.
     func readInt<T: FixedWidthInteger>() throws -> T {
-        let range = offset ..< offset + MemoryLayout<T>.size
+        let range = offset..<offset + MemoryLayout<T>.size
         guard data.count >= range.upperBound else {
             throw UniffiInternalError.bufferOverflow
         }
@@ -74,22 +74,22 @@ private class Reader {
             return value as! T
         }
         var value: T = 0
-        let _ = withUnsafeMutableBytes(of: &value) { data.copyBytes(to: $0, from: range) }
+        let _ = withUnsafeMutableBytes(of: &value, { data.copyBytes(to: $0, from: range)})
         offset = range.upperBound
         return value.bigEndian
     }
 
     // Reads an arbitrary number of bytes, to be used to read
     // raw bytes, this is useful when lifting strings
-    func readBytes(count: Int) throws -> [UInt8] {
-        let range = offset ..< (offset + count)
+    func readBytes(count: Int) throws -> Array<UInt8> {
+        let range = offset..<(offset+count)
         guard data.count >= range.upperBound else {
             throw UniffiInternalError.bufferOverflow
         }
         var value = [UInt8](repeating: 0, count: count)
-        value.withUnsafeMutableBufferPointer { buffer in
+        value.withUnsafeMutableBufferPointer({ buffer in
             data.copyBytes(to: buffer, from: range)
-        }
+        })
         offset = range.upperBound
         return value
     }
@@ -114,13 +114,13 @@ private class Reader {
 }
 
 // A helper class to write values into a byte buffer.
-private class Writer {
+fileprivate class Writer {
     var bytes: [UInt8]
     var offset: Array<UInt8>.Index
 
     init() {
-        bytes = []
-        offset = 0
+        self.bytes = []
+        self.offset = 0
     }
 
     func writeBytes<S>(_ byteArr: S) where S: Sequence, S.Element == UInt8 {
@@ -149,7 +149,7 @@ private class Writer {
 
 // Protocol for types that transfer other types across the FFI. This is
 // analogous go the Rust trait of the same name.
-private protocol FfiConverter {
+fileprivate protocol FfiConverter {
     associatedtype FfiType
     associatedtype SwiftType
 
@@ -160,7 +160,7 @@ private protocol FfiConverter {
 }
 
 // Types conforming to `Primitive` pass themselves directly over the FFI.
-private protocol FfiConverterPrimitive: FfiConverter where FfiType == SwiftType {}
+fileprivate protocol FfiConverterPrimitive: FfiConverter where FfiType == SwiftType { }
 
 extension FfiConverterPrimitive {
     static func lift(_ value: FfiType) throws -> SwiftType {
@@ -174,7 +174,7 @@ extension FfiConverterPrimitive {
 
 // Types conforming to `FfiConverterRustBuffer` lift and lower into a `RustBuffer`.
 // Used for complex types where it's hard to write a custom lift/lower.
-private protocol FfiConverterRustBuffer: FfiConverter where FfiType == RustBuffer {}
+fileprivate protocol FfiConverterRustBuffer: FfiConverter where FfiType == RustBuffer {}
 
 extension FfiConverterRustBuffer {
     static func lift(_ buf: RustBuffer) throws -> SwiftType {
@@ -188,15 +188,14 @@ extension FfiConverterRustBuffer {
     }
 
     static func lower(_ value: SwiftType) -> RustBuffer {
-        let writer = Writer()
-        write(value, into: writer)
-        return RustBuffer(bytes: writer.bytes)
+          let writer = Writer()
+          write(value, into: writer)
+          return RustBuffer(bytes: writer.bytes)
     }
 }
-
 // An error type for FFI errors. These errors occur at the UniFFI level, not
 // the library level.
-private enum UniffiInternalError: LocalizedError {
+fileprivate enum UniffiInternalError: LocalizedError {
     case bufferOverflow
     case incompleteData
     case unexpectedOptionalTag
@@ -222,15 +221,15 @@ private enum UniffiInternalError: LocalizedError {
     }
 }
 
-private let CALL_SUCCESS: Int8 = 0
-private let CALL_ERROR: Int8 = 1
-private let CALL_PANIC: Int8 = 2
+fileprivate let CALL_SUCCESS: Int8 = 0
+fileprivate let CALL_ERROR: Int8 = 1
+fileprivate let CALL_PANIC: Int8 = 2
 
-private extension RustCallStatus {
+fileprivate extension RustCallStatus {
     init() {
         self.init(
             code: CALL_SUCCESS,
-            errorBuf: RustBuffer(
+            errorBuf: RustBuffer.init(
                 capacity: 0,
                 len: 0,
                 data: nil
@@ -247,41 +246,42 @@ private func rustCall<T>(_ callback: (UnsafeMutablePointer<RustCallStatus>) -> T
 }
 
 private func rustCallWithError<T, F: FfiConverter>
-(_ errorFfiConverter: F.Type, _ callback: (UnsafeMutablePointer<RustCallStatus>) -> T) throws -> T
+    (_ errorFfiConverter: F.Type, _ callback: (UnsafeMutablePointer<RustCallStatus>) -> T) throws -> T
     where F.SwiftType: Error, F.FfiType == RustBuffer
-{
-    try makeRustCall(callback, errorHandler: { try errorFfiConverter.lift($0) })
+    {
+    try makeRustCall(callback, errorHandler: { return try errorFfiConverter.lift($0) })
 }
 
 private func makeRustCall<T>(_ callback: (UnsafeMutablePointer<RustCallStatus>) -> T, errorHandler: (RustBuffer) throws -> Error) throws -> T {
-    var callStatus = RustCallStatus()
+    var callStatus = RustCallStatus.init()
     let returnedVal = callback(&callStatus)
     switch callStatus.code {
-    case CALL_SUCCESS:
-        return returnedVal
+        case CALL_SUCCESS:
+            return returnedVal
 
-    case CALL_ERROR:
-        throw try errorHandler(callStatus.errorBuf)
+        case CALL_ERROR:
+            throw try errorHandler(callStatus.errorBuf)
 
-    case CALL_PANIC:
-        // When the rust code sees a panic, it tries to construct a RustBuffer
-        // with the message.  But if that code panics, then it just sends back
-        // an empty buffer.
-        if callStatus.errorBuf.len > 0 {
-            throw UniffiInternalError.rustPanic(try FfiConverterString.lift(callStatus.errorBuf))
-        } else {
-            callStatus.errorBuf.deallocate()
-            throw UniffiInternalError.rustPanic("Rust panic")
-        }
+        case CALL_PANIC:
+            // When the rust code sees a panic, it tries to construct a RustBuffer
+            // with the message.  But if that code panics, then it just sends back
+            // an empty buffer.
+            if callStatus.errorBuf.len > 0 {
+                throw UniffiInternalError.rustPanic(try FfiConverterString.lift(callStatus.errorBuf))
+            } else {
+                callStatus.errorBuf.deallocate()
+                throw UniffiInternalError.rustPanic("Rust panic")
+            }
 
-    default:
-        throw UniffiInternalError.unexpectedRustCallStatusCode
+        default:
+            throw UniffiInternalError.unexpectedRustCallStatusCode
     }
 }
 
 // Public interface members begin here.
 
-private struct FfiConverterUInt8: FfiConverterPrimitive {
+
+fileprivate struct FfiConverterUInt8: FfiConverterPrimitive {
     typealias FfiType = UInt8
     typealias SwiftType = UInt8
 
@@ -294,7 +294,7 @@ private struct FfiConverterUInt8: FfiConverterPrimitive {
     }
 }
 
-private struct FfiConverterUInt16: FfiConverterPrimitive {
+fileprivate struct FfiConverterUInt16: FfiConverterPrimitive {
     typealias FfiType = UInt16
     typealias SwiftType = UInt16
 
@@ -307,7 +307,7 @@ private struct FfiConverterUInt16: FfiConverterPrimitive {
     }
 }
 
-private struct FfiConverterUInt32: FfiConverterPrimitive {
+fileprivate struct FfiConverterUInt32: FfiConverterPrimitive {
     typealias FfiType = UInt32
     typealias SwiftType = UInt32
 
@@ -320,7 +320,7 @@ private struct FfiConverterUInt32: FfiConverterPrimitive {
     }
 }
 
-private struct FfiConverterBool: FfiConverter {
+fileprivate struct FfiConverterBool : FfiConverter {
     typealias FfiType = Int8
     typealias SwiftType = Bool
 
@@ -341,7 +341,7 @@ private struct FfiConverterBool: FfiConverter {
     }
 }
 
-private struct FfiConverterString: FfiConverter {
+fileprivate struct FfiConverterString: FfiConverter {
     typealias SwiftType = String
     typealias FfiType = RustBuffer
 
@@ -379,6 +379,7 @@ private struct FfiConverterString: FfiConverter {
     }
 }
 
+
 public struct ActionResult {
     public var screenLabel: String
     public var back: Bool
@@ -405,8 +406,9 @@ public struct ActionResult {
     }
 }
 
+
 extension ActionResult: Equatable, Hashable {
-    public static func == (lhs: ActionResult, rhs: ActionResult) -> Bool {
+    public static func ==(lhs: ActionResult, rhs: ActionResult) -> Bool {
         if lhs.screenLabel != rhs.screenLabel {
             return false
         }
@@ -450,17 +452,18 @@ extension ActionResult: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeActionResult: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeActionResult: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> ActionResult {
         return try ActionResult(
-            screenLabel: FfiConverterString.read(from: buf),
-            back: FfiConverterBool.read(from: buf),
-            footer: FfiConverterBool.read(from: buf),
-            footerButton: FfiConverterOptionTypeFooterButton.read(from: buf),
-            rightButton: FfiConverterOptionTypeRightButton.read(from: buf),
-            screenNameType: FfiConverterTypeScreenNameType.read(from: buf),
-            screenData: FfiConverterTypeScreenData.read(from: buf),
-            modalData: FfiConverterOptionTypeModalData.read(from: buf),
+            screenLabel: FfiConverterString.read(from: buf), 
+            back: FfiConverterBool.read(from: buf), 
+            footer: FfiConverterBool.read(from: buf), 
+            footerButton: FfiConverterOptionTypeFooterButton.read(from: buf), 
+            rightButton: FfiConverterOptionTypeRightButton.read(from: buf), 
+            screenNameType: FfiConverterTypeScreenNameType.read(from: buf), 
+            screenData: FfiConverterTypeScreenData.read(from: buf), 
+            modalData: FfiConverterOptionTypeModalData.read(from: buf), 
             alertData: FfiConverterOptionTypeAlertData.read(from: buf)
         )
     }
@@ -477,6 +480,7 @@ private struct FfiConverterTypeActionResult: FfiConverterRustBuffer {
         FfiConverterOptionTypeAlertData.write(value.alertData, into: buf)
     }
 }
+
 
 public struct Address {
     public var base58: String
@@ -498,8 +502,9 @@ public struct Address {
     }
 }
 
+
 extension Address: Equatable, Hashable {
-    public static func == (lhs: Address, rhs: Address) -> Bool {
+    public static func ==(lhs: Address, rhs: Address) -> Bool {
         if lhs.base58 != rhs.base58 {
             return false
         }
@@ -531,14 +536,15 @@ extension Address: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeAddress: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeAddress: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> Address {
         return try Address(
-            base58: FfiConverterString.read(from: buf),
-            path: FfiConverterString.read(from: buf),
-            hasPwd: FfiConverterBool.read(from: buf),
-            identicon: FfiConverterSequenceUInt8.read(from: buf),
-            seedName: FfiConverterString.read(from: buf),
+            base58: FfiConverterString.read(from: buf), 
+            path: FfiConverterString.read(from: buf), 
+            hasPwd: FfiConverterBool.read(from: buf), 
+            identicon: FfiConverterSequenceUInt8.read(from: buf), 
+            seedName: FfiConverterString.read(from: buf), 
             multiselect: FfiConverterOptionBool.read(from: buf)
         )
     }
@@ -552,6 +558,7 @@ private struct FfiConverterTypeAddress: FfiConverterRustBuffer {
         FfiConverterOptionBool.write(value.multiselect, into: buf)
     }
 }
+
 
 public struct DerivationCheck {
     public var buttonGood: Bool
@@ -569,8 +576,9 @@ public struct DerivationCheck {
     }
 }
 
+
 extension DerivationCheck: Equatable, Hashable {
-    public static func == (lhs: DerivationCheck, rhs: DerivationCheck) -> Bool {
+    public static func ==(lhs: DerivationCheck, rhs: DerivationCheck) -> Bool {
         if lhs.buttonGood != rhs.buttonGood {
             return false
         }
@@ -594,12 +602,13 @@ extension DerivationCheck: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeDerivationCheck: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeDerivationCheck: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> DerivationCheck {
         return try DerivationCheck(
-            buttonGood: FfiConverterBool.read(from: buf),
-            whereTo: FfiConverterOptionTypeDerivationDestination.read(from: buf),
-            collision: FfiConverterOptionTypeAddress.read(from: buf),
+            buttonGood: FfiConverterBool.read(from: buf), 
+            whereTo: FfiConverterOptionTypeDerivationDestination.read(from: buf), 
+            collision: FfiConverterOptionTypeAddress.read(from: buf), 
             error: FfiConverterOptionString.read(from: buf)
         )
     }
@@ -611,6 +620,7 @@ private struct FfiConverterTypeDerivationCheck: FfiConverterRustBuffer {
         FfiConverterOptionString.write(value.error, into: buf)
     }
 }
+
 
 public struct DerivationEntry {
     public var path: String
@@ -624,8 +634,9 @@ public struct DerivationEntry {
     }
 }
 
+
 extension DerivationEntry: Equatable, Hashable {
-    public static func == (lhs: DerivationEntry, rhs: DerivationEntry) -> Bool {
+    public static func ==(lhs: DerivationEntry, rhs: DerivationEntry) -> Bool {
         if lhs.path != rhs.path {
             return false
         }
@@ -641,10 +652,11 @@ extension DerivationEntry: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeDerivationEntry: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeDerivationEntry: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> DerivationEntry {
         return try DerivationEntry(
-            path: FfiConverterString.read(from: buf),
+            path: FfiConverterString.read(from: buf), 
             hasPwd: FfiConverterBool.read(from: buf)
         )
     }
@@ -654,6 +666,7 @@ private struct FfiConverterTypeDerivationEntry: FfiConverterRustBuffer {
         FfiConverterBool.write(value.hasPwd, into: buf)
     }
 }
+
 
 public struct DerivationPack {
     public var networkTitle: String
@@ -671,8 +684,9 @@ public struct DerivationPack {
     }
 }
 
+
 extension DerivationPack: Equatable, Hashable {
-    public static func == (lhs: DerivationPack, rhs: DerivationPack) -> Bool {
+    public static func ==(lhs: DerivationPack, rhs: DerivationPack) -> Bool {
         if lhs.networkTitle != rhs.networkTitle {
             return false
         }
@@ -696,12 +710,13 @@ extension DerivationPack: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeDerivationPack: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeDerivationPack: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> DerivationPack {
         return try DerivationPack(
-            networkTitle: FfiConverterString.read(from: buf),
-            networkLogo: FfiConverterString.read(from: buf),
-            networkOrder: FfiConverterString.read(from: buf),
+            networkTitle: FfiConverterString.read(from: buf), 
+            networkLogo: FfiConverterString.read(from: buf), 
+            networkOrder: FfiConverterString.read(from: buf), 
             idSet: FfiConverterSequenceTypeDerivationEntry.read(from: buf)
         )
     }
@@ -713,6 +728,7 @@ private struct FfiConverterTypeDerivationPack: FfiConverterRustBuffer {
         FfiConverterSequenceTypeDerivationEntry.write(value.idSet, into: buf)
     }
 }
+
 
 public struct History {
     public var order: UInt32
@@ -728,8 +744,9 @@ public struct History {
     }
 }
 
+
 extension History: Equatable, Hashable {
-    public static func == (lhs: History, rhs: History) -> Bool {
+    public static func ==(lhs: History, rhs: History) -> Bool {
         if lhs.order != rhs.order {
             return false
         }
@@ -749,11 +766,12 @@ extension History: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeHistory: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeHistory: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> History {
         return try History(
-            order: FfiConverterUInt32.read(from: buf),
-            timestamp: FfiConverterString.read(from: buf),
+            order: FfiConverterUInt32.read(from: buf), 
+            timestamp: FfiConverterString.read(from: buf), 
             events: FfiConverterSequenceTypeEvent.read(from: buf)
         )
     }
@@ -764,6 +782,7 @@ private struct FfiConverterTypeHistory: FfiConverterRustBuffer {
         FfiConverterSequenceTypeEvent.write(value.events, into: buf)
     }
 }
+
 
 public struct Identity {
     public var seedName: String
@@ -789,8 +808,9 @@ public struct Identity {
     }
 }
 
+
 extension Identity: Equatable, Hashable {
-    public static func == (lhs: Identity, rhs: Identity) -> Bool {
+    public static func ==(lhs: Identity, rhs: Identity) -> Bool {
         if lhs.seedName != rhs.seedName {
             return false
         }
@@ -830,16 +850,17 @@ extension Identity: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeIdentity: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeIdentity: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> Identity {
         return try Identity(
-            seedName: FfiConverterString.read(from: buf),
-            addressKey: FfiConverterString.read(from: buf),
-            publicKey: FfiConverterString.read(from: buf),
-            identicon: FfiConverterSequenceUInt8.read(from: buf),
-            hasPwd: FfiConverterBool.read(from: buf),
-            path: FfiConverterString.read(from: buf),
-            isMultiselect: FfiConverterBool.read(from: buf),
+            seedName: FfiConverterString.read(from: buf), 
+            addressKey: FfiConverterString.read(from: buf), 
+            publicKey: FfiConverterString.read(from: buf), 
+            identicon: FfiConverterSequenceUInt8.read(from: buf), 
+            hasPwd: FfiConverterBool.read(from: buf), 
+            path: FfiConverterString.read(from: buf), 
+            isMultiselect: FfiConverterBool.read(from: buf), 
             base58: FfiConverterString.read(from: buf)
         )
     }
@@ -855,6 +876,7 @@ private struct FfiConverterTypeIdentity: FfiConverterRustBuffer {
         FfiConverterString.write(value.base58, into: buf)
     }
 }
+
 
 public struct IdentityHistory {
     public var seedName: String
@@ -874,8 +896,9 @@ public struct IdentityHistory {
     }
 }
 
+
 extension IdentityHistory: Equatable, Hashable {
-    public static func == (lhs: IdentityHistory, rhs: IdentityHistory) -> Bool {
+    public static func ==(lhs: IdentityHistory, rhs: IdentityHistory) -> Bool {
         if lhs.seedName != rhs.seedName {
             return false
         }
@@ -903,13 +926,14 @@ extension IdentityHistory: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeIdentityHistory: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeIdentityHistory: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> IdentityHistory {
         return try IdentityHistory(
-            seedName: FfiConverterString.read(from: buf),
-            encryption: FfiConverterTypeEncryption.read(from: buf),
-            publicKey: FfiConverterSequenceUInt8.read(from: buf),
-            path: FfiConverterString.read(from: buf),
+            seedName: FfiConverterString.read(from: buf), 
+            encryption: FfiConverterTypeEncryption.read(from: buf), 
+            publicKey: FfiConverterSequenceUInt8.read(from: buf), 
+            path: FfiConverterString.read(from: buf), 
             networkGenesisHash: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
@@ -923,6 +947,7 @@ private struct FfiConverterTypeIdentityHistory: FfiConverterRustBuffer {
     }
 }
 
+
 public struct MBackup {
     public var seedName: String
     public var derivations: [DerivationPack]
@@ -935,8 +960,9 @@ public struct MBackup {
     }
 }
 
+
 extension MBackup: Equatable, Hashable {
-    public static func == (lhs: MBackup, rhs: MBackup) -> Bool {
+    public static func ==(lhs: MBackup, rhs: MBackup) -> Bool {
         if lhs.seedName != rhs.seedName {
             return false
         }
@@ -952,10 +978,11 @@ extension MBackup: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMBackup: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMBackup: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MBackup {
         return try MBackup(
-            seedName: FfiConverterString.read(from: buf),
+            seedName: FfiConverterString.read(from: buf), 
             derivations: FfiConverterSequenceTypeDerivationPack.read(from: buf)
         )
     }
@@ -965,6 +992,7 @@ private struct FfiConverterTypeMBackup: FfiConverterRustBuffer {
         FfiConverterSequenceTypeDerivationPack.write(value.derivations, into: buf)
     }
 }
+
 
 public struct MDeriveKey {
     public var seedName: String
@@ -988,8 +1016,9 @@ public struct MDeriveKey {
     }
 }
 
+
 extension MDeriveKey: Equatable, Hashable {
-    public static func == (lhs: MDeriveKey, rhs: MDeriveKey) -> Bool {
+    public static func ==(lhs: MDeriveKey, rhs: MDeriveKey) -> Bool {
         if lhs.seedName != rhs.seedName {
             return false
         }
@@ -1025,15 +1054,16 @@ extension MDeriveKey: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMDeriveKey: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMDeriveKey: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MDeriveKey {
         return try MDeriveKey(
-            seedName: FfiConverterString.read(from: buf),
-            networkTitle: FfiConverterString.read(from: buf),
-            networkLogo: FfiConverterString.read(from: buf),
-            networkSpecsKey: FfiConverterString.read(from: buf),
-            suggestedDerivation: FfiConverterString.read(from: buf),
-            keyboard: FfiConverterBool.read(from: buf),
+            seedName: FfiConverterString.read(from: buf), 
+            networkTitle: FfiConverterString.read(from: buf), 
+            networkLogo: FfiConverterString.read(from: buf), 
+            networkSpecsKey: FfiConverterString.read(from: buf), 
+            suggestedDerivation: FfiConverterString.read(from: buf), 
+            keyboard: FfiConverterBool.read(from: buf), 
             derivationCheck: FfiConverterTypeDerivationCheck.read(from: buf)
         )
     }
@@ -1049,6 +1079,7 @@ private struct FfiConverterTypeMDeriveKey: FfiConverterRustBuffer {
     }
 }
 
+
 public struct MEnterPassword {
     public var authorInfo: Address
     public var counter: UInt32
@@ -1061,8 +1092,9 @@ public struct MEnterPassword {
     }
 }
 
+
 extension MEnterPassword: Equatable, Hashable {
-    public static func == (lhs: MEnterPassword, rhs: MEnterPassword) -> Bool {
+    public static func ==(lhs: MEnterPassword, rhs: MEnterPassword) -> Bool {
         if lhs.authorInfo != rhs.authorInfo {
             return false
         }
@@ -1078,10 +1110,11 @@ extension MEnterPassword: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMEnterPassword: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMEnterPassword: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MEnterPassword {
         return try MEnterPassword(
-            authorInfo: FfiConverterTypeAddress.read(from: buf),
+            authorInfo: FfiConverterTypeAddress.read(from: buf), 
             counter: FfiConverterUInt32.read(from: buf)
         )
     }
@@ -1091,6 +1124,7 @@ private struct FfiConverterTypeMEnterPassword: FfiConverterRustBuffer {
         FfiConverterUInt32.write(value.counter, into: buf)
     }
 }
+
 
 public struct MEventMaybeDecoded {
     public var event: Event
@@ -1108,8 +1142,9 @@ public struct MEventMaybeDecoded {
     }
 }
 
+
 extension MEventMaybeDecoded: Equatable, Hashable {
-    public static func == (lhs: MEventMaybeDecoded, rhs: MEventMaybeDecoded) -> Bool {
+    public static func ==(lhs: MEventMaybeDecoded, rhs: MEventMaybeDecoded) -> Bool {
         if lhs.event != rhs.event {
             return false
         }
@@ -1133,12 +1168,13 @@ extension MEventMaybeDecoded: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMEventMaybeDecoded: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMEventMaybeDecoded: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MEventMaybeDecoded {
         return try MEventMaybeDecoded(
-            event: FfiConverterTypeEvent.read(from: buf),
-            signedBy: FfiConverterOptionTypeAddress.read(from: buf),
-            decoded: FfiConverterOptionTypeTransactionCardSet.read(from: buf),
+            event: FfiConverterTypeEvent.read(from: buf), 
+            signedBy: FfiConverterOptionTypeAddress.read(from: buf), 
+            decoded: FfiConverterOptionTypeTransactionCardSet.read(from: buf), 
             verifierDetails: FfiConverterOptionTypeMVerifierDetails.read(from: buf)
         )
     }
@@ -1150,6 +1186,7 @@ private struct FfiConverterTypeMEventMaybeDecoded: FfiConverterRustBuffer {
         FfiConverterOptionTypeMVerifierDetails.write(value.verifierDetails, into: buf)
     }
 }
+
 
 public struct MKeyDetails {
     public var qr: [UInt8]
@@ -1167,8 +1204,9 @@ public struct MKeyDetails {
     }
 }
 
+
 extension MKeyDetails: Equatable, Hashable {
-    public static func == (lhs: MKeyDetails, rhs: MKeyDetails) -> Bool {
+    public static func ==(lhs: MKeyDetails, rhs: MKeyDetails) -> Bool {
         if lhs.qr != rhs.qr {
             return false
         }
@@ -1192,12 +1230,13 @@ extension MKeyDetails: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMKeyDetails: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMKeyDetails: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MKeyDetails {
         return try MKeyDetails(
-            qr: FfiConverterSequenceUInt8.read(from: buf),
-            pubkey: FfiConverterString.read(from: buf),
-            networkInfo: FfiConverterTypeMscNetworkInfo.read(from: buf),
+            qr: FfiConverterSequenceUInt8.read(from: buf), 
+            pubkey: FfiConverterString.read(from: buf), 
+            networkInfo: FfiConverterTypeMscNetworkInfo.read(from: buf), 
             address: FfiConverterTypeAddress.read(from: buf)
         )
     }
@@ -1209,6 +1248,7 @@ private struct FfiConverterTypeMKeyDetails: FfiConverterRustBuffer {
         FfiConverterTypeAddress.write(value.address, into: buf)
     }
 }
+
 
 public struct MKeyDetailsMulti {
     public var keyDetails: MKeyDetails
@@ -1224,8 +1264,9 @@ public struct MKeyDetailsMulti {
     }
 }
 
+
 extension MKeyDetailsMulti: Equatable, Hashable {
-    public static func == (lhs: MKeyDetailsMulti, rhs: MKeyDetailsMulti) -> Bool {
+    public static func ==(lhs: MKeyDetailsMulti, rhs: MKeyDetailsMulti) -> Bool {
         if lhs.keyDetails != rhs.keyDetails {
             return false
         }
@@ -1245,11 +1286,12 @@ extension MKeyDetailsMulti: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMKeyDetailsMulti: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMKeyDetailsMulti: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MKeyDetailsMulti {
         return try MKeyDetailsMulti(
-            keyDetails: FfiConverterTypeMKeyDetails.read(from: buf),
-            currentNumber: FfiConverterString.read(from: buf),
+            keyDetails: FfiConverterTypeMKeyDetails.read(from: buf), 
+            currentNumber: FfiConverterString.read(from: buf), 
             outOf: FfiConverterString.read(from: buf)
         )
     }
@@ -1260,6 +1302,7 @@ private struct FfiConverterTypeMKeyDetailsMulti: FfiConverterRustBuffer {
         FfiConverterString.write(value.outOf, into: buf)
     }
 }
+
 
 public struct MKeys {
     public var set: [MKeysCard]
@@ -1279,8 +1322,9 @@ public struct MKeys {
     }
 }
 
+
 extension MKeys: Equatable, Hashable {
-    public static func == (lhs: MKeys, rhs: MKeys) -> Bool {
+    public static func ==(lhs: MKeys, rhs: MKeys) -> Bool {
         if lhs.set != rhs.set {
             return false
         }
@@ -1308,13 +1352,14 @@ extension MKeys: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMKeys: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMKeys: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MKeys {
         return try MKeys(
-            set: FfiConverterSequenceTypeMKeysCard.read(from: buf),
-            root: FfiConverterTypeMSeedKeyCard.read(from: buf),
-            network: FfiConverterTypeMNetworkCard.read(from: buf),
-            multiselectMode: FfiConverterBool.read(from: buf),
+            set: FfiConverterSequenceTypeMKeysCard.read(from: buf), 
+            root: FfiConverterTypeMSeedKeyCard.read(from: buf), 
+            network: FfiConverterTypeMNetworkCard.read(from: buf), 
+            multiselectMode: FfiConverterBool.read(from: buf), 
             multiselectCount: FfiConverterString.read(from: buf)
         )
     }
@@ -1327,6 +1372,7 @@ private struct FfiConverterTypeMKeys: FfiConverterRustBuffer {
         FfiConverterString.write(value.multiselectCount, into: buf)
     }
 }
+
 
 public struct MKeysCard {
     public var addressKey: String
@@ -1350,8 +1396,9 @@ public struct MKeysCard {
     }
 }
 
+
 extension MKeysCard: Equatable, Hashable {
-    public static func == (lhs: MKeysCard, rhs: MKeysCard) -> Bool {
+    public static func ==(lhs: MKeysCard, rhs: MKeysCard) -> Bool {
         if lhs.addressKey != rhs.addressKey {
             return false
         }
@@ -1387,15 +1434,16 @@ extension MKeysCard: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMKeysCard: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMKeysCard: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MKeysCard {
         return try MKeysCard(
-            addressKey: FfiConverterString.read(from: buf),
-            base58: FfiConverterString.read(from: buf),
-            identicon: FfiConverterSequenceUInt8.read(from: buf),
-            hasPwd: FfiConverterBool.read(from: buf),
-            path: FfiConverterString.read(from: buf),
-            swiped: FfiConverterBool.read(from: buf),
+            addressKey: FfiConverterString.read(from: buf), 
+            base58: FfiConverterString.read(from: buf), 
+            identicon: FfiConverterSequenceUInt8.read(from: buf), 
+            hasPwd: FfiConverterBool.read(from: buf), 
+            path: FfiConverterString.read(from: buf), 
+            swiped: FfiConverterBool.read(from: buf), 
             multiselect: FfiConverterBool.read(from: buf)
         )
     }
@@ -1411,6 +1459,7 @@ private struct FfiConverterTypeMKeysCard: FfiConverterRustBuffer {
     }
 }
 
+
 public struct MLog {
     public var log: [History]
 
@@ -1421,8 +1470,9 @@ public struct MLog {
     }
 }
 
+
 extension MLog: Equatable, Hashable {
-    public static func == (lhs: MLog, rhs: MLog) -> Bool {
+    public static func ==(lhs: MLog, rhs: MLog) -> Bool {
         if lhs.log != rhs.log {
             return false
         }
@@ -1434,7 +1484,8 @@ extension MLog: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMLog: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMLog: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MLog {
         return try MLog(
             log: FfiConverterSequenceTypeHistory.read(from: buf)
@@ -1445,6 +1496,7 @@ private struct FfiConverterTypeMLog: FfiConverterRustBuffer {
         FfiConverterSequenceTypeHistory.write(value.log, into: buf)
     }
 }
+
 
 public struct MLogDetails {
     public var timestamp: String
@@ -1458,8 +1510,9 @@ public struct MLogDetails {
     }
 }
 
+
 extension MLogDetails: Equatable, Hashable {
-    public static func == (lhs: MLogDetails, rhs: MLogDetails) -> Bool {
+    public static func ==(lhs: MLogDetails, rhs: MLogDetails) -> Bool {
         if lhs.timestamp != rhs.timestamp {
             return false
         }
@@ -1475,10 +1528,11 @@ extension MLogDetails: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMLogDetails: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMLogDetails: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MLogDetails {
         return try MLogDetails(
-            timestamp: FfiConverterString.read(from: buf),
+            timestamp: FfiConverterString.read(from: buf), 
             events: FfiConverterSequenceTypeMEventMaybeDecoded.read(from: buf)
         )
     }
@@ -1488,6 +1542,7 @@ private struct FfiConverterTypeMLogDetails: FfiConverterRustBuffer {
         FfiConverterSequenceTypeMEventMaybeDecoded.write(value.events, into: buf)
     }
 }
+
 
 public struct MLogRight {
     public var checksum: String
@@ -1499,8 +1554,9 @@ public struct MLogRight {
     }
 }
 
+
 extension MLogRight: Equatable, Hashable {
-    public static func == (lhs: MLogRight, rhs: MLogRight) -> Bool {
+    public static func ==(lhs: MLogRight, rhs: MLogRight) -> Bool {
         if lhs.checksum != rhs.checksum {
             return false
         }
@@ -1512,7 +1568,8 @@ extension MLogRight: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMLogRight: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMLogRight: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MLogRight {
         return try MLogRight(
             checksum: FfiConverterString.read(from: buf)
@@ -1523,6 +1580,7 @@ private struct FfiConverterTypeMLogRight: FfiConverterRustBuffer {
         FfiConverterString.write(value.checksum, into: buf)
     }
 }
+
 
 public struct MmmNetwork {
     public var title: String
@@ -1540,8 +1598,9 @@ public struct MmmNetwork {
     }
 }
 
+
 extension MmmNetwork: Equatable, Hashable {
-    public static func == (lhs: MmmNetwork, rhs: MmmNetwork) -> Bool {
+    public static func ==(lhs: MmmNetwork, rhs: MmmNetwork) -> Bool {
         if lhs.title != rhs.title {
             return false
         }
@@ -1565,12 +1624,13 @@ extension MmmNetwork: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMmmNetwork: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMmmNetwork: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MmmNetwork {
         return try MmmNetwork(
-            title: FfiConverterString.read(from: buf),
-            logo: FfiConverterString.read(from: buf),
-            order: FfiConverterUInt32.read(from: buf),
+            title: FfiConverterString.read(from: buf), 
+            logo: FfiConverterString.read(from: buf), 
+            order: FfiConverterUInt32.read(from: buf), 
             currentOnScreen: FfiConverterBool.read(from: buf)
         )
     }
@@ -1582,6 +1642,7 @@ private struct FfiConverterTypeMmmNetwork: FfiConverterRustBuffer {
         FfiConverterBool.write(value.currentOnScreen, into: buf)
     }
 }
+
 
 public struct MmNetwork {
     public var key: String
@@ -1599,8 +1660,9 @@ public struct MmNetwork {
     }
 }
 
+
 extension MmNetwork: Equatable, Hashable {
-    public static func == (lhs: MmNetwork, rhs: MmNetwork) -> Bool {
+    public static func ==(lhs: MmNetwork, rhs: MmNetwork) -> Bool {
         if lhs.key != rhs.key {
             return false
         }
@@ -1624,12 +1686,13 @@ extension MmNetwork: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMmNetwork: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMmNetwork: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MmNetwork {
         return try MmNetwork(
-            key: FfiConverterString.read(from: buf),
-            title: FfiConverterString.read(from: buf),
-            logo: FfiConverterString.read(from: buf),
+            key: FfiConverterString.read(from: buf), 
+            title: FfiConverterString.read(from: buf), 
+            logo: FfiConverterString.read(from: buf), 
             order: FfiConverterUInt8.read(from: buf)
         )
     }
@@ -1641,6 +1704,7 @@ private struct FfiConverterTypeMmNetwork: FfiConverterRustBuffer {
         FfiConverterUInt8.write(value.order, into: buf)
     }
 }
+
 
 public struct MManageMetadata {
     public var name: String
@@ -1660,8 +1724,9 @@ public struct MManageMetadata {
     }
 }
 
+
 extension MManageMetadata: Equatable, Hashable {
-    public static func == (lhs: MManageMetadata, rhs: MManageMetadata) -> Bool {
+    public static func ==(lhs: MManageMetadata, rhs: MManageMetadata) -> Bool {
         if lhs.name != rhs.name {
             return false
         }
@@ -1689,13 +1754,14 @@ extension MManageMetadata: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMManageMetadata: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMManageMetadata: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MManageMetadata {
         return try MManageMetadata(
-            name: FfiConverterString.read(from: buf),
-            version: FfiConverterString.read(from: buf),
-            metaHash: FfiConverterString.read(from: buf),
-            metaIdPic: FfiConverterSequenceUInt8.read(from: buf),
+            name: FfiConverterString.read(from: buf), 
+            version: FfiConverterString.read(from: buf), 
+            metaHash: FfiConverterString.read(from: buf), 
+            metaIdPic: FfiConverterSequenceUInt8.read(from: buf), 
             networks: FfiConverterSequenceTypeMmmNetwork.read(from: buf)
         )
     }
@@ -1709,6 +1775,7 @@ private struct FfiConverterTypeMManageMetadata: FfiConverterRustBuffer {
     }
 }
 
+
 public struct MManageNetworks {
     public var networks: [MmNetwork]
 
@@ -1719,8 +1786,9 @@ public struct MManageNetworks {
     }
 }
 
+
 extension MManageNetworks: Equatable, Hashable {
-    public static func == (lhs: MManageNetworks, rhs: MManageNetworks) -> Bool {
+    public static func ==(lhs: MManageNetworks, rhs: MManageNetworks) -> Bool {
         if lhs.networks != rhs.networks {
             return false
         }
@@ -1732,7 +1800,8 @@ extension MManageNetworks: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMManageNetworks: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMManageNetworks: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MManageNetworks {
         return try MManageNetworks(
             networks: FfiConverterSequenceTypeMmNetwork.read(from: buf)
@@ -1743,6 +1812,7 @@ private struct FfiConverterTypeMManageNetworks: FfiConverterRustBuffer {
         FfiConverterSequenceTypeMmNetwork.write(value.networks, into: buf)
     }
 }
+
 
 public struct MMetadataRecord {
     public var specname: String
@@ -1760,8 +1830,9 @@ public struct MMetadataRecord {
     }
 }
 
+
 extension MMetadataRecord: Equatable, Hashable {
-    public static func == (lhs: MMetadataRecord, rhs: MMetadataRecord) -> Bool {
+    public static func ==(lhs: MMetadataRecord, rhs: MMetadataRecord) -> Bool {
         if lhs.specname != rhs.specname {
             return false
         }
@@ -1785,12 +1856,13 @@ extension MMetadataRecord: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMMetadataRecord: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMMetadataRecord: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MMetadataRecord {
         return try MMetadataRecord(
-            specname: FfiConverterString.read(from: buf),
-            specsVersion: FfiConverterString.read(from: buf),
-            metaHash: FfiConverterString.read(from: buf),
+            specname: FfiConverterString.read(from: buf), 
+            specsVersion: FfiConverterString.read(from: buf), 
+            metaHash: FfiConverterString.read(from: buf), 
             metaIdPic: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
@@ -1802,6 +1874,7 @@ private struct FfiConverterTypeMMetadataRecord: FfiConverterRustBuffer {
         FfiConverterSequenceUInt8.write(value.metaIdPic, into: buf)
     }
 }
+
 
 public struct MNetworkCard {
     public var title: String
@@ -1815,8 +1888,9 @@ public struct MNetworkCard {
     }
 }
 
+
 extension MNetworkCard: Equatable, Hashable {
-    public static func == (lhs: MNetworkCard, rhs: MNetworkCard) -> Bool {
+    public static func ==(lhs: MNetworkCard, rhs: MNetworkCard) -> Bool {
         if lhs.title != rhs.title {
             return false
         }
@@ -1832,10 +1906,11 @@ extension MNetworkCard: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMNetworkCard: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMNetworkCard: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MNetworkCard {
         return try MNetworkCard(
-            title: FfiConverterString.read(from: buf),
+            title: FfiConverterString.read(from: buf), 
             logo: FfiConverterString.read(from: buf)
         )
     }
@@ -1845,6 +1920,7 @@ private struct FfiConverterTypeMNetworkCard: FfiConverterRustBuffer {
         FfiConverterString.write(value.logo, into: buf)
     }
 }
+
 
 public struct MNetworkDetails {
     public var base58prefix: UInt16
@@ -1882,8 +1958,9 @@ public struct MNetworkDetails {
     }
 }
 
+
 extension MNetworkDetails: Equatable, Hashable {
-    public static func == (lhs: MNetworkDetails, rhs: MNetworkDetails) -> Bool {
+    public static func ==(lhs: MNetworkDetails, rhs: MNetworkDetails) -> Bool {
         if lhs.base58prefix != rhs.base58prefix {
             return false
         }
@@ -1947,22 +2024,23 @@ extension MNetworkDetails: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMNetworkDetails: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMNetworkDetails: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MNetworkDetails {
         return try MNetworkDetails(
-            base58prefix: FfiConverterUInt16.read(from: buf),
-            color: FfiConverterString.read(from: buf),
-            decimals: FfiConverterUInt8.read(from: buf),
-            encryption: FfiConverterTypeEncryption.read(from: buf),
-            genesisHash: FfiConverterTypeH256.read(from: buf),
-            logo: FfiConverterString.read(from: buf),
-            name: FfiConverterString.read(from: buf),
-            order: FfiConverterString.read(from: buf),
-            pathId: FfiConverterString.read(from: buf),
-            secondaryColor: FfiConverterString.read(from: buf),
-            title: FfiConverterString.read(from: buf),
-            unit: FfiConverterString.read(from: buf),
-            currentVerifier: FfiConverterTypeMVerifier.read(from: buf),
+            base58prefix: FfiConverterUInt16.read(from: buf), 
+            color: FfiConverterString.read(from: buf), 
+            decimals: FfiConverterUInt8.read(from: buf), 
+            encryption: FfiConverterTypeEncryption.read(from: buf), 
+            genesisHash: FfiConverterTypeH256.read(from: buf), 
+            logo: FfiConverterString.read(from: buf), 
+            name: FfiConverterString.read(from: buf), 
+            order: FfiConverterString.read(from: buf), 
+            pathId: FfiConverterString.read(from: buf), 
+            secondaryColor: FfiConverterString.read(from: buf), 
+            title: FfiConverterString.read(from: buf), 
+            unit: FfiConverterString.read(from: buf), 
+            currentVerifier: FfiConverterTypeMVerifier.read(from: buf), 
             meta: FfiConverterSequenceTypeMMetadataRecord.read(from: buf)
         )
     }
@@ -1985,6 +2063,7 @@ private struct FfiConverterTypeMNetworkDetails: FfiConverterRustBuffer {
     }
 }
 
+
 public struct MNetworkMenu {
     public var networks: [Network]
 
@@ -1995,8 +2074,9 @@ public struct MNetworkMenu {
     }
 }
 
+
 extension MNetworkMenu: Equatable, Hashable {
-    public static func == (lhs: MNetworkMenu, rhs: MNetworkMenu) -> Bool {
+    public static func ==(lhs: MNetworkMenu, rhs: MNetworkMenu) -> Bool {
         if lhs.networks != rhs.networks {
             return false
         }
@@ -2008,7 +2088,8 @@ extension MNetworkMenu: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMNetworkMenu: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMNetworkMenu: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MNetworkMenu {
         return try MNetworkMenu(
             networks: FfiConverterSequenceTypeNetwork.read(from: buf)
@@ -2020,6 +2101,7 @@ private struct FfiConverterTypeMNetworkMenu: FfiConverterRustBuffer {
     }
 }
 
+
 public struct MNewSeed {
     public var keyboard: Bool
 
@@ -2030,8 +2112,9 @@ public struct MNewSeed {
     }
 }
 
+
 extension MNewSeed: Equatable, Hashable {
-    public static func == (lhs: MNewSeed, rhs: MNewSeed) -> Bool {
+    public static func ==(lhs: MNewSeed, rhs: MNewSeed) -> Bool {
         if lhs.keyboard != rhs.keyboard {
             return false
         }
@@ -2043,7 +2126,8 @@ extension MNewSeed: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMNewSeed: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMNewSeed: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MNewSeed {
         return try MNewSeed(
             keyboard: FfiConverterBool.read(from: buf)
@@ -2054,6 +2138,7 @@ private struct FfiConverterTypeMNewSeed: FfiConverterRustBuffer {
         FfiConverterBool.write(value.keyboard, into: buf)
     }
 }
+
 
 public struct MNewSeedBackup {
     public var seed: String
@@ -2069,8 +2154,9 @@ public struct MNewSeedBackup {
     }
 }
 
+
 extension MNewSeedBackup: Equatable, Hashable {
-    public static func == (lhs: MNewSeedBackup, rhs: MNewSeedBackup) -> Bool {
+    public static func ==(lhs: MNewSeedBackup, rhs: MNewSeedBackup) -> Bool {
         if lhs.seed != rhs.seed {
             return false
         }
@@ -2090,11 +2176,12 @@ extension MNewSeedBackup: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMNewSeedBackup: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMNewSeedBackup: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MNewSeedBackup {
         return try MNewSeedBackup(
-            seed: FfiConverterString.read(from: buf),
-            seedPhrase: FfiConverterString.read(from: buf),
+            seed: FfiConverterString.read(from: buf), 
+            seedPhrase: FfiConverterString.read(from: buf), 
             identicon: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
@@ -2105,6 +2192,7 @@ private struct FfiConverterTypeMNewSeedBackup: FfiConverterRustBuffer {
         FfiConverterSequenceUInt8.write(value.identicon, into: buf)
     }
 }
+
 
 public struct MPasswordConfirm {
     public var pwd: String
@@ -2120,8 +2208,9 @@ public struct MPasswordConfirm {
     }
 }
 
+
 extension MPasswordConfirm: Equatable, Hashable {
-    public static func == (lhs: MPasswordConfirm, rhs: MPasswordConfirm) -> Bool {
+    public static func ==(lhs: MPasswordConfirm, rhs: MPasswordConfirm) -> Bool {
         if lhs.pwd != rhs.pwd {
             return false
         }
@@ -2141,11 +2230,12 @@ extension MPasswordConfirm: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMPasswordConfirm: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMPasswordConfirm: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MPasswordConfirm {
         return try MPasswordConfirm(
-            pwd: FfiConverterString.read(from: buf),
-            seedName: FfiConverterString.read(from: buf),
+            pwd: FfiConverterString.read(from: buf), 
+            seedName: FfiConverterString.read(from: buf), 
             croppedPath: FfiConverterString.read(from: buf)
         )
     }
@@ -2156,6 +2246,7 @@ private struct FfiConverterTypeMPasswordConfirm: FfiConverterRustBuffer {
         FfiConverterString.write(value.croppedPath, into: buf)
     }
 }
+
 
 public struct MRawKey {
     public var seedName: String
@@ -2177,8 +2268,9 @@ public struct MRawKey {
     }
 }
 
+
 extension MRawKey: Equatable, Hashable {
-    public static func == (lhs: MRawKey, rhs: MRawKey) -> Bool {
+    public static func ==(lhs: MRawKey, rhs: MRawKey) -> Bool {
         if lhs.seedName != rhs.seedName {
             return false
         }
@@ -2210,14 +2302,15 @@ extension MRawKey: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMRawKey: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMRawKey: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MRawKey {
         return try MRawKey(
-            seedName: FfiConverterString.read(from: buf),
-            addressKey: FfiConverterString.read(from: buf),
-            publicKey: FfiConverterString.read(from: buf),
-            identicon: FfiConverterSequenceUInt8.read(from: buf),
-            hasPwd: FfiConverterBool.read(from: buf),
+            seedName: FfiConverterString.read(from: buf), 
+            addressKey: FfiConverterString.read(from: buf), 
+            publicKey: FfiConverterString.read(from: buf), 
+            identicon: FfiConverterSequenceUInt8.read(from: buf), 
+            hasPwd: FfiConverterBool.read(from: buf), 
             path: FfiConverterString.read(from: buf)
         )
     }
@@ -2232,6 +2325,7 @@ private struct FfiConverterTypeMRawKey: FfiConverterRustBuffer {
     }
 }
 
+
 public struct MRecoverSeedName {
     public var keyboard: Bool
     public var seedName: String
@@ -2244,8 +2338,9 @@ public struct MRecoverSeedName {
     }
 }
 
+
 extension MRecoverSeedName: Equatable, Hashable {
-    public static func == (lhs: MRecoverSeedName, rhs: MRecoverSeedName) -> Bool {
+    public static func ==(lhs: MRecoverSeedName, rhs: MRecoverSeedName) -> Bool {
         if lhs.keyboard != rhs.keyboard {
             return false
         }
@@ -2261,10 +2356,11 @@ extension MRecoverSeedName: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMRecoverSeedName: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMRecoverSeedName: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MRecoverSeedName {
         return try MRecoverSeedName(
-            keyboard: FfiConverterBool.read(from: buf),
+            keyboard: FfiConverterBool.read(from: buf), 
             seedName: FfiConverterString.read(from: buf)
         )
     }
@@ -2274,6 +2370,7 @@ private struct FfiConverterTypeMRecoverSeedName: FfiConverterRustBuffer {
         FfiConverterString.write(value.seedName, into: buf)
     }
 }
+
 
 public struct MRecoverSeedPhrase {
     public var keyboard: Bool
@@ -2295,8 +2392,9 @@ public struct MRecoverSeedPhrase {
     }
 }
 
+
 extension MRecoverSeedPhrase: Equatable, Hashable {
-    public static func == (lhs: MRecoverSeedPhrase, rhs: MRecoverSeedPhrase) -> Bool {
+    public static func ==(lhs: MRecoverSeedPhrase, rhs: MRecoverSeedPhrase) -> Bool {
         if lhs.keyboard != rhs.keyboard {
             return false
         }
@@ -2328,14 +2426,15 @@ extension MRecoverSeedPhrase: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMRecoverSeedPhrase: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMRecoverSeedPhrase: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MRecoverSeedPhrase {
         return try MRecoverSeedPhrase(
-            keyboard: FfiConverterBool.read(from: buf),
-            seedName: FfiConverterString.read(from: buf),
-            userInput: FfiConverterString.read(from: buf),
-            guessSet: FfiConverterSequenceString.read(from: buf),
-            draft: FfiConverterSequenceString.read(from: buf),
+            keyboard: FfiConverterBool.read(from: buf), 
+            seedName: FfiConverterString.read(from: buf), 
+            userInput: FfiConverterString.read(from: buf), 
+            guessSet: FfiConverterSequenceString.read(from: buf), 
+            draft: FfiConverterSequenceString.read(from: buf), 
             readySeed: FfiConverterOptionString.read(from: buf)
         )
     }
@@ -2350,6 +2449,7 @@ private struct FfiConverterTypeMRecoverSeedPhrase: FfiConverterRustBuffer {
     }
 }
 
+
 public struct MscAuthorPlain {
     public var base58: String
     public var identicon: [UInt8]
@@ -2362,8 +2462,9 @@ public struct MscAuthorPlain {
     }
 }
 
+
 extension MscAuthorPlain: Equatable, Hashable {
-    public static func == (lhs: MscAuthorPlain, rhs: MscAuthorPlain) -> Bool {
+    public static func ==(lhs: MscAuthorPlain, rhs: MscAuthorPlain) -> Bool {
         if lhs.base58 != rhs.base58 {
             return false
         }
@@ -2379,10 +2480,11 @@ extension MscAuthorPlain: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMscAuthorPlain: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMscAuthorPlain: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MscAuthorPlain {
         return try MscAuthorPlain(
-            base58: FfiConverterString.read(from: buf),
+            base58: FfiConverterString.read(from: buf), 
             identicon: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
@@ -2392,6 +2494,7 @@ private struct FfiConverterTypeMscAuthorPlain: FfiConverterRustBuffer {
         FfiConverterSequenceUInt8.write(value.identicon, into: buf)
     }
 }
+
 
 public struct MscCall {
     public var methodName: String
@@ -2405,8 +2508,9 @@ public struct MscCall {
     }
 }
 
+
 extension MscCall: Equatable, Hashable {
-    public static func == (lhs: MscCall, rhs: MscCall) -> Bool {
+    public static func ==(lhs: MscCall, rhs: MscCall) -> Bool {
         if lhs.methodName != rhs.methodName {
             return false
         }
@@ -2422,10 +2526,11 @@ extension MscCall: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMscCall: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMscCall: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MscCall {
         return try MscCall(
-            methodName: FfiConverterString.read(from: buf),
+            methodName: FfiConverterString.read(from: buf), 
             docs: FfiConverterString.read(from: buf)
         )
     }
@@ -2435,6 +2540,7 @@ private struct FfiConverterTypeMscCall: FfiConverterRustBuffer {
         FfiConverterString.write(value.docs, into: buf)
     }
 }
+
 
 public struct MscCurrency {
     public var amount: String
@@ -2448,8 +2554,9 @@ public struct MscCurrency {
     }
 }
 
+
 extension MscCurrency: Equatable, Hashable {
-    public static func == (lhs: MscCurrency, rhs: MscCurrency) -> Bool {
+    public static func ==(lhs: MscCurrency, rhs: MscCurrency) -> Bool {
         if lhs.amount != rhs.amount {
             return false
         }
@@ -2465,10 +2572,11 @@ extension MscCurrency: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMscCurrency: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMscCurrency: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MscCurrency {
         return try MscCurrency(
-            amount: FfiConverterString.read(from: buf),
+            amount: FfiConverterString.read(from: buf), 
             units: FfiConverterString.read(from: buf)
         )
     }
@@ -2478,6 +2586,7 @@ private struct FfiConverterTypeMscCurrency: FfiConverterRustBuffer {
         FfiConverterString.write(value.units, into: buf)
     }
 }
+
 
 public struct MscEnumVariantName {
     public var name: String
@@ -2491,8 +2600,9 @@ public struct MscEnumVariantName {
     }
 }
 
+
 extension MscEnumVariantName: Equatable, Hashable {
-    public static func == (lhs: MscEnumVariantName, rhs: MscEnumVariantName) -> Bool {
+    public static func ==(lhs: MscEnumVariantName, rhs: MscEnumVariantName) -> Bool {
         if lhs.name != rhs.name {
             return false
         }
@@ -2508,10 +2618,11 @@ extension MscEnumVariantName: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMscEnumVariantName: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMscEnumVariantName: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MscEnumVariantName {
         return try MscEnumVariantName(
-            name: FfiConverterString.read(from: buf),
+            name: FfiConverterString.read(from: buf), 
             docsEnumVariant: FfiConverterString.read(from: buf)
         )
     }
@@ -2521,6 +2632,7 @@ private struct FfiConverterTypeMscEnumVariantName: FfiConverterRustBuffer {
         FfiConverterString.write(value.docsEnumVariant, into: buf)
     }
 }
+
 
 public struct MscEraMortal {
     public var era: String
@@ -2536,8 +2648,9 @@ public struct MscEraMortal {
     }
 }
 
+
 extension MscEraMortal: Equatable, Hashable {
-    public static func == (lhs: MscEraMortal, rhs: MscEraMortal) -> Bool {
+    public static func ==(lhs: MscEraMortal, rhs: MscEraMortal) -> Bool {
         if lhs.era != rhs.era {
             return false
         }
@@ -2557,11 +2670,12 @@ extension MscEraMortal: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMscEraMortal: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMscEraMortal: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MscEraMortal {
         return try MscEraMortal(
-            era: FfiConverterString.read(from: buf),
-            phase: FfiConverterString.read(from: buf),
+            era: FfiConverterString.read(from: buf), 
+            phase: FfiConverterString.read(from: buf), 
             period: FfiConverterString.read(from: buf)
         )
     }
@@ -2572,6 +2686,7 @@ private struct FfiConverterTypeMscEraMortal: FfiConverterRustBuffer {
         FfiConverterString.write(value.period, into: buf)
     }
 }
+
 
 public struct MscFieldName {
     public var name: String
@@ -2589,8 +2704,9 @@ public struct MscFieldName {
     }
 }
 
+
 extension MscFieldName: Equatable, Hashable {
-    public static func == (lhs: MscFieldName, rhs: MscFieldName) -> Bool {
+    public static func ==(lhs: MscFieldName, rhs: MscFieldName) -> Bool {
         if lhs.name != rhs.name {
             return false
         }
@@ -2614,12 +2730,13 @@ extension MscFieldName: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMscFieldName: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMscFieldName: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MscFieldName {
         return try MscFieldName(
-            name: FfiConverterString.read(from: buf),
-            docsFieldName: FfiConverterString.read(from: buf),
-            pathType: FfiConverterString.read(from: buf),
+            name: FfiConverterString.read(from: buf), 
+            docsFieldName: FfiConverterString.read(from: buf), 
+            pathType: FfiConverterString.read(from: buf), 
             docsType: FfiConverterString.read(from: buf)
         )
     }
@@ -2631,6 +2748,7 @@ private struct FfiConverterTypeMscFieldName: FfiConverterRustBuffer {
         FfiConverterString.write(value.docsType, into: buf)
     }
 }
+
 
 public struct MscFieldNumber {
     public var number: String
@@ -2648,8 +2766,9 @@ public struct MscFieldNumber {
     }
 }
 
+
 extension MscFieldNumber: Equatable, Hashable {
-    public static func == (lhs: MscFieldNumber, rhs: MscFieldNumber) -> Bool {
+    public static func ==(lhs: MscFieldNumber, rhs: MscFieldNumber) -> Bool {
         if lhs.number != rhs.number {
             return false
         }
@@ -2673,12 +2792,13 @@ extension MscFieldNumber: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMscFieldNumber: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMscFieldNumber: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MscFieldNumber {
         return try MscFieldNumber(
-            number: FfiConverterString.read(from: buf),
-            docsFieldNumber: FfiConverterString.read(from: buf),
-            pathType: FfiConverterString.read(from: buf),
+            number: FfiConverterString.read(from: buf), 
+            docsFieldNumber: FfiConverterString.read(from: buf), 
+            pathType: FfiConverterString.read(from: buf), 
             docsType: FfiConverterString.read(from: buf)
         )
     }
@@ -2690,6 +2810,7 @@ private struct FfiConverterTypeMscFieldNumber: FfiConverterRustBuffer {
         FfiConverterString.write(value.docsType, into: buf)
     }
 }
+
 
 public struct MscId {
     public var base58: String
@@ -2703,8 +2824,9 @@ public struct MscId {
     }
 }
 
+
 extension MscId: Equatable, Hashable {
-    public static func == (lhs: MscId, rhs: MscId) -> Bool {
+    public static func ==(lhs: MscId, rhs: MscId) -> Bool {
         if lhs.base58 != rhs.base58 {
             return false
         }
@@ -2720,10 +2842,11 @@ extension MscId: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMscId: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMscId: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MscId {
         return try MscId(
-            base58: FfiConverterString.read(from: buf),
+            base58: FfiConverterString.read(from: buf), 
             identicon: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
@@ -2733,6 +2856,7 @@ private struct FfiConverterTypeMscId: FfiConverterRustBuffer {
         FfiConverterSequenceUInt8.write(value.identicon, into: buf)
     }
 }
+
 
 public struct MscNameVersion {
     public var name: String
@@ -2746,8 +2870,9 @@ public struct MscNameVersion {
     }
 }
 
+
 extension MscNameVersion: Equatable, Hashable {
-    public static func == (lhs: MscNameVersion, rhs: MscNameVersion) -> Bool {
+    public static func ==(lhs: MscNameVersion, rhs: MscNameVersion) -> Bool {
         if lhs.name != rhs.name {
             return false
         }
@@ -2763,10 +2888,11 @@ extension MscNameVersion: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMscNameVersion: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMscNameVersion: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MscNameVersion {
         return try MscNameVersion(
-            name: FfiConverterString.read(from: buf),
+            name: FfiConverterString.read(from: buf), 
             version: FfiConverterString.read(from: buf)
         )
     }
@@ -2776,6 +2902,7 @@ private struct FfiConverterTypeMscNameVersion: FfiConverterRustBuffer {
         FfiConverterString.write(value.version, into: buf)
     }
 }
+
 
 public struct MscNetworkInfo {
     public var networkTitle: String
@@ -2789,8 +2916,9 @@ public struct MscNetworkInfo {
     }
 }
 
+
 extension MscNetworkInfo: Equatable, Hashable {
-    public static func == (lhs: MscNetworkInfo, rhs: MscNetworkInfo) -> Bool {
+    public static func ==(lhs: MscNetworkInfo, rhs: MscNetworkInfo) -> Bool {
         if lhs.networkTitle != rhs.networkTitle {
             return false
         }
@@ -2806,10 +2934,11 @@ extension MscNetworkInfo: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMscNetworkInfo: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMscNetworkInfo: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MscNetworkInfo {
         return try MscNetworkInfo(
-            networkTitle: FfiConverterString.read(from: buf),
+            networkTitle: FfiConverterString.read(from: buf), 
             networkLogo: FfiConverterString.read(from: buf)
         )
     }
@@ -2819,6 +2948,7 @@ private struct FfiConverterTypeMscNetworkInfo: FfiConverterRustBuffer {
         FfiConverterString.write(value.networkLogo, into: buf)
     }
 }
+
 
 public struct MscTip {
     public var amount: String
@@ -2832,8 +2962,9 @@ public struct MscTip {
     }
 }
 
+
 extension MscTip: Equatable, Hashable {
-    public static func == (lhs: MscTip, rhs: MscTip) -> Bool {
+    public static func ==(lhs: MscTip, rhs: MscTip) -> Bool {
         if lhs.amount != rhs.amount {
             return false
         }
@@ -2849,10 +2980,11 @@ extension MscTip: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMscTip: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMscTip: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MscTip {
         return try MscTip(
-            amount: FfiConverterString.read(from: buf),
+            amount: FfiConverterString.read(from: buf), 
             units: FfiConverterString.read(from: buf)
         )
     }
@@ -2862,6 +2994,7 @@ private struct FfiConverterTypeMscTip: FfiConverterRustBuffer {
         FfiConverterString.write(value.units, into: buf)
     }
 }
+
 
 public struct MscTxSpecPlain {
     public var networkGenesisHash: H256
@@ -2877,8 +3010,9 @@ public struct MscTxSpecPlain {
     }
 }
 
+
 extension MscTxSpecPlain: Equatable, Hashable {
-    public static func == (lhs: MscTxSpecPlain, rhs: MscTxSpecPlain) -> Bool {
+    public static func ==(lhs: MscTxSpecPlain, rhs: MscTxSpecPlain) -> Bool {
         if lhs.networkGenesisHash != rhs.networkGenesisHash {
             return false
         }
@@ -2898,11 +3032,12 @@ extension MscTxSpecPlain: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMscTxSpecPlain: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMscTxSpecPlain: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MscTxSpecPlain {
         return try MscTxSpecPlain(
-            networkGenesisHash: FfiConverterTypeH256.read(from: buf),
-            version: FfiConverterString.read(from: buf),
+            networkGenesisHash: FfiConverterTypeH256.read(from: buf), 
+            version: FfiConverterString.read(from: buf), 
             txVersion: FfiConverterString.read(from: buf)
         )
     }
@@ -2913,6 +3048,7 @@ private struct FfiConverterTypeMscTxSpecPlain: FfiConverterRustBuffer {
         FfiConverterString.write(value.txVersion, into: buf)
     }
 }
+
 
 public struct MSeedKeyCard {
     public var seedName: String
@@ -2934,8 +3070,9 @@ public struct MSeedKeyCard {
     }
 }
 
+
 extension MSeedKeyCard: Equatable, Hashable {
-    public static func == (lhs: MSeedKeyCard, rhs: MSeedKeyCard) -> Bool {
+    public static func ==(lhs: MSeedKeyCard, rhs: MSeedKeyCard) -> Bool {
         if lhs.seedName != rhs.seedName {
             return false
         }
@@ -2967,14 +3104,15 @@ extension MSeedKeyCard: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMSeedKeyCard: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMSeedKeyCard: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MSeedKeyCard {
         return try MSeedKeyCard(
-            seedName: FfiConverterString.read(from: buf),
-            identicon: FfiConverterSequenceUInt8.read(from: buf),
-            addressKey: FfiConverterString.read(from: buf),
-            base58: FfiConverterString.read(from: buf),
-            swiped: FfiConverterBool.read(from: buf),
+            seedName: FfiConverterString.read(from: buf), 
+            identicon: FfiConverterSequenceUInt8.read(from: buf), 
+            addressKey: FfiConverterString.read(from: buf), 
+            base58: FfiConverterString.read(from: buf), 
+            swiped: FfiConverterBool.read(from: buf), 
             multiselect: FfiConverterBool.read(from: buf)
         )
     }
@@ -2989,6 +3127,7 @@ private struct FfiConverterTypeMSeedKeyCard: FfiConverterRustBuffer {
     }
 }
 
+
 public struct MSeedMenu {
     public var seed: String
 
@@ -2999,8 +3138,9 @@ public struct MSeedMenu {
     }
 }
 
+
 extension MSeedMenu: Equatable, Hashable {
-    public static func == (lhs: MSeedMenu, rhs: MSeedMenu) -> Bool {
+    public static func ==(lhs: MSeedMenu, rhs: MSeedMenu) -> Bool {
         if lhs.seed != rhs.seed {
             return false
         }
@@ -3012,7 +3152,8 @@ extension MSeedMenu: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMSeedMenu: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMSeedMenu: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MSeedMenu {
         return try MSeedMenu(
             seed: FfiConverterString.read(from: buf)
@@ -3024,6 +3165,7 @@ private struct FfiConverterTypeMSeedMenu: FfiConverterRustBuffer {
     }
 }
 
+
 public struct MSeeds {
     public var seedNameCards: [SeedNameCard]
 
@@ -3034,8 +3176,9 @@ public struct MSeeds {
     }
 }
 
+
 extension MSeeds: Equatable, Hashable {
-    public static func == (lhs: MSeeds, rhs: MSeeds) -> Bool {
+    public static func ==(lhs: MSeeds, rhs: MSeeds) -> Bool {
         if lhs.seedNameCards != rhs.seedNameCards {
             return false
         }
@@ -3047,7 +3190,8 @@ extension MSeeds: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMSeeds: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMSeeds: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MSeeds {
         return try MSeeds(
             seedNameCards: FfiConverterSequenceTypeSeedNameCard.read(from: buf)
@@ -3058,6 +3202,7 @@ private struct FfiConverterTypeMSeeds: FfiConverterRustBuffer {
         FfiConverterSequenceTypeSeedNameCard.write(value.seedNameCards, into: buf)
     }
 }
+
 
 public struct MSettings {
     public var publicKey: String?
@@ -3075,8 +3220,9 @@ public struct MSettings {
     }
 }
 
+
 extension MSettings: Equatable, Hashable {
-    public static func == (lhs: MSettings, rhs: MSettings) -> Bool {
+    public static func ==(lhs: MSettings, rhs: MSettings) -> Bool {
         if lhs.publicKey != rhs.publicKey {
             return false
         }
@@ -3100,12 +3246,13 @@ extension MSettings: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMSettings: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMSettings: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MSettings {
         return try MSettings(
-            publicKey: FfiConverterOptionString.read(from: buf),
-            identicon: FfiConverterOptionSequenceUInt8.read(from: buf),
-            encryption: FfiConverterOptionString.read(from: buf),
+            publicKey: FfiConverterOptionString.read(from: buf), 
+            identicon: FfiConverterOptionSequenceUInt8.read(from: buf), 
+            encryption: FfiConverterOptionString.read(from: buf), 
             error: FfiConverterOptionString.read(from: buf)
         )
     }
@@ -3118,6 +3265,7 @@ private struct FfiConverterTypeMSettings: FfiConverterRustBuffer {
     }
 }
 
+
 public struct MSignSufficientCrypto {
     public var identities: [MRawKey]
 
@@ -3128,8 +3276,9 @@ public struct MSignSufficientCrypto {
     }
 }
 
+
 extension MSignSufficientCrypto: Equatable, Hashable {
-    public static func == (lhs: MSignSufficientCrypto, rhs: MSignSufficientCrypto) -> Bool {
+    public static func ==(lhs: MSignSufficientCrypto, rhs: MSignSufficientCrypto) -> Bool {
         if lhs.identities != rhs.identities {
             return false
         }
@@ -3141,7 +3290,8 @@ extension MSignSufficientCrypto: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMSignSufficientCrypto: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMSignSufficientCrypto: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MSignSufficientCrypto {
         return try MSignSufficientCrypto(
             identities: FfiConverterSequenceTypeMRawKey.read(from: buf)
@@ -3153,6 +3303,7 @@ private struct FfiConverterTypeMSignSufficientCrypto: FfiConverterRustBuffer {
     }
 }
 
+
 public struct MSignatureReady {
     public var signature: [UInt8]
 
@@ -3163,8 +3314,9 @@ public struct MSignatureReady {
     }
 }
 
+
 extension MSignatureReady: Equatable, Hashable {
-    public static func == (lhs: MSignatureReady, rhs: MSignatureReady) -> Bool {
+    public static func ==(lhs: MSignatureReady, rhs: MSignatureReady) -> Bool {
         if lhs.signature != rhs.signature {
             return false
         }
@@ -3176,7 +3328,8 @@ extension MSignatureReady: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMSignatureReady: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMSignatureReady: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MSignatureReady {
         return try MSignatureReady(
             signature: FfiConverterSequenceUInt8.read(from: buf)
@@ -3187,6 +3340,7 @@ private struct FfiConverterTypeMSignatureReady: FfiConverterRustBuffer {
         FfiConverterSequenceUInt8.write(value.signature, into: buf)
     }
 }
+
 
 public struct MSufficientCryptoReady {
     public var authorInfo: Address
@@ -3202,8 +3356,9 @@ public struct MSufficientCryptoReady {
     }
 }
 
+
 extension MSufficientCryptoReady: Equatable, Hashable {
-    public static func == (lhs: MSufficientCryptoReady, rhs: MSufficientCryptoReady) -> Bool {
+    public static func ==(lhs: MSufficientCryptoReady, rhs: MSufficientCryptoReady) -> Bool {
         if lhs.authorInfo != rhs.authorInfo {
             return false
         }
@@ -3223,11 +3378,12 @@ extension MSufficientCryptoReady: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMSufficientCryptoReady: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMSufficientCryptoReady: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MSufficientCryptoReady {
         return try MSufficientCryptoReady(
-            authorInfo: FfiConverterTypeAddress.read(from: buf),
-            sufficient: FfiConverterSequenceUInt8.read(from: buf),
+            authorInfo: FfiConverterTypeAddress.read(from: buf), 
+            sufficient: FfiConverterSequenceUInt8.read(from: buf), 
             content: FfiConverterTypeMscContent.read(from: buf)
         )
     }
@@ -3238,6 +3394,7 @@ private struct FfiConverterTypeMSufficientCryptoReady: FfiConverterRustBuffer {
         FfiConverterTypeMscContent.write(value.content, into: buf)
     }
 }
+
 
 public struct MTransaction {
     public var content: TransactionCardSet
@@ -3255,8 +3412,9 @@ public struct MTransaction {
     }
 }
 
+
 extension MTransaction: Equatable, Hashable {
-    public static func == (lhs: MTransaction, rhs: MTransaction) -> Bool {
+    public static func ==(lhs: MTransaction, rhs: MTransaction) -> Bool {
         if lhs.content != rhs.content {
             return false
         }
@@ -3280,12 +3438,13 @@ extension MTransaction: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMTransaction: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMTransaction: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MTransaction {
         return try MTransaction(
-            content: FfiConverterTypeTransactionCardSet.read(from: buf),
-            ttype: FfiConverterTypeTransactionType.read(from: buf),
-            authorInfo: FfiConverterOptionTypeAddress.read(from: buf),
+            content: FfiConverterTypeTransactionCardSet.read(from: buf), 
+            ttype: FfiConverterTypeTransactionType.read(from: buf), 
+            authorInfo: FfiConverterOptionTypeAddress.read(from: buf), 
             networkInfo: FfiConverterOptionTypeMscNetworkInfo.read(from: buf)
         )
     }
@@ -3297,6 +3456,7 @@ private struct FfiConverterTypeMTransaction: FfiConverterRustBuffer {
         FfiConverterOptionTypeMscNetworkInfo.write(value.networkInfo, into: buf)
     }
 }
+
 
 public struct MTypesInfo {
     public var typesOnFile: Bool
@@ -3312,8 +3472,9 @@ public struct MTypesInfo {
     }
 }
 
+
 extension MTypesInfo: Equatable, Hashable {
-    public static func == (lhs: MTypesInfo, rhs: MTypesInfo) -> Bool {
+    public static func ==(lhs: MTypesInfo, rhs: MTypesInfo) -> Bool {
         if lhs.typesOnFile != rhs.typesOnFile {
             return false
         }
@@ -3333,11 +3494,12 @@ extension MTypesInfo: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMTypesInfo: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMTypesInfo: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MTypesInfo {
         return try MTypesInfo(
-            typesOnFile: FfiConverterBool.read(from: buf),
-            typesHash: FfiConverterOptionString.read(from: buf),
+            typesOnFile: FfiConverterBool.read(from: buf), 
+            typesHash: FfiConverterOptionString.read(from: buf), 
             typesIdPic: FfiConverterOptionSequenceUInt8.read(from: buf)
         )
     }
@@ -3348,6 +3510,7 @@ private struct FfiConverterTypeMTypesInfo: FfiConverterRustBuffer {
         FfiConverterOptionSequenceUInt8.write(value.typesIdPic, into: buf)
     }
 }
+
 
 public struct MVerifier {
     public var ttype: String
@@ -3361,8 +3524,9 @@ public struct MVerifier {
     }
 }
 
+
 extension MVerifier: Equatable, Hashable {
-    public static func == (lhs: MVerifier, rhs: MVerifier) -> Bool {
+    public static func ==(lhs: MVerifier, rhs: MVerifier) -> Bool {
         if lhs.ttype != rhs.ttype {
             return false
         }
@@ -3378,10 +3542,11 @@ extension MVerifier: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMVerifier: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMVerifier: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MVerifier {
         return try MVerifier(
-            ttype: FfiConverterString.read(from: buf),
+            ttype: FfiConverterString.read(from: buf), 
             details: FfiConverterTypeMVerifierDetails.read(from: buf)
         )
     }
@@ -3391,6 +3556,7 @@ private struct FfiConverterTypeMVerifier: FfiConverterRustBuffer {
         FfiConverterTypeMVerifierDetails.write(value.details, into: buf)
     }
 }
+
 
 public struct MVerifierDetails {
     public var publicKey: String
@@ -3406,8 +3572,9 @@ public struct MVerifierDetails {
     }
 }
 
+
 extension MVerifierDetails: Equatable, Hashable {
-    public static func == (lhs: MVerifierDetails, rhs: MVerifierDetails) -> Bool {
+    public static func ==(lhs: MVerifierDetails, rhs: MVerifierDetails) -> Bool {
         if lhs.publicKey != rhs.publicKey {
             return false
         }
@@ -3427,11 +3594,12 @@ extension MVerifierDetails: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMVerifierDetails: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMVerifierDetails: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MVerifierDetails {
         return try MVerifierDetails(
-            publicKey: FfiConverterString.read(from: buf),
-            identicon: FfiConverterSequenceUInt8.read(from: buf),
+            publicKey: FfiConverterString.read(from: buf), 
+            identicon: FfiConverterSequenceUInt8.read(from: buf), 
             encryption: FfiConverterString.read(from: buf)
         )
     }
@@ -3442,6 +3610,7 @@ private struct FfiConverterTypeMVerifierDetails: FfiConverterRustBuffer {
         FfiConverterString.write(value.encryption, into: buf)
     }
 }
+
 
 public struct MetaValues {
     public var name: String
@@ -3461,8 +3630,9 @@ public struct MetaValues {
     }
 }
 
+
 extension MetaValues: Equatable, Hashable {
-    public static func == (lhs: MetaValues, rhs: MetaValues) -> Bool {
+    public static func ==(lhs: MetaValues, rhs: MetaValues) -> Bool {
         if lhs.name != rhs.name {
             return false
         }
@@ -3490,13 +3660,14 @@ extension MetaValues: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMetaValues: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMetaValues: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MetaValues {
         return try MetaValues(
-            name: FfiConverterString.read(from: buf),
-            version: FfiConverterUInt32.read(from: buf),
-            optionalBase58prefix: FfiConverterOptionUInt16.read(from: buf),
-            warnIncompleteExtensions: FfiConverterBool.read(from: buf),
+            name: FfiConverterString.read(from: buf), 
+            version: FfiConverterUInt32.read(from: buf), 
+            optionalBase58prefix: FfiConverterOptionUInt16.read(from: buf), 
+            warnIncompleteExtensions: FfiConverterBool.read(from: buf), 
             meta: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
@@ -3509,6 +3680,7 @@ private struct FfiConverterTypeMetaValues: FfiConverterRustBuffer {
         FfiConverterSequenceUInt8.write(value.meta, into: buf)
     }
 }
+
 
 public struct MetaValuesDisplay {
     public var name: String
@@ -3524,8 +3696,9 @@ public struct MetaValuesDisplay {
     }
 }
 
+
 extension MetaValuesDisplay: Equatable, Hashable {
-    public static func == (lhs: MetaValuesDisplay, rhs: MetaValuesDisplay) -> Bool {
+    public static func ==(lhs: MetaValuesDisplay, rhs: MetaValuesDisplay) -> Bool {
         if lhs.name != rhs.name {
             return false
         }
@@ -3545,11 +3718,12 @@ extension MetaValuesDisplay: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMetaValuesDisplay: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMetaValuesDisplay: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MetaValuesDisplay {
         return try MetaValuesDisplay(
-            name: FfiConverterString.read(from: buf),
-            version: FfiConverterUInt32.read(from: buf),
+            name: FfiConverterString.read(from: buf), 
+            version: FfiConverterUInt32.read(from: buf), 
             metaHash: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
@@ -3560,6 +3734,7 @@ private struct FfiConverterTypeMetaValuesDisplay: FfiConverterRustBuffer {
         FfiConverterSequenceUInt8.write(value.metaHash, into: buf)
     }
 }
+
 
 public struct MetaValuesExport {
     public var name: String
@@ -3577,8 +3752,9 @@ public struct MetaValuesExport {
     }
 }
 
+
 extension MetaValuesExport: Equatable, Hashable {
-    public static func == (lhs: MetaValuesExport, rhs: MetaValuesExport) -> Bool {
+    public static func ==(lhs: MetaValuesExport, rhs: MetaValuesExport) -> Bool {
         if lhs.name != rhs.name {
             return false
         }
@@ -3602,12 +3778,13 @@ extension MetaValuesExport: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeMetaValuesExport: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeMetaValuesExport: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> MetaValuesExport {
         return try MetaValuesExport(
-            name: FfiConverterString.read(from: buf),
-            version: FfiConverterUInt32.read(from: buf),
-            metaHash: FfiConverterSequenceUInt8.read(from: buf),
+            name: FfiConverterString.read(from: buf), 
+            version: FfiConverterUInt32.read(from: buf), 
+            metaHash: FfiConverterSequenceUInt8.read(from: buf), 
             signedBy: FfiConverterTypeVerifierValue.read(from: buf)
         )
     }
@@ -3619,6 +3796,7 @@ private struct FfiConverterTypeMetaValuesExport: FfiConverterRustBuffer {
         FfiConverterTypeVerifierValue.write(value.signedBy, into: buf)
     }
 }
+
 
 public struct Network {
     public var key: String
@@ -3638,8 +3816,9 @@ public struct Network {
     }
 }
 
+
 extension Network: Equatable, Hashable {
-    public static func == (lhs: Network, rhs: Network) -> Bool {
+    public static func ==(lhs: Network, rhs: Network) -> Bool {
         if lhs.key != rhs.key {
             return false
         }
@@ -3667,13 +3846,14 @@ extension Network: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeNetwork: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeNetwork: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> Network {
         return try Network(
-            key: FfiConverterString.read(from: buf),
-            logo: FfiConverterString.read(from: buf),
-            order: FfiConverterUInt32.read(from: buf),
-            selected: FfiConverterBool.read(from: buf),
+            key: FfiConverterString.read(from: buf), 
+            logo: FfiConverterString.read(from: buf), 
+            order: FfiConverterUInt32.read(from: buf), 
+            selected: FfiConverterBool.read(from: buf), 
             title: FfiConverterString.read(from: buf)
         )
     }
@@ -3686,6 +3866,7 @@ private struct FfiConverterTypeNetwork: FfiConverterRustBuffer {
         FfiConverterString.write(value.title, into: buf)
     }
 }
+
 
 public struct NetworkSpecs {
     public var base58prefix: UInt16
@@ -3719,8 +3900,9 @@ public struct NetworkSpecs {
     }
 }
 
+
 extension NetworkSpecs: Equatable, Hashable {
-    public static func == (lhs: NetworkSpecs, rhs: NetworkSpecs) -> Bool {
+    public static func ==(lhs: NetworkSpecs, rhs: NetworkSpecs) -> Bool {
         if lhs.base58prefix != rhs.base58prefix {
             return false
         }
@@ -3776,20 +3958,21 @@ extension NetworkSpecs: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeNetworkSpecs: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeNetworkSpecs: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> NetworkSpecs {
         return try NetworkSpecs(
-            base58prefix: FfiConverterUInt16.read(from: buf),
-            color: FfiConverterString.read(from: buf),
-            decimals: FfiConverterUInt8.read(from: buf),
-            encryption: FfiConverterTypeEncryption.read(from: buf),
-            genesisHash: FfiConverterTypeH256.read(from: buf),
-            logo: FfiConverterString.read(from: buf),
-            name: FfiConverterString.read(from: buf),
-            order: FfiConverterUInt8.read(from: buf),
-            pathId: FfiConverterString.read(from: buf),
-            secondaryColor: FfiConverterString.read(from: buf),
-            title: FfiConverterString.read(from: buf),
+            base58prefix: FfiConverterUInt16.read(from: buf), 
+            color: FfiConverterString.read(from: buf), 
+            decimals: FfiConverterUInt8.read(from: buf), 
+            encryption: FfiConverterTypeEncryption.read(from: buf), 
+            genesisHash: FfiConverterTypeH256.read(from: buf), 
+            logo: FfiConverterString.read(from: buf), 
+            name: FfiConverterString.read(from: buf), 
+            order: FfiConverterUInt8.read(from: buf), 
+            pathId: FfiConverterString.read(from: buf), 
+            secondaryColor: FfiConverterString.read(from: buf), 
+            title: FfiConverterString.read(from: buf), 
             unit: FfiConverterString.read(from: buf)
         )
     }
@@ -3810,6 +3993,7 @@ private struct FfiConverterTypeNetworkSpecs: FfiConverterRustBuffer {
     }
 }
 
+
 public struct NetworkSpecsDisplay {
     public var specs: NetworkSpecs
     public var validCurrentVerifier: ValidCurrentVerifier
@@ -3824,8 +4008,9 @@ public struct NetworkSpecsDisplay {
     }
 }
 
+
 extension NetworkSpecsDisplay: Equatable, Hashable {
-    public static func == (lhs: NetworkSpecsDisplay, rhs: NetworkSpecsDisplay) -> Bool {
+    public static func ==(lhs: NetworkSpecsDisplay, rhs: NetworkSpecsDisplay) -> Bool {
         if lhs.specs != rhs.specs {
             return false
         }
@@ -3845,11 +4030,12 @@ extension NetworkSpecsDisplay: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeNetworkSpecsDisplay: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeNetworkSpecsDisplay: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> NetworkSpecsDisplay {
         return try NetworkSpecsDisplay(
-            specs: FfiConverterTypeNetworkSpecs.read(from: buf),
-            validCurrentVerifier: FfiConverterTypeValidCurrentVerifier.read(from: buf),
+            specs: FfiConverterTypeNetworkSpecs.read(from: buf), 
+            validCurrentVerifier: FfiConverterTypeValidCurrentVerifier.read(from: buf), 
             generalVerifier: FfiConverterTypeVerifier.read(from: buf)
         )
     }
@@ -3860,6 +4046,7 @@ private struct FfiConverterTypeNetworkSpecsDisplay: FfiConverterRustBuffer {
         FfiConverterTypeVerifier.write(value.generalVerifier, into: buf)
     }
 }
+
 
 public struct NetworkSpecsExport {
     public var specsToSend: NetworkSpecsToSend
@@ -3873,8 +4060,9 @@ public struct NetworkSpecsExport {
     }
 }
 
+
 extension NetworkSpecsExport: Equatable, Hashable {
-    public static func == (lhs: NetworkSpecsExport, rhs: NetworkSpecsExport) -> Bool {
+    public static func ==(lhs: NetworkSpecsExport, rhs: NetworkSpecsExport) -> Bool {
         if lhs.specsToSend != rhs.specsToSend {
             return false
         }
@@ -3890,10 +4078,11 @@ extension NetworkSpecsExport: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeNetworkSpecsExport: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeNetworkSpecsExport: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> NetworkSpecsExport {
         return try NetworkSpecsExport(
-            specsToSend: FfiConverterTypeNetworkSpecsToSend.read(from: buf),
+            specsToSend: FfiConverterTypeNetworkSpecsToSend.read(from: buf), 
             signedBy: FfiConverterTypeVerifierValue.read(from: buf)
         )
     }
@@ -3903,6 +4092,7 @@ private struct FfiConverterTypeNetworkSpecsExport: FfiConverterRustBuffer {
         FfiConverterTypeVerifierValue.write(value.signedBy, into: buf)
     }
 }
+
 
 public struct NetworkSpecsToSend {
     public var base58prefix: UInt16
@@ -3934,8 +4124,9 @@ public struct NetworkSpecsToSend {
     }
 }
 
+
 extension NetworkSpecsToSend: Equatable, Hashable {
-    public static func == (lhs: NetworkSpecsToSend, rhs: NetworkSpecsToSend) -> Bool {
+    public static func ==(lhs: NetworkSpecsToSend, rhs: NetworkSpecsToSend) -> Bool {
         if lhs.base58prefix != rhs.base58prefix {
             return false
         }
@@ -3987,19 +4178,20 @@ extension NetworkSpecsToSend: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeNetworkSpecsToSend: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeNetworkSpecsToSend: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> NetworkSpecsToSend {
         return try NetworkSpecsToSend(
-            base58prefix: FfiConverterUInt16.read(from: buf),
-            color: FfiConverterString.read(from: buf),
-            decimals: FfiConverterUInt8.read(from: buf),
-            encryption: FfiConverterTypeEncryption.read(from: buf),
-            genesisHash: FfiConverterTypeH256.read(from: buf),
-            logo: FfiConverterString.read(from: buf),
-            name: FfiConverterString.read(from: buf),
-            pathId: FfiConverterString.read(from: buf),
-            secondaryColor: FfiConverterString.read(from: buf),
-            title: FfiConverterString.read(from: buf),
+            base58prefix: FfiConverterUInt16.read(from: buf), 
+            color: FfiConverterString.read(from: buf), 
+            decimals: FfiConverterUInt8.read(from: buf), 
+            encryption: FfiConverterTypeEncryption.read(from: buf), 
+            genesisHash: FfiConverterTypeH256.read(from: buf), 
+            logo: FfiConverterString.read(from: buf), 
+            name: FfiConverterString.read(from: buf), 
+            pathId: FfiConverterString.read(from: buf), 
+            secondaryColor: FfiConverterString.read(from: buf), 
+            title: FfiConverterString.read(from: buf), 
             unit: FfiConverterString.read(from: buf)
         )
     }
@@ -4019,6 +4211,7 @@ private struct FfiConverterTypeNetworkSpecsToSend: FfiConverterRustBuffer {
     }
 }
 
+
 public struct NetworkVerifierDisplay {
     public var genesisHash: H256
     public var validCurrentVerifier: ValidCurrentVerifier
@@ -4033,8 +4226,9 @@ public struct NetworkVerifierDisplay {
     }
 }
 
+
 extension NetworkVerifierDisplay: Equatable, Hashable {
-    public static func == (lhs: NetworkVerifierDisplay, rhs: NetworkVerifierDisplay) -> Bool {
+    public static func ==(lhs: NetworkVerifierDisplay, rhs: NetworkVerifierDisplay) -> Bool {
         if lhs.genesisHash != rhs.genesisHash {
             return false
         }
@@ -4054,11 +4248,12 @@ extension NetworkVerifierDisplay: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeNetworkVerifierDisplay: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeNetworkVerifierDisplay: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> NetworkVerifierDisplay {
         return try NetworkVerifierDisplay(
-            genesisHash: FfiConverterTypeH256.read(from: buf),
-            validCurrentVerifier: FfiConverterTypeValidCurrentVerifier.read(from: buf),
+            genesisHash: FfiConverterTypeH256.read(from: buf), 
+            validCurrentVerifier: FfiConverterTypeValidCurrentVerifier.read(from: buf), 
             generalVerifier: FfiConverterTypeVerifier.read(from: buf)
         )
     }
@@ -4069,6 +4264,7 @@ private struct FfiConverterTypeNetworkVerifierDisplay: FfiConverterRustBuffer {
         FfiConverterTypeVerifier.write(value.generalVerifier, into: buf)
     }
 }
+
 
 public struct SeedNameCard {
     public var seedName: String
@@ -4082,8 +4278,9 @@ public struct SeedNameCard {
     }
 }
 
+
 extension SeedNameCard: Equatable, Hashable {
-    public static func == (lhs: SeedNameCard, rhs: SeedNameCard) -> Bool {
+    public static func ==(lhs: SeedNameCard, rhs: SeedNameCard) -> Bool {
         if lhs.seedName != rhs.seedName {
             return false
         }
@@ -4099,10 +4296,11 @@ extension SeedNameCard: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeSeedNameCard: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeSeedNameCard: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> SeedNameCard {
         return try SeedNameCard(
-            seedName: FfiConverterString.read(from: buf),
+            seedName: FfiConverterString.read(from: buf), 
             identicon: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
@@ -4112,6 +4310,7 @@ private struct FfiConverterTypeSeedNameCard: FfiConverterRustBuffer {
         FfiConverterSequenceUInt8.write(value.identicon, into: buf)
     }
 }
+
 
 public struct SignDisplay {
     public var transaction: [UInt8]
@@ -4129,8 +4328,9 @@ public struct SignDisplay {
     }
 }
 
+
 extension SignDisplay: Equatable, Hashable {
-    public static func == (lhs: SignDisplay, rhs: SignDisplay) -> Bool {
+    public static func ==(lhs: SignDisplay, rhs: SignDisplay) -> Bool {
         if lhs.transaction != rhs.transaction {
             return false
         }
@@ -4154,12 +4354,13 @@ extension SignDisplay: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeSignDisplay: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeSignDisplay: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> SignDisplay {
         return try SignDisplay(
-            transaction: FfiConverterSequenceUInt8.read(from: buf),
-            networkName: FfiConverterString.read(from: buf),
-            signedBy: FfiConverterTypeVerifierValue.read(from: buf),
+            transaction: FfiConverterSequenceUInt8.read(from: buf), 
+            networkName: FfiConverterString.read(from: buf), 
+            signedBy: FfiConverterTypeVerifierValue.read(from: buf), 
             userComment: FfiConverterString.read(from: buf)
         )
     }
@@ -4171,6 +4372,7 @@ private struct FfiConverterTypeSignDisplay: FfiConverterRustBuffer {
         FfiConverterString.write(value.userComment, into: buf)
     }
 }
+
 
 public struct SignMessageDisplay {
     public var message: String
@@ -4188,8 +4390,9 @@ public struct SignMessageDisplay {
     }
 }
 
+
 extension SignMessageDisplay: Equatable, Hashable {
-    public static func == (lhs: SignMessageDisplay, rhs: SignMessageDisplay) -> Bool {
+    public static func ==(lhs: SignMessageDisplay, rhs: SignMessageDisplay) -> Bool {
         if lhs.message != rhs.message {
             return false
         }
@@ -4213,12 +4416,13 @@ extension SignMessageDisplay: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeSignMessageDisplay: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeSignMessageDisplay: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> SignMessageDisplay {
         return try SignMessageDisplay(
-            message: FfiConverterString.read(from: buf),
-            networkName: FfiConverterString.read(from: buf),
-            signedBy: FfiConverterTypeVerifierValue.read(from: buf),
+            message: FfiConverterString.read(from: buf), 
+            networkName: FfiConverterString.read(from: buf), 
+            signedBy: FfiConverterTypeVerifierValue.read(from: buf), 
             userComment: FfiConverterString.read(from: buf)
         )
     }
@@ -4230,6 +4434,7 @@ private struct FfiConverterTypeSignMessageDisplay: FfiConverterRustBuffer {
         FfiConverterString.write(value.userComment, into: buf)
     }
 }
+
 
 public struct TransactionCard {
     public var index: UInt32
@@ -4245,8 +4450,9 @@ public struct TransactionCard {
     }
 }
 
+
 extension TransactionCard: Equatable, Hashable {
-    public static func == (lhs: TransactionCard, rhs: TransactionCard) -> Bool {
+    public static func ==(lhs: TransactionCard, rhs: TransactionCard) -> Bool {
         if lhs.index != rhs.index {
             return false
         }
@@ -4266,11 +4472,12 @@ extension TransactionCard: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeTransactionCard: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeTransactionCard: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> TransactionCard {
         return try TransactionCard(
-            index: FfiConverterUInt32.read(from: buf),
-            indent: FfiConverterUInt32.read(from: buf),
+            index: FfiConverterUInt32.read(from: buf), 
+            indent: FfiConverterUInt32.read(from: buf), 
             card: FfiConverterTypeCard.read(from: buf)
         )
     }
@@ -4281,6 +4488,7 @@ private struct FfiConverterTypeTransactionCard: FfiConverterRustBuffer {
         FfiConverterTypeCard.write(value.card, into: buf)
     }
 }
+
 
 public struct TransactionCardSet {
     public var author: [TransactionCard]?
@@ -4312,8 +4520,9 @@ public struct TransactionCardSet {
     }
 }
 
+
 extension TransactionCardSet: Equatable, Hashable {
-    public static func == (lhs: TransactionCardSet, rhs: TransactionCardSet) -> Bool {
+    public static func ==(lhs: TransactionCardSet, rhs: TransactionCardSet) -> Bool {
         if lhs.author != rhs.author {
             return false
         }
@@ -4365,19 +4574,20 @@ extension TransactionCardSet: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeTransactionCardSet: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeTransactionCardSet: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> TransactionCardSet {
         return try TransactionCardSet(
-            author: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf),
-            error: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf),
-            extensions: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf),
-            importingDerivations: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf),
-            message: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf),
-            meta: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf),
-            method: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf),
-            newSpecs: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf),
-            verifier: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf),
-            warning: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf),
+            author: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf), 
+            error: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf), 
+            extensions: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf), 
+            importingDerivations: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf), 
+            message: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf), 
+            meta: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf), 
+            method: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf), 
+            newSpecs: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf), 
+            verifier: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf), 
+            warning: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf), 
             typesInfo: FfiConverterOptionSequenceTypeTransactionCard.read(from: buf)
         )
     }
@@ -4397,6 +4607,7 @@ private struct FfiConverterTypeTransactionCardSet: FfiConverterRustBuffer {
     }
 }
 
+
 public struct TypesDisplay {
     public var typesHash: [UInt8]
     public var verifier: Verifier
@@ -4409,8 +4620,9 @@ public struct TypesDisplay {
     }
 }
 
+
 extension TypesDisplay: Equatable, Hashable {
-    public static func == (lhs: TypesDisplay, rhs: TypesDisplay) -> Bool {
+    public static func ==(lhs: TypesDisplay, rhs: TypesDisplay) -> Bool {
         if lhs.typesHash != rhs.typesHash {
             return false
         }
@@ -4426,10 +4638,11 @@ extension TypesDisplay: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeTypesDisplay: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeTypesDisplay: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> TypesDisplay {
         return try TypesDisplay(
-            typesHash: FfiConverterSequenceUInt8.read(from: buf),
+            typesHash: FfiConverterSequenceUInt8.read(from: buf), 
             verifier: FfiConverterTypeVerifier.read(from: buf)
         )
     }
@@ -4439,6 +4652,7 @@ private struct FfiConverterTypeTypesDisplay: FfiConverterRustBuffer {
         FfiConverterTypeVerifier.write(value.verifier, into: buf)
     }
 }
+
 
 public struct TypesExport {
     public var typesHash: [UInt8]
@@ -4452,8 +4666,9 @@ public struct TypesExport {
     }
 }
 
+
 extension TypesExport: Equatable, Hashable {
-    public static func == (lhs: TypesExport, rhs: TypesExport) -> Bool {
+    public static func ==(lhs: TypesExport, rhs: TypesExport) -> Bool {
         if lhs.typesHash != rhs.typesHash {
             return false
         }
@@ -4469,10 +4684,11 @@ extension TypesExport: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeTypesExport: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeTypesExport: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> TypesExport {
         return try TypesExport(
-            typesHash: FfiConverterSequenceUInt8.read(from: buf),
+            typesHash: FfiConverterSequenceUInt8.read(from: buf), 
             signedBy: FfiConverterTypeVerifierValue.read(from: buf)
         )
     }
@@ -4482,6 +4698,7 @@ private struct FfiConverterTypeTypesExport: FfiConverterRustBuffer {
         FfiConverterTypeVerifierValue.write(value.signedBy, into: buf)
     }
 }
+
 
 public struct Verifier {
     public var v: VerifierValue?
@@ -4493,8 +4710,9 @@ public struct Verifier {
     }
 }
 
+
 extension Verifier: Equatable, Hashable {
-    public static func == (lhs: Verifier, rhs: Verifier) -> Bool {
+    public static func ==(lhs: Verifier, rhs: Verifier) -> Bool {
         if lhs.v != rhs.v {
             return false
         }
@@ -4506,7 +4724,8 @@ extension Verifier: Equatable, Hashable {
     }
 }
 
-private struct FfiConverterTypeVerifier: FfiConverterRustBuffer {
+
+fileprivate struct FfiConverterTypeVerifier: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> Verifier {
         return try Verifier(
             v: FfiConverterOptionTypeVerifierValue.read(from: buf)
@@ -4521,6 +4740,7 @@ private struct FfiConverterTypeVerifier: FfiConverterRustBuffer {
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum Action {
+    
     case start
     case navbarLog
     case navbarScan
@@ -4567,292 +4787,351 @@ public enum Action {
     case nothing
 }
 
-private struct FfiConverterTypeAction: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeAction: FfiConverterRustBuffer {
     typealias SwiftType = Action
 
     static func read(from buf: Reader) throws -> Action {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .start
-
+        
         case 2: return .navbarLog
-
+        
         case 3: return .navbarScan
-
+        
         case 4: return .navbarKeys
-
+        
         case 5: return .navbarSettings
-
+        
         case 6: return .goBack
-
+        
         case 7: return .goForward
-
+        
         case 8: return .selectSeed
-
+        
         case 9: return .selectKey
-
+        
         case 10: return .newKey
-
+        
         case 11: return .rightButtonAction
-
+        
         case 12: return .shield
-
+        
         case 13: return .newSeed
-
+        
         case 14: return .recoverSeed
-
+        
         case 15: return .backupSeed
-
+        
         case 16: return .networkSelector
-
+        
         case 17: return .nextUnit
-
+        
         case 18: return .previousUnit
-
+        
         case 19: return .changeNetwork
-
+        
         case 20: return .checkPassword
-
+        
         case 21: return .transactionFetched
-
+        
         case 22: return .removeNetwork
-
+        
         case 23: return .removeMetadata
-
+        
         case 24: return .removeTypes
-
+        
         case 25: return .signNetworkSpecs
-
+        
         case 26: return .signMetadata
-
+        
         case 27: return .signTypes
-
+        
         case 28: return .manageNetworks
-
+        
         case 29: return .viewGeneralVerifier
-
+        
         case 30: return .manageMetadata
-
+        
         case 31: return .removeKey
-
+        
         case 32: return .removeSeed
-
+        
         case 33: return .clearLog
-
+        
         case 34: return .createLogComment
-
+        
         case 35: return .showLogDetails
-
+        
         case 36: return .swipe
-
+        
         case 37: return .longTap
-
+        
         case 38: return .selectAll
-
+        
         case 39: return .exportMultiSelect
-
+        
         case 40: return .increment
-
+        
         case 41: return .showDocuments
-
+        
         case 42: return .textEntry
-
+        
         case 43: return .pushWord
-
+        
         case 44: return .nothing
-
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: Action, into buf: Writer) {
         switch value {
+        
+        
         case .start:
             buf.writeInt(Int32(1))
-
+        
+        
         case .navbarLog:
             buf.writeInt(Int32(2))
-
+        
+        
         case .navbarScan:
             buf.writeInt(Int32(3))
-
+        
+        
         case .navbarKeys:
             buf.writeInt(Int32(4))
-
+        
+        
         case .navbarSettings:
             buf.writeInt(Int32(5))
-
+        
+        
         case .goBack:
             buf.writeInt(Int32(6))
-
+        
+        
         case .goForward:
             buf.writeInt(Int32(7))
-
+        
+        
         case .selectSeed:
             buf.writeInt(Int32(8))
-
+        
+        
         case .selectKey:
             buf.writeInt(Int32(9))
-
+        
+        
         case .newKey:
             buf.writeInt(Int32(10))
-
+        
+        
         case .rightButtonAction:
             buf.writeInt(Int32(11))
-
+        
+        
         case .shield:
             buf.writeInt(Int32(12))
-
+        
+        
         case .newSeed:
             buf.writeInt(Int32(13))
-
+        
+        
         case .recoverSeed:
             buf.writeInt(Int32(14))
-
+        
+        
         case .backupSeed:
             buf.writeInt(Int32(15))
-
+        
+        
         case .networkSelector:
             buf.writeInt(Int32(16))
-
+        
+        
         case .nextUnit:
             buf.writeInt(Int32(17))
-
+        
+        
         case .previousUnit:
             buf.writeInt(Int32(18))
-
+        
+        
         case .changeNetwork:
             buf.writeInt(Int32(19))
-
+        
+        
         case .checkPassword:
             buf.writeInt(Int32(20))
-
+        
+        
         case .transactionFetched:
             buf.writeInt(Int32(21))
-
+        
+        
         case .removeNetwork:
             buf.writeInt(Int32(22))
-
+        
+        
         case .removeMetadata:
             buf.writeInt(Int32(23))
-
+        
+        
         case .removeTypes:
             buf.writeInt(Int32(24))
-
+        
+        
         case .signNetworkSpecs:
             buf.writeInt(Int32(25))
-
+        
+        
         case .signMetadata:
             buf.writeInt(Int32(26))
-
+        
+        
         case .signTypes:
             buf.writeInt(Int32(27))
-
+        
+        
         case .manageNetworks:
             buf.writeInt(Int32(28))
-
+        
+        
         case .viewGeneralVerifier:
             buf.writeInt(Int32(29))
-
+        
+        
         case .manageMetadata:
             buf.writeInt(Int32(30))
-
+        
+        
         case .removeKey:
             buf.writeInt(Int32(31))
-
+        
+        
         case .removeSeed:
             buf.writeInt(Int32(32))
-
+        
+        
         case .clearLog:
             buf.writeInt(Int32(33))
-
+        
+        
         case .createLogComment:
             buf.writeInt(Int32(34))
-
+        
+        
         case .showLogDetails:
             buf.writeInt(Int32(35))
-
+        
+        
         case .swipe:
             buf.writeInt(Int32(36))
-
+        
+        
         case .longTap:
             buf.writeInt(Int32(37))
-
+        
+        
         case .selectAll:
             buf.writeInt(Int32(38))
-
+        
+        
         case .exportMultiSelect:
             buf.writeInt(Int32(39))
-
+        
+        
         case .increment:
             buf.writeInt(Int32(40))
-
+        
+        
         case .showDocuments:
             buf.writeInt(Int32(41))
-
+        
+        
         case .textEntry:
             buf.writeInt(Int32(42))
-
+        
+        
         case .pushWord:
             buf.writeInt(Int32(43))
-
+        
+        
         case .nothing:
             buf.writeInt(Int32(44))
+        
         }
     }
 }
 
+
 extension Action: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum AlertData {
+    
     case shield(f: ShieldAlert?)
     case errorData(f: String)
     case confirm
 }
 
-private struct FfiConverterTypeAlertData: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeAlertData: FfiConverterRustBuffer {
     typealias SwiftType = AlertData
 
     static func read(from buf: Reader) throws -> AlertData {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .shield(
-                f: try FfiConverterOptionTypeShieldAlert.read(from: buf)
-            )
-
+            f: try FfiConverterOptionTypeShieldAlert.read(from: buf)
+        )
+        
         case 2: return .errorData(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 3: return .confirm
-
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: AlertData, into buf: Writer) {
         switch value {
+        
+        
         case let .shield(f):
             buf.writeInt(Int32(1))
             FfiConverterOptionTypeShieldAlert.write(f, into: buf)
-
+            
+        
         case let .errorData(f):
             buf.writeInt(Int32(2))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case .confirm:
             buf.writeInt(Int32(3))
+        
         }
     }
 }
 
+
 extension AlertData: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum Card {
+    
     case authorCard(f: Address)
     case authorPlainCard(f: MscAuthorPlain)
     case authorPublicKeyCard(f: MVerifierDetails)
@@ -4890,374 +5169,432 @@ public enum Card {
     case warningCard(f: String)
 }
 
-private struct FfiConverterTypeCard: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeCard: FfiConverterRustBuffer {
     typealias SwiftType = Card
 
     static func read(from buf: Reader) throws -> Card {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .authorCard(
-                f: try FfiConverterTypeAddress.read(from: buf)
-            )
-
+            f: try FfiConverterTypeAddress.read(from: buf)
+        )
+        
         case 2: return .authorPlainCard(
-                f: try FfiConverterTypeMscAuthorPlain.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMscAuthorPlain.read(from: buf)
+        )
+        
         case 3: return .authorPublicKeyCard(
-                f: try FfiConverterTypeMVerifierDetails.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMVerifierDetails.read(from: buf)
+        )
+        
         case 4: return .balanceCard(
-                f: try FfiConverterTypeMscCurrency.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMscCurrency.read(from: buf)
+        )
+        
         case 5: return .bitVecCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 6: return .blockHashCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 7: return .callCard(
-                f: try FfiConverterTypeMscCall.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMscCall.read(from: buf)
+        )
+        
         case 8: return .defaultCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 9: return .derivationsCard(
-                f: try FfiConverterSequenceString.read(from: buf)
-            )
-
+            f: try FfiConverterSequenceString.read(from: buf)
+        )
+        
         case 10: return .enumVariantNameCard(
-                f: try FfiConverterTypeMscEnumVariantName.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMscEnumVariantName.read(from: buf)
+        )
+        
         case 11: return .eraImmortalCard
-
+        
         case 12: return .eraMortalCard(
-                f: try FfiConverterTypeMscEraMortal.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMscEraMortal.read(from: buf)
+        )
+        
         case 13: return .errorCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 14: return .fieldNameCard(
-                f: try FfiConverterTypeMscFieldName.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMscFieldName.read(from: buf)
+        )
+        
         case 15: return .fieldNumberCard(
-                f: try FfiConverterTypeMscFieldNumber.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMscFieldNumber.read(from: buf)
+        )
+        
         case 16: return .idCard(
-                f: try FfiConverterTypeMscId.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMscId.read(from: buf)
+        )
+        
         case 17: return .identityFieldCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 18: return .metaCard(
-                f: try FfiConverterTypeMMetadataRecord.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMMetadataRecord.read(from: buf)
+        )
+        
         case 19: return .nameVersionCard(
-                f: try FfiConverterTypeMscNameVersion.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMscNameVersion.read(from: buf)
+        )
+        
         case 20: return .networkGenesisHashCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 21: return .networkNameCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 22: return .networkInfoCard(
-                f: try FfiConverterTypeMscNetworkInfo.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMscNetworkInfo.read(from: buf)
+        )
+        
         case 23: return .newSpecsCard(
-                f: try FfiConverterTypeNetworkSpecsToSend.read(from: buf)
-            )
-
+            f: try FfiConverterTypeNetworkSpecsToSend.read(from: buf)
+        )
+        
         case 24: return .nonceCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 25: return .noneCard
-
+        
         case 26: return .palletCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 27: return .textCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 28: return .tipCard(
-                f: try FfiConverterTypeMscCurrency.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMscCurrency.read(from: buf)
+        )
+        
         case 29: return .tipPlainCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 30: return .txSpecCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 31: return .txSpecPlainCard(
-                f: try FfiConverterTypeMscTxSpecPlain.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMscTxSpecPlain.read(from: buf)
+        )
+        
         case 32: return .typesInfoCard(
-                f: try FfiConverterTypeMTypesInfo.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMTypesInfo.read(from: buf)
+        )
+        
         case 33: return .varNameCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         case 34: return .verifierCard(
-                f: try FfiConverterTypeMVerifierDetails.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMVerifierDetails.read(from: buf)
+        )
+        
         case 35: return .warningCard(
-                f: try FfiConverterString.read(from: buf)
-            )
-
+            f: try FfiConverterString.read(from: buf)
+        )
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: Card, into buf: Writer) {
         switch value {
+        
+        
         case let .authorCard(f):
             buf.writeInt(Int32(1))
             FfiConverterTypeAddress.write(f, into: buf)
-
+            
+        
         case let .authorPlainCard(f):
             buf.writeInt(Int32(2))
             FfiConverterTypeMscAuthorPlain.write(f, into: buf)
-
+            
+        
         case let .authorPublicKeyCard(f):
             buf.writeInt(Int32(3))
             FfiConverterTypeMVerifierDetails.write(f, into: buf)
-
+            
+        
         case let .balanceCard(f):
             buf.writeInt(Int32(4))
             FfiConverterTypeMscCurrency.write(f, into: buf)
-
+            
+        
         case let .bitVecCard(f):
             buf.writeInt(Int32(5))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case let .blockHashCard(f):
             buf.writeInt(Int32(6))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case let .callCard(f):
             buf.writeInt(Int32(7))
             FfiConverterTypeMscCall.write(f, into: buf)
-
+            
+        
         case let .defaultCard(f):
             buf.writeInt(Int32(8))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case let .derivationsCard(f):
             buf.writeInt(Int32(9))
             FfiConverterSequenceString.write(f, into: buf)
-
+            
+        
         case let .enumVariantNameCard(f):
             buf.writeInt(Int32(10))
             FfiConverterTypeMscEnumVariantName.write(f, into: buf)
-
+            
+        
         case .eraImmortalCard:
             buf.writeInt(Int32(11))
-
+        
+        
         case let .eraMortalCard(f):
             buf.writeInt(Int32(12))
             FfiConverterTypeMscEraMortal.write(f, into: buf)
-
+            
+        
         case let .errorCard(f):
             buf.writeInt(Int32(13))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case let .fieldNameCard(f):
             buf.writeInt(Int32(14))
             FfiConverterTypeMscFieldName.write(f, into: buf)
-
+            
+        
         case let .fieldNumberCard(f):
             buf.writeInt(Int32(15))
             FfiConverterTypeMscFieldNumber.write(f, into: buf)
-
+            
+        
         case let .idCard(f):
             buf.writeInt(Int32(16))
             FfiConverterTypeMscId.write(f, into: buf)
-
+            
+        
         case let .identityFieldCard(f):
             buf.writeInt(Int32(17))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case let .metaCard(f):
             buf.writeInt(Int32(18))
             FfiConverterTypeMMetadataRecord.write(f, into: buf)
-
+            
+        
         case let .nameVersionCard(f):
             buf.writeInt(Int32(19))
             FfiConverterTypeMscNameVersion.write(f, into: buf)
-
+            
+        
         case let .networkGenesisHashCard(f):
             buf.writeInt(Int32(20))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case let .networkNameCard(f):
             buf.writeInt(Int32(21))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case let .networkInfoCard(f):
             buf.writeInt(Int32(22))
             FfiConverterTypeMscNetworkInfo.write(f, into: buf)
-
+            
+        
         case let .newSpecsCard(f):
             buf.writeInt(Int32(23))
             FfiConverterTypeNetworkSpecsToSend.write(f, into: buf)
-
+            
+        
         case let .nonceCard(f):
             buf.writeInt(Int32(24))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case .noneCard:
             buf.writeInt(Int32(25))
-
+        
+        
         case let .palletCard(f):
             buf.writeInt(Int32(26))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case let .textCard(f):
             buf.writeInt(Int32(27))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case let .tipCard(f):
             buf.writeInt(Int32(28))
             FfiConverterTypeMscCurrency.write(f, into: buf)
-
+            
+        
         case let .tipPlainCard(f):
             buf.writeInt(Int32(29))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case let .txSpecCard(f):
             buf.writeInt(Int32(30))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case let .txSpecPlainCard(f):
             buf.writeInt(Int32(31))
             FfiConverterTypeMscTxSpecPlain.write(f, into: buf)
-
+            
+        
         case let .typesInfoCard(f):
             buf.writeInt(Int32(32))
             FfiConverterTypeMTypesInfo.write(f, into: buf)
-
+            
+        
         case let .varNameCard(f):
             buf.writeInt(Int32(33))
             FfiConverterString.write(f, into: buf)
-
+            
+        
         case let .verifierCard(f):
             buf.writeInt(Int32(34))
             FfiConverterTypeMVerifierDetails.write(f, into: buf)
-
+            
+        
         case let .warningCard(f):
             buf.writeInt(Int32(35))
             FfiConverterString.write(f, into: buf)
+            
         }
     }
 }
 
+
 extension Card: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum DerivationDestination {
+    
     case pwd
     case pin
 }
 
-private struct FfiConverterTypeDerivationDestination: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeDerivationDestination: FfiConverterRustBuffer {
     typealias SwiftType = DerivationDestination
 
     static func read(from buf: Reader) throws -> DerivationDestination {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .pwd
-
+        
         case 2: return .pin
-
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: DerivationDestination, into buf: Writer) {
         switch value {
+        
+        
         case .pwd:
             buf.writeInt(Int32(1))
-
+        
+        
         case .pin:
             buf.writeInt(Int32(2))
+        
         }
     }
 }
 
+
 extension DerivationDestination: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum Encryption {
+    
     case ed25519
     case sr25519
     case ecdsa
 }
 
-private struct FfiConverterTypeEncryption: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeEncryption: FfiConverterRustBuffer {
     typealias SwiftType = Encryption
 
     static func read(from buf: Reader) throws -> Encryption {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .ed25519
-
+        
         case 2: return .sr25519
-
+        
         case 3: return .ecdsa
-
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: Encryption, into buf: Writer) {
         switch value {
+        
+        
         case .ed25519:
             buf.writeInt(Int32(1))
-
+        
+        
         case .sr25519:
             buf.writeInt(Int32(2))
-
+        
+        
         case .ecdsa:
             buf.writeInt(Int32(3))
+        
         }
     }
 }
 
+
 extension Encryption: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum Event {
+    
     case metadataAdded(metaValuesDisplay: MetaValuesDisplay)
     case metadataRemoved(metaValuesDisplay: MetaValuesDisplay)
     case metadataSigned(metaValuesExport: MetaValuesExport)
@@ -5289,240 +5626,275 @@ public enum Event {
     case seedRemoved(seedName: String)
 }
 
-private struct FfiConverterTypeEvent: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeEvent: FfiConverterRustBuffer {
     typealias SwiftType = Event
 
     static func read(from buf: Reader) throws -> Event {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .metadataAdded(
-                metaValuesDisplay: try FfiConverterTypeMetaValuesDisplay.read(from: buf)
-            )
-
+            metaValuesDisplay: try FfiConverterTypeMetaValuesDisplay.read(from: buf)
+        )
+        
         case 2: return .metadataRemoved(
-                metaValuesDisplay: try FfiConverterTypeMetaValuesDisplay.read(from: buf)
-            )
-
+            metaValuesDisplay: try FfiConverterTypeMetaValuesDisplay.read(from: buf)
+        )
+        
         case 3: return .metadataSigned(
-                metaValuesExport: try FfiConverterTypeMetaValuesExport.read(from: buf)
-            )
-
+            metaValuesExport: try FfiConverterTypeMetaValuesExport.read(from: buf)
+        )
+        
         case 4: return .networkSpecsAdded(
-                networkSpecsDisplay: try FfiConverterTypeNetworkSpecsDisplay.read(from: buf)
-            )
-
+            networkSpecsDisplay: try FfiConverterTypeNetworkSpecsDisplay.read(from: buf)
+        )
+        
         case 5: return .networkSpecsRemoved(
-                networkSpecsDisplay: try FfiConverterTypeNetworkSpecsDisplay.read(from: buf)
-            )
-
+            networkSpecsDisplay: try FfiConverterTypeNetworkSpecsDisplay.read(from: buf)
+        )
+        
         case 6: return .networkSpecsSigned(
-                networkSpecsExport: try FfiConverterTypeNetworkSpecsExport.read(from: buf)
-            )
-
+            networkSpecsExport: try FfiConverterTypeNetworkSpecsExport.read(from: buf)
+        )
+        
         case 7: return .networkVerifierSet(
-                networkVerifierDisplay: try FfiConverterTypeNetworkVerifierDisplay.read(from: buf)
-            )
-
+            networkVerifierDisplay: try FfiConverterTypeNetworkVerifierDisplay.read(from: buf)
+        )
+        
         case 8: return .generalVerifierSet(
-                verifier: try FfiConverterTypeVerifier.read(from: buf)
-            )
-
+            verifier: try FfiConverterTypeVerifier.read(from: buf)
+        )
+        
         case 9: return .typesAdded(
-                typesDisplay: try FfiConverterTypeTypesDisplay.read(from: buf)
-            )
-
+            typesDisplay: try FfiConverterTypeTypesDisplay.read(from: buf)
+        )
+        
         case 10: return .typesRemoved(
-                typesDisplay: try FfiConverterTypeTypesDisplay.read(from: buf)
-            )
-
+            typesDisplay: try FfiConverterTypeTypesDisplay.read(from: buf)
+        )
+        
         case 11: return .typesSigned(
-                typesExport: try FfiConverterTypeTypesExport.read(from: buf)
-            )
-
+            typesExport: try FfiConverterTypeTypesExport.read(from: buf)
+        )
+        
         case 12: return .transactionSigned(
-                signDisplay: try FfiConverterTypeSignDisplay.read(from: buf)
-            )
-
+            signDisplay: try FfiConverterTypeSignDisplay.read(from: buf)
+        )
+        
         case 13: return .transactionSignError(
-                signDisplay: try FfiConverterTypeSignDisplay.read(from: buf)
-            )
-
+            signDisplay: try FfiConverterTypeSignDisplay.read(from: buf)
+        )
+        
         case 14: return .messageSigned(
-                signMessageDisplay: try FfiConverterTypeSignMessageDisplay.read(from: buf)
-            )
-
+            signMessageDisplay: try FfiConverterTypeSignMessageDisplay.read(from: buf)
+        )
+        
         case 15: return .messageSignError(
-                signMessageDisplay: try FfiConverterTypeSignMessageDisplay.read(from: buf)
-            )
-
+            signMessageDisplay: try FfiConverterTypeSignMessageDisplay.read(from: buf)
+        )
+        
         case 16: return .identityAdded(
-                identityHistory: try FfiConverterTypeIdentityHistory.read(from: buf)
-            )
-
+            identityHistory: try FfiConverterTypeIdentityHistory.read(from: buf)
+        )
+        
         case 17: return .identityRemoved(
-                identityHistory: try FfiConverterTypeIdentityHistory.read(from: buf)
-            )
-
+            identityHistory: try FfiConverterTypeIdentityHistory.read(from: buf)
+        )
+        
         case 18: return .identitiesWiped
-
+        
         case 19: return .deviceWasOnline
-
+        
         case 20: return .resetDangerRecord
-
+        
         case 21: return .seedCreated(
-                seedCreated: try FfiConverterString.read(from: buf)
-            )
-
+            seedCreated: try FfiConverterString.read(from: buf)
+        )
+        
         case 22: return .seedNameWasShown(
-                seedNameWasShown: try FfiConverterString.read(from: buf)
-            )
-
+            seedNameWasShown: try FfiConverterString.read(from: buf)
+        )
+        
         case 23: return .warning(
-                warning: try FfiConverterString.read(from: buf)
-            )
-
+            warning: try FfiConverterString.read(from: buf)
+        )
+        
         case 24: return .wrongPassword
-
+        
         case 25: return .userEntry(
-                userEntry: try FfiConverterString.read(from: buf)
-            )
-
+            userEntry: try FfiConverterString.read(from: buf)
+        )
+        
         case 26: return .systemEntry(
-                systemEntry: try FfiConverterString.read(from: buf)
-            )
-
+            systemEntry: try FfiConverterString.read(from: buf)
+        )
+        
         case 27: return .historyCleared
-
+        
         case 28: return .databaseInitiated
-
+        
         case 29: return .seedRemoved(
-                seedName: try FfiConverterString.read(from: buf)
-            )
-
+            seedName: try FfiConverterString.read(from: buf)
+        )
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: Event, into buf: Writer) {
         switch value {
+        
+        
         case let .metadataAdded(metaValuesDisplay):
             buf.writeInt(Int32(1))
             FfiConverterTypeMetaValuesDisplay.write(metaValuesDisplay, into: buf)
-
+            
+        
         case let .metadataRemoved(metaValuesDisplay):
             buf.writeInt(Int32(2))
             FfiConverterTypeMetaValuesDisplay.write(metaValuesDisplay, into: buf)
-
+            
+        
         case let .metadataSigned(metaValuesExport):
             buf.writeInt(Int32(3))
             FfiConverterTypeMetaValuesExport.write(metaValuesExport, into: buf)
-
+            
+        
         case let .networkSpecsAdded(networkSpecsDisplay):
             buf.writeInt(Int32(4))
             FfiConverterTypeNetworkSpecsDisplay.write(networkSpecsDisplay, into: buf)
-
+            
+        
         case let .networkSpecsRemoved(networkSpecsDisplay):
             buf.writeInt(Int32(5))
             FfiConverterTypeNetworkSpecsDisplay.write(networkSpecsDisplay, into: buf)
-
+            
+        
         case let .networkSpecsSigned(networkSpecsExport):
             buf.writeInt(Int32(6))
             FfiConverterTypeNetworkSpecsExport.write(networkSpecsExport, into: buf)
-
+            
+        
         case let .networkVerifierSet(networkVerifierDisplay):
             buf.writeInt(Int32(7))
             FfiConverterTypeNetworkVerifierDisplay.write(networkVerifierDisplay, into: buf)
-
+            
+        
         case let .generalVerifierSet(verifier):
             buf.writeInt(Int32(8))
             FfiConverterTypeVerifier.write(verifier, into: buf)
-
+            
+        
         case let .typesAdded(typesDisplay):
             buf.writeInt(Int32(9))
             FfiConverterTypeTypesDisplay.write(typesDisplay, into: buf)
-
+            
+        
         case let .typesRemoved(typesDisplay):
             buf.writeInt(Int32(10))
             FfiConverterTypeTypesDisplay.write(typesDisplay, into: buf)
-
+            
+        
         case let .typesSigned(typesExport):
             buf.writeInt(Int32(11))
             FfiConverterTypeTypesExport.write(typesExport, into: buf)
-
+            
+        
         case let .transactionSigned(signDisplay):
             buf.writeInt(Int32(12))
             FfiConverterTypeSignDisplay.write(signDisplay, into: buf)
-
+            
+        
         case let .transactionSignError(signDisplay):
             buf.writeInt(Int32(13))
             FfiConverterTypeSignDisplay.write(signDisplay, into: buf)
-
+            
+        
         case let .messageSigned(signMessageDisplay):
             buf.writeInt(Int32(14))
             FfiConverterTypeSignMessageDisplay.write(signMessageDisplay, into: buf)
-
+            
+        
         case let .messageSignError(signMessageDisplay):
             buf.writeInt(Int32(15))
             FfiConverterTypeSignMessageDisplay.write(signMessageDisplay, into: buf)
-
+            
+        
         case let .identityAdded(identityHistory):
             buf.writeInt(Int32(16))
             FfiConverterTypeIdentityHistory.write(identityHistory, into: buf)
-
+            
+        
         case let .identityRemoved(identityHistory):
             buf.writeInt(Int32(17))
             FfiConverterTypeIdentityHistory.write(identityHistory, into: buf)
-
+            
+        
         case .identitiesWiped:
             buf.writeInt(Int32(18))
-
+        
+        
         case .deviceWasOnline:
             buf.writeInt(Int32(19))
-
+        
+        
         case .resetDangerRecord:
             buf.writeInt(Int32(20))
-
+        
+        
         case let .seedCreated(seedCreated):
             buf.writeInt(Int32(21))
             FfiConverterString.write(seedCreated, into: buf)
-
+            
+        
         case let .seedNameWasShown(seedNameWasShown):
             buf.writeInt(Int32(22))
             FfiConverterString.write(seedNameWasShown, into: buf)
-
+            
+        
         case let .warning(warning):
             buf.writeInt(Int32(23))
             FfiConverterString.write(warning, into: buf)
-
+            
+        
         case .wrongPassword:
             buf.writeInt(Int32(24))
-
+        
+        
         case let .userEntry(userEntry):
             buf.writeInt(Int32(25))
             FfiConverterString.write(userEntry, into: buf)
-
+            
+        
         case let .systemEntry(systemEntry):
             buf.writeInt(Int32(26))
             FfiConverterString.write(systemEntry, into: buf)
-
+            
+        
         case .historyCleared:
             buf.writeInt(Int32(27))
-
+        
+        
         case .databaseInitiated:
             buf.writeInt(Int32(28))
-
+        
+        
         case let .seedRemoved(seedName):
             buf.writeInt(Int32(29))
             FfiConverterString.write(seedName, into: buf)
+            
         }
     }
 }
 
+
 extension Event: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum FooterButton {
+    
     case log
     case scan
     case keys
@@ -5530,104 +5902,124 @@ public enum FooterButton {
     case back
 }
 
-private struct FfiConverterTypeFooterButton: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeFooterButton: FfiConverterRustBuffer {
     typealias SwiftType = FooterButton
 
     static func read(from buf: Reader) throws -> FooterButton {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .log
-
+        
         case 2: return .scan
-
+        
         case 3: return .keys
-
+        
         case 4: return .settings
-
+        
         case 5: return .back
-
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: FooterButton, into buf: Writer) {
         switch value {
+        
+        
         case .log:
             buf.writeInt(Int32(1))
-
+        
+        
         case .scan:
             buf.writeInt(Int32(2))
-
+        
+        
         case .keys:
             buf.writeInt(Int32(3))
-
+        
+        
         case .settings:
             buf.writeInt(Int32(4))
-
+        
+        
         case .back:
             buf.writeInt(Int32(5))
+        
         }
     }
 }
 
+
 extension FooterButton: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum MscContent {
+    
     case loadTypes(types: String, pic: [UInt8])
     case loadMetadata(name: String, version: UInt32)
     case addSpecs(f: MscNetworkInfo)
 }
 
-private struct FfiConverterTypeMscContent: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeMscContent: FfiConverterRustBuffer {
     typealias SwiftType = MscContent
 
     static func read(from buf: Reader) throws -> MscContent {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .loadTypes(
-                types: try FfiConverterString.read(from: buf),
-                pic: try FfiConverterSequenceUInt8.read(from: buf)
-            )
-
+            types: try FfiConverterString.read(from: buf), 
+            pic: try FfiConverterSequenceUInt8.read(from: buf)
+        )
+        
         case 2: return .loadMetadata(
-                name: try FfiConverterString.read(from: buf),
-                version: try FfiConverterUInt32.read(from: buf)
-            )
-
+            name: try FfiConverterString.read(from: buf), 
+            version: try FfiConverterUInt32.read(from: buf)
+        )
+        
         case 3: return .addSpecs(
-                f: try FfiConverterTypeMscNetworkInfo.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMscNetworkInfo.read(from: buf)
+        )
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: MscContent, into buf: Writer) {
         switch value {
-        case let .loadTypes(types, pic):
+        
+        
+        case let .loadTypes(types,pic):
             buf.writeInt(Int32(1))
             FfiConverterString.write(types, into: buf)
             FfiConverterSequenceUInt8.write(pic, into: buf)
-
-        case let .loadMetadata(name, version):
+            
+        
+        case let .loadMetadata(name,version):
             buf.writeInt(Int32(2))
             FfiConverterString.write(name, into: buf)
             FfiConverterUInt32.write(version, into: buf)
-
+            
+        
         case let .addSpecs(f):
             buf.writeInt(Int32(3))
             FfiConverterTypeMscNetworkInfo.write(f, into: buf)
+            
         }
     }
 }
 
+
 extension MscContent: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum ModalData {
+    
     case sufficientCryptoReady(f: MSufficientCryptoReady)
     case backup(f: MBackup)
     case seedMenu(f: MSeedMenu)
@@ -5646,142 +6038,164 @@ public enum ModalData {
     case selectSeed(f: MSeeds)
 }
 
-private struct FfiConverterTypeModalData: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeModalData: FfiConverterRustBuffer {
     typealias SwiftType = ModalData
 
     static func read(from buf: Reader) throws -> ModalData {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .sufficientCryptoReady(
-                f: try FfiConverterTypeMSufficientCryptoReady.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMSufficientCryptoReady.read(from: buf)
+        )
+        
         case 2: return .backup(
-                f: try FfiConverterTypeMBackup.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMBackup.read(from: buf)
+        )
+        
         case 3: return .seedMenu(
-                f: try FfiConverterTypeMSeedMenu.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMSeedMenu.read(from: buf)
+        )
+        
         case 4: return .newSeedBackup(
-                f: try FfiConverterTypeMNewSeedBackup.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMNewSeedBackup.read(from: buf)
+        )
+        
         case 5: return .networkSelector(
-                f: try FfiConverterTypeMNetworkMenu.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMNetworkMenu.read(from: buf)
+        )
+        
         case 6: return .passwordConfirm(
-                f: try FfiConverterTypeMPasswordConfirm.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMPasswordConfirm.read(from: buf)
+        )
+        
         case 7: return .signatureReady(
-                f: try FfiConverterTypeMSignatureReady.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMSignatureReady.read(from: buf)
+        )
+        
         case 8: return .enterPassword(
-                f: try FfiConverterTypeMEnterPassword.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMEnterPassword.read(from: buf)
+        )
+        
         case 9: return .logRight(
-                f: try FfiConverterTypeMLogRight.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMLogRight.read(from: buf)
+        )
+        
         case 10: return .typesInfo(
-                f: try FfiConverterTypeMTypesInfo.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMTypesInfo.read(from: buf)
+        )
+        
         case 11: return .newSeedMenu
-
+        
         case 12: return .networkDetailsMenu
-
+        
         case 13: return .manageMetadata(
-                f: try FfiConverterTypeMManageMetadata.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMManageMetadata.read(from: buf)
+        )
+        
         case 14: return .keyDetailsAction
-
+        
         case 15: return .logComment
-
+        
         case 16: return .selectSeed(
-                f: try FfiConverterTypeMSeeds.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMSeeds.read(from: buf)
+        )
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: ModalData, into buf: Writer) {
         switch value {
+        
+        
         case let .sufficientCryptoReady(f):
             buf.writeInt(Int32(1))
             FfiConverterTypeMSufficientCryptoReady.write(f, into: buf)
-
+            
+        
         case let .backup(f):
             buf.writeInt(Int32(2))
             FfiConverterTypeMBackup.write(f, into: buf)
-
+            
+        
         case let .seedMenu(f):
             buf.writeInt(Int32(3))
             FfiConverterTypeMSeedMenu.write(f, into: buf)
-
+            
+        
         case let .newSeedBackup(f):
             buf.writeInt(Int32(4))
             FfiConverterTypeMNewSeedBackup.write(f, into: buf)
-
+            
+        
         case let .networkSelector(f):
             buf.writeInt(Int32(5))
             FfiConverterTypeMNetworkMenu.write(f, into: buf)
-
+            
+        
         case let .passwordConfirm(f):
             buf.writeInt(Int32(6))
             FfiConverterTypeMPasswordConfirm.write(f, into: buf)
-
+            
+        
         case let .signatureReady(f):
             buf.writeInt(Int32(7))
             FfiConverterTypeMSignatureReady.write(f, into: buf)
-
+            
+        
         case let .enterPassword(f):
             buf.writeInt(Int32(8))
             FfiConverterTypeMEnterPassword.write(f, into: buf)
-
+            
+        
         case let .logRight(f):
             buf.writeInt(Int32(9))
             FfiConverterTypeMLogRight.write(f, into: buf)
-
+            
+        
         case let .typesInfo(f):
             buf.writeInt(Int32(10))
             FfiConverterTypeMTypesInfo.write(f, into: buf)
-
+            
+        
         case .newSeedMenu:
             buf.writeInt(Int32(11))
-
+        
+        
         case .networkDetailsMenu:
             buf.writeInt(Int32(12))
-
+        
+        
         case let .manageMetadata(f):
             buf.writeInt(Int32(13))
             FfiConverterTypeMManageMetadata.write(f, into: buf)
-
+            
+        
         case .keyDetailsAction:
             buf.writeInt(Int32(14))
-
+        
+        
         case .logComment:
             buf.writeInt(Int32(15))
-
+        
+        
         case let .selectSeed(f):
             buf.writeInt(Int32(16))
             FfiConverterTypeMSeeds.write(f, into: buf)
+            
         }
     }
 }
 
+
 extension ModalData: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum RightButton {
+    
     case logRight
     case newSeed
     case backup
@@ -5791,61 +6205,74 @@ public enum RightButton {
     case keyMenu
 }
 
-private struct FfiConverterTypeRightButton: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeRightButton: FfiConverterRustBuffer {
     typealias SwiftType = RightButton
 
     static func read(from buf: Reader) throws -> RightButton {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .logRight
-
+        
         case 2: return .newSeed
-
+        
         case 3: return .backup
-
+        
         case 4: return .multiSelect
-
+        
         case 5: return .ndMenu
-
+        
         case 6: return .typesInfo
-
+        
         case 7: return .keyMenu
-
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: RightButton, into buf: Writer) {
         switch value {
+        
+        
         case .logRight:
             buf.writeInt(Int32(1))
-
+        
+        
         case .newSeed:
             buf.writeInt(Int32(2))
-
+        
+        
         case .backup:
             buf.writeInt(Int32(3))
-
+        
+        
         case .multiSelect:
             buf.writeInt(Int32(4))
-
+        
+        
         case .ndMenu:
             buf.writeInt(Int32(5))
-
+        
+        
         case .typesInfo:
             buf.writeInt(Int32(6))
-
+        
+        
         case .keyMenu:
             buf.writeInt(Int32(7))
+        
         }
     }
 }
 
+
 extension RightButton: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum ScreenData {
+    
     case scan
     case keys(f: MKeys)
     case settings(f: MSettings)
@@ -5867,234 +6294,274 @@ public enum ScreenData {
     case keyDetailsMulti(f: MKeyDetailsMulti)
 }
 
-private struct FfiConverterTypeScreenData: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeScreenData: FfiConverterRustBuffer {
     typealias SwiftType = ScreenData
 
     static func read(from buf: Reader) throws -> ScreenData {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .scan
-
+        
         case 2: return .keys(
-                f: try FfiConverterTypeMKeys.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMKeys.read(from: buf)
+        )
+        
         case 3: return .settings(
-                f: try FfiConverterTypeMSettings.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMSettings.read(from: buf)
+        )
+        
         case 4: return .log(
-                f: try FfiConverterTypeMLog.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMLog.read(from: buf)
+        )
+        
         case 5: return .logDetails(
-                f: try FfiConverterTypeMLogDetails.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMLogDetails.read(from: buf)
+        )
+        
         case 6: return .transaction(
-                f: try FfiConverterTypeMTransaction.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMTransaction.read(from: buf)
+        )
+        
         case 7: return .seedSelector(
-                f: try FfiConverterTypeMSeeds.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMSeeds.read(from: buf)
+        )
+        
         case 8: return .keyDetails(
-                f: try FfiConverterTypeMKeyDetails.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMKeyDetails.read(from: buf)
+        )
+        
         case 9: return .newSeed(
-                f: try FfiConverterTypeMNewSeed.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMNewSeed.read(from: buf)
+        )
+        
         case 10: return .recoverSeedName(
-                f: try FfiConverterTypeMRecoverSeedName.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMRecoverSeedName.read(from: buf)
+        )
+        
         case 11: return .recoverSeedPhrase(
-                f: try FfiConverterTypeMRecoverSeedPhrase.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMRecoverSeedPhrase.read(from: buf)
+        )
+        
         case 12: return .deriveKey(
-                f: try FfiConverterTypeMDeriveKey.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMDeriveKey.read(from: buf)
+        )
+        
         case 13: return .vVerifier(
-                f: try FfiConverterTypeMVerifierDetails.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMVerifierDetails.read(from: buf)
+        )
+        
         case 14: return .manageNetworks(
-                f: try FfiConverterTypeMManageNetworks.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMManageNetworks.read(from: buf)
+        )
+        
         case 15: return .nNetworkDetails(
-                f: try FfiConverterTypeMNetworkDetails.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMNetworkDetails.read(from: buf)
+        )
+        
         case 16: return .signSufficientCrypto(
-                f: try FfiConverterTypeMSignSufficientCrypto.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMSignSufficientCrypto.read(from: buf)
+        )
+        
         case 17: return .selectSeedForBackup(
-                f: try FfiConverterTypeMSeeds.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMSeeds.read(from: buf)
+        )
+        
         case 18: return .documents
-
+        
         case 19: return .keyDetailsMulti(
-                f: try FfiConverterTypeMKeyDetailsMulti.read(from: buf)
-            )
-
+            f: try FfiConverterTypeMKeyDetailsMulti.read(from: buf)
+        )
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: ScreenData, into buf: Writer) {
         switch value {
+        
+        
         case .scan:
             buf.writeInt(Int32(1))
-
+        
+        
         case let .keys(f):
             buf.writeInt(Int32(2))
             FfiConverterTypeMKeys.write(f, into: buf)
-
+            
+        
         case let .settings(f):
             buf.writeInt(Int32(3))
             FfiConverterTypeMSettings.write(f, into: buf)
-
+            
+        
         case let .log(f):
             buf.writeInt(Int32(4))
             FfiConverterTypeMLog.write(f, into: buf)
-
+            
+        
         case let .logDetails(f):
             buf.writeInt(Int32(5))
             FfiConverterTypeMLogDetails.write(f, into: buf)
-
+            
+        
         case let .transaction(f):
             buf.writeInt(Int32(6))
             FfiConverterTypeMTransaction.write(f, into: buf)
-
+            
+        
         case let .seedSelector(f):
             buf.writeInt(Int32(7))
             FfiConverterTypeMSeeds.write(f, into: buf)
-
+            
+        
         case let .keyDetails(f):
             buf.writeInt(Int32(8))
             FfiConverterTypeMKeyDetails.write(f, into: buf)
-
+            
+        
         case let .newSeed(f):
             buf.writeInt(Int32(9))
             FfiConverterTypeMNewSeed.write(f, into: buf)
-
+            
+        
         case let .recoverSeedName(f):
             buf.writeInt(Int32(10))
             FfiConverterTypeMRecoverSeedName.write(f, into: buf)
-
+            
+        
         case let .recoverSeedPhrase(f):
             buf.writeInt(Int32(11))
             FfiConverterTypeMRecoverSeedPhrase.write(f, into: buf)
-
+            
+        
         case let .deriveKey(f):
             buf.writeInt(Int32(12))
             FfiConverterTypeMDeriveKey.write(f, into: buf)
-
+            
+        
         case let .vVerifier(f):
             buf.writeInt(Int32(13))
             FfiConverterTypeMVerifierDetails.write(f, into: buf)
-
+            
+        
         case let .manageNetworks(f):
             buf.writeInt(Int32(14))
             FfiConverterTypeMManageNetworks.write(f, into: buf)
-
+            
+        
         case let .nNetworkDetails(f):
             buf.writeInt(Int32(15))
             FfiConverterTypeMNetworkDetails.write(f, into: buf)
-
+            
+        
         case let .signSufficientCrypto(f):
             buf.writeInt(Int32(16))
             FfiConverterTypeMSignSufficientCrypto.write(f, into: buf)
-
+            
+        
         case let .selectSeedForBackup(f):
             buf.writeInt(Int32(17))
             FfiConverterTypeMSeeds.write(f, into: buf)
-
+            
+        
         case .documents:
             buf.writeInt(Int32(18))
-
+        
+        
         case let .keyDetailsMulti(f):
             buf.writeInt(Int32(19))
             FfiConverterTypeMKeyDetailsMulti.write(f, into: buf)
+            
         }
     }
 }
 
+
 extension ScreenData: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum ScreenNameType {
+    
     case h1
     case h4
 }
 
-private struct FfiConverterTypeScreenNameType: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeScreenNameType: FfiConverterRustBuffer {
     typealias SwiftType = ScreenNameType
 
     static func read(from buf: Reader) throws -> ScreenNameType {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .h1
-
+        
         case 2: return .h4
-
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: ScreenNameType, into buf: Writer) {
         switch value {
+        
+        
         case .h1:
             buf.writeInt(Int32(1))
-
+        
+        
         case .h4:
             buf.writeInt(Int32(2))
+        
         }
     }
 }
 
+
 extension ScreenNameType: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum ShieldAlert {
+    
     case past
 }
 
-private struct FfiConverterTypeShieldAlert: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeShieldAlert: FfiConverterRustBuffer {
     typealias SwiftType = ShieldAlert
 
     static func read(from buf: Reader) throws -> ShieldAlert {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .past
-
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: ShieldAlert, into buf: Writer) {
         switch value {
+        
+        
         case .past:
             buf.writeInt(Int32(1))
+        
         }
     }
 }
 
+
 extension ShieldAlert: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum TransactionType {
+    
     case sign
     case stub
     case read
@@ -6102,148 +6569,188 @@ public enum TransactionType {
     case done
 }
 
-private struct FfiConverterTypeTransactionType: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeTransactionType: FfiConverterRustBuffer {
     typealias SwiftType = TransactionType
 
     static func read(from buf: Reader) throws -> TransactionType {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .sign
-
+        
         case 2: return .stub
-
+        
         case 3: return .read
-
+        
         case 4: return .importDerivations
-
+        
         case 5: return .done
-
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: TransactionType, into buf: Writer) {
         switch value {
+        
+        
         case .sign:
             buf.writeInt(Int32(1))
-
+        
+        
         case .stub:
             buf.writeInt(Int32(2))
-
+        
+        
         case .read:
             buf.writeInt(Int32(3))
-
+        
+        
         case .importDerivations:
             buf.writeInt(Int32(4))
-
+        
+        
         case .done:
             buf.writeInt(Int32(5))
+        
         }
     }
 }
 
+
 extension TransactionType: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum ValidCurrentVerifier {
+    
     case general
     case custom(v: Verifier)
 }
 
-private struct FfiConverterTypeValidCurrentVerifier: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeValidCurrentVerifier: FfiConverterRustBuffer {
     typealias SwiftType = ValidCurrentVerifier
 
     static func read(from buf: Reader) throws -> ValidCurrentVerifier {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .general
-
+        
         case 2: return .custom(
-                v: try FfiConverterTypeVerifier.read(from: buf)
-            )
-
+            v: try FfiConverterTypeVerifier.read(from: buf)
+        )
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: ValidCurrentVerifier, into buf: Writer) {
         switch value {
+        
+        
         case .general:
             buf.writeInt(Int32(1))
-
+        
+        
         case let .custom(v):
             buf.writeInt(Int32(2))
             FfiConverterTypeVerifier.write(v, into: buf)
+            
         }
     }
 }
 
+
 extension ValidCurrentVerifier: Equatable, Hashable {}
+
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum VerifierValue {
+    
     case standard(m: MultiSigner)
 }
 
-private struct FfiConverterTypeVerifierValue: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeVerifierValue: FfiConverterRustBuffer {
     typealias SwiftType = VerifierValue
 
     static func read(from buf: Reader) throws -> VerifierValue {
         let variant: Int32 = try buf.readInt()
         switch variant {
+        
         case 1: return .standard(
-                m: try FfiConverterTypeMultiSigner.read(from: buf)
-            )
-
+            m: try FfiConverterTypeMultiSigner.read(from: buf)
+        )
+        
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: VerifierValue, into buf: Writer) {
         switch value {
+        
+        
         case let .standard(m):
             buf.writeInt(Int32(1))
             FfiConverterTypeMultiSigner.write(m, into: buf)
+            
         }
     }
 }
 
+
 extension VerifierValue: Equatable, Hashable {}
 
+
+
 public enum ErrorDisplayed {
+
+    
+    
     case Str(s: String)
 }
 
-private struct FfiConverterTypeErrorDisplayed: FfiConverterRustBuffer {
+fileprivate struct FfiConverterTypeErrorDisplayed: FfiConverterRustBuffer {
     typealias SwiftType = ErrorDisplayed
 
     static func read(from buf: Reader) throws -> ErrorDisplayed {
         let variant: Int32 = try buf.readInt()
         switch variant {
+
+        
+
+        
         case 1: return .Str(
-                s: try FfiConverterString.read(from: buf)
+            s: try FfiConverterString.read(from: buf)
             )
 
-        default: throw UniffiInternalError.unexpectedEnumCase
+         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
 
     static func write(_ value: ErrorDisplayed, into buf: Writer) {
         switch value {
+
+        
+
+        
+        
         case let .Str(s):
             buf.writeInt(Int32(1))
             FfiConverterString.write(s, into: buf)
+            
         }
     }
 }
 
+
 extension ErrorDisplayed: Equatable, Hashable {}
 
-extension ErrorDisplayed: Error {}
+extension ErrorDisplayed: Error { }
 
-private struct FfiConverterOptionUInt16: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionUInt16: FfiConverterRustBuffer {
     typealias SwiftType = UInt16?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6264,7 +6771,7 @@ private struct FfiConverterOptionUInt16: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionBool: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionBool: FfiConverterRustBuffer {
     typealias SwiftType = Bool?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6285,7 +6792,7 @@ private struct FfiConverterOptionBool: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionString: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionString: FfiConverterRustBuffer {
     typealias SwiftType = String?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6306,7 +6813,7 @@ private struct FfiConverterOptionString: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionTypeActionResult: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionTypeActionResult: FfiConverterRustBuffer {
     typealias SwiftType = ActionResult?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6327,7 +6834,7 @@ private struct FfiConverterOptionTypeActionResult: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionTypeAddress: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionTypeAddress: FfiConverterRustBuffer {
     typealias SwiftType = Address?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6348,7 +6855,7 @@ private struct FfiConverterOptionTypeAddress: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionTypeMscNetworkInfo: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionTypeMscNetworkInfo: FfiConverterRustBuffer {
     typealias SwiftType = MscNetworkInfo?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6369,7 +6876,7 @@ private struct FfiConverterOptionTypeMscNetworkInfo: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionTypeMVerifierDetails: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionTypeMVerifierDetails: FfiConverterRustBuffer {
     typealias SwiftType = MVerifierDetails?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6390,7 +6897,7 @@ private struct FfiConverterOptionTypeMVerifierDetails: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionTypeTransactionCardSet: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionTypeTransactionCardSet: FfiConverterRustBuffer {
     typealias SwiftType = TransactionCardSet?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6411,7 +6918,7 @@ private struct FfiConverterOptionTypeTransactionCardSet: FfiConverterRustBuffer 
     }
 }
 
-private struct FfiConverterOptionTypeAlertData: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionTypeAlertData: FfiConverterRustBuffer {
     typealias SwiftType = AlertData?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6432,7 +6939,7 @@ private struct FfiConverterOptionTypeAlertData: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionTypeDerivationDestination: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionTypeDerivationDestination: FfiConverterRustBuffer {
     typealias SwiftType = DerivationDestination?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6453,7 +6960,7 @@ private struct FfiConverterOptionTypeDerivationDestination: FfiConverterRustBuff
     }
 }
 
-private struct FfiConverterOptionTypeFooterButton: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionTypeFooterButton: FfiConverterRustBuffer {
     typealias SwiftType = FooterButton?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6474,7 +6981,7 @@ private struct FfiConverterOptionTypeFooterButton: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionTypeModalData: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionTypeModalData: FfiConverterRustBuffer {
     typealias SwiftType = ModalData?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6495,7 +7002,7 @@ private struct FfiConverterOptionTypeModalData: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionTypeRightButton: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionTypeRightButton: FfiConverterRustBuffer {
     typealias SwiftType = RightButton?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6516,7 +7023,7 @@ private struct FfiConverterOptionTypeRightButton: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionTypeShieldAlert: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionTypeShieldAlert: FfiConverterRustBuffer {
     typealias SwiftType = ShieldAlert?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6537,7 +7044,7 @@ private struct FfiConverterOptionTypeShieldAlert: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionTypeVerifierValue: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionTypeVerifierValue: FfiConverterRustBuffer {
     typealias SwiftType = VerifierValue?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6558,7 +7065,7 @@ private struct FfiConverterOptionTypeVerifierValue: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionSequenceUInt8: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionSequenceUInt8: FfiConverterRustBuffer {
     typealias SwiftType = [UInt8]?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6579,7 +7086,7 @@ private struct FfiConverterOptionSequenceUInt8: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterOptionSequenceTypeTransactionCard: FfiConverterRustBuffer {
+fileprivate struct FfiConverterOptionSequenceTypeTransactionCard: FfiConverterRustBuffer {
     typealias SwiftType = [TransactionCard]?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -6600,7 +7107,7 @@ private struct FfiConverterOptionSequenceTypeTransactionCard: FfiConverterRustBu
     }
 }
 
-private struct FfiConverterSequenceUInt8: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceUInt8: FfiConverterRustBuffer {
     typealias SwiftType = [UInt8]
 
     static func write(_ value: [UInt8], into buf: Writer) {
@@ -6622,7 +7129,7 @@ private struct FfiConverterSequenceUInt8: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterSequenceString: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceString: FfiConverterRustBuffer {
     typealias SwiftType = [String]
 
     static func write(_ value: [String], into buf: Writer) {
@@ -6644,7 +7151,7 @@ private struct FfiConverterSequenceString: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterSequenceTypeDerivationEntry: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceTypeDerivationEntry: FfiConverterRustBuffer {
     typealias SwiftType = [DerivationEntry]
 
     static func write(_ value: [DerivationEntry], into buf: Writer) {
@@ -6666,7 +7173,7 @@ private struct FfiConverterSequenceTypeDerivationEntry: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterSequenceTypeDerivationPack: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceTypeDerivationPack: FfiConverterRustBuffer {
     typealias SwiftType = [DerivationPack]
 
     static func write(_ value: [DerivationPack], into buf: Writer) {
@@ -6688,7 +7195,7 @@ private struct FfiConverterSequenceTypeDerivationPack: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterSequenceTypeHistory: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceTypeHistory: FfiConverterRustBuffer {
     typealias SwiftType = [History]
 
     static func write(_ value: [History], into buf: Writer) {
@@ -6710,7 +7217,7 @@ private struct FfiConverterSequenceTypeHistory: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterSequenceTypeMEventMaybeDecoded: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceTypeMEventMaybeDecoded: FfiConverterRustBuffer {
     typealias SwiftType = [MEventMaybeDecoded]
 
     static func write(_ value: [MEventMaybeDecoded], into buf: Writer) {
@@ -6732,7 +7239,7 @@ private struct FfiConverterSequenceTypeMEventMaybeDecoded: FfiConverterRustBuffe
     }
 }
 
-private struct FfiConverterSequenceTypeMKeysCard: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceTypeMKeysCard: FfiConverterRustBuffer {
     typealias SwiftType = [MKeysCard]
 
     static func write(_ value: [MKeysCard], into buf: Writer) {
@@ -6754,7 +7261,7 @@ private struct FfiConverterSequenceTypeMKeysCard: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterSequenceTypeMmmNetwork: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceTypeMmmNetwork: FfiConverterRustBuffer {
     typealias SwiftType = [MmmNetwork]
 
     static func write(_ value: [MmmNetwork], into buf: Writer) {
@@ -6776,7 +7283,7 @@ private struct FfiConverterSequenceTypeMmmNetwork: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterSequenceTypeMmNetwork: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceTypeMmNetwork: FfiConverterRustBuffer {
     typealias SwiftType = [MmNetwork]
 
     static func write(_ value: [MmNetwork], into buf: Writer) {
@@ -6798,7 +7305,7 @@ private struct FfiConverterSequenceTypeMmNetwork: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterSequenceTypeMMetadataRecord: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceTypeMMetadataRecord: FfiConverterRustBuffer {
     typealias SwiftType = [MMetadataRecord]
 
     static func write(_ value: [MMetadataRecord], into buf: Writer) {
@@ -6820,7 +7327,7 @@ private struct FfiConverterSequenceTypeMMetadataRecord: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterSequenceTypeMRawKey: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceTypeMRawKey: FfiConverterRustBuffer {
     typealias SwiftType = [MRawKey]
 
     static func write(_ value: [MRawKey], into buf: Writer) {
@@ -6842,7 +7349,7 @@ private struct FfiConverterSequenceTypeMRawKey: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterSequenceTypeNetwork: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceTypeNetwork: FfiConverterRustBuffer {
     typealias SwiftType = [Network]
 
     static func write(_ value: [Network], into buf: Writer) {
@@ -6864,7 +7371,7 @@ private struct FfiConverterSequenceTypeNetwork: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterSequenceTypeSeedNameCard: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceTypeSeedNameCard: FfiConverterRustBuffer {
     typealias SwiftType = [SeedNameCard]
 
     static func write(_ value: [SeedNameCard], into buf: Writer) {
@@ -6886,7 +7393,7 @@ private struct FfiConverterSequenceTypeSeedNameCard: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterSequenceTypeTransactionCard: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceTypeTransactionCard: FfiConverterRustBuffer {
     typealias SwiftType = [TransactionCard]
 
     static func write(_ value: [TransactionCard], into buf: Writer) {
@@ -6908,7 +7415,7 @@ private struct FfiConverterSequenceTypeTransactionCard: FfiConverterRustBuffer {
     }
 }
 
-private struct FfiConverterSequenceTypeEvent: FfiConverterRustBuffer {
+fileprivate struct FfiConverterSequenceTypeEvent: FfiConverterRustBuffer {
     typealias SwiftType = [Event]
 
     static func write(_ value: [Event], into buf: Writer) {
@@ -6930,212 +7437,238 @@ private struct FfiConverterSequenceTypeEvent: FfiConverterRustBuffer {
     }
 }
 
+
 /**
  * Typealias from the type name used in the UDL file to the builtin type.  This
  * is needed because the UDL type name is used in function/method signatures.
  */
 public typealias EcdsaPublic = [UInt8]
-private typealias FfiConverterTypeEcdsaPublic = FfiConverterSequenceUInt8
+fileprivate typealias FfiConverterTypeEcdsaPublic = FfiConverterSequenceUInt8
+
 
 /**
  * Typealias from the type name used in the UDL file to the builtin type.  This
  * is needed because the UDL type name is used in function/method signatures.
  */
 public typealias Ed25519Public = [UInt8]
-private typealias FfiConverterTypeEd25519Public = FfiConverterSequenceUInt8
+fileprivate typealias FfiConverterTypeEd25519Public = FfiConverterSequenceUInt8
+
 
 /**
  * Typealias from the type name used in the UDL file to the builtin type.  This
  * is needed because the UDL type name is used in function/method signatures.
  */
 public typealias H256 = [UInt8]
-private typealias FfiConverterTypeH256 = FfiConverterSequenceUInt8
+fileprivate typealias FfiConverterTypeH256 = FfiConverterSequenceUInt8
+
 
 /**
  * Typealias from the type name used in the UDL file to the builtin type.  This
  * is needed because the UDL type name is used in function/method signatures.
  */
 public typealias MultiSigner = [String]
-private typealias FfiConverterTypeMultiSigner = FfiConverterSequenceString
+fileprivate typealias FfiConverterTypeMultiSigner = FfiConverterSequenceString
+
 
 /**
  * Typealias from the type name used in the UDL file to the builtin type.  This
  * is needed because the UDL type name is used in function/method signatures.
  */
 public typealias Sr25519Public = [UInt8]
-private typealias FfiConverterTypeSr25519Public = FfiConverterSequenceUInt8
+fileprivate typealias FfiConverterTypeSr25519Public = FfiConverterSequenceUInt8
 
-public func actionGetName(action: Action) -> FooterButton? {
+public func actionGetName(action: Action)  -> FooterButton? {
     return try! FfiConverterOptionTypeFooterButton.lift(
         try!
-
-            rustCall {
-                signer_4a1d_action_get_name(
-                    FfiConverterTypeAction.lower(action), $0
-                )
-            }
+    
+    rustCall() {
+    
+    signer_4a1d_action_get_name(
+        FfiConverterTypeAction.lower(action), $0)
+}
     )
 }
 
-public func initNavigation(dbname: String, seedNames: [String]) {
-    try!
 
-        rustCall {
-            signer_4a1d_init_navigation(
-                FfiConverterString.lower(dbname),
-                FfiConverterSequenceString.lower(seedNames), $0
-            )
-        }
+
+public func initNavigation(dbname: String, seedNames: [String])  {
+    try!
+    
+    rustCall() {
+    
+    signer_4a1d_init_navigation(
+        FfiConverterString.lower(dbname), 
+        FfiConverterSequenceString.lower(seedNames), $0)
 }
+}
+
 
 public func backendAction(action: Action, details: String, seedPhrase: String) throws -> ActionResult? {
     return try FfiConverterOptionTypeActionResult.lift(
         try
-
-            rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
-                signer_4a1d_backend_action(
-                    FfiConverterTypeAction.lower(action),
-                    FfiConverterString.lower(details),
-                    FfiConverterString.lower(seedPhrase), $0
-                )
-            }
+    
+    rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
+    
+    signer_4a1d_backend_action(
+        FfiConverterTypeAction.lower(action), 
+        FfiConverterString.lower(details), 
+        FfiConverterString.lower(seedPhrase), $0)
+}
     )
 }
 
-public func updateSeedNames(seedNames: [String]) {
-    try!
 
-        rustCall {
-            signer_4a1d_update_seed_names(
-                FfiConverterSequenceString.lower(seedNames), $0
-            )
-        }
+
+public func updateSeedNames(seedNames: [String])  {
+    try!
+    
+    rustCall() {
+    
+    signer_4a1d_update_seed_names(
+        FfiConverterSequenceString.lower(seedNames), $0)
 }
+}
+
 
 public func qrparserGetPacketsTotal(data: String, cleaned: Bool) throws -> UInt32 {
     return try FfiConverterUInt32.lift(
         try
-
-            rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
-                signer_4a1d_qrparser_get_packets_total(
-                    FfiConverterString.lower(data),
-                    FfiConverterBool.lower(cleaned), $0
-                )
-            }
+    
+    rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
+    
+    signer_4a1d_qrparser_get_packets_total(
+        FfiConverterString.lower(data), 
+        FfiConverterBool.lower(cleaned), $0)
+}
     )
 }
+
+
 
 public func qrparserTryDecodeQrSequence(data: String, cleaned: Bool) throws -> String {
     return try FfiConverterString.lift(
         try
-
-            rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
-                signer_4a1d_qrparser_try_decode_qr_sequence(
-                    FfiConverterString.lower(data),
-                    FfiConverterBool.lower(cleaned), $0
-                )
-            }
+    
+    rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
+    
+    signer_4a1d_qrparser_try_decode_qr_sequence(
+        FfiConverterString.lower(data), 
+        FfiConverterBool.lower(cleaned), $0)
+}
     )
 }
 
-public func substratePathCheck(seedName: String, path: String, network: String, dbname: String) -> DerivationCheck {
+
+
+public func substratePathCheck(seedName: String, path: String, network: String, dbname: String)  -> DerivationCheck {
     return try! FfiConverterTypeDerivationCheck.lift(
         try!
-
-            rustCall {
-                signer_4a1d_substrate_path_check(
-                    FfiConverterString.lower(seedName),
-                    FfiConverterString.lower(path),
-                    FfiConverterString.lower(network),
-                    FfiConverterString.lower(dbname), $0
-                )
-            }
+    
+    rustCall() {
+    
+    signer_4a1d_substrate_path_check(
+        FfiConverterString.lower(seedName), 
+        FfiConverterString.lower(path), 
+        FfiConverterString.lower(network), 
+        FfiConverterString.lower(dbname), $0)
+}
     )
 }
+
+
 
 public func historyInitHistoryWithCert(dbname: String) throws {
     try
-
-        rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
-            signer_4a1d_history_init_history_with_cert(
-                FfiConverterString.lower(dbname), $0
-            )
-        }
+    
+    rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
+    
+    signer_4a1d_history_init_history_with_cert(
+        FfiConverterString.lower(dbname), $0)
 }
+}
+
 
 public func historyInitHistoryNoCert(dbname: String) throws {
     try
-
-        rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
-            signer_4a1d_history_init_history_no_cert(
-                FfiConverterString.lower(dbname), $0
-            )
-        }
+    
+    rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
+    
+    signer_4a1d_history_init_history_no_cert(
+        FfiConverterString.lower(dbname), $0)
 }
+}
+
 
 public func historyDeviceWasOnline(dbname: String) throws {
     try
-
-        rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
-            signer_4a1d_history_device_was_online(
-                FfiConverterString.lower(dbname), $0
-            )
-        }
+    
+    rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
+    
+    signer_4a1d_history_device_was_online(
+        FfiConverterString.lower(dbname), $0)
 }
+}
+
 
 public func historyGetWarnings(dbname: String) throws -> Bool {
     return try FfiConverterBool.lift(
         try
-
-            rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
-                signer_4a1d_history_get_warnings(
-                    FfiConverterString.lower(dbname), $0
-                )
-            }
+    
+    rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
+    
+    signer_4a1d_history_get_warnings(
+        FfiConverterString.lower(dbname), $0)
+}
     )
 }
 
+
+
 public func historyAcknowledgeWarnings(dbname: String) throws {
     try
-
-        rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
-            signer_4a1d_history_acknowledge_warnings(
-                FfiConverterString.lower(dbname), $0
-            )
-        }
+    
+    rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
+    
+    signer_4a1d_history_acknowledge_warnings(
+        FfiConverterString.lower(dbname), $0)
 }
+}
+
 
 public func historyEntrySystem(event: Event, dbname: String) throws {
     try
-
-        rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
-            signer_4a1d_history_entry_system(
-                FfiConverterTypeEvent.lower(event),
-                FfiConverterString.lower(dbname), $0
-            )
-        }
+    
+    rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
+    
+    signer_4a1d_history_entry_system(
+        FfiConverterTypeEvent.lower(event), 
+        FfiConverterString.lower(dbname), $0)
 }
+}
+
 
 public func historySeedNameWasShown(seedName: String, dbname: String) throws {
     try
-
-        rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
-            signer_4a1d_history_seed_name_was_shown(
-                FfiConverterString.lower(seedName),
-                FfiConverterString.lower(dbname), $0
-            )
-        }
+    
+    rustCallWithError(FfiConverterTypeErrorDisplayed.self) {
+    
+    signer_4a1d_history_seed_name_was_shown(
+        FfiConverterString.lower(seedName), 
+        FfiConverterString.lower(dbname), $0)
+}
 }
 
-public func initLogging(tag: String) {
+
+public func initLogging(tag: String)  {
     try!
-
-        rustCall {
-            signer_4a1d_init_logging(
-                FfiConverterString.lower(tag), $0
-            )
-        }
+    
+    rustCall() {
+    
+    signer_4a1d_init_logging(
+        FfiConverterString.lower(tag), $0)
 }
+}
+
 
 /**
  * Top level initializers and tear down methods.
@@ -7146,5 +7679,6 @@ public enum SignerLifecycle {
     /**
      * Initialize the FFI and Rust library. This should be only called once per application.
      */
-    func initialize() {}
+    func initialize() {
+    }
 }

@@ -10,7 +10,7 @@ import SwiftUI
 struct SelectSeed: View {
     let content: MSeeds
     let sign: (String, String) -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg100.swiftUIColor)

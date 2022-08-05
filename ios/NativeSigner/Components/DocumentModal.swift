@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DocumentModal: View {
-    @State var document: ShownDocument = .toc
+    @State private var document: ShownDocument = .toc
 
     // paint top toggle buttons
     init() {

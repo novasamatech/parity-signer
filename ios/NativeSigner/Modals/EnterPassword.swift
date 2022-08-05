@@ -9,7 +9,7 @@ import SwiftUI
 
 struct EnterPassword: View {
     var content: MEnterPassword
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     @State private var password: String = ""
     @FocusState private var focused: Bool
     var body: some View {
@@ -45,7 +45,7 @@ struct EnterPassword: View {
                     text: "Next",
                     isCrypto: true,
                     action: {
-                        pushButton(.goForward, password, "")
+                        navigationRequest(.init(action: .goForward, details: password))
                     },
                     isDisabled: password.isEmpty
                 )

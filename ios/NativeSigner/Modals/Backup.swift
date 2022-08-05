@@ -11,11 +11,11 @@ struct Backup: View {
     let content: MBackup
     let alert: Bool
     let getSeedForBackup: (String) -> String
-    let pushButton: (Action, String, String) -> Void
-    @State var secret: String = ""
+    let navigationRequest: NavigationRequest
+    @State private var secret: String = ""
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    @State var countdown = 60
-    @State var failure = false
+    @State private var countdown = 60
+    @State private var failure = false
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg200.swiftUIColor)
@@ -26,7 +26,7 @@ struct Backup: View {
                         Spacer()
                         Button(
                             action: {
-                                pushButton(.goBack, "", "")
+                                navigationRequest(.init(action: .goBack))
                             },
                             label: {
                                 Image(.xmark).imageScale(.large)

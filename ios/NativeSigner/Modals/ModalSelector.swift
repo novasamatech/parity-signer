@@ -11,7 +11,7 @@ struct ModalSelector: View {
     let modalData: ModalData?
     let alert: Bool
     let alertShow: () -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     let removeSeed: (String) -> Void
     let restoreSeed: (String, String, Bool) -> Void
     let createAddress: (String, String) -> Void
@@ -24,12 +24,12 @@ struct ModalSelector: View {
             NewSeedMenu(
                 alert: alert,
                 alertShow: alertShow,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .networkSelector(value):
             NetworkManager(
                 content: value,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .seedMenu(value):
             SeedMenu(
@@ -37,14 +37,14 @@ struct ModalSelector: View {
                 alert: alert,
                 alertShow: alertShow,
                 removeSeed: removeSeed,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .backup(value):
             Backup(
                 content: value,
                 alert: alert,
                 getSeedForBackup: getSeedForBackup,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .passwordConfirm(value):
             PasswordConfirm(
@@ -54,53 +54,53 @@ struct ModalSelector: View {
         case let .signatureReady(value):
             SignatureReady(
                 content: value,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .enterPassword(value):
             EnterPassword(
                 content: value,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .logRight(value):
             LogMenu(
                 content: value,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case .networkDetailsMenu:
             NetworkDetailsMenu(
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .manageMetadata(value):
             ManageMetadata(
                 content: value,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .sufficientCryptoReady(value):
             SufficientCryptoReady(content: value)
         case .keyDetailsAction:
             KeyMenu(
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .typesInfo(value):
             TypesMenu(
                 content: value,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .newSeedBackup(value):
             NewSeedBackupModal(
                 content: value,
                 restoreSeed: restoreSeed,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case .logComment:
             LogComment(
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .selectSeed(value):
             SelectSeed(
                 content: value,
                 sign: sign,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case nil:
             EmptyView()

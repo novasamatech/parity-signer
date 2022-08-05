@@ -10,10 +10,10 @@ import SwiftUI
 
 struct CameraView: View {
     @StateObject var model = CameraViewModel()
-    @State var total: Int? = 0
-    @State var captured: Int? = 0
-    @State var resetCameraTrigger: Bool = false
-    let pushButton: (Action, String, String) -> Void
+    @State private var total: Int? = 0
+    @State private var captured: Int? = 0
+    @State private var resetCameraTrigger: Bool = false
+    let navigationRequest: NavigationRequest
     let size = UIScreen.main.bounds.size.width
     var body: some View {
         ZStack {
@@ -30,7 +30,7 @@ struct CameraView: View {
                     .onReceive(model.$payload, perform: { payload in
                         if payload != nil {
                             DispatchQueue.main.async {
-                                pushButton(.transactionFetched, payload ?? "", "")
+                                navigationRequest(.init(action: .transactionFetched, details: payload))
                             }
                         }
                     })

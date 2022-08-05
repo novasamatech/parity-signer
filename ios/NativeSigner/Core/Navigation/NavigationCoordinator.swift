@@ -16,9 +16,11 @@ typealias NavigationRequest = (Navigation) -> Void
 final class NavigationCoordinator: ObservableObject {
     private enum Constants {
         static let debounceTime: Double = 0.2
+        static let queueLabel = "navigationCoordinator.debounce"
     }
 
-    private let debounceQueue = DispatchQueue(label: "navigationCoordinator.debounce")
+    private let debounceQueue: Dispatching
+    private let backendActionPerformer: BackendNavigationPerforming
     private var isActionAvailable = true
 
     /// Action handler
@@ -34,6 +36,14 @@ final class NavigationCoordinator: ObservableObject {
         modalData: nil,
         alertData: .none
     )
+
+    init(
+        backendActionPerformer: BackendNavigationPerforming = BackendNavigationAdapter(),
+        debounceQueue: Dispatching = DispatchQueue(label: Constants.queueLabel)
+    ) {
+        self.backendActionPerformer = backendActionPerformer
+        self.debounceQueue = debounceQueue
+    }
 }
 
 extension NavigationCoordinator {
@@ -42,15 +52,12 @@ extension NavigationCoordinator {
 
         isActionAvailable = false
 
-        if let tempActionResult = try? backendAction(
+        if let actionResult = backendActionPerformer.performBackend(
             action: navigation.action,
             details: navigation.details,
             seedPhrase: navigation.seedPhrase
         ) {
-            if case let .sufficientCryptoReady(value) = tempActionResult.modalData {
-                print(value)
-            }
-            actionResult = tempActionResult
+            self.actionResult = actionResult
         }
 
         debounceQueue.asyncAfter(deadline: .now() + Constants.debounceTime, flags: .barrier) {

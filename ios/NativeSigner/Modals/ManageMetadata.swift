@@ -9,9 +9,9 @@ import SwiftUI
 
 struct ManageMetadata: View {
     var content: MManageMetadata
-    let pushButton: (Action, String, String) -> Void
-    @State var removeMetadataAlert = false
-    @State var offset: CGFloat = 0
+    let navigationRequest: NavigationRequest
+    @State private var removeMetadataAlert = false
+    @State private var offset: CGFloat = 0
     var body: some View {
         MenuStack {
             HeaderBar(line1: "MANAGE METADATA", line2: "Select action").padding(.top, 10)
@@ -44,7 +44,7 @@ struct ManageMetadata: View {
                     text: "Sign this metadata",
                     isShaded: true,
                     isCrypto: true,
-                    action: { pushButton(.signMetadata, "", "") }
+                    action: { navigationRequest(.init(action: .signMetadata)) }
                 )
                 BigButton(
                     text: "Delete this metadata",
@@ -63,7 +63,7 @@ struct ManageMetadata: View {
                 .onEnded { drag in
                     if drag.translation.height > 40 {
                         self.offset = UIScreen.main.bounds.size.height
-                        pushButton(.goBack, "", "")
+                        navigationRequest(.init(action: .goBack))
                     }
                 }
         )
@@ -74,7 +74,7 @@ struct ManageMetadata: View {
                 primaryButton: .cancel(Text("Cancel")),
                 secondaryButton: .destructive(
                     Text("Remove metadata"),
-                    action: { pushButton(.removeMetadata, "", "") }
+                    action: { navigationRequest(.init(action: .removeMetadata)) }
                 )
             )
         })

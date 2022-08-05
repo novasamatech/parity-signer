@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SeedManager: View {
     let content: MSeeds
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         VStack {
             ScrollView {
@@ -21,7 +21,7 @@ struct SeedManager: View {
                         HStack {
                             Button(
                                 action: {
-                                    pushButton(.selectSeed, seedNameCard.seedName, "")
+                                    navigationRequest(.init(action: .selectSeed, details: seedNameCard.seedName))
                                 },
                                 label: {
                                     SeedCardForManager(seedNameCard: seedNameCard)
