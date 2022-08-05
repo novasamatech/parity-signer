@@ -383,6 +383,10 @@ pub enum Error {
     /// User has entered a wrong password for a passworded address.
     #[error("Wrong password.")]
     WrongPassword,
+
+    /// User attempted to export root secret key.
+    #[error("Root account cannot be exported.")]
+    RootAccountCannotBeExported,
 }
 
 /// DB handling result.

@@ -153,16 +153,16 @@ pub fn generate_random_phrase(words_number: u32) -> Result<String> {
 ///
 /// </table>
 #[cfg(any(feature = "active", feature = "signer"))]
-pub(crate) fn mark_as_exposed(
-    new_cropped_path: &str,
-    new_is_passworded: bool,
-    old_cropped_path: &str,
-    old_is_passworded: bool,
+pub(crate) fn is_potentially_exposed(
+    path: &str,
+    path_is_passworded: bool,
+    exposed_path: &str,
+    exposed_is_passworded: bool,
 ) -> bool {
-    if (new_cropped_path == old_cropped_path)
-        || new_cropped_path.starts_with(&format!("{}/", old_cropped_path))
+    if (path == exposed_path)
+        || path.starts_with(&format!("{}/", exposed_path))
     {
-        new_is_passworded || !old_is_passworded
+        path_is_passworded || !exposed_is_passworded
     } else {
         false
     }
@@ -182,7 +182,7 @@ fn has_parent_with_exposed_secret(
     let mut out = false;
     for (_, address_details) in get_addresses_by_seed_name(database_name, seed_name)?.iter() {
         if address_details.secret_exposed
-            && mark_as_exposed(
+            && is_potentially_exposed(
                 new_cropped_path,
                 new_is_passworded,
                 &address_details.path,
@@ -209,7 +209,7 @@ fn exposed_set(
     filtered_set
         .into_iter()
         .filter(|(_, address_details)| {
-            mark_as_exposed(
+            is_potentially_exposed(
                 &address_details.path,
                 address_details.has_pwd,
                 exposed_cropped_path,
@@ -1222,7 +1222,7 @@ pub(crate) fn prepare_secret_key_for_export(
     multisigner: &MultiSigner,
     full_address: &str,
     pwd: Option<&str>,
-) -> Result<[u8; 32]> {
+) -> Result<Vec<u8>> {
     match multisigner {
         MultiSigner::Ed25519(public) => {
             let ed25519_pair = match ed25519::Pair::from_string(full_address, pwd) {
@@ -1232,17 +1232,17 @@ pub(crate) fn prepare_secret_key_for_export(
             if public != &ed25519_pair.public() {
                 return Err(Error::WrongPassword);
             }
-            Ok(*ed25519_pair.seed())
+            Ok(ed25519_pair.to_raw_vec())
         }
         MultiSigner::Sr25519(public) => {
-            let (sr25519_pair, seed) = match sr25519::Pair::from_phrase(full_address, pwd) {
+            let sr25519_pair = match sr25519::Pair::from_string(full_address, pwd) {
                 Ok(x) => x,
                 Err(e) => return Err(Error::SecretStringError(e)),
             };
             if public != &sr25519_pair.public() {
                 return Err(Error::WrongPassword);
             }
-            Ok(seed)
+            Ok(sr25519_pair.to_raw_vec())
         }
         MultiSigner::Ecdsa(public) => {
             let ecdsa_pair = match ecdsa::Pair::from_string(full_address, pwd) {
@@ -1252,7 +1252,7 @@ pub(crate) fn prepare_secret_key_for_export(
             if public != &ecdsa_pair.public() {
                 return Err(Error::WrongPassword);
             }
-            Ok(ecdsa_pair.seed())
+            Ok(ecdsa_pair.to_raw_vec())
         }
     }
 }
@@ -1282,6 +1282,9 @@ pub fn export_secret_key(
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let address_key = AddressKey::from_multisigner(multisigner);
     let address_details = get_address_details(database_name, &address_key)?;
+    if address_details.is_root() {
+        return Err(Error::RootAccountCannotBeExported);
+    }
     if address_details.seed_name != expected_seed_name {
         return Err(Error::SeedNameNotMatching {
             address_key,
@@ -1362,7 +1365,7 @@ pub fn export_secret_key(
             match png_qr_from_string(
                 &format!(
                     "secret:0x{}:{}",
-                    hex::encode(secret),
+                    hex::encode(&secret),
                     hex::encode(&network_specs.genesis_hash)
                 ),
                 DataType::Sensitive,
@@ -1399,4 +1402,53 @@ pub fn export_secret_key(
         network_info,
         address,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn potentially_exposed() {
+        assert_eq!(
+            is_potentially_exposed(
+                "//A//0", false,
+                "//A", false),
+            true);
+        assert_eq!(
+            is_potentially_exposed(
+                "//A//0", false,
+                "//A", true),
+            false);
+        assert_eq!(
+            is_potentially_exposed(
+                "//A//0", true,
+                "//A", false),
+            true);
+        assert_eq!(
+            is_potentially_exposed(
+                "//A", false,
+                "//A//0", false),
+            false);
+        assert_eq!(
+            is_potentially_exposed(
+                "//A//0", false,
+                "//A//0", false),
+            true);
+        assert_eq!(
+            is_potentially_exposed(
+                "//A/0", false,
+                "//A", false),
+            true);
+        assert_eq!(
+            is_potentially_exposed(
+                "//A//0//0", true,
+                "//A", true),
+            true);
+        assert_eq!(
+            is_potentially_exposed(
+                "//A//0", false,
+                "//B", false),
+            false);
+    }
 }

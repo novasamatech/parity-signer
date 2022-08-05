@@ -187,6 +187,11 @@ pub const fn alice_westend_root_qr() -> &'static [u8] {
     include_bytes!("alice_westend_root_qr")
 }
 
+/// Export qr code for root Alice secret in westend network
+pub const fn alice_westend_secret_qr() -> &'static [u8] {
+    include_bytes!("alice_westend_derivation_secret")
+}
+
 /// Export qr code for Alice key with `//westend` derivation in westend network
 pub const fn alice_westend_westend_qr() -> &'static [u8] {
     include_bytes!("alice_westend_westend_qr")
