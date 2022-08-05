@@ -19,7 +19,6 @@ protocol BackendNavigationPerforming: AnyObject {
     func performBackend(action: Action, details: String, seedPhrase: String) -> ActionResult?
 }
 
-
 /// We don't want to use module-wide public functions as there is no way of mocking them in unit  / UI tests
 /// This adapters acts as a wrapper for public function for navigation
 final class BackendNavigationAdapter: BackendNavigationPerforming {
