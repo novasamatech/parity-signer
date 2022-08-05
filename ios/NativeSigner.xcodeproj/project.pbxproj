@@ -138,12 +138,23 @@
 		2DE72BC926A588C9002BB752 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC826A588C9002BB752 /* Preview Assets.xcassets */; };
 		2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BFF26A6ADC5002BB752 /* CameraService.swift */; };
 		2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72C0E26A99885002BB752 /* RustNative.swift */; };
+		6D019968289C937600F4C317 /* AuthenticatedScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D019967289C937600F4C317 /* AuthenticatedScreenContainer.swift */; };
+		6D01996A289C939400F4C317 /* UnauthenticatedScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D019969289C939400F4C317 /* UnauthenticatedScreenContainer.swift */; };
+		6D01996C289C974C00F4C317 /* HeaderViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D01996B289C974C00F4C317 /* HeaderViewContainer.swift */; };
 		6D019972289D183200F4C317 /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D019970289CA13000F4C317 /* Navigation.swift */; };
 		6D019973289D183600F4C317 /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D01996E289CA12100F4C317 /* NavigationCoordinator.swift */; };
 		6D019974289D183B00F4C317 /* UInt8+Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D019964289BF7D000F4C317 /* UInt8+Formatting.swift */; };
 		6D4C0753289AC36100B2EE48 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0751289AC36100B2EE48 /* Fonts.swift */; };
 		6D4C0756289B369200B2EE48 /* Assets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0755289B369200B2EE48 /* Assets.swift */; };
 		6D4C0758289BD95500B2EE48 /* SFSymbols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0757289BD95500B2EE48 /* SFSymbols.swift */; };
+		6D57DC43289D29F000005C63 /* ScreenSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D57DC42289D29F000005C63 /* ScreenSelectorView.swift */; };
+		6D57DC45289D2A2600005C63 /* ModalSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D57DC44289D2A2600005C63 /* ModalSelectorView.swift */; };
+		6D57DC47289D2A4200005C63 /* AlertSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D57DC46289D2A4200005C63 /* AlertSelectorView.swift */; };
+		6D57DC4B289D614F00005C63 /* BackendNavigationAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D57DC4A289D614F00005C63 /* BackendNavigationAdapter.swift */; };
+		6D57DC4D289D652400005C63 /* Dispatching.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D57DC4C289D652400005C63 /* Dispatching.swift */; };
+		6D57DC50289D667800005C63 /* NavigationCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D57DC4F289D667800005C63 /* NavigationCoordinatorTests.swift */; };
+		6D57DC52289D68B800005C63 /* ActionResult+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D57DC51289D68B800005C63 /* ActionResult+Generate.swift */; };
+		6D57DC54289D6CE900005C63 /* NavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D57DC53289D6CE900005C63 /* NavigationTests.swift */; };
 		6D5801D12899130E006C41D8 /* PathMonitorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801D02899130E006C41D8 /* PathMonitorProtocol.swift */; };
 		6D5801D42899133A006C41D8 /* ConnectivityMonitoringAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801D32899133A006C41D8 /* ConnectivityMonitoringAdapter.swift */; };
 		6D5801D728991F11006C41D8 /* RuntimePropertiesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801D628991F11006C41D8 /* RuntimePropertiesProvider.swift */; };
@@ -311,11 +322,22 @@
 		2DE72C0C26A992D9002BB752 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
 		2DE72C0E26A99885002BB752 /* RustNative.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RustNative.swift; sourceTree = "<group>"; };
 		6D019964289BF7D000F4C317 /* UInt8+Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UInt8+Formatting.swift"; sourceTree = "<group>"; };
+		6D019967289C937600F4C317 /* AuthenticatedScreenContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatedScreenContainer.swift; sourceTree = "<group>"; };
+		6D019969289C939400F4C317 /* UnauthenticatedScreenContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnauthenticatedScreenContainer.swift; sourceTree = "<group>"; };
+		6D01996B289C974C00F4C317 /* HeaderViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderViewContainer.swift; sourceTree = "<group>"; };
 		6D01996E289CA12100F4C317 /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
 		6D019970289CA13000F4C317 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 		6D4C0751289AC36100B2EE48 /* Fonts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		6D4C0755289B369200B2EE48 /* Assets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Assets.swift; sourceTree = "<group>"; };
 		6D4C0757289BD95500B2EE48 /* SFSymbols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSymbols.swift; sourceTree = "<group>"; };
+		6D57DC42289D29F000005C63 /* ScreenSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSelectorView.swift; sourceTree = "<group>"; };
+		6D57DC44289D2A2600005C63 /* ModalSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalSelectorView.swift; sourceTree = "<group>"; };
+		6D57DC46289D2A4200005C63 /* AlertSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSelectorView.swift; sourceTree = "<group>"; };
+		6D57DC4A289D614F00005C63 /* BackendNavigationAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendNavigationAdapter.swift; sourceTree = "<group>"; };
+		6D57DC4C289D652400005C63 /* Dispatching.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dispatching.swift; sourceTree = "<group>"; };
+		6D57DC4F289D667800005C63 /* NavigationCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinatorTests.swift; sourceTree = "<group>"; };
+		6D57DC51289D68B800005C63 /* ActionResult+Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActionResult+Generate.swift"; sourceTree = "<group>"; };
+		6D57DC53289D6CE900005C63 /* NavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationTests.swift; sourceTree = "<group>"; };
 		6D5801D02899130E006C41D8 /* PathMonitorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathMonitorProtocol.swift; sourceTree = "<group>"; };
 		6D5801D32899133A006C41D8 /* ConnectivityMonitoringAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAdapter.swift; sourceTree = "<group>"; };
 		6D5801D628991F11006C41D8 /* RuntimePropertiesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimePropertiesProvider.swift; sourceTree = "<group>"; };
@@ -385,7 +407,8 @@
 		2D7A7BC626BA974E0053C1E0 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
-				2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */,
+				6D57DC48289D2A8F00005C63 /* SelectorViews */,
+				6D019966289C936800F4C317 /* Containers */,
 				2DA5F8262756629600D8DD29 /* ScreenSelector.swift */,
 				2D48F3B72771D250004B27BE /* SignSufficientCrypto.swift */,
 				2D48F3B32770C164004B27BE /* VerifierScreen.swift */,
@@ -573,10 +596,10 @@
 				2DE72BEF26A5981C002BB752 /* Models */,
 				2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */,
 				2DE72C1226AACB25002BB752 /* Database */,
-				2DE72BCA26A588C9002BB752 /* Info.plist */,
 				2D75EF9E280F02B900C48FAF /* Generated */,
 				2DE72BC726A588C9002BB752 /* Preview Content */,
 				6D4C074F289AB0BD00B2EE48 /* Resources */,
+				2DE72BCA26A588C9002BB752 /* Info.plist */,
 			);
 			path = NativeSigner;
 			sourceTree = "<group>";
@@ -640,6 +663,17 @@
 			path = Design;
 			sourceTree = "<group>";
 		};
+		6D019966289C936800F4C317 /* Containers */ = {
+			isa = PBXGroup;
+			children = (
+				2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */,
+				6D019967289C937600F4C317 /* AuthenticatedScreenContainer.swift */,
+				6D019969289C939400F4C317 /* UnauthenticatedScreenContainer.swift */,
+				6D01996B289C974C00F4C317 /* HeaderViewContainer.swift */,
+			);
+			path = Containers;
+			sourceTree = "<group>";
+		};
 		6D01996D289CA11500F4C317 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
@@ -658,9 +692,37 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		6D57DC48289D2A8F00005C63 /* SelectorViews */ = {
+			isa = PBXGroup;
+			children = (
+				6D57DC42289D29F000005C63 /* ScreenSelectorView.swift */,
+				6D57DC44289D2A2600005C63 /* ModalSelectorView.swift */,
+				6D57DC46289D2A4200005C63 /* AlertSelectorView.swift */,
+			);
+			path = SelectorViews;
+			sourceTree = "<group>";
+		};
+		6D57DC49289D614100005C63 /* Adapters */ = {
+			isa = PBXGroup;
+			children = (
+				6D57DC4A289D614F00005C63 /* BackendNavigationAdapter.swift */,
+			);
+			path = Adapters;
+			sourceTree = "<group>";
+		};
+		6D57DC4E289D667000005C63 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				6D57DC4F289D667800005C63 /* NavigationCoordinatorTests.swift */,
+				6D57DC53289D6CE900005C63 /* NavigationTests.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
 		6D5801CE28991301006C41D8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				6D57DC49289D614100005C63 /* Adapters */,
 				6D01996D289CA11500F4C317 /* Navigation */,
 				6DBD21F8289A7A14005D539B /* Database */,
 				6D5801D528991DA4006C41D8 /* Runtime */,
@@ -677,6 +739,7 @@
 				6D5801D828991F48006C41D8 /* ProcessInfoProtocol.swift */,
 				6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */,
 				6DBD21F3289A77DE005D539B /* BundleProtocol.swift */,
+				6D57DC4C289D652400005C63 /* Dispatching.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -701,6 +764,7 @@
 		6D5801DA2899235C006C41D8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				6D57DC4E289D667000005C63 /* Navigation */,
 				6DBD21FB289A83C9005D539B /* Database */,
 				6D5801DF289924A3006C41D8 /* Connectivity */,
 				6D5801DB28992361006C41D8 /* Runtime */,
@@ -755,6 +819,7 @@
 			children = (
 				6DBD21FF289A8C74005D539B /* URL+Generate.swift */,
 				6DBD2201289A8E1F005D539B /* ErrorMock.swift */,
+				6D57DC51289D68B800005C63 /* ActionResult+Generate.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -936,6 +1001,8 @@
 				2DAA82AF278874F3002917C0 /* NetworkLogo.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
 				2D78032528294D4C00E4D01E /* ShieldAlertComponent.swift in Sources */,
+				6D57DC4D289D652400005C63 /* Dispatching.swift in Sources */,
+				6D01996C289C974C00F4C317 /* HeaderViewContainer.swift in Sources */,
 				2D48F3D8277B95A3004B27BE /* TransactionBlock.swift in Sources */,
 				2DA5F86827566C3600D8DD29 /* TCAuthor.swift in Sources */,
 				2DA5F87427566C3600D8DD29 /* TCEraMortal.swift in Sources */,
@@ -963,6 +1030,7 @@
 				2D48F3532760A2D8004B27BE /* Fontstyle.swift in Sources */,
 				2D48F3AC277092FD004B27BE /* MetadataCard.swift in Sources */,
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
+				6D01996A289C939400F4C317 /* UnauthenticatedScreenContainer.swift in Sources */,
 				2DAA829327873027002917C0 /* TCDerivations.swift in Sources */,
 				2DA5F8312756652600D8DD29 /* CameraView.swift in Sources */,
 				2DA5F86F27566C3600D8DD29 /* TCTXSpec.swift in Sources */,
@@ -982,8 +1050,10 @@
 				2DA5F89F275F885400D8DD29 /* NewSeedMenu.swift in Sources */,
 				2DA5F87027566C3600D8DD29 /* TCNameVersion.swift in Sources */,
 				2DA5F89027590B3A00D8DD29 /* DocumentModal.swift in Sources */,
+				6D57DC4B289D614F00005C63 /* BackendNavigationAdapter.swift in Sources */,
 				2D48F38527691C0F004B27BE /* ErrorAlert.swift in Sources */,
 				2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */,
+				6D019968289C937600F4C317 /* AuthenticatedScreenContainer.swift in Sources */,
 				2DA5F86B27566C3600D8DD29 /* TCTip.swift in Sources */,
 				2DA5F8272756629600D8DD29 /* ScreenSelector.swift in Sources */,
 				2DA5F87E2756A28B00D8DD29 /* NetworkCard.swift in Sources */,
@@ -1034,6 +1104,7 @@
 				6D019973289D183600F4C317 /* NavigationCoordinator.swift in Sources */,
 				6DBD21F7289A798C005D539B /* ErrorDisplayed+Show.swift in Sources */,
 				2DA5F86127566C3600D8DD29 /* TCBalance.swift in Sources */,
+				6D57DC45289D2A2600005C63 /* ModalSelectorView.swift in Sources */,
 				2DA5F87127566C3600D8DD29 /* TCVarName.swift in Sources */,
 				2D48F398276A200F004B27BE /* EnterPassword.swift in Sources */,
 				2D48F3A827708670004B27BE /* NetworkDetails.swift in Sources */,
@@ -1056,12 +1127,14 @@
 				2D48F3BE27720345004B27BE /* KeyMenu.swift in Sources */,
 				6D4C0758289BD95500B2EE48 /* SFSymbols.swift in Sources */,
 				2DA5F88C2757693600D8DD29 /* NewAddressScreen.swift in Sources */,
+				6D57DC47289D2A4200005C63 /* AlertSelectorView.swift in Sources */,
 				2D48F36B2763604F004B27BE /* Backup.swift in Sources */,
 				6D5801D928991F48006C41D8 /* ProcessInfoProtocol.swift in Sources */,
 				2DAA82A527885D4A002917C0 /* TCTipPlain.swift in Sources */,
 				6D019972289D183200F4C317 /* Navigation.swift in Sources */,
 				2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */,
 				2DA5F83F275667CF00D8DD29 /* HistoryCardTemplate.swift in Sources */,
+				6D57DC43289D29F000005C63 /* ScreenSelectorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1070,9 +1143,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */,
+				6D57DC54289D6CE900005C63 /* NavigationTests.swift in Sources */,
+				6D57DC52289D68B800005C63 /* ActionResult+Generate.swift in Sources */,
 				6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */,
 				6DBD2200289A8C74005D539B /* URL+Generate.swift in Sources */,
 				6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */,
+				6D57DC50289D667800005C63 /* NavigationCoordinatorTests.swift in Sources */,
 				6D5801DE28992375006C41D8 /* RuntimePropertiesProviderTests.swift in Sources */,
 				6DBD21FD289A83D0005D539B /* DatabaseMediatorTests.swift in Sources */,
 			);
@@ -1214,7 +1290,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 50100;
 				DEVELOPMENT_ASSET_PATHS = "\"NativeSigner/Preview Content\"";
-				DEVELOPMENT_TEAM = P2PX3JU8FT;
+				DEVELOPMENT_TEAM = HN8MSF5ULF;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1229,7 +1305,7 @@
 					"$(PROJECT_DIR)/NativeSigner",
 				);
 				MARKETING_VERSION = 5.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
+				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner.testing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner-Bridging-Header.h";
@@ -1248,7 +1324,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 50100;
 				DEVELOPMENT_ASSET_PATHS = "\"NativeSigner/Preview Content\"";
-				DEVELOPMENT_TEAM = P2PX3JU8FT;
+				DEVELOPMENT_TEAM = HN8MSF5ULF;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = NativeSigner/Info.plist;
@@ -1262,7 +1338,7 @@
 					"$(PROJECT_DIR)/NativeSigner",
 				);
 				MARKETING_VERSION = 5.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
+				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner.testing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner-Bridging-Header.h";
