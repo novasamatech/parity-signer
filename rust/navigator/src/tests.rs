@@ -1976,7 +1976,7 @@ fn flow_test_1() {
                                     encryption: Encryption::Sr25519,
                                     public_key: vec![],
                                     path: String::new(),
-                                    network_genesis_hash: hex::decode(
+                                    network_genesis_hash: H256::from_str(
                                         network_genesis_hash_polkadot,
                                     )
                                     .unwrap(),
@@ -1988,7 +1988,7 @@ fn flow_test_1() {
                                     encryption: Encryption::Sr25519,
                                     public_key: vec![],
                                     path: "//polkadot".to_string(),
-                                    network_genesis_hash: hex::decode(
+                                    network_genesis_hash: H256::from_str(
                                         network_genesis_hash_polkadot,
                                     )
                                     .unwrap(),
@@ -2000,8 +2000,10 @@ fn flow_test_1() {
                                     encryption: Encryption::Sr25519,
                                     public_key: vec![],
                                     path: String::new(),
-                                    network_genesis_hash: hex::decode(network_genesis_hash_kusama)
-                                        .unwrap(),
+                                    network_genesis_hash: H256::from_str(
+                                        network_genesis_hash_kusama,
+                                    )
+                                    .unwrap(),
                                 },
                             },
                             Event::IdentityAdded {
@@ -2010,8 +2012,10 @@ fn flow_test_1() {
                                     encryption: Encryption::Sr25519,
                                     public_key: vec![],
                                     path: "//kusama".to_string(),
-                                    network_genesis_hash: hex::decode(network_genesis_hash_kusama)
-                                        .unwrap(),
+                                    network_genesis_hash: H256::from_str(
+                                        network_genesis_hash_kusama,
+                                    )
+                                    .unwrap(),
                                 },
                             },
                             Event::IdentityAdded {
@@ -2020,8 +2024,10 @@ fn flow_test_1() {
                                     encryption: Encryption::Sr25519,
                                     public_key: vec![],
                                     path: String::new(),
-                                    network_genesis_hash: hex::decode(network_genesis_hash_westend)
-                                        .unwrap(),
+                                    network_genesis_hash: H256::from_str(
+                                        network_genesis_hash_westend,
+                                    )
+                                    .unwrap(),
                                 },
                             },
                             Event::IdentityAdded {
@@ -2030,8 +2036,10 @@ fn flow_test_1() {
                                     encryption: Encryption::Sr25519,
                                     public_key: vec![],
                                     path: "//westend".to_string(),
-                                    network_genesis_hash: hex::decode(network_genesis_hash_westend)
-                                        .unwrap(),
+                                    network_genesis_hash: H256::from_str(
+                                        network_genesis_hash_westend,
+                                    )
+                                    .unwrap(),
                                 },
                             },
                         ],
@@ -3190,8 +3198,10 @@ fn flow_test_1() {
                                     "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                                 ).unwrap(),
                                 path: "".to_string(),
-                                network_genesis_hash: hex::decode(network_genesis_hash_polkadot)
-                                    .unwrap(),
+                                network_genesis_hash: H256::from_str(
+                                    network_genesis_hash_polkadot
+                                )
+                                .unwrap(),
                             },
                         }],
                     },
@@ -3206,8 +3216,10 @@ fn flow_test_1() {
                                     "e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
                                 ).unwrap(),
                                 path: "//secret//path".to_string(),
-                                network_genesis_hash: hex::decode(network_genesis_hash_polkadot)
-                                    .unwrap(),
+                                network_genesis_hash: H256::from_str(
+                                    network_genesis_hash_polkadot
+                                )
+                                .unwrap(),
                             },
                         }],
                     },
@@ -3226,7 +3238,7 @@ fn flow_test_1() {
                                         "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                                     ).unwrap(),
                                     path: "//polkadot".to_string(),
-                                    network_genesis_hash: hex::decode(
+                                    network_genesis_hash: H256::from_str(
                                         network_genesis_hash_polkadot,
                                     )
                                     .unwrap(),
@@ -3240,8 +3252,9 @@ fn flow_test_1() {
                                         "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                                     ) .unwrap(),
                                     path: "//kusama".to_string(),
-                                    network_genesis_hash: hex::decode(network_genesis_hash_kusama)
-                                        .unwrap(),
+                                    network_genesis_hash: H256::from_str(
+                                        network_genesis_hash_kusama)
+                                    .unwrap(),
                                 },
                             },
                             Event::IdentityAdded {
@@ -3252,8 +3265,10 @@ fn flow_test_1() {
                                         "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                                     ).unwrap(),
                                     path: "//westend".to_string(),
-                                    network_genesis_hash: hex::decode(network_genesis_hash_westend)
-                                        .unwrap(),
+                                    network_genesis_hash: H256::from_str(
+                                    network_genesis_hash_westend
+                                    )
+                                    .unwrap(),
                                 },
                             },
                         ],
@@ -6318,7 +6333,7 @@ fn flow_test_1() {
         ),
     };
     let network_genesis_hash =
-        hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
+        H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
     let message = String::from_utf8(hex::decode(&card_text).unwrap()).unwrap();
     let expected_action = ActionResult {
         screen_label: String::new(),
@@ -6378,7 +6393,7 @@ fn flow_test_1() {
                                 encryption: Encryption::Sr25519,
                                 public_key: hex::decode(&pepper_key0_public).unwrap(),
                                 path: "//0".to_string(),
-                                network_genesis_hash: network_genesis_hash.clone(),
+                                network_genesis_hash,
                             },
                         }],
                     },
