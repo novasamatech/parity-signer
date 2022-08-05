@@ -15,7 +15,7 @@ struct TCTXSpecPlain: View {
                 Text("Unknown network")
                 TCNameValueTemplate(
                     name: "Genesis hash",
-                    value: content.networkGenesisHash.map { String(format: "%02X", $0) }.joined()
+                    value: content.networkGenesisHash.formattedAsString
                 )
                 TCNameValueTemplate(name: "Version", value: content.version)
                 TCNameValueTemplate(name: "Tx version", value: content.txVersion)

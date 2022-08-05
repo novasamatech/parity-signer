@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HistoryCard: View {
     var event: Event
-    var timestamp: String
+    var timestamp: String?
     var body: some View {
         switch event {
         case .databaseInitiated:
@@ -17,16 +17,14 @@ struct HistoryCard: View {
                 image: .init(.iphoneArrow, variant: .forward),
                 timestamp: timestamp,
                 danger: false,
-                line1: "Database initiated",
-                line2: ""
+                line1: "Database initiated"
             )
         case .deviceWasOnline:
             HistoryCardTemplate(
                 image: .init(.xmark, variants: [.shield, .fill]),
                 timestamp: timestamp,
                 danger: true,
-                line1: "Device was connected to network",
-                line2: ""
+                line1: "Device was connected to network"
             )
         case let .generalVerifierSet(value):
             HistoryCardTemplate(
@@ -41,16 +39,14 @@ struct HistoryCard: View {
                 image: .init(.xmark, variants: [.rectangle, .portrait]),
                 timestamp: timestamp,
                 danger: false,
-                line1: "History cleared",
-                line2: ""
+                line1: "History cleared"
             )
         case .identitiesWiped:
             HistoryCardTemplate(
                 image: .init(.xmark, variants: [.rectangle, .portrait]),
                 timestamp: timestamp,
                 danger: false,
-                line1: "All keys were wiped",
-                line2: ""
+                line1: "All keys were wiped"
             )
         case let .identityAdded(value):
             HistoryCardTemplate(
@@ -109,15 +105,14 @@ struct HistoryCard: View {
                 line2: value.validCurrentVerifier == .general ?
                     "general" :
                     "custom" + " for network with genesis hash " +
-                    value.genesisHash.map { String(format: "%02X", $0) }.joined()
+                    value.genesisHash.formattedAsString
             )
         case .resetDangerRecord:
             HistoryCardTemplate(
                 image: .init(.checkmark, variant: .shield),
                 timestamp: timestamp,
                 danger: true,
-                line1: "Warnings acknowledged",
-                line2: ""
+                line1: "Warnings acknowledged"
             )
         case let .seedCreated(text):
             HistoryCardTemplate(
@@ -164,8 +159,7 @@ struct HistoryCard: View {
                 image: .init(.signature),
                 timestamp: timestamp,
                 danger: false,
-                line1: "Types signed",
-                line2: ""
+                line1: "Types signed"
             )
         case let .systemEntry(text):
             HistoryCardTemplate(
@@ -196,16 +190,14 @@ struct HistoryCard: View {
                 image: .init(.plus, variant: .viewfinder),
                 timestamp: timestamp,
                 danger: false,
-                line1: "New types info loaded",
-                line2: ""
+                line1: "New types info loaded"
             )
         case .typesRemoved:
             HistoryCardTemplate(
                 image: .init(.minus, variant: .square),
                 timestamp: timestamp,
                 danger: true,
-                line1: "Types info removed",
-                line2: ""
+                line1: "Types info removed"
             )
         case let .userEntry(text):
             HistoryCardTemplate(
@@ -220,8 +212,7 @@ struct HistoryCard: View {
                 image: .init(.exclamationmark, variants: [.triangle, .fill]),
                 timestamp: timestamp,
                 danger: true,
-                line1: "Warning! " + text,
-                line2: ""
+                line1: "Warning! " + text
             )
         case .wrongPassword:
             HistoryCardTemplate(

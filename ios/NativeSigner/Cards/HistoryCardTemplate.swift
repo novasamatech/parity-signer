@@ -12,7 +12,7 @@ struct HistoryCardTemplate: View {
     var timestamp: String?
     var danger: Bool
     var line1: String
-    var line2: String
+    var line2: String = ""
 
     var body: some View {
         HStack {
