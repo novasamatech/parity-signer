@@ -20,7 +20,10 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MTypesInfo
 
 @Composable
-fun TypesInfo(typesInfo: MTypesInfo, signerDataModel: SignerDataModel) {
+fun TypesInfo(
+	typesInfo: MTypesInfo,
+	button: (Action) -> Unit
+) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Column {
@@ -45,7 +48,7 @@ fun TypesInfo(typesInfo: MTypesInfo, signerDataModel: SignerDataModel) {
 					text = "Sign types",
 					isShaded = true,
 					isCrypto = true,
-					action = { signerDataModel.pushButton(Action.SIGN_TYPES) })
+					action = { button(Action.SIGN_TYPES) })
 				BigButton(
 					text = "Delete types",
 					isShaded = true,
@@ -62,7 +65,7 @@ fun TypesInfo(typesInfo: MTypesInfo, signerDataModel: SignerDataModel) {
 		header = "Remove types?",
 		text = "Types information needed for support of pre-v14 metadata will be removed. Are you sure?",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(Action.REMOVE_TYPES) },
+		forward = { button(Action.REMOVE_TYPES) },
 		backText = "Cancel",
 		forwardText = "Remove types"
 	)

@@ -23,7 +23,7 @@ struct TransactionPreview: View {
                 if let network = content.networkInfo {
                     NetworkCard(title: network.networkTitle, logo: network.networkLogo)
                 }
-                if (content.ttype == .sign) {
+                if content.ttype == .sign {
                     HStack {
                         Text("LOG NOTE").font(FBase(style: .overline)).foregroundColor(Color("Text400"))
                         Spacer()
@@ -34,7 +34,6 @@ struct TransactionPreview: View {
                             .foregroundColor(Color("Text400"))
                             .background(Color("Bg100"))
                             .font(FBase(style: .body2))
-                        //.border(Color("Border400"), width: 1)
                             .focused($focus)
                             .onDisappear {
                                 focus = false

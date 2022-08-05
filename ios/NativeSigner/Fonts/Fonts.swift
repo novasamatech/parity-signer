@@ -8,18 +8,18 @@
 import Foundation
 import SwiftUI
 
-/**
- * Fonts definitions
- *
- * Use this place only to define fonts!
- */
+//
+// Fonts definitions
+//
+// Use this place only to define fonts!
+//
 
-//Fontstyles
+// Fontstyles
 enum Fontstyle {
-    case h1
-    case h2
-    case h3
-    case h4
+    case h1 // swiftlint:disable:this identifier_name
+    case h2 // swiftlint:disable:this identifier_name
+    case h3 // swiftlint:disable:this identifier_name
+    case h4 // swiftlint:disable:this identifier_name
     case button
     case body1
     case body2
@@ -28,80 +28,80 @@ enum Fontstyle {
     case subtitle2
 }
 
-//Base
+// Base
 func FBase(style: Fontstyle) -> Font {
     switch style {
     case .h1:
-        return Font.custom("Inter-Bold", size:19)
+        return Font.custom("Inter-Bold", size: 19)
     case .h2:
-        return Font.custom("Inter-Semibold", size:19)
+        return Font.custom("Inter-Semibold", size: 19)
     case .h3:
-        return Font.custom("Inter-Semibold", size:16)
+        return Font.custom("Inter-Semibold", size: 16)
     case .h4:
-        return Font.custom("Inter-Medium", size:16)
+        return Font.custom("Inter-Medium", size: 16)
     case .button:
-        return Font.custom("Inter-Semibold", size:17)
+        return Font.custom("Inter-Semibold", size: 17)
     case .body1:
-        return Font.custom("Inter-Regular", size:16)
+        return Font.custom("Inter-Regular", size: 16)
     case .body2:
-        return Font.custom("Inter-Regular", size:15)
+        return Font.custom("Inter-Regular", size: 15)
     case .overline:
-        return Font.custom("Inter-Medium", size:13)
+        return Font.custom("Inter-Medium", size: 13)
     case .subtitle1:
-        return Font.custom("Inter-Medium", size:15)
+        return Font.custom("Inter-Medium", size: 15)
     case .subtitle2:
-        return Font.custom("Inter-Regular", size:13)
+        return Font.custom("Inter-Regular", size: 13)
     }
 }
 
-//Crypto
+// Crypto
 func FCrypto(style: Fontstyle) -> Font {
     switch style {
     case .h1:
-        return Font.custom("RobotoMono-Medium", size:19)
+        return Font.custom("RobotoMono-Medium", size: 19)
     case .h2:
-        return Font.custom("RobotoMono-Medium", size:19)
+        return Font.custom("RobotoMono-Medium", size: 19)
     case .h3:
-        return Font.custom("RobotoMono-Medium", size:16)
+        return Font.custom("RobotoMono-Medium", size: 16)
     case .h4:
-        return Font.custom("RobotoMono-Medium", size:16)
+        return Font.custom("RobotoMono-Medium", size: 16)
     case .button:
-        return Font.custom("RobotoMono-Medium", size:16)
+        return Font.custom("RobotoMono-Medium", size: 16)
     case .body1:
-        return Font.custom("RobotoMono-Medium", size:12)
+        return Font.custom("RobotoMono-Medium", size: 12)
     case .body2:
-        return Font.custom("RobotoMono-Light", size:12).weight(.medium)
+        return Font.custom("RobotoMono-Light", size: 12).weight(.medium)
     case .overline:
-        return Font.custom("RobotoMono-Medium", size:12)
+        return Font.custom("RobotoMono-Medium", size: 12)
     case .subtitle1:
-        return Font.custom("RobotoMono-Medium", size:14)
+        return Font.custom("RobotoMono-Medium", size: 14)
     case .subtitle2:
-        return Font.custom("RobotoMono-Medium", size:13)
+        return Font.custom("RobotoMono-Medium", size: 13)
     }
 }
 
-//Web3
+// Web3
 func FWeb3(style: Fontstyle) -> Font {
     switch style {
     case .h1:
-        return Font.custom("Web3-Regular", size:19)
+        return Font.custom("Web3-Regular", size: 19)
     case .h2:
-        return Font.custom("Web3-Regular", size:19)
+        return Font.custom("Web3-Regular", size: 19)
     case .h3:
-        return Font.custom("Web3-Regular", size:16)
+        return Font.custom("Web3-Regular", size: 16)
     case .h4:
-        return Font.custom("Web3-Regular", size:16)
+        return Font.custom("Web3-Regular", size: 16)
     case .button:
-        return Font.custom("Web3-Regular", size:16)
+        return Font.custom("Web3-Regular", size: 16)
     case .body1:
-        return Font.custom("Web3-Regular", size:16)
+        return Font.custom("Web3-Regular", size: 16)
     case .body2:
-        return Font.custom("Web3-Regular", size:15)
+        return Font.custom("Web3-Regular", size: 15)
     case .overline:
-        return Font.custom("Web3-Regular", size:12)
+        return Font.custom("Web3-Regular", size: 12)
     case .subtitle1:
-        return Font.custom("Web3-Regular", size:14)
+        return Font.custom("Web3-Regular", size: 14)
     case .subtitle2:
-        return Font.custom("Web3-Regular", size:13)
+        return Font.custom("Web3-Regular", size: 13)
     }
 }

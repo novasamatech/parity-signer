@@ -32,7 +32,6 @@ struct ExportAddress: View {
                         Text(content.address.seedName)
                     }.padding().foregroundColor(Color("Text400")).font(FBase(style: .body2))
                 }
-                
             }
         }
     }

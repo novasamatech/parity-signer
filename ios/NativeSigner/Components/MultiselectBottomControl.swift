@@ -17,31 +17,35 @@ struct MultiselectBottomControl: View {
     var body: some View {
         ZStack {
             HStack {
-                Button(action: {
-                    delete = true
-                }) {
-                    SmallButton(text: "Delete")
-                }
-                .disabled(selectedCount == "0")
-                .alert(isPresented: $delete, content: {
-                    Alert(
-                        title: Text("Delete key?"),
-                        message: Text("You are about to delete selected keys"),
-                        primaryButton: .cancel(),
-                        secondaryButton: .destructive(
-                            Text("Delete"),
-                            action: {
-                                pushButton(.removeKey, "", "")
-                            }
+                Button(
+                    action: {
+                        delete = true
+                    },
+                    label: {
+                        SmallButton(text: "Delete")
+                    })
+                    .disabled(selectedCount == "0")
+                    .alert(isPresented: $delete, content: {
+                        Alert(
+                            title: Text("Delete key?"),
+                            message: Text("You are about to delete selected keys"),
+                            primaryButton: .cancel(),
+                            secondaryButton: .destructive(
+                                Text("Delete"),
+                                action: {
+                                    pushButton(.removeKey, "", "")
+                                }
+                            )
                         )
-                    )
-                })
+                    })
                 Spacer()
-                Button(action: {
-                    pushButton(.exportMultiSelect, "", "")
-                }) {
-                    SmallButton(text: "Export")
-                }.disabled(selectedCount == "0")
+                Button(
+                    action: {
+                        pushButton(.exportMultiSelect, "", "")
+                    },
+                    label: {
+                        SmallButton(text: "Export")
+                    }).disabled(selectedCount == "0")
             }
             HStack {
                 Text(selectedCount)

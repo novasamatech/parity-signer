@@ -15,6 +15,7 @@
 //! error management is easier.
 use anyhow::anyhow;
 use sp_core::{crypto::SecretStringError, H256};
+use std::fmt::Write as _;
 use time::error::Format;
 #[cfg(feature = "test")]
 use variant_count::VariantCount;
@@ -303,7 +304,8 @@ impl ErrorSource for Signer {
                         format!("General verifier in the database is {}. Received {} could be accepted only if verified by the same general verifier. Current message is verified by {}.", old_general_verifier_value.show_error(), insert, new_general_verifier_value.show_error())
                     },
                     InputSigner::TypesKnown => String::from("Exactly same types information is already in the database."),
-                    InputSigner::MessageNotReadable => String::from("Received message could not be read."),
+                    InputSigner::MessageNoWrapper => String::from("Received message has no `<Bytes></Bytes>` wrapper."),
+                    InputSigner::MessageNotValidUtf8 => String::from("Received message could not be represented as valid utf8 sequence."),
                     InputSigner::UnknownNetwork{genesis_hash, encryption} => format!("Input generated within unknown network and could not be processed. Add network with genesis hash {} and encryption {}.", hex::encode(genesis_hash), encryption.show()),
                     InputSigner::NoMetadata{name} => format!("Input transaction is generated in network {}. Currently there are no metadata entries for it, and transaction could not be processed. Add network metadata.", name),
                     InputSigner::SpecsKnown{name, encryption} => format!("Exactly same network specs for network {} with encryption {} are already in the database.", name, encryption.show()),
@@ -348,7 +350,7 @@ impl ErrorSource for Signer {
                 let mut insert = String::new();
                 for (i,(version, parser_error)) in errors.iter().enumerate() {
                     if i>0 {insert.push(' ')}
-                    insert.push_str(&format!("Parsing with {}{} metadata: {}", network_name, version, parser_error.show()));
+                    let _ = write!(insert, "Parsing with {}{} metadata: {}", network_name, version, parser_error.show());
                 }
                 format!("Failed to decode extensions. Please try updating metadata for {} network. {}", network_name, insert)
             },
@@ -1279,8 +1281,13 @@ pub enum InputSigner {
     TypesKnown,
 
     /// Text message received as a part of signable transaction with `53xx03`
-    /// prelude could not be transformed into a valid `String`.
-    MessageNotReadable,
+    /// does not have `<Bytes></Bytes>` wrapper
+    MessageNoWrapper,
+
+    /// Text message received as a part of signable transaction with `53xx03`
+    /// prelude could not be transformed into a valid `String`, because there
+    /// are invalid utf8 symbols.
+    MessageNotValidUtf8,
 
     /// Received signable transaction (with prelude `53xx00`, `53xx02` or
     /// `53xx03`) is generated in the network that has no corresponding

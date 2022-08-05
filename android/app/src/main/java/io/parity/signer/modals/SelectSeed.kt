@@ -21,7 +21,10 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MSeeds
 
 @Composable
-fun SelectSeed(seeds: MSeeds, signerDataModel: SignerDataModel) {
+fun SelectSeed(
+	seeds: MSeeds,
+	selectSeed: (String) -> Unit
+) {
 	val cards = seeds.seedNameCards
 
 	Surface(
@@ -40,17 +43,8 @@ fun SelectSeed(seeds: MSeeds, signerDataModel: SignerDataModel) {
 					Row(
 						Modifier
 							.clickable {
-								signerDataModel.authentication.authenticate(signerDataModel.activity) {
-									val seedName = cards[item].seedName
-									val seedPhrase = signerDataModel.getSeed(seedName)
-									if (seedPhrase.isNotBlank()) {
-										signerDataModel.pushButton(
-											Action.GO_FORWARD,
-											seedName,
-											seedPhrase
-										)
-									}
-								}
+								val seedName = cards[item].seedName
+								selectSeed(seedName)
 							}
 							.weight(1f, true)
 					) {

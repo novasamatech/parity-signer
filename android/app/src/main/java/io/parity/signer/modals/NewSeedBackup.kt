@@ -21,7 +21,7 @@ import io.parity.signer.uniffi.MNewSeedBackup
 @Composable
 fun NewSeedBackup(
 	newSeedBackup: MNewSeedBackup,
-	signerDataModel: SignerDataModel
+	addSeed: (String, String, Boolean) -> Unit
 ) {
 	val confirmBackup = remember { mutableStateOf(false) }
 	val createRoots = remember { mutableStateOf(true) }
@@ -55,10 +55,10 @@ fun NewSeedBackup(
 				text = "Next",
 				action =
 				{
-					signerDataModel.addSeed(
-						seedName = newSeedBackup.seed,
-						seedPhrase = newSeedBackup.seedPhrase,
-						createRoots = createRoots.value
+					addSeed(
+						newSeedBackup.seed,
+						newSeedBackup.seedPhrase,
+						createRoots.value
 					)
 				},
 				isDisabled = !confirmBackup.value

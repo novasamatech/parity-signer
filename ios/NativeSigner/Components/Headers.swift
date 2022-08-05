@@ -22,7 +22,7 @@ struct HeaderBar: View {
     var line1: String
     var line2: String
     var body: some View {
-        VStack (alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 2) {
             HeadingOverline(text: line1)
             Text(line2)
                 .foregroundColor(Color("Text400"))
@@ -33,8 +33,6 @@ struct HeaderBar: View {
         .font(.caption)
     }
 }
-
-
 
 /*
 struct HeaderBar_Previews: PreviewProvider {

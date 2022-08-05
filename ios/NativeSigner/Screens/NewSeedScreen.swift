@@ -13,14 +13,13 @@ struct NewSeedScreen: View {
     let content: MNewSeed
     let checkSeedCollision: (String) -> Bool
     let pushButton: (Action, String, String) -> Void
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             Text("DISPLAY NAME").font(FBase(style: .overline)).foregroundColor(Color("Text500"))
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(Color("Border400"))
-                //.foregroundColor(Color("Border400"))
                     .frame(height: 39)
                 TextField("Seed", text: $seedName, prompt: Text("Seed name"))
                     .focused($nameFocused)

@@ -19,12 +19,14 @@ import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 
 @Composable
-fun KeyDetailsAction(signerDataModel: SignerDataModel) {
+fun KeyDetailsAction(
+	button: (Action) -> Unit
+) {
 	var confirm by remember { mutableStateOf(false) }
 
-	Column (
-		Modifier.clickable { signerDataModel.pushButton(Action.GO_BACK) }
-		) {
+	Column(
+		Modifier.clickable { button(Action.GO_BACK) }
+	) {
 		Spacer(Modifier.weight(1f))
 		Surface(
 			color = MaterialTheme.colors.Bg000,
@@ -50,7 +52,7 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 		header = "Forget this key?",
 		text = "This key will be removed for this network. Are you sure?",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(Action.REMOVE_KEY) },
+		forward = { button(Action.REMOVE_KEY) },
 		backText = "Cancel",
 		forwardText = "Remove key"
 	)
