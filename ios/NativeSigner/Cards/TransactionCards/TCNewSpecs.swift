@@ -40,7 +40,7 @@ struct TCNewSpecs: View {
                 HStack {
                     Text("genesis hash:")
                         .foregroundColor(Asset.text400.swiftUIColor)
-                    Text(value.genesisHash.map { String(format: "%02X", $0) }.joined())
+                    Text(value.genesisHash.formattedAsString)
                         .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
