@@ -7,7 +7,6 @@ use definitions::{
     keyring::{AddressKey, NetworkSpecsKey},
     navigation::TransactionCardSet,
 };
-use parity_scale_codec::DecodeAll;
 use parser::cards::ParserCard;
 
 use crate::cards::{make_author_info, Card, Warning};
@@ -22,14 +21,21 @@ pub fn process_message(
         multisigner_msg_genesis_encryption(data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
-    // this is a standard decoding of String, with utf8 conversion;
-    // processing input vec![20, 104, 101, 3, 108, 111] will not throw error at element `3`,
-    // it will result in output `helo` instead, length, however, is still correct, 5.
-    // note that some invisible symbols may thus sneak into the message;
-    let message = match String::decode_all(&mut &message_vec[..]) {
-        Ok(a) => a,
-        Err(_) => return Err(ErrorSigner::Input(InputSigner::MessageNotReadable)),
+    // Message starts with `<Bytes>` and ends with `</Bytes>`. Data in the
+    // middle is the message itself represented as bytes.
+    //
+    // Printed part is message in the middle. Signed part will be whole thing
+    // with wrapper.
+    let message_cut_vec = match message_vec.strip_prefix(br#"<Bytes>"#) {
+        Some(a) => match a.strip_suffix(br#"</Bytes>"#) {
+            Some(b) => b,
+            None => return Err(ErrorSigner::Input(InputSigner::MessageNoWrapper)),
+        },
+        None => return Err(ErrorSigner::Input(InputSigner::MessageNoWrapper)),
     };
+
+    let message = String::from_utf8(message_cut_vec.to_vec())
+        .map_err(|_| ErrorSigner::Input(InputSigner::MessageNotValidUtf8))?;
 
     // initialize index and indent
     let mut index: u32 = 0;

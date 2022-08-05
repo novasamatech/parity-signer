@@ -24,16 +24,18 @@ struct AddressCard: View {
                 ZStack {
                     Identicon(identicon: address.identicon)
                     if multiselectMode {
-                        VStack{
+                        VStack {
                             Spacer()
-                            HStack{
+                            HStack {
                                 Spacer()
-                                Image(systemName: address.multiselect == true ? "checkmark.circle.fill" : "circle").imageScale(.large)
+                                Image(systemName: address.multiselect == true ?
+                                      "checkmark.circle.fill" :
+                                        "circle").imageScale(.large)
                             }
                         }
                     }
                 }.frame(width: 30, height: 30)
-                VStack (alignment: .leading) {
+                VStack(alignment: .leading) {
                     HStack {
                         Text(address.seedName).foregroundColor(Color("Text600")).font(FBase(style: .subtitle1))
                         Text(address.path)
@@ -45,7 +47,7 @@ struct AddressCard: View {
                         }
                     }.foregroundColor(Color("Crypto400"))
                         .font(FCrypto(style: .body2))
-                    //Here we could have shortened base58 address when buttons are shown, but we don't need to
+                    // Here we could have shortened base58 address when buttons are shown, but we don't need to
                     Text(address.base58.truncateMiddle(length: 8)).foregroundColor(Color("Text400"))
                         .font(FCrypto(style: .body1))
                 }

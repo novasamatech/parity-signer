@@ -14,14 +14,20 @@ struct SelectSeedForBackup: View {
         VStack {
             ScrollView {
                 LazyVStack {
-                    ForEach(content.seedNameCards.sorted(by: {$0.seedName < $1.seedName}), id: \.seedName) {seedNameCard in
+                    ForEach(
+                        content.seedNameCards.sorted(by: {$0.seedName < $1.seedName}),
+                        id: \.seedName
+                    ) {seedNameCard in
                         HStack {
-                            Button(action: {
-                                pushButton(.backupSeed, seedNameCard.seedName, "")
-                            }) {
-                                SeedCardForManager(seedNameCard: seedNameCard)
-                                Spacer()
-                            }
+                            Button(
+                                action: {
+                                    pushButton(.backupSeed, seedNameCard.seedName, "")
+                                },
+                                label: {
+                                    SeedCardForManager(seedNameCard: seedNameCard)
+                                    Spacer()
+                                }
+                            )
                         }
                     }
                 }
@@ -32,9 +38,9 @@ struct SelectSeedForBackup: View {
 }
 
 /*
-struct SelectSeedForBackup_Previews: PreviewProvider {
-    static var previews: some View {
-        SelectSeedForBackup()
-    }
-}
-*/
+ struct SelectSeedForBackup_Previews: PreviewProvider {
+ static var previews: some View {
+ SelectSeedForBackup()
+ }
+ }
+ */

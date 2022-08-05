@@ -28,13 +28,13 @@ import io.parity.signer.uniffi.MscNetworkInfo
 @Composable
 fun ManageMetadata(
 	networks: MManageMetadata,
-	signerDataModel: SignerDataModel
+	button: (Action) -> Unit
 ) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Surface(
 		color = Color.Transparent,
-		modifier = Modifier.clickable { signerDataModel.pushButton(Action.GO_BACK) }
+		modifier = Modifier.clickable { button(Action.GO_BACK) }
 	) {
 		Column {
 			Spacer(Modifier.weight(1f))
@@ -64,7 +64,7 @@ fun ManageMetadata(
 						text = "Sign this metadata",
 						isShaded = true,
 						isCrypto = true,
-						action = { signerDataModel.pushButton(Action.SIGN_METADATA) })
+						action = { button(Action.SIGN_METADATA) })
 					BigButton(
 						text = "Delete this metadata",
 						isShaded = true,
@@ -83,7 +83,7 @@ fun ManageMetadata(
 		header = "Remove metadata?",
 		text = "This metadata will be removed for all networks",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(Action.REMOVE_METADATA) },
+		forward = { button(Action.REMOVE_METADATA) },
 		backText = "Cancel",
 		forwardText = "Remove metadata"
 	)

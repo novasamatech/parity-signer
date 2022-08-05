@@ -12,24 +12,24 @@ import Foundation
  * uft16 is used for string-native performance
  */
 extension Data {
-    
-    func hexCharValue(u: UInt16) -> UInt8? {
-        switch (u) {
+
+    func hexCharValue(character: UInt16) -> UInt8? {
+        switch character {
         case 0x30 ... 0x39:
-            return UInt8(u - 0x30)
+            return UInt8(character - 0x30)
         case 0x61 ... 0x66:
-            return UInt8(u-0x61 + 10)
+            return UInt8(character-0x61 + 10)
         default:
             return nil
         }
     }
-    
+
     init?(fromHexEncodedString string: String) {
         self.init(capacity: string.utf16.count/2)
         var even = true
         var value: UInt8 = 0
-        for i in string.utf16 {
-            guard let symbol = hexCharValue(u: i) else { return nil }
+        for character in string.utf16 {
+            guard let symbol = hexCharValue(character: character) else { return nil }
             if even {
                 value = symbol << 4
             } else {
@@ -47,7 +47,13 @@ extension Data {
  */
 extension AttributedString {
     init?(fromHexDocs string: String) {
-        try? self.init(markdown: Data(fromHexEncodedString: string) ?? Data(), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace, failurePolicy: .returnPartiallyParsedIfPossible))
+        try? self.init(
+            markdown: Data(fromHexEncodedString: string) ?? Data(),
+            options: AttributedString.MarkdownParsingOptions(
+                interpretedSyntax: .inlineOnlyPreservingWhitespace,
+                failurePolicy: .returnPartiallyParsedIfPossible
+            )
+        )
     }
 }
 
@@ -92,7 +98,7 @@ extension MRecoverSeedPhrase {
 
 extension Verifier {
     func show() -> String {
-        switch(self.v) {
+        switch self.v {
         case .standard(let value):
             return value[0]
         case .none:
@@ -103,7 +109,7 @@ extension Verifier {
 
 extension VerifierValue {
     func show() -> String {
-        switch(self) {
+        switch self {
         case .standard(let value):
             return value [0]
         }

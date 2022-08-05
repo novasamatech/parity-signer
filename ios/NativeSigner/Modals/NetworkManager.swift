@@ -12,7 +12,7 @@ struct NetworkManager: View {
     let pushButton: (Action, String, String) -> Void
     var body: some View {
         VStack {
-            Rectangle().frame(height: UIScreen.main.bounds.height/3).opacity(0.0001).gesture(TapGesture().onEnded{_ in
+            Rectangle().frame(height: UIScreen.main.bounds.height/3).opacity(0.0001).gesture(TapGesture().onEnded {_ in
                 pushButton(.goBack, "", "")
             })
             ZStack {
@@ -27,11 +27,13 @@ struct NetworkManager: View {
                         LazyVStack {
                             ForEach(content.networks.sorted(by: {$0.order < $1.order}), id: \.order) {network in
                                 ZStack {
-                                    Button(action: {
-                                        pushButton(.changeNetwork, network.key, "")
-                                    }) {
-                                        NetworkCard(title: network.title, logo: network.logo, fancy: true)
-                                    }
+                                    Button(
+                                        action: {
+                                            pushButton(.changeNetwork, network.key, "")
+                                        },
+                                        label: {
+                                            NetworkCard(title: network.title, logo: network.logo, fancy: true)
+                                        })
                                     HStack {
                                         Spacer()
                                         if network.selected {

@@ -17,9 +17,9 @@ struct ModalSelector: View {
     let createAddress: (String, String) -> Void
     let getSeedForBackup: (String) -> String
     let sign: (String, String) -> Void
-    
+
     var body: some View {
-        switch (modalData) {
+        switch modalData {
         case .newSeedMenu:
             NewSeedMenu(
                 alert: alert,

@@ -22,67 +22,68 @@ struct Header: View {
             HStack {
                 HStack(spacing: 8.0) {
                     if back {
-                        Button(action: {
-                            pushButton(.goBack, "", "")
-                        }) {
-                            Image(systemName: rightButton == .multiSelect ? "xmark" : "chevron.left")
-                                .imageScale(.large)
-                                .foregroundColor(Color("Text500"))
-                        }
+                        Button(
+                            action: {
+                                pushButton(.goBack, "", "")
+                            },
+                            label: {
+                                Image(systemName: rightButton == .multiSelect ? "xmark" : "chevron.left")
+                                    .imageScale(.large)
+                                    .foregroundColor(Color("Text500"))
+                            })
                     }
                     Spacer()
                 }
                 .frame(width: 72.0)
-                
                 Spacer()
                 Text(screenLabel)
                     .foregroundColor(Color("Text600"))
                     .font(screenNameType == .h1 ? FBase(style: .h2) : FBase(style: .h4))
                     .tracking(0.1)
-                
                 if rightButton == .multiSelect {
-                    Button(action: {
-                        pushButton(.selectAll, "", "")
-                    }) {
-                        SmallButton(text: "Select all")
-                    }
+                    Button(
+                        action: {
+                            pushButton(.selectAll, "", "")
+                        },
+                        label: {
+                            SmallButton(text: "Select all")
+                        })
                 }
                 Spacer()
-                
                 HStack(spacing: 8.0) {
                     Spacer()
-                    Button(action: {
-                        if alert && rightButton == .newSeed {
-                            alertShow()
-                        } else {
-                            pushButton(.rightButtonAction, "", "")
-                        }
-                    }) {
-                        switch(
-                            rightButton
-                        ) {
-                        case .newSeed:
-                            Image(systemName: "plus.circle")
-                                .imageScale(.large)
-                                .foregroundColor(Color("Action400"))
-                        case .backup:
-                            Image(systemName: "ellipsis")
-                                .imageScale(.large)
-                                .foregroundColor(Color("Action400"))
-                        case .logRight:
-                            Image(systemName: "ellipsis")
-                                .imageScale(.large)
-                                .foregroundColor(Color("Action400"))
-                        case .multiSelect:
-                            EmptyView()
-                        case .none:
-                            EmptyView()
-                        default:
-                            Image(systemName: "ellipsis")
-                                .imageScale(.large)
-                                .foregroundColor(Color("Action400"))
-                        }
-                    }
+                    Button(
+                        action: {
+                            if alert && rightButton == .newSeed {
+                                alertShow()
+                            } else {
+                                pushButton(.rightButtonAction, "", "")
+                            }
+                        },
+                        label: {
+                            switch rightButton {
+                            case .newSeed:
+                                Image(systemName: "plus.circle")
+                                    .imageScale(.large)
+                                    .foregroundColor(Color("Action400"))
+                            case .backup:
+                                Image(systemName: "ellipsis")
+                                    .imageScale(.large)
+                                    .foregroundColor(Color("Action400"))
+                            case .logRight:
+                                Image(systemName: "ellipsis")
+                                    .imageScale(.large)
+                                    .foregroundColor(Color("Action400"))
+                            case .multiSelect:
+                                EmptyView()
+                            case .none:
+                                EmptyView()
+                            default:
+                                Image(systemName: "ellipsis")
+                                    .imageScale(.large)
+                                    .foregroundColor(Color("Action400"))
+                            }
+                        })
                     NavbarShield(
                         canaryDead: canaryDead,
                         alert: alert,
