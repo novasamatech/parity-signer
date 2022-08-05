@@ -1,10 +1,10 @@
-name:                         E2E Test
+name:                         iOS build
 
 on:
   pull_request:
   push:
     branches:
-      - master
+      - main
       - stable
 jobs:
   check:

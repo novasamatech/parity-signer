@@ -130,7 +130,7 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
                 }
             };
             let message = {
-                if message.len() > 257 {
+                if message.len() > 257 && &transaction_hex[4..6] != "03" {
                     blake2b(32, &[], &message).as_bytes().to_vec()
                 } else {
                     message
@@ -163,7 +163,7 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
                 }
             };
             let message = {
-                if message.len() > 257 {
+                if message.len() > 257 && &transaction_hex[4..6] != "03" {
                     blake2b(32, &[], &message).as_bytes().to_vec()
                 } else {
                     message
@@ -196,7 +196,7 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
                 }
             };
             let message = {
-                if message.len() > 257 {
+                if message.len() > 257 && &transaction_hex[4..6] != "03" {
                     blake2b(32, &[], &message).as_bytes().to_vec()
                 } else {
                     message
