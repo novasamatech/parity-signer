@@ -2,8 +2,8 @@
 //  Use this file to import your target's public headers that you would like to expose to Swift.
 //
 
-#ifndef NativeSignerTests-Bridging-Header_h
-#define NativeSignerTests-Bridging-Header_h
+#ifndef NativeSignerTests_Bridging_Header_h
+#define NativeSignerTests_Bridging_Header_h
 
 #import "signerFFI.h"
 

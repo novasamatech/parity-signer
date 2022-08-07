@@ -9,9 +9,8 @@ import SwiftUI
 
 struct ScreenSelector: View {
     let screenData: ScreenData
-    let appVersion: String?
     let alert: Bool
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     let getSeed: (String) -> String
     let doJailbreak: () -> Void
     let pathCheck: (String, String, String) -> DerivationCheck
@@ -27,7 +26,7 @@ struct ScreenSelector: View {
         switch screenData {
         case .scan:
             TransactionScreen(
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .keys(value):
             KeyManager(
@@ -35,19 +34,18 @@ struct ScreenSelector: View {
                 alert: alert,
                 alertShow: alertShow,
                 increment: increment,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .settings(value):
             SettingsScreen(
                 content: value,
-                appVersion: appVersion,
                 doWipe: doWipe,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .log(value):
             HistoryScreen(
                 content: value,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .logDetails(value):
             EventDetails(content: value)
@@ -55,12 +53,12 @@ struct ScreenSelector: View {
             TransactionPreview(
                 content: value,
                 sign: sign,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .seedSelector(value):
             SeedManager(
                 content: value,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .keyDetails(value):
             ExportAddress(content: value)
@@ -68,26 +66,26 @@ struct ScreenSelector: View {
             NewSeedScreen(
                 content: value,
                 checkSeedCollision: checkSeedCollision,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .recoverSeedName(value):
             RecoverSeedName(
                 content: value,
                 checkSeedCollision: checkSeedCollision,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .recoverSeedPhrase(value):
             RecoverSeedPhrase(
                 content: value,
                 restoreSeed: restoreSeed,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .deriveKey(value):
             NewAddressScreen(
                 content: value,
                 pathCheck: pathCheck,
                 createAddress: createAddress,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .vVerifier(value):
             VerifierScreen(
@@ -97,30 +95,30 @@ struct ScreenSelector: View {
         case let .manageNetworks(value):
             ManageNetworks(
                 content: value,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .nNetworkDetails(value):
             NetworkDetails(
                 content: value,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case let .signSufficientCrypto(value):
             SignSufficientCrypto(
                 content: value,
-                pushButton: pushButton,
+                navigationRequest: navigationRequest,
                 getSeed: getSeed
             )
         case let .selectSeedForBackup(value):
             SelectSeedForBackup(
                 content: value,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         case .documents:
             DocumentModal()
         case let .keyDetailsMulti(value):
             KeyDetailsMulti(
                 content: value,
-                pushButton: pushButton
+                navigationRequest: navigationRequest
             )
         }
     }

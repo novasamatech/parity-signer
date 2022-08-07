@@ -14,7 +14,7 @@ struct RecoverSeedPhrase: View {
     @FocusState private var focus: Bool
     let content: MRecoverSeedPhrase
     let restoreSeed: (String, String, Bool) -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
 
     var body: some View {
         ZStack {
@@ -45,7 +45,7 @@ struct RecoverSeedPhrase: View {
                                     .keyboardType(.asciiCapable)
                                     .submitLabel(.done)
                                     .onChange(of: userInput, perform: { word in
-                                        pushButton(.textEntry, word, "")
+                                        navigationRequest(.init(action: .textEntry, details: word))
                                         shadowUserInput = word
                                     })
                                     .onSubmit {}
@@ -71,7 +71,7 @@ struct RecoverSeedPhrase: View {
                                     VStack {
                                         Button(
                                             action: {
-                                                pushButton(.pushWord, guess, "")
+                                                navigationRequest(.init(action: .pushWord, details: guess))
                                             },
                                             label: {
                                                 Text(guess)
@@ -96,8 +96,7 @@ struct RecoverSeedPhrase: View {
                             },
                             label: {
                                 HStack {
-                                    (createRoots ? Image(.checkmark, variant: .square) : Image(.square))
-                                        .imageScale(.large)
+                                    Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
                                     Text("Create root keys")
                                         .multilineTextAlignment(.leading)
                                     Spacer()

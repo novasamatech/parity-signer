@@ -9,8 +9,8 @@ import SwiftUI
 
 struct SufficientCryptoReady: View {
     @GestureState private var dragOffset = CGSize.zero
-    @State var offset: CGFloat = 0
-    @State var oldOffset: CGFloat = 0
+    @State private var offset: CGFloat = 0
+    @State private var oldOffset: CGFloat = 0
     var content: MSufficientCryptoReady
     var body: some View {
         ZStack {

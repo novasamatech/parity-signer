@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct NewAddressScreen: View {
-    @State var path: String = ""
+    @State private var path: String = ""
     @FocusState private var focusedField: Bool
     @State private var derivationCheck: DerivationCheck?
     var content: MDeriveKey
     let pathCheck: (String, String, String) -> DerivationCheck
     let createAddress: (String, String) -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
 
     var body: some View {
         ZStack {
@@ -42,7 +42,7 @@ struct NewAddressScreen: View {
                                     case .pin:
                                         createAddress(path, content.seedName)
                                     case .pwd:
-                                        pushButton(.checkPassword, path, "")
+                                        navigationRequest(.init(action: .checkPassword, details: path))
                                     default:
                                         break
                                     }
@@ -69,7 +69,7 @@ struct NewAddressScreen: View {
                             case .pin:
                                 createAddress(path, content.seedName)
                             case .pwd:
-                                pushButton(.checkPassword, path, "")
+                                navigationRequest(.init(action: .checkPassword, details: path))
                             default:
                                 break
                             }

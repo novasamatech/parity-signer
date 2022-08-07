@@ -15,7 +15,7 @@ struct Header: View {
     let alert: Bool
     let canaryDead: Bool
     let alertShow: () -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         VStack {
             Spacer()
@@ -24,7 +24,7 @@ struct Header: View {
                     if back {
                         Button(
                             action: {
-                                pushButton(.goBack, "", "")
+                                navigationRequest(.init(action: .goBack))
                             },
                             label: {
                                 Image(
@@ -47,7 +47,7 @@ struct Header: View {
                 if rightButton == .multiSelect {
                     Button(
                         action: {
-                            pushButton(.selectAll, "", "")
+                            navigationRequest(.init(action: .selectAll))
                         },
                         label: {
                             SmallButton(text: "Select all")
@@ -62,7 +62,7 @@ struct Header: View {
                             if alert, rightButton == .newSeed {
                                 alertShow()
                             } else {
-                                pushButton(.rightButtonAction, "", "")
+                                navigationRequest(.init(action: .rightButtonAction))
                             }
                         },
                         label: {
@@ -93,7 +93,7 @@ struct Header: View {
                     NavbarShield(
                         canaryDead: canaryDead,
                         alert: alert,
-                        pushButton: pushButton
+                        navigationRequest: navigationRequest
                     )
                 }
                 .frame(width: 72.0)

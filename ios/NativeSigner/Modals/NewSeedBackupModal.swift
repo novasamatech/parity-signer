@@ -10,9 +10,9 @@ import SwiftUI
 struct NewSeedBackupModal: View {
     let content: MNewSeedBackup
     let restoreSeed: (String, String, Bool) -> Void
-    let pushButton: (Action, String, String) -> Void
-    @State var confirmBackup = false
-    @State var createRoots = true
+    let navigationRequest: NavigationRequest
+    @State private var confirmBackup = false
+    @State private var createRoots = true
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg200.swiftUIColor)

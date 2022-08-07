@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LogComment: View {
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     @State private var comment: String = ""
     @FocusState private var focused: Bool
     var body: some View {
@@ -35,7 +35,7 @@ struct LogComment: View {
                                 focused = true
                             }
                             .onSubmit {
-                                pushButton(.goForward, comment, "")
+                                navigationRequest(.init(action: .goForward, details: comment))
                             }
                     }
                 }

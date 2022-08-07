@@ -9,12 +9,12 @@ import SwiftUI
 
 struct TransactionPreview: View {
     @State private var comment = ""
-    @State var offset: CGFloat = 0
-    @State var offsetOld: CGFloat = 0
+    @State private var offset: CGFloat = 0
+    @State private var offsetOld: CGFloat = 0
     @FocusState private var focus: Bool
     let content: MTransaction
     let sign: (String, String) -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         VStack {
             TransactionBlock(cards: content.content.assemble())
@@ -67,7 +67,7 @@ struct TransactionPreview: View {
                         BigButton(
                             text: "Approve",
                             action: {
-                                pushButton(.goForward, "", "")
+                                navigationRequest(.init(action: .goForward))
                             }
                         )
                     case .read:
@@ -77,7 +77,7 @@ struct TransactionPreview: View {
                             text: "Select seed",
                             isCrypto: true,
                             action: {
-                                pushButton(.goForward, "", "")
+                                navigationRequest(.init(action: .goForward))
                             }
                         )
                     case .done:
@@ -90,7 +90,7 @@ struct TransactionPreview: View {
                             isDangerous: true,
                             action: {
                                 focus = false
-                                pushButton(.goBack, "", "")
+                                navigationRequest(.init(action: .goBack))
                             }
                         )
                     }

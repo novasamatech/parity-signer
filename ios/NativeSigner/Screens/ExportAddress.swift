@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ExportAddress: View {
-    @State var showDetails = false
+    @State private var showDetails = false
     var content: MKeyDetails
     var body: some View {
         ScrollView {

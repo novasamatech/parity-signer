@@ -8,18 +8,18 @@
 import SwiftUI
 
 struct ErrorAlert: View {
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     let content: String
     var body: some View {
         ZStack {
             Rectangle().foregroundColor(Asset.bgDanger.swiftUIColor).opacity(0.3).gesture(TapGesture().onEnded { _ in
-                pushButton(.goBack, "", "")
+                navigationRequest(.init(action: .goBack))
             })
             VStack {
                 Text("Error!").font(Fontstyle.header1.base).foregroundColor(Asset.signalDanger.swiftUIColor)
                 Text(content).foregroundColor(Asset.signalDanger.swiftUIColor)
                 Button("Ok", action: {
-                    pushButton(.goBack, "", "")
+                    navigationRequest(.init(action: .goBack))
                 })
             }.padding().background(RoundedRectangle(cornerRadius: 20).foregroundColor(Asset.bgDanger.swiftUIColor))
         }

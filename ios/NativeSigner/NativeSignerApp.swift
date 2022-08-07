@@ -9,11 +9,16 @@ import SwiftUI
 
 @main
 struct NativeSignerApp: App {
+    let navigation = NavigationCoordinator()
+
     var body: some Scene {
         WindowGroup {
-            MainScreenContainer()
-                .font(Fontstyle.body1.base)
-                .background(Asset.bg100.swiftUIColor)
+            MainScreenContainer(
+                data: SignerDataModel(navigation: navigation),
+                navigation: navigation
+            )
+            .font(Fontstyle.body1.base)
+            .background(Asset.bg100.swiftUIColor)
         }
     }
 }
