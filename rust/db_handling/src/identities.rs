@@ -177,21 +177,17 @@ fn has_parent_with_exposed_secret(
     seed_name: &str,
     database_name: &str,
 ) -> Result<bool> {
-    let mut out = false;
-    for (_, address_details) in get_addresses_by_seed_name(database_name, seed_name)?.iter() {
-        if address_details.secret_exposed
-            && is_potentially_exposed(
-                new_cropped_path,
-                new_is_passworded,
-                &address_details.path,
-                address_details.has_pwd,
-            )
-        {
-            out = true;
-            break;
-        }
-    }
-    Ok(out)
+    Ok(get_addresses_by_seed_name(database_name, seed_name)?
+        .iter()
+        .any(|(_, address_details)| {
+            address_details.secret_exposed
+                && is_potentially_exposed(
+                    new_cropped_path,
+                    new_is_passworded,
+                    &address_details.path,
+                    address_details.has_pwd,
+                )
+        }))
 }
 
 /// Find all `(AddressKey, AddressDetails)` that must be marked as exposed
@@ -1223,37 +1219,26 @@ pub(crate) fn prepare_secret_key_for_export(
 ) -> Result<[u8; 32]> {
     match multisigner {
         MultiSigner::Ed25519(public) => {
-            let ed25519_pair = match ed25519::Pair::from_string(full_address, pwd) {
-                Ok(x) => x,
-                Err(e) => return Err(Error::SecretStringError(e)),
-            };
+            let ed25519_pair =
+                ed25519::Pair::from_string(full_address, pwd).map_err(Error::SecretStringError)?;
             if public != &ed25519_pair.public() {
                 return Err(Error::WrongPassword);
             }
             Ok(*ed25519_pair.seed())
         }
         MultiSigner::Sr25519(public) => {
-            let (sr25519_pair, seed) = match sr25519::Pair::from_string_with_seed(full_address, pwd)
-            {
-                Ok(x) => x,
-                Err(e) => return Err(Error::SecretStringError(e)),
-            };
+            let (sr25519_pair, seed) = sr25519::Pair::from_string_with_seed(full_address, pwd)
+                .map_err(Error::SecretStringError)?;
             if public != &sr25519_pair.public() {
                 return Err(Error::WrongPassword);
             }
-            if let Some(x) = seed {
-                Ok(x)
-            } else {
-                Err(Error::NoSeedForKeyPair {
-                    full_address: full_address.to_string(),
-                })
-            }
+            Ok(seed.ok_or_else(|| Error::NoSeedForKeyPair {
+                multisigner: multisigner.clone(),
+            })?)
         }
         MultiSigner::Ecdsa(public) => {
-            let ecdsa_pair = match ecdsa::Pair::from_string(full_address, pwd) {
-                Ok(x) => x,
-                Err(e) => return Err(Error::SecretStringError(e)),
-            };
+            let ecdsa_pair =
+                ecdsa::Pair::from_string(full_address, pwd).map_err(Error::SecretStringError)?;
             if public != &ecdsa_pair.public() {
                 return Err(Error::WrongPassword);
             }

@@ -384,9 +384,10 @@ pub enum Error {
     #[error("Wrong password.")]
     WrongPassword,
 
-    /// Key pair can't be expressed as a direct derivation from a seed
-    #[error("Unable to export secret for address {full_address}")]
-    NoSeedForKeyPair { full_address: String },
+    #[error("Key pair with public key {} can't be expressed as a direct derivation from a seed",
+    hex::encode(multisigner_to_public(.multisigner)),
+    )]
+    NoSeedForKeyPair { multisigner: MultiSigner },
 }
 
 /// DB handling result.
