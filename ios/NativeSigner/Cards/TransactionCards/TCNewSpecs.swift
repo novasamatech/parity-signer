@@ -11,40 +11,41 @@ struct TCNewSpecs: View {
     var value: NetworkSpecsToSend
     var body: some View {
         VStack {
-            Text("NEW NETWORK").foregroundColor(Asset.text600.swiftUIColor)
+            Localizable.newNetwork.text
+                .foregroundColor(Asset.text600.swiftUIColor)
             VStack(alignment: .leading) {
                 HStack {
-                    Text("Network name:")
+                    Localizable.networkName.text
                         .foregroundColor(Asset.text400.swiftUIColor)
                     Text(value.title)
                         .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
-                    Text("base58 prefix:")
+                    Localizable.base58Prefix.text
                         .foregroundColor(Asset.text400.swiftUIColor)
                     Text(String(value.base58prefix))
                         .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
-                    Text("decimals:")
+                    Localizable.decimals.text
                         .foregroundColor(Asset.text400.swiftUIColor)
                     Text(String(value.decimals))
                         .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
-                    Text("unit:")
+                    Localizable.unit.text
                         .foregroundColor(Asset.text400.swiftUIColor)
                     Text(value.unit)
                         .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
-                    Text("genesis hash:")
+                    Localizable.genesisHash.text
                         .foregroundColor(Asset.text400.swiftUIColor)
                     Text(value.genesisHash.formattedAsString)
                         .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
-                    Text("crypto:")
+                    Localizable.crypto.text
                         .foregroundColor(Asset.text400.swiftUIColor)
                     Text(
                         value.encryption == .ed25519 ? "ed25519" :
@@ -54,18 +55,18 @@ struct TCNewSpecs: View {
                     .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
-                    Text("spec name:")
+                    Localizable.specName.text
                         .foregroundColor(Asset.text400.swiftUIColor)
                     Text(value.name)
                         .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
-                    Text("logo:")
+                    Localizable.logo.text
                         .foregroundColor(Asset.text400.swiftUIColor)
                     NetworkLogo(logo: value.logo)
                 }
                 HStack {
-                    Text("default path:")
+                    Localizable.defaultPath.text
                         .foregroundColor(Asset.text400.swiftUIColor)
                     Text(value.pathId)
                         .foregroundColor(Asset.text600.swiftUIColor)

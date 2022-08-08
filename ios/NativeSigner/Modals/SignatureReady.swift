@@ -17,12 +17,15 @@ struct SignatureReady: View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg000.swiftUIColor)
             VStack {
-                HeaderBar(line1: "Your Signature", line2: "Scan it into your application")
+                HeaderBar(
+                    line1: Localizable.yourSignature.key,
+                    line2: Localizable.scanItIntoYourApplication.key
+                )
                 Image(uiImage: UIImage(data: Data(content.signature)) ?? UIImage())
                     .resizable()
                     .aspectRatio(contentMode: .fit).padding(12)
                 Spacer()
-                BigButton(text: "Done", action: {
+                BigButton(text: Localizable.done.key, action: {
                     navigationRequest(.init(action: .goBack))
                 })
             }.padding(16)

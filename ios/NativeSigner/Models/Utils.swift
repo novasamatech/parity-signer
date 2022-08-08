@@ -65,21 +65,10 @@ extension String {
 
 extension TransactionCardSet {
     func assemble() -> [TransactionCard] {
-        var assembled: [TransactionCard] = []
-        assembled.append(contentsOf: author ?? [])
-        assembled.append(contentsOf: error ?? [])
-        assembled.append(contentsOf: extensions ?? [])
-        assembled.append(contentsOf: importingDerivations ?? [])
-        assembled.append(contentsOf: message ?? [])
-        assembled.append(contentsOf: meta ?? [])
-        assembled.append(contentsOf: method ?? [])
-        assembled.append(contentsOf: newSpecs ?? [])
-        assembled.append(contentsOf: verifier ?? [])
-        assembled.append(contentsOf: warning ?? [])
-        assembled.append(contentsOf: typesInfo ?? [])
-        return assembled.sorted(by: {
-            $0.index < $1.index
-        })
+        [author, error, extensions, importingDerivations, message, meta, method, newSpecs, verifier, warning, typesInfo]
+            .compactMap { $0 }
+            .flatMap { $0 }
+            .sorted { $0.index < $1.index }
     }
 }
 

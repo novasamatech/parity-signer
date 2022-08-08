@@ -11,8 +11,8 @@ struct TCEraMortal: View {
     var eraMortal: MscEraMortal
     var body: some View {
         VStack {
-            TCNameValueTemplate(name: "phase", value: eraMortal.phase)
-            TCNameValueTemplate(name: "period", value: eraMortal.period)
+            TCNameValueTemplate(name: Localizable.TCName.phase.string, value: eraMortal.phase)
+            TCNameValueTemplate(name: Localizable.TCName.period.string, value: eraMortal.period)
         }
     }
 }

@@ -11,7 +11,7 @@ struct TCWarning: View {
     let text: String
     var body: some View {
         HStack {
-            Text("Warning!")
+            Localizable.warning.text
                 .foregroundColor(Asset.signalDanger.swiftUIColor).font(Fontstyle.body2.base)
             Text(text)
                 .foregroundColor(Asset.signalDanger.swiftUIColor).font(Fontstyle.body2.base)

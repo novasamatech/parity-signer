@@ -17,9 +17,9 @@ struct PasswordConfirm: View {
         ZStack {
             RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg000.swiftUIColor)
             VStack {
-                HeaderBar(line1: "Confirm secret path", line2: "Details")
+                HeaderBar(line1: Localizable.confirmSecretPath.key, line2: Localizable.details.key)
                 HStack {
-                    Text(content.croppedPath + "///")
+                    Text(content.croppedPath + Localizable.Path.delimeter.string)
                     Image(.lock).foregroundColor(Asset.crypto400.swiftUIColor)
                         .font(Fontstyle.body2.crypto)
                 }
@@ -28,8 +28,9 @@ struct PasswordConfirm: View {
                         .stroke(Asset.crypto400.swiftUIColor)
                         .frame(height: 39)
                     HStack {
-                        Text("///").foregroundColor(Asset.crypto400.swiftUIColor)
-                        TextField("SECRET PATH", text: $passwordCheck, prompt: Text(""))
+                        Localizable.Path.delimeter.text
+                            .foregroundColor(Asset.crypto400.swiftUIColor)
+                        TextField(Localizable.secretPath.string, text: $passwordCheck, prompt: Text(""))
                             .foregroundColor(Asset.crypto400.swiftUIColor)
                             .font(Fontstyle.body2.crypto)
                             .disableAutocorrection(true)
@@ -44,9 +45,12 @@ struct PasswordConfirm: View {
                     }
                 }
                 BigButton(
-                    text: "Next",
+                    text: Localizable.next.key,
                     action: {
-                        createAddress(content.croppedPath + "///" + content.pwd, content.seedName)
+                        createAddress(
+                            content.croppedPath + Localizable.Path.delimeter.string + content.pwd,
+                            content.seedName
+                        )
                     },
                     isDisabled: passwordCheck != content.pwd
                 )

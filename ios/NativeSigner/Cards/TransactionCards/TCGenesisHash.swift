@@ -10,7 +10,7 @@ import SwiftUI
 struct TCGenesisHash: View {
     let content: String
     var body: some View {
-        TCNameValueTemplate(name: "Genesis hash", value: content)
+        TCNameValueTemplate(name: Localizable.TCName.genesisHash.string, value: content)
     }
 }
 

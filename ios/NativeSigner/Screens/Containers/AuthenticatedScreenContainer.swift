@@ -50,6 +50,6 @@ struct AuthenticatedScreenContainer: View {
                 }
             }
         )
-        .alert("Navigation error", isPresented: $data.parsingAlert, actions: {})
+        .alert(Localizable.navigationError.text, isPresented: $data.parsingAlert, actions: {})
     }
 }

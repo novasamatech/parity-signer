@@ -10,7 +10,8 @@ import SwiftUI
 struct KeySymbol: View {
     var body: some View {
         VStack {
-            Text("accounts").font(FontFamily.Web3.regular.swiftUIFont(size: 20))
+            Localizable.accounts.text
+                .font(FontFamily.Web3.regular.swiftUIFont(size: 20))
         }
     }
 }
@@ -37,7 +38,7 @@ struct Footer: View {
                         Image(.rectangle, variants: [.grid, .oneByTwo, .fill]).imageScale(.medium)
                             .padding(.top, 4.0)
                             .padding(.bottom, 1.0)
-                        Text("Log")
+                        Localizable.log.text
                     }
                     .foregroundColor(buttonColor(active: footerButton == .log))
                 }
@@ -52,7 +53,7 @@ struct Footer: View {
                         Image(.viewfinder).imageScale(.medium)
                             .padding(.top, 4.0)
                             .padding(.bottom, 1.0)
-                        Text("Scanner")
+                        Localizable.scanner.text
                     }
                     .foregroundColor(buttonColor(active: footerButton == .scan))
                 }
@@ -65,7 +66,7 @@ struct Footer: View {
                 label: {
                     VStack {
                         KeySymbol()
-                        Text("Keys")
+                        Localizable.keys.text
                     }
                     .foregroundColor(buttonColor(active: footerButton == .keys))
                 }
@@ -80,22 +81,18 @@ struct Footer: View {
                         WrenchSymbol()
                             .padding(.top, 4.0)
                             .padding(.bottom, 1.0)
-                        Text("Settings")
+                        Localizable.settings.text
                     }
                     .foregroundColor(buttonColor(active: footerButton == .settings))
                 }
             )
         }.font(.footnote)
     }
-}
 
-func buttonColor(active: Bool) -> Color {
-    active ? Asset.text600.swiftUIColor : Asset.text300.swiftUIColor
+    private func buttonColor(active: Bool) -> Color {
+        active ? Asset.text600.swiftUIColor : Asset.text300.swiftUIColor
+    }
 }
-
-// func buttonLabelColor(active: Bool) -> Color {
-// return active ? Asset.text600.swiftUIColor : Asset.text300.swiftUIColor
-// }
 
 // struct Footer_Previews: PreviewProvider {
 // static var previews: some View {

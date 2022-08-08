@@ -15,10 +15,13 @@ struct NewSeedMenu: View {
         VStack {
             Spacer()
             VStack {
-                HeaderBar(line1: "ADD SEED", line2: "Select seed addition method")
+                HeaderBar(
+                    line1: Localizable.AddSeed.uppercased.key,
+                    line2: Localizable.selectSeedAdditionMethod.key
+                )
                 MenuButtonsStack {
                     BigButton(
-                        text: "New seed",
+                        text: Localizable.newSeed.key,
                         action: {
                             if alert { alertShow() } else {
                                 navigationRequest(.init(action: .newSeed))
@@ -26,7 +29,7 @@ struct NewSeedMenu: View {
                         }
                     )
                     BigButton(
-                        text: "Recover seed",
+                        text: Localizable.recoverSeed.key,
                         isShaded: true,
                         action: {
                             if alert { alertShow() } else {

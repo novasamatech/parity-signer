@@ -12,16 +12,22 @@ struct Backup: View {
     let alert: Bool
     let getSeedForBackup: (String) -> String
     let navigationRequest: NavigationRequest
-    @State private var secret: String = ""
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+    @State private var secret: String = ""
     @State private var countdown = 60
     @State private var failure = false
+
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg200.swiftUIColor)
+            RoundedRectangle(cornerRadius: 20.0)
+                .foregroundColor(Asset.bg200.swiftUIColor)
             VStack {
                 ZStack {
-                    HeaderBar(line1: "Backup", line2: content.seedName)
+                    HeaderBar(
+                        line1: Localizable.backup.key,
+                        line2: LocalizedStringKey(content.seedName)
+                    )
                     HStack {
                         Spacer()
                         Button(
@@ -38,7 +44,8 @@ struct Backup: View {
                 ScrollView {
                     VStack {
                         HStack {
-                            Text("SEED PHRASE").foregroundColor(Asset.text300.swiftUIColor)
+                            Localizable.seedPhrase.text
+                                .foregroundColor(Asset.text300.swiftUIColor)
                                 .font(Fontstyle.overline.base)
                             Spacer()
                         }
@@ -58,9 +65,8 @@ struct Backup: View {
                                 failure = true
                                 countdown = -1
                                 secret = alert ?
-                                    "Network connected! Seeds are not available now. " +
-                                    "Please enable airplane mode and disconnect all cables to access the seed phrase." :
-                                    "Seeds are not available now! Come back again to access them."
+                                    Localizable.Seed.Alert.networkConnected.string :
+                                    Localizable.Seed.Alert.unknown.string
                             }
                             UIApplication.shared.isIdleTimerDisabled = true
                         }
@@ -70,14 +76,15 @@ struct Backup: View {
                         }
                         .background(
                             RoundedRectangle(cornerRadius: 8)
-                                .foregroundColor(Color(
-                                    countdown > 0 ? "Crypto100" :
-                                        failure ? "BgDanger" :
-                                        "Bg300"
-                                ))
+                                .foregroundColor(
+                                    countdown > 0 ? Asset.crypto100.swiftUIColor :
+                                        failure ? Asset.bgDanger.swiftUIColor :
+                                        Asset.bg300.swiftUIColor
+                                )
                         )
                         HStack {
-                            Text("DERIVED KEYS").foregroundColor(Asset.text300.swiftUIColor)
+                            Localizable.derivedKeys.text
+                                .foregroundColor(Asset.text300.swiftUIColor)
                                 .font(Fontstyle.overline.base)
                             Spacer()
                         }
@@ -102,7 +109,8 @@ struct Backup: View {
                                                 .foregroundColor(Asset.crypto400.swiftUIColor)
                                                 .font(Fontstyle.body2.crypto)
                                             if record.hasPwd {
-                                                Text("///").foregroundColor(Asset.crypto400.swiftUIColor)
+                                                Localizable.Path.delimeter.text
+                                                    .foregroundColor(Asset.crypto400.swiftUIColor)
                                                     .font(Fontstyle.body2.crypto)
                                                 Image(.lock).foregroundColor(Asset.crypto400.swiftUIColor)
                                                     .font(Fontstyle.body2.crypto)
@@ -121,16 +129,16 @@ struct Backup: View {
                     Spacer()
                     ZStack {
                         BigButton(
-                            text: "Hide seed phrase in " + String(countdown) + "s",
+                            text: LocalizedStringKey(Localizable.hideSeedPhraseIn(String(countdown))),
                             isShaded: true
                         ) {
                             countdown = 0
-                            secret = "Time out\n\nCome back again\nto see the seed phrase!"
+                            secret = Localizable.Seed.Alert.timeout.string
                         }
                         .onReceive(timer) { _ in
                             if countdown > 0 { countdown -= 1 }
                             if countdown == 0 {
-                                secret = "Time out\n\nCome back again\nto see the seed phrase!"
+                                secret = Localizable.Seed.Alert.timeout.string
                             }
                         }.padding(.horizontal, 16)
                     }.padding(.bottom, 75)

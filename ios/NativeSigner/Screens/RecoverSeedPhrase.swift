@@ -22,7 +22,7 @@ struct RecoverSeedPhrase: View {
                 VStack {
                     Text(content.seedName)
                     VStack(alignment: .leading) {
-                        Text("SEED PHRASE").font(Fontstyle.overline.base)
+                        Localizable.seedPhrase.text.font(Fontstyle.overline.base)
                         VStack {
                             Text(
                                 content.draftPhrase()
@@ -36,7 +36,7 @@ struct RecoverSeedPhrase: View {
                             HStack {
                                 Text(">").foregroundColor(Asset.text400.swiftUIColor)
                                     .font(Fontstyle.body2.base)
-                                TextField("Seed", text: $userInput, prompt: Text("Seed name"))
+                                TextField(Localizable.seed.string, text: $userInput, prompt: Localizable.seedName.text)
                                     .focused($focus)
                                     .foregroundColor(Asset.text600.swiftUIColor)
                                     .font(Fontstyle.body2.base)
@@ -97,7 +97,7 @@ struct RecoverSeedPhrase: View {
                             label: {
                                 HStack {
                                     Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
-                                    Text("Create root keys")
+                                    Localizable.createRootKeys.text
                                         .multilineTextAlignment(.leading)
                                     Spacer()
                                 }
@@ -106,7 +106,7 @@ struct RecoverSeedPhrase: View {
                         if !focus {
                             HStack {
                                 BigButton(
-                                    text: "Next",
+                                    text: Localizable.next.key,
                                     action: {
                                         restoreSeed(content.seedName, content.readySeed ?? "", createRoots)
                                     },

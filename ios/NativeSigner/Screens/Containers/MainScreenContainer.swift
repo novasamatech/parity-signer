@@ -19,12 +19,10 @@ struct MainScreenContainer: View {
         } else if data.protected {
             LandingView(data: data)
         } else if data.protected, data.canaryDead {
-            Text(
-                "Please enable airplane mode, turn off bluetooth and wifi connection" +
-                    " and disconnect all cables!"
-            ).background(Asset.bg000.swiftUIColor)
+            Localizable.Connectivity.detected.text
+                .background(Asset.bg000.swiftUIColor)
         } else {
-            Text("Please protect device with pin or password!")
+            Localizable.pleaseProtectDeviceWithPinOrPassword.text
                 .background(Asset.bg000.swiftUIColor)
         }
     }

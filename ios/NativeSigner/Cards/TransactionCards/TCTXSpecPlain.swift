@@ -12,13 +12,13 @@ struct TCTXSpecPlain: View {
     var body: some View {
         HStack {
             VStack {
-                Text("Unknown network")
+                Localizable.unknownNetwork.text
                 TCNameValueTemplate(
-                    name: "Genesis hash",
+                    name: Localizable.TCName.genesisHash.string,
                     value: content.networkGenesisHash.formattedAsString
                 )
-                TCNameValueTemplate(name: "Version", value: content.version)
-                TCNameValueTemplate(name: "Tx version", value: content.txVersion)
+                TCNameValueTemplate(name: Localizable.TCName.version.string, value: content.version)
+                TCNameValueTemplate(name: Localizable.TCName.txVersion.string, value: content.txVersion)
             }
             Spacer()
         }

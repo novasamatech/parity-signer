@@ -38,7 +38,7 @@ struct HistoryCardExtended: View {
             HistoryCardTemplate(
                 image: .init(.aqi, variant: .medium),
                 danger: false,
-                line1: "Key created",
+                line1: Localizable.keyCreated.string,
                 line2: value.seedName + value.path + " in network with hash " +
                     value.networkGenesisHash.formattedAsString
             )
@@ -46,7 +46,7 @@ struct HistoryCardExtended: View {
             HistoryCardTemplate(
                 image: .init(.xmark, variants: [.rectangle, .portrait]),
                 danger: false,
-                line1: "Key removed",
+                line1: Localizable.keyRemoved.string,
                 line2: value.seedName + value.path + " in network with hash " +
                     value.networkGenesisHash.formattedAsString
             )
@@ -56,7 +56,7 @@ struct HistoryCardExtended: View {
                 HistoryCardTemplate(
                     image: .init(.checkmark, variant: .shield),
                     danger: false,
-                    line1: "Network verifier set",
+                    line1: Localizable.networkVerifierSet.string,
                     line2: value.generalVerifier.show() + " for network with genesis hash " +
                         value.genesisHash.formattedAsString
                 )
@@ -64,7 +64,7 @@ struct HistoryCardExtended: View {
                 HistoryCardTemplate(
                     image: .init(.checkmark, variant: .shield),
                     danger: false,
-                    line1: "Network verifier set",
+                    line1: Localizable.networkVerifierSet.string,
                     line2: verifier.show() + " for network with genesis hash " +
                         value.genesisHash.formattedAsString
                 )
@@ -73,21 +73,21 @@ struct HistoryCardExtended: View {
             HistoryCardTemplate(
                 image: .init(.signature),
                 danger: false,
-                line1: "Metadata signed",
+                line1: Localizable.metadataSigned.string,
                 line2: value.name + String(value.version)
             )
         case let .typesSigned(value):
             HistoryCardTemplate(
                 image: .init(.signature),
                 danger: false,
-                line1: "Types signed",
+                line1: Localizable.typesSigned.string,
                 line2: value.typesHash.formattedAsString
             )
         case let .transactionSignError(value):
             VStack {
-                Text("Transaction failed")
+                Localizable.transactionFailed.text
                 TransactionBlock(cards: event.decoded?.assemble() ?? [])
-                Text("Signed by: ")
+                Localizable.signedBy.text
                 HStack {
                     Identicon(identicon: event.signedBy?.identicon ?? [])
                     VStack {
@@ -95,15 +95,15 @@ struct HistoryCardExtended: View {
                         Text((event.signedBy?.seedName ?? "") + (event.signedBy?.path ?? ""))
                     }
                 }
-                Text("in network")
+                Localizable.inNetwork.text
                 Text(value.networkName)
-                Text("Comment :")
+                Localizable.commentAlt.text
                 Text(value.userComment)
             }
         case let .transactionSigned(value):
             VStack {
                 TransactionBlock(cards: event.decoded?.assemble() ?? [])
-                Text("Signed by: ")
+                Localizable.signedBy.text
                 HStack {
                     Identicon(identicon: event.signedBy?.identicon ?? [])
                     VStack {
@@ -111,9 +111,9 @@ struct HistoryCardExtended: View {
                         Text((event.signedBy?.seedName ?? "") + (event.signedBy?.path ?? ""))
                     }
                 }
-                Text("in network")
+                Localizable.inNetwork.text
                 Text(value.networkName)
-                Text("Comment :")
+                Localizable.commentAlt.text
                 Text(value.userComment)
             }
         }

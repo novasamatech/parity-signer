@@ -20,17 +20,17 @@ struct MultiselectBottomControl: View {
                         delete = true
                     },
                     label: {
-                        SmallButton(text: "Delete")
+                        SmallButton(text: Localizable.delete.key)
                     }
                 )
                 .disabled(selectedCount == "0")
                 .alert(isPresented: $delete, content: {
                     Alert(
-                        title: Text("Delete key?"),
-                        message: Text("You are about to delete selected keys"),
+                        title: Localizable.deleteKey.text,
+                        message: Localizable.youAreAboutToDeleteSelectedKeys.text,
                         primaryButton: .cancel(),
                         secondaryButton: .destructive(
-                            Text("Delete"),
+                            Localizable.delete.text,
                             action: {
                                 navigationRequest(.init(action: .removeKey))
                             }
@@ -43,13 +43,13 @@ struct MultiselectBottomControl: View {
                         navigationRequest(.init(action: .exportMultiSelect))
                     },
                     label: {
-                        SmallButton(text: "Export")
+                        SmallButton(text: Localizable.export.key)
                     }
                 ).disabled(selectedCount == "0")
             }
             HStack {
                 Text(selectedCount)
-                Text("items selected")
+                Localizable.itemsSelected.text
             }
         }
         .padding(.vertical)

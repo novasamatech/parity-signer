@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ConfirmAlert: View {
     let navigationRequest: NavigationRequest
-    let content: String
+    let content: LocalizedStringKey
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8)

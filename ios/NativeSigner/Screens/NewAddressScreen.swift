@@ -19,43 +19,51 @@ struct NewAddressScreen: View {
     var body: some View {
         ZStack {
             ScrollView {
-                HeaderBar(line1: "Create new key", line2: "For seed " + content.seedName)
+                HeaderBar(
+                    line1: Localizable.createNewKey.key,
+                    line2: LocalizedStringKey(Localizable.forSeed(content.seedName))
+                )
                 NetworkCard(title: content.networkTitle, logo: content.networkLogo)
                 VStack(alignment: .leading) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 8).stroke(Asset.crypto400.swiftUIColor).frame(height: 39)
                         HStack {
                             Text(content.seedName)
-                            TextField("Path", text: $path, prompt: Text("//<network>//input"))
-                                .foregroundColor(Asset.crypto400.swiftUIColor)
-                                .font(Fontstyle.body2.crypto)
-                                .disableAutocorrection(true)
-                                .autocapitalization(.none)
-                                .keyboardType(.asciiCapable)
-                                .submitLabel(.done)
-                                .onChange(of: path) { pathNew in
-                                    derivationCheck = pathCheck(content.seedName, pathNew, content.networkSpecsKey)
-                                    path = pathNew
+                            TextField(
+                                Localizable.path.string,
+                                text: $path,
+                                prompt: Localizable.NetworkInput.prompt.text
+                            )
+                            .foregroundColor(Asset.crypto400.swiftUIColor)
+                            .font(Fontstyle.body2.crypto)
+                            .disableAutocorrection(true)
+                            .autocapitalization(.none)
+                            .keyboardType(.asciiCapable)
+                            .submitLabel(.done)
+                            .onChange(of: path) { pathNew in
+                                derivationCheck = pathCheck(content.seedName, pathNew, content.networkSpecsKey)
+                                path = pathNew
+                            }
+                            .onSubmit {
+                                switch derivationCheck?.whereTo {
+                                case .pin:
+                                    createAddress(path, content.seedName)
+                                case .pwd:
+                                    navigationRequest(.init(action: .checkPassword, details: path))
+                                default:
+                                    break
                                 }
-                                .onSubmit {
-                                    switch derivationCheck?.whereTo {
-                                    case .pin:
-                                        createAddress(path, content.seedName)
-                                    case .pwd:
-                                        navigationRequest(.init(action: .checkPassword, details: path))
-                                    default:
-                                        break
-                                    }
-                                }
-                                .focused($focusedField)
-                                .padding(8)
+                            }
+                            .focused($focusedField)
+                            .padding(8)
                         }
                     }
                 }.padding(.vertical)
                 if let collision = derivationCheck?.collision {
                     VStack {
                         HStack {
-                            Text("This key already exists:").foregroundColor(Asset.text300.swiftUIColor)
+                            Localizable.thisKeyAlreadyExists.text
+                                .foregroundColor(Asset.text300.swiftUIColor)
                             Spacer()
                         }
                         AddressCard(address: collision)
@@ -63,7 +71,7 @@ struct NewAddressScreen: View {
                 }
                 HStack {
                     BigButton(
-                        text: "Next",
+                        text: Localizable.next.key,
                         action: {
                             switch derivationCheck?.whereTo {
                             case .pin:

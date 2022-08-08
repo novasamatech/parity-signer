@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingsCardTemplate: View {
-    var text: String
+    var text: LocalizedStringKey
     var danger: Bool = false
     var withIcon: Bool = true
     var withBackground: Bool = true
@@ -26,6 +26,6 @@ struct SettingsCardTemplate: View {
             }
         }
         .padding()
-        .background(withBackground ? Asset.bg200.swiftUIColor : Color(""))
+        .background(withBackground ? Asset.bg200.swiftUIColor : Color.clear)
     }
 }

@@ -22,14 +22,14 @@ struct TCEnumVariantName: View {
                             .foregroundColor(Asset.text600.swiftUIColor)
                         Spacer()
                         if !value.docsEnumVariant.isEmpty {
-                            Text("?")
+                            Localizable.questionMark.text
                                 .foregroundColor(Asset.action400.swiftUIColor)
                         }
                     }
                     if showDoc {
                         Text(
                             AttributedString(fromHexDocs: value.docsEnumVariant) ??
-                                "docs parsing error in iOS, please refer to other sources"
+                                AttributedString(Localizable.Error.docsParsing.string)
                         )
                         .foregroundColor(Asset.text600.swiftUIColor)
                     }

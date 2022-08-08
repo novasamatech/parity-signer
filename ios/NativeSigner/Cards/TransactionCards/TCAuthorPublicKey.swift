@@ -13,7 +13,7 @@ struct TCAuthorPublicKey: View {
         HStack {
             Identicon(identicon: value.identicon)
             VStack(alignment: .leading) {
-                Text("Signed with " + value.encryption)
+                Text(Localizable.TCAuthor.signedWith(value.encryption))
                     .foregroundColor(Asset.text400.swiftUIColor).font(Fontstyle.body2.base)
                 Text(value.publicKey)
                     .font(Fontstyle.body2.crypto)

@@ -61,7 +61,8 @@ public enum {{enumName}} {
 
 // MARK: - Implementation Details
 {% if not param.withoutSupporter %}
-fileprivate func tr(_ table: String, _ key: String, _ locale: Locale = Locale.current, _ args: CVarArg...) -> String {
+fileprivate func tr(_ table: String, _ key: String, _ args: CVarArg...) -> String {
+  let locale = Locale.current
   let path = Bundle.main.path(forResource: locale.identifier, ofType: "lproj") ?? ""
   let format: String
   if let bundle = Bundle(path: path) {
@@ -91,10 +92,6 @@ public struct LocalizedString: Hashable {
 
   var text: Text {
     Text(key, tableName: table, bundle: {{param.bundle|default:"BundleToken.bundle"}})
-  }
-
-  func text(withLocale locale: Locale) -> String {
-    tr(table, lookupKey, locale)
   }
 }
 {% endif %}

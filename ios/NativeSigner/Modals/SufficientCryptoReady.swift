@@ -16,20 +16,24 @@ struct SufficientCryptoReady: View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg000.swiftUIColor)
             VStack {
-                HeaderBar(line1: "Your Signature", line2: "Scan it into your application")
+                HeaderBar(
+                    line1: Localizable.yourSignature.key,
+                    line2: Localizable.scanItIntoYourApplication.key
+                )
                 Image(uiImage: UIImage(data: Data(content.sufficient)) ?? UIImage())
                     .resizable()
-                    .aspectRatio(contentMode: .fit).padding(12)
+                    .aspectRatio(contentMode: .fit)
+                    .padding(12)
                 AddressCard(address: content.authorInfo)
                 switch content.content {
                 case let .addSpecs(network):
-                    Text("Signature for network specs")
+                    Localizable.signatureForNetworkSpecs.text
                     NetworkCard(title: network.networkTitle, logo: network.networkLogo)
                 case .loadTypes(types: _, pic: _):
-                    Text("Signature for types")
+                    Localizable.signatureForTypes.text
                 case let .loadMetadata(name: name, version: version):
-                    Text("Signature for metadata update")
-                    Text(name + " version " + String(version))
+                    Localizable.signatureForMetadataUpdate.text
+                    Text(Localizable.Signature.metadata(name, String(version)))
                 }
             }
         }

@@ -16,47 +16,47 @@ struct NetworkDetails: View {
                 VStack(alignment: .leading) {
                     NetworkCard(title: content.title, logo: content.logo)
                     HStack {
-                        Text("Network name:")
+                        Localizable.networkName.text
                         Text(content.name)
                     }
                     HStack {
-                        Text("base58 prefix:")
+                        Localizable.base58Prefix.text
                         Text(String(content.base58prefix))
                     }
                     HStack {
-                        Text("decimals:")
+                        Localizable.decimals.text
                         Text(String(content.decimals))
                     }
                     HStack {
-                        Text("unit:")
+                        Localizable.unit.text
                         Text(content.unit)
                     }
                     HStack {
-                        Text("genesis hash:")
+                        Localizable.genesisHash.text
                         Text(content.genesisHash.formattedAsString)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     HStack {
-                        Text("Verifier certificate: ").fixedSize(horizontal: false, vertical: true)
+                        Localizable.verifierCertificateAlt.text.fixedSize(horizontal: false, vertical: true)
                         switch content.currentVerifier.ttype {
                         case "general":
-                            Text("general")
+                            Localizable.general.text
                         case "custom":
                             Identicon(identicon: content.currentVerifier.details.identicon)
                             VStack {
-                                Text("custom")
+                                Localizable.custom.text
                                 Text(content.currentVerifier.details.publicKey)
                                     .fixedSize(horizontal: false, vertical: true)
-                                Text("encryption: " + content.currentVerifier.details.encryption)
+                                Text(Localizable.encryption(content.currentVerifier.details.encryption))
                             }
                         case "none":
-                            Text("none")
+                            Localizable.none.text
                         default:
-                            Text("unknown")
+                            Localizable.unknown.text
                         }
                     }
                 }
-                Text("Metadata available:")
+                Localizable.metadataAvailable.text
                 ScrollView {
                     LazyVStack {
                         ForEach(content.meta, id: \.metaHash) { metaEntry in
