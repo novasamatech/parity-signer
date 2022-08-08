@@ -1,14 +1,14 @@
-# Recover Account from PolkadotJs
+# Recover Account from PolkadotJS
 
-The default behaviour on Parity Signer and [PolkadotJs Apps](https://polkadot.js.org/apps/) is a little different. This tutorial will walk you through recovering an account on Parity Signer from PolkadotJs Apps.
+The default behavior on Parity Signer and [PolkadotJS Apps](https://polkadot.js.org/apps/) is a little different. This tutorial will walk you through recovering an account on Parity Signer from PolkadotJS Apps.
 
-* Notice: The UI maybe variant for different versions, but the functionalities are the same in v4 version.
+* Notice: The UI maybe variant for different versions, but the functionalities are the same in `v4` version.
 
 ## Get the mnemonic phrase and path
 
-When creating an account on PolkadotJs, it will give you a mnemonic phrase on the beginning without any key derivation. You can change it if you click `Advanced creation options` button, here you can specify any path you like, leave it as an empty string if you do not want changes.
+When creating an account on PolkadotJS, it will give you a mnemonic phrase on the beginning without any key derivation. You can change it if you click `Advanced creation options` button, here you can specify any path you like, leave it as an empty string if you do not want changes.
 
-![Create Account on PolkadotJs Apps](./images/Polkadotjs-Create-Account.png)
+![Create Account on PolkadotJS Apps](./images/Polkadotjs-Create-Account.png)
 
 ## Recover identity with mnemonic phrase
 
@@ -24,4 +24,4 @@ On Parity Signer, accounts are grouped by different networks, and the accounts g
 
 ![Recover Account](./images/Recover-Path.png)
 
-Here We can input the path from PokadotJs Apps, if you do not have a specific path, then just leave it empty. And then after we choose the network, we will have the same account as we created from PolkadotJs Apps.
+Here We can input the path from PolkadotJS Apps, if you do not have a specific path, then just leave it empty. And then after we choose the network, we will have the same account as we created from PolkadotJS Apps.

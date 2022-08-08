@@ -12,24 +12,22 @@ struct TCMeta: View {
     var body: some View {
         HStack {
             Identicon(identicon: content.metaIdPic)
-            VStack{
-                Text("Add metadata").foregroundColor(Color("Text600"))
+            VStack {
+                Text("Add metadata").foregroundColor(Asset.text600.swiftUIColor)
                 HStack {
                     Text(content.specname)
                     Text(content.specsVersion)
                 }
-                .foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2))
-                Text(content.metaHash).foregroundColor(Color("Text400")).font(FCrypto(style: .body2))
+                .foregroundColor(Asset.crypto400.swiftUIColor).font(Fontstyle.body2.crypto)
+                Text(content.metaHash).foregroundColor(Asset.text400.swiftUIColor).font(Fontstyle.body2.crypto)
             }
             Spacer()
         }
     }
 }
 
-/*
- struct TCMeta_Previews: PreviewProvider {
- static var previews: some View {
- TCMeta()
- }
- }
- */
+// struct TCMeta_Previews: PreviewProvider {
+// static var previews: some View {
+// TCMeta()
+// }
+// }

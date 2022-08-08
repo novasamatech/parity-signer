@@ -38,9 +38,6 @@ pub mod network_specs;
 
 pub mod qr_transfers;
 
-#[cfg(feature = "signer")]
-pub mod test_all_errors_signer;
-
 pub mod types;
 
 pub mod users;

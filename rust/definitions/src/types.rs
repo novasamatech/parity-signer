@@ -1,8 +1,8 @@
 //! Types description needed to decode transactions generated with
 //! [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
-//! V12 and V13  
+//! `V12` and `V13`
 //!
-//! Prior to V14, metadata did not contain information on *what* the type used
+//! Prior to `V14`, metadata did not contain information on *what* the type used
 //! in the transaction actually is, it had only the type name.
 //! For common types (i.e the ones encountered in network Westend, Polkadot,
 //! Kusama, and Rococo) the type information was found elsewhere, and is a part of
@@ -12,11 +12,11 @@
 //! data for common types, and is stored in `SETTREE` tree of both hot and cold databases
 //! with key `TYPES`.  
 //!
-//! For transaction with runtime metadata V12 or V13 to be decoded each of the
+//! For transaction with runtime metadata `V12` or `V13` to be decoded each of the
 //! encountered types must have a corresponding [`TypeEntry`] or be transformable into a type
 //! having [`TypeEntry`].  
 //!
-//! With V14 release this module became obsolete, however, since not all networks are yet on V14
+//! With `V14` release this module became obsolete, however, since not all networks are yet on `V14`
 //! metadata, it remains here.
 
 use parity_scale_codec::{Decode, Encode};

@@ -12,26 +12,25 @@ struct RecoverSeedName: View {
     @FocusState private var nameFocused: Bool
     let content: MRecoverSeedName
     let checkSeedCollision: (String) -> Bool
-    let pushButton: (Action, String, String) -> Void
-    
+    let navigationRequest: NavigationRequest
+
     var body: some View {
         VStack(alignment: .leading) {
-            Text("DISPLAY NAME").font(FBase(style: .overline))
+            Text("DISPLAY NAME").font(Fontstyle.overline.base)
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color("Border400"))
-                //.foregroundColor(Color("Border400"))
+                    .stroke(Asset.border400.swiftUIColor)
                     .frame(height: 39)
                 TextField("Seed", text: $seedName, prompt: Text("Seed name"))
                     .focused($nameFocused)
-                    .foregroundColor(Color("Text600"))
-                    .font(FBase(style: .body2))
+                    .foregroundColor(Asset.text600.swiftUIColor)
+                    .font(Fontstyle.body2.base)
                     .disableAutocorrection(true)
                     .keyboardType(.asciiCapable)
                     .submitLabel(.done)
                     .onSubmit {
-                        if (seedName != "") && !checkSeedCollision(seedName) {
-                            pushButton(.goForward, seedName, "")
+                        if !seedName.isEmpty, !checkSeedCollision(seedName) {
+                            navigationRequest(.init(action: .goForward, details: seedName))
                         }
                     }
                     .onAppear(perform: {
@@ -45,19 +44,17 @@ struct RecoverSeedName: View {
             BigButton(
                 text: "Next",
                 action: {
-                    pushButton(.goForward, seedName, "")
+                    navigationRequest(.init(action: .goForward, details: seedName))
                 },
-                isDisabled: (seedName == "") || checkSeedCollision(seedName)
+                isDisabled: seedName.isEmpty || checkSeedCollision(seedName)
             )
             Spacer()
         }.padding()
     }
 }
 
-/*
- struct RecoverSeedName_Previews: PreviewProvider {
- static var previews: some View {
- RecoverSeedName()
- }
- }
- */
+// struct RecoverSeedName_Previews: PreviewProvider {
+// static var previews: some View {
+// RecoverSeedName()
+// }
+// }

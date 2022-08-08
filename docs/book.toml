@@ -25,7 +25,7 @@ expand = true
 heading-split-level = 2
 
 [output.linkcheck]
-follow-web-links = true
+follow-web-links = false
 cache-timeout = 43200
 warning-policy = "warn"
 

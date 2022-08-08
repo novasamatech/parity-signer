@@ -7,21 +7,22 @@
 
 import SwiftUI
 
-/**
- * Panel with actions for multiselect
- */
+/// Panel with actions for multiselect
 struct MultiselectBottomControl: View {
-    @State var delete = false
+    @State private var delete = false
     var selectedCount: String
-    var pushButton: (Action, String, String) -> Void
+    var navigationRequest: NavigationRequest
     var body: some View {
         ZStack {
             HStack {
-                Button(action: {
-                    delete = true
-                }) {
-                    SmallButton(text: "Delete")
-                }
+                Button(
+                    action: {
+                        delete = true
+                    },
+                    label: {
+                        SmallButton(text: "Delete")
+                    }
+                )
                 .disabled(selectedCount == "0")
                 .alert(isPresented: $delete, content: {
                     Alert(
@@ -31,17 +32,20 @@ struct MultiselectBottomControl: View {
                         secondaryButton: .destructive(
                             Text("Delete"),
                             action: {
-                                pushButton(.removeKey, "", "")
+                                navigationRequest(.init(action: .removeKey))
                             }
                         )
                     )
                 })
                 Spacer()
-                Button(action: {
-                    pushButton(.exportMultiSelect, "", "")
-                }) {
-                    SmallButton(text: "Export")
-                }.disabled(selectedCount == "0")
+                Button(
+                    action: {
+                        navigationRequest(.init(action: .exportMultiSelect))
+                    },
+                    label: {
+                        SmallButton(text: "Export")
+                    }
+                ).disabled(selectedCount == "0")
             }
             HStack {
                 Text(selectedCount)
@@ -52,10 +56,8 @@ struct MultiselectBottomControl: View {
     }
 }
 
-/*
- struct MultiselectBottomControl_Previews: PreviewProvider {
- static var previews: some View {
- MultiselectBottomControl()
- }
- }
- */
+// struct MultiselectBottomControl_Previews: PreviewProvider {
+// static var previews: some View {
+// MultiselectBottomControl()
+// }
+// }

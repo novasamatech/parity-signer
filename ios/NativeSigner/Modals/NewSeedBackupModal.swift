@@ -10,42 +10,49 @@ import SwiftUI
 struct NewSeedBackupModal: View {
     let content: MNewSeedBackup
     let restoreSeed: (String, String, Bool) -> Void
-    let pushButton: (Action, String, String) -> Void
-    @State var confirmBackup = false
-    @State var createRoots = true
+    let navigationRequest: NavigationRequest
+    @State private var confirmBackup = false
+    @State private var createRoots = true
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg200"))
+            RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg200.swiftUIColor)
             VStack {
                 HeaderBar(line1: "Backup Seed Phrase", line2: content.seed)
                 ZStack {
                     Text(content.seedPhrase)
                         .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                        .foregroundColor(Color("Crypto400"))
+                        .foregroundColor(Asset.crypto400.swiftUIColor)
                         .padding(8)
                 }
-                .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Crypto100")))
+                .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.crypto100.swiftUIColor))
                 VStack(spacing: 16) {
-                    Button(action: {
-                        confirmBackup.toggle()
-                    }) {
-                        HStack {
-                            Image(systemName: confirmBackup ? "checkmark.square" : "square").imageScale(.large)
-                            Text("I have written down my seed phrase")
-                                .multilineTextAlignment(.leading).foregroundColor(Color("Text500"))
-                            Spacer()
+                    Button(
+                        action: {
+                            confirmBackup.toggle()
+                        },
+                        label: {
+                            HStack {
+                                (confirmBackup ? Image(.checkmark, variant: .square) : Image(.square))
+                                    .imageScale(.large)
+                                Text("I have written down my seed phrase")
+                                    .multilineTextAlignment(.leading).foregroundColor(Asset.text500.swiftUIColor)
+                                Spacer()
+                            }
                         }
-                    }
-                    Button(action: {
-                        createRoots.toggle()
-                    }) {
-                        HStack {
-                            Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
-                            Text("Create root keys")
-                                .multilineTextAlignment(.leading).foregroundColor(Color("Text500"))
-                            Spacer()
+                    )
+                    Button(
+                        action: {
+                            createRoots.toggle()
+                        },
+                        label: {
+                            HStack {
+                                (createRoots ? Image(.checkmark, variant: .square) : Image(.square)).imageScale(.large)
+                                Text("Create root keys")
+                                    .multilineTextAlignment(.leading).foregroundColor(Asset.text500.swiftUIColor)
+                                Spacer()
+                            }
                         }
-                    }
+                    )
                     Spacer()
                     BigButton(
                         text: "Next",
@@ -54,17 +61,15 @@ struct NewSeedBackupModal: View {
                         },
                         isDisabled: !confirmBackup
                     )
-                        .padding(.vertical, 16.0)
+                    .padding(.vertical, 16.0)
                 }
             }.padding(16)
         }
     }
 }
 
-/*
- struct NewSeedBackupModal_Previews: PreviewProvider {
- static var previews: some View {
- NewSeedBackupModal()
- }
- }
- */
+// struct NewSeedBackupModal_Previews: PreviewProvider {
+// static var previews: some View {
+// NewSeedBackupModal()
+// }
+// }

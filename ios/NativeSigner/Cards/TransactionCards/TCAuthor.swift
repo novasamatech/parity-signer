@@ -12,22 +12,22 @@ struct TCAuthor: View {
     var body: some View {
         HStack {
             Identicon(identicon: author.identicon)
-            VStack (alignment: .leading) {
+            VStack(alignment: .leading) {
                 Text("From:")
-                    .foregroundColor(Color("Text400"))
+                    .foregroundColor(Asset.text400.swiftUIColor)
                 Text(author.seedName + author.path + (author.hasPwd == true ? "///" : ""))
-                    .foregroundColor(Color("Crypto400"))
+                    .foregroundColor(Asset.crypto400.swiftUIColor)
                 Text(author.base58)
                     .font(.caption2)
-                    .foregroundColor(Color("Text600"))
+                    .foregroundColor(Asset.text600.swiftUIColor)
             }
             Spacer()
         }
     }
 }
- /*
-struct TCAuthor_Previews: PreviewProvider {
-    static var previews: some View {
-        TCAuthor()
-    }
-}*/
+
+// struct TCAuthor_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TCAuthor()
+//    }
+// }

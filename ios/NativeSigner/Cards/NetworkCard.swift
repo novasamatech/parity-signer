@@ -16,26 +16,24 @@ struct NetworkCard: View {
         ZStack {
             if fancy {
                 RoundedRectangle(cornerRadius: 4)
-                    .foregroundColor(Color("Bg200"))
+                    .foregroundColor(Asset.bg200.swiftUIColor)
                     .frame(height: 47)
             }
             HStack {
                 NetworkLogo(logo: logo)
-                Text(title).font(FBase(style: .h3))
-                if fancy {Spacer()}
+                Text(title).font(Fontstyle.header3.base)
+                if fancy { Spacer() }
             }
-            .foregroundColor(Color("Text600"))
+            .foregroundColor(Asset.text600.swiftUIColor)
             .frame(height: 36)
             .padding(.horizontal)
         }
     }
 }
 
-/*
- struct NetworkCard_Previews: PreviewProvider {
- static var network = Network.networkData[0]
- static var previews: some View {
- NetworkCard(network: network).previewLayout(.sizeThatFits)
- }
- }
- */
+// struct NetworkCard_Previews: PreviewProvider {
+// static var network = Network.networkData[0]
+// static var previews: some View {
+// NetworkCard(network: network).previewLayout(.sizeThatFits)
+// }
+// }

@@ -9,25 +9,31 @@ import SwiftUI
 
 struct ManageMetadata: View {
     var content: MManageMetadata
-    let pushButton: (Action, String, String) -> Void
-    @State var removeMetadataAlert = false
-    @State var offset: CGFloat = 0
+    let navigationRequest: NavigationRequest
+    @State private var removeMetadataAlert = false
+    @State private var offset: CGFloat = 0
     var body: some View {
         MenuStack {
             HeaderBar(line1: "MANAGE METADATA", line2: "Select action").padding(.top, 10)
-            MetadataCard(meta: MMetadataRecord(specname: content.name, specsVersion: content.version, metaHash: content.metaHash, metaIdPic: content.metaIdPic))
-            HStack{
-            Text("Used for:")
-                VStack{
+            MetadataCard(
+                meta: MMetadataRecord(
+                    specname: content.name,
+                    specsVersion: content.version,
+                    metaHash: content.metaHash,
+                    metaIdPic: content.metaIdPic
+                )
+            )
+            HStack {
+                Text("Used for:")
+                VStack {
                     ForEach(content.networks.sorted(by: {
-                        $0.order<$1.order
-                    }), id: \.order) {
-                        network in
+                        $0.order < $1.order
+                    }), id: \.order) { network in
                         ZStack {
                             if network.currentOnScreen {
                                 RoundedRectangle(cornerRadius: 4).stroke().frame(height: 30)
                             }
-                        NetworkCard(title: network.title, logo: network.logo)
+                            NetworkCard(title: network.title, logo: network.logo)
                         }
                     }
                     EmptyView()
@@ -38,37 +44,45 @@ struct ManageMetadata: View {
                     text: "Sign this metadata",
                     isShaded: true,
                     isCrypto: true,
-                    action:{pushButton(.signMetadata, "", "")}
+                    action: { navigationRequest(.init(action: .signMetadata)) }
                 )
                 BigButton(
                     text: "Delete this metadata",
                     isShaded: true,
                     isDangerous: true,
-                    action: {removeMetadataAlert = true}
+                    action: { removeMetadataAlert = true }
                 )
             }
         }
         .offset(x: 0, y: offset)
-        .gesture(DragGesture()
-                    .onChanged{drag in
-            self.offset = drag.translation.height
-        }
-                    .onEnded{drag in
-            if drag.translation.height > 40 {
-                self.offset = UIScreen.main.bounds.size.height
-                pushButton(.goBack, "", "")
-            }
-        })
+        .gesture(
+            DragGesture()
+                .onChanged { drag in
+                    self.offset = drag.translation.height
+                }
+                .onEnded { drag in
+                    if drag.translation.height > 40 {
+                        self.offset = UIScreen.main.bounds.size.height
+                        navigationRequest(.init(action: .goBack))
+                    }
+                }
+        )
         .alert(isPresented: $removeMetadataAlert, content: {
-            Alert(title: Text("Remove metadata?"), message: Text("This metadata will be removed for all networks"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove metadata"), action: {pushButton(.removeMetadata, "", "")}))
+            Alert(
+                title: Text("Remove metadata?"),
+                message: Text("This metadata will be removed for all networks"),
+                primaryButton: .cancel(Text("Cancel")),
+                secondaryButton: .destructive(
+                    Text("Remove metadata"),
+                    action: { navigationRequest(.init(action: .removeMetadata)) }
+                )
+            )
         })
     }
 }
 
-/*
-struct ManageMetadata_Previews: PreviewProvider {
-    static var previews: some View {
-        ManageMetadata()
-    }
-}
-*/
+// struct ManageMetadata_Previews: PreviewProvider {
+// static var previews: some View {
+// ManageMetadata()
+// }
+// }

@@ -3,7 +3,6 @@ use db_handling::{
     helpers::{try_get_address_details, try_get_network_specs},
 };
 use definitions::{
-    error_signer::{ErrorSigner, InputSigner},
     keyring::{AddressKey, NetworkSpecsKey},
     navigation::TransactionCardSet,
 };
@@ -11,13 +10,11 @@ use parity_scale_codec::DecodeAll;
 use parser::cards::ParserCard;
 
 use crate::cards::{make_author_info, Card, Warning};
+use crate::error::{Error, Result};
 use crate::helpers::multisigner_msg_genesis_encryption;
 use crate::TransactionAction;
 
-pub fn process_message(
-    data_hex: &str,
-    database_name: &str,
-) -> Result<TransactionAction, ErrorSigner> {
+pub fn process_message(data_hex: &str, database_name: &str) -> Result<TransactionAction> {
     let (author_multi_signer, message_vec, genesis_hash, encryption) =
         multisigner_msg_genesis_encryption(data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
@@ -26,10 +23,7 @@ pub fn process_message(
     // processing input vec![20, 104, 101, 3, 108, 111] will not throw error at element `3`,
     // it will result in output `helo` instead, length, however, is still correct, 5.
     // note that some invisible symbols may thus sneak into the message;
-    let message = match String::decode_all(&mut &message_vec[..]) {
-        Ok(a) => a,
-        Err(_) => return Err(ErrorSigner::Input(InputSigner::MessageNotReadable)),
-    };
+    let message = String::decode_all(&mut &message_vec[..])?;
 
     // initialize index and indent
     let mut index: u32 = 0;
@@ -117,10 +111,10 @@ pub fn process_message(
         }
         None => {
             let author_card = Card::AuthorPublicKey(&author_multi_signer).card(&mut index, indent);
-            let error_card = Card::Error(ErrorSigner::Input(InputSigner::UnknownNetwork {
+            let error_card = Card::Error(Error::UnknownNetwork {
                 genesis_hash,
                 encryption,
-            }))
+            })
             .card(&mut index, indent);
             let message_card =
                 Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);

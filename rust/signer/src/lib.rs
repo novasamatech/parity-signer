@@ -20,11 +20,12 @@
 
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
+#![allow(clippy::let_unit_value)]
 
 mod ffi_types;
 
 use crate::ffi_types::*;
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
 
 /// Container for severe error message
 ///
@@ -43,6 +44,20 @@ impl From<anyhow::Error> for ErrorDisplayed {
         Self::Str {
             s: format!("error on signer side: {}", e),
         }
+    }
+}
+
+impl FromStr for ErrorDisplayed {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(ErrorDisplayed::Str { s: s.to_string() })
+    }
+}
+
+impl From<String> for ErrorDisplayed {
+    fn from(s: String) -> Self {
+        ErrorDisplayed::Str { s }
     }
 }
 
@@ -71,7 +86,7 @@ fn action_get_name(action: &Action) -> Option<FooterButton> {
 ///
 /// Action tries to acquire lock on app state mutex and is ignored on failure.
 ///
-/// 'seed_phrase' field is zeroized, it is expected to be used for secrets only.
+/// `seed_phrase` field is zeroized, it is expected to be used for secrets only.
 ///
 /// `details` field is not always zeroized.
 ///
@@ -132,13 +147,13 @@ fn substrate_path_check(
 
 /// Must be called once on normal first start of the app upon accepting conditions; relies on old
 /// data being already removed
-fn history_init_history_with_cert(dbname: &str) -> anyhow::Result<(), anyhow::Error> {
-    db_handling::cold_default::signer_init_with_cert(dbname).map_err(|e| e.anyhow())
+fn history_init_history_with_cert(dbname: &str) -> anyhow::Result<(), String> {
+    db_handling::cold_default::signer_init_with_cert(dbname).map_err(|e| format!("{}", e))
 }
 
 /// Must be called once upon jailbreak (removal of general verifier) after all old data was removed
-fn history_init_history_no_cert(dbname: &str) -> anyhow::Result<(), anyhow::Error> {
-    db_handling::cold_default::signer_init_no_cert(dbname).map_err(|e| e.anyhow())
+fn history_init_history_no_cert(dbname: &str) -> anyhow::Result<(), String> {
+    db_handling::cold_default::signer_init_no_cert(dbname).map_err(|e| format!("{}", e))
 }
 
 /// Must be called every time network detector detects network. Sets alert flag in database that could
@@ -146,47 +161,31 @@ fn history_init_history_no_cert(dbname: &str) -> anyhow::Result<(), anyhow::Erro
 ///
 /// This changes log, so it is expected to fail all operations that check that database remained
 /// intact
-fn history_device_was_online(dbname: &str) -> anyhow::Result<(), anyhow::Error> {
-    db_handling::manage_history::device_was_online(dbname).map_err(|e| e.anyhow())
+fn history_device_was_online(dbname: &str) -> anyhow::Result<(), String> {
+    db_handling::manage_history::device_was_online(dbname).map_err(|e| format!("{}", e))
 }
 
 /// Checks if network alert flag was set
-fn history_get_warnings(dbname: &str) -> anyhow::Result<bool, anyhow::Error> {
-    db_handling::helpers::get_danger_status(dbname).map_err(|e| e.anyhow())
+fn history_get_warnings(dbname: &str) -> anyhow::Result<bool, String> {
+    db_handling::helpers::get_danger_status(dbname).map_err(|e| format!("{}", e))
 }
 
 /// Resets network alert flag; makes record of reset in log
-fn history_acknowledge_warnings(dbname: &str) -> anyhow::Result<(), anyhow::Error> {
-    db_handling::manage_history::reset_danger_status_to_safe(dbname).map_err(|e| e.anyhow())
+fn history_acknowledge_warnings(dbname: &str) -> anyhow::Result<(), String> {
+    db_handling::manage_history::reset_danger_status_to_safe(dbname).map_err(|e| format!("{}", e))
 }
 
 /// Allows frontend to send events into log; TODO: maybe this is not needed
-fn history_entry_system(event: Event, dbname: &str) -> anyhow::Result<(), anyhow::Error> {
-    db_handling::manage_history::history_entry_system(dbname, event).map_err(|e| e.anyhow())
+fn history_entry_system(event: Event, dbname: &str) -> anyhow::Result<(), String> {
+    db_handling::manage_history::history_entry_system(dbname, event).map_err(|e| format!("{}", e))
 }
 
 /// Must be called every time seed backup shows seed to user
 ///
 /// Makes record in log
-fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<(), anyhow::Error> {
+fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<(), String> {
     db_handling::manage_history::seed_name_was_shown(dbname, seed_name.to_string())
-        .map_err(|e| e.anyhow())
-}
-
-/// Test function to show all transaction cards
-fn get_all_tx_cards() -> TransactionCardSet {
-    match transaction_parsing::test_all_cards::make_all_cards() {
-        TransactionAction::Derivations { content, .. } => content,
-        TransactionAction::Sign { content, .. } => content,
-        TransactionAction::Stub { s, .. } => s,
-        TransactionAction::Read { r } => r,
-    }
-}
-
-/// Test function to show all possible log events
-fn get_all_log_cards() -> String {
-    String::new()
-    // TODO: definitions::history::print_all_events()
+        .map_err(|e| format!("{}", e))
 }
 
 /// Must be called once to initialize logging from Rust in development mode.

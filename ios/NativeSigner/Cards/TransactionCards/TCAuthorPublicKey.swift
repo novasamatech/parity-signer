@@ -12,22 +12,20 @@ struct TCAuthorPublicKey: View {
     var body: some View {
         HStack {
             Identicon(identicon: value.identicon)
-            VStack (alignment: .leading) {
+            VStack(alignment: .leading) {
                 Text("Signed with " + value.encryption)
-                    .foregroundColor(Color("Text400")).font(FBase(style: .body2))
+                    .foregroundColor(Asset.text400.swiftUIColor).font(Fontstyle.body2.base)
                 Text(value.publicKey)
-                    .font(FCrypto(style: .body2))
-                    .foregroundColor(Color("Crypto400"))
+                    .font(Fontstyle.body2.crypto)
+                    .foregroundColor(Asset.crypto400.swiftUIColor)
             }
             Spacer()
         }
     }
 }
 
-/*
-struct TCAuthorPublicKey_Previews: PreviewProvider {
-    static var previews: some View {
-        TCAuthorPublicKey()
-    }
-}
-*/
+// struct TCAuthorPublicKey_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TCAuthorPublicKey()
+//    }
+// }

@@ -8,28 +8,26 @@
 import SwiftUI
 
 struct ErrorAlert: View {
-    @EnvironmentObject var data: SignerDataModel
+    let navigationRequest: NavigationRequest
     let content: String
     var body: some View {
         ZStack {
-            Rectangle().foregroundColor(Color("BgDanger")).opacity(0.3).gesture(TapGesture().onEnded{_ in
-                    data.pushButton(action: .goBack)
+            Rectangle().foregroundColor(Asset.bgDanger.swiftUIColor).opacity(0.3).gesture(TapGesture().onEnded { _ in
+                navigationRequest(.init(action: .goBack))
+            })
+            VStack {
+                Text("Error!").font(Fontstyle.header1.base).foregroundColor(Asset.signalDanger.swiftUIColor)
+                Text(content).foregroundColor(Asset.signalDanger.swiftUIColor)
+                Button("Ok", action: {
+                    navigationRequest(.init(action: .goBack))
                 })
-            VStack{
-                Text("Error!").font(FBase(style: .h1)).foregroundColor(Color("SignalDanger"))
-                Text(content).foregroundColor(Color("SignalDanger"))
-                Button(action: {
-                    data.pushButton(action: .goBack)
-                }) {Text("Ok")}
-            }.padding().background(RoundedRectangle(cornerRadius: 20).foregroundColor(Color("BgDanger")))
+            }.padding().background(RoundedRectangle(cornerRadius: 20).foregroundColor(Asset.bgDanger.swiftUIColor))
         }
     }
 }
 
-/*
- struct ErrorAlert_Previews: PreviewProvider {
- static var previews: some View {
- ErrorAlert()
- }
- }
- */
+// struct ErrorAlert_Previews: PreviewProvider {
+// static var previews: some View {
+// ErrorAlert()
+// }
+// }

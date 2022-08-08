@@ -10,14 +10,12 @@ import SwiftUI
 struct TCDefault: View {
     let content: String
     var body: some View {
-        Text(content).foregroundColor(Color("Text600")).font(FBase(style: .body2))
+        Text(content).foregroundColor(Asset.text600.swiftUIColor).font(Fontstyle.body2.base)
     }
 }
 
-/*
-struct TCDefault_Previews: PreviewProvider {
-    static var previews: some View {
-        TCDefault()
-    }
-}
-*/
+// struct TCDefault_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TCDefault()
+//    }
+// }

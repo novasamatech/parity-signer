@@ -7,31 +7,26 @@
 
 import Foundation
 
-import Security //for keyring
+import Security // for keyring
 import SwiftUI
 
-/**
- * Apple's own crypto boilerplate
- */
+/// Apple's own crypto boilerplate
 enum KeychainError: Error {
     case noPassword
     case unexpectedPasswordData
     case unhandledError(status: OSStatus)
 }
 
-/**
- * Seeds management operations - these mostly rely on secure enclave
- *
- *  Seeds are stored in keyring - it has SQL-like api but is backed by secure enclave
- *  IMPORTANT! The keys from keyring are not removed on app uninstall!
- *  Remember to wipe the app with wipe button in settings.
- */
+/// Seeds management operations - these mostly rely on secure enclave
+///
+///  Seeds are stored in keyring - it has SQL-like api but is backed by secure enclave
+///  IMPORTANT! The keys from keyring are not removed on app uninstall!
+///  Remember to wipe the app with wipe button in settings.
 extension SignerDataModel {
-    /**
-     * Get all seed names from secure storage
-     *
-     * this is also used as generic auth request operation that will lock the app on failure
-     */
+    /// Get all seed names from secure storage
+    ///
+    /// this is also used as generic auth request operation that will lock the app on failure
+    // swiftlint:disable:next function_body_length
     func refreshSeeds() {
         var item: CFTypeRef?
         let query: [String: Any] = [
@@ -41,46 +36,52 @@ extension SignerDataModel {
             kSecReturnData as String: false
         ]
         let status = SecItemCopyMatching(query as CFDictionary, &item)
-        switch (status) {
-        case errSecSuccess: do {
-            guard let itemFound = item as? [[String : Any]]
-            else {
-                print("no seeds available")
-                self.seedNames = []
+        switch status {
+        case errSecSuccess:
+            do {
+                guard let itemFound = item as? [[String: Any]]
+                else {
+                    print("no seeds available")
+                    self.seedNames = []
+                    updateSeedNames(seedNames: seedNames)
+                    return
+                }
+                let seedNames = itemFound.map { item -> String in
+                    guard let seedName = item[kSecAttrAccount as String] as? String
+                    else {
+                        print("seed name decoding error")
+                        return "error!"
+                    }
+                    return seedName
+                }
+                self.seedNames = seedNames.sorted()
                 updateSeedNames(seedNames: seedNames)
+                authenticated = true
+            }
+        case errSecItemNotFound:
+            do {
+                print("no seeds available")
+                seedNames = []
+                updateSeedNames(seedNames: seedNames)
+                authenticated = true
                 return
             }
-            let seedNames = itemFound.map{item -> String in
-                guard let seedName = item[kSecAttrAccount as String] as? String
-                else {
-                    print("seed name decoding error")
-                    return "error!"
-                }
-                return seedName
-            }
-            self.seedNames = seedNames.sorted()
-            updateSeedNames(seedNames: seedNames)
-            self.authenticated = true
-        }
-        case errSecItemNotFound: do {
-            print("no seeds available")
-            self.seedNames = []
-            updateSeedNames(seedNames: seedNames)
-            self.authenticated = true
-            return
-        }
         default:
-            self.authenticated = false
+            authenticated = false
         }
     }
-    
-    /**
-     * Creates seed; this is the only way to create seed.
-     * createRoots: choose whether empty derivations for every network should be created
-     */
+
+    /// Creates seed; this is the only way to create seed.
+    /// createRoots: choose whether empty derivations for every network should be created
+    // swiftlint:disable:next function_body_length
     func restoreSeed(seedName: String, seedPhrase: String, createRoots: Bool) {
         var error: Unmanaged<CFError>?
-        guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
+        guard let accessFlags = SecAccessControlCreateWithFlags(
+            kCFAllocatorDefault,
+            kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
+            .devicePasscode,
+            &error
+        ) else {
             print("Access flags could not be allocated")
             print(error ?? "no error code")
             return
@@ -106,26 +107,26 @@ extension SignerDataModel {
         guard status == errSecSuccess else {
             print("key add failure")
             print(status)
-            let lastError = SecCopyErrorMessageString(status, nil)! as String
+            let lastError = SecCopyErrorMessageString(status, nil) as? String ?? ""
             print(lastError)
             return
         }
-        self.seedNames.append(seedName)
-        self.seedNames = self.seedNames.sorted()
-        updateSeedNames(seedNames: self.seedNames)
-        self.pushButton(action: .goForward, details: createRoots ? "true" : "false", seedPhrase: seedPhrase)
+        seedNames.append(seedName)
+        seedNames = seedNames.sorted()
+        updateSeedNames(seedNames: seedNames)
+        navigation.perform(navigation: .init(
+            action: .goForward,
+            details: createRoots ? "true" : "false",
+            seedPhrase: seedPhrase
+        ))
     }
-    
-    /**
-     * Each seed name should be unique, obviously. We do not want to overwrite old seeds.
-     */
+
+    /// Each seed name should be unique, obviously. We do not want to overwrite old seeds.
     func checkSeedCollision(seedName: String) -> Bool {
-        return self.seedNames.contains(seedName)
+        seedNames.contains(seedName)
     }
-    
-    /**
-     * Check if proposed seed phrase is already saved. But mostly require auth on seed creation.
-     */
+
+    /// Check if proposed seed phrase is already saved. But mostly require auth on seed creation.
     func checkSeedPhraseCollision(seedPhrase: String) -> Bool {
         var item: AnyObject?
         guard let finalSeedPhrase = seedPhrase.data(using: .utf8) else {
@@ -139,22 +140,21 @@ extension SignerDataModel {
         ]
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         if !(status == errSecSuccess || status == errSecItemNotFound) {
-            self.authenticated = false
+            authenticated = false
         }
         if status == errSecItemNotFound { return false }
-        if item == nil {return false} else {
-            let found = item as! NSArray
+        if item == nil { return false } else {
+            let found = item as! NSArray // swiftlint:disable:this force_cast
             return found.contains(finalSeedPhrase)
         }
     }
-    
-    /**
-     * Gets seed by seedName from keyring
-     * Calls auth screen automatically; no need to call it specially or wrap
-     */
+
+    /// Gets seed by seedName from keyring
+    /// Calls auth screen automatically; no need to call it specially or wrap
+    // swiftlint:disable:next function_body_length
     func getSeed(seedName: String, backup: Bool = false) -> String {
-        if self.alert {
-            self.alertShow = true
+        if alert {
+            alertShow = true
             return ""
         }
         var item: CFTypeRef?
@@ -169,13 +169,16 @@ extension SignerDataModel {
         if status == errSecSuccess {
             if backup {
                 do {
-                    try historySeedNameWasShown(seedName: seedName, dbname: self.dbName)
+                    try historySeedNameWasShown(seedName: seedName, dbname: dbName)
                 } catch {
                     print("Seed access logging error! This system is broken and should not be used anymore.")
-                    //Attempt to log this anyway one last time;
-                    //if this fails too - complain to joulu pukki
+                    // Attempt to log this anyway one last time;
+                    // if this fails too - complain to joulu pukki
                     do {
-                        try historyEntrySystem(event: .systemEntry(systemEntry: "Seed access logging failed!"), dbname: dbName)
+                        try historyEntrySystem(
+                            event: .systemEntry(systemEntry: "Seed access logging failed!"),
+                            dbname: dbName
+                        )
                     } catch {
                         logSuccess = false
                         authenticated = false
@@ -183,52 +186,56 @@ extension SignerDataModel {
                     }
                     logSuccess = false
                 }
-                return logSuccess ? String(data: (item as! CFData) as Data, encoding: .utf8) ?? "" : ""
+                return logSuccess ? String(
+                    data: (item as! CFData) as Data, // swiftlint:disable:this force_cast
+                    encoding: .utf8
+                ) ?? "" : ""
             }
-            return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
+            return String(
+                data: (item as! CFData) as Data, // swiftlint:disable:this force_cast
+                encoding: .utf8
+            ) ?? ""
         } else {
             authenticated = false
             return ""
         }
     }
-    
-    
-    /**
-     * Removes seed and all derived keys
-     */
+
+    /// Removes seed and all derived keys
     func removeSeed(seedName: String) {
         refreshSeeds()
-        if self.authenticated {
+        if authenticated {
             let query = [
                 kSecClass as String: kSecClassGenericPassword,
                 kSecAttrAccount as String: seedName
             ] as CFDictionary
             let status = SecItemDelete(query)
             if status == errSecSuccess {
-                self.seedNames = self.seedNames.filter {element in
-                    return element != seedName
+                seedNames = seedNames.filter { element in
+                    element != seedName
                 }
-                self.seedNames = seedNames.sorted()
-                updateSeedNames(seedNames: self.seedNames)
-                pushButton(action: .removeSeed)
+                seedNames = seedNames.sorted()
+                updateSeedNames(seedNames: seedNames)
+                navigation.perform(navigation: .init(action: .removeSeed))
             } else {
-                let lastError = SecCopyErrorMessageString(status, nil)! as String
+                let lastError = SecCopyErrorMessageString(status, nil) as? String ?? ""
                 print("remove seed from secure storage error: " + lastError)
             }
         }
     }
-    
-    /**
-     * Wrapper for signing with use of seed material
-     */
+
+    /// Wrapper for signing with use of seed material
     func sign(seedName: String, comment: String) {
-        if self.alert {
-            self.alertShow = true
+        if alert {
+            alertShow = true
         } else {
-            self.pushButton(
-                action: .goForward,
-                details: comment,
-                seedPhrase: self.getSeed(seedName: seedName)
+            navigation.perform(
+                navigation:
+                .init(
+                    action: .goForward,
+                    details: comment,
+                    seedPhrase: getSeed(seedName: seedName)
+                )
             )
         }
     }

@@ -6,7 +6,7 @@ use db_handling::{
 };
 use definitions::{
     error::TransferContent,
-    error_signer::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer},
+    error_signer::GeneralVerifierForContent,
     history::Event,
     keyring::{NetworkSpecsKey, VerifierKey},
     navigation::TransactionCardSet,
@@ -16,36 +16,37 @@ use definitions::{
 
 use crate::cards::{Card, Warning};
 use crate::check_signature::pass_crypto;
+use crate::error::{Error, Result};
 use crate::helpers::specs_are_new;
 use crate::{StubNav, TransactionAction};
 
 use crate::holds::{GeneralHold, Hold, HoldRelease};
 
-pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionAction, ErrorSigner> {
+pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionAction> {
     let checked_info = pass_crypto(data_hex, TransferContent::AddSpecs)?;
-    let specs = ContentAddSpecs::from_slice(&checked_info.message).specs::<Signer>()?;
+    let specs = ContentAddSpecs::from_slice(&checked_info.message).specs()?;
     let network_specs_key = NetworkSpecsKey::from_parts(&specs.genesis_hash, &specs.encryption);
     let verifier_key = VerifierKey::from_parts(specs.genesis_hash);
     let possible_valid_current_verifier =
         try_get_valid_current_verifier(&verifier_key, database_name)?;
     let general_verifier = get_general_verifier(database_name)?;
     if let Some(specs_invariants) =
-        genesis_hash_in_specs(specs.genesis_hash, &open_db::<Signer>(database_name)?)?
+        genesis_hash_in_specs(specs.genesis_hash, &open_db(database_name)?)?
     {
         if specs.name != specs_invariants.name {
-            return Err(ErrorSigner::Input(InputSigner::AddSpecsDifferentName {
+            return Err(Error::AddSpecsDifferentName {
                 genesis_hash: specs_invariants.genesis_hash,
                 name_database: specs_invariants.name,
                 name_input: specs.name,
-            }));
+            });
         }
         if specs.base58prefix != specs_invariants.base58prefix {
-            return Err(ErrorSigner::Input(InputSigner::AddSpecsDifferentBase58 {
+            return Err(Error::AddSpecsDifferentBase58 {
                 genesis_hash: specs_invariants.genesis_hash,
                 name: specs_invariants.name,
                 base58_database: specs_invariants.base58prefix,
                 base58_input: specs.base58prefix,
-            }));
+            });
         }
     }
     let mut stub = TrDbColdStub::new();
@@ -215,10 +216,10 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                             },
                         })
                     } else {
-                        Err(ErrorSigner::Input(InputSigner::SpecsKnown {
+                        Err(Error::SpecsKnown {
                             name: specs.name,
                             encryption: specs.encryption,
-                        }))
+                        })
                     }
                 }
                 Verifier {
@@ -420,10 +421,10 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
             Verifier {
                 v: Some(ref old_verifier_value),
             } => match checked_info.verifier {
-                Verifier { v: None } => Err(ErrorSigner::Input(InputSigner::NeedVerifier {
+                Verifier { v: None } => Err(Error::NeedVerifier {
                     name: specs.name,
                     verifier_value: old_verifier_value.to_owned(),
-                })),
+                }),
                 Verifier {
                     v: Some(ref new_verifier_value),
                 } => {
@@ -509,17 +510,17 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                                 },
                             })
                         } else {
-                            Err(ErrorSigner::Input(InputSigner::SpecsKnown {
+                            Err(Error::SpecsKnown {
                                 name: specs.name,
                                 encryption: specs.encryption,
-                            }))
+                            })
                         }
                     } else {
-                        Err(ErrorSigner::Input(InputSigner::AddSpecsVerifierChanged {
+                        Err(Error::AddSpecsVerifierChanged {
                             name: specs.name,
                             old_verifier_value: old_verifier_value.to_owned(),
                             new_verifier_value: new_verifier_value.to_owned(),
-                        }))
+                        })
                     }
                 }
             },
@@ -552,10 +553,10 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                             },
                         })
                     } else {
-                        Err(ErrorSigner::Input(InputSigner::SpecsKnown {
+                        Err(Error::SpecsKnown {
                             name: specs.name,
                             encryption: specs.encryption,
-                        }))
+                        })
                     }
                 }
                 Verifier {
@@ -641,26 +642,24 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                             },
                         })
                     } else {
-                        Err(ErrorSigner::Input(InputSigner::SpecsKnown {
+                        Err(Error::SpecsKnown {
                             name: specs.name,
                             encryption: specs.encryption,
-                        }))
+                        })
                     }
                 } else {
                     match checked_info.verifier {
-                        Verifier { v: None } => {
-                            Err(ErrorSigner::Input(InputSigner::NeedGeneralVerifier {
-                                content: GeneralVerifierForContent::Network { name: specs.name },
-                                verifier_value: old_general_verifier_value.to_owned(),
-                            }))
-                        }
+                        Verifier { v: None } => Err(Error::NeedGeneralVerifier {
+                            content: GeneralVerifierForContent::Network { name: specs.name },
+                            verifier_value: old_general_verifier_value.to_owned(),
+                        }),
                         Verifier {
                             v: Some(new_general_verifier_value),
-                        } => Err(ErrorSigner::Input(InputSigner::GeneralVerifierChanged {
+                        } => Err(Error::GeneralVerifierChanged {
                             content: GeneralVerifierForContent::Network { name: specs.name },
                             old_general_verifier_value: old_general_verifier_value.to_owned(),
                             new_general_verifier_value,
-                        })),
+                        }),
                     }
                 }
             }

@@ -9,13 +9,13 @@ import SwiftUI
 
 struct SignatureReady: View {
     @GestureState private var dragOffset = CGSize.zero
-    @State var offset: CGFloat = 0
-    @State var oldOffset: CGFloat = UIScreen.main.bounds.size.width
+    @State private var offset: CGFloat = 0
+    @State private var oldOffset: CGFloat = UIScreen.main.bounds.size.width
     var content: MSignatureReady
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
-        ZStack{
-            RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000"))
+        ZStack {
+            RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg000.swiftUIColor)
             VStack {
                 HeaderBar(line1: "Your Signature", line2: "Scan it into your application")
                 Image(uiImage: UIImage(data: Data(content.signature)) ?? UIImage())
@@ -23,32 +23,31 @@ struct SignatureReady: View {
                     .aspectRatio(contentMode: .fit).padding(12)
                 Spacer()
                 BigButton(text: "Done", action: {
-                    pushButton(.goBack, "", "")
+                    navigationRequest(.init(action: .goBack))
                 })
             }.padding(16)
-        }//.background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000")))
-        .offset(x: 0, y: offset+oldOffset)
+        }
+        .offset(x: 0, y: offset + oldOffset)
         .gesture(
             DragGesture()
-                .onChanged {drag in
+                .onChanged { drag in
                     self.offset = drag.translation.height
                 }
-                .onEnded{drag in
+                .onEnded { drag in
                     self.oldOffset += drag.translation.height
                     self.offset = 0
                 }
         )
         .gesture(
-            TapGesture().onEnded{_ in
+            TapGesture().onEnded { _ in
                 self.oldOffset = 0
-            })
+            }
+        )
     }
 }
 
-/*
- struct SignatureReady_Previews: PreviewProvider {
- static var previews: some View {
- SignatureReady()
- }
- }
- */
+// struct SignatureReady_Previews: PreviewProvider {
+// static var previews: some View {
+// SignatureReady()
+// }
+// }

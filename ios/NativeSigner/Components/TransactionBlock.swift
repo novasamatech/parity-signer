@@ -12,7 +12,7 @@ struct TransactionBlock: View {
     let size = UIScreen.main.bounds.size.width
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400"))
+            RoundedRectangle(cornerRadius: 8).stroke(Asset.crypto400.swiftUIColor)
             ScrollView {
                 LazyVStack {
                     ForEach(cards, id: \.index) { card in
@@ -27,10 +27,8 @@ struct TransactionBlock: View {
     }
 }
 
-/*
- struct TransactionBlock_Previews: PreviewProvider {
- static var previews: some View {
- TransactionBlock()
- }
- }
- */
+// struct TransactionBlock_Previews: PreviewProvider {
+// static var previews: some View {
+// TransactionBlock()
+// }
+// }

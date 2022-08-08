@@ -20,7 +20,7 @@
 //!
 //! - History log old entries (if any are present) are removed and a new entry
 //! `Event::DatabaseInitiated` is added
-//! - General verifier is set and this event is recorded inthe history log. By
+//! - General verifier is set and this event is recorded in the history log. By
 //! default, Signer sets up Parity-associated key as a general verifier. This
 //! could be later on changed by the user.
 //!
@@ -48,16 +48,13 @@ use constants::{DANGER, TYPES};
 #[cfg(any(feature = "active", feature = "signer"))]
 use constants::{GENERALVERIFIER, HISTORY};
 
-#[cfg(feature = "signer")]
-use definitions::error_signer::{ErrorSigner, Signer};
 #[cfg(feature = "active")]
 use definitions::{
     danger::DangerRecord,
-    error_active::{Active, ErrorActive},
     keyring::{MetaKey, NetworkSpecsKey},
 };
 #[cfg(any(feature = "active", feature = "signer"))]
-use definitions::{error::ErrorSource, history::Event, network_specs::Verifier};
+use definitions::{history::Event, network_specs::Verifier};
 
 #[cfg(feature = "signer")]
 use defaults::default_general_verifier;
@@ -72,6 +69,8 @@ use crate::identities::generate_test_identities;
 use crate::{
     db_transactions::TrDbCold, helpers::make_batch_clear_tree, manage_history::events_in_batch,
 };
+
+use crate::Result;
 
 /// Cold database generation purpose, determining the metadata to be loaded.
 ///
@@ -99,7 +98,7 @@ enum Purpose {
 ///
 /// Adds default metadata entries, according to [`Purpose`].
 #[cfg(feature = "active")]
-fn default_cold_metadata(purpose: Purpose) -> Result<Batch, ErrorActive> {
+fn default_cold_metadata(purpose: Purpose) -> Result<Batch> {
     let mut batch = Batch::default();
     let metadata_set = match purpose {
         Purpose::Release => release_metadata()?,
@@ -145,7 +144,7 @@ fn default_cold_network_specs() -> Batch {
 /// [`init_db`]. Without general verifier (i.e. a value in the [`SETTREE`] tree
 /// under the key [`GENERALVERIFIER`]) the database is not usable by the Signer.
 #[cfg(feature = "active")]
-fn default_cold_settings_init_later() -> Result<Batch, ErrorActive> {
+fn default_cold_settings_init_later() -> Result<Batch> {
     let mut batch = Batch::default();
     let types_prep = default_types_content()?;
     batch.insert(TYPES, types_prep.store());
@@ -181,14 +180,16 @@ fn default_cold_verifiers() -> Batch {
 /// Note that the resulting database is not initiated and is not ready to be
 /// used by the Signer.
 #[cfg(any(feature = "active", feature = "test"))]
-fn cold_database_no_init(database_name: &str, purpose: Purpose) -> Result<(), ErrorActive> {
+fn cold_database_no_init(database_name: &str, purpose: Purpose) -> Result<()> {
     if std::fs::remove_dir_all(database_name).is_ok() {}
     TrDbCold::new()
         .set_metadata(default_cold_metadata(purpose)?) // set default metadata
         .set_network_specs(default_cold_network_specs()) // set default network specs
         .set_settings(default_cold_settings_init_later()?) // set default types and danger status, no general verifier yet
         .set_verifiers(default_cold_verifiers()) // set default verifiers
-        .apply::<Active>(database_name)
+        .apply(database_name)?;
+
+    Ok(())
 }
 
 /// Initiate cold database and set up the database general verifier to given
@@ -203,15 +204,11 @@ fn cold_database_no_init(database_name: &str, purpose: Purpose) -> Result<(), Er
 ///
 /// After applying this function the database becomes ready to be used by the
 /// Signer.
-#[cfg(any(feature = "active", feature = "signer"))]
-pub fn init_db<T: ErrorSource>(
-    database_name: &str,
-    general_verifier: Verifier,
-) -> Result<(), T::Error> {
+pub fn init_db(database_name: &str, general_verifier: Verifier) -> Result<()> {
     let mut settings_batch = Batch::default();
     settings_batch.insert(GENERALVERIFIER, general_verifier.encode());
 
-    let clear_history_batch = make_batch_clear_tree::<T>(database_name, HISTORY)?;
+    let clear_history_batch = make_batch_clear_tree(database_name, HISTORY)?;
     let events = vec![
         Event::DatabaseInitiated,
         Event::GeneralVerifierSet {
@@ -219,13 +216,14 @@ pub fn init_db<T: ErrorSource>(
         },
     ];
     let start_zero = true;
-    let history_batch =
-        events_in_batch::<T>(database_name, start_zero, clear_history_batch, events)?;
+    let history_batch = events_in_batch(database_name, start_zero, clear_history_batch, events)?;
 
     TrDbCold::new()
         .set_history(history_batch) // set *start* history
         .set_settings(settings_batch) // set general_verifier
-        .apply::<T>(database_name)
+        .apply(database_name)?;
+
+    Ok(())
 }
 
 /// Initiate Signer database with default general verifier (Parity-associated
@@ -234,16 +232,16 @@ pub fn init_db<T: ErrorSource>(
 /// Function is applied during the initial start of the Signer and during
 /// `Wipe all data` procedure.
 #[cfg(feature = "signer")]
-pub fn signer_init_with_cert(database_name: &str) -> Result<(), ErrorSigner> {
-    init_db::<Signer>(database_name, default_general_verifier())
+pub fn signer_init_with_cert(database_name: &str) -> Result<()> {
+    init_db(database_name, default_general_verifier())
 }
 
 /// Initiate Signer database with general verifier set up to `Verifier(None)`.
 ///
 /// Function is applied during `Remove general certificate` procedure.
 #[cfg(feature = "signer")]
-pub fn signer_init_no_cert(database_name: &str) -> Result<(), ErrorSigner> {
-    init_db::<Signer>(database_name, Verifier { v: None })
+pub fn signer_init_no_cert(database_name: &str) -> Result<()> {
+    init_db(database_name, Verifier { v: None })
 }
 
 /// Generate initiated test cold database with no network-associated data.
@@ -252,15 +250,12 @@ pub fn signer_init_no_cert(database_name: &str) -> Result<(), ErrorSigner> {
 /// defaults for types information and danger status. Then the database is
 /// initiated with given general verifier.
 #[cfg(feature = "test")]
-pub fn populate_cold_no_networks(
-    database_name: &str,
-    general_verifier: Verifier,
-) -> Result<(), ErrorActive> {
+pub fn populate_cold_no_networks(database_name: &str, general_verifier: Verifier) -> Result<()> {
     if std::fs::remove_dir_all(database_name).is_ok() {}
     TrDbCold::new()
         .set_settings(default_cold_settings_init_later()?) // set general verifier and load default types
-        .apply::<Active>(database_name)?;
-    init_db::<Active>(database_name, general_verifier)
+        .apply(database_name)?;
+    init_db(database_name, general_verifier)
 }
 
 /// Generate initiated test cold database without network metadata.
@@ -274,36 +269,33 @@ pub fn populate_cold_no_networks(
 ///
 /// Then the database is initiated with given general verifier.
 #[cfg(feature = "test")]
-pub fn populate_cold_no_metadata(
-    database_name: &str,
-    general_verifier: Verifier,
-) -> Result<(), ErrorActive> {
+pub fn populate_cold_no_metadata(database_name: &str, general_verifier: Verifier) -> Result<()> {
     if std::fs::remove_dir_all(database_name).is_ok() {}
     TrDbCold::new()
         .set_network_specs(default_cold_network_specs()) // set default network specs
         .set_settings(default_cold_settings_init_later()?) // set general verifier and load default types
         .set_verifiers(default_cold_verifiers()) // set default verifiers
-        .apply::<Active>(database_name)?;
-    init_db::<Active>(database_name, general_verifier)
+        .apply(database_name)?;
+    init_db(database_name, general_verifier)
 }
 
 /// Generate initiated test cold database with default content, and create in it
 /// Alice default addresses.
 #[cfg(feature = "test")]
-pub fn populate_cold(database_name: &str, general_verifier: Verifier) -> Result<(), ErrorActive> {
+pub fn populate_cold(database_name: &str, general_verifier: Verifier) -> Result<()> {
     cold_database_no_init(database_name, Purpose::Test)?;
-    init_db::<Active>(database_name, general_verifier)?;
+    init_db(database_name, general_verifier)?;
     generate_test_identities(database_name)
 }
 
 /// Generate **not initiated** release cold database.
 #[cfg(feature = "active")]
-pub(crate) fn populate_cold_release(database_name: &str) -> Result<(), ErrorActive> {
+pub(crate) fn populate_cold_release(database_name: &str) -> Result<()> {
     cold_database_no_init(database_name, Purpose::Release)
 }
 
 /// Generate **not initiated** test cold database for `navigator` testing.
 #[cfg(feature = "test")]
-pub fn populate_cold_nav_test(database_name: &str) -> Result<(), ErrorActive> {
+pub fn populate_cold_nav_test(database_name: &str) -> Result<()> {
     cold_database_no_init(database_name, Purpose::TestNavigator)
 }

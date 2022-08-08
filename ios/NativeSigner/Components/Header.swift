@@ -15,78 +15,86 @@ struct Header: View {
     let alert: Bool
     let canaryDead: Bool
     let alertShow: () -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         VStack {
             Spacer()
             HStack {
                 HStack(spacing: 8.0) {
                     if back {
-                        Button(action: {
-                            pushButton(.goBack, "", "")
-                        }) {
-                            Image(systemName: rightButton == .multiSelect ? "xmark" : "chevron.left")
+                        Button(
+                            action: {
+                                navigationRequest(.init(action: .goBack))
+                            },
+                            label: {
+                                Image(
+                                    rightButton == .multiSelect ? .xmark : .chevron,
+                                    variant: rightButton == .multiSelect ? nil : .left
+                                )
                                 .imageScale(.large)
-                                .foregroundColor(Color("Text500"))
-                        }
+                                .foregroundColor(Asset.text500.swiftUIColor)
+                            }
+                        )
                     }
                     Spacer()
                 }
                 .frame(width: 72.0)
-                
                 Spacer()
                 Text(screenLabel)
-                    .foregroundColor(Color("Text600"))
-                    .font(screenNameType == .h1 ? FBase(style: .h2) : FBase(style: .h4))
+                    .foregroundColor(Asset.text600.swiftUIColor)
+                    .font(screenNameType == .h1 ? Fontstyle.header2.base : Fontstyle.header4.base)
                     .tracking(0.1)
-                
                 if rightButton == .multiSelect {
-                    Button(action: {
-                        pushButton(.selectAll, "", "")
-                    }) {
-                        SmallButton(text: "Select all")
-                    }
+                    Button(
+                        action: {
+                            navigationRequest(.init(action: .selectAll))
+                        },
+                        label: {
+                            SmallButton(text: "Select all")
+                        }
+                    )
                 }
                 Spacer()
-                
                 HStack(spacing: 8.0) {
                     Spacer()
-                    Button(action: {
-                        if alert && rightButton == .newSeed {
-                            alertShow()
-                        } else {
-                            pushButton(.rightButtonAction, "", "")
+                    Button(
+                        action: {
+                            if alert, rightButton == .newSeed {
+                                alertShow()
+                            } else {
+                                navigationRequest(.init(action: .rightButtonAction))
+                            }
+                        },
+                        label: {
+                            switch rightButton {
+                            case .newSeed:
+                                Image(.plus, variant: .circle)
+                                    .imageScale(.large)
+                                    .foregroundColor(Asset.action400.swiftUIColor)
+                            case .backup:
+                                Image(.ellipsis)
+                                    .imageScale(.large)
+                                    .foregroundColor(Asset.action400.swiftUIColor)
+                            case .logRight:
+                                Image(.ellipsis)
+                                    .imageScale(.large)
+                                    .foregroundColor(Asset.action400.swiftUIColor)
+                            case .multiSelect:
+                                EmptyView()
+                            case .none:
+                                EmptyView()
+                            default:
+                                Image(.ellipsis)
+                                    .imageScale(.large)
+                                    .foregroundColor(Asset.action400.swiftUIColor)
+                            }
                         }
-                    }) {
-                        switch(
-                            rightButton
-                        ) {
-                        case .newSeed:
-                            Image(systemName: "plus.circle")
-                                .imageScale(.large)
-                                .foregroundColor(Color("Action400"))
-                        case .backup:
-                            Image(systemName: "ellipsis")
-                                .imageScale(.large)
-                                .foregroundColor(Color("Action400"))
-                        case .logRight:
-                            Image(systemName: "ellipsis")
-                                .imageScale(.large)
-                                .foregroundColor(Color("Action400"))
-                        case .multiSelect:
-                            EmptyView()
-                        case .none:
-                            EmptyView()
-                        default:
-                            Image(systemName: "ellipsis")
-                                .imageScale(.large)
-                                .foregroundColor(Color("Action400"))
-                        }
-                    }
+                    )
                     NavbarShield(
                         canaryDead: canaryDead,
                         alert: alert,
-                        pushButton: pushButton)
+                        navigationRequest: navigationRequest
+                    )
                 }
                 .frame(width: 72.0)
             }
@@ -96,10 +104,8 @@ struct Header: View {
     }
 }
 
-/*
- struct Header_Previews: PreviewProvider {
- static var previews: some View {
- Header().previewLayout(.sizeThatFits)
- }
- }
- */
+// struct Header_Previews: PreviewProvider {
+// static var previews: some View {
+// Header().previewLayout(.sizeThatFits)
+// }
+// }

@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct KeyMenu: View {
-    @State var removeConfirm = false
-    
-    let pushButton: (Action, String, String) -> Void
+    @State private var removeConfirm = false
+
+    let navigationRequest: NavigationRequest
     var body: some View {
         MenuStack {
             HeaderBar(line1: "KEY MENU", line2: "Select action").padding(.top, 10)
@@ -26,15 +26,21 @@ struct KeyMenu: View {
             }
         }
         .alert(isPresented: $removeConfirm, content: {
-            Alert(title: Text("Forget this key?"), message: Text("This key will be removed for this network. Are you sure?"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove key"), action: {pushButton(.removeKey, "", "")}))
+            Alert(
+                title: Text("Forget this key?"),
+                message: Text("This key will be removed for this network. Are you sure?"),
+                primaryButton: .cancel(Text("Cancel")),
+                secondaryButton: .destructive(
+                    Text("Remove key"),
+                    action: { navigationRequest(.init(action: .removeKey)) }
+                )
+            )
         })
     }
 }
 
-/*
-struct KeyMenu_Previews: PreviewProvider {
-    static var previews: some View {
-        KeyMenu()
-    }
-}
-*/
+// struct KeyMenu_Previews: PreviewProvider {
+// static var previews: some View {
+// KeyMenu()
+// }
+// }

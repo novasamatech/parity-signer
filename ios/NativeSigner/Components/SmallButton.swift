@@ -10,17 +10,15 @@ import SwiftUI
 struct SmallButton: View {
     var text: String
     var body: some View {
-            Text(text)
+        Text(text)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-                .overlay(RoundedRectangle(cornerRadius: 8.0).strokeBorder().foregroundColor(Color("Action400")))
+            .overlay(RoundedRectangle(cornerRadius: 8.0).strokeBorder().foregroundColor(Asset.action400.swiftUIColor))
     }
 }
 
-/*
-struct SmallButton_Previews: PreviewProvider {
-    static var previews: some View {
-        SmallButton(text: "test")
-    }
-}
-*/
+// struct SmallButton_Previews: PreviewProvider {
+//    static var previews: some View {
+//        SmallButton(text: "test")
+//    }
+// }

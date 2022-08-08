@@ -17,10 +17,8 @@ struct TCEraMortal: View {
     }
 }
 
-/*
- struct TCEraMortalNonce_Previews: PreviewProvider {
- static var previews: some View {
- TCEraMortalNonce()
- }
- }
- */
+// struct TCEraMortalNonce_Previews: PreviewProvider {
+// static var previews: some View {
+// TCEraMortalNonce()
+// }
+// }

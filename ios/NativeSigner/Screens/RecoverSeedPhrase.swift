@@ -14,49 +14,46 @@ struct RecoverSeedPhrase: View {
     @FocusState private var focus: Bool
     let content: MRecoverSeedPhrase
     let restoreSeed: (String, String, Bool) -> Void
-    let pushButton: (Action, String, String) -> Void
-    
+    let navigationRequest: NavigationRequest
+
     var body: some View {
         ZStack {
             ScrollView {
                 VStack {
-                    //SeedNameCardOfSomeKind
                     Text(content.seedName)
                     VStack(alignment: .leading) {
-                        Text("SEED PHRASE").font(FBase(style: .overline))
+                        Text("SEED PHRASE").font(Fontstyle.overline.base)
                         VStack {
                             Text(
                                 content.draftPhrase()
                             )
-                                .lineLimit(nil)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                                .foregroundColor(Color("Crypto400"))
-                                .padding(12)
-                            Divider().foregroundColor(Color("Border400"))
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .font(.system(size: 16, weight: .semibold, design: .monospaced))
+                            .foregroundColor(Asset.crypto400.swiftUIColor)
+                            .padding(12)
+                            Divider().foregroundColor(Asset.border400.swiftUIColor)
                             HStack {
-                                Text(">").foregroundColor(Color("Text400"))
-                                    .font(FBase(style: .body2))
+                                Text(">").foregroundColor(Asset.text400.swiftUIColor)
+                                    .font(Fontstyle.body2.base)
                                 TextField("Seed", text: $userInput, prompt: Text("Seed name"))
                                     .focused($focus)
-                                    .foregroundColor(Color("Text600"))
-                                //.background(Color("backgroundColor"))
-                                    .font(FBase(style: .body2))
+                                    .foregroundColor(Asset.text600.swiftUIColor)
+                                    .font(Fontstyle.body2.base)
                                     .disableAutocorrection(true)
                                     .textInputAutocapitalization(.never)
                                     .keyboardType(.asciiCapable)
                                     .submitLabel(.done)
                                     .onChange(of: userInput, perform: { word in
-                                        pushButton(.textEntry, word, "")
+                                        navigationRequest(.init(action: .textEntry, details: word))
                                         shadowUserInput = word
                                     })
-                                    .onSubmit {
-                                    }
-                                    .onChange(of: shadowUserInput, perform: { word in
+                                    .onSubmit {}
+                                    .onChange(of: shadowUserInput, perform: { _ in
                                         userInput = " " + content.userInput
                                     })
                                     .onChange(of: content, perform: { input in
-                                        userInput = " " + input.userInput // TODO: this in rust
+                                        userInput = " " + input.userInput
                                     })
                                     .onAppear(perform: {
                                         userInput = " " + content.userInput
@@ -67,41 +64,46 @@ struct RecoverSeedPhrase: View {
                                     .padding(.bottom, 10)
                             }
                         }
-                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color("Border400")))
-                        
+                        .background(RoundedRectangle(cornerRadius: 8).stroke(Asset.border400.swiftUIColor))
                         ScrollView(.horizontal) {
                             LazyHStack {
                                 ForEach(content.guessSet, id: \.self) { guess in
                                     VStack {
-                                        Button(action: {
-                                            pushButton(.pushWord, guess, "")
-                                        }) {
-                                            Text(guess)
-                                                .foregroundColor(Color("Crypto400"))
-                                                .font(FCrypto(style: .body2))
-                                                .padding(.horizontal, 12)
-                                                .padding(.vertical, 4)
-                                                .background(RoundedRectangle(cornerRadius: 4)
-                                                                .foregroundColor(Color("Crypto100")))
-                                        }
+                                        Button(
+                                            action: {
+                                                navigationRequest(.init(action: .pushWord, details: guess))
+                                            },
+                                            label: {
+                                                Text(guess)
+                                                    .foregroundColor(Asset.crypto400.swiftUIColor)
+                                                    .font(Fontstyle.body2.crypto)
+                                                    .padding(.horizontal, 12)
+                                                    .padding(.vertical, 4)
+                                                    .background(
+                                                        RoundedRectangle(cornerRadius: 4)
+                                                            .foregroundColor(Asset.crypto100.swiftUIColor)
+                                                    )
+                                            }
+                                        )
                                     }
                                 }
                             }
                         }.frame(height: 23)
-                        
                         Spacer()
-                        Button(action: {
-                            createRoots.toggle()
-                        }) {
-                            HStack {
-                                Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
-                                Text("Create root keys")
-                                    .multilineTextAlignment(.leading)
-                                Spacer()
+                        Button(
+                            action: {
+                                createRoots.toggle()
+                            },
+                            label: {
+                                HStack {
+                                    Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
+                                    Text("Create root keys")
+                                        .multilineTextAlignment(.leading)
+                                    Spacer()
+                                }
                             }
-                        }
-                        
-                        if (!focus) {
+                        )
+                        if !focus {
                             HStack {
                                 BigButton(
                                     text: "Next",
@@ -110,21 +112,18 @@ struct RecoverSeedPhrase: View {
                                     },
                                     isDisabled: content.readySeed == nil
                                 )
-                                    .padding(.top, 16.0)
+                                .padding(.top, 16.0)
                             }
                         }
                     }.padding(.horizontal)
-                    
                 }
             }
         }
     }
 }
 
-/*
- struct RecoverSeedPhrase_Previews: PreviewProvider {
- static var previews: some View {
- RecoverSeedPhrase()
- }
- }
- */
+// struct RecoverSeedPhrase_Previews: PreviewProvider {
+// static var previews: some View {
+// RecoverSeedPhrase()
+// }
+// }

@@ -3,7 +3,7 @@ use pretty_assertions::assert_eq;
 use sled::{open, Db, Tree};
 use sp_core::H256;
 use sp_runtime::MultiSigner;
-use std::{fs, io::Write, str::FromStr};
+use std::{fmt::Write as _, fs, io::Write, str::FromStr};
 
 use constants::{
     test_values::{
@@ -20,8 +20,6 @@ use db_handling::{
 };
 use definitions::{
     crypto::Encryption,
-    error::{AddressKeySource, ErrorSource},
-    error_signer::{DatabaseSigner, ErrorSigner, Signer},
     history::{Entry, Event, SignDisplay, SignMessageDisplay},
     keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey},
     navigation::{
@@ -36,7 +34,7 @@ use transaction_parsing::{
     entry_to_transactions_with_decoding, produce_output, StubNav, TransactionAction,
 };
 
-use crate::{handle_stub, sign_transaction::create_signature};
+use crate::{handle_stub, sign_transaction::create_signature, Error, Result};
 
 const PWD: &str = "";
 const USER_COMMENT: &str = "";
@@ -59,7 +57,7 @@ fn sign_action_test(
     pwd_entry: &str,
     user_comment: &str,
     dbname: &str,
-) -> Result<String, ErrorSigner> {
+) -> Result<String> {
     Ok(hex::encode(
         create_signature(seed_phrase, pwd_entry, user_comment, dbname, checksum)?.encode(),
     ))
@@ -84,36 +82,35 @@ fn print_db_content(dbname: &str) -> String {
     let metadata: Tree = database.open_tree(METATREE).unwrap();
     for (meta_key_vec, _) in metadata.iter().flatten() {
         let meta_key = MetaKey::from_ivec(&meta_key_vec);
-        let (name, version) = meta_key.name_version::<Signer>().unwrap();
+        let (name, version) = meta_key.name_version().unwrap();
         metadata_set.push(format!("{}{}", name, version));
     }
     metadata_set.sort();
     let mut metadata_str = String::new();
     for x in metadata_set.iter() {
-        metadata_str.push_str(&format!("\n    {}", x))
+        let _ = write!(&mut metadata_str, "\n    {}", x);
     }
 
     let mut network_specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
     let chainspecs: Tree = database.open_tree(SPECSTREE).unwrap();
     for (network_specs_key_vec, network_specs_encoded) in chainspecs.iter().flatten() {
         let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
-        let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(
-            &network_specs_key,
-            network_specs_encoded,
-        )
-        .unwrap();
+        let network_specs =
+            NetworkSpecs::from_entry_with_key_checked(&network_specs_key, network_specs_encoded)
+                .unwrap();
         network_specs_set.push((network_specs_key, network_specs));
     }
     network_specs_set.sort_by(|(_, a), (_, b)| a.title.cmp(&b.title));
     let mut network_specs_str = String::new();
     for (network_specs_key, network_specs) in network_specs_set.iter() {
-        network_specs_str.push_str(&format!(
+        let _ = write!(
+            &mut network_specs_str,
             "\n    {}: {} ({} with {})",
             hex::encode(network_specs_key.key()),
             network_specs.title,
             network_specs.name,
             network_specs.encryption.show()
-        ))
+        );
     }
 
     let settings: Tree = database.open_tree(SETTREE).unwrap();
@@ -123,7 +120,7 @@ fn print_db_content(dbname: &str) -> String {
     let mut verifiers_set: Vec<String> = Vec::new();
     let verifiers: Tree = database.open_tree(VERIFIERS).unwrap();
     for (verifier_key_vec, current_verifier_encoded) in verifiers.iter().flatten() {
-        let verifier_key = VerifierKey::from_ivec::<Signer>(&verifier_key_vec).unwrap();
+        let verifier_key = VerifierKey::from_ivec(&verifier_key_vec).unwrap();
         let current_verifier = CurrentVerifier::decode(&mut &current_verifier_encoded[..]).unwrap();
         match current_verifier {
             CurrentVerifier::Valid(a) => {
@@ -172,7 +169,7 @@ fn print_db_content(dbname: &str) -> String {
     verifiers_set.sort();
     let mut verifiers_str = String::new();
     for x in verifiers_set.iter() {
-        verifiers_str.push_str(&format!("\n    {}", x))
+        let _ = write!(&mut verifiers_str, "\n    {}", x);
     }
 
     let mut identities_set: Vec<String> = Vec::new();
@@ -180,9 +177,7 @@ fn print_db_content(dbname: &str) -> String {
     for (address_key_vec, address_details_encoded) in identities.iter().flatten() {
         let address_key = AddressKey::from_ivec(&address_key_vec);
         let address_details = AddressDetails::decode(&mut &address_details_encoded[..]).unwrap();
-        let (public_key, encryption) = address_key
-            .public_key_encryption::<Signer>(AddressKeySource::AddrTree)
-            .unwrap();
+        let (public_key, encryption) = address_key.public_key_encryption().unwrap();
 
         let mut networks_set: Vec<String> = Vec::new();
         for y in address_details.network_id.iter() {
@@ -191,7 +186,7 @@ fn print_db_content(dbname: &str) -> String {
         networks_set.sort();
         let mut networks_str = String::new();
         for y in networks_set.iter() {
-            networks_str.push_str(&format!("\n        {}", y))
+            let _ = write!(&mut networks_str, "\n        {}", y);
         }
 
         identities_set.push(format!(
@@ -205,7 +200,7 @@ fn print_db_content(dbname: &str) -> String {
     identities_set.sort();
     let mut identities_str = String::new();
     for x in identities_set.iter() {
-        identities_str.push_str(&format!("\n    {}", x))
+        let _ = write!(&mut identities_str, "\n    {}", x);
     }
 
     format!("Database contents:\nMetadata:{}\nNetwork Specs:{}\nVerifiers:{}\nGeneral Verifier: {}\nIdentities:{}", metadata_str, network_specs_str, verifiers_str, general_verifier.show_error(), identities_str)
@@ -424,8 +419,8 @@ fn can_sign_transaction_1() {
 
         let result = sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname);
         if let Err(e) = result {
-            let expected_err = ErrorSigner::Database(DatabaseSigner::ChecksumMismatch);
-            if <Signer>::show(&e) != <Signer>::show(&expected_err) {
+            if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
+            } else {
                 panic!("Expected wrong checksum. Got error: {:?}.", e)
             }
         } else {
@@ -668,8 +663,8 @@ fn can_sign_message_1() {
 
         let result = sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname);
         if let Err(e) = result {
-            let expected_err = ErrorSigner::Database(DatabaseSigner::ChecksumMismatch);
-            if <Signer>::show(&e) != <Signer>::show(&expected_err) {
+            if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
+            } else {
                 panic!("Expected wrong checksum. Got error: {:?}.", e)
             }
         } else {
@@ -3258,7 +3253,7 @@ Identities:
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt")
             .unwrap();
-    let error = "Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
+    let error = "Bad input data. Database error. Internal error. Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
 
     let output = produce_output(line.trim(), dbname);
     let reply_known = TransactionCardSet {
@@ -3281,7 +3276,7 @@ Identities:
             .unwrap();
     let output = produce_output(line.trim(), dbname);
 
-    let error = "Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
+    let error = "Bad input data. Database error. Internal error. Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
     let reply_known = TransactionCardSet {
         error: Some(vec![TransactionCard {
             index: 0,
@@ -3588,7 +3583,7 @@ fn rococo_and_verifiers_1() {
     let dbname = "for_tests/rococo_and_verifiers_1";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with ed25519, custom verifier
+    // added rococo specs with `ed25519`, custom verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-ed25519_Alice-ed25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3602,7 +3597,7 @@ fn rococo_and_verifiers_1() {
         panic!("Wrong action: {:?}", output)
     }
 
-    // added rococo specs with sr25519, custom verifier
+    // added rococo specs with `sr25519`, custom verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-ed25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3657,7 +3652,7 @@ fn rococo_and_verifiers_2() {
     let dbname = "for_tests/rococo_and_verifiers_2";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with sr25519, general verifier, specified one
+    // added rococo specs with `sr25519`, general verifier, specified one
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3713,7 +3708,7 @@ fn rococo_and_verifiers_3() {
     let dbname = "for_tests/rococo_and_verifiers_3";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with sr25519, custom verifier None
+    // added rococo specs with `sr25519`, custom verifier None
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_unverified.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3767,7 +3762,7 @@ fn rococo_and_verifiers_4() {
     let dbname = "for_tests/rococo_and_verifiers_4";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with sr25519, custom verifier None
+    // added rococo specs with `sr25519`, custom verifier None
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_unverified.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3792,7 +3787,7 @@ General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a
 Identities:"#;
     assert_eq!(print, expected_print);
 
-    // added rococo specs with sr25519, general verifier
+    // added rococo specs with `sr25519`, general verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3826,7 +3821,7 @@ fn rococo_and_verifiers_5() {
     let dbname = "for_tests/rococo_and_verifiers_5";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with sr25519, custom verifier
+    // added rococo specs with `sr25519`, custom verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-ed25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3851,7 +3846,7 @@ General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a
 Identities:"#;
     assert_eq!(print, expected_print);
 
-    // added rococo specs with sr25519, general verifier
+    // added rococo specs with `sr25519`, general verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {

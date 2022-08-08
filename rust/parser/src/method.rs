@@ -2,7 +2,7 @@ use frame_metadata::{
     decode_different::DecodeDifferent, v12::RuntimeMetadataV12, v13::RuntimeMetadataV13,
 };
 
-use definitions::error_signer::{ParserDecodingError, ParserError};
+use crate::error::{Error, ParserDecodingError, Result};
 
 /// Struct to store the method information
 pub(crate) struct MethodOld {
@@ -24,13 +24,13 @@ pub(crate) struct NextDecodeOld {
     pub(crate) data: Vec<u8>,
 }
 
-/// Enum to transfer around older metadata (V12 and V13)
+/// Enum to transfer around older metadata (`V12` and `V13`)
 pub enum OlderMeta<'a> {
     V12(&'a RuntimeMetadataV12),
     V13(&'a RuntimeMetadataV13),
 }
 
-/// Function to search through metadata version V12 for method with given pallet index and method index,
+/// Function to search through metadata version `V12` for method with given pallet index and method index,
 /// in case of success outputs Method value.
 /// Pallet index is explicitly recorded in network metadata as a number.
 /// Method index is ordinal number in vector of calls within pallet.
@@ -39,7 +39,7 @@ fn find_method_v12(
     pallet_index: u8,
     method_index: u8,
     meta: &RuntimeMetadataV12,
-) -> Result<MethodOld, ParserError> {
+) -> Result<MethodOld> {
     let mut found_pallet_name = None;
     let mut found_method_name = None;
     let mut docs = String::new();
@@ -52,12 +52,10 @@ fn find_method_v12(
                     found_pallet_name = Some(name.to_string());
                     if let Some(DecodeDifferent::Decoded(calls)) = &y.calls {
                         if calls.len() <= method_index.into() {
-                            return Err(ParserError::Decoding(
-                                ParserDecodingError::MethodNotFound {
-                                    method_index,
-                                    pallet_name: name.to_string(),
-                                },
-                            ));
+                            return Err(Error::Decoding(ParserDecodingError::MethodNotFound {
+                                method_index,
+                                pallet_name: name.to_string(),
+                            }));
                         }
                         if let DecodeDifferent::Decoded(nm) = &calls[method_index as usize].name {
                             found_method_name = Some(nm.to_string());
@@ -90,13 +88,13 @@ fn find_method_v12(
                                             arguments.push(Argument { name: x, ty: y });
                                         }
                                         None => {
-                                            return Err(ParserError::Decoding(
+                                            return Err(Error::Decoding(
                                                 ParserDecodingError::ArgumentTypeError,
                                             ))
                                         }
                                     },
                                     None => {
-                                        return Err(ParserError::Decoding(
+                                        return Err(Error::Decoding(
                                             ParserDecodingError::ArgumentNameError,
                                         ))
                                     }
@@ -120,18 +118,18 @@ fn find_method_v12(
                 };
                 Ok(out)
             }
-            None => Err(ParserError::Decoding(ParserDecodingError::MethodNotFound {
+            None => Err(Error::Decoding(ParserDecodingError::MethodNotFound {
                 method_index,
                 pallet_name: x,
             })),
         },
-        None => Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(
+        None => Err(Error::Decoding(ParserDecodingError::PalletNotFound(
             pallet_index,
         ))),
     }
 }
 
-/// Function to search through metadata version V13 for method with given pallet index and method index,
+/// Function to search through metadata version `V13` for method with given pallet index and method index,
 /// in case of success outputs Method value.
 /// Pallet index is explicitly recorded in network metadata as a number.
 /// Method index is ordinal number in vector of calls within pallet.
@@ -140,7 +138,7 @@ fn find_method_v13(
     pallet_index: u8,
     method_index: u8,
     meta: &RuntimeMetadataV13,
-) -> Result<MethodOld, ParserError> {
+) -> Result<MethodOld> {
     let mut found_pallet_name = None;
     let mut found_method_name = None;
     let mut docs = String::new();
@@ -153,12 +151,10 @@ fn find_method_v13(
                     found_pallet_name = Some(name.to_string());
                     if let Some(DecodeDifferent::Decoded(calls)) = &y.calls {
                         if calls.len() <= method_index.into() {
-                            return Err(ParserError::Decoding(
-                                ParserDecodingError::MethodNotFound {
-                                    method_index,
-                                    pallet_name: name.to_string(),
-                                },
-                            ));
+                            return Err(Error::Decoding(ParserDecodingError::MethodNotFound {
+                                method_index,
+                                pallet_name: name.to_string(),
+                            }));
                         }
                         if let DecodeDifferent::Decoded(nm) = &calls[method_index as usize].name {
                             found_method_name = Some(nm.to_string());
@@ -191,13 +187,13 @@ fn find_method_v13(
                                             arguments.push(Argument { name: x, ty: y });
                                         }
                                         None => {
-                                            return Err(ParserError::Decoding(
+                                            return Err(Error::Decoding(
                                                 ParserDecodingError::ArgumentTypeError,
                                             ))
                                         }
                                     },
                                     None => {
-                                        return Err(ParserError::Decoding(
+                                        return Err(Error::Decoding(
                                             ParserDecodingError::ArgumentNameError,
                                         ))
                                     }
@@ -221,23 +217,23 @@ fn find_method_v13(
                 };
                 Ok(out)
             }
-            None => Err(ParserError::Decoding(ParserDecodingError::MethodNotFound {
+            None => Err(Error::Decoding(ParserDecodingError::MethodNotFound {
                 method_index,
                 pallet_name: x,
             })),
         },
-        None => Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(
+        None => Err(Error::Decoding(ParserDecodingError::PalletNotFound(
             pallet_index,
         ))),
     }
 }
 
-/// Function to find method for current call for metadata in v12 or v13
-/// Outputs NextDecode value.
+/// Function to find method for current call for metadata in `V12` or `V13`
+/// Outputs `NextDecode` value.
 
-pub(crate) fn what_next_old(data: Vec<u8>, meta: &OlderMeta) -> Result<NextDecodeOld, ParserError> {
+pub(crate) fn what_next_old(data: Vec<u8>, meta: &OlderMeta) -> Result<NextDecodeOld> {
     if data.len() < 2 {
-        return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+        return Err(Error::Decoding(ParserDecodingError::DataTooShort));
     }
     let pallet_index = data[0];
     let method_index = data[1];

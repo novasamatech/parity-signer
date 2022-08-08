@@ -8,45 +8,41 @@
 import SwiftUI
 
 struct NewAddressScreen: View {
-    @State var path: String = ""
+    @State private var path: String = ""
     @FocusState private var focusedField: Bool
-    @State private var derivationCheck: DerivationCheck? = nil
+    @State private var derivationCheck: DerivationCheck?
     var content: MDeriveKey
     let pathCheck: (String, String, String) -> DerivationCheck
     let createAddress: (String, String) -> Void
-    let pushButton: (Action, String, String) -> Void
-    
+    let navigationRequest: NavigationRequest
+
     var body: some View {
         ZStack {
             ScrollView {
                 HeaderBar(line1: "Create new key", line2: "For seed " + content.seedName)
-                //SeedCardForManager(seedName: data.selectedSeed)
                 NetworkCard(title: content.networkTitle, logo: content.networkLogo)
-                VStack (alignment: .leading) {
-                    //Text("DERIVATION PATH").foregroundColor(Color("Text500")).font(.footnote)
+                VStack(alignment: .leading) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).frame(height: 39)
+                        RoundedRectangle(cornerRadius: 8).stroke(Asset.crypto400.swiftUIColor).frame(height: 39)
                         HStack {
                             Text(content.seedName)
                             TextField("Path", text: $path, prompt: Text("//<network>//input"))
-                                .foregroundColor(Color("Crypto400"))
-                                .font(FCrypto(style: .body2))
+                                .foregroundColor(Asset.crypto400.swiftUIColor)
+                                .font(Fontstyle.body2.crypto)
                                 .disableAutocorrection(true)
                                 .autocapitalization(.none)
                                 .keyboardType(.asciiCapable)
                                 .submitLabel(.done)
-                                .onChange(of: path) {pathNew in
+                                .onChange(of: path) { pathNew in
                                     derivationCheck = pathCheck(content.seedName, pathNew, content.networkSpecsKey)
                                     path = pathNew
                                 }
                                 .onSubmit {
-                                    switch (derivationCheck?.whereTo) {
+                                    switch derivationCheck?.whereTo {
                                     case .pin:
                                         createAddress(path, content.seedName)
-                                        break
                                     case .pwd:
-                                        pushButton(.checkPassword, path, "")
-                                        break
+                                        navigationRequest(.init(action: .checkPassword, details: path))
                                     default:
                                         break
                                     }
@@ -59,7 +55,7 @@ struct NewAddressScreen: View {
                 if let collision = derivationCheck?.collision {
                     VStack {
                         HStack {
-                            Text("This key already exists:").foregroundColor(Color("Text300"))
+                            Text("This key already exists:").foregroundColor(Asset.text300.swiftUIColor)
                             Spacer()
                         }
                         AddressCard(address: collision)
@@ -69,18 +65,17 @@ struct NewAddressScreen: View {
                     BigButton(
                         text: "Next",
                         action: {
-                            switch (derivationCheck?.whereTo) {
+                            switch derivationCheck?.whereTo {
                             case .pin:
                                 createAddress(path, content.seedName)
-                                break
                             case .pwd:
-                                pushButton(.checkPassword, path, "")
-                                break
+                                navigationRequest(.init(action: .checkPassword, details: path))
                             default:
                                 break
                             }
                         },
-                        isDisabled: derivationCheck?.buttonGood != true)
+                        isDisabled: derivationCheck?.buttonGood != true
+                    )
                 }
             }.padding(.horizontal)
         }
@@ -97,10 +92,8 @@ struct NewAddressScreen: View {
     }
 }
 
-/*
- struct NewIdentityScreen_Previews: PreviewProvider {
- static var previews: some View {
- NewIdentityScreen().previewLayout(.sizeThatFits)
- }
- }
- */
+// struct NewIdentityScreen_Previews: PreviewProvider {
+// static var previews: some View {
+// NewIdentityScreen().previewLayout(.sizeThatFits)
+// }
+// }

@@ -6,7 +6,7 @@ interface ErrorDisplayed {
 dictionary MetaValuesDisplay {
     string name;
     u32 version;
-    sequence<u8> meta_hash;
+    H256 meta_hash;
 };
 
 [Custom]
@@ -93,12 +93,12 @@ dictionary NetworkVerifierDisplay {
 };
 
 dictionary TypesDisplay {
-    sequence<u8> types_hash;
+    H256 types_hash;
     Verifier verifier;
 };
 
 dictionary TypesExport {
-    sequence<u8> types_hash;
+    H256 types_hash;
     VerifierValue signed_by;
 };
 
@@ -121,13 +121,13 @@ dictionary IdentityHistory {
     Encryption encryption;
     sequence<u8> public_key;
     string path;
-    sequence<u8> network_genesis_hash;
+    H256 network_genesis_hash;
 };
 
 dictionary MetaValuesExport {
     string name;
     u32 version;
-    sequence<u8> meta_hash;
+    H256 meta_hash;
     VerifierValue signed_by;
 };
 
@@ -218,6 +218,7 @@ interface Event {
     SystemEntry(string system_entry);
     HistoryCleared();
     DatabaseInitiated();
+    SeedRemoved(string seed_name);
 };
 
 enum Action {
@@ -565,10 +566,6 @@ namespace signer {
 
     [Throws=ErrorDisplayed]
     void history_seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
-
-    TransactionCardSet get_all_tx_cards();
-
-    string get_all_log_cards();
 
     void init_logging(string tag);
 };

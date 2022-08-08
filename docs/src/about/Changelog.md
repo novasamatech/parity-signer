@@ -16,12 +16,12 @@ No more typescript or react native. Backend is completely in Rust, frontend is i
 
 Number of dependencies was greatly reduced; no npm/yarn/nodejs/cocoapods, etc. All dependencies are handled by:
  - Cargo (rust packages)
- - XCode (only default iOS frameworks are used)
+ - Xcode (only default iOS frameworks are used)
  - Gradle
 
 #### Rust backend
 
-Rust libraries were moved back into the repository. Crypto functions are imported from Substrate. All logic and most of storage is written in Rust. An important hack here is that `rust/signer` crate has 2 versions of Cargo.toml for android and ios architectures, as target library features could not be adjusted by normal means.
+Rust libraries were moved back into the repository. Crypto functions are imported from Substrate. All logic and most of storage is written in Rust. An important hack here is that `rust/signer` crate has 2 versions of Cargo.toml for android and iOS architectures, as target library features could not be adjusted by normal means.
 
 #### Native frontend
 
@@ -31,7 +31,7 @@ Frontend for both iOS and Android re-written in native frameworks. Thus, standar
 
 #### Secure seed storage
 
-Secrets are stored in devices' encrypted storage and some effort is made to prevent them leaking in system memory. Thus, all is as safe as the phone is - the same credentials used for unlocking the phone are used to unlock seeds. User ir responsible to keep them adequate.
+Secrets are stored in devices' encrypted storage and some effort is made to prevent them leaking in system memory. Thus, all is as safe as the phone is - the same credentials used for unlocking the phone are used to unlock seeds. User is responsible to keep them adequate.
 
 #### Transaction preview
 
@@ -49,7 +49,7 @@ Much requested feature that makes Signer automatically increment numbered seeds 
 
 All network data updates now could be performed through scanning QR codes. Whenever some update is needed, most probably you should just scan some QR video. Don't worry about skipped frames, it's fountain code so you only need enough frames.
 
-All updates could be signed, and signing key will be trusted on first use, so Signer device sould be linked to single source of authority on correct metadata.
+All updates could be signed, and signing key will be trusted on first use, so Signer device should be linked to single source of authority on correct metadata.
 
 #### Key re-use in different networks
 

@@ -8,58 +8,84 @@
 import SwiftUI
 
 struct SettingsScreen: View {
-    @State var wipe = false
-    @State var jailbreak = false
+    @State private var wipe = false
+    @State private var jailbreak = false
     let content: MSettings
-    let appVersion: String?
     let doWipe: () -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
+
+    private let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+
     var body: some View {
-        VStack (spacing: 2) {
-            Button(action: {
-                pushButton(.manageNetworks, "", "")
-            }) {
-                SettingsCardTemplate(text: "Networks")
-            }
-            Button(action: {
-                pushButton(.backupSeed, "", "")
-            }) {
-                SettingsCardTemplate(text: "Backup keys")
-            }
-            Button(action: {pushButton(.viewGeneralVerifier, "", "")}) {
-            VStack {
-                HStack {
-                    Text("Verifier certificate").font(FBase(style: .h1)).foregroundColor(Color("Text600"))
-                    Spacer()
+        VStack(spacing: 2) {
+            Button(
+                action: {
+                    navigationRequest(.init(action: .manageNetworks))
+                },
+                label: {
+                    SettingsCardTemplate(text: "Networks")
                 }
-                VStack {
-                    if content.publicKey != nil {
-                    AddressCard(address: Address(
-                        base58: "encryption: " + (content.encryption ?? "unknown"), path: content.publicKey!.truncateMiddle(length: 8), hasPwd: false, identicon: content.identicon ?? [], seedName: "", multiselect: false
-                    ))
-                    } else {
-                        if let errorMessage = content.error {
-                            Text("Error!").foregroundColor(Color("SignalDanger")).font(FBase(style: .h4))
-                            Text(errorMessage).foregroundColor(Color("SignalDanger")).font(FBase(style: .body2))
-                        } else {
-                            AddressCard(address: Address(
-                                base58: "", path: "None", hasPwd: false, identicon: [], seedName: "", multiselect: false
-                            ))
+            )
+            Button(
+                action: {
+                    navigationRequest(.init(action: .backupSeed))
+                },
+                label: {
+                    SettingsCardTemplate(text: "Backup keys")
+                }
+            )
+            Button(
+                action: { navigationRequest(.init(action: .viewGeneralVerifier)) },
+                label: {
+                    VStack {
+                        HStack {
+                            Text("Verifier certificate").font(Fontstyle.header1.base)
+                                .foregroundColor(Asset.text600.swiftUIColor)
+                            Spacer()
+                        }
+                        VStack {
+                            if content.publicKey != nil {
+                                AddressCard(address: Address(
+                                    base58: "encryption: " + (content.encryption ?? "unknown"),
+                                    path: content.publicKey?.truncateMiddle(length: 8) ?? "",
+                                    hasPwd: false,
+                                    identicon: content.identicon ?? [],
+                                    seedName: "",
+                                    multiselect: false
+                                ))
+                            } else {
+                                if let errorMessage = content.error {
+                                    Text("Error!").foregroundColor(Asset.signalDanger.swiftUIColor)
+                                        .font(Fontstyle.header4.base)
+                                    Text(errorMessage).foregroundColor(Asset.signalDanger.swiftUIColor)
+                                        .font(Fontstyle.body2.base)
+                                } else {
+                                    AddressCard(address: Address(
+                                        base58: "",
+                                        path: "None",
+                                        hasPwd: false,
+                                        identicon: [],
+                                        seedName: "",
+                                        multiselect: false
+                                    ))
+                                }
+                            }
                         }
                     }
+                    .padding()
                 }
-            }
-            .padding()
-            }
-            Button(action: {
-                //TODO: add some alerts to make sure the operation was successful
-                wipe = true
-            }) {
-                SettingsCardTemplate(
-                    text: "Wipe all data",
-                    danger: true
-                )
-            }
+            )
+            Button(
+                action: {
+                    wipe = true
+                },
+                label: {
+                    SettingsCardTemplate(
+                        text: "Wipe all data",
+                        danger: true
+                    )
+                }
+            )
             .alert(isPresented: $wipe, content: {
                 Alert(
                     title: Text("Wipe ALL data?"),
@@ -73,12 +99,14 @@ struct SettingsScreen: View {
                     )
                 )
             })
-            
-            Button(action: {
-                pushButton(.showDocuments, "", "")
-            }) {
-                SettingsCardTemplate(text: "About")
-            }
+            Button(
+                action: {
+                    navigationRequest(.init(action: .showDocuments))
+                },
+                label: {
+                    SettingsCardTemplate(text: "About")
+                }
+            )
             SettingsCardTemplate(
                 text: "App version: " + (appVersion ?? "Unknown!"),
                 withIcon: false,
@@ -88,13 +116,10 @@ struct SettingsScreen: View {
     }
 }
 
-/*
- struct SettingsScreen_Previews: PreviewProvider {
- static var previews: some View {
- NavigationView {
- SettingsScreen()
- }
- }
- }
- */
-  
+// struct SettingsScreen_Previews: PreviewProvider {
+// static var previews: some View {
+// NavigationView {
+// SettingsScreen()
+// }
+// }
+// }

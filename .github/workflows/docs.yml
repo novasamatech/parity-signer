@@ -30,9 +30,25 @@ jobs:
           sudo apt install -y clang libclang-dev libopencv-dev
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@v1.3.0
+        uses:                 Swatinem/rust-cache@v2.0.0
         with:
           working-directory:  rust
+
+      - name:                 Install cargo-spellcheck
+        uses:                 baptiste0928/cargo-install@v1
+        with:
+          crate:              cargo-spellcheck
+
+      - name:                 Install uniffi_bindgen
+        uses:                 actions-rs/install@v0.1
+        with:
+          crate:              uniffi_bindgen
+          version:            0.19.3 # Must be in sync with version in Cargo.toml
+          use-tool-cache:     true
+
+      - name:                 Run spellcheck
+        run:                  |
+          cargo spellcheck check --cfg=.spellcheck/config.toml -m 99
 
       - name:                 Generate cargo doc
         run:                  |
@@ -71,8 +87,9 @@ jobs:
       # deploy
       - name:                 Deploy rustdocs and user-docs
         uses:                 peaceiris/actions-gh-pages@v3
-        # published only from master
-        if:                   ${{ github.ref == 'refs/heads/master' }}
+        # published only from master AND if the triggerer is not dependabot
+        # https://github.com/dependabot/dependabot-core/issues/3253#issuecomment-797125425
+        if:                   ${{ github.ref == 'refs/heads/master' && github.actor != 'dependabot[bot]' }}
         with:
           github_token:       ${{ github.token }}
           force_orphan:       true

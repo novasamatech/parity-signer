@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct SeedMenu: View {
-    @State var removeConfirm = false
+    @State private var removeConfirm = false
     let content: MSeedMenu
     let alert: Bool
     let alertShow: () -> Void
     let removeSeed: (String) -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         MenuStack {
             HeaderBar(line1: "SEED MENU", line2: "Select action").padding(.top, 10)
@@ -21,16 +21,16 @@ struct SeedMenu: View {
                 BigButton(
                     text: "Backup",
                     action: {
-                        pushButton(.backupSeed, "", "")
+                        navigationRequest(.init(action: .backupSeed))
                     }
                 )
                 BigButton(
                     text: "Derive new key",
                     isShaded: true,
                     isCrypto: true,
-                    action:{
+                    action: {
                         if alert { alertShow() } else {
-                            pushButton(.newKey, "", "")
+                            navigationRequest(.init(action: .newKey))
                         }
                     }
                 )
@@ -45,15 +45,21 @@ struct SeedMenu: View {
             }
         }
         .alert(isPresented: $removeConfirm, content: {
-            Alert(title: Text("Forget this seed?"), message: Text("This seed will be removed for all networks. This is not reversible. Are you sure?"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove seed"), action: {removeSeed(content.seed)}))
+            Alert(
+                title: Text("Forget this seed?"),
+                message: Text("This seed will be removed for all networks. This is not reversible. Are you sure?"),
+                primaryButton: .cancel(Text("Cancel")),
+                secondaryButton: .destructive(
+                    Text("Remove seed"),
+                    action: { removeSeed(content.seed) }
+                )
+            )
         })
     }
 }
 
-/*
- struct SeedMenu_Previews: PreviewProvider {
- static var previews: some View {
- SeedMenu()
- }
- }
- */
+// struct SeedMenu_Previews: PreviewProvider {
+// static var previews: some View {
+// SeedMenu()
+// }
+// }

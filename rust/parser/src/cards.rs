@@ -20,7 +20,7 @@ pub enum ParserCard {
     },
     None,
     IdentityField(String),
-    BitVec(String), // String from printing BitVec
+    BitVec(String), // String from printing `BitVec`
     Balance {
         number: String,
         units: String,

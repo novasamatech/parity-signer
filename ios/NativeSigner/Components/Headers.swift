@@ -11,8 +11,8 @@ struct HeadingOverline: View {
     var text: String
     var body: some View {
         Text(text)
-            .foregroundColor(Color("Text600"))
-            .font(FBase(style: .overline))
+            .foregroundColor(Asset.text600.swiftUIColor)
+            .font(Fontstyle.overline.base)
             .tracking(0.5)
             .textCase(.uppercase)
     }
@@ -22,11 +22,11 @@ struct HeaderBar: View {
     var line1: String
     var line2: String
     var body: some View {
-        VStack (alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 2) {
             HeadingOverline(text: line1)
             Text(line2)
-                .foregroundColor(Color("Text400"))
-                .font(FBase(style: .subtitle2))
+                .foregroundColor(Asset.text400.swiftUIColor)
+                .font(Fontstyle.subtitle2.base)
             Divider()
                 .padding(.top, 6)
         }
@@ -34,12 +34,8 @@ struct HeaderBar: View {
     }
 }
 
-
-
-/*
-struct HeaderBar_Previews: PreviewProvider {
-    static var previews: some View {
-        HeaderBar()
-    }
-}
-*/
+// struct HeaderBar_Previews: PreviewProvider {
+//    static var previews: some View {
+//        HeaderBar()
+//    }
+// }

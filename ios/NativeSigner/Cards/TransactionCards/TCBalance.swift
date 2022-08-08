@@ -12,17 +12,15 @@ struct TCBalance: View {
     var body: some View {
         HStack {
             Text(value.amount)
-                .foregroundColor(Color("Text600"))
-            Text(value.units).foregroundColor(Color("Text600"))
+                .foregroundColor(Asset.text600.swiftUIColor)
+            Text(value.units).foregroundColor(Asset.text600.swiftUIColor)
             Spacer()
         }
     }
 }
 
-/*
-struct TCBalance_Previews: PreviewProvider {
-    static var previews: some View {
-        TCBalance()
-    }
-}
-*/
+// struct TCBalance_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TCBalance()
+//    }
+// }

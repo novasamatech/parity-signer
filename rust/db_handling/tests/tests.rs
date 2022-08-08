@@ -21,13 +21,12 @@ use constants::{
     ADDRTREE, ALICE_SEED_PHRASE, METATREE, SPECSTREE,
 };
 #[cfg(feature = "test")]
+use db_handling::Error;
+#[cfg(feature = "test")]
 use defaults::default_chainspecs;
 #[cfg(feature = "test")]
 use definitions::{
     crypto::Encryption,
-    error::ErrorSource,
-    error_active::{Active, IncomingMetadataSourceActiveStr},
-    error_signer::Signer,
     history::{
         all_events_preview, Entry, Event, IdentityHistory, MetaValuesDisplay, MetaValuesExport,
         NetworkSpecsDisplay, NetworkSpecsExport, NetworkVerifierDisplay, SignDisplay,
@@ -59,7 +58,7 @@ use db_handling::{
     },
     identities::{
         create_increment_set, derivation_check, get_addresses_by_seed_name, remove_key,
-        try_create_address, try_create_seed, DerivationCheck,
+        remove_seed, try_create_address, try_create_seed, DerivationCheck,
     },
     interface_signer::{
         addresses_set_seed_name_network, backup_prep, derive_prep, dynamic_path_check, export_key,
@@ -703,7 +702,7 @@ fn types_status_and_history() {
     let history_printed = get_history(dbname).unwrap();
     let expected_element = Event::TypesRemoved {
         types_display: TypesDisplay {
-            types_hash: hex::decode(
+            types_hash: H256::from_str(
                 "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb",
             )
             .unwrap(),
@@ -864,7 +863,7 @@ fn not_find_mock_verifier() {
     match try_get_valid_current_verifier(&verifier_key, dbname) {
         Ok(Some(_)) => panic!("Found network key that should not be in database."),
         Ok(None) => (),
-        Err(e) => panic!("Error looking for mock verifier: {}", <Signer>::show(&e)),
+        Err(e) => panic!("Error looking for mock verifier: {}", e),
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -876,8 +875,8 @@ fn test_generate_default_addresses_for_alice() {
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
     {
-        let database = open_db::<Signer>(dbname).unwrap();
-        let addresses = open_tree::<Signer>(&database, ADDRTREE).unwrap();
+        let database = open_db(dbname).unwrap();
+        let addresses = open_tree(&database, ADDRTREE).unwrap();
         assert_eq!(addresses.len(), 4);
     }
     let chainspecs = default_chainspecs();
@@ -1102,7 +1101,7 @@ fn history_with_identities() {
                 )
                 .unwrap(),
                 path: String::new(),
-                network_genesis_hash: hex::decode(
+                network_genesis_hash: H256::from_str(
                     "91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
                 )
                 .unwrap(),
@@ -1117,7 +1116,7 @@ fn history_with_identities() {
                 )
                 .unwrap(),
                 path: "//polkadot".to_string(),
-                network_genesis_hash: hex::decode(
+                network_genesis_hash: H256::from_str(
                     "91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
                 )
                 .unwrap(),
@@ -1132,7 +1131,7 @@ fn history_with_identities() {
                 )
                 .unwrap(),
                 path: "".to_string(),
-                network_genesis_hash: hex::decode(
+                network_genesis_hash: H256::from_str(
                     "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
                 )
                 .unwrap(),
@@ -1147,7 +1146,7 @@ fn history_with_identities() {
                 )
                 .unwrap(),
                 path: "//kusama".to_string(),
-                network_genesis_hash: hex::decode(
+                network_genesis_hash: H256::from_str(
                     "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
                 )
                 .unwrap(),
@@ -1162,7 +1161,7 @@ fn history_with_identities() {
                 )
                 .unwrap(),
                 path: String::new(),
-                network_genesis_hash: hex::decode(
+                network_genesis_hash: H256::from_str(
                     "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
                 )
                 .unwrap(),
@@ -1177,7 +1176,7 @@ fn history_with_identities() {
                 )
                 .unwrap(),
                 path: "//westend".to_string(),
-                network_genesis_hash: hex::decode(
+                network_genesis_hash: H256::from_str(
                     "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
                 )
                 .unwrap(),
@@ -1206,13 +1205,37 @@ fn history_with_identities() {
 }
 
 #[cfg(feature = "test")]
+#[test]
+fn remove_seed_history() {
+    let dbname = "for_tests/remove_seed_history";
+    let seed_name = "Alice";
+    default_cold_release(Some(PathBuf::from(dbname))).unwrap();
+
+    try_create_seed(seed_name, ALICE_SEED_PHRASE, true, dbname).unwrap();
+    assert!(remove_seed(dbname, "Wrong seed name").is_err());
+    remove_seed(dbname, seed_name).unwrap();
+
+    let history_printed: Vec<_> = get_history(dbname)
+        .unwrap()
+        .into_iter()
+        .map(|e| e.1)
+        .collect();
+    assert!(entries_contain_event(
+        &history_printed,
+        &Event::SeedRemoved {
+            seed_name: seed_name.to_string(),
+        }
+    ));
+    fs::remove_dir_all(dbname).unwrap();
+}
+
+#[cfg(feature = "test")]
 fn get_multisigner_path_set(dbname: &str) -> Vec<(MultiSigner, String)> {
-    let db = open_db::<Signer>(dbname).unwrap();
-    let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
+    let db = open_db(dbname).unwrap();
+    let identities = open_tree(&db, ADDRTREE).unwrap();
     let mut multisigner_path_set: Vec<(MultiSigner, String)> = Vec::new();
     for a in identities.iter().flatten() {
-        let (multisigner, address_details) =
-            AddressDetails::process_entry_checked::<Signer>(a).unwrap();
+        let (multisigner, address_details) = AddressDetails::process_entry_checked(a).unwrap();
         multisigner_path_set.push((multisigner, address_details.path.to_string()))
     }
     multisigner_path_set
@@ -1224,8 +1247,8 @@ fn increment_identities_1() {
     let dbname = "for_tests/increment_identities_1";
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     {
-        let db = open_db::<Signer>(dbname).unwrap();
-        let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
+        let db = open_db(dbname).unwrap();
+        let identities = open_tree(&db, ADDRTREE).unwrap();
         assert!(identities.is_empty());
     }
     let chainspecs = default_chainspecs();
@@ -1270,8 +1293,8 @@ fn increment_identities_2() {
     let dbname = "for_tests/increment_identities_2";
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     {
-        let db = open_db::<Signer>(dbname).unwrap();
-        let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
+        let db = open_db(dbname).unwrap();
+        let identities = open_tree(&db, ADDRTREE).unwrap();
         assert!(identities.is_empty());
     }
     let chainspecs = default_chainspecs();
@@ -1326,8 +1349,8 @@ fn increment_identities_3() {
     let dbname = "for_tests/increment_identities_3";
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     {
-        let db = open_db::<Signer>(dbname).unwrap();
-        let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
+        let db = open_db(dbname).unwrap();
+        let identities = open_tree(&db, ADDRTREE).unwrap();
         assert!(identities.is_empty());
     }
     let chainspecs = default_chainspecs();
@@ -1396,9 +1419,31 @@ fn creating_derivation_1() {
         panic!("Derivation should already exist.");
     }
     match try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname) {
-            Ok(()) => panic!("Should NOT be able to create //Alice derivation again."),
-            Err(e) => assert_eq!(<Signer>::show(&e), "Error generating address. Seed Alice already has derivation //Alice for network specs key 01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe, public key d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d.".to_string()),
+        Ok(()) => panic!("Should NOT be able to create //Alice derivation again."),
+        Err(e) => {
+            if let Error::DerivationExists {
+                ref multisigner,
+                ref address_details,
+                ref network_specs_key,
+            } = e
+            {
+                assert_eq!(address_details.seed_name, "Alice".to_string());
+
+                assert_eq!(
+                    hex::encode(multisigner.as_ref()),
+                    "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d".to_string()
+                );
+
+                assert_eq!(
+                    hex::encode(network_specs_key.key()),
+                    "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+                        .to_string()
+                );
+            } else {
+                panic!("expected Error::DerivationExists, got {:?}", e);
+            }
         }
+    }
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -1538,23 +1583,45 @@ fn creating_derivation_5() {
     } else {
         panic!("Derivation exists, but has password.");
     }
-    match try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice///secret", &network_id_0, dbname) {
-            Ok(()) => panic!("Should NOT be able to create //Alice///secret derivation again."),
-            Err(e) => assert_eq!(<Signer>::show(&e), "Error generating address. Seed Alice already has derivation //Alice///<password> for network specs key 01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe, public key 08a5e583f74f54f3811cb5f7d74e686d473e3a466fd0e95738707a80c3183b15.".to_string()),
+    match try_create_address(
+        "Alice",
+        ALICE_SEED_PHRASE,
+        "//Alice///secret",
+        &network_id_0,
+        dbname,
+    ) {
+        Ok(()) => panic!("Should NOT be able to create //Alice///secret derivation again."),
+        Err(e) => {
+            if let Error::DerivationExists {
+                ref multisigner,
+                ref address_details,
+                ref network_specs_key,
+            } = e
+            {
+                assert_eq!(address_details.seed_name, "Alice".to_string());
+
+                assert_eq!(
+                    hex::encode(multisigner.as_ref()),
+                    "08a5e583f74f54f3811cb5f7d74e686d473e3a466fd0e95738707a80c3183b15".to_string(),
+                );
+
+                assert_eq!(
+                    hex::encode(network_specs_key.key()),
+                    "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+                        .to_string()
+                );
+            } else {
+                panic!("expected Error::DerivationExists, got {:?}", e);
+            }
         }
+    }
     fs::remove_dir_all(dbname).unwrap();
 }
 
 #[cfg(feature = "test")]
 fn insert_metadata_from_file(database_name: &str, filename: &str) {
     let meta_str = std::fs::read_to_string(filename).unwrap();
-    let meta_values = MetaValues::from_str_metadata(
-        meta_str.trim(),
-        IncomingMetadataSourceActiveStr::Default {
-            filename: filename.to_string(),
-        },
-    )
-    .unwrap();
+    let meta_values = MetaValues::from_str_metadata(meta_str.trim()).unwrap();
     let mut meta_batch = Batch::default();
     meta_batch.insert(
         MetaKey::from_parts(&meta_values.name, meta_values.version).key(),
@@ -1562,26 +1629,24 @@ fn insert_metadata_from_file(database_name: &str, filename: &str) {
     );
     TrDbCold::new()
         .set_metadata(meta_batch)
-        .apply::<Active>(database_name)
+        .apply(database_name)
         .unwrap();
 }
 
 #[cfg(feature = "test")]
 fn metadata_len(database_name: &str) -> usize {
-    let database = open_db::<Active>(database_name).unwrap();
-    let metadata = open_tree::<Active>(&database, METATREE).unwrap();
+    let database = open_db(database_name).unwrap();
+    let metadata = open_tree(&database, METATREE).unwrap();
     metadata.len()
 }
 
 #[cfg(feature = "test")]
 fn metadata_contents(database_name: &str) -> Vec<(String, u32)> {
-    let database = open_db::<Active>(database_name).unwrap();
-    let metadata = open_tree::<Active>(&database, METATREE).unwrap();
+    let database = open_db(database_name).unwrap();
+    let metadata = open_tree(&database, METATREE).unwrap();
     let mut out: Vec<(String, u32)> = Vec::new();
     for (meta_key_vec, _) in metadata.iter().flatten() {
-        let new = MetaKey::from_ivec(&meta_key_vec)
-            .name_version::<Active>()
-            .unwrap();
+        let new = MetaKey::from_ivec(&meta_key_vec).name_version().unwrap();
         out.push(new);
     }
     out
@@ -1635,7 +1700,7 @@ fn test_all_events() {
     let dbname = "for_tests/test_all_events";
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let events = all_events_preview();
-    enter_events::<Signer>(dbname, events).unwrap();
+    enter_events(dbname, events).unwrap();
     let entries: Vec<_> = get_history(dbname)
         .unwrap()
         .into_iter()
@@ -1648,7 +1713,7 @@ fn test_all_events() {
             meta_values_display: MetaValuesDisplay {
                 name: "westend".to_string(),
                 version: 9000,
-                meta_hash: hex::decode(
+                meta_hash: H256::from_str(
                     "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
                 )
                 .unwrap()
@@ -1662,7 +1727,7 @@ fn test_all_events() {
             meta_values_display: MetaValuesDisplay {
                 name: "westend".to_string(),
                 version: 9000,
-                meta_hash: hex::decode(
+                meta_hash: H256::from_str(
                     "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
                 )
                 .unwrap()
@@ -1676,7 +1741,7 @@ fn test_all_events() {
             meta_values_export: MetaValuesExport {
                 name: "westend".to_string(),
                 version: 9000,
-                meta_hash: hex::decode(
+                meta_hash: H256::from_str(
                     "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
                 )
                 .unwrap(),
@@ -1854,7 +1919,7 @@ fn test_all_events() {
         &entries,
         &Event::TypesAdded {
             types_display: TypesDisplay {
-                types_hash: hex::decode(
+                types_hash: H256::from_str(
                     "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
                 )
                 .unwrap(),
@@ -1875,7 +1940,7 @@ fn test_all_events() {
         &entries,
         &Event::TypesRemoved {
             types_display: TypesDisplay {
-                types_hash: hex::decode(
+                types_hash: H256::from_str(
                     "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
                 )
                 .unwrap(),
@@ -1896,7 +1961,7 @@ fn test_all_events() {
         &entries,
         &Event::TypesSigned {
             types_export: TypesExport {
-                types_hash: hex::decode(
+                types_hash: H256::from_str(
                     "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
                 )
                 .unwrap(),
@@ -2021,7 +2086,7 @@ fn test_all_events() {
                 )
                 .unwrap(),
                 path: "//".to_string(),
-                network_genesis_hash: hex::decode(
+                network_genesis_hash: H256::from_str(
                     "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 )
                 .unwrap()
@@ -2040,7 +2105,7 @@ fn test_all_events() {
                 )
                 .unwrap(),
                 path: "//".to_string(),
-                network_genesis_hash: hex::decode(
+                network_genesis_hash: H256::from_str(
                     "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 )
                 .unwrap()
@@ -2146,7 +2211,7 @@ fn remove_all_westend() {
         );
         let identities: Tree = database.open_tree(ADDRTREE).unwrap();
         for a in identities.iter().flatten() {
-            let (_, address_details) = AddressDetails::process_entry_checked::<Signer>(a).unwrap();
+            let (_, address_details) = AddressDetails::process_entry_checked(a).unwrap();
             assert!(
                 !address_details.network_id.contains(&network_specs_key),
                 "Some westend identities still remain."
@@ -2197,7 +2262,7 @@ fn remove_all_westend() {
             meta_values_display: MetaValuesDisplay {
                 name: "westend".to_string(),
                 version: 9000,
-                meta_hash: hex::decode(
+                meta_hash: H256::from_str(
                     "e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce"
                 )
                 .unwrap(),
@@ -2211,7 +2276,7 @@ fn remove_all_westend() {
             meta_values_display: MetaValuesDisplay {
                 name: "westend".to_string(),
                 version: 9010,
-                meta_hash: hex::decode(
+                meta_hash: H256::from_str(
                     "70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf"
                 )
                 .unwrap(),
@@ -2229,7 +2294,7 @@ fn remove_all_westend() {
                 )
                 .unwrap(),
                 path: "//westend".to_string(),
-                network_genesis_hash: hex::decode(
+                network_genesis_hash: H256::from_str(
                     "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 )
                 .unwrap()
@@ -2248,7 +2313,7 @@ fn remove_all_westend() {
                 )
                 .unwrap(),
                 path: String::new(),
-                network_genesis_hash: hex::decode(
+                network_genesis_hash: H256::from_str(
                     "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 )
                 .unwrap()
@@ -2267,7 +2332,7 @@ fn remove_all_westend() {
                 )
                 .unwrap(),
                 path: "//Alice".to_string(),
-                network_genesis_hash: hex::decode(
+                network_genesis_hash: H256::from_str(
                     "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 )
                 .unwrap()
