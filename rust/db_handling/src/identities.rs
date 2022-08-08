@@ -1340,7 +1340,7 @@ pub fn export_secret_key(
                 &address_details.encryption,
                 &public_key,
                 &address_details.path,
-                network_specs.genesis_hash.as_bytes(),
+                network_specs.genesis_hash,
             ),
         }],
     )?;

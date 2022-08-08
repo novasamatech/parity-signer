@@ -679,7 +679,7 @@ pub fn all_events_preview() -> Vec<Event> {
                 &Encryption::Sr25519,
                 &public,
                 "//1",
-                network_specs.genesis_hash.as_bytes(),
+                network_specs.genesis_hash,
             ),
         },
         Event::Warning {
