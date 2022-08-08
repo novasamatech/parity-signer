@@ -15,23 +15,23 @@ struct PasswordConfirm: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
+            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg000.swiftUIColor)
             VStack {
                 HeaderBar(line1: "Confirm secret path", line2: "Details")
                 HStack {
                     Text(content.croppedPath + "///")
-                    Image(systemName: "lock").foregroundColor(Color("Crypto400"))
-                        .font(FCrypto(style: .body2))
+                    Image(.lock).foregroundColor(Asset.crypto400.swiftUIColor)
+                        .font(Fontstyle.body2.crypto)
                 }
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color("Crypto400"))
+                        .stroke(Asset.crypto400.swiftUIColor)
                         .frame(height: 39)
                     HStack {
-                        Text("///").foregroundColor(Color("Crypto400"))
+                        Text("///").foregroundColor(Asset.crypto400.swiftUIColor)
                         TextField("SECRET PATH", text: $passwordCheck, prompt: Text(""))
-                            .foregroundColor(Color("Crypto400"))
-                            .font(FCrypto(style: .body2))
+                            .foregroundColor(Asset.crypto400.swiftUIColor)
+                            .font(Fontstyle.body2.crypto)
                             .disableAutocorrection(true)
                             .autocapitalization(.none)
                             .keyboardType(.asciiCapable)

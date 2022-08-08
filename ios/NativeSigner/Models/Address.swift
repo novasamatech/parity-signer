@@ -14,7 +14,7 @@ extension SignerDataModel {
     func createAddress(path: String, seedName: String) {
         let seedPhrase = getSeed(seedName: seedName)
         if !seedPhrase.isEmpty {
-            pushButton(action: .goForward, details: path, seedPhrase: seedPhrase)
+            navigation.perform(navigation: .init(action: .goForward, details: path, seedPhrase: seedPhrase))
         }
     }
 }

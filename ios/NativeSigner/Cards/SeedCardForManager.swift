@@ -12,13 +12,13 @@ struct SeedCardForManager: View {
     var seedNameCard: SeedNameCard
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4).foregroundColor(Color("Bg200")).frame(height: 47)
+            RoundedRectangle(cornerRadius: 4).foregroundColor(Asset.bg200.swiftUIColor).frame(height: 47)
             HStack {
                 Identicon(identicon: seedNameCard.identicon)
                 VStack(alignment: .leading) {
                     Text(seedNameCard.seedName)
-                        .foregroundColor(Color("Text600"))
-                        .font(FBase(style: .subtitle1))
+                        .foregroundColor(Asset.text600.swiftUIColor)
+                        .font(Fontstyle.subtitle1.base)
                 }
                 Spacer()
             }

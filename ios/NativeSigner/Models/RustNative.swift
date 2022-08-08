@@ -7,31 +7,19 @@
 
 import Foundation
 import LocalAuthentication // to detect if password is set
+import SwiftUI
 
 /// Object to store all data; since the data really is mostly stored in RustNative side,
 /// just one object (to describe it) is used here.
 final class SignerDataModel: ObservableObject {
-    // Action handler
-    @Published var actionResult: ActionResult = ActionResult( // Screen state is stored here
-        screenLabel: "",
-        back: false,
-        footer: false,
-        footerButton: .settings,
-        rightButton: .none,
-        screenNameType: .h4,
-        screenData: ScreenData.documents,
-        modalData: nil,
-        alertData: .none
-    )
+    @ObservedObject var navigation: NavigationCoordinator
+
     @Published var parsingAlert: Bool = false
 
     // Data state
     @Published var seedNames: [String] = []
     @Published var onboardingDone: Bool = false
     @Published var authenticated: Bool = false
-
-    // This just starts camera reset. Could be done cleaner probably.
-    @Published var resetCamera: Bool = false
 
     // Alert indicator
     @Published var canaryDead: Bool = false
@@ -40,12 +28,7 @@ final class SignerDataModel: ObservableObject {
 
     /// internal boilerplate
     var dbName: String
-    /// debouncer
-    var actionAvailable = true
-    /// Debounce time
-    let debounceTime: Double = 0.2
-    /// version
-    let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+
     /// did user set up password?
     let protected = LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
 
@@ -55,11 +38,13 @@ final class SignerDataModel: ObservableObject {
     private let fileManager: FileManagingProtocol
 
     init(
+        navigation: NavigationCoordinator,
         bundle: BundleProtocol = Bundle.main,
         connectivityMonitor: ConnectivityMonitoring = ConnectivityMonitoringAssembler().assemble(),
         databaseMediator: DatabaseMediating = DatabaseMediator(),
         fileManager: FileManagingProtocol = FileManager.default
     ) {
+        self.navigation = navigation
         self.bundle = bundle
         self.connectivityMonitor = connectivityMonitor
         self.databaseMediator = databaseMediator
@@ -79,7 +64,7 @@ final class SignerDataModel: ObservableObject {
     /// should be called as often as reasonably possible - on flow interrupts, changes, events, etc.
     func totalRefresh() {
         print("heavy reset")
-        pushButton(action: .start)
+        navigation.perform(navigation: .init(action: .start))
         checkAlert()
         // self.refreshUI()
     }

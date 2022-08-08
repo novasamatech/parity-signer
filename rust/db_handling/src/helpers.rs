@@ -559,7 +559,7 @@ pub fn remove_network(network_specs_key: &NetworkSpecsKey, database_name: &str) 
                         &address_details.encryption,
                         &multisigner_to_public(&multisigner),
                         &address_details.path,
-                        network_specs.genesis_hash.as_bytes(),
+                        network_specs.genesis_hash,
                     );
                     events.push(Event::IdentityRemoved { identity_history });
                     address_details.network_id = address_details

@@ -9,10 +9,10 @@ import SwiftUI
 
 struct KeyDetailsMulti: View {
     @GestureState private var dragOffset = CGSize.zero
-    @State var offset: CGFloat = 0
-    @State var showDetails = false
+    @State private var offset: CGFloat = 0
+    @State private var showDetails = false
     var content: MKeyDetailsMulti
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         ScrollView {
             VStack {
@@ -42,10 +42,10 @@ struct KeyDetailsMulti: View {
                         showDetails.toggle()
                     } else {
                         if drag.translation.width > 20 {
-                            pushButton(.nextUnit, "", "")
+                            navigationRequest(.init(action: .nextUnit))
                         }
                         if drag.translation.width < -20 {
-                            pushButton(.previousUnit, "", "")
+                            navigationRequest(.init(action: .previousUnit))
                         }
                     }
                 }

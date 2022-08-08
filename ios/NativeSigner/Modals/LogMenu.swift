@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct LogMenu: View {
-    @State var clearConfirm = false
+    @State private var clearConfirm = false
     var content: MLogRight
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         VStack {
             Spacer()
@@ -20,7 +20,7 @@ struct LogMenu: View {
                     BigButton(
                         text: "Add note",
                         action: {
-                            pushButton(.createLogComment, "", "")
+                            navigationRequest(.init(action: .createLogComment))
                         }
                     )
                     BigButton(
@@ -35,7 +35,7 @@ struct LogMenu: View {
             }
             .padding([.leading, .trailing, .top])
             .padding(.bottom, 24)
-            .background(Color("Bg000"))
+            .background(Asset.bg000.swiftUIColor)
             .alert(isPresented: $clearConfirm, content: {
                 Alert(
                     title: Text("Clear log?"),
@@ -43,7 +43,7 @@ struct LogMenu: View {
                     primaryButton: .cancel(Text("Cancel")),
                     secondaryButton: .destructive(
                         Text("Clear log"),
-                        action: { pushButton(.clearLog, "", "") }
+                        action: { navigationRequest(.init(action: .clearLog)) }
                     )
                 )
             })

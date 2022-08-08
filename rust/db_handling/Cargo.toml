@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.60"
-blake2-rfc = {version = "0.2.18", optional = true}
 constants = {path = "../constants"}
 defaults = {path = "../defaults", default-features = false, optional = true}
 definitions = {path = "../definitions", default-features = false}
@@ -40,7 +39,6 @@ active = [
 	"zeroize",
 ]
 signer = [
-	"blake2-rfc",
 	"constants/signer",
 	"defaults/signer",
 	"definitions/signer",

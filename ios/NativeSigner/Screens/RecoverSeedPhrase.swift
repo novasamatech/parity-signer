@@ -14,7 +14,7 @@ struct RecoverSeedPhrase: View {
     @FocusState private var focus: Bool
     let content: MRecoverSeedPhrase
     let restoreSeed: (String, String, Bool) -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
 
     var body: some View {
         ZStack {
@@ -22,7 +22,7 @@ struct RecoverSeedPhrase: View {
                 VStack {
                     Text(content.seedName)
                     VStack(alignment: .leading) {
-                        Text("SEED PHRASE").font(FBase(style: .overline))
+                        Text("SEED PHRASE").font(Fontstyle.overline.base)
                         VStack {
                             Text(
                                 content.draftPhrase()
@@ -30,22 +30,22 @@ struct RecoverSeedPhrase: View {
                             .lineLimit(nil)
                             .fixedSize(horizontal: false, vertical: true)
                             .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                            .foregroundColor(Color("Crypto400"))
+                            .foregroundColor(Asset.crypto400.swiftUIColor)
                             .padding(12)
-                            Divider().foregroundColor(Color("Border400"))
+                            Divider().foregroundColor(Asset.border400.swiftUIColor)
                             HStack {
-                                Text(">").foregroundColor(Color("Text400"))
-                                    .font(FBase(style: .body2))
+                                Text(">").foregroundColor(Asset.text400.swiftUIColor)
+                                    .font(Fontstyle.body2.base)
                                 TextField("Seed", text: $userInput, prompt: Text("Seed name"))
                                     .focused($focus)
-                                    .foregroundColor(Color("Text600"))
-                                    .font(FBase(style: .body2))
+                                    .foregroundColor(Asset.text600.swiftUIColor)
+                                    .font(Fontstyle.body2.base)
                                     .disableAutocorrection(true)
                                     .textInputAutocapitalization(.never)
                                     .keyboardType(.asciiCapable)
                                     .submitLabel(.done)
                                     .onChange(of: userInput, perform: { word in
-                                        pushButton(.textEntry, word, "")
+                                        navigationRequest(.init(action: .textEntry, details: word))
                                         shadowUserInput = word
                                     })
                                     .onSubmit {}
@@ -64,24 +64,24 @@ struct RecoverSeedPhrase: View {
                                     .padding(.bottom, 10)
                             }
                         }
-                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color("Border400")))
+                        .background(RoundedRectangle(cornerRadius: 8).stroke(Asset.border400.swiftUIColor))
                         ScrollView(.horizontal) {
                             LazyHStack {
                                 ForEach(content.guessSet, id: \.self) { guess in
                                     VStack {
                                         Button(
                                             action: {
-                                                pushButton(.pushWord, guess, "")
+                                                navigationRequest(.init(action: .pushWord, details: guess))
                                             },
                                             label: {
                                                 Text(guess)
-                                                    .foregroundColor(Color("Crypto400"))
-                                                    .font(FCrypto(style: .body2))
+                                                    .foregroundColor(Asset.crypto400.swiftUIColor)
+                                                    .font(Fontstyle.body2.crypto)
                                                     .padding(.horizontal, 12)
                                                     .padding(.vertical, 4)
                                                     .background(
                                                         RoundedRectangle(cornerRadius: 4)
-                                                            .foregroundColor(Color("Crypto100"))
+                                                            .foregroundColor(Asset.crypto100.swiftUIColor)
                                                     )
                                             }
                                         )

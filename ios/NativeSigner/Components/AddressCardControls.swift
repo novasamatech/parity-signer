@@ -10,7 +10,7 @@ import SwiftUI
 struct AddressCardControls: View {
     let seedName: String
     let increment: (String) -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var rowHeight: CGFloat = 39
     @State private var delete = false
     @State private var count: CGFloat = 1
@@ -23,8 +23,9 @@ struct AddressCardControls: View {
                 },
                 label: {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 6).foregroundColor(Color("Crypto100"))
-                        Text("N+" + String(Int(count))).font(FCrypto(style: .body2)).foregroundColor(Color("Crypto400"))
+                        RoundedRectangle(cornerRadius: 6).foregroundColor(Asset.crypto100.swiftUIColor)
+                        Text("N+" + String(Int(count))).font(Fontstyle.body2.crypto)
+                            .foregroundColor(Asset.crypto400.swiftUIColor)
                     }
                     .frame(width: rowHeight, height: rowHeight)
                     .gesture(
@@ -47,8 +48,8 @@ struct AddressCardControls: View {
                 },
                 label: {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 6).foregroundColor(Color("SignalDanger"))
-                        Image(systemName: "trash.slash").foregroundColor(Color("BgDanger"))
+                        RoundedRectangle(cornerRadius: 6).foregroundColor(Asset.signalDanger.swiftUIColor)
+                        Image(.trash, variant: .slash).foregroundColor(Asset.bgDanger.swiftUIColor)
                     }
                     .frame(width: rowHeight, height: rowHeight)
                     .alert(isPresented: $delete, content: {
@@ -58,7 +59,7 @@ struct AddressCardControls: View {
                             primaryButton: .cancel(),
                             secondaryButton: .destructive(
                                 Text("Delete"),
-                                action: { pushButton(.removeKey, "", "") }
+                                action: { navigationRequest(.init(action: .removeKey)) }
                             )
                         )
                     })

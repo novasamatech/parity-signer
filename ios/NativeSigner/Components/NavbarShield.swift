@@ -11,26 +11,26 @@ import SwiftUI
 struct NavbarShield: View {
     let canaryDead: Bool
     let alert: Bool
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         Button(
             action: {
-                pushButton(.shield, "", "")
+                navigationRequest(.init(action: .shield))
             },
             label: {
                 if canaryDead /* bluetooth detector: `|| data.bsDetector.canaryDead` */ {
-                    Image(systemName: "shield.slash")
+                    Image(.shield, variant: .slash)
                         .imageScale(.large)
-                        .foregroundColor(Color("SignalDanger"))
+                        .foregroundColor(Asset.signalDanger.swiftUIColor)
                 } else {
                     if alert {
-                        Image(systemName: "exclamationmark.shield")
+                        Image(.exclamationmark, variant: .shield)
                             .imageScale(.large)
-                            .foregroundColor(Color("SignalWarning"))
+                            .foregroundColor(Asset.signalWarning.swiftUIColor)
                     } else {
-                        Image(systemName: "lock.shield.fill")
+                        Image(.lock, variants: [.shield, .fill])
                             .imageScale(.large)
-                            .foregroundColor(Color("Crypto400"))
+                            .foregroundColor(Asset.crypto400.swiftUIColor)
                     }
                 }
             }

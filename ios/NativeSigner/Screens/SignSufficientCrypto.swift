@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SignSufficientCrypto: View {
     let content: MSignSufficientCrypto
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     let getSeed: (String) -> String
     var body: some View {
         VStack {
@@ -21,7 +21,11 @@ struct SignSufficientCrypto: View {
                             action: {
                                 let seedPhrase = getSeed(keyrecord.seedName)
                                 if !seedPhrase.isEmpty {
-                                    pushButton(.goForward, keyrecord.addressKey, seedPhrase)
+                                    navigationRequest(.init(
+                                        action: .goForward,
+                                        details: keyrecord.addressKey,
+                                        seedPhrase: seedPhrase
+                                    ))
                                 }
                             },
                             label: {

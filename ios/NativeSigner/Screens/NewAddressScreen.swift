@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct NewAddressScreen: View {
-    @State var path: String = ""
+    @State private var path: String = ""
     @FocusState private var focusedField: Bool
     @State private var derivationCheck: DerivationCheck?
     var content: MDeriveKey
     let pathCheck: (String, String, String) -> DerivationCheck
     let createAddress: (String, String) -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
 
     var body: some View {
         ZStack {
@@ -23,12 +23,12 @@ struct NewAddressScreen: View {
                 NetworkCard(title: content.networkTitle, logo: content.networkLogo)
                 VStack(alignment: .leading) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).frame(height: 39)
+                        RoundedRectangle(cornerRadius: 8).stroke(Asset.crypto400.swiftUIColor).frame(height: 39)
                         HStack {
                             Text(content.seedName)
                             TextField("Path", text: $path, prompt: Text("//<network>//input"))
-                                .foregroundColor(Color("Crypto400"))
-                                .font(FCrypto(style: .body2))
+                                .foregroundColor(Asset.crypto400.swiftUIColor)
+                                .font(Fontstyle.body2.crypto)
                                 .disableAutocorrection(true)
                                 .autocapitalization(.none)
                                 .keyboardType(.asciiCapable)
@@ -42,7 +42,7 @@ struct NewAddressScreen: View {
                                     case .pin:
                                         createAddress(path, content.seedName)
                                     case .pwd:
-                                        pushButton(.checkPassword, path, "")
+                                        navigationRequest(.init(action: .checkPassword, details: path))
                                     default:
                                         break
                                     }
@@ -55,7 +55,7 @@ struct NewAddressScreen: View {
                 if let collision = derivationCheck?.collision {
                     VStack {
                         HStack {
-                            Text("This key already exists:").foregroundColor(Color("Text300"))
+                            Text("This key already exists:").foregroundColor(Asset.text300.swiftUIColor)
                             Spacer()
                         }
                         AddressCard(address: collision)
@@ -69,7 +69,7 @@ struct NewAddressScreen: View {
                             case .pin:
                                 createAddress(path, content.seedName)
                             case .pwd:
-                                pushButton(.checkPassword, path, "")
+                                navigationRequest(.init(action: .checkPassword, details: path))
                             default:
                                 break
                             }

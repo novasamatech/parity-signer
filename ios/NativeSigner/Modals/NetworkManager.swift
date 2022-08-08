@@ -9,18 +9,18 @@ import SwiftUI
 
 struct NetworkManager: View {
     let content: MNetworkMenu
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         VStack {
             Rectangle().frame(height: UIScreen.main.bounds.height / 3).opacity(0.0001)
                 .gesture(TapGesture().onEnded { _ in
-                    pushButton(.goBack, "", "")
+                    navigationRequest(.init(action: .goBack))
                 })
             ZStack {
-                RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
+                RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg000.swiftUIColor)
                 VStack {
                     Spacer()
-                    Rectangle().foregroundColor(Color("Bg000")).frame(height: 25)
+                    Rectangle().foregroundColor(Asset.bg000.swiftUIColor).frame(height: 25)
                 }
                 VStack {
                     HeaderBar(line1: "NETWORK", line2: "Select network").padding(10)
@@ -30,7 +30,7 @@ struct NetworkManager: View {
                                 ZStack {
                                     Button(
                                         action: {
-                                            pushButton(.changeNetwork, network.key, "")
+                                            navigationRequest(.init(action: .changeNetwork, details: network.key))
                                         },
                                         label: {
                                             NetworkCard(title: network.title, logo: network.logo, fancy: true)
@@ -39,7 +39,7 @@ struct NetworkManager: View {
                                     HStack {
                                         Spacer()
                                         if network.selected {
-                                            Image(systemName: "checkmark")
+                                            Image(.checkmark)
                                         }
                                     }.padding(.horizontal, 8)
                                 }.padding(.horizontal, 8)

@@ -11,14 +11,14 @@ struct Backup: View {
     let content: MBackup
     let alert: Bool
     let getSeedForBackup: (String) -> String
-    let pushButton: (Action, String, String) -> Void
-    @State var secret: String = ""
+    let navigationRequest: NavigationRequest
+    @State private var secret: String = ""
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    @State var countdown = 60
-    @State var failure = false
+    @State private var countdown = 60
+    @State private var failure = false
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg200"))
+            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg200.swiftUIColor)
             VStack {
                 ZStack {
                     HeaderBar(line1: "Backup", line2: content.seedName)
@@ -26,10 +26,11 @@ struct Backup: View {
                         Spacer()
                         Button(
                             action: {
-                                pushButton(.goBack, "", "")
+                                navigationRequest(.init(action: .goBack))
                             },
                             label: {
-                                Image(systemName: "xmark").imageScale(.large).foregroundColor(Color("Text300"))
+                                Image(.xmark).imageScale(.large)
+                                    .foregroundColor(Asset.text300.swiftUIColor)
                             }
                         )
                     }
@@ -37,13 +38,17 @@ struct Backup: View {
                 ScrollView {
                     VStack {
                         HStack {
-                            Text("SEED PHRASE").foregroundColor(Color("Text300")).font(FBase(style: .overline))
+                            Text("SEED PHRASE").foregroundColor(Asset.text300.swiftUIColor)
+                                .font(Fontstyle.overline.base)
                             Spacer()
                         }
                         HStack {
                             Text(secret)
                                 .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                                .foregroundColor(Color(failure ? "SignalDanger" : "Crypto400"))
+                                .foregroundColor(
+                                    failure ? Asset.signalDanger.swiftUIColor : Asset.crypto400
+                                        .swiftUIColor
+                                )
                                 .padding(8)
                             Spacer()
                         }
@@ -72,7 +77,8 @@ struct Backup: View {
                                 ))
                         )
                         HStack {
-                            Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))
+                            Text("DERIVED KEYS").foregroundColor(Asset.text300.swiftUIColor)
+                                .font(Fontstyle.overline.base)
                             Spacer()
                         }
                         LazyVStack {
@@ -93,13 +99,13 @@ struct Backup: View {
                                     ForEach(pack.idSet.sorted(by: { $0.path < $1.path }), id: \.self) { record in
                                         HStack {
                                             Text((record.path.isEmpty && !record.hasPwd) ? "seed key" : record.path)
-                                                .foregroundColor(Color("Crypto400"))
-                                                .font(FCrypto(style: .body2))
+                                                .foregroundColor(Asset.crypto400.swiftUIColor)
+                                                .font(Fontstyle.body2.crypto)
                                             if record.hasPwd {
-                                                Text("///").foregroundColor(Color("Crypto400"))
-                                                    .font(FCrypto(style: .body2))
-                                                Image(systemName: "lock").foregroundColor(Color("Crypto400"))
-                                                    .font(FCrypto(style: .body2))
+                                                Text("///").foregroundColor(Asset.crypto400.swiftUIColor)
+                                                    .font(Fontstyle.body2.crypto)
+                                                Image(.lock).foregroundColor(Asset.crypto400.swiftUIColor)
+                                                    .font(Fontstyle.body2.crypto)
                                             }
                                             Spacer()
                                         }.padding(8)

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NetworkDetails: View {
     let content: MNetworkDetails
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         ZStack {
             VStack {
@@ -33,7 +33,7 @@ struct NetworkDetails: View {
                     }
                     HStack {
                         Text("genesis hash:")
-                        Text(content.genesisHash.map { String(format: "%02X", $0) }.joined())
+                        Text(content.genesisHash.formattedAsString)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     HStack {
@@ -62,7 +62,7 @@ struct NetworkDetails: View {
                         ForEach(content.meta, id: \.metaHash) { metaEntry in
                             Button(
                                 action: {
-                                    pushButton(.manageMetadata, metaEntry.specsVersion, "")
+                                    navigationRequest(.init(action: .manageMetadata, details: metaEntry.specsVersion))
                                 },
                                 label: {
                                     MetadataCard(meta: metaEntry)

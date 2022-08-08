@@ -29,20 +29,20 @@ struct BigButton: View {
     var isDisabled: Bool = false
 
     var body: some View {
-        let accentColor = isCrypto ? Color("Crypto400") : Color("Action400")
+        let accentColor = isCrypto ? Asset.crypto400.swiftUIColor : Asset.action400.swiftUIColor
         let bgColor = isDisabled
-            ? Color("Bg200")
-            : isShaded ? Color("Bg300") : accentColor
+            ? Asset.bg200.swiftUIColor
+            : isShaded ? Asset.bg300.swiftUIColor : accentColor
         let fgColor = isDisabled
-            ? Color("Text300")
+            ? Asset.text300.swiftUIColor
             : isShaded
-            ? isDangerous ? Color("SignalDanger") : accentColor
-            : Color("Action600")
+            ? isDangerous ? Asset.signalDanger.swiftUIColor : accentColor
+            : Asset.action600.swiftUIColor
 
         Button(action: action) {
             HStack {
                 Spacer()
-                Text(text).font(FBase(style: .button))
+                Text(text).font(Fontstyle.button.base)
                 Spacer()
             }
         }

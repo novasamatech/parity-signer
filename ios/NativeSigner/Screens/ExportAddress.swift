@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ExportAddress: View {
-    @State var showDetails = false
+    @State private var showDetails = false
     var content: MKeyDetails
     var body: some View {
         ScrollView {
@@ -22,15 +22,15 @@ struct ExportAddress: View {
                     HStack {
                         Text("Base58 key: ")
                         Text(content.address.base58)
-                    }.padding().foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2))
+                    }.padding().foregroundColor(Asset.crypto400.swiftUIColor).font(Fontstyle.body2.crypto)
                     HStack {
                         Text("Hex key: ")
                         Text(content.pubkey)
-                    }.padding().foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2))
+                    }.padding().foregroundColor(Asset.crypto400.swiftUIColor).font(Fontstyle.body2.crypto)
                     HStack {
                         Text("Seed name: ")
                         Text(content.address.seedName)
-                    }.padding().foregroundColor(Color("Text400")).font(FBase(style: .body2))
+                    }.padding().foregroundColor(Asset.text400.swiftUIColor).font(Fontstyle.body2.base)
                 }
             }
         }

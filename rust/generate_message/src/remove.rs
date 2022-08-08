@@ -71,7 +71,7 @@ use crate::parser::Remove;
 pub fn remove_info(info: Remove) -> Result<()> {
     match info {
         // network data by the address book title
-        Remove::Title(network_title) => {
+        Remove::Title { t: network_title } => {
             // init `Batch` for `ADDRESS_BOOK`, `SPECSTREEPREP`, `METADATA` and
             // `META_HISTORY`
             let mut address_book_batch = Batch::default();

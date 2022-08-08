@@ -9,12 +9,12 @@ import SwiftUI
 
 struct TransactionPreview: View {
     @State private var comment = ""
-    @State var offset: CGFloat = 0
-    @State var offsetOld: CGFloat = 0
+    @State private var offset: CGFloat = 0
+    @State private var offsetOld: CGFloat = 0
     @FocusState private var focus: Bool
     let content: MTransaction
     let sign: (String, String) -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         VStack {
             TransactionBlock(cards: content.content.assemble())
@@ -27,15 +27,15 @@ struct TransactionPreview: View {
                 }
                 if content.ttype == .sign {
                     HStack {
-                        Text("LOG NOTE").font(FBase(style: .overline)).foregroundColor(Color("Text400"))
+                        Text("LOG NOTE").font(Fontstyle.overline.base).foregroundColor(Asset.text400.swiftUIColor)
                         Spacer()
                     }
                     ZStack {
-                        RoundedRectangle(cornerRadius: 8).stroke(Color("Border400")).frame(height: 39)
+                        RoundedRectangle(cornerRadius: 8).stroke(Asset.border400.swiftUIColor).frame(height: 39)
                         TextField("comment", text: $comment, prompt: Text("Comment (not published)"))
-                            .foregroundColor(Color("Text400"))
-                            .background(Color("Bg100"))
-                            .font(FBase(style: .body2))
+                            .foregroundColor(Asset.text400.swiftUIColor)
+                            .background(Asset.bg100.swiftUIColor)
+                            .font(Fontstyle.body2.base)
                             .focused($focus)
                             .onDisappear {
                                 focus = false
@@ -43,7 +43,7 @@ struct TransactionPreview: View {
                             .padding(.horizontal, 8)
                     }
                     HStack {
-                        Text("visible only on this device").font(FBase(style: .subtitle1))
+                        Text("visible only on this device").font(Fontstyle.subtitle1.base)
                             .padding(.bottom)
                         Spacer()
                     }
@@ -67,7 +67,7 @@ struct TransactionPreview: View {
                         BigButton(
                             text: "Approve",
                             action: {
-                                pushButton(.goForward, "", "")
+                                navigationRequest(.init(action: .goForward))
                             }
                         )
                     case .read:
@@ -77,7 +77,7 @@ struct TransactionPreview: View {
                             text: "Select seed",
                             isCrypto: true,
                             action: {
-                                pushButton(.goForward, "", "")
+                                navigationRequest(.init(action: .goForward))
                             }
                         )
                     case .done:
@@ -90,7 +90,7 @@ struct TransactionPreview: View {
                             isDangerous: true,
                             action: {
                                 focus = false
-                                pushButton(.goBack, "", "")
+                                navigationRequest(.init(action: .goBack))
                             }
                         )
                     }

@@ -17,7 +17,6 @@ transaction_signing = {path = "../transaction_signing"}
 zeroize = "1.5.7"
 
 [dev-dependencies]
-blake2-rfc = { version = "0.2.18" }
 constants = { path = "../constants", features = ["test"] }
 image = { version = "0.24.3", default-features = false, features = ["ico"] }
 parser = { path = "../parser", default-features = false }

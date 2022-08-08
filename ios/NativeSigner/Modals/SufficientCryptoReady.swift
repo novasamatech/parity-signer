@@ -9,12 +9,12 @@ import SwiftUI
 
 struct SufficientCryptoReady: View {
     @GestureState private var dragOffset = CGSize.zero
-    @State var offset: CGFloat = 0
-    @State var oldOffset: CGFloat = 0
+    @State private var offset: CGFloat = 0
+    @State private var oldOffset: CGFloat = 0
     var content: MSufficientCryptoReady
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000"))
+            RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg000.swiftUIColor)
             VStack {
                 HeaderBar(line1: "Your Signature", line2: "Scan it into your application")
                 Image(uiImage: UIImage(data: Data(content.sufficient)) ?? UIImage())

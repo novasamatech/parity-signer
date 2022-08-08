@@ -8,17 +8,19 @@
 import SwiftUI
 
 struct SettingsScreen: View {
-    @State var wipe = false
-    @State var jailbreak = false
+    @State private var wipe = false
+    @State private var jailbreak = false
     let content: MSettings
-    let appVersion: String?
     let doWipe: () -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
+
+    private let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+
     var body: some View {
         VStack(spacing: 2) {
             Button(
                 action: {
-                    pushButton(.manageNetworks, "", "")
+                    navigationRequest(.init(action: .manageNetworks))
                 },
                 label: {
                     SettingsCardTemplate(text: "Networks")
@@ -26,18 +28,19 @@ struct SettingsScreen: View {
             )
             Button(
                 action: {
-                    pushButton(.backupSeed, "", "")
+                    navigationRequest(.init(action: .backupSeed))
                 },
                 label: {
                     SettingsCardTemplate(text: "Backup keys")
                 }
             )
             Button(
-                action: { pushButton(.viewGeneralVerifier, "", "") },
+                action: { navigationRequest(.init(action: .viewGeneralVerifier)) },
                 label: {
                     VStack {
                         HStack {
-                            Text("Verifier certificate").font(FBase(style: .h1)).foregroundColor(Color("Text600"))
+                            Text("Verifier certificate").font(Fontstyle.header1.base)
+                                .foregroundColor(Asset.text600.swiftUIColor)
                             Spacer()
                         }
                         VStack {
@@ -53,8 +56,10 @@ struct SettingsScreen: View {
                                 ))
                             } else {
                                 if let errorMessage = content.error {
-                                    Text("Error!").foregroundColor(Color("SignalDanger")).font(FBase(style: .h4))
-                                    Text(errorMessage).foregroundColor(Color("SignalDanger")).font(FBase(style: .body2))
+                                    Text("Error!").foregroundColor(Asset.signalDanger.swiftUIColor)
+                                        .font(Fontstyle.header4.base)
+                                    Text(errorMessage).foregroundColor(Asset.signalDanger.swiftUIColor)
+                                        .font(Fontstyle.body2.base)
                                 } else {
                                     AddressCard(address: Address(
                                         base58: "",
@@ -98,7 +103,7 @@ struct SettingsScreen: View {
             })
             Button(
                 action: {
-                    pushButton(.showDocuments, "", "")
+                    navigationRequest(.init(action: .showDocuments))
                 },
                 label: {
                     SettingsCardTemplate(text: "About")

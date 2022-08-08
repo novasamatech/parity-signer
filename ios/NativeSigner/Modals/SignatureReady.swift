@@ -9,13 +9,13 @@ import SwiftUI
 
 struct SignatureReady: View {
     @GestureState private var dragOffset = CGSize.zero
-    @State var offset: CGFloat = 0
-    @State var oldOffset: CGFloat = UIScreen.main.bounds.size.width
+    @State private var offset: CGFloat = 0
+    @State private var oldOffset: CGFloat = UIScreen.main.bounds.size.width
     var content: MSignatureReady
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000"))
+            RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg000.swiftUIColor)
             VStack {
                 HeaderBar(line1: "Your Signature", line2: "Scan it into your application")
                 Image(uiImage: UIImage(data: Data(content.signature)) ?? UIImage())
@@ -23,7 +23,7 @@ struct SignatureReady: View {
                     .aspectRatio(contentMode: .fit).padding(12)
                 Spacer()
                 BigButton(text: "Done", action: {
-                    pushButton(.goBack, "", "")
+                    navigationRequest(.init(action: .goBack))
                 })
             }.padding(16)
         }

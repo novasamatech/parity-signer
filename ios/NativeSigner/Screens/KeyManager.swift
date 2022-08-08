@@ -13,15 +13,15 @@ struct KeyManager: View {
     let alert: Bool
     let alertShow: () -> Void
     let increment: (String, String) -> Void
-    let pushButton: (Action, String, String) -> Void
-    @State var searchString: String = "" // This is supposed to be used with search, which is disabled now
+    let navigationRequest: NavigationRequest
+    @State private var searchString: String = "" // This is supposed to be used with search, which is disabled now
     var body: some View {
         ZStack {
             VStack {
                 ZStack {
                     Button(
                         action: {
-                            pushButton(.selectKey, content.root.addressKey, "")
+                            navigationRequest(.init(action: .selectKey, details: content.root.addressKey))
                         },
                         label: {
                             SeedKeyCard(
@@ -33,7 +33,10 @@ struct KeyManager: View {
                                     .onEnded { drag in
                                         if abs(drag.translation.height) < 20, abs(drag.translation.width) > 20 {
                                             if !content.root.addressKey.isEmpty {
-                                                pushButton(.swipe, content.root.addressKey, "")
+                                                navigationRequest(.init(
+                                                    action: .swipe,
+                                                    details: content.root.addressKey
+                                                ))
                                             }
                                         }
                                     }
@@ -42,7 +45,7 @@ struct KeyManager: View {
                                 LongPressGesture()
                                     .onEnded { _ in
                                         if !content.root.addressKey.isEmpty {
-                                            pushButton(.longTap, content.root.addressKey, "")
+                                            navigationRequest(.init(action: .longTap, details: content.root.addressKey))
                                         }
                                     }
                             )
@@ -56,33 +59,34 @@ struct KeyManager: View {
                             increment: { details in
                                 increment(content.root.seedName, details)
                             },
-                            pushButton: pushButton
+                            navigationRequest: navigationRequest
                         )
                     }
                 }
                 Button(
-                    action: { pushButton(.networkSelector, "", "") },
+                    action: { navigationRequest(.init(action: .networkSelector)) },
                     label: {
                         HStack {
                             NetworkCard(title: content.network.title, logo: content.network.logo)
-                            Image(systemName: "chevron.down")
+                            Image(.chevron, variant: .down)
                             Spacer()
                         }
                     }
                 )
                 HStack {
-                    Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))
+                    Text("DERIVED KEYS").foregroundColor(Asset.text300.swiftUIColor).font(Fontstyle.overline.base)
                     Spacer()
                     Button(
                         action: {
                             if alert {
                                 alertShow()
                             } else {
-                                pushButton(.newKey, "", "")
+                                navigationRequest(.init(action: .newKey))
                             }
                         },
                         label: {
-                            Image(systemName: "plus.circle").imageScale(.large).foregroundColor(Color("Action400"))
+                            Image(.plus, variant: .circle).imageScale(.large)
+                                .foregroundColor(Asset.action400.swiftUIColor)
                         }
                     )
                 }.padding(.horizontal, 8)
@@ -94,7 +98,7 @@ struct KeyManager: View {
                             ZStack {
                                 Button(
                                     action: {
-                                        pushButton(.selectKey, address.addressKey, "")
+                                        navigationRequest(.init(action: .selectKey, details: address.addressKey))
                                     },
                                     label: {
                                         AddressCard(
@@ -112,13 +116,16 @@ struct KeyManager: View {
                                         .gesture(DragGesture().onEnded { drag in
                                             if abs(drag.translation.height) < 20,
                                                abs(drag.translation.width) > 20 {
-                                                pushButton(.swipe, address.addressKey, "")
+                                                navigationRequest(.init(action: .swipe, details: address.addressKey))
                                             }
                                         })
                                         .gesture(
                                             LongPressGesture()
                                                 .onEnded { _ in
-                                                    pushButton(.longTap, address.addressKey, "")
+                                                    navigationRequest(.init(
+                                                        action: .longTap,
+                                                        details: address.addressKey
+                                                    ))
                                                 }
                                         )
                                     }
@@ -129,7 +136,7 @@ struct KeyManager: View {
                                         increment: { details in
                                             increment(content.root.seedName, details)
                                         },
-                                        pushButton: pushButton
+                                        navigationRequest: navigationRequest
                                     )
                                 }
                             }
@@ -140,7 +147,7 @@ struct KeyManager: View {
                 if content.multiselectMode {
                     MultiselectBottomControl(
                         selectedCount: content.multiselectCount,
-                        pushButton: pushButton
+                        navigationRequest: navigationRequest
                     )
                 } else {
                     // SearchKeys(searchString: $searchString)

@@ -12,7 +12,9 @@ use std::convert::TryInto;
 use plot_icon::generate_png_scaled_default;
 
 use crate::crypto::Encryption;
-use crate::error::{Error, Result};
+#[cfg(feature = "signer")]
+use crate::error::Error;
+use crate::error::Result;
 
 /// Decode hexadecimal `&str` into `Vec<u8>`, with descriptive error  
 ///

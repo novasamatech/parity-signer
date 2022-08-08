@@ -1,8 +1,9 @@
-use generate_message::{full_run, parser::Command, Error};
-use std::env;
+use clap::Parser;
+use generate_message::{full_run, parser::Cli};
 
-fn main() -> Result<(), Error> {
-    let command = Command::new(env::args())?;
-    full_run(command).unwrap();
-    Ok(())
+fn main() {
+    let args = Cli::parse();
+    if let Err(e) = full_run(args.command) {
+        eprintln!("An error occured: {}", e);
+    }
 }

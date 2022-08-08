@@ -114,7 +114,11 @@ extension SignerDataModel {
         seedNames.append(seedName)
         seedNames = seedNames.sorted()
         updateSeedNames(seedNames: seedNames)
-        pushButton(action: .goForward, details: createRoots ? "true" : "false", seedPhrase: seedPhrase)
+        navigation.perform(navigation: .init(
+            action: .goForward,
+            details: createRoots ? "true" : "false",
+            seedPhrase: seedPhrase
+        ))
     }
 
     /// Each seed name should be unique, obviously. We do not want to overwrite old seeds.
@@ -212,7 +216,7 @@ extension SignerDataModel {
                 }
                 seedNames = seedNames.sorted()
                 updateSeedNames(seedNames: seedNames)
-                pushButton(action: .removeSeed)
+                navigation.perform(navigation: .init(action: .removeSeed))
             } else {
                 let lastError = SecCopyErrorMessageString(status, nil) as? String ?? ""
                 print("remove seed from secure storage error: " + lastError)
@@ -225,10 +229,13 @@ extension SignerDataModel {
         if alert {
             alertShow = true
         } else {
-            pushButton(
-                action: .goForward,
-                details: comment,
-                seedPhrase: getSeed(seedName: seedName)
+            navigation.perform(
+                navigation:
+                .init(
+                    action: .goForward,
+                    details: comment,
+                    seedPhrase: getSeed(seedName: seedName)
+                )
             )
         }
     }

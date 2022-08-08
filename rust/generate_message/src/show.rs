@@ -1,12 +1,11 @@
 //! Utils to display the database content and to verify default metadata files
-use blake2_rfc::blake2b::blake2b;
-
 use constants::HOT_DB_NAME;
 use db_handling::helpers::try_get_meta_values_by_name_version;
 use definitions::{
     metadata::{AddressBookEntry, MetaValues},
     network_specs::NetworkSpecsToSend,
 };
+use sp_core::blake2_256;
 
 use crate::error::Result;
 use crate::helpers::{
@@ -184,7 +183,7 @@ pub fn check_file(path: String) -> Result<()> {
 
 /// Hash metadata and produce hash hexadecimal string.
 fn hash_string(meta: &[u8]) -> String {
-    hex::encode(blake2b(32, &[], meta).as_bytes())
+    hex::encode(blake2_256(meta))
 }
 
 /// Show network specs for user-entered address book title.

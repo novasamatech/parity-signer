@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ConfirmAlert: View {
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     let content: String
     var body: some View {
         ZStack {
@@ -18,13 +18,13 @@ struct ConfirmAlert: View {
                 BigButton(
                     text: "content.yes",
                     action: {
-                        pushButton(.goForward, "", "")
+                        navigationRequest(.init(action: .goForward))
                     }
                 )
                 BigButton(
                     text: "content.no",
                     action: {
-                        pushButton(.goBack, "", "")
+                        navigationRequest(.init(action: .goBack))
                     }
                 )
             }

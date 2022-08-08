@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct VerifierScreen: View {
-    @State var jailbreak = false
+    @State private var jailbreak = false
     let content: MVerifierDetails
     let doJailbreak: () -> Void
     var body: some View {

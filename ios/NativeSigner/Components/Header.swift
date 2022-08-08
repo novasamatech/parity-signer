@@ -15,7 +15,7 @@ struct Header: View {
     let alert: Bool
     let canaryDead: Bool
     let alertShow: () -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         VStack {
             Spacer()
@@ -24,12 +24,15 @@ struct Header: View {
                     if back {
                         Button(
                             action: {
-                                pushButton(.goBack, "", "")
+                                navigationRequest(.init(action: .goBack))
                             },
                             label: {
-                                Image(systemName: rightButton == .multiSelect ? "xmark" : "chevron.left")
-                                    .imageScale(.large)
-                                    .foregroundColor(Color("Text500"))
+                                Image(
+                                    rightButton == .multiSelect ? .xmark : .chevron,
+                                    variant: rightButton == .multiSelect ? nil : .left
+                                )
+                                .imageScale(.large)
+                                .foregroundColor(Asset.text500.swiftUIColor)
                             }
                         )
                     }
@@ -38,13 +41,13 @@ struct Header: View {
                 .frame(width: 72.0)
                 Spacer()
                 Text(screenLabel)
-                    .foregroundColor(Color("Text600"))
-                    .font(screenNameType == .h1 ? FBase(style: .h2) : FBase(style: .h4))
+                    .foregroundColor(Asset.text600.swiftUIColor)
+                    .font(screenNameType == .h1 ? Fontstyle.header2.base : Fontstyle.header4.base)
                     .tracking(0.1)
                 if rightButton == .multiSelect {
                     Button(
                         action: {
-                            pushButton(.selectAll, "", "")
+                            navigationRequest(.init(action: .selectAll))
                         },
                         label: {
                             SmallButton(text: "Select all")
@@ -59,38 +62,38 @@ struct Header: View {
                             if alert, rightButton == .newSeed {
                                 alertShow()
                             } else {
-                                pushButton(.rightButtonAction, "", "")
+                                navigationRequest(.init(action: .rightButtonAction))
                             }
                         },
                         label: {
                             switch rightButton {
                             case .newSeed:
-                                Image(systemName: "plus.circle")
+                                Image(.plus, variant: .circle)
                                     .imageScale(.large)
-                                    .foregroundColor(Color("Action400"))
+                                    .foregroundColor(Asset.action400.swiftUIColor)
                             case .backup:
-                                Image(systemName: "ellipsis")
+                                Image(.ellipsis)
                                     .imageScale(.large)
-                                    .foregroundColor(Color("Action400"))
+                                    .foregroundColor(Asset.action400.swiftUIColor)
                             case .logRight:
-                                Image(systemName: "ellipsis")
+                                Image(.ellipsis)
                                     .imageScale(.large)
-                                    .foregroundColor(Color("Action400"))
+                                    .foregroundColor(Asset.action400.swiftUIColor)
                             case .multiSelect:
                                 EmptyView()
                             case .none:
                                 EmptyView()
                             default:
-                                Image(systemName: "ellipsis")
+                                Image(.ellipsis)
                                     .imageScale(.large)
-                                    .foregroundColor(Color("Action400"))
+                                    .foregroundColor(Asset.action400.swiftUIColor)
                             }
                         }
                     )
                     NavbarShield(
                         canaryDead: canaryDead,
                         alert: alert,
-                        pushButton: pushButton
+                        navigationRequest: navigationRequest
                     )
                 }
                 .frame(width: 72.0)

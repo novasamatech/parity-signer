@@ -9,9 +9,9 @@ import SwiftUI
 
 /// Panel with actions for multiselect
 struct MultiselectBottomControl: View {
-    @State var delete = false
+    @State private var delete = false
     var selectedCount: String
-    var pushButton: (Action, String, String) -> Void
+    var navigationRequest: NavigationRequest
     var body: some View {
         ZStack {
             HStack {
@@ -32,7 +32,7 @@ struct MultiselectBottomControl: View {
                         secondaryButton: .destructive(
                             Text("Delete"),
                             action: {
-                                pushButton(.removeKey, "", "")
+                                navigationRequest(.init(action: .removeKey))
                             }
                         )
                     )
@@ -40,7 +40,7 @@ struct MultiselectBottomControl: View {
                 Spacer()
                 Button(
                     action: {
-                        pushButton(.exportMultiSelect, "", "")
+                        navigationRequest(.init(action: .exportMultiSelect))
                     },
                     label: {
                         SmallButton(text: "Export")

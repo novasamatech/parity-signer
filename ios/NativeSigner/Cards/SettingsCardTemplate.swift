@@ -16,16 +16,16 @@ struct SettingsCardTemplate: View {
     var body: some View {
         HStack {
             Text(text)
-                .font(FBase(style: .body1))
-                .foregroundColor(Color(danger ? "SignalDanger" : "Text400"))
+                .font(Fontstyle.body1.base)
+                .foregroundColor(danger ? Asset.signalDanger.swiftUIColor : Asset.text400.swiftUIColor)
             Spacer()
             if withIcon {
-                Image(systemName: "chevron.forward")
+                Image(.chevron, variant: .forward)
                     .imageScale(.medium)
-                    .foregroundColor(Color("Border400"))
+                    .foregroundColor(Asset.border400.swiftUIColor)
             }
         }
         .padding()
-        .background(Color(withBackground ? "Bg200" : ""))
+        .background(withBackground ? Asset.bg200.swiftUIColor : Color(""))
     }
 }

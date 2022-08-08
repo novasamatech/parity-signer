@@ -10,7 +10,7 @@ import SwiftUI
 struct KeySymbol: View {
     var body: some View {
         VStack {
-            Text("accounts").font(Font.custom("Web3-Regular", size: 20))
+            Text("accounts").font(FontFamily.Web3.regular.swiftUIFont(size: 20))
         }
     }
 }
@@ -18,23 +18,23 @@ struct KeySymbol: View {
 struct WrenchSymbol: View {
     var body: some View {
         VStack {
-            Image(systemName: "gearshape.fill").imageScale(.medium)
+            Image(.gearshape, variant: .fill).imageScale(.medium)
         }
     }
 }
 
 struct Footer: View {
     let footerButton: FooterButton?
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         HStack {
             Button(
                 action: {
-                    pushButton(.navbarLog, "", "")
+                    navigationRequest(.init(action: .navbarLog))
                 },
                 label: {
                     VStack(alignment: .center) {
-                        Image(systemName: "rectangle.grid.1x2.fill").imageScale(.medium)
+                        Image(.rectangle, variants: [.grid, .oneByTwo, .fill]).imageScale(.medium)
                             .padding(.top, 4.0)
                             .padding(.bottom, 1.0)
                         Text("Log")
@@ -45,11 +45,11 @@ struct Footer: View {
             Spacer()
             Button(
                 action: {
-                    pushButton(.navbarScan, "", "")
+                    navigationRequest(.init(action: .navbarScan))
                 },
                 label: {
                     VStack {
-                        Image(systemName: "viewfinder").imageScale(.medium)
+                        Image(.viewfinder).imageScale(.medium)
                             .padding(.top, 4.0)
                             .padding(.bottom, 1.0)
                         Text("Scanner")
@@ -60,7 +60,7 @@ struct Footer: View {
             Spacer()
             Button(
                 action: {
-                    pushButton(.navbarKeys, "", "")
+                    navigationRequest(.init(action: .navbarKeys))
                 },
                 label: {
                     VStack {
@@ -73,7 +73,7 @@ struct Footer: View {
             Spacer()
             Button(
                 action: {
-                    pushButton(.navbarSettings, "", "")
+                    navigationRequest(.init(action: .navbarSettings))
                 },
                 label: {
                     VStack {
@@ -90,11 +90,11 @@ struct Footer: View {
 }
 
 func buttonColor(active: Bool) -> Color {
-    active ? Color("Text600") : Color("Text300")
+    active ? Asset.text600.swiftUIColor : Asset.text300.swiftUIColor
 }
 
 // func buttonLabelColor(active: Bool) -> Color {
-// return active ? Color("Text600") : Color("Text300")
+// return active ? Asset.text600.swiftUIColor : Asset.text300.swiftUIColor
 // }
 
 // struct Footer_Previews: PreviewProvider {

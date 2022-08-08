@@ -33,7 +33,7 @@ extension SignerDataModel {
         do {
             try historyAcknowledgeWarnings(dbname: dbName)
             checkAlert()
-            pushButton(action: .goBack)
+            navigation.perform(navigation: .init(action: .goBack))
         } catch {
             print("History init failed! This will not do.")
             alert = true

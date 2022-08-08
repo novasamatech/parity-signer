@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct SeedMenu: View {
-    @State var removeConfirm = false
+    @State private var removeConfirm = false
     let content: MSeedMenu
     let alert: Bool
     let alertShow: () -> Void
     let removeSeed: (String) -> Void
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         MenuStack {
             HeaderBar(line1: "SEED MENU", line2: "Select action").padding(.top, 10)
@@ -21,7 +21,7 @@ struct SeedMenu: View {
                 BigButton(
                     text: "Backup",
                     action: {
-                        pushButton(.backupSeed, "", "")
+                        navigationRequest(.init(action: .backupSeed))
                     }
                 )
                 BigButton(
@@ -30,7 +30,7 @@ struct SeedMenu: View {
                     isCrypto: true,
                     action: {
                         if alert { alertShow() } else {
-                            pushButton(.newKey, "", "")
+                            navigationRequest(.init(action: .newKey))
                         }
                     }
                 )

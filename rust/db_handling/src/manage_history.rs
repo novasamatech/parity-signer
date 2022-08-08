@@ -29,9 +29,10 @@ use definitions::danger::DangerRecord;
 
 use crate::helpers::{open_db, open_tree};
 #[cfg(feature = "signer")]
+use crate::Error;
+use crate::Result;
+#[cfg(feature = "signer")]
 use crate::{db_transactions::TrDbCold, helpers::make_batch_clear_tree};
-
-use crate::{Error, Result};
 
 /// Print total number of pages, for maximum [`HISTORY_PAGE_SIZE`](constants::HISTORY_PAGE_SIZE) number of
 /// entries per page.

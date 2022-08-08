@@ -8,16 +8,16 @@
 import SwiftUI
 
 struct DocumentModal: View {
-    @State var document: ShownDocument = .toc
+    @State private var document: ShownDocument = .toc
 
     // paint top toggle buttons
     init() {
-        UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(Color("Bg400"))
-        UISegmentedControl.appearance().backgroundColor = UIColor(Color("Bg000"))
+        UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(Asset.bg400.swiftUIColor)
+        UISegmentedControl.appearance().backgroundColor = UIColor(Asset.bg000.swiftUIColor)
         UISegmentedControl.appearance()
-            .setTitleTextAttributes([.foregroundColor: UIColor(Color("Text600"))], for: .selected)
+            .setTitleTextAttributes([.foregroundColor: UIColor(Asset.text600.swiftUIColor)], for: .selected)
         UISegmentedControl.appearance()
-            .setTitleTextAttributes([.foregroundColor: UIColor(Color("Text400"))], for: .normal)
+            .setTitleTextAttributes([.foregroundColor: UIColor(Asset.text400.swiftUIColor)], for: .normal)
     }
 
     var body: some View {
@@ -25,24 +25,24 @@ struct DocumentModal: View {
             VStack {
                 Picker("", selection: $document) {
                     ForEach(ShownDocument.allCases) { doc in
-                        Text(doc.label).tag(doc).font(FBase(style: .button))
-                            .foregroundColor(Color(doc == document ? "Text600" : "Text400"))
+                        Text(doc.label).tag(doc).font(Fontstyle.button.base)
+                            .foregroundColor(doc == document ? Asset.text600.swiftUIColor : Asset.text400.swiftUIColor)
                     }
-                }.pickerStyle(.segmented).listItemTint(Color("Bg000"))
+                }.pickerStyle(.segmented).listItemTint(Asset.bg000.swiftUIColor)
                     .padding(.horizontal)
                 switch document {
                 case .privacyPolicy:
                     ScrollView {
                         Text(getPP())
-                            .font(FBase(style: .body1))
-                            .foregroundColor(Color("Text600"))
+                            .font(Fontstyle.body1.base)
+                            .foregroundColor(Asset.text600.swiftUIColor)
                     }.padding()
                 case .toc:
                     ScrollView {
                         InstructionsSquare().padding(.bottom)
                         Text(getTaC())
-                            .font(FBase(style: .body1))
-                            .foregroundColor(Color("Text600"))
+                            .font(Fontstyle.body1.base)
+                            .foregroundColor(Asset.text600.swiftUIColor)
                     }.padding()
                 }
                 Spacer()

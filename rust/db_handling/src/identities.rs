@@ -349,7 +349,7 @@ pub(crate) fn create_address(
         &network_specs.encryption,
         &public_key,
         cropped_path,
-        network_specs.genesis_hash.as_bytes(),
+        network_specs.genesis_hash,
     );
     let history_prep = vec![Event::IdentityAdded { identity_history }];
 
@@ -660,7 +660,7 @@ pub fn remove_keys_set(
             &network_specs.encryption,
             &public_key,
             &address_details.path,
-            network_specs.genesis_hash.as_bytes(),
+            network_specs.genesis_hash,
         );
         events.push(Event::IdentityRemoved { identity_history });
         address_details.network_id = address_details
@@ -1051,7 +1051,7 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<()> {
                 &address_details.encryption,
                 &public_key,
                 &address_details.path,
-                genesis_hash_vec.as_ref(),
+                genesis_hash_vec,
             );
             // separate `Event` for each `NetworkSpecsKey` from `network_id` set
             events.push(Event::IdentityRemoved { identity_history });
