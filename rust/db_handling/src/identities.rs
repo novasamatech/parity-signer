@@ -159,9 +159,7 @@ pub(crate) fn is_potentially_exposed(
     exposed_path: &str,
     exposed_is_passworded: bool,
 ) -> bool {
-    if (path == exposed_path)
-        || path.starts_with(&format!("{}/", exposed_path))
-    {
+    if (path == exposed_path) || path.starts_with(&format!("{}/", exposed_path)) {
         path_is_passworded || !exposed_is_passworded
     } else {
         false
@@ -1222,7 +1220,7 @@ pub(crate) fn prepare_secret_key_for_export(
     multisigner: &MultiSigner,
     full_address: &str,
     pwd: Option<&str>,
-) -> Result<Vec<u8>> {
+) -> Result<[u8; 32]> {
     match multisigner {
         MultiSigner::Ed25519(public) => {
             let ed25519_pair = match ed25519::Pair::from_string(full_address, pwd) {
@@ -1232,17 +1230,24 @@ pub(crate) fn prepare_secret_key_for_export(
             if public != &ed25519_pair.public() {
                 return Err(Error::WrongPassword);
             }
-            Ok(ed25519_pair.to_raw_vec())
+            Ok(*ed25519_pair.seed())
         }
         MultiSigner::Sr25519(public) => {
-            let sr25519_pair = match sr25519::Pair::from_string(full_address, pwd) {
+            let (sr25519_pair, seed) = match sr25519::Pair::from_string_with_seed(full_address, pwd)
+            {
                 Ok(x) => x,
                 Err(e) => return Err(Error::SecretStringError(e)),
             };
             if public != &sr25519_pair.public() {
                 return Err(Error::WrongPassword);
             }
-            Ok(sr25519_pair.to_raw_vec())
+            if let Some(x) = seed {
+                Ok(x)
+            } else {
+                Err(Error::NoSeedForKeyPair {
+                    full_address: full_address.to_string(),
+                })
+            }
         }
         MultiSigner::Ecdsa(public) => {
             let ecdsa_pair = match ecdsa::Pair::from_string(full_address, pwd) {
@@ -1252,7 +1257,7 @@ pub(crate) fn prepare_secret_key_for_export(
             if public != &ecdsa_pair.public() {
                 return Err(Error::WrongPassword);
             }
-            Ok(ecdsa_pair.to_raw_vec())
+            Ok(ecdsa_pair.seed())
         }
     }
 }
@@ -1282,9 +1287,6 @@ pub fn export_secret_key(
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let address_key = AddressKey::from_multisigner(multisigner);
     let address_details = get_address_details(database_name, &address_key)?;
-    if address_details.is_root() {
-        return Err(Error::RootAccountCannotBeExported);
-    }
     if address_details.seed_name != expected_seed_name {
         return Err(Error::SeedNameNotMatching {
             address_key,
@@ -1410,45 +1412,13 @@ mod tests {
 
     #[test]
     fn potentially_exposed() {
-        assert_eq!(
-            is_potentially_exposed(
-                "//A//0", false,
-                "//A", false),
-            true);
-        assert_eq!(
-            is_potentially_exposed(
-                "//A//0", false,
-                "//A", true),
-            false);
-        assert_eq!(
-            is_potentially_exposed(
-                "//A//0", true,
-                "//A", false),
-            true);
-        assert_eq!(
-            is_potentially_exposed(
-                "//A", false,
-                "//A//0", false),
-            false);
-        assert_eq!(
-            is_potentially_exposed(
-                "//A//0", false,
-                "//A//0", false),
-            true);
-        assert_eq!(
-            is_potentially_exposed(
-                "//A/0", false,
-                "//A", false),
-            true);
-        assert_eq!(
-            is_potentially_exposed(
-                "//A//0//0", true,
-                "//A", true),
-            true);
-        assert_eq!(
-            is_potentially_exposed(
-                "//A//0", false,
-                "//B", false),
-            false);
+        assert!(is_potentially_exposed("//A//0", false, "//A", false));
+        assert!(!is_potentially_exposed("//A//0", false, "//A", true));
+        assert!(is_potentially_exposed("//A//0", true, "//A", false));
+        assert!(!is_potentially_exposed("//A", false, "//A//0", false));
+        assert!(is_potentially_exposed("//A//0", false, "//A//0", false));
+        assert!(is_potentially_exposed("//A/0", false, "//A", false));
+        assert!(is_potentially_exposed("//A//0//0", true, "//A", true));
+        assert!(!is_potentially_exposed("//A//0", false, "//B", false));
     }
 }

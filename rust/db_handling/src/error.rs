@@ -384,9 +384,9 @@ pub enum Error {
     #[error("Wrong password.")]
     WrongPassword,
 
-    /// User attempted to export root secret key.
-    #[error("Root account cannot be exported.")]
-    RootAccountCannotBeExported,
+    /// Key pair can't be expressed as a direct derivation from a seed
+    #[error("Unable to export secret for address {full_address}")]
+    NoSeedForKeyPair { full_address: String },
 }
 
 /// DB handling result.

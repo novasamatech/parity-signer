@@ -15,8 +15,8 @@ use std::{convert::TryInto, fs, path::PathBuf, str::FromStr};
 use constants::{
     test_values::{
         alice_sr_alice, alice_sr_kusama, alice_sr_polkadot, alice_sr_root,
-        alice_sr_secret_abracadabra, alice_sr_westend, alice_westend_root_qr, empty_png,
-        types_known, westend_9000, westend_9010, alice_westend_secret_qr,
+        alice_sr_secret_abracadabra, alice_sr_westend, alice_westend_root_qr,
+        alice_westend_secret_qr, empty_png, types_known, westend_9000, westend_9010,
     },
     ADDRTREE, ALICE_SEED_PHRASE, METATREE, SPECSTREE,
 };
@@ -57,8 +57,8 @@ use db_handling::{
         try_get_valid_current_verifier,
     },
     identities::{
-        create_increment_set, derivation_check, get_addresses_by_seed_name, remove_key,
-        remove_seed, try_create_address, try_create_seed, DerivationCheck, export_secret_key,
+        create_increment_set, derivation_check, export_secret_key, get_addresses_by_seed_name,
+        remove_key, remove_seed, try_create_address, try_create_seed, DerivationCheck,
     },
     interface_signer::{
         addresses_set_seed_name_network, backup_prep, derive_prep, dynamic_path_check, export_key,
@@ -2387,37 +2387,41 @@ fn test_export_secret_key() {
     let network_id = NetworkSpecsKey::from_parts(&spec.genesis_hash, &spec.encryption);
     let seed_name = "Alice";
 
-    let (root_path, derivation_path, child_path) = ("", "//Alice", "//Alice//1");
-    try_create_address(seed_name, ALICE_SEED_PHRASE, child_path, &network_id, dbname).unwrap();
-
-    let identities: Vec<(MultiSigner, AddressDetails)> = get_addresses_by_seed_name(dbname, seed_name).unwrap();
-
-    let (root_multisigner, _) = identities.iter().find(|(_, a)| a.path == root_path).unwrap();
-    let root_secret = export_secret_key(
-        dbname,
-        &root_multisigner,
+    let (derivation_path, child_path) = ("//Alice", "//Alice//1");
+    try_create_address(
         seed_name,
+        ALICE_SEED_PHRASE,
+        child_path,
         &network_id,
-        &ALICE_SEED_PHRASE,
-        None
-    );
-    assert!(matches!(root_secret, Err(Error::RootAccountCannotBeExported)));
+        dbname,
+    )
+    .unwrap();
+    let identities: Vec<(MultiSigner, AddressDetails)> =
+        get_addresses_by_seed_name(dbname, seed_name).unwrap();
 
-    let (derivation_multisigner, _) = identities.iter().find(|(_, a)| a.path == derivation_path).unwrap();
+    let (derivation_multisigner, _) = identities
+        .iter()
+        .find(|(_, a)| a.path == derivation_path)
+        .unwrap();
     let secret_key = export_secret_key(
         dbname,
-        &derivation_multisigner,
+        derivation_multisigner,
         seed_name,
         &network_id,
-        &ALICE_SEED_PHRASE,
-        None
-    ).unwrap();
+        ALICE_SEED_PHRASE,
+        None,
+    )
+    .unwrap();
 
     assert_eq!(secret_key.qr, alice_westend_secret_qr().to_vec());
     assert!(secret_key.address.secret_exposed);
 
-    let identities: Vec<(MultiSigner, AddressDetails)> = get_addresses_by_seed_name(dbname, seed_name).unwrap();
-    let (_, child_address) = identities.iter().find(|(_, a)| a.path == child_path).unwrap();
+    let identities: Vec<(MultiSigner, AddressDetails)> =
+        get_addresses_by_seed_name(dbname, seed_name).unwrap();
+    let (_, child_address) = identities
+        .iter()
+        .find(|(_, a)| a.path == child_path)
+        .unwrap();
     assert!(child_address.secret_exposed);
 
     fs::remove_dir_all(dbname).unwrap();
