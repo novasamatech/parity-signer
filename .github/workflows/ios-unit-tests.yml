@@ -1,0 +1,81 @@
+name:                         iOS Unit Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - stable
+      - ios-unit-tests
+
+jobs:
+  ios-unit-tests:
+    name:                     Run iOS Unit Tests
+    runs-on:                  macos-12
+    steps:
+
+      - name:                 Cancel Previous Runs
+        uses:                 styfle/cancel-workflow-action@0.10.0
+        with:
+          access_token:       ${{ github.token }}
+
+      - name:                 Checkout sources
+        uses:                 actions/checkout@v3.0.2
+        with:
+          fetch-depth:        50
+          submodules:         'recursive'
+
+      - name:                 Setup - Xcode
+        run:                  sudo xcode-select -switch '/Applications/Xcode_13.4.1.app/Contents/Developer' && /usr/bin/xcodebuild -version
+
+      - name:                 Install dependencies
+        run:                  |
+                              brew update
+                              brew install swiftgen
+                              brew install swiftformat
+                              brew install xcbeautify
+
+      - name:                 Install Rust aarch64-apple-ios target
+        uses:                 actions-rs/toolchain@v1.0.7
+        with:
+          profile:            minimal
+          toolchain:          stable
+          target:             aarch64-apple-ios
+          components:         rust-std
+          override:           true
+
+      - name:                 Install Rust x86_64-apple-ios target
+        uses:                 actions-rs/toolchain@v1.0.7
+        with:
+          profile:            minimal
+          toolchain:          stable
+          target:             x86_64-apple-ios
+          components:         rust-std
+          override:           true
+
+      - name:                 Install uniffi_bindgen
+        uses:                 actions-rs/install@v0.1
+        with:
+          crate:              uniffi_bindgen
+          use-tool-cache:     true
+
+      - name:                 Rust Cache
+        uses:                 Swatinem/rust-cache@v2.0.0
+
+      - name:                 Rust build
+        shell:                bash
+        run:                  |
+          cd scripts
+          ./build.sh ios
+
+      - name:                 Run tests
+        shell:                bash
+        run:                  |
+          cd ios
+          xcodebuild \
+          -project NativeSigner.xcodeproj \
+          -scheme NativeSigner \
+          -sdk iphonesimulator \
+          -destination 'platform=iOS Simulator,name=iPhone 13' \
+          test \
+          | xcbeautify

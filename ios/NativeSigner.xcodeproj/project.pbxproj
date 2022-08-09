@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -973,17 +973,22 @@
 		};
 		6D4C0750289AC2F400B2EE48 /* Run SwiftGen */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				$PROJECT_DIR/$TARGET_NAME/swiftgent.yml,
 			);
 			name = "Run SwiftGen";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				$PROJECT_DIR/$TARGET_NAME/Generated/Assets.swift,
+				$PROJECT_DIR/$TARGET_NAME/Generated/Fonts.swift,
+				$PROJECT_DIR/$TARGET_NAME/Generated/Localizable.swift,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1326,7 +1331,7 @@
 				DEVELOPMENT_TEAM = HN8MSF5ULF;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
+				"EXCLUDED_ARCHS[sdk=*]" = arm64;
 				INFOPLIST_FILE = NativeSigner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1389,6 +1394,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4GK8JWU7P9;
+				"EXCLUDED_ARCHS[sdk=*]" = arm64;
 				INFOPLIST_FILE = NativeSignerTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
