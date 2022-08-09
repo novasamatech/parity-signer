@@ -10,7 +10,7 @@ import SwiftUI
 struct TCTXSpec: View {
     let value: String
     var body: some View {
-        TCNameValueTemplate(name: "TX version", value: value)
+        TCNameValueTemplate(name: Localizable.TCName.TxVersion.uppercased.string, value: value)
     }
 }
 

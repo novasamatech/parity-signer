@@ -10,7 +10,7 @@ import SwiftUI
 struct TCBlockHash: View {
     var text: String
     var body: some View {
-        TCNameValueTemplate(name: "Block hash", value: text)
+        TCNameValueTemplate(name: Localizable.TCName.blockHash.string, value: text)
     }
 }
 

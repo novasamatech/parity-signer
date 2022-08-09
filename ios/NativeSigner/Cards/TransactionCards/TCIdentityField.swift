@@ -10,7 +10,7 @@ import SwiftUI
 struct TCIdentityField: View {
     let content: String
     var body: some View {
-        TCNameValueTemplate(name: "IdentityField", value: content)
+        TCNameValueTemplate(name: Localizable.TCName.identityField.string, value: content)
     }
 }
 

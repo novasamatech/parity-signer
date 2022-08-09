@@ -50,7 +50,7 @@ struct Header: View {
                             navigationRequest(.init(action: .selectAll))
                         },
                         label: {
-                            SmallButton(text: "Select all")
+                            SmallButton(text: Localizable.selectAll.key)
                         }
                     )
                 }

@@ -12,7 +12,10 @@ struct TCTypesInfo: View {
     var body: some View {
         HStack {
             Identicon(identicon: content.typesIdPic ?? [])
-            TCNameValueTemplate(name: "Types hash:", value: content.typesHash ?? "")
+            TCNameValueTemplate(
+                name: Localizable.TCName.typesHash.string,
+                value: content.typesHash ?? ""
+            )
         }
     }
 }

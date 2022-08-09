@@ -17,7 +17,7 @@ struct NewSeedBackupModal: View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg200.swiftUIColor)
             VStack {
-                HeaderBar(line1: "Backup Seed Phrase", line2: content.seed)
+                HeaderBar(line1: Localizable.backupSeedPhrase.key, line2: LocalizedStringKey(content.seed))
                 ZStack {
                     Text(content.seedPhrase)
                         .font(.system(size: 16, weight: .semibold, design: .monospaced))
@@ -34,8 +34,9 @@ struct NewSeedBackupModal: View {
                             HStack {
                                 (confirmBackup ? Image(.checkmark, variant: .square) : Image(.square))
                                     .imageScale(.large)
-                                Text("I have written down my seed phrase")
-                                    .multilineTextAlignment(.leading).foregroundColor(Asset.text500.swiftUIColor)
+                                Localizable.iHaveWrittenDownMySeedPhrase.text
+                                    .multilineTextAlignment(.leading)
+                                    .foregroundColor(Asset.text500.swiftUIColor)
                                 Spacer()
                             }
                         }
@@ -47,15 +48,16 @@ struct NewSeedBackupModal: View {
                         label: {
                             HStack {
                                 (createRoots ? Image(.checkmark, variant: .square) : Image(.square)).imageScale(.large)
-                                Text("Create root keys")
-                                    .multilineTextAlignment(.leading).foregroundColor(Asset.text500.swiftUIColor)
+                                Localizable.createRootKeys.text
+                                    .multilineTextAlignment(.leading)
+                                    .foregroundColor(Asset.text500.swiftUIColor)
                                 Spacer()
                             }
                         }
                     )
                     Spacer()
                     BigButton(
-                        text: "Next",
+                        text: Localizable.next.key,
                         action: {
                             restoreSeed(content.seed, content.seedPhrase, createRoots)
                         },

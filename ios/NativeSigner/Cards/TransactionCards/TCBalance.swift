@@ -13,7 +13,8 @@ struct TCBalance: View {
         HStack {
             Text(value.amount)
                 .foregroundColor(Asset.text600.swiftUIColor)
-            Text(value.units).foregroundColor(Asset.text600.swiftUIColor)
+            Text(value.units)
+                .foregroundColor(Asset.text600.swiftUIColor)
             Spacer()
         }
     }

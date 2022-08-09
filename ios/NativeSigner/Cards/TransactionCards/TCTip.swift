@@ -11,11 +11,12 @@ struct TCTip: View {
     var value: MscCurrency
     var body: some View {
         HStack {
-            Text("Tip")
+            Localizable.tip.text
                 .foregroundColor(Asset.text400.swiftUIColor)
             Text(value.amount)
                 .foregroundColor(Asset.text600.swiftUIColor)
-            Text(value.units).foregroundColor(Asset.text600.swiftUIColor)
+            Text(value.units)
+                .foregroundColor(Asset.text600.swiftUIColor)
             Spacer()
         }
     }

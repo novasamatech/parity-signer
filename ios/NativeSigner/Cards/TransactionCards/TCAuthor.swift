@@ -13,9 +13,9 @@ struct TCAuthor: View {
         HStack {
             Identicon(identicon: author.identicon)
             VStack(alignment: .leading) {
-                Text("From:")
+                Localizable.from.text
                     .foregroundColor(Asset.text400.swiftUIColor)
-                Text(author.seedName + author.path + (author.hasPwd == true ? "///" : ""))
+                Text(author.seedName + author.path + (author.hasPwd == true ? Localizable.Path.delimeter.string : ""))
                     .foregroundColor(Asset.crypto400.swiftUIColor)
                 Text(author.base58)
                     .font(.caption2)

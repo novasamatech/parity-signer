@@ -16,16 +16,16 @@ struct SeedMenu: View {
     let navigationRequest: NavigationRequest
     var body: some View {
         MenuStack {
-            HeaderBar(line1: "SEED MENU", line2: "Select action").padding(.top, 10)
+            HeaderBar(line1: Localizable.seedMenu.key, line2: Localizable.selectAction.key).padding(.top, 10)
             MenuButtonsStack {
                 BigButton(
-                    text: "Backup",
+                    text: Localizable.backup.key,
                     action: {
                         navigationRequest(.init(action: .backupSeed))
                     }
                 )
                 BigButton(
-                    text: "Derive new key",
+                    text: Localizable.deriveNewKey.key,
                     isShaded: true,
                     isCrypto: true,
                     action: {
@@ -35,7 +35,7 @@ struct SeedMenu: View {
                     }
                 )
                 BigButton(
-                    text: "Forget this seed forever",
+                    text: Localizable.forgetThisSeedForever.key,
                     isShaded: true,
                     isDangerous: true,
                     action: {
@@ -46,11 +46,11 @@ struct SeedMenu: View {
         }
         .alert(isPresented: $removeConfirm, content: {
             Alert(
-                title: Text("Forget this seed?"),
-                message: Text("This seed will be removed for all networks. This is not reversible. Are you sure?"),
-                primaryButton: .cancel(Text("Cancel")),
+                title: Localizable.forgetThisSeed.text,
+                message: Localizable.ThisSeedWillBeRemovedForAllNetworks.ThisIsNotReversible.areYouSure.text,
+                primaryButton: .cancel(Localizable.cancel.text),
                 secondaryButton: .destructive(
-                    Text("Remove seed"),
+                    Localizable.removeSeed.text,
                     action: { removeSeed(content.seed) }
                 )
             )

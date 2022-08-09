@@ -13,11 +13,11 @@ struct MetadataCard: View {
         HStack {
             Identicon(identicon: meta.metaIdPic) // this is potentially different from identicon
             VStack {
-                Text("version")
+                Localizable.version.text
                 Text(meta.specsVersion)
             }
             VStack {
-                Text("hash")
+                Localizable.hash.text
                 Text(meta.metaHash.truncateMiddle(length: 8))
             }
         }.padding(.horizontal, 8)

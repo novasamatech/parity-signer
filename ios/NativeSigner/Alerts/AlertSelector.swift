@@ -28,8 +28,10 @@ struct AlertSelector: View {
                 content: value
             )
         case .confirm:
-            let value = "TODO"
-            ConfirmAlert(navigationRequest: navigationRequest, content: value)
+            ConfirmAlert(
+                navigationRequest: navigationRequest,
+                content: "TODO"
+            )
         }
     }
 }

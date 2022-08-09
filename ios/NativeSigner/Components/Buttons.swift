@@ -21,7 +21,7 @@ struct BigButtonStyle: ButtonStyle {
 }
 
 struct BigButton: View {
-    var text: String
+    var text: LocalizedStringKey
     var isShaded: Bool = false
     var isCrypto: Bool = false
     var isDangerous: Bool = false

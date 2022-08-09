@@ -28,7 +28,7 @@ struct KeyDetailsMulti: View {
                     .onAppear {
                         offset = 0
                     }
-                Text("Key " + content.currentNumber + " out of " + content.outOf)
+                Text(Localizable.Key.outOf(content.currentNumber, content.outOf))
             }
         }
         .gesture(

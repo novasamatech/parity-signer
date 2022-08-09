@@ -17,18 +17,18 @@ struct ExportAddress: View {
                 Image(uiImage: UIImage(data: Data(content.qr)) ?? UIImage())
                     .resizable()
                     .aspectRatio(contentMode: .fit).padding(12)
-                HeaderBar(line1: "KEY DETAILS", line2: "").padding(.horizontal, 8)
+                HeaderBar(line1: Localizable.ExportAddress.header.key, line2: "").padding(.horizontal, 8)
                 VStack {
                     HStack {
-                        Text("Base58 key: ")
+                        Localizable.base58Key.text
                         Text(content.address.base58)
                     }.padding().foregroundColor(Asset.crypto400.swiftUIColor).font(Fontstyle.body2.crypto)
                     HStack {
-                        Text("Hex key: ")
+                        Localizable.hexKey.text
                         Text(content.pubkey)
                     }.padding().foregroundColor(Asset.crypto400.swiftUIColor).font(Fontstyle.body2.crypto)
                     HStack {
-                        Text("Seed name: ")
+                        Localizable.seedNameAlt.text
                         Text(content.address.seedName)
                     }.padding().foregroundColor(Asset.text400.swiftUIColor).font(Fontstyle.body2.base)
                 }

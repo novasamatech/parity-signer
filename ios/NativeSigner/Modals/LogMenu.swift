@@ -15,16 +15,19 @@ struct LogMenu: View {
         VStack {
             Spacer()
             VStack {
-                HeaderBar(line1: "LOG", line2: "Checksum: " + content.checksum)
+                HeaderBar(
+                    line1: Localizable.Log.uppercased.key,
+                    line2: LocalizedStringKey(Localizable.checksumContent(content.checksum))
+                )
                 MenuButtonsStack {
                     BigButton(
-                        text: "Add note",
+                        text: Localizable.addNote.key,
                         action: {
                             navigationRequest(.init(action: .createLogComment))
                         }
                     )
                     BigButton(
-                        text: "Clear log",
+                        text: Localizable.clearLog.key,
                         isShaded: true,
                         isDangerous: true,
                         action: {
@@ -38,11 +41,11 @@ struct LogMenu: View {
             .background(Asset.bg000.swiftUIColor)
             .alert(isPresented: $clearConfirm, content: {
                 Alert(
-                    title: Text("Clear log?"),
-                    message: Text("Do you want this Signer to forget all logged events? This is not reversible."),
-                    primaryButton: .cancel(Text("Cancel")),
+                    title: Localizable.clearLogQuestion.text,
+                    message: Localizable.doYouWantThisSignerToForgetAllLoggedEventsThisIsNotReversible.text,
+                    primaryButton: .cancel(Localizable.cancel.text),
                     secondaryButton: .destructive(
-                        Text("Clear log"),
+                        Localizable.clearLog.text,
                         action: { navigationRequest(.init(action: .clearLog)) }
                     )
                 )

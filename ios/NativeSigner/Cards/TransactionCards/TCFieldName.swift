@@ -22,21 +22,22 @@ struct TCFieldName: View {
                             .foregroundColor(Asset.text600.swiftUIColor)
                         Spacer()
                         if (value.docsFieldName + value.pathType + value.docsType).isEmpty {
-                            Text("?")
+                            Localizable.questionMark.text
                                 .foregroundColor(Asset.action400.swiftUIColor)
                         }
                     }
                     if showDoc {
                         VStack {
-                            Text("Path: " + value.pathType).foregroundColor(Asset.text600.swiftUIColor)
+                            Text(Localizable.TCField.path(value.pathType))
+                                .foregroundColor(Asset.text600.swiftUIColor)
                             Text(
                                 AttributedString(fromHexDocs: value.docsFieldName) ??
-                                    "docs parsing error in iOS, please refer to other sources"
+                                    AttributedString(Localizable.Error.docsParsing.string)
                             )
                             .foregroundColor(Asset.text600.swiftUIColor)
                             Text(
                                 AttributedString(fromHexDocs: value.docsType) ??
-                                    "docs parsing error in iOS, please refer to other sources"
+                                    AttributedString(Localizable.Error.docsParsing.string)
                             )
                             .foregroundColor(Asset.text600.swiftUIColor)
                         }
