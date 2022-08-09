@@ -10,7 +10,7 @@ import SwiftUI
 struct TCEraImmortal: View {
     var body: some View {
         HStack {
-            Text("Immortal transaction")
+            Localizable.immortalTransaction.text
                 .foregroundColor(Asset.text400.swiftUIColor)
             Spacer()
         }

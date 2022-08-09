@@ -13,7 +13,8 @@ struct TCMeta: View {
         HStack {
             Identicon(identicon: content.metaIdPic)
             VStack {
-                Text("Add metadata").foregroundColor(Asset.text600.swiftUIColor)
+                Localizable.addMetadata.text
+                    .foregroundColor(Asset.text600.swiftUIColor)
                 HStack {
                     Text(content.specname)
                     Text(content.specsVersion)

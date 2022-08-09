@@ -10,7 +10,7 @@ import SwiftUI
 struct TCNonce: View {
     let content: String
     var body: some View {
-        TCNameValueTemplate(name: "Nonce ", value: content)
+        TCNameValueTemplate(name: Localizable.TCName.nonce.string, value: content)
     }
 }
 

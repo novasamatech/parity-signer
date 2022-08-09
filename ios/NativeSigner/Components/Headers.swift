@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HeadingOverline: View {
-    var text: String
+    var text: LocalizedStringKey
     var body: some View {
         Text(text)
             .foregroundColor(Asset.text600.swiftUIColor)
@@ -19,8 +19,8 @@ struct HeadingOverline: View {
 }
 
 struct HeaderBar: View {
-    var line1: String
-    var line2: String
+    var line1: LocalizedStringKey
+    var line2: LocalizedStringKey
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             HeadingOverline(text: line1)

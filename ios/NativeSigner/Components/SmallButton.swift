@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SmallButton: View {
-    var text: String
+    var text: LocalizedStringKey
     var body: some View {
         Text(text)
             .padding(.horizontal, 8)

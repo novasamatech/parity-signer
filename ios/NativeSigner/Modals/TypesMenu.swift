@@ -14,24 +14,24 @@ struct TypesMenu: View {
     @State private var removeTypesAlert = false
     var body: some View {
         MenuStack {
-            HeaderBar(line1: "MANAGE TYPES", line2: "Select action").padding(.top, 10)
+            HeaderBar(line1: Localizable.manageTypes.key, line2: Localizable.selectAction.key).padding(.top, 10)
             if content.typesOnFile {
                 HStack {
                     Identicon(identicon: content.typesIdPic ?? []) // this is potentially different image
                 }
-                Text(content.typesHash ?? "none")
+                Text(content.typesHash ?? Localizable.none.string)
             } else {
-                Text("Pre-v14 types not installed")
+                Localizable.preV14TypesNotInstalled.text
             }
             MenuButtonsStack {
                 BigButton(
-                    text: "Sign types",
+                    text: Localizable.signTypes.key,
                     isShaded: true,
                     isCrypto: true,
                     action: { navigationRequest(.init(action: .signTypes)) }
                 )
                 BigButton(
-                    text: "Delete types",
+                    text: Localizable.deleteTypes.key,
                     isShaded: true,
                     isDangerous: true,
                     action: { removeTypesAlert = true }
@@ -45,13 +45,11 @@ struct TypesMenu: View {
         })
         .alert(isPresented: $removeTypesAlert, content: {
             Alert(
-                title: Text("Remove types?"),
-                message: Text(
-                    "Types information needed for support of pre-v14 metadata will be removed. Are you sure?"
-                ),
-                primaryButton: .cancel(Text("Cancel")),
+                title: Localizable.removeTypesQuestion.text,
+                message: Localizable.TypesInformationNeededForSupportOfPreV14MetadataWillBeRemoved.areYouSure.text,
+                primaryButton: .cancel(Localizable.cancel.text),
                 secondaryButton: .destructive(
-                    Text("Remove types"),
+                    Localizable.removeTypes.text,
                     action: { navigationRequest(.init(action: .removeTypes)) }
                 )
             )

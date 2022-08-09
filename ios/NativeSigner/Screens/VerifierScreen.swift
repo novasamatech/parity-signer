@@ -16,9 +16,9 @@ struct VerifierScreen: View {
             HStack {
                 Identicon(identicon: content.identicon, rowHeight: 42)
                 VStack {
-                    Text("General verifier certificate")
+                    Localizable.generalVerifierCertificate.text
                     Text(content.publicKey)
-                    Text("encryption: " + content.encryption)
+                    Text(Localizable.encryption(content.encryption))
                 }
             }
             Button(
@@ -27,7 +27,7 @@ struct VerifierScreen: View {
                 },
                 label: {
                     SettingsCardTemplate(
-                        text: "Remove general certificate",
+                        text: Localizable.removeGeneralCertificate.key,
                         danger: true
                     )
                 }
@@ -36,19 +36,11 @@ struct VerifierScreen: View {
                 isPresented: $jailbreak,
                 content: {
                     Alert(
-                        title: Text("Wipe ALL data?"),
-                        message: Text(
-                            """
-                            Remove all data and set general verifier blank so that it could be set later.
-                            This operation can not be reverted.
-                            Do not proceed unless you absolutely know what you are doing,
-                            there is no need to use this procedure in most cases.
-                            Misusing this feature may lead to loss of funds!
-                            """
-                        ),
+                        title: Localizable.wipeALLData.text,
+                        message: Localizable.RemoveAllData.message.text,
                         primaryButton: .cancel(),
                         secondaryButton: .destructive(
-                            Text("I understand"),
+                            Localizable.iUnderstand.text,
                             action: {
                                 doJailbreak()
                             }

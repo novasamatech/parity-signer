@@ -10,7 +10,7 @@ import SwiftUI
 struct TCNetworkName: View {
     let content: String
     var body: some View {
-        TCNameValueTemplate(name: "Network name", value: content)
+        TCNameValueTemplate(name: Localizable.TCName.networkName.string, value: content)
     }
 }
 

@@ -18,51 +18,36 @@ struct ShieldAlertComponent: View {
             if canaryDead {
                 Text("")
                     .alert(
-                        "Network connected!",
+                        Localizable.networkConnected.key,
                         isPresented: $show,
                         actions: {
-                            Button("Ok") { navigationRequest(.init(action: .goBack)) }
+                            Button(Localizable.Common.ok.key) { navigationRequest(.init(action: .goBack)) }
                         },
-                        message: {
-                            Text(
-                                "Signer detects currently connected network;" +
-                                    " please enable airplane mode, disconnect all cables" +
-                                    " and handle security breach according with your security protocol."
-                            )
-                        }
+                        message: { Localizable.networkConnectedMessage.text }
                     )
             } else {
                 if content == .past {
                     Text("")
                         .alert(
-                            "Network was connected!",
+                            Localizable.networkWasConnected.key,
                             isPresented: $show,
                             actions: {
-                                Button("Back") { navigationRequest(.init(action: .goBack)) }
-                                Button("Acknowledge and reset") {
+                                Button(Localizable.back.key) { navigationRequest(.init(action: .goBack)) }
+                                Button(Localizable.acknowledgeAndReset.key) {
                                     resetAlert()
                                 }
                             },
-                            message: {
-                                Text(
-                                    "Your Signer device has connected to a WiFi," +
-                                        " tether or Bluetooth network since your last acknowledgement" +
-                                        " and should be considered unsafe to use." +
-                                        " Please follow your security protocol"
-                                )
-                            }
+                            message: { Localizable.networkWasConnectedMessage.text }
                         )
                 } else {
                     Text("")
                         .alert(
-                            "Signer is secure",
+                            Localizable.signerIsSecure.key,
                             isPresented: $show,
                             actions: {
-                                Button("Ok") { navigationRequest(.init(action: .goBack)) }
+                                Button(Localizable.Common.ok.key) { navigationRequest(.init(action: .goBack)) }
                             },
-                            message: {
-                                Text("Please proceed")
-                            }
+                            message: { Localizable.pleaseProceed.text }
                         )
                 }
             }

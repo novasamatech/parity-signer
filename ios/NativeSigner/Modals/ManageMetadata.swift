@@ -14,7 +14,7 @@ struct ManageMetadata: View {
     @State private var offset: CGFloat = 0
     var body: some View {
         MenuStack {
-            HeaderBar(line1: "MANAGE METADATA", line2: "Select action").padding(.top, 10)
+            HeaderBar(line1: Localizable.manageMetadata.key, line2: Localizable.selectAction.key).padding(.top, 10)
             MetadataCard(
                 meta: MMetadataRecord(
                     specname: content.name,
@@ -24,7 +24,7 @@ struct ManageMetadata: View {
                 )
             )
             HStack {
-                Text("Used for:")
+                Localizable.usedFor.text
                 VStack {
                     ForEach(content.networks.sorted(by: {
                         $0.order < $1.order
@@ -41,13 +41,13 @@ struct ManageMetadata: View {
             }
             MenuButtonsStack {
                 BigButton(
-                    text: "Sign this metadata",
+                    text: Localizable.signThisMetadata.key,
                     isShaded: true,
                     isCrypto: true,
                     action: { navigationRequest(.init(action: .signMetadata)) }
                 )
                 BigButton(
-                    text: "Delete this metadata",
+                    text: Localizable.deleteThisMetadata.key,
                     isShaded: true,
                     isDangerous: true,
                     action: { removeMetadataAlert = true }
@@ -69,11 +69,11 @@ struct ManageMetadata: View {
         )
         .alert(isPresented: $removeMetadataAlert, content: {
             Alert(
-                title: Text("Remove metadata?"),
-                message: Text("This metadata will be removed for all networks"),
-                primaryButton: .cancel(Text("Cancel")),
+                title: Localizable.removeMetadataQuestion.text,
+                message: Localizable.thisMetadataWillBeRemovedForAllNetworks.text,
+                primaryButton: .cancel(Localizable.cancel.text),
                 secondaryButton: .destructive(
-                    Text("Remove metadata"),
+                    Localizable.removeMetadata.text,
                     action: { navigationRequest(.init(action: .removeMetadata)) }
                 )
             )

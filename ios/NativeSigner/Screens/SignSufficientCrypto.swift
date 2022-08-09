@@ -13,7 +13,7 @@ struct SignSufficientCrypto: View {
     let getSeed: (String) -> String
     var body: some View {
         VStack {
-            Text("Select key for signing")
+            Localizable.selectKeyForSigning.text
             ScrollView {
                 LazyVStack {
                     ForEach(content.identities, id: \.addressKey) { keyrecord in

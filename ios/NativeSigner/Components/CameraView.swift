@@ -72,7 +72,7 @@ struct CameraView: View {
                 Spacer()
                 if model.total ?? 0 > 0 {
                     MenuStack {
-                        HeadingOverline(text: "PARSING MULTIPART DATA").padding(.top, 12)
+                        HeadingOverline(text: Localizable.CameraView.parsingMultidata.key).padding(.top, 12)
                         ProgressView(value: min(Float(captured ?? 0) / (Float(total ?? -1) + 2), 1))
                             .border(Asset.crypto400.swiftUIColor)
                             .foregroundColor(Asset.crypto400.swiftUIColor)
@@ -80,12 +80,12 @@ struct CameraView: View {
                         Text(constructFrameCountMessage(captured: model.captured, total: model.total))
                             .font(Fontstyle.subtitle1.base)
                             .foregroundColor(Asset.text600.swiftUIColor)
-                        Text("Please hold still")
+                        Localizable.pleaseHoldStill.text
                             .font(Fontstyle.subtitle2.base)
                             .foregroundColor(Asset.text400.swiftUIColor)
                         MenuButtonsStack {
                             BigButton(
-                                text: "Start over",
+                                text: Localizable.CameraView.startOver.key,
                                 isShaded: true,
                                 action: {
                                     model.reset()

@@ -10,7 +10,7 @@ import SwiftUI
 struct TCTipPlain: View {
     let content: String
     var body: some View {
-        TCNameValueTemplate(name: "Tip", value: content)
+        TCNameValueTemplate(name: Localizable.TCName.tip.string, value: content)
     }
 }
 

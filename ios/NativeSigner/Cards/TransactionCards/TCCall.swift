@@ -18,18 +18,19 @@ struct TCCall: View {
             label: {
                 VStack {
                     HStack {
-                        TCNameValueTemplate(name: "Method", value: value.methodName)
+                        TCNameValueTemplate(name: Localizable.TCName.method.string, value: value.methodName)
                         if !value.docs.isEmpty {
-                            Text("?")
+                            Localizable.questionMark.text
                                 .foregroundColor(Asset.action400.swiftUIColor)
                         }
                     }
                     if showDoc {
                         Text(
                             AttributedString(fromHexDocs: value.docs) ??
-                                "docs parsing error in iOS, please refer to other sources"
+                                AttributedString(Localizable.Error.docsParsing.string)
                         )
-                        .foregroundColor(Asset.text600.swiftUIColor).multilineTextAlignment(.leading)
+                        .foregroundColor(Asset.text600.swiftUIColor)
+                        .multilineTextAlignment(.leading)
                     }
                 }
             }

@@ -26,11 +26,12 @@ struct AddressCard: View {
                             Spacer()
                             HStack {
                                 Spacer()
-                                Image(
-                                    systemName: address.multiselect == true ?
-                                        "checkmark.circle.fill" :
-                                        "circle"
-                                ).imageScale(.large)
+                                (
+                                    address
+                                        .multiselect == true ? Image(.checkmark, variants: [.circle, .fill]) :
+                                        Image(.circle)
+                                )
+                                .imageScale(.large)
                             }
                         }
                     }
@@ -41,9 +42,11 @@ struct AddressCard: View {
                             .font(Fontstyle.subtitle1.base)
                         Text(address.path)
                         if address.hasPwd {
-                            Text("///").foregroundColor(Asset.crypto400.swiftUIColor)
+                            Localizable.Path.delimeter.text
+                                .foregroundColor(Asset.crypto400.swiftUIColor)
                                 .font(Fontstyle.body2.crypto)
-                            Image(.lock).foregroundColor(Asset.crypto400.swiftUIColor)
+                            Image(.lock)
+                                .foregroundColor(Asset.crypto400.swiftUIColor)
                                 .font(Fontstyle.body2.crypto)
                         }
                     }.foregroundColor(Asset.crypto400.swiftUIColor)

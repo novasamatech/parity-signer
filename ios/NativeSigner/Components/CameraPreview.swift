@@ -14,8 +14,8 @@ struct CameraPreview: UIViewRepresentable {
             AVCaptureVideoPreviewLayer.self
         }
 
-        var videoPreviewLayer: AVCaptureVideoPreviewLayer {
-            layer as! AVCaptureVideoPreviewLayer // swiftlint:disable:this force_cast
+        var videoPreviewLayer: AVCaptureVideoPreviewLayer? {
+            layer as? AVCaptureVideoPreviewLayer
         }
     }
 
@@ -24,8 +24,8 @@ struct CameraPreview: UIViewRepresentable {
 
     func makeUIView(context _: Context) -> VideoPreviewView {
         let view = VideoPreviewView()
-        view.videoPreviewLayer.session = session
-        view.videoPreviewLayer.connection?.videoOrientation = .portrait
+        view.videoPreviewLayer?.session = session
+        view.videoPreviewLayer?.connection?.videoOrientation = .portrait
         return view
     }
 

@@ -74,7 +74,9 @@ struct KeyManager: View {
                     }
                 )
                 HStack {
-                    Text("DERIVED KEYS").foregroundColor(Asset.text300.swiftUIColor).font(Fontstyle.overline.base)
+                    Localizable.derivedKeys.text
+                        .foregroundColor(Asset.text300.swiftUIColor)
+                        .font(Fontstyle.overline.base)
                     Spacer()
                     Button(
                         action: {
@@ -85,7 +87,8 @@ struct KeyManager: View {
                             }
                         },
                         label: {
-                            Image(.plus, variant: .circle).imageScale(.large)
+                            Image(.plus, variant: .circle)
+                                .imageScale(.large)
                                 .foregroundColor(Asset.action400.swiftUIColor)
                         }
                     )

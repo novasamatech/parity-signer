@@ -18,7 +18,7 @@ struct NavbarShield: View {
                 navigationRequest(.init(action: .shield))
             },
             label: {
-                if canaryDead /* bluetooth detector: `|| data.bsDetector.canaryDead` */ {
+                if canaryDead {
                     Image(.shield, variant: .slash)
                         .imageScale(.large)
                         .foregroundColor(Asset.signalDanger.swiftUIColor)

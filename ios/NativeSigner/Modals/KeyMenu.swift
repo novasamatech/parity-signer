@@ -13,10 +13,10 @@ struct KeyMenu: View {
     let navigationRequest: NavigationRequest
     var body: some View {
         MenuStack {
-            HeaderBar(line1: "KEY MENU", line2: "Select action").padding(.top, 10)
+            HeaderBar(line1: Localizable.keyMenu.key, line2: Localizable.selectAction.key).padding(.top, 10)
             MenuButtonsStack {
                 BigButton(
-                    text: "Forget this key forever",
+                    text: Localizable.forgetThisKeyForever.key,
                     isShaded: true,
                     isDangerous: true,
                     action: {
@@ -27,11 +27,11 @@ struct KeyMenu: View {
         }
         .alert(isPresented: $removeConfirm, content: {
             Alert(
-                title: Text("Forget this key?"),
-                message: Text("This key will be removed for this network. Are you sure?"),
-                primaryButton: .cancel(Text("Cancel")),
+                title: Localizable.forgetThisKey.text,
+                message: Localizable.ThisKeyWillBeRemovedForThisNetwork.areYouSure.text,
+                primaryButton: .cancel(Localizable.cancel.text),
                 secondaryButton: .destructive(
-                    Text("Remove key"),
+                    Localizable.removeKey.text,
                     action: { navigationRequest(.init(action: .removeKey)) }
                 )
             )

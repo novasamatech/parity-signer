@@ -12,18 +12,27 @@ struct NetworkManager: View {
     let navigationRequest: NavigationRequest
     var body: some View {
         VStack {
-            Rectangle().frame(height: UIScreen.main.bounds.height / 3).opacity(0.0001)
+            Rectangle()
+                .frame(height: UIScreen.main.bounds.height / 3)
+                .opacity(0.0001)
                 .gesture(TapGesture().onEnded { _ in
                     navigationRequest(.init(action: .goBack))
                 })
             ZStack {
-                RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg000.swiftUIColor)
+                RoundedRectangle(cornerRadius: 20.0)
+                    .foregroundColor(Asset.bg000.swiftUIColor)
                 VStack {
                     Spacer()
-                    Rectangle().foregroundColor(Asset.bg000.swiftUIColor).frame(height: 25)
+                    Rectangle()
+                        .foregroundColor(Asset.bg000.swiftUIColor)
+                        .frame(height: 25)
                 }
                 VStack {
-                    HeaderBar(line1: "NETWORK", line2: "Select network").padding(10)
+                    HeaderBar(
+                        line1: Localizable.network.key,
+                        line2: Localizable.selectNetwork.key
+                    )
+                    .padding(10)
                     ScrollView {
                         LazyVStack {
                             ForEach(content.networks.sorted(by: { $0.order < $1.order }), id: \.order) { network in

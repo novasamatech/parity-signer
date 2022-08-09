@@ -10,7 +10,7 @@ import SwiftUI
 struct TCBitVec: View {
     let content: String
     var body: some View {
-        TCNameValueTemplate(name: "BitVec", value: content)
+        TCNameValueTemplate(name: Localizable.TCName.bitVec.string, value: content)
     }
 }
 

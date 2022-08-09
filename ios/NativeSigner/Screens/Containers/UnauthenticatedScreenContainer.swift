@@ -15,7 +15,7 @@ struct UnauthenticatedScreenContainer: View {
             action: { data.refreshSeeds() },
             label: {
                 BigButton(
-                    text: "Unlock app",
+                    text: Localizable.unlockApp.key,
                     action: {
                         data.refreshSeeds()
                         data.totalRefresh()

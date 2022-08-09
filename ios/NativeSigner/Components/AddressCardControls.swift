@@ -54,11 +54,11 @@ struct AddressCardControls: View {
                     .frame(width: rowHeight, height: rowHeight)
                     .alert(isPresented: $delete, content: {
                         Alert(
-                            title: Text("Delete key?"),
-                            message: Text("You are about to delete key"),
+                            title: Localizable.deleteKey.text,
+                            message: Localizable.youAreAboutToDeleteKey.text,
                             primaryButton: .cancel(),
                             secondaryButton: .destructive(
-                                Text("Delete"),
+                                Localizable.delete.text,
                                 action: { navigationRequest(.init(action: .removeKey)) }
                             )
                         )

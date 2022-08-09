@@ -57,7 +57,7 @@ struct TransactionCardSelector: View {
             case let .nonceCard(text):
                 TCNonce(content: text)
             case .noneCard:
-                Text("None")
+                Localizable.noneCapitalised.text
             case let .palletCard(text):
                 TCPallet(text: text)
             case let .textCard(text):

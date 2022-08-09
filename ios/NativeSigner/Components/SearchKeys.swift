@@ -17,7 +17,7 @@ struct SearchKeys: View {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(searchString.isEmpty ? Asset.action100.swiftUIColor : Asset.action400.swiftUIColor)
                     .frame(height: 39)
-                TextField("find keys", text: $searchString)
+                TextField(Localizable.findKeys.string, text: $searchString)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
                     .font(.system(size: 12, design: .monospaced))

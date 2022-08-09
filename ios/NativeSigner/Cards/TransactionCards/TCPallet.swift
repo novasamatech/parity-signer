@@ -11,7 +11,7 @@ struct TCPallet: View {
     let text: String
     @State private var showDoc = false
     var body: some View {
-        TCNameValueTemplate(name: "Pallet", value: text)
+        TCNameValueTemplate(name: Localizable.TCName.pallet.string, value: text)
     }
 }
 
