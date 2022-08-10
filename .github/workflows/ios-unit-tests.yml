@@ -61,6 +61,7 @@ jobs:
 
       - name:                 Rust Cache
         uses:                 Swatinem/rust-cache@v2.0.0
+          workspaces:         rust -> rust/target
 
       - name:                 Rust build
         shell:                bash
