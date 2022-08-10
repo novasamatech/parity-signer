@@ -1,0 +1,22 @@
+opt_out_usage
+xcversion(version: "~>13.4.0")
+default_platform(:ios)
+
+ENV["FASTLANE_XCODEBUILD_SETTINGS_RETRIES"] = "5"
+
+platform :ios do
+
+  # imports
+  import ("lanes/lane_tests.rb")
+
+  # shared variables
+  main_target = "NativeSigner"
+  main_scheme = "NativeSigner"
+
+  desc "Runs unit tests"
+  desc "Example usage: fastlane test_main"
+  lane :run_tests do
+    test_build scheme: main_scheme
+  end
+
+end
