@@ -52,7 +52,7 @@ jobs:
       - name:                 Rust Cache
         uses:                 Swatinem/rust-cache@v2.0.0
         with:
-          working-directory:  rust
+          workspaces:         rust -> rust/target
 
       - name:                 cargo nextest
         run:                  |
