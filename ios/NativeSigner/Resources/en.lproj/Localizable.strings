@@ -193,6 +193,7 @@
 "Key removed" = "Key removed";
 "Network verifier set" = "Network verifier set";
 "Metadata signed" = "Metadata signed";
+"Secret was exported" = "Secret was exported";
 "Types signed" = "Types signed";
 "QuestionMark" = "?";
 "Error.DocsParsing" = "docs parsing error in iOS, please refer to other sources";
@@ -234,6 +235,7 @@
 "HistoryCard.NetworkRemoved" = "Network removed";
 "HistoryCard.NetworkVerifier" = "Network verifier set";
 "HistoryCard.ResetDanger" = "Warnings acknowledged";
+"HistoryCard.SecretWasExported" = "Secret was exported";
 "HistoryCard.SeedCreated" = "Seed created";
 "HistoryCard.SeedRemoved" = "Seed removed";
 "HistoryCard.SeedShown" = "Seed was shown";

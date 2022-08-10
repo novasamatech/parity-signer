@@ -69,7 +69,7 @@ struct HistoryCard: View {
                 image: .init(.eye, variants: [.trianglebadge, .exclamationmark, .fill]),
                 timestamp: timestamp,
                 danger: true,
-                line1: "Secret was exported",
+                line1: Localizable.HistoryCard.secretWasExported.string,
                 line2: value.seedName + value.path
             )
         case let .metadataAdded(value):

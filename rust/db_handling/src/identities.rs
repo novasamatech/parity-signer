@@ -1212,7 +1212,7 @@ pub fn prepare_derivations_import(
 }
 
 #[cfg(feature = "signer")]
-pub(crate) fn prepare_secret_key_for_export(
+fn prepare_secret_key_for_export(
     multisigner: &MultiSigner,
     full_address: &str,
     pwd: Option<&str>,
@@ -1279,15 +1279,19 @@ pub fn export_secret_key(
             real_seed_name: address_details.seed_name,
         });
     }
-    let base58 = print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix));
+    if !address_details.network_id.contains(network_specs_key) {
+        return Err(Error::NetworkSpecsKeyForAddressNotFound {
+            network_specs_key: network_specs_key.to_owned(),
+            address_key,
+        });
+    }
     let public_key = multisigner_to_public(multisigner);
-    let identicon = make_identicon_from_multisigner(multisigner);
 
     let address = Address {
-        base58,
+        base58: print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix)),
         path: address_details.path.to_string(),
         has_pwd: address_details.has_pwd,
-        identicon,
+        identicon: make_identicon_from_multisigner(multisigner),
         seed_name: address_details.seed_name.to_string(),
         multiselect: None,
         secret_exposed: true,
@@ -1300,7 +1304,7 @@ pub fn export_secret_key(
 
     let database_addresses = get_addresses_by_seed_name(database_name, expected_seed_name)?;
 
-    let mark_as_exposed = exposed_set(
+    let exposed_addresses = exposed_set(
         &address_details.path,
         address_details.has_pwd,
         database_addresses,
@@ -1308,7 +1312,7 @@ pub fn export_secret_key(
 
     let mut identity_batch = Batch::default();
 
-    for (x_multisigner, x_address_details) in mark_as_exposed.into_iter() {
+    for (x_multisigner, x_address_details) in exposed_addresses.into_iter() {
         let mut new_address_details = x_address_details;
         new_address_details.secret_exposed = true;
         identity_batch.insert(
@@ -1330,49 +1334,13 @@ pub fn export_secret_key(
         }],
     )?;
 
-    let mut qr = {
-        if address_details.network_id.contains(network_specs_key) {
-            // create fixed-length string to avoid reallocations
-            let mut full_address =
-                String::with_capacity(seed_phrase.len() + address_details.path.len());
-            full_address.push_str(seed_phrase);
-            full_address.push_str(&address_details.path);
-
-            let mut secret = match prepare_secret_key_for_export(multisigner, &full_address, pwd) {
-                Ok(a) => {
-                    full_address.zeroize();
-                    a
-                }
-                Err(e) => {
-                    full_address.zeroize();
-                    return Err(e);
-                }
-            };
-
-            match png_qr_from_string(
-                &format!(
-                    "secret:0x{}:{}",
-                    hex::encode(&secret),
-                    hex::encode(&network_specs.genesis_hash)
-                ),
-                DataType::Sensitive,
-            ) {
-                Ok(a) => {
-                    secret.zeroize();
-                    a
-                }
-                Err(e) => {
-                    secret.zeroize();
-                    return Err(Error::Qr(e.to_string()));
-                }
-            }
-        } else {
-            return Err(Error::NetworkSpecsKeyForAddressNotFound {
-                network_specs_key: network_specs_key.to_owned(),
-                address_key,
-            });
-        }
-    };
+    let mut qr = generate_secret_qr(
+        multisigner,
+        &address_details,
+        &network_specs.genesis_hash,
+        seed_phrase,
+        pwd,
+    )?;
 
     if let Err(e) = TrDbCold::new()
         .set_addresses(identity_batch) // modify addresses
@@ -1389,6 +1357,43 @@ pub fn export_secret_key(
         network_info,
         address,
     })
+}
+
+#[cfg(feature = "signer")]
+fn generate_secret_qr(
+    multisigner: &MultiSigner,
+    address_details: &AddressDetails,
+    genesis_hash: &H256,
+    seed_phrase: &str,
+    pwd: Option<&str>,
+) -> Result<Vec<u8>> {
+    // create fixed-length string to avoid reallocations
+    let mut full_address = String::with_capacity(seed_phrase.len() + address_details.path.len());
+    full_address.push_str(seed_phrase);
+    full_address.push_str(&address_details.path);
+
+    let mut secret = match prepare_secret_key_for_export(multisigner, &full_address, pwd) {
+        Ok(a) => {
+            full_address.zeroize();
+            a
+        }
+        Err(e) => {
+            full_address.zeroize();
+            return Err(e);
+        }
+    };
+
+    let qr = png_qr_from_string(
+        &format!(
+            "secret:0x{}:{}",
+            hex::encode(&secret),
+            hex::encode(genesis_hash)
+        ),
+        DataType::Sensitive,
+    )
+    .map_err(|e| Error::Qr(e.to_string()));
+    secret.zeroize();
+    qr
 }
 
 #[cfg(test)]
