@@ -1,4 +1,4 @@
-name:                         Check on MacOS
+name:                         E2E Test
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
       - stable
 
 jobs:
-  ios-unit-tests:
+  check:
     name:                     Check on MacOS
     runs-on:                  macos-12
     steps:
