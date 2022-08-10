@@ -1,4 +1,4 @@
-name:                         iOS Unit Tests
+name:                         Check on MacOS
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   ios-unit-tests:
-    name:                     Run iOS Unit Tests
+    name:                     Check on MacOS
     runs-on:                  macos-12
     steps:
 
@@ -29,10 +29,10 @@ jobs:
 
       - name:                 Install dependencies
         run:                  |
-                              brew update
-                              brew install swiftgen
-                              brew install swiftformat
-                              brew install xcbeautify
+          brew update
+          brew install swiftgen
+          brew install swiftformat
+          brew install xcbeautify
 
       - name:                 Install Rust aarch64-apple-ios target
         uses:                 actions-rs/toolchain@v1.0.7
