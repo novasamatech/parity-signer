@@ -1331,7 +1331,7 @@
 				DEVELOPMENT_TEAM = HN8MSF5ULF;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
-				"EXCLUDED_ARCHS[sdk=*]" = arm64;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = NativeSigner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1343,7 +1343,7 @@
 					"$(PROJECT_DIR)/NativeSigner",
 				);
 				MARKETING_VERSION = 5.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner.testing;
+				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner-Bridging-Header.h";
@@ -1376,7 +1376,7 @@
 					"$(PROJECT_DIR)/NativeSigner",
 				);
 				MARKETING_VERSION = 5.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner.testing;
+				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner-Bridging-Header.h";
@@ -1394,7 +1394,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4GK8JWU7P9;
-				"EXCLUDED_ARCHS[sdk=*]" = arm64;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = NativeSignerTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
