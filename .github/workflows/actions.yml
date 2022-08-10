@@ -6,10 +6,11 @@ on:
     branches:
       - master
       - stable
+
 jobs:
   check:
     name:                     Check on MacOS
-    runs-on:                  macos-latest
+    runs-on:                  macos-12
     steps:
 
       - name:                 Cancel Previous Runs
@@ -23,12 +24,15 @@ jobs:
           fetch-depth:        50
           submodules:         'recursive'
 
+      - name:                 Setup - Xcode
+        run:                  sudo xcode-select -switch '/Applications/Xcode_13.4.1.app/Contents/Developer' && /usr/bin/xcodebuild -version
+
       - name:                 Install dependencies
         run:                  |
-          brew tap wix/brew
           brew update
-          brew install applesimutils
-          gem install xcpretty
+          brew install swiftgen
+          brew install swiftformat
+          brew install xcbeautify
 
       - name:                 Install Rust aarch64-apple-ios target
         uses:                 actions-rs/toolchain@v1.0.7
@@ -66,13 +70,14 @@ jobs:
           cd scripts
           ./build.sh ios
 
-      - name:                 Detox build
+      - name:                 Run tests
+        shell:                bash
         run:                  |
+          cd ios
           xcodebuild \
-            -workspace ios/NativeSigner.xcodeproj/project.xcworkspace \
-            -scheme NativeSigner \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            -derivedDataPath ios/build/NativeSigner \
-            -UseModernBuildSystem=YES | \
-              xcpretty -t && exit ${PIPESTATUS[0]}
+          -project NativeSigner.xcodeproj \
+          -scheme NativeSigner \
+          -sdk iphonesimulator \
+          -destination 'platform=iOS Simulator,name=iPhone 13' \
+          test \
+          | xcbeautify
