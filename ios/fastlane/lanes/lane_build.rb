@@ -56,12 +56,13 @@ lane :prepare_code_signing do |options|
 
   cert(
     api_key: api_key,
-    keychain_path: ENV["KEYCHAIN_PATH"] # the path to the keychain where your certificates are stored
+    keychain_path: ENV["KEYCHAIN_PATH"],
+    keychain_password: ENV["KEYCHAIN_PASSWORD"]
   )
   sigh(
     api_key: api_key,
     app_identifier: app_identifier,
     provisioning_name: profile_name,
-    force: true # always recreate this exact profile to ensure it's valid and not expired
+    force: false
  )
 end

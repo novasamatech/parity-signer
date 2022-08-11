@@ -25,19 +25,17 @@ platform :ios do
   desc "Distribute new iOS build through TestFlight"
   desc "Example usage: fastlane distribute_testflight"
   lane :distribute_testflight do
-    sh "cd ./../../scripts/ && ./build.sh ios"
-
-    #load_asc_api_key
-    # prepare_code_signing
-    # build_release(
-    #   scheme:main_scheme,
-    #   target:main_target,
-    #   configuration:configuration
-    # )
-    # upload_testflight(
-    #   scheme:main_scheme,
-    #   target:main_target,
-    #   configuration:configuration
-    # )
+    load_asc_api_key
+    prepare_code_signing
+    build_release(
+      scheme:main_scheme,
+      target:main_target,
+      configuration:configuration
+    )
+    upload_testflight(
+      scheme:main_scheme,
+      target:main_target,
+      configuration:configuration
+    )
   end
 end
