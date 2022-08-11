@@ -1,12 +1,14 @@
 name: Distribute TestFlight Build
 
-on:
-  push:
-    branches:
-      - fastlane-testflight-setup
 # on:
-#  workflow_dispatch:
+#  workflow_dispatch: 
 #
+# on:
+#   pull_request:
+#   push:
+#     branches:
+#       - master
+#       - stable
 
 jobs:
   distribute_testflight:
