@@ -77,7 +77,7 @@ use crate::network_specs::VerifierValue;
 /// Encryption algorithm
 ///
 /// Lists all encryption algorithms supported by Substrate
-#[derive(Clone, Debug, Decode, Encode, PartialEq)]
+#[derive(Clone, Debug, Decode, Encode, PartialEq, Eq)]
 pub enum Encryption {
     Ed25519,
     Sr25519,
@@ -104,7 +104,7 @@ impl Encryption {
 ///
 /// Stores no information on what data exactly is signed, supposedly user
 /// keeps track of what they are signing.  
-#[derive(Decode, Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub enum SufficientCrypto {
     /// `Ed25519` encryption algorithm
     Ed25519 {

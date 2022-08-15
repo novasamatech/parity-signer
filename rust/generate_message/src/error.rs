@@ -331,7 +331,7 @@ pub enum Error {
 }
 
 /// Errors on the active side with network specs received through RPC call
-#[derive(Debug, PartialEq, thiserror::Error)]
+#[derive(Debug, PartialEq, Eq, thiserror::Error)]
 pub enum SpecsError {
     /// Network base58 prefix information is not found neither in results of
     /// the `system_properties` RPC call, nor in `System` pallet of the metadata

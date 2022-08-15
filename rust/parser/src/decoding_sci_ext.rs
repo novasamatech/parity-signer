@@ -180,7 +180,7 @@ pub(crate) fn special_case_era(
     found_ext: &mut FoundExt,
     indent: u32,
 ) -> Result<DecodedOut> {
-    let (era_data, remaining_vector) = match data.get(0) {
+    let (era_data, remaining_vector) = match data.first() {
         Some(0) => (data[0..1].to_vec(), data[1..].to_vec()),
         Some(_) => match data.get(0..2) {
             Some(a) => (a.to_vec(), data[2..].to_vec()),

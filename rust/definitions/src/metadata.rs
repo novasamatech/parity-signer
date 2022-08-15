@@ -45,7 +45,7 @@ use crate::{
 /// Network information extracted from the metadata: name, version, optional
 /// base58 prefix, warning about extensions incompatible with transaction
 /// parsing for `RuntimeMetadata` with version 14 and above
-#[derive(Decode, Encode, PartialEq)]
+#[derive(Decode, Encode, PartialEq, Eq)]
 pub struct MetaInfo {
     /// Network name, from metadata `Version` constant  
     pub name: String,
@@ -69,7 +69,7 @@ pub struct MetaInfo {
 /// Metadata values: name, version, optional base58 prefix, warning about
 /// extensions incompatible with transaction parsing for `RuntimeMetadata` with
 /// version 14 and above, and metadata itself as raw `Vec<u8>`
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct MetaValues {
     /// Network name, from metadata `Version` constant  
     pub name: String,
@@ -432,7 +432,7 @@ impl MetaSetElement {
 ///
 /// `ADDRESS_BOOK` tree stores SCALE-encoded [`AddressBookEntry`] entries under
 /// keys [`AddressBookKey`]
-#[derive(Debug, Decode, Encode, PartialEq)]
+#[derive(Debug, Decode, Encode, PartialEq, Eq)]
 #[cfg(feature = "active")]
 pub struct AddressBookEntry {
     /// Network name, as it appears in `Version` constant in metadata  
@@ -499,7 +499,7 @@ impl AddressBookEntry {
 }
 
 /// `META_HISTORY` tree entry
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 #[cfg(feature = "active")]
 pub struct MetaHistoryEntry {
     /// network name, from key

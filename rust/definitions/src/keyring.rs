@@ -55,7 +55,7 @@ use crate::{
 /// Network could support more than one encryption algorithm. In this case
 /// there would be more than one database entry with different
 /// [`NetworkSpecsKey`] values. Such entries do not conflict.  
-#[derive(Decode, Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub struct NetworkSpecsKey(Vec<u8>);
 
 /// Decoded `NetworkSpecsKey` content, encryption-based variants with vector
@@ -123,7 +123,7 @@ impl NetworkSpecsKey {
 ///
 /// - network specs, for any encryption algorithm  
 /// - network metadata
-#[derive(Decode, Encode, Debug, Clone, PartialEq)]
+#[derive(Decode, Encode, Debug, Clone, PartialEq, Eq)]
 pub struct VerifierKey(H256);
 
 impl VerifierKey {
@@ -180,7 +180,7 @@ impl VerifierKey {
 /// For the user interface these addresses would appear as separate entities,
 /// however, the database stores them under same [`AddressKey`], with a set of
 /// allowed networks.  
-#[derive(Decode, Encode, Debug, PartialEq, Clone)]
+#[derive(Decode, Encode, Debug, PartialEq, Eq, Clone)]
 pub struct AddressKey(Vec<u8>);
 
 /// Decoded `AddressKey` content, struct with `MultiSigner` inside  
@@ -347,7 +347,7 @@ impl MetaKeyPrefix {
 ///
 /// Order is generated from the number of the history entry in the database
 /// `HISTORY` tree.  
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Order(u32);
 
 impl Order {

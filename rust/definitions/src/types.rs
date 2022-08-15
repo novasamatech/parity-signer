@@ -22,7 +22,7 @@
 use parity_scale_codec::{Decode, Encode};
 
 /// Information each type has to have: type name and description
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Clone)]
 pub struct TypeEntry {
     /// type name, as it appears in the metadata
     pub name: String,
@@ -34,7 +34,7 @@ pub struct TypeEntry {
 /// Type description
 ///
 /// Must be available for all types
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Clone)]
 pub enum Description {
     /// type is a type alias
     Type(String),
@@ -49,7 +49,7 @@ pub enum Description {
 /// Enum variant description
 ///
 /// Must be available for each variant of the enum.
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Clone)]
 pub struct EnumVariant {
     /// enum variant name, will be displayed during the parsing if the variant is encountered
     pub variant_name: String,
@@ -59,7 +59,7 @@ pub struct EnumVariant {
 }
 
 /// Types of enum variants
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Clone)]
 pub enum EnumVariantType {
     None,
     Type(String),
@@ -69,7 +69,7 @@ pub enum EnumVariantType {
 /// Struct field description
 ///
 /// Must be available for each field if the struct.
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Clone)]
 pub struct StructField {
     /// struct field name, if it exists, it will be displayed during the parsing if the struct is encountered
     pub field_name: Option<String>,
