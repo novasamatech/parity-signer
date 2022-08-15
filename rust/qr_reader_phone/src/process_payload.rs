@@ -3,7 +3,7 @@ use constants::CHUNK_SIZE;
 use raptorq;
 use std::convert::TryInto;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub struct Fountain {
     decoder: raptorq::Decoder,
     collected_ser_packets: Vec<Vec<u8>>,
@@ -17,26 +17,26 @@ impl Fountain {
     }
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub struct LegacyMulti {
     length: u16,
     elements: Vec<Element>,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub struct Element {
     number: u16,
     contents: Vec<u8>,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum InProgress {
     None,
     Fountain(Fountain),
     LegacyMulti(LegacyMulti),
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum Ready {
     NotYet(InProgress),
     Yes(Vec<u8>),
@@ -92,11 +92,9 @@ pub fn process_decoded_payload(
                     Ok(Ready::NotYet(InProgress::Fountain(in_progress)))
                 }
             }
-            InProgress::LegacyMulti(_) => {
-                return Err(anyhow!(
-                    "Was decoding legacy multi-element qr, and got interrupted by a fountain one."
-                ))
-            }
+            InProgress::LegacyMulti(_) => Err(anyhow!(
+                "Was decoding legacy multi-element qr, and got interrupted by a fountain one."
+            )),
         }
     } else if payload.starts_with(&[0]) {
         //            println!("dealing with part of legacy dynamic multi-element qr code");
@@ -126,11 +124,9 @@ pub fn process_decoded_payload(
                     None => Ok(Ready::NotYet(InProgress::LegacyMulti(collected))),
                 }
             }
-            InProgress::Fountain(_) => {
-                return Err(anyhow!(
+            InProgress::Fountain(_) => Err(anyhow!(
                 "Was decoding fountain qr code, and got interrupted by a legacy multi-element one."
-            ))
-            }
+            )),
             InProgress::LegacyMulti(mut collected) => {
                 if collected.length != length {
                     return Err(anyhow!("Was decoding legacy multi-element qr code with {} elements, got interrupted by legacy multi-element qr code with {} elements", collected.length, length));
@@ -154,9 +150,9 @@ pub fn process_decoded_payload(
     } else if let InProgress::None = decoding {
         Ok(Ready::Yes(payload))
     } else {
-        return Err(anyhow!(
+        Err(anyhow!(
             "Was reading dynamic qr, and got interrupted by a static one."
-        ));
+        ))
     }
 }
 

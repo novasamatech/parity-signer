@@ -107,7 +107,7 @@ pub fn make_pretty_qr(input: &[u8], output_name: &str) -> Result<(), Box<dyn std
         let qr = png_qr(input)?;
         match std::fs::write(output_name, &qr) {
             Ok(_) => Ok(()),
-            Err(e) => return Err(Box::from(format!("Output error {}", e))),
+            Err(e) => Err(Box::from(format!("Output error {}", e))),
         }
     } else {
         transform_into_qr_apng(input, output_name)

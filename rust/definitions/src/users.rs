@@ -23,7 +23,7 @@ use crate::{
 ///
 /// Info that should be available for any address key.  
 /// No secrets are stored there.  
-#[derive(Decode, PartialEq, Encode, Debug, Clone)]
+#[derive(Decode, PartialEq, Eq, Encode, Debug, Clone)]
 pub struct AddressDetails {
     /// seed name (as it is known to the Signer device)  
     pub seed_name: String,
