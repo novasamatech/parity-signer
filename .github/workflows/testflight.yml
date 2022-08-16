@@ -1,17 +1,11 @@
 name: Distribute TestFlight Build
 
-# on:
-#  workflow_dispatch: 
-#
-# on:
-#   pull_request:
-#   push:
-#     branches:
-#       - master
-#       - stable
+on:
+ workflow_dispatch:
 
 jobs:
   distribute_testflight:
+    if: contains('["krodak","prybalko", "montekki"]', github.actor) 
     runs-on:                  macos-12
     name:                     Distribute TestFlight Build
 
