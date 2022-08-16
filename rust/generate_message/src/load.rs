@@ -15,7 +15,7 @@
 //! hot database entries
 use sp_core::H256;
 
-use constants::{EXPORT_FOLDER, HOT_DB_NAME, METATREE};
+use constants::{EXPORT_FOLDER, METATREE};
 use db_handling::helpers::{get_meta_values_by_name_version, open_db, open_tree};
 use definitions::{error::MetadataError, keyring::MetaKeyPrefix, metadata::MetaValues};
 
@@ -26,6 +26,7 @@ use crate::helpers::{
     MetaValuesStamped, SortedMetaValues, Write,
 };
 use crate::parser::{Content, InstructionMeta, Set};
+use crate::HOT_DB_PATH;
 
 /// Process `load_metadata` command according to the [`InstructionMeta`]
 /// received from the command line.
@@ -223,7 +224,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
 /// - Output raw bytes payload file
 fn meta_f_a_element(set_element: &AddressSpecs) -> Result<()> {
     let meta_key_prefix = MetaKeyPrefix::from_name(&set_element.name);
-    let database = open_db(HOT_DB_NAME)?;
+    let database = open_db(HOT_DB_PATH.to_str().unwrap())?;
     let metadata = open_tree(&database, METATREE)?;
     for x in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
         let meta_values = MetaValues::from_entry_checked(x)?;
@@ -575,7 +576,8 @@ pub fn unwasm(filename: &str, update_db: bool) -> Result<()> {
 /// Generate text file with hex string metadata, from a hot database
 /// [`METATREE`] entry, for `defaults` crate.
 pub fn meta_default_file(name: &str, version: u32) -> Result<()> {
-    let meta_values = get_meta_values_by_name_version(HOT_DB_NAME, name, version)?;
+    let meta_values =
+        get_meta_values_by_name_version(HOT_DB_PATH.to_str().unwrap(), name, version)?;
     let filename = format!("{}/{}{}", EXPORT_FOLDER, name, version);
     std::fs::write(&filename, hex::encode(meta_values.meta))?;
     Ok(())

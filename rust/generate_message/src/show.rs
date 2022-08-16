@@ -1,5 +1,4 @@
 //! Utils to display the database content and to verify default metadata files
-use constants::HOT_DB_NAME;
 use db_handling::helpers::try_get_meta_values_by_name_version;
 use definitions::{
     metadata::{AddressBookEntry, MetaValues},
@@ -12,6 +11,7 @@ use crate::helpers::{
     address_book_content, meta_history_content, network_specs_from_entry, network_specs_from_title,
     read_metadata_database,
 };
+use crate::HOT_DB_PATH;
 
 /// Display all metadata currently stored in the hot database.
 ///
@@ -145,7 +145,11 @@ pub fn check_file(path: String) -> Result<()> {
     // `MetaValues` from metadata in file
     let from_file = MetaValues::from_str_metadata(meta_str.trim())?;
 
-    match try_get_meta_values_by_name_version(HOT_DB_NAME, &from_file.name, from_file.version)? {
+    match try_get_meta_values_by_name_version(
+        HOT_DB_PATH.to_str().unwrap(),
+        &from_file.name,
+        from_file.version,
+    )? {
         // network metadata for same network name and version is in the database
         Some(from_database) => {
             if from_database.meta == from_file.meta {

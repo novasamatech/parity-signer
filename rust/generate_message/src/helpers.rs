@@ -5,9 +5,10 @@ use sled::Batch;
 use sp_core::H256;
 use std::{cmp::Ordering, convert::TryInto};
 
+use crate::HOT_DB_PATH;
 use constants::{
-    add_specs, load_metadata, ADDRESS_BOOK, COLOR, EXPORT_FOLDER, HOT_DB_NAME, METATREE,
-    META_HISTORY, SECONDARY_COLOR, SPECSTREEPREP,
+    add_specs, load_metadata, ADDRESS_BOOK, COLOR, EXPORT_FOLDER, METATREE, META_HISTORY,
+    SECONDARY_COLOR, SPECSTREEPREP,
 };
 use db_handling::{
     db_transactions::TrDbHot,
@@ -29,7 +30,7 @@ use crate::parser::Token;
 
 /// Get [`AddressBookEntry`] from the database for given address book title.
 pub fn get_address_book_entry(title: &str) -> Result<AddressBookEntry> {
-    let database = open_db(HOT_DB_NAME)?;
+    let database = open_db(HOT_DB_PATH.to_str().unwrap())?;
     let address_book = open_tree(&database, ADDRESS_BOOK)?;
     match address_book.get(AddressBookKey::from_title(title).key())? {
         Some(a) => Ok(AddressBookEntry::from_entry_with_title(title, &a)?),
@@ -72,7 +73,7 @@ pub fn network_specs_from_entry(
 pub fn try_get_network_specs_to_send(
     network_specs_key: &NetworkSpecsKey,
 ) -> Result<Option<NetworkSpecsToSend>> {
-    let database = open_db(HOT_DB_NAME)?;
+    let database = open_db(HOT_DB_PATH.to_str().unwrap())?;
     let chainspecs = open_tree(&database, SPECSTREEPREP)?;
     match chainspecs.get(network_specs_key.key())? {
         Some(specs_encoded) => Ok(Some(NetworkSpecsToSend::from_entry_with_key_checked(
@@ -130,7 +131,7 @@ pub fn db_upd_network(address: &str, network_specs: &NetworkSpecsToSend) -> Resu
     TrDbHot::new()
         .set_address_book(address_book_batch)
         .set_network_specs_prep(network_specs_prep_batch)
-        .apply(HOT_DB_NAME)?;
+        .apply(HOT_DB_PATH.to_str().unwrap())?;
     Ok(())
 }
 
@@ -158,7 +159,7 @@ pub enum Write {
 
 /// Get all [`ADDRESS_BOOK`] entries with address book titles.
 pub fn address_book_content() -> Result<Vec<(String, AddressBookEntry)>> {
-    let database = open_db(HOT_DB_NAME)?;
+    let database = open_db(HOT_DB_PATH.to_str().unwrap())?;
     let address_book = open_tree(&database, ADDRESS_BOOK)?;
     let mut out: Vec<(String, AddressBookEntry)> = Vec::new();
     for x in address_book.iter().flatten() {
@@ -207,7 +208,7 @@ pub fn genesis_hash_in_hot_db(genesis_hash: H256) -> Result<Option<AddressBookEn
 /// Check if [`ADDRESS_BOOK`] has entries with given `name` and title other than
 /// `except_title`.
 pub fn is_specname_in_db(name: &str, except_title: &str) -> Result<bool> {
-    let database = open_db(HOT_DB_NAME)?;
+    let database = open_db(HOT_DB_PATH.to_str().unwrap())?;
     let address_book = open_tree(&database, ADDRESS_BOOK)?;
     let mut out = false;
     for x in address_book.iter().flatten() {
@@ -222,7 +223,7 @@ pub fn is_specname_in_db(name: &str, except_title: &str) -> Result<bool> {
 
 /// Get all entries from `META_HISTORY`.
 pub fn meta_history_content() -> Result<Vec<MetaHistoryEntry>> {
-    let database = open_db(HOT_DB_NAME)?;
+    let database = open_db(HOT_DB_PATH.to_str().unwrap())?;
     let meta_history = open_tree(&database, META_HISTORY)?;
     let mut out: Vec<MetaHistoryEntry> = Vec::new();
     for x in meta_history.iter().flatten() {
@@ -243,7 +244,7 @@ pub struct MetaValuesStamped {
 
 /// Collect all [`MetaValuesStamped`] from the hot database.
 pub fn read_metadata_database() -> Result<Vec<MetaValuesStamped>> {
-    let database = open_db(HOT_DB_NAME)?;
+    let database = open_db(HOT_DB_PATH.to_str().unwrap())?;
     let metadata = open_tree(&database, METATREE)?;
     let meta_history = open_tree(&database, META_HISTORY)?;
     let mut out: Vec<MetaValuesStamped> = Vec::new();
@@ -496,7 +497,7 @@ pub fn prepare_metadata() -> Result<SortedMetaValues> {
 ///
 /// Update [`META_HISTORY`] tree.
 pub fn db_upd_metadata(sorted_meta_values: SortedMetaValues) -> Result<()> {
-    let mut metadata_batch = make_batch_clear_tree(HOT_DB_NAME, METATREE)?;
+    let mut metadata_batch = make_batch_clear_tree(HOT_DB_PATH.to_str().unwrap(), METATREE)?;
     let mut meta_history_batch = Batch::default();
     let mut all_meta = sorted_meta_values.newer;
     all_meta.extend_from_slice(&sorted_meta_values.older);
@@ -510,7 +511,7 @@ pub fn db_upd_metadata(sorted_meta_values: SortedMetaValues) -> Result<()> {
     TrDbHot::new()
         .set_metadata(metadata_batch)
         .set_meta_history(meta_history_batch)
-        .apply(HOT_DB_NAME)?;
+        .apply(HOT_DB_PATH.to_str().unwrap())?;
 
     Ok(())
 }

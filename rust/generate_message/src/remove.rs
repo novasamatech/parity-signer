@@ -55,7 +55,7 @@
 //!
 //! If one of the default networks gets removed, it could be added back,
 //! however, it will not be marked as default anymore.
-use constants::{HOT_DB_NAME, METATREE, META_HISTORY};
+use constants::{METATREE, META_HISTORY};
 use db_handling::{
     db_transactions::TrDbHot,
     helpers::{get_meta_values_by_name_version, open_db, open_tree},
@@ -66,6 +66,7 @@ use sled::Batch;
 use crate::error::Result;
 use crate::helpers::{get_address_book_entry, is_specname_in_db};
 use crate::parser::Remove;
+use crate::HOT_DB_PATH;
 
 /// Remove information from the database.
 pub fn remove_info(info: Remove) -> Result<()> {
@@ -98,7 +99,7 @@ pub fn remove_info(info: Remove) -> Result<()> {
             // except the one currently being removed, the metadata and
             // the block history entries get removed
             if !is_specname_in_db(&address_book_entry.name, &network_title)? {
-                let database = open_db(HOT_DB_NAME)?;
+                let database = open_db(HOT_DB_PATH.to_str().unwrap())?;
                 let metadata = open_tree(&database, METATREE)?;
                 let meta_history = open_tree(&database, META_HISTORY)?;
                 let meta_key_prefix = MetaKeyPrefix::from_name(&address_book_entry.name);
@@ -116,18 +117,18 @@ pub fn remove_info(info: Remove) -> Result<()> {
                 .set_metadata(metadata_batch)
                 .set_meta_history(meta_history_batch)
                 .set_network_specs_prep(network_specs_prep_batch)
-                .apply(HOT_DB_NAME)?;
+                .apply(HOT_DB_PATH.to_str().unwrap())?;
         }
 
         // network metadata by network name and version
         Remove::SpecNameVersion { name, version } => {
             let mut metadata_batch = Batch::default();
-            get_meta_values_by_name_version(HOT_DB_NAME, &name, version)?;
+            get_meta_values_by_name_version(HOT_DB_PATH.to_str().unwrap(), &name, version)?;
             let meta_key = MetaKey::from_parts(&name, version);
             metadata_batch.remove(meta_key.key());
             TrDbHot::new()
                 .set_metadata(metadata_batch)
-                .apply(HOT_DB_NAME)?;
+                .apply(HOT_DB_PATH.to_str().unwrap())?;
         }
     };
 
