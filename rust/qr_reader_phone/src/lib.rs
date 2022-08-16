@@ -13,7 +13,7 @@ pub fn get_payload(line: &str, cleaned: bool) -> anyhow::Result<Vec<u8>> {
     if cleaned {
         match hex::decode(&line) {
             Ok(a) => Ok(a),
-            Err(_) => return Err(anyhow!("Not hex")),
+            Err(_) => Err(anyhow!("Not hex")),
         }
     } else {
         if !line.starts_with('4') {
@@ -31,7 +31,7 @@ pub fn get_payload(line: &str, cleaned: bool) -> anyhow::Result<Vec<u8>> {
         match line.get(5..5 + msg_length * 2) {
             Some(a) => match hex::decode(&a) {
                 Ok(b) => Ok(b),
-                Err(_) => return Err(anyhow!("Not hex")),
+                Err(_) => Err(anyhow!("Not hex")),
             },
             None => {
                 // fast fix for qr codes with version below 10
@@ -48,9 +48,9 @@ pub fn get_payload(line: &str, cleaned: bool) -> anyhow::Result<Vec<u8>> {
                 match line.get(3..3 + msg_length * 2) {
                     Some(a) => match hex::decode(&a) {
                         Ok(b) => Ok(b),
-                        Err(_) => return Err(anyhow!("Not hex")),
+                        Err(_) => Err(anyhow!("Not hex")),
                     },
-                    None => return Err(anyhow!("Length error")),
+                    None => Err(anyhow!("Length error")),
                 }
             }
         }
@@ -110,7 +110,7 @@ pub fn decode_sequence(jsonline: &str, cleaned: bool) -> anyhow::Result<String> 
     }
     match final_result {
         Some(a) => Ok(a),
-        None => return Err(anyhow!("Was unable to decode on given dataset")),
+        None => Err(anyhow!("Was unable to decode on given dataset")),
     }
 }
 

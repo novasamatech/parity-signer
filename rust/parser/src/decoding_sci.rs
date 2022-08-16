@@ -510,7 +510,7 @@ pub(crate) fn decoding_sci_entry_point(
     mut indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut> {
-    let pallet_index: u8 = *data.get(0).ok_or(ParserDecodingError::DataTooShort)?;
+    let pallet_index: u8 = *data.first().ok_or(ParserDecodingError::DataTooShort)?;
 
     let mut found_call_type: Option<u32> = None;
     let mut found_pallet_name: Option<String> = None;
@@ -741,7 +741,7 @@ fn decode_type_def_variant(
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut> {
-    let enum_index = *data.get(0).ok_or(ParserDecodingError::DataTooShort)?;
+    let enum_index = *data.first().ok_or(ParserDecodingError::DataTooShort)?;
 
     let check = is_option_bool(found_ty, meta_v14);
     if check.is_option {
