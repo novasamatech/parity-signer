@@ -1065,6 +1065,7 @@
 //!
 //! `$ cargo run meta-at-block --url wss://westend-rpc.polkadot.io --block
 //! 780812df50c4006d1865742269fe4ca339c097e61d6279cce91ebc58f5aebada`
+#![deny(unused)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
 use constants::{load_types, COLD_DB_NAME_RELEASE, HOT_DB_NAME};
