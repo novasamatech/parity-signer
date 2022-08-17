@@ -25,21 +25,20 @@ pub fn base_cmd() -> Command {
     Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap()
 }
 
-pub fn assert_cmd_stdout(command: &str, output: &'static str, db_path: &str) {
+pub fn assert_cmd_stdout(command: &str, output: &'static str) {
     base_cmd()
         .args(&command.split(' ').collect::<Vec<&str>>())
-        .env("HOT_DB_PATH", db_path)
         .assert()
         .success()
         .code(0)
         .stdout(output);
 }
 
-pub fn run_cmd_test(command: &str, output: &'static str) {
-    let db_path = format!("./tests/{}", command.replace('/', "_"));
-    setup(&db_path);
-    assert_cmd_stdout(command, output, &db_path);
-    teardown(&db_path);
+pub fn run_cmd_test(command: &str, output: &'static str, db_path: &str) {
+    let cmd = &format!("{} --hot-db-path {}", command, db_path);
+    setup(db_path);
+    assert_cmd_stdout(cmd, output);
+    teardown(db_path);
 }
 
 pub fn assert_files_eq<P: AsRef<Path>>(f1: P, f2: P) {

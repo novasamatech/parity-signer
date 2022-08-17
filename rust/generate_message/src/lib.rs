@@ -1068,13 +1068,11 @@
 #![deny(unused)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use constants::{load_types, COLD_DB_NAME_RELEASE, HOT_DB_NAME};
+use constants::{load_types, COLD_DB_NAME_RELEASE};
 use db_handling::{
     default_cold_release, default_hot,
     helpers::{prep_types, transfer_metadata_to_cold},
 };
-use lazy_static::lazy_static;
-use std::path::PathBuf;
 
 mod derivations;
 use derivations::process_derivations;
@@ -1098,35 +1096,32 @@ use specs::gen_add_specs;
 mod error;
 pub use error::{Error, Result};
 
-lazy_static! {
-    pub(crate) static ref HOT_DB_PATH: PathBuf =
-        PathBuf::from(std::env::var("HOT_DB_PATH").unwrap_or_else(|_| HOT_DB_NAME.to_string()));
-}
-
 /// Process incoming command as interpreted by parser.
 pub fn full_run(command: Command) -> Result<()> {
     match command {
-        Command::Show(x) => match x {
-            Show::Metadata => show_metadata(),
-            Show::Networks => show_networks(),
-            Show::Specs { s: title } => show_specs(title),
-            Show::CheckFile { s: path } => check_file(path),
-            Show::BlockHistory => show_block_history(),
+        Command::Show { s: show, db_path } => match show {
+            Show::Metadata => show_metadata(db_path),
+            Show::Networks => show_networks(db_path),
+            Show::Specs { s: title } => show_specs(title, db_path),
+            Show::CheckFile { s: path } => check_file(path, db_path),
+            Show::BlockHistory => show_block_history(db_path),
         },
         Command::Specs { s: instruction } => gen_add_specs(instruction),
         Command::Load(instruction) => gen_load_meta(instruction),
-        Command::Types => Ok(prep_types(HOT_DB_PATH.to_str().unwrap())?.write(&load_types())?),
+        Command::Types { db_path } => {
+            Ok(prep_types(db_path.to_str().unwrap())?.write(&load_types())?)
+        }
         Command::Sign(make) | Command::Make(make) => make_message(make),
-        Command::Remove(info) => remove_info(info),
-        Command::RestoreDefaults => Ok(default_hot(Some(HOT_DB_PATH.clone()))?),
+        Command::Remove { r: info, db_path } => remove_info(info, db_path),
+        Command::RestoreDefaults { db_path } => Ok(default_hot(Some(db_path))?),
         Command::MakeColdRelease { path } => Ok(default_cold_release(path)?),
-        Command::TransferMetaToColdRelease { path } => {
+        Command::TransferMetaToColdRelease { path, hot_db_path } => {
             let cold_database_path = match path {
                 Some(ref path) => path.to_str().unwrap_or(COLD_DB_NAME_RELEASE),
                 None => COLD_DB_NAME_RELEASE,
             };
             Ok(transfer_metadata_to_cold(
-                HOT_DB_PATH.to_str().unwrap(),
+                hot_db_path.to_str().unwrap(),
                 cold_database_path,
             )?)
         }
@@ -1135,8 +1130,13 @@ pub fn full_run(command: Command) -> Result<()> {
         Command::Unwasm {
             filename,
             update_db,
-        } => unwasm(&filename, update_db),
-        Command::MetaDefaultFile { name, version } => meta_default_file(&name, version),
+            db_path,
+        } => unwasm(&filename, update_db, db_path),
+        Command::MetaDefaultFile {
+            name,
+            version,
+            db_path,
+        } => meta_default_file(&name, version, db_path),
         Command::MetaAtBlock { url, block_hash } => debug_meta_at_block(&url, &block_hash),
     }
 }

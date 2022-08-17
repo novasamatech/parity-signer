@@ -1,5 +1,5 @@
 //! Command line parser for the client
-use constants::FOLDER;
+use constants::{FOLDER, HOT_DB_NAME};
 use definitions::{
     crypto::{Encryption, SufficientCrypto},
     helpers::unhex,
@@ -22,8 +22,14 @@ pub struct Cli {
 #[derive(Debug, Subcommand)]
 pub enum Command {
     /// Display content of the a given tree of the hot database
-    #[clap(subcommand)]
-    Show(Show),
+    Show {
+        #[clap(subcommand)]
+        s: Show,
+
+        /// Path to the hot database
+        #[clap(long= "hot-db-path", global = true, value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        db_path: PathBuf,
+    },
 
     /// Prepare payload for add-specs update
     ///
@@ -52,7 +58,11 @@ pub enum Command {
 
     /// Prepare payload for load-types update
     #[clap(name = "load-types")]
-    Types,
+    Types {
+        /// Path to hot db
+        #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        db_path: PathBuf,
+    },
 
     /// Complete update generation according
     Make(Make),
@@ -75,8 +85,14 @@ pub enum Command {
     /// - all associated meta block history entries from
     /// [`META_HISTORY`](constants::META_HISTORY) if there are no other address book
     /// entries this block history entries are associated with
-    #[clap(subcommand)]
-    Remove(Remove),
+    Remove {
+        #[clap(subcommand)]
+        r: Remove,
+
+        /// Path to the hot database
+        #[clap(long= "hot-db-path", global=true,value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        db_path: PathBuf,
+    },
 
     /// Restore hot database to default state
     ///
@@ -93,7 +109,11 @@ pub enum Command {
     /// [`META_HISTORY`](constants::META_HISTORY)
     ///
     /// Default networks are Polkadot, Kusama, and Westend.
-    RestoreDefaults,
+    RestoreDefaults {
+        /// Path to hot db
+        #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        db_path: PathBuf,
+    },
 
     /// Generate release cold database at optionally provided path
     ///
@@ -133,6 +153,10 @@ pub enum Command {
     TransferMetaToColdRelease {
         /// Path to release db
         path: Option<PathBuf>,
+
+        /// Path to hot db
+        #[clap(long, default_value = HOT_DB_NAME)]
+        hot_db_path: PathBuf,
     },
 
     /// Make derivations import QR and/or hexadecimal string file
@@ -173,6 +197,10 @@ pub enum Command {
         /// update the DB.
         #[clap(long, short)]
         update_db: bool,
+
+        /// Hot database path
+        #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        db_path: PathBuf,
     },
 
     /// Make file with hexadecimal metadata for defaults release metadata set
@@ -191,6 +219,10 @@ pub enum Command {
         /// Version
         #[clap(long, value_name = "NETWORK VERSION")]
         version: u32,
+
+        /// Hot database path
+        #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        db_path: PathBuf,
     },
 
     /// Create file with network metadata at block hash
@@ -248,6 +280,10 @@ pub struct InstructionMeta {
     /// Reference key, as read from command line
     #[clap(flatten)]
     pub content: ContentArgs,
+
+    /// Path to the hot database
+    #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+    pub db: PathBuf,
 }
 
 impl From<SetFlags> for Set {
@@ -279,6 +315,10 @@ pub struct InstructionSpecs {
 
     #[clap(flatten)]
     pub content: ContentArgs,
+
+    /// Path to the hot database
+    #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+    pub db: PathBuf,
 }
 
 #[derive(clap::Args, Debug, Default, Clone)]
@@ -629,6 +669,10 @@ pub struct Derivations {
     /// Contents of the payload file
     #[clap(long)]
     pub derivations: String,
+
+    /// Path to the hot database
+    #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+    pub db: PathBuf,
 }
 
 /// Overrides for `add_specs` command.

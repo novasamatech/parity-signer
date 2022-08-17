@@ -12,6 +12,7 @@ fn it_derives() {
     run_cmd_test(
         "derivations --title polkadot --goal text --derivations //1",
         "Found and used 1 valid derivations:\n\"//1\"\n",
+        "./tests/derivations",
     );
 
     assert_files_eq(&expected_text, &result_path);

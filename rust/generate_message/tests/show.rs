@@ -6,6 +6,7 @@ fn it_shows_block_history() {
     run_cmd_test(
         "show block-history",
         "Database has no metadata fetch history entries on record.\n",
+        "./tests/it_shows_block_history",
     );
 }
 
@@ -16,6 +17,7 @@ fn it_shows_networks() {
         "Address book has entries for following networks:
 
 polkadot at wss://rpc.polkadot.io, encryption sr25519, Signer display title Polkadot\n",
+        "./tests/it_shows_networks",
     );
 }
 
@@ -29,6 +31,7 @@ kusama 2030, metadata hash efaa97434a2e971067e5819f6f80e892daeb2711ac0544a4e8260
 westend 9000, metadata hash e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce, no block hash on record
 westend 9010, metadata hash 70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf, no block hash on record
 polkadot 30, metadata hash 93b9065e4a6b8327ca1ce90e9ac3d7d967a660dcc5cda408e2595aa3e5c1ab46, no block hash on record\n",
+        "./tests/it_shows_metadata",
         );
 }
 
@@ -48,5 +51,6 @@ path_id: //polkadot
 secondary_color: #262626
 title: Polkadot
 unit: DOT\n",
+        "./tests/it_shows_specs",
     );
 }
