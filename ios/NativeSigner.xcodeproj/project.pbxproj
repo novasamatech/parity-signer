@@ -1044,6 +1044,7 @@
 				$PROJECT_DIR/$TARGET_NAME/Generated/Assets.swift,
 				$PROJECT_DIR/$TARGET_NAME/Generated/Fonts.swift,
 				$PROJECT_DIR/$TARGET_NAME/Generated/Localizable.swift,
+				$PROJECT_DIR/$TARGET_NAME/Generated/ApplicationInformation.swift,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
