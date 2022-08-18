@@ -24,6 +24,7 @@ final class NavigationCoordinator: ObservableObject {
     private var isActionAvailable = true
 
     /// Action handler
+    ///
     /// Screen state is stored here
     @Published var actionResult: ActionResult = ActionResult(
         screenLabel: "",
@@ -36,6 +37,12 @@ final class NavigationCoordinator: ObservableObject {
         modalData: nil,
         alertData: .none
     )
+
+    /// Stores view model of currently selected tab
+    ///
+    /// This should preceed information from `ActionResult.footerButton` as `FooterButton` enum contains also `back` value which is irrelevant to bottom navigation system that mimics system `TabView`
+    /// This should be removed once navigation is moved to native system.
+    @Published var selectedTab: Tab = .keys
 
     init(
         backendActionPerformer: BackendNavigationPerforming = BackendNavigationAdapter(),
@@ -58,6 +65,9 @@ extension NavigationCoordinator {
             seedPhrase: navigation.seedPhrase
         ) {
             self.actionResult = actionResult
+            if let tab = Tab(actionResult.footerButton), tab != selectedTab {
+                selectedTab = tab
+            }
         }
 
         debounceQueue.asyncAfter(deadline: .now() + Constants.debounceTime, flags: .barrier) {
