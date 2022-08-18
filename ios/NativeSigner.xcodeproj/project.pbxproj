@@ -177,6 +177,7 @@
 		6DDEF11828AD4215004CA2FD /* TabTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF11728AD4215004CA2FD /* TabTests.swift */; };
 		6DDEF11C28AE2DF3004CA2FD /* TabViewModelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF11B28AE2DF3004CA2FD /* TabViewModelBuilder.swift */; };
 		6DDEF12228AE38A1004CA2FD /* TabViewModelBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF12128AE38A1004CA2FD /* TabViewModelBuilderTests.swift */; };
+		6DDEF13C28AE7A30004CA2FD /* ApplicationInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF13B28AE7A30004CA2FD /* ApplicationInformation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -368,6 +369,7 @@
 		6DDEF11728AD4215004CA2FD /* TabTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTests.swift; sourceTree = "<group>"; };
 		6DDEF11B28AE2DF3004CA2FD /* TabViewModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelBuilder.swift; sourceTree = "<group>"; };
 		6DDEF12128AE38A1004CA2FD /* TabViewModelBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelBuilderTests.swift; sourceTree = "<group>"; };
+		6DDEF13B28AE7A30004CA2FD /* ApplicationInformation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationInformation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -392,6 +394,7 @@
 		2D75EF9E280F02B900C48FAF /* Generated */ = {
 			isa = PBXGroup;
 			children = (
+				6DDEF13B28AE7A30004CA2FD /* ApplicationInformation.swift */,
 				6D01997D289D238700F4C317 /* Localizable.swift */,
 				6D4C0755289B369200B2EE48 /* Assets.swift */,
 				6D4C0751289AC36100B2EE48 /* Fonts.swift */,
@@ -1120,6 +1123,7 @@
 				2DAA829B2788596C002917C0 /* TCNonce.swift in Sources */,
 				2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */,
 				2D6A9F84278C8275000DAE64 /* TCNetworkInfo.swift in Sources */,
+				6DDEF13C28AE7A30004CA2FD /* ApplicationInformation.swift in Sources */,
 				6D57DC74289E525F00005C63 /* ScreenSelectorView.swift in Sources */,
 				04197D2B276BA40C003485D2 /* MenuElements.swift in Sources */,
 				2DA5F86927566C3600D8DD29 /* TCEraImmortal.swift in Sources */,
