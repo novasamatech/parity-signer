@@ -155,7 +155,7 @@ pub enum Command {
         path: Option<PathBuf>,
 
         /// Path to hot db
-        #[clap(long, default_value = HOT_DB_NAME)]
+        #[clap(long, value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
         hot_db_path: PathBuf,
     },
 

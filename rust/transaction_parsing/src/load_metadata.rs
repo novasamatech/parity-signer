@@ -14,6 +14,7 @@ use definitions::{
     network_specs::{ValidCurrentVerifier, Verifier},
     qr_transfers::ContentLoadMeta,
 };
+use std::path::Path;
 
 use crate::cards::{Card, Warning};
 use crate::check_signature::pass_crypto;
@@ -26,17 +27,21 @@ enum FirstCard {
     VerifierCard(TransactionCard),
 }
 
-pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<TransactionAction> {
+pub fn load_metadata<P>(data_hex: &str, db_path: P) -> Result<TransactionAction>
+where
+    P: AsRef<Path>,
+{
     let checked_info = pass_crypto(data_hex, TransferContent::LoadMeta)?;
     let (meta, genesis_hash) = ContentLoadMeta::from_slice(&checked_info.message).meta_genhash()?;
     let meta_values = MetaValues::from_slice_metadata(&meta)?;
-    let general_verifier = get_general_verifier(database_name)?;
+    let general_verifier = get_general_verifier(&db_path)?;
     let verifier_key = VerifierKey::from_parts(genesis_hash);
-    let valid_current_verifier = try_get_valid_current_verifier(&verifier_key, database_name)?
-        .ok_or(Error::LoadMetaUnknownNetwork {
+    let valid_current_verifier = try_get_valid_current_verifier(&verifier_key, &db_path)?.ok_or(
+        Error::LoadMetaUnknownNetwork {
             name: meta_values.name.clone(),
-        })?;
-    let specs_invariants = genesis_hash_in_specs(genesis_hash, &open_db(database_name)?)?.ok_or(
+        },
+    )?;
+    let specs_invariants = genesis_hash_in_specs(genesis_hash, &open_db(&db_path)?)?.ok_or(
         Error::LoadMetaNoSpecs {
             name: meta_values.name.clone(),
             valid_current_verifier: valid_current_verifier.clone(),
@@ -160,9 +165,9 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<TransactionA
             FirstCard::VerifierCard(Card::Verifier(new_verifier_value).card(&mut index, 0))
         }
     };
-    if accept_meta_values(&meta_values, database_name)? {
+    if accept_meta_values(&meta_values, &db_path)? {
         stub = stub.add_metadata(&meta_values);
-        let checksum = stub.store_and_get_checksum(database_name)?;
+        let checksum = stub.store_and_get_checksum(&db_path)?;
         let meta_display = MetaValuesDisplay::get(&meta_values);
         let meta_card = Card::Meta(meta_display).card(&mut index, 0);
         match first_card {

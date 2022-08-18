@@ -33,7 +33,7 @@ pub fn get_address_book_entry<P>(title: &str, db_path: P) -> Result<AddressBookE
 where
     P: AsRef<Path>,
 {
-    let database = open_db(db_path.as_ref().to_str().unwrap())?;
+    let database = open_db(db_path)?;
     let address_book = open_tree(&database, ADDRESS_BOOK)?;
     match address_book.get(AddressBookKey::from_title(title).key())? {
         Some(a) => Ok(AddressBookEntry::from_entry_with_title(title, &a)?),
@@ -87,7 +87,7 @@ pub fn try_get_network_specs_to_send<P>(
 where
     P: AsRef<Path>,
 {
-    let database = open_db(db_path.as_ref().to_str().unwrap())?;
+    let database = open_db(db_path)?;
     let chainspecs = open_tree(&database, SPECSTREEPREP)?;
     match chainspecs.get(network_specs_key.key())? {
         Some(specs_encoded) => Ok(Some(NetworkSpecsToSend::from_entry_with_key_checked(
@@ -156,7 +156,7 @@ where
     TrDbHot::new()
         .set_address_book(address_book_batch)
         .set_network_specs_prep(network_specs_prep_batch)
-        .apply(db_path.as_ref().to_str().unwrap())?;
+        .apply(db_path)?;
     Ok(())
 }
 
@@ -187,7 +187,7 @@ pub fn address_book_content<P>(db_path: P) -> Result<Vec<(String, AddressBookEnt
 where
     P: AsRef<Path>,
 {
-    let database = open_db(db_path.as_ref().to_str().unwrap())?;
+    let database = open_db(db_path)?;
     let address_book = open_tree(&database, ADDRESS_BOOK)?;
     let mut out: Vec<(String, AddressBookEntry)> = Vec::new();
     for x in address_book.iter().flatten() {
@@ -248,7 +248,7 @@ pub fn is_specname_in_db<P>(name: &str, except_title: &str, db_path: P) -> Resul
 where
     P: AsRef<Path>,
 {
-    let database = open_db(db_path.as_ref().to_str().unwrap())?;
+    let database = open_db(db_path)?;
     let address_book = open_tree(&database, ADDRESS_BOOK)?;
     let mut out = false;
     for x in address_book.iter().flatten() {
@@ -266,7 +266,7 @@ pub fn meta_history_content<P>(db_path: P) -> Result<Vec<MetaHistoryEntry>>
 where
     P: AsRef<Path>,
 {
-    let database = open_db(db_path.as_ref().to_str().unwrap())?;
+    let database = open_db(db_path)?;
     let meta_history = open_tree(&database, META_HISTORY)?;
     let mut out: Vec<MetaHistoryEntry> = Vec::new();
     for x in meta_history.iter().flatten() {
@@ -290,7 +290,7 @@ pub fn read_metadata_database<P>(db_path: P) -> Result<Vec<MetaValuesStamped>>
 where
     P: AsRef<Path>,
 {
-    let database = open_db(db_path.as_ref().to_str().unwrap())?;
+    let database = open_db(db_path)?;
     let metadata = open_tree(&database, METATREE)?;
     let meta_history = open_tree(&database, META_HISTORY)?;
     let mut out: Vec<MetaValuesStamped> = Vec::new();
@@ -549,7 +549,7 @@ pub fn db_upd_metadata<P>(sorted_meta_values: SortedMetaValues, db_path: P) -> R
 where
     P: AsRef<Path>,
 {
-    let mut metadata_batch = make_batch_clear_tree(db_path.as_ref().to_str().unwrap(), METATREE)?;
+    let mut metadata_batch = make_batch_clear_tree(&db_path, METATREE)?;
     let mut meta_history_batch = Batch::default();
     let mut all_meta = sorted_meta_values.newer;
     all_meta.extend_from_slice(&sorted_meta_values.older);
@@ -563,7 +563,7 @@ where
     TrDbHot::new()
         .set_metadata(metadata_batch)
         .set_meta_history(meta_history_batch)
-        .apply(db_path.as_ref().to_str().unwrap())?;
+        .apply(&db_path)?;
 
     Ok(())
 }

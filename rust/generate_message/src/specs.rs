@@ -488,7 +488,6 @@ mod tests {
     use super::*;
     use crate::parser::{ContentArgs, Override, SetFlags};
     use constants::{FOLDER, HOT_DB_NAME};
-    use std::path::PathBuf;
 
     // The aim is to check that RPC calls are going through for "officially
     // approved" networks. Although the blanket fetch test was nice, not all
@@ -518,7 +517,7 @@ mod tests {
                     token_unit: None,
                     token_decimals: None,
                 },
-                db: PathBuf::from(HOT_DB_NAME),
+                db: HOT_DB_NAME.into(),
             };
             match gen_add_specs(instruction) {
                 Ok(()) => (),

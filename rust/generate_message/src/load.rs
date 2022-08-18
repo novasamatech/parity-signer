@@ -227,7 +227,7 @@ where
     P: AsRef<Path>,
 {
     let meta_key_prefix = MetaKeyPrefix::from_name(&set_element.name);
-    let database = open_db(db_path.as_ref().to_str().unwrap())?;
+    let database = open_db(db_path)?;
     let metadata = open_tree(&database, METATREE)?;
     for x in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
         let meta_values = MetaValues::from_entry_checked(x)?;
@@ -607,8 +607,7 @@ pub fn meta_default_file<P>(name: &str, version: u32, db_path: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
-    let meta_values =
-        get_meta_values_by_name_version(db_path.as_ref().to_str().unwrap(), name, version)?;
+    let meta_values = get_meta_values_by_name_version(db_path, name, version)?;
     let filename = format!("{}/{}{}", EXPORT_FOLDER, name, version);
     std::fs::write(&filename, hex::encode(meta_values.meta))?;
     Ok(())
