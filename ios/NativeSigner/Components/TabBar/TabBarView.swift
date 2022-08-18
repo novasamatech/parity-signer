@@ -58,6 +58,7 @@ private struct TabBarButton: View {
                 VStack {
                     viewModel.icon
                         .frame(height: 28, alignment: .center)
+                        .padding(.bottom, -4)
                     viewModel.label
                         .font(Fontstyle.captionS.base)
                 }
