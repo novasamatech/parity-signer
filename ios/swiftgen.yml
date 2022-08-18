@@ -6,6 +6,13 @@ fonts:
     outputs:
       templateName: swift5
       output: Fonts.swift
+plist:
+  - inputs: ./NativeSigner/Info.plist
+    outputs:
+      templateName: runtime-swift5
+      output: ApplicationInformation.swift
+      params:
+          enumName: ApplicationInformation
 strings:
     - inputs: ./NativeSigner/Resources/en.lproj/Localizable.strings
       outputs:
