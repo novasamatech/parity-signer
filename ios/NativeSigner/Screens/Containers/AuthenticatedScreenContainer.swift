@@ -30,17 +30,11 @@ struct AuthenticatedScreenContainer: View {
                     }
                 })
             )
-            // Certain places are better off without footer
             if navigation.actionResult.footer {
-                Footer(
-                    footerButton: navigation.actionResult.footerButton,
-                    navigationRequest: { navigationRequest in
-                        navigation.perform(navigation: navigationRequest)
-                    }
+                TabBarView(
+                    navigation: navigation,
+                    selectedTab: $navigation.selectedTab
                 )
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-                .background(Asset.bg000.swiftUIColor)
             }
         }
         .gesture(
