@@ -2,7 +2,7 @@
 
 use definitions::{keyring::NetworkSpecsKey, navigation::MSCContent};
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub enum Modal {
     Backup(String),
     NewSeedMenu,

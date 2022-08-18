@@ -294,7 +294,7 @@ use crate::navigation::MVerifierDetails;
 ///
 /// These network parameters must be in Signer database for the Signer to be
 /// able to operate with this network.
-#[derive(Decode, Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub struct NetworkSpecs {
     /// Network-specific prefix for address representation in
     /// [base58 format](https://docs.rs/sp-core/6.0.0/sp_core/crypto/trait.Ss58Codec.html#method.to_ss58check_with_version)  
@@ -342,7 +342,7 @@ pub struct NetworkSpecs {
 /// in `add_specs` messages
 ///
 /// These network parameters are sufficient to add network into Signer database.
-#[derive(Decode, Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub struct NetworkSpecsToSend {
     /// Network-specific prefix for address representation in
     /// [base58 format](https://docs.rs/sp-core/6.0.0/sp_core/crypto/trait.Ss58Codec.html#method.to_ss58check_with_version)  
@@ -383,7 +383,7 @@ pub struct NetworkSpecsToSend {
 }
 
 /// Network parameters needed to decode and display transaction
-#[derive(Decode, Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub struct ShortSpecs {
     /// Network-specific prefix for address representation in
     /// [base58 format](https://docs.rs/sp-core/6.0.0/sp_core/crypto/trait.Ss58Codec.html#method.to_ss58check_with_version)  
@@ -541,7 +541,7 @@ impl NetworkSpecsToSend {
 
 /// Network properties that must be fetched with RPC call for properties
 /// in each compatible network
-#[derive(Decode, Encode, PartialEq, Debug)]
+#[derive(Decode, Encode, PartialEq, Eq, Debug)]
 #[cfg(feature = "active")]
 pub struct NetworkProperties {
     pub base58prefix: u16,
@@ -552,7 +552,7 @@ pub struct NetworkProperties {
 /// Verifier information
 ///
 /// Either real verifier or information that there is no verifier.
-#[derive(Decode, Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub struct Verifier {
     pub v: Option<VerifierValue>,
 }
@@ -560,7 +560,7 @@ pub struct Verifier {
 /// Information on known and existing verifier  
 ///
 /// Verifier public key with associated encryption algorithm.
-#[derive(Decode, Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub enum VerifierValue {
     /// public key for standard substrate-compatible encryption algorithms  
     Standard { m: MultiSigner },
@@ -631,7 +631,7 @@ impl VerifierValue {
 }
 
 /// Current network verifier
-#[derive(Decode, Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub enum CurrentVerifier {
     /// Verifier is valid, Signer can use the network
     Valid(ValidCurrentVerifier),
@@ -645,7 +645,7 @@ pub enum CurrentVerifier {
 ///
 /// Could be general verifier (by default for networks Polkadot, Kusama, Westend),
 /// or custom verifier.
-#[derive(Decode, Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub enum ValidCurrentVerifier {
     /// Network has general verifier
     General,
