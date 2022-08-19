@@ -48,8 +48,6 @@
 		2D6A9F84278C8275000DAE64 /* TCNetworkInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
-		2D75EFA1280F163700C48FAF /* signer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D75EFA0280F163700C48FAF /* signer.swift */; };
-		2D7803232819BE7700E4D01E /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D7803222819BE7600E4D01E /* libsigner.a */; };
 		2D78032528294D4C00E4D01E /* ShieldAlertComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D78032428294D4C00E4D01E /* ShieldAlertComponent.swift */; };
 		2D7A7BCE26BBC5690053C1E0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */; };
 		2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BD326BBEAF00053C1E0 /* Canary.swift */; };
@@ -177,8 +175,28 @@
 		6DDEF11828AD4215004CA2FD /* TabTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF11728AD4215004CA2FD /* TabTests.swift */; };
 		6DDEF11C28AE2DF3004CA2FD /* TabViewModelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF11B28AE2DF3004CA2FD /* TabViewModelBuilder.swift */; };
 		6DDEF12228AE38A1004CA2FD /* TabViewModelBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF12128AE38A1004CA2FD /* TabViewModelBuilderTests.swift */; };
+		6DDEF13228AE6039004CA2FD /* signer.udl in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF12E28AE5EDA004CA2FD /* signer.udl */; };
 		6DDEF13C28AE7A30004CA2FD /* ApplicationInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF13B28AE7A30004CA2FD /* ApplicationInformation.swift */; };
+		6DEEA87E28AFBF5D00371ECA /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DEEA87D28AFBF5D00371ECA /* libsigner.a */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXBuildRule section */
+		6DDEF12B28AE5D8F004CA2FD /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.udl";
+			fileType = pattern.proxy;
+			inputFiles = (
+			);
+			isEditable = 1;
+			outputFiles = (
+				"$(PROJECT_DIR)/NativeSigner/Generated/$(INPUT_FILE_BASE).swift",
+				"$(PROJECT_DIR)/NativeSigner/Generated/$(INPUT_FILE_BASE)FFI.h",
+			);
+			runOncePerArchitecture = 0;
+			script = "$HOME/.cargo/bin/uniffi-bindgen generate $INPUT_FILE_PATH --language swift --out-dir $PROJECT_DIR/NativeSigner/Generated\n";
+		};
+/* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
 		2DE72BD026A588C9002BB752 /* PBXContainerItemProxy */ = {
@@ -233,9 +251,6 @@
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
 		2D75EF9C280EC3B000C48FAF /* NativeSigner-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NativeSigner-Bridging-Header.h"; sourceTree = "<group>"; };
-		2D75EFA0280F163700C48FAF /* signer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = signer.swift; sourceTree = "<group>"; };
-		2D75EFA2280F164000C48FAF /* signerFFI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = signerFFI.h; sourceTree = "<group>"; };
-		2D7803222819BE7600E4D01E /* libsigner.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsigner.a; sourceTree = "<group>"; };
 		2D78032428294D4C00E4D01E /* ShieldAlertComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldAlertComponent.swift; sourceTree = "<group>"; };
 		2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LaunchScreen.xib; path = NativeSigner/LaunchScreen.xib; sourceTree = "<group>"; };
 		2D7A7BD326BBEAF00053C1E0 /* Canary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Canary.swift; path = NativeSigner/Components/Canary.swift; sourceTree = SOURCE_ROOT; };
@@ -369,7 +384,11 @@
 		6DDEF11728AD4215004CA2FD /* TabTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTests.swift; sourceTree = "<group>"; };
 		6DDEF11B28AE2DF3004CA2FD /* TabViewModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelBuilder.swift; sourceTree = "<group>"; };
 		6DDEF12128AE38A1004CA2FD /* TabViewModelBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelBuilderTests.swift; sourceTree = "<group>"; };
+		6DDEF12E28AE5EDA004CA2FD /* signer.udl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = signer.udl; path = ../../../rust/signer/src/signer.udl; sourceTree = "<group>"; };
+		6DDEF13328AE6542004CA2FD /* signerFFI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = signerFFI.h; sourceTree = "<group>"; };
+		6DDEF13428AE6542004CA2FD /* signer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = signer.swift; sourceTree = "<group>"; };
 		6DDEF13B28AE7A30004CA2FD /* ApplicationInformation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationInformation.swift; sourceTree = "<group>"; };
+		6DEEA87D28AFBF5D00371ECA /* libsigner.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsigner.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -377,7 +396,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2D7803232819BE7700E4D01E /* libsigner.a in Frameworks */,
+				6DEEA87E28AFBF5D00371ECA /* libsigner.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -394,12 +413,12 @@
 		2D75EF9E280F02B900C48FAF /* Generated */ = {
 			isa = PBXGroup;
 			children = (
+				6DDEF13428AE6542004CA2FD /* signer.swift */,
+				6DDEF13328AE6542004CA2FD /* signerFFI.h */,
 				6DDEF13B28AE7A30004CA2FD /* ApplicationInformation.swift */,
 				6D01997D289D238700F4C317 /* Localizable.swift */,
 				6D4C0755289B369200B2EE48 /* Assets.swift */,
 				6D4C0751289AC36100B2EE48 /* Fonts.swift */,
-				2D75EFA2280F164000C48FAF /* signerFFI.h */,
-				2D75EFA0280F163700C48FAF /* signer.swift */,
 			);
 			path = Generated;
 			sourceTree = "<group>";
@@ -587,10 +606,10 @@
 		2DE72BC026A588C7002BB752 /* NativeSigner */ = {
 			isa = PBXGroup;
 			children = (
+				6DEEA87D28AFBF5D00371ECA /* libsigner.a */,
 				6D5801CE28991301006C41D8 /* Core */,
 				6D019963289BEE5200F4C317 /* Design */,
 				6DBD21F5289A7983005D539B /* Extensions */,
-				2D7803222819BE7600E4D01E /* libsigner.a */,
 				2DA5F899275F86B600D8DD29 /* Alerts */,
 				2D7A7BE126C3FB680053C1E0 /* Docs */,
 				2D7A7BC826BA97AE0053C1E0 /* Components */,
@@ -718,6 +737,7 @@
 		6D57DC56289E524800005C63 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				6DDEF12E28AE5EDA004CA2FD /* signer.udl */,
 				6D57DC57289E524800005C63 /* Localizable.strings */,
 				6D57DC59289E524800005C63 /* Assets.xcassets */,
 				6D57DC5C289E524800005C63 /* Templates */,
@@ -903,6 +923,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2DE72BE326A588C9002BB752 /* Build configuration list for PBXNativeTarget "NativeSigner" */;
 			buildPhases = (
+				6DDEF13528AE65D7004CA2FD /* Build libsigner.a */,
+				6DDEF13A28AE744F004CA2FD /* Generate Database */,
 				6D4C0750289AC2F400B2EE48 /* Run SwiftGen */,
 				6DBD21F0289983DB005D539B /* Run Code Formatter */,
 				2D75EF99280EACC800C48FAF /* Run Linter */,
@@ -911,6 +933,7 @@
 				2DE72BBC26A588C7002BB752 /* Resources */,
 			);
 			buildRules = (
+				6DDEF12B28AE5D8F004CA2FD /* PBXBuildRule */,
 			);
 			dependencies = (
 			);
@@ -1068,6 +1091,46 @@
 			shellPath = /bin/sh;
 			shellScript = "if which swiftformat >/dev/null; then\n    swiftformat .\nelse\n    echo \"warning: swiftformat not installed, download from https://github.com/nicklockwood/SwiftFormat\"\nfi\n";
 		};
+		6DDEF13528AE65D7004CA2FD /* Build libsigner.a */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(PROJECT_DIR)/scripts/build_libsigner.sh",
+			);
+			name = "Build libsigner.a";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(PROJECT_DIR)/Frameworks/libsigner.a",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash $PROJECT_DIR/scripts/build_libsigner.sh\n";
+		};
+		6DDEF13A28AE744F004CA2FD /* Generate Database */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(PROJECT_DIR)/scripts/generate_database.sh",
+			);
+			name = "Generate Database";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(PROJECT_DIR)/Database/Database/",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash $PROJECT_DIR/scripts/generate_database.sh\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1075,6 +1138,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6DDEF13228AE6039004CA2FD /* signer.udl in Sources */,
 				2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */,
 				2D48F3DE277E4BEC004B27BE /* SmallButton.swift in Sources */,
 				2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */,
@@ -1092,7 +1156,6 @@
 				2DA5F86327566C3600D8DD29 /* TCCall.swift in Sources */,
 				2D48F3A0276C8D5E004B27BE /* LogMenu.swift in Sources */,
 				2DAA82A127885BAF002917C0 /* TCDefault.swift in Sources */,
-				2D75EFA1280F163700C48FAF /* signer.swift in Sources */,
 				2DAA82A327885C2E002917C0 /* TCIdentityField.swift in Sources */,
 				2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */,
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
@@ -1402,6 +1465,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/NativeSigner",
+					"$(PROJECT_DIR)/NativeSigner/Frameworks",
 				);
 				MARKETING_VERSION = 5.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
@@ -1435,6 +1499,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/NativeSigner",
+					"$(PROJECT_DIR)/NativeSigner/Frameworks",
 				);
 				MARKETING_VERSION = 5.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
