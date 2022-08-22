@@ -14,8 +14,6 @@ struct SettingsScreen: View {
     let doWipe: () -> Void
     let navigationRequest: NavigationRequest
 
-    private let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-
     var body: some View {
         VStack(spacing: 2) {
             Button(
@@ -111,7 +109,7 @@ struct SettingsScreen: View {
                 }
             )
             SettingsCardTemplate(
-                text: LocalizedStringKey(Localizable.appVersion(appVersion ?? "")),
+                text: LocalizedStringKey(Localizable.appVersion(ApplicationInformation.cfBundleShortVersionString)),
                 withIcon: false,
                 withBackground: false
             )
