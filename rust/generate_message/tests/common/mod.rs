@@ -6,18 +6,24 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
-pub fn setup(db_path: &str) {
-    if std::fs::remove_dir_all(db_path).is_ok() {}
+pub fn setup<P>(db_path: P)
+where
+    P: AsRef<Path>,
+{
+    if std::fs::remove_dir_all(&db_path).is_ok() {}
     TrDbHot::new()
         .set_address_book(data::address_book())
         .set_network_specs_prep(data::network_specs_prep())
         .set_metadata(data::metadata())
         .set_settings(data::settings())
-        .apply(db_path)
+        .apply(&db_path)
         .unwrap();
 }
 
-pub fn teardown(db_path: &str) {
+pub fn teardown<P>(db_path: P)
+where
+    P: AsRef<Path>,
+{
     if std::fs::remove_dir_all(db_path).is_ok() {}
 }
 
@@ -32,13 +38,6 @@ pub fn assert_cmd_stdout(command: &str, output: &'static str) {
         .success()
         .code(0)
         .stdout(output);
-}
-
-pub fn run_cmd_test(command: &str, output: &'static str, db_path: &str) {
-    let cmd = &format!("{} --hot-db-path {}", command, db_path);
-    setup(db_path);
-    assert_cmd_stdout(cmd, output);
-    teardown(db_path);
 }
 
 pub fn assert_files_eq<P: AsRef<Path>>(f1: P, f2: P) {

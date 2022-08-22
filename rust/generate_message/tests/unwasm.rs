@@ -1,37 +1,21 @@
 pub mod common;
-use crate::common::{assert_cmd_stdout, remove_if_exists, setup, teardown};
-use constants::FOLDER;
-use std::fs;
-use std::path::Path;
+use crate::common::{assert_cmd_stdout, assert_files_eq, setup, teardown};
+
+use std::path::PathBuf;
 
 #[test]
 fn it_unwasm() {
-    let db_path = "./tests/unwasm";
-    setup(db_path);
-
-    let f_path = format!("{}/sign_me_load_metadata_polkadotV9270", FOLDER);
-    remove_if_exists(&f_path);
+    let files_dir = PathBuf::from("./tests/it_unwasm");
+    setup(&files_dir);
 
     let cmd = format!(
-        "unwasm --filename ./tests/for_tests/polkadot.wasm --update-db --hot-db-path {}",
-        db_path
+        "unwasm --filename ./tests/for_tests/polkadot.wasm --update-db --hot-db-path {0} --files-dir {0}",
+        files_dir.to_string_lossy()
     );
     assert_cmd_stdout(&cmd, "Unwasmed new metadata polkadot9270\n");
 
-    // Confirm that the new metadata is in the database.
-    assert_cmd_stdout(
-        &format!("show metadata --hot-db-path {}", db_path),
-        "Database has metadata information for following networks:
-
-kusama 2030, metadata hash efaa97434a2e971067e5819f6f80e892daeb2711ac0544a4e8260d4ff0c14270, no block hash on record
-westend 9000, metadata hash e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce, no block hash on record
-westend 9010, metadata hash 70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf, no block hash on record
-polkadot 30, metadata hash 93b9065e4a6b8327ca1ce90e9ac3d7d967a660dcc5cda408e2595aa3e5c1ab46, no block hash on record
-polkadot 9270, metadata hash 01dfb0d5c7bebc31f1027cfd6bdc2a50295b3e39ee97e19156471044597ee20b, no block hash on record\n",
-        );
-
-    let f_path = format!("{}/sign_me_load_metadata_polkadotV9270", FOLDER);
-    assert!(Path::new(&f_path).exists());
-    fs::remove_file(&f_path).unwrap();
-    teardown(db_path);
+    let result_file = files_dir.join("sign_me_load_metadata_polkadotV9270");
+    let expected_file = PathBuf::from("./tests/for_tests/sign_me_load_metadata_polkadotV9270");
+    assert_files_eq(&result_file, &expected_file);
+    teardown(&files_dir);
 }

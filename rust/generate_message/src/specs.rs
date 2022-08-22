@@ -40,7 +40,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
 
                 // process each entry
                 for (_, address_book_entry) in address_book_set.iter() {
-                    specs_f_a_element(address_book_entry, &instruction.db)?;
+                    specs_f_a_element(address_book_entry, &instruction.db, &instruction.files_dir)?;
                 }
                 Ok(())
             }
@@ -64,6 +64,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
                     instruction.over.encryption,
                     instruction.over.title,
                     instruction.db,
+                    instruction.files_dir,
                 )
             }
 
@@ -108,6 +109,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
                         encryption.clone(),
                         instruction.over.token(),
                         instruction.over.title.clone(),
+                        &instruction.files_dir,
                     )
                 } else {
                     Err(Error::NotSupported)
@@ -143,7 +145,13 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // Payload files are not created.
             Content::Name { s: name } => {
                 // using this command makes sense only if there is some override
-                specs_pt_n(&name, instruction.over, false, &instruction.db)
+                specs_pt_n(
+                    &name,
+                    instruction.over,
+                    false,
+                    &instruction.db,
+                    &instruction.files_dir,
+                )
             }
 
             // `$ cargo run add_specs -p -u network_url_address
@@ -168,6 +176,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
                         instruction.over.title,
                         false,
                         instruction.db,
+                        instruction.files_dir,
                     )
                 } else {
                     Err(Error::NotSupported)
@@ -193,7 +202,13 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // displayed network title
             //
             // Payload files are created.
-            Content::Name { s: name } => specs_pt_n(&name, instruction.over, true, instruction.db),
+            Content::Name { s: name } => specs_pt_n(
+                &name,
+                instruction.over,
+                true,
+                instruction.db,
+                instruction.files_dir,
+            ),
 
             // `$ cargo run add_specs -u network_url_address
             // <encryption override> <optional token override>`
@@ -218,6 +233,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
                         instruction.over.title,
                         true,
                         instruction.db,
+                        instruction.files_dir,
                     )
                 } else {
                     Err(Error::NotSupported)
@@ -233,12 +249,12 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
 /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) from
 /// the database using information in address book entry
 /// - Output raw bytes payload file
-fn specs_f_a_element<P>(entry: &AddressBookEntry, db_path: P) -> Result<()>
+fn specs_f_a_element<P>(entry: &AddressBookEntry, db_path: P, files_dir: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
     let network_specs = network_specs_from_entry(entry, db_path)?;
-    add_specs_print(&network_specs)
+    add_specs_print(&network_specs, files_dir)
 }
 
 /// `add_specs -f -n <address_book_title> <override(s)>`
@@ -256,6 +272,7 @@ fn specs_f_n<P>(
     optional_encryption_override: Option<Encryption>,
     optional_signer_title_override: Option<String>,
     db_path: P,
+    files_dir: P,
 ) -> Result<()>
 where
     P: AsRef<Path>,
@@ -267,7 +284,7 @@ where
                 if let Some(new_title) = optional_signer_title_override {
                     network_specs.title = new_title
                 }
-                add_specs_print(&network_specs)
+                add_specs_print(&network_specs, &files_dir)
             } else {
                 network_specs.title = optional_signer_title_override.unwrap_or(format!(
                     "{}-{}",
@@ -275,10 +292,10 @@ where
                     encryption.show()
                 ));
                 network_specs.encryption = encryption;
-                add_specs_print(&network_specs)
+                add_specs_print(&network_specs, &files_dir)
             }
         }
-        None => add_specs_print(&network_specs),
+        None => add_specs_print(&network_specs, &files_dir),
     }
 }
 
@@ -292,19 +309,23 @@ where
 /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) with
 /// fetched values, user overrides and defaults
 /// - Output raw bytes payload file
-fn specs_d_u(
+fn specs_d_u<P>(
     address: &str,
     encryption: Encryption,
     optional_token_override: Option<Token>,
     optional_signer_title_override: Option<String>,
-) -> Result<()> {
+    files_dir: P,
+) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let specs = specs_agnostic(
         address,
         encryption,
         optional_token_override,
         optional_signer_title_override,
     )?;
-    add_specs_print(&specs)
+    add_specs_print(&specs, &files_dir)
 }
 
 /// `add_specs <-p/-t> -n <address_book_title> <override(s)>`
@@ -334,7 +355,13 @@ fn specs_d_u(
 /// the title under which Signer displays the network, is also constructed as
 /// `<network_name>-<encryption>` for non-default networks, unless overridden by
 /// the user.
-fn specs_pt_n<P>(title: &str, over: Override, printing: bool, db_path: P) -> Result<()>
+fn specs_pt_n<P>(
+    title: &str,
+    over: Override,
+    printing: bool,
+    db_path: P,
+    files_dir: P,
+) -> Result<()>
 where
     P: AsRef<Path>,
 {
@@ -407,12 +434,12 @@ where
             db_path,
         )?;
         if printing {
-            add_specs_print(&network_specs_to_change)
+            add_specs_print(&network_specs_to_change, &files_dir)
         } else {
             Ok(())
         }
     } else if printing {
-        add_specs_print(&network_specs_to_change)
+        add_specs_print(&network_specs_to_change, &files_dir)
     } else {
         Err(Error::SpecsInDb {
             name: address_book_entry.name,
@@ -448,6 +475,7 @@ fn specs_pt_u<P>(
     optional_signer_title_override: Option<String>,
     printing: bool,
     db_path: P,
+    files_dir: P,
 ) -> Result<()>
 where
     P: AsRef<Path>,
@@ -476,7 +504,7 @@ where
         None => {
             db_upd_network(address, &specs, &db_path)?;
             if printing {
-                add_specs_print(&specs)?
+                add_specs_print(&specs, &files_dir)?
             }
             Ok(())
         }
@@ -518,6 +546,7 @@ mod tests {
                     token_decimals: None,
                 },
                 db: HOT_DB_NAME.into(),
+                files_dir: FOLDER.into(),
             };
             match gen_add_specs(instruction) {
                 Ok(()) => (),

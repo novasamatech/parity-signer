@@ -1,5 +1,5 @@
 //! Command line parser for the client
-use constants::{FOLDER, HOT_DB_NAME};
+use constants::{COLD_DB_NAME_RELEASE, EXPORT_FOLDER, FOLDER, HOT_DB_NAME};
 use definitions::{
     crypto::{Encryption, SufficientCrypto},
     helpers::unhex,
@@ -62,6 +62,10 @@ pub enum Command {
         /// Path to hot db
         #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
         db_path: PathBuf,
+
+        /// Folder to save payloads ready for signing
+        #[clap(long, value_name = "FOLDER_PATH", default_value = FOLDER)]
+        files_dir: PathBuf,
     },
 
     /// Complete update generation according
@@ -90,7 +94,7 @@ pub enum Command {
         r: Remove,
 
         /// Path to the hot database
-        #[clap(long= "hot-db-path", global=true,value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        #[clap(long="hot-db-path", global=true, value_name="HOT_DB_PATH", default_value = HOT_DB_NAME)]
         db_path: PathBuf,
     },
 
@@ -111,7 +115,7 @@ pub enum Command {
     /// Default networks are Polkadot, Kusama, and Westend.
     RestoreDefaults {
         /// Path to hot db
-        #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        #[clap(long = "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
         db_path: PathBuf,
     },
 
@@ -152,11 +156,12 @@ pub enum Command {
     #[clap(name = "transfer-meta")]
     TransferMetaToColdRelease {
         /// Path to release db
-        path: Option<PathBuf>,
+        #[clap(long, value_name = "COLD_DB_PATH", default_value = COLD_DB_NAME_RELEASE)]
+        cold_db: PathBuf,
 
         /// Path to hot db
         #[clap(long, value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
-        hot_db_path: PathBuf,
+        hot_db: PathBuf,
     },
 
     /// Make derivations import QR and/or hexadecimal string file
@@ -201,6 +206,10 @@ pub enum Command {
         /// Hot database path
         #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
         db_path: PathBuf,
+
+        /// Folder to save payloads ready for signing
+        #[clap(long, default_value = FOLDER)]
+        files_dir: PathBuf,
     },
 
     /// Make file with hexadecimal metadata for defaults release metadata set
@@ -223,6 +232,10 @@ pub enum Command {
         /// Hot database path
         #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
         db_path: PathBuf,
+
+        /// Folder to save completed update messages
+        #[clap(long, default_value = EXPORT_FOLDER)]
+        export_dir: PathBuf,
     },
 
     /// Create file with network metadata at block hash
@@ -239,6 +252,10 @@ pub enum Command {
         /// Hash of the block at which meta is asked
         #[clap(long, value_name = "BLOCK HASH")]
         block_hash: String,
+
+        /// Folder to save completed update messages
+        #[clap(long, default_value = EXPORT_FOLDER)]
+        export_dir: PathBuf,
     },
 }
 
@@ -284,6 +301,10 @@ pub struct InstructionMeta {
     /// Path to the hot database
     #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
     pub db: PathBuf,
+
+    /// Folder to save payloads ready for signing
+    #[clap(long, default_value = FOLDER)]
+    pub files_dir: PathBuf,
 }
 
 impl From<SetFlags> for Set {
@@ -317,8 +338,12 @@ pub struct InstructionSpecs {
     pub content: ContentArgs,
 
     /// Path to the hot database
-    #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+    #[clap(long = "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
     pub db: PathBuf,
+
+    /// Folder to save payloads ready for signing
+    #[clap(long, default_value = FOLDER)]
+    pub files_dir: PathBuf,
 }
 
 #[derive(clap::Args, Debug, Default, Clone)]
@@ -472,15 +497,19 @@ pub struct Make {
     /// output name override
     #[clap(long, name = "name")]
     pub name: Option<PathBuf>,
+
+    /// Folder to save payloads ready for signing
+    #[clap(long, default_value = FOLDER)]
+    pub files_dir: PathBuf,
+
+    /// Folder to save completed update messages
+    #[clap(long, default_value = EXPORT_FOLDER)]
+    pub export_dir: PathBuf,
 }
 
 impl Make {
     pub fn payload(&self) -> Result<Vec<u8>> {
-        Ok(std::fs::read(&format!(
-            "{}/{}",
-            FOLDER,
-            self.payload.to_string_lossy()
-        ))?)
+        Ok(std::fs::read(&self.files_dir.join(&self.payload))?)
     }
 
     pub fn crypto(&self) -> Result<Crypto> {
@@ -490,8 +519,8 @@ impl Make {
         ) {
             (Some(hex), None) => Some(unhex(hex)?),
             (None, Some(path)) => {
-                let sufficient_filename = format!("{}/{}", FOLDER, path);
-                Some(std::fs::read(&sufficient_filename)?)
+                let sufficient_filename = &self.files_dir.join(path);
+                Some(std::fs::read(sufficient_filename)?)
             }
             _ => None,
         } {
@@ -506,8 +535,8 @@ impl Make {
             (Some(e), None, None) => return Ok(Crypto::Alice { e: e.clone() }),
             (None, Some(hex), None) => unhex(hex)?,
             (None, None, Some(path)) => {
-                let verifier_filename = format!("{}/{}", FOLDER, path.to_string_lossy());
-                std::fs::read(&verifier_filename)?
+                let verifier_filename = &self.files_dir.join(path);
+                std::fs::read(verifier_filename)?
             }
             f => {
                 if self.signature.signature_file.is_none() && self.signature.signature_hex.is_none()
@@ -525,8 +554,8 @@ impl Make {
         ) {
             (Some(hex), None) => unhex(hex)?,
             (None, Some(path)) => {
-                let signature_filename = format!("{}/{}", FOLDER, path);
-                std::fs::read(&signature_filename)?
+                let signature_filename = &self.files_dir.join(path);
+                std::fs::read(signature_filename)?
             }
             f => panic!("mutually exclusive flags: {:?}", f),
         };

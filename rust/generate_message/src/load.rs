@@ -16,7 +16,7 @@
 use sp_core::H256;
 use std::path::Path;
 
-use constants::{EXPORT_FOLDER, METATREE};
+use constants::METATREE;
 use db_handling::helpers::{get_meta_values_by_name_version, open_db, open_tree};
 use definitions::{error::MetadataError, keyring::MetaKeyPrefix, metadata::MetaValues};
 
@@ -44,7 +44,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
 
                 // Process each entry
                 for x in set.iter() {
-                    match meta_f_a_element(x, &instruction.db) {
+                    match meta_f_a_element(x, &instruction.db, &instruction.files_dir) {
                         Ok(()) => (),
                         Err(e) => error_occured(e, pass_errors)?,
                     }
@@ -56,7 +56,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
             //
             // Make payload(s) for all metadata entries in the database for
             // network with user-entered name.
-            Content::Name { s: name } => meta_f_n(&name, &instruction.db),
+            Content::Name { s: name } => meta_f_n(&name, &instruction.db, &instruction.files_dir),
 
             // `-u` content key is to provide the URL address for RPC calls;
             // since `-f` indicates the data is taken from the database, the
@@ -77,7 +77,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
 
                 // Process each entry
                 for x in set.iter() {
-                    match meta_d_a_element(x) {
+                    match meta_d_a_element(x, &instruction.files_dir) {
                         Ok(()) => (),
                         Err(e) => error_occured(e, pass_errors)?,
                     }
@@ -93,7 +93,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
             // Network here must already have an entry in `ADDRESS_BOOK`, so
             // so that the URL address at which to make RPC call is made could
             // be found.
-            Content::Name { s: name } => meta_d_n(&name, &instruction.db),
+            Content::Name { s: name } => meta_d_n(&name, &instruction.db, &instruction.files_dir),
 
             // `$ cargo run load_metadata -d -u <url_address>`
             //
@@ -106,7 +106,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
             // This key combination is completely agnostic and will not address
             // the database at all. If there are changes in the base58 prefix or
             // genesis hash, this will not be found here.
-            Content::Address { s: address } => meta_d_u(&address),
+            Content::Address { s: address } => meta_d_u(&address, &instruction.files_dir),
         },
 
         // `-k` setting key: get network data using RPC calls, update the
@@ -124,7 +124,9 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 // If there are two entries for the same network with different
                 // encryption, fetch and (possibly) payload export is done only
                 // once: `load_metadata` payloads do not specify encryption.
-                Content::All { pass_errors } => meta_kpt_a(&write, pass_errors, &instruction.db),
+                Content::All { pass_errors } => {
+                    meta_kpt_a(&write, pass_errors, &instruction.db, &instruction.files_dir)
+                }
 
                 // `$ cargo run load_metadata -k -n <network_name>`
                 //
@@ -138,7 +140,9 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 //
                 // Regardless of how many entries with different encryptions are
                 // there, fetch and (possibly) payload export is done only once.
-                Content::Name { s: name } => meta_kpt_n(&name, &write, &instruction.db),
+                Content::Name { s: name } => {
+                    meta_kpt_n(&name, &write, &instruction.db, &instruction.files_dir)
+                }
 
                 // Key `-u` is for URL addresses. If network has no entry in the
                 // database, its metadata can not be added before its specs. If
@@ -159,7 +163,9 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 // networks in address book.
                 //
                 // One fetch for each address.
-                Content::All { pass_errors } => meta_kpt_a(&write, pass_errors, &instruction.db),
+                Content::All { pass_errors } => {
+                    meta_kpt_a(&write, pass_errors, &instruction.db, &instruction.files_dir)
+                }
 
                 // `$ cargo run load_metadata -p -n <network_name>`
                 //
@@ -171,7 +177,9 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 // database.
                 //
                 // One fetch only.
-                Content::Name { s: name } => meta_kpt_n(&name, &write, &instruction.db),
+                Content::Name { s: name } => {
+                    meta_kpt_n(&name, &write, &instruction.db, &instruction.files_dir)
+                }
 
                 // Key `-u` is for URL addresses. If network has no entry in the
                 // database, its metadata can not be added before its specs. If
@@ -192,7 +200,9 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 // payload files for all networks in address book.
                 //
                 // One fetch and one payload print for each address.
-                Content::All { pass_errors } => meta_kpt_a(&write, pass_errors, &instruction.db),
+                Content::All { pass_errors } => {
+                    meta_kpt_a(&write, pass_errors, &instruction.db, &instruction.files_dir)
+                }
 
                 // `$ cargo run load_metadata -n <network_name>`
                 //
@@ -204,7 +214,9 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 // database.
                 //
                 // One fetch and one payload print only.
-                Content::Name { s: name } => meta_kpt_n(&name, &write, &instruction.db),
+                Content::Name { s: name } => {
+                    meta_kpt_n(&name, &write, &instruction.db, &instruction.files_dir)
+                }
 
                 // Key `-u` is for URL addresses. If network has no entry in the
                 // database, its metadata can not be added before its specs. If
@@ -222,7 +234,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
 /// generated with network name. At most two entries are expected.
 /// - Check the metadata integrity
 /// - Output raw bytes payload file
-fn meta_f_a_element<P>(set_element: &AddressSpecs, db_path: P) -> Result<()>
+fn meta_f_a_element<P>(set_element: &AddressSpecs, db_path: P, files_dir: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
@@ -246,7 +258,7 @@ where
             meta_values,
             genesis_hash: set_element.genesis_hash,
         };
-        load_metadata_print(&shortcut)?;
+        load_metadata_print(&shortcut, &files_dir)?;
     }
     Ok(())
 }
@@ -259,11 +271,11 @@ where
 /// generated with `name`. At most two entries are expected.
 /// - Check the metadata integrity
 /// - Output raw bytes payload file
-fn meta_f_n<P>(name: &str, db_path: P) -> Result<()>
+fn meta_f_n<P>(name: &str, db_path: P, files_dir: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
-    meta_f_a_element(&search_name(name, &db_path)?, &db_path)
+    meta_f_a_element(&search_name(name, &db_path)?, &db_path, &files_dir)
 }
 
 /// `load_metadata -d -a` for individual [`AddressSpecs`] value.
@@ -272,9 +284,12 @@ where
 /// and interpret it
 /// - Check the metadata integrity with the data on record in the database
 /// - Output raw bytes payload file
-fn meta_d_a_element(set_element: &AddressSpecs) -> Result<()> {
+fn meta_d_a_element<P>(set_element: &AddressSpecs, files_dir: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let meta_fetch = fetch_set_element(set_element)?;
-    load_metadata_print(&meta_fetch.cut())
+    load_metadata_print(&meta_fetch.cut(), files_dir)
 }
 
 /// `load_metadata -d -n <network_name>`
@@ -285,11 +300,11 @@ fn meta_d_a_element(set_element: &AddressSpecs) -> Result<()> {
 /// and interpret it
 /// - Check the metadata integrity with the data on record in the database
 /// - Output raw bytes payload file
-fn meta_d_n<P>(name: &str, db_path: P) -> Result<()>
+fn meta_d_n<P>(name: &str, db_path: P, files_dir: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
-    meta_d_a_element(&search_name(name, db_path)?)
+    meta_d_a_element(&search_name(name, db_path)?, files_dir)
 }
 
 /// `load_metadata -d -u <url_address>`
@@ -307,7 +322,10 @@ where
 /// error here. The Signer, if such contradicting metadata update is scanned,
 /// will produce an error, since the Signer must have matching network specs to
 /// accept the metadata.
-fn meta_d_u(address: &str) -> Result<()> {
+fn meta_d_u<P>(address: &str, files_dir: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let meta_fetched = meta_fetch(address)?;
     if meta_fetched.meta_values.warn_incomplete_extensions {
         warn(
@@ -315,7 +333,7 @@ fn meta_d_u(address: &str) -> Result<()> {
             meta_fetched.meta_values.version,
         );
     }
-    load_metadata_print(&meta_fetched.cut())
+    load_metadata_print(&meta_fetched.cut(), files_dir)
 }
 
 /// `load_metadata <-k/-p/-t> -a`
@@ -327,14 +345,14 @@ fn meta_d_u(address: &str) -> Result<()> {
 /// process. Input [`Write`] indicates if the payload file should be created.
 /// - Rewrite the database [`METATREE`] with updated metadata set and update
 /// [`META_HISTORY`](constants::META_HISTORY)
-fn meta_kpt_a<P>(write: &Write, pass_errors: bool, db_path: P) -> Result<()>
+fn meta_kpt_a<P>(write: &Write, pass_errors: bool, db_path: P, files_dir: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
     let set = address_specs_set(&db_path)?;
     let mut sorted_meta_values = prepare_metadata(&db_path)?;
     for x in set.iter() {
-        match meta_kpt_a_element(x, write, &mut sorted_meta_values) {
+        match meta_kpt_a_element(x, write, &mut sorted_meta_values, &files_dir) {
             Ok(_) => (),
             Err(e) => error_occured(e, pass_errors)?,
         };
@@ -353,18 +371,22 @@ where
 /// Inputs [`AddressSpecs`] for the network currently processed, [`Write`]
 /// indicating if the `load_metadata` payload should be created, and
 /// [`SortedMetaValues`] to be updated.
-fn meta_kpt_a_element(
+fn meta_kpt_a_element<P>(
     set_element: &AddressSpecs,
     write: &Write,
     sorted_meta_values: &mut SortedMetaValues,
-) -> Result<()> {
+    files_dir: P,
+) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let meta_fetched = fetch_set_element(set_element)?;
     let got_meta_update = add_new_metadata(&meta_fetched.stamped(), sorted_meta_values)?;
     match write {
-        Write::All => load_metadata_print(&meta_fetched.cut())?,
+        Write::All => load_metadata_print(&meta_fetched.cut(), files_dir)?,
         Write::OnlyNew => {
             if got_meta_update {
-                load_metadata_print(&meta_fetched.cut())?
+                load_metadata_print(&meta_fetched.cut(), files_dir)?
             }
         }
         Write::None => (),
@@ -401,7 +423,7 @@ fn meta_kpt_a_element(
 ///
 /// Inputs user-entered network name and [`Write`] indicating if the
 /// `load_metadata` payload should be created.
-fn meta_kpt_n<P>(name: &str, write: &Write, db_path: P) -> Result<()>
+fn meta_kpt_n<P>(name: &str, write: &Write, db_path: P, files_dir: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
@@ -410,6 +432,7 @@ where
         &search_name(name, &db_path)?,
         write,
         &mut sorted_meta_values,
+        files_dir,
     )?;
     db_upd_metadata(sorted_meta_values, &db_path)
 }
@@ -557,7 +580,7 @@ fn warn(name: &str, version: u32) {
 ///
 /// Optional key `-d`, if used, indicates that the metadata entry should **not**
 /// be added to the [`METATREE`] of the hot database.
-pub fn unwasm<P>(filename: &str, update_db: bool, db_path: P) -> Result<()>
+pub fn unwasm<P>(filename: &str, update_db: bool, db_path: P, files_dir: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
@@ -596,19 +619,19 @@ where
         meta_values,
         genesis_hash,
     };
-    load_metadata_print(&shortcut)
+    load_metadata_print(&shortcut, files_dir)
 }
 
 /// `meta_default_file -name <network_name> -version <metadata_version>`
 ///
 /// Generate text file with hex string metadata, from a hot database
 /// [`METATREE`] entry, for `defaults` crate.
-pub fn meta_default_file<P>(name: &str, version: u32, db_path: P) -> Result<()>
+pub fn meta_default_file<P>(name: &str, version: u32, db_path: P, export_dir: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
     let meta_values = get_meta_values_by_name_version(db_path, name, version)?;
-    let filename = format!("{}/{}{}", EXPORT_FOLDER, name, version);
-    std::fs::write(&filename, hex::encode(meta_values.meta))?;
+    let file_path = export_dir.as_ref().join(format!("{}{}", name, version));
+    std::fs::write(file_path, hex::encode(meta_values.meta))?;
     Ok(())
 }

@@ -1068,7 +1068,6 @@
 #![deny(unused)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use constants::{load_types, COLD_DB_NAME_RELEASE};
 use db_handling::{
     default_cold_release, default_hot,
     helpers::{prep_types, transfer_metadata_to_cold},
@@ -1108,35 +1107,33 @@ pub fn full_run(command: Command) -> Result<()> {
         },
         Command::Specs { s: instruction } => gen_add_specs(instruction),
         Command::Load(instruction) => gen_load_meta(instruction),
-        Command::Types { db_path } => {
-            Ok(prep_types(db_path.to_str().unwrap())?.write(&load_types())?)
+        Command::Types { db_path, files_dir } => {
+            Ok(prep_types(db_path)?.write(files_dir.join("sign_me_load_types"))?)
         }
         Command::Sign(make) | Command::Make(make) => make_message(make),
         Command::Remove { r: info, db_path } => remove_info(info, db_path),
         Command::RestoreDefaults { db_path } => Ok(default_hot(Some(db_path))?),
         Command::MakeColdRelease { path } => Ok(default_cold_release(path)?),
-        Command::TransferMetaToColdRelease { path, hot_db_path } => {
-            let cold_database_path = match path {
-                Some(ref path) => path.to_str().unwrap_or(COLD_DB_NAME_RELEASE),
-                None => COLD_DB_NAME_RELEASE,
-            };
-            Ok(transfer_metadata_to_cold(
-                hot_db_path.to_str().unwrap(),
-                cold_database_path,
-            )?)
+        Command::TransferMetaToColdRelease { cold_db, hot_db } => {
+            Ok(transfer_metadata_to_cold(hot_db, cold_db)?)
         }
         Command::Derivations(x) => process_derivations(x),
-
         Command::Unwasm {
             filename,
             update_db,
             db_path,
-        } => unwasm(&filename, update_db, db_path),
+            files_dir,
+        } => unwasm(&filename, update_db, db_path, files_dir),
         Command::MetaDefaultFile {
             name,
             version,
             db_path,
-        } => meta_default_file(&name, version, db_path),
-        Command::MetaAtBlock { url, block_hash } => debug_meta_at_block(&url, &block_hash),
+            export_dir,
+        } => meta_default_file(&name, version, db_path, export_dir),
+        Command::MetaAtBlock {
+            url,
+            block_hash,
+            export_dir,
+        } => debug_meta_at_block(&url, &block_hash, export_dir),
     }
 }

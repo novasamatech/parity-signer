@@ -1,5 +1,13 @@
+use crate::common::{assert_cmd_stdout, setup, teardown};
+
 pub mod common;
-use crate::common::run_cmd_test;
+
+pub fn run_cmd_test(command: &str, output: &'static str, db_path: &str) {
+    let cmd = &format!("{} --hot-db-path {}", command, db_path);
+    setup(db_path);
+    assert_cmd_stdout(cmd, output);
+    teardown(db_path);
+}
 
 #[test]
 fn it_shows_block_history() {

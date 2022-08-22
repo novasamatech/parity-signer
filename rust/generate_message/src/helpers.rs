@@ -6,10 +6,7 @@ use sp_core::H256;
 use std::path::Path;
 use std::{cmp::Ordering, convert::TryInto};
 
-use constants::{
-    add_specs, load_metadata, ADDRESS_BOOK, COLOR, EXPORT_FOLDER, METATREE, META_HISTORY,
-    SECONDARY_COLOR, SPECSTREEPREP,
-};
+use constants::{ADDRESS_BOOK, COLOR, METATREE, META_HISTORY, SECONDARY_COLOR, SPECSTREEPREP};
 use db_handling::{
     db_transactions::TrDbHot,
     helpers::{make_batch_clear_tree, open_db, open_tree},
@@ -635,18 +632,21 @@ pub fn meta_fetch(address: &str) -> Result<MetaFetched> {
 /// Command line to get metadata at block:
 ///
 /// `meta_at_block -u <network_url_address> -block <block_hash>`
-pub fn debug_meta_at_block(address: &str, hex_block_hash: &str) -> Result<()> {
+pub fn debug_meta_at_block<P>(address: &str, hex_block_hash: &str, export_dir: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let block_hash = get_hash(hex_block_hash, Hash::BlockEntered)?;
     let meta_fetched = fetch_meta_at_block(address, block_hash)?;
     let meta_values = MetaValues::from_str_metadata(&meta_fetched)?;
     let filename = format!(
-        "{}/{}{}_{}",
-        EXPORT_FOLDER,
+        "{}{}_{}",
         meta_values.name,
         meta_values.version,
         hex::encode(block_hash)
     );
-    std::fs::write(&filename, hex::encode(meta_values.meta))?;
+    let f_path = export_dir.as_ref().join(filename);
+    std::fs::write(f_path, hex::encode(meta_values.meta))?;
 
     Ok(())
 }
@@ -973,30 +973,35 @@ fn get_hash(input_hash: &str, what: Hash) -> Result<H256> {
 ///
 /// Resulting file, located in dedicated [`FOLDER`](constants::FOLDER), could be
 /// used to generate data signature and to produce updates.
-pub fn load_metadata_print(shortcut: &MetaShortCut) -> Result<()> {
-    let filename = format!(
-        "{}_{}V{}",
-        load_metadata(),
-        shortcut.meta_values.name,
-        shortcut.meta_values.version
+pub fn load_metadata_print<P>(shortcut: &MetaShortCut, files_dir: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let file_name = format!(
+        "sign_me_load_metadata_{}V{}",
+        shortcut.meta_values.name, shortcut.meta_values.version
     );
+    let file_path = files_dir.as_ref().join(file_name);
     let content = ContentLoadMeta::generate(&shortcut.meta_values.meta, &shortcut.genesis_hash);
-    content.write(&filename)?;
+    content.write(file_path)?;
     Ok(())
 }
 
 /// Write to file `add_specs` update payload as raw bytes.
 ///
-/// Resulting file, located in dedicated [`FOLDER`](constants::FOLDER), could be
+/// Resulting file, located in dedicated directory (by default, [`FOLDER`](constants::FOLDER)), could be
 /// used to generate data signature and to produce updates.
-pub fn add_specs_print(network_specs: &NetworkSpecsToSend) -> Result<()> {
-    let filename = format!(
-        "{}_{}_{}",
-        add_specs(),
+pub fn add_specs_print<P>(network_specs: &NetworkSpecsToSend, files_dir: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let file_name = format!(
+        "sign_me_add_specs_{}_{}",
         network_specs.name,
         network_specs.encryption.show()
     );
+    let file_path = files_dir.as_ref().join(file_name);
     let content = ContentAddSpecs::generate(network_specs);
-    content.write(&filename)?;
+    content.write(file_path)?;
     Ok(())
 }
