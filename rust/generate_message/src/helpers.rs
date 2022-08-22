@@ -627,7 +627,7 @@ pub fn meta_fetch(address: &str) -> Result<MetaFetched> {
 ///
 /// Fetched network metadata, processes it, and outputs file
 /// `<network_name><metadata_version>_<block_hash>` with hexadecimal
-/// metadata in [`EXPORT_FOLDER`].
+/// metadata in [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
 ///
 /// Command line to get metadata at block:
 ///
