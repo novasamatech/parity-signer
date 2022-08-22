@@ -1,3 +1,9 @@
+"TabBar.Keys" = "Keys";
+"TabBar.Logs" = "Logs";
+"TabBar.Scanner" = "Scanner";
+"TabBar.Settings" = "Settings";
+
+
 "common.ok" = "Ok";
 
 
@@ -64,8 +70,7 @@
 "in network" = "in network";
 "items selected" = "items selected";
 "key:" = "key:";
-"Keys" = "Keys";
-"Log" = "Log";
+
 "log.uppercased" = "LOG";
 "LOG NOTE" = "LOG NOTE";
 "logo:" = "logo:";

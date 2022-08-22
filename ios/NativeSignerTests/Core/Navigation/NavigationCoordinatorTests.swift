@@ -75,7 +75,6 @@ final class NavigationCoordinatorTests: XCTestCase {
         // Given
         let firstNavigation = Navigation(action: .goBack, details: "details", seedPhrase: nil)
         let secondNavigation = Navigation(action: .goForward, details: nil, seedPhrase: "seed")
-        debounceQueue.shouldPerformAsyncWork = true
 
         // When
         subject.perform(navigation: firstNavigation)
@@ -89,6 +88,58 @@ final class NavigationCoordinatorTests: XCTestCase {
         )
         XCTAssertEqual(backendActionPerformer.performBackendReceivedDetails, [firstNavigation.details, ""])
         XCTAssertEqual(backendActionPerformer.performBackendReceivedSeedPhrase, ["", secondNavigation.seedPhrase])
+    }
+
+    func test_performNavigation_whenActionUpdatesFooterButton_updatesSelectedTab() {
+        // Given
+        let navigation = Navigation(action: .navbarLog, details: "details", seedPhrase: nil)
+        backendActionPerformer.performBackendReturnValue = .generate(footerButton: .log)
+        XCTAssertEqual(subject.selectedTab, .keys)
+
+        // When
+        subject.perform(navigation: navigation)
+
+        // Then
+        XCTAssertEqual(subject.selectedTab, .logs)
+    }
+
+    func test_performNavigation_whenActionDoesNotChangeFooterButton_doesNotUpdateSelectedTab() {
+        // Given
+        let navigation = Navigation(action: .navbarLog, details: "details", seedPhrase: nil)
+        backendActionPerformer.performBackendReturnValue = .generate(footerButton: .keys)
+        XCTAssertEqual(subject.selectedTab, .keys)
+
+        // When
+        subject.perform(navigation: navigation)
+
+        // Then
+        XCTAssertEqual(subject.selectedTab, .keys)
+    }
+
+    func test_performNavigation_whenActionHasNilFooterButton_doesNotUpdateSelectedTab() {
+        // Given
+        let navigation = Navigation(action: .navbarLog, details: "details", seedPhrase: nil)
+        backendActionPerformer.performBackendReturnValue = .generate(footerButton: nil)
+        XCTAssertEqual(subject.selectedTab, .keys)
+
+        // When
+        subject.perform(navigation: navigation)
+
+        // Then
+        XCTAssertEqual(subject.selectedTab, .keys)
+    }
+
+    func test_performNavigation_whenActionHasInvalidFooterButton_doesNotUpdateSelectedTab() {
+        // Given
+        let navigation = Navigation(action: .navbarLog, details: "details", seedPhrase: nil)
+        backendActionPerformer.performBackendReturnValue = .generate(footerButton: .back)
+        XCTAssertEqual(subject.selectedTab, .keys)
+
+        // When
+        subject.perform(navigation: navigation)
+
+        // Then
+        XCTAssertEqual(subject.selectedTab, .keys)
     }
 }
 

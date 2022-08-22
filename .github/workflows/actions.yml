@@ -64,13 +64,7 @@ jobs:
         with:
           workspaces:         rust -> rust/target
 
-      - name:                 Rust build
-        shell:                bash
-        run:                  |
-          cd scripts
-          ./build.sh ios
-
-      - name:                 Run tests
+      - name:                 Build iOS and run tests
         shell:                bash
         run:                  |
           cd ios

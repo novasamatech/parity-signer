@@ -110,12 +110,24 @@ If you get errors like `cargo: feature X is required`, it most likely means you 
 
 ## iOS
 
-**3.** You probably already have [Xcode](https://developer.apple.com/xcode/) installed if you are reading this. If not, go get it. 
+**3.** You probably already have [Xcode](https://developer.apple.com/xcode/) installed if you are reading this. If not, go get it.
 
-**4.** Compile the core Rust library first:
+**4.** Install dependencies
+Currently most of iOS tooling is integrated via [Homebrew](https://brew.sh) to avoid use of [CocoaPods](https://cocoapods.org).
 
+Before running project for the first time, run the following in the console
+
+```bash
+brew install swiftgen
+brew install swiftformat
+brew install swiftlint
 ```
-cd scripts && ./build.sh ios
+
+If you are using M1 machine, it might be necessary to run following commands for XCode's Build Phases to run tooling correctly:
+```
+sudo ln -s /opt/homebrew/bin/swiftgen /usr/local/bin/swiftgen
+sudo ln -s /opt/homebrew/bin/swiftformat /usr/local/bin/swiftformat
+sudo ln -s /opt/homebrew/bin/swiftlint /usr/local/bin/swiftlint
 ```
 
 **5.** Open the `NativeSigner.xcodeproj` project from the `ios` folder in your Xcode. Project features two schemes:
