@@ -19,9 +19,6 @@ lane :build_release do |options|
 
   clean_build_artifacts
 
-  # build Rust dependencies
-  sh "cd ./../../scripts/ && ./build.sh ios"
-
   increment_build_number(
     build_number: ENV["BUILD_NUMBER"], # based on commit, defined in GA
     xcodeproj: xcodeproj_path
