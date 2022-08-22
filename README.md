@@ -110,15 +110,9 @@ If you get errors like `cargo: feature X is required`, it most likely means you 
 
 ## iOS
 
-**3.** You probably already have [Xcode](https://developer.apple.com/xcode/) installed if you are reading this. If not, go get it. 
+**3.** You probably already have [Xcode](https://developer.apple.com/xcode/) installed if you are reading this. If not, go get it.
 
-**4.** Compile the core Rust library first:
-
-```
-cd scripts && ./build.sh ios
-```
-
-**5.** Install dependencies
+**4.** Install dependencies
 Currently most of iOS tooling is integrated via [Homebrew](https://brew.sh) to avoid use of [CocoaPods](https://cocoapods.org).
 
 Before running project for the first time, run the following in the console
@@ -136,7 +130,7 @@ sudo ln -s /opt/homebrew/bin/swiftformat /usr/local/bin/swiftformat
 sudo ln -s /opt/homebrew/bin/swiftlint /usr/local/bin/swiftlint
 ```
 
-**6.** Open the `NativeSigner.xcodeproj` project from the `ios` folder in your Xcode. Project features two schemes:
+**5.** Open the `NativeSigner.xcodeproj` project from the `ios` folder in your Xcode. Project features two schemes:
 - `NativeSigner` - used for deployments and running production-ready app on your devices
 - `NativeSigner-Dev` - development scheme that can be used to simulate offline mode without turning off WiFi on your Mac if you are using simulator.
 To run project, select one of the schemes and click `Run` (Cmd+R)
