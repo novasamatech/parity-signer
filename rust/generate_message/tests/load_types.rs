@@ -1,8 +1,6 @@
 pub mod common;
 use crate::common::{assert_cmd_stdout, assert_files_eq, setup, teardown};
 
-
-
 use std::path::PathBuf;
 
 #[test]
