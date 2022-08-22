@@ -1,6 +1,7 @@
 //! Common helper functions
 
 use hex;
+use plot_icon::EMPTY_PNG;
 use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 #[cfg(feature = "signer")]
 use sp_core::{ecdsa, ed25519, sr25519};
@@ -9,7 +10,7 @@ use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 
 #[cfg(feature = "signer")]
-use plot_icon::generate_png_scaled_default;
+use plot_icon::{generate_png, generate_png_scaled_default};
 
 use crate::crypto::Encryption;
 #[cfg(feature = "signer")]
@@ -58,7 +59,10 @@ pub fn multisigner_to_encryption(m: &MultiSigner) -> Encryption {
 /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)  
 #[cfg(feature = "signer")]
 pub fn make_identicon_from_multisigner(multisigner: &MultiSigner) -> Vec<u8> {
-    generate_png_scaled_default(&multisigner_to_public(multisigner))
+    match generate_png(&multisigner_to_public(multisigner), 72) {
+        Ok(a) => a,
+        Err(_) => EMPTY_PNG.to_vec(),
+    }
 }
 
 /// Get [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
