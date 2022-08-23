@@ -1,6 +1,7 @@
 //! Common helper functions
 
 use hex;
+#[cfg(feature = "signer")]
 use plot_icon::EMPTY_PNG;
 use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 #[cfg(feature = "signer")]
