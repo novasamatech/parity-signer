@@ -42,7 +42,7 @@ struct KeySetList: View {
                     }
                     Spacer()
                         .listRowSeparator(.hidden)
-                        .frame(height: 85)
+                        .frame(height: Heights.actionButton + Padding.large)
                 }
                 .listStyle(.plain)
             }

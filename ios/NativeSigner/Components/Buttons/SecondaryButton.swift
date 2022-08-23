@@ -8,9 +8,20 @@
 import SwiftUI
 
 struct SecondaryButton: View {
-    var action: () -> Void
-    var text: LocalizedStringKey
-    @State var isDisabled: Bool = false
+    private let action: () -> Void
+    private let text: LocalizedStringKey
+
+    @State var isDisabled: Bool
+
+    init(
+        action: @escaping () -> Void,
+        text: LocalizedStringKey,
+        isDisabled: Bool = false
+    ) {
+        self.action = action
+        self.text = text
+        self.isDisabled = isDisabled
+    }
 
     var body: some View {
         ActionButton(
@@ -20,7 +31,7 @@ struct SecondaryButton: View {
                 backgroundColor: Asset.fill18.swiftUIColor,
                 foregroundColor: (isDisabled ? Asset.textAndIconsDisabled : Asset.textAndIconsPrimary).swiftUIColor
             ),
-            isDisabled: isDisabled
+            isDisabled: $isDisabled
         )
     }
 }

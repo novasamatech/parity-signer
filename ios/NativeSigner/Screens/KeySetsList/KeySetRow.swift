@@ -18,9 +18,9 @@ struct KeySetRow: View {
         ZStack {
             RoundedRectangle(cornerRadius: CornerRadius.small)
                 .foregroundColor(Asset.fill6.swiftUIColor)
-                .frame(height: 72)
+                .frame(height: Heights.keyCellContainer)
             HStack(alignment: .center, spacing: Padding.small) {
-                Identicon(identicon: viewModel.identicon, rowHeight: 36)
+                Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
                 VStack(alignment: .leading) {
                     Text(viewModel.keyName)
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)

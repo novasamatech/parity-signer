@@ -18,15 +18,28 @@ struct ActionButtonStyle: ButtonStyle {
             .foregroundColor(foregroundColor)
             .cornerRadius(CornerRadius.extraExtraLarge)
             .font(Fontstyle.labelL.base)
-            .frame(height: 57, alignment: .center)
+            .frame(height: Heights.actionButton, alignment: .center)
     }
 }
 
 struct ActionButton: View {
-    var action: () -> Void
-    var text: LocalizedStringKey
-    var style: ActionButtonStyle
-    @State var isDisabled: Bool = false
+    private let action: () -> Void
+    private let text: LocalizedStringKey
+    private let style: ActionButtonStyle
+
+    @Binding var isDisabled: Bool
+
+    init(
+        action: @escaping () -> Void,
+        text: LocalizedStringKey,
+        style: ActionButtonStyle,
+        isDisabled: Binding<Bool> = Binding<Bool>.constant(false)
+    ) {
+        self.action = action
+        self.text = text
+        self.style = style
+        _isDisabled = isDisabled
+    }
 
     var body: some View {
         Button(action: action) {
