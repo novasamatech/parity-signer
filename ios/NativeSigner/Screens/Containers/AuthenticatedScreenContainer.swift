@@ -14,22 +14,37 @@ struct AuthenticatedScreenContainer: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HeaderViewContainer(data: data, navigation: navigation)
-            ZStack {
-                VStack(spacing: 0) {
-                    ScreenSelectorView(data: data, navigation: navigation)
-                    Spacer()
-                }
-                ModalSelectorView(data: data, navigation: navigation)
-                AlertSelectorView(data: data, navigation: navigation)
-            }
-            .gesture(
-                DragGesture().updating($dragOffset, body: { value, _, _ in
-                    if value.startLocation.x < 20, value.translation.width > 100 {
-                        navigation.perform(navigation: .init(action: .goBack))
+            if navigation.shouldSkipInjectedViews {
+                ZStack {
+                    VStack(spacing: 0) {
+                        ScreenSelectorView(data: data, navigation: navigation)
                     }
-                })
-            )
+                }
+                .gesture(
+                    DragGesture().updating($dragOffset, body: { value, _, _ in
+                        if value.startLocation.x < 20, value.translation.width > 100 {
+                            navigation.perform(navigation: .init(action: .goBack))
+                        }
+                    })
+                )
+            } else {
+                HeaderViewContainer(data: data, navigation: navigation)
+                ZStack {
+                    VStack(spacing: 0) {
+                        ScreenSelectorView(data: data, navigation: navigation)
+                        Spacer()
+                    }
+                    ModalSelectorView(data: data, navigation: navigation)
+                    AlertSelectorView(data: data, navigation: navigation)
+                }
+                .gesture(
+                    DragGesture().updating($dragOffset, body: { value, _, _ in
+                        if value.startLocation.x < 20, value.translation.width > 100 {
+                            navigation.perform(navigation: .init(action: .goBack))
+                        }
+                    })
+                )
+            }
             if navigation.actionResult.footer {
                 TabBarView(
                     navigation: navigation,

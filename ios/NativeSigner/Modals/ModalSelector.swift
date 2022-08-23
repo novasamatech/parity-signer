@@ -20,12 +20,6 @@ struct ModalSelector: View {
 
     var body: some View {
         switch modalData {
-        case .newSeedMenu:
-            NewSeedMenu(
-                alert: alert,
-                alertShow: alertShow,
-                navigationRequest: navigationRequest
-            )
         case let .networkSelector(value):
             NetworkManager(
                 content: value,
@@ -102,6 +96,8 @@ struct ModalSelector: View {
                 sign: sign,
                 navigationRequest: navigationRequest
             )
+        case .newSeedMenu:
+            EmptyView()
         case nil:
             EmptyView()
         }

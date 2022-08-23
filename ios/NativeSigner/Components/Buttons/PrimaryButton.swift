@@ -26,24 +26,6 @@ struct PrimaryButton: View {
     }
 }
 
-struct ActionButton: View {
-    var action: () -> Void
-    var text: LocalizedStringKey
-    var style: ActionButtonStyle
-    @State var isDisabled: Bool = false
-
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                Text(text)
-            }
-            .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(style)
-        .disabled(isDisabled)
-    }
-}
-
 struct PrimaryButton_Previews: PreviewProvider {
     static var previews: some View {
         VStack {

@@ -13,18 +13,15 @@ struct SecondaryButton: View {
     @State var isDisabled: Bool = false
 
     var body: some View {
-        Button(action: action) {
-            HStack {
-                Text(text)
-            }
-        }
-        .buttonStyle(
-            ActionButtonStyle(
+        ActionButton(
+            action: action,
+            text: text,
+            style: ActionButtonStyle(
                 backgroundColor: Asset.fill18.swiftUIColor,
                 foregroundColor: (isDisabled ? Asset.textAndIconsDisabled : Asset.textAndIconsPrimary).swiftUIColor
-            )
+            ),
+            isDisabled: isDisabled
         )
-        .disabled(isDisabled)
     }
 }
 
