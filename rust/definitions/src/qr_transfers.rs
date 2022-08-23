@@ -22,6 +22,7 @@
 //! This module deals with content part of QR codes.  
 
 use parity_scale_codec::{Decode, Encode};
+use std::path::Path;
 
 use crate::crypto::Encryption;
 use crate::error::Result;
@@ -78,8 +79,11 @@ impl ContentLoadMeta {
 
     /// Write [`ContentLoadMeta`] into file that could be signed by the verifier.
     #[cfg(feature = "active")]
-    pub fn write(&self, filename: &str) -> Result<()> {
-        Ok(std::fs::write(&filename, &self.to_sign())?)
+    pub fn write<P>(&self, filename: P) -> Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        Ok(std::fs::write(filename, &self.to_sign())?)
     }
 
     /// Transform [`ContentLoadMeta`] into `Vec<u8>` that could be signed by the verifier.
@@ -130,8 +134,11 @@ impl ContentAddSpecs {
 
     /// Write [`ContentAddSpecs`] into file that could be signed by the verifier.
     #[cfg(feature = "active")]
-    pub fn write(&self, filename: &str) -> Result<()> {
-        Ok(std::fs::write(&filename, &self.to_sign())?)
+    pub fn write<P>(&self, file_path: P) -> Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        Ok(std::fs::write(file_path, &self.to_sign())?)
     }
 
     /// Transform [`ContentAddSpecs`] into `Vec<u8>` that could be signed by the verifier.
@@ -191,8 +198,11 @@ impl ContentLoadTypes {
 
     /// Write [`ContentLoadTypes`] into file that could be signed by the verifier.  
     #[cfg(feature = "active")]
-    pub fn write(&self, filename: &str) -> Result<()> {
-        Ok(std::fs::write(&filename, &self.to_sign())?)
+    pub fn write<P>(&self, path: P) -> Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        Ok(std::fs::write(path, &self.to_sign())?)
     }
 
     /// Transform [`ContentLoadTypes`] into `Vec<u8>` to be put in the database.  

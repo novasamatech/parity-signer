@@ -1,4 +1,5 @@
 use std::fmt::Write;
+use std::path::Path;
 
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES, VERIFIERS};
 use db_handling::{
@@ -101,12 +102,15 @@ impl GeneralHold {
         }
     }
     /// function to find all entries in the database that were verified by general verifier
-    pub(crate) fn get(database_name: &str) -> Result<Self> {
+    pub(crate) fn get<P>(db_path: P) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
         let mut metadata_set = Vec::new();
         let mut network_specs_set = Vec::new(); // all are verified by general_verifier
         let mut verifier_set = Vec::new();
 
-        let database = open_db(database_name)?;
+        let database = open_db(&db_path)?;
         let metadata = open_tree(&database, METATREE)?;
         let chainspecs = open_tree(&database, SPECSTREE)?;
         let settings = open_tree(&database, SETTREE)?;
@@ -133,13 +137,16 @@ impl GeneralHold {
             types,
         })
     }
-    pub(crate) fn upd_stub(
+    pub(crate) fn upd_stub<P>(
         &self,
         stub: TrDbColdStub,
         new_general_verifier: &Verifier,
-        database_name: &str,
-    ) -> Result<TrDbColdStub> {
-        let former_general_verifier = get_general_verifier(database_name)?;
+        db_path: P,
+    ) -> Result<TrDbColdStub>
+    where
+        P: AsRef<Path>,
+    {
+        let former_general_verifier = get_general_verifier(&db_path)?;
         let mut out = stub;
         out = out.new_history_entry(Event::Warning {
             warning: Warning::GeneralVerifierAppeared(self).show(),
@@ -155,7 +162,7 @@ impl GeneralHold {
             )
         }
         if self.types {
-            out = out.remove_types(&prep_types(database_name)?, &former_general_verifier)
+            out = out.remove_types(&prep_types(&db_path)?, &former_general_verifier)
         }
         out = out.new_general_verifier(new_general_verifier);
         Ok(out)
@@ -173,8 +180,11 @@ impl Hold {
         print_affected(&self.metadata_set, &self.network_specs_set)
     }
     /// function to find all entries in the database corresponding to given `verifier_key`, that was used to store the former verifier
-    pub(crate) fn get(verifier_key: &VerifierKey, database_name: &str) -> Result<Self> {
-        let database = open_db(database_name)?;
+    pub(crate) fn get<P>(verifier_key: &VerifierKey, db_path: P) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
+        let database = open_db(&db_path)?;
         let metadata = open_tree(&database, METATREE)?;
         let chainspecs = open_tree(&database, SPECSTREE)?;
         let (metadata_set, network_specs_set) = collect_set(verifier_key, &chainspecs, &metadata)?;
@@ -183,16 +193,19 @@ impl Hold {
             network_specs_set,
         })
     }
-    pub(crate) fn upd_stub(
+    pub(crate) fn upd_stub<P>(
         &self,
         stub: TrDbColdStub,
         verifier_key: &VerifierKey,
         former_verifier: &Verifier,
         new_verifier: &ValidCurrentVerifier,
         hold_release: HoldRelease,
-        database_name: &str,
-    ) -> Result<TrDbColdStub> {
-        let general_verifier = get_general_verifier(database_name)?;
+        db_path: P,
+    ) -> Result<TrDbColdStub>
+    where
+        P: AsRef<Path>,
+    {
+        let general_verifier = get_general_verifier(&db_path)?;
         let mut out = stub;
         let warning = match hold_release {
             HoldRelease::General => Warning::VerifierChangingToGeneral {
