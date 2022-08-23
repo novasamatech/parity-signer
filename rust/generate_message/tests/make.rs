@@ -15,7 +15,8 @@ fn it_signs() {
     assert_cmd_stdout(&cmd, "");
 
     let sign_cmd = format!(
-        "make --goal text --crypto sr25519 --msg load-metadata --payload sign_me_load_metadata_polkadotV30 --files-dir {0} --export-dir {0}",
+        "make --goal text --crypto sr25519 --msg load-metadata \
+        --payload sign_me_load_metadata_polkadotV30 --files-dir {0} --export-dir {0}",
         files_dir.path().to_string_lossy()
     );
     assert_cmd_stdout(&sign_cmd, "");
@@ -27,7 +28,8 @@ fn it_signs() {
     assert_files_eq(&unverified, &expected);
 
     let sign_cmd = format!(
-        "make --goal text --crypto sr25519 --msg load-metadata --verifier-alice sr25519 --payload sign_me_load_metadata_polkadotV30 --files-dir {0} --export-dir {0}",
+        "make --goal text --crypto sr25519 --msg load-metadata --verifier-alice sr25519 \
+        --payload sign_me_load_metadata_polkadotV30 --files-dir {0} --export-dir {0}",
         files_dir.path().to_string_lossy()
     );
     assert_cmd_stdout(&sign_cmd, "");
