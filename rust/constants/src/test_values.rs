@@ -7,11 +7,6 @@ pub const fn empty_png() -> &'static [u8] {
     include_bytes!("empty_png")
 }
 
-/// Real Parity verifier identicon
-pub const fn real_parity_verifier() -> &'static [u8] {
-    include_bytes!("real_parity_verifier")
-}
-
 /// Identicon for Alice root key, `Sr25519` encryption
 pub const fn alice_sr_root() -> &'static [u8] {
     include_bytes!("alice_sr_root")
@@ -121,11 +116,6 @@ pub const fn westend_9122() -> &'static [u8] {
     include_bytes!("westend_9122")
 }
 
-/// Identicon for `westend9150` metadata hash
-pub const fn westend_9150() -> &'static [u8] {
-    include_bytes!("westend_9150")
-}
-
 /// Identicon for `dock31` metadata hash
 pub const fn dock_31() -> &'static [u8] {
     include_bytes!("dock_31")
@@ -170,11 +160,6 @@ pub const fn types_unknown() -> &'static [u8] {
 /// Identicon for Alice key with derivation `//Bob`, aka Bob, `Sr25519` encryption
 pub const fn bob() -> &'static [u8] {
     include_bytes!("bob")
-}
-
-/// Identicon for empty vector hashed, value encountered in card tests
-pub const fn empty_vec_hash_pic() -> &'static [u8] {
-    include_bytes!("empty_vec_hash_pic")
 }
 
 /// Identicon for Alice key with derivation `//Alice`, `Ed25519` encryption
