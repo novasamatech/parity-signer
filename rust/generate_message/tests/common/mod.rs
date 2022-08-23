@@ -10,7 +10,6 @@ pub fn setup<P>(db_path: P)
 where
     P: AsRef<Path>,
 {
-    if std::fs::remove_dir_all(&db_path).is_ok() {}
     TrDbHot::new()
         .set_address_book(data::address_book())
         .set_network_specs_prep(data::network_specs_prep())
@@ -18,13 +17,6 @@ where
         .set_settings(data::settings())
         .apply(&db_path)
         .unwrap();
-}
-
-pub fn teardown<P>(db_path: P)
-where
-    P: AsRef<Path>,
-{
-    if std::fs::remove_dir_all(db_path).is_ok() {}
 }
 
 pub fn base_cmd() -> Command {
