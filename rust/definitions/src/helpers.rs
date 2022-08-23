@@ -1,17 +1,15 @@
 //! Common helper functions
 
 use hex;
-#[cfg(feature = "signer")]
-use plot_icon::EMPTY_PNG;
 use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 #[cfg(feature = "signer")]
-use sp_core::{ecdsa, ed25519, sr25519};
+use sp_core::{crypto::AccountId32, ecdsa, ed25519, sr25519};
 use sp_runtime::MultiSigner;
 #[cfg(feature = "signer")]
 use std::convert::TryInto;
 
 #[cfg(feature = "signer")]
-use plot_icon::{generate_png, generate_png_scaled_default};
+use plot_icon::{generate_png, EMPTY_PNG};
 
 use crate::crypto::Encryption;
 #[cfg(feature = "signer")]
@@ -60,7 +58,17 @@ pub fn multisigner_to_encryption(m: &MultiSigner) -> Encryption {
 /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)  
 #[cfg(feature = "signer")]
 pub fn make_identicon_from_multisigner(multisigner: &MultiSigner) -> Vec<u8> {
-    match generate_png(&multisigner_to_public(multisigner), 72) {
+    make_identicon(&multisigner_to_public(multisigner))
+}
+
+#[cfg(feature = "signer")]
+pub fn make_identicon_from_account(account: AccountId32) -> Vec<u8> {
+    make_identicon(&<[u8; 32]>::from(account))
+}
+
+#[cfg(feature = "signer")]
+fn make_identicon(into_id: &[u8]) -> Vec<u8> {
+    match generate_png(into_id, 72) {
         Ok(a) => a,
         Err(_) => EMPTY_PNG.to_vec(),
     }
@@ -133,7 +141,7 @@ pub fn print_multisigner_as_base58(
 /// Currently uses PNG identicon generator, could be changed later.
 #[cfg(feature = "signer")]
 pub fn pic_meta(meta_hash: &[u8]) -> Vec<u8> {
-    generate_png_scaled_default(meta_hash)
+    make_identicon(meta_hash)
 }
 
 /// Print id pic for hash of SCALE-encoded types data
@@ -141,5 +149,5 @@ pub fn pic_meta(meta_hash: &[u8]) -> Vec<u8> {
 /// Currently uses PNG identicon generator, could be changed later.
 #[cfg(feature = "signer")]
 pub fn pic_types(types_hash: &[u8]) -> Vec<u8> {
-    generate_png_scaled_default(types_hash)
+    make_identicon(types_hash)
 }

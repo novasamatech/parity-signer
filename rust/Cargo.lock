@@ -3705,7 +3705,6 @@ dependencies = [
  "hex",
  "parity-scale-codec",
  "parser",
- "plot_icon",
  "pretty_assertions",
  "sled",
  "sp-core",
