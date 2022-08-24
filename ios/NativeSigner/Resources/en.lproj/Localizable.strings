@@ -1,7 +1,3 @@
-"TabBar.Keys" = "Keys";
-"TabBar.Logs" = "Logs";
-"TabBar.Scanner" = "Scanner";
-"TabBar.Settings" = "Settings";
 
 
 "common.ok" = "Ok";
@@ -267,4 +263,14 @@
 "CameraView.parsingMultidata" = "PARSING MULTIPART DATA";
 "CameraView.startOver" = "Start over";
 
+// Copy for updated design
+"TabBar.Keys" = "Keys";
+"TabBar.Logs" = "Logs";
+"TabBar.Scanner" = "Scanner";
+"TabBar.Settings" = "Settings";
+
+"KeySets.Title" = "Key Sets";
+"KeySets.Action.Add" = "Add Key Set";
+"KeySets.Label.DerivedKeys.single" = "%@ Derived Key";
+"KeySets.Label.DerivedKeys.plural" = "%@ Derived Keys";
 

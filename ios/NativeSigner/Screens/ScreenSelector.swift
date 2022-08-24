@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ScreenSelector: View {
+    @ObservedObject var navigation: NavigationCoordinator
     let screenData: ScreenData
     let alert: Bool
     let navigationRequest: NavigationRequest
@@ -56,9 +57,9 @@ struct ScreenSelector: View {
                 navigationRequest: navigationRequest
             )
         case let .seedSelector(value):
-            SeedManager(
-                content: value,
-                navigationRequest: navigationRequest
+            KeySetList(
+                navigation: navigation,
+                viewModel: KeySetListViewModelBuilder().build(for: value)
             )
         case let .keyDetails(value):
             ExportAddress(content: value)

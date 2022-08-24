@@ -44,6 +44,12 @@ final class NavigationCoordinator: ObservableObject {
     /// This should be removed once navigation is moved to native system.
     @Published var selectedTab: Tab = .keys
 
+    /// Enables to override old logic based on `ActionResult` to not include additional components in main view hierarchy
+    /// for screens with updated design approach.
+    ///
+    /// This will enable to slowly move into proper view hierachy in newer screens and then update navigation
+    var shouldSkipInjectedViews: Bool = false
+
     init(
         backendActionPerformer: BackendNavigationPerforming = BackendNavigationAdapter(),
         debounceQueue: Dispatching = DispatchQueue(label: Constants.queueLabel)
@@ -64,6 +70,16 @@ extension NavigationCoordinator {
             details: navigation.details,
             seedPhrase: navigation.seedPhrase
         ) {
+            var updatedShouldSkipInjectedViews: Bool
+            switch actionResult.screenData {
+            case .seedSelector:
+                updatedShouldSkipInjectedViews = true
+            default:
+                updatedShouldSkipInjectedViews = false
+            }
+            if updatedShouldSkipInjectedViews != shouldSkipInjectedViews {
+                shouldSkipInjectedViews = updatedShouldSkipInjectedViews
+            }
             self.actionResult = actionResult
             if let tab = Tab(actionResult.footerButton), tab != selectedTab {
                 selectedTab = tab

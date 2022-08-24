@@ -13,6 +13,7 @@ struct ScreenSelectorView: View {
 
     var body: some View {
         ScreenSelector(
+            navigation: navigation,
             screenData: navigation.actionResult.screenData,
             alert: data.alert,
             navigationRequest: { navigationRequest in
