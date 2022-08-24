@@ -1927,6 +1927,7 @@ fn flow_test_1() {
                 seed_name_cards: vec![SeedNameCard {
                     seed_name: "Portia".to_string(),
                     identicon: vec![],
+                    derived_keys_count: 3,
                 }],
             },
         },
@@ -2719,10 +2720,12 @@ fn flow_test_1() {
                     SeedNameCard {
                         seed_name: "Alice".to_string(),
                         identicon: vec![],
+                        derived_keys_count: 3,
                     },
                     SeedNameCard {
                         seed_name: "Portia".to_string(),
                         identicon: vec![],
+                        derived_keys_count: 3,
                     },
                 ],
             },
@@ -3029,10 +3032,12 @@ fn flow_test_1() {
                     SeedNameCard {
                         seed_name: "Alice".to_string(),
                         identicon: vec![],
+                        derived_keys_count: 4,
                     },
                     SeedNameCard {
                         seed_name: "Portia".to_string(),
                         identicon: vec![],
+                        derived_keys_count: 3,
                     },
                 ],
             },
@@ -3357,6 +3362,7 @@ fn flow_test_1() {
                 seed_name_cards: vec![SeedNameCard {
                     seed_name: "Alice".to_string(),
                     identicon: alice_sr_root().to_vec(),
+                    derived_keys_count: 4,
                 }],
             },
         },
@@ -3521,6 +3527,7 @@ fn flow_test_1() {
             seed_name_cards: vec![SeedNameCard {
                 seed_name: "Alice".to_string(),
                 identicon: alice_sr_root().to_vec(),
+                derived_keys_count: 4,
             }],
         },
     });
@@ -4446,6 +4453,7 @@ fn flow_test_1() {
                 seed_name_cards: vec![SeedNameCard {
                     seed_name: "Alice".to_string(),
                     identicon: alice_sr_root().to_vec(),
+                    derived_keys_count: 6,
                 }],
             },
         },
