@@ -45,14 +45,14 @@ final class KeySetListViewModelBuilder {
 }
 
 private extension KeySetListViewModelBuilder {
-    func derivedKeys(for _: SeedNameCard) -> String? {
-        switch Int.random(in: 0 ... 6) {
+    func derivedKeys(for seed: SeedNameCard) -> String? {
+        switch seed.derivedKeysCount {
         case 0:
             return nil
         case 1:
             return Localizable.KeySets.Label.DerivedKeys.single(1)
         default:
-            return Localizable.KeySets.Label.DerivedKeys.plural(Int.random(in: 2 ... 6))
+            return Localizable.KeySets.Label.DerivedKeys.plural(seed.derivedKeysCount)
         }
     }
 }

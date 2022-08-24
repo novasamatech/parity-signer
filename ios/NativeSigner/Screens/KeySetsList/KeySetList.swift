@@ -75,13 +75,41 @@ struct KeySetListPreview: PreviewProvider {
                     for:
                     MSeeds(
                         seedNameCards: [
-                            SeedNameCard(seedName: "aaaa", identicon: PreviewData.exampleIdenticon),
-                            SeedNameCard(seedName: "bbbb", identicon: PreviewData.exampleIdenticon),
-                            SeedNameCard(seedName: "cccc", identicon: PreviewData.exampleIdenticon),
-                            SeedNameCard(seedName: "dddd", identicon: PreviewData.exampleIdenticon),
-                            SeedNameCard(seedName: "eeee", identicon: PreviewData.exampleIdenticon),
-                            SeedNameCard(seedName: "ffff", identicon: PreviewData.exampleIdenticon),
-                            SeedNameCard(seedName: "gggg", identicon: PreviewData.exampleIdenticon)
+                            SeedNameCard(
+                                seedName: "aaaa",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 3
+                            ),
+                            SeedNameCard(
+                                seedName: "bbbb",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 0
+                            ),
+                            SeedNameCard(
+                                seedName: "cccc",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 1
+                            ),
+                            SeedNameCard(
+                                seedName: "dddd",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 4
+                            ),
+                            SeedNameCard(
+                                seedName: "eeee",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 15
+                            ),
+                            SeedNameCard(
+                                seedName: "ffff",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 1
+                            ),
+                            SeedNameCard(
+                                seedName: "gggg",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 0
+                            )
                         ]
                     )
                 )
