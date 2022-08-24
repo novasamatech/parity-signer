@@ -38,29 +38,61 @@ struct EmptyButton: View {
 
 struct EmptyButton_Previews: PreviewProvider {
     static var previews: some View {
-        VStack {
+        VStack(alignment: .center, spacing: 10) {
             Text("<< Enabled >>")
             EmptyButton(
                 action: {},
                 text: "Short Title"
             )
+            .padding(10)
             EmptyButton(
                 action: {},
                 text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
             )
+            .padding(10)
             Text("<< Disabled >>")
             EmptyButton(
                 action: {},
                 text: "Short Title",
                 isDisabled: true
             )
+            .padding(10)
             EmptyButton(
                 action: {},
                 text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                 isDisabled: true
             )
+            .padding(10)
         }
         .preferredColorScheme(.dark)
+        .previewLayout(.sizeThatFits)
+        VStack(alignment: .center, spacing: 10) {
+            Text("<< Enabled >>")
+            EmptyButton(
+                action: {},
+                text: "Short Title"
+            )
+            .padding(10)
+            EmptyButton(
+                action: {},
+                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+            )
+            .padding(10)
+            Text("<< Disabled >>")
+            EmptyButton(
+                action: {},
+                text: "Short Title",
+                isDisabled: true
+            )
+            .padding(10)
+            EmptyButton(
+                action: {},
+                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                isDisabled: true
+            )
+            .padding(10)
+        }
+        .preferredColorScheme(.light)
         .previewLayout(.sizeThatFits)
     }
 }
