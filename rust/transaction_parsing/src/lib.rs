@@ -2,6 +2,7 @@
 #![deny(rustdoc::broken_intra_doc_links)]
 
 use definitions::navigation::TransactionCardSet;
+use std::path::Path;
 
 pub use definitions::navigation::{StubNav, TransactionAction};
 mod add_specs;
@@ -34,7 +35,10 @@ pub use crate::error::{Error, Result};
 /// - actual content (differs between transaction types, could be even empty)
 /// actual content is handled individually depending on prelude
 
-fn handle_scanner_input(payload: &str, dbname: &str) -> Result<TransactionAction> {
+fn handle_scanner_input<P>(payload: &str, db_path: P) -> Result<TransactionAction>
+where
+    P: AsRef<Path>,
+{
     let data_hex = {
         if let Some(a) = payload.strip_prefix("0x") {
             a
@@ -52,17 +56,20 @@ fn handle_scanner_input(payload: &str, dbname: &str) -> Result<TransactionAction
     }
 
     match &data_hex[4..6] {
-        "00" | "02" => parse_transaction(data_hex, dbname),
-        "03" => process_message(data_hex, dbname),
-        "80" => load_metadata(data_hex, dbname),
-        "81" => load_types(data_hex, dbname),
-        "c1" => add_specs(data_hex, dbname),
-        "de" => process_derivations(data_hex, dbname),
+        "00" | "02" => parse_transaction(data_hex, db_path),
+        "03" => process_message(data_hex, db_path),
+        "80" => load_metadata(data_hex, db_path),
+        "81" => load_types(data_hex, db_path),
+        "c1" => add_specs(data_hex, db_path),
+        "de" => process_derivations(data_hex, db_path),
         _ => Err(Error::PayloadNotSupported(data_hex[4..6].to_string())),
     }
 }
 
-pub fn produce_output(payload: &str, dbname: &str) -> TransactionAction {
+pub fn produce_output<P>(payload: &str, dbname: P) -> TransactionAction
+where
+    P: AsRef<Path>,
+{
     match handle_scanner_input(payload, dbname) {
         Ok(out) => out,
         Err(e) => TransactionAction::Read {

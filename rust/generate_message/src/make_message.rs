@@ -1,5 +1,5 @@
 //! Complete generating update QR code or test string, signed or unsigned
-use constants::{ALICE_SEED_PHRASE, EXPORT_FOLDER};
+use constants::ALICE_SEED_PHRASE;
 use definitions::{
     crypto::{Encryption, SufficientCrypto},
     metadata::MetaValues,
@@ -184,26 +184,22 @@ pub fn make_message(make: Make) -> Result<()> {
         },
     };
 
-    let output_name = match make.name {
-        Some(a) => format!("{}", a.to_string_lossy()),
-        None => format!("{}/{}", EXPORT_FOLDER, complete_name),
-    };
+    let mut output_name = make
+        .name
+        .clone()
+        .unwrap_or_else(|| make.export_dir.join(complete_name));
 
     match make.goal {
         Goal::Qr => {
             make_pretty_qr(&complete_message, &output_name).map_err(Error::Qr)?;
         }
         Goal::Text => {
-            std::fs::write(
-                &format!("{}.txt", output_name),
-                &hex::encode(&complete_message),
-            )?;
+            output_name.set_extension("txt");
+            std::fs::write(&output_name, &hex::encode(&complete_message))?;
         }
         Goal::Both => {
-            std::fs::write(
-                &format!("{}.txt", output_name),
-                &hex::encode(&complete_message),
-            )?;
+            output_name.set_extension("txt");
+            std::fs::write(&output_name, &hex::encode(&complete_message))?;
             make_pretty_qr(&complete_message, &output_name).map_err(Error::Qr)?;
         }
     }

@@ -14,7 +14,7 @@ jobs:
     steps:
 
       - name:                 Cancel Previous Runs
-        uses:                 styfle/cancel-workflow-action@0.10.0
+        uses:                 styfle/cancel-workflow-action@bb6001c4ea612bf59c3abfc4756fbceee4f870c7 # 0.10.0
         with:
           access_token:       ${{ github.token }}
 
@@ -37,7 +37,7 @@ jobs:
           override:           true
 
       - name:                 Install cargo-nextest
-        uses:                 baptiste0928/cargo-install@v1
+        uses:                 baptiste0928/cargo-install@bf6758885262d0e6f61089a9d8c8790d3ac3368f # v1.3.0
         with:
           crate:              cargo-nextest
           version:            0.9
@@ -50,7 +50,7 @@ jobs:
           use-tool-cache:     true
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@v2.0.0
+        uses:                 Swatinem/rust-cache@6720f05bc48b77f96918929a9019fb2203ff71f8 # v2.0.0
         with:
           workspaces:         rust -> rust/target
 

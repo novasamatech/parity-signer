@@ -13,7 +13,7 @@ jobs:
     runs-on:            ubuntu-latest
     steps:
       - name:           Cancel Previous Runs
-        uses:           styfle/cancel-workflow-action@0.10.0
+        uses:           styfle/cancel-workflow-action@bb6001c4ea612bf59c3abfc4756fbceee4f870c7 # 0.10.0
         with:
           access_token: ${{ github.token }}
 
@@ -55,7 +55,7 @@ jobs:
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@v2.0.0
+        uses:           Swatinem/rust-cache@6720f05bc48b77f96918929a9019fb2203ff71f8 # v2.0.0
         with:
           workspaces:   rust -> rust/target
 
@@ -80,7 +80,7 @@ jobs:
     # if: github.ref == ' refs/head/main'
     steps:
       - name:           Cancel Previous Runs
-        uses:           styfle/cancel-workflow-action@0.10.0
+        uses:           styfle/cancel-workflow-action@bb6001c4ea612bf59c3abfc4756fbceee4f870c7 # 0.10.0
         with:
           access_token: ${{ github.token }}
 
@@ -123,7 +123,7 @@ jobs:
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@v2.0.0
+        uses:           Swatinem/rust-cache@6720f05bc48b77f96918929a9019fb2203ff71f8 # v2.0.0
         with:
           workspaces:   rust -> rust/target
 

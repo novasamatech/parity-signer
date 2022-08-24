@@ -13,17 +13,21 @@ use parser::{method::OlderMeta, MetadataBundle};
 use sp_core::{ecdsa, ed25519, sr25519, H256};
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
+use std::path::Path;
 
 use crate::error::{Error, Result};
 
 /// Function to get the network specs from the database
 /// by network name and encryption
-pub(crate) fn specs_by_name(
+pub(crate) fn specs_by_name<P>(
     network_name: &str,
     encryption: &Encryption,
-    database_name: &str,
-) -> Result<NetworkSpecs> {
-    let database = open_db(database_name)?;
+    db_path: P,
+) -> Result<NetworkSpecs>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
     let chainspecs = open_tree(&database, SPECSTREE)?;
     let mut found_network_specs = None;
     for x in chainspecs.iter().flatten() {
@@ -51,8 +55,11 @@ pub(crate) fn specs_by_name(
     }
 }
 
-pub fn find_meta_set(short_specs: &ShortSpecs, database_name: &str) -> Result<Vec<MetaSetElement>> {
-    let database = open_db(database_name)?;
+pub fn find_meta_set<P>(short_specs: &ShortSpecs, db_path: P) -> Result<Vec<MetaSetElement>>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
     let metadata = open_tree(&database, METATREE)?;
     let mut out: Vec<MetaSetElement> = Vec::new();
     let meta_key_prefix = MetaKeyPrefix::from_name(&short_specs.name);
@@ -73,19 +80,22 @@ pub fn find_meta_set(short_specs: &ShortSpecs, database_name: &str) -> Result<Ve
     Ok(out)
 }
 
-pub fn bundle_from_meta_set_element<'a>(
-    meta_set_element: &'a MetaSetElement,
-    database_name: &'a str,
-) -> Result<MetadataBundle<'a>> {
+pub fn bundle_from_meta_set_element<P>(
+    meta_set_element: &MetaSetElement,
+    db_path: P,
+) -> Result<MetadataBundle>
+where
+    P: AsRef<Path>,
+{
     match meta_set_element.runtime_metadata() {
         RuntimeMetadata::V12(ref meta_v12) => Ok(MetadataBundle::Older {
             older_meta: OlderMeta::V12(meta_v12),
-            types: get_types(database_name)?,
+            types: get_types(db_path)?,
             network_version: meta_set_element.version(),
         }),
         RuntimeMetadata::V13(ref meta_v13) => Ok(MetadataBundle::Older {
             older_meta: OlderMeta::V13(meta_v13),
-            types: get_types(database_name)?,
+            types: get_types(db_path)?,
             network_version: meta_set_element.version(),
         }),
         RuntimeMetadata::V14(ref meta_v14) => Ok(MetadataBundle::Sci {
@@ -96,9 +106,12 @@ pub fn bundle_from_meta_set_element<'a>(
     }
 }
 
-pub fn accept_meta_values(meta_values: &MetaValues, database_name: &str) -> Result<bool> {
+pub fn accept_meta_values<P>(meta_values: &MetaValues, db_path: P) -> Result<bool>
+where
+    P: AsRef<Path>,
+{
     let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
-    let database = open_db(database_name)?;
+    let database = open_db(db_path)?;
     let metadata = open_tree(&database, METATREE)?;
     match metadata.get(meta_key.key())? {
         Some(a) => {
@@ -116,9 +129,12 @@ pub fn accept_meta_values(meta_values: &MetaValues, database_name: &str) -> Resu
 }
 
 /// Function to check if the chain specs are already in the database
-pub fn specs_are_new(new: &NetworkSpecsToSend, database_name: &str) -> Result<bool> {
+pub fn specs_are_new<P>(new: &NetworkSpecsToSend, db_path: P) -> Result<bool>
+where
+    P: AsRef<Path>,
+{
     let network_specs_key = NetworkSpecsKey::from_parts(&new.genesis_hash, &new.encryption);
-    let database = open_db(database_name)?;
+    let database = open_db(db_path)?;
     let chainspecs = open_tree(&database, SPECSTREE)?;
     match chainspecs.get(network_specs_key.key())? {
         Some(encoded_known_network_specs) => {
