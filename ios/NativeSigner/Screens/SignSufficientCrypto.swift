@@ -36,7 +36,8 @@ struct SignSufficientCrypto: View {
                                         hasPwd: keyrecord.hasPwd,
                                         identicon: keyrecord.identicon,
                                         seedName: keyrecord.seedName,
-                                        multiselect: nil
+                                        multiselect: nil,
+                                        secretExposed: keyrecord.secretExposed
                                     )
                                 )
                             }

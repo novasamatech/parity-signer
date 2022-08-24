@@ -50,6 +50,14 @@ struct HistoryCardExtended: View {
                 line2: value.seedName + value.path + " in network with hash " +
                     value.networkGenesisHash.formattedAsString
             )
+        case let .secretWasExported(value):
+            HistoryCardTemplate(
+                image: .init(.eye, variants: [.trianglebadge, .exclamationmark, .fill]),
+                danger: true,
+                line1: Localizable.secretWasExported.string,
+                line2: value.seedName + value.path + " in network with hash " +
+                    value.networkGenesisHash.formattedAsString
+            )
         case let .networkVerifierSet(value):
             switch value.validCurrentVerifier {
             case .general:

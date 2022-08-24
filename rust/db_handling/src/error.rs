@@ -364,6 +364,30 @@ pub enum Error {
 
     #[error("There are no seeds. Please create a seed first.")]
     NoKnownSeeds,
+
+    /// Found `secret_exposed` flag mismatch in the database: address is not
+    /// marked as potentially exposed when it must have been.
+    #[error(
+    "Address details entry with public key {} (seed {}, path {}{}) is not marked as potentially exposed, \
+        when it should be.",
+    hex::encode(multisigner_to_public(.multisigner)),
+    .address_details.seed_name,
+    .address_details.path,
+    if .address_details.has_pwd { "///<password>" } else { "" },
+    )]
+    SecretExposedMismatch {
+        multisigner: MultiSigner,
+        address_details: AddressDetails,
+    },
+
+    /// User has entered a wrong password for a passworded address.
+    #[error("Wrong password.")]
+    WrongPassword,
+
+    #[error("Key pair with public key {} can't be expressed as a direct derivation from a seed",
+    hex::encode(multisigner_to_public(.multisigner)),
+    )]
+    NoSeedForKeyPair { multisigner: MultiSigner },
 }
 
 /// DB handling result.

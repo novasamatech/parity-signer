@@ -71,6 +71,7 @@ fun KeyCardActive(
 					hasPwd = address.hasPwd,
 					identicon = address.identicon,
 					multiselect = address.multiselect,
+					secretExposed = address.secretExposed,
 					seedName = rootSeed
 				), multiselectMode
 			)

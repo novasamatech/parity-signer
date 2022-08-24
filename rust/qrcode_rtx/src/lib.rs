@@ -2,7 +2,7 @@
 
 use bitvec::prelude::{BitVec, Msb0};
 use constants::{qr_palette, BORDER, CHUNK_SIZE, FPS_DEN, FPS_NOM, SCALING};
-use qrcode_static::png_qr;
+use qrcode_static::{png_qr, DataType};
 use qrcodegen::{QrCode, QrCodeEcc};
 use std::fs;
 use std::path::Path;
@@ -111,7 +111,7 @@ where
     P: AsRef<Path>,
 {
     if input.len() <= 2953 {
-        let qr = png_qr(input)?;
+        let qr = png_qr(input, DataType::Regular)?;
         match std::fs::write(output_name, &qr) {
             Ok(_) => Ok(()),
             Err(e) => Err(Box::from(format!("Output error {}", e))),

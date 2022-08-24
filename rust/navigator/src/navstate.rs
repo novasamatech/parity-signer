@@ -1786,6 +1786,7 @@ impl State {
                                 path: author_info.path,
                                 has_pwd: author_info.has_pwd,
                                 multiselect: None,
+                                secret_exposed: author_info.secret_exposed,
                             };
                             let f = MSufficientCryptoReady {
                                 author_info,

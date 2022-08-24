@@ -31,6 +31,7 @@ fun SignSufficientCrypto(
 						hasPwd = identity.hasPwd,
 						identicon = identity.identicon,
 						seedName = identity.seedName,
+						secretExposed = identity.secretExposed,
 						multiselect = null
 					))
 				}

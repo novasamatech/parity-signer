@@ -488,6 +488,9 @@ pub enum Event {
     /// text on screen (stored value here is the seed name)
     SeedNameWasShown { seed_name_was_shown: String }, // for individual seed_name
 
+    /// User has generated QR code for secret key export
+    SecretWasExported { identity_history: IdentityHistory },
+
     /// A warning was produces and displayed to user
     Warning { warning: String },
 
@@ -669,6 +672,15 @@ pub fn all_events_preview() -> Vec<Event> {
         },
         Event::SeedNameWasShown {
             seed_name_was_shown: String::from("AliceSecretSeed"),
+        },
+        Event::SecretWasExported {
+            identity_history: IdentityHistory::get(
+                "Alice",
+                &Encryption::Sr25519,
+                &public,
+                "//1",
+                network_specs.genesis_hash,
+            ),
         },
         Event::Warning {
             warning: String::from("Received network information is not verified."),

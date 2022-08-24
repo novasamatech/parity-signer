@@ -64,6 +64,14 @@ struct HistoryCard: View {
                 line1: Localizable.HistoryCard.keysRemoved.string,
                 line2: value.seedName + value.path
             )
+        case let .secretWasExported(value):
+            HistoryCardTemplate(
+                image: .init(.eye, variants: [.trianglebadge, .exclamationmark, .fill]),
+                timestamp: timestamp,
+                danger: true,
+                line1: Localizable.HistoryCard.secretWasExported.string,
+                line2: value.seedName + value.path
+            )
         case let .metadataAdded(value):
             HistoryCardTemplate(
                 image: .init(.plus, variant: .viewfinder),

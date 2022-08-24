@@ -15,8 +15,8 @@ use std::{convert::TryInto, fs, path::PathBuf, str::FromStr};
 use constants::{
     test_values::{
         alice_sr_alice, alice_sr_kusama, alice_sr_polkadot, alice_sr_root,
-        alice_sr_secret_abracadabra, alice_sr_westend, alice_westend_root_qr, empty_png,
-        types_known, westend_9000, westend_9010,
+        alice_sr_secret_abracadabra, alice_sr_westend, alice_westend_root_qr,
+        alice_westend_secret_qr, empty_png, types_known, westend_9000, westend_9010,
     },
     ADDRTREE, ALICE_SEED_PHRASE, METATREE, SPECSTREE,
 };
@@ -57,8 +57,8 @@ use db_handling::{
         try_get_valid_current_verifier,
     },
     identities::{
-        create_increment_set, derivation_check, get_addresses_by_seed_name, remove_key,
-        remove_seed, try_create_address, try_create_seed, DerivationCheck,
+        create_increment_set, derivation_check, export_secret_key, get_addresses_by_seed_name,
+        remove_key, remove_seed, try_create_address, try_create_seed, DerivationCheck,
     },
     interface_signer::{
         addresses_set_seed_name_network, backup_prep, derive_prep, dynamic_path_check, export_key,
@@ -131,6 +131,7 @@ fn print_all_ids() {
             identicon: alice_sr_westend().to_vec(),
             has_pwd: false,
             path: "//westend".to_string(),
+            secret_exposed: false,
         },
         MRawKey {
             seed_name: "Alice".to_string(),
@@ -141,6 +142,7 @@ fn print_all_ids() {
             identicon: alice_sr_root().to_vec(),
             has_pwd: false,
             path: "".to_string(),
+            secret_exposed: false,
         },
         MRawKey {
             seed_name: "Alice".to_string(),
@@ -151,6 +153,7 @@ fn print_all_ids() {
             identicon: alice_sr_kusama().to_vec(),
             has_pwd: false,
             path: "//kusama".to_string(),
+            secret_exposed: false,
         },
         MRawKey {
             seed_name: "Alice".to_string(),
@@ -161,6 +164,7 @@ fn print_all_ids() {
             identicon: alice_sr_alice().to_vec(),
             has_pwd: false,
             path: "//Alice".to_string(),
+            secret_exposed: false,
         },
         MRawKey {
             seed_name: "Alice".to_string(),
@@ -171,6 +175,7 @@ fn print_all_ids() {
             identicon: alice_sr_polkadot().to_vec(),
             has_pwd: false,
             path: "//polkadot".to_string(),
+            secret_exposed: false,
         },
     ];
 
@@ -204,6 +209,7 @@ fn print_ids_seed_name_network() {
             base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
             swiped: false,
             multiselect: false,
+            secret_exposed: false,
         },
         vec![
             MKeysCard {
@@ -215,6 +221,7 @@ fn print_ids_seed_name_network() {
                 path: "//westend".to_string(),
                 swiped: false,
                 multiselect: false,
+                secret_exposed: false,
             },
             MKeysCard {
                 address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
@@ -225,6 +232,7 @@ fn print_ids_seed_name_network() {
                 path: "//Alice".to_string(),
                 swiped: false,
                 multiselect: false,
+                secret_exposed: false,
             },
         ],
     );
@@ -350,6 +358,7 @@ fn export_alice_westend() {
             path: "".to_string(),
             has_pwd: false,
             multiselect: None,
+            secret_exposed: false,
         },
         network_info: MSCNetworkInfo {
             network_title: "Westend".to_string(),
@@ -512,6 +521,7 @@ fn derive_prep_alice_collided() {
                 identicon: alice_sr_alice().to_vec(),
                 seed_name: "Alice".to_string(),
                 multiselect: None,
+                secret_exposed: false,
             }),
             error: None,
         },
@@ -580,6 +590,7 @@ fn derive_prep_alice_collided_with_password() {
                 identicon: alice_sr_secret_abracadabra().to_vec(),
                 seed_name: "Alice".to_string(),
                 multiselect: None,
+                secret_exposed: false,
             }),
             error: None,
         },
@@ -740,6 +751,7 @@ fn path_is_known() {
             identicon: alice_sr_alice().to_vec(),
             seed_name: "Alice".to_string(),
             multiselect: None,
+            secret_exposed: false,
         }),
         error: None,
     };
@@ -923,6 +935,7 @@ fn test_generate_default_addresses_for_alice() {
                     .unwrap(),
                 ],
                 encryption: Encryption::Sr25519,
+                secret_exposed: false,
             },
         ),
         (
@@ -944,6 +957,7 @@ fn test_generate_default_addresses_for_alice() {
                 ]))
                 .unwrap()],
                 encryption: Encryption::Sr25519,
+                secret_exposed: false,
             },
         ),
     ];
@@ -2363,5 +2377,55 @@ fn remove_westend_9010() {
         !check_for_network("westend", network_version, dbname),
         "Westend 9010 not removed."
     );
+    fs::remove_dir_all(dbname).unwrap();
+}
+
+#[cfg(feature = "test")]
+#[test]
+fn test_export_secret_key() {
+    let dbname = "for_tests/export_alice_secret";
+    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let specs = default_chainspecs();
+    let spec = specs.iter().find(|spec| spec.name == "westend").unwrap();
+    let network_id = NetworkSpecsKey::from_parts(&spec.genesis_hash, &spec.encryption);
+    let seed_name = "Alice";
+
+    let (derivation_path, child_path) = ("//Alice", "//Alice//1");
+    try_create_address(
+        seed_name,
+        ALICE_SEED_PHRASE,
+        child_path,
+        &network_id,
+        dbname,
+    )
+    .unwrap();
+    let identities: Vec<(MultiSigner, AddressDetails)> =
+        get_addresses_by_seed_name(dbname, seed_name).unwrap();
+
+    let (derivation_multisigner, _) = identities
+        .iter()
+        .find(|(_, a)| a.path == derivation_path)
+        .unwrap();
+    let secret_key = export_secret_key(
+        dbname,
+        derivation_multisigner,
+        seed_name,
+        &network_id,
+        ALICE_SEED_PHRASE,
+        None,
+    )
+    .unwrap();
+
+    assert_eq!(secret_key.qr, alice_westend_secret_qr().to_vec());
+    assert!(secret_key.address.secret_exposed);
+
+    let identities: Vec<(MultiSigner, AddressDetails)> =
+        get_addresses_by_seed_name(dbname, seed_name).unwrap();
+    let (_, child_address) = identities
+        .iter()
+        .find(|(_, a)| a.path == child_path)
+        .unwrap();
+    assert!(child_address.secret_exposed);
+
     fs::remove_dir_all(dbname).unwrap();
 }

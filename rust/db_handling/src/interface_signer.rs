@@ -26,7 +26,7 @@ use definitions::{
     qr_transfers::ContentLoadTypes,
     users::AddressDetails,
 };
-use qrcode_static::png_qr_from_string;
+use qrcode_static::{png_qr_from_string, DataType};
 
 use crate::helpers::{
     get_address_details, get_all_networks, get_general_verifier, get_meta_values_by_name,
@@ -168,6 +168,7 @@ where
                 identicon,
                 has_pwd: address_details.has_pwd,
                 path: address_details.path,
+                secret_exposed: address_details.secret_exposed,
             }
         })
         .collect())
@@ -221,6 +222,7 @@ where
                 base58,
                 swiped,
                 multiselect,
+                secret_exposed: address_details.secret_exposed,
             });
         } else {
             other_id.push((multisigner, address_details, identicon, swiped, multiselect))
@@ -242,6 +244,7 @@ where
                 path: address_details.path,
                 swiped,
                 multiselect,
+                secret_exposed: address_details.secret_exposed,
             },
         )
         .collect();
@@ -362,11 +365,14 @@ where
     let identicon = make_identicon_from_multisigner(multisigner);
     let qr = {
         if address_details.network_id.contains(network_specs_key) {
-            png_qr_from_string(&format!(
-                "substrate:{}:0x{}",
-                base58,
-                hex::encode(&network_specs.genesis_hash)
-            ))
+            png_qr_from_string(
+                &format!(
+                    "substrate:{}:0x{}",
+                    base58,
+                    hex::encode(&network_specs.genesis_hash)
+                ),
+                DataType::Regular,
+            )
             .map_err(|e| Error::Qr(e.to_string()))?
         } else {
             return Err(Error::NetworkSpecsKeyForAddressNotFound {
@@ -382,6 +388,7 @@ where
         identicon,
         seed_name: address_details.seed_name,
         multiselect: None,
+        secret_exposed: address_details.secret_exposed,
     };
 
     let network_info = MSCNetworkInfo {
@@ -480,6 +487,7 @@ where
                 identicon,
                 seed_name,
                 multiselect: None,
+                secret_exposed: address_details.secret_exposed,
             };
 
             NavDerivationCheck {
@@ -568,6 +576,7 @@ where
                     identicon,
                     seed_name: seed_name.to_string(),
                     multiselect: None,
+                    secret_exposed: address_details.secret_exposed,
                 };
                 NavDerivationCheck {
                     button_good: false,
