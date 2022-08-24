@@ -59,18 +59,10 @@ struct Header: View {
                     Spacer()
                     Button(
                         action: {
-                            if alert, rightButton == .newSeed {
-                                alertShow()
-                            } else {
-                                navigationRequest(.init(action: .rightButtonAction))
-                            }
+                            navigationRequest(.init(action: .rightButtonAction))
                         },
                         label: {
                             switch rightButton {
-                            case .newSeed:
-                                Image(.plus, variant: .circle)
-                                    .imageScale(.large)
-                                    .foregroundColor(Asset.action400.swiftUIColor)
                             case .backup:
                                 Image(.ellipsis)
                                     .imageScale(.large)

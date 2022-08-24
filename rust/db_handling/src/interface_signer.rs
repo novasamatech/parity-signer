@@ -60,6 +60,7 @@ where
     P: AsRef<Path>,
 {
     let mut data_set: HashMap<String, Vec<MultiSigner>> = HashMap::new();
+    let mut derivation_count: HashMap<String, u32> = HashMap::new();
     for (multisigner, address_details) in get_all_addresses(&db_path)?.into_iter() {
         if address_details.is_root() {
             // found a seed key; could be any of the supported encryptions;
@@ -81,8 +82,14 @@ where
                     data_set.insert(address_details.seed_name.to_string(), vec![multisigner]);
                 }
             }
-        } else if data_set.get(&address_details.seed_name).is_none() {
-            data_set.insert(address_details.seed_name.to_string(), Vec::new());
+        } else {
+            derivation_count
+                .entry(address_details.seed_name.to_string())
+                .and_modify(|e| *e += 1)
+                .or_insert(1);
+            if data_set.get(&address_details.seed_name).is_none() {
+                data_set.insert(address_details.seed_name.to_string(), Vec::new());
+            }
         }
     }
     for x in names_phone_knows.iter() {
@@ -93,8 +100,9 @@ where
     let mut res: Vec<_> = data_set
         .into_iter()
         .map(|(seed_name, multisigner_set)| SeedNameCard {
-            seed_name,
+            seed_name: seed_name.clone(),
             identicon: preferred_multisigner_identicon(&multisigner_set),
+            derived_keys_count: *derivation_count.get(&seed_name).unwrap_or(&0),
         })
         .collect();
     res.sort_by(|a, b| a.seed_name.cmp(&b.seed_name));
