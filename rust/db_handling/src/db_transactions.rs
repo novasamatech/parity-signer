@@ -7,6 +7,7 @@
 //!
 //! For transactions scanned into Signer, currently a temporary database entry
 //! is made to store transaction details while they are displayed to user.
+use std::path::Path;
 // TODO this is a temporary solution, the data eventually could be stored in
 // `navigator` state.
 #[cfg(feature = "signer")]
@@ -152,8 +153,11 @@ impl TrDbCold {
     /// with a given name, in a single transaction.
     ///
     /// Note that both `ErrorSource` variants are available.
-    pub fn apply(&self, database_name: &str) -> Result<()> {
-        let database = open_db(database_name)?;
+    pub fn apply<P>(&self, db_path: P) -> Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        let database = open_db(&db_path)?;
         let addresses = open_tree(&database, ADDRTREE)?;
         let history = open_tree(&database, HISTORY)?;
         let metadata = open_tree(&database, METATREE)?;
@@ -293,8 +297,11 @@ impl TrDbHot {
 
     /// Apply constructed set of batches within [`TrDbHot`] to the database
     /// with a given name, in a single transaction.
-    pub fn apply(&self, database_name: &str) -> Result<()> {
-        let database = open_db(database_name)?;
+    pub fn apply<P>(&self, db_path: P) -> Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        let database = open_db(&db_path)?;
         let address_book = open_tree(&database, ADDRESS_BOOK)?;
         let metadata = open_tree(&database, METATREE)?;
         let meta_history = open_tree(&database, META_HISTORY)?;
@@ -473,16 +480,19 @@ impl TrDbColdStub {
     /// into storage.
     ///
     /// [`TRANSACTION`] tree is cleared in the process.
-    pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self> {
+    pub fn from_storage<P>(db_path: P, checksum: u32) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
         let stub_encoded = {
-            let database = open_db(database_name)?;
+            let database = open_db(&db_path)?;
             verify_checksum(&database, checksum)?;
             let transaction = open_tree(&database, TRANSACTION)?;
             transaction.get(STUB)?.ok_or(Error::Stub)?
         };
         TrDbCold::new()
-            .set_transaction(make_batch_clear_tree(database_name, TRANSACTION)?) // clear transaction tree
-            .apply(database_name)?;
+            .set_transaction(make_batch_clear_tree(&db_path, TRANSACTION)?) // clear transaction tree
+            .apply(&db_path)?;
         Ok(Self::decode(&mut &stub_encoded[..])?)
     }
 
@@ -493,13 +503,16 @@ impl TrDbColdStub {
     /// stored [`TrDbColdStub`] using `from_storage` method.
     ///
     /// The [`TRANSACTION`] tree is cleared prior to adding data to storage.
-    pub fn store_and_get_checksum(&self, database_name: &str) -> Result<u32> {
-        let mut transaction_batch = make_batch_clear_tree(database_name, TRANSACTION)?;
+    pub fn store_and_get_checksum<P>(&self, db_path: P) -> Result<u32>
+    where
+        P: AsRef<Path>,
+    {
+        let mut transaction_batch = make_batch_clear_tree(&db_path, TRANSACTION)?;
         transaction_batch.insert(STUB, self.encode());
         TrDbCold::new()
             .set_transaction(transaction_batch) // clear transaction tree
-            .apply(database_name)?;
-        let database = open_db(database_name)?;
+            .apply(&db_path)?;
+        let database = open_db(&db_path)?;
         Ok(database.checksum()?)
     }
 
@@ -567,19 +580,22 @@ impl TrDbColdStub {
     /// Note that `add_network_specs` does not deal with network verifiers:
     /// verifier data is not necessarily updated each time the network
     /// specs are added.
-    pub fn add_network_specs(
+    pub fn add_network_specs<P>(
         mut self,
         network_specs_to_send: &NetworkSpecsToSend,
         valid_current_verifier: &ValidCurrentVerifier,
         general_verifier: &Verifier,
-        database_name: &str,
-    ) -> Result<Self> {
+        db_path: P,
+    ) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
         let network_specs_key = NetworkSpecsKey::from_parts(
             &network_specs_to_send.genesis_hash,
             &network_specs_to_send.encryption,
         );
         let order = {
-            let database = open_db(database_name)?;
+            let database = open_db(&db_path)?;
             let chainspecs = open_tree(&database, SPECSTREE)?;
             chainspecs.len()
         } as u8;
@@ -595,7 +611,7 @@ impl TrDbColdStub {
             ),
         });
         {
-            let database = open_db(database_name)?;
+            let database = open_db(&db_path)?;
             let identities = open_tree(&database, ADDRTREE)?;
             for (address_key_vec, address_entry) in identities.iter().flatten() {
                 let address_key = AddressKey::from_ivec(&address_key_vec);
@@ -746,18 +762,21 @@ impl TrDbColdStub {
     /// It is unlikely that this clearing is ever doing anything, as the
     /// intended use of the [`TrDbColdStub`] is to recover it from the database
     /// (with clearing the [`TRANSACTION`] tree) and then immediately apply.
-    pub fn apply(self, database_name: &str) -> Result<()> {
-        let for_transaction = make_batch_clear_tree(database_name, TRANSACTION)?;
+    pub fn apply<P>(self, db_path: P) -> Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        let for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
         TrDbCold {
             for_addresses: self.addresses_stub.make_batch(),
-            for_history: events_to_batch(database_name, self.history_stub)?,
+            for_history: events_to_batch(&db_path, self.history_stub)?,
             for_metadata: self.metadata_stub.make_batch(),
             for_network_specs: self.network_specs_stub.make_batch(),
             for_settings: self.settings_stub.make_batch(),
             for_transaction,
             for_verifiers: self.verifiers_stub.make_batch(),
         }
-        .apply(database_name)
+        .apply(db_path)
     }
 }
 
@@ -878,9 +897,12 @@ impl TrDbColdSign {
     /// [`TRANSACTION`] tree is **not** cleared in the process. User is allowed
     /// to try entering password several times, for all this time the
     /// transaction remains in the database.
-    pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self> {
+    pub fn from_storage<P>(db_path: P, checksum: u32) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
         let sign_encoded = {
-            let database = open_db(database_name)?;
+            let database = open_db(&db_path)?;
             verify_checksum(&database, checksum)?;
             let transaction = open_tree(&database, TRANSACTION)?;
             match transaction.get(SIGN)? {
@@ -918,13 +940,16 @@ impl TrDbColdSign {
     /// stored [`TrDbColdSign`] using `from_storage` method.
     ///
     /// The [`TRANSACTION`] tree is cleared prior to adding data to storage.
-    pub fn store_and_get_checksum(&self, database_name: &str) -> Result<u32> {
-        let mut transaction_batch = make_batch_clear_tree(database_name, TRANSACTION)?;
+    pub fn store_and_get_checksum<P>(&self, db_path: P) -> Result<u32>
+    where
+        P: AsRef<Path>,
+    {
+        let mut transaction_batch = make_batch_clear_tree(&db_path, TRANSACTION)?;
         transaction_batch.insert(SIGN, self.encode());
         TrDbCold::new()
             .set_transaction(transaction_batch) // clear transaction tree
-            .apply(database_name)?;
-        let database = open_db(database_name)?;
+            .apply(&db_path)?;
+        let database = open_db(&db_path)?;
         Ok(database.checksum()?)
     }
 
@@ -952,12 +977,10 @@ impl TrDbColdSign {
     ///
     /// If the password entered is correct, the [`TRANSACTION`] tree gets
     /// cleared.
-    pub fn apply(
-        self,
-        wrong_password: bool,
-        user_comment: &str,
-        database_name: &str,
-    ) -> Result<u32> {
+    pub fn apply<P>(self, wrong_password: bool, user_comment: &str, db_path: P) -> Result<u32>
+    where
+        P: AsRef<Path>,
+    {
         let signed_by = VerifierValue::Standard {
             m: self.multisigner(),
         };
@@ -972,7 +995,7 @@ impl TrDbColdSign {
                     history.push(Event::TransactionSignError { sign_display })
                 } else {
                     history.push(Event::TransactionSigned { sign_display });
-                    for_transaction = make_batch_clear_tree(database_name, TRANSACTION)?;
+                    for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
                 }
             }
             SignContent::Message(message) => {
@@ -986,15 +1009,15 @@ impl TrDbColdSign {
                     history.push(Event::MessageSigned {
                         sign_message_display,
                     });
-                    for_transaction = make_batch_clear_tree(database_name, TRANSACTION)?;
+                    for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
                 }
             }
         }
         TrDbCold::new()
-            .set_history(events_to_batch(database_name, history)?)
+            .set_history(events_to_batch(&db_path, history)?)
             .set_transaction(for_transaction)
-            .apply(database_name)?;
-        let database = open_db(database_name)?;
+            .apply(&db_path)?;
+        let database = open_db(&db_path)?;
         Ok(database.checksum()?)
     }
 }
@@ -1047,9 +1070,12 @@ impl TrDbColdDerivations {
     /// occured.
     ///
     /// [`TRANSACTION`] tree is cleared in the process.
-    pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self> {
+    pub fn from_storage<P>(db_path: P, checksum: u32) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
         let drv_encoded = {
-            let database = open_db(database_name)?;
+            let database = open_db(&db_path)?;
             verify_checksum(&database, checksum)?;
             let transaction = open_tree(&database, TRANSACTION)?;
             match transaction.get(DRV)? {
@@ -1058,8 +1084,8 @@ impl TrDbColdDerivations {
             }
         };
         TrDbCold::new()
-            .set_transaction(make_batch_clear_tree(database_name, TRANSACTION)?) // clear transaction tree
-            .apply(database_name)?;
+            .set_transaction(make_batch_clear_tree(&db_path, TRANSACTION)?) // clear transaction tree
+            .apply(&db_path)?;
         Ok(Self::decode(&mut &drv_encoded[..])?)
     }
 
@@ -1080,13 +1106,16 @@ impl TrDbColdDerivations {
     /// stored [`TrDbColdDerivations`] using `from_storage` method.
     ///
     /// The [`TRANSACTION`] tree is cleared prior to adding data to storage.
-    pub fn store_and_get_checksum(&self, database_name: &str) -> Result<u32> {
-        let mut transaction_batch = make_batch_clear_tree(database_name, TRANSACTION)?;
+    pub fn store_and_get_checksum<P>(&self, db_path: P) -> Result<u32>
+    where
+        P: AsRef<Path>,
+    {
+        let mut transaction_batch = make_batch_clear_tree(&db_path, TRANSACTION)?;
         transaction_batch.insert(DRV, self.encode());
         TrDbCold::new()
             .set_transaction(transaction_batch) // clear transaction tree
-            .apply(database_name)?;
-        let database = open_db(database_name)?;
+            .apply(&db_path)?;
+        let database = open_db(&db_path)?;
 
         Ok(database.checksum()?)
     }
