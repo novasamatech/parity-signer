@@ -258,6 +258,7 @@ pub struct MTransaction {
 pub struct SeedNameCard {
     pub seed_name: String,
     pub identicon: Vec<u8>,
+    pub derived_keys_count: u32,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

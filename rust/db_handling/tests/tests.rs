@@ -81,6 +81,7 @@ fn print_seed_names() {
     let expected_cards = vec![SeedNameCard {
         seed_name: "Alice".to_string(),
         identicon: alice_sr_root().to_vec(),
+        derived_keys_count: 4, // "//westend", "//kusama", "//polkadot", "//Alice"
     }];
     assert!(cards == expected_cards, "\nReceived: \n{:?}", cards);
     fs::remove_dir_all(dbname).unwrap();
@@ -101,10 +102,12 @@ fn print_seed_names_with_orphan() {
         SeedNameCard {
             seed_name: "Alice".to_string(),
             identicon: alice_sr_root().to_vec(),
+            derived_keys_count: 4,
         },
         SeedNameCard {
             seed_name: "BobGhost".to_string(),
             identicon: empty_png().to_vec(),
+            derived_keys_count: 0,
         },
     ];
     assert!(cards == expected_cards, "\nReceived: \n{:?}", cards);

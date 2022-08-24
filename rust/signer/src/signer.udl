@@ -378,6 +378,7 @@ dictionary TransactionCardSet {
 dictionary SeedNameCard {
     string seed_name;
     sequence<u8> identicon;
+    u32 derived_keys_count;
 };
 
 dictionary MSeeds {
