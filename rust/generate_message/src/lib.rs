@@ -1065,10 +1065,9 @@
 //!
 //! `$ cargo run meta-at-block --url wss://westend-rpc.polkadot.io --block
 //! 780812df50c4006d1865742269fe4ca339c097e61d6279cce91ebc58f5aebada`
-#![deny(unused_crate_dependencies)]
+#![deny(unused)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use constants::{load_types, COLD_DB_NAME_RELEASE, HOT_DB_NAME};
 use db_handling::{
     default_cold_release, default_hot,
     helpers::{prep_types, transfer_metadata_to_cold},
@@ -1099,34 +1098,42 @@ pub use error::{Error, Result};
 /// Process incoming command as interpreted by parser.
 pub fn full_run(command: Command) -> Result<()> {
     match command {
-        Command::Show(x) => match x {
-            Show::Metadata => show_metadata(),
-            Show::Networks => show_networks(),
-            Show::Specs { s: title } => show_specs(title),
-            Show::CheckFile { s: path } => check_file(path),
-            Show::BlockHistory => show_block_history(),
+        Command::Show { s: show, db_path } => match show {
+            Show::Metadata => show_metadata(db_path),
+            Show::Networks => show_networks(db_path),
+            Show::Specs { s: title } => show_specs(title, db_path),
+            Show::CheckFile { s: path } => check_file(path, db_path),
+            Show::BlockHistory => show_block_history(db_path),
         },
         Command::Specs { s: instruction } => gen_add_specs(instruction),
         Command::Load(instruction) => gen_load_meta(instruction),
-        Command::Types => Ok(prep_types(HOT_DB_NAME)?.write(&load_types())?),
+        Command::Types { db_path, files_dir } => {
+            Ok(prep_types(db_path)?.write(files_dir.join("sign_me_load_types"))?)
+        }
         Command::Sign(make) | Command::Make(make) => make_message(make),
-        Command::Remove(info) => remove_info(info),
-        Command::RestoreDefaults => Ok(default_hot(None)?),
+        Command::Remove { r: info, db_path } => remove_info(info, db_path),
+        Command::RestoreDefaults { db_path } => Ok(default_hot(Some(db_path))?),
         Command::MakeColdRelease { path } => Ok(default_cold_release(path)?),
-        Command::TransferMetaToColdRelease { path } => {
-            let cold_database_path = match path {
-                Some(ref path) => path.to_str().unwrap_or(COLD_DB_NAME_RELEASE),
-                None => COLD_DB_NAME_RELEASE,
-            };
-            Ok(transfer_metadata_to_cold(HOT_DB_NAME, cold_database_path)?)
+        Command::TransferMetaToColdRelease { cold_db, hot_db } => {
+            Ok(transfer_metadata_to_cold(hot_db, cold_db)?)
         }
         Command::Derivations(x) => process_derivations(x),
-
         Command::Unwasm {
             filename,
             update_db,
-        } => unwasm(&filename, update_db),
-        Command::MetaDefaultFile { name, version } => meta_default_file(&name, version),
-        Command::MetaAtBlock { url, block_hash } => debug_meta_at_block(&url, &block_hash),
+            db_path,
+            files_dir,
+        } => unwasm(&filename, update_db, db_path, files_dir),
+        Command::MetaDefaultFile {
+            name,
+            version,
+            db_path,
+            export_dir,
+        } => meta_default_file(&name, version, db_path, export_dir),
+        Command::MetaAtBlock {
+            url,
+            block_hash,
+            export_dir,
+        } => debug_meta_at_block(&url, &block_hash, export_dir),
     }
 }

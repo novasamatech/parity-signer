@@ -40,7 +40,7 @@ use crate::parser::{Derivations, Goal};
 /// and genesis hash.
 pub fn process_derivations(x: Derivations) -> Result<()> {
     // get network information from the database, by network address book title
-    let address_book_entry = get_address_book_entry(&x.title)?;
+    let address_book_entry = get_address_book_entry(&x.title, x.db)?;
 
     // prepare `ContentDerivations`
     let content = prepare_derivations_import(

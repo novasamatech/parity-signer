@@ -8,13 +8,17 @@ use definitions::{
 };
 use parity_scale_codec::DecodeAll;
 use parser::cards::ParserCard;
+use std::path::Path;
 
 use crate::cards::{make_author_info, Card, Warning};
 use crate::error::{Error, Result};
 use crate::helpers::multisigner_msg_genesis_encryption;
 use crate::TransactionAction;
 
-pub fn process_message(data_hex: &str, database_name: &str) -> Result<TransactionAction> {
+pub fn process_message<P>(data_hex: &str, db_path: P) -> Result<TransactionAction>
+where
+    P: AsRef<Path>,
+{
     let (author_multi_signer, message_vec, genesis_hash, encryption) =
         multisigner_msg_genesis_encryption(data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
@@ -29,10 +33,10 @@ pub fn process_message(data_hex: &str, database_name: &str) -> Result<Transactio
     let mut index: u32 = 0;
     let indent: u32 = 0;
 
-    match try_get_network_specs(database_name, &network_specs_key)? {
+    match try_get_network_specs(&db_path, &network_specs_key)? {
         Some(network_specs) => {
             let address_key = AddressKey::from_multisigner(&author_multi_signer);
-            match try_get_address_details(database_name, &address_key)? {
+            match try_get_address_details(&db_path, &address_key)? {
                 Some(address_details) => {
                     if address_details.network_id.contains(&network_specs_key) {
                         let message_card = Card::ParserCard(&ParserCard::Text(message.to_string()))
@@ -45,7 +49,7 @@ pub fn process_message(data_hex: &str, database_name: &str) -> Result<Transactio
                             &author_multi_signer,
                             Vec::new(),
                         );
-                        let checksum = sign.store_and_get_checksum(database_name)?;
+                        let checksum = sign.store_and_get_checksum(&db_path)?;
                         let author_info = make_author_info(
                             &author_multi_signer,
                             network_specs.base58prefix,

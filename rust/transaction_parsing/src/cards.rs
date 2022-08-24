@@ -1,6 +1,7 @@
 use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 use sp_runtime::{generic::Era, MultiSigner};
 
+use definitions::helpers::make_identicon_from_account;
 use definitions::{
     crypto::Encryption,
     helpers::{make_identicon_from_multisigner, pic_meta, print_multisigner_as_base58},
@@ -16,7 +17,6 @@ use definitions::{
     users::AddressDetails,
 };
 use parser::cards::ParserCard;
-use plot_icon::generate_png_scaled_default;
 
 use crate::error::Error;
 use crate::holds::{GeneralHold, Hold};
@@ -115,7 +115,7 @@ impl<'a> Card<'a> {
                     f: MSCId {
                         base58: id
                             .to_ss58check_with_version(Ss58AddressFormat::custom(*base58prefix)),
-                        identicon: generate_png_scaled_default(&<[u8; 32]>::from(id.to_owned())),
+                        identicon: make_identicon_from_account(id.to_owned()),
                     },
                 },
                 ParserCard::None => NavCard::NoneCard,
