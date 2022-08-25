@@ -37,63 +37,63 @@ struct PrimaryButton: View {
     }
 }
 
-struct PrimaryButton_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(alignment: .center, spacing: 30) {
-            Text("<< Enabled >>")
-            PrimaryButton(
-                action: {},
-                text: "Short Title"
-            )
-            .padding(10)
-            PrimaryButton(
-                action: {},
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-            )
-            .padding(10)
-            Text("<< Disabled >>")
-            PrimaryButton(
-                action: {},
-                text: "Short Title",
-                isDisabled: true
-            )
-            .padding(10)
-            PrimaryButton(
-                action: {},
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                isDisabled: true
-            )
-            .padding(10)
-        }
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-        VStack(alignment: .center, spacing: 30) {
-            Text("<< Enabled >>")
-            PrimaryButton(
-                action: {},
-                text: "Short Title"
-            )
-            .padding(10)
-            PrimaryButton(
-                action: {},
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-            )
-            .padding(10)
-            Text("<< Disabled >>")
-            PrimaryButton(
-                action: {},
-                text: "Short Title",
-                isDisabled: true
-            )
-            .padding(10)
-            PrimaryButton(
-                action: {},
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                isDisabled: true
-            )
-            .padding(10)
-        }
-        .preferredColorScheme(.light)
-        .previewLayout(.sizeThatFits)
-    }
-}
+//struct PrimaryButton_Previews: PreviewProvider {
+//    static var previews: some View {
+//        VStack(alignment: .center, spacing: 30) {
+//            Text("<< Enabled >>")
+//            PrimaryButton(
+//                action: {},
+//                text: "Short Title"
+//            )
+//            .padding(10)
+//            PrimaryButton(
+//                action: {},
+//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+//            )
+//            .padding(10)
+//            Text("<< Disabled >>")
+//            PrimaryButton(
+//                action: {},
+//                text: "Short Title",
+//                isDisabled: true
+//            )
+//            .padding(10)
+//            PrimaryButton(
+//                action: {},
+//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+//                isDisabled: true
+//            )
+//            .padding(10)
+//        }
+//        .preferredColorScheme(.dark)
+//        .previewLayout(.sizeThatFits)
+//        VStack(alignment: .center, spacing: 30) {
+//            Text("<< Enabled >>")
+//            PrimaryButton(
+//                action: {},
+//                text: "Short Title"
+//            )
+//            .padding(10)
+//            PrimaryButton(
+//                action: {},
+//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+//            )
+//            .padding(10)
+//            Text("<< Disabled >>")
+//            PrimaryButton(
+//                action: {},
+//                text: "Short Title",
+//                isDisabled: true
+//            )
+//            .padding(10)
+//            PrimaryButton(
+//                action: {},
+//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+//                isDisabled: true
+//            )
+//            .padding(10)
+//        }
+//        .preferredColorScheme(.light)
+//        .previewLayout(.sizeThatFits)
+//    }
+//}

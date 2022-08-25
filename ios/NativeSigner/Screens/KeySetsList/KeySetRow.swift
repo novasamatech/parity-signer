@@ -42,32 +42,32 @@ struct KeySetRow: View {
     }
 }
 
-struct AddressCardSelector_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack {
-            KeySetRow(
-                KeySetViewModel(
-                    keyName: "Parity",
-                    derivedKeys: "1 Derived Key",
-                    identicon: PreviewData.exampleIdenticon
-                )
-            )
-            KeySetRow(
-                KeySetViewModel(
-                    keyName: "Kusama",
-                    derivedKeys: nil,
-                    identicon: PreviewData.exampleIdenticon
-                )
-            )
-            KeySetRow(
-                KeySetViewModel(
-                    keyName: "Dotsama crowdloans",
-                    derivedKeys: "3 Derived Keys",
-                    identicon: PreviewData.exampleIdenticon
-                )
-            )
-        }
+//struct AddressCardSelector_Previews: PreviewProvider {
+//    static var previews: some View {
+//        VStack {
+//            KeySetRow(
+//                KeySetViewModel(
+//                    keyName: "Parity",
+//                    derivedKeys: "1 Derived Key",
+//                    identicon: PreviewData.exampleIdenticon
+//                )
+//            )
+//            KeySetRow(
+//                KeySetViewModel(
+//                    keyName: "Kusama",
+//                    derivedKeys: nil,
+//                    identicon: PreviewData.exampleIdenticon
+//                )
+//            )
+//            KeySetRow(
+//                KeySetViewModel(
+//                    keyName: "Dotsama crowdloans",
+//                    derivedKeys: "3 Derived Keys",
+//                    identicon: PreviewData.exampleIdenticon
+//                )
+//            )
+//        }
 //        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-    }
-}
+//        .previewLayout(.sizeThatFits)
+//    }
+//}

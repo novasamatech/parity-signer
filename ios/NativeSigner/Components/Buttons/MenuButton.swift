@@ -54,53 +54,53 @@ struct MenuButton: View {
     }
 }
 
-struct MenuButton_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            MenuButton(
-                action: {},
-                icon: Asset.add.swiftUIImage,
-                text: "Short Title"
-            )
-            .padding(10)
-            MenuButton(
-                action: {},
-                icon: Asset.recover.swiftUIImage,
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-            )
-            .padding(10)
-            MenuButton(
-                action: {},
-                icon: Asset.recover.swiftUIImage,
-                text: "Delete",
-                foregroundColor: Asset.accentRed400.swiftUIColor
-            )
-            .padding(10)
-        }
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-        VStack(alignment: .leading, spacing: 10) {
-            MenuButton(
-                action: {},
-                icon: Asset.add.swiftUIImage,
-                text: "Short Title"
-            )
-            .padding(10)
-            MenuButton(
-                action: {},
-                icon: Asset.recover.swiftUIImage,
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-            )
-            .padding(10)
-            MenuButton(
-                action: {},
-                icon: Asset.recover.swiftUIImage,
-                text: "Delete",
-                foregroundColor: Asset.accentRed400.swiftUIColor
-            )
-            .padding(10)
-        }
-        .preferredColorScheme(.light)
-        .previewLayout(.sizeThatFits)
-    }
-}
+//struct MenuButton_Previews: PreviewProvider {
+//    static var previews: some View {
+//        VStack(alignment: .leading, spacing: 10) {
+//            MenuButton(
+//                action: {},
+//                icon: Asset.add.swiftUIImage,
+//                text: "Short Title"
+//            )
+//            .padding(10)
+//            MenuButton(
+//                action: {},
+//                icon: Asset.recover.swiftUIImage,
+//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+//            )
+//            .padding(10)
+//            MenuButton(
+//                action: {},
+//                icon: Asset.recover.swiftUIImage,
+//                text: "Delete",
+//                foregroundColor: Asset.accentRed400.swiftUIColor
+//            )
+//            .padding(10)
+//        }
+//        .preferredColorScheme(.dark)
+//        .previewLayout(.sizeThatFits)
+//        VStack(alignment: .leading, spacing: 10) {
+//            MenuButton(
+//                action: {},
+//                icon: Asset.add.swiftUIImage,
+//                text: "Short Title"
+//            )
+//            .padding(10)
+//            MenuButton(
+//                action: {},
+//                icon: Asset.recover.swiftUIImage,
+//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+//            )
+//            .padding(10)
+//            MenuButton(
+//                action: {},
+//                icon: Asset.recover.swiftUIImage,
+//                text: "Delete",
+//                foregroundColor: Asset.accentRed400.swiftUIColor
+//            )
+//            .padding(10)
+//        }
+//        .preferredColorScheme(.light)
+//        .previewLayout(.sizeThatFits)
+//    }
+//}
