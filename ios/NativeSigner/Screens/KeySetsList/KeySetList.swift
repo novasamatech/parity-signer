@@ -32,6 +32,7 @@ struct KeySetList: View {
                         KeySetRow(keySet).onTapGesture {
                             navigation.perform(navigation: .init(action: .selectSeed, details: keySet.keyName))
                         }
+                        .listRowBackground(Asset.backgroundSystem.swiftUIColor)
                         .listRowSeparator(.hidden)
                         .listRowInsets(.init(
                             top: Padding.extraExtraSmall,
@@ -41,6 +42,7 @@ struct KeySetList: View {
                         ))
                     }
                     Spacer()
+                        .listRowBackground(Asset.backgroundSystem.swiftUIColor)
                         .listRowSeparator(.hidden)
                         .frame(height: Heights.actionButton + Padding.large)
                 }
@@ -59,9 +61,12 @@ struct KeySetList: View {
             )
             .padding(Padding.large)
         }
-        .background(Asset.backgroundSolidSystem.swiftUIColor)
-        .sheet(isPresented: $isShowingNewSeedMenu) {
-            NewSeedMenu(isShowingNewSeedMenu: $isShowingNewSeedMenu, navigation: navigation)
+        .fullScreenCover(isPresented: $isShowingNewSeedMenu) {
+            AddKeySetModal(
+                isShowingNewSeedMenu: $isShowingNewSeedMenu,
+                navigation: navigation
+            )
+            .clearModalBackground()
         }
     }
 }
@@ -114,7 +119,7 @@ struct KeySetListPreview: PreviewProvider {
                     )
                 )
         )
-        .preferredColorScheme(.dark)
+//        .preferredColorScheme(.dark)
         .previewLayout(.sizeThatFits)
     }
 }

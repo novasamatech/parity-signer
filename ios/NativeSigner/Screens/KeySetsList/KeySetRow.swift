@@ -17,7 +17,7 @@ struct KeySetRow: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: CornerRadius.small)
-                .foregroundColor(Asset.fill6.swiftUIColor)
+                .foregroundColor(Asset.backgroundPrimary.swiftUIColor)
                 .frame(height: Heights.keyCellContainer)
             HStack(alignment: .center, spacing: Padding.small) {
                 Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
@@ -38,6 +38,7 @@ struct KeySetRow: View {
             }
             .padding(Padding.medium)
         }
+        .background(Asset.backgroundSystem.swiftUIColor)
     }
 }
 
@@ -66,7 +67,7 @@ struct AddressCardSelector_Previews: PreviewProvider {
                 )
             )
         }
-        .preferredColorScheme(.dark)
+//        .preferredColorScheme(.dark)
         .previewLayout(.sizeThatFits)
     }
 }

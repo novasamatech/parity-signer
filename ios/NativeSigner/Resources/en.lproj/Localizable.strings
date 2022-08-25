@@ -266,6 +266,7 @@
 "CameraView.startOver" = "Start over";
 
 // Copy for updated design
+
 "TabBar.Keys" = "Keys";
 "TabBar.Logs" = "Logs";
 "TabBar.Scanner" = "Scanner";
@@ -276,3 +277,7 @@
 "KeySets.Label.DerivedKeys.single" = "%@ Derived Key";
 "KeySets.Label.DerivedKeys.plural" = "%@ Derived Keys";
 
+"AddKeySet.Title" = "Add Key Set";
+"AddKeySet.Button.Cancel" = "Cancel";
+"AddKeySet.Button.Add" = "Add new Key Set";
+"AddKeySet.Button.Recover" = "Recover Key Set";

@@ -10,17 +10,19 @@ import SwiftUI
 struct EmptyButton: View {
     private let action: () -> Void
     private let text: LocalizedStringKey
-
+    private let foregroundColor: Color
     @State var isDisabled: Bool
 
     init(
         action: @escaping () -> Void,
         text: LocalizedStringKey,
-        isDisabled: Bool = false
+        isDisabled: Bool = false,
+        foregroundColor: Color = Asset.textAndIconsPrimary.swiftUIColor
     ) {
         self.action = action
         self.text = text
         self.isDisabled = isDisabled
+        self.foregroundColor = foregroundColor
     }
 
     var body: some View {
@@ -29,7 +31,7 @@ struct EmptyButton: View {
             text: text,
             style: ActionButtonStyle(
                 backgroundColor: .clear,
-                foregroundColor: Asset.textAndIconsPrimary.swiftUIColor
+                foregroundColor: foregroundColor
             ),
             isDisabled: $isDisabled
         )
