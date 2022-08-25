@@ -36,7 +36,7 @@ struct SecondaryButton: View {
     }
 }
 
-//struct SecondaryButton_Previews: PreviewProvider {
+// struct SecondaryButton_Previews: PreviewProvider {
 //    static var previews: some View {
 //        VStack(alignment: .center, spacing: 10) {
 //            Text("<< Enabled >>")
@@ -95,4 +95,4 @@ struct SecondaryButton: View {
 //        .preferredColorScheme(.light)
 //        .previewLayout(.sizeThatFits)
 //    }
-//}
+// }

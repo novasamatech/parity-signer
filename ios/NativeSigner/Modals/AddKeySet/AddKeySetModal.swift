@@ -92,7 +92,7 @@ struct AddKeySetModal: View {
     }
 }
 
-//struct AddKeySetModal_Previews: PreviewProvider {
+// struct AddKeySetModal_Previews: PreviewProvider {
 //    static var previews: some View {
 //        AddKeySetModal(
 //            isShowingNewSeedMenu: Binding<Bool>.constant(true),
@@ -101,4 +101,4 @@ struct AddKeySetModal: View {
 //        .preferredColorScheme(.dark)
 //        .previewLayout(.sizeThatFits)
 //    }
-//}
+// }

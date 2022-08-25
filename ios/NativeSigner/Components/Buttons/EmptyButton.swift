@@ -38,7 +38,7 @@ struct EmptyButton: View {
     }
 }
 
-//struct EmptyButton_Previews: PreviewProvider {
+// struct EmptyButton_Previews: PreviewProvider {
 //    static var previews: some View {
 //        VStack(alignment: .center, spacing: 10) {
 //            Text("<< Enabled >>")
@@ -97,4 +97,4 @@ struct EmptyButton: View {
 //        .preferredColorScheme(.light)
 //        .previewLayout(.sizeThatFits)
 //    }
-//}
+// }

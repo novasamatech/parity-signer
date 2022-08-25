@@ -54,7 +54,7 @@ struct MenuButton: View {
     }
 }
 
-//struct MenuButton_Previews: PreviewProvider {
+// struct MenuButton_Previews: PreviewProvider {
 //    static var previews: some View {
 //        VStack(alignment: .leading, spacing: 10) {
 //            MenuButton(
@@ -103,4 +103,4 @@ struct MenuButton: View {
 //        .preferredColorScheme(.light)
 //        .previewLayout(.sizeThatFits)
 //    }
-//}
+// }
