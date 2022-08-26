@@ -5,7 +5,7 @@ use nom::error::ErrorKind;
 use nom::sequence::tuple;
 use nom::IResult;
 
-/// QR code prefix always starts with 0x4 symbol indicating "raw" encoding.
+/// QR code prefix always starts with `0x4` symbol indicating "raw" encoding.
 fn qr_prefix(i: &str) -> IResult<&str, &str> {
     tag("4")(i)
 }
@@ -14,7 +14,7 @@ fn qr_prefix(i: &str) -> IResult<&str, &str> {
 fn length_prefixed(prefix_bytes: u8) -> impl Fn(&str) -> IResult<&str, &str> {
     move |i: &str| {
         let (i, prefix) = take(prefix_bytes * 2)(i)?; // *2 because each byte is represented as two hex digits.
-        let len_bytes = u64::from_str_radix(prefix, 16).map_err(|_| {
+        let len_bytes = usize::from_str_radix(prefix, 16).map_err(|_| {
             nom::Err::Error(nom::error::Error {
                 input: "Not hex",
                 code: ErrorKind::HexDigit,
