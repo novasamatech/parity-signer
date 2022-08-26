@@ -24,6 +24,6 @@ struct NavigationBarView: View {
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
         }
         .frame(height: 64)
-        .background(Asset.backgroundSolidSystem.swiftUIColor)
+        .background(Asset.backgroundSystem.swiftUIColor)
     }
 }

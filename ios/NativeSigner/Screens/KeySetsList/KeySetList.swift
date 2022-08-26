@@ -32,6 +32,7 @@ struct KeySetList: View {
                         KeySetRow(keySet).onTapGesture {
                             navigation.perform(navigation: .init(action: .selectSeed, details: keySet.keyName))
                         }
+                        .listRowBackground(Asset.backgroundSystem.swiftUIColor)
                         .listRowSeparator(.hidden)
                         .listRowInsets(.init(
                             top: Padding.extraExtraSmall,
@@ -41,6 +42,7 @@ struct KeySetList: View {
                         ))
                     }
                     Spacer()
+                        .listRowBackground(Asset.backgroundSystem.swiftUIColor)
                         .listRowSeparator(.hidden)
                         .frame(height: Heights.actionButton + Padding.large)
                 }
@@ -59,62 +61,65 @@ struct KeySetList: View {
             )
             .padding(Padding.large)
         }
-        .background(Asset.backgroundSolidSystem.swiftUIColor)
-        .sheet(isPresented: $isShowingNewSeedMenu) {
-            NewSeedMenu(isShowingNewSeedMenu: $isShowingNewSeedMenu, navigation: navigation)
+        .fullScreenCover(isPresented: $isShowingNewSeedMenu) {
+            AddKeySetModal(
+                isShowingNewSeedMenu: $isShowingNewSeedMenu,
+                navigation: navigation
+            )
+            .clearModalBackground()
         }
     }
 }
 
-struct KeySetListPreview: PreviewProvider {
-    static var previews: some View {
-        KeySetList(
-            navigation: NavigationCoordinator(),
-            viewModel: KeySetListViewModelBuilder()
-                .build(
-                    for:
-                    MSeeds(
-                        seedNameCards: [
-                            SeedNameCard(
-                                seedName: "aaaa",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 3
-                            ),
-                            SeedNameCard(
-                                seedName: "bbbb",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 0
-                            ),
-                            SeedNameCard(
-                                seedName: "cccc",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 1
-                            ),
-                            SeedNameCard(
-                                seedName: "dddd",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 4
-                            ),
-                            SeedNameCard(
-                                seedName: "eeee",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 15
-                            ),
-                            SeedNameCard(
-                                seedName: "ffff",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 1
-                            ),
-                            SeedNameCard(
-                                seedName: "gggg",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 0
-                            )
-                        ]
-                    )
-                )
-        )
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-    }
-}
+// struct KeySetListPreview: PreviewProvider {
+//    static var previews: some View {
+//        KeySetList(
+//            navigation: NavigationCoordinator(),
+//            viewModel: KeySetListViewModelBuilder()
+//                .build(
+//                    for:
+//                    MSeeds(
+//                        seedNameCards: [
+//                            SeedNameCard(
+//                                seedName: "aaaa",
+//                                identicon: PreviewData.exampleIdenticon,
+//                                derivedKeysCount: 3
+//                            ),
+//                            SeedNameCard(
+//                                seedName: "bbbb",
+//                                identicon: PreviewData.exampleIdenticon,
+//                                derivedKeysCount: 0
+//                            ),
+//                            SeedNameCard(
+//                                seedName: "cccc",
+//                                identicon: PreviewData.exampleIdenticon,
+//                                derivedKeysCount: 1
+//                            ),
+//                            SeedNameCard(
+//                                seedName: "dddd",
+//                                identicon: PreviewData.exampleIdenticon,
+//                                derivedKeysCount: 4
+//                            ),
+//                            SeedNameCard(
+//                                seedName: "eeee",
+//                                identicon: PreviewData.exampleIdenticon,
+//                                derivedKeysCount: 15
+//                            ),
+//                            SeedNameCard(
+//                                seedName: "ffff",
+//                                identicon: PreviewData.exampleIdenticon,
+//                                derivedKeysCount: 1
+//                            ),
+//                            SeedNameCard(
+//                                seedName: "gggg",
+//                                identicon: PreviewData.exampleIdenticon,
+//                                derivedKeysCount: 0
+//                            )
+//                        ]
+//                    )
+//                )
+//        )
+//        .preferredColorScheme(.dark)
+//        .previewLayout(.sizeThatFits)
+//    }
+// }
