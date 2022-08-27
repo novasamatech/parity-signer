@@ -12,7 +12,7 @@ anyhow = "1.0.62"
 raptorq = "1.7.0"
 serde_json = "1.0.85"
 constants = {path = "../constants"}
-
+nom = "7.1.1"
 
 [lib]
 name = "qr_reader_phone"

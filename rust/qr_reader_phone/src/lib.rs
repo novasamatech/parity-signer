@@ -5,56 +5,18 @@ use anyhow::anyhow;
 
 use std::convert::TryInto;
 
+mod parser;
 pub mod process_payload;
+
+use crate::parser::parse_payload;
 use process_payload::{process_decoded_payload, InProgress, Ready};
 
-//This will be a temporary fix
 pub fn get_payload(line: &str, cleaned: bool) -> anyhow::Result<Vec<u8>> {
-    if cleaned {
-        match hex::decode(&line) {
-            Ok(a) => Ok(a),
-            Err(_) => Err(anyhow!("Not hex")),
-        }
-    } else {
-        if !line.starts_with('4') {
-            return Err(anyhow!("Encountered unexpected qr content start"));
-        }
-        let msg_length_info = match line.get(1..5) {
-            Some(a) => a,
-            None => return Err(anyhow!("Too short")),
-        };
-        let msg_length_piece: [u8; 2] = match hex::decode(&msg_length_info) {
-            Ok(a) => a.try_into().expect("constant slice size, always fits"),
-            Err(_) => return Err(anyhow!("Not hex")),
-        };
-        let msg_length = u16::from_be_bytes(msg_length_piece) as usize;
-        match line.get(5..5 + msg_length * 2) {
-            Some(a) => match hex::decode(&a) {
-                Ok(b) => Ok(b),
-                Err(_) => Err(anyhow!("Not hex")),
-            },
-            None => {
-                // fast fix for qr codes with version below 10
-                // feels abominable, change later
-                let msg_length_info = match line.get(1..3) {
-                    Some(a) => a,
-                    None => return Err(anyhow!("Too short")),
-                };
-                let msg_length_piece: [u8; 1] = match hex::decode(&msg_length_info) {
-                    Ok(a) => a.try_into().expect("constant slice size, always fits"),
-                    Err(_) => return Err(anyhow!("Not hex")),
-                };
-                let msg_length = u8::from_be_bytes(msg_length_piece) as usize;
-                match line.get(3..3 + msg_length * 2) {
-                    Some(a) => match hex::decode(&a) {
-                        Ok(b) => Ok(b),
-                        Err(_) => Err(anyhow!("Not hex")),
-                    },
-                    None => Err(anyhow!("Length error")),
-                }
-            }
-        }
-    }
+    let payload = match cleaned {
+        true => line,
+        false => parse_payload(line)?,
+    };
+    hex::decode(payload).map_err(anyhow::Error::msg)
 }
 
 pub fn get_length(line: &str, cleaned: bool) -> anyhow::Result<u32> {
@@ -137,5 +99,12 @@ mod tests {
         let jsonline = r#"["400be00000100005301025a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969a40403005a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe9690700e40b5402c5005c00ec07000004000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafebcd1b489599db4424ed928804ddad3a4689fb8c835151ef34bc250bb845cdc1eb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe0ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec"]"#;
         let result = decode_sequence(jsonline, false);
         assert!(result.is_ok(), "Expected ok, {:?}", result);
+    }
+
+    #[test]
+    fn get_cleaned_payload() {
+        let res = get_payload("ab", true);
+        assert!(res.is_ok(), "Expected ok, {:?}", res);
+        assert_eq!(res.unwrap(), vec![171]);
     }
 }
