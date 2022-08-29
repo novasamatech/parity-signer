@@ -167,6 +167,8 @@
 		6D8AF88228BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8AF88128BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift */; };
 		6D8AF88628BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8AF88528BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift */; };
 		6D8AF88A28BCC60600CF0AB2 /* KeychainQueryProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8AF88928BCC60600CF0AB2 /* KeychainQueryProviderTests.swift */; };
+		6D8AF88D28BD0AF200CF0AB2 /* SVGView in Frameworks */ = {isa = PBXBuildFile; productRef = 6D8AF88C28BD0AF200CF0AB2 /* SVGView */; };
+		6D8AF88F28BD0D6F00CF0AB2 /* identicon_example.svg in Resources */ = {isa = PBXBuildFile; fileRef = 6D8AF88E28BD0D6F00CF0AB2 /* identicon_example.svg */; };
 		6D95E97328B4F42300E28A11 /* ActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D95E97228B4F42300E28A11 /* ActionButton.swift */; };
 		6D95E97528B500EE00E28A11 /* Heights.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D95E97428B500EE00E28A11 /* Heights.swift */; };
 		6D95E97828B6250B00E28A11 /* ClearBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D95E97728B6250B00E28A11 /* ClearBackgroundView.swift */; };
@@ -400,6 +402,7 @@
 		6D8AF88128BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessControlProvidingAssemblerTests.swift; sourceTree = "<group>"; };
 		6D8AF88528BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimePropertiesProvidingMock.swift; sourceTree = "<group>"; };
 		6D8AF88928BCC60600CF0AB2 /* KeychainQueryProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainQueryProviderTests.swift; sourceTree = "<group>"; };
+		6D8AF88E28BD0D6F00CF0AB2 /* identicon_example.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = identicon_example.svg; path = ../../../../../Downloads/identicon_example.svg; sourceTree = "<group>"; };
 		6D95E97228B4F42300E28A11 /* ActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionButton.swift; sourceTree = "<group>"; };
 		6D95E97428B500EE00E28A11 /* Heights.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Heights.swift; sourceTree = "<group>"; };
 		6D95E97728B6250B00E28A11 /* ClearBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearBackgroundView.swift; sourceTree = "<group>"; };
@@ -443,6 +446,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6D8AF88D28BD0AF200CF0AB2 /* SVGView in Frameworks */,
 				6DEEA87E28AFBF5D00371ECA /* libsigner.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -810,6 +814,7 @@
 		6D57DC56289E524800005C63 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				6D8AF88E28BD0D6F00CF0AB2 /* identicon_example.svg */,
 				6DDEF12E28AE5EDA004CA2FD /* signer.udl */,
 				6D57DC57289E524800005C63 /* Localizable.strings */,
 				6D57DC59289E524800005C63 /* Assets.xcassets */,
@@ -1104,6 +1109,9 @@
 			dependencies = (
 			);
 			name = NativeSigner;
+			packageProductDependencies = (
+				6D8AF88C28BD0AF200CF0AB2 /* SVGView */,
+			);
 			productName = NativeSigner;
 			productReference = 2DE72BBE26A588C7002BB752 /* NativeSigner.app */;
 			productType = "com.apple.product-type.application";
@@ -1154,6 +1162,9 @@
 				Base,
 			);
 			mainGroup = 2DE72BB526A588C7002BB752;
+			packageReferences = (
+				6D8AF88B28BD0AF200CF0AB2 /* XCRemoteSwiftPackageReference "SVGView" */,
+			);
 			productRefGroup = 2DE72BBF26A588C7002BB752 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1178,6 +1189,7 @@
 				6D57DC6F289E524800005C63 /* RobotoMono-Light.otf in Resources */,
 				6D57DC70289E524800005C63 /* Web3-Regular.otf in Resources */,
 				2D7A7BE726C410FF0053C1E0 /* privacy-policy.txt in Resources */,
+				6D8AF88F28BD0D6F00CF0AB2 /* identicon_example.svg in Resources */,
 				6D57DC69289E524800005C63 /* swiftui-strings-template.stencil in Resources */,
 				6D57DC6B289E524800005C63 /* Inter-Regular.otf in Resources */,
 				6D57DC6C289E524800005C63 /* Inter-Medium.otf in Resources */,
@@ -1781,6 +1793,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6D8AF88B28BD0AF200CF0AB2 /* XCRemoteSwiftPackageReference "SVGView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/SVGView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6D8AF88C28BD0AF200CF0AB2 /* SVGView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6D8AF88B28BD0AF200CF0AB2 /* XCRemoteSwiftPackageReference "SVGView" */;
+			productName = SVGView;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2DE72BB626A588C7002BB752 /* Project object */;
 }
