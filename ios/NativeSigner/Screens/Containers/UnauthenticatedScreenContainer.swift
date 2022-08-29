@@ -12,12 +12,12 @@ struct UnauthenticatedScreenContainer: View {
 
     var body: some View {
         Button(
-            action: { data.refreshSeeds() },
+            action: { data.seedsMediator.refreshSeeds() },
             label: {
                 BigButton(
                     text: Localizable.unlockApp.key,
                     action: {
-                        data.refreshSeeds()
+                        data.seedsMediator.refreshSeeds()
                         data.totalRefresh()
                     }
                 )

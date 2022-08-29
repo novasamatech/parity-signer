@@ -14,10 +14,11 @@ import SwiftUI
 final class SignerDataModel: ObservableObject {
     @ObservedObject var navigation: NavigationCoordinator
 
+    let seedsMediator: SeedsMediating = SeedsMediator()
+
     @Published var parsingAlert: Bool = false
 
     // Data state
-    @Published var seedNames: [String] = []
     @Published var onboardingDone: Bool = false
     @Published var authenticated: Bool = false
 
@@ -52,6 +53,7 @@ final class SignerDataModel: ObservableObject {
         dbName = databaseMediator.databaseName
         onboardingDone = databaseMediator.isDatabaseAvailable()
 
+        seedsMediator.set(signerDataModel: self)
         setUpConnectivityMonitoring()
         finaliseInitialisation()
     }
@@ -76,7 +78,7 @@ final class SignerDataModel: ObservableObject {
         print("onboarding...")
         wipe()
         guard databaseMediator.recreateDatabaseFile() else {
-            print("Databse could not be recreated")
+            print("Database could not be recreated")
             return
         }
         do {
@@ -90,9 +92,9 @@ final class SignerDataModel: ObservableObject {
             // if self.canaryDead {
             // device_was_online(nil, self.dbName)
             // }
-            initNavigation(dbname: dbName, seedNames: seedNames)
+            initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
             totalRefresh()
-            refreshSeeds()
+            seedsMediator.refreshSeeds()
         } catch {
             print("History init failed! This will not do.")
         }
@@ -116,8 +118,8 @@ private extension SignerDataModel {
 
     func finaliseInitialisation() {
         guard onboardingDone else { return }
-        refreshSeeds()
-        initNavigation(dbname: dbName, seedNames: seedNames)
+        seedsMediator.refreshSeeds()
+        initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
         totalRefresh()
     }
 }
@@ -126,18 +128,15 @@ extension SignerDataModel {
     /// Restores the Signer to factory new state
     /// Should be called before app uninstall/upgrade!
     func wipe() {
-        refreshSeeds()
+        seedsMediator.refreshSeeds()
         guard authenticated else { return }
         // remove secrets first
-        let query = [
-            kSecClass as String: kSecClassGenericPassword
-        ] as CFDictionary
-        SecItemDelete(query)
+        seedsMediator.removeAllSeeds()
         // then everything else
         databaseMediator.wipeDatabase()
         onboardingDone = false
-        seedNames = []
-        initNavigation(dbname: dbName, seedNames: seedNames)
+        seedsMediator.seedNames = []
+        initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
     }
 }
 
@@ -147,6 +146,23 @@ extension SignerDataModel {
         wipe()
         if !onboardingDone {
             onboard(jailbreak: true)
+        }
+    }
+}
+
+extension SignerDataModel {
+    func sign(seedName: String, comment: String) {
+        if alert {
+            alertShow = true
+        } else {
+            navigation.perform(
+                navigation:
+                .init(
+                    action: .goForward,
+                    details: comment,
+                    seedPhrase: seedsMediator.getSeed(seedName: seedName)
+                )
+            )
         }
     }
 }

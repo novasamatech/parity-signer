@@ -1,26 +1,26 @@
 //
-//  ConnectivityMonitoringAssemblerTests.swift
+//  AccessControlProvidingAssemblerTests.swift
 //  NativeSignerTests
 //
-//  Created by Krzysztof Rodak on 02/08/2022.
+//  Created by Krzysztof Rodak on 29/08/2022.
 //
 
 @testable import NativeSigner
 import XCTest
 
-final class ConnectivityMonitoringAssemblerTests: XCTestCase {
+final class AccessControlProvidingAssemblerTests: XCTestCase {
     private var runtimePropertiesProvider: RuntimePropertiesProvidingMock!
-    private var subject: ConnectivityMonitoringAssembler!
+    private var subject: AccessControlProvidingAssembler!
 
     override func setUp() {
         super.setUp()
         runtimePropertiesProvider = RuntimePropertiesProvidingMock()
-        subject = ConnectivityMonitoringAssembler(
+        subject = AccessControlProvidingAssembler(
             runtimePropertiesProvider: runtimePropertiesProvider
         )
     }
 
-    func test_assemble_whenInDevelopmentMode_returnsStub() {
+    func test_assemble_whenInDevelopmentMode_returnsSimulatorClass() {
         // Given
         runtimePropertiesProvider.isInDevelopmentMode = true
 
@@ -28,10 +28,10 @@ final class ConnectivityMonitoringAssemblerTests: XCTestCase {
         let result = subject.assemble()
 
         // Then
-        XCTAssertTrue(result is ConnectivityMonitoringStub)
+        XCTAssertTrue(result is SimulatorAccessControlProvider)
     }
 
-    func test_assemble_whenNotInDevelopmentMode_returnsSystemAdapter() {
+    func test_assemble_whenNotInDevelopmentMode_returnsStandardProvider() {
         // Given
         runtimePropertiesProvider.isInDevelopmentMode = false
 
@@ -39,6 +39,6 @@ final class ConnectivityMonitoringAssemblerTests: XCTestCase {
         let result = subject.assemble()
 
         // Then
-        XCTAssertTrue(result is ConnectivityMonitoringAdapter)
+        XCTAssertTrue(result is AccessControlProvider)
     }
 }

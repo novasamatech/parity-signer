@@ -19,7 +19,7 @@ struct ScreenSelectorView: View {
             navigationRequest: { navigationRequest in
                 navigation.perform(navigation: navigationRequest)
             },
-            getSeed: { seedName in data.getSeed(seedName: seedName) },
+            getSeed: { seedName in data.seedsMediator.getSeed(seedName: seedName) },
             doJailbreak: data.jailbreak,
             pathCheck: { seed, path, network in
                 substratePathCheck(
@@ -27,15 +27,15 @@ struct ScreenSelectorView: View {
                 )
             },
             createAddress: { path, seedName in data.createAddress(path: path, seedName: seedName) },
-            checkSeedCollision: { seedName in data.checkSeedCollision(seedName: seedName) },
-            restoreSeed: { seedName, seedPhrase, createRoots in data.restoreSeed(
+            checkSeedCollision: { seedName in data.seedsMediator.checkSeedCollision(seedName: seedName) },
+            restoreSeed: { seedName, seedPhrase, createRoots in data.seedsMediator.restoreSeed(
                 seedName: seedName, seedPhrase: seedPhrase, createRoots: createRoots
             ) },
             sign: { seedName, comment in data.sign(seedName: seedName, comment: comment) },
             doWipe: data.wipe,
             alertShow: { data.alertShow = true },
             increment: { seedName, _ in
-                let seedPhrase = data.getSeed(seedName: seedName)
+                let seedPhrase = data.seedsMediator.getSeed(seedName: seedName)
                 if !seedPhrase.isEmpty {
                     navigation.perform(navigation: .init(
                         action: .increment,
