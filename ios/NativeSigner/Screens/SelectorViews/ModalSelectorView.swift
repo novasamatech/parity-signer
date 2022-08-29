@@ -19,12 +19,12 @@ struct ModalSelectorView: View {
             navigationRequest: { navigationRequest in
                 navigation.perform(navigation: navigationRequest)
             },
-            removeSeed: { seedName in data.removeSeed(seedName: seedName) },
-            restoreSeed: { seedName, seedPhrase, createSeedKeys in data.restoreSeed(
+            removeSeed: { seedName in data.seedsMediator.removeSeed(seedName: seedName) },
+            restoreSeed: { seedName, seedPhrase, createSeedKeys in data.seedsMediator.restoreSeed(
                 seedName: seedName, seedPhrase: seedPhrase, createRoots: createSeedKeys
             ) },
             createAddress: { path, seedName in data.createAddress(path: path, seedName: seedName) },
-            getSeedForBackup: { seedName in data.getSeed(seedName: seedName, backup: true) },
+            getSeedForBackup: { seedName in data.seedsMediator.getSeedBackup(seedName: seedName) },
             sign: { seedName, comment in data.sign(seedName: seedName, comment: comment) }
         )
     }

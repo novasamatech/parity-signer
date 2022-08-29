@@ -12,7 +12,7 @@ import SwiftUI
 extension SignerDataModel {
     /// Creates address in database with checks and features
     func createAddress(path: String, seedName: String) {
-        let seedPhrase = getSeed(seedName: seedName)
+        let seedPhrase = seedsMediator.getSeed(seedName: seedName)
         if !seedPhrase.isEmpty {
             navigation.perform(navigation: .init(action: .goForward, details: path, seedPhrase: seedPhrase))
         }
