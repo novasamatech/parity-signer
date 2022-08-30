@@ -21,12 +21,12 @@ import io.parity.signer.ui.theme.Bg100
  * First screen with legal consent request
  */
 @Composable
-fun LandingView(onBoard: () -> Unit) {
+fun LandingView(onBoard: () -> Unit, modifier: Modifier) {
 	var confirm by remember { mutableStateOf(false) }
 	var tacAccept by remember { mutableStateOf(false) }
 	var ppAccept by remember { mutableStateOf(false) }
 
-	Box {
+	Box(modifier = modifier) {
 		Documents()
 		Column(Modifier.padding(horizontal = 20.dp)) {
 			Spacer(Modifier.weight(1f))
