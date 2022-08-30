@@ -24,8 +24,10 @@ struct SVGIdenticon: View {
     private let svgAsData: Data
     private let maxSize: CGSize
 
-    init(svgAsData: Data,
-         maxSize: CGSize = .init(width: 36, height: 36)) {
+    init(
+        svgAsData: Data,
+        maxSize: CGSize = .init(width: 36, height: 36)
+    ) {
         self.svgAsData = svgAsData
         self.maxSize = maxSize
     }
