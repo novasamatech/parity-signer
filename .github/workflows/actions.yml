@@ -34,12 +34,12 @@ jobs:
           brew install swiftformat
           brew install xcbeautify
 
-      - name: Get cached Swift Packages managed by Xcode
-        uses: actions/cache@v2
+      - name:                 Get cached Swift Packages managed by Xcode
+        uses:                 actions/cache@v3
         with:
-          path: Users/runner/Library/Developer/Xcode/DerivedData/**/SourcePackages/checkouts
-          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: |
+          path:               Users/runner/Library/Developer/Xcode/DerivedData/**/SourcePackages/checkouts
+          key:                ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys:       |
             ${{ runner.os }}-spm-
 
       - name:                 Install Rust aarch64-apple-ios target
