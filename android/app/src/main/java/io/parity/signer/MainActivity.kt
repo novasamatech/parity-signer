@@ -137,8 +137,8 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 			}
 			OnBoardingState.No -> {
 				if (shieldAlert.value == AlertState.None) {
-					Scaffold {
-						LandingView(signerDataModel::onBoard)
+					Scaffold { padding ->
+						LandingView(signerDataModel::onBoard, modifier=Modifier.padding(padding))
 					}
 				} else {
 					Box(
