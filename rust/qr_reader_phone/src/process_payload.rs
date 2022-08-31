@@ -47,7 +47,7 @@ pub fn process_decoded_payload(
     payload: Vec<u8>,
     mut decoding: InProgress,
 ) -> anyhow::Result<Ready> {
-    if let Ok(frame) = RaptorqFrame::try_from(&payload) {
+    if let Ok(frame) = RaptorqFrame::try_from(payload.as_ref()) {
         let length = frame.size;
         let total = frame.total();
         let new_packet = frame.payload;
@@ -92,7 +92,7 @@ pub fn process_decoded_payload(
                 "Was decoding legacy multi-element qr, and got interrupted by a fountain one."
             )),
         }
-    } else if let Ok(frame) = LegacyFrame::try_from(&payload) {
+    } else if let Ok(frame) = LegacyFrame::try_from(payload.as_ref()) {
         let length = frame.total;
         let number = frame.index;
         if number >= length {

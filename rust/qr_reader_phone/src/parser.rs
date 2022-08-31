@@ -30,10 +30,10 @@ impl RaptorqFrame {
     }
 }
 
-impl TryFrom<&Vec<u8>> for RaptorqFrame {
+impl TryFrom<&[u8]> for RaptorqFrame {
     type Error = anyhow::Error;
 
-    fn try_from(i: &Vec<u8>) -> Result<Self, Self::Error> {
+    fn try_from(i: &[u8]) -> Result<Self, Self::Error> {
         let (_, (size, payload)) = parse_raptor_frame(i)
             .map_err(|e| e.map(|e| anyhow!("Unable to parse RaptorqFrame: {:?}", e.code)))?;
         Ok(Self {
@@ -49,10 +49,10 @@ pub(crate) struct LegacyFrame {
     pub(crate) data: Vec<u8>,
 }
 
-impl TryFrom<&Vec<u8>> for LegacyFrame {
+impl TryFrom<&[u8]> for LegacyFrame {
     type Error = anyhow::Error;
 
-    fn try_from(i: &Vec<u8>) -> Result<Self, Self::Error> {
+    fn try_from(i: &[u8]) -> Result<Self, Self::Error> {
         let (_, (total, index, data)) = parse_legacy_frame(i)
             .map_err(|e| e.map(|e| anyhow!("Unable to parse LegacyFrame: {:?}", e.code)))?;
         Ok(Self {

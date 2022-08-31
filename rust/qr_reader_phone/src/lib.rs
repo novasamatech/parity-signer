@@ -20,9 +20,9 @@ pub fn get_payload(line: &str, cleaned: bool) -> anyhow::Result<Vec<u8>> {
 
 pub fn get_length(line: &str, cleaned: bool) -> anyhow::Result<u32> {
     let payload = get_payload(line, cleaned)?;
-    if let Ok(frame) = RaptorqFrame::try_from(&payload) {
+    if let Ok(frame) = RaptorqFrame::try_from(payload.as_ref()) {
         Ok(frame.total())
-    } else if let Ok(frame) = LegacyFrame::try_from(&payload) {
+    } else if let Ok(frame) = LegacyFrame::try_from(payload.as_ref()) {
         Ok(frame.total as u32)
     } else {
         Ok(1)
