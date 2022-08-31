@@ -1,7 +1,7 @@
 [package]
 name = "qr_reader_phone-fuzz"
-version = "0.0.0"
-authors = ["Automatically generated"]
+version = "0.1.0"
+authors = ["Parity Technologies Ltd."]
 publish = false
 edition = "2018"
 
