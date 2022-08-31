@@ -1,0 +1,25 @@
+[package]
+name = "qr_reader_phone-fuzz"
+version = "0.1.0"
+authors = ["Parity Technologies Ltd."]
+publish = false
+edition = "2018"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.qr_reader_phone]
+path = ".."
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "fuzz_parser"
+path = "fuzz_targets/fuzz_parser.rs"
+test = false
+doc = false

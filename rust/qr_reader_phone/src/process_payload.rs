@@ -1,14 +1,15 @@
+use crate::{LegacyFrame, RaptorqFrame};
 use anyhow::anyhow;
 use constants::CHUNK_SIZE;
 use raptorq;
-use std::convert::TryInto;
+use std::convert::TryFrom;
 
 #[derive(PartialEq, Eq)]
 pub struct Fountain {
     decoder: raptorq::Decoder,
     collected_ser_packets: Vec<Vec<u8>>,
     length: u32,
-    pub total: usize,
+    pub total: u32,
 }
 
 impl Fountain {
@@ -46,17 +47,12 @@ pub fn process_decoded_payload(
     payload: Vec<u8>,
     mut decoding: InProgress,
 ) -> anyhow::Result<Ready> {
-    if payload[0] & 0b10000000 > 0 {
-        //        println!("dealing with part of dynamic fountain qr code");
-        let length_piece: [u8; 4] = payload[..4]
-            .to_vec()
-            .try_into()
-            .expect("constant vector slice size, always fits");
-        let length = u32::from_be_bytes(length_piece) - 0x80000000;
-        let new_packet = payload[4..].to_vec();
+    if let Ok(frame) = RaptorqFrame::try_from(payload.as_ref()) {
+        let length = frame.size;
+        let total = frame.total();
+        let new_packet = frame.payload;
         match decoding {
             InProgress::None => {
-                let total = (length as usize) / new_packet.len() + 2;
                 let collected_ser_packets = vec![new_packet];
                 let config = raptorq::ObjectTransmissionInformation::with_defaults(
                     length as u64,
@@ -96,22 +92,13 @@ pub fn process_decoded_payload(
                 "Was decoding legacy multi-element qr, and got interrupted by a fountain one."
             )),
         }
-    } else if payload.starts_with(&[0]) {
-        //            println!("dealing with part of legacy dynamic multi-element qr code");
-        let length_piece: [u8; 2] = payload[1..3]
-            .to_vec()
-            .try_into()
-            .expect("constant vector slice size, always fits");
-        let length = u16::from_be_bytes(length_piece);
-        let element_number_piece: [u8; 2] = payload[3..5]
-            .to_vec()
-            .try_into()
-            .expect("constant vector slice size, always fits");
-        let number = u16::from_be_bytes(element_number_piece);
+    } else if let Ok(frame) = LegacyFrame::try_from(payload.as_ref()) {
+        let length = frame.total;
+        let number = frame.index;
         if number >= length {
             return Err(anyhow!("Number of element in legacy multi-element qr sequence exceeds expected sequence length."));
         }
-        let contents = payload[5..].to_vec();
+        let contents = frame.data;
         let new_element = Element { number, contents };
         match decoding {
             InProgress::None => {
