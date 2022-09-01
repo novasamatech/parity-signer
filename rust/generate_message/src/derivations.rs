@@ -18,7 +18,7 @@
 //!
 //! Example command line to generate derivations import QR:
 //!
-//! `$ cargo run derivations -qr -title westend-sr25519 -payload
+//! `$ cargo run derivations -qr --title westend-sr25519 -payload
 //! my_westend_set.txt`
 use db_handling::identities::prepare_derivations_import;
 use qrcode_rtx::make_pretty_qr;

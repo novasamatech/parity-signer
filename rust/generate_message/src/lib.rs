@@ -455,7 +455,7 @@
 //!
 //! Make `add-specs` update payload for a new network:
 //!
-//! `$ cargo run add-specs -d -u wss://rococo-rpc.polkadot.io --encryption sr25519 -title Rococo`
+//! `$ cargo run add-specs -d -u wss://rococo-rpc.polkadot.io --encryption sr25519 --title Rococo`
 //!
 //! Make `add-specs` update payload for a new network with token set:
 //!
