@@ -126,7 +126,6 @@ class SignerDataModel : ViewModel() {
 		} else {
 			false
 		}
-		authentication.strongCredentials = hasStrongbox
 
 		Log.d("strongbox available:", hasStrongbox.toString())
 
@@ -145,10 +144,10 @@ class SignerDataModel : ViewModel() {
 
 		// Init crypto for seeds:
 		// https://developer.android.com/training/articles/keystore
-		masterKey = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+		masterKey = if (hasStrongbox) {
 			MasterKey.Builder(context)
 				.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-				.setRequestStrongBoxBacked(true) // This might cause failures but shouldn't
+				.setRequestStrongBoxBacked(true)
 				.setUserAuthenticationRequired(true)
 				.build()
 		} else {
