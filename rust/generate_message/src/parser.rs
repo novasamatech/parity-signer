@@ -659,7 +659,7 @@ pub struct Sufficient {
 /// Payload content details are described in [`definitions::qr_transfers`].
 #[derive(clap::ValueEnum, Clone, Debug)]
 pub enum Msg {
-    /// `load_types` payload
+    /// `load-types` payload
     LoadTypes,
 
     /// `load-metadata` payload

@@ -22,7 +22,7 @@
 //! - `load-metadata`, to load into the Signer the network metadata, for
 //! networks that already have corresponding network specs entry in the Signer
 //! database
-//! - `load_types`, to load types information (it is used to support the
+//! - `load-types`, to load types information (it is used to support the
 //! transactions parsing in networks with legacy metadata, `RuntimeMetadata`
 //! version below `V14`)
 //!
@@ -31,7 +31,7 @@
 //! - `PNG` QR codes, static or dynamic multiframe depending on the data size
 //! - hex-encoded string (for tests)
 //!
-//! Information in `add-specs`, `load-metadata` and `load_types` could be either
+//! Information in `add-specs`, `load-metadata` and `load-types` could be either
 //! signed or unsigned. Using signed updates is strongly encouraged.
 //!
 //! Update has following general structure:
@@ -732,7 +732,7 @@
 //!         <td><code>load_metadata_&ltnetwork_name&gtV&ltmetadata_version&gt</code></td>
 //!     </tr>
 //!     <tr>
-//!         <td><code>load_types</code></td>
+//!         <td><code>load-types</code></td>
 //!         <td><code>load_types</code></td>
 //!     </tr>
 //! </table>
@@ -762,7 +762,7 @@
 //!    - `none` if the message is not verified
 //!
 //! - Key `-msgtype` followed by update type:
-//!    - `load_types`
+//!    - `load-types`
 //!    - `load-metadata`
 //!    - `add-specs`
 //!
@@ -809,7 +809,7 @@
 //! Signer-produced `SufficientCrypto` QR code
 //!
 //! - Key `-msgtype` followed by message type:
-//!    - `load_types`
+//!    - `load-types`
 //!    - `load-metadata`
 //!    - `add_specs`
 //!
