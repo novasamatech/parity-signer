@@ -776,7 +776,7 @@
 //! [`FOLDER`](constants::FOLDER) containing already generated payload as
 //! raw bytes
 //!
-//! - Key `-signature` (can be entered only if the `--crypto` argument was
+//! - Key `--signature` (can be entered only if the `--crypto` argument was
 //! `ed25519`, `sr25519`, or `ecdsa` **and** `--verifier` is not `Alice`),
 //! followed by:
 //!    - `-hex` followed by hex signature
@@ -835,7 +835,7 @@
 //!
 //! `$ cargo run make --goal qr --crypto <encryption> --msg load-metadata
 //! --verifier-hex <public key> --payload sign_me_load_metadata_westendV9200
-//! --signature -hex <signature>`
+//! --signature-hex <signature>`
 //!
 //! Here `<signature>` is hexadecimal signature generated for the contents of
 //! the payload file for `<public_key>` using `<encryption>` algorithm.
