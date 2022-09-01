@@ -764,7 +764,7 @@
 //!    - `load-metadata`
 //!    - `add-specs`
 //!
-//! - Key `-verifier` (can be entered only if the `--crypto` argument was
+//! - Key `--verifier` (can be entered only if the `--crypto` argument was
 //! `ed25519`, `sr25519`, or `ecdsa`), followed by:
 //!    - `Alice` to generate messages "verified" by
 //! [Alice seed phrase](constants::ALICE_SEED_PHRASE) with derivation `//Alice`
@@ -777,7 +777,7 @@
 //! raw bytes
 //!
 //! - Key `-signature` (can be entered only if the `--crypto` argument was
-//! `ed25519`, `sr25519`, or `ecdsa` **and** `-verifier` is not `Alice`),
+//! `ed25519`, `sr25519`, or `ecdsa` **and** `--verifier` is not `Alice`),
 //! followed by:
 //!    - `-hex` followed by hex signature
 //!    - `-file` followed by the path in dedicated [`FOLDER`](constants::FOLDER)
@@ -834,8 +834,8 @@
 //! #### `make` for external signature
 //!
 //! `$ cargo run make --goal qr --crypto <encryption> --msg load-metadata
-//! -verifier -hex <public key> --payload sign_me_load_metadata_westendV9200
-//! -signature -hex <signature>`
+//! --verifier-hex <public key> --payload sign_me_load_metadata_westendV9200
+//! --signature -hex <signature>`
 //!
 //! Here `<signature>` is hexadecimal signature generated for the contents of
 //! the payload file for `<public_key>` using `<encryption>` algorithm.
