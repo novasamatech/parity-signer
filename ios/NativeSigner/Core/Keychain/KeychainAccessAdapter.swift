@@ -138,7 +138,7 @@ final class KeychainAccessAdapter: KeychainAccessAdapting {
         let query = queryProvider.query(for: .check)
         var queryResult: AnyObject?
         let osStatus = SecItemCopyMatching(query, &queryResult)
-        if !(osStatus == errSecSuccess && osStatus == errSecItemNotFound) {
+        if osStatus != errSecSuccess, osStatus != errSecItemNotFound {
             return .failure(.checkError)
         }
         if osStatus == errSecItemNotFound { return .success(false) }
