@@ -34,7 +34,7 @@ struct AddKeySetModal: View {
                 Localizable.AddKeySet.title.text
                     .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                     .font(Fontstyle.titleS.base)
-                    .padding([.bottom, .top], Padding.medium)
+                    .padding([.bottom, .top], Spacing.medium)
                 Divider()
                 MenuButton(
                     action: {
@@ -64,10 +64,10 @@ struct AddKeySetModal: View {
                     foregroundColor: Asset.textAndIconsSecondary.swiftUIColor
                 )
                 Spacer()
-                    .frame(height: Padding.small)
+                    .frame(height: Spacing.small)
             }
-            .padding([.bottom, .top], Padding.medium)
-            .padding([.leading, .trailing], Padding.large)
+            .padding([.bottom, .top], Spacing.medium)
+            .padding([.leading, .trailing], Spacing.large)
             .background(Asset.backgroundSecondary.swiftUIColor)
             .cornerRadius(radius: CornerRadius.medium, corners: [.topLeft, .topRight])
         }

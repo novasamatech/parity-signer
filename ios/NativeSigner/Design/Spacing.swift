@@ -5,9 +5,10 @@
 //  Created by Krzysztof Rodak on 19/08/2022.
 //
 
+import SwiftUI
 import UIKit
 
-enum Padding {
+enum Spacing {
     /// No padding: 0 pts
     static let none: CGFloat = 0
     /// Extra Extra Small: 4 pts
@@ -20,4 +21,14 @@ enum Padding {
     static let medium: CGFloat = 16
     /// Large: 24 pts
     static let large: CGFloat = 24
+}
+
+enum Padding {
+    /// To be used on clickable cells and headers (top: 8, leading: 24, bottom: 8, trailing: 24)
+    static let detailsCell: EdgeInsets = .init(
+        top: Spacing.extraSmall,
+        leading: Spacing.large,
+        bottom: Spacing.extraSmall,
+        trailing: Spacing.large
+    )
 }

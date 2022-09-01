@@ -12,7 +12,7 @@ struct MenuButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
-            .padding(Padding.none)
+            .padding(Spacing.none)
             .foregroundColor(foregroundColor)
             .font(Fontstyle.button.base)
             .frame(height: Heights.menuButton, alignment: .leading)
@@ -43,7 +43,7 @@ struct MenuButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(alignment: .center, spacing: Padding.medium) {
+            HStack(alignment: .center, spacing: Spacing.medium) {
                 icon
                     .padding(10)
                 Text(text)

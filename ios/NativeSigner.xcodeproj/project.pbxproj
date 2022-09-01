@@ -186,6 +186,8 @@
 		6DC5643728B79EC6003D540B /* SeedsMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643628B79EC6003D540B /* SeedsMediator.swift */; };
 		6DC5643928B7DED8003D540B /* KeychainQueryProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643828B7DED8003D540B /* KeychainQueryProvider.swift */; };
 		6DC5643B28B8D189003D540B /* KeychainAccessAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643A28B8D189003D540B /* KeychainAccessAdapter.swift */; };
+		6DC5643D28B91EFE003D540B /* NavbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643C28B91EFE003D540B /* NavbarButton.swift */; };
+		6DC5644028B929EA003D540B /* KeyDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643F28B929EA003D540B /* KeyDetailsView.swift */; };
 		6DDEF11028AD105F004CA2FD /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF10F28AD105F004CA2FD /* TabBarView.swift */; };
 		6DDEF11428AD12FA004CA2FD /* Tab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF11328AD12FA004CA2FD /* Tab.swift */; };
 		6DDEF11828AD4215004CA2FD /* TabTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF11728AD4215004CA2FD /* TabTests.swift */; };
@@ -196,11 +198,15 @@
 		6DDEF13F28AE7C57004CA2FD /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF13E28AE7C57004CA2FD /* PrimaryButton.swift */; };
 		6DDEF14328AE8794004CA2FD /* SecondaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF14228AE8794004CA2FD /* SecondaryButton.swift */; };
 		6DDEF14528AE87A7004CA2FD /* EmptyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF14428AE87A7004CA2FD /* EmptyButton.swift */; };
+		6DE8466A28BF6EA20051346A /* KeyDetailsActionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466928BF6EA20051346A /* KeyDetailsActionModel.swift */; };
+		6DE8466C28BF6EB10051346A /* KeyDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466B28BF6EB10051346A /* KeyDetailsViewModel.swift */; };
+		6DE8466E28BF73E40051346A /* DerivedKeyRowModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */; };
 		6DEEA87E28AFBF5D00371ECA /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DEEA87D28AFBF5D00371ECA /* libsigner.a */; };
+		6DF7257828BE0E08007CD9B6 /* DerivedKeyRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */; };
 		6DF7751B28B399AC0040012E /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7751A28B399AC0040012E /* CornerRadius.swift */; };
 		6DF7751E28B39F630040012E /* KeySetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7751D28B39F630040012E /* KeySetRow.swift */; };
 		6DF7751F28B3A0500040012E /* (null) in Resources */ = {isa = PBXBuildFile; };
-		6DFAF36B28AF7F8A0048763B /* Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFAF36A28AF7F8A0048763B /* Padding.swift */; };
+		6DFAF36B28AF7F8A0048763B /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFAF36A28AF7F8A0048763B /* Spacing.swift */; };
 		6DFAF36E28AF846C0048763B /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFAF36D28AF846C0048763B /* PreviewData.swift */; };
 /* End PBXBuildFile section */
 
@@ -419,6 +425,8 @@
 		6DC5643628B79EC6003D540B /* SeedsMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedsMediator.swift; sourceTree = "<group>"; };
 		6DC5643828B7DED8003D540B /* KeychainQueryProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainQueryProvider.swift; sourceTree = "<group>"; };
 		6DC5643A28B8D189003D540B /* KeychainAccessAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainAccessAdapter.swift; sourceTree = "<group>"; };
+		6DC5643C28B91EFE003D540B /* NavbarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarButton.swift; sourceTree = "<group>"; };
+		6DC5643F28B929EA003D540B /* KeyDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsView.swift; sourceTree = "<group>"; };
 		6DDEF10F28AD105F004CA2FD /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
 		6DDEF11328AD12FA004CA2FD /* Tab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tab.swift; sourceTree = "<group>"; };
 		6DDEF11728AD4215004CA2FD /* TabTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTests.swift; sourceTree = "<group>"; };
@@ -431,10 +439,14 @@
 		6DDEF13E28AE7C57004CA2FD /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		6DDEF14228AE8794004CA2FD /* SecondaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryButton.swift; sourceTree = "<group>"; };
 		6DDEF14428AE87A7004CA2FD /* EmptyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyButton.swift; sourceTree = "<group>"; };
+		6DE8466928BF6EA20051346A /* KeyDetailsActionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsActionModel.swift; sourceTree = "<group>"; };
+		6DE8466B28BF6EB10051346A /* KeyDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsViewModel.swift; sourceTree = "<group>"; };
+		6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyRowModel.swift; sourceTree = "<group>"; };
 		6DEEA87D28AFBF5D00371ECA /* libsigner.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsigner.a; sourceTree = "<group>"; };
+		6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyRow.swift; sourceTree = "<group>"; };
 		6DF7751A28B399AC0040012E /* CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadius.swift; sourceTree = "<group>"; };
 		6DF7751D28B39F630040012E /* KeySetRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetRow.swift; sourceTree = "<group>"; };
-		6DFAF36A28AF7F8A0048763B /* Padding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Padding.swift; sourceTree = "<group>"; };
+		6DFAF36A28AF7F8A0048763B /* Spacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
 		6DFAF36D28AF846C0048763B /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -491,6 +503,7 @@
 		2D7A7BC626BA974E0053C1E0 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				6DC5643E28B929E0003D540B /* KeyDetails */,
 				6DF7751C28B39F590040012E /* KeySetsList */,
 				6D57DC48289D2A8F00005C63 /* SelectorViews */,
 				6D019966289C936800F4C317 /* Containers */,
@@ -736,7 +749,7 @@
 			children = (
 				2D48F3522760A2D8004B27BE /* Fontstyle.swift */,
 				6D4C0757289BD95500B2EE48 /* SFSymbols.swift */,
-				6DFAF36A28AF7F8A0048763B /* Padding.swift */,
+				6DFAF36A28AF7F8A0048763B /* Spacing.swift */,
 				6DF7751A28B399AC0040012E /* CornerRadius.swift */,
 				6D95E97428B500EE00E28A11 /* Heights.swift */,
 				6DC5642F28B65B9C003D540B /* AnimationDuration.swift */,
@@ -1009,6 +1022,16 @@
 			path = Keychain;
 			sourceTree = "<group>";
 		};
+		6DC5643E28B929E0003D540B /* KeyDetails */ = {
+			isa = PBXGroup;
+			children = (
+				6DE8466828BF6E9B0051346A /* Models */,
+				6DC5643F28B929EA003D540B /* KeyDetailsView.swift */,
+				6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */,
+			);
+			path = KeyDetails;
+			sourceTree = "<group>";
+		};
 		6DDEF11228AD12F2004CA2FD /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -1060,8 +1083,19 @@
 				6DDEF14428AE87A7004CA2FD /* EmptyButton.swift */,
 				6D95E97228B4F42300E28A11 /* ActionButton.swift */,
 				6D95E97928B6282D00E28A11 /* MenuButton.swift */,
+				6DC5643C28B91EFE003D540B /* NavbarButton.swift */,
 			);
 			path = Buttons;
+			sourceTree = "<group>";
+		};
+		6DE8466828BF6E9B0051346A /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				6DE8466928BF6EA20051346A /* KeyDetailsActionModel.swift */,
+				6DE8466B28BF6EB10051346A /* KeyDetailsViewModel.swift */,
+				6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		6DF7751C28B39F590040012E /* KeySetsList */ = {
@@ -1325,6 +1359,7 @@
 				6DDEF14328AE8794004CA2FD /* SecondaryButton.swift in Sources */,
 				2DAA82A127885BAF002917C0 /* TCDefault.swift in Sources */,
 				2DAA82A327885C2E002917C0 /* TCIdentityField.swift in Sources */,
+				6DE8466E28BF73E40051346A /* DerivedKeyRowModel.swift in Sources */,
 				2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */,
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
 				2DA5F8A1275F889400D8DD29 /* Headers.swift in Sources */,
@@ -1353,6 +1388,7 @@
 				6DDEF11028AD105F004CA2FD /* TabBarView.swift in Sources */,
 				2DA5F86F27566C3600D8DD29 /* TCTXSpec.swift in Sources */,
 				2DA5F8412756687200D8DD29 /* TransactionCardView.swift in Sources */,
+				6DE8466A28BF6EA20051346A /* KeyDetailsActionModel.swift in Sources */,
 				6D95E97A28B6282D00E28A11 /* MenuButton.swift in Sources */,
 				2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */,
 				2DAA829B2788596C002917C0 /* TCNonce.swift in Sources */,
@@ -1398,6 +1434,8 @@
 				6D95E97828B6250B00E28A11 /* ClearBackgroundView.swift in Sources */,
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,
 				2D59B9FD278F1D930088057A /* InstructionsSquare.swift in Sources */,
+				6DC5644028B929EA003D540B /* KeyDetailsView.swift in Sources */,
+				6DF7257828BE0E08007CD9B6 /* DerivedKeyRow.swift in Sources */,
 				6DF7751E28B39F630040012E /* KeySetRow.swift in Sources */,
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
 				2D48F3D02777A823004B27BE /* NewSeedBackupModal.swift in Sources */,
@@ -1419,7 +1457,7 @@
 				6D5801D42899133A006C41D8 /* ConnectivityMonitoringAdapter.swift in Sources */,
 				2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */,
 				2DAA82A927885FCF002917C0 /* TCTXSpecPlain.swift in Sources */,
-				6DFAF36B28AF7F8A0048763B /* Padding.swift in Sources */,
+				6DFAF36B28AF7F8A0048763B /* Spacing.swift in Sources */,
 				2D48F3A62770828B004B27BE /* ManageNetworks.swift in Sources */,
 				2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */,
 				2DA5F86D27566C3600D8DD29 /* TCAuthorPlain.swift in Sources */,
@@ -1428,6 +1466,7 @@
 				6DBE12D828B3A80A005F3CCC /* KeySetList.swift in Sources */,
 				0452BC572767B26600C6DD37 /* Buttons.swift in Sources */,
 				2DA5F86427566C3600D8DD29 /* TCError.swift in Sources */,
+				6DC5643D28B91EFE003D540B /* NavbarButton.swift in Sources */,
 				2DA5F86627566C3600D8DD29 /* TCText.swift in Sources */,
 				2DA5F82B2756631D00D8DD29 /* KeyManager.swift in Sources */,
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
@@ -1468,6 +1507,7 @@
 				6D019972289D183200F4C317 /* Navigation.swift in Sources */,
 				2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */,
 				2DA5F83F275667CF00D8DD29 /* HistoryCardTemplate.swift in Sources */,
+				6DE8466C28BF6EB10051346A /* KeyDetailsViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
