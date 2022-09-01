@@ -8,7 +8,7 @@
 import Foundation
 
 /// Model representing single instance of navigation within app
-struct Navigation {
+struct Navigation: Equatable {
     /// Action to be performed in Rust backend
     let action: Action
     /// Additional data to be send along with `action`

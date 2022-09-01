@@ -56,6 +56,7 @@ extension Fontstyle {
             return FontFamily.Inter.medium.swiftUIFont(size: 15)
         case .subtitle2:
             return FontFamily.Inter.regular.swiftUIFont(size: 13)
+
         case .titleXL:
             return FontFamily.Inter.bold.swiftUIFont(size: 28)
         case .titleL:
