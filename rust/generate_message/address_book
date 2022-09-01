@@ -144,13 +144,13 @@ wss://alphaville.zero.io				ok
 How do I add a custom network into Signer?
 
 `$ cargo run add-specs -d -u wss://rpc.astar.network --encryption sr25519`
-`$ cargo run make --goal qr -crypto none -msgtype add-specs --payload sign_me_add_specs_astar_sr25519`
+`$ cargo run make --goal qr -crypto none --msg add-specs --payload sign_me_add_specs_astar_sr25519`
 
 Now there is a scannable qr code with network specs in `../files/signed` folder named `add_specs_astar-sr25519_unverified`.
 Scan it to add the network into Signer.
 
 `$ cargo run load-metadata -d -u wss://rpc.astar.network`
-`$ cargo run make --goal qr -crypto none -msgtype load-metadata --payload sign_me_load_metadata_astarV4`
+`$ cargo run make --goal qr -crypto none --msg load-metadata --payload sign_me_load_metadata_astarV4`
 
 Now there is a scannable qr movie with network metadata in `../files/signed` folder, named `load_metadata_astarV4_unverified`.
 Scan it to add the metadata into Signer.

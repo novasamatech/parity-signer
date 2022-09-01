@@ -720,7 +720,7 @@
 //!
 //! <table>
 //!     <tr>
-//!         <th><code>msgtype</code></th>
+//!         <th><code>msg</code></th>
 //!         <th>default update file name</th>
 //!     </tr>
 //!     <tr>
@@ -759,7 +759,7 @@
 //!    - `ecdsa`
 //!    - `none` if the message is not verified
 //!
-//! - Key `-msgtype` followed by update type:
+//! - Key `--msg` followed by update type:
 //!    - `load-types`
 //!    - `load-metadata`
 //!    - `add-specs`
@@ -804,10 +804,10 @@
 //! [`FOLDER`](constants::FOLDER) for raw bytes file with contents of
 //! Signer-produced `SufficientCrypto` QR code
 //!
-//! - Key `-msgtype` followed by message type:
+//! - Key `-msg` followed by message type:
 //!    - `load-types`
 //!    - `load-metadata`
-//!    - `add_specs`
+//!    - `add-specs`
 //!
 //! - Key `--payload` followed by file path in dedicated
 //! [`FOLDER`](constants::FOLDER) containing already generated payload as
@@ -833,7 +833,7 @@
 //!
 //! #### `make` for external signature
 //!
-//! `$ cargo run make --goal qr -crypto <encryption> -msgtype load-metadata
+//! `$ cargo run make --goal qr -crypto <encryption> --msg load-metadata
 //! -verifier -hex <public key> --payload sign_me_load_metadata_westendV9200
 //! -signature -hex <signature>`
 //!
@@ -896,7 +896,7 @@
 //!
 //! `$ cargo run sign --goal qr --sufficient-hex
 //! 0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47aceef7c58b5f952b6233b8aba5beb6f0000c8ca7f7cc16b7ada7cd45026fc3f3ec2289dd90dab0dfac38dfe3be843231443ddd30a3f3bbabb5cefcd2bbcef908c
-//! --msgtype load-metadata --payload sign_me_load_metadata_westendV9200`
+//! --msg load-metadata --payload sign_me_load_metadata_westendV9200`
 //!
 //! ## Remove a single metadata entry from the `METATREE`
 //!
