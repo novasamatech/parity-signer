@@ -320,7 +320,7 @@ impl From<SetFlags> for Set {
     }
 }
 
-/// Command details for `add_specs`.
+/// Command details for `add-specs`.
 #[derive(clap::Args, Debug)]
 #[clap(group(clap::ArgGroup::new("referencekey")
                 .required(true)
@@ -330,7 +330,7 @@ pub struct InstructionSpecs {
     #[clap(flatten)]
     pub set: SetFlags,
 
-    /// Overrides, relevant only for `add_specs` command
+    /// Overrides, relevant only for `add-specs` command
     #[clap(flatten)]
     pub over: Override,
 
@@ -378,7 +378,7 @@ impl From<ContentArgs> for Content {
     }
 }
 
-/// Reference key for `load_metadata` and `add_specs` commands.
+/// Reference key for `load_metadata` and `add-specs` commands.
 #[derive(Subcommand, Debug)]
 pub enum Content {
     /// Deal with all relevant database entries
@@ -403,7 +403,7 @@ pub enum Content {
     },
 }
 
-/// Setting key for `load_metadata` and `add_specs` commands.
+/// Setting key for `load_metadata` and `add-specs` commands.
 #[derive(clap::ValueEnum, Clone, Debug)]
 pub enum Set {
     /// Key `-d`: do **not** update the database, make RPC calls, and produce
@@ -665,7 +665,7 @@ pub enum Msg {
     /// `load_metadata` payload
     LoadMetadata,
 
-    /// `add_specs` payload
+    /// `add-specs` payload
     AddSpecs,
 }
 
@@ -704,7 +704,7 @@ pub struct Derivations {
     pub db: PathBuf,
 }
 
-/// Overrides for `add_specs` command.
+/// Overrides for `add-specs` command.
 #[derive(Args, Debug)]
 pub struct Override {
     /// [`Encryption`] override to specify encryption algorithm used by a new

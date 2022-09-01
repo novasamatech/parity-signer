@@ -112,7 +112,7 @@ where
     }
 }
 
-/// Update the database after `add_specs` run.
+/// Update the database after `add-specs` run.
 ///
 /// Inputs `&str` URL address that was used for RPC calls and already completed
 /// [`NetworkSpecsToSend`].
@@ -789,7 +789,7 @@ fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch> {
 /// Check known [`NetworkSpecsToSend`] with network data fetched and apply token
 /// override.
 ///
-/// This is a helper function for `add_specs` runs with `-n` reference key, i.e.
+/// This is a helper function for `add-specs` runs with `-n` reference key, i.e.
 /// for cases when *some* network specs entry already exists in the database.
 ///
 /// Input [`NetworkSpecsToSend`] is the entry from the database to which the

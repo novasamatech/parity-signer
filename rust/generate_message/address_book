@@ -143,8 +143,8 @@ wss://alphaville.zero.io				ok
 ===
 How do I add a custom network into Signer?
 
-`$ cargo run add_specs -d -u wss://rpc.astar.network -sr25519`
-`$ cargo run make -qr -crypto none -msgtype add_specs -payload sign_me_add_specs_astar_sr25519`
+`$ cargo run add-specs -d -u wss://rpc.astar.network -sr25519`
+`$ cargo run make -qr -crypto none -msgtype add-specs -payload sign_me_add_specs_astar_sr25519`
 
 Now there is a scannable qr code with network specs in `../files/signed` folder named `add_specs_astar-sr25519_unverified`.
 Scan it to add the network into Signer.

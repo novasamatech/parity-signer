@@ -32,7 +32,7 @@
 //!
 //! Command line with token override:
 //!
-//! `$ cargo run add_specs -d -u <url_address> -sr25519 -token <decimals> <unit>`
+//! `$ cargo run add-specs -d -u <url_address> -sr25519 -token <decimals> <unit>`
 use definitions::network_specs::NetworkProperties;
 use serde_json::{map::Map, value::Value};
 use std::convert::TryInto;

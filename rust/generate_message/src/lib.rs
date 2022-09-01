@@ -18,7 +18,7 @@
 //! Crate `generate_message` can generate and the Signer can accept following
 //! updates:
 //!
-//! - `add_specs`, to add a new network (i.e. the network specs) into the Signer
+//! - `add-specs`, to add a new network (i.e. the network specs) into the Signer
 //! - `load_metadata`, to load into the Signer the network metadata, for
 //! networks that already have corresponding network specs entry in the Signer
 //! database
@@ -31,7 +31,7 @@
 //! - `PNG` QR codes, static or dynamic multiframe depending on the data size
 //! - hex-encoded string (for tests)
 //!
-//! Information in `add_specs`, `load_metadata` and `load_types` could be either
+//! Information in `add-specs`, `load_metadata` and `load_types` could be either
 //! signed or unsigned. Using signed updates is strongly encouraged.
 //!
 //! Update has following general structure:
@@ -453,13 +453,13 @@
 //!
 //! `$ cargo run add-specs --name westend-sr25519`
 //!
-//! Make `add_specs` update payload for a new network:
+//! Make `add-specs` update payload for a new network:
 //!
-//! `$ cargo run add_specs -d -u wss://rococo-rpc.polkadot.io --encryption sr25519 -title Rococo`
+//! `$ cargo run add-specs -d -u wss://rococo-rpc.polkadot.io --encryption sr25519 -title Rococo`
 //!
-//! Make `add_specs` update payload for a new network with token set:
+//! Make `add-specs` update payload for a new network with token set:
 //!
-//! `$ cargo run add_specs -d -u wss://acala.polkawallet.io --encryption sr25519 --token-decimals 12 --token-unit ACA --title Acala`
+//! `$ cargo run add-specs -d -u wss://acala.polkawallet.io --encryption sr25519 --token-decimals 12 --token-unit ACA --title Acala`
 //!
 //! ## Prepare `load_metadata` update payload
 //!
@@ -522,7 +522,7 @@
 //!     </tr>
 //! </table>
 //!
-//! Network metadata updates quite often, compared to `add_specs` command there
+//! Network metadata updates quite often, compared to `add-specs` command there
 //! is also setting key `-k` to print only the data that was not in the hot
 //! database before the fetch.
 //!
@@ -724,7 +724,7 @@
 //!         <th>default update file name</th>
 //!     </tr>
 //!     <tr>
-//!         <td><code>add_specs</code></td>
+//!         <td><code>add-specs</code></td>
 //!         <td><code>add_specs_&ltnetwork_name&gt-&ltnetwork_encryption&gt</code></td>
 //!     </tr>
 //!     <tr>
@@ -764,7 +764,7 @@
 //! - Key `-msgtype` followed by update type:
 //!    - `load_types`
 //!    - `load_metadata`
-//!    - `add_specs`
+//!    - `add-specs`
 //!
 //! - Key `-verifier` (can be entered only if the `-crypto` argument was
 //! `ed25519`, `sr25519`, or `ecdsa`), followed by:
