@@ -753,7 +753,7 @@
 //!    - `text` will generate only text file with hex-encoded update.
 //!    - default, i.e. if goal is not provided, both QR code and text file are generated.
 //!
-//! - Key `-crypto` followed by encryption used to make update signature:
+//! - Key `--crypto` followed by encryption used to make update signature:
 //!    - `ed25519`
 //!    - `sr25519`
 //!    - `ecdsa`
@@ -764,7 +764,7 @@
 //!    - `load-metadata`
 //!    - `add-specs`
 //!
-//! - Key `-verifier` (can be entered only if the `-crypto` argument was
+//! - Key `-verifier` (can be entered only if the `--crypto` argument was
 //! `ed25519`, `sr25519`, or `ecdsa`), followed by:
 //!    - `Alice` to generate messages "verified" by
 //! [Alice seed phrase](constants::ALICE_SEED_PHRASE) with derivation `//Alice`
@@ -776,7 +776,7 @@
 //! [`FOLDER`](constants::FOLDER) containing already generated payload as
 //! raw bytes
 //!
-//! - Key `-signature` (can be entered only if the `-crypto` argument was
+//! - Key `-signature` (can be entered only if the `--crypto` argument was
 //! `ed25519`, `sr25519`, or `ecdsa` **and** `-verifier` is not `Alice`),
 //! followed by:
 //!    - `-hex` followed by hex signature
@@ -833,7 +833,7 @@
 //!
 //! #### `make` for external signature
 //!
-//! `$ cargo run make --goal qr -crypto <encryption> --msg load-metadata
+//! `$ cargo run make --goal qr --crypto <encryption> --msg load-metadata
 //! -verifier -hex <public key> --payload sign_me_load_metadata_westendV9200
 //! -signature -hex <signature>`
 //!
