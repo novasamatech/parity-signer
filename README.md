@@ -157,6 +157,9 @@ Note - old x86 is not supported. Just use x86_64 emulator image.
 
 **7.** Install NDK. Currently specific version 24.0.8215888 is required.
 
+Android Studio -> SDK Manager -> SDK Tools tab. Find NDK there.
+Enable "Show package details" checkmark to select specific version.
+
 **8.** Connect your device or create a virtual one. Open `Tools -> Device Manager` and create a new phone simulator with the latest Android.
 
 **9. (macOS)** : Specify path to `python` in `local.properties`.
