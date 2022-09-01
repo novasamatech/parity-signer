@@ -1294,17 +1294,21 @@ fn prepare_secret_key_for_export(
 /// coloration, so that the difference with safe QR codes is immediately visible
 /// on screen.
 #[cfg(feature = "signer")]
-pub fn export_secret_key(
-    database_name: &str,
+pub fn export_secret_key<P>(
+    db_path: P,
     multisigner: &MultiSigner,
     expected_seed_name: &str,
-    network_specs_key: &NetworkSpecsKey,
+    network_specs_key_hex: &str,
     seed_phrase: &str,
-    pwd: Option<&str>,
-) -> Result<MKeyDetails> {
-    let network_specs = get_network_specs(database_name, network_specs_key)?;
+    mut pwd: Option<String>,
+) -> Result<MKeyDetails>
+where
+    P: AsRef<Path>,
+{
+    let network_specs_key = &NetworkSpecsKey::from_hex(network_specs_key_hex)?;
+    let network_specs = get_network_specs(&db_path, network_specs_key)?;
     let address_key = AddressKey::from_multisigner(multisigner);
-    let address_details = get_address_details(database_name, &address_key)?;
+    let address_details = get_address_details(&db_path, &address_key)?;
     if address_details.seed_name != expected_seed_name {
         return Err(Error::SeedNameNotMatching {
             address_key,
@@ -1335,7 +1339,7 @@ pub fn export_secret_key(
         network_logo: network_specs.logo,
     };
 
-    let database_addresses = get_addresses_by_seed_name(database_name, expected_seed_name)?;
+    let database_addresses = get_addresses_by_seed_name(&db_path, expected_seed_name)?;
 
     let exposed_addresses = exposed_set(
         &address_details.path,
@@ -1355,7 +1359,7 @@ pub fn export_secret_key(
     }
 
     let history_batch = events_to_batch(
-        database_name,
+        &db_path,
         vec![Event::SecretWasExported {
             identity_history: IdentityHistory::get(
                 &address_details.seed_name,
@@ -1372,13 +1376,14 @@ pub fn export_secret_key(
         &address_details,
         &network_specs.genesis_hash,
         seed_phrase,
-        pwd,
+        pwd.as_deref(),
     )?;
+    pwd.zeroize();
 
     if let Err(e) = TrDbCold::new()
         .set_addresses(identity_batch) // modify addresses
         .set_history(history_batch) // add corresponding history
-        .apply(database_name)
+        .apply(&db_path)
     {
         qr.zeroize();
         return Err(e);

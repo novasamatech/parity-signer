@@ -130,6 +130,25 @@ fn qrparser_try_decode_qr_sequence(
     qr_reader_phone::decode_sequence(data, cleaned)
 }
 
+fn generate_secret_key_qr(
+    dbname: &str,
+    multisigner: &MultiSigner,
+    expected_seed_name: &str,
+    network: &str,
+    seed_phrase: &str,
+    pwd: Option<String>,
+) -> Result<MKeyDetails, anyhow::Error> {
+    db_handling::identities::export_secret_key(
+        dbname,
+        multisigner,
+        expected_seed_name,
+        network,
+        seed_phrase,
+        pwd,
+    )
+    .map_err(Into::into)
+}
+
 /// Checks derivation path for validity and collisions
 ///
 /// Returns struct that has information on collisions, presence of password and validity of path;

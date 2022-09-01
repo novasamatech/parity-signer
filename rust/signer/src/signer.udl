@@ -550,6 +550,9 @@ namespace signer {
     [Throws=ErrorDisplayed]
     string qrparser_try_decode_qr_sequence([ByRef] string data, boolean cleaned);
 
+    [Throws=ErrorDisplayed]
+    MKeyDetails generate_secret_key_qr([ByRef] string dbname, [ByRef] MultiSigner multisigner, [ByRef] string expected_seed_name, [ByRef] string network, [ByRef] string seed_phrase, string? pwd);
+
     DerivationCheck substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
 
     [Throws=ErrorDisplayed]

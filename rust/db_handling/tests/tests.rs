@@ -2410,7 +2410,7 @@ fn test_export_secret_key() {
         dbname,
         derivation_multisigner,
         seed_name,
-        &network_id,
+        &hex::encode(network_id.key()),
         ALICE_SEED_PHRASE,
         None,
     )
