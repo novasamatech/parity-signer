@@ -317,14 +317,14 @@
 //! `--all` key could be used with `--pass-errors` key, to stop processing after first
 //! error.
 //!
-//! Override key specifying encryption algorithm supported by the network is
-//! optional for `--name` reference key (since there is already an entry in the
-//! database with specified encryption) and mandatory for `--url` reference key.
+//! `--encryption` key to override specifying encryption algorithm supported by the
+//! network is optional for `--name` reference key (since there is already an entry in
+//! the database with specified encryption) and mandatory for `--url` reference key.
 //! Supported variants are:
 //!
-//! - `-ed25519`
-//! - `-sr25519`
-//! - `-ecdsa`
+//! - `ed25519`
+//! - `sr25519`
+//! - `ecdsa`
 //!
 //! Sequence invoking token override could be used when processing an
 //! individual network that has multiple allowed decimals and unit values
