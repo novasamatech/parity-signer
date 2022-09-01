@@ -774,7 +774,7 @@
 //!    - `-file` followed by the path in dedicated [`FOLDER`](constants::FOLDER)
 //! for file with public key as raw bytes
 //!
-//! - Key `-payload` followed by file path in dedicated
+//! - Key `--payload` followed by file path in dedicated
 //! [`FOLDER`](constants::FOLDER) containing already generated payload as
 //! raw bytes
 //!
@@ -813,7 +813,7 @@
 //!    - `load-metadata`
 //!    - `add_specs`
 //!
-//! - Key `-payload` followed by file path in dedicated
+//! - Key `--payload` followed by file path in dedicated
 //! [`FOLDER`](constants::FOLDER) containing already generated payload as
 //! raw bytes
 //!
@@ -838,7 +838,7 @@
 //! #### `make` for external signature
 //!
 //! `$ cargo run make -qr -crypto <encryption> -msgtype load-metadata
-//! -verifier -hex <public key> -payload sign_me_load_metadata_westendV9200
+//! -verifier -hex <public key> --payload sign_me_load_metadata_westendV9200
 //! -signature -hex <signature>`
 //!
 //! Here `<signature>` is hexadecimal signature generated for the contents of
