@@ -19,7 +19,7 @@
 //! updates:
 //!
 //! - `add-specs`, to add a new network (i.e. the network specs) into the Signer
-//! - `load_metadata`, to load into the Signer the network metadata, for
+//! - `load-metadata`, to load into the Signer the network metadata, for
 //! networks that already have corresponding network specs entry in the Signer
 //! database
 //! - `load_types`, to load types information (it is used to support the
@@ -31,7 +31,7 @@
 //! - `PNG` QR codes, static or dynamic multiframe depending on the data size
 //! - hex-encoded string (for tests)
 //!
-//! Information in `add-specs`, `load_metadata` and `load_types` could be either
+//! Information in `add-specs`, `load-metadata` and `load_types` could be either
 //! signed or unsigned. Using signed updates is strongly encouraged.
 //!
 //! Update has following general structure:
@@ -538,7 +538,7 @@
 //! `-a` key could be used with `--pass-errors` key, to stop processing after first
 //! error.
 //!
-//! `load_metadata` has no overrides available. Not all setting and reference
+//! `load-metadata` has no overrides available. Not all setting and reference
 //! key combinations are compatible, and not all overrides are supported. Users
 //! are encouraged to comment if they need some other than current key
 //! combinations available.
@@ -728,7 +728,7 @@
 //!         <td><code>add_specs_&ltnetwork_name&gt-&ltnetwork_encryption&gt</code></td>
 //!     </tr>
 //!     <tr>
-//!         <td><code>load_metadata</code></td>
+//!         <td><code>load-metadata</code></td>
 //!         <td><code>load_metadata_&ltnetwork_name&gtV&ltmetadata_version&gt</code></td>
 //!     </tr>
 //!     <tr>
@@ -763,7 +763,7 @@
 //!
 //! - Key `-msgtype` followed by update type:
 //!    - `load_types`
-//!    - `load_metadata`
+//!    - `load-metadata`
 //!    - `add-specs`
 //!
 //! - Key `-verifier` (can be entered only if the `-crypto` argument was
@@ -810,7 +810,7 @@
 //!
 //! - Key `-msgtype` followed by message type:
 //!    - `load_types`
-//!    - `load_metadata`
+//!    - `load-metadata`
 //!    - `add_specs`
 //!
 //! - Key `-payload` followed by file path in dedicated
@@ -837,7 +837,7 @@
 //!
 //! #### `make` for external signature
 //!
-//! `$ cargo run make -qr -crypto <encryption> -msgtype load_metadata
+//! `$ cargo run make -qr -crypto <encryption> -msgtype load-metadata
 //! -verifier -hex <public key> -payload sign_me_load_metadata_westendV9200
 //! -signature -hex <signature>`
 //!

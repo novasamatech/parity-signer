@@ -167,7 +167,7 @@ pub fn error_occured(e: Error, pass_errors: bool) -> Result<()> {
     }
 }
 
-/// Content to print during `load_metadata <-k/-p/-t>` processing.
+/// Content to print during `load-metadata<-k/-p/-t>` processing.
 pub enum Write {
     /// all payloads, `-t` key or no setting key was used
     All,
@@ -536,7 +536,7 @@ where
     sort_metavalues(known_metavalues)
 }
 
-/// Update the database after `load_metadata` run.
+/// Update the database after `load-metadata` run.
 ///
 /// Clear [`METATREE`] tree of the hot database and write new metadata set in
 /// it.

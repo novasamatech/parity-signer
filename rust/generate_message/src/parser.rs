@@ -287,7 +287,7 @@ pub enum Show {
     BlockHistory,
 }
 
-/// Command details for `load_metadata`.
+/// Command details for `load-metadata`.
 #[derive(clap::Args, Debug)]
 pub struct InstructionMeta {
     /// Setting key, as read from command line
@@ -378,7 +378,7 @@ impl From<ContentArgs> for Content {
     }
 }
 
-/// Reference key for `load_metadata` and `add-specs` commands.
+/// Reference key for `load-metadata` and `add-specs` commands.
 #[derive(Subcommand, Debug)]
 pub enum Content {
     /// Deal with all relevant database entries
@@ -403,7 +403,7 @@ pub enum Content {
     },
 }
 
-/// Setting key for `load_metadata` and `add-specs` commands.
+/// Setting key for `load-metadata` and `add-specs` commands.
 #[derive(clap::ValueEnum, Clone, Debug)]
 pub enum Set {
     /// Key `-d`: do **not** update the database, make RPC calls, and produce
@@ -662,7 +662,7 @@ pub enum Msg {
     /// `load_types` payload
     LoadTypes,
 
-    /// `load_metadata` payload
+    /// `load-metadata` payload
     LoadMetadata,
 
     /// `add-specs` payload
