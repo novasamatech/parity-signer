@@ -744,16 +744,14 @@
 //!
 //! ### `make` command
 //!
-//! `$ cargo run make <optional_target_key> <keys> <arguments>`
+//! `$ cargo run make <keys> <arguments>`
 //!
 //! Keys to be used in command line:
 //!
-//! - `<optional_target_key>`: `-qr` will generate only apng QR code, `-text`
-//! will generate only text file with hex-encoded update. By default, i.e. if
-//! content key is not provided, both QR code and text file are generated.
-//! `<optional_target_key>` is expected immediately after `make` command, if at
-//! all; keys to follow could go in any order, but with argument immediately
-//! following the key.
+//! - Key `--goal` followed by the type to to generate
+//!    - `qr` will generate only a png QR code
+//!    - `text` will generate only text file with hex-encoded update.
+//!    - default, i.e. if goal is not provided, both QR code and text file are generated.
 //!
 //! - Key `-crypto` followed by encryption used to make update signature:
 //!    - `ed25519`
@@ -790,16 +788,14 @@
 //!
 //! ### `sign` command
 //!
-//! `$ cargo run make <optional_target_key> <keys> <arguments>`
+//! `$ cargo run make <keys> <arguments>`
 //!
 //! Keys to be used in command line:
 //!
-//! - `<optional_target_key>`: `-qr` will generate only apng QR code, `-text`
-//! will generate only text file with hex-encoded update. By default, i.e. if
-//! content key is not provided, both QR code and text file are generated.
-//! `<optional_target_key>` is expected immediately after `sign` command, if at
-//! all; keys to follow could go in any order, but with argument immediately
-//! following the key.
+//! - Key `--goal` followed by the type to to generate
+//!    - `qr` will generate only a png QR code
+//!    - `text` will generate only text file with hex-encoded update.
+//!    - default, i.e. if goal is not provided, both QR code and text file are generated.
 //!
 //! - Key `-sufficient` followed by:
 //!    - `-hex` followed by hexadecimal string with contents of Signer-produced
@@ -837,7 +833,7 @@
 //!
 //! #### `make` for external signature
 //!
-//! `$ cargo run make -qr -crypto <encryption> -msgtype load-metadata
+//! `$ cargo run make --goal qr -crypto <encryption> -msgtype load-metadata
 //! -verifier -hex <public key> --payload sign_me_load_metadata_westendV9200
 //! -signature -hex <signature>`
 //!
