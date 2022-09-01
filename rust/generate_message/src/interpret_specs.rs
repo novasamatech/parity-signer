@@ -32,7 +32,7 @@
 //!
 //! Command line with token override:
 //!
-//! `$ cargo run add-specs -d -u <url_address> --encryption sr25519 -token <decimals> <unit>`
+//! `$ cargo run add-specs -d -u <url_address> --encryption sr25519 --token-decimals <decimals> --token-unit <unit>`
 use definitions::network_specs::NetworkProperties;
 use serde_json::{map::Map, value::Value};
 use std::convert::TryInto;
@@ -72,7 +72,7 @@ pub fn interpret_properties(
                 (token_override.decimals, token_override.unit)
             } else {
                 // token override is possible, but not called for by the user
-                println!("Network supports several tokens. An array of tokenDecimals {} and an array of tokenSymbol {} were fetched. By default, decimals value will be set to 0, and unit value will be set to UNIT. To override, use -token <value_decimals> <value_unit>. To improve this behavior, please file a ticket.", decimals, unit);
+                println!("Network supports several tokens. An array of tokenDecimals {} and an array of tokenSymbol {} were fetched. By default, decimals value will be set to 0, and unit value will be set to UNIT. To override, use --token-decimals <value_decimals> --token-unit <value_unit>. To improve this behavior, please file a ticket.", decimals, unit);
                 (0, String::from("UNIT"))
             }
         }

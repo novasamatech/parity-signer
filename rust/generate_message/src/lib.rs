@@ -328,10 +328,10 @@
 //!
 //! Sequence invoking token override could be used when processing an
 //! individual network that has multiple allowed decimals and unit values
-//! retrieved as arrays of equal size. To override token, key `--token` followed
-//! by `u8` decimals value and `String` unit value is used. By default, if no
-//! token override in provided, such networks have `0u8` decimals and `UNIT`
-//! unit set up.
+//! retrieved as arrays of equal size. To override token, key `--token-decimals`
+//! followed by `u8` decimals value and key `--token-unit` `String` unit value is used.
+//! By default, if no token override in provided, such networks have `0u8` decimals
+//! and `UNIT` unit set up.
 //!
 //! Title override could be used when processing an individual network, to set
 //! the title under which the network will be displayed in Signer, should the
