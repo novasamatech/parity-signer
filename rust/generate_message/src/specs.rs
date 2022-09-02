@@ -2,7 +2,7 @@
 //!
 //! This module deals with processing command
 //!
-//! `$ cargo run add_specs <keys> <argument(s)>`
+//! `$ cargo run add-specs <keys> <argument(s)>`
 use definitions::{crypto::Encryption, keyring::NetworkSpecsKey, metadata::AddressBookEntry};
 use std::path::Path;
 
@@ -15,14 +15,14 @@ use crate::helpers::{
 };
 use crate::parser::{Content, InstructionSpecs, Override, Set, Token};
 
-/// Process `add_specs` command according to the [`InstructionSpecs`] received
+/// Process `add-specs` command according to the [`InstructionSpecs`] received
 /// from the command line.
 pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
     match instruction.set.into() {
         // `-f` setting key: produce `add_specs` payload files from existing
         // database entries.
         Set::F => match instruction.content.clone().into() {
-            // `$ cargo run add_specs -f -a`
+            // `$ cargo run add-specs -f -a`
             //
             // Make `add_specs` payloads for all specs entries in the database.
             Content::All { pass_errors: _ } => {
@@ -45,7 +45,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
                 Ok(())
             }
 
-            // `$ cargo run add_specs -f -n <address_book_title>
+            // `$ cargo run add-specs -f -n <address_book_title>
             // <optional encryption override> <optional signer title override>`
             //
             // Make `add_specs` payload for single specs entry from the
@@ -86,7 +86,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // Same as `-d -a` combination, of no use.
             Content::Name { .. } => Err(Error::NotSupported),
 
-            // `$ cargo run add_specs -d -u network_url_address
+            // `$ cargo run add-specs -d -u network_url_address
             // <encryption override> <optional token override> <optional signer
             // title override>`
             //
@@ -131,7 +131,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // use.
             Content::All { pass_errors: _ } => Err(Error::NotSupported),
 
-            // `$ cargo run add_specs -p -n network_address_book_title
+            // `$ cargo run add-specs -p -n network_address_book_title
             // <encryption override> <optional title override>
             // <optional token override>`
             //
@@ -154,7 +154,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
                 )
             }
 
-            // `$ cargo run add_specs -p -u network_url_address
+            // `$ cargo run add-specs -p -u network_url_address
             // <encryption override> <optional token override>`
             //
             // Update the database by making RPC calls at `network_url_address`.
@@ -191,7 +191,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // this command seems to be of no use.
             Content::All { pass_errors: _ } => Err(Error::NotSupported),
 
-            // `$ cargo run add_specs -n network_address_book_title
+            // `$ cargo run add-specs -n network_address_book_title
             // <encryption override>`
             //
             // Network already has an entry in the database and could be
@@ -210,7 +210,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
                 instruction.files_dir,
             ),
 
-            // `$ cargo run add_specs -u network_url_address
+            // `$ cargo run add-specs -u network_url_address
             // <encryption override> <optional token override>`
             //
             // Update the database by making RPC calls at `network_url_address`
@@ -243,7 +243,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
     }
 }
 
-/// `add_specs -f -a` for individual address book entry.
+/// `add-specs -f -a` for individual address book entry.
 ///
 /// - Get network specs
 /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) from
@@ -257,7 +257,7 @@ where
     add_specs_print(&network_specs, files_dir)
 }
 
-/// `add_specs -f -n <address_book_title> <override(s)>`
+/// `add-specs -f -n <address_book_title> <override(s)>`
 ///
 /// Token override is not allowed. Encryption and title override are optional.
 /// Overrides are used to modify the entry for specified address book title.
@@ -299,7 +299,7 @@ where
     }
 }
 
-/// `add_specs -d -u <url_address> <override(s)>`
+/// `add-specs -d -u <url_address> <override(s)>`
 ///
 /// Encryption override is mandatory. Title override is optional. Token override
 /// is possible if token set is fetched.
@@ -328,7 +328,7 @@ where
     add_specs_print(&specs, &files_dir)
 }
 
-/// `add_specs <-p/-t> -n <address_book_title> <override(s)>`
+/// `add-specs <-p/-t> -n <address_book_title> <override(s)>`
 ///
 /// Encryption and title overrides are possible. Token override is possible if
 /// network has token set.
@@ -448,7 +448,7 @@ where
     }
 }
 
-/// `add_specs <-p/-t> -u <url_address> <override(s)>`
+/// `add-specs <-p/-t> -u <url_address> <override(s)>`
 ///
 /// Encryption override is mandatory. Title override is optional. Token override
 /// is possible if token set is fetched.
