@@ -37,7 +37,6 @@ use sp_runtime::MultiSigner;
 
 #[cfg(feature = "signer")]
 use crate::helpers::{get_multisigner, unhex};
-#[cfg(feature = "active")]
 use crate::{
     crypto::Encryption,
     error::{Error, Result},

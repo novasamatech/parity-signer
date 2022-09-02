@@ -598,15 +598,15 @@ impl std::fmt::Display for Goal {
 pub struct Verifier {
     /// Use Alice key with a specified encryption scheme
     #[clap(long, name = "alice", value_parser = encryption_from_args)]
-    verifier_alice: Option<Encryption>,
+    pub verifier_alice: Option<Encryption>,
 
     /// Specify Verifier as a hex string argument
     #[clap(long, name = "HEX")]
-    verifier_hex: Option<String>,
+    pub verifier_hex: Option<String>,
 
     /// Read Verifier from a file
     #[clap(long, name = "FILE")]
-    verifier_file: Option<PathBuf>,
+    pub verifier_file: Option<PathBuf>,
 }
 
 /// Verifier-to-be, for `make` and `sign` commands.
@@ -632,11 +632,11 @@ pub enum Crypto {
 pub struct Signature {
     /// Supply signature in hex format as command line argument
     #[clap(long, value_name = "HEX")]
-    signature_hex: Option<String>,
+    pub signature_hex: Option<String>,
 
     /// Read signature from a file
     #[clap(long, value_name = "FILE")]
-    signature_file: Option<String>,
+    pub signature_file: Option<String>,
 }
 
 #[derive(clap::Args, Debug, Clone)]
@@ -646,11 +646,11 @@ pub struct Signature {
 pub struct Sufficient {
     /// Supply signature in hex format as command line argument
     #[clap(long, value_name = "HEX")]
-    sufficient_hex: Option<String>,
+    pub sufficient_hex: Option<String>,
 
     /// Read signature from a file
     #[clap(long, value_name = "FILE")]
-    sufficient_file: Option<String>,
+    pub sufficient_file: Option<String>,
 }
 /// Payload for `make` and `sign` commands.
 ///
