@@ -38,7 +38,6 @@ use parity_scale_codec::Encode;
 use regex::Regex;
 #[cfg(feature = "signer")]
 use sled::Batch;
-#[cfg(feature = "active")]
 use sp_core::H256;
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
@@ -1257,7 +1256,7 @@ fn prepare_secret_key_for_export(
             if public != &ed25519_pair.public() {
                 return Err(Error::WrongPassword);
             }
-            Ok(*ed25519_pair.seed())
+            Ok(ed25519_pair.seed().to_owned())
         }
         MultiSigner::Sr25519(public) => {
             let (sr25519_pair, seed) = sr25519::Pair::from_string_with_seed(full_address, pwd)
