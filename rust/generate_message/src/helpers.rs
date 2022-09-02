@@ -112,7 +112,7 @@ where
     }
 }
 
-/// Update the database after `add_specs` run.
+/// Update the database after `add-specs` run.
 ///
 /// Inputs `&str` URL address that was used for RPC calls and already completed
 /// [`NetworkSpecsToSend`].
@@ -167,7 +167,7 @@ pub fn error_occured(e: Error, pass_errors: bool) -> Result<()> {
     }
 }
 
-/// Content to print during `load_metadata <-k/-p/-t>` processing.
+/// Content to print during `load-metadata<-k/-p/-t>` processing.
 pub enum Write {
     /// all payloads, `-t` key or no setting key was used
     All,
@@ -536,7 +536,7 @@ where
     sort_metavalues(known_metavalues)
 }
 
-/// Update the database after `load_metadata` run.
+/// Update the database after `load-metadata` run.
 ///
 /// Clear [`METATREE`] tree of the hot database and write new metadata set in
 /// it.
@@ -789,7 +789,7 @@ fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch> {
 /// Check known [`NetworkSpecsToSend`] with network data fetched and apply token
 /// override.
 ///
-/// This is a helper function for `add_specs` runs with `-n` reference key, i.e.
+/// This is a helper function for `add-specs` runs with `-n` reference key, i.e.
 /// for cases when *some* network specs entry already exists in the database.
 ///
 /// Input [`NetworkSpecsToSend`] is the entry from the database to which the
