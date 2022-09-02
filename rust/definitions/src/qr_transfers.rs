@@ -22,6 +22,7 @@
 //! This module deals with content part of QR codes.  
 
 use parity_scale_codec::{Decode, Encode};
+#[cfg(feature = "active")]
 use std::path::Path;
 
 use crate::crypto::Encryption;
