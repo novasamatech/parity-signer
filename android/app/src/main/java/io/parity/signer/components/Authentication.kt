@@ -9,8 +9,6 @@ import androidx.fragment.app.FragmentActivity
 
 
 class Authentication(val setAuth: (Boolean) -> Unit) {
-	var strongCredentials: Boolean = false
-
 
 	private lateinit var biometricPrompt: BiometricPrompt
 	lateinit var context: Context
@@ -19,22 +17,14 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 		val biometricManager = BiometricManager.from(context)
 
 		val promptInfo =
-			if (strongCredentials) {
 				BiometricPrompt.PromptInfo.Builder()
 					.setTitle("UNLOCK SIGNER")
 					.setSubtitle("Please authenticate yourself")
-					.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+					.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK)
 					.build()
-			} else {
-				BiometricPrompt.PromptInfo.Builder()
-					.setTitle("UNLOCK SIGNER")
-					.setSubtitle("Please authenticate yourself")
-					.setNegativeButtonText("Cancel")
-					.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
-					.build()
-			}
 
-		when (biometricManager.canAuthenticate(if (strongCredentials) BiometricManager.Authenticators.DEVICE_CREDENTIAL else BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
+		when (biometricManager.canAuthenticate(BiometricManager.Authenticators.DEVICE_CREDENTIAL
+			or BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
 			BiometricManager.BIOMETRIC_SUCCESS -> {
 
 				val executor = ContextCompat.getMainExecutor(context)
@@ -95,11 +85,8 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 			BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
 				Toast.makeText(
 					context,
-					"Authentication system not enrolled; please enable "
-						+ if (strongCredentials)
-						"password or pin code"
-					else
-						"biometric authentication",
+					"Authentication system not enrolled; please enable " +
+						"password, pin code or biometric authentication",
 					Toast.LENGTH_LONG
 				).show()
 				return
