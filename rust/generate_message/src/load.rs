@@ -2,7 +2,7 @@
 //!
 //! This module deals with processing commands:
 //!
-//! - `$ cargo run load_metadata <key(s)> <(argument)>` to produce
+//! - `$ cargo run load-metadata <key(s)> <(argument)>` to produce
 //! `load_metadata` update payloads from the database entries and through RPC
 //! calls and update the hot database
 //!
@@ -28,14 +28,14 @@ use crate::helpers::{
 };
 use crate::parser::{Content, InstructionMeta, Set};
 
-/// Process `load_metadata` command according to the [`InstructionMeta`]
+/// Process `load-metadata` command according to the [`InstructionMeta`]
 /// received from the command line.
 pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
     match instruction.set.into() {
         // `-f` setting key: produce payload files from existing database
         // entries.
         Set::F => match instruction.content.into() {
-            // `$ cargo run load_metadata -f -a`
+            // `$ cargo run load-metadata -f -a`
             //
             // Make payloads for all metadata entries in the database.
             Content::All { pass_errors } => {
@@ -52,7 +52,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 Ok(())
             }
 
-            // `$ cargo run load_metadata -f -n <network_name>`
+            // `$ cargo run load-metadata -f -n <network_name>`
             //
             // Make payload(s) for all metadata entries in the database for
             // network with user-entered name.
@@ -67,7 +67,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
         // `-d` setting key: get network data using RPC calls, **do not**
         // update the database, export payload files.
         Set::D => match instruction.content.into() {
-            // `$ cargo run load_metadata -d -a`
+            // `$ cargo run load-metadata -d -a`
             //
             // Make RPC calls for all networks in `ADDRESS_BOOK`, produce
             // `load_metadata` payload files.
@@ -85,7 +85,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                 Ok(())
             }
 
-            // `$ cargo run load_metadata -d -n <network_name>`
+            // `$ cargo run load-metadata -d -n <network_name>`
             //
             // Make RPC calls for network with user-entered name and produce
             // `load_metadata` payload file.
@@ -95,7 +95,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
             // be found.
             Content::Name { s: name } => meta_d_n(&name, &instruction.db, &instruction.files_dir),
 
-            // `$ cargo run load_metadata -d -u <url_address>`
+            // `$ cargo run load-metadata -d -u <url_address>`
             //
             // Make RPC calls for network at user-entered URL address and
             // produce `load_metadata` payload file.
@@ -115,7 +115,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
         Set::K => {
             let write = Write::OnlyNew;
             match instruction.content.into() {
-                // `$ cargo run load_metadata -k -a`
+                // `$ cargo run load-metadata -k -a`
                 //
                 // Make RPC calls, update the database as needed and produce
                 // payload files if new data is fetched for all networks in
@@ -128,7 +128,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                     meta_kpt_a(&write, pass_errors, &instruction.db, &instruction.files_dir)
                 }
 
-                // `$ cargo run load_metadata -k -n <network_name>`
+                // `$ cargo run load-metadata -k -n <network_name>`
                 //
                 // Make RPC calls, update the database as needed and produce
                 // payload file if new data is fetched for network with
@@ -157,7 +157,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
         Set::P => {
             let write = Write::None;
             match instruction.content.into() {
-                // `$ cargo run load_metadata -p -a`
+                // `$ cargo run load-metadata -p -a`
                 //
                 // Make RPC calls and update the database as needed for all
                 // networks in address book.
@@ -167,7 +167,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                     meta_kpt_a(&write, pass_errors, &instruction.db, &instruction.files_dir)
                 }
 
-                // `$ cargo run load_metadata -p -n <network_name>`
+                // `$ cargo run load-metadata -p -n <network_name>`
                 //
                 // Make RPC calls and update the database as needed for network
                 // with specified name.
@@ -194,7 +194,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
         Set::T => {
             let write = Write::All;
             match instruction.content.into() {
-                // `$ cargo run load_metadata -a`
+                // `$ cargo run load-metadata -a`
                 //
                 // Make RPC calls, update the database as needed and produce
                 // payload files for all networks in address book.
@@ -204,7 +204,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
                     meta_kpt_a(&write, pass_errors, &instruction.db, &instruction.files_dir)
                 }
 
-                // `$ cargo run load_metadata -n <network_name>`
+                // `$ cargo run load-metadata -n <network_name>`
                 //
                 // Make RPC calls, update the database as needed and produce
                 // payload file for network with specified name.
@@ -228,7 +228,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
     }
 }
 
-/// `load_metadata -f -a` for individual [`AddressSpecs`] value.
+/// `load-metadata-f -a` for individual [`AddressSpecs`] value.
 ///
 /// - Get metadata entries from database [`METATREE`] by [`MetaKeyPrefix`]
 /// generated with network name. At most two entries are expected.
@@ -263,7 +263,7 @@ where
     Ok(())
 }
 
-/// `load_metadata -f -n <network_name>`
+/// `load-metadata-f -n <network_name>`
 ///
 /// - Get all available [`AddressSpecs`] from the database and search for the
 /// one with user-entered network name
@@ -278,7 +278,7 @@ where
     meta_f_a_element(&search_name(name, &db_path)?, &db_path, &files_dir)
 }
 
-/// `load_metadata -d -a` for individual [`AddressSpecs`] value.
+/// `load-metadata-d -a` for individual [`AddressSpecs`] value.
 ///
 /// - Fetch network information using RPC calls at `address` in [`AddressSpecs`]
 /// and interpret it
@@ -292,7 +292,7 @@ where
     load_metadata_print(&meta_fetch.cut(), files_dir)
 }
 
-/// `load_metadata -d -n <network_name>`
+/// `load-metadata-d -n <network_name>`
 ///
 /// - Get all available [`AddressSpecs`] from the database and search for the
 /// one with user-entered network name
@@ -307,7 +307,7 @@ where
     meta_d_a_element(&search_name(name, db_path)?, files_dir)
 }
 
-/// `load_metadata -d -u <url_address>`
+/// `load-metadata-d -u <url_address>`
 ///
 /// - Fetch network information using RPC calls at user-entered `address` and
 /// interpret it
@@ -336,7 +336,7 @@ where
     load_metadata_print(&meta_fetched.cut(), files_dir)
 }
 
-/// `load_metadata <-k/-p/-t> -a`
+/// `load-metadata<-k/-p/-t> -a`
 ///
 /// - Get all available [`AddressSpecs`] from the database
 /// - Get and sort existing metadata entries from [`METATREE`], with block
@@ -360,7 +360,7 @@ where
     db_upd_metadata(sorted_meta_values, &db_path)
 }
 
-/// `load_metadata <-k/-p/-t> -a` for individual [`AddressSpecs`] value.
+/// `load-metadata<-k/-p/-t> -a` for individual [`AddressSpecs`] value.
 ///
 /// - Fetch network information using RPC calls at `address` in [`AddressSpecs`]
 /// and interpret it
@@ -407,7 +407,7 @@ where
     Ok(())
 }
 
-/// `load_metadata <-k/-p/-t> -n <network_name>`
+/// `load-metadata<-k/-p/-t> -n <network_name>`
 ///
 /// - Get and sort existing metadata entries from [`METATREE`], with block
 /// data from [`META_HISTORY`](constants::META_HISTORY) if available
