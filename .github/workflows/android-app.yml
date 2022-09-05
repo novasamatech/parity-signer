@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on:            ubuntu-latest
+    runs-on:            ubuntu-20.04
     steps:
       - name:           Cancel Previous Runs
         uses:           styfle/cancel-workflow-action@bb6001c4ea612bf59c3abfc4756fbceee4f870c7 # 0.10.0
@@ -73,10 +73,10 @@ jobs:
         run:            |
           cd android
           ./gradlew build
-     
+
   debug:
     name: Build unsigned APKs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     # if: github.ref == ' refs/head/main'
     steps:
       - name:           Cancel Previous Runs
