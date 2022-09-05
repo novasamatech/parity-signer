@@ -6,11 +6,10 @@ on:
     branches:
       - master
       - stable
-      - change-android-runner
 
 jobs:
   build:
-    name: Build android
+    name: Build
     runs-on:            ubuntu-22.04
     steps:
       - name:           Cancel Previous Runs
