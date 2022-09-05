@@ -23,7 +23,10 @@ struct KeySetList: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
-                NavigationBarView(title: Localizable.KeySets.title.string)
+                NavigationBarView(
+                    navigation: navigation,
+                    viewModel: NavigationBarViewModel(title: Localizable.KeySets.title.string)
+                )
                 List {
                     ForEach(
                         viewModel.list.sorted(by: { $0.keyName < $1.keyName }),
@@ -35,16 +38,16 @@ struct KeySetList: View {
                         .listRowBackground(Asset.backgroundSystem.swiftUIColor)
                         .listRowSeparator(.hidden)
                         .listRowInsets(.init(
-                            top: Padding.extraExtraSmall,
-                            leading: Padding.extraSmall,
-                            bottom: Padding.extraExtraSmall,
-                            trailing: Padding.extraSmall
+                            top: Spacing.extraExtraSmall,
+                            leading: Spacing.extraSmall,
+                            bottom: Spacing.extraExtraSmall,
+                            trailing: Spacing.extraSmall
                         ))
                     }
                     Spacer()
                         .listRowBackground(Asset.backgroundSystem.swiftUIColor)
                         .listRowSeparator(.hidden)
-                        .frame(height: Heights.actionButton + Padding.large)
+                        .frame(height: Heights.actionButton + Spacing.large)
                 }
                 .listStyle(.plain)
             }
@@ -59,7 +62,7 @@ struct KeySetList: View {
                 },
                 text: Localizable.KeySets.Action.add.key
             )
-            .padding(Padding.large)
+            .padding(Spacing.large)
         }
         .fullScreenCover(isPresented: $isShowingNewSeedMenu) {
             AddKeySetModal(
@@ -71,55 +74,55 @@ struct KeySetList: View {
     }
 }
 
-// struct KeySetListPreview: PreviewProvider {
-//    static var previews: some View {
-//        KeySetList(
-//            navigation: NavigationCoordinator(),
-//            viewModel: KeySetListViewModelBuilder()
-//                .build(
-//                    for:
-//                    MSeeds(
-//                        seedNameCards: [
-//                            SeedNameCard(
-//                                seedName: "aaaa",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 3
-//                            ),
-//                            SeedNameCard(
-//                                seedName: "bbbb",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 0
-//                            ),
-//                            SeedNameCard(
-//                                seedName: "cccc",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 1
-//                            ),
-//                            SeedNameCard(
-//                                seedName: "dddd",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 4
-//                            ),
-//                            SeedNameCard(
-//                                seedName: "eeee",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 15
-//                            ),
-//                            SeedNameCard(
-//                                seedName: "ffff",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 1
-//                            ),
-//                            SeedNameCard(
-//                                seedName: "gggg",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 0
-//                            )
-//                        ]
-//                    )
-//                )
-//        )
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }
+struct KeySetListPreview: PreviewProvider {
+    static var previews: some View {
+        KeySetList(
+            navigation: NavigationCoordinator(),
+            viewModel: KeySetListViewModelBuilder()
+                .build(
+                    for:
+                    MSeeds(
+                        seedNameCards: [
+                            SeedNameCard(
+                                seedName: "aaaa",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 3
+                            ),
+                            SeedNameCard(
+                                seedName: "bbbb",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 0
+                            ),
+                            SeedNameCard(
+                                seedName: "cccc",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 1
+                            ),
+                            SeedNameCard(
+                                seedName: "dddd",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 4
+                            ),
+                            SeedNameCard(
+                                seedName: "eeee",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 15
+                            ),
+                            SeedNameCard(
+                                seedName: "ffff",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 1
+                            ),
+                            SeedNameCard(
+                                seedName: "gggg",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 0
+                            )
+                        ]
+                    )
+                )
+        )
+        .preferredColorScheme(.dark)
+        .previewLayout(.sizeThatFits)
+    }
+}

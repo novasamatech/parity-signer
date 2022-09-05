@@ -287,7 +287,7 @@ pub enum Show {
     BlockHistory,
 }
 
-/// Command details for `load_metadata`.
+/// Command details for `load-metadata`.
 #[derive(clap::Args, Debug)]
 pub struct InstructionMeta {
     /// Setting key, as read from command line
@@ -320,7 +320,7 @@ impl From<SetFlags> for Set {
     }
 }
 
-/// Command details for `add_specs`.
+/// Command details for `add-specs`.
 #[derive(clap::Args, Debug)]
 #[clap(group(clap::ArgGroup::new("referencekey")
                 .required(true)
@@ -330,7 +330,7 @@ pub struct InstructionSpecs {
     #[clap(flatten)]
     pub set: SetFlags,
 
-    /// Overrides, relevant only for `add_specs` command
+    /// Overrides, relevant only for `add-specs` command
     #[clap(flatten)]
     pub over: Override,
 
@@ -378,7 +378,7 @@ impl From<ContentArgs> for Content {
     }
 }
 
-/// Reference key for `load_metadata` and `add_specs` commands.
+/// Reference key for `load-metadata` and `add-specs` commands.
 #[derive(Subcommand, Debug)]
 pub enum Content {
     /// Deal with all relevant database entries
@@ -403,7 +403,7 @@ pub enum Content {
     },
 }
 
-/// Setting key for `load_metadata` and `add_specs` commands.
+/// Setting key for `load-metadata` and `add-specs` commands.
 #[derive(clap::ValueEnum, Clone, Debug)]
 pub enum Set {
     /// Key `-d`: do **not** update the database, make RPC calls, and produce
@@ -598,15 +598,15 @@ impl std::fmt::Display for Goal {
 pub struct Verifier {
     /// Use Alice key with a specified encryption scheme
     #[clap(long, name = "alice", value_parser = encryption_from_args)]
-    verifier_alice: Option<Encryption>,
+    pub verifier_alice: Option<Encryption>,
 
     /// Specify Verifier as a hex string argument
     #[clap(long, name = "HEX")]
-    verifier_hex: Option<String>,
+    pub verifier_hex: Option<String>,
 
     /// Read Verifier from a file
     #[clap(long, name = "FILE")]
-    verifier_file: Option<PathBuf>,
+    pub verifier_file: Option<PathBuf>,
 }
 
 /// Verifier-to-be, for `make` and `sign` commands.
@@ -632,11 +632,11 @@ pub enum Crypto {
 pub struct Signature {
     /// Supply signature in hex format as command line argument
     #[clap(long, value_name = "HEX")]
-    signature_hex: Option<String>,
+    pub signature_hex: Option<String>,
 
     /// Read signature from a file
     #[clap(long, value_name = "FILE")]
-    signature_file: Option<String>,
+    pub signature_file: Option<String>,
 }
 
 #[derive(clap::Args, Debug, Clone)]
@@ -646,11 +646,11 @@ pub struct Signature {
 pub struct Sufficient {
     /// Supply signature in hex format as command line argument
     #[clap(long, value_name = "HEX")]
-    sufficient_hex: Option<String>,
+    pub sufficient_hex: Option<String>,
 
     /// Read signature from a file
     #[clap(long, value_name = "FILE")]
-    sufficient_file: Option<String>,
+    pub sufficient_file: Option<String>,
 }
 /// Payload for `make` and `sign` commands.
 ///
@@ -659,13 +659,13 @@ pub struct Sufficient {
 /// Payload content details are described in [`definitions::qr_transfers`].
 #[derive(clap::ValueEnum, Clone, Debug)]
 pub enum Msg {
-    /// `load_types` payload
+    /// `load-types` payload
     LoadTypes,
 
-    /// `load_metadata` payload
+    /// `load-metadata` payload
     LoadMetadata,
 
-    /// `add_specs` payload
+    /// `add-specs` payload
     AddSpecs,
 }
 
@@ -704,7 +704,7 @@ pub struct Derivations {
     pub db: PathBuf,
 }
 
-/// Overrides for `add_specs` command.
+/// Overrides for `add-specs` command.
 #[derive(Args, Debug)]
 pub struct Override {
     /// [`Encryption`] override to specify encryption algorithm used by a new

@@ -11,6 +11,8 @@ import UIKit
 enum Heights {
     /// All variants of `ActionButton`, 57 pt
     static let actionButton: CGFloat = 57
+    /// All variants of `NavbarButton`, 40 pt
+    static let navigationButton: CGFloat = 40
     /// All variants of `MenuButton`, 48 pt
     static let menuButton: CGFloat = 48
     /// Height for cell container for Key Set collection element

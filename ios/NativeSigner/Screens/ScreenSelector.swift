@@ -30,12 +30,10 @@ struct ScreenSelector: View {
                 navigationRequest: navigationRequest
             )
         case let .keys(value):
-            KeyManager(
-                content: value,
-                alert: alert,
-                alertShow: alertShow,
-                increment: increment,
-                navigationRequest: navigationRequest
+            KeyDetailsView(
+                navigation: navigation,
+                viewModel: KeyDetailsViewModel(value),
+                actionModel: KeyDetailsActionModel(value, alert: alert, alertShow: alertShow)
             )
         case let .settings(value):
             SettingsScreen(

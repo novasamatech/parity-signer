@@ -15,8 +15,8 @@ db_handling = { path = "../db_handling", default-features = false, features = ["
 qrcode_static = { path = "../qrcode_static" }
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
-thiserror = "1.0.32"
-anyhow = "1.0.62"
+thiserror = "1.0.33"
+anyhow = "1.0.63"
 
 [dev-dependencies]
 pretty_assertions = "1"

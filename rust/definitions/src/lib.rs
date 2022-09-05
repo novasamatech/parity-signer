@@ -20,7 +20,6 @@ pub mod danger;
 
 pub mod error;
 
-#[cfg(feature = "active")]
 pub mod error_active;
 
 #[cfg(feature = "signer")]
