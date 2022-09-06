@@ -4,8 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -18,14 +17,30 @@ import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun KeyDetailsAction(signerDataModel: SignerDataModel) {
-	var confirmForget by remember { mutableStateOf(false) }
-	var confirmExport by remember { mutableStateOf(false) }
+fun PrivateKeyExtractBottomSheet() {
+
+	val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+		bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
+	)
+	val coroutineScope = rememberCoroutineScope()
+	BottomSheetScaffold(
+		scaffoldState = bottomSheetScaffoldState,
+		sheetContent = {
+			Box(
+				Modifier
+					.fillMaxWidth()
+					.height(200.dp)
+			) {
+				Text(text = "Hello from sheet")
+			}
+		}, sheetPeekHeight = 0.dp
+	)
 
 	Column (
-		Modifier.clickable { signerDataModel.pushButton(Action.GO_BACK) }
-		) {
+		Modifier.clickable { close() } //todo dmitry
+	) {
 		Spacer(Modifier.weight(1f))
 		Surface(
 			color = MaterialTheme.colors.Bg000,
