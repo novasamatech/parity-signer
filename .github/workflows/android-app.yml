@@ -71,8 +71,7 @@ jobs:
 
       - name:           Build
         run:            |
-          cd android
-          ./gradlew :app:testDebugUnitTest
+          ./gradlew :android:testDebugUnitTest
 
   debug:
     name: Build unsigned APKs
@@ -139,7 +138,6 @@ jobs:
 
       - name:           Assemble GPlay unsigned apk
         run:            |
-          cd android
           ./gradlew clean assembleDebug --stacktrace
 
       - name:           Upload Gplay unsigned APKs
@@ -147,4 +145,4 @@ jobs:
         with:
           name:         signer-debug-unsigned
           path:         |
-            android/app/build/outputs/apk/debug/*.apk
+            android/build/outputs/apk/debug/*.apk
