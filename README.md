@@ -1,8 +1,8 @@
 <div align="center">
-	
-![Logo Black](docs/src/res/logo-black.svg#gh-light-mode-only)	
+
+![Logo Black](docs/src/res/logo-black.svg#gh-light-mode-only)
 ![Logo White](docs/src/res/logo-white.svg#gh-dark-mode-only)
-	
+
 </div>
 
 <div align="center">
@@ -153,7 +153,7 @@ Note - old x86 is not supported. Just use x86_64 emulator image.
 
 **5.** Download [Android Studio](https://developer.android.com/studio).
 
-**6.** Open the project from the `android` directory.
+**6.** Open the project from the root directory.
 
 **7.** Install NDK. Currently specific version 24.0.8215888 is required.
 

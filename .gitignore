@@ -74,13 +74,13 @@ fastlane/test_output
 .vscode
 
 # Android
+.project
 android/.project
-android/app/.project
-android/app/bin
-android/app/src/main/jniLibs
-android/app/src/main/assets/Database/*
-android/app/release
-android/app/debug
+android/bin
+android/src/main/jniLibs
+android/src/main/assets/Database/*
+android/release
+android/debug
 
 # iOS
 ios/NativeSigner/Database/Database/*
