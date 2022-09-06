@@ -4,11 +4,18 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
+use error::Error;
 //do we support mutex?
 use lazy_static::lazy_static;
 use std::sync::{Mutex, TryLockError};
 
-use definitions::{keyring::NetworkSpecsKey, navigation::ActionResult};
+use definitions::{
+    keyring::NetworkSpecsKey,
+    navigation::{
+        ActionResult, MKeys, MLog, MLogDetails, MManageNetworks, MRecoverSeedName, MSeeds,
+        MSettings, MSignSufficientCrypto, MTransaction, MVerifierDetails,
+    },
+};
 
 mod error;
 
@@ -84,6 +91,116 @@ pub fn init_navigation(dbname: &str, seed_names: Vec<String>) {
                 Err(e) => println!("No networks could be fetched: {:?}", e),
             };
         }
+        Err(_) => {
+            //TODO: maybe more grace here?
+            panic!("Concurrency error! Restart the app.");
+        }
+    }
+}
+
+pub fn get_log() -> Result<MLog, Error> {
+    let guard = STATE.lock();
+    match guard {
+        Ok(mut navstate) => navstate.get_log(),
+        Err(_) => {
+            //TODO: maybe more grace here?
+            panic!("Concurrency error! Restart the app.");
+        }
+    }
+}
+
+pub fn get_log_details(order: u32) -> Result<MLogDetails, Error> {
+    let guard = STATE.lock();
+    match guard {
+        Ok(mut navstate) => navstate.get_log_details(order),
+        Err(_) => {
+            //TODO: maybe more grace here?
+            panic!("Concurrency error! Restart the app.");
+        }
+    }
+}
+
+pub fn get_transaction() -> Result<MTransaction, Error> {
+    let guard = STATE.lock();
+    match guard {
+        Ok(mut navstate) => navstate.get_transaction(),
+        Err(_) => {
+            //TODO: maybe more grace here?
+            panic!("Concurrency error! Restart the app.");
+        }
+    }
+}
+
+pub fn get_seeds() -> Result<MSeeds, Error> {
+    let guard = STATE.lock();
+    match guard {
+        Ok(mut navstate) => navstate.get_seeds(),
+        Err(_) => {
+            //TODO: maybe more grace here?
+            panic!("Concurrency error! Restart the app.");
+        }
+    }
+}
+
+pub fn get_keys() -> Result<MKeys, Error> {
+    let guard = STATE.lock();
+    match guard {
+        Ok(mut navstate) => navstate.get_keys(),
+        Err(_) => {
+            //TODO: maybe more grace here?
+            panic!("Concurrency error! Restart the app.");
+        }
+    }
+}
+
+pub fn recover_seed_name(keyboard: bool, seed_name: &str) -> MRecoverSeedName {
+    let guard = STATE.lock();
+    match guard {
+        Ok(mut navstate) => navstate.recover_seed_name(keyboard, seed_name),
+        Err(_) => {
+            //TODO: maybe more grace here?
+            panic!("Concurrency error! Restart the app.");
+        }
+    }
+}
+
+pub fn settings() -> MSettings {
+    let guard = STATE.lock();
+    match guard {
+        Ok(mut navstate) => navstate.settings(),
+        Err(_) => {
+            //TODO: maybe more grace here?
+            panic!("Concurrency error! Restart the app.");
+        }
+    }
+}
+
+pub fn get_verifier() -> Result<MVerifierDetails, Error> {
+    let guard = STATE.lock();
+    match guard {
+        Ok(mut navstate) => navstate.get_verifier(),
+        Err(_) => {
+            //TODO: maybe more grace here?
+            panic!("Concurrency error! Restart the app.");
+        }
+    }
+}
+
+pub fn manage_networks() -> Result<MManageNetworks, Error> {
+    let guard = STATE.lock();
+    match guard {
+        Ok(mut navstate) => navstate.manage_networks(),
+        Err(_) => {
+            //TODO: maybe more grace here?
+            panic!("Concurrency error! Restart the app.");
+        }
+    }
+}
+
+pub fn get_sign_sufficient_crypto() -> Result<MSignSufficientCrypto, Error> {
+    let guard = STATE.lock();
+    match guard {
+        Ok(mut navstate) => navstate.get_sign_sufficient_crypto(),
         Err(_) => {
             //TODO: maybe more grace here?
             panic!("Concurrency error! Restart the app.");

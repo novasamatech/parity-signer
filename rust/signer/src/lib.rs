@@ -188,6 +188,46 @@ fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<
         .map_err(|e| format!("{}", e))
 }
 
+fn get_log() -> anyhow::Result<MLog, String> {
+    navigator::get_log().map_err(|e| format!("{}", e))
+}
+
+fn get_log_details(order: u32) -> anyhow::Result<MLogDetails, String> {
+    navigator::get_log_details(order).map_err(|e| format!("{}", e))
+}
+
+fn get_transaction() -> anyhow::Result<MTransaction, String> {
+    navigator::get_transaction().map_err(|e| format!("{}", e))
+}
+
+fn get_seeds() -> anyhow::Result<MSeeds, String> {
+    navigator::get_seeds().map_err(|e| format!("{}", e))
+}
+
+fn get_keys() -> anyhow::Result<MKeys, String> {
+    navigator::get_keys().map_err(|e| format!("{}", e))
+}
+
+fn recover_seed_name(keyboard: bool, seed_name: &str) -> MRecoverSeedName {
+    navigator::recover_seed_name(keyboard, seed_name)
+}
+
+fn settings() -> MSettings {
+    navigator::settings()
+}
+
+fn get_verifier() -> anyhow::Result<MVerifierDetails, String> {
+    navigator::get_verifier().map_err(|e| format!("{}", e))
+}
+
+fn manage_networks() -> anyhow::Result<MManageNetworks, String> {
+    navigator::manage_networks().map_err(|e| format!("{}", e))
+}
+
+fn get_sign_sufficient_crypto() -> anyhow::Result<MSignSufficientCrypto, String> {
+    navigator::get_sign_sufficient_crypto().map_err(|e| format!("{}", e))
+}
+
 /// Must be called once to initialize logging from Rust in development mode.
 ///
 /// Do not use in production.

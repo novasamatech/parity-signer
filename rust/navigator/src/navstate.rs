@@ -6,8 +6,8 @@ use definitions::navigation::{
     ActionResult, Address, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti,
     MKeys, MLog, MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm,
     MRecoverSeedName, MRecoverSeedPhrase, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings,
-    MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData,
-    RightButton, ScreenData, ScreenNameType, ShieldAlert, TransactionType,
+    MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, MVerifierDetails,
+    ModalData, RightButton, ScreenData, ScreenNameType, ShieldAlert, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use std::fmt::Write;
@@ -1442,24 +1442,12 @@ impl State {
     ) -> Result<ScreenData> {
         let sd = match new_navstate.screen {
             Screen::Log => {
-                let history = db_handling::manage_history::get_history(dbname)?;
-                let log: Vec<_> = history
-                    .into_iter()
-                    .map(|(order, entry)| History {
-                        order: order.stamp(),
-                        timestamp: entry.timestamp,
-                        events: entry.events,
-                    })
-                    .collect();
-                let f = MLog { log };
-
+                let f = self.get_log()?;
                 ScreenData::Log { f }
             }
             Screen::LogDetails(order) => {
-                let e = get_history_entry_by_order(order, dbname)?;
-                let timestamp = e.timestamp.clone();
-                let events = entry_to_transactions_with_decoding(e, dbname)?;
-                let f = MLogDetails { timestamp, events };
+                let f = self.get_log_details(order)?;
+
                 ScreenData::LogDetails { f }
             }
             Screen::Scan => ScreenData::Scan,
@@ -1502,21 +1490,11 @@ impl State {
                 }
             }
             Screen::SeedSelector => {
-                let seed_name_cards =
-                    db_handling::interface_signer::get_all_seed_names_with_identicons(
-                        dbname,
-                        &self.seed_names,
-                    )?;
-                let f = MSeeds { seed_name_cards };
+                let f = self.get_seeds()?;
                 ScreenData::SeedSelector { f }
             }
             Screen::SelectSeedForBackup => {
-                let seed_name_cards =
-                    db_handling::interface_signer::get_all_seed_names_with_identicons(
-                        dbname,
-                        &self.seed_names,
-                    )?;
-                let f = MSeeds { seed_name_cards };
+                let f = self.get_seeds()?;
                 ScreenData::SelectSeedForBackup { f }
             }
             Screen::Keys(ref keys_state) => {
@@ -1576,10 +1554,7 @@ impl State {
                 ScreenData::NewSeed { f }
             }
             Screen::RecoverSeedName(ref seed_name) => {
-                let f = MRecoverSeedName {
-                    keyboard: new_navstate.keyboard(),
-                    seed_name: seed_name.to_string(),
-                };
+                let f = self.recover_seed_name(new_navstate.keyboard(), seed_name);
                 ScreenData::RecoverSeedName { f }
             }
             Screen::RecoverSeedPhrase(ref recover_seed_phrase_state) => {
@@ -1613,43 +1588,15 @@ impl State {
                 ScreenData::DeriveKey { f }
             }
             Screen::Settings => {
-                // for now has same content as Screen::Verifier
-                //
-                // IMPORTANT: this screen should never fail. Ever.
-                // There is no error handling beyond this point,
-                // if this fails - user is stuck here forever.
-                //
-                // Please don't fall into error modal from here,
-                // you have `error` field for that.
-                //
-                // Don't ignore this on refactor like everyone else before you.
-                let f = match db_handling::helpers::get_general_verifier(dbname) {
-                    Ok(Verifier { v: Some(vv) }) => {
-                        let card = vv.show_card();
-                        MSettings {
-                            public_key: Some(card.public_key),
-                            identicon: Some(card.identicon),
-                            encryption: Some(card.encryption),
-                            error: None,
-                        }
-                    }
-                    Ok(Verifier { v: None }) => Default::default(),
-                    Err(e) => MSettings {
-                        public_key: None,
-                        identicon: None,
-                        encryption: None,
-                        error: Some(format!("{}", e)),
-                    },
-                };
+                let f = self.settings();
                 ScreenData::Settings { f }
             }
             Screen::Verifier => {
-                let f = db_handling::helpers::get_general_verifier(dbname)?;
-                ScreenData::VVerifier { f: f.show_card() }
+                let f = self.get_verifier()?;
+                ScreenData::VVerifier { f }
             }
             Screen::ManageNetworks => {
-                let networks = db_handling::interface_signer::show_all_networks(dbname)?;
-                let f = MManageNetworks { networks };
+                let f = self.manage_networks()?;
                 ScreenData::ManageNetworks { f }
             }
             Screen::NetworkDetails(ref network_specs_key) => {
@@ -1660,8 +1607,8 @@ impl State {
                 ScreenData::NNetworkDetails { f }
             }
             Screen::SignSufficientCrypto(_) => {
-                let identities = db_handling::interface_signer::print_all_identities(dbname)?;
-                let f = MSignSufficientCrypto { identities };
+                let f = self.get_sign_sufficient_crypto()?;
+
                 ScreenData::SignSufficientCrypto { f }
             }
             _ => ScreenData::Documents,
@@ -1826,6 +1773,124 @@ impl State {
             Modal::Empty => None,
         };
         Ok(modal)
+    }
+
+    pub fn get_log(&mut self) -> Result<MLog> {
+        let dbname = self.dbname.as_ref().ok_or(Error::DbNotInitialized)?;
+        let history = db_handling::manage_history::get_history(dbname)?;
+        let log: Vec<_> = history
+            .into_iter()
+            .map(|(order, entry)| History {
+                order: order.stamp(),
+                timestamp: entry.timestamp,
+                events: entry.events,
+            })
+            .collect();
+        let f = MLog { log };
+
+        Ok(f)
+    }
+
+    pub fn get_log_details(&mut self, order: u32) -> Result<MLogDetails> {
+        let dbname = self.dbname.as_ref().ok_or(Error::DbNotInitialized)?;
+        let e = get_history_entry_by_order(order, dbname)?;
+        let timestamp = e.timestamp.clone();
+        let events = entry_to_transactions_with_decoding(e, dbname)?;
+        let f = MLogDetails { timestamp, events };
+
+        Ok(f)
+    }
+
+    pub fn get_transaction(&mut self) -> Result<MTransaction> {
+        todo!()
+    }
+
+    pub fn get_seeds(&mut self) -> Result<MSeeds> {
+        let dbname = self.dbname.as_ref().ok_or(Error::DbNotInitialized)?;
+        let seed_name_cards = db_handling::interface_signer::get_all_seed_names_with_identicons(
+            dbname,
+            &self.seed_names,
+        )?;
+        let f = MSeeds { seed_name_cards };
+
+        Ok(f)
+    }
+
+    pub fn get_keys(&mut self) -> Result<MKeys> {
+        todo!()
+    }
+
+    pub fn recover_seed_name(&mut self, keyboard: bool, seed_name: &str) -> MRecoverSeedName {
+        MRecoverSeedName {
+            keyboard,
+            seed_name: seed_name.to_string(),
+        }
+    }
+
+    pub fn settings(&mut self) -> MSettings {
+        let dbname = match self.dbname {
+            Some(ref dbname) => dbname,
+            None => {
+                return MSettings {
+                    public_key: None,
+                    identicon: None,
+                    encryption: None,
+                    error: Some(format!("{}", Error::DbNotInitialized)),
+                }
+            }
+        };
+
+        // for now has same content as Screen::Verifier
+        //
+        // IMPORTANT: this screen should never fail. Ever.
+        // There is no error handling beyond this point,
+        // if this fails - user is stuck here forever.
+        //
+        // Please don't fall into error modal from here,
+        // you have `error` field for that.
+        //
+        // Don't ignore this on refactor like everyone else before you.
+        let f = match db_handling::helpers::get_general_verifier(dbname) {
+            Ok(Verifier { v: Some(vv) }) => {
+                let card = vv.show_card();
+                MSettings {
+                    public_key: Some(card.public_key),
+                    identicon: Some(card.identicon),
+                    encryption: Some(card.encryption),
+                    error: None,
+                }
+            }
+            Ok(Verifier { v: None }) => Default::default(),
+            Err(e) => MSettings {
+                public_key: None,
+                identicon: None,
+                encryption: None,
+                error: Some(format!("{}", e)),
+            },
+        };
+        f
+    }
+
+    pub fn get_verifier(&mut self) -> Result<MVerifierDetails> {
+        let dbname = self.dbname.as_ref().ok_or(Error::DbNotInitialized)?;
+        let f = db_handling::helpers::get_general_verifier(dbname)?;
+        Ok(f.show_card())
+    }
+
+    pub fn manage_networks(&mut self) -> Result<MManageNetworks> {
+        let dbname = self.dbname.as_ref().ok_or(Error::DbNotInitialized)?;
+        let networks = db_handling::interface_signer::show_all_networks(dbname)?;
+        let f = MManageNetworks { networks };
+
+        Ok(f)
+    }
+
+    pub fn get_sign_sufficient_crypto(&mut self) -> Result<MSignSufficientCrypto> {
+        let dbname = self.dbname.as_ref().ok_or(Error::DbNotInitialized)?;
+        let identities = db_handling::interface_signer::print_all_identities(dbname)?;
+        let f = MSignSufficientCrypto { identities };
+
+        Ok(f)
     }
 
     ///Decide what to do and do it!

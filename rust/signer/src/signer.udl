@@ -573,6 +573,34 @@ namespace signer {
     [Throws=ErrorDisplayed]
     void history_seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
 
+    [Throws=ErrorDisplayed]
+    MLog get_log();
+
+    [Throws=ErrorDisplayed]
+    MLogDetails get_log_details(u32 order);
+
+    [Throws=ErrorDisplayed]
+    MTransaction get_transaction();
+
+    [Throws=ErrorDisplayed]
+    MSeeds get_seeds();
+
+    [Throws=ErrorDisplayed]
+    MKeys get_keys();
+
+    MRecoverSeedName recover_seed_name(boolean keyboard, [ByRef] string seed_name);
+
+    MSettings settings();
+
+    [Throws=ErrorDisplayed]
+    MVerifierDetails get_verifier();
+
+    [Throws=ErrorDisplayed]
+    MManageNetworks manage_networks();
+
+    [Throws=ErrorDisplayed]
+    MSignSufficientCrypto get_sign_sufficient_crypto();
+
     void init_logging(string tag);
 };
 
