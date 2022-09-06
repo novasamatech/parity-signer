@@ -13,66 +13,52 @@ struct AddKeySetModal: View {
     @ObservedObject var navigation: NavigationCoordinator
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Spacer()
-                .frame(idealHeight: .infinity)
-                .background(animateBackground ? Color.black.opacity(0.5) : .clear)
-                .onTapGesture {
-                    animateDismissal {
-                        navigation.perform(navigation: .init(action: .rightButtonAction))
-                    }
+        FullScreenRoundedModal(
+            backgroundTapAction: {
+                animateDismissal {
+                    navigation.perform(navigation: .init(action: .rightButtonAction))
                 }
-                .onAppear {
-                    withAnimation(
-                        Animation.easeIn(duration: AnimationDuration.standard)
-                            .delay(AnimationDuration.standard)
-                    ) {
-                        animateBackground.toggle()
-                    }
+            },
+            animateBackground: $animateBackground,
+            content: {
+                VStack(alignment: .leading) {
+                    Localizable.AddKeySet.title.text
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .font(Fontstyle.titleS.base)
+                        .padding([.bottom, .top], Spacing.medium)
+                    Divider()
+                    MenuButton(
+                        action: {
+                            animateDismissal {
+                                navigation.perform(navigation: .init(action: .newSeed))
+                            }
+                        },
+                        icon: Asset.add.swiftUIImage,
+                        text: Localizable.AddKeySet.Button.add.key
+                    )
+                    MenuButton(
+                        action: {
+                            animateDismissal {
+                                navigation.perform(navigation: .init(action: .recoverSeed))
+                            }
+                        },
+                        icon: Asset.recover.swiftUIImage,
+                        text: Localizable.AddKeySet.Button.recover.key
+                    )
+                    EmptyButton(
+                        action: {
+                            animateDismissal {
+                                navigation.perform(navigation: .init(action: .rightButtonAction))
+                            }
+                        },
+                        text: Localizable.AddKeySet.Button.cancel.key,
+                        foregroundColor: Asset.textAndIconsSecondary.swiftUIColor
+                    )
                 }
-            VStack(alignment: .leading) {
-                Localizable.AddKeySet.title.text
-                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                    .font(Fontstyle.titleS.base)
-                    .padding([.bottom, .top], Spacing.medium)
-                Divider()
-                MenuButton(
-                    action: {
-                        animateDismissal {
-                            navigation.perform(navigation: .init(action: .newSeed))
-                        }
-                    },
-                    icon: Asset.add.swiftUIImage,
-                    text: Localizable.AddKeySet.Button.add.key
-                )
-                MenuButton(
-                    action: {
-                        animateDismissal {
-                            navigation.perform(navigation: .init(action: .recoverSeed))
-                        }
-                    },
-                    icon: Asset.recover.swiftUIImage,
-                    text: Localizable.AddKeySet.Button.recover.key
-                )
-                EmptyButton(
-                    action: {
-                        animateDismissal {
-                            navigation.perform(navigation: .init(action: .rightButtonAction))
-                        }
-                    },
-                    text: Localizable.AddKeySet.Button.cancel.key,
-                    foregroundColor: Asset.textAndIconsSecondary.swiftUIColor
-                )
-                Spacer()
-                    .frame(height: Spacing.small)
+                .padding([.leading, .trailing], Spacing.large)
+                .padding(.bottom, Spacing.small)
             }
-            .padding([.bottom, .top], Spacing.medium)
-            .padding([.leading, .trailing], Spacing.large)
-            .background(Asset.backgroundSecondary.swiftUIColor)
-            .cornerRadius(radius: CornerRadius.medium, corners: [.topLeft, .topRight])
-        }
-        .ignoresSafeArea()
-        .transition(.move(edge: .leading))
+        )
     }
 
     private func animateDismissal(_ completion: @escaping () -> Void = {}) {
@@ -92,13 +78,13 @@ struct AddKeySetModal: View {
     }
 }
 
-// struct AddKeySetModal_Previews: PreviewProvider {
-//    static var previews: some View {
-//        AddKeySetModal(
-//            isShowingNewSeedMenu: Binding<Bool>.constant(true),
-//            navigation: NavigationCoordinator()
-//        )
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }
+struct AddKeySetModal_Previews: PreviewProvider {
+    static var previews: some View {
+        AddKeySetModal(
+            isShowingNewSeedMenu: Binding<Bool>.constant(true),
+            navigation: NavigationCoordinator()
+        )
+        .preferredColorScheme(.dark)
+        .previewLayout(.sizeThatFits)
+    }
+}
