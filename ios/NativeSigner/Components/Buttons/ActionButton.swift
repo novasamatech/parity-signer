@@ -16,9 +16,9 @@ struct ActionButtonStyle: ButtonStyle {
             .padding(Spacing.large)
             .background(backgroundColor)
             .foregroundColor(foregroundColor)
+            .frame(height: Heights.actionButton, alignment: .center)
             .cornerRadius(CornerRadius.extraExtraLarge)
             .font(Fontstyle.labelL.base)
-            .frame(height: Heights.actionButton, alignment: .center)
     }
 }
 
