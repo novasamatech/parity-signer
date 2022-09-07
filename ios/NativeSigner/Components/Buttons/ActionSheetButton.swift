@@ -1,29 +1,33 @@
 //
-//  MenuButton.swift
+//  ActionSheetButton.swift
 //  NativeSigner
 //
-//  Created by Krzysztof Rodak on 24/08/2022.
+//  Created by Krzysztof Rodak on 05/09/2022.
 //
 
 import SwiftUI
 
-struct MenuButtonStyle: ButtonStyle {
+struct ActionSheetButtonStyle: ButtonStyle {
     let foregroundColor: Color
 
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
+            .frame(height: Heights.actionSheetButton, alignment: .leading)
             .padding(Spacing.none)
             .foregroundColor(foregroundColor)
             .font(Fontstyle.labelL.base)
-            .frame(height: Heights.menuButton, alignment: .leading)
     }
+
+    static let destructive = ActionSheetButtonStyle(foregroundColor: Asset.accentRed400.swiftUIColor)
+    static let `default` = ActionSheetButtonStyle(foregroundColor: Asset.textAndIconsSecondary.swiftUIColor)
+    static let hightlighted = ActionSheetButtonStyle(foregroundColor: Asset.textAndIconsPrimary.swiftUIColor)
 }
 
-struct MenuButton: View {
+struct ActionSheetButton: View {
     private let action: () -> Void
     private let icon: Image
     private let text: LocalizedStringKey
-    private let foregroundColor: Color
+    private let style: ActionSheetButtonStyle
 
     @State var isDisabled: Bool
 
@@ -32,76 +36,73 @@ struct MenuButton: View {
         icon: Image,
         text: LocalizedStringKey,
         isDisabled: Bool = false,
-        foregroundColor: Color = Asset.textAndIconsSecondary.swiftUIColor
+        style: ActionSheetButtonStyle = .default
     ) {
         self.action = action
         self.icon = icon
         self.text = text
         self.isDisabled = isDisabled
-        self.foregroundColor = foregroundColor
+        self.style = style
     }
 
     var body: some View {
         Button(action: action) {
-            HStack(alignment: .center, spacing: Spacing.medium) {
+            HStack(alignment: .center, spacing: 0) {
                 icon
                     .frame(width: Sizes.actionSheetIcon, alignment: .center)
-                    .padding(Spacing.extraSmall)
+                    .padding(.trailing, Spacing.large)
                 Text(text)
                 Spacer()
             }
             .frame(maxWidth: .infinity)
         }
-        .buttonStyle(MenuButtonStyle(foregroundColor: foregroundColor))
+        .buttonStyle(style)
         .disabled(isDisabled)
     }
 }
 
-// struct MenuButton_Previews: PreviewProvider {
+//
+// struct ActionSheetButton_Previews: PreviewProvider {
 //    static var previews: some View {
-//        VStack(alignment: .leading, spacing: 10) {
-//            MenuButton(
+//        VStack(alignment: .leading) {
+//            ActionSheetButton(
 //                action: {},
 //                icon: Asset.add.swiftUIImage,
 //                text: "Short Title"
 //            )
-//            .padding(10)
-//            MenuButton(
+//            ActionSheetButton(
 //                action: {},
 //                icon: Asset.recover.swiftUIImage,
-//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+//                style: .hightlighted
 //            )
-//            .padding(10)
-//            MenuButton(
+//            ActionSheetButton(
 //                action: {},
-//                icon: Asset.recover.swiftUIImage,
+//                icon: Asset.delete.swiftUIImage,
 //                text: "Delete",
-//                foregroundColor: Asset.accentRed400.swiftUIColor
+//                style: .destructive
 //            )
-//            .padding(10)
 //        }
 //        .preferredColorScheme(.dark)
 //        .previewLayout(.sizeThatFits)
-//        VStack(alignment: .leading, spacing: 10) {
-//            MenuButton(
+//        VStack(alignment: .leading) {
+//            ActionSheetButton(
 //                action: {},
 //                icon: Asset.add.swiftUIImage,
 //                text: "Short Title"
 //            )
-//            .padding(10)
-//            MenuButton(
+//            ActionSheetButton(
 //                action: {},
 //                icon: Asset.recover.swiftUIImage,
-//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+//                style: .hightlighted
 //            )
-//            .padding(10)
-//            MenuButton(
+//            ActionSheetButton(
 //                action: {},
-//                icon: Asset.recover.swiftUIImage,
+//                icon: Asset.delete.swiftUIImage,
 //                text: "Delete",
-//                foregroundColor: Asset.accentRed400.swiftUIColor
+//                style: .destructive
 //            )
-//            .padding(10)
 //        }
 //        .preferredColorScheme(.light)
 //        .previewLayout(.sizeThatFits)

@@ -25,14 +25,6 @@ struct ModalSelector: View {
                 content: value,
                 navigationRequest: navigationRequest
             )
-        case let .seedMenu(value):
-            SeedMenu(
-                content: value,
-                alert: alert,
-                alertShow: alertShow,
-                removeSeed: removeSeed,
-                navigationRequest: navigationRequest
-            )
         case let .backup(value):
             Backup(
                 content: value,
@@ -96,7 +88,10 @@ struct ModalSelector: View {
                 sign: sign,
                 navigationRequest: navigationRequest
             )
+        // Handled in native navigation
         case .newSeedMenu:
+            EmptyView()
+        case .seedMenu:
             EmptyView()
         case nil:
             EmptyView()

@@ -23,19 +23,28 @@ struct NavigationBarViewModel: Equatable {
     }
 }
 
+struct NavigationBarActionModel {
+    let rightBarMenuAction: () -> Void
+}
+
 /// UI component that mimics system `NavigationView` and should be used as `NavigationBar` equivalent in `UIKit`
 ///
 /// As we can't switch to `NavigationView` just yet, this should us in the meantime
 struct NavigationBarView: View {
     @ObservedObject private var navigation: NavigationCoordinator
     private let viewModel: NavigationBarViewModel
+    private let actionModel: NavigationBarActionModel
 
     init(
         navigation: NavigationCoordinator,
-        viewModel: NavigationBarViewModel
+        viewModel: NavigationBarViewModel,
+        actionModel: NavigationBarActionModel? = nil
     ) {
         self.navigation = navigation
         self.viewModel = viewModel
+        self.actionModel = actionModel ?? .init(rightBarMenuAction: {
+            navigation.perform(navigation: .init(action: .rightButtonAction))
+        })
     }
 
     var body: some View {
@@ -57,7 +66,7 @@ struct NavigationBarView: View {
             Spacer().frame(maxWidth: .infinity)
             if viewModel.isRightBarMenuButtonVisible {
                 NavbarButton(
-                    action: { navigation.perform(navigation: .init(action: .rightButtonAction)) },
+                    action: actionModel.rightBarMenuAction,
                     icon: Asset.moreDots.swiftUIImage
                 )
             } else {

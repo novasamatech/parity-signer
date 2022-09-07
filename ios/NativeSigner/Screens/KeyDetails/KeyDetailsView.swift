@@ -8,18 +8,23 @@
 import SwiftUI
 
 struct KeyDetailsView: View {
+    @State private var isShowingActionSheet = false
     @ObservedObject private var navigation: NavigationCoordinator
+    private var seedsMediator: SeedsMediating!
+
     private let alertClosure: (() -> Void)?
     private let viewModel: KeyDetailsViewModel
     private let actionModel: KeyDetailsActionModel
 
     init(
         navigation: NavigationCoordinator,
+        seedsMediator: SeedsMediating? = nil,
         viewModel: KeyDetailsViewModel,
         actionModel: KeyDetailsActionModel,
         alertClosure: (() -> Void)? = nil
     ) {
         self.navigation = navigation
+        self.seedsMediator = seedsMediator
         self.viewModel = viewModel
         self.actionModel = actionModel
         self.alertClosure = alertClosure
@@ -34,7 +39,10 @@ struct KeyDetailsView: View {
                     viewModel: .init(
                         isBackButtonVisible: true,
                         isRightBarMenuButtonVisible: true
-                    )
+                    ),
+                    actionModel: .init(rightBarMenuAction: {
+                        isShowingActionSheet.toggle()
+                    })
                 )
                 // Main key cell
                 HStack {
@@ -103,6 +111,16 @@ struct KeyDetailsView: View {
                 text: Localizable.KeyDetails.Action.create.key
             )
             .padding(Spacing.large)
+        }
+        .fullScreenCover(isPresented: $isShowingActionSheet) {
+            KeyDetailsActionsModal(
+                isShowingActionSheet: $isShowingActionSheet,
+                navigation: navigation,
+                removeSeed: {
+                    seedsMediator?.removeSeed(seedName: actionModel.removeSeed)
+                }
+            )
+            .clearModalBackground()
         }
     }
 }

@@ -14,7 +14,7 @@ struct FullScreenRoundedModal<Content: View>: View {
 
     init(
         backgroundTapAction: @escaping () -> Void = {},
-        animateBackground: Binding<Bool> = Binding<Bool>.constant(true),
+        animateBackground: Binding<Bool> = Binding<Bool>.constant(false),
         @ViewBuilder content: @escaping () -> Content
     ) {
         self.backgroundTapAction = backgroundTapAction
@@ -48,8 +48,9 @@ struct FullScreenRoundedModal<Content: View>: View {
         .transition(.move(edge: .leading))
     }
 }
+
 //
-//struct FullScreenRoundedModal_Previews: PreviewProvider {
+// struct FullScreenRoundedModal_Previews: PreviewProvider {
 //    static var previews: some View {
 //        VStack {
 //            FullScreenRoundedModal {
@@ -72,4 +73,4 @@ struct FullScreenRoundedModal<Content: View>: View {
 //        .preferredColorScheme(.light)
 //        .previewLayout(.sizeThatFits)
 //    }
-//}
+// }
