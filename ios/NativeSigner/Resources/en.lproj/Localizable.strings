@@ -277,6 +277,11 @@
 "KeySets.Label.DerivedKeys.single" = "%@ Derived Key";
 "KeySets.Label.DerivedKeys.plural" = "%@ Derived Keys";
 
+"KeySetsModal.Action.Select" = "Select Keys";
+"KeySetsModal.Action.Derive" = "Derive from Key";
+"KeySetsModal.Action.Backup" = "Backup Key Set";
+"KeySetsModal.Action.Delete" = "Delete";
+
 "AddKeySet.Title" = "Add Key Set";
 "AddKeySet.Button.Cancel" = "Cancel";
 "AddKeySet.Button.Add" = "Add new Key Set";
@@ -284,3 +289,5 @@
 
 "KeyDetails.Label.Derived" = "Derived keys";
 "KeyDetails.Action.Create" = "Create Derived key";
+
+
