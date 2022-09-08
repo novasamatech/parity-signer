@@ -3,38 +3,43 @@ package io.parity.signer.bottomsheets
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.parity.signer.components.KeyCard
+import androidx.core.graphics.drawable.toBitmap
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
-import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.EmptyNavigator
+import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap
-import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
+import io.parity.signer.R
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun PrivateKeyExtractBottomSheet(model: PrivateKeyExtractModel,
-																 signerDataModel: SignerDataModel) {
+fun PrivateKeyExtractBottomSheet(
+	model: PrivateKeyExtractModel,
+	navigator: Navigator,
+) {
 
 //	val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
 //		bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
 //	)
 //	val coroutineScope = rememberCoroutineScope()
 
-	Column (
-		Modifier.clickable { signerDataModel.navigate(Action.GO_BACK) }
+	Column(
+		Modifier.clickable { navigator.navigate(Action.GO_BACK) }
 	) {
 		Spacer(Modifier.weight(1f))
 		Surface(
@@ -62,7 +67,12 @@ fun PrivateKeyExtractBottomSheet(model: PrivateKeyExtractModel,
 					NetworkCard(network = model.network)
 				}
 				Image(
-					model.qrImage.intoImageBitmap(),
+					if (LocalInspectionMode.current) {
+						LocalContext.current.getDrawable(R.drawable.icon)!!.toBitmap()
+							.asImageBitmap()
+					} else {
+						model.qrImage.intoImageBitmap()
+					},
 					contentDescription = "QR with address to scan",
 					contentScale = ContentScale.FillWidth,
 					modifier = Modifier
@@ -78,5 +88,23 @@ fun PrivateKeyExtractBottomSheet(model: PrivateKeyExtractModel,
 	}
 }
 
-class PrivateKeyExtractModel(val qrImage: List<UByte>,
-														 val network: NetworkCardModel)
+class PrivateKeyExtractModel(
+	val qrImage: List<UByte>,
+	val network: NetworkCardModel
+) {
+	companion object {
+		fun createMock() = PrivateKeyExtractModel(
+			0u.rangeTo(200u).map { it.toUByte() }.toList(),
+			NetworkCardModel("NetworkTitle", "NetworkLogo")
+		)
+	}
+}
+
+@Preview
+@Composable
+private fun PrivateKeyExtractBottomSheetPreview() {
+	PrivateKeyExtractBottomSheet(
+		model = PrivateKeyExtractModel.createMock(),
+		EmptyNavigator()
+	)
+}
