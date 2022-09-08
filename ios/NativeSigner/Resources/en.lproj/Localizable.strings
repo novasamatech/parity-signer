@@ -282,6 +282,11 @@
 "KeySetsModal.Action.Backup" = "Backup Key Set";
 "KeySetsModal.Action.Delete" = "Delete";
 
+"KeySetsModal.Confirmation.Label.Title" = "Forget this Key Set?";
+"KeySetsModal.Confirmation.Label.Content" = "This Key Set will be removed for all networks. This is not reversible.\nAre you sure?";
+"KeySetsModal.Confirmation.Action.Cancel" = "Cancel";
+"KeySetsModal.Confirmation.Action.Remove" = "Remove";
+
 "AddKeySet.Title" = "Add Key Set";
 "AddKeySet.Button.Cancel" = "Cancel";
 "AddKeySet.Button.Add" = "Add new Key Set";
