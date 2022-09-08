@@ -37,6 +37,7 @@ enum Encryption {
     "Ed25519",
     "Sr25519",
     "Ecdsa",
+    "Ethereum",
 };
 
 [Enum]

@@ -82,6 +82,7 @@ pub enum Encryption {
     Ed25519,
     Sr25519,
     Ecdsa,
+    Ethereum,
 }
 
 impl Encryption {
@@ -93,6 +94,7 @@ impl Encryption {
             Encryption::Ed25519 => String::from("ed25519"),
             Encryption::Sr25519 => String::from("sr25519"),
             Encryption::Ecdsa => String::from("ecdsa"),
+            Encryption::Ethereum => String::from("ethereum"),
         }
     }
 }

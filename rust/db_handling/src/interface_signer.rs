@@ -11,6 +11,7 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
 use definitions::{
+    crypto::Encryption,
     helpers::{
         make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public,
         pic_meta, print_multisigner_as_base58,
@@ -365,9 +366,15 @@ where
     let identicon = make_identicon_from_multisigner(multisigner);
     let qr = {
         if address_details.network_id.contains(network_specs_key) {
+            let prefix = if network_specs.encryption == Encryption::Ethereum {
+                "ethereum"
+            } else {
+                "substrate"
+            };
             png_qr_from_string(
                 &format!(
-                    "substrate:{}:0x{}",
+                    "{}:{}:0x{}",
+                    prefix,
                     base58,
                     hex::encode(&network_specs.genesis_hash)
                 ),

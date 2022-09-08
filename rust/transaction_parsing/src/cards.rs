@@ -1,7 +1,7 @@
 use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 use sp_runtime::{generic::Era, MultiSigner};
 
-use definitions::helpers::make_identicon_from_account;
+use definitions::helpers::{make_identicon_from_account, print_ethereum_address};
 use definitions::{
     crypto::Encryption,
     helpers::{make_identicon_from_multisigner, pic_meta, print_multisigner_as_base58},
@@ -287,8 +287,16 @@ pub(crate) fn make_author_info(
     base58prefix: u16,
     address_details: &AddressDetails,
 ) -> Address {
+    let base58 = if let (Encryption::Ethereum, MultiSigner::Ecdsa(public)) =
+        (&address_details.encryption, author)
+    {
+        print_ethereum_address(public).unwrap()
+    } else {
+        print_multisigner_as_base58(author, Some(base58prefix))
+    };
+
     Address {
-        base58: print_multisigner_as_base58(author, Some(base58prefix)),
+        base58,
         identicon: make_identicon_from_multisigner(author),
         seed_name: address_details.seed_name.clone(),
         path: address_details.path.clone(),

@@ -64,6 +64,7 @@ enum NetworkSpecsKeyContent {
     Ed25519(H256),
     Sr25519(H256),
     Ecdsa(H256),
+    Ethereum(H256),
 }
 
 impl NetworkSpecsKey {
@@ -74,6 +75,7 @@ impl NetworkSpecsKey {
             Encryption::Ed25519 => NetworkSpecsKeyContent::Ed25519(*genesis_hash),
             Encryption::Sr25519 => NetworkSpecsKeyContent::Sr25519(*genesis_hash),
             Encryption::Ecdsa => NetworkSpecsKeyContent::Ecdsa(*genesis_hash),
+            Encryption::Ethereum => NetworkSpecsKeyContent::Ecdsa(*genesis_hash),
         };
         Self(network_key_content.encode())
     }
@@ -102,6 +104,7 @@ impl NetworkSpecsKey {
             NetworkSpecsKeyContent::Ed25519(b) => Ok((b, Encryption::Ed25519)),
             NetworkSpecsKeyContent::Sr25519(b) => Ok((b, Encryption::Sr25519)),
             NetworkSpecsKeyContent::Ecdsa(b) => Ok((b, Encryption::Ecdsa)),
+            NetworkSpecsKeyContent::Ethereum(b) => Ok((b, Encryption::Ethereum)),
         }
     }
 
@@ -433,7 +436,7 @@ mod tests {
     #[test]
     fn error_in_network_specs_key_signer() {
         let network_specs_key_hex =
-            "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+            "0450e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
         let network_specs_key = NetworkSpecsKey::from_hex(network_specs_key_hex).unwrap();
         let error = network_specs_key.genesis_hash_encryption().unwrap_err();
         if let Error::CodecError(_) = error {
@@ -445,7 +448,7 @@ mod tests {
     #[test]
     fn error_in_network_specs_key_active() {
         let network_specs_key_hex =
-            "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+            "0450e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
         let network_specs_key =
             NetworkSpecsKey::from_ivec(&IVec::from(hex::decode(network_specs_key_hex).unwrap()));
         let error = network_specs_key.genesis_hash_encryption().unwrap_err();

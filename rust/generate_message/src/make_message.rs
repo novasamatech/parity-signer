@@ -101,7 +101,7 @@ pub fn make_message(make: Make) -> Result<()> {
                 .concat();
                 (complete_message, format!("{}_Alice-sr25519", name_stub))
             }
-            Encryption::Ecdsa => {
+            Encryption::Ecdsa | Encryption::Ethereum => {
                 let crypto_type_code = "02";
                 let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
                 let ecdsa_pair =

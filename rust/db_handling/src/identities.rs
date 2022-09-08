@@ -323,16 +323,18 @@ where
                 return Err(Error::SecretStringError(e));
             }
         },
-        Encryption::Ecdsa => match ecdsa::Pair::from_string(&full_address, None) {
-            Ok(a) => {
-                full_address.zeroize();
-                MultiSigner::Ecdsa(a.public())
+        Encryption::Ecdsa | Encryption::Ethereum => {
+            match ecdsa::Pair::from_string(&full_address, None) {
+                Ok(a) => {
+                    full_address.zeroize();
+                    MultiSigner::Ecdsa(a.public())
+                }
+                Err(e) => {
+                    full_address.zeroize();
+                    return Err(Error::SecretStringError(e));
+                }
             }
-            Err(e) => {
-                full_address.zeroize();
-                return Err(Error::SecretStringError(e));
-            }
-        },
+        }
     };
 
     let public_key = multisigner_to_public(&multisigner);

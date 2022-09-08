@@ -1,9 +1,13 @@
 //! Common helper functions
 
 use hex;
-use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 #[cfg(feature = "signer")]
 use sp_core::{crypto::AccountId32, ecdsa, ed25519, sr25519};
+use sp_core::{
+    crypto::{Ss58AddressFormat, Ss58Codec},
+    hexdisplay::HexDisplay,
+    Hasher, KeccakHasher, H160, H256,
+};
 use sp_runtime::MultiSigner;
 #[cfg(feature = "signer")]
 use std::convert::TryInto;
@@ -93,7 +97,7 @@ pub fn get_multisigner(public: &[u8], encryption: &Encryption) -> Result<MultiSi
                 .map_err(|_| Error::WrongPublicKeyLength)?;
             Ok(MultiSigner::Sr25519(sr25519::Public::from_raw(into_pubkey)))
         }
-        Encryption::Ecdsa => {
+        Encryption::Ecdsa | Encryption::Ethereum => {
             let into_pubkey: [u8; 33] = public
                 .to_vec()
                 .try_into()
@@ -136,6 +140,19 @@ pub fn print_multisigner_as_base58(
     }
 }
 
+pub fn print_ethereum_address(public: &ecdsa::Public) -> Result<String> {
+    let decompressed = libsecp256k1::PublicKey::parse_slice(
+        &public.0,
+        Some(libsecp256k1::PublicKeyFormat::Compressed),
+    )?
+    .serialize();
+    let mut m = [0u8; 64];
+    m.copy_from_slice(&decompressed[1..65]);
+    let account = H160::from(H256::from_slice(KeccakHasher::hash(&m).as_bytes()));
+
+    Ok(format!("{:?}", HexDisplay::from(&account.as_bytes())))
+}
+
 /// Print id pic for metadata hash
 ///
 /// Currently uses PNG identicon generator, could be changed later.
@@ -150,4 +167,39 @@ pub fn pic_meta(meta_hash: &[u8]) -> Vec<u8> {
 #[cfg(feature = "signer")]
 pub fn pic_types(types_hash: &[u8]) -> Vec<u8> {
     make_identicon(types_hash)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pretty_assertions::assert_eq;
+    use sp_core::Pair;
+
+    #[test]
+    fn test_eth_account_1() {
+        let secret_key =
+            hex::decode("502f97299c472b88754accd412b7c9a6062ef3186fba0c0388365e1edec24875")
+                .unwrap();
+
+        let public_key = ecdsa::Pair::from_seed_slice(&secret_key).unwrap().public();
+
+        assert_eq!(
+            print_ethereum_address(&public_key).unwrap(),
+            "976f8456e4e2034179b284a23c0e0c8f6d3da50c"
+        )
+    }
+
+    #[test]
+    fn test_eth_account_2() {
+        let secret_key =
+            hex::decode("0f02ba4d7f83e59eaa32eae9c3c4d99b68ce76decade21cdab7ecce8f4aef81a")
+                .unwrap();
+
+        let public_key = ecdsa::Pair::from_seed_slice(&secret_key).unwrap().public();
+
+        assert_eq!(
+            print_ethereum_address(&public_key).unwrap(),
+            "420e9f260b40af7e49440cead3069f8e82a5230f",
+        )
+    }
 }

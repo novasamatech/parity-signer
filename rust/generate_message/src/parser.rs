@@ -758,7 +758,10 @@ fn encryption_from_args(s: &str) -> std::result::Result<Encryption, &'static str
         "ed25519" => Ok(Encryption::Ed25519),
         "sr25519" => Ok(Encryption::Sr25519),
         "ecdsa" => Ok(Encryption::Ecdsa),
-        _ => Err("unexpected encryption type, expected `ed25519`, `sr25519` or `ecdsa`"),
+        "ethereum" => Ok(Encryption::Ethereum),
+        _ => {
+            Err("unexpected encryption type, expected `ed25519`, `sr25519`, `ecdsa` or `ethereum`")
+        }
     }
 }
 
@@ -810,7 +813,7 @@ fn into_sufficient(
             let signature = sr25519::Signature::from_raw(into_sign);
             Ok(SufficientCrypto::Sr25519 { public, signature })
         }
-        Encryption::Ecdsa => {
+        Encryption::Ecdsa | Encryption::Ethereum => {
             let into_pubkey = vec_to_pubkey_array(verifier_public_key)?;
             let public = ecdsa::Public::from_raw(into_pubkey);
             let into_sign = vec_to_signature_array(signature)?;
