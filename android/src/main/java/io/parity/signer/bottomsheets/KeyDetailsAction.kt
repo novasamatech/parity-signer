@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
+import io.parity.signer.models.FeatureFlags
+import io.parity.signer.models.FeatureOption
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
@@ -35,14 +37,16 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 				modifier = Modifier.padding(20.dp)
 			) {
 				HeaderBar(line1 = "KEY MENU", line2 = "Select action")
-				BigButton(
-					text = "Export Private Key",
-					isShaded = true,
-					isDangerous = false,
-					action = {
-						confirmExport = true
-					}
-				)
+				if (FeatureFlags.isEnabled(FeatureOption.EXPORT_SECRET_KEY)) {
+					BigButton(
+						text = "Export Private Key",
+						isShaded = true,
+						isDangerous = false,
+						action = {
+							confirmExport = true
+						}
+					)
+				}
 				BigButton(
 					text = "Forget this key forever",
 					isShaded = true,
@@ -68,7 +72,7 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 		header = "Export Private Key",
 		text = "A private key can be used to sign transactions. This key will be marked as a hot key after export.",
 		back = { confirmExport = false },
-		forward = { signerDataModel.navigate(Action.REMOVE_KEY) }, //TODO dmitry
+		forward = { signerDataModel.navigate(Action.REMOVE_KEY) }, //TODO dmitry show PrivateKeyExtractBottomSheet
 		backText = "Cancel",
 		forwardText = "Export Private Key"
 	)
