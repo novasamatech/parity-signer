@@ -54,6 +54,7 @@ use constants::ALICE_SEED_PHRASE;
 #[cfg(feature = "signer")]
 use constants::TRANSACTION;
 
+use definitions::helpers::{get_multisigner, unhex};
 #[cfg(feature = "active")]
 use definitions::qr_transfers::ContentDerivations;
 #[cfg(any(feature = "active", feature = "signer"))]
@@ -1295,17 +1296,19 @@ fn prepare_secret_key_for_export(
 #[cfg(feature = "signer")]
 pub fn export_secret_key<P>(
     db_path: P,
-    multisigner: &MultiSigner,
+    public_key: &str,
     expected_seed_name: &str,
     network_specs_key_hex: &str,
     seed_phrase: &str,
-    mut pwd: Option<String>,
+    mut key_password: Option<String>,
 ) -> Result<MKeyDetails>
 where
     P: AsRef<Path>,
 {
+    let public_key = &unhex(public_key)?;
     let network_specs_key = &NetworkSpecsKey::from_hex(network_specs_key_hex)?;
     let network_specs = get_network_specs(&db_path, network_specs_key)?;
+    let multisigner = &get_multisigner(public_key, &network_specs.encryption)?;
     let address_key = AddressKey::from_multisigner(multisigner);
     let address_details = get_address_details(&db_path, &address_key)?;
     if address_details.seed_name != expected_seed_name {
@@ -1321,8 +1324,6 @@ where
             address_key,
         });
     }
-    let public_key = multisigner_to_public(multisigner);
-
     let address = Address {
         base58: print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix)),
         path: address_details.path.to_string(),
@@ -1363,7 +1364,7 @@ where
             identity_history: IdentityHistory::get(
                 &address_details.seed_name,
                 &address_details.encryption,
-                &public_key,
+                public_key,
                 &address_details.path,
                 network_specs.genesis_hash,
             ),
@@ -1375,9 +1376,9 @@ where
         &address_details,
         &network_specs.genesis_hash,
         seed_phrase,
-        pwd.as_deref(),
+        key_password.as_deref(),
     )?;
-    pwd.zeroize();
+    key_password.zeroize();
 
     if let Err(e) = TrDbCold::new()
         .set_addresses(identity_batch) // modify addresses

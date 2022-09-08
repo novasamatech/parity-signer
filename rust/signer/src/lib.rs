@@ -132,19 +132,19 @@ fn qrparser_try_decode_qr_sequence(
 
 fn generate_secret_key_qr(
     dbname: &str,
-    multisigner: &MultiSigner,
+    public_key: &str,
     expected_seed_name: &str,
-    network: &str,
+    network_specs_key_hex: &str,
     seed_phrase: &str,
-    pwd: Option<String>,
+    key_password: Option<String>,
 ) -> Result<MKeyDetails, anyhow::Error> {
     db_handling::identities::export_secret_key(
         dbname,
-        multisigner,
+        public_key,
         expected_seed_name,
-        network,
+        network_specs_key_hex,
         seed_phrase,
-        pwd,
+        key_password,
     )
     .map_err(Into::into)
 }

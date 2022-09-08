@@ -71,6 +71,7 @@ use db_handling::{
         reset_danger_status_to_safe,
     },
 };
+use definitions::helpers::multisigner_to_public;
 
 #[cfg(feature = "test")]
 #[test]
@@ -2408,7 +2409,7 @@ fn test_export_secret_key() {
         .unwrap();
     let secret_key = export_secret_key(
         dbname,
-        derivation_multisigner,
+        hex::encode(multisigner_to_public(derivation_multisigner)).as_str(),
         seed_name,
         &hex::encode(network_id.key()),
         ALICE_SEED_PHRASE,
