@@ -6,7 +6,7 @@ import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.alerts.ShieldAlert
 import io.parity.signer.components.Documents
-import io.parity.signer.modals.*
+import io.parity.signer.bottomsheets.*
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
 import io.parity.signer.uniffi.Action
@@ -60,24 +60,24 @@ fun ScreenSelector(
 		)
 		is ScreenData.NewSeed -> NewSeedScreen(
 			screenData.f,
-			signerDataModel::pushButton,
+			signerDataModel::navigate,
 			seedNames
 		)
 		is ScreenData.RecoverSeedName -> RecoverSeedName(
 			screenData.f,
-			signerDataModel::pushButton,
+			signerDataModel::navigate,
 			seedNames
 		)
 		is ScreenData.RecoverSeedPhrase -> RecoverSeedPhrase(
 			recoverSeedPhrase = screenData.f,
-			button = signerDataModel::pushButton,
+			button = signerDataModel::navigate,
 			addSeed = signerDataModel::addSeed
 		)
 		ScreenData.Scan -> ScanScreen(
 			progress = progress,
 			captured = captured,
 			total = total,
-			button = signerDataModel::pushButton,
+			button = signerDataModel::navigate,
 			handleCameraPermissions = signerDataModel::handleCameraPermissions,
 			processFrame = signerDataModel::processFrame,
 			resetScanValues = signerDataModel::resetScanValues,
@@ -104,7 +104,7 @@ fun ScreenSelector(
 		)
 		is ScreenData.Transaction -> TransactionPreview(
 			screenData.f,
-			signerDataModel::pushButton,
+			signerDataModel::navigate,
 			signerDataModel::signTransaction
 		)
 		is ScreenData.VVerifier -> VerifierScreen(

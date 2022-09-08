@@ -1,4 +1,4 @@
-package io.parity.signer.modals
+package io.parity.signer.bottomsheets
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +12,7 @@ import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
@@ -35,7 +35,7 @@ fun LogMenu(logRight: MLogRight, signerDataModel: SignerDataModel) {
 				HeaderBar(line1 = "LOG", line2 = "Checksum: $checksum")
 				BigButton(text = "Add note",
 					action = {
-						signerDataModel.pushButton(Action.CREATE_LOG_COMMENT)
+						signerDataModel.navigate(Action.CREATE_LOG_COMMENT)
 					})
 				BigButton(
 					text = "Clear log",
@@ -51,5 +51,5 @@ fun LogMenu(logRight: MLogRight, signerDataModel: SignerDataModel) {
 		show = confirm,
 		header = "Clear log?",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(Action.CLEAR_LOG) })
+		forward = { signerDataModel.navigate(Action.CLEAR_LOG) })
 }

@@ -302,7 +302,7 @@ class SignerDataModel : ViewModel() {
 			getAlertState()
 			isAirplaneOn()
 			refreshSeedNames(init = true)
-			pushButton(Action.START)
+			navigate(Action.START)
 		}
 	}
 

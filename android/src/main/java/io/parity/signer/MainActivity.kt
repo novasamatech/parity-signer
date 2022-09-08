@@ -21,7 +21,7 @@ import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.navigate
 import io.parity.signer.screens.LandingView
 import io.parity.signer.screens.WaitingScreen
 import io.parity.signer.ui.theme.ParitySignerTheme
@@ -84,7 +84,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						) {
 							signerDataModel.activity.moveTaskToBack(true)
 						} else
-							signerDataModel.pushButton(Action.GO_BACK)
+							signerDataModel.navigate(Action.GO_BACK)
 					}
 					// Structure to contain all app
 					Scaffold(
@@ -103,19 +103,19 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								progress = progress,
 								captured = captured,
 								total = total,
-								button = signerDataModel::pushButton,
+								button = signerDataModel::navigate,
 								signerDataModel = signerDataModel
 							)
 							ModalSelector(
 								modalData = actionResult.value?.modalData,
 								alertState = shieldAlert,
-								button = signerDataModel::pushButton,
+								button = signerDataModel::navigate,
 								signerDataModel = signerDataModel,
 							)
 							AlertSelector(
 								alert = actionResult.value?.alertData,
 								alertState = shieldAlert,
-								button = signerDataModel::pushButton,
+								button = signerDataModel::navigate,
 								acknowledgeWarning = signerDataModel::acknowledgeWarning
 							)
 						}

@@ -1,4 +1,4 @@
-package io.parity.signer.modals
+package io.parity.signer.bottomsheets
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
@@ -46,7 +46,7 @@ fun LogComment(signerDataModel: SignerDataModel) {
 					comment.value = it
 				},
 				onDone = {
-					signerDataModel.pushButton(Action.GO_FORWARD, comment.value)
+					signerDataModel.navigate(Action.GO_FORWARD, comment.value)
 				},
 				focusManager = focusManager,
 				focusRequester = focusRequester
