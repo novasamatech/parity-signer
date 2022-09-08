@@ -5,18 +5,39 @@ import android.widget.Toast
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.backendAction
 
-/**
- * This pretty much offloads all navigation to backend!
- */
+
+@Deprecated("obsolete, for backwards compatibility, use SignerNavigator class")
 fun SignerDataModel.navigate(
 	button: Action,
 	details: String = "",
 	seedPhrase: String = ""
 ) {
-	try {
-		_actionResult.value = backendAction(button, details, seedPhrase)
-	} catch (e: java.lang.Exception) {
-		Log.e("Navigation error", e.toString())
-		Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
+	SignerNavigator(this).navigate(button, details, seedPhrase)
+}
+
+
+interface Navigator {
+	fun navigate(
+		button: Action,
+		details: String = "",
+		seedPhrase: String = ""
+	)
+}
+
+class SignerNavigator(private val singleton: SignerDataModel): Navigator {
+
+	override fun navigate(button: Action, details: String, seedPhrase: String) {
+		try {
+			singleton._actionResult.value = backendAction(button, details, seedPhrase)
+		} catch (e: java.lang.Exception) {
+			Log.e("Navigation error", e.toString())
+			Toast.makeText(singleton.context, e.toString(), Toast.LENGTH_SHORT).show()
+		}
+	}
+}
+
+class EmptyNavigator : Navigator {
+	override fun navigate(button: Action, details: String, seedPhrase: String) {
+		//do nothing
 	}
 }
