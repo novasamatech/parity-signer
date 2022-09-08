@@ -8,12 +8,10 @@
 import SwiftUI
 
 struct KeyDetailsActionsModal: View {
-    @State private var removeConfirm = false
     @State private var animateBackground: Bool = false
-
     @Binding var isShowingActionSheet: Bool
+    @Binding var isShowingRemoveConfirmation: Bool
     @ObservedObject var navigation: NavigationCoordinator
-    let removeSeed: () -> Void
 
     var body: some View {
         FullScreenRoundedModal(
@@ -49,7 +47,7 @@ struct KeyDetailsActionsModal: View {
                         text: Localizable.KeySetsModal.Action.backup.key
                     )
                     ActionSheetButton(
-                        action: { removeConfirm.toggle() },
+                        action: { animateDismissal { isShowingRemoveConfirmation.toggle() } },
                         icon: Asset.delete.swiftUIImage,
                         text: Localizable.KeySetsModal.Action.delete.key,
                         style: .destructive
@@ -57,7 +55,7 @@ struct KeyDetailsActionsModal: View {
                     EmptyButton(
                         action: { animateDismissal() },
                         text: Localizable.AddKeySet.Button.cancel.key,
-                        foregroundColor: Asset.textAndIconsSecondary.swiftUIColor
+                        style: .emptySecondary()
                     )
                 }
                 .padding([.leading, .trailing], Spacing.large)
@@ -68,33 +66,16 @@ struct KeyDetailsActionsModal: View {
             // We need to fake right button action here, or Rust state machine won't work for `Backup` action
             navigation.perform(navigation: .init(action: .rightButtonAction))
         }
-        .alert(isPresented: $removeConfirm, content: {
-            Alert(
-                title: Localizable.forgetThisSeed.text,
-                message: Localizable.ThisSeedWillBeRemovedForAllNetworks.ThisIsNotReversible.areYouSure.text,
-                primaryButton: .destructive(
-                    Localizable.removeSeed.text,
-                    action: removeSeed
-                ),
-                secondaryButton: .cancel(Localizable.cancel.text)
-            )
-        })
     }
 
     private func animateDismissal(_ completion: @escaping () -> Void = {}) {
-        withAnimation(
-            Animation.easeIn(duration: AnimationDuration.standard)
-        ) {
-            animateBackground.toggle()
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + AnimationDuration.standard) {
-            withAnimation(
-                Animation.easeIn(duration: AnimationDuration.standard)
-            ) {
+        Animations.chainAnimation(
+            animateBackground.toggle(),
+            delayedAnimationClosure: {
                 isShowingActionSheet.toggle()
                 completion()
-            }
-        }
+            }()
+        )
     }
 }
 

@@ -52,7 +52,7 @@ struct AddKeySetModal: View {
                             }
                         },
                         text: Localizable.AddKeySet.Button.cancel.key,
-                        foregroundColor: Asset.textAndIconsSecondary.swiftUIColor
+                        style: .emptySecondary()
                     )
                 }
                 .padding([.leading, .trailing], Spacing.large)
@@ -62,19 +62,13 @@ struct AddKeySetModal: View {
     }
 
     private func animateDismissal(_ completion: @escaping () -> Void = {}) {
-        withAnimation(
-            Animation.easeIn(duration: AnimationDuration.standard)
-        ) {
-            animateBackground.toggle()
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + AnimationDuration.standard) {
-            withAnimation(
-                Animation.easeIn(duration: AnimationDuration.standard)
-            ) {
+        Animations.chainAnimation(
+            animateBackground.toggle(),
+            delayedAnimationClosure: {
                 isShowingNewSeedMenu.toggle()
                 completion()
-            }
-        }
+            }()
+        )
     }
 }
 
