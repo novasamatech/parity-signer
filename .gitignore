@@ -54,7 +54,7 @@ gen/
 # BUCK
 buck-out/
 \.buckd/
-android/app/libs
+android/libs
 *.keystore
 
 # fastlane
