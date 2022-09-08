@@ -51,7 +51,7 @@ fun NewAddressScreen(
 			Spacer(Modifier.weight(1f))
 		}
 		NetworkCard(
-			network = MscNetworkInfo(
+			network = NetworkCardModel(
 				networkTitle = deriveKey.networkTitle,
 				networkLogo = deriveKey.networkLogo
 			)

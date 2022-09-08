@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import io.parity.signer.components.Identicon
 import io.parity.signer.components.MetadataCard
 import io.parity.signer.components.NetworkCard
+import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNetworkDetails
@@ -22,7 +23,7 @@ fun NetworkDetails(
 ) {
 	Column {
 		NetworkCard(
-			network = MscNetworkInfo(
+			network = NetworkCardModel(
 				networkTitle = networkDetails.title,
 				networkLogo = networkDetails.logo
 			)

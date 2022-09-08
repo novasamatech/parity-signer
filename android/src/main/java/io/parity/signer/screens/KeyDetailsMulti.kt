@@ -14,6 +14,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.KeyCard
 import io.parity.signer.components.NetworkCard
+import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.Action
@@ -43,7 +44,7 @@ fun KeyDetailsMulti(
 		Row(
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 		) {
-			NetworkCard(network = keyDetailsMulti.keyDetails.networkInfo)
+			NetworkCard(network = NetworkCardModel(keyDetailsMulti.keyDetails.networkInfo))
 		}
 		Image(
 			(keyDetailsMulti.keyDetails.qr).intoImageBitmap(),

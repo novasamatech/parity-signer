@@ -64,7 +64,7 @@ fun SeedBackup(
 					for (pack in derivations) {
 						item {
 							NetworkCard(
-								MscNetworkInfo(
+								NetworkCardModel(
 									networkTitle = pack.networkTitle,
 									networkLogo = pack.networkLogo
 								)

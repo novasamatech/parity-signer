@@ -17,13 +17,13 @@ import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.NetworkCard
+import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MManageMetadata
-import io.parity.signer.uniffi.MscNetworkInfo
 
 @Composable
 fun ManageMetadata(
@@ -52,7 +52,7 @@ fun ManageMetadata(
 						LazyColumn {
 							items(networks.networks.size) { index ->
 								NetworkCard(
-									network = MscNetworkInfo(
+									network = NetworkCardModel(
 										networkTitle = networks.networks[index].title,
 										networkLogo = networks.networks[index].logo
 									)
