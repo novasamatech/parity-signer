@@ -75,7 +75,7 @@ impl NetworkSpecsKey {
             Encryption::Ed25519 => NetworkSpecsKeyContent::Ed25519(*genesis_hash),
             Encryption::Sr25519 => NetworkSpecsKeyContent::Sr25519(*genesis_hash),
             Encryption::Ecdsa => NetworkSpecsKeyContent::Ecdsa(*genesis_hash),
-            Encryption::Ethereum => NetworkSpecsKeyContent::Ecdsa(*genesis_hash),
+            Encryption::Ethereum => NetworkSpecsKeyContent::Ethereum(*genesis_hash),
         };
         Self(network_key_content.encode())
     }

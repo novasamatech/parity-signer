@@ -5,8 +5,8 @@ use parity_scale_codec::Encode;
 use plot_icon::EMPTY_PNG;
 use sp_core::{blake2_256, sr25519, Pair};
 use sp_runtime::MultiSigner;
-use std::collections::HashMap;
 use std::path::Path;
+use std::{collections::HashMap, convert::TryInto};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
@@ -14,7 +14,7 @@ use definitions::{
     crypto::Encryption,
     helpers::{
         make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public,
-        pic_meta, print_multisigner_as_base58,
+        pic_meta, print_ethereum_address, print_multisigner_as_base58,
     },
     keyring::{AddressKey, NetworkSpecsKey, VerifierKey},
     navigation::{
@@ -361,7 +361,16 @@ where
             real_seed_name: address_details.seed_name,
         });
     }
-    let base58 = print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix));
+    let base58 = if network_specs.encryption == Encryption::Ethereum {
+        if let MultiSigner::Ecdsa(ref public) = multisigner {
+            print_ethereum_address(public).unwrap()
+        } else {
+            print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix))
+        }
+    } else {
+        print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix))
+    };
+
     let public_key = multisigner_to_public(multisigner);
     let identicon = make_identicon_from_multisigner(multisigner);
     let qr = {
