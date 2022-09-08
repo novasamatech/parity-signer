@@ -1,12 +1,13 @@
 //! Utils to communicate with the Signer frontend
 use bip39::{Language, Mnemonic};
+use definitions::helpers::IdenticonStyle;
 use hex;
 use parity_scale_codec::Encode;
 use plot_icon::EMPTY_PNG;
 use sp_core::{blake2_256, sr25519, Pair};
 use sp_runtime::MultiSigner;
+use std::collections::HashMap;
 use std::path::Path;
-use std::{collections::HashMap, convert::TryInto};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
@@ -134,11 +135,11 @@ fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> Vec<u8> {
             }
         }
         if let Some(a) = got_sr25519 {
-            make_identicon_from_multisigner(&a)
+            make_identicon_from_multisigner(&a, IdenticonStyle::Dots)
         } else if let Some(a) = got_ed25519 {
-            make_identicon_from_multisigner(&a)
+            make_identicon_from_multisigner(&a, IdenticonStyle::Dots)
         } else if let Some(a) = got_ecdsa {
-            make_identicon_from_multisigner(&a)
+            make_identicon_from_multisigner(&a, IdenticonStyle::Dots)
         } else {
             EMPTY_PNG.to_vec()
         }
@@ -161,7 +162,12 @@ where
         .map(|(multisigner, address_details)| {
             let address_key = AddressKey::from_multisigner(&multisigner); // to click
             let public_key = multisigner_to_public(&multisigner); // to display
-            let identicon = make_identicon_from_multisigner(&multisigner);
+            let style = if address_details.encryption == Encryption::Ethereum {
+                IdenticonStyle::Blockies
+            } else {
+                IdenticonStyle::Dots
+            };
+            let identicon = make_identicon_from_multisigner(&multisigner, style);
             MRawKey {
                 seed_name: address_details.seed_name,
                 address_key: hex::encode(address_key.key()),
@@ -198,7 +204,12 @@ where
     let mut root_id = None;
     let mut other_id: Vec<(MultiSigner, AddressDetails, Vec<u8>, bool, bool)> = Vec::new();
     for (multisigner, address_details) in identities.into_iter() {
-        let identicon = make_identicon_from_multisigner(&multisigner);
+        let style = if address_details.encryption == Encryption::Ethereum {
+            IdenticonStyle::Blockies
+        } else {
+            IdenticonStyle::Dots
+        };
+        let identicon = make_identicon_from_multisigner(&multisigner, style);
         let base58 = print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
         let address_key = AddressKey::from_multisigner(&multisigner);
         let swiped = {
@@ -372,7 +383,12 @@ where
     };
 
     let public_key = multisigner_to_public(multisigner);
-    let identicon = make_identicon_from_multisigner(multisigner);
+    let style = if network_specs.encryption == Encryption::Ethereum {
+        IdenticonStyle::Blockies
+    } else {
+        IdenticonStyle::Dots
+    };
+    let identicon = make_identicon_from_multisigner(multisigner, style);
     let qr = {
         if address_details.network_id.contains(network_specs_key) {
             let prefix = if network_specs.encryption == Encryption::Ethereum {
@@ -492,9 +508,14 @@ where
         Some((multisigner, address_details)) => {
             let base58 =
                 print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
+            let style = if address_details.encryption == Encryption::Ethereum {
+                IdenticonStyle::Blockies
+            } else {
+                IdenticonStyle::Dots
+            };
             let path = address_details.path;
             let has_pwd = address_details.has_pwd;
-            let identicon = make_identicon_from_multisigner(&multisigner);
+            let identicon = make_identicon_from_multisigner(&multisigner, style);
             let seed_name = seed_name.to_string();
             let collision = Address {
                 base58,
@@ -584,7 +605,12 @@ where
             Ok(DerivationCheck::NoPassword(Some((multisigner, address_details)))) => {
                 let address_base58 =
                     print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
-                let identicon = make_identicon_from_multisigner(&multisigner);
+                let style = if address_details.encryption == Encryption::Ethereum {
+                    IdenticonStyle::Blockies
+                } else {
+                    IdenticonStyle::Dots
+                };
+                let identicon = make_identicon_from_multisigner(&multisigner, style);
                 let collision_display = Address {
                     base58: address_base58,
                     path: address_details.path,
@@ -743,7 +769,10 @@ pub fn print_new_seed(seed_name: &str) -> Result<MNewSeedBackup> {
     let seed_phrase = generate_random_phrase(24)?;
     let sr25519_pair =
         sr25519::Pair::from_string(&seed_phrase, None).map_err(Error::SecretStringError)?;
-    let identicon = make_identicon_from_multisigner(&MultiSigner::Sr25519(sr25519_pair.public()));
+    let identicon = make_identicon_from_multisigner(
+        &MultiSigner::Sr25519(sr25519_pair.public()),
+        IdenticonStyle::Dots,
+    );
     Ok(MNewSeedBackup {
         seed: seed_name.to_string(),
         seed_phrase,

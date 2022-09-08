@@ -1,7 +1,7 @@
 use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 use sp_runtime::{generic::Era, MultiSigner};
 
-use definitions::helpers::{make_identicon_from_account, print_ethereum_address};
+use definitions::helpers::{make_identicon_from_account, print_ethereum_address, IdenticonStyle};
 use definitions::{
     crypto::Encryption,
     helpers::{make_identicon_from_multisigner, pic_meta, print_multisigner_as_base58},
@@ -205,11 +205,11 @@ impl<'a> Card<'a> {
             } => NavCard::AuthorPlainCard {
                 f: MSCAuthorPlain {
                     base58: print_multisigner_as_base58(author, Some(*base58prefix)),
-                    identicon: make_identicon_from_multisigner(author),
+                    identicon: make_identicon_from_multisigner(author, IdenticonStyle::Dots),
                 },
             },
             Card::AuthorPublicKey(author) => {
-                let identicon = make_identicon_from_multisigner(author);
+                let identicon = make_identicon_from_multisigner(author, IdenticonStyle::Dots);
                 let (public_key, encryption) = match author {
                     MultiSigner::Ed25519(p) => (hex::encode(&p), Encryption::Ed25519.show()),
                     MultiSigner::Sr25519(p) => (hex::encode(&p), Encryption::Sr25519.show()),
@@ -233,7 +233,7 @@ impl<'a> Card<'a> {
                     NavCard::VerifierCard {
                         f: MVerifierDetails {
                             public_key,
-                            identicon: make_identicon_from_multisigner(m),
+                            identicon: make_identicon_from_multisigner(m, IdenticonStyle::Dots),
                             encryption,
                         },
                     }
@@ -295,9 +295,14 @@ pub(crate) fn make_author_info(
         print_multisigner_as_base58(author, Some(base58prefix))
     };
 
+    let style = if address_details.encryption == Encryption::Ethereum {
+        IdenticonStyle::Blockies
+    } else {
+        IdenticonStyle::Dots
+    };
     Address {
         base58,
-        identicon: make_identicon_from_multisigner(author),
+        identicon: make_identicon_from_multisigner(author, style),
         seed_name: address_details.seed_name.clone(),
         path: address_details.path.clone(),
         has_pwd: address_details.has_pwd,

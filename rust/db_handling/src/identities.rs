@@ -1303,6 +1303,8 @@ pub fn export_secret_key(
     seed_phrase: &str,
     pwd: Option<&str>,
 ) -> Result<MKeyDetails> {
+    use definitions::helpers::IdenticonStyle;
+
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let address_key = AddressKey::from_multisigner(multisigner);
     let address_details = get_address_details(database_name, &address_key)?;
@@ -1321,11 +1323,16 @@ pub fn export_secret_key(
     }
     let public_key = multisigner_to_public(multisigner);
 
+    let style = if address_details.encryption == Encryption::Ethereum {
+        IdenticonStyle::Blockies
+    } else {
+        IdenticonStyle::Dots
+    };
     let address = Address {
         base58: print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix)),
         path: address_details.path.to_string(),
         has_pwd: address_details.has_pwd,
-        identicon: make_identicon_from_multisigner(multisigner),
+        identicon: make_identicon_from_multisigner(multisigner, style),
         seed_name: address_details.seed_name.to_string(),
         multiselect: None,
         secret_exposed: true,

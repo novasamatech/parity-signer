@@ -115,7 +115,6 @@ struct DecodedContentAddSpecs {
 impl ContentAddSpecs {
     /// Generate [`ContentAddSpecs`] from network specs [`NetworkSpecsToSend`].
     pub fn generate(specs: &NetworkSpecsToSend) -> Self {
-        println!("A {:#?}", specs);
         Self(
             DecodedContentAddSpecs {
                 specs: specs.to_owned(),

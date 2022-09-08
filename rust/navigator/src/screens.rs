@@ -8,7 +8,8 @@ use db_handling::{
     interface_signer::{first_network, SeedDraft},
 };
 use definitions::{
-    helpers::{make_identicon_from_multisigner, multisigner_to_public},
+    crypto::Encryption,
+    helpers::{make_identicon_from_multisigner, multisigner_to_public, IdenticonStyle},
     keyring::{AddressKey, NetworkSpecsKey},
     navigation::{Address, TransactionCardSet},
     network_specs::NetworkSpecs,
@@ -477,7 +478,13 @@ impl SufficientCryptoState {
         address_details: &AddressDetails,
         new_secret_string: &str,
     ) -> Self {
-        let identicon = make_identicon_from_multisigner(multisigner);
+        let style = if address_details.encryption == Encryption::Ethereum {
+            IdenticonStyle::Blockies
+        } else {
+            IdenticonStyle::Dots
+        };
+
+        let identicon = make_identicon_from_multisigner(multisigner, style);
         let author_info = Address {
             base58: hex::encode(multisigner_to_public(multisigner)),
             identicon,

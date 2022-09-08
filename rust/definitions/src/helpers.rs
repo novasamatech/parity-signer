@@ -58,11 +58,36 @@ pub fn multisigner_to_encryption(m: &MultiSigner) -> Encryption {
     }
 }
 
+pub enum IdenticonStyle {
+    /// Default style for substrate-based networks, dots in a circle.
+    Dots,
+
+    /// Blockies style used in Ethereum networks.
+    Blockies,
+}
+
 /// Print identicon from
 /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)  
 #[cfg(feature = "signer")]
-pub fn make_identicon_from_multisigner(multisigner: &MultiSigner) -> Vec<u8> {
-    make_identicon(&multisigner_to_public(multisigner))
+pub fn make_identicon_from_multisigner(
+    multisigner: &MultiSigner,
+    style: IdenticonStyle,
+) -> Vec<u8> {
+    match style {
+        IdenticonStyle::Dots => make_identicon(&multisigner_to_public(multisigner)),
+        IdenticonStyle::Blockies => {
+            if let MultiSigner::Ecdsa(ref public) = multisigner {
+                use eth_blockies::{eth_blockies_png_data, SeedString};
+                let account = print_ethereum_address(public).unwrap();
+                let account = account.canonicalize_ethaddr();
+                let dimension = (72, 72);
+                let compressed_output = false;
+                eth_blockies_png_data(account, dimension, compressed_output)
+            } else {
+                EMPTY_PNG.to_vec()
+            }
+        }
+    }
 }
 
 #[cfg(feature = "signer")]
@@ -140,7 +165,8 @@ pub fn print_multisigner_as_base58(
     }
 }
 
-pub fn print_ethereum_address(public: &ecdsa::Public) -> Result<String> {
+/// Turn a `ecdsa::Public` addr into an Ethereum address.
+pub fn ecdsa_public_to_eth_address(public: &ecdsa::Public) -> Result<H160> {
     let decompressed = libsecp256k1::PublicKey::parse_slice(
         &public.0,
         Some(libsecp256k1::PublicKeyFormat::Compressed),
@@ -148,7 +174,14 @@ pub fn print_ethereum_address(public: &ecdsa::Public) -> Result<String> {
     .serialize();
     let mut m = [0u8; 64];
     m.copy_from_slice(&decompressed[1..65]);
-    let account = H160::from(H256::from_slice(KeccakHasher::hash(&m).as_bytes()));
+    Ok(H160::from(H256::from_slice(
+        KeccakHasher::hash(&m).as_bytes(),
+    )))
+}
+
+/// Print a `ecdsa::Public` into `String`.
+pub fn print_ethereum_address(public: &ecdsa::Public) -> Result<String> {
+    let account = ecdsa_public_to_eth_address(public)?;
 
     Ok(format!("{:?}", HexDisplay::from(&account.as_bytes())))
 }
