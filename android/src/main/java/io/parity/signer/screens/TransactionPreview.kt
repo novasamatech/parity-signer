@@ -38,7 +38,7 @@ fun TransactionPreview(
 			KeyCard(identity = it)
 		}
 		transaction.networkInfo?.let {
-			NetworkCard(network = it)
+			NetworkCard(network = NetworkCardModel(it))
 		}
 		when (action) {
 			TransactionType.SIGN -> {

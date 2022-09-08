@@ -14,6 +14,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.KeyCard
 import io.parity.signer.components.NetworkCard
+import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.models.navigate
@@ -58,7 +59,7 @@ fun PrivateKeyExtractBottomSheet(model: PrivateKeyExtractModel,
 				Row(
 					Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 				) {
-//					NetworkCard(network = keyDetailsMulti.keyDetails.networkInfo)
+					NetworkCard(network = model.network)
 				}
 				Image(
 					model.qrImage.intoImageBitmap(),
@@ -77,4 +78,5 @@ fun PrivateKeyExtractBottomSheet(model: PrivateKeyExtractModel,
 	}
 }
 
-class PrivateKeyExtractModel(var qrImage: List<UByte>, )
+class PrivateKeyExtractModel(val qrImage: List<UByte>,
+														 val network: NetworkCardModel)

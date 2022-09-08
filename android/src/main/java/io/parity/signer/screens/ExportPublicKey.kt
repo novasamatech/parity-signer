@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.KeyCard
 import io.parity.signer.components.NetworkCard
+import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.MKeyDetails
@@ -42,7 +43,7 @@ fun ExportPublicKey(keyDetails: MKeyDetails) {
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 		) {
 			NetworkCard(
-				network = keyDetails.networkInfo
+				network = NetworkCardModel(keyDetails.networkInfo)
 			)
 		}
 		Image(
