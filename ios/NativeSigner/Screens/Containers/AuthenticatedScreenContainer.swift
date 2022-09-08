@@ -19,6 +19,8 @@ struct AuthenticatedScreenContainer: View {
                     VStack(spacing: 0) {
                         ScreenSelectorView(data: data, navigation: navigation)
                     }
+                    ModalSelectorView(data: data, navigation: navigation)
+                    AlertSelectorView(data: data, navigation: navigation)
                 }
                 .gesture(
                     DragGesture().updating($dragOffset, body: { value, _, _ in

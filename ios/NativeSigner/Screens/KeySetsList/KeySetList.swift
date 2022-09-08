@@ -23,7 +23,10 @@ struct KeySetList: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
-                NavigationBarView(title: Localizable.KeySets.title.string)
+                NavigationBarView(
+                    navigation: navigation,
+                    viewModel: NavigationBarViewModel(title: Localizable.KeySets.title.string)
+                )
                 List {
                     ForEach(
                         viewModel.list.sorted(by: { $0.keyName < $1.keyName }),
@@ -35,16 +38,16 @@ struct KeySetList: View {
                         .listRowBackground(Asset.backgroundSystem.swiftUIColor)
                         .listRowSeparator(.hidden)
                         .listRowInsets(.init(
-                            top: Padding.extraExtraSmall,
-                            leading: Padding.extraSmall,
-                            bottom: Padding.extraExtraSmall,
-                            trailing: Padding.extraSmall
+                            top: Spacing.extraExtraSmall,
+                            leading: Spacing.extraSmall,
+                            bottom: Spacing.extraExtraSmall,
+                            trailing: Spacing.extraSmall
                         ))
                     }
                     Spacer()
                         .listRowBackground(Asset.backgroundSystem.swiftUIColor)
                         .listRowSeparator(.hidden)
-                        .frame(height: Heights.actionButton + Padding.large)
+                        .frame(height: Heights.actionButton + Spacing.large)
                 }
                 .listStyle(.plain)
             }
@@ -59,7 +62,7 @@ struct KeySetList: View {
                 },
                 text: Localizable.KeySets.Action.add.key
             )
-            .padding(Padding.large)
+            .padding(Spacing.large)
         }
         .fullScreenCover(isPresented: $isShowingNewSeedMenu) {
             AddKeySetModal(

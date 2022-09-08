@@ -19,7 +19,7 @@ struct KeySetRow: View {
             RoundedRectangle(cornerRadius: CornerRadius.small)
                 .foregroundColor(Asset.backgroundPrimary.swiftUIColor)
                 .frame(height: Heights.keyCellContainer)
-            HStack(alignment: .center, spacing: Padding.small) {
+            HStack(alignment: .center, spacing: Spacing.small) {
                 Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
                 VStack(alignment: .leading) {
                     Text(viewModel.keyName)
@@ -36,38 +36,38 @@ struct KeySetRow: View {
                 Asset.chevronRight.swiftUIImage
                     .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
             }
-            .padding(Padding.medium)
+            .padding(Spacing.medium)
         }
         .background(Asset.backgroundSystem.swiftUIColor)
     }
 }
 
-// struct AddressCardSelector_Previews: PreviewProvider {
-//    static var previews: some View {
-//        VStack {
-//            KeySetRow(
-//                KeySetViewModel(
-//                    keyName: "Parity",
-//                    derivedKeys: "1 Derived Key",
-//                    identicon: PreviewData.exampleIdenticon
-//                )
-//            )
-//            KeySetRow(
-//                KeySetViewModel(
-//                    keyName: "Kusama",
-//                    derivedKeys: nil,
-//                    identicon: PreviewData.exampleIdenticon
-//                )
-//            )
-//            KeySetRow(
-//                KeySetViewModel(
-//                    keyName: "Dotsama crowdloans",
-//                    derivedKeys: "3 Derived Keys",
-//                    identicon: PreviewData.exampleIdenticon
-//                )
-//            )
-//        }
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }
+struct KeySetRow_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack {
+            KeySetRow(
+                KeySetViewModel(
+                    keyName: "Parity",
+                    derivedKeys: "1 Derived Key",
+                    identicon: PreviewData.exampleIdenticon
+                )
+            )
+            KeySetRow(
+                KeySetViewModel(
+                    keyName: "Kusama",
+                    derivedKeys: nil,
+                    identicon: PreviewData.exampleIdenticon
+                )
+            )
+            KeySetRow(
+                KeySetViewModel(
+                    keyName: "Dotsama crowdloans",
+                    derivedKeys: "3 Derived Keys",
+                    identicon: PreviewData.exampleIdenticon
+                )
+            )
+        }
+        .preferredColorScheme(.dark)
+        .previewLayout(.sizeThatFits)
+    }
+}

@@ -26,7 +26,7 @@
 //!
 //! ### Command line
 //!
-//! `$ cargo run remove -title <address_book_title>`
+//! `$ cargo run remove title <address_book_title>`
 //!
 //! Network title in the address book is unique identifier for a network with
 //! given encryption. It always is constructed as
@@ -51,7 +51,7 @@
 //!
 //! ### Example
 //!
-//! `$ cargo run remove -title westend-sr25519`
+//! `$ cargo run remove title westend-sr25519`
 //!
 //! If one of the default networks gets removed, it could be added back,
 //! however, it will not be marked as default anymore.

@@ -13,12 +13,12 @@ struct ActionButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
-            .padding(Padding.large)
+            .padding(Spacing.large)
             .background(backgroundColor)
             .foregroundColor(foregroundColor)
+            .frame(height: Heights.actionButton, alignment: .center)
             .cornerRadius(CornerRadius.extraExtraLarge)
             .font(Fontstyle.labelL.base)
-            .frame(height: Heights.actionButton, alignment: .center)
     }
 }
 

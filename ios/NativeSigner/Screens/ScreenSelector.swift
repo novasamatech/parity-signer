@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ScreenSelector: View {
+    @ObservedObject var data: SignerDataModel
     @ObservedObject var navigation: NavigationCoordinator
     let screenData: ScreenData
     let alert: Bool
@@ -30,12 +31,11 @@ struct ScreenSelector: View {
                 navigationRequest: navigationRequest
             )
         case let .keys(value):
-            KeyManager(
-                content: value,
-                alert: alert,
-                alertShow: alertShow,
-                increment: increment,
-                navigationRequest: navigationRequest
+            KeyDetailsView(
+                navigation: navigation,
+                seedsMediator: data.seedsMediator,
+                viewModel: KeyDetailsViewModel(value),
+                actionModel: KeyDetailsActionModel(value, alert: alert, alertShow: alertShow)
             )
         case let .settings(value):
             SettingsScreen(

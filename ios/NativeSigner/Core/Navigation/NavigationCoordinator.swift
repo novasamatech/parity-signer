@@ -72,7 +72,8 @@ extension NavigationCoordinator {
         ) {
             var updatedShouldSkipInjectedViews: Bool
             switch actionResult.screenData {
-            case .seedSelector:
+            case .seedSelector,
+                 .keys:
                 updatedShouldSkipInjectedViews = true
             default:
                 updatedShouldSkipInjectedViews = false
