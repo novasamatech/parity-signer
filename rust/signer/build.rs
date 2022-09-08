@@ -16,7 +16,9 @@ fn cold_release() -> Result<(), String> {
     Ok(())
 }
 
-#[cfg(target_os = "ios")]
+#[cfg(not(target_os = "android"))]
+///iOS db blobs generated in generate_database.sh script that runs during XCode build phase, not here yet
+///other OS -> don't generate blobs
 fn cold_release() -> Result<(), String> {
     Ok(())
 }
