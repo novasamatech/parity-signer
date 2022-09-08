@@ -8,7 +8,7 @@ import io.parity.signer.uniffi.backendAction
 /**
  * This pretty much offloads all navigation to backend!
  */
-fun SignerDataModel.pushButton(
+fun SignerDataModel.navigate(
 	button: Action,
 	details: String = "",
 	seedPhrase: String = ""

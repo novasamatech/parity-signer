@@ -1,26 +1,24 @@
-package io.parity.signer.modals
+package io.parity.signer.bottomsheets
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.components.Identicon
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.MTypesInfo
 
 @Composable
-fun TypesInfo(typesInfo: MTypesInfo, signerDataModel: SignerDataModel) {
+fun NetworkDetailsMenu(signerDataModel: SignerDataModel) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Column {
@@ -32,22 +30,14 @@ fun TypesInfo(typesInfo: MTypesInfo, signerDataModel: SignerDataModel) {
 			Column(
 				modifier = Modifier.padding(20.dp)
 			) {
-				HeaderBar(line1 = "MANAGE TYPES", line2 = "Select action")
-				if (typesInfo.typesOnFile) {
-					Row {
-						Identicon(identicon = typesInfo.typesIdPic?:listOf())
-						Text(typesInfo.typesHash ?: "")
-					}
-				} else {
-					Text("Pre-v14 types not installed")
-				}
+				HeaderBar(line1 = "MANAGE NETWORK", line2 = "Select action")
 				BigButton(
-					text = "Sign types",
+					text = "Sign network specs",
 					isShaded = true,
 					isCrypto = true,
-					action = { signerDataModel.pushButton(Action.SIGN_TYPES) })
+					action = { signerDataModel.navigate(Action.SIGN_NETWORK_SPECS) })
 				BigButton(
-					text = "Delete types",
+					text = "Delete network",
 					isShaded = true,
 					isDangerous = true,
 					action = {
@@ -59,11 +49,11 @@ fun TypesInfo(typesInfo: MTypesInfo, signerDataModel: SignerDataModel) {
 	}
 	AndroidCalledConfirm(
 		show = confirm,
-		header = "Remove types?",
-		text = "Types information needed for support of pre-v14 metadata will be removed. Are you sure?",
+		header = "Remove network?",
+		text = "This network will be removed for whole device",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(Action.REMOVE_TYPES) },
+		forward = { signerDataModel.navigate(Action.REMOVE_NETWORK) },
 		backText = "Cancel",
-		forwardText = "Remove types"
+		forwardText = "Remove network"
 	)
 }

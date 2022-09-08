@@ -1,10 +1,11 @@
-package io.parity.signer.modals
+package io.parity.signer.bottomsheets
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -12,35 +13,19 @@ import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun PrivateKeyExtractBottomSheet() {
-
-	val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-		bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
-	)
-	val coroutineScope = rememberCoroutineScope()
-	BottomSheetScaffold(
-		scaffoldState = bottomSheetScaffoldState,
-		sheetContent = {
-			Box(
-				Modifier
-					.fillMaxWidth()
-					.height(200.dp)
-			) {
-				Text(text = "Hello from sheet")
-			}
-		}, sheetPeekHeight = 0.dp
-	)
+fun KeyDetailsAction(signerDataModel: SignerDataModel) {
+	var confirmForget by remember { mutableStateOf(false) }
+	var confirmExport by remember { mutableStateOf(false) }
 
 	Column (
-		Modifier.clickable { close() } //todo dmitry
-	) {
+		Modifier.clickable { signerDataModel.navigate(Action.GO_BACK) }
+		) {
 		Spacer(Modifier.weight(1f))
 		Surface(
 			color = MaterialTheme.colors.Bg000,
@@ -74,7 +59,7 @@ fun PrivateKeyExtractBottomSheet() {
 		header = "Forget this key?",
 		text = "This key will be removed for this network. Are you sure?",
 		back = { confirmForget = false },
-		forward = { signerDataModel.pushButton(Action.REMOVE_KEY) },
+		forward = { signerDataModel.navigate(Action.REMOVE_KEY) },
 		backText = "Cancel",
 		forwardText = "Remove key"
 	)
@@ -83,7 +68,7 @@ fun PrivateKeyExtractBottomSheet() {
 		header = "Export Private Key",
 		text = "A private key can be used to sign transactions. This key will be marked as a hot key after export.",
 		back = { confirmExport = false },
-		forward = { signerDataModel.pushButton(Action.REMOVE_KEY) }, //TODO dmitry
+		forward = { signerDataModel.navigate(Action.REMOVE_KEY) }, //TODO dmitry
 		backText = "Cancel",
 		forwardText = "Export Private Key"
 	)

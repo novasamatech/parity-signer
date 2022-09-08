@@ -1,4 +1,4 @@
-package io.parity.signer.modals
+package io.parity.signer.bottomsheets
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -18,7 +18,7 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
@@ -34,7 +34,7 @@ fun ManageMetadata(
 
 	Surface(
 		color = Color.Transparent,
-		modifier = Modifier.clickable { signerDataModel.pushButton(Action.GO_BACK) }
+		modifier = Modifier.clickable { signerDataModel.navigate(Action.GO_BACK) }
 	) {
 		Column {
 			Spacer(Modifier.weight(1f))
@@ -64,7 +64,7 @@ fun ManageMetadata(
 						text = "Sign this metadata",
 						isShaded = true,
 						isCrypto = true,
-						action = { signerDataModel.pushButton(Action.SIGN_METADATA) })
+						action = { signerDataModel.navigate(Action.SIGN_METADATA) })
 					BigButton(
 						text = "Delete this metadata",
 						isShaded = true,
@@ -83,7 +83,7 @@ fun ManageMetadata(
 		header = "Remove metadata?",
 		text = "This metadata will be removed for all networks",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(Action.REMOVE_METADATA) },
+		forward = { signerDataModel.navigate(Action.REMOVE_METADATA) },
 		backText = "Cancel",
 		forwardText = "Remove metadata"
 	)
