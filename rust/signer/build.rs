@@ -1,4 +1,4 @@
-#[cfg(not(target_os = "ios"))]
+#[cfg(target_os = "android")]
 fn cold_release() -> Result<(), String> {
     use std::{env, fs::create_dir_all, path::Path};
 
