@@ -85,26 +85,27 @@ struct HorizontalActionsBottomModal: View {
     }
 }
 
-struct HorizontalActionsBottomModal_Previews: PreviewProvider {
-    static var previews: some View {
-        HorizontalActionsBottomModal(
-            viewModel: .forgetKeySet,
-            mainAction: {},
-            isShowingBottomAlert: Binding<Bool>.constant(true)
-        )
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-        VStack {
-            HorizontalActionsBottomModal(
-                viewModel: .forgetKeySet,
-                mainAction: {},
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
-            .preferredColorScheme(.light)
-            .previewLayout(.sizeThatFits)
-        }
-        .background(.black)
-        .preferredColorScheme(.light)
-        .previewLayout(.sizeThatFits)
-    }
-}
+//
+// struct HorizontalActionsBottomModal_Previews: PreviewProvider {
+//    static var previews: some View {
+//        HorizontalActionsBottomModal(
+//            viewModel: .forgetKeySet,
+//            mainAction: {},
+//            isShowingBottomAlert: Binding<Bool>.constant(true)
+//        )
+//        .preferredColorScheme(.dark)
+//        .previewLayout(.sizeThatFits)
+//        VStack {
+//            HorizontalActionsBottomModal(
+//                viewModel: .forgetKeySet,
+//                mainAction: {},
+//                isShowingBottomAlert: Binding<Bool>.constant(true)
+//            )
+//            .preferredColorScheme(.light)
+//            .previewLayout(.sizeThatFits)
+//        }
+//        .background(.black)
+//        .preferredColorScheme(.light)
+//        .previewLayout(.sizeThatFits)
+//    }
+// }

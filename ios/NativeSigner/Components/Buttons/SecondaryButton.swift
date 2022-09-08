@@ -31,63 +31,64 @@ struct SecondaryButton: View {
     }
 }
 
-struct SecondaryButton_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(alignment: .center, spacing: 10) {
-            Text("<< Enabled >>")
-            SecondaryButton(
-                action: {}(),
-                text: "Short Title"
-            )
-            .padding(10)
-            SecondaryButton(
-                action: {}(),
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-            )
-            .padding(10)
-            Text("<< Disabled >>")
-            SecondaryButton(
-                action: {}(),
-                text: "Short Title",
-                style: .secondary(isDisabled: Binding<Bool>.constant(true))
-            )
-            .padding(10)
-            SecondaryButton(
-                action: {}(),
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                style: .secondary(isDisabled: Binding<Bool>.constant(true))
-            )
-            .padding(10)
-        }
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-        VStack(alignment: .center, spacing: 10) {
-            Text("<< Enabled >>")
-            SecondaryButton(
-                action: {}(),
-                text: "Short Title"
-            )
-            .padding(10)
-            SecondaryButton(
-                action: {}(),
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-            )
-            .padding(10)
-            Text("<< Disabled >>")
-            SecondaryButton(
-                action: {}(),
-                text: "Short Title",
-                style: .secondary(isDisabled: Binding<Bool>.constant(true))
-            )
-            .padding(10)
-            SecondaryButton(
-                action: {}(),
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                style: .secondary(isDisabled: Binding<Bool>.constant(true))
-            )
-            .padding(10)
-        }
-        .preferredColorScheme(.light)
-        .previewLayout(.sizeThatFits)
-    }
-}
+//
+// struct SecondaryButton_Previews: PreviewProvider {
+//    static var previews: some View {
+//        VStack(alignment: .center, spacing: 10) {
+//            Text("<< Enabled >>")
+//            SecondaryButton(
+//                action: {}(),
+//                text: "Short Title"
+//            )
+//            .padding(10)
+//            SecondaryButton(
+//                action: {}(),
+//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+//            )
+//            .padding(10)
+//            Text("<< Disabled >>")
+//            SecondaryButton(
+//                action: {}(),
+//                text: "Short Title",
+//                style: .secondary(isDisabled: Binding<Bool>.constant(true))
+//            )
+//            .padding(10)
+//            SecondaryButton(
+//                action: {}(),
+//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+//                style: .secondary(isDisabled: Binding<Bool>.constant(true))
+//            )
+//            .padding(10)
+//        }
+//        .preferredColorScheme(.dark)
+//        .previewLayout(.sizeThatFits)
+//        VStack(alignment: .center, spacing: 10) {
+//            Text("<< Enabled >>")
+//            SecondaryButton(
+//                action: {}(),
+//                text: "Short Title"
+//            )
+//            .padding(10)
+//            SecondaryButton(
+//                action: {}(),
+//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+//            )
+//            .padding(10)
+//            Text("<< Disabled >>")
+//            SecondaryButton(
+//                action: {}(),
+//                text: "Short Title",
+//                style: .secondary(isDisabled: Binding<Bool>.constant(true))
+//            )
+//            .padding(10)
+//            SecondaryButton(
+//                action: {}(),
+//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+//                style: .secondary(isDisabled: Binding<Bool>.constant(true))
+//            )
+//            .padding(10)
+//        }
+//        .preferredColorScheme(.light)
+//        .previewLayout(.sizeThatFits)
+//    }
+// }

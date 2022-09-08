@@ -72,13 +72,13 @@ struct AddKeySetModal: View {
     }
 }
 
-struct AddKeySetModal_Previews: PreviewProvider {
-    static var previews: some View {
-        AddKeySetModal(
-            isShowingNewSeedMenu: Binding<Bool>.constant(true),
-            navigation: NavigationCoordinator()
-        )
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-    }
-}
+// struct AddKeySetModal_Previews: PreviewProvider {
+//    static var previews: some View {
+//        AddKeySetModal(
+//            isShowingNewSeedMenu: Binding<Bool>.constant(true),
+//            navigation: NavigationCoordinator()
+//        )
+//        .preferredColorScheme(.dark)
+//        .previewLayout(.sizeThatFits)
+//    }
+// }
