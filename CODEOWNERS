@@ -20,6 +20,6 @@
 /.github/ @paritytech/ci
 /scripts/ @paritytech/ci
 /.gitlab-ci.yml @paritytech/ci
-./ios @tetekinandrey @krodak
-./android @tetekinandrey @Dmitry-Borodin
-./rust @montekki @prybalko
+/ios @tetekinandrey @krodak
+/android @tetekinandrey @Dmitry-Borodin
+/rust @montekki @prybalko
