@@ -60,6 +60,7 @@ struct KeyDetailsView: View {
                     Asset.chevronRight.swiftUIImage
                 }
                 .padding(Padding.detailsCell)
+                .contentShape(Rectangle())
                 .onTapGesture {
                     navigation.perform(navigation: actionModel.addressKeyNavigation)
                 }
@@ -88,6 +89,7 @@ struct KeyDetailsView: View {
                             .listRowBackground(Asset.backgroundSystem.swiftUIColor)
                             .listRowSeparator(.hidden)
                             .listRowInsets(EdgeInsets())
+                            .contentShape(Rectangle())
                             .onTapGesture {
                                 navigation.perform(navigation: deriveKey.actionModel.tapAction)
                             }
