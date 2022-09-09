@@ -183,7 +183,7 @@ pub fn ecdsa_public_to_eth_address(public: &ecdsa::Public) -> Result<H160> {
 pub fn print_ethereum_address(public: &ecdsa::Public) -> Result<String> {
     let account = ecdsa_public_to_eth_address(public)?;
 
-    Ok(format!("{:?}", HexDisplay::from(&account.as_bytes())))
+    Ok(format!("0x{:?}", HexDisplay::from(&account.as_bytes())))
 }
 
 /// Print id pic for metadata hash
