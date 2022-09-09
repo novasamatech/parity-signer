@@ -189,7 +189,7 @@ final class SeedsMediator: SeedsMediating {
                 .filter { $0 != seedName }
                 .sorted()
             updateSeedNames(seedNames: seedNames)
-            signerDataModel.navigation.perform(navigation: .init(action: .removeSeed))
+            signerDataModel.navigation.perform(navigation: .init(action: .removeSeed), skipDebounce: true)
         case .failure: ()
             // We should inform user with some dedicated UI state for that error, maybe just system alert
         }

@@ -33,7 +33,7 @@ struct ScreenSelector: View {
         case let .keys(value):
             KeyDetailsView(
                 navigation: navigation,
-                seedsMediator: data.seedsMediator,
+                forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation, seedsMediator: data.seedsMediator),
                 viewModel: KeyDetailsViewModel(value),
                 actionModel: KeyDetailsActionModel(value, alert: alert, alertShow: alertShow)
             )

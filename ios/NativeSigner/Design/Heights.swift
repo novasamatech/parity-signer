@@ -11,6 +11,9 @@ import UIKit
 enum Heights {
     /// All variants of `ActionButton`, 56 pt
     static let actionButton: CGFloat = 56
+    /// All variants of `ActionButton`, 56 pt
+
+    static let snackbarHeight: CGFloat = 56
     /// All variants of `NavbarButton`, 40 pt
     static let navigationButton: CGFloat = 40
     /// All variants of `MenuButton`, 48 pt
