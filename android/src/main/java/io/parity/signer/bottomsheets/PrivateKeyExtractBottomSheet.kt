@@ -1,7 +1,6 @@
 package io.parity.signer.bottomsheets
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,6 +17,8 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
+import io.parity.signer.R
+import io.parity.signer.components.KeyCard
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.EmptyNavigator
@@ -27,7 +28,7 @@ import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
-import io.parity.signer.R
+import io.parity.signer.uniffi.Address
 
 @Composable
 fun PrivateKeyExtractBottomSheet(
@@ -81,22 +82,26 @@ fun PrivateKeyExtractBottomSheet(
 						.fillMaxWidth(1f)
 						.padding(12.dp)
 				)
-//				Text(
-//					"Key " + keyDetailsMulti.currentNumber + " out of " + keyDetailsMulti.outOf
-//				)
+				KeyCard(model.address)
+				Spacer(modifier = Modifier
+					.padding(bottom = 24.dp)
+				)
 			}
-
 		}
 	}
 }
 
 class PrivateKeyExtractModel(
 	val qrImage: List<UByte>,
+	val address: Address,
 	val network: NetworkCardModel
 ) {
 	companion object {
 		fun createMock() = PrivateKeyExtractModel(
 			0u.rangeTo(200u).map { it.toUByte() }.toList(),
+			Address("base58", "path", true,
+				listOf(0u,1u),
+			"seedName", false, true),
 			NetworkCardModel("NetworkTitle", "NetworkLogo")
 		)
 	}
@@ -115,15 +120,15 @@ private fun PrivateKeyExtractBottomSheetPreview() {
 	)
 }
 
-@Preview(
-	name = "dark theme",
-	group = "themes",
-	uiMode = UI_MODE_NIGHT_YES
-)
-@Composable
-private fun PrivateKeyExtractBottomSheetPreviewNight() {
-	PrivateKeyExtractBottomSheet(
-		model = PrivateKeyExtractModel.createMock(),
-		EmptyNavigator()
-	)
-}
+//@Preview(
+//	name = "dark theme",
+//	group = "themes",
+//	uiMode = UI_MODE_NIGHT_YES
+//)
+//@Composable
+//private fun PrivateKeyExtractBottomSheetPreviewNight() {
+//	PrivateKeyExtractBottomSheet(
+//		model = PrivateKeyExtractModel.createMock(),
+//		EmptyNavigator()
+//	)
+//}
