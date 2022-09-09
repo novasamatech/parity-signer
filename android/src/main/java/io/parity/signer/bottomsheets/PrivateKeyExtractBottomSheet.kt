@@ -1,5 +1,7 @@
 package io.parity.signer.bottomsheets
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -100,9 +102,26 @@ class PrivateKeyExtractModel(
 	}
 }
 
-@Preview
+@Preview(
+	name = "day",
+	group = "themes",
+	uiMode = UI_MODE_NIGHT_NO
+)
 @Composable
 private fun PrivateKeyExtractBottomSheetPreview() {
+	PrivateKeyExtractBottomSheet(
+		model = PrivateKeyExtractModel.createMock(),
+		EmptyNavigator()
+	)
+}
+
+@Preview(
+	name = "dark theme",
+	group = "themes",
+	uiMode = UI_MODE_NIGHT_YES
+)
+@Composable
+private fun PrivateKeyExtractBottomSheetPreviewNight() {
 	PrivateKeyExtractBottomSheet(
 		model = PrivateKeyExtractModel.createMock(),
 		EmptyNavigator()
