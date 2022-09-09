@@ -130,6 +130,11 @@ fn qrparser_try_decode_qr_sequence(
     qr_reader_phone::decode_sequence(data, cleaned)
 }
 
+
+/// Exports secret (private) key as QR code
+///
+/// `public_key` is hex-encoded public key of the key to export. Can be taken from [`MKeyDetails`]
+/// `network_specs_key_hex` is hex-encoded [`NetworkSpecsKey`]. Can be taken from [`MDeriveKey`]
 fn generate_secret_key_qr(
     dbname: &str,
     public_key: &str,
