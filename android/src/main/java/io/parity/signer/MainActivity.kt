@@ -24,7 +24,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.navigate
 import io.parity.signer.screens.LandingView
 import io.parity.signer.screens.WaitingScreen
-import io.parity.signer.ui.theme.ParitySignerTheme
+import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.*
 
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 @ExperimentalAnimationApi
 @Composable
 fun SignerApp(signerDataModel: SignerDataModel) {
-	ParitySignerTheme {
+	SignerOldTheme {
 		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 		val authenticated = signerDataModel.authenticated.observeAsState()
 		val actionResult = signerDataModel.actionResult.observeAsState()
