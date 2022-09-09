@@ -9,6 +9,7 @@ import SwiftUI
 
 struct KeyDetailsView: View {
     @State private var isShowingActionSheet = false
+    @State private var isShowingRemoveConfirmation: Bool = false
     @ObservedObject private var navigation: NavigationCoordinator
     private var seedsMediator: SeedsMediating!
 
@@ -115,10 +116,24 @@ struct KeyDetailsView: View {
         .fullScreenCover(isPresented: $isShowingActionSheet) {
             KeyDetailsActionsModal(
                 isShowingActionSheet: $isShowingActionSheet,
-                navigation: navigation,
-                removeSeed: {
+                isShowingRemoveConfirmation: $isShowingRemoveConfirmation,
+                navigation: navigation
+            )
+            .clearModalBackground()
+        }
+        .fullScreenCover(isPresented: $isShowingRemoveConfirmation) {
+            HorizontalActionsBottomModal(
+                viewModel: .forgetKeySet,
+                mainAction: {
                     seedsMediator?.removeSeed(seedName: actionModel.removeSeed)
-                }
+                },
+                dismissAction: {
+                    // We need to fake right button action here or Rust machine will break
+                    // In old UI, if you dismiss equivalent of this modal, underlying modal would still be there,
+                    // so we need to inform Rust we actually hid it
+                    navigation.perform(navigation: .init(action: .rightButtonAction))
+                },
+                isShowingBottomAlert: $isShowingRemoveConfirmation
             )
             .clearModalBackground()
         }

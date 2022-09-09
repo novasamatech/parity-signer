@@ -10,33 +10,28 @@ import SwiftUI
 struct PrimaryButton: View {
     private let action: () -> Void
     private let text: LocalizedStringKey
-
-    @State var isDisabled: Bool
+    private let style: ActionButtonStyle
 
     init(
         action: @escaping () -> Void,
         text: LocalizedStringKey,
-        isDisabled: Bool = false
+        style: ActionButtonStyle = .primary()
     ) {
         self.action = action
         self.text = text
-        self.isDisabled = isDisabled
+        self.style = style
     }
 
     var body: some View {
         ActionButton(
-            action: action,
+            action: action(),
             text: text,
-            style: ActionButtonStyle(
-                backgroundColor: Asset.accentPink500.swiftUIColor,
-                foregroundColor: (isDisabled ? Asset.accentForegroundTextDisabled : Asset.accentForegroundText)
-                    .swiftUIColor
-            ),
-            isDisabled: $isDisabled
+            style: style
         )
     }
 }
 
+//
 // struct PrimaryButton_Previews: PreviewProvider {
 //    static var previews: some View {
 //        VStack(alignment: .center, spacing: 30) {
@@ -51,17 +46,29 @@ struct PrimaryButton: View {
 //                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 //            )
 //            .padding(10)
+//            PrimaryButton(
+//                action: {},
+//                text: "Short Title",
+//                style: .primaryDestructive()
+//            )
+//            .padding(10)
 //            Text("<< Disabled >>")
 //            PrimaryButton(
 //                action: {},
 //                text: "Short Title",
-//                isDisabled: true
+//                style: .primary(isDisabled: Binding<Bool>.constant(true))
 //            )
 //            .padding(10)
 //            PrimaryButton(
 //                action: {},
 //                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-//                isDisabled: true
+//                style: .primary(isDisabled: Binding<Bool>.constant(true))
+//            )
+//            .padding(10)
+//            PrimaryButton(
+//                action: {},
+//                text: "Short Title",
+//                style: .primaryDestructive(isDisabled: Binding<Bool>.constant(true))
 //            )
 //            .padding(10)
 //        }
@@ -79,17 +86,29 @@ struct PrimaryButton: View {
 //                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 //            )
 //            .padding(10)
+//            PrimaryButton(
+//                action: {},
+//                text: "Short Title",
+//                style: .primaryDestructive()
+//            )
+//            .padding(10)
 //            Text("<< Disabled >>")
 //            PrimaryButton(
 //                action: {},
 //                text: "Short Title",
-//                isDisabled: true
+//                style: .primary(isDisabled: Binding<Bool>.constant(true))
 //            )
 //            .padding(10)
 //            PrimaryButton(
 //                action: {},
 //                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-//                isDisabled: true
+//                style: .primary(isDisabled: Binding<Bool>.constant(true))
+//            )
+//            .padding(10)
+//            PrimaryButton(
+//                action: {},
+//                text: "Short Title",
+//                style: .primaryDestructive(isDisabled: Binding<Bool>.constant(true))
 //            )
 //            .padding(10)
 //        }
