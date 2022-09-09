@@ -163,6 +163,11 @@
 		6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */; };
 		6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */; };
 		6D5801E7289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */; };
+		6D6430EC28CB2FDF00342E37 /* TapAndDelayDismissAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6430EB28CB2FDF00342E37 /* TapAndDelayDismissAnimator.swift */; };
+		6D6430EF28CB30A000342E37 /* BottoEdgeOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6430EE28CB30A000342E37 /* BottoEdgeOverlay.swift */; };
+		6D6430F128CB32CC00342E37 /* Snackbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6430F028CB32CC00342E37 /* Snackbar.swift */; };
+		6D6430F428CB447900342E37 /* ForgetKeySetAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6430F328CB447900342E37 /* ForgetKeySetAction.swift */; };
+		6D6430F628CB460A00342E37 /* ServiceLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6430F528CB460A00342E37 /* ServiceLocator.swift */; };
 		6D88CFF028C60815001FB0A1 /* CloseModalButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D88CFEF28C60815001FB0A1 /* CloseModalButton.swift */; };
 		6D88CFF228C60AED001FB0A1 /* FullScreenRoundedModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D88CFF128C60AED001FB0A1 /* FullScreenRoundedModal.swift */; };
 		6D88CFF828C634CA001FB0A1 /* KeyDetailsActionsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D88CFF728C634CA001FB0A1 /* KeyDetailsActionsModal.swift */; };
@@ -408,6 +413,11 @@
 		6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAdapterTests.swift; sourceTree = "<group>"; };
 		6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAssemblerTests.swift; sourceTree = "<group>"; };
 		6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAssembler.swift; sourceTree = "<group>"; };
+		6D6430EB28CB2FDF00342E37 /* TapAndDelayDismissAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapAndDelayDismissAnimator.swift; sourceTree = "<group>"; };
+		6D6430EE28CB30A000342E37 /* BottoEdgeOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottoEdgeOverlay.swift; sourceTree = "<group>"; };
+		6D6430F028CB32CC00342E37 /* Snackbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snackbar.swift; sourceTree = "<group>"; };
+		6D6430F328CB447900342E37 /* ForgetKeySetAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgetKeySetAction.swift; sourceTree = "<group>"; };
+		6D6430F528CB460A00342E37 /* ServiceLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceLocator.swift; sourceTree = "<group>"; };
 		6D88CFEF28C60815001FB0A1 /* CloseModalButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseModalButton.swift; sourceTree = "<group>"; };
 		6D88CFF128C60AED001FB0A1 /* FullScreenRoundedModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenRoundedModal.swift; sourceTree = "<group>"; };
 		6D88CFF728C634CA001FB0A1 /* KeyDetailsActionsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsActionsModal.swift; sourceTree = "<group>"; };
@@ -570,6 +580,8 @@
 		2D7A7BC826BA97AE0053C1E0 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				6D6430ED28CB309500342E37 /* Overlays */,
+				6D6430EA28CB2FD300342E37 /* Animators */,
 				6D95E97628B624FF00E28A11 /* Modals */,
 				6DDEF13D28AE7C4B004CA2FD /* Buttons */,
 				6DDEF11928AE2DD3004CA2FD /* TabBar */,
@@ -668,7 +680,6 @@
 				2DE72BD226A588C9002BB752 /* NativeSignerTests */,
 				2DE72BBF26A588C7002BB752 /* Products */,
 				2DE72C0B26A992D9002BB752 /* Frameworks */,
-				6DBE12D628B3A292005F3CCC /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -879,6 +890,7 @@
 				6D5801D528991DA4006C41D8 /* Runtime */,
 				6D5801D22899132C006C41D8 /* Connectivity */,
 				6D5801CF28991306006C41D8 /* Protocols */,
+				6D6430F528CB460A00342E37 /* ServiceLocator.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -941,6 +953,30 @@
 			path = Connectivity;
 			sourceTree = "<group>";
 		};
+		6D6430EA28CB2FD300342E37 /* Animators */ = {
+			isa = PBXGroup;
+			children = (
+				6D6430EB28CB2FDF00342E37 /* TapAndDelayDismissAnimator.swift */,
+			);
+			path = Animators;
+			sourceTree = "<group>";
+		};
+		6D6430ED28CB309500342E37 /* Overlays */ = {
+			isa = PBXGroup;
+			children = (
+				6D6430EE28CB30A000342E37 /* BottoEdgeOverlay.swift */,
+			);
+			path = Overlays;
+			sourceTree = "<group>";
+		};
+		6D6430F228CB447100342E37 /* Actions */ = {
+			isa = PBXGroup;
+			children = (
+				6D6430F328CB447900342E37 /* ForgetKeySetAction.swift */,
+			);
+			path = Actions;
+			sourceTree = "<group>";
+		};
 		6D88CFF628C634BC001FB0A1 /* KeySet */ = {
 			isa = PBXGroup;
 			children = (
@@ -981,6 +1017,7 @@
 			children = (
 				6D95E97728B6250B00E28A11 /* ClearBackgroundView.swift */,
 				6D88CFF128C60AED001FB0A1 /* FullScreenRoundedModal.swift */,
+				6D6430F028CB32CC00342E37 /* Snackbar.swift */,
 			);
 			path = Modals;
 			sourceTree = "<group>";
@@ -1019,13 +1056,6 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
-		6DBE12D628B3A292005F3CCC /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
 		6DC5642C28B652D0003D540B /* AddKeySet */ = {
 			isa = PBXGroup;
 			children = (
@@ -1049,6 +1079,7 @@
 		6DC5643E28B929E0003D540B /* KeyDetails */ = {
 			isa = PBXGroup;
 			children = (
+				6D6430F228CB447100342E37 /* Actions */,
 				6DE8466828BF6E9B0051346A /* Models */,
 				6DC5643F28B929EA003D540B /* KeyDetailsView.swift */,
 				6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */,
@@ -1409,10 +1440,12 @@
 				6D5801D728991F11006C41D8 /* RuntimePropertiesProvider.swift in Sources */,
 				2DA5F8252756624000D8DD29 /* NavbarShield.swift in Sources */,
 				6DDEF11428AD12FA004CA2FD /* Tab.swift in Sources */,
+				6D6430F628CB460A00342E37 /* ServiceLocator.swift in Sources */,
 				6DC5642E28B652DE003D540B /* AddKeySetModal.swift in Sources */,
 				2D48F3572760BBEC004B27BE /* RecoverSeedName.swift in Sources */,
 				6DBD21FA289A7A26005D539B /* DatabaseMediator.swift in Sources */,
 				2D48F3D6277B94C4004B27BE /* Identicon.swift in Sources */,
+				6D6430EF28CB30A000342E37 /* BottoEdgeOverlay.swift in Sources */,
 				6D88CFF828C634CA001FB0A1 /* KeyDetailsActionsModal.swift in Sources */,
 				2D48F3532760A2D8004B27BE /* Fontstyle.swift in Sources */,
 				6D57DC75289E525F00005C63 /* ModalSelectorView.swift in Sources */,
@@ -1435,6 +1468,7 @@
 				6D57DC74289E525F00005C63 /* ScreenSelectorView.swift in Sources */,
 				04197D2B276BA40C003485D2 /* MenuElements.swift in Sources */,
 				6DF7751B28B399AC0040012E /* CornerRadius.swift in Sources */,
+				6D6430EC28CB2FDF00342E37 /* TapAndDelayDismissAnimator.swift in Sources */,
 				2DA5F86927566C3600D8DD29 /* TCEraImmortal.swift in Sources */,
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
 				6DC5643028B65B9C003D540B /* AnimationDuration.swift in Sources */,
@@ -1535,6 +1569,8 @@
 				2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */,
 				2D48F38327691C0A004B27BE /* ConfirmAlert.swift in Sources */,
 				2DAA82912786FA4B002917C0 /* KeyDetailsMulti.swift in Sources */,
+				6D6430F128CB32CC00342E37 /* Snackbar.swift in Sources */,
+				6D6430F428CB447900342E37 /* ForgetKeySetAction.swift in Sources */,
 				2D48F3BE27720345004B27BE /* KeyMenu.swift in Sources */,
 				6DC5643928B7DED8003D540B /* KeychainQueryProvider.swift in Sources */,
 				6D4C0758289BD95500B2EE48 /* SFSymbols.swift in Sources */,
