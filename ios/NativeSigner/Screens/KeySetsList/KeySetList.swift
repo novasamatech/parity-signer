@@ -10,6 +10,7 @@ import SwiftUI
 struct KeySetList: View {
     @ObservedObject private var navigation: NavigationCoordinator
     @State private var isShowingNewSeedMenu = false
+
     private let viewModel: KeySetListViewModel
 
     init(

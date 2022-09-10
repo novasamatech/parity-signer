@@ -11,4 +11,6 @@ import UIKit
 enum AnimationDuration {
     /// Standard, 0.3, should align with most system animations
     static let standard: CGFloat = 0.3
+    /// To be used with different `Overlay` presenrtation. 0.8, should allow for smooth transition
+    static let overlayPresentation: CGFloat = 0.8
 }
