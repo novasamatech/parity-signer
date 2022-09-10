@@ -364,6 +364,7 @@ fn export_alice_westend() {
         network_info: MSCNetworkInfo {
             network_title: "Westend".to_string(),
             network_logo: "westend".to_string(),
+            network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string()
         },
     };
     assert_eq!(key, expected_key);

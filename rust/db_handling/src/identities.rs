@@ -1337,6 +1337,7 @@ where
     let network_info = MSCNetworkInfo {
         network_title: network_specs.title,
         network_logo: network_specs.logo,
+        network_specs_key: network_specs_key_hex.to_owned(),
     };
 
     let database_addresses = get_addresses_by_seed_name(&db_path, expected_seed_name)?;

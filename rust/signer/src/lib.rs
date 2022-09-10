@@ -133,12 +133,12 @@ fn qrparser_try_decode_qr_sequence(
 /// Exports secret (private) key as QR code
 ///
 /// `public_key` is hex-encoded public key of the key to export. Can be taken from [`MKeyDetails`]
-/// `network_specs_key_hex` is hex-encoded [`NetworkSpecsKey`]. Can be taken from [`MDeriveKey`]
+/// `network_specs_key` is hex-encoded [`NetworkSpecsKey`]. Can be taken from [`MSCNetworkInfo`]
 fn generate_secret_key_qr(
     dbname: &str,
     public_key: &str,
     expected_seed_name: &str,
-    network_specs_key_hex: &str,
+    network_specs_key: &str,
     seed_phrase: &str,
     key_password: Option<String>,
 ) -> Result<MKeyDetails, anyhow::Error> {
@@ -146,7 +146,7 @@ fn generate_secret_key_qr(
         dbname,
         public_key,
         expected_seed_name,
-        network_specs_key_hex,
+        network_specs_key,
         seed_phrase,
         key_password,
     )

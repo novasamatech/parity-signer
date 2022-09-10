@@ -1497,6 +1497,7 @@ impl State {
                         network_info: network_info.map(|i| MSCNetworkInfo {
                             network_title: i.title,
                             network_logo: i.logo,
+                            network_specs_key: hex::encode(NetworkSpecsKey::from_parts(&i.genesis_hash, &i.encryption).key())
                         }),
                     },
                 }

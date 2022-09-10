@@ -16,6 +16,7 @@ use definitions::{
     qr_transfers::ContentLoadTypes,
     users::AddressDetails,
 };
+use definitions::keyring::NetworkSpecsKey;
 use parser::cards::ParserCard;
 
 use crate::error::Error;
@@ -262,6 +263,7 @@ impl<'a> Card<'a> {
                 f: MSCNetworkInfo {
                     network_title: x.title.clone(),
                     network_logo: x.logo.clone(),
+                    network_specs_key: hex::encode(NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption).key()),
                 },
             },
             Card::NetworkGenesisHash(x) => NavCard::NetworkGenesisHashCard { f: hex::encode(x) },
