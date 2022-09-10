@@ -60,7 +60,7 @@ final class NavigationCoordinator: ObservableObject {
 }
 
 extension NavigationCoordinator {
-    func perform(navigation: Navigation) {
+    func perform(navigation: Navigation, skipDebounce: Bool = false) {
         guard isActionAvailable else { return }
 
         isActionAvailable = false
@@ -87,8 +87,12 @@ extension NavigationCoordinator {
             }
         }
 
-        debounceQueue.asyncAfter(deadline: .now() + Constants.debounceTime, flags: .barrier) {
-            self.isActionAvailable = true
+        if skipDebounce {
+            isActionAvailable = true
+        } else {
+            debounceQueue.asyncAfter(deadline: .now() + Constants.debounceTime, flags: .barrier) {
+                self.isActionAvailable = true
+            }
         }
     }
 }

@@ -30,8 +30,8 @@ struct HorizontalActionsBottomModal: View {
 
     init(
         viewModel: HorizontalActionsBottomModalViewModel,
-        mainAction: @escaping () -> Void,
-        dismissAction: @escaping () -> Void = {},
+        mainAction: @escaping @autoclosure () -> Void,
+        dismissAction: @escaping @autoclosure () -> Void = {}(),
         isShowingBottomAlert: Binding<Bool> = Binding<Bool>.constant(false)
     ) {
         self.viewModel = viewModel
@@ -50,7 +50,7 @@ struct HorizontalActionsBottomModal: View {
                         .font(Fontstyle.titleL.base)
                     Text(viewModel.content)
                         .font(Fontstyle.bodyL.base)
-                        .lineSpacing(4)
+                        .lineSpacing(Spacing.extraExtraSmall)
                         .multilineTextAlignment(.center)
                         .padding([.leading, .trailing], Spacing.large)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)

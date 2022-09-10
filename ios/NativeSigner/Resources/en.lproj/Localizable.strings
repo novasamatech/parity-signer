@@ -286,6 +286,7 @@
 "KeySetsModal.Confirmation.Label.Content" = "This Key Set will be removed for all networks. This is not reversible.\nAre you sure?";
 "KeySetsModal.Confirmation.Action.Cancel" = "Cancel";
 "KeySetsModal.Confirmation.Action.Remove" = "Remove";
+"KeySetsModal.Confirmation.Snackbar" = "Key Set Has Been Removed";
 
 "AddKeySet.Title" = "Add Key Set";
 "AddKeySet.Button.Cancel" = "Cancel";
