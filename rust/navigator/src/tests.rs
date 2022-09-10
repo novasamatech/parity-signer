@@ -2783,7 +2783,9 @@ fn flow_test_1() {
                 network_info: MSCNetworkInfo {
                     network_title: "Polkadot".to_string(),
                     network_logo: "polkadot".to_string(),
-                    network_specs_key: "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3".to_string(),
+                    network_specs_key:
+                        "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+                            .to_string(),
                 },
             },
         },
@@ -3521,7 +3523,9 @@ fn flow_test_1() {
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
-                    network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
+                    network_specs_key:
+                        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                            .to_string(),
                 }),
             },
         },
@@ -4143,7 +4147,9 @@ fn flow_test_1() {
                     network_info: MSCNetworkInfo {
                         network_title: "Westend".to_string(),
                         network_logo: "westend".to_string(),
-                        network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
+                        network_specs_key:
+                            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                                .to_string(),
                     },
                 },
                 current_number: "1".to_string(),
@@ -4189,7 +4195,9 @@ fn flow_test_1() {
                     network_info: MSCNetworkInfo {
                         network_title: "Westend".to_string(),
                         network_logo: "westend".to_string(),
-                        network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
+                        network_specs_key:
+                            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                                .to_string(),
                     },
                 },
                 current_number: "2".to_string(),
@@ -4236,7 +4244,9 @@ fn flow_test_1() {
                     network_info: MSCNetworkInfo {
                         network_title: "Westend".to_string(),
                         network_logo: "westend".to_string(),
-                        network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
+                        network_specs_key:
+                            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                                .to_string(),
                     },
                 },
                 current_number: "3".to_string(),
@@ -4464,7 +4474,9 @@ fn flow_test_1() {
                 network_info: MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
-                    network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
+                    network_specs_key:
+                        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                            .to_string(),
                 },
             },
         },
@@ -4790,7 +4802,9 @@ fn flow_test_1() {
                 f: MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
-                    network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
+                    network_specs_key:
+                        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                            .to_string(),
                 },
             },
         },
@@ -5470,7 +5484,9 @@ fn flow_test_1() {
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
-                    network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
+                    network_specs_key:
+                        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                            .to_string(),
                 }),
             },
         },
@@ -5622,7 +5638,9 @@ fn flow_test_1() {
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
-                    network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
+                    network_specs_key:
+                        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                            .to_string(),
                 }),
             },
         },
@@ -6077,7 +6095,9 @@ fn flow_test_1() {
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
-                    network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
+                    network_specs_key:
+                        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                            .to_string(),
                 }),
             },
         },
@@ -6306,7 +6326,9 @@ fn flow_test_1() {
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
-                    network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
+                    network_specs_key:
+                        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                            .to_string(),
                 }),
             },
         },
