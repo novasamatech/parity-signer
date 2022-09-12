@@ -45,7 +45,10 @@ fun SufficientCryptoReady(
 			when (val c = sufficientCrypto.content) {
 				is MscContent.AddSpecs -> Column {
 					Text("Specs")
-					NetworkCard(c.f)
+					NetworkCard(
+						title = c.f.networkTitle,
+						logo = c.f.networkLogo
+					)
 				}
 				is MscContent.LoadMetadata -> Text("Metadata for " + c.name + " with version " + c.version)
 				is MscContent.LoadTypes -> Column {

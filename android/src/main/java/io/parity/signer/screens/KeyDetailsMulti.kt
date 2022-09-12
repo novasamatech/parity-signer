@@ -43,7 +43,10 @@ fun KeyDetailsMulti(
 		Row(
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 		) {
-			NetworkCard(network = keyDetailsMulti.keyDetails.networkInfo)
+			NetworkCard(
+				title = keyDetailsMulti.keyDetails.networkInfo.networkTitle,
+				logo = keyDetailsMulti.keyDetails.networkInfo.networkLogo,
+			)
 		}
 		Image(
 			(keyDetailsMulti.keyDetails.qr).intoImageBitmap(),

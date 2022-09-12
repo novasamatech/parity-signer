@@ -130,6 +130,29 @@ fn qrparser_try_decode_qr_sequence(
     qr_reader_phone::decode_sequence(data, cleaned)
 }
 
+/// Exports secret (private) key as QR code
+///
+/// `public_key` is hex-encoded public key of the key to export. Can be taken from [`MKeyDetails`]
+/// `network_specs_key` is hex-encoded [`NetworkSpecsKey`]. Can be taken from [`MSCNetworkInfo`]
+fn generate_secret_key_qr(
+    dbname: &str,
+    public_key: &str,
+    expected_seed_name: &str,
+    network_specs_key: &str,
+    seed_phrase: &str,
+    key_password: Option<String>,
+) -> Result<MKeyDetails, anyhow::Error> {
+    db_handling::identities::export_secret_key(
+        dbname,
+        public_key,
+        expected_seed_name,
+        network_specs_key,
+        seed_phrase,
+        key_password,
+    )
+    .map_err(Into::into)
+}
+
 /// Checks derivation path for validity and collisions
 ///
 /// Returns struct that has information on collisions, presence of password and validity of path;

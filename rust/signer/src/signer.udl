@@ -550,6 +550,9 @@ namespace signer {
     [Throws=ErrorDisplayed]
     string qrparser_try_decode_qr_sequence([ByRef] string data, boolean cleaned);
 
+    [Throws=ErrorDisplayed]
+    MKeyDetails generate_secret_key_qr([ByRef] string dbname, [ByRef] string public_key, [ByRef] string expected_seed_name, [ByRef] string network_specs_key, [ByRef] string seed_phrase, string? key_password);
+
     DerivationCheck substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
 
     [Throws=ErrorDisplayed]
@@ -742,6 +745,7 @@ dictionary MSCNameVersion {
 dictionary MSCNetworkInfo {
     string network_title;
     string network_logo;
+    string network_specs_key;
 };
 
 dictionary MSCTip {

@@ -51,10 +51,8 @@ fun TransactionCard(card: TransactionCard) {
 			is Card.NameVersionCard -> TCNameVersion(nameVersion = txCard.f)
 			is Card.NetworkGenesisHashCard -> TCGenesisHash(payload = txCard.f)
 			is Card.NetworkInfoCard -> NetworkCard(
-				network = MscNetworkInfo(
-					networkTitle = txCard.f.networkTitle,
-					networkLogo = txCard.f.networkLogo
-				)
+				title = txCard.f.networkTitle,
+				logo = txCard.f.networkLogo
 			)
 			is Card.NetworkNameCard -> TCNetworkName(text = txCard.f)
 			is Card.NewSpecsCard -> TCNewSpecs(specs = txCard.f)
