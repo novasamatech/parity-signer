@@ -54,14 +54,14 @@ fun SignerOldTheme(
 }
 
 private val DarkColorPaletteNew = darkColors(
-	primary = Color(0xFF3996EC),
+	primary = Color(0xFFFFFFFF), // text and icons primary
 	primaryVariant = Color(0xFF000000),
 	secondary = Color(0xFFAEAEAE),
 	secondaryVariant = Color(0xFF343434),
-	background = Color(0xFF111111),
+	background = Color(0xFF101015), //system background
 	surface = Color(0xFF1A1A1B),
 	error = Color(0xFF2F2424),
-	onPrimary = Color(0xFFFEFEFE),
+	onPrimary = Color(0xFF1E1E23),
 	onSecondary = Color(0xFFFEFEFE),
 	onBackground = Color(0xFFFEFEFE),
 	onSurface = Color(0xFFFEFEFE),
@@ -69,15 +69,15 @@ private val DarkColorPaletteNew = darkColors(
 )
 
 private val LightColorPaletteNew = lightColors(
-	primary = Color(0xFF4FA5F5),
+	primary = Color(0xFF000000), // text and icons primary
 	primaryVariant = Color(0xFFFFFFFF),
 	secondary = Color(0xFF8F8E8E),
 	secondaryVariant = Color(0xFF343434),
-	background = Color(0xFFF3F4F5),
+	background = Color(0xFFF3F3F2),//system background
 	surface = Color(0xFFFFFFFF),
 	error = Color(0xFFFFD3D0),
 	onPrimary = Color(0xFF000000),
-	onSecondary = Color(0xFF000000),
+	onSecondary = Color(0xFFFFFFFF),
 	onBackground = Color(0xFF000000),
 	onSurface = Color(0xFF000000),
 	onError = Color(0xFFFF3B30)
@@ -112,3 +112,16 @@ val Colors.fill12: Color
 
 val Colors.fill6: Color
 	get() = if (isLight) Color(0x0F000000) else Color(0x0FFFFFFF)
+
+
+val Colors.backgroundPrimary: Color
+	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF1E1E23)
+
+val Colors.backgroundSecondary: Color
+	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF2C2C30)
+
+val Colors.textSecondary: Color
+	get() = if (isLight) Color(0xA8000000) else Color(0xB0FFFFFF)
+
+val Colors.textTertiary: Color
+	get() = if (isLight) Color(0x73000000) else Color(0x7AFFFFFF)

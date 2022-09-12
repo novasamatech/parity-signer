@@ -36,7 +36,7 @@ fun SufficientCryptoReady(
 				contentScale = ContentScale.FillWidth,
 				modifier = Modifier.fillMaxWidth()
 			)
-			KeyCard(
+			KeyCardOld(
 				identity = sufficientCrypto.authorInfo,
 			)
 			when (val c = sufficientCrypto.content) {

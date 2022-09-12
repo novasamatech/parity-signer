@@ -105,7 +105,7 @@ fun NewAddressScreen(
 				Modifier.fillMaxWidth(1f)
 			) {
 				Text("This key already exists:")
-				KeyCard(identity = it)
+				KeyCardOld(identity = it)
 			}
 		}
 		Spacer(Modifier.height(20.dp))

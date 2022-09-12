@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.components.KeyCard
+import io.parity.signer.components.KeyCardOld
 import io.parity.signer.components.SingleTextInput
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
@@ -46,7 +46,7 @@ fun EnterPassword(
 			modifier = Modifier.padding(20.dp)
 		) {
 			HeaderBar(line1 = "SECRET PATH", line2 = "///password")
-			KeyCard(
+			KeyCardOld(
 				identity = enterPassword.authorInfo
 			)
 			if (enterPassword.counter > 0u) {

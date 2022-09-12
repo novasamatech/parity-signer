@@ -27,7 +27,7 @@ fun NetworkLogoName(logo: String, name: String) {
 	)
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun NetworkLogoName() {
 	NetworkLogoName("Logo", "name")

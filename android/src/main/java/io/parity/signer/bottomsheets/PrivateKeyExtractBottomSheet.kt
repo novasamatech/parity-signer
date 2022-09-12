@@ -11,7 +11,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -20,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import io.parity.signer.R
-import io.parity.signer.components.KeyCard
+import io.parity.signer.components.KeyCardOld
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.EmptyNavigator
@@ -79,7 +78,7 @@ fun PrivateKeyExtractBottomSheet(
 						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 						.clip(plateShape)
 						.border(BorderStroke(1.dp, MaterialTheme.colors.fill12), plateShape)//todo check color
-						.background(MaterialTheme.colors.fill6, plateShape)
+						.background(MaterialTheme.colors.fill12, plateShape)
 				) {
 					Image(
 						if (LocalInspectionMode.current) {
@@ -93,7 +92,7 @@ fun PrivateKeyExtractBottomSheet(
 						modifier = Modifier
 							.clip(RoundedCornerShape(16.dp))
 					)
-					KeyCard(model.address)
+					KeyCardOld(model.address)
 					Spacer(modifier = Modifier.padding(bottom = 4.dp))
 				}
 				Spacer(modifier = Modifier.padding(bottom = 24.dp))

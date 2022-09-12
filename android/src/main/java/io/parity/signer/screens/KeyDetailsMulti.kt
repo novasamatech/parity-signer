@@ -12,7 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import io.parity.signer.components.KeyCard
+import io.parity.signer.components.KeyCardOld
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.intoImageBitmap
@@ -39,7 +39,7 @@ fun KeyDetailsMulti(
 				)
 				.fillMaxWidth()
 		) {
-			KeyCard(identity = keyDetailsMulti.keyDetails.address)
+			KeyCardOld(identity = keyDetailsMulti.keyDetails.address)
 		}
 		Row(
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
