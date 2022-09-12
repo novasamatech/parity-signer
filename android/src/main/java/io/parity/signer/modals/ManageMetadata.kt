@@ -52,10 +52,8 @@ fun ManageMetadata(
 						LazyColumn {
 							items(networks.networks.size) { index ->
 								NetworkCard(
-									network = MscNetworkInfo(
-										networkTitle = networks.networks[index].title,
-										networkLogo = networks.networks[index].logo
-									)
+									title = networks.networks[index].title,
+									logo = networks.networks[index].logo,
 								)
 							}
 						}

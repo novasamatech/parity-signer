@@ -64,10 +64,8 @@ fun SeedBackup(
 					for (pack in derivations) {
 						item {
 							NetworkCard(
-								MscNetworkInfo(
-									networkTitle = pack.networkTitle,
-									networkLogo = pack.networkLogo
-								)
+								title = pack.networkTitle,
+								logo = pack.networkLogo
 							)
 						}
 						val networkDerivations = pack.idSet.sortedBy { it.path }

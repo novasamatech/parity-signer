@@ -32,10 +32,8 @@ fun ManageNetworks(
 				)
 			}) {
 				NetworkCard(
-					network = MscNetworkInfo(
-						networkTitle = thisNetwork.title,
-						networkLogo = thisNetwork.logo
-					)
+					title = thisNetwork.title,
+					logo = thisNetwork.logo
 				)
 			}
 		}

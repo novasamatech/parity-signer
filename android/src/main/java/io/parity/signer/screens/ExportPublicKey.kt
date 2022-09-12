@@ -42,7 +42,8 @@ fun ExportPublicKey(keyDetails: MKeyDetails) {
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 		) {
 			NetworkCard(
-				network = keyDetails.networkInfo
+				title = keyDetails.networkInfo.networkTitle,
+				logo = keyDetails.networkInfo.networkLogo,
 			)
 		}
 		Image(
