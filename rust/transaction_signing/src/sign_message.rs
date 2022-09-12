@@ -236,6 +236,7 @@ pub(crate) fn sufficient_crypto_add_specs(
             f: MSCNetworkInfo {
                 network_title: network_specs_to_send.title,
                 network_logo: network_specs_to_send.logo,
+                network_specs_key: hex::encode(network_specs_key.key()),
             },
         },
     ))

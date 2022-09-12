@@ -71,6 +71,7 @@ use db_handling::{
         reset_danger_status_to_safe,
     },
 };
+use definitions::helpers::multisigner_to_public;
 
 #[cfg(feature = "test")]
 #[test]
@@ -363,6 +364,8 @@ fn export_alice_westend() {
         network_info: MSCNetworkInfo {
             network_title: "Westend".to_string(),
             network_logo: "westend".to_string(),
+            network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                .to_string(),
         },
     };
     assert_eq!(key, expected_key);
@@ -2408,9 +2411,9 @@ fn test_export_secret_key() {
         .unwrap();
     let secret_key = export_secret_key(
         dbname,
-        derivation_multisigner,
+        hex::encode(multisigner_to_public(derivation_multisigner)).as_str(),
         seed_name,
-        &network_id,
+        &hex::encode(network_id.key()),
         ALICE_SEED_PHRASE,
         None,
     )
