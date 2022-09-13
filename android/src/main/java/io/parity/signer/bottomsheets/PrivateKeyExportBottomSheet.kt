@@ -19,8 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import io.parity.signer.R
-import io.parity.signer.components.KeyCardOld
-import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components2.KeyCard
 import io.parity.signer.components2.KeyCardModel
@@ -32,8 +30,8 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.Address
 
 @Composable
-fun PrivateKeyExtractBottomSheet(
-	model: PrivateKeyExtractModel,
+fun PrivateKeyExportBottomSheet(
+	model: PrivateKeyExportModel,
 	navigator: Navigator,
 ) {
 
@@ -90,13 +88,13 @@ fun PrivateKeyExtractBottomSheet(
 	}
 }
 
-class PrivateKeyExtractModel(
+class PrivateKeyExportModel(
 	val qrImage: List<UByte>,
 	val address: Address,
-	val network: NetworkCardModel
+	val network: NetworkCardModel,
 ) {
 	companion object {
-		fun createMock() = PrivateKeyExtractModel(
+		fun createMock(): PrivateKeyExportModel = PrivateKeyExportModel(
 			0u.rangeTo(200u).map { it.toUByte() }.toList(),
 			Address(
 				"base58", "path", true, listOf(0u, 1u),
@@ -110,10 +108,10 @@ class PrivateKeyExtractModel(
 @Preview(name = "day", group = "themes", uiMode = UI_MODE_NIGHT_NO)
 @Preview(name = "dark theme", group = "themes", uiMode = UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
-private fun PrivateKeyExtractBottomSheetPreview() {
+private fun PreviewPrivateKeyExportBottomSheet() {
 	SignerNewTheme {
-		PrivateKeyExtractBottomSheet(
-			model = PrivateKeyExtractModel.createMock(),
+		PrivateKeyExportBottomSheet(
+			model = PrivateKeyExportModel.createMock(),
 			EmptyNavigator()
 		)
 	}

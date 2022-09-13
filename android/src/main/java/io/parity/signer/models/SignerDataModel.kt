@@ -40,6 +40,8 @@ class SignerDataModel : ViewModel() {
 	private lateinit var masterKey: MasterKey
 	private var hasStrongbox: Boolean = false
 
+	val navigator by lazy { SignerNavigator(this) }
+
 	// Alert
 	private val _alertState: MutableLiveData<AlertState> = MutableLiveData(AlertState.None)
 
@@ -302,7 +304,7 @@ class SignerDataModel : ViewModel() {
 			getAlertState()
 			isAirplaneOn()
 			refreshSeedNames(init = true)
-			navigate(Action.START)
+			navigator.navigate(Action.START)
 		}
 	}
 

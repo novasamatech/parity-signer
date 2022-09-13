@@ -12,10 +12,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.models.FeatureFlags
-import io.parity.signer.models.FeatureOption
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.navigate
+import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
@@ -72,7 +69,7 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 		header = "Export Private Key",
 		text = "A private key can be used to sign transactions. This key will be marked as a hot key after export.",
 		back = { confirmExport = false },
-		forward = { signerDataModel.navigate(Action.REMOVE_KEY) }, //TODO dmitry show PrivateKeyExtractBottomSheet
+		forward = { signerDataModel.navigator.navigate(LocalNavAction.ShowExportPrivateKey() }, //TODO dmitry show PrivateKeyExportBottomSheet
 		backText = "Cancel",
 		forwardText = "Export Private Key"
 	)
