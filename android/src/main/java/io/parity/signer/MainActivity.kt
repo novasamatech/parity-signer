@@ -66,6 +66,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		val progress = signerDataModel.progress.observeAsState()
 		val captured = signerDataModel.captured.observeAsState()
 		val total = signerDataModel.total.observeAsState()
+		val localNavAction = signerDataModel.localNavAction.observeAsState()
 
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {
@@ -96,6 +97,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						}
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
+
 							ScreenSelector(
 								screenData = actionResult.value?.screenData
 									?: ScreenData.Documents,//default fallback
@@ -118,6 +120,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								button = signerDataModel::navigate,
 								acknowledgeWarning = signerDataModel::acknowledgeWarning
 							)
+							LocalNavSelector(navAction = localNavAction.value)
 						}
 					}
 				} else {

@@ -83,6 +83,10 @@ class SignerDataModel : ViewModel() {
 		)
 	)
 
+	internal val _localNavigationAction = MutableLiveData<LocalNavAction>(
+		LocalNavAction.None
+	)
+
 	// Data storage locations
 	internal var dbName: String = ""
 	private val keyStore = "AndroidKeyStore"
@@ -103,6 +107,8 @@ class SignerDataModel : ViewModel() {
 	val alertState: LiveData<AlertState> = _alertState
 
 	val actionResult: LiveData<ActionResult> = _actionResult
+
+	val localNavAction: LiveData<LocalNavAction> = _localNavigationAction
 
 	// MARK: init boilerplate begin
 

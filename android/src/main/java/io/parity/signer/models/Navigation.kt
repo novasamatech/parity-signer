@@ -26,7 +26,7 @@ interface Navigator {
 		seedPhrase: String = ""
 	)
 
-	fun navigate(action: LocalNavAction)
+	fun navigate(action: LocalNavRequest)
 }
 
 class SignerNavigator(private val singleton: SignerDataModel): Navigator {
@@ -40,9 +40,9 @@ class SignerNavigator(private val singleton: SignerDataModel): Navigator {
 		}
 	}
 
-	override fun navigate(action: LocalNavAction) {
+	override fun navigate(action: LocalNavRequest) {
 		when (action) {
-			is LocalNavAction.ShowExportPrivateKey -> {
+			is LocalNavRequest.ShowExportPrivateKey -> {
 				// `publicKey`: String, - take from MKeyDetails todo dmitry
 				// `expectedSeedName`: String,
 				// `networkSpecsKey`: String, // - take from MDeriveKey it's speca_key_hex
@@ -53,6 +53,8 @@ class SignerNavigator(private val singleton: SignerDataModel): Navigator {
 					seedPhrase =  action.seedPhrase, keyPassword = action.keyPassword)
 				val viewModel = PrivateKeyExportModel(qrImage = keyDetails.qr,
 					address = keyDetails.address, NetworkCardModel(keyDetails.networkInfo))
+				singleton._localNavigationAction.value = LocalNavAction.ShowExportPrivateKey(
+					viewModel, singleton.navigator)
 			}
 		}
 	}
@@ -63,13 +65,19 @@ class EmptyNavigator : Navigator {
 		//do nothing
 	}
 
-	override fun navigate(action: LocalNavAction) {
+	override fun navigate(action: LocalNavRequest) {
 		//do nothing
 	}
 }
 
 
 sealed class LocalNavAction {
-	class ShowExportPrivateKey(val publicKey: String, val expectedSeedName: String,val networkSpecsKey: String,
-														 val seedPhrase: String,val keyPassword: String? = null): LocalNavAction()
+	object None : LocalNavAction()
+	class ShowExportPrivateKey(val model: PrivateKeyExportModel, val navigator: SignerNavigator): LocalNavAction()
+}
+
+sealed class LocalNavRequest {
+	class ShowExportPrivateKey(val publicKey: String, val expectedSeedName: String,
+														 val networkSpecsKey: String, val seedPhrase: String,
+														 val keyPassword: String? = null): LocalNavRequest()
 }

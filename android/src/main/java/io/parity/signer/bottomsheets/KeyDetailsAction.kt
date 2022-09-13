@@ -69,7 +69,7 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 		header = "Export Private Key",
 		text = "A private key can be used to sign transactions. This key will be marked as a hot key after export.",
 		back = { confirmExport = false },
-		forward = { signerDataModel.navigator.navigate(LocalNavAction.ShowExportPrivateKey() }, //TODO dmitry show PrivateKeyExportBottomSheet
+		forward = { signerDataModel.navigator.navigate(LocalNavRequest.ShowExportPrivateKey()) }, //TODO dmitry show PrivateKeyExportBottomSheet
 		backText = "Cancel",
 		forwardText = "Export Private Key"
 	)

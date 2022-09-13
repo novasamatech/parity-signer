@@ -213,6 +213,17 @@ fun AlertSelector(
 	}
 }
 
+@Composable
+fun LocalNavSelector(navAction: LocalNavAction?) {
+	when (navAction) {
+		is LocalNavAction.ShowExportPrivateKey -> {
+			PrivateKeyExportBottomSheet(model = navAction.model, navigator = navAction.navigator)
+		}
+		LocalNavAction.None -> {}
+		null -> {}
+	}
+}
+
 enum class OnBoardingState {
 	InProgress,
 	No,
