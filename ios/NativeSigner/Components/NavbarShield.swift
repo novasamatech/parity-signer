@@ -11,11 +11,12 @@ import SwiftUI
 struct NavbarShield: View {
     let canaryDead: Bool
     let alert: Bool
-    let navigationRequest: NavigationRequest
+    @ObservedObject var navigation: NavigationCoordinator
+
     var body: some View {
         Button(
             action: {
-                navigationRequest(.init(action: .shield))
+                navigation.perform(navigation: .init(action: .shield))
             },
             label: {
                 if canaryDead {

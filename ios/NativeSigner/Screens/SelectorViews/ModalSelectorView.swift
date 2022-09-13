@@ -13,6 +13,8 @@ struct ModalSelectorView: View {
 
     var body: some View {
         ModalSelector(
+            data: data,
+            navigation: navigation,
             modalData: navigation.actionResult.modalData,
             alert: data.alert,
             alertShow: { data.alertShow = true },
