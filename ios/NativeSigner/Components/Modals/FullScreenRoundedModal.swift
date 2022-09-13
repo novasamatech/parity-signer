@@ -45,7 +45,6 @@ struct FullScreenRoundedModal<Content: View>: View {
                 .cornerRadius(radius: CornerRadius.medium, corners: [.topLeft, .topRight])
         }
         .ignoresSafeArea()
-        .transition(.move(edge: .leading))
     }
 }
 

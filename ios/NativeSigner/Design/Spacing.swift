@@ -21,6 +21,10 @@ enum Spacing {
     static let medium: CGFloat = 16
     /// Large: 24 pts
     static let large: CGFloat = 24
+    /// Extra Large: 32 pts
+    static let extraLarge: CGFloat = 32
+    /// Extra Extra Large: 40 pts
+    static let extraExtraLarge: CGFloat = 40
 }
 
 enum Padding {

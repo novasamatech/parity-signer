@@ -177,7 +177,7 @@ pub const MAIN_COLOR: [u8; 3] = [0x00, 0x00, 0x00];
 
 /// Main color for **dangerous** QR codes (static only, in Signer)
 #[cfg(feature = "signer")]
-pub const MAIN_COLOR_DANGER: [u8; 3] = [0xff, 0x00, 0x00];
+pub const MAIN_COLOR_DANGER: [u8; 3] = [0xfd, 0x49, 0x35];
 
 /// Background color for QR codes (both static and animated ones)
 pub const BACK_COLOR: [u8; 3] = [0xff, 0xff, 0xff];

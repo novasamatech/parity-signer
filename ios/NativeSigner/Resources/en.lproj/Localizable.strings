@@ -296,4 +296,14 @@
 "KeyDetails.Label.Derived" = "Derived keys";
 "KeyDetails.Action.Create" = "Create Derived key";
 
+"KeyScreen.Label.Hotkey" = "This key is marked hot because its root private key has been exported";
+"KeyScreen.Action.Export" = "Export Private Key";
+
+"KeyExportWarning.Label.Header" = "Export Private Key";
+"KeyExportWarning.Label.Content" = "A private key can be used to sign transactions. This key will be marked as a hot key after export.";
+"KeyExportWarning.Action.Export" = "Export Private Key";
+"KeyExportWarning.Action.Cancel" = "Cancel";
+
+"KeyExport.Label.Header" = "Export Private Key";
+"KeyExport.Label.Hide" = "Private Key will be hidden in";
 

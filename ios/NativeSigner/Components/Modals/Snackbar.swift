@@ -78,7 +78,7 @@ extension View {
     }
 }
 
-//struct SnackbarDemo: View {
+// struct SnackbarDemo: View {
 //    @State private var showInfo = false
 //    @State private var showWarning = false
 //
@@ -94,15 +94,15 @@ extension View {
 //            isPresented: $showInfo
 //        )
 //    }
-//}
+// }
 //
 //
-//struct Snackbar_Previews: PreviewProvider {
+// struct Snackbar_Previews: PreviewProvider {
 //    @State private var showOverlay = false
 //
 //    static var previews: some View {
 //        SnackbarDemo()
 //            .preferredColorScheme(.light)
 //    }
-//}
+// }
 //
