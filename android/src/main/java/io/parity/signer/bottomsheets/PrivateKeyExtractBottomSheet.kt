@@ -22,6 +22,8 @@ import io.parity.signer.R
 import io.parity.signer.components.KeyCardOld
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
+import io.parity.signer.components2.KeyCard
+import io.parity.signer.components2.KeyCardModel
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap
@@ -92,7 +94,7 @@ fun PrivateKeyExtractBottomSheet(
 						modifier = Modifier
 							.clip(RoundedCornerShape(16.dp))
 					)
-					KeyCardOld(model.address)
+					KeyCard(KeyCardModel.fromAddress(model.address, model.network.networkTitle))
 					Spacer(modifier = Modifier.padding(bottom = 4.dp))
 				}
 				Spacer(modifier = Modifier.padding(bottom = 24.dp))

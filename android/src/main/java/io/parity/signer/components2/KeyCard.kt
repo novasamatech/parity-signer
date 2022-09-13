@@ -21,6 +21,7 @@ import io.parity.signer.components.Identicon
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Address
+import io.parity.signer.uniffi.MKeyDetails
 
 
 @Composable
@@ -31,6 +32,7 @@ fun KeyCard(model: KeyCardModel) {
 		modifier = Modifier
 			.padding(8.dp)
 	) {
+
 		Box(contentAlignment = Alignment.BottomEnd) {
 			Identicon(model.identIcon)
 			model.multiselect?.let {
@@ -51,6 +53,11 @@ fun KeyCard(model: KeyCardModel) {
 		}
 		Spacer(modifier = Modifier.width(10.dp))
 		Column {
+			Text(
+				model.network,
+				color = MaterialTheme.colors.textSecondary,
+				style = MaterialTheme.typography.subtitle2
+			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically
 			) {
@@ -73,23 +80,34 @@ fun KeyCard(model: KeyCardModel) {
 					Icon(
 						Icons.Default.Lock,
 						contentDescription = "Locked account",
-						tint = MaterialTheme.colors.primary,)
+						tint = MaterialTheme.colors.primary,
+					)
 				}
 			}
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier.clickable { expanded.value = !expanded.value }
 			) {
-				Text(
-					if (expanded.value) model.base58 else model.base58.abbreviateString(8),
-					color = MaterialTheme.colors.textTertiary,
-					style = CryptoTypography.body2
-				)
-				if (!expanded.value) {
-					Icon(imageVector = Icons.Default.KeyboardArrowDown,
-						modifier = Modifier.padding(start = 10.dp),
+				if (expanded.value) {
+					Text(
+						model.base58,
+						color = MaterialTheme.colors.textTertiary,
+						style = CryptoTypography.body2
+					)
+					Icon(
+						imageVector = Icons.Default.KeyboardArrowDown,
+						modifier = Modifier
+							.padding(start = 10.dp)
+							.size(24.dp),
 						contentDescription = "expand icon",
 						tint = MaterialTheme.colors.textSecondary
+					)
+				} else {
+					Text(
+						model.base58.abbreviateString(8),
+						color = MaterialTheme.colors.textTertiary,
+						style = CryptoTypography.body2,
+						maxLines = 1,
 					)
 				}
 			}
@@ -98,6 +116,7 @@ fun KeyCard(model: KeyCardModel) {
 }
 
 data class KeyCardModel(
+	val network: String,
 	val base58: String,
 	val path: String,
 	val hasPwd: Boolean,
@@ -106,16 +125,19 @@ data class KeyCardModel(
 	val multiselect: Boolean?,
 ) {
 	companion object {
-		fun fromAddress(address: Address): KeyCardModel = KeyCardModel(
-			base58 = address.base58,
-			path = address.path,
-			hasPwd = address.hasPwd,
-			identIcon = address.identicon,
-			seedName = address.seedName,
-			multiselect = address.multiselect,
-		)
+		fun fromAddress(address: Address, networkTitle: String): KeyCardModel =
+			KeyCardModel(
+				network = networkTitle, //keyDetails.networkInfo.networkTitle, todo dmitry update according to data model
+				base58 = address.base58,
+				path = address.path,
+				hasPwd = address.hasPwd,
+				identIcon = address.identicon,
+				seedName = address.seedName,
+				multiselect = address.multiselect,
+			)
 
 		fun createStub() = KeyCardModel(
+			network = "polkadot",
 			base58 = "kg;dlfgopdifopbcvjblkcvjpiobjvlkjvlkbjnlkfd",
 			path = "path long path",
 			hasPwd = false,
@@ -127,7 +149,7 @@ data class KeyCardModel(
 }
 
 
-@Preview
+@Preview(backgroundColor = 0xFFFFFFFF)
 @Composable
 private fun PreviewKeyCard2() {
 	SignerNewTheme() {
