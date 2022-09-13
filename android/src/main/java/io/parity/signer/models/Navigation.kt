@@ -22,6 +22,8 @@ interface Navigator {
 		details: String = "",
 		seedPhrase: String = ""
 	)
+
+	fun navigate(action: LocalNavigationAction)
 }
 
 class SignerNavigator(private val singleton: SignerDataModel): Navigator {
@@ -34,10 +36,22 @@ class SignerNavigator(private val singleton: SignerDataModel): Navigator {
 			Toast.makeText(singleton.context, e.toString(), Toast.LENGTH_SHORT).show()
 		}
 	}
+
+	override fun navigate(action: LocalNavigationAction) {
+	}
 }
 
 class EmptyNavigator : Navigator {
 	override fun navigate(button: Action, details: String, seedPhrase: String) {
 		//do nothing
 	}
+
+	override fun navigate(action: LocalNavigationAction) {
+		//do nothing
+	}
+}
+
+
+sealed class LocalNavigationAction {
+	class ShowExportPrivateKey(hash: String): LocalNavigationAction()
 }
