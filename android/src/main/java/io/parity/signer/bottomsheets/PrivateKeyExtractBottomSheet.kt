@@ -69,17 +69,12 @@ fun PrivateKeyExtractBottomSheet(
 				) {
 					NetworkCard(network = model.network)
 				}
-//				Surface(
-//					shape = RoundedCornerShape(16.dp, 16.dp, 16.dp, 16.dp),
-//					border = BorderStroke(1.dp, Color(0x1FFFFFFF)),//todo dmitry export color
-//					modifier = Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-//				) {
 				val plateShape = RoundedCornerShape(16.dp, 16.dp, 16.dp, 16.dp)
 				Column(
 					modifier = Modifier
 						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 						.clip(plateShape)
-						.border(BorderStroke(1.dp, MaterialTheme.colors.fill12), plateShape)//todo check color
+						.border(BorderStroke(1.dp, MaterialTheme.colors.fill12), plateShape)
 						.background(MaterialTheme.colors.fill12, plateShape)
 				) {
 					Image(
