@@ -304,6 +304,6 @@
 "KeyExportWarning.Action.Export" = "Export Private Key";
 "KeyExportWarning.Action.Cancel" = "Cancel";
 
-"KeyExport.Label.Header" = "Private Key";
+"KeyExport.Label.Header" = "Export Private Key";
 "KeyExport.Label.Hide" = "Private Key will be hidden in";
 

@@ -20,8 +20,8 @@ struct ExportPrivateKeyModal: View {
         static let compactDeviceWidth: CGFloat = 320
         static let qrCodeWidthForSmallDevices: CGFloat = 216
         static let qrCodeWidthForStandardDevices: CGFloat = 232
-
     }
+
     @State private var animateBackground: Bool = false
     @State private var showFullAddress: Bool = false
 
@@ -48,17 +48,24 @@ struct ExportPrivateKeyModal: View {
                     .padding([.leading], Spacing.large)
                     .padding([.trailing], Spacing.medium)
                     // QR Code container
-                    VStack {
+                    VStack(spacing: 0) {
                         // QR Code
                         ZStack {
-
                             Image(uiImage: UIImage(data: Data(viewModel.qrCode)) ?? UIImage())
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(minWidth: Constants.qrCodeWidthForSmallDevices, idealWidth: Constants.qrCodeWidthForStandardDevices, maxWidth: Constants.qrCodeWidthForStandardDevices, alignment: .center)
+                                .frame(
+                                    minWidth: Constants.qrCodeWidthForSmallDevices,
+                                    idealWidth: Constants.qrCodeWidthForStandardDevices,
+                                    maxWidth: Constants.qrCodeWidthForStandardDevices,
+                                    alignment: .center
+                                )
                         }
                         .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(UIScreen.main.bounds.width == Constants.compactDeviceWidth ? Spacing.large : Spacing.extraExtraLarge)
+                        .padding(
+                            UIScreen.main.bounds.width == Constants.compactDeviceWidth ? Spacing.large : Spacing
+                                .extraExtraLarge
+                        )
                         .background(.white)
                         .cornerRadius(CornerRadius.medium)
 
@@ -95,7 +102,7 @@ struct ExportPrivateKeyModal: View {
                             }
                         }
                         .padding([.leading, .trailing], Spacing.medium)
-                        .padding([.top, .bottom], Spacing.small)
+                        .padding([.top, .bottom], Spacing.medium)
                         .fixedSize(horizontal: false, vertical: true)
                     }
                     .fixedSize(horizontal: false, vertical: true)
@@ -151,8 +158,8 @@ private struct ExportPrivateKeyAddressFooter: View {
         .padding([.top, .bottom], Spacing.extraSmall)
     }
 }
-//
-//struct ExportPrivateKeyModal_Previews: PreviewProvider {
+
+// struct ExportPrivateKeyModal_Previews: PreviewProvider {
 //    static var previews: some View {
 //        Group {
 //            VStack {
@@ -187,4 +194,4 @@ private struct ExportPrivateKeyAddressFooter: View {
 //            .preferredColorScheme(.dark)
 //        }
 //    }
-//}
+// }
