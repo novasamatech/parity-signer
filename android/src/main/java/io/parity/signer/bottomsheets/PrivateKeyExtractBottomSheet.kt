@@ -57,17 +57,9 @@ fun PrivateKeyExtractBottomSheet(
 				Row(
 					Modifier
 						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-						.background(
-							MaterialTheme.colors.Bg200
-						)
 						.fillMaxWidth()
 				) {
-					Text("Export Private Key")
-				}
-				Row(
-					Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-				) {
-					NetworkCard(network = model.network)
+					Text(text = "Export Private Key")
 				}
 				val plateShape = RoundedCornerShape(16.dp, 16.dp, 16.dp, 16.dp)
 				Column(
