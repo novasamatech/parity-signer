@@ -394,6 +394,7 @@ where
     let network_info = MSCNetworkInfo {
         network_title: network_specs.title,
         network_logo: network_specs.logo,
+        network_specs_key: hex::encode(network_specs_key.key()),
     };
 
     Ok(MKeyDetails {

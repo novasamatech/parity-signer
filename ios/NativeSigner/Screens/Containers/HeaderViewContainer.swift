@@ -20,9 +20,7 @@ struct HeaderViewContainer: View {
             alert: data.alert,
             canaryDead: data.canaryDead,
             alertShow: { data.alertShow = true },
-            navigationRequest: { navigationRequest in
-                navigation.perform(navigation: navigationRequest)
-            }
+            navigation: navigation
         )
     }
 }

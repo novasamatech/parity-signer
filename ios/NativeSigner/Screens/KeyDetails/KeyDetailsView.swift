@@ -8,18 +8,24 @@
 import SwiftUI
 
 struct KeyDetailsView: View {
+    @State private var isShowingActionSheet = false
+    @State private var isShowingRemoveConfirmation: Bool = false
     @ObservedObject private var navigation: NavigationCoordinator
+
     private let alertClosure: (() -> Void)?
     private let viewModel: KeyDetailsViewModel
     private let actionModel: KeyDetailsActionModel
+    private let forgetKeyActionHandler: ForgetKeySetAction
 
     init(
         navigation: NavigationCoordinator,
+        forgetKeyActionHandler: ForgetKeySetAction,
         viewModel: KeyDetailsViewModel,
         actionModel: KeyDetailsActionModel,
         alertClosure: (() -> Void)? = nil
     ) {
         self.navigation = navigation
+        self.forgetKeyActionHandler = forgetKeyActionHandler
         self.viewModel = viewModel
         self.actionModel = actionModel
         self.alertClosure = alertClosure
@@ -34,7 +40,10 @@ struct KeyDetailsView: View {
                     viewModel: .init(
                         isBackButtonVisible: true,
                         isRightBarMenuButtonVisible: true
-                    )
+                    ),
+                    actionModel: .init(rightBarMenuAction: {
+                        isShowingActionSheet.toggle()
+                    })
                 )
                 // Main key cell
                 HStack {
@@ -49,8 +58,10 @@ struct KeyDetailsView: View {
                     }
                     Spacer().frame(maxWidth: .infinity)
                     Asset.chevronRight.swiftUIImage
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                 }
                 .padding(Padding.detailsCell)
+                .contentShape(Rectangle())
                 .onTapGesture {
                     navigation.perform(navigation: actionModel.addressKeyNavigation)
                 }
@@ -79,6 +90,7 @@ struct KeyDetailsView: View {
                             .listRowBackground(Asset.backgroundSystem.swiftUIColor)
                             .listRowSeparator(.hidden)
                             .listRowInsets(EdgeInsets())
+                            .contentShape(Rectangle())
                             .onTapGesture {
                                 navigation.perform(navigation: deriveKey.actionModel.tapAction)
                             }
@@ -103,6 +115,26 @@ struct KeyDetailsView: View {
                 text: Localizable.KeyDetails.Action.create.key
             )
             .padding(Spacing.large)
+        }
+        .fullScreenCover(isPresented: $isShowingActionSheet) {
+            KeyDetailsActionsModal(
+                isShowingActionSheet: $isShowingActionSheet,
+                isShowingRemoveConfirmation: $isShowingRemoveConfirmation,
+                navigation: navigation
+            )
+            .clearModalBackground()
+        }
+        .fullScreenCover(isPresented: $isShowingRemoveConfirmation) {
+            HorizontalActionsBottomModal(
+                viewModel: .forgetKeySet,
+                mainAction: forgetKeyActionHandler.forgetKeySet(actionModel.removeSeed),
+                // We need to fake right button action here or Rust machine will break
+                // In old UI, if you dismiss equivalent of this modal, underlying modal would still be there,
+                // so we need to inform Rust we actually hid it
+                dismissAction: navigation.perform(navigation: .init(action: .rightButtonAction), skipDebounce: true),
+                isShowingBottomAlert: $isShowingRemoveConfirmation
+            )
+            .clearModalBackground()
         }
     }
 }

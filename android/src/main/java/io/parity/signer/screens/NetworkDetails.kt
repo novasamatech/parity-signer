@@ -22,10 +22,8 @@ fun NetworkDetails(
 ) {
 	Column {
 		NetworkCard(
-			network = MscNetworkInfo(
-				networkTitle = networkDetails.title,
-				networkLogo = networkDetails.logo
-			)
+			title = networkDetails.title,
+			logo = networkDetails.logo
 		)
 
 		Row {

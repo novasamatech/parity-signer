@@ -10,6 +10,8 @@ import SwiftUI
 struct AuthenticatedScreenContainer: View {
     @ObservedObject var data: SignerDataModel
     @ObservedObject var navigation: NavigationCoordinator
+
+    @StateObject var snackBarPresentation = ServiceLocator.bottomSnackbarPresentation
     @GestureState private var dragOffset = CGSize.zero
 
     var body: some View {
@@ -61,6 +63,8 @@ struct AuthenticatedScreenContainer: View {
                 }
             }
         )
+        .environmentObject(snackBarPresentation)
         .alert(Localizable.navigationError.text, isPresented: $data.parsingAlert, actions: {})
+        .bottomSnackbar(snackBarPresentation.viewModel, isPresented: $snackBarPresentation.isSnackbarPresented)
     }
 }

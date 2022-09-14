@@ -50,6 +50,11 @@ final class NavigationCoordinator: ObservableObject {
     /// This will enable to slowly move into proper view hierachy in newer screens and then update navigation
     var shouldSkipInjectedViews: Bool = false
 
+    /// Stores currently selected Key Set Details
+    ///
+    /// This is a temporary fix that should be removed after introduction of Rust API
+    @Published var currentKeyDetails: MKeyDetails!
+
     init(
         backendActionPerformer: BackendNavigationPerforming = BackendNavigationAdapter(),
         debounceQueue: Dispatching = DispatchQueue(label: Constants.queueLabel)
@@ -60,35 +65,60 @@ final class NavigationCoordinator: ObservableObject {
 }
 
 extension NavigationCoordinator {
-    func perform(navigation: Navigation) {
+    func perform(navigation: Navigation, skipDebounce: Bool = false) {
         guard isActionAvailable else { return }
+        defer { handleDebounce(skipDebounce) }
 
         isActionAvailable = false
 
-        if let actionResult = backendActionPerformer.performBackend(
+        guard let actionResult = backendActionPerformer.performBackend(
             action: navigation.action,
             details: navigation.details,
             seedPhrase: navigation.seedPhrase
-        ) {
-            var updatedShouldSkipInjectedViews: Bool
-            switch actionResult.screenData {
-            case .seedSelector,
-                 .keys:
-                updatedShouldSkipInjectedViews = true
-            default:
-                updatedShouldSkipInjectedViews = false
-            }
-            if updatedShouldSkipInjectedViews != shouldSkipInjectedViews {
-                shouldSkipInjectedViews = updatedShouldSkipInjectedViews
-            }
-            self.actionResult = actionResult
-            if let tab = Tab(actionResult.footerButton), tab != selectedTab {
-                selectedTab = tab
-            }
-        }
+        ) else { return }
 
-        debounceQueue.asyncAfter(deadline: .now() + Constants.debounceTime, flags: .barrier) {
-            self.isActionAvailable = true
+        updateIntermediateNavigation(actionResult)
+        updateIntermediateDataModels(actionResult)
+        self.actionResult = actionResult
+        updateTabBar()
+    }
+}
+
+private extension NavigationCoordinator {
+    func updateIntermediateNavigation(_ actionResult: ActionResult) {
+        var updatedShouldSkipInjectedViews: Bool
+        switch actionResult.screenData {
+        case .seedSelector, // Main `Keys` screen
+             .keys: // `Key Details` screen
+            updatedShouldSkipInjectedViews = true
+        default:
+            updatedShouldSkipInjectedViews = false
+        }
+        if updatedShouldSkipInjectedViews != shouldSkipInjectedViews {
+            shouldSkipInjectedViews = updatedShouldSkipInjectedViews
+        }
+    }
+
+    func updateIntermediateDataModels(_ actionResult: ActionResult) {
+        // Used temporarly in Export Private Key flow. To be removed
+        if case let .keyDetails(keyDetails) = actionResult.screenData {
+            currentKeyDetails = keyDetails
+        }
+    }
+
+    func updateTabBar() {
+        guard let tab = Tab(actionResult.footerButton), tab != selectedTab else { return }
+        selectedTab = tab
+    }
+
+    func handleDebounce(_ skipDebounce: Bool) {
+        guard !isActionAvailable else { return }
+        if skipDebounce {
+            isActionAvailable = true
+        } else {
+            debounceQueue.asyncAfter(deadline: .now() + Constants.debounceTime, flags: .barrier) {
+                self.isActionAvailable = true
+            }
         }
     }
 }

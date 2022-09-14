@@ -14,7 +14,7 @@ struct MenuButtonStyle: ButtonStyle {
         configuration.label
             .padding(Spacing.none)
             .foregroundColor(foregroundColor)
-            .font(Fontstyle.button.base)
+            .font(Fontstyle.labelL.base)
             .frame(height: Heights.menuButton, alignment: .leading)
     }
 }
@@ -45,9 +45,12 @@ struct MenuButton: View {
         Button(action: action) {
             HStack(alignment: .center, spacing: Spacing.medium) {
                 icon
-                    .padding(10)
+                    .frame(width: Sizes.actionSheetIcon, alignment: .center)
+                    .padding(Spacing.extraSmall)
                 Text(text)
+                Spacer()
             }
+            .frame(maxWidth: .infinity)
         }
         .buttonStyle(MenuButtonStyle(foregroundColor: foregroundColor))
         .disabled(isDisabled)

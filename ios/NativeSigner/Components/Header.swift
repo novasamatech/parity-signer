@@ -15,7 +15,8 @@ struct Header: View {
     let alert: Bool
     let canaryDead: Bool
     let alertShow: () -> Void
-    let navigationRequest: NavigationRequest
+    @ObservedObject var navigation: NavigationCoordinator
+
     var body: some View {
         VStack {
             Spacer()
@@ -24,7 +25,9 @@ struct Header: View {
                     if back {
                         Button(
                             action: {
-                                navigationRequest(.init(action: .goBack))
+                                navigation.perform(navigation: .init(action: .goBack))
+                                // Temporar fix for Private Key Export - clears intermediate state for Key Details
+                                navigation.currentKeyDetails = nil
                             },
                             label: {
                                 Image(
@@ -47,7 +50,7 @@ struct Header: View {
                 if rightButton == .multiSelect {
                     Button(
                         action: {
-                            navigationRequest(.init(action: .selectAll))
+                            navigation.perform(navigation: .init(action: .selectAll))
                         },
                         label: {
                             SmallButton(text: Localizable.selectAll.key)
@@ -59,7 +62,7 @@ struct Header: View {
                     Spacer()
                     Button(
                         action: {
-                            navigationRequest(.init(action: .rightButtonAction))
+                            navigation.perform(navigation: .init(action: .rightButtonAction))
                         },
                         label: {
                             switch rightButton {
@@ -85,7 +88,7 @@ struct Header: View {
                     NavbarShield(
                         canaryDead: canaryDead,
                         alert: alert,
-                        navigationRequest: navigationRequest
+                        navigation: navigation
                     )
                 }
                 .frame(width: 72.0)

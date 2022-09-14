@@ -17,6 +17,8 @@ struct KeyDetailsActionModel {
     let createDerivedKey: Navigation = .init(action: .newKey)
     /// Optional alert closure when tapping on `Create Derived Key`
     let alertClosure: (() -> Void)?
+    /// Name of seed to be removed with `Remove Seed` action
+    let removeSeed: String
 }
 
 extension KeyDetailsActionModel {
@@ -26,5 +28,6 @@ extension KeyDetailsActionModel {
             .sorted(by: { $0.path < $1.path })
             .map { .init(action: .selectKey, details: $0.addressKey) }
         alertClosure = alert ? alertShow : nil
+        removeSeed = keys.root.seedName
     }
 }

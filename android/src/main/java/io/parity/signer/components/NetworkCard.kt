@@ -15,7 +15,7 @@ import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.MscNetworkInfo
 
 @Composable
-fun NetworkCard(network: MscNetworkInfo, selected: Boolean = false) {
+fun NetworkCard(title: String, logo: String, selected: Boolean = false) {
 	Surface(
 		shape = MaterialTheme.shapes.large,
 		color = MaterialTheme.colors.Bg200,
@@ -28,8 +28,8 @@ fun NetworkCard(network: MscNetworkInfo, selected: Boolean = false) {
 				.padding(horizontal = 20.dp)
 		) {
 			NetworkLogoName(
-				logo = network.networkLogo,
-				name = network.networkTitle,
+				logo = logo,
+				name = title,
 			)
 			Spacer(Modifier.weight(1f))
 			if (selected) {

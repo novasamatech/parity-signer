@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ModalSelector: View {
+    @ObservedObject var data: SignerDataModel
+    @ObservedObject var navigation: NavigationCoordinator
     let modalData: ModalData?
     let alert: Bool
     let alertShow: () -> Void
@@ -23,14 +25,6 @@ struct ModalSelector: View {
         case let .networkSelector(value):
             NetworkManager(
                 content: value,
-                navigationRequest: navigationRequest
-            )
-        case let .seedMenu(value):
-            SeedMenu(
-                content: value,
-                alert: alert,
-                alertShow: alertShow,
-                removeSeed: removeSeed,
                 navigationRequest: navigationRequest
             )
         case let .backup(value):
@@ -73,7 +67,8 @@ struct ModalSelector: View {
             SufficientCryptoReady(content: value)
         case .keyDetailsAction:
             KeyMenu(
-                navigationRequest: navigationRequest
+                exportKeyService: ExportPrivateKeyService(seedsMediator: data.seedsMediator),
+                navigation: navigation
             )
         case let .typesInfo(value):
             TypesMenu(
@@ -96,7 +91,10 @@ struct ModalSelector: View {
                 sign: sign,
                 navigationRequest: navigationRequest
             )
+        // Handled in native navigation
         case .newSeedMenu:
+            EmptyView()
+        case .seedMenu:
             EmptyView()
         case nil:
             EmptyView()

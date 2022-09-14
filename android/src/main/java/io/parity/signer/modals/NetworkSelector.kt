@@ -58,10 +58,8 @@ fun NetworkSelector(
 								)
 							}) {
 								NetworkCard(
-									network = MscNetworkInfo(
-										networkTitle = networks[item].title,
-										networkLogo = networks[item].logo
-									),
+									title = networks[item].title,
+									logo = networks[item].logo,
 									selected = networks[item].selected
 								)
 							}

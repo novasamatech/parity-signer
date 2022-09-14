@@ -10,34 +10,28 @@ import SwiftUI
 struct EmptyButton: View {
     private let action: () -> Void
     private let text: LocalizedStringKey
-    private let foregroundColor: Color
-    @State var isDisabled: Bool
+    private let style: ActionButtonStyle
 
     init(
         action: @escaping () -> Void,
         text: LocalizedStringKey,
-        isDisabled: Bool = false,
-        foregroundColor: Color = Asset.textAndIconsPrimary.swiftUIColor
+        style: ActionButtonStyle = .emptyPrimary()
     ) {
         self.action = action
         self.text = text
-        self.isDisabled = isDisabled
-        self.foregroundColor = foregroundColor
+        self.style = style
     }
 
     var body: some View {
         ActionButton(
-            action: action,
+            action: action(),
             text: text,
-            style: ActionButtonStyle(
-                backgroundColor: .clear,
-                foregroundColor: foregroundColor
-            ),
-            isDisabled: $isDisabled
+            style: style
         )
     }
 }
 
+//
 // struct EmptyButton_Previews: PreviewProvider {
 //    static var previews: some View {
 //        VStack(alignment: .center, spacing: 10) {
@@ -56,13 +50,13 @@ struct EmptyButton: View {
 //            EmptyButton(
 //                action: {},
 //                text: "Short Title",
-//                isDisabled: true
+//                style: .emptyPrimary(isDisabled: Binding<Bool>.constant(true))
 //            )
 //            .padding(10)
 //            EmptyButton(
 //                action: {},
 //                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-//                isDisabled: true
+//                style: .emptyPrimary(isDisabled: Binding<Bool>.constant(true))
 //            )
 //            .padding(10)
 //        }
@@ -84,13 +78,13 @@ struct EmptyButton: View {
 //            EmptyButton(
 //                action: {},
 //                text: "Short Title",
-//                isDisabled: true
+//                style: .emptyPrimary(isDisabled: Binding<Bool>.constant(true))
 //            )
 //            .padding(10)
 //            EmptyButton(
 //                action: {},
 //                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-//                isDisabled: true
+//                style: .emptyPrimary(isDisabled: Binding<Bool>.constant(true))
 //            )
 //            .padding(10)
 //        }

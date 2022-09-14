@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ScreenSelector: View {
+    @ObservedObject var data: SignerDataModel
     @ObservedObject var navigation: NavigationCoordinator
     let screenData: ScreenData
     let alert: Bool
@@ -32,6 +33,7 @@ struct ScreenSelector: View {
         case let .keys(value):
             KeyDetailsView(
                 navigation: navigation,
+                forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation, seedsMediator: data.seedsMediator),
                 viewModel: KeyDetailsViewModel(value),
                 actionModel: KeyDetailsActionModel(value, alert: alert, alertShow: alertShow)
             )
