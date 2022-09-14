@@ -2,11 +2,14 @@ package io.parity.signer.models
 
 import android.util.Log
 import android.widget.Toast
+import io.parity.signer.BuildConfig
 import io.parity.signer.bottomsheets.PrivateKeyExportModel
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.ScreenData
 import io.parity.signer.uniffi.backendAction
 import io.parity.signer.uniffi.generateSecretKeyQr
+import java.lang.RuntimeException
 
 
 @Deprecated("obsolete, for backwards compatibility, use SignerNavigator class")
@@ -33,7 +36,12 @@ class SignerNavigator(private val singleton: SignerDataModel): Navigator {
 
 	override fun navigate(button: Action, details: String, seedPhrase: String) {
 		try {
-			singleton._actionResult.value = backendAction(button, details, seedPhrase)
+			val navigationAction = backendAction(button, details, seedPhrase)
+			//Workaround while Rust state machine is keeping state inside as it's needed for exporting private key in different screen
+			if (navigationAction?.screenData is ScreenData.KeyDetails) {
+				singleton.lastOpenedKeyDetails = (navigationAction.screenData as ScreenData.KeyDetails).f
+			}
+			singleton._actionResult.value = navigationAction
 		} catch (e: java.lang.Exception) {
 			Log.e("Navigation error", e.toString())
 			Toast.makeText(singleton.context, e.toString(), Toast.LENGTH_SHORT).show()
@@ -47,12 +55,22 @@ class SignerNavigator(private val singleton: SignerDataModel): Navigator {
 				// `expectedSeedName`: String,
 				// `networkSpecsKey`: String, // - take from MDeriveKey it's speca_key_hex
 				// `seedPhrase`: String,
-				// `keyPassword`: String?
-				val keyDetails = generateSecretKeyQr(dbname = singleton.dbName, publicKey = action.publicKey,
-					expectedSeedName = action.expectedSeedName, networkSpecsKey = action.networkSpecsKey,
-					seedPhrase =  action.seedPhrase, keyPassword = action.keyPassword)
-				val viewModel = PrivateKeyExportModel(qrImage = keyDetails.qr,
-					address = keyDetails.address, NetworkCardModel(keyDetails.networkInfo))
+				// `keyPassword`:
+
+				val keyDetails = singleton.lastOpenedKeyDetails
+				if (keyDetails == null || keyDetails.pubkey != action.publicKey) {
+					Toast.makeText(singleton.context, "Invalid navigation state - cannot export key. You should never see it. ${keyDetails == null}",
+						Toast.LENGTH_LONG).show()
+					if (BuildConfig.DEBUG) throw RuntimeException("Invalid navigation state - cannot export key. You should never see it. ${keyDetails == null}")
+					return
+				}
+				//password only from
+				val secretKeyDetailsQR = generateSecretKeyQr(dbname = singleton.dbName,
+					publicKey = action.publicKey, expectedSeedName = keyDetails.address.seedName,
+					networkSpecsKey = keyDetails.networkInfo.networkSpecsKey,
+					seedPhrase = singleton.getSeed(keyDetails.address.seedName), keyPassword = null)
+				val viewModel = PrivateKeyExportModel(qrImage = secretKeyDetailsQR.qr,
+					address = secretKeyDetailsQR.address, NetworkCardModel(secretKeyDetailsQR.networkInfo))
 				singleton._localNavigationAction.value = LocalNavAction.ShowExportPrivateKey(
 					viewModel, singleton.navigator)
 			}
@@ -77,7 +95,5 @@ sealed class LocalNavAction {
 }
 
 sealed class LocalNavRequest {
-	class ShowExportPrivateKey(val publicKey: String, val expectedSeedName: String,
-														 val networkSpecsKey: String, val seedPhrase: String,
-														 val keyPassword: String? = null): LocalNavRequest()
+	class ShowExportPrivateKey(val publicKey: String): LocalNavRequest()
 }

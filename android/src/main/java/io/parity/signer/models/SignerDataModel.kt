@@ -45,6 +45,9 @@ class SignerDataModel : ViewModel() {
 	// Alert
 	private val _alertState: MutableLiveData<AlertState> = MutableLiveData(AlertState.None)
 
+	// Current key details, after rust API will migrate to REST-like should not store this value here.
+	internal var lastOpenedKeyDetails: MKeyDetails? = null
+
 	// State of the app being unlocked
 	private val _authenticated = MutableLiveData(false)
 

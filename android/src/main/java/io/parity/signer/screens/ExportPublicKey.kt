@@ -22,6 +22,9 @@ import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.MKeyDetails
 
+/**
+ * Other name is Key Details screen
+ */
 @Composable
 fun ExportPublicKey(keyDetails: MKeyDetails) {
 	Column(

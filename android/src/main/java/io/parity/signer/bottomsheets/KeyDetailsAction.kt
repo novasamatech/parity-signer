@@ -22,9 +22,9 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 	var confirmForget by remember { mutableStateOf(false) }
 	var confirmExport by remember { mutableStateOf(false) }
 
-	Column (
+	Column(
 		Modifier.clickable { signerDataModel.navigate(Action.GO_BACK) }
-		) {
+	) {
 		Spacer(Modifier.weight(1f))
 		Surface(
 			color = MaterialTheme.colors.Bg000,
@@ -35,14 +35,17 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 			) {
 				HeaderBar(line1 = "KEY MENU", line2 = "Select action")
 				if (FeatureFlags.isEnabled(FeatureOption.EXPORT_SECRET_KEY)) {
-					BigButton(
-						text = "Export Private Key",
-						isShaded = true,
-						isDangerous = false,
-						action = {
-							confirmExport = true
-						}
-					)
+					// Don't show `Export Private Key` if intermediate state is broken or when key is password protected
+					if (signerDataModel.lastOpenedKeyDetails?.address?.hasPwd == false) {
+						BigButton(
+							text = "Export Private Key",
+							isShaded = true,
+							isDangerous = false,
+							action = {
+								confirmExport = true
+							}
+						)
+					}
 				}
 				BigButton(
 					text = "Forget this key forever",
@@ -69,7 +72,11 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 		header = "Export Private Key",
 		text = "A private key can be used to sign transactions. This key will be marked as a hot key after export.",
 		back = { confirmExport = false },
-		forward = { signerDataModel.navigator.navigate(LocalNavRequest.ShowExportPrivateKey()) }, //TODO dmitry show PrivateKeyExportBottomSheet
+		forward = {
+			signerDataModel.navigator.navigate(
+				LocalNavRequest.ShowExportPrivateKey(signerDataModel.lastOpenedKeyDetails!!.pubkey)
+			)
+		},
 		backText = "Cancel",
 		forwardText = "Export Private Key"
 	)
