@@ -296,6 +296,10 @@
 "KeyDetails.Label.Derived" = "Derived keys";
 "KeyDetails.Action.Create" = "Create Derived key";
 
+"PublicKeyDetails.Label.Title" = "Public Key";
+"PublicKeyDetails.Label.Subtitle" = "Derived Key";
+"PublicKeyDetails.Label.Keys" = "%@ Keys";
+
 "KeyScreen.Label.Hotkey" = "This key is marked hot because its root private key has been exported";
 "KeyScreen.Action.Export" = "Export Private Key";
 

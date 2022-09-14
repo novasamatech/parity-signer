@@ -62,7 +62,10 @@ struct ScreenSelector: View {
                 viewModel: KeySetListViewModelBuilder().build(for: value)
             )
         case let .keyDetails(value):
-            ExportAddress(content: value)
+            KeyDetailsPublicKeyView(
+                navigation: navigation,
+                viewModel: KeyDetailsPublicKeyViewModel(value)
+            )
         case let .newSeed(value):
             NewSeedScreen(
                 content: value,

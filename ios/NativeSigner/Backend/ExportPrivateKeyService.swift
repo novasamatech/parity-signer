@@ -30,11 +30,13 @@ final class ExportPrivateKeyService {
         ).qr else { return nil }
 
         return ExportPrivateKeyViewModel(
-            identicon: keyDetails.address.identicon,
-            qrCode: qrCode,
-            path: [keyDetails.address.seedName, keyDetails.address.path].joined(separator: " "),
-            network: keyDetails.networkInfo.networkTitle,
-            base58: keyDetails.address.base58
+            qrCode: .init(qrCode: qrCode),
+            addressFooter: .init(
+                identicon: keyDetails.address.identicon,
+                path: [keyDetails.address.seedName, keyDetails.address.path].joined(separator: " "),
+                network: keyDetails.networkInfo.networkTitle,
+                base58: keyDetails.address.base58
+            )
         )
     }
 }
