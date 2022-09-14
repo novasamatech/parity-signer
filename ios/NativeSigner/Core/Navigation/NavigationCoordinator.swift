@@ -89,7 +89,8 @@ private extension NavigationCoordinator {
         var updatedShouldSkipInjectedViews: Bool
         switch actionResult.screenData {
         case .seedSelector, // Main `Keys` screen
-             .keys: // `Key Details` screen
+             .keys, // `Key Details` screen
+             .keyDetails: // `Public Key` screen
             updatedShouldSkipInjectedViews = true
         default:
             updatedShouldSkipInjectedViews = false

@@ -38,8 +38,8 @@ struct KeyDetailsView: View {
                 NavigationBarView(
                     navigation: navigation,
                     viewModel: .init(
-                        isBackButtonVisible: true,
-                        isRightBarMenuButtonVisible: true
+                        leftButton: .arrow,
+                        rightButton: .more
                     ),
                     actionModel: .init(rightBarMenuAction: {
                         isShowingActionSheet.toggle()
