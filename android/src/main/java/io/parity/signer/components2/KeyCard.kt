@@ -125,9 +125,12 @@ data class KeyCardModel(
 	val multiselect: Boolean?,
 ) {
 	companion object {
+		/**
+		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
+		 */
 		fun fromAddress(address: Address, networkTitle: String): KeyCardModel =
 			KeyCardModel(
-				network = networkTitle, //keyDetails.networkInfo.networkTitle, todo dmitry update according to data model
+				network = networkTitle,
 				base58 = address.base58,
 				path = address.path,
 				hasPwd = address.hasPwd,

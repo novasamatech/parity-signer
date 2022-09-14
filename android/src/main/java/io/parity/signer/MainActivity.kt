@@ -97,7 +97,6 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						}
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
-
 							ScreenSelector(
 								screenData = actionResult.value?.screenData
 									?: ScreenData.Documents,//default fallback

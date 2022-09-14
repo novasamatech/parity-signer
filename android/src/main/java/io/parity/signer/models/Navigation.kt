@@ -51,12 +51,6 @@ class SignerNavigator(private val singleton: SignerDataModel): Navigator {
 	override fun navigate(action: LocalNavRequest) {
 		when (action) {
 			is LocalNavRequest.ShowExportPrivateKey -> {
-				// `publicKey`: String, - take from MKeyDetails todo dmitry
-				// `expectedSeedName`: String,
-				// `networkSpecsKey`: String, // - take from MDeriveKey it's speca_key_hex
-				// `seedPhrase`: String,
-				// `keyPassword`:
-
 				val keyDetails = singleton.lastOpenedKeyDetails
 				if (keyDetails == null || keyDetails.pubkey != action.publicKey) {
 					Toast.makeText(singleton.context, "Invalid navigation state - cannot export key. You should never see it. ${keyDetails == null}",

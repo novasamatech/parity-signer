@@ -41,7 +41,8 @@ fun PrivateKeyExportBottomSheet(
 //	val coroutineScope = rememberCoroutineScope()
 
 	Column(
-		Modifier.clickable { navigator.navigate(Action.GO_BACK) }
+		modifier = Modifier.clickable { navigator.navigate(Action.GO_BACK)}
+			.fillMaxWidth()
 	) {
 		Spacer(Modifier.weight(1f))
 		Surface(
@@ -57,7 +58,8 @@ fun PrivateKeyExportBottomSheet(
 						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 						.fillMaxWidth()
 				) {
-					Text(text = "Export Private Key")
+					Text(text = "Export Private Key",
+						color = MaterialTheme.colors.primary)
 				}
 				val plateShape = RoundedCornerShape(16.dp, 16.dp, 16.dp, 16.dp)
 				Column(
@@ -77,6 +79,7 @@ fun PrivateKeyExportBottomSheet(
 						contentDescription = "QR with address to scan",
 						contentScale = ContentScale.FillWidth,
 						modifier = Modifier
+							.fillMaxWidth(1f)
 							.clip(RoundedCornerShape(16.dp))
 					)
 					KeyCard(KeyCardModel.fromAddress(model.address, model.network.networkTitle))
