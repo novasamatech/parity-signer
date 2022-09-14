@@ -58,6 +58,7 @@ struct KeyDetailsView: View {
                     }
                     Spacer().frame(maxWidth: .infinity)
                     Asset.chevronRight.swiftUIImage
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                 }
                 .padding(Padding.detailsCell)
                 .contentShape(Rectangle())

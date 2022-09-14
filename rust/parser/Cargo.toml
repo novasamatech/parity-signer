@@ -14,14 +14,14 @@ frame-metadata = { version = "15.0.0", default-features = false, features = ["st
 hex = "0.4.3"
 lazy_static = "1.4.0"
 num-bigint = "0.4.3"
-parity-scale-codec = {version = "3.1.5", features = ["derive", "bit-vec"]}
+parity-scale-codec = {version = "3.2.0", features = ["derive", "bit-vec"]}
 printing_balance = {path = "../printing_balance"}
 regex = "1.6.0"
 scale-info = "2.1.2"
 sp-arithmetic = {git = "https://github.com/paritytech/substrate"}
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
-thiserror = "1.0.34"
+thiserror = "1.0.35"
 
 [features]
 default = ["test"]

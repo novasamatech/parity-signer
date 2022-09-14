@@ -16,10 +16,9 @@ struct DerivedKeyRow: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: Spacing.small) {
-            VStack {
-                Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
-                    .padding(.top, Spacing.extraExtraSmall)
-            }
+            Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
+                .padding(.top, Spacing.extraExtraSmall)
+                .padding(.leading, Spacing.medium)
             VStack(alignment: .leading) {
                 HStack(alignment: .top, spacing: 0) {
                     Text(viewModel.path)
@@ -42,11 +41,12 @@ struct DerivedKeyRow: View {
             Spacer()
             VStack(alignment: .center) {
                 Asset.chevronRight.swiftUIImage
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    .padding(.trailing, Spacing.large)
             }
             .frame(minHeight: .zero, maxHeight: .infinity)
         }
-        .padding(Spacing.medium)
+        .padding([.top, .bottom], Spacing.medium)
         .fixedSize(horizontal: false, vertical: true)
     }
 }

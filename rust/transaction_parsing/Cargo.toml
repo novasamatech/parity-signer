@@ -12,12 +12,12 @@ db_handling = {path = "../db_handling", default-features = false, features = ["s
 definitions = {path = "../definitions", default-features = false, features = ["signer"]}
 frame-metadata = {version = "15.0.0", default-features = false}
 hex = "0.4.3"
-parity-scale-codec = "3.1.5"
+parity-scale-codec = "3.2.0"
 parser = {path = "../parser", default-features = false}
 sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
-thiserror = "1.0.34"
+thiserror = "1.0.35"
 
 [dev-dependencies]
 pretty_assertions = "1"
