@@ -26,6 +26,7 @@ import io.parity.signer.components2.KeyCardModel
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap
+import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.fill12
@@ -38,11 +39,10 @@ fun PrivateKeyExportBottomSheet(
 	model: PrivateKeyExportModel,
 	navigator: Navigator,
 ) {
-
 	Column(
 		modifier = Modifier
-            .clickable { navigator.navigate(Action.GO_BACK) }
-            .fillMaxWidth()
+			.clickable { navigator.navigate(Action.GO_BACK) }
+			.fillMaxWidth()
 	) {
 		Spacer(Modifier.weight(1f))
 		Surface(
@@ -55,8 +55,8 @@ fun PrivateKeyExportBottomSheet(
 			) {
 				Row(
 					modifier = Modifier
-                        .padding(top = 3.dp, start = 12.dp, end = 12.dp)
-                        .fillMaxWidth()
+						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+						.fillMaxWidth()
 				) {
 					Text(
 						text = stringResource(R.string.export_private_key_title),
@@ -65,30 +65,24 @@ fun PrivateKeyExportBottomSheet(
 				}
 
 				val qrRounding = 16.dp
-				val plateShape =
-					RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
+				val plateShape = RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
 				Column(
 					modifier = Modifier
-                        .padding(top = 3.dp, start = 12.dp, end = 12.dp)
-                        .clip(plateShape)
-                        .border(
-                            BorderStroke(1.dp, MaterialTheme.colors.fill12),
-                            plateShape
-                        )
-                        .background(MaterialTheme.colors.fill12, plateShape)
+						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+						.clip(plateShape)
+						.border(
+							BorderStroke(1.dp, MaterialTheme.colors.fill12),
+							plateShape
+						)
+						.background(MaterialTheme.colors.fill12, plateShape)
 				) {
 					Image(
-						if (LocalInspectionMode.current) {
-							LocalContext.current.getDrawable(R.drawable.icon)!!.toBitmap()
-								.asImageBitmap()
-						} else {
-							model.qrImage.intoImageBitmap()
-						},
+						bitmap = model.qrImage.intoImageBitmap(),
 						contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
 						contentScale = ContentScale.FillWidth,
 						modifier = Modifier
-                            .fillMaxWidth(1f)
-                            .clip(RoundedCornerShape(qrRounding))
+							.fillMaxWidth(1f)
+							.clip(RoundedCornerShape(qrRounding))
 					)
 					KeyCard(
 						KeyCardModel.fromAddress(
@@ -111,23 +105,23 @@ class PrivateKeyExportModel(
 ) {
 	companion object {
 		fun createMock(): PrivateKeyExportModel = PrivateKeyExportModel(
-			0u.rangeTo(200u).map { it.toUByte() }.toList(),
-			Address(
-				"base58", "path", true, listOf(0u, 1u),
-				"seedName", false, true
+			qrImage = PreviewData.exampleQRCode,
+			address = Address(
+				base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
+				path = "//polkadot//path",
+				hasPwd = false,
+				identicon = PreviewData.exampleIdenticon,
+				seedName = "seedName",
+				multiselect = false,
+				secretExposed = true
 			),
-			NetworkCardModel("NetworkTitle", "NetworkLogo")
+			network = NetworkCardModel("NetworkTitle", "NetworkLogo")
 		)
 	}
 }
 
-@Preview(name = "day", group = "themes", uiMode = UI_MODE_NIGHT_NO)
-@Preview(
-	name = "dark theme",
-	group = "themes",
-	uiMode = UI_MODE_NIGHT_YES,
-	showBackground = true
-)
+@Preview(name = "day", group = "themes", uiMode = UI_MODE_NIGHT_NO, showBackground = true,)
+@Preview(name = "dark theme",	group = "themes",	uiMode = UI_MODE_NIGHT_YES,)
 @Composable
 private fun PreviewPrivateKeyExportBottomSheet() {
 	SignerNewTheme {
