@@ -39,15 +39,10 @@ fun PrivateKeyExportBottomSheet(
 	navigator: Navigator,
 ) {
 
-//	val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-//		bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
-//	)
-//	val coroutineScope = rememberCoroutineScope()
-
 	Column(
 		modifier = Modifier
-			.clickable { navigator.navigate(Action.GO_BACK) }
-			.fillMaxWidth()
+            .clickable { navigator.navigate(Action.GO_BACK) }
+            .fillMaxWidth()
 	) {
 		Spacer(Modifier.weight(1f))
 		Surface(
@@ -59,20 +54,28 @@ fun PrivateKeyExportBottomSheet(
 					.fillMaxWidth()
 			) {
 				Row(
-					Modifier
-						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-						.fillMaxWidth()
+					modifier = Modifier
+                        .padding(top = 3.dp, start = 12.dp, end = 12.dp)
+                        .fillMaxWidth()
 				) {
-					Text(text = stringResource(R.string.export_private_key_title),
-						color = MaterialTheme.colors.primary)
+					Text(
+						text = stringResource(R.string.export_private_key_title),
+						color = MaterialTheme.colors.primary
+					)
 				}
-				val plateShape = RoundedCornerShape(16.dp, 16.dp, 16.dp, 16.dp)
+
+				val qrRounding = 16.dp
+				val plateShape =
+					RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
 				Column(
 					modifier = Modifier
-						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-						.clip(plateShape)
-						.border(BorderStroke(1.dp, MaterialTheme.colors.fill12), plateShape)
-						.background(MaterialTheme.colors.fill12, plateShape)
+                        .padding(top = 3.dp, start = 12.dp, end = 12.dp)
+                        .clip(plateShape)
+                        .border(
+                            BorderStroke(1.dp, MaterialTheme.colors.fill12),
+                            plateShape
+                        )
+                        .background(MaterialTheme.colors.fill12, plateShape)
 				) {
 					Image(
 						if (LocalInspectionMode.current) {
@@ -84,10 +87,15 @@ fun PrivateKeyExportBottomSheet(
 						contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
 						contentScale = ContentScale.FillWidth,
 						modifier = Modifier
-							.fillMaxWidth(1f)
-							.clip(RoundedCornerShape(16.dp))
+                            .fillMaxWidth(1f)
+                            .clip(RoundedCornerShape(qrRounding))
 					)
-					KeyCard(KeyCardModel.fromAddress(model.address, model.network.networkTitle))
+					KeyCard(
+						KeyCardModel.fromAddress(
+							model.address,
+							model.network.networkTitle
+						)
+					)
 					Spacer(modifier = Modifier.padding(bottom = 4.dp))
 				}
 				Spacer(modifier = Modifier.padding(bottom = 24.dp))
@@ -114,7 +122,12 @@ class PrivateKeyExportModel(
 }
 
 @Preview(name = "day", group = "themes", uiMode = UI_MODE_NIGHT_NO)
-@Preview(name = "dark theme", group = "themes", uiMode = UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(
+	name = "dark theme",
+	group = "themes",
+	uiMode = UI_MODE_NIGHT_YES,
+	showBackground = true
+)
 @Composable
 private fun PreviewPrivateKeyExportBottomSheet() {
 	SignerNewTheme {
