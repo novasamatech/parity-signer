@@ -101,6 +101,7 @@ struct KeyDetailsView: View {
                         .frame(height: Heights.actionButton + Spacing.large)
                 }
                 .listStyle(.plain)
+                .hiddenScrollContent()
             }
             .background(Asset.backgroundSystem.swiftUIColor)
             // Main CTA

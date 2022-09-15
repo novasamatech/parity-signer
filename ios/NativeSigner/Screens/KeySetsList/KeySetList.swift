@@ -51,6 +51,7 @@ struct KeySetList: View {
                         .frame(height: Heights.actionButton + Spacing.large)
                 }
                 .listStyle(.plain)
+                .hiddenScrollContent()
             }
             PrimaryButton(
                 action: {
