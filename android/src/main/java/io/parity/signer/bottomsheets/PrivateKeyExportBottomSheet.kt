@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
@@ -25,7 +26,10 @@ import io.parity.signer.components2.KeyCardModel
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.Bg000
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.fill12
+import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.Address
 
@@ -41,7 +45,8 @@ fun PrivateKeyExportBottomSheet(
 //	val coroutineScope = rememberCoroutineScope()
 
 	Column(
-		modifier = Modifier.clickable { navigator.navigate(Action.GO_BACK)}
+		modifier = Modifier
+			.clickable { navigator.navigate(Action.GO_BACK) }
 			.fillMaxWidth()
 	) {
 		Spacer(Modifier.weight(1f))
@@ -58,7 +63,7 @@ fun PrivateKeyExportBottomSheet(
 						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 						.fillMaxWidth()
 				) {
-					Text(text = "Export Private Key",
+					Text(text = stringResource(R.string.export_private_key_title),
 						color = MaterialTheme.colors.primary)
 				}
 				val plateShape = RoundedCornerShape(16.dp, 16.dp, 16.dp, 16.dp)
@@ -76,7 +81,7 @@ fun PrivateKeyExportBottomSheet(
 						} else {
 							model.qrImage.intoImageBitmap()
 						},
-						contentDescription = "QR with address to scan",
+						contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
 						contentScale = ContentScale.FillWidth,
 						modifier = Modifier
 							.fillMaxWidth(1f)

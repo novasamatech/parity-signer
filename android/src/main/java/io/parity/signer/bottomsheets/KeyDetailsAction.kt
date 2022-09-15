@@ -8,7 +8,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.parity.signer.R
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
@@ -38,7 +40,7 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 					// Don't show `Export Private Key` if intermediate state is broken or when key is password protected
 					if (signerDataModel.lastOpenedKeyDetails?.address?.hasPwd == false) {
 						BigButton(
-							text = "Export Private Key",
+							text = stringResource(R.string.menu_option_export_private_key),
 							isShaded = true,
 							isDangerous = false,
 							action = {
@@ -48,7 +50,7 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 					}
 				}
 				BigButton(
-					text = "Forget this key forever",
+					text = stringResource(R.string.menu_option_forget_delete_key),
 					isShaded = true,
 					isDangerous = true,
 					action = {
@@ -60,24 +62,24 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 	}
 	AndroidCalledConfirm(
 		show = confirmForget,
-		header = "Forget this key?",
-		text = "This key will be removed for this network. Are you sure?",
+		header = stringResource(R.string.remove_key_confirm_title),
+		text = stringResource(R.string.remove_key_confirm_text),
 		back = { confirmForget = false },
 		forward = { signerDataModel.navigate(Action.REMOVE_KEY) },
-		backText = "Cancel",
-		forwardText = "Remove key"
+		backText = stringResource(R.string.generic_cancel),
+		forwardText = stringResource(R.string.remove_key_confirm_cta)
 	)
 	AndroidCalledConfirm(
 		show = confirmExport,
-		header = "Export Private Key",
-		text = "A private key can be used to sign transactions. This key will be marked as a hot key after export.",
+		header = stringResource(R.string.export_private_key_confirm_title),
+		text = stringResource(R.string.export_private_key_confirm_text),
 		back = { confirmExport = false },
 		forward = {
 			signerDataModel.navigator.navigate(
 				LocalNavRequest.ShowExportPrivateKey(signerDataModel.lastOpenedKeyDetails!!.pubkey)
 			)
 		},
-		backText = "Cancel",
-		forwardText = "Export Private Key"
+		backText = stringResource(R.string.generic_cancel),
+		forwardText = stringResource(R.string.export_private_key_confirm_cta)
 	)
 }

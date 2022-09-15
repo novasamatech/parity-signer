@@ -13,7 +13,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.parity.signer.R
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.KeyCardOld
 import io.parity.signer.components.NetworkCard
@@ -51,7 +53,7 @@ fun ExportPublicKey(keyDetails: MKeyDetails) {
 		}
 		Image(
 			keyDetails.qr.intoImageBitmap(),
-			contentDescription = "QR with address to scan",
+			contentDescription = stringResource(id = R.string.qr_with_address_to_scan_description),
 			contentScale = ContentScale.FillWidth,
 			modifier = Modifier
 				.padding(12.dp)
