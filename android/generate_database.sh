@@ -1,3 +1,5 @@
+#!/bin/bash
+
 RELEASE_PATH=../rust/database/database_cold_release
 DBPATH=./src/main/assets/Database
 
