@@ -38,7 +38,7 @@ fun PrivateKeyExportBottomSheet(
 ) {
 	Column(
 		modifier = Modifier
-			.clickable { navigator.navigate(Action.GO_BACK) }
+			.clickable { navigator.backAction() }
 			.fillMaxWidth()
 	) {
 		Spacer(Modifier.weight(1f))

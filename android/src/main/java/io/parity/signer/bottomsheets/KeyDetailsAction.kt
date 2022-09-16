@@ -25,7 +25,7 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 	var confirmExport by remember { mutableStateOf(false) }
 
 	Column(
-		Modifier.clickable { signerDataModel.navigate(Action.GO_BACK) }
+		Modifier.clickable { signerDataModel.navigator.backAction() }
 	) {
 		Spacer(Modifier.weight(1f))
 		Surface(
