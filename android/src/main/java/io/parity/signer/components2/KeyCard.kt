@@ -1,5 +1,6 @@
 package io.parity.signer.components2
 
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
@@ -19,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.Identicon
 import io.parity.signer.models.abbreviateString
+import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Address
 import io.parity.signer.uniffi.MKeyDetails
@@ -94,6 +96,13 @@ fun KeyCard(model: KeyCardModel) {
 						color = MaterialTheme.colors.textTertiary,
 						style = CryptoTypography.body2
 					)
+				} else {
+					Text(
+						model.base58.abbreviateString(8),
+						color = MaterialTheme.colors.textTertiary,
+						style = CryptoTypography.body2,
+						maxLines = 1,
+					)
 					Icon(
 						imageVector = Icons.Default.KeyboardArrowDown,
 						modifier = Modifier
@@ -101,13 +110,6 @@ fun KeyCard(model: KeyCardModel) {
 							.size(24.dp),
 						contentDescription = "expand icon",
 						tint = MaterialTheme.colors.textSecondary
-					)
-				} else {
-					Text(
-						model.base58.abbreviateString(8),
-						color = MaterialTheme.colors.textTertiary,
-						style = CryptoTypography.body2,
-						maxLines = 1,
 					)
 				}
 			}
@@ -144,17 +146,28 @@ data class KeyCardModel(
 			base58 = "kg;dlfgopdifopbcvjblkcvjpiobjvlkjvlkbjnlkfd",
 			path = "path long path",
 			hasPwd = false,
-			identIcon = listOf(0u, 1u),
+			identIcon = PreviewData.exampleIdenticon,
 			seedName = "seed name",
-			multiselect = false,
+			multiselect = null,
 		)
 	}
 }
 
-
-@Preview(backgroundColor = 0xFFFFFFFF)
+@Preview(
+	name = "day",
+	group = "themes",
+	uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true,
+)
+@Preview(
+	name = "dark theme",
+	group = "themes",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	backgroundColor = 0xFFFFFFFF
+)
+//@Preview(backgroundColor = 0xFFFFFFFF)
 @Composable
-private fun PreviewKeyCard2() {
+private fun PreviewKeyCard() {
 	SignerNewTheme() {
 		KeyCard(model = KeyCardModel.createStub())
 	}

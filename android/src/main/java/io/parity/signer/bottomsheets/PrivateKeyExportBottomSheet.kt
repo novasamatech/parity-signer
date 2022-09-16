@@ -27,10 +27,7 @@ import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.ui.theme.Bg000
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.fill12
-import io.parity.signer.ui.theme.modal
+import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.Address
 
@@ -46,21 +43,24 @@ fun PrivateKeyExportBottomSheet(
 	) {
 		Spacer(Modifier.weight(1f))
 		Surface(
-			color = MaterialTheme.colors.Bg000,
+			color = MaterialTheme.colors.backgroundSecondary,
 			shape = MaterialTheme.shapes.modal
 		) {
+			val sidePadding = 24.dp
 			Column(
 				modifier = Modifier
 					.fillMaxWidth()
 			) {
 				Row(
 					modifier = Modifier
-						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+						.padding(top = sidePadding, bottom = sidePadding,
+							start = sidePadding, end = sidePadding)
 						.fillMaxWidth()
 				) {
 					Text(
 						text = stringResource(R.string.export_private_key_title),
-						color = MaterialTheme.colors.primary
+						color = MaterialTheme.colors.primary,
+						style = MaterialTheme.typography.h3,
 					)
 				}
 
@@ -68,7 +68,7 @@ fun PrivateKeyExportBottomSheet(
 				val plateShape = RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
 				Column(
 					modifier = Modifier
-						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+						.padding(start = sidePadding, end = sidePadding)
 						.clip(plateShape)
 						.border(
 							BorderStroke(1.dp, MaterialTheme.colors.fill12),
@@ -120,8 +120,10 @@ class PrivateKeyExportModel(
 	}
 }
 
-@Preview(name = "day", group = "themes", uiMode = UI_MODE_NIGHT_NO, showBackground = true,)
-@Preview(name = "dark theme",	group = "themes",	uiMode = UI_MODE_NIGHT_YES,)
+@Preview(name = "day", group = "themes", uiMode = UI_MODE_NIGHT_NO, showBackground = true,
+	backgroundColor = 0)
+@Preview(name = "dark theme",	group = "themes",	uiMode = UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun PreviewPrivateKeyExportBottomSheet() {
 	SignerNewTheme {
