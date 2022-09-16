@@ -75,6 +75,7 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 		text = stringResource(R.string.export_private_key_confirm_text),
 		back = { confirmExport = false },
 		forward = {
+			confirmExport = false
 			signerDataModel.navigator.navigate(
 				LocalNavRequest.ShowExportPrivateKey(signerDataModel.lastOpenedKeyDetails!!.pubkey)
 			)

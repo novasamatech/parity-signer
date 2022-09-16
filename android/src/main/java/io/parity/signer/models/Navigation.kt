@@ -23,6 +23,9 @@ fun SignerDataModel.navigate(
 
 
 interface Navigator {
+	/**
+	 * For old Rust-backed navigation actions
+	 */
 	fun navigate(
 		button: Action,
 		details: String = "",
@@ -30,16 +33,19 @@ interface Navigator {
 	)
 
 	fun navigate(action: LocalNavRequest)
+
+	fun backAction()
 }
 
-class SignerNavigator(private val singleton: SignerDataModel): Navigator {
+class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 
 	override fun navigate(button: Action, details: String, seedPhrase: String) {
 		try {
 			val navigationAction = backendAction(button, details, seedPhrase)
 			//Workaround while Rust state machine is keeping state inside as it's needed for exporting private key in different screen
 			if (navigationAction?.screenData is ScreenData.KeyDetails) {
-				singleton.lastOpenedKeyDetails = (navigationAction.screenData as ScreenData.KeyDetails).f
+				singleton.lastOpenedKeyDetails =
+					(navigationAction.screenData as ScreenData.KeyDetails).f
 			}
 			singleton._actionResult.value = navigationAction
 		} catch (e: java.lang.Exception) {
@@ -53,22 +59,61 @@ class SignerNavigator(private val singleton: SignerDataModel): Navigator {
 			is LocalNavRequest.ShowExportPrivateKey -> {
 				val keyDetails = singleton.lastOpenedKeyDetails
 				if (keyDetails == null || keyDetails.pubkey != action.publicKey) {
-					Toast.makeText(singleton.context, "Invalid navigation state - cannot export key. You should never see it. ${keyDetails == null}",
-						Toast.LENGTH_LONG).show()
+					Toast.makeText(
+						singleton.context,
+						"Invalid navigation state - cannot export key. You should never see it. ${keyDetails == null}",
+						Toast.LENGTH_LONG
+					).show()
 					if (BuildConfig.DEBUG) throw RuntimeException("Invalid navigation state - cannot export key. You should never see it. ${keyDetails == null}")
 					return
 				}
-				//password only from
-				val secretKeyDetailsQR = generateSecretKeyQr(dbname = singleton.dbName,
-					publicKey = action.publicKey, expectedSeedName = keyDetails.address.seedName,
+				val secretKeyDetailsQR = generateSecretKeyQr(
+					dbname = singleton.dbName,
+					publicKey = action.publicKey,
+					expectedSeedName = keyDetails.address.seedName,
 					networkSpecsKey = keyDetails.networkInfo.networkSpecsKey,
-					seedPhrase = singleton.getSeed(keyDetails.address.seedName), keyPassword = null)
-				val viewModel = PrivateKeyExportModel(qrImage = secretKeyDetailsQR.qr,
-					address = secretKeyDetailsQR.address, NetworkCardModel(secretKeyDetailsQR.networkInfo))
-				singleton._localNavigationAction.value = LocalNavAction.ShowExportPrivateKey(
-					viewModel, singleton.navigator)
+					seedPhrase = singleton.getSeed(keyDetails.address.seedName),
+					keyPassword = null
+				)
+				val viewModel = PrivateKeyExportModel(
+					qrImage = secretKeyDetailsQR.qr,
+					address = secretKeyDetailsQR.address,
+					NetworkCardModel(secretKeyDetailsQR.networkInfo)
+				)
+				navigate(Action.GO_BACK) // close bottom sheet from rust stack
+				singleton._localNavigationAction.value =
+					LocalNavAction.ShowExportPrivateKey(
+						viewModel, singleton.navigator
+					)
 			}
 		}
+	}
+
+	override fun backAction() {
+		if (singleton.localNavAction.value !is LocalNavAction.None) {
+			//todo support navigation stack from compose NavHostController
+			// rather than going all the way back to rust navigation
+			singleton._localNavigationAction.value = LocalNavAction.None
+		} else {
+			backRustNavigation()
+		}
+	}
+
+	private fun backRustNavigation() {
+		val lastRustNavAction = singleton.actionResult.value
+		if (
+			lastRustNavAction?.alertData == null &&
+			lastRustNavAction?.modalData == null &&
+			(
+				lastRustNavAction?.screenData is ScreenData.Log ||
+					lastRustNavAction?.screenData is ScreenData.Scan ||
+					lastRustNavAction?.screenData is ScreenData.SeedSelector ||
+					lastRustNavAction?.screenData is ScreenData.Settings
+				)
+		) {
+			singleton.activity.moveTaskToBack(true)
+		} else
+			navigate(Action.GO_BACK)
 	}
 }
 
@@ -80,14 +125,20 @@ class EmptyNavigator : Navigator {
 	override fun navigate(action: LocalNavRequest) {
 		//do nothing
 	}
+
+	override fun backAction() {
+	}
 }
 
 
 sealed class LocalNavAction {
 	object None : LocalNavAction()
-	class ShowExportPrivateKey(val model: PrivateKeyExportModel, val navigator: SignerNavigator): LocalNavAction()
+	class ShowExportPrivateKey(
+		val model: PrivateKeyExportModel,
+		val navigator: SignerNavigator
+	) : LocalNavAction()
 }
 
 sealed class LocalNavRequest {
-	class ShowExportPrivateKey(val publicKey: String): LocalNavRequest()
+	class ShowExportPrivateKey(val publicKey: String) : LocalNavRequest()
 }
