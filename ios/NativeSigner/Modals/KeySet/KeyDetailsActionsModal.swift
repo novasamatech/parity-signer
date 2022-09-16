@@ -10,7 +10,7 @@ import SwiftUI
 struct KeyDetailsActionsModal: View {
     @State private var animateBackground: Bool = false
     @Binding var isShowingActionSheet: Bool
-    @Binding var isShowingRemoveConfirmation: Bool
+    @Binding var shouldPresentRemoveConfirmationModal: Bool
     @ObservedObject var navigation: NavigationCoordinator
 
     var body: some View {
@@ -47,7 +47,7 @@ struct KeyDetailsActionsModal: View {
                         text: Localizable.KeySetsModal.Action.backup.key
                     )
                     ActionSheetButton(
-                        action: { animateDismissal { isShowingRemoveConfirmation.toggle() } },
+                        action: { animateDismissal { shouldPresentRemoveConfirmationModal.toggle() } },
                         icon: Asset.delete.swiftUIImage,
                         text: Localizable.KeySetsModal.Action.delete.key,
                         style: .destructive
