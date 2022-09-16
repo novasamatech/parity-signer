@@ -25,7 +25,7 @@ jobs:
           submodules:         'recursive'
 
       - name:                 Setup - Xcode
-        run:                  sudo xcode-select -switch '/Applications/Xcode_13.4.1.app/Contents/Developer' && /usr/bin/xcodebuild -version
+        run:                  sudo xcode-select -switch '/Applications/Xcode_14.0.app/Contents/Developer' && /usr/bin/xcodebuild -version
 
       - name:                 Install dependencies
         run:                  |
@@ -72,6 +72,6 @@ jobs:
           -project NativeSigner.xcodeproj \
           -scheme NativeSigner \
           -sdk iphonesimulator \
-          -destination 'platform=iOS Simulator,name=iPhone 13' \
+          -destination 'platform=iOS Simulator,name=iPhone 14' \
           test \
           | xcbeautify

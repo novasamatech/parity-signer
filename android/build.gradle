@@ -82,6 +82,10 @@ cargo {
 	extraCargoBuildArguments = ["--locked"]
 }
 
+task buildDB (type: Exec) {
+	commandLine './generate_database.sh'
+}
+
 dependencies {
 
 	implementation 'androidx.core:core-ktx:1.8.0'
@@ -114,4 +118,4 @@ dependencies {
 	debugImplementation "androidx.compose.ui:ui-tooling:$compose_libs_version"
 }
 
-preBuild.dependsOn "cargoBuild"
+preBuild.dependsOn "cargoBuild","buildDB"

@@ -8,22 +8,12 @@
 import SwiftUI
 
 struct ExportPrivateKeyViewModel: Equatable {
-    let identicon: [UInt8]
-    let qrCode: [UInt8]
-    let path: String
-    let network: String
-    let base58: String
+    let qrCode: QRCodeContainerViewModel
+    let addressFooter: QRCodeAddressFooterViewModel
 }
 
 struct ExportPrivateKeyModal: View {
-    private enum Constants {
-        static let compactDeviceWidth: CGFloat = 320
-        static let qrCodeWidthForSmallDevices: CGFloat = 216
-        static let qrCodeWidthForStandardDevices: CGFloat = 232
-    }
-
     @State private var animateBackground: Bool = false
-    @State private var showFullAddress: Bool = false
 
     @Binding var isPresentingExportKeysModal: Bool
     @ObservedObject var navigation: NavigationCoordinator
@@ -49,61 +39,8 @@ struct ExportPrivateKeyModal: View {
                     .padding([.trailing], Spacing.medium)
                     // QR Code container
                     VStack(spacing: 0) {
-                        // QR Code
-                        ZStack {
-                            Image(uiImage: UIImage(data: Data(viewModel.qrCode)) ?? UIImage())
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(
-                                    minWidth: Constants.qrCodeWidthForSmallDevices,
-                                    idealWidth: Constants.qrCodeWidthForStandardDevices,
-                                    maxWidth: Constants.qrCodeWidthForStandardDevices,
-                                    alignment: .center
-                                )
-                        }
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(
-                            UIScreen.main.bounds.width == Constants.compactDeviceWidth ? Spacing.large : Spacing
-                                .extraExtraLarge
-                        )
-                        .background(.white)
-                        .cornerRadius(CornerRadius.medium)
-
-                        // QR Footer
-                        HStack(spacing: Spacing.small) {
-                            VStack {
-                                Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
-                                    .padding(.top, Spacing.extraExtraSmall)
-                            }
-                            VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                                Text(viewModel.network)
-                                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                                    .font(Fontstyle.captionM.base)
-                                Text(viewModel.path)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                                    .font(Fontstyle.bodyM.base)
-                                HStack(spacing: Spacing.extraExtraSmall) {
-                                    Asset.derivedKeyAddress.swiftUIImage
-                                    Text(showFullAddress ? viewModel.base58 : viewModel.base58.truncateMiddle())
-                                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                                        .font(Fontstyle.bodyM.base)
-                                        .frame(idealWidth: .infinity, alignment: .leading)
-                                    Asset.chevronDown.swiftUIImage
-                                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                                        .rotationEffect(Angle(degrees: showFullAddress ? 180 : 0))
-                                        .padding(.leading, Spacing.extraExtraSmall)
-                                    Spacer()
-                                }
-                                .onTapGesture {
-                                    withAnimation {
-                                        showFullAddress.toggle()
-                                    }
-                                }
-                            }
-                        }
-                        .padding([.leading, .trailing], Spacing.medium)
-                        .padding([.top, .bottom], Spacing.medium)
-                        .fixedSize(horizontal: false, vertical: true)
+                        QRCodeContainerView(viewModel: viewModel.qrCode)
+                        QRCodeAddressFooterView(viewModel: viewModel.addressFooter)
                     }
                     .fixedSize(horizontal: false, vertical: true)
                     .background(

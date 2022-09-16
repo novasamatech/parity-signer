@@ -7,19 +7,34 @@
 
 import SwiftUI
 
+enum NavigationLeftButton: Equatable {
+    case empty
+    case arrow
+    case xmark
+}
+
+enum NavigationRightButton: Equatable {
+    case empty
+    case more
+    case action(LocalizedStringKey)
+}
+
 struct NavigationBarViewModel: Equatable {
     let title: String?
-    let isBackButtonVisible: Bool
-    let isRightBarMenuButtonVisible: Bool
+    let subtitle: String?
+    let leftButton: NavigationLeftButton
+    let rightButton: NavigationRightButton
 
     init(
         title: String? = nil,
-        isBackButtonVisible: Bool = false,
-        isRightBarMenuButtonVisible: Bool = false
+        subtitle: String? = nil,
+        leftButton: NavigationLeftButton = .empty,
+        rightButton: NavigationRightButton = .empty
     ) {
         self.title = title
-        self.isBackButtonVisible = isBackButtonVisible
-        self.isRightBarMenuButtonVisible = isRightBarMenuButtonVisible
+        self.subtitle = subtitle
+        self.leftButton = leftButton
+        self.rightButton = rightButton
     }
 }
 
@@ -49,32 +64,50 @@ struct NavigationBarView: View {
 
     var body: some View {
         HStack(alignment: .center) {
-            if viewModel.isBackButtonVisible {
+            switch viewModel.leftButton {
+            case .empty:
+                Spacer().frame(width: Heights.navigationButton)
+            case .arrow:
                 NavbarButton(
                     action: { navigation.perform(navigation: .init(action: .goBack)) },
                     icon: Asset.arrowBack.swiftUIImage
                 )
-            } else {
+            case .xmark:
+                NavbarButton(
+                    action: { navigation.perform(navigation: .init(action: .goBack)) },
+                    icon: Asset.xmarkButton.swiftUIImage
+                )
+            }
+            Spacer()
+            VStack {
+                if let title = viewModel.title {
+                    Text(title)
+                        .font(Fontstyle.titleS.base)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).lineLimit(1)
+                }
+                if let subtitle = viewModel.subtitle {
+                    Text(subtitle)
+                        .font(Fontstyle.captionM.base)
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                }
+            }
+
+            Spacer()
+            switch viewModel.rightButton {
+            case .empty:
                 Spacer().frame(width: Heights.navigationButton)
-            }
-            Spacer().frame(maxWidth: .infinity)
-            if let title = viewModel.title {
-                Text(title)
-                    .font(Fontstyle.titleS.base)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-            }
-            Spacer().frame(maxWidth: .infinity)
-            if viewModel.isRightBarMenuButtonVisible {
+            case .more:
                 NavbarButton(
                     action: actionModel.rightBarMenuAction,
                     icon: Asset.moreDots.swiftUIImage
                 )
-            } else {
-                Spacer().frame(width: Heights.navigationButton)
+            case let .action(title):
+                NavbarActionButton(action: actionModel.rightBarMenuAction, title: title)
             }
         }
+        .padding([.leading, .trailing], Spacing.extraExtraSmall)
         .frame(maxWidth: .infinity)
-        .frame(height: 64)
+        .frame(height: Heights.navigationBarHeight)
         .background(Asset.backgroundSystem.swiftUIColor)
     }
 }
@@ -86,72 +119,53 @@ struct NavigationBarView_Previews: PreviewProvider {
                 navigation: NavigationCoordinator(),
                 viewModel: NavigationBarViewModel(
                     title: "Key Sets",
-                    isBackButtonVisible: false,
-                    isRightBarMenuButtonVisible: false
+                    leftButton: .empty,
+                    rightButton: .empty
                 )
             )
             NavigationBarView(
                 navigation: NavigationCoordinator(),
                 viewModel: NavigationBarViewModel(
                     title: "Key Sets",
-                    isBackButtonVisible: true,
-                    isRightBarMenuButtonVisible: true
+                    leftButton: .arrow,
+                    rightButton: .more
                 )
             )
             NavigationBarView(
                 navigation: NavigationCoordinator(),
                 viewModel: NavigationBarViewModel(
                     title: "Key Sets",
-                    isBackButtonVisible: true,
-                    isRightBarMenuButtonVisible: false
+                    leftButton: .arrow,
+                    rightButton: .empty
                 )
             )
             NavigationBarView(
                 navigation: NavigationCoordinator(),
                 viewModel: NavigationBarViewModel(
                     title: "Key Sets",
-                    isBackButtonVisible: false,
-                    isRightBarMenuButtonVisible: true
+                    leftButton: .empty,
+                    rightButton: .more
+                )
+            )
+            NavigationBarView(
+                navigation: NavigationCoordinator(),
+                viewModel: NavigationBarViewModel(
+                    title: "Public Key",
+                    subtitle: "Derived Key",
+                    leftButton: .xmark,
+                    rightButton: .more
+                )
+            )
+            NavigationBarView(
+                navigation: NavigationCoordinator(),
+                viewModel: NavigationBarViewModel(
+                    title: "Create Derived Key",
+                    leftButton: .xmark,
+                    rightButton: .action(Localizable.done.key)
                 )
             )
         }
         .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-        VStack {
-            NavigationBarView(
-                navigation: NavigationCoordinator(),
-                viewModel: NavigationBarViewModel(
-                    title: "Key Sets",
-                    isBackButtonVisible: false,
-                    isRightBarMenuButtonVisible: false
-                )
-            )
-            NavigationBarView(
-                navigation: NavigationCoordinator(),
-                viewModel: NavigationBarViewModel(
-                    title: "Key Sets",
-                    isBackButtonVisible: true,
-                    isRightBarMenuButtonVisible: true
-                )
-            )
-            NavigationBarView(
-                navigation: NavigationCoordinator(),
-                viewModel: NavigationBarViewModel(
-                    title: "Key Sets",
-                    isBackButtonVisible: true,
-                    isRightBarMenuButtonVisible: false
-                )
-            )
-            NavigationBarView(
-                navigation: NavigationCoordinator(),
-                viewModel: NavigationBarViewModel(
-                    title: "Key Sets",
-                    isBackButtonVisible: false,
-                    isRightBarMenuButtonVisible: true
-                )
-            )
-        }
-        .preferredColorScheme(.light)
         .previewLayout(.sizeThatFits)
     }
 }

@@ -38,8 +38,8 @@ struct KeyDetailsView: View {
                 NavigationBarView(
                     navigation: navigation,
                     viewModel: .init(
-                        isBackButtonVisible: true,
-                        isRightBarMenuButtonVisible: true
+                        leftButton: .arrow,
+                        rightButton: .more
                     ),
                     actionModel: .init(rightBarMenuAction: {
                         isShowingActionSheet.toggle()
@@ -101,6 +101,7 @@ struct KeyDetailsView: View {
                         .frame(height: Heights.actionButton + Spacing.large)
                 }
                 .listStyle(.plain)
+                .hiddenScrollContent()
             }
             .background(Asset.backgroundSystem.swiftUIColor)
             // Main CTA
