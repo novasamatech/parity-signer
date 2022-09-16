@@ -54,6 +54,7 @@ use constants::ALICE_SEED_PHRASE;
 #[cfg(feature = "signer")]
 use constants::TRANSACTION;
 
+#[cfg(feature = "signer")]
 use definitions::helpers::{get_multisigner, unhex};
 #[cfg(feature = "active")]
 use definitions::qr_transfers::ContentDerivations;
