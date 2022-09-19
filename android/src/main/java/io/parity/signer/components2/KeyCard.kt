@@ -163,9 +163,9 @@ data class KeyCardModel(
 	name = "dark theme",
 	group = "themes",
 	uiMode = Configuration.UI_MODE_NIGHT_YES,
-	backgroundColor = 0xFFFFFFFF
+	backgroundColor = 0xFF000000,
+	showBackground = true,
 )
-//@Preview(backgroundColor = 0xFFFFFFFF)
 @Composable
 private fun PreviewKeyCard() {
 	SignerNewTheme() {
