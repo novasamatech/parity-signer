@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.NetworkCardModel
-import io.parity.signer.components2.CountDown
+import io.parity.signer.components2.CircularCountDownTimer
 import io.parity.signer.components2.KeyCard
 import io.parity.signer.components2.KeyCardModel
 import io.parity.signer.models.EmptyNavigator
@@ -91,9 +91,9 @@ fun PrivateKeyExportBottomSheet(
 				}
 				Spacer(modifier = Modifier.padding(bottom = 24.dp))
 				//autohide component
-				val timeout = 45 //seconds
+				val showKeyTimeout = 60 //seconds
 				val text = "Private Key will be hidden in "
-				CountDown(timeout, text) { navigator.backAction() }
+				CircularCountDownTimer(showKeyTimeout, text) { navigator.backAction() }
 			}
 		}
 	}
