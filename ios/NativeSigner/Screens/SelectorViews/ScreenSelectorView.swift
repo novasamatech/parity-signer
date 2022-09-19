@@ -10,7 +10,7 @@ import SwiftUI
 struct ScreenSelectorView: View {
     @ObservedObject var data: SignerDataModel
     @ObservedObject var navigation: NavigationCoordinator
-
+    private let seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
     var body: some View {
         ScreenSelector(
             data: data,
@@ -20,7 +20,7 @@ struct ScreenSelectorView: View {
             navigationRequest: { navigationRequest in
                 navigation.perform(navigation: navigationRequest)
             },
-            getSeed: { seedName in data.seedsMediator.getSeed(seedName: seedName) },
+            getSeed: { seedName in seedsMediator.getSeed(seedName: seedName) },
             doJailbreak: data.jailbreak,
             pathCheck: { seed, path, network in
                 substratePathCheck(
@@ -28,15 +28,15 @@ struct ScreenSelectorView: View {
                 )
             },
             createAddress: { path, seedName in data.createAddress(path: path, seedName: seedName) },
-            checkSeedCollision: { seedName in data.seedsMediator.checkSeedCollision(seedName: seedName) },
-            restoreSeed: { seedName, seedPhrase, createRoots in data.seedsMediator.restoreSeed(
+            checkSeedCollision: { seedName in seedsMediator.checkSeedCollision(seedName: seedName) },
+            restoreSeed: { seedName, seedPhrase, createRoots in seedsMediator.restoreSeed(
                 seedName: seedName, seedPhrase: seedPhrase, createRoots: createRoots
             ) },
             sign: { seedName, comment in data.sign(seedName: seedName, comment: comment) },
             doWipe: data.wipe,
             alertShow: { data.alertShow = true },
             increment: { seedName, _ in
-                let seedPhrase = data.seedsMediator.getSeed(seedName: seedName)
+                let seedPhrase = seedsMediator.getSeed(seedName: seedName)
                 if !seedPhrase.isEmpty {
                     navigation.perform(navigation: .init(
                         action: .increment,

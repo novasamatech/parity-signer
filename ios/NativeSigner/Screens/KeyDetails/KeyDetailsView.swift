@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct KeyDetailsView: View {
+    @State private var shouldPresentRemoveConfirmationModal = false
     @State private var isShowingActionSheet = false
     @State private var isShowingRemoveConfirmation: Bool = false
     @ObservedObject private var navigation: NavigationCoordinator
@@ -101,6 +102,7 @@ struct KeyDetailsView: View {
                         .frame(height: Heights.actionButton + Spacing.large)
                 }
                 .listStyle(.plain)
+                .hiddenScrollContent()
             }
             .background(Asset.backgroundSystem.swiftUIColor)
             // Main CTA
@@ -116,10 +118,18 @@ struct KeyDetailsView: View {
             )
             .padding(Spacing.large)
         }
-        .fullScreenCover(isPresented: $isShowingActionSheet) {
+        .fullScreenCover(
+            isPresented: $isShowingActionSheet,
+            onDismiss: {
+                if shouldPresentRemoveConfirmationModal == true {
+                    shouldPresentRemoveConfirmationModal.toggle()
+                    isShowingRemoveConfirmation.toggle()
+                }
+            }
+        ) {
             KeyDetailsActionsModal(
                 isShowingActionSheet: $isShowingActionSheet,
-                isShowingRemoveConfirmation: $isShowingRemoveConfirmation,
+                shouldPresentRemoveConfirmationModal: $shouldPresentRemoveConfirmationModal,
                 navigation: navigation
             )
             .clearModalBackground()

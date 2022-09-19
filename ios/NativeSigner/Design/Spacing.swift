@@ -25,6 +25,8 @@ enum Spacing {
     static let extraLarge: CGFloat = 32
     /// Extra Extra Large: 40 pts
     static let extraExtraLarge: CGFloat = 40
+    /// Spacing for dedicated spacer: 60 pts
+    static let componentSpacer: CGFloat = 60
 }
 
 enum Padding {

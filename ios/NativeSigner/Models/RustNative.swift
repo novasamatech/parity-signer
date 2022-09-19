@@ -12,10 +12,9 @@ import SwiftUI
 /// Object to store all data; since the data really is mostly stored in RustNative side,
 /// just one object (to describe it) is used here.
 final class SignerDataModel: ObservableObject {
+    private let seedsMediator: SeedsMediating
+
     @ObservedObject var navigation: NavigationCoordinator
-
-    let seedsMediator: SeedsMediating = SeedsMediator()
-
     @Published var parsingAlert: Bool = false
 
     // Data state
@@ -43,8 +42,10 @@ final class SignerDataModel: ObservableObject {
         bundle: BundleProtocol = Bundle.main,
         connectivityMonitor: ConnectivityMonitoring = ConnectivityMonitoringAssembler().assemble(),
         databaseMediator: DatabaseMediating = DatabaseMediator(),
-        fileManager: FileManagingProtocol = FileManager.default
+        fileManager: FileManagingProtocol = FileManager.default,
+        seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
     ) {
+        self.seedsMediator = seedsMediator
         self.navigation = navigation
         self.bundle = bundle
         self.connectivityMonitor = connectivityMonitor
@@ -163,6 +164,17 @@ extension SignerDataModel {
                     seedPhrase: seedsMediator.getSeed(seedName: seedName)
                 )
             )
+        }
+    }
+}
+
+/// Address-related operations in data model
+extension SignerDataModel {
+    /// Creates address in database with checks and features
+    func createAddress(path: String, seedName: String) {
+        let seedPhrase = seedsMediator.getSeed(seedName: seedName)
+        if !seedPhrase.isEmpty {
+            navigation.perform(navigation: .init(action: .goForward, details: path, seedPhrase: seedPhrase))
         }
     }
 }

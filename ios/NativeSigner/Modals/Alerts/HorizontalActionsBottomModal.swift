@@ -19,6 +19,13 @@ struct HorizontalActionsBottomModalViewModel {
         dismissActionLabel: Localizable.KeySetsModal.Confirmation.Action.cancel.key,
         mainActionLabel: Localizable.KeySetsModal.Confirmation.Action.remove.key
     )
+
+    static let forgetSingleKey = HorizontalActionsBottomModalViewModel(
+        title: Localizable.PublicKeyDetailsModal.Confirmation.Label.title.string,
+        content: Localizable.PublicKeyDetailsModal.Confirmation.Label.content.string,
+        dismissActionLabel: Localizable.PublicKeyDetailsModal.Confirmation.Action.cancel.key,
+        mainActionLabel: Localizable.PublicKeyDetailsModal.Confirmation.Action.remove.key
+    )
 }
 
 struct HorizontalActionsBottomModal: View {
@@ -52,7 +59,6 @@ struct HorizontalActionsBottomModal: View {
                         .font(Fontstyle.bodyL.base)
                         .lineSpacing(Spacing.extraExtraSmall)
                         .multilineTextAlignment(.center)
-                        .padding([.leading, .trailing], Spacing.large)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                     HStack {
                         SecondaryButton(
@@ -85,27 +91,20 @@ struct HorizontalActionsBottomModal: View {
     }
 }
 
-//
-// struct HorizontalActionsBottomModal_Previews: PreviewProvider {
-//    static var previews: some View {
-//        HorizontalActionsBottomModal(
-//            viewModel: .forgetKeySet,
-//            mainAction: {},
-//            isShowingBottomAlert: Binding<Bool>.constant(true)
-//        )
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//        VStack {
-//            HorizontalActionsBottomModal(
-//                viewModel: .forgetKeySet,
-//                mainAction: {},
-//                isShowingBottomAlert: Binding<Bool>.constant(true)
-//            )
-//            .preferredColorScheme(.light)
-//            .previewLayout(.sizeThatFits)
-//        }
-//        .background(.black)
-//        .preferredColorScheme(.light)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }
+struct HorizontalActionsBottomModal_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            HorizontalActionsBottomModal(
+                viewModel: .forgetKeySet,
+                mainAction: {}(),
+                isShowingBottomAlert: Binding<Bool>.constant(true)
+            )
+            HorizontalActionsBottomModal(
+                viewModel: .forgetSingleKey,
+                mainAction: {}(),
+                isShowingBottomAlert: Binding<Bool>.constant(true)
+            )
+        }
+        .previewLayout(.sizeThatFits)
+    }
+}
