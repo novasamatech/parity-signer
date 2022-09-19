@@ -9,11 +9,11 @@ import Foundation
 
 final class ExportPrivateKeyService {
     private let databaseMediator: DatabaseMediating
-    private weak var seedsMediator: SeedsMediating!
+    private let seedsMediator: SeedsMediating
 
     init(
         databaseMediator: DatabaseMediating = DatabaseMediator(),
-        seedsMediator: SeedsMediating? = nil
+        seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
     ) {
         self.databaseMediator = databaseMediator
         self.seedsMediator = seedsMediator

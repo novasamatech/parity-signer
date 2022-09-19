@@ -7,54 +7,35 @@
 
 import SwiftUI
 
-struct KeyDetailsPublicKeyViewModel: Equatable {
-    let qrCode: QRCodeContainerViewModel
-    let addressFooter: QRCodeAddressFooterViewModel?
-    let rootFooter: QRCodeRootFooterViewModel?
-    let isKeyExposed: Bool
-    let isRootKey: Bool
-
-    init(_ keyDetails: MKeyDetails) {
-        qrCode = .init(qrCode: keyDetails.qr)
-        rootFooter = keyDetails.isRootKey ? .init(
-            keyName: keyDetails.address.seedName,
-            base58: keyDetails.address.base58
-        ) : nil
-        addressFooter = keyDetails.isRootKey ? nil : .init(
-            identicon: keyDetails.address.identicon,
-            path: [keyDetails.address.seedName, keyDetails.address.path].joined(separator: " "),
-            network: keyDetails.networkInfo.networkTitle,
-            base58: keyDetails.address.base58
-        )
-        isKeyExposed = keyDetails.address.secretExposed
-        isRootKey = keyDetails.isRootKey
-    }
-
-    init(
-        qrCode: QRCodeContainerViewModel,
-        addressFooter: QRCodeAddressFooterViewModel?,
-        rootFooter: QRCodeRootFooterViewModel?,
-        isKeyExposed: Bool,
-        isRootKey: Bool
-    ) {
-        self.qrCode = qrCode
-        self.addressFooter = addressFooter
-        self.rootFooter = rootFooter
-        self.isKeyExposed = isKeyExposed
-        self.isRootKey = isRootKey
-    }
-}
-
 struct KeyDetailsPublicKeyView: View {
-    @ObservedObject private var navigation: NavigationCoordinator
     private let viewModel: KeyDetailsPublicKeyViewModel
+    private let actionModel: KeyDetailsPublicKeyActionModel
+    private let exportKeyService: ExportPrivateKeyService
+    private let forgetKeyActionHandler: ForgetSingleKeyAction
+
+    @State private var isShowingRemoveConfirmation = false
+    @State private var isShowingActionSheet = false
+    @State private var isPresentingExportKeysWarningModal = false
+    @State private var isPresentingExportKeysModal = false
+
+    @State private var shouldPresentExportKeysWarningModal = false
+    @State private var shouldPresentExportKeysModal = false
+    @State private var shouldPresentRemoveConfirmationModal = false
+
+    @ObservedObject private var navigation: NavigationCoordinator
 
     init(
         navigation: NavigationCoordinator,
-        viewModel: KeyDetailsPublicKeyViewModel
+        forgetKeyActionHandler: ForgetSingleKeyAction,
+        viewModel: KeyDetailsPublicKeyViewModel,
+        actionModel: KeyDetailsPublicKeyActionModel,
+        exportKeyService: ExportPrivateKeyService = ExportPrivateKeyService()
     ) {
         self.navigation = navigation
+        self.forgetKeyActionHandler = forgetKeyActionHandler
         self.viewModel = viewModel
+        self.actionModel = actionModel
+        self.exportKeyService = exportKeyService
     }
 
     var body: some View {
@@ -67,7 +48,8 @@ struct KeyDetailsPublicKeyView: View {
                     subtitle: viewModel.isRootKey ? nil : Localizable.PublicKeyDetails.Label.subtitle.string,
                     leftButton: .xmark,
                     rightButton: .more
-                )
+                ),
+                actionModel: .init(rightBarMenuAction: { isShowingActionSheet.toggle() })
             )
             ScrollView {
                 VStack {
@@ -111,6 +93,75 @@ struct KeyDetailsPublicKeyView: View {
             }
             .background(Asset.backgroundSolidSystem.swiftUIColor)
         }
+        // Action sheet
+        .fullScreenCover(
+            isPresented: $isShowingActionSheet,
+            onDismiss: {
+                if shouldPresentExportKeysWarningModal {
+                    shouldPresentExportKeysWarningModal.toggle()
+                    isPresentingExportKeysWarningModal.toggle()
+                }
+                if shouldPresentRemoveConfirmationModal {
+                    shouldPresentRemoveConfirmationModal.toggle()
+                    isShowingRemoveConfirmation.toggle()
+                }
+            }
+        ) {
+            PublicKeyActionsModal(
+                shouldPresentExportKeysWarningModal: $shouldPresentExportKeysWarningModal,
+                isShowingActionSheet: $isShowingActionSheet,
+                shouldPresentRemoveConfirmationModal: $shouldPresentRemoveConfirmationModal,
+                navigation: navigation
+            )
+            .clearModalBackground()
+        }
+        // Export private key warning
+        .fullScreenCover(
+            isPresented: $isPresentingExportKeysWarningModal,
+            onDismiss: {
+                if shouldPresentExportKeysModal {
+                    shouldPresentExportKeysModal.toggle()
+                    isPresentingExportKeysModal.toggle()
+                } else {
+                    // If user cancelled, mimic Rust state machine and hide "..." modal menu
+                    navigation.perform(navigation: .init(action: .rightButtonAction))
+                }
+            }
+        ) {
+            ExportPrivateKeyWarningModal(
+                isPresentingExportKeysWarningModal: $isPresentingExportKeysWarningModal,
+                shouldPresentExportKeysModal: $shouldPresentExportKeysModal
+            )
+            .clearModalBackground()
+        }
+        // Export private key modal
+        .fullScreenCover(
+            isPresented: $isPresentingExportKeysModal,
+            onDismiss: {
+                // When user finished Export Private Key interaction, mimic Rust state machine and hide "..." modal menu
+                navigation.perform(navigation: .init(action: .rightButtonAction))
+            }
+        ) {
+            ExportPrivateKeyModal(
+                isPresentingExportKeysModal: $isPresentingExportKeysModal,
+                navigation: navigation,
+                viewModel: exportKeyService.exportPrivateKey(from: navigation.currentKeyDetails)
+            )
+            .clearModalBackground()
+        }
+        // Remove key modal
+        .fullScreenCover(isPresented: $isShowingRemoveConfirmation) {
+            HorizontalActionsBottomModal(
+                viewModel: .forgetSingleKey,
+                mainAction: forgetKeyActionHandler.forgetSingleKey(actionModel.removeSeed),
+                // We need to fake right button action here or Rust machine will break
+                // In old UI, if you dismiss equivalent of this modal, underlying modal would still be there,
+                // so we need to inform Rust we actually hid it
+                dismissAction: navigation.perform(navigation: .init(action: .rightButtonAction), skipDebounce: true),
+                isShowingBottomAlert: $isShowingRemoveConfirmation
+            )
+            .clearModalBackground()
+        }
     }
 }
 
@@ -120,25 +171,33 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
             VStack {
                 KeyDetailsPublicKeyView(
                     navigation: NavigationCoordinator(),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey()
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                    viewModel: PreviewData.exampleKeyDetailsPublicKey(),
+                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
                 )
             }
             VStack {
                 KeyDetailsPublicKeyView(
                     navigation: NavigationCoordinator(),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false)
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
+                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
                 )
             }
             VStack {
                 KeyDetailsPublicKeyView(
                     navigation: NavigationCoordinator(),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false)
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
+                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
                 )
             }
             VStack {
                 KeyDetailsPublicKeyView(
                     navigation: NavigationCoordinator(),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false)
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
+                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
                 )
             }
         }
