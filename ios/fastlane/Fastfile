@@ -1,5 +1,5 @@
 opt_out_usage
-xcversion(version: "~>13.4.0")
+xcversion(version: "~>14.0")
 default_platform(:ios)
 
 ENV["FASTLANE_XCODEBUILD_SETTINGS_RETRIES"] = "5"
