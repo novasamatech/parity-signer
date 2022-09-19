@@ -542,6 +542,7 @@ namespace signer {
     [Throws=ErrorDisplayed]
     ActionResult? backend_action(Action action, [ByRef] string details, [ByRef] string seed_phrase);
 
+    [Throws=ErrorDisplayed]
     void update_seed_names(sequence<string> seed_names);
 
     [Throws=ErrorDisplayed]
@@ -591,8 +592,10 @@ namespace signer {
     [Throws=ErrorDisplayed]
     MKeys get_keys();
 
+    [Throws=ErrorDisplayed]
     MRecoverSeedName recover_seed_name(boolean keyboard, [ByRef] string seed_name);
 
+    [Throws=ErrorDisplayed]
     MSettings settings();
 
     [Throws=ErrorDisplayed]

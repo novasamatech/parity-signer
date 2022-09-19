@@ -108,8 +108,8 @@ fn init_navigation(dbname: &str, seed_names: Vec<String>) {
 
 /// Should be called every time any change could have been done to seeds. Accepts updated list of
 /// seeds, completely disregards previously known list
-fn update_seed_names(seed_names: Vec<String>) {
-    navigator::update_seed_names(seed_names)
+fn update_seed_names(seed_names: Vec<String>) -> anyhow::Result<(), ErrorDisplayed> {
+    navigator::update_seed_names(seed_names).map_err(|s| ErrorDisplayed::Str { s: s.to_string() })
 }
 
 /// Determines estimated required number of multiframe QR that should be gathered before decoding
@@ -231,12 +231,12 @@ fn get_keys() -> anyhow::Result<MKeys, String> {
     navigator::get_keys().map_err(|e| format!("{}", e))
 }
 
-fn recover_seed_name(keyboard: bool, seed_name: &str) -> MRecoverSeedName {
-    navigator::recover_seed_name(keyboard, seed_name)
+fn recover_seed_name(keyboard: bool, seed_name: &str) -> Result<MRecoverSeedName, String> {
+    navigator::recover_seed_name(keyboard, seed_name).map_err(|e| format!("{}", e))
 }
 
-fn settings() -> MSettings {
-    navigator::settings()
+fn settings() -> Result<MSettings, String> {
+    navigator::settings().map_err(|e| format!("{}", e))
 }
 
 fn get_verifier() -> anyhow::Result<MVerifierDetails, String> {

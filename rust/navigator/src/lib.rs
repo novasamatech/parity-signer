@@ -99,125 +99,65 @@ pub fn init_navigation(dbname: &str, seed_names: Vec<String>) {
 }
 
 pub fn get_log() -> Result<MLog, Error> {
-    let guard = STATE.lock();
-    match guard {
-        Ok(mut navstate) => navstate.get_log(),
-        Err(_) => {
-            //TODO: maybe more grace here?
-            panic!("Concurrency error! Restart the app.");
-        }
-    }
+    STATE.lock().map_err(|_| Error::StatePoisoned)?.get_log()
 }
 
 pub fn get_log_details(order: u32) -> Result<MLogDetails, Error> {
-    let guard = STATE.lock();
-    match guard {
-        Ok(mut navstate) => navstate.get_log_details(order),
-        Err(_) => {
-            //TODO: maybe more grace here?
-            panic!("Concurrency error! Restart the app.");
-        }
-    }
+    STATE
+        .lock()
+        .map_err(|_| Error::StatePoisoned)?
+        .get_log_details(order)
 }
 
 pub fn get_transaction() -> Result<MTransaction, Error> {
-    let guard = STATE.lock();
-    match guard {
-        Ok(mut navstate) => navstate.get_transaction(),
-        Err(_) => {
-            //TODO: maybe more grace here?
-            panic!("Concurrency error! Restart the app.");
-        }
-    }
+    STATE
+        .lock()
+        .map_err(|_| Error::StatePoisoned)?
+        .get_transaction()
 }
 
 pub fn get_seeds() -> Result<MSeeds, Error> {
-    let guard = STATE.lock();
-    match guard {
-        Ok(mut navstate) => navstate.get_seeds(),
-        Err(_) => {
-            //TODO: maybe more grace here?
-            panic!("Concurrency error! Restart the app.");
-        }
-    }
+    STATE.lock().map_err(|_| Error::StatePoisoned)?.get_seeds()
 }
 
 pub fn get_keys() -> Result<MKeys, Error> {
-    let guard = STATE.lock();
-    match guard {
-        Ok(mut navstate) => navstate.get_keys(),
-        Err(_) => {
-            //TODO: maybe more grace here?
-            panic!("Concurrency error! Restart the app.");
-        }
-    }
+    STATE.lock().map_err(|_| Error::StatePoisoned)?.get_keys()
 }
 
-pub fn recover_seed_name(keyboard: bool, seed_name: &str) -> MRecoverSeedName {
-    let guard = STATE.lock();
-    match guard {
-        Ok(mut navstate) => navstate.recover_seed_name(keyboard, seed_name),
-        Err(_) => {
-            //TODO: maybe more grace here?
-            panic!("Concurrency error! Restart the app.");
-        }
-    }
+pub fn recover_seed_name(keyboard: bool, seed_name: &str) -> Result<MRecoverSeedName, Error> {
+    Ok(STATE
+        .lock()
+        .map_err(|_| Error::StatePoisoned)?
+        .recover_seed_name(keyboard, seed_name))
 }
 
-pub fn settings() -> MSettings {
-    let guard = STATE.lock();
-    match guard {
-        Ok(mut navstate) => navstate.settings(),
-        Err(_) => {
-            //TODO: maybe more grace here?
-            panic!("Concurrency error! Restart the app.");
-        }
-    }
+pub fn settings() -> Result<MSettings, Error> {
+    Ok(STATE.lock().map_err(|_| Error::StatePoisoned)?.settings())
 }
 
 pub fn get_verifier() -> Result<MVerifierDetails, Error> {
-    let guard = STATE.lock();
-    match guard {
-        Ok(mut navstate) => navstate.get_verifier(),
-        Err(_) => {
-            //TODO: maybe more grace here?
-            panic!("Concurrency error! Restart the app.");
-        }
-    }
+    STATE
+        .lock()
+        .map_err(|_| Error::StatePoisoned)?
+        .get_verifier()
 }
 
 pub fn manage_networks() -> Result<MManageNetworks, Error> {
-    let guard = STATE.lock();
-    match guard {
-        Ok(mut navstate) => navstate.manage_networks(),
-        Err(_) => {
-            //TODO: maybe more grace here?
-            panic!("Concurrency error! Restart the app.");
-        }
-    }
+    STATE
+        .lock()
+        .map_err(|_| Error::StatePoisoned)?
+        .manage_networks()
 }
 
 pub fn get_sign_sufficient_crypto() -> Result<MSignSufficientCrypto, Error> {
-    let guard = STATE.lock();
-    match guard {
-        Ok(mut navstate) => navstate.get_sign_sufficient_crypto(),
-        Err(_) => {
-            //TODO: maybe more grace here?
-            panic!("Concurrency error! Restart the app.");
-        }
-    }
+    STATE
+        .lock()
+        .map_err(|_| Error::StatePoisoned)?
+        .get_sign_sufficient_crypto()
 }
 
 /// Should be called when seed names are modified in native to synchronize data
-pub fn update_seed_names(seed_names: Vec<String>) {
-    let guard = STATE.lock();
-    match guard {
-        Ok(mut navstate) => {
-            (*navstate).seed_names = seed_names;
-        }
-        Err(_) => {
-            //TODO: maybe more grace here?
-            panic!("Concurrency error! Restart the app.");
-        }
-    }
+pub fn update_seed_names(seed_names: Vec<String>) -> Result<(), Error> {
+    STATE.lock().map_err(|_| Error::StatePoisoned)?.seed_names = seed_names;
+    Ok(())
 }

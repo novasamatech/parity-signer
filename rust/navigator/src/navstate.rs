@@ -1853,7 +1853,7 @@ impl State {
         // you have `error` field for that.
         //
         // Don't ignore this on refactor like everyone else before you.
-        let f = match db_handling::helpers::get_general_verifier(dbname) {
+        match db_handling::helpers::get_general_verifier(dbname) {
             Ok(Verifier { v: Some(vv) }) => {
                 let card = vv.show_card();
                 MSettings {
@@ -1870,8 +1870,7 @@ impl State {
                 encryption: None,
                 error: Some(format!("{}", e)),
             },
-        };
-        f
+        }
     }
 
     pub fn get_verifier(&mut self) -> Result<MVerifierDetails> {
