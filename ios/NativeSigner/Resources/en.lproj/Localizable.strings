@@ -311,3 +311,13 @@
 "KeyExport.Label.Header" = "Export Private Key";
 "KeyExport.Label.Hide" = "Private Key will be hidden in";
 
+"PublicKeyDetailsModal.Action.Networks" = "Other Networks";
+"PublicKeyDetailsModal.Action.Share" = "Share Private Key";
+"PublicKeyDetailsModal.Action.ChangeNetwork" = "Change Key's network";
+"PublicKeyDetailsModal.Action.Delete" = "Delete";
+
+"PublicKeyDetailsModal.Confirmation.Label.Title" = "Forget this Key?";
+"PublicKeyDetailsModal.Confirmation.Label.Content" = "This key for this network will be removed.\nAre you sure?";
+"PublicKeyDetailsModal.Confirmation.Action.Cancel" = "Cancel";
+"PublicKeyDetailsModal.Confirmation.Action.Remove" = "Remove Key";
+"PublicKeyDetailsModal.Confirmation.Snackbar" = "Key Has Been Removed";

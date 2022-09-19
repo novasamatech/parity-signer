@@ -65,11 +65,6 @@ struct ModalSelector: View {
             )
         case let .sufficientCryptoReady(value):
             SufficientCryptoReady(content: value)
-        case .keyDetailsAction:
-            KeyMenu(
-                exportKeyService: ExportPrivateKeyService(seedsMediator: data.seedsMediator),
-                navigation: navigation
-            )
         case let .typesInfo(value):
             TypesMenu(
                 content: value,
@@ -92,6 +87,8 @@ struct ModalSelector: View {
                 navigationRequest: navigationRequest
             )
         // Handled in native navigation
+        case .keyDetailsAction:
+            EmptyView()
         case .newSeedMenu:
             EmptyView()
         case .seedMenu:
