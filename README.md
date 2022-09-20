@@ -12,7 +12,7 @@
 </div>
 
 <div align="center">
-    <a href="https://github.com/paritytech/parity-signer/releases"><img src="docs/src/res/github-badge.png" width="150"></a> <a href="https://play.google.com/store/apps/details?id=io.parity.signer"><img src="docs/src/res/google-play-badge.png" width="150"></a> <a href="https://itunes.apple.com/us/app/parity-signer/id1218174838"><img src="docs/src/res/app-store-badge.png" width="150"></a><br<br>
+    <a href="https://github.com/paritytech/parity-signer/releases"><img src="docs/src/res/github-badge.png" width="150"></a> <a href="https://play.google.com/store/apps/details?id=io.parity.signer"><img src="docs/src/res/google-play-badge.png" width="150"></a> <a href="https://itunes.apple.com/us/app/parity-signer/id1218174838"><img src="docs/src/res/app-store-badge.png" width="150"></a><br><br>
 </div>
 
 # Introduction
@@ -102,10 +102,10 @@ Sub-folders of the `rust` folder:
 If you get errors like `cargo: feature X is required`, it most likely means you have an old version of Rust. Update it by running `rustup update stable`.
 
 **2.** Install `uniffi-bindgen`. Version has to match the version of `uniffi` crates specified
-   in the project (currently it is `0.19.3`):
+   in the project (currently it is `0.20.0`):
 
    ```bash
-   cargo install uniffi_bindgen --version 0.19.3
+   cargo install uniffi_bindgen --version 0.20.0
    ```
 
 **3.**  Ensure [opencv crate dependencies](https://crates.io/crates/opencv).
