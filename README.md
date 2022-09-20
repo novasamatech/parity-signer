@@ -12,7 +12,7 @@
 </div>
 
 <div align="center">
-    <a href="https://github.com/paritytech/parity-signer/releases"><img src="docs/src/res/github-badge.png" width="150"></a> <a href="https://play.google.com/store/apps/details?id=io.parity.signer"><img src="docs/src/res/google-play-badge.png" width="150"></a> <a href="https://itunes.apple.com/us/app/parity-signer/id1218174838"><img src="docs/src/res/app-store-badge.png" width="150"></a><br<br>
+    <a href="https://github.com/paritytech/parity-signer/releases"><img src="docs/src/res/github-badge.png" width="150"></a> <a href="https://play.google.com/store/apps/details?id=io.parity.signer"><img src="docs/src/res/google-play-badge.png" width="150"></a> <a href="https://itunes.apple.com/us/app/parity-signer/id1218174838"><img src="docs/src/res/app-store-badge.png" width="150"></a><br><br>
 </div>
 
 # Introduction
