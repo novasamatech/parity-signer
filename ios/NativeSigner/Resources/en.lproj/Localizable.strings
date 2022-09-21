@@ -276,6 +276,8 @@
 "KeySets.Action.Add" = "Add Key Set";
 "KeySets.Label.DerivedKeys.single" = "%@ Derived Key";
 "KeySets.Label.DerivedKeys.plural" = "%@ Derived Keys";
+"KeySets.Label.Empty.Title" = "You Don't Have\nAny Key Sets";
+"KeySets.Label.Empty.Subtitle" = "Add a new Key Set to Store Keys and Sign Transactions";
 
 "KeySetsModal.Action.Select" = "Select Keys";
 "KeySetsModal.Action.Derive" = "Derive from Key";
