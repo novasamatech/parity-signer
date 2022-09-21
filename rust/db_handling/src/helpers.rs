@@ -9,20 +9,19 @@ use sp_core::H256;
 use std::path::Path;
 
 #[cfg(feature = "signer")]
-use constants::{ADDRTREE, DANGER, GENERALVERIFIER, VERIFIERS};
-use constants::{METATREE, SETTREE, SPECSTREE, TYPES};
+use constants::{ADDRTREE, GENERALVERIFIER, VERIFIERS};
+use constants::{DANGER, METATREE, SETTREE, SPECSTREE, TYPES};
 
+use definitions::{
+    danger::DangerRecord, keyring::MetaKey, metadata::MetaValues, network_specs::NetworkSpecs,
+    qr_transfers::ContentLoadTypes, types::TypeEntry,
+};
 #[cfg(feature = "signer")]
 use definitions::{
-    danger::DangerRecord,
     helpers::multisigner_to_public,
     history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, TypesDisplay},
     keyring::{NetworkSpecsKey, VerifierKey},
     network_specs::{CurrentVerifier, ValidCurrentVerifier, Verifier},
-};
-use definitions::{
-    keyring::MetaKey, metadata::MetaValues, network_specs::NetworkSpecs,
-    qr_transfers::ContentLoadTypes, types::TypeEntry,
 };
 #[cfg(any(feature = "active", feature = "signer"))]
 use definitions::{
@@ -735,7 +734,6 @@ pub(crate) fn verify_checksum(database: &Db, checksum: u32) -> Result<()> {
 ///
 /// Currently, the only flag contributing to the danger status is whether the
 /// device was online. This may change eventually.
-#[cfg(feature = "signer")]
 pub fn get_danger_status<P>(db_path: P) -> Result<bool>
 where
     P: AsRef<Path>,

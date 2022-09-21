@@ -257,6 +257,13 @@ pub enum Command {
         #[clap(long, default_value = EXPORT_FOLDER)]
         export_dir: PathBuf,
     },
+
+    /// Get danger status from the db
+    GetDangerStatus {
+        /// Path to the hot database
+        #[clap(long= "hot-db-path", global = true, value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        db_path: PathBuf,
+    },
 }
 
 /// Display data commands.

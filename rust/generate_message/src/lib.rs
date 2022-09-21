@@ -1066,7 +1066,7 @@
 
 use db_handling::{
     default_cold_release, default_hot,
-    helpers::{prep_types, transfer_metadata_to_cold},
+    helpers::{get_danger_status, prep_types, transfer_metadata_to_cold},
 };
 
 mod derivations;
@@ -1131,5 +1131,9 @@ pub fn full_run(command: Command) -> Result<()> {
             block_hash,
             export_dir,
         } => debug_meta_at_block(&url, &block_hash, export_dir),
+        Command::GetDangerStatus { db_path } => {
+            println!("{}", get_danger_status(db_path)?);
+            Ok(())
+        }
     }
 }
