@@ -30,7 +30,6 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.backgroundSecondary
 import io.parity.signer.ui.theme.fill12
 import io.parity.signer.ui.theme.modal
-import io.parity.signer.uniffi.Address
 
 @Composable
 fun PrivateKeyExportBottomSheet(
@@ -86,12 +85,7 @@ fun PrivateKeyExportBottomSheet(
 							.fillMaxWidth(1f)
 							.clip(RoundedCornerShape(qrRounding))
 					)
-					KeyCard(
-						KeyCardModel.fromAddress(
-							model.address,
-							model.network.networkTitle
-						)
-					)
+					KeyCard(model.keyCard)
 					Spacer(modifier = Modifier.padding(bottom = 4.dp))
 				}
 				//autohide component
@@ -107,7 +101,7 @@ fun PrivateKeyExportBottomSheet(
 
 class PrivateKeyExportModel(
 	val qrImage: List<UByte>,
-	val address: Address,
+	val keyCard: KeyCardModel,
 	val network: NetworkCardModel,
 ) {
 	companion object {
@@ -115,16 +109,8 @@ class PrivateKeyExportModel(
 
 		fun createMock(): PrivateKeyExportModel = PrivateKeyExportModel(
 			qrImage = PreviewData.exampleQRCode,
-			address = Address(
-				base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
-				path = "//polkadot//path",
-				hasPwd = false,
-				identicon = PreviewData.exampleIdenticon,
-				seedName = "seedName",
-				multiselect = false,
-				secretExposed = true
-			),
-			network = NetworkCardModel("NetworkTitle", "NetworkLogo")
+			keyCard = KeyCardModel.createStub(),
+			network = NetworkCardModel("Polkadot", "NetworkLogo")
 		)
 	}
 }

@@ -23,7 +23,6 @@ import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Address
-import io.parity.signer.uniffi.MKeyDetails
 
 
 @Composable
@@ -121,10 +120,10 @@ data class KeyCardModel(
 	val network: String,
 	val base58: String,
 	val path: String,
-	val hasPwd: Boolean,
 	val identIcon: List<UByte>,
 	val seedName: String,
-	val multiselect: Boolean?,
+	val hasPwd: Boolean = false,
+	val multiselect: Boolean? = null,
 ) {
 	companion object {
 		/**
@@ -142,12 +141,12 @@ data class KeyCardModel(
 			)
 
 		fun createStub() = KeyCardModel(
-			network = "polkadot",
-			base58 = "kg;dlfgopdifopbcvjblkcvjpiobjvlkjvlkbjnlkfd",
-			path = "path long path",
-			hasPwd = false,
+			network = "Polkadot",
+			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
+			path = "//polkadot//path",
 			identIcon = PreviewData.exampleIdenticon,
-			seedName = "seed name",
+			seedName = "Seed Name",
+			hasPwd = false,
 			multiselect = null,
 		)
 	}
@@ -165,10 +164,9 @@ data class KeyCardModel(
 	uiMode = Configuration.UI_MODE_NIGHT_YES,
 	backgroundColor = 0xFFFFFFFF
 )
-//@Preview(backgroundColor = 0xFFFFFFFF)
 @Composable
 private fun PreviewKeyCard() {
-	SignerNewTheme() {
+	SignerNewTheme {
 		KeyCard(model = KeyCardModel.createStub())
 	}
 }

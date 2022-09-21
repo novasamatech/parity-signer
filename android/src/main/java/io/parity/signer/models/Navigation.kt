@@ -5,6 +5,7 @@ import android.widget.Toast
 import io.parity.signer.BuildConfig
 import io.parity.signer.bottomsheets.PrivateKeyExportModel
 import io.parity.signer.components.NetworkCardModel
+import io.parity.signer.components2.KeyCardModel
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ScreenData
 import io.parity.signer.uniffi.backendAction
@@ -77,7 +78,10 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 				)
 				val viewModel = PrivateKeyExportModel(
 					qrImage = secretKeyDetailsQR.qr,
-					address = secretKeyDetailsQR.address,
+					keyCard = KeyCardModel.fromAddress(
+						address = secretKeyDetailsQR.address,
+						networkTitle = secretKeyDetailsQR.networkInfo.networkTitle
+					),
 					NetworkCardModel(secretKeyDetailsQR.networkInfo)
 				)
 				navigate(Action.GO_BACK) // close bottom sheet from rust stack
