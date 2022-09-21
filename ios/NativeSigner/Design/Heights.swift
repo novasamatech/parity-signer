@@ -32,4 +32,6 @@ enum Sizes {
     static let xmarkButtonDiameter: CGFloat = 32
     /// Size for left-aligned icons within `MenuButton` / `ActionSheetButton`, 30pt
     static let actionSheetIcon: CGFloat = 30
+    /// Size for seed word position label
+    static let seedWordPositionWidth: CGFloat = 28
 }
