@@ -86,9 +86,9 @@ private struct ExportPrivateKeyAddressFooter: View {
             CircularProgressView(
                 CircularCountdownModel(
                     counter: Constants.keyVisibilityTime,
+                    viewModel: .privateKeyCountdown,
                     onCompletion: hideAction
-                ),
-                viewModel: .privateKeyCountdown
+                )
             )
         }
         .padding([.leading, .trailing], Spacing.large)
