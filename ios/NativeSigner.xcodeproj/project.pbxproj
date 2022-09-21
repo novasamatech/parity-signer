@@ -224,6 +224,8 @@
 		6DE8466A28BF6EA20051346A /* KeyDetailsActionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466928BF6EA20051346A /* KeyDetailsActionModel.swift */; };
 		6DE8466C28BF6EB10051346A /* KeyDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466B28BF6EB10051346A /* KeyDetailsViewModel.swift */; };
 		6DE8466E28BF73E40051346A /* DerivedKeyRowModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */; };
+		6DEA1B1528D4587200D170B7 /* SeedPhraseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEA1B1428D4587200D170B7 /* SeedPhraseView.swift */; };
+		6DEA1B1728D4593100D170B7 /* RobotoMono-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DEA1B1628D4592B00D170B7 /* RobotoMono-Bold.ttf */; };
 		6DEEA87E28AFBF5D00371ECA /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DEEA87D28AFBF5D00371ECA /* libsigner.a */; };
 		6DF7257828BE0E08007CD9B6 /* DerivedKeyRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */; };
 		6DF7751B28B399AC0040012E /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7751A28B399AC0040012E /* CornerRadius.swift */; };
@@ -488,6 +490,8 @@
 		6DE8466B28BF6EB10051346A /* KeyDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsViewModel.swift; sourceTree = "<group>"; };
 		6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyRowModel.swift; sourceTree = "<group>"; };
 		6DE8467028C0FA1E0051346A /* ExportPrivateKeyWarningModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportPrivateKeyWarningModal.swift; sourceTree = "<group>"; };
+		6DEA1B1428D4587200D170B7 /* SeedPhraseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedPhraseView.swift; sourceTree = "<group>"; };
+		6DEA1B1628D4592B00D170B7 /* RobotoMono-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobotoMono-Bold.ttf"; sourceTree = "<group>"; };
 		6DEEA87D28AFBF5D00371ECA /* libsigner.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsigner.a; sourceTree = "<group>"; };
 		6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyRow.swift; sourceTree = "<group>"; };
 		6DF7751A28B399AC0040012E /* CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadius.swift; sourceTree = "<group>"; };
@@ -604,6 +608,7 @@
 		2D7A7BC826BA97AE0053C1E0 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				6DEA1B1328D4586400D170B7 /* SeedPhrase */,
 				6D84442228D342430072FBAC /* Modifiers */,
 				6D8045D328D06DAD00237F8C /* Deprecated */,
 				6D8045DF28D095AE00237F8C /* QRCode */,
@@ -895,6 +900,7 @@
 		6D57DC5E289E524800005C63 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
+				6DEA1B1628D4592B00D170B7 /* RobotoMono-Bold.ttf */,
 				6D57DC5F289E524800005C63 /* Inter-Bold.otf */,
 				6D57DC60289E524800005C63 /* Inter-Regular.otf */,
 				6D57DC61289E524800005C63 /* Inter-Medium.otf */,
@@ -1254,6 +1260,14 @@
 			path = ExportPrivateKey;
 			sourceTree = "<group>";
 		};
+		6DEA1B1328D4586400D170B7 /* SeedPhrase */ = {
+			isa = PBXGroup;
+			children = (
+				6DEA1B1428D4587200D170B7 /* SeedPhraseView.swift */,
+			);
+			path = SeedPhrase;
+			sourceTree = "<group>";
+		};
 		6DF7751C28B39F590040012E /* KeySetsList */ = {
 			isa = PBXGroup;
 			children = (
@@ -1364,6 +1378,7 @@
 				2D7A7BCE26BBC5690053C1E0 /* LaunchScreen.xib in Resources */,
 				6D57DC6E289E524800005C63 /* Inter-SemiBold.otf in Resources */,
 				6D57DC6D289E524800005C63 /* RobotoMono-Medium.otf in Resources */,
+				6DEA1B1728D4593100D170B7 /* RobotoMono-Bold.ttf in Resources */,
 				6D57DC6A289E524800005C63 /* Inter-Bold.otf in Resources */,
 				6D57DC66289E524800005C63 /* Localizable.strings in Resources */,
 				6D57DC6F289E524800005C63 /* RobotoMono-Light.otf in Resources */,
@@ -1540,6 +1555,7 @@
 				6DBD21FA289A7A26005D539B /* DatabaseMediator.swift in Sources */,
 				2D48F3D6277B94C4004B27BE /* Identicon.swift in Sources */,
 				6D8045D528D06DC700237F8C /* QRCodeContainerView.swift in Sources */,
+				6DEA1B1528D4587200D170B7 /* SeedPhraseView.swift in Sources */,
 				6D6430EF28CB30A000342E37 /* BottoEdgeOverlay.swift in Sources */,
 				6D88CFF828C634CA001FB0A1 /* KeyDetailsActionsModal.swift in Sources */,
 				2D48F3532760A2D8004B27BE /* Fontstyle.swift in Sources */,

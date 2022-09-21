@@ -15,17 +15,24 @@ final class BottomSnackbarPresentation: ObservableObject {
 struct SnackbarViewModel {
     let title: String
     let style: Snackbar.Style
+    let countdown: CircularCountdownModel?
 
     init(
         title: String,
-        style: Snackbar.Style = .info
+        style: Snackbar.Style = .info,
+        countdown: CircularCountdownModel? = nil
     ) {
         self.title = title
         self.style = style
+        self.countdown = countdown
     }
 }
 
 struct Snackbar: View {
+    private enum Constants {
+        static let keyVisibilityTime: CGFloat = 60
+    }
+
     enum Style {
         case info
         case warning
@@ -57,6 +64,10 @@ struct Snackbar: View {
                     .foregroundColor(Asset.accentForegroundText.swiftUIColor)
                     .padding(Spacing.large)
                 Spacer()
+                if let countdown = viewModel.countdown {
+                    CircularProgressView(countdown)
+                        .padding(.trailing, Spacing.medium)
+                }
             }
             .frame(height: Heights.snackbarHeight, alignment: .center)
             .background(viewModel.style.tintColor)
@@ -74,35 +85,40 @@ extension View {
     /// - Returns: view that modifier is applied to
     func bottomSnackbar(_ viewModel: SnackbarViewModel, isPresented: Binding<Bool>) -> some View {
         bottomEdgeOverlay(overlayView: Snackbar(viewModel: viewModel), isPresented: isPresented)
-            .tapAndDelayDismiss(isPresented: isPresented)
+            .tapAndDelayDismiss(
+                autodismissCounter: Double(viewModel.countdown?.counter ?? 3),
+                isPresented: isPresented
+            )
     }
 }
 
-// struct SnackbarDemo: View {
-//    @State private var showInfo = false
-//    @State private var showWarning = false
-//
-//    var body: some View {
-//        VStack {
-//            Text("Present info snackbar")
-//                .onTapGesture {
-//                    showInfo = true
-//                }
-//            Spacer()
-//        }.bottomSnackbar(
-//            SnackbarViewModel(title: "Metadata has been updated", style: .info),
-//            isPresented: $showInfo
-//        )
-//    }
-// }
-//
-//
-// struct Snackbar_Previews: PreviewProvider {
-//    @State private var showOverlay = false
-//
-//    static var previews: some View {
-//        SnackbarDemo()
-//            .preferredColorScheme(.light)
-//    }
-// }
-//
+struct SnackbarDemo: View {
+    @State private var showInfo = false
+    @State private var showWarning = false
+
+    var body: some View {
+        VStack {
+            Text("Present info snackbar")
+                .onTapGesture {
+                    showInfo = true
+                }
+            Spacer()
+        }.bottomSnackbar(
+            SnackbarViewModel(
+                title: "Metadata has been updated",
+                style: .info,
+                countdown: .init(counter: 60, viewModel: .snackbarCountdown, onCompletion: {})
+            ),
+            isPresented: $showInfo
+        )
+    }
+}
+
+struct Snackbar_Previews: PreviewProvider {
+    @State private var showOverlay = false
+
+    static var previews: some View {
+        SnackbarDemo()
+            .preferredColorScheme(.light)
+    }
+}

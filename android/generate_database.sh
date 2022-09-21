@@ -18,4 +18,4 @@ rm -rf $DBPATH
 mkdir -p $DBPATH
 
 echo "Copying DB from $RELEASE_PATH to $DBPATH"
-cp -R $RELEASE_PATH/ $DBPATH
+cp -R $RELEASE_PATH/. $DBPATH
