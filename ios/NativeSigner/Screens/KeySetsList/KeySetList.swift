@@ -28,30 +28,34 @@ struct KeySetList: View {
                     navigation: navigation,
                     viewModel: NavigationBarViewModel(title: Localizable.KeySets.title.string)
                 )
-                List {
-                    ForEach(
-                        viewModel.list.sorted(by: { $0.keyName < $1.keyName }),
-                        id: \.keyName
-                    ) { keySet in
-                        KeySetRow(keySet).onTapGesture {
-                            navigation.perform(navigation: .init(action: .selectSeed, details: keySet.keyName))
+                if viewModel.list.isEmpty {
+                    KeyListEmptyState()
+                } else {
+                    List {
+                        ForEach(
+                            viewModel.list.sorted(by: { $0.keyName < $1.keyName }),
+                            id: \.keyName
+                        ) { keySet in
+                            KeySetRow(keySet).onTapGesture {
+                                navigation.perform(navigation: .init(action: .selectSeed, details: keySet.keyName))
+                            }
+                            .listRowBackground(Asset.backgroundSystem.swiftUIColor)
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(.init(
+                                top: Spacing.extraExtraSmall,
+                                leading: Spacing.extraSmall,
+                                bottom: Spacing.extraExtraSmall,
+                                trailing: Spacing.extraSmall
+                            ))
                         }
-                        .listRowBackground(Asset.backgroundSystem.swiftUIColor)
-                        .listRowSeparator(.hidden)
-                        .listRowInsets(.init(
-                            top: Spacing.extraExtraSmall,
-                            leading: Spacing.extraSmall,
-                            bottom: Spacing.extraExtraSmall,
-                            trailing: Spacing.extraSmall
-                        ))
+                        Spacer()
+                            .listRowBackground(Asset.backgroundSystem.swiftUIColor)
+                            .listRowSeparator(.hidden)
+                            .frame(height: Heights.actionButton + Spacing.large)
                     }
-                    Spacer()
-                        .listRowBackground(Asset.backgroundSystem.swiftUIColor)
-                        .listRowSeparator(.hidden)
-                        .frame(height: Heights.actionButton + Spacing.large)
+                    .listStyle(.plain)
+                    .hiddenScrollContent()
                 }
-                .listStyle(.plain)
-                .hiddenScrollContent()
             }
             PrimaryButton(
                 action: {
@@ -76,55 +80,74 @@ struct KeySetList: View {
     }
 }
 
-// struct KeySetListPreview: PreviewProvider {
-//    static var previews: some View {
-//        KeySetList(
-//            navigation: NavigationCoordinator(),
-//            viewModel: KeySetListViewModelBuilder()
-//                .build(
-//                    for:
-//                    MSeeds(
-//                        seedNameCards: [
-//                            SeedNameCard(
-//                                seedName: "aaaa",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 3
-//                            ),
-//                            SeedNameCard(
-//                                seedName: "bbbb",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 0
-//                            ),
-//                            SeedNameCard(
-//                                seedName: "cccc",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 1
-//                            ),
-//                            SeedNameCard(
-//                                seedName: "dddd",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 4
-//                            ),
-//                            SeedNameCard(
-//                                seedName: "eeee",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 15
-//                            ),
-//                            SeedNameCard(
-//                                seedName: "ffff",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 1
-//                            ),
-//                            SeedNameCard(
-//                                seedName: "gggg",
-//                                identicon: PreviewData.exampleIdenticon,
-//                                derivedKeysCount: 0
-//                            )
-//                        ]
-//                    )
-//                )
-//        )
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }
+private struct KeyListEmptyState: View {
+    var body: some View {
+        VStack(spacing: Spacing.extraSmall) {
+            Spacer()
+            Text(Localizable.KeySets.Label.Empty.title.key)
+                .font(Fontstyle.titleM.base)
+            Text(Localizable.KeySets.Label.Empty.subtitle.key)
+                .font(Fontstyle.bodyL.base)
+            Spacer()
+                .frame(height: Heights.actionButton + 2 * Spacing.large)
+            Spacer()
+        }
+        .padding(Spacing.componentSpacer)
+        .multilineTextAlignment(.center)
+        .lineSpacing(Spacing.extraExtraSmall)
+        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+    }
+}
+
+struct KeySetListPreview: PreviewProvider {
+    static var previews: some View {
+        KeySetList(
+            navigation: NavigationCoordinator(),
+            viewModel: KeySetListViewModelBuilder()
+                .build(
+                    for:
+                    MSeeds(
+                        seedNameCards: [
+                            SeedNameCard(
+                                seedName: "aaaa",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 3
+                            ),
+                            SeedNameCard(
+                                seedName: "bbbb",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 0
+                            ),
+                            SeedNameCard(
+                                seedName: "cccc",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 1
+                            ),
+                            SeedNameCard(
+                                seedName: "dddd",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 4
+                            ),
+                            SeedNameCard(
+                                seedName: "eeee",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 15
+                            ),
+                            SeedNameCard(
+                                seedName: "ffff",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 1
+                            ),
+                            SeedNameCard(
+                                seedName: "gggg",
+                                identicon: PreviewData.exampleIdenticon,
+                                derivedKeysCount: 0
+                            )
+                        ]
+                    )
+                )
+        )
+        .preferredColorScheme(.dark)
+        .previewLayout(.sizeThatFits)
+    }
+}
