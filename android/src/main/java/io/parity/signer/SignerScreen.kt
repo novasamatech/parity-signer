@@ -9,6 +9,7 @@ import io.parity.signer.components.Documents
 import io.parity.signer.bottomsheets.*
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
+import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.ModalData
@@ -215,12 +216,17 @@ fun AlertSelector(
 
 @Composable
 fun LocalNavSelector(navAction: LocalNavAction?) {
-	when (navAction) {
-		is LocalNavAction.ShowExportPrivateKey -> {
-			PrivateKeyExportBottomSheet(model = navAction.model, navigator = navAction.navigator)
+	SignerNewTheme {
+		when (navAction) {
+			is LocalNavAction.ShowExportPrivateKey -> {
+				PrivateKeyExportBottomSheet(
+					model = navAction.model,
+					navigator = navAction.navigator
+				)
+			}
+			LocalNavAction.None -> {}
+			null -> {}
 		}
-		LocalNavAction.None -> {}
-		null -> {}
 	}
 }
 
