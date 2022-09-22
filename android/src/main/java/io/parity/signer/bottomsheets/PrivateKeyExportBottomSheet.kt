@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +22,7 @@ import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components2.CircularCountDownTimer
 import io.parity.signer.components2.KeyCard
 import io.parity.signer.components2.KeyCardModel
+import io.parity.signer.components2.base.BottomSheetHeader
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap
@@ -39,8 +39,8 @@ fun PrivateKeyExportBottomSheet(
 ) {
 	Column(
 		modifier = Modifier
-			.clickable { navigator.backAction() }
-			.fillMaxWidth()
+            .clickable { navigator.backAction() }
+            .fillMaxWidth()
 	) {
 		Spacer(Modifier.weight(1f))
 		Surface(
@@ -50,20 +50,12 @@ fun PrivateKeyExportBottomSheet(
 			val sidePadding = 24.dp
 			Column(
 				modifier = Modifier
-					.fillMaxWidth()
-					.padding(start = sidePadding, end = sidePadding),
+                    .fillMaxWidth()
+                    .padding(start = sidePadding, end = sidePadding),
 				horizontalAlignment = Alignment.CenterHorizontally,
 			) {
-				Row(
-					modifier = Modifier
-						.padding(top = sidePadding, bottom = sidePadding)
-						.fillMaxWidth()
-				) {
-					Text(
-						text = stringResource(R.string.export_private_key_title),
-						color = MaterialTheme.colors.primary,
-						style = MaterialTheme.typography.h3,
-					)
+				BottomSheetHeader(stringResource(R.string.export_private_key_title)) {
+					navigator.backAction()
 				}
 
 				val qrRounding = 16.dp
@@ -71,25 +63,28 @@ fun PrivateKeyExportBottomSheet(
 					RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
 				Column(
 					modifier = Modifier
-						.clip(plateShape)
-						.border(
-							BorderStroke(1.dp, MaterialTheme.colors.fill12),
-							plateShape
-						)
-						.background(MaterialTheme.colors.fill12, plateShape)
+                        .clip(plateShape)
+                        .border(
+                            BorderStroke(1.dp, MaterialTheme.colors.fill12),
+                            plateShape
+                        )
+                        .background(MaterialTheme.colors.fill12, plateShape)
 				) {
 					Box(
 						modifier = Modifier
-							.fillMaxWidth(1f)
-							.background(Color.White, RoundedCornerShape(qrRounding))
+                            .fillMaxWidth(1f)
+                            .aspectRatio(1f)
+                            .background(
+                                Color.White,
+                                RoundedCornerShape(qrRounding)
+                            ),
+						contentAlignment = Alignment.Center,
 					) {
 						Image(
 							bitmap = model.qrImage.intoImageBitmap(),
 							contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
-							contentScale = ContentScale.FillWidth,
-							modifier = Modifier
-								.padding(horizontal = 48.dp, vertical = 40.dp)
-								.fillMaxWidth(1f)
+							contentScale = ContentScale.Fit,
+							modifier = Modifier.size(264.dp)
 						)
 					}
 					KeyCard(model.keyCard)
@@ -126,8 +121,8 @@ class PrivateKeyExportModel(
 	name = "day",
 	group = "themes",
 	uiMode = UI_MODE_NIGHT_NO,
-	showBackground = true,
-	backgroundColor = 0
+//	showBackground = true,
+//	backgroundColor = 0xFFFFFFFF,
 )
 @Preview(
 	name = "dark theme", group = "themes", uiMode = UI_MODE_NIGHT_YES,
