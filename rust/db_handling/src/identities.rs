@@ -685,11 +685,9 @@ where
             network_specs.genesis_hash,
         );
         events.push(Event::IdentityRemoved { identity_history });
-        address_details.network_id = address_details
+        address_details
             .network_id
-            .into_iter()
-            .filter(|id| id != network_specs_key)
-            .collect();
+            .retain(|id| id != network_specs_key);
         if address_details.network_id.is_empty() {
             id_batch.remove(address_key.key())
         } else {

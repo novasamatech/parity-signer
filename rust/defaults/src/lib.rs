@@ -362,13 +362,13 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
     let mut types_prep: Vec<TypeEntry> = Vec::new();
 
     for caps1 in REG_STRUCTS_WITH_NAMES.captures_iter(&type_info) {
-        let struct_name = (&caps1["name"]).to_string();
-        let struct_description = (&caps1["description"]).to_string();
+        let struct_name = (caps1["name"]).to_string();
+        let struct_description = (caps1["description"]).to_string();
         let mut struct_fields: Vec<StructField> = Vec::new();
         for caps2 in REG_STRUCT_FIELDS.captures_iter(&struct_description) {
             let new = StructField {
-                field_name: Some((&caps2["field_name"]).to_string()),
-                field_type: (&caps2["field_type"]).to_string(),
+                field_name: Some((caps2["field_name"]).to_string()),
+                field_type: (caps2["field_type"]).to_string(),
             };
             struct_fields.push(new);
         }
@@ -381,17 +381,17 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
     for caps in REG_STRUCTS_NO_NAMES.captures_iter(&type_info) {
         let only_field = StructField {
             field_name: None,
-            field_type: (&caps["description"]).to_string(),
+            field_type: (caps["description"]).to_string(),
         };
         let new_entry = TypeEntry {
-            name: (&caps["name"]).to_string(),
+            name: (caps["name"]).to_string(),
             description: Description::Struct(vec![only_field]),
         };
         types_prep.push(new_entry);
     }
     for caps1 in REG_ENUM.captures_iter(&type_info) {
-        let enum_name = (&caps1["name"]).to_string();
-        let enum_description = (&caps1["description"]).to_string();
+        let enum_name = (caps1["name"]).to_string();
+        let enum_description = (caps1["description"]).to_string();
         let enum_variants = enum_description
             .lines()
             .filter(|line| REG_ENUM_VARIANTS.is_match(line))
@@ -399,7 +399,7 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
                 let caps2 = REG_ENUM_VARIANTS
                     .captures(line)
                     .expect("just checked it is match");
-                let variant_name = (&caps2["variant_name"]).to_string();
+                let variant_name = (caps2["variant_name"]).to_string();
                 let variant_type = match caps2.name("variant_type") {
                     None => EnumVariantType::None,
                     Some(a) => {
@@ -408,7 +408,7 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
                             // either a single type or a tuple
                             match REG_ENUM_SIMPLE.captures(&x[1..x.len() - 1]) {
                                 // single type
-                                Some(b) => EnumVariantType::Type((&b["simple_type"]).to_string()),
+                                Some(b) => EnumVariantType::Type((b["simple_type"]).to_string()),
                                 // tuple
                                 None => EnumVariantType::Type(x),
                             }
@@ -417,8 +417,8 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
                             let mut type_is_struct: Vec<StructField> = Vec::new();
                             for caps3 in REG_ENUM_STRUCT.captures_iter(&x) {
                                 let new = StructField {
-                                    field_name: Some((&caps3["field_name"]).to_string()),
-                                    field_type: (&caps3["field_type"]).to_string(),
+                                    field_name: Some((caps3["field_name"]).to_string()),
+                                    field_type: (caps3["field_type"]).to_string(),
                                 };
                                 type_is_struct.push(new);
                             }
@@ -440,8 +440,8 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
     }
     for caps in REG_TYPES.captures_iter(&type_info) {
         let new_entry = TypeEntry {
-            name: (&caps["name"]).to_string(),
-            description: Description::Type((&caps["description"]).to_string()),
+            name: (caps["name"]).to_string(),
+            description: Description::Type((caps["description"]).to_string()),
         };
         types_prep.push(new_entry);
     }
