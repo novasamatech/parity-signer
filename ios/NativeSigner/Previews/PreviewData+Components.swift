@@ -67,16 +67,16 @@ extension PreviewData {
     )
 
     static let exampleDerivedKeyOverviews: [DerivedKeyOverviewViewModel] = [
-        //        DerivedKeyOverviewViewModel(
-//            identicon: PreviewData.exampleIdenticon,
-//            path: "// polkadot",
-//            hasPassword: false
-//        ),
-//        DerivedKeyOverviewViewModel(
-//            identicon: PreviewData.exampleIdenticon,
-//            path: "// kusama",
-//            hasPassword: false
-//        ),
+        DerivedKeyOverviewViewModel(
+            identicon: PreviewData.exampleIdenticon,
+            path: "// polkadot",
+            hasPassword: false
+        ),
+        DerivedKeyOverviewViewModel(
+            identicon: PreviewData.exampleIdenticon,
+            path: "// kusama",
+            hasPassword: false
+        ),
         DerivedKeyOverviewViewModel(
             identicon: PreviewData.exampleIdenticon,
             path: "// astar",

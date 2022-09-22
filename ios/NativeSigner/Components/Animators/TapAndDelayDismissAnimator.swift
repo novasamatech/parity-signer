@@ -43,9 +43,6 @@ struct TapAndDelayDismissAnimator: ViewModifier {
                     stop()
                 }
             }
-//            .onAppear {
-//                start()
-//            }
             .onChange(
                 of: isPresented,
                 perform: {
