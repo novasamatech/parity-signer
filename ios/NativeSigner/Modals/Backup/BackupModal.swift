@@ -108,12 +108,12 @@ struct BackupModal: View {
                         title: Localizable.BackupModal.Label.snackbar.string,
                         style: .info,
                         tapToDismiss: false,
-                        countdown: .init(counter: 8, viewModel: .snackbarCountdown, onCompletion: animateDismissal)
+                        countdown: .init(counter: 60, viewModel: .snackbarCountdown, onCompletion: animateDismissal)
                     )
                     snackbar.isSnackbarPresented = true
                 }
                 .padding(.bottom, -Spacing.medium)
-                .bottomSnackbar(snackbar.viewModel, isPresented: $snackbar.isSnackbarPresented, autodismissCounter: 8)
+                .bottomSnackbar(snackbar.viewModel, isPresented: $snackbar.isSnackbarPresented, autodismissCounter: 60)
                 .padding(.bottom, -Spacing.medium)
             }
         )
