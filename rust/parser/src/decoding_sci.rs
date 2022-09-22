@@ -1001,7 +1001,7 @@ fn decode_type_def_bit_sequence(
 ) -> Result<DecodedOut> {
     let pre_bitvec = get_compact::<u32>(&data)?;
     let actual_length = match pre_bitvec.compact_found % 8 {
-        0 => (pre_bitvec.compact_found / 8),
+        0 => pre_bitvec.compact_found / 8,
         _ => (pre_bitvec.compact_found / 8) + 1,
     };
     match pre_bitvec.start_next_unit {
