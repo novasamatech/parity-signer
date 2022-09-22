@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -77,14 +78,20 @@ fun PrivateKeyExportBottomSheet(
 						)
 						.background(MaterialTheme.colors.fill12, plateShape)
 				) {
-					Image(
-						bitmap = model.qrImage.intoImageBitmap(),
-						contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
-						contentScale = ContentScale.FillWidth,
+					Box(
 						modifier = Modifier
 							.fillMaxWidth(1f)
-							.clip(RoundedCornerShape(qrRounding))
-					)
+							.background(Color.White, RoundedCornerShape(qrRounding))
+					) {
+						Image(
+							bitmap = model.qrImage.intoImageBitmap(),
+							contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
+							contentScale = ContentScale.FillWidth,
+							modifier = Modifier
+								.padding(horizontal = 48.dp, vertical = 40.dp)
+								.fillMaxWidth(1f)
+						)
+					}
 					KeyCard(model.keyCard)
 					Spacer(modifier = Modifier.padding(bottom = 4.dp))
 				}
