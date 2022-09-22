@@ -16,7 +16,6 @@
 		2D48F3572760BBEC004B27BE /* RecoverSeedName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3562760BBEC004B27BE /* RecoverSeedName.swift */; };
 		2D48F35B2760E5DF004B27BE /* RecoverSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F35A2760E5DF004B27BE /* RecoverSeedPhrase.swift */; };
 		2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36027620F49004B27BE /* SeedKeyCard.swift */; };
-		2D48F36B2763604F004B27BE /* Backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36A2763604F004B27BE /* Backup.swift */; };
 		2D48F36F2767419D004B27BE /* PasswordConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36E2767419D004B27BE /* PasswordConfirm.swift */; };
 		2D48F38127691C05004B27BE /* AlertSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38027691C05004B27BE /* AlertSelector.swift */; };
 		2D48F38327691C0A004B27BE /* ConfirmAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38227691C0A004B27BE /* ConfirmAlert.swift */; };
@@ -136,6 +135,7 @@
 		6D2D244F28CE5C1B00862726 /* NavbarActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D244E28CE5C1B00862726 /* NavbarActionButton.swift */; };
 		6D2D245228CE5F2D00862726 /* KeyDetailsPublicKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D245128CE5F2D00862726 /* KeyDetailsPublicKeyView.swift */; };
 		6D2D245728CF5C5200862726 /* PublicKeyActionsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D245628CF5C5200862726 /* PublicKeyActionsModal.swift */; };
+		6D42793728DB147800C141DC /* PrivateKeyQRCodeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D42793628DB147800C141DC /* PrivateKeyQRCodeService.swift */; };
 		6D4C0753289AC36100B2EE48 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0751289AC36100B2EE48 /* Fonts.swift */; };
 		6D4C0756289B369200B2EE48 /* Assets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0755289B369200B2EE48 /* Assets.swift */; };
 		6D4C0758289BD95500B2EE48 /* SFSymbols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0757289BD95500B2EE48 /* SFSymbols.swift */; };
@@ -172,6 +172,7 @@
 		6D6430F628CB460A00342E37 /* ServiceLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6430F528CB460A00342E37 /* ServiceLocator.swift */; };
 		6D6430F728CB662500342E37 /* ExportPrivateKeyWarningModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8467028C0FA1E0051346A /* ExportPrivateKeyWarningModal.swift */; };
 		6D6430F828CB662B00342E37 /* ExportPrivateKeyModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D91F3EB28C114D1007560F5 /* ExportPrivateKeyModal.swift */; };
+		6D6E99DB28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6E99DA28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift */; };
 		6D8045D528D06DC700237F8C /* QRCodeContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D428D06DC700237F8C /* QRCodeContainerView.swift */; };
 		6D8045D728D06E6B00237F8C /* PreviewData+Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D628D06E6B00237F8C /* PreviewData+Components.swift */; };
 		6D8045D928D0761E00237F8C /* QRCodeAddressFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */; };
@@ -209,6 +210,7 @@
 		6DC5643B28B8D189003D540B /* KeychainAccessAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643A28B8D189003D540B /* KeychainAccessAdapter.swift */; };
 		6DC5643D28B91EFE003D540B /* NavbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643C28B91EFE003D540B /* NavbarButton.swift */; };
 		6DC5644028B929EA003D540B /* KeyDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643F28B929EA003D540B /* KeyDetailsView.swift */; };
+		6DCC572728D8C0490014278A /* BackupModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DCC572628D8C0490014278A /* BackupModal.swift */; };
 		6DD9FF1628C8B85300FB6195 /* HorizontalActionsBottomModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD9FF1528C8B85300FB6195 /* HorizontalActionsBottomModal.swift */; };
 		6DD9FF1928C8C9B000FB6195 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD9FF1828C8C9AF00FB6195 /* Animations.swift */; };
 		6DDEF11028AD105F004CA2FD /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF10F28AD105F004CA2FD /* TabBarView.swift */; };
@@ -273,7 +275,6 @@
 		2D48F3562760BBEC004B27BE /* RecoverSeedName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverSeedName.swift; sourceTree = "<group>"; };
 		2D48F35A2760E5DF004B27BE /* RecoverSeedPhrase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecoverSeedPhrase.swift; sourceTree = "<group>"; };
 		2D48F36027620F49004B27BE /* SeedKeyCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeedKeyCard.swift; sourceTree = "<group>"; };
-		2D48F36A2763604F004B27BE /* Backup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backup.swift; sourceTree = "<group>"; };
 		2D48F36E2767419D004B27BE /* PasswordConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordConfirm.swift; sourceTree = "<group>"; };
 		2D48F38027691C05004B27BE /* AlertSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertSelector.swift; sourceTree = "<group>"; };
 		2D48F38227691C0A004B27BE /* ConfirmAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfirmAlert.swift; sourceTree = "<group>"; };
@@ -399,6 +400,7 @@
 		6D2D244E28CE5C1B00862726 /* NavbarActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarActionButton.swift; sourceTree = "<group>"; };
 		6D2D245128CE5F2D00862726 /* KeyDetailsPublicKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsPublicKeyView.swift; sourceTree = "<group>"; };
 		6D2D245628CF5C5200862726 /* PublicKeyActionsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicKeyActionsModal.swift; sourceTree = "<group>"; };
+		6D42793628DB147800C141DC /* PrivateKeyQRCodeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateKeyQRCodeService.swift; sourceTree = "<group>"; };
 		6D4C0751289AC36100B2EE48 /* Fonts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		6D4C0755289B369200B2EE48 /* Assets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Assets.swift; sourceTree = "<group>"; };
 		6D4C0757289BD95500B2EE48 /* SFSymbols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSymbols.swift; sourceTree = "<group>"; };
@@ -434,6 +436,7 @@
 		6D6430F028CB32CC00342E37 /* Snackbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snackbar.swift; sourceTree = "<group>"; };
 		6D6430F328CB447900342E37 /* ForgetKeySetAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgetKeySetAction.swift; sourceTree = "<group>"; };
 		6D6430F528CB460A00342E37 /* ServiceLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceLocator.swift; sourceTree = "<group>"; };
+		6D6E99DA28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyOverviewRow.swift; sourceTree = "<group>"; };
 		6D8045D428D06DC700237F8C /* QRCodeContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeContainerView.swift; sourceTree = "<group>"; };
 		6D8045D628D06E6B00237F8C /* PreviewData+Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreviewData+Components.swift"; sourceTree = "<group>"; };
 		6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeAddressFooterView.swift; sourceTree = "<group>"; };
@@ -472,6 +475,7 @@
 		6DC5643A28B8D189003D540B /* KeychainAccessAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainAccessAdapter.swift; sourceTree = "<group>"; };
 		6DC5643C28B91EFE003D540B /* NavbarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarButton.swift; sourceTree = "<group>"; };
 		6DC5643F28B929EA003D540B /* KeyDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsView.swift; sourceTree = "<group>"; };
+		6DCC572628D8C0490014278A /* BackupModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupModal.swift; sourceTree = "<group>"; };
 		6DD9FF1528C8B85300FB6195 /* HorizontalActionsBottomModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalActionsBottomModal.swift; sourceTree = "<group>"; };
 		6DD9FF1828C8C9AF00FB6195 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		6DDEF10F28AD105F004CA2FD /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
@@ -553,6 +557,7 @@
 		2D7A7BC626BA974E0053C1E0 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				6DCC572428D8C0290014278A /* Backup */,
 				6D2D245028CE5F0E00862726 /* PublicKey */,
 				6DC5643E28B929E0003D540B /* KeyDetails */,
 				6DF7751C28B39F590040012E /* KeySetsList */,
@@ -583,6 +588,7 @@
 		2D7A7BC726BA97A50053C1E0 /* Modals */ = {
 			isa = PBXGroup;
 			children = (
+				6DCC572528D8C0410014278A /* Backup */,
 				6DD9FF1428C8B83C00FB6195 /* Alerts */,
 				6D88CFF628C634BC001FB0A1 /* KeySet */,
 				6DE8466F28C0FA090051346A /* ExportPrivateKey */,
@@ -600,7 +606,6 @@
 				2D48F395276A2003004B27BE /* SignatureReady.swift */,
 				2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */,
 				2D48F397276A200F004B27BE /* EnterPassword.swift */,
-				2D48F36A2763604F004B27BE /* Backup.swift */,
 			);
 			path = Modals;
 			sourceTree = "<group>";
@@ -608,6 +613,7 @@
 		2D7A7BC826BA97AE0053C1E0 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				6D6E99D928D8DCAD003F45CE /* Rows */,
 				6DEA1B1328D4586400D170B7 /* SeedPhrase */,
 				6D84442228D342430072FBAC /* Modifiers */,
 				6D8045D328D06DAD00237F8C /* Deprecated */,
@@ -837,6 +843,7 @@
 			isa = PBXGroup;
 			children = (
 				6D2D244A28CCAD4100862726 /* ExportPrivateKeyService.swift */,
+				6D42793628DB147800C141DC /* PrivateKeyQRCodeService.swift */,
 			);
 			path = Backend;
 			sourceTree = "<group>";
@@ -1010,6 +1017,14 @@
 			path = Actions;
 			sourceTree = "<group>";
 		};
+		6D6E99D928D8DCAD003F45CE /* Rows */ = {
+			isa = PBXGroup;
+			children = (
+				6D6E99DA28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift */,
+			);
+			path = Rows;
+			sourceTree = "<group>";
+		};
 		6D8045D328D06DAD00237F8C /* Deprecated */ = {
 			isa = PBXGroup;
 			children = (
@@ -1172,6 +1187,21 @@
 				6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */,
 			);
 			path = KeyDetails;
+			sourceTree = "<group>";
+		};
+		6DCC572428D8C0290014278A /* Backup */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Backup;
+			sourceTree = "<group>";
+		};
+		6DCC572528D8C0410014278A /* Backup */ = {
+			isa = PBXGroup;
+			children = (
+				6DCC572628D8C0490014278A /* BackupModal.swift */,
+			);
+			path = Backup;
 			sourceTree = "<group>";
 		};
 		6DD9FF1428C8B83C00FB6195 /* Alerts */ = {
@@ -1512,6 +1542,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6DDEF13228AE6039004CA2FD /* signer.udl in Sources */,
+				6DCC572728D8C0490014278A /* BackupModal.swift in Sources */,
 				2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */,
 				2D48F3DE277E4BEC004B27BE /* SmallButton.swift in Sources */,
 				2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */,
@@ -1569,6 +1600,7 @@
 				6DDEF11028AD105F004CA2FD /* TabBarView.swift in Sources */,
 				2DA5F86F27566C3600D8DD29 /* TCTXSpec.swift in Sources */,
 				2DA5F8412756687200D8DD29 /* TransactionCardView.swift in Sources */,
+				6D6E99DB28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift in Sources */,
 				6DE8466A28BF6EA20051346A /* KeyDetailsActionModel.swift in Sources */,
 				6D95E97A28B6282D00E28A11 /* MenuButton.swift in Sources */,
 				2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */,
@@ -1696,8 +1728,8 @@
 				6DC5643728B79EC6003D540B /* SeedsMediator.swift in Sources */,
 				2DA5F88C2757693600D8DD29 /* NewAddressScreen.swift in Sources */,
 				6D95E97528B500EE00E28A11 /* Heights.swift in Sources */,
-				2D48F36B2763604F004B27BE /* Backup.swift in Sources */,
 				6D8045DE28D087D400237F8C /* QRCodeRootFooterView.swift in Sources */,
+				6D42793728DB147800C141DC /* PrivateKeyQRCodeService.swift in Sources */,
 				6D5801D928991F48006C41D8 /* ProcessInfoProtocol.swift in Sources */,
 				2DAA82A527885D4A002917C0 /* TCTipPlain.swift in Sources */,
 				6D019972289D183200F4C317 /* Navigation.swift in Sources */,

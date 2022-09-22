@@ -53,3 +53,41 @@ extension PreviewData {
         """
     )
 }
+
+extension PreviewData {
+    static let exampleKeySummary = KeySummaryViewModel(
+        keyName: "Parity",
+        base58: "15322Gsc678...0HA04H0A"
+    )
+
+    static let exampleDerivedKeyOverview = DerivedKeyOverviewViewModel(
+        identicon: PreviewData.exampleIdenticon,
+        path: "// polkadot",
+        hasPassword: false
+    )
+
+    static let exampleDerivedKeyOverviews: [DerivedKeyOverviewViewModel] = [
+        //        DerivedKeyOverviewViewModel(
+//            identicon: PreviewData.exampleIdenticon,
+//            path: "// polkadot",
+//            hasPassword: false
+//        ),
+//        DerivedKeyOverviewViewModel(
+//            identicon: PreviewData.exampleIdenticon,
+//            path: "// kusama",
+//            hasPassword: false
+//        ),
+        DerivedKeyOverviewViewModel(
+            identicon: PreviewData.exampleIdenticon,
+            path: "// astar",
+            hasPassword: true
+        )
+    ]
+
+    static let exampleBackupViewModel = BackupModalViewModel(
+        header: exampleKeySummary,
+        derivedKeys: exampleDerivedKeyOverviews,
+        seedPhrase: seedPhraseViewModel,
+        qrCode: qrCodeContainerViewModel
+    )
+}

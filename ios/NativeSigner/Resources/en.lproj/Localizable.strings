@@ -323,3 +323,8 @@
 "PublicKeyDetailsModal.Confirmation.Action.Cancel" = "Cancel";
 "PublicKeyDetailsModal.Confirmation.Action.Remove" = "Remove Key";
 "PublicKeyDetailsModal.Confirmation.Snackbar" = "Key Has Been Removed";
+
+"BackupModal.Label.Secret" = "Secret Recovery Phrase";
+"BackupModal.Label.Derived" = "Derived keys";
+"BackupModal.Label.QRCode" = "Backup with QR Code";
+"BackupModal.Label.Snackbar" = "Private Keys will be hidden in";

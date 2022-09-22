@@ -13,14 +13,17 @@ struct TapAndDelayDismissAnimator: ViewModifier {
         .autoconnect()
 
     @State var autodismissCounter: TimeInterval
-    private var retainedAutodismissCounter: TimeInterval
+    @State private var retainedAutodismissCounter: TimeInterval
+    private let isTapToDismissActive: Bool
     @Binding var isPresented: Bool
 
     init(
         autodismissCounter: TimeInterval,
+        isTapToDismissActive: Bool,
         isPresented: Binding<Bool>
     ) {
         retainedAutodismissCounter = autodismissCounter
+        self.isTapToDismissActive = isTapToDismissActive
         self.autodismissCounter = autodismissCounter
         _isPresented = isPresented
     }
@@ -28,6 +31,7 @@ struct TapAndDelayDismissAnimator: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onTapGesture {
+                guard isTapToDismissActive else { return }
                 withAnimation {
                     self.isPresented = false
                 }
@@ -36,9 +40,18 @@ struct TapAndDelayDismissAnimator: ViewModifier {
                 autodismissCounter -= 1
                 if autodismissCounter <= 0 {
                     self.isPresented = false
+                    stop()
                 }
             }
-            .onChange(of: isPresented, perform: { $0 ? start() : stop() })
+//            .onAppear {
+//                start()
+//            }
+            .onChange(
+                of: isPresented,
+                perform: {
+                    $0 ? start() : stop()
+                }
+            )
     }
 
     private func stop() {
@@ -57,7 +70,15 @@ extension View {
     ///   - autodismissCounter: after how many seconds view should autodismiss. Default to 3
     ///   - isPresented: action controller in form of `Bool`
     /// - Returns: view that modifier is applied to
-    func tapAndDelayDismiss(autodismissCounter: TimeInterval = 3, isPresented: Binding<Bool>) -> some View {
-        modifier(TapAndDelayDismissAnimator(autodismissCounter: autodismissCounter, isPresented: isPresented))
+    func tapAndDelayDismiss(
+        autodismissCounter: TimeInterval = 3,
+        isTapToDismissActive: Bool = true,
+        isPresented: Binding<Bool>
+    ) -> some View {
+        modifier(TapAndDelayDismissAnimator(
+            autodismissCounter: autodismissCounter,
+            isTapToDismissActive: isTapToDismissActive,
+            isPresented: isPresented
+        ))
     }
 }
