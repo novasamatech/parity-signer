@@ -21,5 +21,10 @@
 /scripts/ @paritytech/ci
 /.gitlab-ci.yml @paritytech/ci
 /ios @tetekinandrey @krodak
-/android @tetekinandrey @Dmitry-Borodin
+/android @Dmitry-Borodin
+/android/src/main/java/io/parity/signer/ui @tetekinandrey @Dmitry-Borodin
+/android/src/main/java/io/parity/signer/screens @tetekinandrey @Dmitry-Borodin
+/android/src/main/java/io/parity/signer/components @tetekinandrey @Dmitry-Borodin
+/android/src/main/java/io/parity/signer/components2 @tetekinandrey @Dmitry-Borodin
+/android/src/main/java/io/parity/signer/bottmsheets @tetekinandrey @Dmitry-Borodin
 /rust @montekki @prybalko
