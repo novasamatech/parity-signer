@@ -41,6 +41,11 @@ interface Navigator {
 class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 
 	override fun navigate(button: Action, details: String, seedPhrase: String) {
+		if (singleton.localNavAction.value != LocalNavAction.None) {
+			//if state machine navigation triggered - remove platform layers on top
+			singleton._localNavAction.value = LocalNavAction.None
+		}
+
 		try {
 			val navigationAction = backendAction(button, details, seedPhrase)
 			//Workaround while Rust state machine is keeping state inside as it's needed for exporting private key in different screen
@@ -85,7 +90,7 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 					NetworkCardModel(secretKeyDetailsQR.networkInfo)
 				)
 				navigate(Action.GO_BACK) // close bottom sheet from rust stack
-				singleton._localNavigationAction.value =
+				singleton._localNavAction.value =
 					LocalNavAction.ShowExportPrivateKey(
 						viewModel, singleton.navigator
 					)
@@ -97,7 +102,7 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 		if (singleton.localNavAction.value !is LocalNavAction.None) {
 			//todo support navigation stack from compose NavHostController
 			// rather than going all the way back to rust navigation
-			singleton._localNavigationAction.value = LocalNavAction.None
+			singleton._localNavAction.value = LocalNavAction.None
 		} else {
 			backRustNavigation()
 		}

@@ -86,7 +86,7 @@ class SignerDataModel : ViewModel() {
 		)
 	)
 
-	internal val _localNavigationAction = MutableLiveData<LocalNavAction>(
+	internal val _localNavAction = MutableLiveData<LocalNavAction>(
 		LocalNavAction.None
 	)
 
@@ -111,7 +111,7 @@ class SignerDataModel : ViewModel() {
 
 	val actionResult: LiveData<ActionResult> = _actionResult
 
-	val localNavAction: LiveData<LocalNavAction> = _localNavigationAction
+	val localNavAction: LiveData<LocalNavAction> = _localNavAction
 
 	// MARK: init boilerplate begin
 
