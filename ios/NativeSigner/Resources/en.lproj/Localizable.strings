@@ -324,7 +324,17 @@
 "PublicKeyDetailsModal.Confirmation.Action.Remove" = "Remove Key";
 "PublicKeyDetailsModal.Confirmation.Snackbar" = "Key Has Been Removed";
 
+"Connectivity.Label.Title" = "Network Connected";
+"Connectivity.Label.Content" = "Signer detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.";
+"Connectivity.Action.Ok" = "Got It";
+"PastConnectivity.Label.Title" = "Network Was Connected!";
+"PastConnectivity.Label.Content" = "Your Signer device has connected to a WIFI, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use.";
+"PastConnectivity.Action.Ok" = "Got It";
+
 "BackupModal.Label.Secret" = "Secret Recovery Phrase";
 "BackupModal.Label.Derived" = "Derived keys";
 "BackupModal.Label.QRCode" = "Backup with QR Code";
 "BackupModal.Label.Snackbar" = "Private Keys will be hidden in";
+
+
+

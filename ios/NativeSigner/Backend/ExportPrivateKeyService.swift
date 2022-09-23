@@ -19,7 +19,7 @@ final class ExportPrivateKeyService {
         self.seedsMediator = seedsMediator
     }
 
-    func exportPrivateKey(from keyDetails: MKeyDetails) -> ExportPrivateKeyViewModel! {
+    func exportPrivateKey(from keyDetails: MKeyDetails) -> ExportPrivateKeyViewModel? {
         guard let qrCode = try? generateSecretKeyQr(
             dbname: databaseMediator.databaseName,
             publicKey: keyDetails.pubkey,

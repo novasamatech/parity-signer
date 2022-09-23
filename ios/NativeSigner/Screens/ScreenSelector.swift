@@ -65,9 +65,11 @@ struct ScreenSelector: View {
         case let .keyDetails(value):
             KeyDetailsPublicKeyView(
                 navigation: navigation,
+                data: data,
                 forgetKeyActionHandler: ForgetSingleKeyAction(navigation: navigation),
                 viewModel: KeyDetailsPublicKeyViewModel(value),
-                actionModel: KeyDetailsPublicKeyActionModel(value)
+                actionModel: KeyDetailsPublicKeyActionModel(value),
+                exportPrivateKeyViewModel: ExportPrivateKeyService().exportPrivateKey(from: value)
             )
         case let .newSeed(value):
             NewSeedScreen(
