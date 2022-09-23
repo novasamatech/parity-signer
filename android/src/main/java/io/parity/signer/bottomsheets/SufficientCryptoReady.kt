@@ -1,4 +1,4 @@
-package io.parity.signer.modals
+package io.parity.signer.bottomsheets
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -9,10 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import io.parity.signer.components.HeaderBar
-import io.parity.signer.components.Identicon
-import io.parity.signer.components.KeyCard
-import io.parity.signer.components.NetworkCard
+import io.parity.signer.components.*
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
@@ -39,16 +36,13 @@ fun SufficientCryptoReady(
 				contentScale = ContentScale.FillWidth,
 				modifier = Modifier.fillMaxWidth()
 			)
-			KeyCard(
+			KeyCardOld(
 				identity = sufficientCrypto.authorInfo,
 			)
 			when (val c = sufficientCrypto.content) {
 				is MscContent.AddSpecs -> Column {
 					Text("Specs")
-					NetworkCard(
-						title = c.f.networkTitle,
-						logo = c.f.networkLogo
-					)
+					NetworkCard(NetworkCardModel(c.f))
 				}
 				is MscContent.LoadMetadata -> Text("Metadata for " + c.name + " with version " + c.version)
 				is MscContent.LoadTypes -> Column {

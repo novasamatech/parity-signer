@@ -35,10 +35,10 @@ fun TransactionPreview(
 			cardSet = transaction.content,
 		)
 		transaction.authorInfo?.let {
-			KeyCard(identity = it)
+			KeyCardOld(identity = it)
 		}
 		transaction.networkInfo?.let {
-			NetworkCard(title = it.networkTitle, logo = it.networkLogo)
+			NetworkCard(NetworkCardModel(it.networkTitle, it.networkLogo))
 		}
 		when (action) {
 			TransactionType.SIGN -> {

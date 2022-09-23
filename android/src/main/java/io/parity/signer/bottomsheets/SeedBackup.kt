@@ -1,4 +1,4 @@
-package io.parity.signer.modals
+package io.parity.signer.bottomsheets
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -64,8 +64,10 @@ fun SeedBackup(
 					for (pack in derivations) {
 						item {
 							NetworkCard(
-								title = pack.networkTitle,
-								logo = pack.networkLogo
+								NetworkCardModel(
+									networkTitle = pack.networkTitle,
+									networkLogo = pack.networkLogo
+								)
 							)
 						}
 						val networkDerivations = pack.idSet.sortedBy { it.path }

@@ -6,6 +6,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.ui.theme.Web3Typography
@@ -23,4 +25,10 @@ fun NetworkLogoName(logo: String, name: String) {
 		style = MaterialTheme.typography.h3,
 		color = MaterialTheme.colors.Text600
 	)
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun NetworkLogoName() {
+	NetworkLogoName("Logo", "name")
 }
