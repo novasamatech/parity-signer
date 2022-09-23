@@ -72,7 +72,7 @@ private struct ExportPrivateKeyAddressFooter: View {
         static let keyVisibilityTime: CGFloat = 60
     }
 
-    private var hideAction: () -> Void
+    private let hideAction: () -> Void
 
     init(hideAction: @escaping () -> Void) {
         self.hideAction = hideAction

@@ -189,47 +189,47 @@ struct KeyDetailsPublicKeyView: View {
     }
 }
 
-struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
-    static var previews: some View {
-        HStack {
-            VStack {
-                KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
+// struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        HStack {
+//            VStack {
+//                KeyDetailsPublicKeyView(
+//                    navigation: NavigationCoordinator(),
                     data: SignerDataModel(navigation: NavigationCoordinator()),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(),
-                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
-                )
-            }
-            VStack {
-                KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
+//                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+//                    viewModel: PreviewData.exampleKeyDetailsPublicKey(),
+//                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
+//                )
+//            }
+//            VStack {
+//                KeyDetailsPublicKeyView(
+//                    navigation: NavigationCoordinator(),
                     data: SignerDataModel(navigation: NavigationCoordinator()),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
-                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
-                )
-            }
-            VStack {
-                KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
+//                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+//                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
+//                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
+//                )
+//            }
+//            VStack {
+//                KeyDetailsPublicKeyView(
+//                    navigation: NavigationCoordinator(),
                     data: SignerDataModel(navigation: NavigationCoordinator()),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
-                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
-                )
-            }
-            VStack {
-                KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
+//                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+//                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
+//                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
+//                )
+//            }
+//            VStack {
+//                KeyDetailsPublicKeyView(
+//                    navigation: NavigationCoordinator(),
                     data: SignerDataModel(navigation: NavigationCoordinator()),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
-                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
-                )
-            }
-        }
-        .previewLayout(.sizeThatFits)
-        .preferredColorScheme(.dark)
-    }
-}
+//                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+//                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
+//                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
+//                )
+//            }
+//        }
+//        .previewLayout(.sizeThatFits)
+//        .preferredColorScheme(.dark)
+//    }
+// }

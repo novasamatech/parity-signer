@@ -35,7 +35,8 @@ struct ScreenSelector: View {
                 navigation: navigation,
                 forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
                 viewModel: KeyDetailsViewModel(value),
-                actionModel: KeyDetailsActionModel(value, alert: alert, alertShow: alertShow)
+                actionModel: KeyDetailsActionModel(value, alert: alert, alertShow: alertShow),
+                exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value)
             )
         case let .settings(value):
             SettingsScreen(

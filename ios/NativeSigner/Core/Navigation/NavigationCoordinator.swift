@@ -65,6 +65,14 @@ final class NavigationCoordinator: ObservableObject {
 }
 
 extension NavigationCoordinator {
+    func performFake(navigation: Navigation) -> ActionResult {
+        backendActionPerformer.performBackend(
+            action: navigation.action,
+            details: navigation.details,
+            seedPhrase: navigation.seedPhrase
+        ) ?? actionResult
+    }
+
     func perform(navigation: Navigation, skipDebounce: Bool = false) {
         guard isActionAvailable else { return }
         defer { handleDebounce(skipDebounce) }
