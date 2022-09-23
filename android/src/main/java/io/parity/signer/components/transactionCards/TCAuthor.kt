@@ -8,7 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.Composable
-import io.parity.signer.components.Identicon
+import io.parity.signer.components.IdentIcon
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
@@ -18,7 +18,7 @@ import io.parity.signer.uniffi.Address
 @Composable
 fun TCAuthor(author: Address) {
 	Row {
-		Identicon(author.identicon)
+		IdentIcon(author.identicon)
 		Column {
 			Text(
 				"From: ",

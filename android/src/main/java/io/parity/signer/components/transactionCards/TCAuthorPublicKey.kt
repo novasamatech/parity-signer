@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import io.parity.signer.components.Identicon
+import io.parity.signer.components.IdentIcon
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.Text400
@@ -14,7 +14,7 @@ import io.parity.signer.uniffi.MVerifierDetails
 @Composable
 fun TCAuthorPublicKey(key: MVerifierDetails) {
 	Row {
-		Identicon(identicon = key.identicon)
+		IdentIcon(identicon = key.identicon)
 		Column {
 			Text(
 				"Signed with " + key.encryption,

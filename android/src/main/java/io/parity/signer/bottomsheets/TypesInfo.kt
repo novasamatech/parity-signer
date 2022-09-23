@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.components.Identicon
+import io.parity.signer.components.IdentIcon
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
@@ -35,7 +35,7 @@ fun TypesInfo(typesInfo: MTypesInfo, signerDataModel: SignerDataModel) {
 				HeaderBar(line1 = "MANAGE TYPES", line2 = "Select action")
 				if (typesInfo.typesOnFile) {
 					Row {
-						Identicon(identicon = typesInfo.typesIdPic?:listOf())
+						IdentIcon(identicon = typesInfo.typesIdPic?:listOf())
 						Text(typesInfo.typesHash ?: "")
 					}
 				} else {
