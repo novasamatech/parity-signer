@@ -7,7 +7,6 @@ import io.parity.signer.components.AlertComponent
  * Unified alert that is called by Android
  * (navigation has no idea about it).
  *
- * TODO: completely replace by navigation-driven one
  */
 @Composable
 fun AndroidCalledConfirm(

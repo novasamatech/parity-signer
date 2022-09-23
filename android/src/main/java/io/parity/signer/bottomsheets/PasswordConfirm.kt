@@ -1,4 +1,4 @@
-package io.parity.signer.modals
+package io.parity.signer.bottomsheets
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

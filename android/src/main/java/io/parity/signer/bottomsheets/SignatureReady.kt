@@ -1,4 +1,4 @@
-package io.parity.signer.modals
+package io.parity.signer.bottomsheets
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.Orientation
@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.components.BigButton
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
@@ -64,7 +64,7 @@ fun SignatureReady(
 			BigButton(
 				text = "Done",
 				action = {
-					signerDataModel.pushButton(Action.GO_BACK, "", "")
+					signerDataModel.navigate(Action.GO_BACK, "", "")
 				}
 			)
 		}

@@ -64,7 +64,7 @@ fun KeyCardActive(
 					}
 				)
 		) {
-			KeyCard(
+			KeyCardOld(
 				identity = Address(
 					base58 = address.base58,
 					path = address.path,

@@ -20,8 +20,9 @@ import io.parity.signer.uniffi.Address
  * A card to show key info; only visual things.
  * TODO: paint root keys in scary colors
  */
+@Deprecated("Use KeyCard for new screens")
 @Composable
-fun KeyCard(identity: Address, multiselectMode: Boolean = false) {
+fun KeyCardOld(identity: Address, multiselectMode: Boolean = false) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier

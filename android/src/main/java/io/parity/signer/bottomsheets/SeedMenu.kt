@@ -1,6 +1,5 @@
-package io.parity.signer.modals
+package io.parity.signer.bottomsheets
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -12,19 +11,22 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.AlertState
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MSeedMenu
 
 @Composable
-fun KeyDetailsAction(signerDataModel: SignerDataModel) {
+fun SeedMenu(
+	seedMenu: MSeedMenu,
+	alertState: State<AlertState?>,
+	button: (Action) -> Unit,
+	removeSeed: (String) -> Unit
+) {
 	var confirm by remember { mutableStateOf(false) }
 
-	Column (
-		Modifier.clickable { signerDataModel.pushButton(Action.GO_BACK) }
-		) {
+	Column {
 		Spacer(Modifier.weight(1f))
 		Surface(
 			color = MaterialTheme.colors.Bg000,
@@ -33,9 +35,29 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 			Column(
 				modifier = Modifier.padding(20.dp)
 			) {
-				HeaderBar(line1 = "KEY MENU", line2 = "Select action")
+				HeaderBar(line1 = "SEED MENU", line2 = "Select action")
 				BigButton(
-					text = "Forget this key forever",
+					text = "Backup",
+					action = {
+						if (alertState.value == AlertState.None)
+							button(Action.BACKUP_SEED)
+						else
+							button(Action.SHIELD)
+					}
+				)
+				BigButton(
+					text = "Derive new key",
+					action = {
+						if (alertState.value == AlertState.None)
+							button(Action.NEW_KEY)
+						else
+							button(Action.SHIELD)
+					},
+					isShaded = true,
+					isCrypto = true
+				)
+				BigButton(
+					text = "Forget this seed forever",
 					isShaded = true,
 					isDangerous = true,
 					action = {
@@ -45,13 +67,19 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 			}
 		}
 	}
+
 	AndroidCalledConfirm(
 		show = confirm,
-		header = "Forget this key?",
-		text = "This key will be removed for this network. Are you sure?",
+		header = "Forget this seed forever?",
+		text = "This seed will be removed for all networks. " +
+			"This is not reversible. Are you sure?",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(Action.REMOVE_KEY) },
+		forward = {
+			seedMenu.seed.let {
+				if (seedMenu.seed.isNotBlank()) removeSeed(it)
+			}
+		},
 		backText = "Cancel",
-		forwardText = "Remove key"
+		forwardText = "Remove seed"
 	)
 }

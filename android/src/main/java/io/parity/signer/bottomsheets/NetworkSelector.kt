@@ -1,4 +1,4 @@
-package io.parity.signer.modals
+package io.parity.signer.bottomsheets
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,11 +11,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.NetworkCard
+import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNetworkMenu
-import io.parity.signer.uniffi.MscNetworkInfo
 
 @Composable
 fun NetworkSelector(
@@ -58,8 +58,10 @@ fun NetworkSelector(
 								)
 							}) {
 								NetworkCard(
-									title = networks[item].title,
-									logo = networks[item].logo,
+									network = NetworkCardModel(
+										networkTitle = networks[item].title,
+										networkLogo = networks[item].logo
+									),
 									selected = networks[item].selected
 								)
 							}

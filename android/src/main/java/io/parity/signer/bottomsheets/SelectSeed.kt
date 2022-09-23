@@ -1,4 +1,4 @@
-package io.parity.signer.modals
+package io.parity.signer.bottomsheets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.components.SeedCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.getSeed
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
@@ -44,7 +44,7 @@ fun SelectSeed(seeds: MSeeds, signerDataModel: SignerDataModel) {
 									val seedName = cards[item].seedName
 									val seedPhrase = signerDataModel.getSeed(seedName)
 									if (seedPhrase.isNotBlank()) {
-										signerDataModel.pushButton(
+										signerDataModel.navigate(
 											Action.GO_FORWARD,
 											seedName,
 											seedPhrase

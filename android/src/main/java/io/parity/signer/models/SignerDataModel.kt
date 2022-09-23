@@ -40,8 +40,13 @@ class SignerDataModel : ViewModel() {
 	private lateinit var masterKey: MasterKey
 	private var hasStrongbox: Boolean = false
 
+	val navigator by lazy { SignerNavigator(this) }
+
 	// Alert
 	private val _alertState: MutableLiveData<AlertState> = MutableLiveData(AlertState.None)
+
+	// Current key details, after rust API will migrate to REST-like should not store this value here.
+	internal var lastOpenedKeyDetails: MKeyDetails? = null
 
 	// State of the app being unlocked
 	private val _authenticated = MutableLiveData(false)
@@ -81,6 +86,10 @@ class SignerDataModel : ViewModel() {
 		)
 	)
 
+	internal val _localNavAction = MutableLiveData<LocalNavAction>(
+		LocalNavAction.None
+	)
+
 	// Data storage locations
 	internal var dbName: String = ""
 	private val keyStore = "AndroidKeyStore"
@@ -101,6 +110,8 @@ class SignerDataModel : ViewModel() {
 	val alertState: LiveData<AlertState> = _alertState
 
 	val actionResult: LiveData<ActionResult> = _actionResult
+
+	val localNavAction: LiveData<LocalNavAction> = _localNavAction
 
 	// MARK: init boilerplate begin
 
@@ -302,7 +313,7 @@ class SignerDataModel : ViewModel() {
 			getAlertState()
 			isAirplaneOn()
 			refreshSeedNames(init = true)
-			pushButton(Action.START)
+			navigator.navigate(Action.START)
 		}
 	}
 
