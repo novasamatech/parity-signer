@@ -15,15 +15,18 @@ final class BottomSnackbarPresentation: ObservableObject {
 struct SnackbarViewModel {
     let title: String
     let style: Snackbar.Style
+    let tapToDismiss: Bool
     let countdown: CircularCountdownModel?
 
     init(
         title: String,
         style: Snackbar.Style = .info,
+        tapToDismiss: Bool = true,
         countdown: CircularCountdownModel? = nil
     ) {
         self.title = title
         self.style = style
+        self.tapToDismiss = tapToDismiss
         self.countdown = countdown
     }
 }
@@ -73,7 +76,8 @@ struct Snackbar: View {
             .background(viewModel.style.tintColor)
             .cornerRadius(CornerRadius.small)
         }
-        .padding()
+        .padding([.top, .bottom])
+        .padding([.leading, .trailing], Spacing.extraSmall)
     }
 }
 
@@ -83,10 +87,15 @@ extension View {
     ///   - overlayView: view to be presented as overlay
     ///   - isPresented: action controller in form of `Bool`
     /// - Returns: view that modifier is applied to
-    func bottomSnackbar(_ viewModel: SnackbarViewModel, isPresented: Binding<Bool>) -> some View {
+    func bottomSnackbar(
+        _ viewModel: SnackbarViewModel,
+        isPresented: Binding<Bool>,
+        autodismissCounter: TimeInterval = 3
+    ) -> some View {
         bottomEdgeOverlay(overlayView: Snackbar(viewModel: viewModel), isPresented: isPresented)
             .tapAndDelayDismiss(
-                autodismissCounter: Double(viewModel.countdown?.counter ?? 3),
+                autodismissCounter: autodismissCounter,
+                isTapToDismissActive: viewModel.tapToDismiss,
                 isPresented: isPresented
             )
     }
