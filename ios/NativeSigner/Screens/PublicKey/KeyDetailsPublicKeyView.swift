@@ -10,32 +10,36 @@ import SwiftUI
 struct KeyDetailsPublicKeyView: View {
     private let viewModel: KeyDetailsPublicKeyViewModel
     private let actionModel: KeyDetailsPublicKeyActionModel
-    private let exportKeyService: ExportPrivateKeyService
+    private let exportPrivateKeyViewModel: ExportPrivateKeyViewModel?
     private let forgetKeyActionHandler: ForgetSingleKeyAction
 
     @State private var isShowingRemoveConfirmation = false
     @State private var isShowingActionSheet = false
     @State private var isPresentingExportKeysWarningModal = false
     @State private var isPresentingExportKeysModal = false
+    @State private var isPresentingConnectivityAlert = false
 
     @State private var shouldPresentExportKeysWarningModal = false
     @State private var shouldPresentExportKeysModal = false
     @State private var shouldPresentRemoveConfirmationModal = false
 
     @ObservedObject private var navigation: NavigationCoordinator
+    @ObservedObject private var data: SignerDataModel
 
     init(
         navigation: NavigationCoordinator,
+        data: SignerDataModel,
         forgetKeyActionHandler: ForgetSingleKeyAction,
         viewModel: KeyDetailsPublicKeyViewModel,
         actionModel: KeyDetailsPublicKeyActionModel,
-        exportKeyService: ExportPrivateKeyService = ExportPrivateKeyService()
+        exportPrivateKeyViewModel: ExportPrivateKeyViewModel? = nil
     ) {
         self.navigation = navigation
+        self.data = data
         self.forgetKeyActionHandler = forgetKeyActionHandler
         self.viewModel = viewModel
         self.actionModel = actionModel
-        self.exportKeyService = exportKeyService
+        self.exportPrivateKeyViewModel = exportPrivateKeyViewModel
     }
 
     var body: some View {
@@ -99,7 +103,11 @@ struct KeyDetailsPublicKeyView: View {
             onDismiss: {
                 if shouldPresentExportKeysWarningModal {
                     shouldPresentExportKeysWarningModal.toggle()
-                    isPresentingExportKeysWarningModal.toggle()
+                    if data.alert || exportPrivateKeyViewModel == nil {
+                        isPresentingConnectivityAlert.toggle()
+                    } else {
+                        isPresentingExportKeysWarningModal.toggle()
+                    }
                 }
                 if shouldPresentRemoveConfirmationModal {
                     shouldPresentRemoveConfirmationModal.toggle()
@@ -142,12 +150,16 @@ struct KeyDetailsPublicKeyView: View {
                 navigation.perform(navigation: .init(action: .rightButtonAction))
             }
         ) {
-            ExportPrivateKeyModal(
-                isPresentingExportKeysModal: $isPresentingExportKeysModal,
-                navigation: navigation,
-                viewModel: exportKeyService.exportPrivateKey(from: navigation.currentKeyDetails)
-            )
-            .clearModalBackground()
+            if let viewModel = exportPrivateKeyViewModel {
+                ExportPrivateKeyModal(
+                    isPresentingExportKeysModal: $isPresentingExportKeysModal,
+                    navigation: navigation,
+                    viewModel: viewModel
+                )
+                .clearModalBackground()
+            } else {
+                EmptyView()
+            }
         }
         // Remove key modal
         .fullScreenCover(isPresented: $isShowingRemoveConfirmation) {
@@ -162,6 +174,18 @@ struct KeyDetailsPublicKeyView: View {
             )
             .clearModalBackground()
         }
+        .alert(
+            data.canaryDead ? Localizable.Connectivity.Label.title.string : Localizable.PastConnectivity
+                .Label.title.string,
+            isPresented: $isPresentingConnectivityAlert,
+            actions: {
+                Button(Localizable.Connectivity.Action.ok.string) { isPresentingConnectivityAlert.toggle() }
+            },
+            message: {
+                data.canaryDead ? Localizable.Connectivity.Label.content.text : Localizable.PastConnectivity
+                    .Label.content.text
+            }
+        )
     }
 }
 
@@ -171,6 +195,7 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
             VStack {
                 KeyDetailsPublicKeyView(
                     navigation: NavigationCoordinator(),
+                    data: SignerDataModel(navigation: NavigationCoordinator()),
                     forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
@@ -179,6 +204,7 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
             VStack {
                 KeyDetailsPublicKeyView(
                     navigation: NavigationCoordinator(),
+                    data: SignerDataModel(navigation: NavigationCoordinator()),
                     forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
@@ -187,6 +213,7 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
             VStack {
                 KeyDetailsPublicKeyView(
                     navigation: NavigationCoordinator(),
+                    data: SignerDataModel(navigation: NavigationCoordinator()),
                     forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
@@ -195,6 +222,7 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
             VStack {
                 KeyDetailsPublicKeyView(
                     navigation: NavigationCoordinator(),
+                    data: SignerDataModel(navigation: NavigationCoordinator()),
                     forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
