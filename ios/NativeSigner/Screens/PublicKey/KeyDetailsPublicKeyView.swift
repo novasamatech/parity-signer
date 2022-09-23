@@ -195,7 +195,7 @@ struct KeyDetailsPublicKeyView: View {
 //            VStack {
 //                KeyDetailsPublicKeyView(
 //                    navigation: NavigationCoordinator(),
-                    data: SignerDataModel(navigation: NavigationCoordinator()),
+//                    data: SignerDataModel(navigation: NavigationCoordinator()),
 //                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
 //                    viewModel: PreviewData.exampleKeyDetailsPublicKey(),
 //                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
@@ -204,7 +204,7 @@ struct KeyDetailsPublicKeyView: View {
 //            VStack {
 //                KeyDetailsPublicKeyView(
 //                    navigation: NavigationCoordinator(),
-                    data: SignerDataModel(navigation: NavigationCoordinator()),
+//                    data: SignerDataModel(navigation: NavigationCoordinator()),
 //                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
 //                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
 //                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
@@ -213,7 +213,7 @@ struct KeyDetailsPublicKeyView: View {
 //            VStack {
 //                KeyDetailsPublicKeyView(
 //                    navigation: NavigationCoordinator(),
-                    data: SignerDataModel(navigation: NavigationCoordinator()),
+//                    data: SignerDataModel(navigation: NavigationCoordinator()),
 //                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
 //                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
 //                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
@@ -222,7 +222,7 @@ struct KeyDetailsPublicKeyView: View {
 //            VStack {
 //                KeyDetailsPublicKeyView(
 //                    navigation: NavigationCoordinator(),
-                    data: SignerDataModel(navigation: NavigationCoordinator()),
+//                    data: SignerDataModel(navigation: NavigationCoordinator()),
 //                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
 //                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
 //                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
