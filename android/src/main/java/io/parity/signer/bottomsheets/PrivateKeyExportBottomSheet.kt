@@ -73,7 +73,7 @@ fun PrivateKeyExportBottomSheet(
 					Box(
 						modifier = Modifier
                             .fillMaxWidth(1f)
-                            .aspectRatio(1f)
+                            .aspectRatio(1.1f)
                             .background(
                                 Color.White,
                                 RoundedCornerShape(qrRounding)
@@ -88,7 +88,6 @@ fun PrivateKeyExportBottomSheet(
 						)
 					}
 					KeyCard(model.keyCard)
-					Spacer(modifier = Modifier.padding(bottom = 4.dp))
 				}
 				//autohide component
 				val timerText = stringResource(R.string.export_private_key_timer_label)
