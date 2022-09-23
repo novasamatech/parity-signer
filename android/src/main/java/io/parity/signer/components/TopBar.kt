@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Text400
@@ -48,7 +48,7 @@ fun TopBar(
 						backgroundColor = MaterialTheme.colors.Bg100
 					),
 					onClick = {
-						signerDataModel.pushButton(Action.GO_BACK)
+						signerDataModel.navigate(Action.GO_BACK)
 					}
 				) {
 					if (actionResult.value?.rightButton == RightButton.MULTI_SELECT) {
@@ -81,7 +81,7 @@ fun TopBar(
 			)
 			if (actionResult.value?.rightButton == RightButton.MULTI_SELECT) {
 				SmallButton(text = "Select all") {
-					signerDataModel.pushButton(Action.SELECT_ALL)
+					signerDataModel.navigate(Action.SELECT_ALL)
 				}
 			}
 		}
@@ -91,7 +91,7 @@ fun TopBar(
 				.weight(0.2f, fill = true)
 				.width(72.dp)
 		) {
-			IconButton(onClick = { signerDataModel.pushButton(Action.RIGHT_BUTTON_ACTION) }) {
+			IconButton(onClick = { signerDataModel.navigate(Action.RIGHT_BUTTON_ACTION) }) {
 				when (actionResult.value?.rightButton) {
 					RightButton.NEW_SEED -> {
 						Icon(
@@ -126,7 +126,7 @@ fun TopBar(
 					}
 				}
 			}
-			IconButton(onClick = { signerDataModel.pushButton(Action.SHIELD) }) {
+			IconButton(onClick = { signerDataModel.navigate(Action.SHIELD) }) {
 				NavbarShield(alertState = alertState)
 			}
 		}

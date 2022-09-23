@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import io.parity.signer.components.KeyCard
+import io.parity.signer.components.KeyCardOld
 import io.parity.signer.uniffi.Address
 import io.parity.signer.uniffi.MSignSufficientCrypto
 
@@ -25,7 +25,7 @@ fun SignSufficientCrypto(
 				Row(Modifier.clickable {
 					signSufficientCrypto(identity.seedName, identity.addressKey)
 				}) {
-					KeyCard(identity = Address(
+					KeyCardOld(identity = Address(
 						base58 = identity.publicKey,
 						path = identity.path,
 						hasPwd = identity.hasPwd,

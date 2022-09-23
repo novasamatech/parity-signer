@@ -40,7 +40,7 @@ fun SignerDataModel.processFrame(
 										true
 									)
 									resetScanValues()
-									pushButton(Action.TRANSACTION_FETCHED, payload)
+									navigate(Action.TRANSACTION_FETCHED, payload)
 								} catch (e: java.lang.Exception) {
 									Log.e("Single frame decode failed", e.toString())
 								}
@@ -61,7 +61,7 @@ fun SignerDataModel.processFrame(
 								)
 								if (payload.isNotEmpty()) {
 									resetScanValues()
-									pushButton(Action.TRANSACTION_FETCHED, payload)
+									navigate(Action.TRANSACTION_FETCHED, payload)
 								}
 							} catch (e: java.lang.Exception) {
 								Log.e("failed to parse sequence", e.toString())

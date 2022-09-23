@@ -1,4 +1,4 @@
-package io.parity.signer.modals
+package io.parity.signer.bottomsheets
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,13 +12,15 @@ import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MLogRight
 
 @Composable
-fun NetworkDetailsMenu(signerDataModel: SignerDataModel) {
+fun LogMenu(logRight: MLogRight, signerDataModel: SignerDataModel) {
+	val checksum = logRight.checksum
 	var confirm by remember { mutableStateOf(false) }
 
 	Column {
@@ -30,30 +32,24 @@ fun NetworkDetailsMenu(signerDataModel: SignerDataModel) {
 			Column(
 				modifier = Modifier.padding(20.dp)
 			) {
-				HeaderBar(line1 = "MANAGE NETWORK", line2 = "Select action")
-				BigButton(
-					text = "Sign network specs",
-					isShaded = true,
-					isCrypto = true,
-					action = { signerDataModel.pushButton(Action.SIGN_NETWORK_SPECS) })
-				BigButton(
-					text = "Delete network",
-					isShaded = true,
-					isDangerous = true,
+				HeaderBar(line1 = "LOG", line2 = "Checksum: $checksum")
+				BigButton(text = "Add note",
 					action = {
-						confirm = true
-					}
+						signerDataModel.navigate(Action.CREATE_LOG_COMMENT)
+					})
+				BigButton(
+					text = "Clear log",
+					action = { confirm = true },
+					isDangerous = true,
+					isShaded = true
 				)
 			}
 		}
 	}
+
 	AndroidCalledConfirm(
 		show = confirm,
-		header = "Remove network?",
-		text = "This network will be removed for whole device",
+		header = "Clear log?",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(Action.REMOVE_NETWORK) },
-		backText = "Cancel",
-		forwardText = "Remove network"
-	)
+		forward = { signerDataModel.navigate(Action.CLEAR_LOG) })
 }

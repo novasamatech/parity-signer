@@ -51,8 +51,10 @@ fun NewAddressScreen(
 			Spacer(Modifier.weight(1f))
 		}
 		NetworkCard(
-			title = deriveKey.networkTitle,
-			logo = deriveKey.networkLogo
+			network = NetworkCardModel(
+				networkTitle = deriveKey.networkTitle,
+				networkLogo = deriveKey.networkLogo
+			)
 		)
 		SingleTextInput(
 			content = derivationPath,
@@ -103,7 +105,7 @@ fun NewAddressScreen(
 				Modifier.fillMaxWidth(1f)
 			) {
 				Text("This key already exists:")
-				KeyCard(identity = it)
+				KeyCardOld(identity = it)
 			}
 		}
 		Spacer(Modifier.height(20.dp))

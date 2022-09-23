@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.NetworkCard
+import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MManageNetworks
 import io.parity.signer.uniffi.MscNetworkInfo
@@ -32,8 +33,10 @@ fun ManageNetworks(
 				)
 			}) {
 				NetworkCard(
-					title = thisNetwork.title,
-					logo = thisNetwork.logo
+					network = NetworkCardModel(
+						networkTitle = thisNetwork.title,
+						networkLogo = thisNetwork.logo
+					)
 				)
 			}
 		}
