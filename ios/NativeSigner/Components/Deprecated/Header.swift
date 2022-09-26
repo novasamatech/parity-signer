@@ -13,7 +13,7 @@ struct Header: View {
     let screenNameType: ScreenNameType?
     let rightButton: RightButton?
     let alert: Bool
-    let canaryDead: Bool
+    let isConnectivityOn: Bool
     let alertShow: () -> Void
     @ObservedObject var navigation: NavigationCoordinator
 
@@ -86,7 +86,7 @@ struct Header: View {
                         }
                     )
                     NavbarShield(
-                        canaryDead: canaryDead,
+                        isConnectivityOn: isConnectivityOn,
                         alert: alert,
                         navigation: navigation
                     )

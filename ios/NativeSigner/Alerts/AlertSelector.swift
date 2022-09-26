@@ -10,7 +10,7 @@ import SwiftUI
 
 struct AlertSelector: View {
     let alertData: AlertData?
-    let canaryDead: Bool
+    let isConnectivityOn: Bool
     let resetAlert: () -> Void
     let navigationRequest: NavigationRequest
 
@@ -24,7 +24,7 @@ struct AlertSelector: View {
             ShieldAlertComponent(
                 resetAlert: resetAlert,
                 navigationRequest: navigationRequest,
-                canaryDead: canaryDead,
+                isConnectivityOn: isConnectivityOn,
                 content: value
             )
         case .confirm:

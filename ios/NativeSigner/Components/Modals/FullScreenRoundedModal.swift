@@ -48,7 +48,7 @@ struct FullScreenRoundedModal<Content: View>: View {
                 VStack(alignment: .leading, spacing: Spacing.medium, content: content)
                     .padding([.bottom, .top], Spacing.medium)
                     .padding([.leading, .trailing], 0)
-                    .background(Asset.backgroundSecondary.swiftUIColor)
+                    .background(Asset.backgroundTertiary.swiftUIColor)
                     .cornerRadius(radius: CornerRadius.medium, corners: [.topLeft, .topRight])
             }
         }

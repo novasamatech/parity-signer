@@ -96,6 +96,10 @@ struct BackupModal: View {
                             }
                             QRCodeContainerView(viewModel: viewModel.qrCode)
                                 .fixedSize(horizontal: false, vertical: true)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: CornerRadius.medium)
+                                        .stroke(Asset.fill12.swiftUIColor, lineWidth: 0.5)
+                                )
                             Spacer()
                                 .frame(height: Spacing.componentSpacer)
                         }

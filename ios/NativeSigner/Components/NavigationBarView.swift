@@ -24,17 +24,20 @@ struct NavigationBarViewModel: Equatable {
     let subtitle: String?
     let leftButton: NavigationLeftButton
     let rightButton: NavigationRightButton
+    let backgroundColor: Color
 
     init(
         title: String? = nil,
         subtitle: String? = nil,
         leftButton: NavigationLeftButton = .empty,
-        rightButton: NavigationRightButton = .empty
+        rightButton: NavigationRightButton = .empty,
+        backgroundColor: Color = Asset.backgroundPrimary.swiftUIColor
     ) {
         self.title = title
         self.subtitle = subtitle
         self.leftButton = leftButton
         self.rightButton = rightButton
+        self.backgroundColor = backgroundColor
     }
 }
 
@@ -108,7 +111,7 @@ struct NavigationBarView: View {
         .padding([.leading, .trailing], Spacing.extraExtraSmall)
         .frame(maxWidth: .infinity)
         .frame(height: Heights.navigationBarHeight)
-        .background(Asset.backgroundSystem.swiftUIColor)
+        .background(viewModel.backgroundColor)
     }
 }
 

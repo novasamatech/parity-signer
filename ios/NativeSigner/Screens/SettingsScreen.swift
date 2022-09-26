@@ -115,6 +115,7 @@ struct SettingsScreen: View {
                 withIcon: false,
                 withBackground: false
             )
+            Spacer().frame(idealHeight: .infinity)
         }
     }
 }
