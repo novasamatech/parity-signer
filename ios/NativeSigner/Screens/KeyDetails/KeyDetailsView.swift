@@ -13,9 +13,12 @@ struct KeyDetailsView: View {
     @State private var isShowingActionSheet = false
     @State private var isShowingRemoveConfirmation: Bool = false
     @State private var isShowingBackupModal: Bool = false
+    @State private var isPresentingConnectivityAlert = false
 
     @ObservedObject private var navigation: NavigationCoordinator
+    @ObservedObject private var data: SignerDataModel
 
+    @State private var backupModalViewModel: BackupModalViewModel?
     private let alertClosure: (() -> Void)?
     private let viewModel: KeyDetailsViewModel
     private let actionModel: KeyDetailsActionModel
@@ -24,6 +27,7 @@ struct KeyDetailsView: View {
 
     init(
         navigation: NavigationCoordinator,
+        data: SignerDataModel,
         forgetKeyActionHandler: ForgetKeySetAction,
         viewModel: KeyDetailsViewModel,
         actionModel: KeyDetailsActionModel,
@@ -31,6 +35,7 @@ struct KeyDetailsView: View {
         alertClosure: (() -> Void)? = nil
     ) {
         self.navigation = navigation
+        self.data = data
         self.forgetKeyActionHandler = forgetKeyActionHandler
         self.viewModel = viewModel
         self.actionModel = actionModel
@@ -103,6 +108,9 @@ struct KeyDetailsView: View {
             )
             .padding(Spacing.large)
         }
+        .onAppear {
+            backupModalViewModel = exportPrivateKeyService.backupViewModel()
+        }
         .fullScreenCover(
             isPresented: $isShowingActionSheet,
             onDismiss: {
@@ -112,7 +120,13 @@ struct KeyDetailsView: View {
                 }
                 if shouldPresentBackupModal == true {
                     shouldPresentBackupModal.toggle()
-                    isShowingBackupModal.toggle()
+                    if data.alert || backupModalViewModel == nil {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            isPresentingConnectivityAlert.toggle()
+                        }
+                    } else {
+                        isShowingBackupModal.toggle()
+                    }
                 }
             }
         ) {
@@ -131,13 +145,13 @@ struct KeyDetailsView: View {
                 // We need to fake right button action here or Rust machine will break
                 // In old UI, if you dismiss equivalent of this modal, underlying modal would still be there,
                 // so we need to inform Rust we actually hid it
-                dismissAction: navigation.perform(navigation: .init(action: .rightButtonAction), skipDebounce: true),
+                dismissAction: { _ = navigation.performFake(navigation: .init(action: .rightButtonAction)) }(),
                 isShowingBottomAlert: $isShowingRemoveConfirmation
             )
             .clearModalBackground()
         }
         .fullScreenCover(isPresented: $isShowingBackupModal) {
-            if let viewModel = exportPrivateKeyService.backupViewModel() {
+            if let viewModel = backupModalViewModel {
                 BackupModal(
                     isShowingBackupModal: $isShowingBackupModal,
                     viewModel: viewModel
@@ -147,6 +161,18 @@ struct KeyDetailsView: View {
                 EmptyView()
             }
         }
+        .alert(
+            data.canaryDead ? Localizable.Connectivity.Label.title.string : Localizable.PastConnectivity
+                .Label.title.string,
+            isPresented: $isPresentingConnectivityAlert,
+            actions: {
+                Button(Localizable.Connectivity.Action.ok.string) { isPresentingConnectivityAlert.toggle() }
+            },
+            message: {
+                data.canaryDead ? Localizable.Connectivity.Label.content.text : Localizable.PastConnectivity
+                    .Label.content.text
+            }
+        )
     }
 }
 
@@ -192,6 +218,7 @@ struct KeyDetailsView_Previews: PreviewProvider {
         VStack {
             KeyDetailsView(
                 navigation: NavigationCoordinator(),
+                data: SignerDataModel(navigation: NavigationCoordinator()),
                 forgetKeyActionHandler: .init(navigation: NavigationCoordinator()),
                 viewModel: .init(
                     keySummary: KeySummaryViewModel(
