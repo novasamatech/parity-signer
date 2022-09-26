@@ -52,73 +52,52 @@ struct KeyDetailsView: View {
                         isShowingActionSheet.toggle()
                     })
                 )
-                // Main key cell
-                HStack {
-                    VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                        Text(viewModel.keySummary.keyName)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            .font(Fontstyle.titleL.base)
-                        Text(viewModel.keySummary.base58)
-                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                            .font(Fontstyle.bodyM.base)
-                            .lineLimit(1)
-                    }
-                    Spacer().frame(maxWidth: .infinity)
-                    Asset.chevronRight.swiftUIImage
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                }
-                .padding(Padding.detailsCell)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    navigation.perform(navigation: actionModel.addressKeyNavigation)
-                }
-                // Header
-                HStack {
-                    Localizable.KeyDetails.Label.derived.text
-                        .font(Fontstyle.bodyM.base)
-                    Spacer().frame(maxWidth: .infinity)
-                    Button(
-                        action: {
-                            navigation.perform(navigation: .init(action: .networkSelector))
-                        }, label: {
-                            Asset.switches.swiftUIImage
-                        }
-                    )
-                }
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                .padding(Padding.detailsCell)
-                // List of derived keys
                 List {
+                    // Main key cell
+                    KeySummaryView(viewModel: viewModel.keySummary)
+                        .padding(Padding.detailsCell)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            navigation.perform(navigation: actionModel.addressKeyNavigation)
+                        }
+                        .keyDetailsListElement()
+                    // Header
+                    HStack {
+                        Localizable.KeyDetails.Label.derived.text
+                            .font(Fontstyle.bodyM.base)
+                        Spacer().frame(maxWidth: .infinity)
+                        Asset.switches.swiftUIImage
+                            .frame(width: Heights.actionSheetButton)
+                            .onTapGesture {
+                                navigation.perform(navigation: .init(action: .networkSelector))
+                            }
+                    }
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .padding(Padding.detailsCell)
+                    .keyDetailsListElement()
+                    // List of derived keys
                     ForEach(
                         viewModel.derivedKeys,
                         id: \.viewModel.path
                     ) { deriveKey in
                         DerivedKeyRow(deriveKey.viewModel)
-                            .listRowBackground(Asset.backgroundSystem.swiftUIColor)
-                            .listRowSeparator(.hidden)
-                            .listRowInsets(EdgeInsets())
-                            .contentShape(Rectangle())
+                            .keyDetailsListElement()
                             .onTapGesture {
                                 navigation.perform(navigation: deriveKey.actionModel.tapAction)
                             }
                     }
                     Spacer()
-                        .listRowBackground(Asset.backgroundSystem.swiftUIColor)
-                        .listRowSeparator(.hidden)
+                        .keyDetailsListElement()
                         .frame(height: Heights.actionButton + Spacing.large)
                 }
                 .listStyle(.plain)
                 .hiddenScrollContent()
             }
-            .background(Asset.backgroundSystem.swiftUIColor)
+            .background(Asset.backgroundPrimary.swiftUIColor)
             // Main CTA
             PrimaryButton(
                 action: {
-                    if let alertClosure = actionModel.alertClosure {
-                        alertClosure()
-                    } else {
-                        navigation.perform(navigation: actionModel.createDerivedKey)
-                    }
+                    navigation.perform(navigation: actionModel.createDerivedKey)
                 },
                 text: Localizable.KeyDetails.Action.create.key
             )
@@ -167,6 +146,43 @@ struct KeyDetailsView: View {
             } else {
                 EmptyView()
             }
+        }
+    }
+}
+
+private struct KeyDetailsListElement: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .listRowBackground(Asset.backgroundPrimary.swiftUIColor)
+            .listRowSeparator(.hidden)
+            .listRowInsets(EdgeInsets())
+            .contentShape(Rectangle())
+    }
+}
+
+private extension View {
+    func keyDetailsListElement() -> some View {
+        modifier(KeyDetailsListElement())
+    }
+}
+
+private struct KeySummaryView: View {
+    let viewModel: KeySummaryViewModel
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
+                Text(viewModel.keyName)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .font(Fontstyle.titleL.base)
+                Text(viewModel.base58)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(Fontstyle.bodyM.base)
+                    .lineLimit(1)
+            }
+            Spacer().frame(maxWidth: .infinity)
+            Asset.chevronRight.swiftUIImage
+                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
         }
     }
 }

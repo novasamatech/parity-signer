@@ -59,6 +59,7 @@ struct KeyDetailsPublicKeyView: View {
                 VStack {
                     VStack(spacing: 0) {
                         QRCodeContainerView(viewModel: viewModel.qrCode)
+                            .padding(0.5)
                         if let addressFooter = viewModel.addressFooter {
                             QRCodeAddressFooterView(viewModel: addressFooter)
                         }
@@ -92,10 +93,10 @@ struct KeyDetailsPublicKeyView: View {
                     }
                 }
                 .padding([.leading, .trailing], Spacing.large)
-                .padding([.top, .bottom], 60)
-                .background(Asset.backgroundSolidSystem.swiftUIColor)
+                .padding([.top, .bottom], Spacing.componentSpacer)
+                .background(Asset.backgroundPrimary.swiftUIColor)
             }
-            .background(Asset.backgroundSolidSystem.swiftUIColor)
+            .background(Asset.backgroundPrimary.swiftUIColor)
         }
         // Action sheet
         .fullScreenCover(
