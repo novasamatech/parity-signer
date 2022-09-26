@@ -10,32 +10,36 @@ import SwiftUI
 struct KeyDetailsPublicKeyView: View {
     private let viewModel: KeyDetailsPublicKeyViewModel
     private let actionModel: KeyDetailsPublicKeyActionModel
-    private let exportKeyService: ExportPrivateKeyService
+    private let exportPrivateKeyViewModel: ExportPrivateKeyViewModel?
     private let forgetKeyActionHandler: ForgetSingleKeyAction
 
     @State private var isShowingRemoveConfirmation = false
     @State private var isShowingActionSheet = false
     @State private var isPresentingExportKeysWarningModal = false
     @State private var isPresentingExportKeysModal = false
+    @State private var isPresentingConnectivityAlert = false
 
     @State private var shouldPresentExportKeysWarningModal = false
     @State private var shouldPresentExportKeysModal = false
     @State private var shouldPresentRemoveConfirmationModal = false
 
     @ObservedObject private var navigation: NavigationCoordinator
+    @ObservedObject private var data: SignerDataModel
 
     init(
         navigation: NavigationCoordinator,
+        data: SignerDataModel,
         forgetKeyActionHandler: ForgetSingleKeyAction,
         viewModel: KeyDetailsPublicKeyViewModel,
         actionModel: KeyDetailsPublicKeyActionModel,
-        exportKeyService: ExportPrivateKeyService = ExportPrivateKeyService()
+        exportPrivateKeyViewModel: ExportPrivateKeyViewModel? = nil
     ) {
         self.navigation = navigation
+        self.data = data
         self.forgetKeyActionHandler = forgetKeyActionHandler
         self.viewModel = viewModel
         self.actionModel = actionModel
-        self.exportKeyService = exportKeyService
+        self.exportPrivateKeyViewModel = exportPrivateKeyViewModel
     }
 
     var body: some View {
@@ -55,6 +59,7 @@ struct KeyDetailsPublicKeyView: View {
                 VStack {
                     VStack(spacing: 0) {
                         QRCodeContainerView(viewModel: viewModel.qrCode)
+                            .padding(0.5)
                         if let addressFooter = viewModel.addressFooter {
                             QRCodeAddressFooterView(viewModel: addressFooter)
                         }
@@ -88,10 +93,10 @@ struct KeyDetailsPublicKeyView: View {
                     }
                 }
                 .padding([.leading, .trailing], Spacing.large)
-                .padding([.top, .bottom], 60)
-                .background(Asset.backgroundSolidSystem.swiftUIColor)
+                .padding([.top, .bottom], Spacing.componentSpacer)
+                .background(Asset.backgroundPrimary.swiftUIColor)
             }
-            .background(Asset.backgroundSolidSystem.swiftUIColor)
+            .background(Asset.backgroundPrimary.swiftUIColor)
         }
         // Action sheet
         .fullScreenCover(
@@ -99,7 +104,11 @@ struct KeyDetailsPublicKeyView: View {
             onDismiss: {
                 if shouldPresentExportKeysWarningModal {
                     shouldPresentExportKeysWarningModal.toggle()
-                    isPresentingExportKeysWarningModal.toggle()
+                    if data.alert || exportPrivateKeyViewModel == nil {
+                        isPresentingConnectivityAlert.toggle()
+                    } else {
+                        isPresentingExportKeysWarningModal.toggle()
+                    }
                 }
                 if shouldPresentRemoveConfirmationModal {
                     shouldPresentRemoveConfirmationModal.toggle()
@@ -142,12 +151,16 @@ struct KeyDetailsPublicKeyView: View {
                 navigation.perform(navigation: .init(action: .rightButtonAction))
             }
         ) {
-            ExportPrivateKeyModal(
-                isPresentingExportKeysModal: $isPresentingExportKeysModal,
-                navigation: navigation,
-                viewModel: exportKeyService.exportPrivateKey(from: navigation.currentKeyDetails)
-            )
-            .clearModalBackground()
+            if let viewModel = exportPrivateKeyViewModel {
+                ExportPrivateKeyModal(
+                    isPresentingExportKeysModal: $isPresentingExportKeysModal,
+                    navigation: navigation,
+                    viewModel: viewModel
+                )
+                .clearModalBackground()
+            } else {
+                EmptyView()
+            }
         }
         // Remove key modal
         .fullScreenCover(isPresented: $isShowingRemoveConfirmation) {
@@ -157,51 +170,67 @@ struct KeyDetailsPublicKeyView: View {
                 // We need to fake right button action here or Rust machine will break
                 // In old UI, if you dismiss equivalent of this modal, underlying modal would still be there,
                 // so we need to inform Rust we actually hid it
-                dismissAction: navigation.perform(navigation: .init(action: .rightButtonAction), skipDebounce: true),
+                dismissAction: { _ = navigation.performFake(navigation: .init(action: .rightButtonAction)) }(),
                 isShowingBottomAlert: $isShowingRemoveConfirmation
             )
             .clearModalBackground()
         }
+        .alert(
+            data.isConnectivityOn ? Localizable.Connectivity.Label.title.string : Localizable.PastConnectivity
+                .Label.title.string,
+            isPresented: $isPresentingConnectivityAlert,
+            actions: {
+                Button(Localizable.Connectivity.Action.ok.string) { isPresentingConnectivityAlert.toggle() }
+            },
+            message: {
+                data.isConnectivityOn ? Localizable.Connectivity.Label.content.text : Localizable.PastConnectivity
+                    .Label.content.text
+            }
+        )
     }
 }
 
-struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
-    static var previews: some View {
-        HStack {
-            VStack {
-                KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(),
-                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
-                )
-            }
-            VStack {
-                KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
-                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
-                )
-            }
-            VStack {
-                KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
-                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
-                )
-            }
-            VStack {
-                KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
-                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
-                )
-            }
-        }
-        .previewLayout(.sizeThatFits)
-        .preferredColorScheme(.dark)
-    }
-}
+// struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        HStack {
+//            VStack {
+//                KeyDetailsPublicKeyView(
+//                    navigation: NavigationCoordinator(),
+//                    data: SignerDataModel(navigation: NavigationCoordinator()),
+//                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+//                    viewModel: PreviewData.exampleKeyDetailsPublicKey(),
+//                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
+//                )
+//            }
+//            VStack {
+//                KeyDetailsPublicKeyView(
+//                    navigation: NavigationCoordinator(),
+//                    data: SignerDataModel(navigation: NavigationCoordinator()),
+//                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+//                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
+//                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
+//                )
+//            }
+//            VStack {
+//                KeyDetailsPublicKeyView(
+//                    navigation: NavigationCoordinator(),
+//                    data: SignerDataModel(navigation: NavigationCoordinator()),
+//                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+//                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
+//                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
+//                )
+//            }
+//            VStack {
+//                KeyDetailsPublicKeyView(
+//                    navigation: NavigationCoordinator(),
+//                    data: SignerDataModel(navigation: NavigationCoordinator()),
+//                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+//                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
+//                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
+//                )
+//            }
+//        }
+//        .previewLayout(.sizeThatFits)
+//        .preferredColorScheme(.dark)
+//    }
+// }

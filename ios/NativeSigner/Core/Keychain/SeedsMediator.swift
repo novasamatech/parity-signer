@@ -130,10 +130,6 @@ final class SeedsMediator: SeedsMediating {
     }
 
     func getSeedBackup(seedName: String) -> String {
-        if signerDataModel.alert {
-            signerDataModel.alertShow = true
-            return ""
-        }
         let result = keychainAccessAdapter.retrieveSeed(with: seedName)
         switch result {
         case let .success(resultSeed):
@@ -148,9 +144,6 @@ final class SeedsMediator: SeedsMediating {
                         dbname: signerDataModel.dbName
                     )
                 } catch {
-                    signerDataModel.authenticated = false
-                    // If we have valid data in Keychain, should we really not treat it as such because of Rust code failure?
-                    // Should we maybe call
                     return ""
                 }
                 return ""
@@ -163,10 +156,6 @@ final class SeedsMediator: SeedsMediating {
     }
 
     func getSeed(seedName: String) -> String {
-        if signerDataModel.alert {
-            signerDataModel.alertShow = true
-            return ""
-        }
         let result = keychainAccessAdapter.retrieveSeed(with: seedName)
         switch result {
         case let .success(seed):

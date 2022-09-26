@@ -11,6 +11,7 @@ struct KeyDetailsActionsModal: View {
     @State private var animateBackground: Bool = false
     @Binding var isShowingActionSheet: Bool
     @Binding var shouldPresentRemoveConfirmationModal: Bool
+    @Binding var shouldPresentBackupModal: Bool
     @ObservedObject var navigation: NavigationCoordinator
 
     var body: some View {
@@ -41,6 +42,7 @@ struct KeyDetailsActionsModal: View {
                         action: {
                             animateDismissal {
                                 navigation.perform(navigation: .init(action: .backupSeed))
+                                shouldPresentBackupModal.toggle()
                             }
                         },
                         icon: Asset.backupKey.swiftUIImage,

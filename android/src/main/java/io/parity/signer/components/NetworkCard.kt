@@ -9,13 +9,20 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.MscNetworkInfo
 
 @Composable
-fun NetworkCard(title: String, logo: String, selected: Boolean = false) {
+fun NetworkCard(
+	network: NetworkCardModel,
+	selected: Boolean = false
+) {
+
 	Surface(
 		shape = MaterialTheme.shapes.large,
 		color = MaterialTheme.colors.Bg200,
@@ -28,8 +35,8 @@ fun NetworkCard(title: String, logo: String, selected: Boolean = false) {
 				.padding(horizontal = 20.dp)
 		) {
 			NetworkLogoName(
-				logo = logo,
-				name = title,
+				logo = network.networkLogo,
+				name = network.networkTitle,
 			)
 			Spacer(Modifier.weight(1f))
 			if (selected) {
@@ -42,3 +49,33 @@ fun NetworkCard(title: String, logo: String, selected: Boolean = false) {
 		}
 	}
 }
+
+class NetworkCardModel(
+	val networkTitle: String,
+	val networkLogo: String
+) {
+
+	constructor(network: MscNetworkInfo) : this(
+		network.networkTitle,
+		network.networkLogo
+	)
+}
+
+
+
+internal class NetworkCardPreviewParameter :
+	PreviewParameterProvider<NetworkCardModel> {
+	override val values: Sequence<NetworkCardModel> = sequenceOf(
+		NetworkCardModel("Network Title", "Network Logo")
+	)
+}
+
+@Preview
+@Composable
+private fun NetworkCardPreview(
+	@PreviewParameter(NetworkCardPreviewParameter::class) network: NetworkCardModel
+) {
+	NetworkCard(network)
+}
+
+

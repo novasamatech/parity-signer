@@ -27,7 +27,6 @@ struct ModalSelectorView: View {
                 seedName: seedName, seedPhrase: seedPhrase, createRoots: createSeedKeys
             ) },
             createAddress: { path, seedName in data.createAddress(path: path, seedName: seedName) },
-            getSeedForBackup: { seedName in seedsMediator.getSeedBackup(seedName: seedName) },
             sign: { seedName, comment in data.sign(seedName: seedName, comment: comment) }
         )
     }

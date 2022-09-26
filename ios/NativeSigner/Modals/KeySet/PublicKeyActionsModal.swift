@@ -80,10 +80,6 @@ struct PublicKeyActionsModal: View {
                 .padding(.top, -Spacing.extraSmall)
             }
         )
-//        .onAppear {
-//            // We need to fake right button action here, or Rust state machine won't work for `Backup` action
-//            navigation.perform(navigation: .init(action: .rightButtonAction))
-//        }
     }
 
     private func animateDismissal(_ completion: @escaping () -> Void = {}) {

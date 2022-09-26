@@ -9,7 +9,7 @@ import Network
 import SwiftUI
 
 struct NavbarShield: View {
-    let canaryDead: Bool
+    let isConnectivityOn: Bool
     let alert: Bool
     @ObservedObject var navigation: NavigationCoordinator
 
@@ -19,7 +19,7 @@ struct NavbarShield: View {
                 navigation.perform(navigation: .init(action: .shield))
             },
             label: {
-                if canaryDead {
+                if isConnectivityOn {
                     Image(.shield, variant: .slash)
                         .imageScale(.large)
                         .foregroundColor(Asset.signalDanger.swiftUIColor)

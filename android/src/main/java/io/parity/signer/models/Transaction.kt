@@ -11,7 +11,7 @@ fun SignerDataModel.signTransaction(
 			seedName
 		)
 		if (seedPhrase.isNotBlank()) {
-			pushButton(Action.GO_FORWARD, comment, seedPhrase)
+			navigate(Action.GO_FORWARD, comment, seedPhrase)
 		}
 	}
 }
@@ -22,7 +22,7 @@ fun SignerDataModel.signSufficientCrypto(seedName: String, addressKey: String) {
 			seedName
 		)
 		if (seedPhrase.isNotBlank()) {
-			pushButton(
+			navigate(
 				Action.GO_FORWARD,
 				addressKey,
 				seedPhrase
