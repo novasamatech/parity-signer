@@ -11,11 +11,11 @@ struct ShieldAlertComponent: View {
     @State private var show = true
     let resetAlert: () -> Void
     let navigationRequest: NavigationRequest
-    let canaryDead: Bool
+    let isConnectivityOn: Bool
     let content: ShieldAlert?
     var body: some View {
         ZStack {
-            if canaryDead {
+            if isConnectivityOn {
                 Text("")
                     .alert(
                         Localizable.networkConnected.key,

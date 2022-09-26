@@ -176,14 +176,14 @@ struct KeyDetailsPublicKeyView: View {
             .clearModalBackground()
         }
         .alert(
-            data.canaryDead ? Localizable.Connectivity.Label.title.string : Localizable.PastConnectivity
+            data.isConnectivityOn ? Localizable.Connectivity.Label.title.string : Localizable.PastConnectivity
                 .Label.title.string,
             isPresented: $isPresentingConnectivityAlert,
             actions: {
                 Button(Localizable.Connectivity.Action.ok.string) { isPresentingConnectivityAlert.toggle() }
             },
             message: {
-                data.canaryDead ? Localizable.Connectivity.Label.content.text : Localizable.PastConnectivity
+                data.isConnectivityOn ? Localizable.Connectivity.Label.content.text : Localizable.PastConnectivity
                     .Label.content.text
             }
         )
