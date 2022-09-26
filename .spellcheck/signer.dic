@@ -3,6 +3,7 @@
 “
 —
 APK
+Blockies
 E2E
 FFI
 HDKD
@@ -15,6 +16,7 @@ UI
 UOS
 WASM
 Xcode
+addr
 affordances
 airgap
 airgapped
