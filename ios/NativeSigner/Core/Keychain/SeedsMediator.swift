@@ -130,10 +130,6 @@ final class SeedsMediator: SeedsMediating {
     }
 
     func getSeedBackup(seedName: String) -> String {
-        if signerDataModel.alert {
-            signerDataModel.alertShow = true
-            return ""
-        }
         let result = keychainAccessAdapter.retrieveSeed(with: seedName)
         switch result {
         case let .success(resultSeed):
