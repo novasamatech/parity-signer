@@ -16,20 +16,13 @@ struct DerivedKeyRow: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: Spacing.small) {
-            VStack {
-                Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
-                    .padding(.top, Spacing.extraExtraSmall)
-            }
+            Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
+                .padding(.top, Spacing.extraExtraSmall)
+                .padding(.leading, Spacing.medium)
             VStack(alignment: .leading) {
-                HStack(alignment: .top, spacing: 0) {
-                    Text(viewModel.path)
-                    if viewModel.hasPassword {
-                        Localizable.Path.delimeter.text
-                        Image(.lock)
-                    }
-                }
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                .font(Fontstyle.titleS.base)
+                fullPath
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .font(Fontstyle.titleS.base)
                 Spacer().frame(height: Spacing.extraExtraSmall)
                 HStack(spacing: Spacing.extraExtraSmall) {
                     Asset.derivedKeyAddress.swiftUIImage
@@ -42,52 +35,62 @@ struct DerivedKeyRow: View {
             Spacer()
             VStack(alignment: .center) {
                 Asset.chevronRight.swiftUIImage
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    .padding(.trailing, Spacing.large)
             }
             .frame(minHeight: .zero, maxHeight: .infinity)
         }
-        .padding(Spacing.medium)
+        .padding([.top, .bottom], Spacing.medium)
         .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// String interpolation for SFSymbols is a bit unstable if creating `String` inline by using conditional logic or `appending` from `StringProtocol`. Hence less DRY approach and dedicated function to wrap that
+    private var fullPath: Text {
+        viewModel.hasPassword ?
+            Text(
+                "\(viewModel.path)\(Localizable.Path.delimeter.string)\(Image(.lock))"
+            ) :
+            Text(viewModel.path)
     }
 }
 
-// struct DerivedKeyRow_Previews: PreviewProvider {
-//    static var previews: some View {
-//        VStack {
-//            DerivedKeyRow(
-//                DerivedKeyRowViewModel(
-//                    identicon: PreviewData.exampleIdenticon,
-//                    path: "// polkadot",
-//                    hasPassword: false,
-//                    base58: "15Gsc678654FDSG0HA04H0A"
-//                )
-//            )
-//            DerivedKeyRow(
-//                DerivedKeyRowViewModel(
-//                    identicon: PreviewData.exampleIdenticon,
-//                    path: "// astar",
-//                    hasPassword: false,
-//                    base58: "15Gsc678654FDSG0HA04H0A"
-//                )
-//            )
-//            DerivedKeyRow(
-//                DerivedKeyRowViewModel(
-//                    identicon: PreviewData.exampleIdenticon,
-//                    path: "// kusama",
-//                    hasPassword: true,
-//                    base58: "15Gsc678654FDSG0HA04H0A"
-//                )
-//            )
-//            DerivedKeyRow(
-//                DerivedKeyRowViewModel(
-//                    identicon: PreviewData.exampleIdenticon,
-//                    path: "// kusama // verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
-//                    hasPassword: true,
-//                    base58: "15Gsc678654FDSG0HA04H0A"
-//                )
-//            )
-//        }
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }
+struct DerivedKeyRow_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack {
+            DerivedKeyRow(
+                DerivedKeyRowViewModel(
+                    identicon: PreviewData.exampleIdenticon,
+                    path: "// polkadot",
+                    hasPassword: false,
+                    base58: "15Gsc678654FDSG0HA04H0A"
+                )
+            )
+            DerivedKeyRow(
+                DerivedKeyRowViewModel(
+                    identicon: PreviewData.exampleIdenticon,
+                    path: "// astar",
+                    hasPassword: false,
+                    base58: "15Gsc678654FDSG0HA04H0A"
+                )
+            )
+            DerivedKeyRow(
+                DerivedKeyRowViewModel(
+                    identicon: PreviewData.exampleIdenticon,
+                    path: "// kusama",
+                    hasPassword: true,
+                    base58: "15Gsc678654FDSG0HA04H0A"
+                )
+            )
+            DerivedKeyRow(
+                DerivedKeyRowViewModel(
+                    identicon: PreviewData.exampleIdenticon,
+                    path: "// kusama // verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
+                    hasPassword: true,
+                    base58: "15Gsc678654FDSG0HA04H0A"
+                )
+            )
+        }
+        .preferredColorScheme(.dark)
+        .previewLayout(.sizeThatFits)
+    }
+}

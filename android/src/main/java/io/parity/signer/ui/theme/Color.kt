@@ -3,64 +3,47 @@ package io.parity.signer.ui.theme
 import androidx.compose.material.Colors
 import androidx.compose.ui.graphics.Color
 
-val Colors.Border600: Color
-	get() = if (isLight) Color(0xFFB9C3C8) else Color(0xFF7E8D95)
-val Colors.Border500: Color
-	get() = if (isLight) Color(0xFFACB7BF) else Color(0xFF556068)
-val Colors.Border400: Color
-	get() = if (isLight) Color(0xFFDCE3E7) else Color(0xFF334048)
 
-val Colors.Bg600: Color
-	get() = if (isLight) Color(0xFF3A3A3C) else Color(0xFF3A3A3C)
-val Colors.Bg500: Color
-	get() = if (isLight) Color(0xFF343434) else Color(0xFF343434)
-val Colors.Bg400: Color
-	get() = if (isLight) Color(0xFFEDEDED) else Color(0xFF2E2D2F)
-val Colors.Bg300: Color
-	get() = if (isLight) Color(0xFFF7FAFD) else Color(0xFF1F2021)
-val Colors.Bg200: Color
-	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF1A1A1B)
-val Colors.Bg100: Color
-	get() = if (isLight) Color(0xFFF3F4F5) else Color(0xFF111111)
-val Colors.Bg000: Color
-	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF000000)
-val Colors.BgDanger: Color
-	get() = if (isLight) Color(0xFFFFD3D0) else Color(0xFF2F2424)
+val Colors.fill30: Color
+	get() = if (isLight) Color(0x4D000000) else Color(0x4DFFFFFF)
 
-val Colors.Text600: Color
-	get() = if (isLight) Color(0xFF000000) else Color(0xFFFEFEFE)
-val Colors.Text500: Color
-	get() = if (isLight) Color(0xFF535353) else Color(0xFFD1D1D1)
-val Colors.Text400: Color
-	get() = if (isLight) Color(0xFF8F8E8E) else Color(0xFFAEAEAE)
-val Colors.Text300: Color
-	get() = if (isLight) Color(0xFF7B8287) else Color(0xFF7E8D95)
-val Colors.Text100: Color
-	get() = if (isLight) Color(0xFF020202) else Color(0xFF334048)
+val Colors.fill24: Color
+	get() = if (isLight) Color(0x3D000000) else Color(0x3DFFFFFF)
 
-val Colors.Action600: Color
-	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFFFFFFFF)
-val Colors.Action400: Color
-	get() = if (isLight) Color(0xFF4FA5F5) else Color(0xFF3996EC)
-val Colors.Action300: Color
-	get() = if (isLight) Color(0xFF2980D7) else Color(0xFF2980D7)
-val Colors.Action200: Color
-	get() = if (isLight) Color(0xFFB9D4EF) else Color(0xFF0F447A)
-val Colors.Action100: Color
-	get() = if (isLight) Color(0xFFDFEFFF) else Color(0xFF082542)
+val Colors.fill18: Color
+	get() = if (isLight) Color(0x2E000000) else Color(0x2EFFFFFF)
 
-val Colors.Crypto500: Color
-	get() = if (isLight) Color(0xFFB6EBEE) else Color(0xFF257681)
-val Colors.Crypto400: Color
-	get() = if (isLight) Color(0xFF39929E) else Color(0xFF65A8B1)
-val Colors.Crypto200: Color
-	get() = if (isLight) Color(0xFF6CA7AF) else Color(0xFF3D686D)
-val Colors.Crypto100: Color
-	get() = if (isLight) Color(0xFFDCEDEF) else Color(0xFF21373A)
+val Colors.fill12: Color
+	get() = if (isLight) Color(0x1F000000) else Color(0x1FFFFFFF)
 
-val Colors.SignalDanger: Color
-	get() = if (isLight) Color(0xFFFF3B30) else Color(0xFFFF3B30)
-val Colors.SignalOn: Color
-	get() = if (isLight) Color(0xFF32D74B) else Color(0xFF32D74B)
-val Colors.SignalWarning: Color
-	get() = if (isLight) Color(0xFFFFD541) else Color(0xFFFFD541)
+val Colors.fill6: Color
+	get() = if (isLight) Color(0x0F000000) else Color(0x0FFFFFFF)
+
+
+
+
+val Colors.backgroundPrimary: Color
+	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF1E1E23)
+
+val Colors.backgroundSecondary: Color
+	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF2C2C30)
+
+val Colors.textSecondary: Color
+	get() = if (isLight) Color(0xA8000000) else Color(0xB0FFFFFF)
+
+val Colors.textTertiary: Color
+	get() = if (isLight) Color(0x73000000) else Color(0x7AFFFFFF)
+
+
+
+val Colors.pink500: Color
+	get() = Color(0xFFE6007A)
+
+val Colors.pink300: Color
+	get() = Color(0xFFF272B6)
+
+val Colors.red400: Color
+	get() = Color(0xFFFD4935)
+
+val Colors.red500: Color
+	get() = Color(0xFFFE8D81)

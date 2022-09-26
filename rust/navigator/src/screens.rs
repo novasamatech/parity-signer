@@ -178,10 +178,7 @@ impl KeysState {
             SpecialtyKeysState::MultiSelect(multiselect) => {
                 let mut new_multiselect = multiselect.to_owned();
                 if multiselect.contains(multisigner) {
-                    new_multiselect = new_multiselect
-                        .into_iter()
-                        .filter(|a| a != multisigner)
-                        .collect();
+                    new_multiselect.retain(|a| a != multisigner);
                 } else {
                     new_multiselect.push(multisigner.to_owned());
                 }

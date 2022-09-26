@@ -8,23 +8,22 @@
 import Foundation
 
 struct KeyDetailsViewModel: Equatable {
-    let keyName: String
-    let base58: String
+    let keySummary: KeySummaryViewModel
     let derivedKeys: [DerivedKeyRowModel]
 
     init(
-        keyName: String,
-        base58: String,
+        keySummary: KeySummaryViewModel,
         derivedKeys: [DerivedKeyRowModel]
     ) {
-        self.keyName = keyName
-        self.base58 = base58
+        self.keySummary = keySummary
         self.derivedKeys = derivedKeys
     }
 
     init(_ keys: MKeys) {
-        keyName = keys.root.seedName
-        base58 = keys.root.base58.truncateMiddle(length: 8)
+        keySummary = KeySummaryViewModel(
+            keyName: keys.root.seedName,
+            base58: keys.root.base58.truncateMiddle()
+        )
         derivedKeys = keys.set
             .sorted(by: { $0.path < $1.path })
             .map {

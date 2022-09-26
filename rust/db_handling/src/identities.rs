@@ -54,6 +54,8 @@ use constants::ALICE_SEED_PHRASE;
 #[cfg(feature = "signer")]
 use constants::TRANSACTION;
 
+#[cfg(feature = "signer")]
+use definitions::helpers::{get_multisigner, unhex};
 #[cfg(feature = "active")]
 use definitions::qr_transfers::ContentDerivations;
 #[cfg(any(feature = "active", feature = "signer"))]
@@ -685,11 +687,9 @@ where
             network_specs.genesis_hash,
         );
         events.push(Event::IdentityRemoved { identity_history });
-        address_details.network_id = address_details
+        address_details
             .network_id
-            .into_iter()
-            .filter(|id| id != network_specs_key)
-            .collect();
+            .retain(|id| id != network_specs_key);
         if address_details.network_id.is_empty() {
             id_batch.remove(address_key.key())
         } else {
@@ -1295,19 +1295,25 @@ fn prepare_secret_key_for_export(
 /// coloration, so that the difference with safe QR codes is immediately visible
 /// on screen.
 #[cfg(feature = "signer")]
-pub fn export_secret_key(
-    database_name: &str,
-    multisigner: &MultiSigner,
+pub fn export_secret_key<P>(
+    db_path: P,
+    public_key: &str,
     expected_seed_name: &str,
-    network_specs_key: &NetworkSpecsKey,
+    network_specs_key_hex: &str,
     seed_phrase: &str,
-    pwd: Option<&str>,
-) -> Result<MKeyDetails> {
+    mut key_password: Option<String>,
+) -> Result<MKeyDetails>
+where
+    P: AsRef<Path>,
+{
     use definitions::helpers::IdenticonStyle;
 
-    let network_specs = get_network_specs(database_name, network_specs_key)?;
+    let public_key = &unhex(public_key)?;
+    let network_specs_key = &NetworkSpecsKey::from_hex(network_specs_key_hex)?;
+    let network_specs = get_network_specs(&db_path, network_specs_key)?;
+    let multisigner = &get_multisigner(public_key, &network_specs.encryption)?;
     let address_key = AddressKey::from_multisigner(multisigner);
-    let address_details = get_address_details(database_name, &address_key)?;
+    let address_details = get_address_details(&db_path, &address_key)?;
     if address_details.seed_name != expected_seed_name {
         return Err(Error::SeedNameNotMatching {
             address_key,
@@ -1341,9 +1347,10 @@ pub fn export_secret_key(
     let network_info = MSCNetworkInfo {
         network_title: network_specs.title,
         network_logo: network_specs.logo,
+        network_specs_key: network_specs_key_hex.to_owned(),
     };
 
-    let database_addresses = get_addresses_by_seed_name(database_name, expected_seed_name)?;
+    let database_addresses = get_addresses_by_seed_name(&db_path, expected_seed_name)?;
 
     let exposed_addresses = exposed_set(
         &address_details.path,
@@ -1363,7 +1370,7 @@ pub fn export_secret_key(
     }
 
     let history_batch = events_to_batch(
-        database_name,
+        &db_path,
         vec![Event::SecretWasExported {
             identity_history: IdentityHistory::get(
                 &address_details.seed_name,
@@ -1380,13 +1387,14 @@ pub fn export_secret_key(
         &address_details,
         &network_specs.genesis_hash,
         seed_phrase,
-        pwd,
+        key_password.as_deref(),
     )?;
+    key_password.zeroize();
 
     if let Err(e) = TrDbCold::new()
         .set_addresses(identity_batch) // modify addresses
         .set_history(history_batch) // add corresponding history
-        .apply(database_name)
+        .apply(&db_path)
     {
         qr.zeroize();
         return Err(e);

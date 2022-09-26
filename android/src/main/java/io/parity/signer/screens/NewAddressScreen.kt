@@ -51,7 +51,7 @@ fun NewAddressScreen(
 			Spacer(Modifier.weight(1f))
 		}
 		NetworkCard(
-			network = MscNetworkInfo(
+			network = NetworkCardModel(
 				networkTitle = deriveKey.networkTitle,
 				networkLogo = deriveKey.networkLogo
 			)
@@ -105,7 +105,7 @@ fun NewAddressScreen(
 				Modifier.fillMaxWidth(1f)
 			) {
 				Text("This key already exists:")
-				KeyCard(identity = it)
+				KeyCardOld(identity = it)
 			}
 		}
 		Spacer(Modifier.height(20.dp))

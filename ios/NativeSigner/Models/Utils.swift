@@ -52,17 +52,6 @@ extension AttributedString {
     }
 }
 
-extension String {
-    /// St...ng
-    func truncateMiddle(length: Int) -> String {
-        if count > length * 2 {
-            return prefix(length) + "..." + suffix(length)
-        } else {
-            return self
-        }
-    }
-}
-
 extension TransactionCardSet {
     func assemble() -> [TransactionCard] {
         [author, error, extensions, importingDerivations, message, meta, method, newSpecs, verifier, warning, typesInfo]

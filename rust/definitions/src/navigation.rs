@@ -611,6 +611,7 @@ pub struct MSCNameVersion {
 pub struct MSCNetworkInfo {
     pub network_title: String,
     pub network_logo: String,
+    pub network_specs_key: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

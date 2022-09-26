@@ -8,26 +8,33 @@
 import SwiftUI
 
 struct KeyDetailsView: View {
+    @State private var shouldPresentRemoveConfirmationModal = false
+    @State private var shouldPresentBackupModal = false
     @State private var isShowingActionSheet = false
     @State private var isShowingRemoveConfirmation: Bool = false
+    @State private var isShowingBackupModal: Bool = false
+
     @ObservedObject private var navigation: NavigationCoordinator
 
     private let alertClosure: (() -> Void)?
     private let viewModel: KeyDetailsViewModel
     private let actionModel: KeyDetailsActionModel
     private let forgetKeyActionHandler: ForgetKeySetAction
+    private let exportPrivateKeyService: PrivateKeyQRCodeService
 
     init(
         navigation: NavigationCoordinator,
         forgetKeyActionHandler: ForgetKeySetAction,
         viewModel: KeyDetailsViewModel,
         actionModel: KeyDetailsActionModel,
+        exportPrivateKeyService: PrivateKeyQRCodeService,
         alertClosure: (() -> Void)? = nil
     ) {
         self.navigation = navigation
         self.forgetKeyActionHandler = forgetKeyActionHandler
         self.viewModel = viewModel
         self.actionModel = actionModel
+        self.exportPrivateKeyService = exportPrivateKeyService
         self.alertClosure = alertClosure
     }
 
@@ -38,8 +45,8 @@ struct KeyDetailsView: View {
                 NavigationBarView(
                     navigation: navigation,
                     viewModel: .init(
-                        isBackButtonVisible: true,
-                        isRightBarMenuButtonVisible: true
+                        leftButton: .arrow,
+                        rightButton: .more
                     ),
                     actionModel: .init(rightBarMenuAction: {
                         isShowingActionSheet.toggle()
@@ -48,16 +55,17 @@ struct KeyDetailsView: View {
                 // Main key cell
                 HStack {
                     VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                        Text(viewModel.keyName)
+                        Text(viewModel.keySummary.keyName)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             .font(Fontstyle.titleL.base)
-                        Text(viewModel.base58)
+                        Text(viewModel.keySummary.base58)
                             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                             .font(Fontstyle.bodyM.base)
                             .lineLimit(1)
                     }
                     Spacer().frame(maxWidth: .infinity)
                     Asset.chevronRight.swiftUIImage
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                 }
                 .padding(Padding.detailsCell)
                 .contentShape(Rectangle())
@@ -100,6 +108,7 @@ struct KeyDetailsView: View {
                         .frame(height: Heights.actionButton + Spacing.large)
                 }
                 .listStyle(.plain)
+                .hiddenScrollContent()
             }
             .background(Asset.backgroundSystem.swiftUIColor)
             // Main CTA
@@ -115,10 +124,23 @@ struct KeyDetailsView: View {
             )
             .padding(Spacing.large)
         }
-        .fullScreenCover(isPresented: $isShowingActionSheet) {
+        .fullScreenCover(
+            isPresented: $isShowingActionSheet,
+            onDismiss: {
+                if shouldPresentRemoveConfirmationModal == true {
+                    shouldPresentRemoveConfirmationModal.toggle()
+                    isShowingRemoveConfirmation.toggle()
+                }
+                if shouldPresentBackupModal == true {
+                    shouldPresentBackupModal.toggle()
+                    isShowingBackupModal.toggle()
+                }
+            }
+        ) {
             KeyDetailsActionsModal(
                 isShowingActionSheet: $isShowingActionSheet,
-                isShowingRemoveConfirmation: $isShowingRemoveConfirmation,
+                shouldPresentRemoveConfirmationModal: $shouldPresentRemoveConfirmationModal,
+                shouldPresentBackupModal: $shouldPresentBackupModal,
                 navigation: navigation
             )
             .clearModalBackground()
@@ -135,107 +157,139 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenCover(isPresented: $isShowingBackupModal) {
+            if let viewModel = exportPrivateKeyService.backupViewModel() {
+                BackupModal(
+                    isShowingBackupModal: $isShowingBackupModal,
+                    viewModel: viewModel
+                )
+                .clearModalBackground()
+            } else {
+                EmptyView()
+            }
+        }
     }
 }
 
-//
-// struct KeyDetailsView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        VStack {
-//            KeyDetailsView(
-//                navigation: NavigationCoordinator(),
-//                viewModel: .init(
-//                    keyName: "Parity",
-//                    base58: "15Gsc678...0HA04H0A",
-//                    derivedKeys: [
-//                        DerivedKeyRowModel(
-//                            viewModel: DerivedKeyRowViewModel(
-//                                identicon: PreviewData.exampleIdenticon,
-//                                path: "// polkadot",
-//                                hasPassword: false,
-//                                base58: "15Gsc678654FDSG0HA04H0A"
-//                            ),
-//                            actionModel: DerivedKeyActionModel(
-//                                tapAction: .init(action: .rightButtonAction)
-//                            )
-//                        ),
-//
-//                        DerivedKeyRowModel(
-//                            viewModel: DerivedKeyRowViewModel(
-//                                identicon: PreviewData.exampleIdenticon,
-//                                path: "// polkadot",
-//                                hasPassword: false,
-//                                base58: "15Gsc678654FDSG0HA04H0A"
-//                            ),
-//                            actionModel: DerivedKeyActionModel(
-//                                tapAction: .init(action: .rightButtonAction)
-//                            )
-//                        ),
-//                        DerivedKeyRowModel(
-//                            viewModel: DerivedKeyRowViewModel(
-//                                identicon: PreviewData.exampleIdenticon,
-//                                path: "// astar",
-//                                hasPassword: false,
-//                                base58: "15Gsc678654FDSG0HA04H0A"
-//                            ),
-//                            actionModel: DerivedKeyActionModel(
-//                                tapAction: .init(action: .rightButtonAction)
-//                            )
-//                        ),
-//                        DerivedKeyRowModel(
-//                            viewModel: DerivedKeyRowViewModel(
-//                                identicon: PreviewData.exampleIdenticon,
-//                                path: "// verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
-//                                hasPassword: false,
-//                                base58: "15Gsc678654FDSG0HA04H0A"
-//                            ),
-//                            actionModel: DerivedKeyActionModel(
-//                                tapAction: .init(action: .rightButtonAction)
-//                            )
-//                        ),
-//                        DerivedKeyRowModel(
-//                            viewModel: DerivedKeyRowViewModel(
-//                                identicon: PreviewData.exampleIdenticon,
-//                                path: "// acala",
-//                                hasPassword: true,
-//                                base58: "15Gsc678654FDSG0HA04H0A"
-//                            ),
-//                            actionModel: DerivedKeyActionModel(
-//                                tapAction: .init(action: .rightButtonAction)
-//                            )
-//                        ),
-//                        DerivedKeyRowModel(
-//                            viewModel: DerivedKeyRowViewModel(
-//                                identicon: PreviewData.exampleIdenticon,
-//                                path: "// moonbeam",
-//                                hasPassword: true,
-//                                base58: "15Gsc678654FDSG0HA04H0A"
-//                            ),
-//                            actionModel: DerivedKeyActionModel(
-//                                tapAction: .init(action: .rightButtonAction)
-//                            )
-//                        ),
-//                        DerivedKeyRowModel(
-//                            viewModel: DerivedKeyRowViewModel(
-//                                identicon: PreviewData.exampleIdenticon,
-//                                path: "// kilt",
-//                                hasPassword: true,
-//                                base58: "15Gsc6786546423FDSG0HA04H0A"
-//                            ),
-//                            actionModel: DerivedKeyActionModel(
-//                                tapAction: .init(action: .rightButtonAction)
-//                            )
-//                        )
-//                    ]
-//                ),
-//                actionModel: KeyDetailsActionModel(
-//                    addressKeyNavigation: .init(action: .goBack),
-//                    derivedKeysNavigation: [],
-//                    alertClosure: nil
-//                )
-//            )
-//        }
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }
+struct KeyDetailsView_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack {
+            KeyDetailsView(
+                navigation: NavigationCoordinator(),
+                forgetKeyActionHandler: .init(navigation: NavigationCoordinator()),
+                viewModel: .init(
+                    keySummary: KeySummaryViewModel(
+                        keyName: "Parity",
+                        base58: "15Gsc678...0HA04H0A"
+                    ),
+                    derivedKeys: [
+                        DerivedKeyRowModel(
+                            viewModel: DerivedKeyRowViewModel(
+                                identicon: PreviewData.exampleIdenticon,
+                                path: "// polkadot",
+                                hasPassword: false,
+                                base58: "15Gsc678654FDSG0HA04H0A"
+                            ),
+                            actionModel: DerivedKeyActionModel(
+                                tapAction: .init(action: .rightButtonAction)
+                            )
+                        ),
+
+                        DerivedKeyRowModel(
+                            viewModel: DerivedKeyRowViewModel(
+                                identicon: PreviewData.exampleIdenticon,
+                                path: "// polkadot",
+                                hasPassword: false,
+                                base58: "15Gsc678654FDSG0HA04H0A"
+                            ),
+                            actionModel: DerivedKeyActionModel(
+                                tapAction: .init(action: .rightButtonAction)
+                            )
+                        ),
+                        DerivedKeyRowModel(
+                            viewModel: DerivedKeyRowViewModel(
+                                identicon: PreviewData.exampleIdenticon,
+                                path: "//astar//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
+                                hasPassword: true,
+                                base58: "15Gsc678654FDSG0HA04H0A"
+                            ),
+                            actionModel: DerivedKeyActionModel(
+                                tapAction: .init(action: .rightButtonAction)
+                            )
+                        ),
+                        DerivedKeyRowModel(
+                            viewModel: DerivedKeyRowViewModel(
+                                identicon: PreviewData.exampleIdenticon,
+                                path: "//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
+                                hasPassword: false,
+                                base58: "15Gsc678654FDSG0HA04H0A"
+                            ),
+                            actionModel: DerivedKeyActionModel(
+                                tapAction: .init(action: .rightButtonAction)
+                            )
+                        ),
+                        DerivedKeyRowModel(
+                            viewModel: DerivedKeyRowViewModel(
+                                identicon: PreviewData.exampleIdenticon,
+                                path: "// acala",
+                                hasPassword: true,
+                                base58: "15Gsc678654FDSG0HA04H0A"
+                            ),
+                            actionModel: DerivedKeyActionModel(
+                                tapAction: .init(action: .rightButtonAction)
+                            )
+                        ),
+                        DerivedKeyRowModel(
+                            viewModel: DerivedKeyRowViewModel(
+                                identicon: PreviewData.exampleIdenticon,
+                                path: "// moonbeam",
+                                hasPassword: true,
+                                base58: "15Gsc678654FDSG0HA04H0A"
+                            ),
+                            actionModel: DerivedKeyActionModel(
+                                tapAction: .init(action: .rightButtonAction)
+                            )
+                        ),
+                        DerivedKeyRowModel(
+                            viewModel: DerivedKeyRowViewModel(
+                                identicon: PreviewData.exampleIdenticon,
+                                path: "// kilt",
+                                hasPassword: true,
+                                base58: "15Gsc6786546423FDSG0HA04H0A"
+                            ),
+                            actionModel: DerivedKeyActionModel(
+                                tapAction: .init(action: .rightButtonAction)
+                            )
+                        )
+                    ]
+                ),
+                actionModel: KeyDetailsActionModel(
+                    addressKeyNavigation: .init(action: .goBack),
+                    derivedKeysNavigation: [],
+                    alertClosure: nil,
+                    removeSeed: ""
+                ),
+                exportPrivateKeyService: PrivateKeyQRCodeService(
+                    navigation: NavigationCoordinator(),
+                    keys: MKeys(
+                        set: [],
+                        root: .init(
+                            seedName: "",
+                            identicon: [],
+                            addressKey: "",
+                            base58: "",
+                            swiped: false,
+                            multiselect: false,
+                            secretExposed: false
+                        ),
+                        network: .init(title: "", logo: ""),
+                        multiselectMode: false,
+                        multiselectCount: ""
+                    )
+                )
+            )
+        }
+        .preferredColorScheme(.dark)
+        .previewLayout(.sizeThatFits)
+    }
+}

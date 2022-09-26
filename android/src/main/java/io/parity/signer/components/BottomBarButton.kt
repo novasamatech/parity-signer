@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Text300
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
@@ -45,7 +45,7 @@ fun BottomBarButton(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier
 			.clickable(onClick = {
-				signerDataModel.pushButton(action)
+				signerDataModel.navigate(action)
 			})
 			.width(66.dp)
 	) {

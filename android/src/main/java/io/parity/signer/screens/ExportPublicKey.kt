@@ -13,14 +13,20 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.parity.signer.R
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.components.KeyCard
+import io.parity.signer.components.KeyCardOld
 import io.parity.signer.components.NetworkCard
+import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.MKeyDetails
 
+/**
+ * Other name is Key Details screen
+ */
 @Composable
 fun ExportPublicKey(keyDetails: MKeyDetails) {
 	Column(
@@ -36,18 +42,18 @@ fun ExportPublicKey(keyDetails: MKeyDetails) {
 				)
 				.fillMaxWidth()
 		) {
-			KeyCard(identity = keyDetails.address)
+			KeyCardOld(identity = keyDetails.address)
 		}
 		Row(
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 		) {
 			NetworkCard(
-				network = keyDetails.networkInfo
+				network = NetworkCardModel(keyDetails.networkInfo)
 			)
 		}
 		Image(
 			keyDetails.qr.intoImageBitmap(),
-			contentDescription = "QR with address to scan",
+			contentDescription = stringResource(id = R.string.qr_with_address_to_scan_description),
 			contentScale = ContentScale.FillWidth,
 			modifier = Modifier
 				.padding(12.dp)

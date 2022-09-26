@@ -11,9 +11,10 @@ import UIKit
 enum Heights {
     /// All variants of `ActionButton`, 56 pt
     static let actionButton: CGFloat = 56
-    /// All variants of `ActionButton`, 56 pt
-
+    /// All variants of `Snackbar`, 56 pt
     static let snackbarHeight: CGFloat = 56
+    /// All variants of `NavigationBarView`, 64 pt
+    static let navigationBarHeight: CGFloat = 64
     /// All variants of `NavbarButton`, 40 pt
     static let navigationButton: CGFloat = 40
     /// All variants of `MenuButton`, 48 pt
@@ -31,4 +32,6 @@ enum Sizes {
     static let xmarkButtonDiameter: CGFloat = 32
     /// Size for left-aligned icons within `MenuButton` / `ActionSheetButton`, 30pt
     static let actionSheetIcon: CGFloat = 30
+    /// Size for seed word position label
+    static let seedWordPositionWidth: CGFloat = 28
 }

@@ -608,11 +608,7 @@ where
                         network_specs.genesis_hash,
                     );
                     events.push(Event::IdentityRemoved { identity_history });
-                    address_details.network_id = address_details
-                        .network_id
-                        .into_iter()
-                        .filter(|id| id != key)
-                        .collect();
+                    address_details.network_id.retain(|id| id != key);
                 }
             }
             if address_details.network_id.is_empty() {

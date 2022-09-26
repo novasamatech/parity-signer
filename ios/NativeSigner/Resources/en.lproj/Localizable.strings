@@ -276,6 +276,8 @@
 "KeySets.Action.Add" = "Add Key Set";
 "KeySets.Label.DerivedKeys.single" = "%@ Derived Key";
 "KeySets.Label.DerivedKeys.plural" = "%@ Derived Keys";
+"KeySets.Label.Empty.Title" = "You Don't Have\nAny Key Sets";
+"KeySets.Label.Empty.Subtitle" = "Add a new Key Set to Store Keys and Sign Transactions";
 
 "KeySetsModal.Action.Select" = "Select Keys";
 "KeySetsModal.Action.Derive" = "Derive from Key";
@@ -295,5 +297,44 @@
 
 "KeyDetails.Label.Derived" = "Derived keys";
 "KeyDetails.Action.Create" = "Create Derived key";
+
+"PublicKeyDetails.Label.Title" = "Public Key";
+"PublicKeyDetails.Label.Subtitle" = "Derived Key";
+"PublicKeyDetails.Label.Keys" = "%@ Keys";
+
+"KeyScreen.Label.Hotkey" = "This key is marked hot because its root private key has been exported";
+"KeyScreen.Action.Export" = "Export Private Key";
+
+"KeyExportWarning.Label.Header" = "Export Private Key";
+"KeyExportWarning.Label.Content" = "A private key can be used to sign transactions. This key will be marked as a hot key after export.";
+"KeyExportWarning.Action.Export" = "Export Private Key";
+"KeyExportWarning.Action.Cancel" = "Cancel";
+
+"KeyExport.Label.Header" = "Export Private Key";
+"KeyExport.Label.Hide" = "Private Key will be hidden in";
+
+"PublicKeyDetailsModal.Action.Networks" = "Other Networks";
+"PublicKeyDetailsModal.Action.Share" = "Share Private Key";
+"PublicKeyDetailsModal.Action.ChangeNetwork" = "Change Key's network";
+"PublicKeyDetailsModal.Action.Delete" = "Delete";
+
+"PublicKeyDetailsModal.Confirmation.Label.Title" = "Forget this Key?";
+"PublicKeyDetailsModal.Confirmation.Label.Content" = "This key for this network will be removed.\nAre you sure?";
+"PublicKeyDetailsModal.Confirmation.Action.Cancel" = "Cancel";
+"PublicKeyDetailsModal.Confirmation.Action.Remove" = "Remove Key";
+"PublicKeyDetailsModal.Confirmation.Snackbar" = "Key Has Been Removed";
+
+"Connectivity.Label.Title" = "Network Connected";
+"Connectivity.Label.Content" = "Signer detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.";
+"Connectivity.Action.Ok" = "Got It";
+"PastConnectivity.Label.Title" = "Network Was Connected!";
+"PastConnectivity.Label.Content" = "Your Signer device has connected to a WIFI, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use.";
+"PastConnectivity.Action.Ok" = "Got It";
+
+"BackupModal.Label.Secret" = "Secret Recovery Phrase";
+"BackupModal.Label.Derived" = "Derived keys";
+"BackupModal.Label.QRCode" = "Backup with QR Code";
+"BackupModal.Label.Snackbar" = "Private Keys will be hidden in";
+
 
 

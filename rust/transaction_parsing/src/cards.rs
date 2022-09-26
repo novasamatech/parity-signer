@@ -2,6 +2,8 @@ use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 use sp_runtime::{generic::Era, MultiSigner};
 
 use definitions::helpers::{make_identicon_from_account, print_ethereum_address, IdenticonStyle};
+use definitions::keyring::NetworkSpecsKey;
+
 use definitions::{
     crypto::Encryption,
     helpers::{make_identicon_from_multisigner, pic_meta, print_multisigner_as_base58},
@@ -262,6 +264,9 @@ impl<'a> Card<'a> {
                 f: MSCNetworkInfo {
                     network_title: x.title.clone(),
                     network_logo: x.logo.clone(),
+                    network_specs_key: hex::encode(
+                        NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption).key(),
+                    ),
                 },
             },
             Card::NetworkGenesisHash(x) => NavCard::NetworkGenesisHashCard { f: hex::encode(x) },

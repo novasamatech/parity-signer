@@ -53,7 +53,7 @@ fun SignerDataModel.addSeed(
 			}
 
 			refreshSeedNames()
-			pushButton(
+			navigate(
 				button = Action.GO_FORWARD,
 				details = if (createRoots) "true" else "false",
 				seedPhrase = seedPhrase
@@ -100,7 +100,7 @@ fun SignerDataModel.removeSeed(seedName: String) {
 		try {
 			sharedPreferences.edit().remove(seedName).apply()
 			refreshSeedNames()
-			pushButton(Action.REMOVE_SEED)
+			navigate(Action.REMOVE_SEED)
 		} catch (e: java.lang.Exception) {
 			Log.d("remove seed error", e.toString())
 			Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()

@@ -20,11 +20,12 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
 import io.parity.signer.models.AlertState
+import io.parity.signer.models.LocalNavAction
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.navigate
 import io.parity.signer.screens.LandingView
 import io.parity.signer.screens.WaitingScreen
-import io.parity.signer.ui.theme.ParitySignerTheme
+import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.*
 
@@ -58,7 +59,7 @@ class MainActivity : AppCompatActivity() {
 @ExperimentalAnimationApi
 @Composable
 fun SignerApp(signerDataModel: SignerDataModel) {
-	ParitySignerTheme {
+	SignerOldTheme {
 		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 		val authenticated = signerDataModel.authenticated.observeAsState()
 		val actionResult = signerDataModel.actionResult.observeAsState()
@@ -66,25 +67,13 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		val progress = signerDataModel.progress.observeAsState()
 		val captured = signerDataModel.captured.observeAsState()
 		val total = signerDataModel.total.observeAsState()
+		val localNavAction = signerDataModel.localNavAction.observeAsState()
 
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {
 				if (authenticated.value == true) {
 					BackHandler {
-						// TODO: implement this in backend
-						if (
-							actionResult.value?.alertData == null &&
-							actionResult.value?.modalData == null &&
-							(
-								actionResult.value?.screenData is ScreenData.Log ||
-									actionResult.value?.screenData is ScreenData.Scan ||
-									actionResult.value?.screenData is ScreenData.SeedSelector ||
-									actionResult.value?.screenData is ScreenData.Settings
-								)
-						) {
-							signerDataModel.activity.moveTaskToBack(true)
-						} else
-							signerDataModel.pushButton(Action.GO_BACK)
+						signerDataModel.navigator.backAction()
 					}
 					// Structure to contain all app
 					Scaffold(
@@ -96,28 +85,32 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						}
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
-							ScreenSelector(
-								screenData = actionResult.value?.screenData
-									?: ScreenData.Documents,//default fallback
-								alertState = shieldAlert,
-								progress = progress,
-								captured = captured,
-								total = total,
-								button = signerDataModel::pushButton,
-								signerDataModel = signerDataModel
-							)
-							ModalSelector(
-								modalData = actionResult.value?.modalData,
-								alertState = shieldAlert,
-								button = signerDataModel::pushButton,
-								signerDataModel = signerDataModel,
-							)
-							AlertSelector(
-								alert = actionResult.value?.alertData,
-								alertState = shieldAlert,
-								button = signerDataModel::pushButton,
-								acknowledgeWarning = signerDataModel::acknowledgeWarning
-							)
+							if (signerDataModel.localNavAction.value == LocalNavAction.None) {
+								ScreenSelector(
+									screenData = actionResult.value?.screenData
+										?: ScreenData.Documents,//default fallback
+									alertState = shieldAlert,
+									progress = progress,
+									captured = captured,
+									total = total,
+									button = signerDataModel::navigate,
+									signerDataModel = signerDataModel
+								)
+								ModalSelector(
+									modalData = actionResult.value?.modalData,
+									alertState = shieldAlert,
+									button = signerDataModel::navigate,
+									signerDataModel = signerDataModel,
+								)
+								AlertSelector(
+									alert = actionResult.value?.alertData,
+									alertState = shieldAlert,
+									button = signerDataModel::navigate,
+									acknowledgeWarning = signerDataModel::acknowledgeWarning
+								)
+							} else {
+								LocalNavSelector(navAction = localNavAction.value)
+							}
 						}
 					}
 				} else {
