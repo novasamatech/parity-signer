@@ -23,14 +23,23 @@ struct KeySetList: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
+            // Background color
+            Asset.backgroundSystem.swiftUIColor
+            // Main screen
             VStack(spacing: 0) {
+                // Navigation Bar
                 NavigationBarView(
                     navigation: navigation,
-                    viewModel: NavigationBarViewModel(title: Localizable.KeySets.title.string)
+                    viewModel: NavigationBarViewModel(
+                        title: Localizable.KeySets.title.string,
+                        backgroundColor: Asset.backgroundSystem.swiftUIColor
+                    )
                 )
+                // Empty state
                 if viewModel.list.isEmpty {
                     KeyListEmptyState()
                 } else {
+                    // List of Key Sets
                     List {
                         ForEach(
                             viewModel.list.sorted(by: { $0.keyName < $1.keyName }),
@@ -57,6 +66,7 @@ struct KeySetList: View {
                     .hiddenScrollContent()
                 }
             }
+            // Add Key Set
             PrimaryButton(
                 action: {
                     // We need to call this conditionally, as if there are no seeds,

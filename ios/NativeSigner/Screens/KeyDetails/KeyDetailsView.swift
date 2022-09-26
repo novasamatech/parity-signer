@@ -13,9 +13,12 @@ struct KeyDetailsView: View {
     @State private var isShowingActionSheet = false
     @State private var isShowingRemoveConfirmation: Bool = false
     @State private var isShowingBackupModal: Bool = false
+    @State private var isPresentingConnectivityAlert = false
 
     @ObservedObject private var navigation: NavigationCoordinator
+    @ObservedObject private var data: SignerDataModel
 
+    @State private var backupModalViewModel: BackupModalViewModel?
     private let alertClosure: (() -> Void)?
     private let viewModel: KeyDetailsViewModel
     private let actionModel: KeyDetailsActionModel
@@ -24,6 +27,7 @@ struct KeyDetailsView: View {
 
     init(
         navigation: NavigationCoordinator,
+        data: SignerDataModel,
         forgetKeyActionHandler: ForgetKeySetAction,
         viewModel: KeyDetailsViewModel,
         actionModel: KeyDetailsActionModel,
@@ -31,6 +35,7 @@ struct KeyDetailsView: View {
         alertClosure: (() -> Void)? = nil
     ) {
         self.navigation = navigation
+        self.data = data
         self.forgetKeyActionHandler = forgetKeyActionHandler
         self.viewModel = viewModel
         self.actionModel = actionModel
@@ -52,77 +57,59 @@ struct KeyDetailsView: View {
                         isShowingActionSheet.toggle()
                     })
                 )
-                // Main key cell
-                HStack {
-                    VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                        Text(viewModel.keySummary.keyName)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            .font(Fontstyle.titleL.base)
-                        Text(viewModel.keySummary.base58)
-                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                            .font(Fontstyle.bodyM.base)
-                            .lineLimit(1)
-                    }
-                    Spacer().frame(maxWidth: .infinity)
-                    Asset.chevronRight.swiftUIImage
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                }
-                .padding(Padding.detailsCell)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    navigation.perform(navigation: actionModel.addressKeyNavigation)
-                }
-                // Header
-                HStack {
-                    Localizable.KeyDetails.Label.derived.text
-                        .font(Fontstyle.bodyM.base)
-                    Spacer().frame(maxWidth: .infinity)
-                    Button(
-                        action: {
-                            navigation.perform(navigation: .init(action: .networkSelector))
-                        }, label: {
-                            Asset.switches.swiftUIImage
-                        }
-                    )
-                }
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                .padding(Padding.detailsCell)
-                // List of derived keys
                 List {
+                    // Main key cell
+                    KeySummaryView(viewModel: viewModel.keySummary)
+                        .padding(Padding.detailsCell)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            navigation.perform(navigation: actionModel.addressKeyNavigation)
+                        }
+                        .keyDetailsListElement()
+                    // Header
+                    HStack {
+                        Localizable.KeyDetails.Label.derived.text
+                            .font(Fontstyle.bodyM.base)
+                        Spacer().frame(maxWidth: .infinity)
+                        Asset.switches.swiftUIImage
+                            .frame(width: Heights.actionSheetButton)
+                            .onTapGesture {
+                                navigation.perform(navigation: .init(action: .networkSelector))
+                            }
+                    }
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .padding(Padding.detailsCell)
+                    .keyDetailsListElement()
+                    // List of derived keys
                     ForEach(
                         viewModel.derivedKeys,
                         id: \.viewModel.path
                     ) { deriveKey in
                         DerivedKeyRow(deriveKey.viewModel)
-                            .listRowBackground(Asset.backgroundSystem.swiftUIColor)
-                            .listRowSeparator(.hidden)
-                            .listRowInsets(EdgeInsets())
-                            .contentShape(Rectangle())
+                            .keyDetailsListElement()
                             .onTapGesture {
                                 navigation.perform(navigation: deriveKey.actionModel.tapAction)
                             }
                     }
                     Spacer()
-                        .listRowBackground(Asset.backgroundSystem.swiftUIColor)
-                        .listRowSeparator(.hidden)
+                        .keyDetailsListElement()
                         .frame(height: Heights.actionButton + Spacing.large)
                 }
                 .listStyle(.plain)
                 .hiddenScrollContent()
             }
-            .background(Asset.backgroundSystem.swiftUIColor)
+            .background(Asset.backgroundPrimary.swiftUIColor)
             // Main CTA
             PrimaryButton(
                 action: {
-                    if let alertClosure = actionModel.alertClosure {
-                        alertClosure()
-                    } else {
-                        navigation.perform(navigation: actionModel.createDerivedKey)
-                    }
+                    navigation.perform(navigation: actionModel.createDerivedKey)
                 },
                 text: Localizable.KeyDetails.Action.create.key
             )
             .padding(Spacing.large)
+        }
+        .onAppear {
+            backupModalViewModel = exportPrivateKeyService.backupViewModel()
         }
         .fullScreenCover(
             isPresented: $isShowingActionSheet,
@@ -133,7 +120,13 @@ struct KeyDetailsView: View {
                 }
                 if shouldPresentBackupModal == true {
                     shouldPresentBackupModal.toggle()
-                    isShowingBackupModal.toggle()
+                    if data.alert || backupModalViewModel == nil {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            isPresentingConnectivityAlert.toggle()
+                        }
+                    } else {
+                        isShowingBackupModal.toggle()
+                    }
                 }
             }
         ) {
@@ -152,13 +145,13 @@ struct KeyDetailsView: View {
                 // We need to fake right button action here or Rust machine will break
                 // In old UI, if you dismiss equivalent of this modal, underlying modal would still be there,
                 // so we need to inform Rust we actually hid it
-                dismissAction: navigation.perform(navigation: .init(action: .rightButtonAction), skipDebounce: true),
+                dismissAction: { _ = navigation.performFake(navigation: .init(action: .rightButtonAction)) }(),
                 isShowingBottomAlert: $isShowingRemoveConfirmation
             )
             .clearModalBackground()
         }
         .fullScreenCover(isPresented: $isShowingBackupModal) {
-            if let viewModel = exportPrivateKeyService.backupViewModel() {
+            if let viewModel = backupModalViewModel {
                 BackupModal(
                     isShowingBackupModal: $isShowingBackupModal,
                     viewModel: viewModel
@@ -168,6 +161,55 @@ struct KeyDetailsView: View {
                 EmptyView()
             }
         }
+        .alert(
+            data.isConnectivityOn ? Localizable.Connectivity.Label.title.string : Localizable.PastConnectivity
+                .Label.title.string,
+            isPresented: $isPresentingConnectivityAlert,
+            actions: {
+                Button(Localizable.Connectivity.Action.ok.string) { isPresentingConnectivityAlert.toggle() }
+            },
+            message: {
+                data.isConnectivityOn ? Localizable.Connectivity.Label.content.text : Localizable.PastConnectivity
+                    .Label.content.text
+            }
+        )
+    }
+}
+
+private struct KeyDetailsListElement: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .listRowBackground(Asset.backgroundPrimary.swiftUIColor)
+            .listRowSeparator(.hidden)
+            .listRowInsets(EdgeInsets())
+            .contentShape(Rectangle())
+    }
+}
+
+private extension View {
+    func keyDetailsListElement() -> some View {
+        modifier(KeyDetailsListElement())
+    }
+}
+
+private struct KeySummaryView: View {
+    let viewModel: KeySummaryViewModel
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
+                Text(viewModel.keyName)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .font(Fontstyle.titleL.base)
+                Text(viewModel.base58)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(Fontstyle.bodyM.base)
+                    .lineLimit(1)
+            }
+            Spacer().frame(maxWidth: .infinity)
+            Asset.chevronRight.swiftUIImage
+                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+        }
     }
 }
 
@@ -176,6 +218,7 @@ struct KeyDetailsView_Previews: PreviewProvider {
         VStack {
             KeyDetailsView(
                 navigation: NavigationCoordinator(),
+                data: SignerDataModel(navigation: NavigationCoordinator()),
                 forgetKeyActionHandler: .init(navigation: NavigationCoordinator()),
                 viewModel: .init(
                     keySummary: KeySummaryViewModel(

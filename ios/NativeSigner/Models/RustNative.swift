@@ -22,7 +22,7 @@ final class SignerDataModel: ObservableObject {
     @Published var authenticated: Bool = false
 
     // Alert indicator
-    @Published var canaryDead: Bool = false
+    @Published var isConnectivityOn: Bool = false
     @Published var alert: Bool = false
     @Published var alertShow: Bool = false
 
@@ -66,7 +66,6 @@ final class SignerDataModel: ObservableObject {
     /// refresh everything except for seedNames
     /// should be called as often as reasonably possible - on flow interrupts, changes, events, etc.
     func totalRefresh() {
-        print("heavy reset")
         navigation.perform(navigation: .init(action: .start))
         checkAlert()
         // self.refreshUI()
@@ -75,8 +74,7 @@ final class SignerDataModel: ObservableObject {
     /// Should be called once on factory-new state of the app
     /// Populates database with starting values
     func onboard(jailbreak: Bool = false) {
-        guard !canaryDead else { return }
-        print("onboarding...")
+        guard !isConnectivityOn else { return }
         wipe()
         guard databaseMediator.recreateDatabaseFile() else {
             print("Database could not be recreated")
@@ -90,7 +88,7 @@ final class SignerDataModel: ObservableObject {
             }
             onboardingDone = true
             // Mean app mode:
-            // if self.canaryDead {
+            // if self.isConnectivityOn {
             // device_was_online(nil, self.dbName)
             // }
             initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
@@ -113,7 +111,7 @@ private extension SignerDataModel {
                 }
                 self.alert = true
             }
-            self.canaryDead = isConnected
+            self.isConnectivityOn = isConnected
         }
     }
 

@@ -11,6 +11,8 @@ import SwiftUI
 ///
 /// `body` should rely on system `TabView` or its subclass, when navigation is moved to native system
 struct TabBarView: View {
+    @Environment(\.colorScheme) var deviceColorScheme: ColorScheme
+
     /// Handles navigation when `Tab` is selected
     @ObservedObject var navigation: NavigationCoordinator
     /// View model reflecting selected tab in bottom navigation
@@ -30,8 +32,12 @@ struct TabBarView: View {
                 )
             }
         }
-        .frame(height: 49)
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .frame(height: Heights.tabbarHeight)
+        .background(Asset.backgroundSecondary.swiftUIColor)
+        .overlay(
+            Divider().background(deviceColorScheme == .dark ? Asset.fill30LightOnly.swiftUIColor : Color.clear),
+            alignment: .top
+        )
     }
 }
 
