@@ -272,7 +272,7 @@ fun HistoryCardExtended(
 				}
 				Text("Signed by:")
 				Row {
-					Identicon(
+					IdentIcon(
 						identicon = signedBy?.identicon ?: listOf()
 					)
 					Column {

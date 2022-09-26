@@ -29,7 +29,7 @@ fun KeyCardOld(identity: Address, multiselectMode: Boolean = false) {
 			.padding(8.dp)
 	) {
 		Box(contentAlignment = Alignment.BottomEnd) {
-			Identicon(identity.identicon)
+			IdentIcon(identity.identicon)
 			if (multiselectMode) {
 				identity.multiselect?.let {
 					if (it) {

@@ -3,6 +3,19 @@ package io.parity.signer.ui.theme
 import androidx.compose.material.Colors
 import androidx.compose.ui.graphics.Color
 
+val Colors.backgroundPrimary: Color
+	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF1E1E23)
+
+val Colors.backgroundSecondary: Color
+	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF2C2C30)
+
+val Colors.textSecondary: Color
+	get() = if (isLight) Color(0xA8000000) else Color(0xB0FFFFFF)
+
+val Colors.textTertiary: Color
+	get() = if (isLight) Color(0x73000000) else Color(0x7AFFFFFF)
+
+
 
 val Colors.fill30: Color
 	get() = if (isLight) Color(0x4D000000) else Color(0x4DFFFFFF)
@@ -21,18 +34,17 @@ val Colors.fill6: Color
 
 
 
+val Colors.appliedOverlay: Color
+	get() = if (isLight) Color(0x7A000000) else Color(0xB3000000)
 
-val Colors.backgroundPrimary: Color
-	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF1E1E23)
+val Colors.appliedHover: Color
+	get() = if (isLight) Color(0xD2000000) else Color(0xD2FFFFFF)
 
-val Colors.backgroundSecondary: Color
-	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF2C2C30)
+val Colors.appliedStroke: Color
+	get() = if (isLight) Color(0x1F000000) else Color(0x1FFFFFFF)
 
-val Colors.textSecondary: Color
-	get() = if (isLight) Color(0xA8000000) else Color(0xB0FFFFFF)
-
-val Colors.textTertiary: Color
-	get() = if (isLight) Color(0x73000000) else Color(0x7AFFFFFF)
+val Colors.appliedSeparator: Color
+	get() = if (isLight) Color(0x14000000) else Color(0x14FFFFFF)
 
 
 
