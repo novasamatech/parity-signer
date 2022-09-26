@@ -1912,7 +1912,7 @@ fn flow_test_1() {
         "GoForward on NewSeed screen with NewSeedBackup modal active. Expected Keys screen with no modals."
     );
 
-    update_seed_names(vec![String::from("Portia")]);
+    update_seed_names(vec![String::from("Portia")]).unwrap();
 
     let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
     erase_identicon(&mut action.screen_data);
@@ -2704,7 +2704,7 @@ fn flow_test_1() {
         )
     );
 
-    update_seed_names(vec![String::from("Portia"), String::from("Alice")]);
+    update_seed_names(vec![String::from("Portia"), String::from("Alice")]).unwrap();
 
     let mut alice_polkadot_keys_action = action;
 
@@ -3348,7 +3348,7 @@ fn flow_test_1() {
     */
     // Switching to log. Maybe we want to switch here to updated SeedSelector?
 
-    update_seed_names(vec![String::from("Alice")]);
+    update_seed_names(vec![String::from("Alice")]).unwrap();
 
     do_action(Action::RightButtonAction, "", "")
         .unwrap()
@@ -5872,7 +5872,7 @@ fn flow_test_1() {
         )
     );
 
-    update_seed_names(vec![String::from("Alice"), String::from("Pepper")]);
+    update_seed_names(vec![String::from("Alice"), String::from("Pepper")]).unwrap();
 
     do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
     let mut action = do_action(
