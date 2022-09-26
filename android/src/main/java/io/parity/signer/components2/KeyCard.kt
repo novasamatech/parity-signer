@@ -138,6 +138,7 @@ private fun showBase58Collapsible(model: KeyCardModel) {
 				style = TypefaceNew.BodyM,
 				maxLines = 1,
 			)
+			Spacer(modifier = Modifier.padding(horizontal = 4.dp))
 			Icon(
 				imageVector = Icons.Default.KeyboardArrowDown,
 				modifier = Modifier.size(20.dp),
@@ -183,6 +184,7 @@ data class KeyCardModel(
 		)
 	}
 }
+
 
 @Preview(
 	name = "day",

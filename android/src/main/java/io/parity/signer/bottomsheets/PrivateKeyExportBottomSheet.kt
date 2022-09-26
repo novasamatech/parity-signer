@@ -27,10 +27,7 @@ import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.backgroundSecondary
-import io.parity.signer.ui.theme.fill12
-import io.parity.signer.ui.theme.modal
+import io.parity.signer.ui.theme.*
 
 @Composable
 fun PrivateKeyExportBottomSheet(
@@ -65,10 +62,10 @@ fun PrivateKeyExportBottomSheet(
 					modifier = Modifier
                         .clip(plateShape)
                         .border(
-                            BorderStroke(1.dp, MaterialTheme.colors.fill12),
+                            BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
                             plateShape
                         )
-                        .background(MaterialTheme.colors.fill12, plateShape)
+                        .background(MaterialTheme.colors.fill6, plateShape)
 				) {
 					Box(
 						modifier = Modifier
