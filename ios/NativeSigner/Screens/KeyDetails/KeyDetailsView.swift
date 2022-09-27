@@ -18,7 +18,9 @@ struct KeyDetailsView: View {
     @ObservedObject private var navigation: NavigationCoordinator
     @ObservedObject private var data: SignerDataModel
 
-    @State private var backupModalViewModel: BackupModalViewModel?
+    // This view is recreated few times because of Rust navigation, for now we need to store modal view model in static
+    // property because it can't be created earlier as it would trigger passcode request on the device
+    private static var backupModalViewModel: BackupModalViewModel!
     private let alertClosure: (() -> Void)?
     private let viewModel: KeyDetailsViewModel
     private let actionModel: KeyDetailsActionModel
@@ -108,9 +110,6 @@ struct KeyDetailsView: View {
             )
             .padding(Spacing.large)
         }
-        .onAppear {
-            backupModalViewModel = exportPrivateKeyService.backupViewModel()
-        }
         .fullScreenCover(
             isPresented: $isShowingActionSheet,
             onDismiss: {
@@ -120,11 +119,12 @@ struct KeyDetailsView: View {
                 }
                 if shouldPresentBackupModal == true {
                     shouldPresentBackupModal.toggle()
-                    if data.alert || backupModalViewModel == nil {
+                    if data.alert {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             isPresentingConnectivityAlert.toggle()
                         }
                     } else {
+                        KeyDetailsView.backupModalViewModel = exportPrivateKeyService.backupViewModel()
                         isShowingBackupModal.toggle()
                     }
                 }
@@ -151,15 +151,11 @@ struct KeyDetailsView: View {
             .clearModalBackground()
         }
         .fullScreenCover(isPresented: $isShowingBackupModal) {
-            if let viewModel = backupModalViewModel {
-                BackupModal(
-                    isShowingBackupModal: $isShowingBackupModal,
-                    viewModel: viewModel
-                )
-                .clearModalBackground()
-            } else {
-                EmptyView()
-            }
+            BackupModal(
+                isShowingBackupModal: $isShowingBackupModal,
+                viewModel: KeyDetailsView.backupModalViewModel
+            )
+            .clearModalBackground()
         }
         .alert(
             data.isConnectivityOn ? Localizable.Connectivity.Label.title.string : Localizable.PastConnectivity
@@ -314,21 +310,7 @@ struct KeyDetailsView_Previews: PreviewProvider {
                 ),
                 exportPrivateKeyService: PrivateKeyQRCodeService(
                     navigation: NavigationCoordinator(),
-                    keys: MKeys(
-                        set: [],
-                        root: .init(
-                            seedName: "",
-                            identicon: [],
-                            addressKey: "",
-                            base58: "",
-                            swiped: false,
-                            multiselect: false,
-                            secretExposed: false
-                        ),
-                        network: .init(title: "", logo: ""),
-                        multiselectMode: false,
-                        multiselectCount: ""
-                    )
+                    keys: PreviewData.mkeys
                 )
             )
         }

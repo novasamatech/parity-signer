@@ -10,8 +10,12 @@ import SwiftUI
 struct KeyDetailsPublicKeyView: View {
     private let viewModel: KeyDetailsPublicKeyViewModel
     private let actionModel: KeyDetailsPublicKeyActionModel
-    private let exportPrivateKeyViewModel: ExportPrivateKeyViewModel?
     private let forgetKeyActionHandler: ForgetSingleKeyAction
+    private let exportPrivateKeyService: ExportPrivateKeyService
+
+    // This view is recreated few times because of Rust navigation, for now we need to store modal view model in static
+    // property because it can't be created earlier as it would trigger passcode request on the device
+    private static var exportPrivateKeyViewModel: ExportPrivateKeyViewModel!
 
     @State private var isShowingRemoveConfirmation = false
     @State private var isShowingActionSheet = false
@@ -32,14 +36,14 @@ struct KeyDetailsPublicKeyView: View {
         forgetKeyActionHandler: ForgetSingleKeyAction,
         viewModel: KeyDetailsPublicKeyViewModel,
         actionModel: KeyDetailsPublicKeyActionModel,
-        exportPrivateKeyViewModel: ExportPrivateKeyViewModel? = nil
+        exportPrivateKeyService: ExportPrivateKeyService
     ) {
         self.navigation = navigation
         self.data = data
         self.forgetKeyActionHandler = forgetKeyActionHandler
         self.viewModel = viewModel
         self.actionModel = actionModel
-        self.exportPrivateKeyViewModel = exportPrivateKeyViewModel
+        self.exportPrivateKeyService = exportPrivateKeyService
     }
 
     var body: some View {
@@ -104,9 +108,10 @@ struct KeyDetailsPublicKeyView: View {
             onDismiss: {
                 if shouldPresentExportKeysWarningModal {
                     shouldPresentExportKeysWarningModal.toggle()
-                    if data.alert || exportPrivateKeyViewModel == nil {
+                    if data.alert {
                         isPresentingConnectivityAlert.toggle()
                     } else {
+                        KeyDetailsPublicKeyView.exportPrivateKeyViewModel = exportPrivateKeyService.exportPrivateKey()
                         isPresentingExportKeysWarningModal.toggle()
                     }
                 }
@@ -151,16 +156,12 @@ struct KeyDetailsPublicKeyView: View {
                 navigation.perform(navigation: .init(action: .rightButtonAction))
             }
         ) {
-            if let viewModel = exportPrivateKeyViewModel {
-                ExportPrivateKeyModal(
-                    isPresentingExportKeysModal: $isPresentingExportKeysModal,
-                    navigation: navigation,
-                    viewModel: viewModel
-                )
-                .clearModalBackground()
-            } else {
-                EmptyView()
-            }
+            ExportPrivateKeyModal(
+                isPresentingExportKeysModal: $isPresentingExportKeysModal,
+                navigation: navigation,
+                viewModel: KeyDetailsPublicKeyView.exportPrivateKeyViewModel
+            )
+            .clearModalBackground()
         }
         // Remove key modal
         .fullScreenCover(isPresented: $isShowingRemoveConfirmation) {
@@ -190,47 +191,51 @@ struct KeyDetailsPublicKeyView: View {
     }
 }
 
-// struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        HStack {
-//            VStack {
-//                KeyDetailsPublicKeyView(
-//                    navigation: NavigationCoordinator(),
-//                    data: SignerDataModel(navigation: NavigationCoordinator()),
-//                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-//                    viewModel: PreviewData.exampleKeyDetailsPublicKey(),
-//                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
-//                )
-//            }
-//            VStack {
-//                KeyDetailsPublicKeyView(
-//                    navigation: NavigationCoordinator(),
-//                    data: SignerDataModel(navigation: NavigationCoordinator()),
-//                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-//                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
-//                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
-//                )
-//            }
-//            VStack {
-//                KeyDetailsPublicKeyView(
-//                    navigation: NavigationCoordinator(),
-//                    data: SignerDataModel(navigation: NavigationCoordinator()),
-//                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-//                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
-//                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
-//                )
-//            }
-//            VStack {
-//                KeyDetailsPublicKeyView(
-//                    navigation: NavigationCoordinator(),
-//                    data: SignerDataModel(navigation: NavigationCoordinator()),
-//                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-//                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
-//                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: "")
-//                )
-//            }
-//        }
-//        .previewLayout(.sizeThatFits)
-//        .preferredColorScheme(.dark)
-//    }
-// }
+struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
+    static var previews: some View {
+        HStack {
+            VStack {
+                KeyDetailsPublicKeyView(
+                    navigation: NavigationCoordinator(),
+                    data: SignerDataModel(navigation: NavigationCoordinator()),
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                    viewModel: PreviewData.exampleKeyDetailsPublicKey(),
+                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
+                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
+                )
+            }
+            VStack {
+                KeyDetailsPublicKeyView(
+                    navigation: NavigationCoordinator(),
+                    data: SignerDataModel(navigation: NavigationCoordinator()),
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
+                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
+                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
+                )
+            }
+            VStack {
+                KeyDetailsPublicKeyView(
+                    navigation: NavigationCoordinator(),
+                    data: SignerDataModel(navigation: NavigationCoordinator()),
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
+                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
+                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
+                )
+            }
+            VStack {
+                KeyDetailsPublicKeyView(
+                    navigation: NavigationCoordinator(),
+                    data: SignerDataModel(navigation: NavigationCoordinator()),
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
+                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
+                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
+                )
+            }
+        }
+        .previewLayout(.sizeThatFits)
+        .preferredColorScheme(.dark)
+    }
+}
