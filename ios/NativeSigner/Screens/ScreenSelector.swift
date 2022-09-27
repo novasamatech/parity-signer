@@ -70,7 +70,7 @@ struct ScreenSelector: View {
                 forgetKeyActionHandler: ForgetSingleKeyAction(navigation: navigation),
                 viewModel: KeyDetailsPublicKeyViewModel(value),
                 actionModel: KeyDetailsPublicKeyActionModel(value),
-                exportPrivateKeyViewModel: ExportPrivateKeyService().exportPrivateKey(from: value)
+                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value)
             )
         case let .newSeed(value):
             NewSeedScreen(
