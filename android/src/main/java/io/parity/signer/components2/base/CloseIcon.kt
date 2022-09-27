@@ -5,7 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -19,13 +19,16 @@ import io.parity.signer.R
 import io.parity.signer.ui.theme.fill18
 
 @Composable
-fun CloseIcon(onClicked: () -> Unit) {
+fun CloseIcon(
+	modifier: Modifier = Modifier,
+	onCloseClicked: () -> Unit
+) {
 	Box(
-		modifier = Modifier
+		modifier = modifier
 			.size(32.dp)
 			.background(
 				MaterialTheme.colors.fill18,
-				RoundedCornerShape(50)
+				CircleShape
 			),
 		contentAlignment = Alignment.Center,
 	) {
@@ -35,7 +38,7 @@ fun CloseIcon(onClicked: () -> Unit) {
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
 				.size(20.dp)
-				.clickable { onClicked() }
+				.clickable { onCloseClicked() }
 		)
 	}
 }

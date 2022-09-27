@@ -2,11 +2,13 @@ package io.parity.signer.bottomsheets
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,76 +30,61 @@ import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.backgroundSecondary
 import io.parity.signer.ui.theme.fill12
-import io.parity.signer.ui.theme.modal
 
 @Composable
 fun PrivateKeyExportBottomSheet(
 	model: PrivateKeyExportModel,
 	navigator: Navigator,
 ) {
+	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-            .clickable { navigator.backAction() }
-            .fillMaxWidth()
+			.fillMaxWidth()
+			.padding(start = sidePadding, end = sidePadding),
+		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
-		Spacer(Modifier.weight(1f))
-		Surface(
-			color = MaterialTheme.colors.backgroundSecondary,
-			shape = MaterialTheme.shapes.modal
-		) {
-			val sidePadding = 24.dp
-			Column(
-				modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = sidePadding, end = sidePadding),
-				horizontalAlignment = Alignment.CenterHorizontally,
-			) {
-				BottomSheetHeader(stringResource(R.string.export_private_key_title)) {
-					navigator.backAction()
-				}
-
-				val qrRounding = 16.dp
-				val plateShape =
-					RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
-				Column(
-					modifier = Modifier
-                        .clip(plateShape)
-                        .border(
-                            BorderStroke(1.dp, MaterialTheme.colors.fill12),
-                            plateShape
-                        )
-                        .background(MaterialTheme.colors.fill12, plateShape)
-				) {
-					Box(
-						modifier = Modifier
-                            .fillMaxWidth(1f)
-                            .aspectRatio(1f)
-                            .background(
-                                Color.White,
-                                RoundedCornerShape(qrRounding)
-                            ),
-						contentAlignment = Alignment.Center,
-					) {
-						Image(
-							bitmap = model.qrImage.intoImageBitmap(),
-							contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
-							contentScale = ContentScale.Fit,
-							modifier = Modifier.size(264.dp)
-						)
-					}
-					KeyCard(model.keyCard)
-					Spacer(modifier = Modifier.padding(bottom = 4.dp))
-				}
-				//autohide component
-				val timerText = stringResource(R.string.export_private_key_timer_label)
-				CircularCountDownTimer(
-					SHOW_PRIVATE_KEY_TIMEOUT,
-					timerText
-				) { navigator.backAction() }
-			}
+		BottomSheetHeader(stringResource(R.string.export_private_key_title)) {
+			navigator.backAction()
 		}
+		val qrRounding = 16.dp
+		val plateShape =
+			RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
+		Column(
+			modifier = Modifier
+				.clip(plateShape)
+				.border(
+					BorderStroke(1.dp, MaterialTheme.colors.fill12),
+					plateShape
+				)
+				.background(MaterialTheme.colors.fill12, plateShape)
+		) {
+			Box(
+				modifier = Modifier
+					.fillMaxWidth(1f)
+					.aspectRatio(1f)
+					.background(
+						Color.White,
+						RoundedCornerShape(qrRounding)
+					),
+				contentAlignment = Alignment.Center,
+			) {
+				Image(
+					bitmap = model.qrImage.intoImageBitmap(),
+					contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
+					contentScale = ContentScale.Fit,
+					modifier = Modifier.size(264.dp)
+				)
+			}
+			KeyCard(model.keyCard)
+			Spacer(modifier = Modifier.padding(bottom = 4.dp))
+		}
+		//autohide component
+		val timerText = stringResource(R.string.export_private_key_timer_label)
+		CircularCountDownTimer(
+			SHOW_PRIVATE_KEY_TIMEOUT,
+			timerText
+		) { navigator.backAction() }
 	}
 }
 

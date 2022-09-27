@@ -9,6 +9,7 @@ import io.parity.signer.components.Documents
 import io.parity.signer.bottomsheets.*
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
+import io.parity.signer.ui.BottomSheetPositionHandle
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
@@ -215,14 +216,38 @@ fun AlertSelector(
 }
 
 @Composable
-fun LocalNavSelector(navAction: LocalNavAction?) {
+fun BottomSheetSelector(
+	stateHandle: BottomSheetPositionHandle,
+	signerDataModel: SignerDataModel,
+	navAction: LocalNavAction?,
+) {
 	SignerNewTheme {
-		when (navAction) {
+		val shouldShow: Boolean = when (navAction) {
 			is LocalNavAction.ShowExportPrivateKey -> {
 				PrivateKeyExportBottomSheet(
 					model = navAction.model,
 					navigator = navAction.navigator
 				)
+				true
+			}
+			LocalNavAction.None -> {
+				false
+			}
+			null -> {false}
+		}
+		if (shouldShow) stateHandle.show() else stateHandle.hide()
+	}
+}
+
+@Composable
+fun LocalNavSelectorFullScreen(
+	signerDataModel: SignerDataModel,
+	navAction: LocalNavAction?,
+) {
+	SignerNewTheme {
+		when (navAction) {
+			is LocalNavAction.ShowExportPrivateKey -> {
+				//show as bottom sheet not full screen
 			}
 			LocalNavAction.None -> {}
 			null -> {}

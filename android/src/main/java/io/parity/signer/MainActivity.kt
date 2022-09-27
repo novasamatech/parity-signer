@@ -7,11 +7,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,11 +17,11 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
 import io.parity.signer.models.AlertState
-import io.parity.signer.models.LocalNavAction
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.navigate
 import io.parity.signer.screens.LandingView
 import io.parity.signer.screens.WaitingScreen
+import io.parity.signer.ui.BottomSheetWrapper
 import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.*
@@ -71,6 +68,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {
+
 				if (authenticated.value == true) {
 					BackHandler {
 						signerDataModel.navigator.backAction()
@@ -78,39 +76,47 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					// Structure to contain all app
 					Scaffold(
 						topBar = {
-							TopBar(signerDataModel = signerDataModel, alertState = shieldAlert)
+							TopBar(
+								signerDataModel = signerDataModel,
+								alertState = shieldAlert
+							)
 						},
 						bottomBar = {
-							if (actionResult.value?.footer == true) BottomBar(signerDataModel = signerDataModel)
+							if (actionResult.value?.footer == true) BottomBar(
+								signerDataModel = signerDataModel
+							)
 						}
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
-							if (signerDataModel.localNavAction.value == LocalNavAction.None) {
-								ScreenSelector(
-									screenData = actionResult.value?.screenData
-										?: ScreenData.Documents,//default fallback
-									alertState = shieldAlert,
-									progress = progress,
-									captured = captured,
-									total = total,
-									button = signerDataModel::navigate,
-									signerDataModel = signerDataModel
-								)
-								ModalSelector(
-									modalData = actionResult.value?.modalData,
-									alertState = shieldAlert,
-									button = signerDataModel::navigate,
-									signerDataModel = signerDataModel,
-								)
-								AlertSelector(
-									alert = actionResult.value?.alertData,
-									alertState = shieldAlert,
-									button = signerDataModel::navigate,
-									acknowledgeWarning = signerDataModel::acknowledgeWarning
-								)
-							} else {
-								LocalNavSelector(navAction = localNavAction.value)
-							}
+//								if (signerDataModel.localNavAction.value == LocalNavAction.None) {
+							ScreenSelector(
+								screenData = actionResult.value?.screenData
+									?: ScreenData.Documents,//default fallback
+								alertState = shieldAlert,
+								progress = progress,
+								captured = captured,
+								total = total,
+								button = signerDataModel::navigate,
+								signerDataModel = signerDataModel
+							)
+							ModalSelector(
+								modalData = actionResult.value?.modalData,
+								alertState = shieldAlert,
+								button = signerDataModel::navigate,
+								signerDataModel = signerDataModel,
+							)
+							AlertSelector(
+								alert = actionResult.value?.alertData,
+								alertState = shieldAlert,
+								button = signerDataModel::navigate,
+								acknowledgeWarning = signerDataModel::acknowledgeWarning
+							)
+//								} else {
+//									LocalNavSelectorFullScreen(
+//										signerDataModel,
+//										navAction = localNavAction.value
+//									)
+//								}
 						}
 					}
 				} else {
@@ -127,11 +133,22 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						Spacer(Modifier.weight(0.5f))
 					}
 				}
+				//todo dmitry put in the middle for bottom sheet
+				BottomSheetWrapper { handle ->
+					BottomSheetSelector(
+						stateHandle = handle,
+						signerDataModel = signerDataModel,
+						navAction = localNavAction.value
+					)
+				}
 			}
 			OnBoardingState.No -> {
 				if (shieldAlert.value == AlertState.None) {
 					Scaffold { padding ->
-						LandingView(signerDataModel::onBoard, modifier=Modifier.padding(padding))
+						LandingView(
+							signerDataModel::onBoard,
+							modifier = Modifier.padding(padding)
+						)
 					}
 				} else {
 					Box(

@@ -36,18 +36,16 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 				modifier = Modifier.padding(20.dp)
 			) {
 				HeaderBar(line1 = "KEY MENU", line2 = "Select action")
-				if (FeatureFlags.isEnabled(FeatureOption.EXPORT_SECRET_KEY)) {
-					// Don't show `Export Private Key` if intermediate state is broken or when key is password protected
-					if (signerDataModel.lastOpenedKeyDetails?.address?.hasPwd == false) {
-						BigButton(
-							text = stringResource(R.string.menu_option_export_private_key),
-							isShaded = true,
-							isDangerous = false,
-							action = {
-								confirmExport = true
-							}
-						)
-					}
+				// Don't show `Export Private Key` if intermediate state is broken or when key is password protected
+				if (signerDataModel.lastOpenedKeyDetails?.address?.hasPwd == false) {
+					BigButton(
+						text = stringResource(R.string.menu_option_export_private_key),
+						isShaded = true,
+						isDangerous = false,
+						action = {
+							confirmExport = true
+						}
+					)
 				}
 				BigButton(
 					text = stringResource(R.string.menu_option_forget_delete_key),

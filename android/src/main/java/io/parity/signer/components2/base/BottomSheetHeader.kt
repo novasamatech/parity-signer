@@ -28,7 +28,7 @@ fun BottomSheetHeader(header: String, onCancelClicked: () -> Unit) {
 			style = MaterialTheme.typography.h3,
 		)
 		Spacer(modifier = Modifier.weight(1.0f))
-		CloseIcon(onCancelClicked)
+		CloseIcon(onCloseClicked = onCancelClicked)
 	}
 }
 
