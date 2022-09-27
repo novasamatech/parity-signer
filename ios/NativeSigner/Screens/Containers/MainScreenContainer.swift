@@ -18,7 +18,7 @@ struct MainScreenContainer: View {
             UnauthenticatedScreenContainer(data: data)
         } else if data.protected {
             LandingView(data: data)
-        } else if data.protected, data.canaryDead {
+        } else if data.protected, data.isConnectivityOn {
             Localizable.Connectivity.detected.text
                 .background(Asset.bg000.swiftUIColor)
         } else {

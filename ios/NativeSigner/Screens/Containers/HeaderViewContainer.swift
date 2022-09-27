@@ -18,7 +18,7 @@ struct HeaderViewContainer: View {
             screenNameType: navigation.actionResult.screenNameType,
             rightButton: navigation.actionResult.rightButton,
             alert: data.alert,
-            canaryDead: data.canaryDead,
+            isConnectivityOn: data.isConnectivityOn,
             alertShow: { data.alertShow = true },
             navigation: navigation
         )

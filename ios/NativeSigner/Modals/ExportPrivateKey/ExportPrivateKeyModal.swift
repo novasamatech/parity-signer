@@ -40,6 +40,7 @@ struct ExportPrivateKeyModal: View {
                     // QR Code container
                     VStack(spacing: 0) {
                         QRCodeContainerView(viewModel: viewModel.qrCode)
+                            .padding(0.5)
                         QRCodeAddressFooterView(viewModel: viewModel.addressFooter)
                     }
                     .fixedSize(horizontal: false, vertical: true)
@@ -96,39 +97,39 @@ private struct ExportPrivateKeyAddressFooter: View {
     }
 }
 
-// struct ExportPrivateKeyModal_Previews: PreviewProvider {
-//    static var previews: some View {
-//        Group {
-//            VStack {
-//                ExportPrivateKeyModal(
-//                    isPresentingExportKeysModal: Binding<Bool>.constant(true),
-//                    navigation: NavigationCoordinator(),
-//                    viewModel: PreviewData.exampleExportPrivateKey
-//                )
-//            }
-//            .previewDevice("iPhone 11 Pro")
-//            .background(.gray)
-//            .preferredColorScheme(.dark)
-//            VStack {
-//                ExportPrivateKeyModal(
-//                    isPresentingExportKeysModal: Binding<Bool>.constant(true),
-//                    navigation: NavigationCoordinator(),
-//                    viewModel: PreviewData.exampleExportPrivateKey
-//                )
-//            }
-//            .previewDevice("iPod touch (7th generation)")
-//            .background(.gray)
-//            .preferredColorScheme(.dark)
-//            VStack {
-//                ExportPrivateKeyModal(
-//                    isPresentingExportKeysModal: Binding<Bool>.constant(true),
-//                    navigation: NavigationCoordinator(),
-//                    viewModel: PreviewData.exampleExportPrivateKey
-//                )
-//            }
-//            .previewDevice("iPhone 8")
-//            .background(.gray)
-//            .preferredColorScheme(.dark)
-//        }
-//    }
-// }
+struct ExportPrivateKeyModal_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            VStack {
+                ExportPrivateKeyModal(
+                    isPresentingExportKeysModal: Binding<Bool>.constant(true),
+                    navigation: NavigationCoordinator(),
+                    viewModel: PreviewData.exampleExportPrivateKey
+                )
+            }
+            .previewDevice("iPhone 11 Pro")
+            .background(.gray)
+            .preferredColorScheme(.dark)
+            VStack {
+                ExportPrivateKeyModal(
+                    isPresentingExportKeysModal: Binding<Bool>.constant(true),
+                    navigation: NavigationCoordinator(),
+                    viewModel: PreviewData.exampleExportPrivateKey
+                )
+            }
+            .previewDevice("iPod touch (7th generation)")
+            .background(.gray)
+            .preferredColorScheme(.dark)
+            VStack {
+                ExportPrivateKeyModal(
+                    isPresentingExportKeysModal: Binding<Bool>.constant(true),
+                    navigation: NavigationCoordinator(),
+                    viewModel: PreviewData.exampleExportPrivateKey
+                )
+            }
+            .previewDevice("iPhone 8")
+            .background(.gray)
+            .preferredColorScheme(.dark)
+        }
+    }
+}
