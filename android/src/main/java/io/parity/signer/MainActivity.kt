@@ -7,8 +7,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,10 +24,10 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.navigate
 import io.parity.signer.screens.LandingView
 import io.parity.signer.screens.WaitingScreen
-import io.parity.signer.ui.BottomSheetWrapper
 import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.ui.theme.Text600
-import io.parity.signer.uniffi.*
+import io.parity.signer.uniffi.ScreenData
+import io.parity.signer.uniffi.initLogging
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -134,13 +137,10 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					}
 				}
 				//todo dmitry put in the middle for bottom sheet
-				BottomSheetWrapper { handle ->
-					BottomSheetSelector(
-						stateHandle = handle,
-						signerDataModel = signerDataModel,
-						navAction = localNavAction.value
-					)
-				}
+				BottomSheetSelector(
+					signerDataModel = signerDataModel,
+					navAction = localNavAction.value,
+				)
 			}
 			OnBoardingState.No -> {
 				if (shieldAlert.value == AlertState.None) {

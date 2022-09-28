@@ -7,48 +7,50 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-
-//todo dmitry handle closing bottom sheet as need to press back
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BottomSheetWrapper(
+	onClosedAction: () -> Unit = {},
 	bottomSheetContent: @Composable (state: BottomSheetPositionHandle) -> Unit,
 ) {
 	val coroutineScope = rememberCoroutineScope()
 	val modalBottomSheetState =
 		rememberModalBottomSheetState(
-			ModalBottomSheetValue.Hidden,
+			ModalBottomSheetValue.Expanded,
 			confirmStateChange = {
 				it != ModalBottomSheetValue.HalfExpanded
 			}
 		)
 
-	val handle = object : BottomSheetPositionHandle {
-		override fun hide() {
-			coroutineScope.launch {
-				if (!modalBottomSheetState.isVisible) {
-					modalBottomSheetState.hide()
+	var wasSheetClosed by remember { mutableStateOf(false) }
+
+	val handle = remember {
+		object : BottomSheetPositionHandle {
+			override fun hide() {
+				wasSheetClosed = true
+				coroutineScope.launch {
+					if (!modalBottomSheetState.isVisible) {
+						modalBottomSheetState.hide()
+					}
 				}
 			}
-		}
 
-		override fun show() {
-			coroutineScope.launch {
-				if (modalBottomSheetState.isVisible) {
-					modalBottomSheetState.hide()
+			override fun show() {
+				coroutineScope.launch {
+					modalBottomSheetState.show()
 				}
-				modalBottomSheetState.show()
 			}
 		}
 	}
@@ -57,10 +59,7 @@ fun BottomSheetWrapper(
 		sheetBackgroundColor = Color.Transparent,
 		sheetState = modalBottomSheetState,
 		sheetContent = {
-			BottomSheetContentWrapper(
-				coroutineScope,
-				modalBottomSheetState
-			) {
+			BottomSheetContentWrapper {
 				bottomSheetContent(handle)
 			}
 		},
@@ -70,6 +69,14 @@ fun BottomSheetWrapper(
 	BackHandler {
 		coroutineScope.launch { modalBottomSheetState.hide() }
 	}
+
+	// Take action based on hidden state
+	LaunchedEffect(modalBottomSheetState.currentValue) {
+		when (modalBottomSheetState.currentValue) {
+			ModalBottomSheetValue.Hidden -> if (!wasSheetClosed) onClosedAction()
+			else -> {}
+		}
+	}
 }
 
 interface BottomSheetPositionHandle {
@@ -77,11 +84,8 @@ interface BottomSheetPositionHandle {
 	fun show()
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun BottomSheetContentWrapper(
-	coroutineScope: CoroutineScope,
-	modalBottomSheetState: ModalBottomSheetState,
 	content: @Composable () -> Unit,
 ) {
 	Box(

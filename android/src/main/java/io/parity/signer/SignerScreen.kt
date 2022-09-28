@@ -1,15 +1,19 @@
 package io.parity.signer
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.alerts.ShieldAlert
-import io.parity.signer.components.Documents
 import io.parity.signer.bottomsheets.*
+import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
-import io.parity.signer.ui.BottomSheetPositionHandle
+import io.parity.signer.ui.BottomSheetWrapper
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
@@ -217,25 +221,31 @@ fun AlertSelector(
 
 @Composable
 fun BottomSheetSelector(
-	stateHandle: BottomSheetPositionHandle,
 	signerDataModel: SignerDataModel,
 	navAction: LocalNavAction?,
 ) {
 	SignerNewTheme {
 		val shouldShow: Boolean = when (navAction) {
 			is LocalNavAction.ShowExportPrivateKey -> {
-				PrivateKeyExportBottomSheet(
-					model = navAction.model,
-					navigator = navAction.navigator
-				)
+				BottomSheetWrapper {
+					PrivateKeyExportBottomSheet(
+						model = navAction.model,
+						navigator = navAction.navigator
+					)
+				}
 				true
 			}
 			LocalNavAction.None -> {
+				BottomSheetWrapper() {
+					Text(text = "my super text", Modifier.padding(vertical = 40.dp))
+				}
+				true
+//				false
+			}
+			null -> {
 				false
 			}
-			null -> {false}
 		}
-		if (shouldShow) stateHandle.show() else stateHandle.hide()
 	}
 }
 
