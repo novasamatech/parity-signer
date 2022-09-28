@@ -34,7 +34,7 @@ fun CloseIcon(
 	) {
 		Image(
 			imageVector = Icons.Filled.Close,
-			contentDescription = stringResource(R.string.close_button_description),
+			contentDescription = stringResource(R.string.description_close_button),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
 				.size(20.dp)

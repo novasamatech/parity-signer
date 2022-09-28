@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.alerts.AndroidCalledConfirm
-import io.parity.signer.components.Identicon
+import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.SettingsCardTemplate
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.abbreviateString
@@ -74,7 +74,7 @@ fun SettingsScreen(
 						.padding(8.dp)
 						.fillMaxWidth(1f)
 				) {
-					Identicon(identicon = settings.identicon ?: listOf())
+					IdentIcon(identicon = settings.identicon ?: listOf())
 					Spacer(Modifier.width(4.dp))
 					Column {
 						Text(

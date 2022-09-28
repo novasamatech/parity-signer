@@ -30,7 +30,8 @@ import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.fill12
+import io.parity.signer.ui.theme.appliedStroke
+import io.parity.signer.ui.theme.fill6
 
 @Composable
 fun PrivateKeyExportBottomSheet(
@@ -54,15 +55,15 @@ fun PrivateKeyExportBottomSheet(
 			modifier = Modifier
 				.clip(plateShape)
 				.border(
-					BorderStroke(1.dp, MaterialTheme.colors.fill12),
+					BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
 					plateShape
 				)
-				.background(MaterialTheme.colors.fill12, plateShape)
+				.background(MaterialTheme.colors.fill6, plateShape)
 		) {
 			Box(
 				modifier = Modifier
 					.fillMaxWidth(1f)
-					.aspectRatio(1f)
+					.aspectRatio(1.1f)
 					.background(
 						Color.White,
 						RoundedCornerShape(qrRounding)
@@ -77,7 +78,7 @@ fun PrivateKeyExportBottomSheet(
 				)
 			}
 			KeyCard(model.keyCard)
-			Spacer(modifier = Modifier.padding(bottom = 4.dp))
+
 		}
 		//autohide component
 		val timerText = stringResource(R.string.export_private_key_timer_label)
