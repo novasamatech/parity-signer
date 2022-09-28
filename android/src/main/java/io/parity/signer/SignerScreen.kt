@@ -236,22 +236,6 @@ fun AlertSelector(
 	}
 }
 
-@Composable
-fun LocalNavSelectorFullScreen(
-	signerDataModel: SignerDataModel,
-	navAction: LocalNavAction?,
-) {
-	SignerNewTheme {
-		when (navAction) {
-			is LocalNavAction.ShowExportPrivateKey -> {
-				//show as bottom sheet not full screen
-			}
-			LocalNavAction.None -> {}
-			null -> {}
-		}
-	}
-}
-
 enum class OnBoardingState {
 	InProgress,
 	No,

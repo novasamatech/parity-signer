@@ -79,16 +79,6 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					}
 					// Structure to contain all app
 					Scaffold(
-						topBar = {
-							if (NavigationMigrations.shouldShowTopBar(
-									localNavAction = localNavAction.value,
-									globalNavAction = actionResult.value)) {
-								TopBar(
-									signerDataModel = signerDataModel,
-									alertState = shieldAlert
-								)
-							}
-						},
 						bottomBar = {
 							if (actionResult.value?.footer == true) BottomBar(
 								signerDataModel = signerDataModel
@@ -96,16 +86,33 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						}
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
-							ScreenSelector(
-								screenData = actionResult.value?.screenData
-									?: ScreenData.Documents,//default fallback
-								alertState = shieldAlert,
-								progress = progress,
-								captured = captured,
-								total = total,
-								button = signerDataModel::navigate,
-								signerDataModel = signerDataModel
-							)
+							Scaffold(
+								topBar = {
+									if (NavigationMigrations.shouldShowTopBar(
+											localNavAction = localNavAction.value,
+											globalNavAction = actionResult.value
+										)
+									) {
+										TopBar(
+											signerDataModel = signerDataModel,
+											alertState = shieldAlert,
+										)
+									}
+								},
+							) { screenPadding ->
+								Box(modifier = Modifier.padding(screenPadding)) {
+									ScreenSelector(
+										screenData = actionResult.value?.screenData
+											?: ScreenData.Documents,//default fallback
+										alertState = shieldAlert,
+										progress = progress,
+										captured = captured,
+										total = total,
+										button = signerDataModel::navigate,
+										signerDataModel = signerDataModel
+									)
+								}
+							}
 							ModalSelector(
 								modalData = actionResult.value?.modalData,
 								localNavAction = localNavAction.value,

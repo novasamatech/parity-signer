@@ -8,10 +8,6 @@ import io.parity.signer.uniffi.ActionResult
 object NavigationMigrations {
 	fun shouldShowTopBar(localNavAction: LocalNavAction?,
 											 globalNavAction: ActionResult?): Boolean {
-		when (localNavAction) {
-			is LocalNavAction.ShowExportPrivateKey -> return false
-			else -> {}
-		}
 
 		return true
 	}
