@@ -596,8 +596,8 @@ impl MetaFetched {
 
 /// Get network information through RPC calls at `address` and interpret it into
 /// [`MetaFetched`].
-pub fn meta_fetch(address: &str, connection_timeout: Option<u64>, request_timeout:Option<u64>) -> Result<MetaFetched> {
-    let new_info = fetch_info(address, connection_timeout, request_timeout)?;
+pub fn meta_fetch(address: &str) -> Result<MetaFetched> {
+    let new_info = fetch_info(address)?;
 
     let genesis_hash = get_hash(
         &new_info.genesis_hash,
@@ -632,12 +632,12 @@ pub fn meta_fetch(address: &str, connection_timeout: Option<u64>, request_timeou
 /// Command line to get metadata at block:
 ///
 /// `meta_at_block -u <network_url_address> -block <block_hash>`
-pub fn debug_meta_at_block<P>(address: &str, hex_block_hash: &str, export_dir: P, connection_timeout: Option<u64>, request_timeout:Option<u64>) -> Result<()>
+pub fn debug_meta_at_block<P>(address: &str, hex_block_hash: &str, export_dir: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
     let block_hash = get_hash(hex_block_hash, Hash::BlockEntered)?;
-    let meta_fetched = fetch_meta_at_block(address, block_hash, connection_timeout, request_timeout)?;
+    let meta_fetched = fetch_meta_at_block(address, block_hash)?;
     let meta_values = MetaValues::from_str_metadata(&meta_fetched)?;
     let filename = format!(
         "{}{}_{}",
@@ -660,10 +660,8 @@ pub fn specs_agnostic(
     encryption: Encryption,
     optional_token_override: Option<Token>,
     optional_signer_title_override: Option<String>,
-		connection_timeout: Option<u64>,
-		request_timeout: Option<u64>,
 ) -> Result<NetworkSpecsToSend> {
-    let fetch = common_specs_fetch(address, connection_timeout, request_timeout)?;
+    let fetch = common_specs_fetch(address)?;
 
     // `NetworkProperties` checked and processed
     let new_properties = interpret_properties(
@@ -709,7 +707,7 @@ pub fn update_known_specs(
     optional_signer_title_override: Option<String>,
     optional_token_override: Option<Token>,
 ) -> Result<bool> {
-    let mut update_done = known_specs_processing(address, specs, optional_token_override, None, None)?;
+    let mut update_done = known_specs_processing(address, specs, optional_token_override)?;
 
     if let Some(title) = optional_signer_title_override {
         if specs.title != title {
@@ -741,7 +739,7 @@ pub fn update_modify_encryption_specs(
     optional_signer_title_override: Option<String>,
     optional_token_override: Option<Token>,
 ) -> Result<()> {
-    known_specs_processing(address, specs, optional_token_override, None, None)?;
+    known_specs_processing(address, specs, optional_token_override)?;
 
     specs.title =
         optional_signer_title_override.unwrap_or(format!("{}-{}", specs.name, encryption.show()));
@@ -765,9 +763,9 @@ struct CommonSpecsFetch {
 ///
 /// Processing of propertoes depends on what is done to the fetch results and
 /// the contents of the database.
-fn common_specs_fetch(address: &str, connection_timeout: Option<u64>, request_timeout: Option<u64>) -> Result<CommonSpecsFetch> {
+fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch> {
     // actual fetch
-    let new_info = fetch_info_with_network_specs(address, connection_timeout, request_timeout)?;
+    let new_info = fetch_info_with_network_specs(address)?;
 
     // genesis hash in proper format
     let genesis_hash = get_hash(
@@ -808,13 +806,11 @@ fn known_specs_processing(
     address: &str,
     specs: &mut NetworkSpecsToSend,
     optional_token_override: Option<Token>,
-		connection_timeout: Option<u64>,
-		request_timeout: Option<u64>
 ) -> Result<bool> {
     let mut update_done = false;
     let url = address.to_string();
 
-    let fetch = common_specs_fetch(address, connection_timeout, request_timeout)?;
+    let fetch = common_specs_fetch(address)?;
 
     let (base58prefix, token_fetch) =
         check_specs(&fetch.properties, fetch.meta_values.optional_base58prefix)?;

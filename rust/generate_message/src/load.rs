@@ -326,7 +326,7 @@ fn meta_d_u<P>(address: &str, files_dir: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
-    let meta_fetched = meta_fetch(address, None, None)?;
+    let meta_fetched = meta_fetch(address)?;
     if meta_fetched.meta_values.warn_incomplete_extensions {
         warn(
             &meta_fetched.meta_values.name,
@@ -525,7 +525,7 @@ where
 /// Outputs [`MetaFetched`], the data sufficient to produce `load_metadata`
 /// payload and update the database.
 fn fetch_set_element(set_element: &AddressSpecs) -> Result<MetaFetched> {
-    let meta_fetched = meta_fetch(&set_element.address, None, None)?;
+    let meta_fetched = meta_fetch(&set_element.address)?;
     if meta_fetched.meta_values.name != set_element.name {
         return Err(Error::ValuesChanged {
             url: set_element.address.to_string(),
