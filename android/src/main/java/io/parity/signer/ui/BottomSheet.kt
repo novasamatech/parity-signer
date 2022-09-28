@@ -29,7 +29,7 @@ fun BottomSheetWrapper(
 	val coroutineScope = rememberCoroutineScope()
 	val modalBottomSheetState =
 		rememberModalBottomSheetState(
-			ModalBottomSheetValue.Expanded,
+			ModalBottomSheetValue.Hidden,
 			confirmStateChange = {
 				it != ModalBottomSheetValue.HalfExpanded
 			}
@@ -77,6 +77,11 @@ fun BottomSheetWrapper(
 			ModalBottomSheetValue.Hidden -> if (!wasSheetClosed) onClosedAction()
 			else -> {}
 		}
+	}
+
+	//show once view is create to have initial open animation
+	LaunchedEffect(key1 = modalBottomSheetState) {
+			modalBottomSheetState.show()
 	}
 }
 
