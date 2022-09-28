@@ -16,6 +16,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.ProvideWindowInsets
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
@@ -48,7 +49,9 @@ class MainActivity : AppCompatActivity() {
 		signerDataModel.lateInit()
 
 		setContent {
-			SignerApp(signerDataModel)
+			ProvideWindowInsets {
+				SignerApp(signerDataModel)
+			}
 		}
 	}
 }

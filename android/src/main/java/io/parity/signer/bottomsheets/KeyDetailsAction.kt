@@ -14,7 +14,9 @@ import io.parity.signer.R
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.models.*
+import io.parity.signer.models.LocalNavRequest
+import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action

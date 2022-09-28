@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.navigationBarsWithImePadding
 import kotlinx.coroutines.launch
 
 
@@ -90,13 +91,12 @@ private fun BottomSheetContentWrapper(
 ) {
 	Box(
 		modifier = Modifier
+			.navigationBarsWithImePadding()
 			.wrapContentHeight()
 			.fillMaxWidth()
 			.clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
 			.background(Color.White)
 	) {
-		Box(Modifier.padding(top = 25.dp)) {
 			content()
-		}
 	}
 }
