@@ -14,7 +14,7 @@ import io.parity.signer.uniffi.MMetadataRecord
 @Composable
 fun MetadataCard(metadataRecord: MMetadataRecord) {
 	Row {
-		Identicon(identicon = metadataRecord.metaIdPic)
+		IdentIcon(identicon = metadataRecord.metaIdPic)
 		Column {
 			Text("version")
 			Text(metadataRecord.specsVersion)

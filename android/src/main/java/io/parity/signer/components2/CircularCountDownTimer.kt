@@ -1,10 +1,7 @@
 package io.parity.signer.components2
 
-import android.os.CountDownTimer
 import android.widget.Toast
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -19,16 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.models.submitErrorState
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.pink500
+import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.pink300
 import io.parity.signer.ui.theme.textSecondary
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
@@ -52,7 +45,7 @@ fun CircularCountDownTimer(
 		Text(
 			text = text,
 			color = MaterialTheme.colors.textSecondary,
-			style = MaterialTheme.typography.h3,
+			style = TypefaceNew.BodyL,
 		)
 		Box(
 			modifier = Modifier.padding(start = 8.dp),
@@ -65,12 +58,12 @@ fun CircularCountDownTimer(
 			)
 			CircularProgressIndicator(
 				progress = animatedProgress,
-				color = MaterialTheme.colors.pink500,
+				color = MaterialTheme.colors.pink300,
 			)
 			Text(
 				text = timeLeft.toString(),
 				color = MaterialTheme.colors.primary,
-				style = MaterialTheme.typography.h2,
+				style = TypefaceNew.LabelS,
 			)
 		}
 	}

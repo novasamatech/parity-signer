@@ -36,7 +36,7 @@ fun SeedCard(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			Box(contentAlignment = Alignment.BottomEnd) {
-				Identicon(identicon)
+				IdentIcon(identicon)
 				if (multiselectMode) {
 					if(selected) {
 						Icon(Icons.Default.CheckCircle, "Not multiselected", tint = MaterialTheme.colors.Action400)
