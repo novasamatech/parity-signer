@@ -1,11 +1,7 @@
-package io.parity.signer
+package io.parity.signer.ui
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.alerts.ShieldAlert
@@ -13,7 +9,6 @@ import io.parity.signer.bottomsheets.*
 import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
-import io.parity.signer.ui.BottomSheetWrapper
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
@@ -132,18 +127,10 @@ fun ModalSelector(
 	val button2: (Action, String) -> Unit =
 		{ action, details -> button(action, details, "") }
 	if (localNavAction != null && localNavAction != LocalNavAction.None) {
-		SignerNewTheme {
-			when (localNavAction) {
-				is LocalNavAction.ShowExportPrivateKey -> {
-					BottomSheetWrapper {
-						PrivateKeyExportBottomSheet(
-							model = localNavAction.model,
-							navigator = localNavAction.navigator
-						)
-					}
-				}
-				LocalNavAction.None -> { }
+		when (localNavAction) {
+			is LocalNavAction.ShowExportPrivateKey -> {
 			}
+			LocalNavAction.None -> {}
 		}
 	} else {
 		when (modalData) {

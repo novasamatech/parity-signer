@@ -1,5 +1,6 @@
 package io.parity.signer
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -16,7 +17,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.ProvideWindowInsets
+import androidx.core.view.WindowCompat
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
@@ -26,6 +27,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.navigate
 import io.parity.signer.screens.LandingView
 import io.parity.signer.screens.WaitingScreen
+import io.parity.signer.ui.*
 import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.ScreenData
@@ -48,10 +50,11 @@ class MainActivity : AppCompatActivity() {
 
 		signerDataModel.lateInit()
 
+		WindowCompat.setDecorFitsSystemWindows(window, false)
+		window.statusBarColor = Color.TRANSPARENT;
+
 		setContent {
-			ProvideWindowInsets {
-				SignerApp(signerDataModel)
-			}
+			SignerApp(signerDataModel)
 		}
 	}
 }
@@ -81,53 +84,69 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						signerDataModel.navigator.backAction()
 					}
 					// Structure to contain all app
-					Scaffold(
-						bottomBar = {
-							if (actionResult.value?.footer == true) BottomBar(
-								signerDataModel = signerDataModel
-							)
-						}
-					) { innerPadding ->
-						Box(modifier = Modifier.padding(innerPadding)) {
-							Scaffold(
-								topBar = {
-									if (NavigationMigrations.shouldShowTopBar(
-											localNavAction = localNavAction.value,
-											globalNavAction = actionResult.value
-										)
-									) {
-										TopBar(
-											signerDataModel = signerDataModel,
-											alertState = shieldAlert,
-										)
-									}
-								},
-							) { screenPadding ->
-								Box(modifier = Modifier.padding(screenPadding)) {
-									ScreenSelector(
-										screenData = actionResult.value?.screenData
-											?: ScreenData.Documents,//default fallback
+					Box {
+						//screens before redesign
+						Scaffold(
+							modifier = Modifier
+								.navigationBarsPadding()
+								.captionBarPadding()
+								.statusBarsPadding(),
+							topBar = {
+								if (NavigationMigrations.shouldShowTopBar(
+										localNavAction = localNavAction.value,
+										globalNavAction = actionResult.value
+									)
+								) {
+									TopBar(
+										signerDataModel = signerDataModel,
 										alertState = shieldAlert,
-										progress = progress,
-										captured = captured,
-										total = total,
-										button = signerDataModel::navigate,
-										signerDataModel = signerDataModel
 									)
 								}
+							},
+							bottomBar = {
+								if (actionResult.value?.footer == true) BottomBar(
+									signerDataModel = signerDataModel
+								)
+							},
+						) { innerPadding ->
+							Box(modifier = Modifier.padding(innerPadding)) {
+								ScreenSelector(
+									screenData = actionResult.value?.screenData
+										?: ScreenData.Documents,//default fallback
+									alertState = shieldAlert,
+									progress = progress,
+									captured = captured,
+									total = total,
+									button = signerDataModel::navigate,
+									signerDataModel = signerDataModel
+								)
+								ModalSelector(
+									modalData = actionResult.value?.modalData,
+									localNavAction = localNavAction.value,
+									alertState = shieldAlert,
+									button = signerDataModel::navigate,
+									signerDataModel = signerDataModel,
+								)
+								AlertSelector(
+									alert = actionResult.value?.alertData,
+									alertState = shieldAlert,
+									button = signerDataModel::navigate,
+									acknowledgeWarning = signerDataModel::acknowledgeWarning
+								)
 							}
-							ModalSelector(
+						}
+						//new screens selectors
+						Box(
+							modifier = Modifier
+								.navigationBarsPadding()
+								.captionBarPadding(),
+						) {
+							BottomSheetSelector(
 								modalData = actionResult.value?.modalData,
 								localNavAction = localNavAction.value,
 								alertState = shieldAlert,
 								button = signerDataModel::navigate,
 								signerDataModel = signerDataModel,
-							)
-							AlertSelector(
-								alert = actionResult.value?.alertData,
-								alertState = shieldAlert,
-								button = signerDataModel::navigate,
-								acknowledgeWarning = signerDataModel::acknowledgeWarning
 							)
 						}
 					}
