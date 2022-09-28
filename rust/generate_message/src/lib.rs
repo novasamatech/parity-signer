@@ -1130,6 +1130,6 @@ pub fn full_run(command: Command) -> Result<()> {
             url,
             block_hash,
             export_dir,
-        } => debug_meta_at_block(&url, &block_hash, export_dir),
+        } => debug_meta_at_block(&url, &block_hash, export_dir, None, None),
     }
 }

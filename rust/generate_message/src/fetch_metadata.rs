@@ -62,6 +62,7 @@
 //!
 //! This module deals only with the RPC calls part and does **no processing**
 //! of the fetched data.
+use std::time::Duration;
 use jsonrpsee::core::client::ClientT;
 use jsonrpsee::rpc_params;
 use jsonrpsee::ws_client::WsClientBuilder;
@@ -154,8 +155,15 @@ fn address_with_port(str_address: &str) -> String {
 /// 2. metadata at this block hash
 /// 3. network genesis hash
 #[tokio::main]
-pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo> {
-    let client = WsClientBuilder::default()
+pub async fn fetch_info(str_address: &str, connection_timeout: Option<u64>, request_timeout:Option<u64>) -> Result<FetchedInfo> {
+		let mut ws_client_builder= WsClientBuilder::default();
+		if connection_timeout.is_some() {
+			ws_client_builder = ws_client_builder.connection_timeout(Duration::from_secs(connection_timeout.unwrap()));
+		}
+		if request_timeout.is_some() {
+			ws_client_builder = ws_client_builder.request_timeout(Duration::from_secs(request_timeout.unwrap()));
+		}
+    let client = ws_client_builder
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client.request("chain_getBlockHash", rpc_params![]).await?;
@@ -193,8 +201,15 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo> {
 /// Function inputs address at which RPC call is made and block hash in [`H256`]
 /// format. Outputs hexadecimal metadata.
 #[tokio::main]
-pub async fn fetch_meta_at_block(str_address: &str, block_hash: H256) -> Result<String> {
-    let client = WsClientBuilder::default()
+pub async fn fetch_meta_at_block(str_address: &str, block_hash: H256, connection_timeout: Option<u64>, request_timeout:Option<u64>) -> Result<String> {
+		let mut ws_client_builder= WsClientBuilder::default();
+		if connection_timeout.is_some() {
+			ws_client_builder = ws_client_builder.connection_timeout(Duration::from_secs(connection_timeout.unwrap()));
+		}
+		if request_timeout.is_some() {
+			ws_client_builder = ws_client_builder.request_timeout(Duration::from_secs(request_timeout.unwrap()));
+		}
+		let client = ws_client_builder
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client
@@ -221,8 +236,17 @@ pub async fn fetch_meta_at_block(str_address: &str, block_hash: H256) -> Result<
 #[tokio::main]
 pub async fn fetch_info_with_network_specs(
     str_address: &str,
+		connection_timeout: Option<u64>,
+		request_timeout: Option<u64>
 ) -> Result<FetchedInfoWithNetworkSpecs> {
-    let client = WsClientBuilder::default()
+		let mut ws_client_builder= WsClientBuilder::default();
+		if connection_timeout.is_some() {
+			ws_client_builder = ws_client_builder.connection_timeout(Duration::from_secs(connection_timeout.unwrap()));
+		}
+		if request_timeout.is_some() {
+			ws_client_builder = ws_client_builder.request_timeout(Duration::from_secs(request_timeout.unwrap()));
+		}
+    let client = ws_client_builder
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
