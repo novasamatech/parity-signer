@@ -36,7 +36,8 @@ final class ExportPrivateKeyService {
             qrCode: .init(qrCode: qrCode),
             addressFooter: .init(
                 identicon: keyDetails.address.identicon,
-                path: [keyDetails.address.seedName, keyDetails.address.path].joined(separator: " "),
+                rootKeyName: keyDetails.address.seedName,
+                path: keyDetails.address.path,
                 network: keyDetails.networkInfo.networkTitle,
                 base58: keyDetails.address.base58
             )
