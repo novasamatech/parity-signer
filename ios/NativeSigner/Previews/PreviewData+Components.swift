@@ -14,6 +14,7 @@ extension PreviewData {
 
     static let qrCodeAddressFooterViewModel = QRCodeAddressFooterViewModel(
         identicon: PreviewData.exampleIdenticon,
+        rootKeyName: "Dotsama parachains",
         path: "//polkadot//path",
         network: "Polkadot",
         base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"

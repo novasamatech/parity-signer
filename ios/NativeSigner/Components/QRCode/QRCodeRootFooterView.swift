@@ -24,7 +24,7 @@ struct QRCodeRootFooterView: View {
 
     var body: some View {
         HStack(spacing: Spacing.small) {
-            VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
+            VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                 Text(Localizable.PublicKeyDetails.Label.keys(viewModel.keyName))
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .font(Fontstyle.bodyM.base)
@@ -33,10 +33,11 @@ struct QRCodeRootFooterView: View {
                         .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                         .font(Fontstyle.bodyM.base)
                         .frame(idealWidth: .infinity, alignment: .leading)
-                    Asset.chevronDown.swiftUIImage
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                        .rotationEffect(Angle(degrees: showFullAddress ? 180 : 0))
-                        .padding(.leading, Spacing.extraExtraSmall)
+                    if !showFullAddress {
+                        Asset.chevronDown.swiftUIImage
+                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .padding(.leading, Spacing.extraExtraSmall)
+                    }
                     Spacer()
                 }
                 .onTapGesture {
@@ -56,11 +57,14 @@ struct QRCodeRootFooterView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             VStack {
+                Spacer()
                 QRCodeRootFooterView(
                     viewModel: PreviewData.qrCodeRootFooterViewModel
                 )
+                .background(Asset.fill6Solid.swiftUIColor)
+                Spacer()
             }
-            .background(.gray)
+            .background(.white)
             .preferredColorScheme(.dark)
         }
     }
