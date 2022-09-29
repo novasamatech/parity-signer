@@ -1,5 +1,6 @@
 package io.parity.signer.bottomsheets.exportprivatekey
 
+import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.BorderStroke
@@ -107,15 +108,12 @@ class PrivateKeyExportModel(
 }
 
 @Preview(
-	name = "day",
-	group = "themes",
-	uiMode = UI_MODE_NIGHT_NO,
-	showBackground = true,
-	backgroundColor = 0xFFFFFFFF,
+	name = "light", group = "themes", uiMode = UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
 )
 @Preview(
-	name = "dark theme", group = "themes", uiMode = UI_MODE_NIGHT_YES,
-	showBackground = true, backgroundColor = 0xFF000000
+	name = "dark", group = "themes", uiMode = UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
 private fun PreviewPrivateKeyExportBottomSheet() {

@@ -1,5 +1,6 @@
 package io.parity.signer.bottomsheets
 
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,26 +10,30 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.models.LocalNavRequest
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.navigate
+import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Bg000
+import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MKeyDetails
 
 //todo dmitry finish this one
 @Composable
-fun KeyDetailsMenuAction(signerDataModel: SignerDataModel) {
+fun KeyDetailsMenuAction(
+	navigator: Navigator,
+	keyDetails: MKeyDetails?
+) {
 	var confirmForget by remember { mutableStateOf(false) }
 	var confirmExport by remember { mutableStateOf(false) }
 
 	Column(
-		Modifier.clickable { signerDataModel.navigator.backAction() }
+		Modifier.clickable { navigator.backAction() }
 	) {
 		Spacer(Modifier.weight(1f))
 		Surface(
@@ -40,7 +45,7 @@ fun KeyDetailsMenuAction(signerDataModel: SignerDataModel) {
 			) {
 				HeaderBar(line1 = "KEY MENU", line2 = "Select action")
 				// Don't show `Export Private Key` if intermediate state is broken or when key is password protected
-				if (signerDataModel.lastOpenedKeyDetails?.address?.hasPwd == false) {
+				if (keyDetails?.address?.hasPwd == false) {
 					BigButton(
 						text = stringResource(R.string.menu_option_export_private_key),
 						isShaded = true,
@@ -66,7 +71,7 @@ fun KeyDetailsMenuAction(signerDataModel: SignerDataModel) {
 		header = stringResource(R.string.remove_key_confirm_title),
 		text = stringResource(R.string.remove_key_confirm_text),
 		back = { confirmForget = false },
-		forward = { signerDataModel.navigate(Action.REMOVE_KEY) },
+		forward = { navigator.navigate(Action.REMOVE_KEY) },
 		backText = stringResource(R.string.generic_cancel),
 		forwardText = stringResource(R.string.remove_key_confirm_cta)
 	)
@@ -77,11 +82,31 @@ fun KeyDetailsMenuAction(signerDataModel: SignerDataModel) {
 		back = { confirmExport = false },
 		forward = {
 			confirmExport = false
-			signerDataModel.navigator.navigate(
-				LocalNavRequest.ShowExportPrivateKey(signerDataModel.lastOpenedKeyDetails!!.pubkey)
+			navigator.navigate(
+				LocalNavRequest.ShowExportPrivateKey(keyDetails!!.pubkey)
 			)
 		},
 		backText = stringResource(R.string.generic_cancel),
 		forwardText = stringResource(R.string.export_private_key_confirm_cta)
 	)
+}
+
+
+@Preview(
+	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "themes",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewKeyDetailsMenuAction() {
+	SignerNewTheme {
+		KeyDetailsMenuAction(
+			EmptyNavigator(),
+			null
+		)
+	}
 }
