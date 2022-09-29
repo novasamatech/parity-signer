@@ -44,7 +44,8 @@ struct DerivedKeyRow: View {
         .fixedSize(horizontal: false, vertical: true)
     }
 
-    /// String interpolation for SFSymbols is a bit unstable if creating `String` inline by using conditional logic or `appending` from `StringProtocol`. Hence less DRY approach and dedicated function to wrap that
+    /// String interpolation for SFSymbols is a bit unstable if creating `String` inline by using conditional logic or
+    /// `appending` from `StringProtocol`. Hence less DRY approach and dedicated function to wrap that
     private var fullPath: Text {
         viewModel.hasPassword ?
             Text(
