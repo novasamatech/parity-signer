@@ -29,9 +29,7 @@ import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.appliedStroke
-import io.parity.signer.ui.theme.fill6
+import io.parity.signer.ui.theme.*
 
 @Composable
 fun PrivateKeyExportBottomSheet(
