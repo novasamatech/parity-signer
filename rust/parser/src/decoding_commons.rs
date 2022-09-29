@@ -40,6 +40,7 @@ where
     T: HasCompact,
     Compact<T>: Decode,
 {
+    println!("get_compact {}", data.len());
     if data.is_empty() {
         return Err(ParserDecodingError::DataTooShort.into());
     }
@@ -347,6 +348,27 @@ pub(crate) fn special_case_account_id(
     let fancy_out = vec![OutputCard {
         card: ParserCard::Id {
             id: account_id,
+            base58prefix: short_specs.base58prefix,
+        },
+        indent,
+    }];
+    Ok(DecodedOut {
+        remaining_vector,
+        fancy_out,
+    })
+}
+
+pub(crate) fn special_case_account_id_20(
+    data: Vec<u8>,
+    indent: u32,
+    short_specs: &ShortSpecs,
+) -> Result<DecodedOut> {
+    let a = data.get(0..20).ok_or(ParserDecodingError::DataTooShort)?;
+    let array_decoded: [u8; 20] = a.try_into().expect("constant length, always fits");
+    let remaining_vector = data[20..].to_vec();
+    let fancy_out = vec![OutputCard {
+        card: ParserCard::Id20 {
+            id: array_decoded,
             base58prefix: short_specs.base58prefix,
         },
         indent,

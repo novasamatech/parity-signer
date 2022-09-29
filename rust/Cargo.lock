@@ -2213,6 +2213,7 @@ dependencies = [
  "frame-metadata",
  "hex",
  "lazy_static",
+ "log",
  "num-bigint 0.4.3",
  "parity-scale-codec",
  "printing_balance",

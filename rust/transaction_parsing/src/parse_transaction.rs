@@ -92,10 +92,7 @@ where
             };
 
             let short_specs = network_specs.short();
-            let (method_data, extensions_data) = match cut_method_extensions(&parser_data) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::SeparateMethodExtensions),
-            };
+            let (method_data, extensions_data) = cut_method_extensions(&parser_data)?;
 
             let meta_set = find_meta_set(&short_specs, &db_path)?;
             if meta_set.is_empty() {

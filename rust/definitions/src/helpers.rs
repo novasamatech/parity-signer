@@ -91,6 +91,16 @@ pub fn make_identicon_from_multisigner(
 }
 
 #[cfg(feature = "signer")]
+pub fn make_identicon_from_id20(id: &[u8; 20]) -> Vec<u8> {
+    use eth_blockies::eth_blockies_png_data;
+
+    let account = format!("0x{}", hex::encode(&id));
+    let dimension = (72, 72);
+    let compressed_output = false;
+    eth_blockies_png_data(account, dimension, compressed_output)
+}
+
+#[cfg(feature = "signer")]
 pub fn make_identicon_from_account(account: AccountId32) -> Vec<u8> {
     make_identicon(&<[u8; 32]>::from(account))
 }

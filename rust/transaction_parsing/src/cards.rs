@@ -1,7 +1,9 @@
 use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 use sp_runtime::{generic::Era, MultiSigner};
 
-use definitions::helpers::{make_identicon_from_account, print_ethereum_address, IdenticonStyle};
+use definitions::helpers::{
+    make_identicon_from_account, make_identicon_from_id20, print_ethereum_address, IdenticonStyle,
+};
 use definitions::keyring::NetworkSpecsKey;
 
 use definitions::{
@@ -118,6 +120,15 @@ impl<'a> Card<'a> {
                         base58: id
                             .to_ss58check_with_version(Ss58AddressFormat::custom(*base58prefix)),
                         identicon: make_identicon_from_account(id.to_owned()),
+                    },
+                },
+                ParserCard::Id20 {
+                    id,
+                    base58prefix: _,
+                } => NavCard::IdCard {
+                    f: MSCId {
+                        base58: format!("0x{}", hex::encode(&id)),
+                        identicon: make_identicon_from_id20(id),
                     },
                 },
                 ParserCard::None => NavCard::NoneCard,

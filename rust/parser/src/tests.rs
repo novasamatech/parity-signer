@@ -222,3 +222,26 @@ block_hash: 5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620"#;
         reply
     );
 }
+
+#[test]
+fn tr_7() {
+    let data = hex::decode(concat!(
+           "780300e855f5e79ca68ecae0fe99a3fa46806461740e1a0f0000c16ff28623e40000000a0700000200000091bc6e169807aaa54802737e1c504b2577d4fafedd5a02c10293b1cd60e395272470dff6295dd9bb3e5a89c9eb7647d7c5ae525618d77757171718dc034be8f5")
+        ).unwrap();
+    let specs_moonbase = ShortSpecs {
+        base58prefix: 1287,
+        decimals: 18,
+        genesis_hash: [
+            145, 188, 110, 22, 152, 7, 170, 165, 72, 2, 115, 126, 28, 80, 75, 37, 119, 212, 250,
+            254, 221, 90, 2, 193, 2, 147, 177, 205, 96, 227, 149, 39,
+        ]
+        .into(),
+        name: "moonbase".to_string(),
+        unit: "DEV".to_string(),
+    };
+
+    let reply =
+        parse_and_display_set(&data, &metadata("for_tests/moonbase1802"), &specs_moonbase).unwrap();
+
+    println!("reply {}", reply);
+}

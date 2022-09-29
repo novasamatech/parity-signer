@@ -17,7 +17,7 @@ use definitions::network_specs::ShortSpecs;
 
 use crate::decoding_commons::{
     decode_known_length, decode_primitive_with_flags, get_compact, special_case_account_id,
-    DecodedOut, OutputCard,
+    special_case_account_id_20, DecodedOut, OutputCard,
 };
 use crate::decoding_sci_ext::{special_case_era, special_case_hash, Ext, Hash, SpecialExt};
 use crate::error::{ParserDecodingError, ParserMetadataError, Result};
@@ -293,14 +293,16 @@ fn decode_big256(data: &[u8], signed: bool, indent: u32) -> Result<DecodedOut> {
 #[derive(Debug)]
 enum SpecialType {
     AccountId,
+    AccountId20,
     Call,
     None,
 }
 
 fn check_special(current_type: &Type<PortableForm>) -> SpecialType {
     match current_type.path().ident() {
-        Some(a) => match a.as_str() {
+        Some(a) => match dbg!(a.as_str()) {
             "AccountId32" => SpecialType::AccountId,
+            "AccountId20" => SpecialType::AccountId20,
             "Call" => SpecialType::Call,
             _ => SpecialType::None,
         },
@@ -347,6 +349,7 @@ pub(crate) fn decoding_sci_complete(
     };
     match special_type {
         SpecialType::AccountId => special_case_account_id(data, indent, short_specs),
+        SpecialType::AccountId20 => special_case_account_id_20(data, indent, short_specs),
         _ => {
             if let Some(ext) = possible_ext {
                 if let SpecialExt::Era = ext.specialty {

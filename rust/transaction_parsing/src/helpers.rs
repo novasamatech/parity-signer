@@ -199,6 +199,16 @@ pub fn multisigner_msg_genesis_encryption(
             ),
             None => return Err(Error::TooShort),
         },
+        "03" => match data.get(3..36) {
+            Some(a) => (
+                MultiSigner::Ecdsa(ecdsa::Public::from_raw(
+                    a.try_into().expect("static length"),
+                )),
+                &data[36..],
+                Encryption::Ethereum,
+            ),
+            None => return Err(Error::TooShort),
+        },
         _ => return Err(Error::EncryptionNotSupported(data_hex[2..4].to_string())),
     };
     if data.len() < 32 {
