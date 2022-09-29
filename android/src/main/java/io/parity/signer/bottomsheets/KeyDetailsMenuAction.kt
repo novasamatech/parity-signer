@@ -21,10 +21,9 @@ import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 
-//todo dmitry delete this one
-@Deprecated("use KeyDetailsMenuAction in bottom sheet")
+//todo dmitry finish this one
 @Composable
-fun KeyDetailsAction(signerDataModel: SignerDataModel) {
+fun KeyDetailsMenuAction(signerDataModel: SignerDataModel) {
 	var confirmForget by remember { mutableStateOf(false) }
 	var confirmExport by remember { mutableStateOf(false) }
 
