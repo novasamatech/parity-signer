@@ -79,7 +79,8 @@ private struct TabBarButton: View {
     }
 }
 
-/// To test preview with different `Tab` selected, just substitute `selectedTab` with `Binding<Tab>.constant(<any enum Tab value here>)`
+/// To test preview with different `Tab` selected, just substitute `selectedTab` with `Binding<Tab>.constant(<any enum
+// Tab value here>)`
 // struct TabBarView_Previews: PreviewProvider {
 //    static var previews: some View {
 //        TabBarView(
