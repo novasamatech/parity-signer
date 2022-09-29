@@ -72,6 +72,7 @@ use serde_json::{
     value::{Number, Value},
 };
 use sp_core::H256;
+use std::time::Duration;
 
 use crate::error::{Error, Result};
 
@@ -116,6 +117,9 @@ lazy_static! {
     static ref PORT: Regex = Regex::new(r"^(?P<body>wss://[^/]*?)(?P<port>:[0-9]+)?(?P<tail>/.*)?$").expect("known value");
 }
 
+const CONNECTION_TIMEOUT: Duration = Duration::from_secs(60);
+const REQUEST_TIMEOUT: Duration = Duration::from_secs(120);
+
 /// Supply address with port if needed.
 ///
 /// Transform address as it is displayed to user in <https://polkadot.js.org/>
@@ -156,6 +160,8 @@ fn address_with_port(str_address: &str) -> String {
 #[tokio::main]
 pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo> {
     let client = WsClientBuilder::default()
+        .connection_timeout(CONNECTION_TIMEOUT)
+        .request_timeout(REQUEST_TIMEOUT)
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client.request("chain_getBlockHash", rpc_params![]).await?;
@@ -195,6 +201,8 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo> {
 #[tokio::main]
 pub async fn fetch_meta_at_block(str_address: &str, block_hash: H256) -> Result<String> {
     let client = WsClientBuilder::default()
+        .connection_timeout(CONNECTION_TIMEOUT)
+        .request_timeout(REQUEST_TIMEOUT)
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client
@@ -223,6 +231,8 @@ pub async fn fetch_info_with_network_specs(
     str_address: &str,
 ) -> Result<FetchedInfoWithNetworkSpecs> {
     let client = WsClientBuilder::default()
+        .connection_timeout(CONNECTION_TIMEOUT)
+        .request_timeout(REQUEST_TIMEOUT)
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
