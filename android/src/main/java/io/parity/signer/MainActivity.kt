@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
 
 		signerDataModel.lateInit()
 
+		//remove automatic insets so bottom sheet can dimm status bar, other views will add their paddings if needed.
 		WindowCompat.setDecorFitsSystemWindows(window, false)
 		window.statusBarColor = Color.TRANSPARENT;
 
