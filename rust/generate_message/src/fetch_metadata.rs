@@ -62,7 +62,6 @@
 //!
 //! This module deals only with the RPC calls part and does **no processing**
 //! of the fetched data.
-use std::time::Duration;
 use jsonrpsee::core::client::ClientT;
 use jsonrpsee::rpc_params;
 use jsonrpsee::ws_client::WsClientBuilder;
@@ -73,6 +72,7 @@ use serde_json::{
     value::{Number, Value},
 };
 use sp_core::H256;
+use std::time::Duration;
 
 use crate::error::{Error, Result};
 
@@ -160,8 +160,8 @@ fn address_with_port(str_address: &str) -> String {
 #[tokio::main]
 pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo> {
     let client = WsClientBuilder::default()
-				.connection_timeout(CONNECTION_TIMEOUT)
-				.request_timeout(REQUEST_TIMEOUT)
+        .connection_timeout(CONNECTION_TIMEOUT)
+        .request_timeout(REQUEST_TIMEOUT)
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client.request("chain_getBlockHash", rpc_params![]).await?;
@@ -201,8 +201,8 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo> {
 #[tokio::main]
 pub async fn fetch_meta_at_block(str_address: &str, block_hash: H256) -> Result<String> {
     let client = WsClientBuilder::default()
-				.connection_timeout(CONNECTION_TIMEOUT)
-				.request_timeout(REQUEST_TIMEOUT)
+        .connection_timeout(CONNECTION_TIMEOUT)
+        .request_timeout(REQUEST_TIMEOUT)
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client
@@ -231,8 +231,8 @@ pub async fn fetch_info_with_network_specs(
     str_address: &str,
 ) -> Result<FetchedInfoWithNetworkSpecs> {
     let client = WsClientBuilder::default()
-				.connection_timeout(CONNECTION_TIMEOUT)
-				.request_timeout(REQUEST_TIMEOUT)
+        .connection_timeout(CONNECTION_TIMEOUT)
+        .request_timeout(REQUEST_TIMEOUT)
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
