@@ -1,26 +1,27 @@
 package io.parity.signer.bottomsheets
 
 import android.content.res.Configuration
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.alerts.AndroidCalledConfirm
-import io.parity.signer.components.BigButton
-import io.parity.signer.components.HeaderBar
+import io.parity.signer.bottomsheets.exportprivatekey.ConfirmExportPrivateKeyAction
+import io.parity.signer.components2.base.CtaButtonBottomSheet
+import io.parity.signer.components2.base.SecondaryButtonBottomSheet
 import io.parity.signer.models.*
-import io.parity.signer.ui.theme.Bg000
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.modal
-import io.parity.signer.uniffi.Action
+import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.MKeyDetails
 
 //todo dmitry finish this one
@@ -29,84 +30,180 @@ fun KeyDetailsMenuAction(
 	navigator: Navigator,
 	keyDetails: MKeyDetails?
 ) {
-	var confirmForget by remember { mutableStateOf(false) }
-	var confirmExport by remember { mutableStateOf(false) }
+	val state = remember {
+		mutableStateOf(KeyDetailsMenuState.GENERAL)
+	}
+	when (state.value) {
+		KeyDetailsMenuState.GENERAL -> KeyDetailsGeneralMenu(navigator, state)
 
+		KeyDetailsMenuState.DELETE_CONFIRM -> ConfirmExportPrivateKeyAction(
+			navigator = navigator,
+			publicKey = keyDetails!!.pubkey,
+		)
+		KeyDetailsMenuState.PRIVATE_KEY_CONFIRM -> ConfirmExportPrivateKeyAction(
+			navigator = navigator,
+			publicKey = keyDetails!!.pubkey,
+		)
+	}
+}
+
+@Composable
+private fun KeyDetailsGeneralMenu(
+	navigator: Navigator,
+	state: MutableState<KeyDetailsMenuState>
+) {
+	val sidePadding = 24.dp
 	Column(
-		Modifier.clickable { navigator.backAction() }
+		modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = sidePadding, end = sidePadding, top = 8.dp),
 	) {
-		Spacer(Modifier.weight(1f))
-		Surface(
-			color = MaterialTheme.colors.Bg000,
-			shape = MaterialTheme.shapes.modal
+
+		MenuItemForBottomSheet(
+			iconId = R.drawable.ic_private_key_28,
+			label = stringResource(R.string.menu_option_export_private_key),
+			tint = null,
+			onclick = {
+				state.value = KeyDetailsMenuState.PRIVATE_KEY_CONFIRM
+			}
+		)
+
+		MenuItemForBottomSheet(
+			iconId = R.drawable.ic_backspace_28,
+			label = "Delete",
+			tint = MaterialTheme.colors.red400,
+			onclick = {
+				state.value = KeyDetailsMenuState.PRIVATE_KEY_CONFIRM
+			}
+		)
+
+		SecondaryButtonBottomSheet(
+			label = stringResource(R.string.generic_cancel),
+			modifier = Modifier.padding(vertical = 16.dp)
 		) {
-			Column(
-				modifier = Modifier.padding(20.dp)
+			navigator.backAction()
+		}
+		Spacer(modifier = Modifier.padding(bottom = 24.dp))
+	}
+}
+
+
+@Composable
+private fun KeyDetailsDeleteConfirmMenu(
+	navigator: Navigator,
+	state: MutableState<KeyDetailsMenuState>
+) {
+	val sidePadding = 24.dp
+	Column(
+		modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = sidePadding, end = sidePadding, top = 8.dp),
+	) {
+
+		Text(
+			text = stringResource(R.string.export_private_key_confirm_title),
+			color = MaterialTheme.colors.primary,
+			style = TypefaceNew.TitleL,
+		)
+		Text(
+			modifier = Modifier.padding(top = 16.dp, bottom = 24.dp),
+			text = stringResource(R.string.export_private_key_confirm_text),
+			color = MaterialTheme.colors.textSecondary,
+			style = TypefaceNew.BodyL,
+			textAlign = TextAlign.Center,
+		)
+
+		Row(Modifier.fillMaxWidth()) {
+			CtaButtonBottomSheet(
+				label = stringResource(R.string.generic_cancel),
+				modifier = Modifier.padding(vertical = 16.dp)
 			) {
-				HeaderBar(line1 = "KEY MENU", line2 = "Select action")
-				// Don't show `Export Private Key` if intermediate state is broken or when key is password protected
-				if (keyDetails?.address?.hasPwd == false) {
-					BigButton(
-						text = stringResource(R.string.menu_option_export_private_key),
-						isShaded = true,
-						isDangerous = false,
-						action = {
-							confirmExport = true
-						}
-					)
-				}
-				BigButton(
-					text = stringResource(R.string.menu_option_forget_delete_key),
-					isShaded = true,
-					isDangerous = true,
-					action = {
-						confirmForget = true
-					}
-				)
+				navigator.backAction()
+			}
+			CtaButtonBottomSheet(
+				label = stringResource(R.string.generic_cancel),//todo dmitry text
+				modifier = Modifier.padding(vertical = 16.dp)
+			) {
+				navigator.backAction()
 			}
 		}
+		Spacer(modifier = Modifier.padding(bottom = 24.dp))
 	}
-	AndroidCalledConfirm(
-		show = confirmForget,
-		header = stringResource(R.string.remove_key_confirm_title),
-		text = stringResource(R.string.remove_key_confirm_text),
-		back = { confirmForget = false },
-		forward = { navigator.navigate(Action.REMOVE_KEY) },
-		backText = stringResource(R.string.generic_cancel),
-		forwardText = stringResource(R.string.remove_key_confirm_cta)
-	)
-	AndroidCalledConfirm(
-		show = confirmExport,
-		header = stringResource(R.string.export_private_key_confirm_title),
-		text = stringResource(R.string.export_private_key_confirm_text),
-		back = { confirmExport = false },
-		forward = {
-			confirmExport = false
-			navigator.navigate(
-				LocalNavRequest.ShowExportPrivateKey(keyDetails!!.pubkey)
-			)
-		},
-		backText = stringResource(R.string.generic_cancel),
-		forwardText = stringResource(R.string.export_private_key_confirm_cta)
-	)
+}
+
+
+@Composable
+private fun MenuItemForBottomSheet(
+	@DrawableRes iconId: Int,
+	label: String,
+	tint: Color? = null,
+	onclick: () -> Unit
+) {
+	Row(
+		modifier = Modifier
+            .padding(vertical = 8.dp)
+            .clickable(onClick = onclick)
+            .fillMaxWidth(),
+		verticalAlignment = Alignment.CenterVertically,
+	) {
+		Icon(
+			painter = painterResource(id = iconId),
+			contentDescription = null,
+			modifier = Modifier
+				.size(32.dp),
+			tint = tint ?: MaterialTheme.colors.primary,
+		)
+		Spacer(modifier = Modifier.padding(end = 24.dp))
+		Text(
+			text = label,
+			color = tint ?: MaterialTheme.colors.primary,
+			style = TypefaceNew.TitleS,
+		)
+	}
+}
+
+
+private enum class KeyDetailsMenuState {
+	GENERAL, DELETE_CONFIRM, PRIVATE_KEY_CONFIRM
 }
 
 
 @Preview(
-	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
 )
 @Preview(
-	name = "dark", group = "themes",
+	name = "dark", group = "general",
 	uiMode = Configuration.UI_MODE_NIGHT_YES,
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewKeyDetailsMenuAction() {
+private fun PreviewKeyDetailsGeneralMenu() {
 	SignerNewTheme {
 		KeyDetailsMenuAction(
 			EmptyNavigator(),
 			null
+		)
+	}
+}
+
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewKeyDetailsDeleteConfirmAction() {
+	SignerNewTheme {
+		KeyDetailsDeleteConfirmMenu(
+			EmptyNavigator(), remember {
+				mutableStateOf(KeyDetailsMenuState.DELETE_CONFIRM)
+			}
 		)
 	}
 }
