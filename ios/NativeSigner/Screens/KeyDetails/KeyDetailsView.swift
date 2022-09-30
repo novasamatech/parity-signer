@@ -26,6 +26,7 @@ struct KeyDetailsView: View {
     private let actionModel: KeyDetailsActionModel
     private let forgetKeyActionHandler: ForgetKeySetAction
     private let exportPrivateKeyService: PrivateKeyQRCodeService
+    private let resetWarningAction: ResetConnectivtyWarningsAction
 
     init(
         navigation: NavigationCoordinator,
@@ -34,6 +35,7 @@ struct KeyDetailsView: View {
         viewModel: KeyDetailsViewModel,
         actionModel: KeyDetailsActionModel,
         exportPrivateKeyService: PrivateKeyQRCodeService,
+        resetWarningAction: ResetConnectivtyWarningsAction,
         alertClosure: (() -> Void)? = nil
     ) {
         self.navigation = navigation
@@ -42,6 +44,7 @@ struct KeyDetailsView: View {
         self.viewModel = viewModel
         self.actionModel = actionModel
         self.exportPrivateKeyService = exportPrivateKeyService
+        self.resetWarningAction = resetWarningAction
         self.alertClosure = alertClosure
     }
 
@@ -113,7 +116,7 @@ struct KeyDetailsView: View {
         .fullScreenCover(
             isPresented: $isShowingActionSheet,
             onDismiss: {
-                if shouldPresentRemoveConfirmationModal == true {
+                if shouldPresentRemoveConfirmationModal {
                     shouldPresentRemoveConfirmationModal.toggle()
                     isShowingRemoveConfirmation.toggle()
                 }
@@ -157,18 +160,39 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
-        .alert(
-            data.isConnectivityOn ? Localizable.Connectivity.Label.title.string : Localizable.PastConnectivity
-                .Label.title.string,
+        .fullScreenCover(
             isPresented: $isPresentingConnectivityAlert,
-            actions: {
-                Button(Localizable.Connectivity.Action.ok.string) { isPresentingConnectivityAlert.toggle() }
-            },
-            message: {
-                data.isConnectivityOn ? Localizable.Connectivity.Label.content.text : Localizable.PastConnectivity
-                    .Label.content.text
+            onDismiss: checkForActionsPresentation
+        ) {
+            ErrorBottomModal(
+                viewModel: data.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
+                    continueAction: {
+                        resetWarningAction.resetConnectivityWarnings()
+                        shouldPresentBackupModal.toggle()
+                    }()
+                ),
+                isShowingBottomAlert: $isPresentingConnectivityAlert
+            )
+            .clearModalBackground()
+        }
+    }
+
+    func checkForActionsPresentation() {
+        if shouldPresentRemoveConfirmationModal {
+            shouldPresentRemoveConfirmationModal.toggle()
+            isShowingRemoveConfirmation.toggle()
+        }
+        if shouldPresentBackupModal {
+            shouldPresentBackupModal.toggle()
+            if data.alert {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    isPresentingConnectivityAlert.toggle()
+                }
+            } else {
+                KeyDetailsView.backupModalViewModel = exportPrivateKeyService.backupViewModel()
+                isShowingBackupModal.toggle()
             }
-        )
+        }
     }
 }
 
@@ -311,7 +335,8 @@ struct KeyDetailsView_Previews: PreviewProvider {
                 exportPrivateKeyService: PrivateKeyQRCodeService(
                     navigation: NavigationCoordinator(),
                     keys: PreviewData.mkeys
-                )
+                ),
+                resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
             )
         }
         .preferredColorScheme(.dark)
