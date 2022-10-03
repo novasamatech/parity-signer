@@ -12,7 +12,7 @@ struct KeyDetailsActionsModal: View {
     @Binding var isShowingActionSheet: Bool
     @Binding var shouldPresentRemoveConfirmationModal: Bool
     @Binding var shouldPresentBackupModal: Bool
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         FullScreenRoundedModal(

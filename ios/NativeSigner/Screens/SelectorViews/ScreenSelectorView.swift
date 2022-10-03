@@ -8,15 +8,14 @@
 import SwiftUI
 
 struct ScreenSelectorView: View {
-    @ObservedObject var data: SignerDataModel
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject var navigation: NavigationCoordinator
     private let seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+    private let databaseMediator: DatabaseMediating = DatabaseMediator()
+
     var body: some View {
         ScreenSelector(
-            data: data,
-            navigation: navigation,
             screenData: navigation.actionResult.screenData,
-            alert: data.alert,
             navigationRequest: { navigationRequest in
                 navigation.perform(navigation: navigationRequest)
             },
@@ -24,7 +23,7 @@ struct ScreenSelectorView: View {
             doJailbreak: data.jailbreak,
             pathCheck: { seed, path, network in
                 substratePathCheck(
-                    seedName: seed, path: path, network: network, dbname: data.dbName
+                    seedName: seed, path: path, network: network, dbname: databaseMediator.databaseName
                 )
             },
             createAddress: { path, seedName in data.createAddress(path: path, seedName: seedName) },

@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct AlertSelectorView: View {
-    @ObservedObject var data: SignerDataModel
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         AlertSelector(
             alertData: navigation.actionResult.alertData,
-            isConnectivityOn: data.isConnectivityOn,
+            isConnectivityOn: connectivityMediator.isConnectivityOn,
             resetAlert: data.resetAlert,
             navigationRequest: { navigationRequest in
                 navigation.perform(navigation: navigationRequest)

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HistoryScreen: View {
-    @EnvironmentObject var data: SignerDataModel
+    @EnvironmentObject private var data: SignerDataModel
     let content: MLog
     let navigationRequest: NavigationRequest
     var body: some View {

@@ -28,20 +28,17 @@ struct KeyDetailsPublicKeyView: View {
     @State private var shouldPresentExportKeysModal = false
     @State private var shouldPresentRemoveConfirmationModal = false
 
-    @ObservedObject private var navigation: NavigationCoordinator
-    @ObservedObject private var data: SignerDataModel
+    @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+    @EnvironmentObject private var data: SignerDataModel
 
     init(
-        navigation: NavigationCoordinator,
-        data: SignerDataModel,
-        forgetKeyActionHandler: ForgetSingleKeyAction,
+        forgetKeyActionHandler: ForgetSingleKeyAction = ForgetSingleKeyAction(),
         viewModel: KeyDetailsPublicKeyViewModel,
         actionModel: KeyDetailsPublicKeyActionModel,
         exportPrivateKeyService: ExportPrivateKeyService,
         resetWarningAction: ResetConnectivtyWarningsAction
     ) {
-        self.navigation = navigation
-        self.data = data
         self.forgetKeyActionHandler = forgetKeyActionHandler
         self.viewModel = viewModel
         self.actionModel = actionModel
@@ -53,7 +50,6 @@ struct KeyDetailsPublicKeyView: View {
         VStack(spacing: 0) {
             // Navigation bar
             NavigationBarView(
-                navigation: navigation,
                 viewModel: .init(
                     title: Localizable.PublicKeyDetails.Label.title.string,
                     subtitle: viewModel.isRootKey ? nil : Localizable.PublicKeyDetails.Label.subtitle.string,
@@ -113,8 +109,7 @@ struct KeyDetailsPublicKeyView: View {
             PublicKeyActionsModal(
                 shouldPresentExportKeysWarningModal: $shouldPresentExportKeysWarningModal,
                 isShowingActionSheet: $isShowingActionSheet,
-                shouldPresentRemoveConfirmationModal: $shouldPresentRemoveConfirmationModal,
-                navigation: navigation
+                shouldPresentRemoveConfirmationModal: $shouldPresentRemoveConfirmationModal
             )
             .clearModalBackground()
         }
@@ -147,7 +142,6 @@ struct KeyDetailsPublicKeyView: View {
         ) {
             ExportPrivateKeyModal(
                 isPresentingExportKeysModal: $isPresentingExportKeysModal,
-                navigation: navigation,
                 viewModel: KeyDetailsPublicKeyView.exportPrivateKeyViewModel
             )
             .clearModalBackground()
@@ -170,7 +164,7 @@ struct KeyDetailsPublicKeyView: View {
             onDismiss: checkForActionsPresentation
         ) {
             ErrorBottomModal(
-                viewModel: data.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
+                viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
                     continueAction: {
                         resetWarningAction.resetConnectivityWarnings()
                         shouldPresentExportKeysWarningModal.toggle()
@@ -204,9 +198,6 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
         HStack {
             VStack {
                 KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
-                    data: SignerDataModel(navigation: NavigationCoordinator()),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
                     exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
@@ -215,9 +206,6 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
             }
             VStack {
                 KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
-                    data: SignerDataModel(navigation: NavigationCoordinator()),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
                     exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
@@ -226,9 +214,6 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
             }
             VStack {
                 KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
-                    data: SignerDataModel(navigation: NavigationCoordinator()),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
                     exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
@@ -237,9 +222,6 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
             }
             VStack {
                 KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
-                    data: SignerDataModel(navigation: NavigationCoordinator()),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
                     exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
@@ -249,5 +231,7 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
         }
         .previewLayout(.sizeThatFits)
         .preferredColorScheme(.dark)
+        .environmentObject(NavigationCoordinator())
+        .environmentObject(ConnectivityMediator())
     }
 }

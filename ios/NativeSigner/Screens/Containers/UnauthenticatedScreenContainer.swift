@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct UnauthenticatedScreenContainer: View {
-    @ObservedObject var data: SignerDataModel
+    @EnvironmentObject private var data: SignerDataModel
     private let seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
 
     var body: some View {
