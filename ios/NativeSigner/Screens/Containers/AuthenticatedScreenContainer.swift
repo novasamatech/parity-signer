@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct AuthenticatedScreenContainer: View {
-    @ObservedObject var data: SignerDataModel
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+    @EnvironmentObject private var navigation: NavigationCoordinator
 
     @StateObject var snackBarPresentation = ServiceLocator.bottomSnackbarPresentation
     @GestureState private var dragOffset = CGSize.zero
@@ -17,14 +18,14 @@ struct AuthenticatedScreenContainer: View {
     var body: some View {
         VStack(spacing: 0) {
             if !navigation.shouldSkipInjectedViews {
-                HeaderViewContainer(data: data, navigation: navigation)
+                HeaderViewContainer()
             }
             ZStack {
                 VStack(spacing: 0) {
-                    ScreenSelectorView(data: data, navigation: navigation)
+                    ScreenSelectorView()
                 }
-                ModalSelectorView(data: data, navigation: navigation)
-                AlertSelectorView(data: data, navigation: navigation)
+                ModalSelectorView()
+                AlertSelectorView()
             }
             .gesture(
                 DragGesture().updating($dragOffset, body: { value, _, _ in
@@ -35,7 +36,6 @@ struct AuthenticatedScreenContainer: View {
             )
             if navigation.actionResult.footer {
                 TabBarView(
-                    navigation: navigation,
                     selectedTab: $navigation.selectedTab
                 )
             }
@@ -48,7 +48,6 @@ struct AuthenticatedScreenContainer: View {
             }
         )
         .environmentObject(snackBarPresentation)
-        .alert(Localizable.navigationError.text, isPresented: $data.parsingAlert, actions: {})
         .bottomSnackbar(snackBarPresentation.viewModel, isPresented: $snackBarPresentation.isSnackbarPresented)
     }
 }

@@ -13,18 +13,16 @@ struct PublicKeyActionsModal: View {
     @Binding private var shouldPresentExportKeysWarningModal: Bool
     @Binding private var isShowingActionSheet: Bool
     @Binding private var shouldPresentRemoveConfirmationModal: Bool
-    @ObservedObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var navigation: NavigationCoordinator
 
     init(
         shouldPresentExportKeysWarningModal: Binding<Bool> = Binding<Bool>.constant(false),
         isShowingActionSheet: Binding<Bool> = Binding<Bool>.constant(false),
-        shouldPresentRemoveConfirmationModal: Binding<Bool> = Binding<Bool>.constant(false),
-        navigation: NavigationCoordinator
+        shouldPresentRemoveConfirmationModal: Binding<Bool> = Binding<Bool>.constant(false)
     ) {
         _shouldPresentExportKeysWarningModal = shouldPresentExportKeysWarningModal
         _isShowingActionSheet = isShowingActionSheet
         _shouldPresentRemoveConfirmationModal = shouldPresentRemoveConfirmationModal
-        self.navigation = navigation
     }
 
     var body: some View {
@@ -96,15 +94,13 @@ struct PublicKeyActionsModal: View {
 struct PublicKeyActionsModal_Previews: PreviewProvider {
     static var previews: some View {
         PublicKeyActionsModal(
-            isShowingActionSheet: Binding<Bool>.constant(true),
-            navigation: NavigationCoordinator()
+            isShowingActionSheet: Binding<Bool>.constant(true)
         )
         .preferredColorScheme(.dark)
         .previewLayout(.sizeThatFits)
         VStack {
             PublicKeyActionsModal(
-                isShowingActionSheet: Binding<Bool>.constant(true),
-                navigation: NavigationCoordinator()
+                isShowingActionSheet: Binding<Bool>.constant(true)
             )
             .preferredColorScheme(.light)
             .previewLayout(.sizeThatFits)
@@ -112,5 +108,6 @@ struct PublicKeyActionsModal_Previews: PreviewProvider {
         .background(.black)
         .preferredColorScheme(.light)
         .previewLayout(.sizeThatFits)
+        .environmentObject(NavigationCoordinator())
     }
 }

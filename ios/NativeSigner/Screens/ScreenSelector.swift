@@ -8,10 +8,9 @@
 import SwiftUI
 
 struct ScreenSelector: View {
-    @ObservedObject var data: SignerDataModel
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject var navigation: NavigationCoordinator
     let screenData: ScreenData
-    let alert: Bool
     let navigationRequest: NavigationRequest
     let getSeed: (String) -> String
     let doJailbreak: () -> Void
@@ -32,11 +31,9 @@ struct ScreenSelector: View {
             )
         case let .keys(value):
             KeyDetailsView(
-                navigation: navigation,
-                data: data,
-                forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
+                forgetKeyActionHandler: ForgetKeySetAction(),
                 viewModel: KeyDetailsViewModel(value),
-                actionModel: KeyDetailsActionModel(value, alert: alert, alertShow: alertShow),
+                actionModel: KeyDetailsActionModel(value, alert: data.alert, alertShow: alertShow),
                 exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value),
                 resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
             )
@@ -61,14 +58,11 @@ struct ScreenSelector: View {
             )
         case let .seedSelector(value):
             KeySetList(
-                navigation: navigation,
                 viewModel: KeySetListViewModelBuilder().build(for: value)
             )
         case let .keyDetails(value):
             KeyDetailsPublicKeyView(
-                navigation: navigation,
-                data: data,
-                forgetKeyActionHandler: ForgetSingleKeyAction(navigation: navigation),
+                forgetKeyActionHandler: ForgetSingleKeyAction(),
                 viewModel: KeyDetailsPublicKeyViewModel(value),
                 actionModel: KeyDetailsPublicKeyActionModel(value),
                 exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value),

@@ -15,8 +15,9 @@ struct KeyDetailsView: View {
     @State private var isShowingBackupModal: Bool = false
     @State private var isPresentingConnectivityAlert = false
 
-    @ObservedObject private var navigation: NavigationCoordinator
-    @ObservedObject private var data: SignerDataModel
+    @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+    @EnvironmentObject private var data: SignerDataModel
 
     // This view is recreated few times because of Rust navigation, for now we need to store modal view model in static
     // property because it can't be created earlier as it would trigger passcode request on the device
@@ -29,8 +30,6 @@ struct KeyDetailsView: View {
     private let resetWarningAction: ResetConnectivtyWarningsAction
 
     init(
-        navigation: NavigationCoordinator,
-        data: SignerDataModel,
         forgetKeyActionHandler: ForgetKeySetAction,
         viewModel: KeyDetailsViewModel,
         actionModel: KeyDetailsActionModel,
@@ -38,8 +37,6 @@ struct KeyDetailsView: View {
         resetWarningAction: ResetConnectivtyWarningsAction,
         alertClosure: (() -> Void)? = nil
     ) {
-        self.navigation = navigation
-        self.data = data
         self.forgetKeyActionHandler = forgetKeyActionHandler
         self.viewModel = viewModel
         self.actionModel = actionModel
@@ -53,7 +50,6 @@ struct KeyDetailsView: View {
             VStack(spacing: 0) {
                 // Navigation bar
                 NavigationBarView(
-                    navigation: navigation,
                     viewModel: .init(
                         leftButton: .arrow,
                         rightButton: .more
@@ -136,8 +132,7 @@ struct KeyDetailsView: View {
             KeyDetailsActionsModal(
                 isShowingActionSheet: $isShowingActionSheet,
                 shouldPresentRemoveConfirmationModal: $shouldPresentRemoveConfirmationModal,
-                shouldPresentBackupModal: $shouldPresentBackupModal,
-                navigation: navigation
+                shouldPresentBackupModal: $shouldPresentBackupModal
             )
             .clearModalBackground()
         }
@@ -165,7 +160,7 @@ struct KeyDetailsView: View {
             onDismiss: checkForActionsPresentation
         ) {
             ErrorBottomModal(
-                viewModel: data.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
+                viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
                     continueAction: {
                         resetWarningAction.resetConnectivityWarnings()
                         shouldPresentBackupModal.toggle()
@@ -237,9 +232,7 @@ struct KeyDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
             KeyDetailsView(
-                navigation: NavigationCoordinator(),
-                data: SignerDataModel(navigation: NavigationCoordinator()),
-                forgetKeyActionHandler: .init(navigation: NavigationCoordinator()),
+                forgetKeyActionHandler: .init(),
                 viewModel: .init(
                     keySummary: KeySummaryViewModel(
                         keyName: "Parity",
@@ -341,5 +334,6 @@ struct KeyDetailsView_Previews: PreviewProvider {
         }
         .preferredColorScheme(.dark)
         .previewLayout(.sizeThatFits)
+        .environmentObject(NavigationCoordinator())
     }
 }

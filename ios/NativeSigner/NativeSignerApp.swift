@@ -9,16 +9,19 @@ import SwiftUI
 
 @main
 struct NativeSignerApp: App {
-    let navigation = NavigationCoordinator()
+    @StateObject var connectivityMediator = ConnectivityMediator()
+    @StateObject var navigation = NavigationCoordinator()
 
     var body: some Scene {
         WindowGroup {
-            MainScreenContainer(
-                data: SignerDataModel(navigation: navigation),
-                navigation: navigation
-            )
+            MainScreenContainer(data: SignerDataModel(
+                navigation: navigation,
+                connectivityMediator: connectivityMediator
+            ))
             .font(Fontstyle.body1.base)
             .background(Asset.bg100.swiftUIColor)
+            .environmentObject(navigation)
+            .environmentObject(connectivityMediator)
         }
     }
 }

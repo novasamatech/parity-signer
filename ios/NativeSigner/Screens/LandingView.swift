@@ -11,7 +11,7 @@ struct LandingView: View {
     @State private var tacAccept = false
     @State private var ppAccept = false
     @State private var accept = false
-    @ObservedObject var data: SignerDataModel
+    @EnvironmentObject private var data: SignerDataModel
     var body: some View {
         VStack {
             DocumentModal()
