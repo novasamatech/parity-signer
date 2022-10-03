@@ -37,7 +37,8 @@ struct ScreenSelector: View {
                 forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
                 viewModel: KeyDetailsViewModel(value),
                 actionModel: KeyDetailsActionModel(value, alert: alert, alertShow: alertShow),
-                exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value)
+                exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value),
+                resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
             )
         case let .settings(value):
             SettingsScreen(
@@ -70,7 +71,8 @@ struct ScreenSelector: View {
                 forgetKeyActionHandler: ForgetSingleKeyAction(navigation: navigation),
                 viewModel: KeyDetailsPublicKeyViewModel(value),
                 actionModel: KeyDetailsPublicKeyActionModel(value),
-                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value)
+                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value),
+                resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
             )
         case let .newSeed(value):
             NewSeedScreen(
