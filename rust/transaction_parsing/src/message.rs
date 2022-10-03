@@ -27,8 +27,8 @@ where
         multisigner_msg_genesis_encryption(data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
-    let to_sign = str::from_utf8(&message_vec)?.to_owned();
-    let message = strip_bytes_tag(&to_sign)?;
+    let message = str::from_utf8(&message_vec)?.to_owned();
+    let display_msg = strip_bytes_tag(&message)?;
 
     // initialize index and indent
     let mut index: u32 = 0;
@@ -40,10 +40,10 @@ where
             match try_get_address_details(&db_path, &address_key)? {
                 Some(address_details) => {
                     if address_details.network_id.contains(&network_specs_key) {
-                        let message_card =
-                            Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
+                        let message_card = Card::ParserCard(&ParserCard::Text(display_msg))
+                            .card(&mut index, indent);
                         let sign = TrDbColdSign::generate(
-                            SignContent::Message(to_sign),
+                            SignContent::Message(message),
                             &network_specs.name,
                             &address_details.path,
                             address_details.has_pwd,
