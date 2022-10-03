@@ -137,14 +137,29 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
             sp_core::ed25519::Pair::verify(&signature, &message, &public)
         }
         "5301" => {
-            assert!(
-                signature_hex.starts_with("01"),
-                "Signature in sr25519 should start with `01`."
-            );
-            let into_signature: [u8; 64] = hex::decode(&signature_hex[2..])
-                .unwrap()
-                .try_into()
-                .unwrap();
+            println!("Signature sr25519 {}.", signature_hex);
+            let into_signature: [u8; 64] = match &transaction_hex[4..6] {
+                "03" => hex::decode(&signature_hex).unwrap().try_into().unwrap(),
+                _ => {
+                    assert!(
+                        signature_hex.starts_with("01"),
+                        "Signature in sr25519 should start with `01`."
+                    );
+                    hex::decode(&signature_hex[2..])
+                        .unwrap()
+                        .try_into()
+                        .unwrap()
+                }
+            };
+
+            // assert!(
+            //     signature_hex.starts_with("01"),
+            //     "Signature in sr25519 should start with `01`."
+            // );
+            // let into_signature: [u8; 64] = hex::decode(&signature_hex[2..])
+            //     .unwrap()
+            //     .try_into()
+            //     .unwrap();
             let signature = sp_core::sr25519::Signature::from_raw(into_signature);
             let into_public: [u8; 32] = hex::decode(&transaction_hex[6..70])
                 .unwrap()
@@ -5601,9 +5616,10 @@ fn flow_test_1() {
 
     // let's scan a text message
     do_action(Action::NavbarScan, "", "").unwrap().unwrap();
-    let message_hex = "5301033efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34f5064c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2ee143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-    let card_text = "4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e".to_string();
-    let action = do_action(Action::TransactionFetched, message_hex, "")
+    let card_text = hex::encode(b"uuid-abcd");
+    let sign_msg = hex::encode(b"<Bytes>uuid-abcd</Bytes>");
+    let message_hex = format!("5301033efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", sign_msg);
+    let action = do_action(Action::TransactionFetched, &message_hex, "")
         .unwrap()
         .unwrap();
     let expected_action = ActionResult {
@@ -5679,7 +5695,7 @@ fn flow_test_1() {
     */
 
     assert!(
-        signature_is_good(message_hex, &signature_hex),
+        signature_is_good(&message_hex, &signature_hex),
         "Produced bad signature: \n{}",
         signature_hex
     );
@@ -5702,7 +5718,7 @@ fn flow_test_1() {
                         timestamp: String::new(),
                         events: vec![Event::MessageSigned {
                             sign_message_display: SignMessageDisplay {
-                                message: String::from_utf8(hex::decode(&card_text).unwrap())
+                                message: String::from_utf8(hex::decode(&sign_msg).unwrap())
                                     .unwrap(),
                                 network_name: "westend".to_string(),
                                 signed_by: VerifierValue::Standard {
@@ -5748,7 +5764,7 @@ fn flow_test_1() {
                 events: vec![MEventMaybeDecoded {
                     event: Event::MessageSigned {
                         sign_message_display: SignMessageDisplay {
-                            message: String::from_utf8(hex::decode(&card_text).unwrap()).unwrap(),
+                            message: String::from_utf8(hex::decode(&sign_msg).unwrap()).unwrap(),
                             network_name: "westend".to_string(),
                             signed_by: VerifierValue::Standard {
                                 m: MultiSigner::Sr25519(
@@ -6307,9 +6323,7 @@ fn flow_test_1() {
                     message: Some(vec![TransactionCard {
                         index: 0,
                         indent: 0,
-                        card: Card::TextCard {
-                            f: card_text.clone(),
-                        },
+                        card: Card::TextCard { f: card_text },
                     }]),
                     ..Default::default()
                 },
@@ -6442,7 +6456,7 @@ fn flow_test_1() {
     };
     let network_genesis_hash =
         H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
-    let message = String::from_utf8(hex::decode(&card_text).unwrap()).unwrap();
+    let message = String::from_utf8(hex::decode(&sign_msg).unwrap()).unwrap();
     let expected_action = ActionResult {
         screen_label: String::new(),
         back: false,
@@ -6685,7 +6699,7 @@ fn flow_test_1() {
                         timestamp: String::new(),
                         events: vec![Event::MessageSigned {
                             sign_message_display: SignMessageDisplay {
-                                message: String::from_utf8_lossy(&hex::decode(&card_text).unwrap())
+                                message: String::from_utf8_lossy(&hex::decode(&sign_msg).unwrap())
                                     .to_string(),
                                 network_name: "westend".to_string(),
                                 signed_by: verifier_value,

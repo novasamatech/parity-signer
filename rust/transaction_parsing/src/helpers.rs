@@ -168,6 +168,7 @@ pub fn multisigner_msg_genesis_encryption(
     data_hex: &str,
 ) -> Result<(MultiSigner, Vec<u8>, H256, Encryption)> {
     let data = unhex(data_hex)?;
+    println!("data: {:?}", data.get(3..35));
     let (multi_signer, data, encryption) = match &data_hex[2..4] {
         "00" => match data.get(3..35) {
             Some(a) => (
