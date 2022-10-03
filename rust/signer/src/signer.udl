@@ -294,6 +294,7 @@ dictionary MSeedKeyCard {
 dictionary MNetworkCard {
     string title;
     string logo;
+    string key;
 };
 
 dictionary MKeys {

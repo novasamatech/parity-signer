@@ -37,6 +37,7 @@ lazy_static! {
 /// No matter if here or beyond FFI
     pub static ref STATE: Mutex<State> = Mutex::new(
         State{
+            state: None,
             navstate: Navstate::new(),
             dbname: None,
             seed_names: Vec::new(),
@@ -78,18 +79,7 @@ pub fn init_navigation(dbname: &str, seed_names: Vec<String>) {
     let guard = STATE.lock();
     match guard {
         Ok(mut navstate) => {
-            (*navstate).dbname = Some(dbname.to_string());
-            (*navstate).seed_names = seed_names;
-            match db_handling::helpers::get_all_networks(dbname) {
-                Ok(a) => {
-                    for x in a.iter() {
-                        (*navstate)
-                            .networks
-                            .push(NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption));
-                    }
-                }
-                Err(e) => println!("No networks could be fetched: {:?}", e),
-            };
+            navstate.init_navigation(dbname, seed_names).unwrap();
         }
         Err(_) => {
             //TODO: maybe more grace here?
@@ -121,7 +111,7 @@ pub fn get_seeds() -> Result<MSeeds, Error> {
 }
 
 pub fn get_keys() -> Result<MKeys, Error> {
-    STATE.lock().map_err(|_| Error::StatePoisoned)?.get_keys()
+    todo!()
 }
 
 pub fn recover_seed_name(keyboard: bool, seed_name: &str) -> Result<MRecoverSeedName, Error> {

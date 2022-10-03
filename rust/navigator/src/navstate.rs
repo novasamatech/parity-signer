@@ -5,7 +5,7 @@ use db_handling::identities::get_multisigner_by_address;
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
     ActionResult, Address, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti,
-    MKeys, MLog, MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm,
+    MKeys, MKeysNew, MLog, MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm,
     MRecoverSeedName, MRecoverSeedPhrase, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings,
     MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, MVerifierDetails,
     ModalData, RightButton, ScreenData, ScreenNameType, ShieldAlert, TransactionType,
@@ -22,7 +22,7 @@ use crate::screens::{
     AddressState, AddressStateMulti, DeriveState, KeysState, RecoverSeedPhraseState, Screen,
     SpecialtyKeysState, SufficientCryptoState, TransactionState,
 };
-use db_handling::interface_signer::{get_all_seed_names_with_identicons, guess};
+use db_handling::interface_signer::{get_all_seed_names_with_identicons, guess, keys_by_seed_name};
 use definitions::{
     keyring::{AddressKey, NetworkSpecsKey},
     network_specs::Verifier,
@@ -38,6 +38,119 @@ pub struct State {
     pub dbname: Option<String>,
     pub seed_names: Vec<String>,
     pub networks: Vec<NetworkSpecsKey>,
+    pub state: Option<NewNavState>,
+}
+
+impl State {
+    pub fn new() -> Self {
+        Self {
+            navstate: Navstate::new(),
+            dbname: None,
+            seed_names: vec![],
+            networks: vec![],
+            state: None,
+        }
+    }
+
+    pub fn init_navigation(&mut self, dbname: &str, seed_names: Vec<String>) -> Result<()> {
+        self.dbname = Some(dbname.to_string());
+        self.seed_names = seed_names;
+        for network in db_handling::helpers::get_all_networks(dbname)? {
+            self.networks.push(NetworkSpecsKey::from_parts(
+                &network.genesis_hash,
+                &network.encryption,
+            ));
+        }
+
+        Ok(())
+    }
+
+    pub fn recover_seed_phrase_start(&mut self, seed_name: &str) -> Result<MRecoverSeedPhrase> {
+        let addresses = db_handling::identities::get_addresses_by_seed_name(
+            self.dbname.as_ref().unwrap(),
+            seed_name,
+        )?;
+
+        if !addresses.is_empty() {
+            return Err(Error::SeedNameExists);
+        }
+
+        self.state = Some(NewNavState::recover_seed_phrase(seed_name));
+        self.current_m_recover_seed_phrase()
+    }
+
+    pub fn recover_seed_phrase_handle_text_entry(
+        &mut self,
+        entry: &str,
+    ) -> Result<MRecoverSeedPhrase> {
+        if let Some(NewNavState::RecoverSeedPhrase(ref mut recover_seed_phrase_state)) = self.state
+        {
+            recover_seed_phrase_state.text_entry(entry);
+            self.current_m_recover_seed_phrase()
+        } else {
+            Err(Error::WrongNewState)
+        }
+    }
+
+    pub fn recover_seed_phrase_handle_push_word(
+        &mut self,
+        word: &str,
+    ) -> Result<MRecoverSeedPhrase> {
+        if let Some(NewNavState::RecoverSeedPhrase(ref mut recover_seed_phrase_state)) = self.state
+        {
+            recover_seed_phrase_state.push_word(word);
+            self.current_m_recover_seed_phrase()
+        } else {
+            Err(Error::WrongNewState)
+        }
+    }
+
+    pub fn recover_seed_phrase_finish(&mut self, create_roots: bool) -> Result<()> {
+        if let Some(NewNavState::RecoverSeedPhrase(ref mut s)) = self.state {
+            db_handling::identities::try_create_seed(
+                &s.name(),
+                s.draft().try_finalize().as_ref().unwrap(),
+                create_roots,
+                self.dbname.as_ref().unwrap(),
+            )?;
+            Ok(())
+        } else {
+            Err(Error::WrongNewState)
+        }
+    }
+
+    fn current_m_recover_seed_phrase(&mut self) -> Result<MRecoverSeedPhrase> {
+        if let Some(NewNavState::RecoverSeedPhrase(ref recover_seed_phrase_state)) = self.state {
+            let draft = recover_seed_phrase_state.draft();
+            let user_input = draft.user_input();
+            let guess_set = guess(user_input);
+            let ready_seed = draft.try_finalize();
+            let mut draft = draft.draft();
+
+            let f = MRecoverSeedPhrase {
+                keyboard: false,
+                seed_name: recover_seed_phrase_state.name(),
+                user_input: user_input.to_string(),
+                guess_set: guess_set.iter().map(|s| s.to_string()).collect(),
+                draft: draft.clone(),
+                ready_seed,
+            };
+
+            draft.zeroize();
+
+            Ok(f)
+        } else {
+            Err(Error::WrongNewState)
+        }
+    }
+
+    pub fn derive_key_start(&mut self) {
+        self.state = Some(NewNavState::DeriveState(DeriveState {
+            entered_info: todo!(),
+            keys_state: todo!(),
+            collision: todo!(),
+        }));
+    }
 }
 
 ///Navigation state is completely defined here
@@ -46,6 +159,18 @@ pub struct Navstate {
     pub screen: Screen,
     pub modal: Modal,
     pub alert: Alert,
+}
+
+#[derive(Clone, Debug)]
+pub enum NewNavState {
+    RecoverSeedPhrase(RecoverSeedPhraseState),
+    DeriveState(DeriveState),
+}
+
+impl NewNavState {
+    fn recover_seed_phrase(seed_name: &str) -> Self {
+        Self::RecoverSeedPhrase(RecoverSeedPhraseState::new(seed_name))
+    }
 }
 
 impl Navstate {
@@ -1527,7 +1652,11 @@ impl State {
                 } else {
                     String::new()
                 };
-                let network = MNetworkCard { title, logo };
+                let network = MNetworkCard {
+                    title,
+                    logo,
+                    key: hex::encode(keys_state.network_specs_key().key()),
+                };
                 let f = MKeys {
                     set,
                     root,
@@ -1829,8 +1958,9 @@ impl State {
         Ok(f)
     }
 
-    pub fn get_keys(&mut self) -> Result<MKeys> {
-        todo!()
+    pub fn get_keys(&mut self, seed_name: &str) -> Result<MKeysNew> {
+        let dbname = self.dbname.as_ref().ok_or(Error::DbNotInitialized)?;
+        Ok(keys_by_seed_name(dbname, seed_name)?)
     }
 
     pub fn recover_seed_name(&mut self, keyboard: bool, seed_name: &str) -> MRecoverSeedName {

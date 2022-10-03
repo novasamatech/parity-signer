@@ -156,10 +156,23 @@ pub struct MKeysCard {
     pub secret_exposed: bool,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MKeysNew {
+    pub root: Option<MSeedKeyCard>,
+    pub set: Vec<MKeyAndNetworkCard>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MKeyAndNetworkCard {
+    pub key: MKeysCard,
+    pub network: MNetworkCard,
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MNetworkCard {
     pub title: String,
     pub logo: String,
+    pub key: String,
 }
 
 // TODO: This has to have a custom default.

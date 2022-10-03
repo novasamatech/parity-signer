@@ -19,4 +19,10 @@ pub enum Error {
 
     #[error("Key not found {0}")]
     KeyNotFound(String),
+
+    #[error("Seed name exists in db")]
+    SeedNameExists,
+
+    #[error("Wrong new state")]
+    WrongNewState,
 }

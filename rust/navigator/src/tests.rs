@@ -26,22 +26,27 @@ use definitions::{
     navigation::{
         ActionResult, Address, AlertData, Card, DerivationCheck, DerivationDestination,
         DerivationEntry, DerivationPack, FooterButton, History, MBackup, MDeriveKey,
-        MEnterPassword, MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog,
-        MLogDetails, MLogRight, MMMNetwork, MMNetwork, MManageMetadata, MManageNetworks,
-        MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup,
-        MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCCall, MSCContent,
-        MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion,
-        MSCNetworkInfo, MSeedKeyCard, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
-        MSignatureReady, MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier,
-        MVerifierDetails, ModalData, Network, NetworkSpecsToSend, RightButton, ScreenData,
-        ScreenNameType, SeedNameCard, TransactionCard, TransactionCardSet, TransactionType,
+        MEnterPassword, MEventMaybeDecoded, MKeyAndNetworkCard, MKeyDetails, MKeyDetailsMulti,
+        MKeys, MKeysCard, MKeysNew, MLog, MLogDetails, MLogRight, MMMNetwork, MMNetwork,
+        MManageMetadata, MManageNetworks, MMetadataRecord, MNetworkCard, MNetworkDetails,
+        MNetworkMenu, MNewSeed, MNewSeedBackup, MPasswordConfirm, MRawKey, MRecoverSeedName,
+        MRecoverSeedPhrase, MSCCall, MSCContent, MSCCurrency, MSCEnumVariantName, MSCEraMortal,
+        MSCFieldName, MSCId, MSCNameVersion, MSCNetworkInfo, MSeedKeyCard, MSeedMenu, MSeeds,
+        MSettings, MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction,
+        MTypesInfo, MVerifier, MVerifierDetails, ModalData, Network, NetworkSpecsToSend,
+        RightButton, ScreenData, ScreenNameType, SeedNameCard, TransactionCard, TransactionCardSet,
+        TransactionType,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
 
 use pretty_assertions::assert_eq;
 
-use crate::{do_action, init_navigation, update_seed_names, Action};
+use crate::{
+    do_action, init_navigation,
+    navstate::{Navstate, State},
+    update_seed_names, Action,
+};
 
 const ALICE: [u8; 32] = [
     212, 53, 147, 199, 21, 253, 211, 28, 97, 20, 26, 189, 4, 169, 159, 214, 130, 44, 133, 88, 133,
@@ -291,6 +296,260 @@ fn erase_public_keys(m: &mut ScreenData) {
             }
         }
     }
+}
+
+#[test]
+fn recover_seed_phrase() {
+    let dbname = "for_tests/recover_seed_phrase";
+    populate_cold_nav_test(dbname).unwrap();
+    init_db(dbname, verifier_alice_sr25519()).unwrap();
+
+    let mut state = State::new();
+
+    state.init_navigation(dbname, vec![]).unwrap();
+
+    let model = state.recover_seed_phrase_start("Alice").unwrap();
+    let expected_model = MRecoverSeedPhrase {
+        keyboard: false,
+        seed_name: "Alice".to_string(),
+        user_input: String::new(),
+        guess_set: vec![
+            "abandon".to_string(),
+            "ability".to_string(),
+            "able".to_string(),
+            "about".to_string(),
+            "above".to_string(),
+            "absent".to_string(),
+            "absorb".to_string(),
+            "abstract".to_string(),
+        ],
+        draft: vec![],
+        ready_seed: None,
+    };
+    assert_eq!(model, expected_model);
+
+    let model = state
+        .recover_seed_phrase_handle_text_entry(" botto")
+        .unwrap();
+
+    let expected_model = MRecoverSeedPhrase {
+        keyboard: false,
+        seed_name: "Alice".to_string(),
+        user_input: "botto".to_string(),
+        guess_set: vec!["bottom".to_string()],
+        draft: vec![],
+        ready_seed: None,
+    };
+
+    assert_eq!(model, expected_model);
+
+    let model = state
+        .recover_seed_phrase_handle_text_entry("botto ")
+        .unwrap();
+
+    let mut expected_model = MRecoverSeedPhrase {
+        keyboard: false,
+        seed_name: "Alice".to_string(),
+        user_input: String::new(),
+        guess_set: vec![
+            "abandon".to_string(),
+            "ability".to_string(),
+            "able".to_string(),
+            "about".to_string(),
+            "above".to_string(),
+            "absent".to_string(),
+            "absorb".to_string(),
+            "abstract".to_string(),
+        ],
+        draft: vec!["bottom".to_string()],
+        ready_seed: None,
+    };
+
+    assert_eq!(model, expected_model);
+
+    let model = state
+        .recover_seed_phrase_handle_text_entry(" abstract ")
+        .unwrap();
+
+    expected_model.draft.push("abstract".to_string());
+
+    assert_eq!(model, expected_model);
+
+    let model = state.recover_seed_phrase_handle_text_entry("").unwrap();
+
+    expected_model.draft.pop();
+
+    assert_eq!(model, expected_model);
+
+    let _ = state.recover_seed_phrase_handle_text_entry(" d").unwrap();
+
+    let model = state
+        .recover_seed_phrase_handle_text_entry(" ddddd")
+        .unwrap();
+
+    expected_model.user_input = "d".to_string();
+    expected_model.guess_set = vec![
+        "dad".to_string(),
+        "damage".to_string(),
+        "damp".to_string(),
+        "dance".to_string(),
+        "danger".to_string(),
+        "daring".to_string(),
+        "dash".to_string(),
+        "daughter".to_string(),
+    ];
+
+    assert_eq!(model, expected_model);
+
+    let model = state
+        .recover_seed_phrase_handle_text_entry(" ddddd ")
+        .unwrap();
+
+    assert_eq!(model, expected_model);
+
+    state
+        .recover_seed_phrase_handle_text_entry(" driv ")
+        .unwrap();
+
+    state
+        .recover_seed_phrase_handle_text_entry(" obe ")
+        .unwrap();
+
+    state
+        .recover_seed_phrase_handle_text_entry(" lake ")
+        .unwrap();
+
+    state
+        .recover_seed_phrase_handle_text_entry(" curt ")
+        .unwrap();
+
+    let model = state.recover_seed_phrase_handle_text_entry(" som").unwrap();
+
+    expected_model.user_input = "som".to_string();
+    expected_model.guess_set = vec!["someone".to_string()];
+    expected_model.draft = vec![
+        "bottom".to_string(),
+        "drive".to_string(),
+        "obey".to_string(),
+        "lake".to_string(),
+        "curtain".to_string(),
+    ];
+
+    assert_eq!(model, expected_model);
+
+    let model = state.recover_seed_phrase_handle_text_entry(" smo").unwrap();
+
+    expected_model.user_input = "smo".to_string();
+    expected_model.guess_set = vec!["smoke".to_string(), "smooth".to_string()];
+
+    assert_eq!(model, expected_model);
+
+    let model = state.recover_seed_phrase_handle_text_entry(" smo").unwrap();
+
+    assert_eq!(model, expected_model);
+
+    let default_guess_set = vec![
+        "abandon".to_string(),
+        "ability".to_string(),
+        "able".to_string(),
+        "about".to_string(),
+        "above".to_string(),
+        "absent".to_string(),
+        "absorb".to_string(),
+        "abstract".to_string(),
+    ];
+    let model = state.recover_seed_phrase_handle_push_word("smoke").unwrap();
+
+    expected_model.user_input = String::new();
+    expected_model.guess_set = default_guess_set.clone();
+    expected_model.draft.push("smoke".to_string());
+
+    assert_eq!(model, expected_model);
+
+    for entry in &[" bask ", " hold ", " race ", " lone ", " fit "] {
+        state.recover_seed_phrase_handle_text_entry(entry).unwrap();
+    }
+
+    let model = state
+        .recover_seed_phrase_handle_text_entry(" walk ")
+        .unwrap();
+    expected_model.draft.push("basket".to_string());
+    expected_model.draft.push("hold".to_string());
+    expected_model.draft.push("race".to_string());
+    expected_model.draft.push("lonely".to_string());
+    expected_model.draft.push("fit".to_string());
+    expected_model.draft.push("walk".to_string());
+
+    expected_model.ready_seed =
+        Some("bottom drive obey lake curtain smoke basket hold race lonely fit walk".to_string());
+
+    assert_eq!(model, expected_model);
+
+    state.recover_seed_phrase_finish(false).unwrap();
+
+    let keys = state.get_keys("Alice").unwrap();
+
+    let expected_keys = MKeysNew {
+        root: None,
+        set: vec![
+            MKeyAndNetworkCard {
+                key: MKeysCard {
+                    address_key:
+                        "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
+                            .to_string(),
+                    base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
+                    identicon: alice_sr_westend().to_vec(),
+                    has_pwd: false,
+                    path: "//westend".to_string(),
+                    swiped: false,
+                    multiselect: false,
+                    secret_exposed: false,
+                },
+                network: MNetworkCard {
+                    title: "Westend".to_string(),
+                    logo: "westend".to_string(),
+                },
+            },
+            MKeyAndNetworkCard {
+                key: MKeysCard {
+                    address_key:
+                        "0164a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
+                            .to_string(),
+                    base58: "ErGkNDDPmnaRZKxwe4VBLonyBJVmucqURFMatEJTwktsuTv".to_string(),
+
+                    identicon: alice_sr_kusama().to_vec(),
+                    has_pwd: false,
+                    path: "//kusama".to_string(),
+                    swiped: false,
+                    multiselect: false,
+                    secret_exposed: false,
+                },
+                network: MNetworkCard {
+                    title: "Kusama".to_string(),
+                    logo: "kusama".to_string(),
+                },
+            },
+            MKeyAndNetworkCard {
+                key: MKeysCard {
+                    address_key:
+                        "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
+                            .to_string(),
+                    base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
+                    identicon: alice_sr_polkadot().to_vec(),
+                    has_pwd: false,
+                    path: "//polkadot".to_string(),
+                    swiped: false,
+                    multiselect: false,
+                    secret_exposed: false,
+                },
+                network: MNetworkCard {
+                    title: "Polkadot".to_string(),
+                    logo: "polkadot".to_string(),
+                },
+            },
+        ],
+    };
+    assert_eq!(keys, expected_keys);
 }
 
 #[test]
@@ -3496,7 +3755,6 @@ fn flow_test_1() {
         action, expected_action,
         "ChangeNetwork on Keys screen. Expected Keys screen for Alice westend keys.",
     );
-
     do_action(Action::NavbarScan, "", "").unwrap().unwrap();
     let action = do_action(Action::TransactionFetched,"53ffde01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e141c2f2f416c6963653c2f2f416c6963652f77657374656e64582f2f416c6963652f7365637265742f2f7365637265740c2f2f300c2f2f31","").unwrap().unwrap();
     let mut expected_action = ActionResult {

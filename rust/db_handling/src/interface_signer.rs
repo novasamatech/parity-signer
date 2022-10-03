@@ -20,9 +20,10 @@ use definitions::{
     keyring::{AddressKey, NetworkSpecsKey, VerifierKey},
     navigation::{
         Address, DerivationCheck as NavDerivationCheck, DerivationDestination, DerivationEntry,
-        DerivationPack, MBackup, MDeriveKey, MKeyDetails, MKeysCard, MMMNetwork, MMNetwork,
-        MManageMetadata, MMetadataRecord, MNetworkDetails, MNetworkMenu, MNewSeedBackup, MRawKey,
-        MSCNetworkInfo, MSeedKeyCard, MTypesInfo, MVerifier, Network, SeedNameCard,
+        DerivationPack, MBackup, MDeriveKey, MKeyAndNetworkCard, MKeyDetails, MKeysCard, MKeysNew,
+        MMMNetwork, MMNetwork, MManageMetadata, MMetadataRecord, MNetworkCard, MNetworkDetails,
+        MNetworkMenu, MNewSeedBackup, MRawKey, MSCNetworkInfo, MSeedKeyCard, MTypesInfo, MVerifier,
+        Network, SeedNameCard,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier},
     qr_transfers::ContentLoadTypes,
@@ -175,6 +176,52 @@ where
             }
         })
         .collect())
+}
+
+pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<MKeysNew> {
+    let (root, derived): (Vec<_>, Vec<_>) = get_addresses_by_seed_name(&db_path, seed_name)?
+        .into_iter()
+        .partition(|(_, address)| address.is_root());
+
+    let root = root.get(0).map(|root| MSeedKeyCard {
+        seed_name: seed_name.to_string(),
+        identicon: make_identicon_from_multisigner(&root.0),
+        address_key: hex::encode(AddressKey::from_multisigner(&root.0).key()),
+        base58: print_multisigner_as_base58(&root.0, None),
+        swiped: false,
+        multiselect: false,
+        secret_exposed: root.1.secret_exposed,
+    });
+
+    let set: Result<_> = derived
+        .into_iter()
+        .map(|(multisigner, address_details)| -> Result<_> {
+            let network_specs = get_network_specs(&db_path, &address_details.network_id[0])?;
+            let identicon = make_identicon_from_multisigner(&multisigner);
+            let base58 =
+                print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
+            let address_key = hex::encode(AddressKey::from_multisigner(&multisigner).key());
+            let key = MKeysCard {
+                address_key,
+                base58,
+                identicon,
+                has_pwd: address_details.has_pwd,
+                path: address_details.path,
+                swiped: false,
+                multiselect: false,
+                secret_exposed: address_details.secret_exposed,
+            };
+            let network = MNetworkCard {
+                title: network_specs.title,
+                logo: network_specs.logo,
+                key: hex::encode(address_details.network_id[0].key()),
+            };
+
+            Ok(MKeyAndNetworkCard { key, network })
+        })
+        .collect();
+
+    Ok(MKeysNew { root, set: set? })
 }
 
 /// Return `Vec` with address-associated public data for all addresses from the
