@@ -21,7 +21,8 @@ protocol SeedsMediating: AnyObject {
     ///
     /// This should be turned to `private` in future refactors
     var seedNames: [String] { get set }
-    /// Sets weak dependency to parent due to current architecture limitation (we should not store this class in `SignerDataModel`)
+    /// Sets weak dependency to parent due to current architecture limitation (we should not store this class in
+    // `SignerDataModel`)
     /// - Parameter signerDataModel: reference to `SignerDataModel`
     func set(signerDataModel: SignerDataModel)
     /// Get all seed names from secure storage

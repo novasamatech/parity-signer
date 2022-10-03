@@ -14,7 +14,9 @@ import io.parity.signer.R
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.models.*
+import io.parity.signer.models.LocalNavRequest
+import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
@@ -36,18 +38,16 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 				modifier = Modifier.padding(20.dp)
 			) {
 				HeaderBar(line1 = "KEY MENU", line2 = "Select action")
-				if (FeatureFlags.isEnabled(FeatureOption.EXPORT_SECRET_KEY)) {
-					// Don't show `Export Private Key` if intermediate state is broken or when key is password protected
-					if (signerDataModel.lastOpenedKeyDetails?.address?.hasPwd == false) {
-						BigButton(
-							text = stringResource(R.string.menu_option_export_private_key),
-							isShaded = true,
-							isDangerous = false,
-							action = {
-								confirmExport = true
-							}
-						)
-					}
+				// Don't show `Export Private Key` if intermediate state is broken or when key is password protected
+				if (signerDataModel.lastOpenedKeyDetails?.address?.hasPwd == false) {
+					BigButton(
+						text = stringResource(R.string.menu_option_export_private_key),
+						isShaded = true,
+						isDangerous = false,
+						action = {
+							confirmExport = true
+						}
+					)
 				}
 				BigButton(
 					text = stringResource(R.string.menu_option_forget_delete_key),

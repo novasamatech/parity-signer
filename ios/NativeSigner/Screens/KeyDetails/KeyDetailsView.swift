@@ -18,12 +18,15 @@ struct KeyDetailsView: View {
     @ObservedObject private var navigation: NavigationCoordinator
     @ObservedObject private var data: SignerDataModel
 
-    @State private var backupModalViewModel: BackupModalViewModel?
+    // This view is recreated few times because of Rust navigation, for now we need to store modal view model in static
+    // property because it can't be created earlier as it would trigger passcode request on the device
+    private static var backupModalViewModel: BackupModalViewModel!
     private let alertClosure: (() -> Void)?
     private let viewModel: KeyDetailsViewModel
     private let actionModel: KeyDetailsActionModel
     private let forgetKeyActionHandler: ForgetKeySetAction
     private let exportPrivateKeyService: PrivateKeyQRCodeService
+    private let resetWarningAction: ResetConnectivtyWarningsAction
 
     init(
         navigation: NavigationCoordinator,
@@ -32,6 +35,7 @@ struct KeyDetailsView: View {
         viewModel: KeyDetailsViewModel,
         actionModel: KeyDetailsActionModel,
         exportPrivateKeyService: PrivateKeyQRCodeService,
+        resetWarningAction: ResetConnectivtyWarningsAction,
         alertClosure: (() -> Void)? = nil
     ) {
         self.navigation = navigation
@@ -40,6 +44,7 @@ struct KeyDetailsView: View {
         self.viewModel = viewModel
         self.actionModel = actionModel
         self.exportPrivateKeyService = exportPrivateKeyService
+        self.resetWarningAction = resetWarningAction
         self.alertClosure = alertClosure
     }
 
@@ -108,23 +113,21 @@ struct KeyDetailsView: View {
             )
             .padding(Spacing.large)
         }
-        .onAppear {
-            backupModalViewModel = exportPrivateKeyService.backupViewModel()
-        }
         .fullScreenCover(
             isPresented: $isShowingActionSheet,
             onDismiss: {
-                if shouldPresentRemoveConfirmationModal == true {
+                if shouldPresentRemoveConfirmationModal {
                     shouldPresentRemoveConfirmationModal.toggle()
                     isShowingRemoveConfirmation.toggle()
                 }
                 if shouldPresentBackupModal == true {
                     shouldPresentBackupModal.toggle()
-                    if data.alert || backupModalViewModel == nil {
+                    if data.alert {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             isPresentingConnectivityAlert.toggle()
                         }
                     } else {
+                        KeyDetailsView.backupModalViewModel = exportPrivateKeyService.backupViewModel()
                         isShowingBackupModal.toggle()
                     }
                 }
@@ -151,28 +154,45 @@ struct KeyDetailsView: View {
             .clearModalBackground()
         }
         .fullScreenCover(isPresented: $isShowingBackupModal) {
-            if let viewModel = backupModalViewModel {
-                BackupModal(
-                    isShowingBackupModal: $isShowingBackupModal,
-                    viewModel: viewModel
-                )
-                .clearModalBackground()
+            BackupModal(
+                isShowingBackupModal: $isShowingBackupModal,
+                viewModel: KeyDetailsView.backupModalViewModel
+            )
+            .clearModalBackground()
+        }
+        .fullScreenCover(
+            isPresented: $isPresentingConnectivityAlert,
+            onDismiss: checkForActionsPresentation
+        ) {
+            ErrorBottomModal(
+                viewModel: data.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
+                    continueAction: {
+                        resetWarningAction.resetConnectivityWarnings()
+                        shouldPresentBackupModal.toggle()
+                    }()
+                ),
+                isShowingBottomAlert: $isPresentingConnectivityAlert
+            )
+            .clearModalBackground()
+        }
+    }
+
+    func checkForActionsPresentation() {
+        if shouldPresentRemoveConfirmationModal {
+            shouldPresentRemoveConfirmationModal.toggle()
+            isShowingRemoveConfirmation.toggle()
+        }
+        if shouldPresentBackupModal {
+            shouldPresentBackupModal.toggle()
+            if data.alert {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    isPresentingConnectivityAlert.toggle()
+                }
             } else {
-                EmptyView()
+                KeyDetailsView.backupModalViewModel = exportPrivateKeyService.backupViewModel()
+                isShowingBackupModal.toggle()
             }
         }
-        .alert(
-            data.isConnectivityOn ? Localizable.Connectivity.Label.title.string : Localizable.PastConnectivity
-                .Label.title.string,
-            isPresented: $isPresentingConnectivityAlert,
-            actions: {
-                Button(Localizable.Connectivity.Action.ok.string) { isPresentingConnectivityAlert.toggle() }
-            },
-            message: {
-                data.isConnectivityOn ? Localizable.Connectivity.Label.content.text : Localizable.PastConnectivity
-                    .Label.content.text
-            }
-        )
     }
 }
 
@@ -314,22 +334,9 @@ struct KeyDetailsView_Previews: PreviewProvider {
                 ),
                 exportPrivateKeyService: PrivateKeyQRCodeService(
                     navigation: NavigationCoordinator(),
-                    keys: MKeys(
-                        set: [],
-                        root: .init(
-                            seedName: "",
-                            identicon: [],
-                            addressKey: "",
-                            base58: "",
-                            swiped: false,
-                            multiselect: false,
-                            secretExposed: false
-                        ),
-                        network: .init(title: "", logo: ""),
-                        multiselectMode: false,
-                        multiselectCount: ""
-                    )
-                )
+                    keys: PreviewData.mkeys
+                ),
+                resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
             )
         }
         .preferredColorScheme(.dark)

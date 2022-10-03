@@ -201,6 +201,10 @@
 		6DBD2200289A8C74005D539B /* URL+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21FF289A8C74005D539B /* URL+Generate.swift */; };
 		6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD2201289A8E1F005D539B /* ErrorMock.swift */; };
 		6DBE12D828B3A80A005F3CCC /* KeySetList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBE12D728B3A80A005F3CCC /* KeySetList.swift */; };
+		6DBF6E2228E1FB6F00CC959F /* PreviewData+Rust.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E2128E1FB6F00CC959F /* PreviewData+Rust.swift */; };
+		6DBF6E2728E44DD700CC959F /* ErrorBottomModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E2628E44DD700CC959F /* ErrorBottomModal.swift */; };
+		6DBF6E2928E47EE000CC959F /* ErrorBottomModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E2828E47EE000CC959F /* ErrorBottomModalViewModel.swift */; };
+		6DBF6E2B28E58D7900CC959F /* ResetConnectivtyWarningsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E2A28E58D7900CC959F /* ResetConnectivtyWarningsAction.swift */; };
 		6DC5642E28B652DE003D540B /* AddKeySetModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5642D28B652DE003D540B /* AddKeySetModal.swift */; };
 		6DC5643028B65B9C003D540B /* AnimationDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5642F28B65B9C003D540B /* AnimationDuration.swift */; };
 		6DC5643328B68FC5003D540B /* AccessControlProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643228B68FC5003D540B /* AccessControlProvider.swift */; };
@@ -466,6 +470,10 @@
 		6DBD21FF289A8C74005D539B /* URL+Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Generate.swift"; sourceTree = "<group>"; };
 		6DBD2201289A8E1F005D539B /* ErrorMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorMock.swift; sourceTree = "<group>"; };
 		6DBE12D728B3A80A005F3CCC /* KeySetList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetList.swift; sourceTree = "<group>"; };
+		6DBF6E2128E1FB6F00CC959F /* PreviewData+Rust.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreviewData+Rust.swift"; sourceTree = "<group>"; };
+		6DBF6E2628E44DD700CC959F /* ErrorBottomModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBottomModal.swift; sourceTree = "<group>"; };
+		6DBF6E2828E47EE000CC959F /* ErrorBottomModalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBottomModalViewModel.swift; sourceTree = "<group>"; };
+		6DBF6E2A28E58D7900CC959F /* ResetConnectivtyWarningsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetConnectivtyWarningsAction.swift; sourceTree = "<group>"; };
 		6DC5642D28B652DE003D540B /* AddKeySetModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddKeySetModal.swift; sourceTree = "<group>"; };
 		6DC5642F28B65B9C003D540B /* AnimationDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationDuration.swift; sourceTree = "<group>"; };
 		6DC5643228B68FC5003D540B /* AccessControlProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessControlProvider.swift; sourceTree = "<group>"; };
@@ -588,6 +596,7 @@
 		2D7A7BC726BA97A50053C1E0 /* Modals */ = {
 			isa = PBXGroup;
 			children = (
+				6DBF6E2528E44DBA00CC959F /* Errors */,
 				6DCC572528D8C0410014278A /* Backup */,
 				6DD9FF1428C8B83C00FB6195 /* Alerts */,
 				6D88CFF628C634BC001FB0A1 /* KeySet */,
@@ -1013,6 +1022,7 @@
 			children = (
 				6D6430F328CB447900342E37 /* ForgetKeySetAction.swift */,
 				6D84442028D3267A0072FBAC /* ForgetSingleKeyAction.swift */,
+				6DBF6E2A28E58D7900CC959F /* ResetConnectivtyWarningsAction.swift */,
 			);
 			path = Actions;
 			sourceTree = "<group>";
@@ -1156,6 +1166,15 @@
 				6D8AF88328BCC52000CF0AB2 /* Mocks */,
 			);
 			path = Helpers;
+			sourceTree = "<group>";
+		};
+		6DBF6E2528E44DBA00CC959F /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				6DBF6E2628E44DD700CC959F /* ErrorBottomModal.swift */,
+				6DBF6E2828E47EE000CC959F /* ErrorBottomModalViewModel.swift */,
+			);
+			path = Errors;
 			sourceTree = "<group>";
 		};
 		6DC5642C28B652D0003D540B /* AddKeySet */ = {
@@ -1313,6 +1332,7 @@
 			children = (
 				6DFAF36D28AF846C0048763B /* PreviewData.swift */,
 				6D8045D628D06E6B00237F8C /* PreviewData+Components.swift */,
+				6DBF6E2128E1FB6F00CC959F /* PreviewData+Rust.swift */,
 			);
 			path = Previews;
 			sourceTree = "<group>";
@@ -1619,6 +1639,7 @@
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
 				6DC5643028B65B9C003D540B /* AnimationDuration.swift in Sources */,
 				2DA5F88A2757692F00D8DD29 /* NewSeedScreen.swift in Sources */,
+				6DBF6E2228E1FB6F00CC959F /* PreviewData+Rust.swift in Sources */,
 				2DA5F86727566C3600D8DD29 /* TCVerifier.swift in Sources */,
 				2DA5F8392756666C00D8DD29 /* EventDetails.swift in Sources */,
 				6DBD21F4289A77DE005D539B /* BundleProtocol.swift in Sources */,
@@ -1668,6 +1689,7 @@
 				04197D27276A41E7003485D2 /* SettingsCardTemplate.swift in Sources */,
 				2DA5F89227590B4F00D8DD29 /* Documents.swift in Sources */,
 				2DA5F80D2756304B00D8DD29 /* Camera.swift in Sources */,
+				6DBF6E2928E47EE000CC959F /* ErrorBottomModalViewModel.swift in Sources */,
 				6D019974289D183B00F4C317 /* UInt8+Formatting.swift in Sources */,
 				2D48F3D2277A0AB2004B27BE /* HistoryCardExtended.swift in Sources */,
 				6D88CFF028C60815001FB0A1 /* CloseModalButton.swift in Sources */,
@@ -1696,10 +1718,12 @@
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
 				2D48F3AE2770AD6B004B27BE /* NetworkDetailsMenu.swift in Sources */,
 				6DD9FF1628C8B85300FB6195 /* HorizontalActionsBottomModal.swift in Sources */,
+				6DBF6E2728E44DD700CC959F /* ErrorBottomModal.swift in Sources */,
 				6D91F3EE28C16163007560F5 /* CircularProgressView.swift in Sources */,
 				6D019973289D183600F4C317 /* NavigationCoordinator.swift in Sources */,
 				6DBD21F7289A798C005D539B /* ErrorDisplayed+Show.swift in Sources */,
 				6D2D245228CE5F2D00862726 /* KeyDetailsPublicKeyView.swift in Sources */,
+				6DBF6E2B28E58D7900CC959F /* ResetConnectivtyWarningsAction.swift in Sources */,
 				2DA5F86127566C3600D8DD29 /* TCBalance.swift in Sources */,
 				6D95E97328B4F42300E28A11 /* ActionButton.swift in Sources */,
 				2DA5F87127566C3600D8DD29 /* TCVarName.swift in Sources */,
