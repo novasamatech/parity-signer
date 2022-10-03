@@ -137,9 +137,8 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
             sp_core::ed25519::Pair::verify(&signature, &message, &public)
         }
         "5301" => {
-            println!("Signature sr25519 {}.", signature_hex);
             let into_signature: [u8; 64] = match &transaction_hex[4..6] {
-                "03" => hex::decode(&signature_hex).unwrap().try_into().unwrap(),
+                "03" => hex::decode(&signature_hex).unwrap().try_into().unwrap(), // raw message
                 _ => {
                     assert!(
                         signature_hex.starts_with("01"),
@@ -152,14 +151,6 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
                 }
             };
 
-            // assert!(
-            //     signature_hex.starts_with("01"),
-            //     "Signature in sr25519 should start with `01`."
-            // );
-            // let into_signature: [u8; 64] = hex::decode(&signature_hex[2..])
-            //     .unwrap()
-            //     .try_into()
-            //     .unwrap();
             let signature = sp_core::sr25519::Signature::from_raw(into_signature);
             let into_public: [u8; 32] = hex::decode(&transaction_hex[6..70])
                 .unwrap()
