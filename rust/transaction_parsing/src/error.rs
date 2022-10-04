@@ -31,6 +31,10 @@ pub enum Error {
     #[error("Input is too short.")]
     TooShort,
 
+    /// Key corresponding to the address was not found in the db
+    #[error("Address {0} was not found in DB")]
+    AddrNotFound(String),
+
     /// All transactions are expected to be the Substrate ones, starting with
     /// hexadecimal `53`.
     ///

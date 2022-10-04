@@ -45,7 +45,7 @@ where
     P: AsRef<Path>,
 {
     let (author_multi_signer, parser_data, genesis_hash, encryption) =
-        multisigner_msg_genesis_encryption(data_hex)?;
+        multisigner_msg_genesis_encryption(&db_path, data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
     // Some(true/false) should be here by the standard; should stay None for now, as currently existing transactions apparently do not comply to standard.

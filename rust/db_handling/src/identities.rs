@@ -98,7 +98,7 @@ lazy_static! {
 
 /// Get all existing addresses from the database.
 #[cfg(any(feature = "active", feature = "signer"))]
-pub(crate) fn get_all_addresses<P>(db_path: P) -> Result<Vec<(MultiSigner, AddressDetails)>>
+pub fn get_all_addresses<P>(db_path: P) -> Result<Vec<(MultiSigner, AddressDetails)>>
 where
     P: AsRef<Path>,
 {

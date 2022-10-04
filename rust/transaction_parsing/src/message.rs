@@ -20,7 +20,7 @@ where
     P: AsRef<Path>,
 {
     let (author_multi_signer, message_vec, genesis_hash, encryption) =
-        multisigner_msg_genesis_encryption(data_hex)?;
+        multisigner_msg_genesis_encryption(&db_path, data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
     // this is a standard decoding of String, with utf8 conversion;
