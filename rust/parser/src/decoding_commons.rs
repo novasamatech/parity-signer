@@ -40,7 +40,6 @@ where
     T: HasCompact,
     Compact<T>: Decode,
 {
-    println!("get_compact {}", data.len());
     if data.is_empty() {
         return Err(ParserDecodingError::DataTooShort.into());
     }

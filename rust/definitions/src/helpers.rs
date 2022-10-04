@@ -1,5 +1,7 @@
 //! Common helper functions
 
+#[cfg(feature = "signer")]
+use constants::IDENTICON_IMG_SIZE;
 use hex;
 #[cfg(feature = "signer")]
 use sp_core::{crypto::AccountId32, ecdsa, ed25519, sr25519};
@@ -80,7 +82,7 @@ pub fn make_identicon_from_multisigner(
                 use eth_blockies::{eth_blockies_png_data, SeedString};
                 let account = print_ethereum_address(public).unwrap();
                 let account = account.canonicalize_ethaddr();
-                let dimension = (72, 72);
+                let dimension = (IDENTICON_IMG_SIZE, IDENTICON_IMG_SIZE);
                 let compressed_output = false;
                 eth_blockies_png_data(account, dimension, compressed_output)
             } else {
@@ -95,7 +97,7 @@ pub fn make_identicon_from_id20(id: &[u8; 20]) -> Vec<u8> {
     use eth_blockies::eth_blockies_png_data;
 
     let account = format!("0x{}", hex::encode(&id));
-    let dimension = (72, 72);
+    let dimension = (IDENTICON_IMG_SIZE, IDENTICON_IMG_SIZE);
     let compressed_output = false;
     eth_blockies_png_data(account, dimension, compressed_output)
 }
@@ -107,7 +109,7 @@ pub fn make_identicon_from_account(account: AccountId32) -> Vec<u8> {
 
 #[cfg(feature = "signer")]
 fn make_identicon(into_id: &[u8]) -> Vec<u8> {
-    match generate_png(into_id, 72) {
+    match generate_png(into_id, IDENTICON_IMG_SIZE as u16) {
         Ok(a) => a,
         Err(_) => EMPTY_PNG.to_vec(),
     }

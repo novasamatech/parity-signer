@@ -746,6 +746,7 @@ dependencies = [
 name = "definitions"
 version = "0.1.0"
 dependencies = [
+ "constants",
  "eth-blockies",
  "frame-metadata",
  "hex",
@@ -2213,9 +2214,9 @@ dependencies = [
  "frame-metadata",
  "hex",
  "lazy_static",
- "log",
  "num-bigint 0.4.3",
  "parity-scale-codec",
+ "pretty_assertions",
  "printing_balance",
  "regex",
  "scale-info",

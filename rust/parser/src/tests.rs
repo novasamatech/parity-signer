@@ -2,6 +2,7 @@ use crate::{parse_and_display_set, Error};
 use definitions::network_specs::ShortSpecs;
 use frame_metadata::RuntimeMetadata;
 use parity_scale_codec::Decode;
+use pretty_assertions::assert_eq;
 
 fn metadata(filename: &str) -> RuntimeMetadata {
     let metadata_hex = std::fs::read_to_string(&filename).unwrap();
@@ -243,5 +244,25 @@ fn tr_7() {
     let reply =
         parse_and_display_set(&data, &metadata("for_tests/moonbase1802"), &specs_moonbase).unwrap();
 
-    println!("reply {}", reply);
+    let reply_known = r#"
+Method:
+
+pallet: Balances,
+  method: transfer,
+    field_name: dest,
+      Id: 0xe855f5e79ca68ecae0fe99a3fa46806461740e1a,
+    field_name: value,
+      balance: 10.000000000000000 mDEV
+
+
+Extensions:
+
+era: Mortal, phase: 14, period: 32,
+nonce: 0,
+tip: 0 aDEV,
+network: moonbase1802,
+tx_version: 2,
+block_hash: 2470dff6295dd9bb3e5a89c9eb7647d7c5ae525618d77757171718dc034be8f5"#;
+
+    assert_eq!(reply, reply_known)
 }

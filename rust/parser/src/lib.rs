@@ -208,22 +208,15 @@ pub fn parse_extensions(
 }
 
 pub fn cut_method_extensions(data: &[u8]) -> Result<(Vec<u8>, Vec<u8>)> {
-    let pre_method = get_compact::<u32>(data).map_err(|_| {
-        log::error!("HERE1");
-        Error::SeparateMethodExtensions
-    })?;
+    let pre_method = get_compact::<u32>(data).map_err(|_| Error::SeparateMethodExtensions)?;
     let method_length = pre_method.compact_found as usize;
     match pre_method.start_next_unit {
         Some(start) => match data.get(start..start + method_length) {
             Some(a) => Ok((a.to_vec(), data[start + method_length..].to_vec())),
-            None => {
-                log::error!("HERE2 {} {} {}", data[0], data[1], method_length);
-                Err(Error::SeparateMethodExtensions)
-            }
+            None => Err(Error::SeparateMethodExtensions),
         },
         None => {
             if method_length != 0 {
-                log::error!("HERE3");
                 return Err(Error::SeparateMethodExtensions);
             }
             Ok((Vec::new(), data.to_vec()))

@@ -300,7 +300,7 @@ enum SpecialType {
 
 fn check_special(current_type: &Type<PortableForm>) -> SpecialType {
     match current_type.path().ident() {
-        Some(a) => match dbg!(a.as_str()) {
+        Some(a) => match a.as_str() {
             "AccountId32" => SpecialType::AccountId,
             "AccountId20" => SpecialType::AccountId20,
             "Call" => SpecialType::Call,

@@ -13,7 +13,6 @@ definitions = {path = "../definitions", default-features = false, features = ["s
 frame-metadata = { version = "15.0.0", default-features = false, features = ["std", "legacy"]}
 hex = "0.4.3"
 lazy_static = "1.4.0"
-log = "0.4.17"
 num-bigint = "0.4.3"
 parity-scale-codec = {version = "3.2.1", features = ["derive", "bit-vec"]}
 printing_balance = {path = "../printing_balance"}
@@ -31,3 +30,6 @@ test = ["defaults/active"]
 [lib]
 name = "parser"
 crate-type = ["lib"]
+
+[dev-dependencies]
+pretty_assertions = "1.3.0"

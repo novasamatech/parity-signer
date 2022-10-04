@@ -206,3 +206,6 @@ pub const FPS_DEN: u16 = 30;
 
 /// Width of the QR code border, in QR code dots
 pub const BORDER: i32 = 4;
+
+/// Size of square identicon images.
+pub const IDENTICON_IMG_SIZE: usize = 72;
