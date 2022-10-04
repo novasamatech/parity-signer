@@ -224,7 +224,7 @@ pub fn multisigner_msg_genesis_encryption<P: AsRef<Path>>(
                 {
                     (addr, &data[23..], Encryption::Ethereum)
                 } else {
-                    return Err(Error::AddrNotFound(format!("{}", hex::encode(a))));
+                    return Err(Error::AddrNotFound(format!("0x{}", hex::encode(a))));
                 }
             }
             None => return Err(Error::TooShort),

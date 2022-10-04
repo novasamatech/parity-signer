@@ -228,7 +228,7 @@ mod tests {
 
         assert_eq!(
             print_ethereum_address(&public_key).unwrap(),
-            "976f8456e4e2034179b284a23c0e0c8f6d3da50c"
+            "0x976f8456e4e2034179b284a23c0e0c8f6d3da50c"
         )
     }
 
@@ -242,7 +242,7 @@ mod tests {
 
         assert_eq!(
             print_ethereum_address(&public_key).unwrap(),
-            "420e9f260b40af7e49440cead3069f8e82a5230f",
+            "0x420e9f260b40af7e49440cead3069f8e82a5230f",
         )
     }
 }
