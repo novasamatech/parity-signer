@@ -18,6 +18,9 @@ val Colors.textSecondary: Color
 val Colors.textTertiary: Color
 	get() = if (isLight) Color(0x73000000) else Color(0x7AFFFFFF)
 
+val Colors.textDisabled: Color
+	get() = if (isLight) Color(0x40000000) else Color(0x45FFFFFF)
+
 
 
 val Colors.fill30: Color

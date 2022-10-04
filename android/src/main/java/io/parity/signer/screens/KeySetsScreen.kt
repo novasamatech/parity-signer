@@ -11,12 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.SeedCard
-import io.parity.signer.components2.base.CtaButtonBottomSheet
-import io.parity.signer.components2.base.RowButtonsBottomSheet
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MSeeds
 import io.parity.signer.uniffi.SeedNameCard
 
@@ -60,7 +57,7 @@ fun KeySetsSelectScreen(
 /**
  * Local copy of shared [MSeeds] class
  */
-data class KeySetsSelectViewModel(val keys: List<SeedViewModel>)
+data class KeySetsSelectViewModel(val keys: List<KeySetViewModel>)
 
 fun MSeeds.toKeySetsSelectViewModel() = KeySetsSelectViewModel(
 	seedNameCards.map { it.toSeedViewModel() }
@@ -69,14 +66,14 @@ fun MSeeds.toKeySetsSelectViewModel() = KeySetsSelectViewModel(
 /**
  * Local copy of shared [SeedNameCard] class
  */
-data class SeedViewModel(
+data class KeySetViewModel(
 	val seedName: String,
 	val identicon: List<UByte>,
 	val derivedKeysCount: UInt
 )
 
 fun SeedNameCard.toSeedViewModel() =
-	SeedViewModel(seedName, identicon, derivedKeysCount)
+	KeySetViewModel(seedName, identicon, derivedKeysCount)
 
 
 
@@ -92,8 +89,8 @@ fun SeedNameCard.toSeedViewModel() =
 @Composable
 private fun PreviewKeySetsSelectScreen() {
 	val mockModel =  KeySetsSelectViewModel(listOf(
-		SeedViewModel("first seed name", PreviewData.exampleIdenticon, 1),
-		SeedViewModel("second seed name", PreviewData.exampleIdenticon, 3),
+		KeySetViewModel("first seed name", PreviewData.exampleIdenticon, 1.toUInt()),
+		KeySetViewModel("second seed name", PreviewData.exampleIdenticon, 3.toUInt()),
 	))
 	SignerNewTheme {
 		KeySetsSelectScreen(mockModel)
