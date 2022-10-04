@@ -52,4 +52,13 @@ struct ErrorBottomModalViewModel {
             tertiaryAction: .init(label: Localizable.PastConnectivity.Action.continue.key, action: continueAction)
         )
     }
+
+    static func alertError(_ action: @escaping @autoclosure () -> Void = {}()) -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            icon: Asset.wifiOn.swiftUIImage,
+            title: Localizable.Connectivity.Label.title.string,
+            content: Localizable.Connectivity.Label.content.string,
+            secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
+        )
+    }
 }
