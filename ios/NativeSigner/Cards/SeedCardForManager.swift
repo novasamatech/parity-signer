@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SeedCardForManager: View {
-    @EnvironmentObject var data: SignerDataModel
+    @EnvironmentObject private var data: SignerDataModel
     var seedNameCard: SeedNameCard
     var body: some View {
         ZStack {

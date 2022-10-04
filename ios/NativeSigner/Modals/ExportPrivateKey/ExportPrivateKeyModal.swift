@@ -16,7 +16,7 @@ struct ExportPrivateKeyModal: View {
     @State private var animateBackground: Bool = false
 
     @Binding var isPresentingExportKeysModal: Bool
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var navigation: NavigationCoordinator
     let viewModel: ExportPrivateKeyViewModel
 
     var body: some View {
@@ -103,7 +103,6 @@ struct ExportPrivateKeyModal_Previews: PreviewProvider {
             VStack {
                 ExportPrivateKeyModal(
                     isPresentingExportKeysModal: Binding<Bool>.constant(true),
-                    navigation: NavigationCoordinator(),
                     viewModel: PreviewData.exampleExportPrivateKey
                 )
             }
@@ -113,7 +112,6 @@ struct ExportPrivateKeyModal_Previews: PreviewProvider {
             VStack {
                 ExportPrivateKeyModal(
                     isPresentingExportKeysModal: Binding<Bool>.constant(true),
-                    navigation: NavigationCoordinator(),
                     viewModel: PreviewData.exampleExportPrivateKey
                 )
             }
@@ -123,7 +121,6 @@ struct ExportPrivateKeyModal_Previews: PreviewProvider {
             VStack {
                 ExportPrivateKeyModal(
                     isPresentingExportKeysModal: Binding<Bool>.constant(true),
-                    navigation: NavigationCoordinator(),
                     viewModel: PreviewData.exampleExportPrivateKey
                 )
             }
@@ -131,5 +128,6 @@ struct ExportPrivateKeyModal_Previews: PreviewProvider {
             .background(.gray)
             .preferredColorScheme(.dark)
         }
+        .environmentObject(NavigationCoordinator())
     }
 }

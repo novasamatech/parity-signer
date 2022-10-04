@@ -13,9 +13,8 @@ struct Header: View {
     let screenNameType: ScreenNameType?
     let rightButton: RightButton?
     let alert: Bool
-    let isConnectivityOn: Bool
     let alertShow: () -> Void
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         VStack {
@@ -86,9 +85,7 @@ struct Header: View {
                         }
                     )
                     NavbarShield(
-                        isConnectivityOn: isConnectivityOn,
-                        alert: alert,
-                        navigation: navigation
+                        alert: alert
                     )
                 }
                 .frame(width: 72.0)

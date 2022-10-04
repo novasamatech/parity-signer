@@ -10,7 +10,7 @@ import SwiftUI
 struct AddKeySetModal: View {
     @Binding var isShowingNewSeedMenu: Bool
     @State private var animateBackground: Bool = false
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         FullScreenRoundedModal(

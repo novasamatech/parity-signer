@@ -14,44 +14,43 @@ import SwiftUI
 final class SignerDataModel: ObservableObject {
     private let seedsMediator: SeedsMediating
 
-    @ObservedObject var navigation: NavigationCoordinator
-    @Published var parsingAlert: Bool = false
+    @ObservedObject private(set) var navigation: NavigationCoordinator
+    @ObservedObject private var connectivityMediator: ConnectivityMediator
 
     // Data state
     @Published var onboardingDone: Bool = false
     @Published var authenticated: Bool = false
 
     // Alert indicator
-    @Published var isConnectivityOn: Bool = false
     @Published var alert: Bool = false
     @Published var alertShow: Bool = false
 
     /// internal boilerplate
-    var dbName: String
+    private var dbName: String {
+        databaseMediator.databaseName
+    }
 
     /// did user set up password?
     let protected = LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
 
     private let bundle: BundleProtocol
-    private let connectivityMonitor: ConnectivityMonitoring
     private let databaseMediator: DatabaseMediating
     private let fileManager: FileManagingProtocol
 
     init(
-        navigation: NavigationCoordinator,
+        navigation: NavigationCoordinator = NavigationCoordinator(),
+        connectivityMediator: ConnectivityMediator = ConnectivityMediator(),
         bundle: BundleProtocol = Bundle.main,
-        connectivityMonitor: ConnectivityMonitoring = ConnectivityMonitoringAssembler().assemble(),
         databaseMediator: DatabaseMediating = DatabaseMediator(),
         fileManager: FileManagingProtocol = FileManager.default,
         seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
     ) {
-        self.seedsMediator = seedsMediator
         self.navigation = navigation
+        self.connectivityMediator = connectivityMediator
+        self.seedsMediator = seedsMediator
         self.bundle = bundle
-        self.connectivityMonitor = connectivityMonitor
         self.databaseMediator = databaseMediator
         self.fileManager = fileManager
-        dbName = databaseMediator.databaseName
         onboardingDone = databaseMediator.isDatabaseAvailable()
 
         seedsMediator.set(signerDataModel: self)
@@ -59,22 +58,17 @@ final class SignerDataModel: ObservableObject {
         finaliseInitialisation()
     }
 
-    /// Mild refresh for situations when no interaction with data was really performed.
-    /// Should not call stuff in signer.h
-    func refreshUI() {}
-
     /// refresh everything except for seedNames
     /// should be called as often as reasonably possible - on flow interrupts, changes, events, etc.
     func totalRefresh() {
         navigation.perform(navigation: .init(action: .start))
         checkAlert()
-        // self.refreshUI()
     }
 
     /// Should be called once on factory-new state of the app
     /// Populates database with starting values
     func onboard(jailbreak: Bool = false) {
-        guard !isConnectivityOn else { return }
+        guard !connectivityMediator.isConnectivityOn else { return }
         wipe()
         guard databaseMediator.recreateDatabaseFile() else {
             print("Database could not be recreated")
@@ -102,17 +96,7 @@ final class SignerDataModel: ObservableObject {
 
 private extension SignerDataModel {
     func setUpConnectivityMonitoring() {
-        connectivityMonitor.startMonitoring { isConnected in
-            if isConnected, self.onboardingDone {
-                do {
-                    try historyDeviceWasOnline(dbname: self.dbName)
-                } catch {
-                    return
-                }
-                self.alert = true
-            }
-            self.isConnectivityOn = isConnected
-        }
+        alert = connectivityMediator.isConnectivityOn
     }
 
     func finaliseInitialisation() {
@@ -173,6 +157,37 @@ extension SignerDataModel {
         let seedPhrase = seedsMediator.getSeed(seedName: seedName)
         if !seedPhrase.isEmpty {
             navigation.perform(navigation: .init(action: .goForward, details: path, seedPhrase: seedPhrase))
+        }
+    }
+}
+
+extension SignerDataModel {
+    /// Check if alert was triggered
+    func checkAlert() {
+        if onboardingDone {
+            do {
+                let res = try historyGetWarnings(dbname: dbName)
+                if res {
+                    alert = true
+                } else {
+                    alert = false
+                }
+            } catch {
+                print("History init failed! This will not do.")
+                alert = true
+            }
+        }
+    }
+
+    /// Acknowledge alert and reset it
+    func resetAlert() {
+        do {
+            try historyAcknowledgeWarnings(dbname: dbName)
+            checkAlert()
+            navigation.perform(navigation: .init(action: .goBack))
+        } catch {
+            print("History init failed! This will not do.")
+            alert = true
         }
     }
 }

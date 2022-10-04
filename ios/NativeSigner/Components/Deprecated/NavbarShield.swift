@@ -9,9 +9,9 @@ import Network
 import SwiftUI
 
 struct NavbarShield: View {
-    let isConnectivityOn: Bool
     let alert: Bool
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
 
     var body: some View {
         Button(
@@ -19,7 +19,7 @@ struct NavbarShield: View {
                 navigation.perform(navigation: .init(action: .shield))
             },
             label: {
-                if isConnectivityOn {
+                if connectivityMediator.isConnectivityOn {
                     Image(.shield, variant: .slash)
                         .imageScale(.large)
                         .foregroundColor(Asset.signalDanger.swiftUIColor)
