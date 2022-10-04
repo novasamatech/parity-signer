@@ -32,6 +32,7 @@ fun BottomSheetWrapper(
 		)
 
 	var wasSheetClosed by remember { mutableStateOf(false) }
+	var wasSheetShown by remember { mutableStateOf(false) }
 
 	val handle = remember {
 		object : BottomSheetPositionHandle {
@@ -67,17 +68,22 @@ fun BottomSheetWrapper(
 		coroutineScope.launch { modalBottomSheetState.hide() }
 	}
 
+	//show once view is create to have initial open animation
+	LaunchedEffect(key1 = modalBottomSheetState) {
+		modalBottomSheetState.show()
+		wasSheetShown = true
+	}
+
 	// Take action based on hidden state
 	LaunchedEffect(modalBottomSheetState.currentValue) {
 		when (modalBottomSheetState.currentValue) {
-			ModalBottomSheetValue.Hidden -> if (!wasSheetClosed) onClosedAction()
+			ModalBottomSheetValue.Hidden -> {
+				if (!wasSheetClosed && wasSheetShown) {
+					onClosedAction()
+				}
+			}
 			else -> {}
 		}
-	}
-
-	//show once view is create to have initial open animation
-	LaunchedEffect(key1 = modalBottomSheetState) {
-			modalBottomSheetState.show()
 	}
 }
 
@@ -97,6 +103,6 @@ private fun BottomSheetContentWrapper(
 			.clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
 			.background(Color.White)
 	) {
-			content()
+		content()
 	}
 }

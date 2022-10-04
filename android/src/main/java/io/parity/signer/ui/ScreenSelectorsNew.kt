@@ -38,7 +38,9 @@ fun BottomSheetSelector(
 		} else {
 			when (modalData) {
 				is ModalData.KeyDetailsAction ->
-					BottomSheetWrapper {
+					BottomSheetWrapper(onClosedAction = {
+						signerDataModel.navigator.backAction()
+					} ) {
 						KeyDetailsMenuAction(
 							navigator = signerDataModel.navigator,
 							keyDetails = signerDataModel.lastOpenedKeyDetails
