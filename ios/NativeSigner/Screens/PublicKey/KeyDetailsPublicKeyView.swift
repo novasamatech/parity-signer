@@ -12,6 +12,7 @@ struct KeyDetailsPublicKeyView: View {
     private let actionModel: KeyDetailsPublicKeyActionModel
     private let forgetKeyActionHandler: ForgetSingleKeyAction
     private let exportPrivateKeyService: ExportPrivateKeyService
+    private let resetWarningAction: ResetConnectivtyWarningsAction
 
     // This view is recreated few times because of Rust navigation, for now we need to store modal view model in static
     // property because it can't be created earlier as it would trigger passcode request on the device
@@ -27,30 +28,28 @@ struct KeyDetailsPublicKeyView: View {
     @State private var shouldPresentExportKeysModal = false
     @State private var shouldPresentRemoveConfirmationModal = false
 
-    @ObservedObject private var navigation: NavigationCoordinator
-    @ObservedObject private var data: SignerDataModel
+    @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+    @EnvironmentObject private var data: SignerDataModel
 
     init(
-        navigation: NavigationCoordinator,
-        data: SignerDataModel,
-        forgetKeyActionHandler: ForgetSingleKeyAction,
+        forgetKeyActionHandler: ForgetSingleKeyAction = ForgetSingleKeyAction(),
         viewModel: KeyDetailsPublicKeyViewModel,
         actionModel: KeyDetailsPublicKeyActionModel,
-        exportPrivateKeyService: ExportPrivateKeyService
+        exportPrivateKeyService: ExportPrivateKeyService,
+        resetWarningAction: ResetConnectivtyWarningsAction
     ) {
-        self.navigation = navigation
-        self.data = data
         self.forgetKeyActionHandler = forgetKeyActionHandler
         self.viewModel = viewModel
         self.actionModel = actionModel
         self.exportPrivateKeyService = exportPrivateKeyService
+        self.resetWarningAction = resetWarningAction
     }
 
     var body: some View {
         VStack(spacing: 0) {
             // Navigation bar
             NavigationBarView(
-                navigation: navigation,
                 viewModel: .init(
                     title: Localizable.PublicKeyDetails.Label.title.string,
                     subtitle: viewModel.isRootKey ? nil : Localizable.PublicKeyDetails.Label.subtitle.string,
@@ -105,27 +104,12 @@ struct KeyDetailsPublicKeyView: View {
         // Action sheet
         .fullScreenCover(
             isPresented: $isShowingActionSheet,
-            onDismiss: {
-                if shouldPresentExportKeysWarningModal {
-                    shouldPresentExportKeysWarningModal.toggle()
-                    if data.alert {
-                        isPresentingConnectivityAlert.toggle()
-                    } else {
-                        KeyDetailsPublicKeyView.exportPrivateKeyViewModel = exportPrivateKeyService.exportPrivateKey()
-                        isPresentingExportKeysWarningModal.toggle()
-                    }
-                }
-                if shouldPresentRemoveConfirmationModal {
-                    shouldPresentRemoveConfirmationModal.toggle()
-                    isShowingRemoveConfirmation.toggle()
-                }
-            }
+            onDismiss: checkForActionsPresentation
         ) {
             PublicKeyActionsModal(
                 shouldPresentExportKeysWarningModal: $shouldPresentExportKeysWarningModal,
                 isShowingActionSheet: $isShowingActionSheet,
-                shouldPresentRemoveConfirmationModal: $shouldPresentRemoveConfirmationModal,
-                navigation: navigation
+                shouldPresentRemoveConfirmationModal: $shouldPresentRemoveConfirmationModal
             )
             .clearModalBackground()
         }
@@ -158,7 +142,6 @@ struct KeyDetailsPublicKeyView: View {
         ) {
             ExportPrivateKeyModal(
                 isPresentingExportKeysModal: $isPresentingExportKeysModal,
-                navigation: navigation,
                 viewModel: KeyDetailsPublicKeyView.exportPrivateKeyViewModel
             )
             .clearModalBackground()
@@ -176,18 +159,37 @@ struct KeyDetailsPublicKeyView: View {
             )
             .clearModalBackground()
         }
-        .alert(
-            data.isConnectivityOn ? Localizable.Connectivity.Label.title.string : Localizable.PastConnectivity
-                .Label.title.string,
+        .fullScreenCover(
             isPresented: $isPresentingConnectivityAlert,
-            actions: {
-                Button(Localizable.Connectivity.Action.ok.string) { isPresentingConnectivityAlert.toggle() }
-            },
-            message: {
-                data.isConnectivityOn ? Localizable.Connectivity.Label.content.text : Localizable.PastConnectivity
-                    .Label.content.text
+            onDismiss: checkForActionsPresentation
+        ) {
+            ErrorBottomModal(
+                viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
+                    continueAction: {
+                        resetWarningAction.resetConnectivityWarnings()
+                        shouldPresentExportKeysWarningModal.toggle()
+                    }()
+                ),
+                isShowingBottomAlert: $isPresentingConnectivityAlert
+            )
+            .clearModalBackground()
+        }
+    }
+
+    func checkForActionsPresentation() {
+        if shouldPresentExportKeysWarningModal {
+            shouldPresentExportKeysWarningModal.toggle()
+            if data.alert {
+                isPresentingConnectivityAlert.toggle()
+            } else {
+                KeyDetailsPublicKeyView.exportPrivateKeyViewModel = exportPrivateKeyService.exportPrivateKey()
+                isPresentingExportKeysWarningModal.toggle()
             }
-        )
+        }
+        if shouldPresentRemoveConfirmationModal {
+            shouldPresentRemoveConfirmationModal.toggle()
+            isShowingRemoveConfirmation.toggle()
+        }
     }
 }
 
@@ -196,46 +198,40 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
         HStack {
             VStack {
                 KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
-                    data: SignerDataModel(navigation: NavigationCoordinator()),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
-                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
+                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
+                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
                 )
             }
             VStack {
                 KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
-                    data: SignerDataModel(navigation: NavigationCoordinator()),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
-                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
+                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
+                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
                 )
             }
             VStack {
                 KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
-                    data: SignerDataModel(navigation: NavigationCoordinator()),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
-                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
+                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
+                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
                 )
             }
             VStack {
                 KeyDetailsPublicKeyView(
-                    navigation: NavigationCoordinator(),
-                    data: SignerDataModel(navigation: NavigationCoordinator()),
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
-                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
+                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
+                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
                 )
             }
         }
         .previewLayout(.sizeThatFits)
         .preferredColorScheme(.dark)
+        .environmentObject(NavigationCoordinator())
+        .environmentObject(ConnectivityMediator())
     }
 }

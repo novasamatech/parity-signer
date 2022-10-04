@@ -49,20 +49,16 @@ struct NavigationBarActionModel {
 ///
 /// As we can't switch to `NavigationView` just yet, this should us in the meantime
 struct NavigationBarView: View {
-    @ObservedObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var navigation: NavigationCoordinator
     private let viewModel: NavigationBarViewModel
     private let actionModel: NavigationBarActionModel
 
     init(
-        navigation: NavigationCoordinator,
         viewModel: NavigationBarViewModel,
-        actionModel: NavigationBarActionModel? = nil
+        actionModel: NavigationBarActionModel
     ) {
-        self.navigation = navigation
         self.viewModel = viewModel
-        self.actionModel = actionModel ?? .init(rightBarMenuAction: {
-            navigation.perform(navigation: .init(action: .rightButtonAction))
-        })
+        self.actionModel = actionModel
     }
 
     var body: some View {
@@ -119,56 +115,57 @@ struct NavigationBarView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
             NavigationBarView(
-                navigation: NavigationCoordinator(),
                 viewModel: NavigationBarViewModel(
                     title: "Key Sets",
                     leftButton: .empty,
                     rightButton: .empty
-                )
+                ),
+                actionModel: .init(rightBarMenuAction: {})
             )
             NavigationBarView(
-                navigation: NavigationCoordinator(),
                 viewModel: NavigationBarViewModel(
                     title: "Key Sets",
                     leftButton: .arrow,
                     rightButton: .more
-                )
+                ),
+                actionModel: .init(rightBarMenuAction: {})
             )
             NavigationBarView(
-                navigation: NavigationCoordinator(),
                 viewModel: NavigationBarViewModel(
                     title: "Key Sets",
                     leftButton: .arrow,
                     rightButton: .empty
-                )
+                ),
+                actionModel: .init(rightBarMenuAction: {})
             )
             NavigationBarView(
-                navigation: NavigationCoordinator(),
                 viewModel: NavigationBarViewModel(
                     title: "Key Sets",
                     leftButton: .empty,
                     rightButton: .more
-                )
+                ),
+                actionModel: .init(rightBarMenuAction: {})
             )
             NavigationBarView(
-                navigation: NavigationCoordinator(),
                 viewModel: NavigationBarViewModel(
                     title: "Public Key",
                     subtitle: "Derived Key",
                     leftButton: .xmark,
                     rightButton: .more
-                )
+                ),
+                actionModel: .init(rightBarMenuAction: {})
             )
             NavigationBarView(
-                navigation: NavigationCoordinator(),
                 viewModel: NavigationBarViewModel(
                     title: "Create Derived Key",
                     leftButton: .xmark,
                     rightButton: .action(Localizable.done.key)
-                )
+                ),
+                actionModel: .init(rightBarMenuAction: {})
             )
         }
         .preferredColorScheme(.dark)
         .previewLayout(.sizeThatFits)
+        .environmentObject(NavigationCoordinator())
     }
 }

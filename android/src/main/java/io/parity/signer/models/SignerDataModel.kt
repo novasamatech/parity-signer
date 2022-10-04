@@ -15,8 +15,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import io.parity.signer.*
 import io.parity.signer.components.Authentication
+import io.parity.signer.ui.OnBoardingState
 import io.parity.signer.uniffi.*
 import org.json.JSONObject
 import java.io.File

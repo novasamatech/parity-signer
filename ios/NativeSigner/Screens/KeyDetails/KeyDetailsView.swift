@@ -15,8 +15,9 @@ struct KeyDetailsView: View {
     @State private var isShowingBackupModal: Bool = false
     @State private var isPresentingConnectivityAlert = false
 
-    @ObservedObject private var navigation: NavigationCoordinator
-    @ObservedObject private var data: SignerDataModel
+    @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+    @EnvironmentObject private var data: SignerDataModel
 
     // This view is recreated few times because of Rust navigation, for now we need to store modal view model in static
     // property because it can't be created earlier as it would trigger passcode request on the device
@@ -26,22 +27,21 @@ struct KeyDetailsView: View {
     private let actionModel: KeyDetailsActionModel
     private let forgetKeyActionHandler: ForgetKeySetAction
     private let exportPrivateKeyService: PrivateKeyQRCodeService
+    private let resetWarningAction: ResetConnectivtyWarningsAction
 
     init(
-        navigation: NavigationCoordinator,
-        data: SignerDataModel,
         forgetKeyActionHandler: ForgetKeySetAction,
         viewModel: KeyDetailsViewModel,
         actionModel: KeyDetailsActionModel,
         exportPrivateKeyService: PrivateKeyQRCodeService,
+        resetWarningAction: ResetConnectivtyWarningsAction,
         alertClosure: (() -> Void)? = nil
     ) {
-        self.navigation = navigation
-        self.data = data
         self.forgetKeyActionHandler = forgetKeyActionHandler
         self.viewModel = viewModel
         self.actionModel = actionModel
         self.exportPrivateKeyService = exportPrivateKeyService
+        self.resetWarningAction = resetWarningAction
         self.alertClosure = alertClosure
     }
 
@@ -50,7 +50,6 @@ struct KeyDetailsView: View {
             VStack(spacing: 0) {
                 // Navigation bar
                 NavigationBarView(
-                    navigation: navigation,
                     viewModel: .init(
                         leftButton: .arrow,
                         rightButton: .more
@@ -113,7 +112,7 @@ struct KeyDetailsView: View {
         .fullScreenCover(
             isPresented: $isShowingActionSheet,
             onDismiss: {
-                if shouldPresentRemoveConfirmationModal == true {
+                if shouldPresentRemoveConfirmationModal {
                     shouldPresentRemoveConfirmationModal.toggle()
                     isShowingRemoveConfirmation.toggle()
                 }
@@ -133,8 +132,7 @@ struct KeyDetailsView: View {
             KeyDetailsActionsModal(
                 isShowingActionSheet: $isShowingActionSheet,
                 shouldPresentRemoveConfirmationModal: $shouldPresentRemoveConfirmationModal,
-                shouldPresentBackupModal: $shouldPresentBackupModal,
-                navigation: navigation
+                shouldPresentBackupModal: $shouldPresentBackupModal
             )
             .clearModalBackground()
         }
@@ -157,18 +155,39 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
-        .alert(
-            data.isConnectivityOn ? Localizable.Connectivity.Label.title.string : Localizable.PastConnectivity
-                .Label.title.string,
+        .fullScreenCover(
             isPresented: $isPresentingConnectivityAlert,
-            actions: {
-                Button(Localizable.Connectivity.Action.ok.string) { isPresentingConnectivityAlert.toggle() }
-            },
-            message: {
-                data.isConnectivityOn ? Localizable.Connectivity.Label.content.text : Localizable.PastConnectivity
-                    .Label.content.text
+            onDismiss: checkForActionsPresentation
+        ) {
+            ErrorBottomModal(
+                viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
+                    continueAction: {
+                        resetWarningAction.resetConnectivityWarnings()
+                        shouldPresentBackupModal.toggle()
+                    }()
+                ),
+                isShowingBottomAlert: $isPresentingConnectivityAlert
+            )
+            .clearModalBackground()
+        }
+    }
+
+    func checkForActionsPresentation() {
+        if shouldPresentRemoveConfirmationModal {
+            shouldPresentRemoveConfirmationModal.toggle()
+            isShowingRemoveConfirmation.toggle()
+        }
+        if shouldPresentBackupModal {
+            shouldPresentBackupModal.toggle()
+            if data.alert {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    isPresentingConnectivityAlert.toggle()
+                }
+            } else {
+                KeyDetailsView.backupModalViewModel = exportPrivateKeyService.backupViewModel()
+                isShowingBackupModal.toggle()
             }
-        )
+        }
     }
 }
 
@@ -213,9 +232,7 @@ struct KeyDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
             KeyDetailsView(
-                navigation: NavigationCoordinator(),
-                data: SignerDataModel(navigation: NavigationCoordinator()),
-                forgetKeyActionHandler: .init(navigation: NavigationCoordinator()),
+                forgetKeyActionHandler: .init(),
                 viewModel: .init(
                     keySummary: KeySummaryViewModel(
                         keyName: "Parity",
@@ -311,10 +328,12 @@ struct KeyDetailsView_Previews: PreviewProvider {
                 exportPrivateKeyService: PrivateKeyQRCodeService(
                     navigation: NavigationCoordinator(),
                     keys: PreviewData.mkeys
-                )
+                ),
+                resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
             )
         }
         .preferredColorScheme(.dark)
         .previewLayout(.sizeThatFits)
+        .environmentObject(NavigationCoordinator())
     }
 }

@@ -8,16 +8,14 @@
 import SwiftUI
 
 struct KeySetList: View {
-    @ObservedObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var navigation: NavigationCoordinator
     @State private var isShowingNewSeedMenu = false
 
     private let viewModel: KeySetListViewModel
 
     init(
-        navigation: NavigationCoordinator,
         viewModel: KeySetListViewModel
     ) {
-        self.navigation = navigation
         self.viewModel = viewModel
     }
 
@@ -29,10 +27,12 @@ struct KeySetList: View {
             VStack(spacing: 0) {
                 // Navigation Bar
                 NavigationBarView(
-                    navigation: navigation,
                     viewModel: NavigationBarViewModel(
                         title: Localizable.KeySets.title.string,
                         backgroundColor: Asset.backgroundSystem.swiftUIColor
+                    ),
+                    actionModel: .init(
+                        rightBarMenuAction: { navigation.perform(navigation: .init(action: .rightButtonAction)) }
                     )
                 )
                 // Empty state
@@ -82,8 +82,7 @@ struct KeySetList: View {
         }
         .fullScreenCover(isPresented: $isShowingNewSeedMenu) {
             AddKeySetModal(
-                isShowingNewSeedMenu: $isShowingNewSeedMenu,
-                navigation: navigation
+                isShowingNewSeedMenu: $isShowingNewSeedMenu
             )
             .clearModalBackground()
         }
@@ -112,7 +111,6 @@ private struct KeyListEmptyState: View {
 struct KeySetListPreview: PreviewProvider {
     static var previews: some View {
         KeySetList(
-            navigation: NavigationCoordinator(),
             viewModel: KeySetListViewModelBuilder()
                 .build(
                     for:
@@ -159,5 +157,6 @@ struct KeySetListPreview: PreviewProvider {
         )
         .preferredColorScheme(.dark)
         .previewLayout(.sizeThatFits)
+        .environmentObject(NavigationCoordinator())
     }
 }

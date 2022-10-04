@@ -9,6 +9,7 @@ import SwiftUI
 
 struct QRCodeAddressFooterViewModel: Equatable {
     let identicon: [UInt8]
+    let rootKeyName: String
     let path: String
     let network: String
     let base58: String
@@ -25,39 +26,49 @@ struct QRCodeAddressFooterView: View {
     }
 
     var body: some View {
-        HStack(spacing: Spacing.small) {
-            VStack {
-                Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
-                    .padding(.top, Spacing.extraExtraSmall)
-            }
-            VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                Text(viewModel.network)
-                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                    .font(Fontstyle.captionM.base)
-                Text(viewModel.path)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    .font(Fontstyle.bodyM.base)
-                HStack(spacing: Spacing.extraExtraSmall) {
-                    Asset.derivedKeyAddress.swiftUIImage
-                    Text(showFullAddress ? viewModel.base58 : viewModel.base58.truncateMiddle())
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+        VStack(spacing: Spacing.small) {
+            HStack(alignment: .center, spacing: Spacing.small) {
+                VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
+                    Text(viewModel.rootKeyName)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         .font(Fontstyle.bodyM.base)
-                        .frame(idealWidth: .infinity, alignment: .leading)
-                    Asset.chevronDown.swiftUIImage
+                    Text(viewModel.path)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                        .rotationEffect(Angle(degrees: showFullAddress ? 180 : 0))
-                        .padding(.leading, Spacing.extraExtraSmall)
-                    Spacer()
+                        .font(Fontstyle.bodyM.base)
                 }
-                .onTapGesture {
-                    withAnimation {
-                        showFullAddress.toggle()
+                Spacer()
+                Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
+            }
+            HStack(alignment: .top, spacing: Spacing.small) {
+                VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
+                    HStack(spacing: Spacing.extraExtraSmall) {
+                        Text(showFullAddress ? viewModel.base58 : viewModel.base58.truncateMiddle())
+                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                            .font(Fontstyle.bodyM.base)
+                            .frame(idealWidth: .infinity, alignment: .leading)
+                        if !showFullAddress {
+                            Asset.chevronDown.swiftUIImage
+                                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                                .padding(.leading, Spacing.extraExtraSmall)
+                        }
+                        Spacer()
+                    }
+                    .onTapGesture {
+                        withAnimation {
+                            showFullAddress.toggle()
+                        }
                     }
                 }
+                Text(viewModel.network)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(Fontstyle.captionM.base)
+                    .padding([.top, .bottom], Spacing.extraExtraSmall)
+                    .padding([.leading, .trailing], Spacing.extraSmall)
+                    .background(Asset.fill12.swiftUIColor)
+                    .clipShape(Capsule())
             }
         }
-        .padding([.leading, .trailing], Spacing.medium)
-        .padding([.top, .bottom], Spacing.medium)
+        .padding(Spacing.medium)
         .fixedSize(horizontal: false, vertical: true)
     }
 }
@@ -66,11 +77,14 @@ struct QRCodeAddressFooterView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             VStack {
+                Spacer()
                 QRCodeAddressFooterView(
                     viewModel: PreviewData.qrCodeAddressFooterViewModel
                 )
+                .background(Asset.fill6Solid.swiftUIColor)
+                Spacer()
             }
-            .background(.gray)
+            .background(.white)
             .preferredColorScheme(.dark)
         }
     }

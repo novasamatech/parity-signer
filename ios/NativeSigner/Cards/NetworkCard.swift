@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NetworkCard: View {
-    @EnvironmentObject var data: SignerDataModel
+    @EnvironmentObject private var data: SignerDataModel
     let title: String
     let logo: String
     var fancy: Bool = false
