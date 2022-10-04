@@ -6,16 +6,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.parity.signer.R
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.fill18
 import io.parity.signer.ui.theme.pink500
 
 @Composable
@@ -28,9 +30,13 @@ fun CtaButtonBottomSheet(
 	Column(
 		modifier = modifier
 			.clickable(onClick = onClicked)
-			.background(MaterialTheme.colors.pink500, RoundedCornerShape(40.dp))
+			.background(
+				MaterialTheme.colors.pink500, RoundedCornerShape(
+					dimensionResource(id = R.dimen.buttonCornerRadius)
+				)
+			)
 			.fillMaxWidth()
-			.padding(vertical = 16.dp),
+			.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)),
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		Text(
@@ -51,7 +57,7 @@ fun SecondaryButtonBottomSheet(
 	Column(
 		modifier = modifier
 			.clickable(onClick = onClicked)
-			.padding(vertical = 16.dp)
+			.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
 			.fillMaxWidth(),
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
@@ -61,6 +67,57 @@ fun SecondaryButtonBottomSheet(
 			style = TypefaceNew.TitleS,
 			maxLines = 1,
 		)
+	}
+}
+
+@Composable
+fun RowButtonsBottomSheet(
+	labelCancel: String,
+	labelCta: String,
+	onClickedCancel: () -> Unit,
+	onClickedCta: () -> Unit,
+) {
+	Row {
+		Column(
+			modifier = Modifier
+				.clickable(onClick = onClickedCta)
+				.background(
+					MaterialTheme.colors.fill18, RoundedCornerShape(
+						dimensionResource(id = R.dimen.buttonCornerRadius)
+					)
+				)
+				.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
+				.weight(1f),
+			horizontalAlignment = Alignment.CenterHorizontally
+		) {
+			Text(
+				text = labelCancel,
+				color = MaterialTheme.colors.primary,
+				style = TypefaceNew.TitleS,
+				maxLines = 1,
+			)
+		}
+
+		Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+		Column(
+			modifier = Modifier
+				.clickable(onClick = onClickedCancel)
+				.background(
+					MaterialTheme.colors.pink500, RoundedCornerShape(
+						dimensionResource(id = R.dimen.buttonCornerRadius)
+					)
+				)
+				.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
+				.weight(1f),
+			horizontalAlignment = Alignment.CenterHorizontally
+		) {
+			Text(
+				text = labelCta,
+				color = MaterialTheme.colors.primary,
+				style = TypefaceNew.TitleS,
+				maxLines = 1,
+			)
+		}
 	}
 }
 
@@ -77,9 +134,16 @@ fun SecondaryButtonBottomSheet(
 @Composable
 private fun PreviewCtaButtons() {
 	SignerNewTheme {
-		Box(modifier = Modifier.size(300.dp),
-			contentAlignment = Alignment.BottomStart) {
+		Column(
+			modifier = Modifier.size(300.dp),
+		) {
 			CtaButtonBottomSheet("button") {}
+			RowButtonsBottomSheet(
+				labelCancel = "Cancel",
+				labelCta = "Apply",
+				onClickedCancel = { },
+				onClickedCta = {},
+			)
 		}
 	}
 }

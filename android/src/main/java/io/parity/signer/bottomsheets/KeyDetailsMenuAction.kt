@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,14 +21,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.bottomsheets.exportprivatekey.ConfirmExportPrivateKeyAction
-import io.parity.signer.components2.base.CtaButtonBottomSheet
+import io.parity.signer.components2.base.RowButtonsBottomSheet
 import io.parity.signer.components2.base.SecondaryButtonBottomSheet
-import io.parity.signer.models.*
-import io.parity.signer.ui.theme.*
+import io.parity.signer.models.EmptyNavigator
+import io.parity.signer.models.Navigator
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.red400
+import io.parity.signer.ui.theme.textSecondary
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MKeyDetails
 
-//todo dmitry finish this one
 @Composable
 fun KeyDetailsMenuAction(
 	navigator: Navigator,
@@ -73,7 +79,7 @@ private fun KeyDetailsGeneralMenu(
 			label = stringResource(R.string.menu_option_forget_delete_key),
 			tint = MaterialTheme.colors.red400,
 			onclick = {
-				state.value = KeyDetailsMenuState.PRIVATE_KEY_CONFIRM
+				state.value = KeyDetailsMenuState.DELETE_CONFIRM
 			}
 		)
 
@@ -112,21 +118,12 @@ private fun KeyDetailsDeleteConfirmMenu(
 			style = TypefaceNew.BodyL,
 			textAlign = TextAlign.Center,
 		)
-
-//		Row(Modifier.fillMaxWidth()) { //todo dmitry do in a row
-			CtaButtonBottomSheet(
-				label = stringResource(R.string.remove_key_confirm_cta),
-				modifier = Modifier.padding(vertical = 16.dp)
-			) {
-				navigator.navigate(Action.REMOVE_KEY)
-			}
-			CtaButtonBottomSheet(
-				label = stringResource(R.string.generic_cancel),
-				modifier = Modifier.padding(vertical = 16.dp)
-			) {
-				navigator.backAction()
-			}
-//		}
+		RowButtonsBottomSheet(
+			labelCancel = stringResource(R.string.generic_cancel),
+			labelCta = stringResource(R.string.remove_key_confirm_cta),
+			onClickedCancel = { navigator.backAction() },
+			onClickedCta = { navigator.navigate(Action.REMOVE_KEY) },
+		)
 		Spacer(modifier = Modifier.padding(bottom = 24.dp))
 	}
 }

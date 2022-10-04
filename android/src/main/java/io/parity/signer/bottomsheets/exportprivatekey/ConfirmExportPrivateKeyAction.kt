@@ -26,7 +26,6 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
 import io.parity.signer.ui.theme.textSecondary
 
-//todo dmitry finish
 @Composable
 fun ConfirmExportPrivateKeyAction(
 	navigator: Navigator,

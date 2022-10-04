@@ -1,6 +1,5 @@
 package io.parity.signer.bottomsheets.exportprivatekey
 
-import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.BorderStroke
@@ -34,7 +33,6 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.appliedStroke
 import io.parity.signer.ui.theme.fill6
 
-// todo dmitry finish this one
 @Composable
 fun PrivateKeyExportBottomSheet(
 	model: PrivateKeyExportModel,
