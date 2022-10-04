@@ -10,7 +10,7 @@ import SwiftUI
 /// Card for showing any address.
 /// Accepts Address object
 struct AddressCard: View {
-    @EnvironmentObject var data: SignerDataModel
+    @EnvironmentObject private var data: SignerDataModel
     var address: Address
     var multiselectMode: Bool = false
     @GestureState private var dragOffset = CGSize.zero

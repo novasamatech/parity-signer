@@ -8,14 +8,12 @@
 import SwiftUI
 
 struct ModalSelectorView: View {
-    @ObservedObject var data: SignerDataModel
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var navigation: NavigationCoordinator
     private let seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
 
     var body: some View {
         ModalSelector(
-            data: data,
-            navigation: navigation,
             modalData: navigation.actionResult.modalData,
             alert: data.alert,
             alertShow: { data.alertShow = true },

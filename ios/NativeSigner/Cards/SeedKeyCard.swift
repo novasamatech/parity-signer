@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SeedKeyCard: View {
-    @EnvironmentObject var data: SignerDataModel
+    @EnvironmentObject private var data: SignerDataModel
     var seedCard: MSeedKeyCard
     var multiselectMode: Bool = false
     var body: some View {

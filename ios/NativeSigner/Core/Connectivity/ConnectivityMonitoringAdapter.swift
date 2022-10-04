@@ -16,7 +16,7 @@ protocol ConnectivityMonitoring: AnyObject {
 }
 
 /// Adapter that monitors for connectivity changes
-final class ConnectivityMonitoringAdapter: ConnectivityMonitoring {
+final class ConnectivityMonitoringAdapter: ObservableObject, ConnectivityMonitoring {
     private let adaptee: PathMonitorProtocol
     private let monitoringQueue: DispatchQueue
     private let notificationQueue: DispatchQueue

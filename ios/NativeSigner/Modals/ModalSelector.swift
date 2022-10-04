@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct ModalSelector: View {
-    @ObservedObject var data: SignerDataModel
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var data: SignerDataModel
     let modalData: ModalData?
     let alert: Bool
     let alertShow: () -> Void
