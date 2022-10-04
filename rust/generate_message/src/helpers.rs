@@ -175,7 +175,7 @@ pub enum Write {
     /// only new payloads, `-k` setting key was used
     OnlyNew,
 
-    /// no payloads, `-p` setting key was used    
+    /// no payloads, `-p` setting key was used
     None,
 }
 

@@ -21,7 +21,8 @@ protocol SeedsMediating: AnyObject {
     ///
     /// This should be turned to `private` in future refactors
     var seedNames: [String] { get set }
-    /// Sets weak dependency to parent due to current architecture limitation (we should not store this class in `SignerDataModel`)
+    /// Sets weak dependency to parent due to current architecture limitation (we should not store this class in
+    // `SignerDataModel`)
     /// - Parameter signerDataModel: reference to `SignerDataModel`
     func set(signerDataModel: SignerDataModel)
     /// Get all seed names from secure storage
@@ -73,15 +74,18 @@ final class SeedsMediator: SeedsMediating {
     private let queryProvider: KeychainQueryProviding
     private let keychainAccessAdapter: KeychainAccessAdapting
     private weak var signerDataModel: SignerDataModel!
+    private let databaseMediator: DatabaseMediating
 
     @Published var seedNames: [String] = []
 
     init(
         queryProvider: KeychainQueryProviding = KeychainQueryProvider(),
-        keychainAccessAdapter: KeychainAccessAdapting = KeychainAccessAdapter()
+        keychainAccessAdapter: KeychainAccessAdapting = KeychainAccessAdapter(),
+        databaseMediator: DatabaseMediating = DatabaseMediator()
     ) {
         self.queryProvider = queryProvider
         self.keychainAccessAdapter = keychainAccessAdapter
+        self.databaseMediator = databaseMediator
     }
 
     func set(signerDataModel: SignerDataModel) {
@@ -134,14 +138,14 @@ final class SeedsMediator: SeedsMediating {
         switch result {
         case let .success(resultSeed):
             do {
-                try historySeedNameWasShown(seedName: seedName, dbname: signerDataModel.dbName)
+                try historySeedNameWasShown(seedName: seedName, dbname: databaseMediator.databaseName)
             } catch {
                 // Revisit why exactly we are returning empty String here, if Keychain data is all good
                 print("Seed access logging error! This system is broken and should not be used anymore.")
                 do {
                     try historyEntrySystem(
                         event: .systemEntry(systemEntry: "Seed access logging failed!"),
-                        dbname: signerDataModel.dbName
+                        dbname: databaseMediator.databaseName
                     )
                 } catch {
                     return ""
