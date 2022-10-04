@@ -22,6 +22,7 @@ import io.parity.signer.components2.base.CtaButtonBottomSheet
 import io.parity.signer.components2.base.SecondaryButtonBottomSheet
 import io.parity.signer.models.*
 import io.parity.signer.ui.theme.*
+import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MKeyDetails
 
 //todo dmitry finish this one
@@ -36,9 +37,8 @@ fun KeyDetailsMenuAction(
 	when (state.value) {
 		KeyDetailsMenuState.GENERAL -> KeyDetailsGeneralMenu(navigator, state)
 
-		KeyDetailsMenuState.DELETE_CONFIRM -> ConfirmExportPrivateKeyAction(
-			navigator = navigator,
-			publicKey = keyDetails!!.pubkey,
+		KeyDetailsMenuState.DELETE_CONFIRM -> KeyDetailsDeleteConfirmMenu(
+			navigator = navigator, state = state
 		)
 		KeyDetailsMenuState.PRIVATE_KEY_CONFIRM -> ConfirmExportPrivateKeyAction(
 			navigator = navigator,
@@ -70,7 +70,7 @@ private fun KeyDetailsGeneralMenu(
 
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_backspace_28,
-			label = "Delete",
+			label = stringResource(R.string.menu_option_forget_delete_key),
 			tint = MaterialTheme.colors.red400,
 			onclick = {
 				state.value = KeyDetailsMenuState.PRIVATE_KEY_CONFIRM
@@ -107,26 +107,26 @@ private fun KeyDetailsDeleteConfirmMenu(
 		)
 		Text(
 			modifier = Modifier.padding(top = 16.dp, bottom = 24.dp),
-			text = stringResource(R.string.export_private_key_confirm_text),
+			text = stringResource(R.string.remove_key_confirm_text),
 			color = MaterialTheme.colors.textSecondary,
 			style = TypefaceNew.BodyL,
 			textAlign = TextAlign.Center,
 		)
 
-		Row(Modifier.fillMaxWidth()) {
+//		Row(Modifier.fillMaxWidth()) { //todo dmitry do in a row
+			CtaButtonBottomSheet(
+				label = stringResource(R.string.remove_key_confirm_cta),
+				modifier = Modifier.padding(vertical = 16.dp)
+			) {
+				navigator.navigate(Action.REMOVE_KEY)
+			}
 			CtaButtonBottomSheet(
 				label = stringResource(R.string.generic_cancel),
 				modifier = Modifier.padding(vertical = 16.dp)
 			) {
 				navigator.backAction()
 			}
-			CtaButtonBottomSheet(
-				label = stringResource(R.string.generic_cancel),//todo dmitry text
-				modifier = Modifier.padding(vertical = 16.dp)
-			) {
-				navigator.backAction()
-			}
-		}
+//		}
 		Spacer(modifier = Modifier.padding(bottom = 24.dp))
 	}
 }
