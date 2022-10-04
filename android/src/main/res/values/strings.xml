@@ -9,6 +9,8 @@
 	<string name="export_private_key_confirm_cta">Export Private Key</string>
 	<string name="menu_option_export_private_key">Export Private Key</string>
 	<string name="menu_option_forget_delete_key">Delete</string>
+	<string name="menu_option_address_on_other_networks">Address on Other Networks</string>
+	<string name="menu_option_change_keys_network">Change this Key's Network</string>
 	<string name="export_private_key_title">Export Private Key</string>
 	<string name="qr_with_address_to_scan_description">QR with address to scan</string>
 	<string name="export_private_key_timer_label">Private Key will be hidden in</string>
