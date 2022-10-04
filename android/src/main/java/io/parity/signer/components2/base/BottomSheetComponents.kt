@@ -15,10 +15,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.TypefaceNew
-import io.parity.signer.ui.theme.fill18
-import io.parity.signer.ui.theme.pink500
+import io.parity.signer.ui.theme.*
 
 @Composable
 fun CtaButtonBottomSheet(
@@ -74,6 +71,7 @@ fun SecondaryButtonBottomSheet(
 fun RowButtonsBottomSheet(
 	labelCancel: String,
 	labelCta: String,
+	isDangerCta: Boolean = false,
 	onClickedCancel: () -> Unit,
 	onClickedCta: () -> Unit,
 ) {
@@ -103,9 +101,8 @@ fun RowButtonsBottomSheet(
 			modifier = Modifier
 				.clickable(onClick = onClickedCancel)
 				.background(
-					MaterialTheme.colors.pink500, RoundedCornerShape(
-						dimensionResource(id = R.dimen.buttonCornerRadius)
-					)
+					color = if (isDangerCta) MaterialTheme.colors.red400 else MaterialTheme.colors.pink500,
+					shape = RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
 				)
 				.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
 				.weight(1f),
