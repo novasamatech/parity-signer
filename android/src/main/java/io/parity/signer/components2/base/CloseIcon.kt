@@ -26,6 +26,7 @@ fun CloseIcon(
 	Box(
 		modifier = modifier
 			.size(32.dp)
+			.clickable(onClick = onCloseClicked)
 			.background(
 				MaterialTheme.colors.fill18,
 				CircleShape
@@ -38,7 +39,6 @@ fun CloseIcon(
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
 				.size(20.dp)
-				.clickable(onClick = onCloseClicked)
 		)
 	}
 }
