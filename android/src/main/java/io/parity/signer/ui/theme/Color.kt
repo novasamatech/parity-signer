@@ -3,6 +3,10 @@ package io.parity.signer.ui.theme
 import androidx.compose.material.Colors
 import androidx.compose.ui.graphics.Color
 
+/**
+ * Our color schema is shared with iOS and not mapped to android [androidx.compose.material.MaterialTheme] so mainly defined here
+ */
+
 val Colors.backgroundPrimary: Color
 	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF101015)
 

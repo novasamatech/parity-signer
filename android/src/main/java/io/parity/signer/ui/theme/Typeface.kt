@@ -111,7 +111,9 @@ val Web3Typography = Typography(
 	)
 )
 
-
+/**
+ * Our Typefase schema is shared with iOS and not mapped to android [androidx.compose.material.Typography] so mainly defined here
+ */
 object TypefaceNew {
 	val TitleXl = TextStyle(
 		fontFamily = InterFontFamily,
