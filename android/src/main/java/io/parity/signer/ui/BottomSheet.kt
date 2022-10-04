@@ -2,17 +2,17 @@ package io.parity.signer.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import io.parity.signer.ui.theme.backgroundTertiary
 import kotlinx.coroutines.launch
 
 
@@ -54,7 +54,7 @@ fun BottomSheetWrapper(
 	}
 
 	ModalBottomSheetLayout(
-		sheetBackgroundColor = Color.Transparent,
+		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
 		sheetState = modalBottomSheetState,
 		sheetContent = {
 			BottomSheetContentWrapper {
@@ -101,7 +101,6 @@ private fun BottomSheetContentWrapper(
 			.wrapContentHeight()
 			.fillMaxWidth()
 			.clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
-			.background(Color.White)
 	) {
 		content()
 	}
