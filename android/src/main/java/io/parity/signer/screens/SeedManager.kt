@@ -13,6 +13,7 @@ import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MSeeds
 
+@Deprecated("outdated - use new KeySets Screen") //todo dmitry remove
 @Composable
 fun SeedManager(
 	seed: MSeeds,

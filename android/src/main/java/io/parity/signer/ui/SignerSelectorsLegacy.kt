@@ -83,7 +83,7 @@ fun ScreenSelector(
 			processFrame = signerDataModel::processFrame,
 			resetScanValues = signerDataModel::resetScanValues,
 		)
-		is ScreenData.SeedSelector -> SeedManager(
+		is ScreenData.SeedSelector -> SeedManager( //todo dmitry main seed selector screen
 			screenData.f,
 			button2
 		)
