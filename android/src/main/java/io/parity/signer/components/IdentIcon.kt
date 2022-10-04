@@ -2,6 +2,7 @@ package io.parity.signer.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,7 +24,7 @@ fun IdentIcon(identicon: List<UByte>, size: Dp = 28.dp) {
 		modifier = Modifier
 			.size(size)
 			.clip(
-				RoundedCornerShape(100)
+				CircleShape
 			)
 	)
 }
