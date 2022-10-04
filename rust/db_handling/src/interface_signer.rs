@@ -162,11 +162,7 @@ where
         .map(|(multisigner, address_details)| {
             let address_key = AddressKey::from_multisigner(&multisigner); // to click
             let public_key = multisigner_to_public(&multisigner); // to display
-            let style = if address_details.encryption == Encryption::Ethereum {
-                IdenticonStyle::Blockies
-            } else {
-                IdenticonStyle::Dots
-            };
+            let style = address_details.encryption.identicon_style();
             let identicon = make_identicon_from_multisigner(&multisigner, style);
             MRawKey {
                 seed_name: address_details.seed_name,

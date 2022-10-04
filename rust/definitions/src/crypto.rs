@@ -72,7 +72,7 @@ use parity_scale_codec::{Decode, Encode};
 use sp_core;
 use sp_runtime::{MultiSignature, MultiSigner};
 
-use crate::network_specs::VerifierValue;
+use crate::{helpers::IdenticonStyle, network_specs::VerifierValue};
 
 /// Encryption algorithm
 ///
@@ -95,6 +95,17 @@ impl Encryption {
             Encryption::Sr25519 => String::from("sr25519"),
             Encryption::Ecdsa => String::from("ecdsa"),
             Encryption::Ethereum => String::from("ethereum"),
+        }
+    }
+
+    /// The style to use for identicons.
+    ///
+    /// Dots ss58
+    /// Blockies for ethereum h160 addrs.
+    pub fn identicon_style(&self) -> IdenticonStyle {
+        match self {
+            Encryption::Ethereum => IdenticonStyle::Blockies,
+            _ => IdenticonStyle::Dots,
         }
     }
 }

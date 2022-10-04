@@ -179,11 +179,7 @@ pub fn print_multisigner_as_base58(
 
 /// Turn a `ecdsa::Public` addr into an Ethereum address.
 pub fn ecdsa_public_to_eth_address(public: &ecdsa::Public) -> Result<H160> {
-    let decompressed = libsecp256k1::PublicKey::parse_slice(
-        &public.0,
-        Some(libsecp256k1::PublicKeyFormat::Compressed),
-    )?
-    .serialize();
+    let decompressed = libsecp256k1::PublicKey::parse_compressed(&public.0)?.serialize();
     let mut m = [0u8; 64];
     m.copy_from_slice(&decompressed[1..65]);
     Ok(H160::from(H256::from_slice(

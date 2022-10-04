@@ -1306,8 +1306,6 @@ pub fn export_secret_key<P>(
 where
     P: AsRef<Path>,
 {
-    use definitions::helpers::IdenticonStyle;
-
     let public_key = &unhex(public_key)?;
     let network_specs_key = &NetworkSpecsKey::from_hex(network_specs_key_hex)?;
     let network_specs = get_network_specs(&db_path, network_specs_key)?;
@@ -1329,11 +1327,7 @@ where
     }
     let public_key = multisigner_to_public(multisigner);
 
-    let style = if address_details.encryption == Encryption::Ethereum {
-        IdenticonStyle::Blockies
-    } else {
-        IdenticonStyle::Dots
-    };
+    let style = address_details.encryption.identicon_style();
     let address = Address {
         base58: print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix)),
         path: address_details.path.to_string(),
