@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.BottomBar
-import io.parity.signer.components.TopBar
+import io.parity.signer.components.panels.TopBar
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.NavigationMigrations
 import io.parity.signer.models.SignerDataModel

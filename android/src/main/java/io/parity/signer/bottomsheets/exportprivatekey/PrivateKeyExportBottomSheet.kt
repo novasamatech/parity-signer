@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.bottomsheets.exportprivatekey.PrivateKeyExportModel.Companion.SHOW_PRIVATE_KEY_TIMEOUT
 import io.parity.signer.components.NetworkCardModel
-import io.parity.signer.components2.CircularCountDownTimer
-import io.parity.signer.components2.KeyCard
-import io.parity.signer.components2.KeyCardModel
-import io.parity.signer.components2.base.BottomSheetHeader
+import io.parity.signer.components.sharedcomponents.CircularCountDownTimer
+import io.parity.signer.components.sharedcomponents.KeyCard
+import io.parity.signer.components.sharedcomponents.KeyCardModel
+import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap

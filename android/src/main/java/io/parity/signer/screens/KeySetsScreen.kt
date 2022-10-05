@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.items.KeySetItem
-import io.parity.signer.components2.base.CtaButtonBottomSheet
+import io.parity.signer.components.base.CtaButtonBottomSheet
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.ui.helpers.PreviewData
