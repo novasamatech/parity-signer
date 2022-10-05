@@ -340,5 +340,5 @@
 "ErrorModal.Action.Ok" = "Got It";
 "GenericErrorModal.Label.Title" = "Something has gone wrong.";
 "GenericErrorModal.Label.MessagePrefix" = "View the details below to find out more.";
-"GenericErrorModal.Action.Ok" = "Ok";
+"GenericErrorModal.Action.Ok" = "OK";
 
