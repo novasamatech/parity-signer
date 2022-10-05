@@ -95,7 +95,7 @@ fun RowButtonsBottomSheet(
 			)
 		}
 
-		Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+		Spacer(modifier = Modifier.padding(end = 8.dp))
 		Column(
 			modifier = Modifier
 				.clickable(onClick = onClickedCta)
