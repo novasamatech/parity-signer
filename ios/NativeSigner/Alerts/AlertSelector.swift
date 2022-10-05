@@ -10,8 +10,6 @@ import SwiftUI
 
 struct AlertSelector: View {
     let alertData: AlertData?
-    let isConnectivityOn: Bool
-    let resetAlert: () -> Void
     let navigationRequest: NavigationRequest
 
     var body: some View {
@@ -20,18 +18,12 @@ struct AlertSelector: View {
             EmptyView()
         case let .errorData(value):
             ErrorAlert(navigationRequest: navigationRequest, content: value)
-        case let .shield(value):
-            ShieldAlertComponent(
-                resetAlert: resetAlert,
-                navigationRequest: navigationRequest,
-                isConnectivityOn: isConnectivityOn,
-                content: value
-            )
+        case .shield:
+            // Handled elsewhere
+            EmptyView()
         case .confirm:
-            ConfirmAlert(
-                navigationRequest: navigationRequest,
-                content: "TODO"
-            )
+            // This was never used
+            EmptyView()
         }
     }
 }

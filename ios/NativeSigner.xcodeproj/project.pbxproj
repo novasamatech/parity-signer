@@ -44,7 +44,6 @@
 		2D6A9F84278C8275000DAE64 /* TCNetworkInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
-		2D78032528294D4C00E4D01E /* ShieldAlertComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D78032428294D4C00E4D01E /* ShieldAlertComponent.swift */; };
 		2D7A7BCE26BBC5690053C1E0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */; };
 		2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BD526C1126C0053C1E0 /* Utils.swift */; };
 		2D7A7BE326C3FC250053C1E0 /* terms-and-conditions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BE226C3FC250053C1E0 /* terms-and-conditions.txt */; };
@@ -204,7 +203,6 @@
 		6DBF6E2928E47EE000CC959F /* ErrorBottomModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E2828E47EE000CC959F /* ErrorBottomModalViewModel.swift */; };
 		6DBF6E2B28E58D7900CC959F /* ResetConnectivtyWarningsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E2A28E58D7900CC959F /* ResetConnectivtyWarningsAction.swift */; };
 		6DBF6E4328EACB7B00CC959F /* ConnectivityMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E4228EACB7B00CC959F /* ConnectivityMediator.swift */; };
-		6DBF6E4528EB147100CC959F /* ConfirmAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E4428EB147100CC959F /* ConfirmAlert.swift */; };
 		6DC5642E28B652DE003D540B /* AddKeySetModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5642D28B652DE003D540B /* AddKeySetModal.swift */; };
 		6DC5643028B65B9C003D540B /* AnimationDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5642F28B65B9C003D540B /* AnimationDuration.swift */; };
 		6DC5643328B68FC5003D540B /* AccessControlProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643228B68FC5003D540B /* AccessControlProvider.swift */; };
@@ -308,7 +306,6 @@
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
 		2D75EF9C280EC3B000C48FAF /* NativeSigner-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NativeSigner-Bridging-Header.h"; sourceTree = "<group>"; };
-		2D78032428294D4C00E4D01E /* ShieldAlertComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldAlertComponent.swift; sourceTree = "<group>"; };
 		2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LaunchScreen.xib; path = NativeSigner/LaunchScreen.xib; sourceTree = "<group>"; };
 		2D7A7BD526C1126C0053C1E0 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		2D7A7BE226C3FC250053C1E0 /* terms-and-conditions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "terms-and-conditions.txt"; sourceTree = "<group>"; };
@@ -473,7 +470,6 @@
 		6DBF6E2828E47EE000CC959F /* ErrorBottomModalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBottomModalViewModel.swift; sourceTree = "<group>"; };
 		6DBF6E2A28E58D7900CC959F /* ResetConnectivtyWarningsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetConnectivtyWarningsAction.swift; sourceTree = "<group>"; };
 		6DBF6E4228EACB7B00CC959F /* ConnectivityMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMediator.swift; sourceTree = "<group>"; };
-		6DBF6E4428EB147100CC959F /* ConfirmAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfirmAlert.swift; sourceTree = "<group>"; };
 		6DC5642D28B652DE003D540B /* AddKeySetModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddKeySetModal.swift; sourceTree = "<group>"; };
 		6DC5642F28B65B9C003D540B /* AnimationDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationDuration.swift; sourceTree = "<group>"; };
 		6DC5643228B68FC5003D540B /* AccessControlProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessControlProvider.swift; sourceTree = "<group>"; };
@@ -693,9 +689,7 @@
 			isa = PBXGroup;
 			children = (
 				2D48F38427691C0F004B27BE /* ErrorAlert.swift */,
-				6DBF6E4428EB147100CC959F /* ConfirmAlert.swift */,
 				2D48F38027691C05004B27BE /* AlertSelector.swift */,
-				2D78032428294D4C00E4D01E /* ShieldAlertComponent.swift */,
 			);
 			path = Alerts;
 			sourceTree = "<group>";
@@ -1570,7 +1564,6 @@
 				2DAA82AF278874F3002917C0 /* NetworkLogo.swift in Sources */,
 				6DD9FF1928C8C9B000FB6195 /* Animations.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
-				2D78032528294D4C00E4D01E /* ShieldAlertComponent.swift in Sources */,
 				6D57DC4D289D652400005C63 /* Dispatching.swift in Sources */,
 				6D01996C289C974C00F4C317 /* HeaderViewContainer.swift in Sources */,
 				2D48F3D8277B95A3004B27BE /* TransactionBlock.swift in Sources */,
@@ -1626,7 +1619,6 @@
 				2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */,
 				6D2D244F28CE5C1B00862726 /* NavbarActionButton.swift in Sources */,
 				6D84442128D3267A0072FBAC /* ForgetSingleKeyAction.swift in Sources */,
-				6DBF6E4528EB147100CC959F /* ConfirmAlert.swift in Sources */,
 				2DAA829B2788596C002917C0 /* TCNonce.swift in Sources */,
 				2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */,
 				2D6A9F84278C8275000DAE64 /* TCNetworkInfo.swift in Sources */,
