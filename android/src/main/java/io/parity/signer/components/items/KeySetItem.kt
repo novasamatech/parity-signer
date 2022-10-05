@@ -3,6 +3,7 @@ package io.parity.signer.components.items
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -10,52 +11,69 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
 import io.parity.signer.screens.KeySetViewModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 
-//todo dmitry finish item
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun KeySetItem(
 	model: KeySetViewModel,
 ) {
 	Surface(
-		shape = MaterialTheme.shapes.medium,
-		color = MaterialTheme.colors.Bg200,
+		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
+		color = MaterialTheme.colors.backgroundSecondary,
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
-				IdentIcon(identicon = model.identicon, size = 36.dp)
-				Column() {
+			IdentIcon(
+				identicon = model.identicon, size = 36.dp, modifier = Modifier.padding(
+					top = 16.dp,
+					bottom = 16.dp,
+					start = 16.dp,
+					end = 12.dp
+				)
+			)
+			Column(Modifier.weight(1f)) {
+				Text(
+					text = model.seedName,
+					color = MaterialTheme.colors.primary,
+					style = TypefaceNew.LabelM,
+				)
+				if (model.derivedKeysCount > 0.toUInt()) {
+					Spacer(modifier = Modifier.padding(top = 4.dp))
 					Text(
-						text = model.seedName,
-						color = MaterialTheme.colors.primary,
-						style = TypefaceNew.LabelM,
-					)
-					Text(
-						text = model.seedName,
+						text = pluralStringResource(
+							id = R.plurals.key_sets_item_derived_subtitle,
+							count = model.derivedKeysCount.toInt(),
+							model.derivedKeysCount.toInt(),
+						),
 						color = MaterialTheme.colors.textDisabled,
 						style = TypefaceNew.BodyM,
 					)
 				}
+			}
 			Image(
 				imageVector = Icons.Filled.ChevronRight,
 				contentDescription = null,
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
 				modifier = Modifier
 					.size(28.dp)
+					.padding(end = 8.dp)
 			)
 		}
 	}
 }
-
-
 
 
 @Preview(
@@ -70,7 +88,11 @@ fun KeySetItem(
 private fun PreviewKeySetItem() {
 	SignerNewTheme {
 		KeySetItem(
-			KeySetViewModel("My special key set", PreviewData.exampleIdenticon, 2.toUInt())
+			KeySetViewModel(
+				"My special key set",
+				PreviewData.exampleIdenticon,
+				2.toUInt()
+			)
 		)
 	}
 }

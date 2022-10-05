@@ -14,8 +14,8 @@ import io.parity.signer.models.intoImageBitmap
  * Just draw a standard identicon used everywhere, with standard size
  */
 @Composable
-fun IdentIcon(identicon: List<UByte>, size: Dp = 28.dp) {
+fun IdentIcon(identicon: List<UByte>, size: Dp = 28.dp, modifier: Modifier = Modifier) {
 	Image(
-		identicon.intoImageBitmap(), stringResource(R.string.description_identicon), modifier = Modifier.size(size)
+		identicon.intoImageBitmap(), stringResource(R.string.description_identicon), modifier = modifier.size(size)
 	)
 }
