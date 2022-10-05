@@ -338,3 +338,7 @@
 "BackupModal.Label.Snackbar" = "Private Keys will be hidden in";
 
 "ErrorModal.Action.Ok" = "Got It";
+"GenericErrorModal.Label.Title" = "An Error Occured";
+"GenericErrorModal.Label.MessagePrefix" = "Something is wrong, read details in the description below";
+"GenericErrorModal.Action.Ok" = "Ok";
+
