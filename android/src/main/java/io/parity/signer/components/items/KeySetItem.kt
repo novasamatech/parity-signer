@@ -2,6 +2,7 @@ package io.parity.signer.components.items
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -28,10 +29,12 @@ import io.parity.signer.ui.theme.*
 @Composable
 fun KeySetItem(
 	model: KeySetViewModel,
+	onClick: () -> Unit = {},
 ) {
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
 		color = MaterialTheme.colors.backgroundSecondary,
+		modifier = Modifier.clickable(onClick = onClick),
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
