@@ -528,11 +528,11 @@ impl Make {
             return Ok(Crypto::Sufficient { s });
         }
         let verifier_public_key = match (
-            &self.verifier.verifier_alice,
+            self.verifier.verifier_alice,
             &self.verifier.verifier_hex,
             &self.verifier.verifier_file,
         ) {
-            (Some(e), None, None) => return Ok(Crypto::Alice { e: e.clone() }),
+            (Some(e), None, None) => return Ok(Crypto::Alice { e }),
             (None, Some(hex), None) => unhex(hex)?,
             (None, None, Some(path)) => {
                 let verifier_filename = &self.files_dir.join(path);
@@ -561,7 +561,7 @@ impl Make {
         };
 
         Ok(Crypto::Sufficient {
-            s: into_sufficient(verifier_public_key, signature, self.crypto.clone().unwrap())?,
+            s: into_sufficient(verifier_public_key, signature, self.crypto.unwrap())?,
         })
     }
 }
