@@ -1,17 +1,24 @@
 package io.parity.signer.screens
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.parity.signer.R
 import io.parity.signer.components.items.KeySetItem
+import io.parity.signer.components2.base.CtaButtonBottomSheet
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.TypefaceNew
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MSeeds
 import io.parity.signer.uniffi.SeedNameCard
@@ -22,15 +29,32 @@ fun KeySetsScreen(
 	model: KeySetsSelectViewModel,
 	navigator: Navigator,
 ) {
-	val cards = model.keys
-	LazyColumn(
-		contentPadding = PaddingValues(horizontal = 12.dp),
-		verticalArrangement = Arrangement.spacedBy(10.dp)
-	) {
-		items(cards.size) { i ->
-			KeySetItem(model = cards[i]) {
-				navigator.navigate(Action.SELECT_SEED, cards[i].seedName)
+	Column() {
+		Text(
+			text = stringResource(R.string.key_sets_screem_title),
+			color = MaterialTheme.colors.primary,
+			style = TypefaceNew.TitleS,
+			textAlign = TextAlign.Center,
+			modifier = Modifier
+                .fillMaxWidth(1f)
+                .padding(8.dp),
+		)
+		LazyColumn(
+			contentPadding = PaddingValues(horizontal = 12.dp),
+			verticalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+			val cards = model.keys
+			items(cards.size) { i ->
+				KeySetItem(model = cards[i]) {
+					navigator.navigate(Action.SELECT_SEED, cards[i].seedName)
+				}
 			}
+		}
+		CtaButtonBottomSheet(
+			label = stringResource(R.string.key_sets_screem_add_key_button),
+			modifier = Modifier.padding(24.dp),
+		) {
+			//callback
 		}
 	}
 }
@@ -83,6 +107,8 @@ private fun PreviewKeySetsSelectScreen() {
 		)
 	)
 	SignerNewTheme {
-		KeySetsScreen(mockModel, EmptyNavigator())
+		Box(modifier = Modifier.size(350.dp, 550.dp)) {
+			KeySetsScreen(mockModel, EmptyNavigator())
+		}
 	}
 }

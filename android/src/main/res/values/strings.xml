@@ -18,4 +18,6 @@
 	<string name="description_locked_icon">Locked account</string>
 	<string name="description_identicon">identicon</string>
 	<string name="description_expand_button">Expand button</string>
+	<string name="key_sets_screem_title">Key Sets</string>
+	<string name="key_sets_screem_add_key_button">Add Key Set</string>
 </resources>
