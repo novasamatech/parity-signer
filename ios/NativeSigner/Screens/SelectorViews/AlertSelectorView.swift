@@ -15,8 +15,6 @@ struct AlertSelectorView: View {
     var body: some View {
         AlertSelector(
             alertData: navigation.actionResult.alertData,
-            isConnectivityOn: connectivityMediator.isConnectivityOn,
-            resetAlert: data.resetAlert,
             navigationRequest: { navigationRequest in
                 navigation.perform(navigation: navigationRequest)
             }
