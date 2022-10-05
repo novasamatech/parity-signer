@@ -1,5 +1,7 @@
-package io.parity.signer.components
+package io.parity.signer.components.panels
 
+import android.content.res.Configuration
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomAppBar
@@ -12,18 +14,22 @@ import androidx.compose.material.icons.filled.CropFree
 import androidx.compose.material.icons.filled.Pattern
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.navigate
-import io.parity.signer.ui.theme.Bg000
-import io.parity.signer.ui.theme.Text300
-import io.parity.signer.ui.theme.Text400
-import io.parity.signer.ui.theme.Text600
+import io.parity.signer.R
+import io.parity.signer.models.EmptyNavigator
+import io.parity.signer.models.Navigator
+import io.parity.signer.screens.KeySetViewModel
+import io.parity.signer.screens.KeySetsScreen
+import io.parity.signer.screens.KeySetsSelectViewModel
+import io.parity.signer.ui.helpers.PreviewData
+import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.FooterButton
 import io.parity.signer.uniffi.actionGetName
 
 /**
@@ -32,10 +38,11 @@ import io.parity.signer.uniffi.actionGetName
  */
 @Composable
 fun BottomBar2(
-	signerDataModel: SignerDataModel,
+	navigator: Navigator,
+	footerButton: FooterButton?,
 ) {
 	BottomAppBar(
-		backgroundColor = MaterialTheme.colors.Bg000,
+		backgroundColor = MaterialTheme.colors.backgroundSecondary,
 		elevation = 0.dp,
 		modifier = Modifier.height(56.dp)
 	) {
@@ -44,63 +51,102 @@ fun BottomBar2(
 			modifier = Modifier.fillMaxWidth(1f)
 		) {
 			BottomBarButton2(
-				signerDataModel = signerDataModel,
-				image = Icons.Default.CalendarViewDay,
-				action = Action.NAVBAR_LOG
-			)
-			BottomBarButton2(
-				signerDataModel = signerDataModel,
-				image = Icons.Default.CropFree,
-				action = Action.NAVBAR_SCAN
-			)
-			BottomBarButton2(
-				signerDataModel = signerDataModel,
+				footerButton = footerButton,
+				navigator = navigator,
 				image = Icons.Default.Pattern,
-				action = Action.NAVBAR_KEYS
+				action = Action.NAVBAR_KEYS,
+				labelResId = R.string.bottom_bar_label_key_sets,
 			)
 			BottomBarButton2(
-				signerDataModel = signerDataModel,
+				footerButton = footerButton,
+				navigator = navigator,
+				image = Icons.Default.CropFree,
+				action = Action.NAVBAR_SCAN,
+				labelResId = R.string.bottom_bar_label_scanner,
+			)
+			BottomBarButton2(
+				footerButton = footerButton,
+				navigator = navigator,
+				image = Icons.Default.CalendarViewDay,
+				action = Action.NAVBAR_LOG,
+				labelResId = R.string.bottom_bar_label_logs,
+			)
+			BottomBarButton2(
+				footerButton = footerButton,
+				navigator = navigator,
 				image = Icons.Default.Settings,
-				action = Action.NAVBAR_SETTINGS
+				action = Action.NAVBAR_SETTINGS,
+				labelResId = R.string.bottom_bar_label_settings,
 			)
 		}
 	}
 }
 
 /**
- * Unified bottom bar button view
+ * Unified bottom bar button view for [BottomBar2]
  */
 @Composable
 fun BottomBarButton2(
-	signerDataModel: SignerDataModel,
+	footerButton: FooterButton?,
+	navigator: Navigator,
 	image: ImageVector,
 	action: Action,
+	@StringRes labelResId: Int,
 ) {
-	val selected =
-		signerDataModel.actionResult.observeAsState().value?.footerButton == actionGetName(action)
-	val tint = if (selected) {
-		MaterialTheme.colors.Text600
-	} else {
-		MaterialTheme.colors.Text300
-	}
+	val selected = footerButton == actionGetName(action)
 	val color = if (selected) {
-		MaterialTheme.colors.Text600
+		MaterialTheme.colors.pink500
 	} else {
-		MaterialTheme.colors.Text400
+		MaterialTheme.colors.textTertiary
 	}
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier
-			.clickable(onClick = {
-				signerDataModel.navigate(action)
-			})
-			.width(66.dp)
+            .clickable { navigator.navigate(action) }
+            .width(66.dp)
 	) {
-		Icon(image, contentDescription = actionGetName(action).toString(), tint = tint)
-		Text(
-			actionGetName(action).toString(),
-			color = color,
-			style = MaterialTheme.typography.subtitle2
+		Icon(
+			imageVector = image,
+			contentDescription = actionGetName(action).toString(),
+			tint = color,
+			modifier = Modifier.size(28.dp)
 		)
+		Text(
+			text = stringResource(id = labelResId),
+			color = color,
+			style = TypefaceNew.CaptionS,
+		)
+	}
+}
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewBottomBar2() {
+	val mockModel = KeySetsSelectViewModel(
+		listOf(
+			KeySetViewModel(
+				"first seed name",
+				PreviewData.exampleIdenticon,
+				1.toUInt()
+			),
+			KeySetViewModel(
+				"second seed name",
+				PreviewData.exampleIdenticon,
+				3.toUInt()
+			),
+		)
+	)
+	SignerNewTheme {
+		Box(modifier = Modifier.size(350.dp, 550.dp)) {
+			BottomBar2(EmptyNavigator(), null)
+		}
 	}
 }

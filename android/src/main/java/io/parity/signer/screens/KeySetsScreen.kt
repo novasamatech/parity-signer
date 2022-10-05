@@ -11,23 +11,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.parity.signer.R
 import io.parity.signer.components.items.KeySetItem
 import io.parity.signer.components.base.CtaButtonBottomSheet
+import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.MSeeds
-import io.parity.signer.uniffi.SeedNameCard
+import io.parity.signer.uniffi.*
 
 //old design screen was called SeedManager todo dmitry update
 @Composable
 fun KeySetsScreen(
 	model: KeySetsSelectViewModel,
 	navigator: Navigator,
+	footerButton: FooterButton?,
 ) {
 	Column() {
 		Text(
@@ -36,8 +38,8 @@ fun KeySetsScreen(
 			style = TypefaceNew.TitleS,
 			textAlign = TextAlign.Center,
 			modifier = Modifier
-                .fillMaxWidth(1f)
-                .padding(8.dp),
+				.fillMaxWidth(1f)
+				.padding(8.dp),
 		)
 		LazyColumn(
 			contentPadding = PaddingValues(horizontal = 12.dp),
@@ -56,8 +58,10 @@ fun KeySetsScreen(
 		) {
 			//callback
 		}
+		BottomBar2(navigator, footerButton)
 	}
 }
+
 
 /**
  * Local copy of shared [MSeeds] class
@@ -108,7 +112,7 @@ private fun PreviewKeySetsSelectScreen() {
 	)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreen(mockModel, EmptyNavigator())
+			KeySetsScreen(mockModel, EmptyNavigator(), null)
 		}
 	}
 }

@@ -20,4 +20,8 @@
 	<string name="description_expand_button">Expand button</string>
 	<string name="key_sets_screem_title">Key Sets</string>
 	<string name="key_sets_screem_add_key_button">Add Key Set</string>
+	<string name="bottom_bar_label_key_sets">Key Sets</string>
+	<string name="bottom_bar_label_scanner">Scanner</string>
+	<string name="bottom_bar_label_logs">Logs</string>
+	<string name="bottom_bar_label_settings">Settings</string>
 </resources>
