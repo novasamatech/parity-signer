@@ -125,6 +125,7 @@
 		6D019973289D183600F4C317 /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D01996E289CA12100F4C317 /* NavigationCoordinator.swift */; };
 		6D019974289D183B00F4C317 /* UInt8+Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D019964289BF7D000F4C317 /* UInt8+Formatting.swift */; };
 		6D01997E289D238700F4C317 /* Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D01997D289D238700F4C317 /* Localizable.swift */; };
+		6D17EF8328EDC951008626E9 /* Encryption+RawRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D17EF8228EDC951008626E9 /* Encryption+RawRepresentable.swift */; };
 		6D2779C828B3D33100570055 /* NavigationBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779C728B3D33100570055 /* NavigationBarView.swift */; };
 		6D2779CA28B3E58600570055 /* KeySetListViewModelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779C928B3E58600570055 /* KeySetListViewModelBuilder.swift */; };
 		6D2779CE28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779CD28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift */; };
@@ -394,6 +395,7 @@
 		6D01996E289CA12100F4C317 /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
 		6D019970289CA13000F4C317 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 		6D01997D289D238700F4C317 /* Localizable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Localizable.swift; sourceTree = "<group>"; };
+		6D17EF8228EDC951008626E9 /* Encryption+RawRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encryption+RawRepresentable.swift"; sourceTree = "<group>"; };
 		6D2779C728B3D33100570055 /* NavigationBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarView.swift; sourceTree = "<group>"; };
 		6D2779C928B3E58600570055 /* KeySetListViewModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetListViewModelBuilder.swift; sourceTree = "<group>"; };
 		6D2779CD28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetListViewModelBuilderTests.swift; sourceTree = "<group>"; };
@@ -1064,6 +1066,7 @@
 			isa = PBXGroup;
 			children = (
 				6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */,
+				6D17EF8228EDC951008626E9 /* Encryption+RawRepresentable.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1745,6 +1748,7 @@
 				2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */,
 				2DAA82912786FA4B002917C0 /* KeyDetailsMulti.swift in Sources */,
 				6D6430F128CB32CC00342E37 /* Snackbar.swift in Sources */,
+				6D17EF8328EDC951008626E9 /* Encryption+RawRepresentable.swift in Sources */,
 				6DBF6E4328EACB7B00CC959F /* ConnectivityMediator.swift in Sources */,
 				6D6430F428CB447900342E37 /* ForgetKeySetAction.swift in Sources */,
 				6DC5643928B7DED8003D540B /* KeychainQueryProvider.swift in Sources */,

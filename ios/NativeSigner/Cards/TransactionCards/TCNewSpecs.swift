@@ -47,12 +47,8 @@ struct TCNewSpecs: View {
                 HStack {
                     Localizable.crypto.text
                         .foregroundColor(Asset.text400.swiftUIColor)
-                    Text(
-                        value.encryption == .ed25519 ? "ed25519" :
-                            value.encryption == .sr25519 ? "sr25519" :
-                            value.encryption == .ecdsa ? "ecdsa" : "error"
-                    )
-                    .foregroundColor(Asset.text600.swiftUIColor)
+                    Text(value.encryption.rawValue)
+                        .foregroundColor(Asset.text600.swiftUIColor)
                 }
                 HStack {
                     Localizable.specName.text
