@@ -80,7 +80,7 @@ pub fn make_identicon_from_multisigner(
         IdenticonStyle::Blockies => {
             if let MultiSigner::Ecdsa(ref public) = multisigner {
                 use eth_blockies::{eth_blockies_png_data, SeedString};
-                let account = print_ethereum_address(public).unwrap();
+                let account = print_ethereum_address(public);
                 let account = account.canonicalize_ethaddr();
                 let dimension = (IDENTICON_IMG_SIZE, IDENTICON_IMG_SIZE);
                 let compressed_output = false;
@@ -152,9 +152,10 @@ pub fn get_multisigner(public: &[u8], encryption: &Encryption) -> Result<MultiSi
 /// network-specific base58 prefix by providing `Some(value)` as `optional_prefix` or with
 /// [default](https://docs.rs/sp-core/6.0.0/sp_core/crypto/trait.Ss58Codec.html#method.to_ss58check)
 /// one by leaving it `None`.
-pub fn print_multisigner_as_base58(
+pub fn print_multisigner_as_base58_or_eth(
     multi_signer: &MultiSigner,
     optional_prefix: Option<u16>,
+    encryption: Encryption,
 ) -> String {
     match optional_prefix {
         Some(base58prefix) => {
@@ -166,13 +167,25 @@ pub fn print_multisigner_as_base58(
                 MultiSigner::Sr25519(pubkey) => {
                     pubkey.to_ss58check_with_version(version_for_base58)
                 }
-                MultiSigner::Ecdsa(pubkey) => pubkey.to_ss58check_with_version(version_for_base58),
+                MultiSigner::Ecdsa(pubkey) => {
+                    if encryption == Encryption::Ethereum {
+                        print_ethereum_address(pubkey)
+                    } else {
+                        pubkey.to_ss58check_with_version(version_for_base58)
+                    }
+                }
             }
         }
         None => match multi_signer {
             MultiSigner::Ed25519(pubkey) => pubkey.to_ss58check(),
             MultiSigner::Sr25519(pubkey) => pubkey.to_ss58check(),
-            MultiSigner::Ecdsa(pubkey) => pubkey.to_ss58check(),
+            MultiSigner::Ecdsa(pubkey) => {
+                if encryption == Encryption::Ethereum {
+                    print_ethereum_address(pubkey)
+                } else {
+                    pubkey.to_ss58check()
+                }
+            }
         },
     }
 }
@@ -188,10 +201,12 @@ pub fn ecdsa_public_to_eth_address(public: &ecdsa::Public) -> Result<H160> {
 }
 
 /// Print a `ecdsa::Public` into `String`.
-pub fn print_ethereum_address(public: &ecdsa::Public) -> Result<String> {
-    let account = ecdsa_public_to_eth_address(public)?;
+///
+/// Panics if provided ecdsa public key is in wrong format.
+fn print_ethereum_address(public: &ecdsa::Public) -> String {
+    let account = ecdsa_public_to_eth_address(public).expect("Wrong ecdsa public key provided");
 
-    Ok(format!("0x{:?}", HexDisplay::from(&account.as_bytes())))
+    format!("0x{:?}", HexDisplay::from(&account.as_bytes()))
 }
 
 /// Print id pic for metadata hash
@@ -225,7 +240,7 @@ mod tests {
         let public_key = ecdsa::Pair::from_seed_slice(&secret_key).unwrap().public();
 
         assert_eq!(
-            print_ethereum_address(&public_key).unwrap(),
+            print_ethereum_address(&public_key),
             "0x976f8456e4e2034179b284a23c0e0c8f6d3da50c"
         )
     }
@@ -239,7 +254,7 @@ mod tests {
         let public_key = ecdsa::Pair::from_seed_slice(&secret_key).unwrap().public();
 
         assert_eq!(
-            print_ethereum_address(&public_key).unwrap(),
+            print_ethereum_address(&public_key),
             "0x420e9f260b40af7e49440cead3069f8e82a5230f",
         )
     }

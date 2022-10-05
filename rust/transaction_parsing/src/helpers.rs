@@ -210,8 +210,13 @@ pub fn multisigner_msg_genesis_encryption<P: AsRef<Path>>(
                         .into_iter()
                         .find_map(|(multisigner, _)| {
                             if let MultiSigner::Ecdsa(ref e) = multisigner {
-                                let eth_addr =
-                                    definitions::helpers::ecdsa_public_to_eth_address(e).unwrap();
+                                let eth_addr = if let Ok(addr) =
+                                    definitions::helpers::ecdsa_public_to_eth_address(e)
+                                {
+                                    addr
+                                } else {
+                                    return None;
+                                };
                                 if eth_addr.as_ref() == a {
                                     Some(multisigner.clone())
                                 } else {

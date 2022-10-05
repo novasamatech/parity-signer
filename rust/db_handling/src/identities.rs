@@ -69,7 +69,7 @@ use definitions::{
 };
 #[cfg(feature = "signer")]
 use definitions::{
-    helpers::{make_identicon_from_multisigner, print_multisigner_as_base58},
+    helpers::{make_identicon_from_multisigner, print_multisigner_as_base58_or_eth},
     navigation::{Address, MKeyDetails, MSCNetworkInfo},
 };
 #[cfg(feature = "signer")]
@@ -1329,7 +1329,11 @@ where
 
     let style = address_details.encryption.identicon_style();
     let address = Address {
-        base58: print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix)),
+        base58: print_multisigner_as_base58_or_eth(
+            multisigner,
+            Some(network_specs.base58prefix),
+            address_details.encryption,
+        ),
         path: address_details.path.to_string(),
         has_pwd: address_details.has_pwd,
         identicon: make_identicon_from_multisigner(multisigner, style),
