@@ -100,14 +100,13 @@ private fun KeyDetailsGeneralMenu(
 				state.value = KeyDetailsMenuState.DELETE_CONFIRM
 			}
 		)
-
+		Spacer(modifier = Modifier.padding(bottom = 16.dp))
 		SecondaryButtonBottomSheet(
 			label = stringResource(R.string.generic_cancel),
-			modifier = Modifier.padding(vertical = 16.dp)
 		) {
 			navigator.backAction()
 		}
-		Spacer(modifier = Modifier.padding(bottom = 24.dp))
+		Spacer(modifier = Modifier.padding(bottom = 16.dp))
 	}
 }
 
@@ -173,7 +172,7 @@ private fun MenuItemForBottomSheet(
 			painter = painterResource(id = iconId),
 			contentDescription = null,
 			modifier = Modifier
-				.size(32.dp),
+				.size(28.dp),
 			tint = tint ?: MaterialTheme.colors.primary,
 		)
 		Spacer(modifier = Modifier.padding(end = 24.dp))
