@@ -77,7 +77,7 @@ use crate::{helpers::IdenticonStyle, network_specs::VerifierValue};
 /// Encryption algorithm
 ///
 /// Lists all encryption algorithms supported by Substrate
-#[derive(Clone, Debug, Decode, Encode, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, Decode, Encode, PartialEq, Eq)]
 pub enum Encryption {
     Ed25519,
     Sr25519,

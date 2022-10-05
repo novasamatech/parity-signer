@@ -57,9 +57,18 @@ fn sign_action_test(
     pwd_entry: &str,
     user_comment: &str,
     dbname: &str,
+    encryption: Encryption,
 ) -> Result<String> {
     Ok(hex::encode(
-        create_signature(seed_phrase, pwd_entry, user_comment, dbname, checksum)?.encode(),
+        create_signature(
+            seed_phrase,
+            pwd_entry,
+            user_comment,
+            dbname,
+            checksum,
+            encryption,
+        )?
+        .encode(),
     ))
 }
 
@@ -380,7 +389,14 @@ fn can_sign_transaction_1() {
         assert_eq!(network_info, network_info_known);
         assert!(!has_pwd, "Expected no password");
 
-        match sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname) {
+        match sign_action_test(
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            dbname,
+            network_info.encryption,
+        ) {
             Ok(signature) => assert!(
                 (signature.len() == 130) && (signature.starts_with("01")),
                 "Wrong signature format,\nReceived: \n{}",
@@ -418,7 +434,14 @@ fn can_sign_transaction_1() {
 
         assert!(entries_contain_event(&history_recorded, &my_event));
 
-        let result = sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname);
+        let result = sign_action_test(
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            dbname,
+            network_info.encryption,
+        );
         if let Err(e) = result {
             if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
             } else {
@@ -620,7 +643,14 @@ fn can_sign_message_1() {
         assert_eq!(network_info, network_info_known);
         assert!(!has_pwd, "Expected no password");
 
-        match sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname) {
+        match sign_action_test(
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            dbname,
+            network_info.encryption,
+        ) {
             Ok(signature) => assert!(
                 (signature.len() == 130) && (signature.starts_with("01")),
                 "Wrong signature format,\nReceived: \n{}",
@@ -663,7 +693,14 @@ fn can_sign_message_1() {
             history_recorded
         );
 
-        let result = sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname);
+        let result = sign_action_test(
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            dbname,
+            network_info.encryption,
+        );
         if let Err(e) = result {
             if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
             } else {
@@ -2472,14 +2509,22 @@ Identities:
         checksum,
         has_pwd,
         author_info,
-        network_info: _,
+        network_info,
     } = output
     {
         assert_eq!(content, content_known);
         assert_eq!(author_info, author_info_known);
         // TODO: assert_eq!(network_info, network_info_known);
         assert!(!has_pwd, "Expected no password");
-        sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname).unwrap();
+        sign_action_test(
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            dbname,
+            network_info.encryption,
+        )
+        .unwrap();
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -2775,14 +2820,22 @@ Identities:
         checksum,
         has_pwd,
         author_info,
-        network_info: _,
+        network_info,
     } = output
     {
         assert_eq!(content, content_known);
         assert_eq!(author_info, author_info_known);
         // TODO assert_eq!(network_info, network_info_known);
         assert!(!has_pwd, "Expected no password");
-        sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname).unwrap();
+        sign_action_test(
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            dbname,
+            network_info.encryption,
+        )
+        .unwrap();
     } else {
         panic!("Wrong action: {:?}", output)
     }

@@ -392,6 +392,7 @@ impl State {
                                         details_str,
                                         &t.get_comment(),
                                         dbname,
+                                        network_info.encryption,
                                     ) {
                                         Ok(a) => {
                                             seed.zeroize();
@@ -434,6 +435,7 @@ impl State {
                                 "",
                                 details_str,
                                 dbname,
+                                network_info.encryption,
                             ) {
                                 Ok(a) => {
                                     new_navstate.modal = Modal::SignatureReady(a);

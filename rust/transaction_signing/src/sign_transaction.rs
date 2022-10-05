@@ -1,3 +1,4 @@
+use definitions::crypto::Encryption;
 use parity_scale_codec::Encode;
 use sp_core::blake2_256;
 use sp_runtime::MultiSignature;
@@ -18,6 +19,7 @@ pub(crate) fn create_signature(
     user_comment: &str,
     database_name: &str,
     checksum: u32,
+    encryption: Encryption,
 ) -> Result<MultiSignature> {
     let sign = TrDbColdSign::from_storage(database_name, checksum)?;
     let pwd = {
@@ -44,7 +46,13 @@ pub(crate) fn create_signature(
         }
     };
     let mut full_address = seed_phrase.to_owned() + &sign.path();
-    match sign_as_address_key(&content_vec, &sign.multisigner(), &full_address, pwd) {
+    match sign_as_address_key(
+        &content_vec,
+        &sign.multisigner(),
+        &full_address,
+        pwd,
+        encryption,
+    ) {
         Ok(s) => {
             full_address.zeroize();
             sign.apply(false, user_comment, database_name)?;
@@ -68,6 +76,7 @@ pub fn create_signature_png(
     user_comment: &str,
     database_name: &str,
     checksum: u32,
+    encryption: Encryption,
 ) -> Result<Vec<u8>> {
     let hex_result = hex::encode(
         create_signature(
@@ -76,6 +85,7 @@ pub fn create_signature_png(
             user_comment,
             database_name,
             checksum,
+            encryption,
         )?
         .encode(),
     );
