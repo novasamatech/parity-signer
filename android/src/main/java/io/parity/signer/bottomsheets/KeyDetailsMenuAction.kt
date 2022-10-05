@@ -146,7 +146,9 @@ private fun KeyDetailsDeleteConfirmMenu(
 			labelCancel = stringResource(R.string.generic_cancel),
 			labelCta = stringResource(R.string.remove_key_confirm_cta),
 			isDangerCta = true,
-			onClickedCancel = { navigator.backAction() },
+			onClickedCancel = {
+				navigator.backAction()
+												},
 			onClickedCta = { navigator.navigate(Action.REMOVE_KEY) },
 		)
 		Spacer(modifier = Modifier.padding(bottom = 24.dp))
