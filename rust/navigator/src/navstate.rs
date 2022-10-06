@@ -1,6 +1,7 @@
 //! Navigation state of the app
 
 use db_handling::helpers::get_danger_status;
+use db_handling::identities::get_multisigner_by_address;
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
     ActionResult, Address, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti,
@@ -646,11 +647,18 @@ impl State {
         match self.navstate.screen {
             Screen::Keys(ref keys_state) => {
                 if keys_state.is_multiselect() {
-                    match process_hex_address_key(details_str) {
-                        Ok(multisigner) => {
+                    match get_multisigner_by_address(
+                        dbname,
+                        &AddressKey::from_hex(details_str).unwrap(),
+                    ) {
+                        Ok(Some(multisigner)) => {
                             new_navstate = Navstate::clean_screen(Screen::Keys(
                                 keys_state.select_single(&multisigner),
                             ));
+                        }
+                        Ok(None) => {
+                            new_navstate.alert = Alert::Error;
+                            let _ = write!(&mut errorline, "key not found {}", details_str);
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
@@ -2125,7 +2133,7 @@ fn process_hex_address_key_address_details(
     dbname: &str,
 ) -> Result<(MultiSigner, AddressDetails)> {
     let address_key = AddressKey::from_hex(hex_address_key)?;
-    let multisigner = address_key.multi_signer()?;
+    let multisigner = get_multisigner_by_address(dbname, &address_key)?.unwrap();
     let address_details = db_handling::helpers::get_address_details(dbname, &address_key)?;
     Ok((multisigner, address_details))
 }

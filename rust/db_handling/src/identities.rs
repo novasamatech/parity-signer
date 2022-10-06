@@ -114,6 +114,39 @@ where
     Ok(out)
 }
 
+#[cfg(any(feature = "active", feature = "signer"))]
+pub fn get_multisigner_by_address<P: AsRef<Path>>(
+    db_path: P,
+    address: &AddressKey,
+) -> Result<Option<MultiSigner>> {
+    use definitions::helpers::ecdsa_public_to_eth_address;
+
+    Ok(get_all_addresses(db_path)?.into_iter().find_map(|(m, a)| {
+        if a.encryption == Encryption::Ethereum {
+            if let MultiSigner::Ecdsa(ref public) = m {
+                if let Ok(addr) = ecdsa_public_to_eth_address(public) {
+                    if addr.as_ref() == address.key() {
+                        return Some(m);
+                    }
+                }
+            }
+        } else {
+            match m {
+                MultiSigner::Ed25519(ed25519::Public(ref public))
+                | MultiSigner::Sr25519(sr25519::Public(ref public)) => {
+                    if &public[..] == &address.key() {
+                        return Some(m);
+                    }
+                }
+                MultiSigner::Ecdsa(_) => {
+                    // TODO: ecdsa is a special case
+                }
+            }
+        }
+        None
+    }))
+}
+
 /// Get all existing addresses for a given seed name from the database.
 #[cfg(any(feature = "active", feature = "signer"))]
 pub fn get_addresses_by_seed_name<P>(
