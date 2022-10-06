@@ -45,6 +45,10 @@ final class NavigationCoordinator: ObservableObject {
     /// This should be removed once navigation is moved to native system.
     @Published var selectedTab: Tab = .keys
 
+    /// Responsible for presentation of generic error bottom sheet alert component
+    /// Currently error is based on `actionResult.alertData` component when app receives `.errorData(message)` value
+    @Published var genericError = GenericErrorViewModel()
+
     /// Enables to override old logic based on `ActionResult` to not include additional components in main view hierarchy
     /// for screens with updated design approach.
     ///
@@ -88,6 +92,7 @@ extension NavigationCoordinator {
 
         updateIntermediateNavigation(actionResult)
         updateIntermediateDataModels(actionResult)
+        updateGlobalViews(actionResult)
         self.actionResult = actionResult
         updateTabBar()
     }
@@ -113,6 +118,13 @@ private extension NavigationCoordinator {
         // Used temporarly in Export Private Key flow. To be removed
         if case let .keyDetails(keyDetails) = actionResult.screenData {
             currentKeyDetails = keyDetails
+        }
+    }
+
+    func updateGlobalViews(_ actionResult: ActionResult) {
+        if case let .errorData(message) = actionResult.alertData {
+            genericError.errorMessage = message
+            genericError.isPresented = true
         }
     }
 

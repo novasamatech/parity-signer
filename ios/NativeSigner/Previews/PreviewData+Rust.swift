@@ -37,4 +37,8 @@ extension PreviewData {
             secretExposed: false
         )
     )
+
+    static let exampleErrorMessage =
+        // swiftlint:disable:next line_length
+        "The Westend network current metadata does not correspond to the one you use in the app. Please update it to sign the transaction."
 }
