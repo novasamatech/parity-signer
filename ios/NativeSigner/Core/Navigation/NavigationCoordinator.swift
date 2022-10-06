@@ -70,6 +70,7 @@ final class NavigationCoordinator: ObservableObject {
 }
 
 extension NavigationCoordinator {
+    @discardableResult
     func performFake(navigation: Navigation) -> ActionResult {
         backendActionPerformer.performBackend(
             action: navigation.action,
