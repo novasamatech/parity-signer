@@ -48,6 +48,20 @@ struct ErrorBottomModal: View {
                         .font(Fontstyle.bodyM.base)
                         .lineSpacing(Spacing.extraExtraSmall)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    if let detailsMessage = viewModel.details {
+                        Text(detailsMessage)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .font(Fontstyle.bodyL.base)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(Spacing.medium)
+                            .background(
+                                RoundedRectangle(cornerRadius: CornerRadius.medium)
+                                    .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
+                                    .background(Asset.fill6.swiftUIColor)
+                                    .cornerRadius(CornerRadius.medium)
+                            )
+                            .padding(.top, Spacing.extraSmall)
+                    }
                     VStack {
                         if let primaryAction = viewModel.primaryAction {
                             PrimaryButton(
@@ -96,6 +110,12 @@ struct ErrorBottomModal_Previews: PreviewProvider {
             )
             ErrorBottomModal(
                 viewModel: .connectivityWasOn(backAction: {}(), continueAction: {}()),
+                isShowingBottomAlert: Binding<Bool>.constant(true)
+            )
+            ErrorBottomModal(
+                viewModel: .alertError(
+                    message: PreviewData.exampleErrorMessage
+                ),
                 isShowingBottomAlert: Binding<Bool>.constant(true)
             )
         }
