@@ -101,6 +101,9 @@ struct KeyDetailsPublicKeyView: View {
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
         }
+        .onAppear {
+            navigation.performFake(navigation: .init(action: .rightButtonAction))
+        }
         // Action sheet
         .fullScreenCover(
             isPresented: $isShowingActionSheet,
