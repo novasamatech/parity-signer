@@ -3,6 +3,7 @@
 “
 —
 APK
+Blockies
 E2E
 FFI
 HDKD
@@ -15,6 +16,7 @@ UI
 UOS
 WASM
 Xcode
+addr
 affordances
 airgap
 airgapped
@@ -22,6 +24,8 @@ apng
 app's
 backend/S
 base58
+ss58
+h160
 biometric
 biometrics
 blockchain
@@ -40,6 +44,7 @@ decodable
 deterministically
 encryptions
 enum/S
+ecdsa
 ethereum
 extrinsics
 filename/S

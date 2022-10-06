@@ -144,7 +144,7 @@ where
         name: network_specs.name.to_string(),
         genesis_hash: network_specs.genesis_hash,
         address: address.to_string(),
-        encryption: network_specs.encryption.clone(),
+        encryption: network_specs.encryption,
         def: false,
     }
     .encode();

@@ -746,10 +746,14 @@ dependencies = [
 name = "definitions"
 version = "0.1.0"
 dependencies = [
+ "constants",
+ "eth-blockies",
  "frame-metadata",
  "hex",
+ "libsecp256k1",
  "parity-scale-codec",
  "plot_icon",
+ "pretty_assertions",
  "sc-executor-common",
  "sc-executor-wasmi",
  "sled",
@@ -921,6 +925,15 @@ name = "environmental"
 version = "1.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68b91989ae21441195d7d9b9993a2f9295c7e1a8c96255d8b729accddc124797"
+
+[[package]]
+name = "eth-blockies"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8932e43959186cffa4e9f5201c610dd0831b26e04d2c3de9d39a759c4cf0236d"
+dependencies = [
+ "deflate",
+]
 
 [[package]]
 name = "event-listener"
@@ -1644,9 +1657,9 @@ dependencies = [
 
 [[package]]
 name = "libsecp256k1"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b0452aac8bab02242429380e9b2f94ea20cea2b37e2c1777a1358799bbe97f37"
+checksum = "95b09eff1b35ed3b33b877ced3a691fc7a481919c7e29c53c906226fcf55e2a1"
 dependencies = [
  "arrayref",
  "base64",
@@ -2203,6 +2216,7 @@ dependencies = [
  "lazy_static",
  "num-bigint 0.4.3",
  "parity-scale-codec",
+ "pretty_assertions",
  "printing_balance",
  "regex",
  "scale-info",

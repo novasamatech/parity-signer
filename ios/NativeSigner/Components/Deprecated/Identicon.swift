@@ -15,12 +15,16 @@ struct Identicon: View {
         Image(uiImage: UIImage(data: Data(identicon)) ?? UIImage())
             .resizable(resizingMode: .stretch)
             .frame(width: rowHeight, height: rowHeight)
+            .clipShape(Circle())
     }
 }
 
 // struct Identicon_Previews: PreviewProvider {
 //    static var previews: some View {
-//        Identicon()
+//        VStack {
+//            Identicon(identicon: PreviewData.exampleIdenticon, rowHeight: 36)
+//        }
+//        .preferredColorScheme(.dark)
+//        .previewLayout(.sizeThatFits)
 //    }
 // }
-//

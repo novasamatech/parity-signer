@@ -24,7 +24,7 @@ where
     P: AsRef<Path>,
 {
     let (author_multi_signer, message_vec, genesis_hash, encryption) =
-        multisigner_msg_genesis_encryption(data_hex)?;
+        multisigner_msg_genesis_encryption(&db_path, data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
     let message = str::from_utf8(&message_vec)?.to_owned();
