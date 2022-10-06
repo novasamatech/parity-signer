@@ -230,12 +230,10 @@ impl AddressState {
         let address_key = AddressKey::from_hex(hex_address_key)?;
         let multisigner = if let Ok(m) = address_key.multi_signer() {
             m
+        } else if let Some(key) = get_multisigner_by_address(database_name, &address_key)? {
+            key
         } else {
-            if let Some(key) = get_multisigner_by_address(database_name, &address_key)? {
-                key
-            } else {
-                return Err(Error::KeyNotFound(format!("{:?}", address_key)));
-            }
+            return Err(Error::KeyNotFound(format!("{:?}", address_key)));
         };
         let is_root =
             get_address_details(database_name, &AddressKey::from_multisigner(&multisigner))?
