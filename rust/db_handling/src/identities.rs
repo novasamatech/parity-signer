@@ -131,18 +131,10 @@ pub fn get_multisigner_by_address<P: AsRef<Path>>(
                 }
             }
         } else {
-            match m {
-                MultiSigner::Ed25519(ed25519::Public(ref public))
-                | MultiSigner::Sr25519(sr25519::Public(ref public)) => {
-                    if &public[..] == &address.key() {
-                        return Some(m);
-                    }
-                }
-                MultiSigner::Ecdsa(_) => {
-                    // TODO: ecdsa is a special case
-                }
+            // TODO: for ecdsa address is not simply a public key
+            if address.key() == m.encode() {
+                return Some(m);
             }
-        }
         None
     }))
 }
