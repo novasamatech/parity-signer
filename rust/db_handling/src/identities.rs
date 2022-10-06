@@ -33,7 +33,7 @@
 #[cfg(feature = "signer")]
 use bip39::{Language, Mnemonic, MnemonicType};
 use lazy_static::lazy_static;
-#[cfg(feature = "signer")]
+#[cfg(any(feature = "active", feature = "signer"))]
 use parity_scale_codec::Encode;
 use regex::Regex;
 #[cfg(feature = "signer")]
