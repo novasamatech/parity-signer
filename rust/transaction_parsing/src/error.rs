@@ -581,6 +581,12 @@ pub enum Error {
         /// network supported encryption
         encryption: Encryption,
     },
+
+    #[error(transparent)]
+    NotUtf8(#[from] std::str::Utf8Error),
+
+    #[error("Parser error: {0}")]
+    ParserError(String),
 }
 
 fn display_parsing_errors(network_name: &str, errors: &[(u32, parser::Error)]) -> String {

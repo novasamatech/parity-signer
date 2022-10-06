@@ -20,7 +20,7 @@ pub(crate) fn create_signature(
     database_name: &str,
     checksum: u32,
     encryption: Encryption,
-) -> Result<MultiSignature> {
+) -> Result<String> {
     let sign = TrDbColdSign::from_storage(database_name, checksum)?;
     let pwd = {
         if sign.has_pwd() {
@@ -29,11 +29,12 @@ pub(crate) fn create_signature(
             None
         }
     };
-    let content_vec = match sign.content() {
+    let content = sign.content().to_owned();
+    let content_vec = match &content {
         SignContent::Transaction { method, extensions } => {
             [method.to_vec(), extensions.to_vec()].concat()
         }
-        SignContent::Message(a) => a.encode(),
+        SignContent::Message(a) => a.as_bytes().to_vec(),
     };
 
     // For larger transactions, their hash should be signed instead; this is not implemented
@@ -46,7 +47,7 @@ pub(crate) fn create_signature(
         }
     };
     let mut full_address = seed_phrase.to_owned() + &sign.path();
-    match sign_as_address_key(
+    let signature = match sign_as_address_key(
         &content_vec,
         &sign.multisigner(),
         &full_address,
@@ -67,7 +68,20 @@ pub(crate) fn create_signature(
                 Err(e)
             }
         }
-    }
+    }?;
+
+    let encoded = match &content {
+        SignContent::Transaction {
+            method: _,
+            extensions: _,
+        } => hex::encode(signature.encode()),
+        SignContent::Message(_) => match signature {
+            MultiSignature::Sr25519(a) => hex::encode(a),
+            MultiSignature::Ed25519(a) => hex::encode(a),
+            MultiSignature::Ecdsa(a) => hex::encode(a),
+        },
+    };
+    Ok(encoded)
 }
 
 pub fn create_signature_png(
@@ -78,17 +92,14 @@ pub fn create_signature_png(
     checksum: u32,
     encryption: Encryption,
 ) -> Result<Vec<u8>> {
-    let hex_result = hex::encode(
-        create_signature(
-            seed_phrase,
-            pwd_entry,
-            user_comment,
-            database_name,
-            checksum,
-            encryption,
-        )?
-        .encode(),
-    );
+    let hex_result = create_signature(
+        seed_phrase,
+        pwd_entry,
+        user_comment,
+        database_name,
+        checksum,
+        encryption,
+    )?;
     let qr_data = png_qr_from_string(&hex_result, DataType::Regular)?;
     Ok(qr_data)
 }

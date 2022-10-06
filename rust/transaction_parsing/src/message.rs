@@ -6,9 +6,13 @@ use definitions::{
     keyring::{AddressKey, NetworkSpecsKey},
     navigation::TransactionCardSet,
 };
-use parity_scale_codec::DecodeAll;
+use nom::bytes::complete::{tag, take_until};
 use parser::cards::ParserCard;
 use std::path::Path;
+use std::str;
+
+use nom::sequence::preceded;
+use nom::IResult;
 
 use crate::cards::{make_author_info, Card, Warning};
 use crate::error::{Error, Result};
@@ -23,11 +27,8 @@ where
         multisigner_msg_genesis_encryption(&db_path, data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
-    // this is a standard decoding of String, with utf8 conversion;
-    // processing input vec![20, 104, 101, 3, 108, 111] will not throw error at element `3`,
-    // it will result in output `helo` instead, length, however, is still correct, 5.
-    // note that some invisible symbols may thus sneak into the message;
-    let message = String::decode_all(&mut &message_vec[..])?;
+    let message = str::from_utf8(&message_vec)?.to_owned();
+    let display_msg = strip_bytes_tag(&message)?;
 
     // initialize index and indent
     let mut index: u32 = 0;
@@ -39,7 +40,7 @@ where
             match try_get_address_details(&db_path, &address_key)? {
                 Some(address_details) => {
                     if address_details.network_id.contains(&network_specs_key) {
-                        let message_card = Card::ParserCard(&ParserCard::Text(message.to_string()))
+                        let message_card = Card::ParserCard(&ParserCard::Text(display_msg))
                             .card(&mut index, indent);
                         let sign = TrDbColdSign::generate(
                             SignContent::Message(message),
@@ -134,5 +135,42 @@ where
                 },
             })
         }
+    }
+}
+
+fn bytes_prefix(i: &str) -> IResult<&str, &str> {
+    tag("<Bytes>")(i)
+}
+
+fn take_until_suffix(i: &str) -> IResult<&str, &str> {
+    take_until("</Bytes>")(i)
+}
+
+fn strip_bytes_tag(message: &str) -> Result<String> {
+    let mut parser = preceded(bytes_prefix, take_until_suffix);
+    let (_, payload) = parser(message).map_err(|e| Error::ParserError(format!("{:?}", e)))?;
+    Ok(payload.to_owned())
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn parse_bytes_msg() {
+        let result = strip_bytes_tag("<Bytes>uuid-1234</Bytes>");
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), "uuid-1234");
+    }
+
+    #[test]
+    fn parse_bytes_err() {
+        let result = strip_bytes_tag("<Bytes>uuid-1234");
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Parser error: Error(Error { input: \"uuid-1234\", code: TakeUntil })"
+        );
     }
 }
