@@ -135,6 +135,7 @@ pub fn get_multisigner_by_address<P: AsRef<Path>>(
             if address.key() == m.encode() {
                 return Some(m);
             }
+        }
         None
     }))
 }
