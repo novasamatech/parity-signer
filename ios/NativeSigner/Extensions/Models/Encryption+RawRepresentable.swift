@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 extension Encryption: RawRepresentable {
     /// Currently there is no native type bridging for enums available, this helps to keep possible enum values in sync
     /// while allowing of use of Swift's native `RawRepresentable` for that enum
