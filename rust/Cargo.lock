@@ -3916,6 +3916,7 @@ dependencies = [
  "definitions",
  "frame-metadata",
  "hex",
+ "nom",
  "parity-scale-codec",
  "parser",
  "pretty_assertions",
