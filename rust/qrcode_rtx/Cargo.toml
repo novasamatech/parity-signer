@@ -11,7 +11,7 @@ bitvec = "1.0.1"
 hex = "0.4.3"
 raptorq = "1.7.0"
 qrcodegen = "1.8.0"
-png = "0.17.5"
+png = "0.17.6"
 constants = {path = "../constants"}
 qrcode_static = {path = "../qrcode_static"}
 
