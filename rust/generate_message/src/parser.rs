@@ -627,7 +627,7 @@ pub enum Crypto {
 
 #[derive(clap::Args, Debug, Clone)]
 #[clap(group(clap::ArgGroup::new("signature")
-                .args(&["signature-hex", "signature-file"])
+                .args(&["signature_hex", "signature_file"])
         ))]
 pub struct Signature {
     /// Supply signature in hex format as command line argument
@@ -641,7 +641,7 @@ pub struct Signature {
 
 #[derive(clap::Args, Debug, Clone)]
 #[clap(group(clap::ArgGroup::new("sufficient")
-                .args(&["sufficient-hex", "sufficient-file"])
+                .args(&["sufficient_hex", "sufficient_file"])
         ))]
 pub struct Sufficient {
     /// Supply signature in hex format as command line argument
