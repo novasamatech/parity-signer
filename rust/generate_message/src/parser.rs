@@ -27,7 +27,7 @@ pub enum Command {
         s: Show,
 
         /// Path to the hot database
-        #[clap(long= "hot-db-path", global = true, value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        #[arg(long= "hot-db-path", global = true, value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
         db_path: PathBuf,
     },
 
@@ -46,25 +46,25 @@ pub enum Command {
     /// - all associated meta block history entries from
     /// [`META_HISTORY`](constants::META_HISTORY) if there are no other address book
     /// entries this block history entries are associated with
-    #[clap(name = "add-specs")]
+    #[command(name = "add-specs")]
     Specs {
         #[clap(flatten)]
         s: InstructionSpecs,
     },
 
     /// Prepare payload for load-metadata update
-    #[clap(name = "load-metadata")]
+    #[command(name = "load-metadata")]
     Load(InstructionMeta),
 
     /// Prepare payload for load-types update
-    #[clap(name = "load-types")]
+    #[command(name = "load-types")]
     Types {
         /// Path to hot db
-        #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        #[arg(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
         db_path: PathBuf,
 
         /// Folder to save payloads ready for signing
-        #[clap(long, value_name = "FOLDER_PATH", default_value = FOLDER)]
+        #[arg(long, value_name = "FOLDER_PATH", default_value = FOLDER)]
         files_dir: PathBuf,
     },
 
@@ -94,7 +94,7 @@ pub enum Command {
         r: Remove,
 
         /// Path to the hot database
-        #[clap(long="hot-db-path", global=true, value_name="HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        #[arg(long="hot-db-path", global=true, value_name="HOT_DB_PATH", default_value = HOT_DB_NAME)]
         db_path: PathBuf,
     },
 
@@ -115,7 +115,7 @@ pub enum Command {
     /// Default networks are Polkadot, Kusama, and Westend.
     RestoreDefaults {
         /// Path to hot db
-        #[clap(long = "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        #[arg(long = "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
         db_path: PathBuf,
     },
 
@@ -153,14 +153,14 @@ pub enum Command {
     /// database, i.e. the ones having
     /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
     /// [`SPECSTREE`](constants::SPECSTREE).
-    #[clap(name = "transfer-meta")]
+    #[command(name = "transfer-meta")]
     TransferMetaToColdRelease {
         /// Path to release db
-        #[clap(long, value_name = "COLD_DB_PATH", default_value = COLD_DB_NAME_RELEASE)]
+        #[arg(long, value_name = "COLD_DB_PATH", default_value = COLD_DB_NAME_RELEASE)]
         cold_db: PathBuf,
 
         /// Path to hot db
-        #[clap(long, value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        #[arg(long, value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
         hot_db: PathBuf,
     },
 
@@ -196,19 +196,19 @@ pub enum Command {
     /// added if the same metadata is later fetched from a node.
     Unwasm {
         /// WASM file
-        #[clap(long, short)]
+        #[arg(long, short)]
         filename: String,
 
         /// update the DB.
-        #[clap(long, short)]
+        #[arg(long, short)]
         update_db: bool,
 
         /// Hot database path
-        #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        #[arg(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
         db_path: PathBuf,
 
         /// Folder to save payloads ready for signing
-        #[clap(long, default_value = FOLDER)]
+        #[arg(long, default_value = FOLDER)]
         files_dir: PathBuf,
     },
 
@@ -222,19 +222,19 @@ pub enum Command {
     /// hexadecimal network metadata.
     MetaDefaultFile {
         /// File name
-        #[clap(long, value_name = "NETWORK NAME")]
+        #[arg(long, value_name = "NETWORK NAME")]
         name: String,
 
         /// Version
-        #[clap(long, value_name = "NETWORK VERSION")]
+        #[arg(long, value_name = "NETWORK VERSION")]
         version: u32,
 
         /// Hot database path
-        #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        #[arg(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
         db_path: PathBuf,
 
         /// Folder to save completed update messages
-        #[clap(long, default_value = EXPORT_FOLDER)]
+        #[arg(long, default_value = EXPORT_FOLDER)]
         export_dir: PathBuf,
     },
 
@@ -246,15 +246,15 @@ pub enum Command {
     /// This command does not address or update the hot database.
     MetaAtBlock {
         /// URL of the chain RPC point
-        #[clap(long, value_name = "RPC URL")]
+        #[arg(long, value_name = "RPC URL")]
         url: String,
 
         /// Hash of the block at which meta is asked
-        #[clap(long, value_name = "BLOCK HASH")]
+        #[arg(long, value_name = "BLOCK HASH")]
         block_hash: String,
 
         /// Folder to save completed update messages
-        #[clap(long, default_value = EXPORT_FOLDER)]
+        #[arg(long, default_value = EXPORT_FOLDER)]
         export_dir: PathBuf,
     },
 }
@@ -270,7 +270,7 @@ pub enum Show {
 
     /// Show network specs from entry.
     Specs {
-        #[clap(value_name = "ADDRESS BOOK TITLE")]
+        #[arg(value_name = "ADDRESS BOOK TITLE")]
         /// Address book title
         s: String,
     },
@@ -278,7 +278,7 @@ pub enum Show {
     /// Check that external file is valid network metadata and search for
     /// similar entry in hot database
     CheckFile {
-        #[clap(value_name = "METADATA FILE")]
+        #[arg(value_name = "METADATA FILE")]
         /// Path to metadata file
         s: String,
     },
@@ -299,11 +299,11 @@ pub struct InstructionMeta {
     pub content: ContentArgs,
 
     /// Path to the hot database
-    #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+    #[arg(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
     pub db: PathBuf,
 
     /// Folder to save payloads ready for signing
-    #[clap(long, default_value = FOLDER)]
+    #[arg(long, default_value = FOLDER)]
     pub files_dir: PathBuf,
 }
 
@@ -322,7 +322,7 @@ impl From<SetFlags> for Set {
 
 /// Command details for `add-specs`.
 #[derive(clap::Args, Debug)]
-#[clap(group(clap::ArgGroup::new("referencekey")
+#[command(group(clap::ArgGroup::new("referencekey")
                 .required(true)
                 .args(&["all", "name", "address"])
 ))]
@@ -338,30 +338,30 @@ pub struct InstructionSpecs {
     pub content: ContentArgs,
 
     /// Path to the hot database
-    #[clap(long = "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+    #[arg(long = "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
     pub db: PathBuf,
 
     /// Folder to save payloads ready for signing
-    #[clap(long, default_value = FOLDER)]
+    #[arg(long, default_value = FOLDER)]
     pub files_dir: PathBuf,
 }
 
 #[derive(clap::Args, Debug, Default, Clone)]
 pub struct ContentArgs {
     /// Deal with all relevant database entries
-    #[clap(long, short)]
+    #[arg(long, short)]
     pub all: bool,
 
     /// Process only a specified network
-    #[clap(long, short)]
+    #[arg(long, short)]
     pub name: Option<String>,
 
     /// Process only the network referred to by URL address
-    #[clap(short = 'u', long = "url")]
+    #[arg(short = 'u', long = "url")]
     pub address: Option<String>,
 
     /// Skip errors
-    #[clap(long)]
+    #[arg(long)]
     pub pass_errors: bool,
 }
 
@@ -383,7 +383,7 @@ impl From<ContentArgs> for Content {
 pub enum Content {
     /// Deal with all relevant database entries
     All {
-        #[clap(short)]
+        #[arg(short)]
         /// Skip errors
         pass_errors: bool,
     },
@@ -391,14 +391,14 @@ pub enum Content {
     /// Process only a specified network
     Name {
         /// network name or network address book title
-        #[clap(long, short)]
+        #[arg(long, short)]
         s: String,
     },
 
     /// Process only the network referred to by URL address
     Address {
         /// Network address
-        #[clap(long, short)]
+        #[arg(long, short)]
         s: String,
     },
 }
@@ -408,56 +408,56 @@ pub enum Content {
 pub enum Set {
     /// Key `-d`: do **not** update the database, make RPC calls, and produce
     /// output files
-    #[clap(name = "-d")]
+    #[value(name = "-d")]
     D,
 
     /// Key `-f`: do **not** run RPC calls, produce output files from database
     /// as it is
-    #[clap(name = "-f")]
+    #[value(name = "-f")]
     F,
 
     /// Key `-k`: update database through RPC calls, produce output files only
     /// for **updated** database entries
-    #[clap(name = "-k")]
+    #[value(name = "-k")]
     K,
 
     /// Key `-p`: update database through RPC calls, do **not** produce any
     /// output files
-    #[clap(name = "-p")]
+    #[value(name = "-p")]
     P,
 
     /// Key `-t` (no setting key defaults here): update database through RPC
     /// calls, produce output files
-    #[clap(name = "-t")]
+    #[value(name = "-t")]
     T,
 }
 
 #[derive(clap::Args, Default, Clone, Debug)]
-#[clap(group(clap::ArgGroup::new("setflags")
+#[command(group(clap::ArgGroup::new("setflags")
                 .required(true)
                 .args(&["d", "f", "k", "p", "t"])
 ))]
 pub struct SetFlags {
     /// do not update the database, make RPC calls, and produce output files
-    #[clap(short = 'd')]
+    #[arg(short = 'd')]
     pub d: bool,
 
     /// do not run RPC calls, produce output files from database as it is
-    #[clap(short = 'f')]
+    #[arg(short = 'f')]
     pub f: bool,
 
     /// update database through RPC calls, produce output files only
     /// for updated database entries
-    #[clap(short = 'k')]
+    #[arg(short = 'k')]
     pub k: bool,
 
     /// update database through RPC calls, do **not** produce any output files
-    #[clap(short = 'p')]
+    #[arg(short = 'p')]
     pub p: bool,
 
     /// (no setting key defaults here): update database through RPC
     /// calls, produce output files
-    #[clap(short = 't')]
+    #[arg(short = 't')]
     pub t: bool,
 }
 
@@ -471,14 +471,14 @@ impl std::fmt::Display for Set {
 #[derive(clap::Args, Debug)]
 pub struct Make {
     /// payload
-    #[clap(long, name = "msg", value_parser)]
+    #[arg(long)]
     pub msg: Msg,
 
-    #[clap(long, name = "payload")]
+    #[arg(long)]
     pub payload: PathBuf,
 
     /// target output format
-    #[clap(long, name = "goal", value_parser, default_value_t = Goal::Both)]
+    #[arg(long, default_value_t = Goal::Both)]
     pub goal: Goal,
 
     #[clap(flatten)]
@@ -491,19 +491,19 @@ pub struct Make {
     pub sufficient: Sufficient,
 
     /// who is signing the payload
-    #[clap(long, name = "crypto", value_parser = encryption_from_args)]
+    #[arg(long, value_name = "crypto", value_parser = encryption_from_args)]
     pub crypto: Option<Encryption>,
 
     /// output name override
-    #[clap(long, name = "name")]
+    #[arg(long, value_name = "name")]
     pub name: Option<PathBuf>,
 
     /// Folder to save payloads ready for signing
-    #[clap(long, default_value = FOLDER)]
+    #[arg(long, default_value = FOLDER)]
     pub files_dir: PathBuf,
 
     /// Folder to save completed update messages
-    #[clap(long, default_value = EXPORT_FOLDER)]
+    #[arg(long, default_value = EXPORT_FOLDER)]
     pub export_dir: PathBuf,
 }
 
@@ -592,20 +592,20 @@ impl std::fmt::Display for Goal {
 
 /// Verifier-to-be, for `make` and `sign` commands.
 #[derive(clap::Args, Debug, Clone)]
-#[clap(group(clap::ArgGroup::new("verifier")
-                .args(&["alice", "HEX", "FILE"])
+#[command(group(clap::ArgGroup::new("verifier")
+                .args(&["verifier_alice", "verifier_hex", "verifier_file"])
         ))]
 pub struct Verifier {
     /// Use Alice key with a specified encryption scheme
-    #[clap(long, name = "alice", value_parser = encryption_from_args)]
+    #[arg(long, value_name = "alice", value_parser = encryption_from_args)]
     pub verifier_alice: Option<Encryption>,
 
     /// Specify Verifier as a hex string argument
-    #[clap(long, name = "HEX")]
+    #[arg(long, value_name = "HEX")]
     pub verifier_hex: Option<String>,
 
     /// Read Verifier from a file
-    #[clap(long, name = "FILE")]
+    #[arg(long, value_name = "FILE")]
     pub verifier_file: Option<PathBuf>,
 }
 
@@ -626,30 +626,30 @@ pub enum Crypto {
 }
 
 #[derive(clap::Args, Debug, Clone)]
-#[clap(group(clap::ArgGroup::new("signature")
+#[command(group(clap::ArgGroup::new("signature")
                 .args(&["signature_hex", "signature_file"])
         ))]
 pub struct Signature {
     /// Supply signature in hex format as command line argument
-    #[clap(long, value_name = "HEX")]
+    #[arg(long, value_name = "HEX")]
     pub signature_hex: Option<String>,
 
     /// Read signature from a file
-    #[clap(long, value_name = "FILE")]
+    #[arg(long, value_name = "FILE")]
     pub signature_file: Option<String>,
 }
 
 #[derive(clap::Args, Debug, Clone)]
-#[clap(group(clap::ArgGroup::new("sufficient")
+#[command(group(clap::ArgGroup::new("sufficient")
                 .args(&["sufficient_hex", "sufficient_file"])
         ))]
 pub struct Sufficient {
     /// Supply signature in hex format as command line argument
-    #[clap(long, value_name = "HEX")]
+    #[arg(long, value_name = "HEX")]
     pub sufficient_hex: Option<String>,
 
     /// Read signature from a file
-    #[clap(long, value_name = "FILE")]
+    #[arg(long, value_name = "FILE")]
     pub sufficient_file: Option<String>,
 }
 /// Payload for `make` and `sign` commands.
@@ -687,20 +687,20 @@ pub enum Remove {
 #[derive(clap::Args, Clone, Debug)]
 pub struct Derivations {
     /// Target output format
-    #[clap(long, value_parser)]
+    #[arg(long)]
     pub goal: Goal,
 
     /// Address book title for network in which addresses with imported
     /// derivations will be made in Signer
-    #[clap(long)]
+    #[arg(long)]
     pub title: String,
 
     /// Contents of the payload file
-    #[clap(long)]
+    #[arg(long)]
     pub derivations: String,
 
     /// Path to the hot database
-    #[clap(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+    #[arg(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
     pub db: PathBuf,
 }
 
@@ -709,13 +709,13 @@ pub struct Derivations {
 pub struct Override {
     /// [`Encryption`] override to specify encryption algorithm used by a new
     /// network or to add another encryption algorithm in known network.
-    #[clap(long, value_parser = encryption_from_args)]
+    #[arg(long, value_parser = encryption_from_args)]
     pub encryption: Option<Encryption>,
 
     /// Network title override, so that user can specify the network title in
     /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
     /// that determines under what title the network is displayed in the Signer
-    #[clap(long)]
+    #[arg(long)]
     pub title: Option<String>,
 
     /// Token override to specify decimals used to display balance in
@@ -726,7 +726,7 @@ pub struct Override {
     /// - network has no database record yet
     /// - network has multiple decimals and unit values, those were retrieved as
     /// arrays of equal size.
-    #[clap(long)]
+    #[arg(long)]
     pub token_decimals: Option<u8>,
 
     /// Token override to specify units used to display balance in
@@ -737,7 +737,7 @@ pub struct Override {
     /// - network has no database record yet
     /// - network has multiple decimals and unit values, those were retrieved as
     /// arrays of equal size.
-    #[clap(long)]
+    #[arg(long)]
     pub token_unit: Option<String>,
 }
 
