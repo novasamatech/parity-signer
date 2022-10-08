@@ -47,6 +47,7 @@ pub fn process_decoded_payload(
     payload: Vec<u8>,
     mut decoding: InProgress,
 ) -> anyhow::Result<Ready> {
+    println!("PROCESSED");
     if let Ok(frame) = RaptorqFrame::try_from(payload.as_ref()) {
         let length = frame.size;
         let total = frame.total();
