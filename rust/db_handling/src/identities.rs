@@ -129,7 +129,7 @@ pub struct AddrInfo {
 }
 
 /// Export all info about keys and their addresses known to Signer
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "signer")]
 pub fn export_all_addrs<P: AsRef<Path>>(db_path: P) -> Result<ExportAddrs> {
     let addrs: Result<Vec<_>> = get_all_addresses(&db_path)?
         .into_iter()
