@@ -1,7 +1,8 @@
 use crate::{LegacyFrame, RaptorqFrame};
 use anyhow::anyhow;
+use constants::CHUNK_SIZE;
 use raptorq;
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryFrom;
 
 #[derive(PartialEq, Eq)]
 pub struct Fountain {
@@ -49,14 +50,13 @@ pub fn process_decoded_payload(
     if let Ok(frame) = RaptorqFrame::try_from(payload.as_ref()) {
         let length = frame.size;
         let total = frame.total();
-        let chunk_size: u16 = frame.payload.len().try_into()?;
         let new_packet = frame.payload;
         match decoding {
             InProgress::None => {
                 let collected_ser_packets = vec![new_packet];
                 let config = raptorq::ObjectTransmissionInformation::with_defaults(
                     length as u64,
-                    chunk_size,
+                    CHUNK_SIZE,
                 );
                 let mut decoder = raptorq::Decoder::new(config);
                 match try_fountain(&collected_ser_packets, &mut decoder) {
