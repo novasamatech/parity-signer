@@ -4,11 +4,17 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
+use db_handling::identities::export_all_addrs;
 //do we support mutex?
 use lazy_static::lazy_static;
 use std::sync::{Mutex, TryLockError};
 
-use definitions::{keyring::NetworkSpecsKey, navigation::ActionResult};
+use definitions::{
+    keyring::NetworkSpecsKey,
+    navigation::{ActionResult, MKeysInfoExport},
+};
+use parity_scale_codec::Encode;
+use qrcode_rtx::make_data_packs;
 
 mod error;
 
@@ -103,4 +109,12 @@ pub fn update_seed_names(seed_names: Vec<String>) {
             panic!("Concurrency error! Restart the app.");
         }
     }
+}
+
+pub fn export_key_info(dbname: &str) -> Result<MKeysInfoExport, String> {
+    let export_all_addrs = export_all_addrs(dbname).map_err(|e| format!("{}", e))?;
+
+    let frames = make_data_packs(&export_all_addrs.encode(), 128)?;
+
+    Ok(MKeysInfoExport { frames })
 }

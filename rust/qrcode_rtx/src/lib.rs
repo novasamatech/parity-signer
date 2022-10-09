@@ -9,7 +9,7 @@ use std::path::Path;
 
 /// function to take data as `Vec<u8>`, apply `raptorq` to get `Vec<EncodingPacket>`
 /// and serialize it to get `Vec<u8>` output
-fn make_data_packs(input: &[u8]) -> Result<Vec<Vec<u8>>, &'static str> {
+pub fn make_data_packs(input: &[u8], chunk_size: u16) -> Result<Vec<Vec<u8>>, &'static str> {
     // checking that data is not too long, set limit for now at 2^31 bit
     if input.len() >= 0x80000000 {
         return Err("Input data is too long, processing not possible");
@@ -19,14 +19,14 @@ fn make_data_packs(input: &[u8]) -> Result<Vec<Vec<u8>>, &'static str> {
 
     // number of additional packets; currently roughly equal to number of core packets
     let repair_packets_per_block: u32 = {
-        if input.len() as u32 <= CHUNK_SIZE as u32 {
+        if input.len() as u32 <= chunk_size as u32 {
             0
         } else {
-            input.len() as u32 / CHUNK_SIZE as u32
+            input.len() as u32 / chunk_size as u32
         }
     };
     // making `raptorq` Encoder, with defaults
-    let raptor_encoder = raptorq::Encoder::with_defaults(input, CHUNK_SIZE);
+    let raptor_encoder = raptorq::Encoder::with_defaults(input, chunk_size);
     // making EncodingPacket and deserializing each into `Vec<u8>`
     let out: Vec<Vec<u8>> = raptor_encoder
         .get_encoded_packets(repair_packets_per_block)
@@ -100,7 +100,7 @@ fn transform_into_qr_apng<P>(input: &[u8], output_name: P) -> Result<(), Box<dyn
 where
     P: AsRef<Path>,
 {
-    let data_packs = make_data_packs(input)?;
+    let data_packs = make_data_packs(input, CHUNK_SIZE)?;
     make_apng(make_qr_codes(data_packs)?, output_name)?;
     Ok(())
 }

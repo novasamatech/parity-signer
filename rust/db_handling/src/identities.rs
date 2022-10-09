@@ -33,6 +33,7 @@
 #[cfg(feature = "signer")]
 use bip39::{Language, Mnemonic, MnemonicType};
 use lazy_static::lazy_static;
+use parity_scale_codec::Decode;
 #[cfg(any(feature = "active", feature = "signer"))]
 use parity_scale_codec::Encode;
 use regex::Regex;
@@ -94,6 +95,63 @@ lazy_static! {
 // removed seed phrase part
 // last '+' used to be '*', but empty password is an error
     static ref REG_PATH: Regex = Regex::new(r"^(?P<path>(//?[^/]+)*)(///(?P<password>.+))?$").expect("known value");
+}
+
+#[derive(Encode, Decode)]
+pub enum ExportAddrs {
+    V1(ExportAddrsV1),
+}
+
+#[derive(Encode, Decode)]
+pub struct ExportAddrsV1 {
+    pub addrs: Vec<AddrInfo>,
+}
+
+#[derive(Encode, Decode)]
+pub struct AddrInfo {
+    /// Name of the key
+    pub name: String,
+
+    /// Address in the network.
+    ///
+    /// This is either `ss58` form for substrate-based chains or h160 form for ethereum based
+    /// chains
+    pub address: String,
+
+    /// Name of the network this key is used on in string form.
+    pub network: String,
+
+    /// The derivation path of the key if user provided one
+    pub derivation_path: Option<String>,
+
+    /// The type of encryption in the network
+    pub encryption: Encryption,
+}
+
+/// Export all info about keys and their addresses known to Signer
+#[cfg(any(feature = "active", feature = "signer"))]
+pub fn export_all_addrs<P: AsRef<Path>>(db_path: P) -> Result<ExportAddrs> {
+    let addrs: Result<Vec<_>> = get_all_addresses(&db_path)?
+        .into_iter()
+        .map(|(m, a)| {
+            let network_specs = get_network_specs(&db_path, &a.network_id[0])?;
+            Ok(AddrInfo {
+                name: a.seed_name,
+                address: print_multisigner_as_base58_or_eth(
+                    &m,
+                    Some(network_specs.base58prefix),
+                    a.encryption,
+                ),
+                network: network_specs.name,
+                derivation_path: Some(a.path),
+                encryption: a.encryption,
+            })
+        })
+        .collect();
+
+    let addrs = addrs?;
+
+    Ok(ExportAddrs::V1(ExportAddrsV1 { addrs }))
 }
 
 /// Get all existing addresses from the database.

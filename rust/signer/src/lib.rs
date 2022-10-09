@@ -211,6 +211,10 @@ fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<
         .map_err(|e| format!("{}", e))
 }
 
+fn export_key_info(dbname: &str) -> anyhow::Result<MKeysInfoExport, String> {
+    navigator::export_key_info(dbname)
+}
+
 /// Must be called once to initialize logging from Rust in development mode.
 ///
 /// Do not use in production.
