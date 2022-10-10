@@ -13,6 +13,7 @@ import Foundation
 
 final class CameraViewModel: ObservableObject {
     private let service = CameraService()
+    private let cameraPermissionHandler = CameraPermissionHandler()
 
     @Published var payload: String?
     @Published var captured: Int?
@@ -49,8 +50,14 @@ final class CameraViewModel: ObservableObject {
     }
 
     func configure() {
-        service.checkForPermissions()
-        service.configure()
+        cameraPermissionHandler.checkForPermissions { [weak self] isGranted in
+            guard let self = self else { return }
+            self.service.setupResult = isGranted ? .success : .notAuthorized
+            if !isGranted {
+                self.service.isCameraUnavailable = true
+            }
+            self.service.configure()
+        }
     }
 
     func shutdown() {
