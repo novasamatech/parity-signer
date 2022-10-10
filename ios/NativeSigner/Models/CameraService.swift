@@ -223,7 +223,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                                     let res = try qrparserGetPacketsTotal(data: payloadStr, cleaned: false)
                                     let proposeTotal = Int(res)
                                     if proposeTotal == 1 { // Special handling for 1-frame payloads
-                                        let process = "[\"" + payloadStr + "\"]" // Decoder expects JSON array
+                                        let process = [payloadStr]
                                         let res2 = try qrparserTryDecodeQrSequence(data: process, cleaned: false)
                                         DispatchQueue.main.async {
                                             self.payload = res2
@@ -245,9 +245,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                                 }
                                 if (self.bucket.count + 1) >= self.total ?? 0 {
                                     do {
-                                        let process = "[\"" +
-                                            self.bucket.joined(separator: "\",\"") +
-                                            "\"]" // Decoder expects JSON array
+                                        let process = self.bucket
                                         let res = try qrparserTryDecodeQrSequence(data: process, cleaned: false)
                                         DispatchQueue.main.async {
                                             self.payload = res

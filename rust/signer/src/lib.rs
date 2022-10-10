@@ -124,7 +124,7 @@ fn qrparser_get_packets_total(data: &str, cleaned: bool) -> anyhow::Result<u32, 
 /// `cleaned` is platform-specific flag indicating whether QR payloads have QR prefix stripped by
 /// QR parsing code
 fn qrparser_try_decode_qr_sequence(
-    data: &str,
+    data: &[String],
     cleaned: bool,
 ) -> anyhow::Result<String, anyhow::Error> {
     qr_reader_phone::decode_sequence(data, cleaned)

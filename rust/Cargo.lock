@@ -2497,7 +2497,6 @@ dependencies = [
  "hex",
  "nom",
  "raptorq",
- "serde_json",
 ]
 
 [[package]]
