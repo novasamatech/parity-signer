@@ -2,8 +2,12 @@ package io.parity.signer.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import io.parity.signer.bottomsheets.*
-import io.parity.signer.models.*
+import io.parity.signer.bottomsheets.KeyDetailsMenuAction
+import io.parity.signer.bottomsheets.exportprivatekey.PrivateKeyExportBottomSheet
+import io.parity.signer.models.AlertState
+import io.parity.signer.models.LocalNavAction
+import io.parity.signer.models.Navigator
+import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ModalData
@@ -13,14 +17,13 @@ fun BottomSheetSelector(
 	modalData: ModalData?,
 	localNavAction: LocalNavAction?,
 	alertState: State<AlertState?>,
-	button: (Action, String, String) -> Unit,
-	signerDataModel: SignerDataModel
+	signerDataModel: SignerDataModel,
+	navigator: Navigator,
 ) {
-	val button1: (Action) -> Unit = { action -> button(action, "", "") }
-	val button2: (Action, String) -> Unit =
-		{ action, details -> button(action, details, "") }
-	if (localNavAction != null && localNavAction != LocalNavAction.None) {
-		SignerNewTheme {
+	SignerNewTheme {
+
+		if (localNavAction != null && localNavAction != LocalNavAction.None) {
+
 			when (localNavAction) {
 				is LocalNavAction.ShowExportPrivateKey -> {
 					BottomSheetWrapper {
@@ -30,10 +33,23 @@ fun BottomSheetSelector(
 						)
 					}
 				}
-				LocalNavAction.None -> { }
+				LocalNavAction.None -> {}
+			}
+
+		} else {
+			when (modalData) {
+				is ModalData.KeyDetailsAction ->
+					BottomSheetWrapper(onClosedAction = {
+						navigator.backAction()
+					} ) {
+						KeyDetailsMenuAction(
+							navigator = navigator,
+							keyDetails = signerDataModel.lastOpenedKeyDetails
+						)
+					}
+				else -> {}
 			}
 		}
-	} else {
 	}
 }
 

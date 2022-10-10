@@ -178,9 +178,7 @@ fun ModalSelector(
 			is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
 				modalData.f,
 			)
-			is ModalData.KeyDetailsAction -> KeyDetailsAction(
-				signerDataModel = signerDataModel
-			)
+			is ModalData.KeyDetailsAction -> {} //migrated to bottom sheet
 			is ModalData.TypesInfo -> TypesInfo(
 				modalData.f,
 				signerDataModel = signerDataModel
