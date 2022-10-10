@@ -1,20 +1,26 @@
 use crate::{LegacyFrame, RaptorqFrame};
 use anyhow::anyhow;
 use constants::CHUNK_SIZE;
-use raptorq;
-use std::convert::TryFrom;
+use raptorq::{self, EncodingPacket};
+use std::{collections::HashSet, convert::TryFrom};
 
 #[derive(PartialEq, Eq)]
 pub struct Fountain {
     decoder: raptorq::Decoder,
-    collected_ser_packets: Vec<Vec<u8>>,
     length: u32,
     pub total: u32,
+    collected: HashSet<usize>,
 }
 
 impl Fountain {
+    /// Return the number of packets collected.
     pub fn collected(&self) -> usize {
-        self.collected_ser_packets.len()
+        self.collected.len()
+    }
+
+    /// Called to inform that the packet with the id has been collected.
+    pub fn collect(&mut self, frame_index: usize) {
+        self.collected.insert(frame_index);
     }
 }
 
@@ -51,23 +57,25 @@ pub fn process_decoded_payload(
         let length = frame.size;
         let total = frame.total();
         let new_packet = frame.payload;
+        let decoded_packet = EncodingPacket::deserialize(&new_packet);
+        let block_number = decoded_packet.payload_id().source_block_number() as usize;
         match decoding {
             InProgress::None => {
-                let collected_ser_packets = vec![new_packet];
                 let config = raptorq::ObjectTransmissionInformation::with_defaults(
                     length as u64,
                     CHUNK_SIZE,
                 );
                 let mut decoder = raptorq::Decoder::new(config);
-                match try_fountain(&collected_ser_packets, &mut decoder) {
+                match try_fountain(decoded_packet, &mut decoder) {
                     Some(v) => Ok(Ready::Yes(v)),
                     None => {
-                        let in_progress = Fountain {
+                        let mut in_progress = Fountain {
                             decoder,
-                            collected_ser_packets,
                             length,
                             total,
+                            collected: HashSet::new(),
                         };
+                        in_progress.collect(block_number);
                         decoding = InProgress::Fountain(in_progress);
                         Ok(Ready::NotYet(decoding))
                     }
@@ -77,15 +85,11 @@ pub fn process_decoded_payload(
                 if in_progress.length != length {
                     return Err(anyhow!("Was decoding fountain qr code with message length {}, got interrupted by fountain qr code with message length {}", in_progress.length, length));
                 }
-                if !in_progress.collected_ser_packets.contains(&new_packet) {
-                    in_progress.collected_ser_packets.push(new_packet);
-                    match try_fountain(&in_progress.collected_ser_packets, &mut in_progress.decoder)
-                    {
-                        Some(v) => Ok(Ready::Yes(v)),
-                        None => Ok(Ready::NotYet(InProgress::Fountain(in_progress))),
-                    }
-                } else {
-                    Ok(Ready::NotYet(InProgress::Fountain(in_progress)))
+
+                in_progress.collect(block_number);
+                match try_fountain(decoded_packet, &mut in_progress.decoder) {
+                    Some(v) => Ok(Ready::Yes(v)),
+                    None => Ok(Ready::NotYet(InProgress::Fountain(in_progress))),
                 }
             }
             InProgress::LegacyMulti(_) => Err(anyhow!(
@@ -143,15 +147,9 @@ pub fn process_decoded_payload(
     }
 }
 
-fn try_fountain(
-    collected_ser_packets: &[Vec<u8>],
-    current_decoder: &mut raptorq::Decoder,
-) -> Option<Vec<u8>> {
-    let mut result = None;
-    for x in collected_ser_packets.iter() {
-        result = current_decoder.decode(raptorq::EncodingPacket::deserialize(x));
-    }
-    result
+fn try_fountain(packet: EncodingPacket, decoder: &mut raptorq::Decoder) -> Option<Vec<u8>> {
+    decoder.add_new_packet(packet);
+    decoder.get_result()
 }
 
 fn try_legacy(collected: &mut LegacyMulti) -> Option<Vec<u8>> {
