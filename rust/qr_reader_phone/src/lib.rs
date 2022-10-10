@@ -29,14 +29,10 @@ pub fn get_length(line: &str, cleaned: bool) -> anyhow::Result<u32> {
     }
 }
 
-pub fn decode_sequence(jsonline: &str, cleaned: bool) -> anyhow::Result<String> {
-    let set: Vec<String> = match serde_json::from_str(jsonline) {
-        Ok(a) => a,
-        Err(_) => return Err(anyhow!("Unable to parse incoming string set")),
-    };
+pub fn decode_sequence(set: &[String], cleaned: bool) -> anyhow::Result<String> {
     let mut out = Ready::NotYet(InProgress::None);
     let mut final_result: Option<String> = None;
-    for x in set.iter() {
+    for x in set {
         let payload = get_payload(x, cleaned)?;
         if let Ready::NotYet(decoding) = out {
             out = process_decoded_payload(payload, decoding)?;
@@ -89,15 +85,19 @@ mod tests {
 
     #[test]
     fn bad_sequence() {
-        let jsonline = r#"["400021234","400021456","400021578"]"#;
-        let result = decode_sequence(jsonline, false);
+        let jsonline = vec![
+            "400021234".to_string(),
+            "400021456".to_string(),
+            "400021578".to_string(),
+        ];
+        let result = decode_sequence(&jsonline, false);
         assert!(result.is_ok(), "Expected ok, {:?}", result);
     }
 
     #[test]
     fn legacy_multiframe_one_frame() {
-        let jsonline = r#"["400be00000100005301025a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969a40403005a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe9690700e40b5402c5005c00ec07000004000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafebcd1b489599db4424ed928804ddad3a4689fb8c835151ef34bc250bb845cdc1eb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe0ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec"]"#;
-        let result = decode_sequence(jsonline, false);
+        let jsonline = vec!["400be00000100005301025a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969a40403005a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe9690700e40b5402c5005c00ec07000004000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafebcd1b489599db4424ed928804ddad3a4689fb8c835151ef34bc250bb845cdc1eb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe0ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec".to_string()];
+        let result = decode_sequence(&jsonline, false);
         assert!(result.is_ok(), "Expected ok, {:?}", result);
     }
 

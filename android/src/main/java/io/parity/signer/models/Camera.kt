@@ -36,7 +36,7 @@ fun SignerDataModel.processFrame(
 							if (proposeTotal == 1) {
 								try {
 									payload = qrparserTryDecodeQrSequence(
-										"[\"$payloadString\"]",
+										listOf(payloadString),
 										true
 									)
 									resetScanValues()
@@ -56,7 +56,7 @@ fun SignerDataModel.processFrame(
 						if ((bucket.size + 1) >= (total.value ?: 0)) {
 							try {
 								payload = qrparserTryDecodeQrSequence(
-									"[\"" + bucket.joinToString(separator = "\",\"") + "\"]",
+									bucket.toList(),
 									true
 								)
 								if (payload.isNotEmpty()) {
