@@ -1073,7 +1073,7 @@ mod derivations;
 use derivations::process_derivations;
 pub mod fetch_metadata;
 pub mod helpers;
-use helpers::debug_meta_at_block;
+use helpers::{debug_meta_at_block, generate_qr_code};
 pub mod interpret_specs;
 mod load;
 use load::{gen_load_meta, meta_default_file, unwasm};
@@ -1131,5 +1131,21 @@ pub fn full_run(command: Command) -> Result<()> {
             block_hash,
             export_dir,
         } => debug_meta_at_block(&url, &block_hash, export_dir),
+        Command::EncodeToQr {
+            path,
+            hex,
+            chunk_size,
+            dst_file,
+        } => {
+            let data = if let Some(hex) = hex {
+                hex::decode(hex).unwrap()
+            } else if let Some(path) = path {
+                std::fs::read(path).unwrap()
+            } else {
+                panic!("path or hex data required");
+            };
+
+            generate_qr_code(&data, chunk_size, dst_file)
+        }
     }
 }

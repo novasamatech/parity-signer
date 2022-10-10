@@ -96,11 +96,15 @@ where
 }
 
 /// Function to transform input `Vec<u8>` into fountain qr-code
-fn transform_into_qr_apng<P>(input: &[u8], output_name: P) -> Result<(), Box<dyn std::error::Error>>
+pub fn transform_into_qr_apng<P>(
+    input: &[u8],
+    chunk_size: u16,
+    output_name: P,
+) -> Result<(), Box<dyn std::error::Error>>
 where
     P: AsRef<Path>,
 {
-    let data_packs = make_data_packs(input, CHUNK_SIZE)?;
+    let data_packs = make_data_packs(input, chunk_size)?;
     make_apng(make_qr_codes(data_packs)?, output_name)?;
     Ok(())
 }
@@ -117,6 +121,6 @@ where
             Err(e) => Err(Box::from(format!("Output error {}", e))),
         }
     } else {
-        transform_into_qr_apng(input, output_name)
+        transform_into_qr_apng(input, CHUNK_SIZE, output_name)
     }
 }

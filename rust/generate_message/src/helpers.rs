@@ -1,5 +1,6 @@
 //! Helpers
 use parity_scale_codec::Encode;
+use qrcode_rtx::transform_into_qr_apng;
 use serde_json::{map::Map, value::Value};
 use sled::Batch;
 use sp_core::H256;
@@ -649,6 +650,15 @@ where
     std::fs::write(f_path, hex::encode(meta_values.meta))?;
 
     Ok(())
+}
+
+/// Generate with data into a specified file.
+pub fn generate_qr_code<P: AsRef<Path>>(
+    input: &[u8],
+    chunk_size: u16,
+    output_name: P,
+) -> Result<()> {
+    Ok(transform_into_qr_apng(input, chunk_size, output_name).map_err(Error::Qr)?)
 }
 
 /// Fetch data and assemble [`NetworkSpecsToSend`] with only URL address and
