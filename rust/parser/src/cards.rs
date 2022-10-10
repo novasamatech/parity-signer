@@ -18,6 +18,10 @@ pub enum ParserCard {
         id: AccountId32,
         base58prefix: u16,
     },
+    Id20 {
+        id: [u8; 20],
+        base58prefix: u16,
+    },
     None,
     IdentityField(String),
     BitVec(String), // String from printing `BitVec`
@@ -71,6 +75,10 @@ impl ParserCard {
                 "Id",
                 &id.to_ss58check_with_version(Ss58AddressFormat::custom(*base58prefix)),
             ),
+            ParserCard::Id20 {
+                id,
+                base58prefix: _,
+            } => readable(indent, "Id", &format!("0x{}", hex::encode(&id))),
             ParserCard::None => readable(indent, "none", ""),
             ParserCard::IdentityField(variant) => readable(indent, "identity_field", variant),
             ParserCard::BitVec(bv) => readable(indent, "bitvec", bv),

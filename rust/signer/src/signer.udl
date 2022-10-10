@@ -37,6 +37,7 @@ enum Encryption {
     "Ed25519",
     "Sr25519",
     "Ecdsa",
+    "Ethereum",
 };
 
 [Enum]
@@ -548,7 +549,7 @@ namespace signer {
     u32 qrparser_get_packets_total([ByRef] string data, boolean cleaned);
 
     [Throws=ErrorDisplayed]
-    string qrparser_try_decode_qr_sequence([ByRef] string data, boolean cleaned);
+    string qrparser_try_decode_qr_sequence([ByRef] sequence<string> data, boolean cleaned);
 
     [Throws=ErrorDisplayed]
     MKeyDetails generate_secret_key_qr([ByRef] string dbname, [ByRef] string public_key, [ByRef] string expected_seed_name, [ByRef] string network_specs_key, [ByRef] string seed_phrase, string? key_password);

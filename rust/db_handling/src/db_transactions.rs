@@ -844,7 +844,7 @@ pub struct TrDbColdSign {
 ///
 /// Messages contain SCALE-encoded text messages.
 #[cfg(feature = "signer")]
-#[derive(Debug, Decode, Encode)]
+#[derive(Debug, Decode, Encode, Clone)]
 pub enum SignContent {
     /// `53xx00` or `53xx02` transaction
     Transaction {

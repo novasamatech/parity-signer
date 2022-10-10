@@ -57,7 +57,10 @@ impl AddressDetails {
     ) -> Result<(MultiSigner, Self)> {
         let multisigner = address_key.multi_signer()?;
         let address_details = AddressDetails::decode(&mut &address_details_encoded[..])?;
-        if multisigner_to_encryption(&multisigner) != address_details.encryption {
+        if multisigner_to_encryption(&multisigner) != address_details.encryption
+            && multisigner_to_encryption(&multisigner) != Encryption::Ecdsa
+            && address_details.encryption != Encryption::Ethereum
+        {
             return Err(Error::EncryptionMismatch {
                 address_key: address_key.to_owned(),
                 encryption: address_details.encryption,

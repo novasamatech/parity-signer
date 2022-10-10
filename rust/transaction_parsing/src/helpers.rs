@@ -1,5 +1,8 @@
 use constants::{METATREE, SPECSTREE};
-use db_handling::helpers::{get_types, open_db, open_tree};
+use db_handling::{
+    helpers::{get_types, open_db, open_tree},
+    identities::get_all_addresses,
+};
 use definitions::{
     crypto::Encryption,
     error::MetadataError,
@@ -164,7 +167,8 @@ where
 /// function to process hex data and get from it author_public_key, encryption,
 /// data to process (either transaction to parse or message to decode),
 /// and network specs key
-pub fn multisigner_msg_genesis_encryption(
+pub fn multisigner_msg_genesis_encryption<P: AsRef<Path>>(
+    db_path: P,
     data_hex: &str,
 ) -> Result<(MultiSigner, Vec<u8>, H256, Encryption)> {
     let data = unhex(data_hex)?;
@@ -197,6 +201,37 @@ pub fn multisigner_msg_genesis_encryption(
                 &data[36..],
                 Encryption::Ecdsa,
             ),
+            None => return Err(Error::TooShort),
+        },
+        "03" => match data.get(3..23) {
+            Some(a) => {
+                if let Some(addr) =
+                    get_all_addresses(db_path)?
+                        .into_iter()
+                        .find_map(|(multisigner, _)| {
+                            if let MultiSigner::Ecdsa(ref e) = multisigner {
+                                let eth_addr = if let Ok(addr) =
+                                    definitions::helpers::ecdsa_public_to_eth_address(e)
+                                {
+                                    addr
+                                } else {
+                                    return None;
+                                };
+                                if eth_addr.as_ref() == a {
+                                    Some(multisigner.clone())
+                                } else {
+                                    None
+                                }
+                            } else {
+                                None
+                            }
+                        })
+                {
+                    (addr, &data[23..], Encryption::Ethereum)
+                } else {
+                    return Err(Error::AddrNotFound(format!("0x{}", hex::encode(a))));
+                }
+            }
             None => return Err(Error::TooShort),
         },
         _ => return Err(Error::EncryptionNotSupported(data_hex[2..4].to_string())),

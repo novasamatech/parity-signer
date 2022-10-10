@@ -33,7 +33,7 @@
 #[cfg(feature = "signer")]
 use bip39::{Language, Mnemonic, MnemonicType};
 use lazy_static::lazy_static;
-#[cfg(feature = "signer")]
+#[cfg(any(feature = "active", feature = "signer"))]
 use parity_scale_codec::Encode;
 use regex::Regex;
 #[cfg(feature = "signer")]
@@ -69,7 +69,7 @@ use definitions::{
 };
 #[cfg(feature = "signer")]
 use definitions::{
-    helpers::{make_identicon_from_multisigner, print_multisigner_as_base58},
+    helpers::{make_identicon_from_multisigner, print_multisigner_as_base58_or_eth},
     navigation::{Address, MKeyDetails, MSCNetworkInfo},
 };
 #[cfg(feature = "signer")]
@@ -98,7 +98,7 @@ lazy_static! {
 
 /// Get all existing addresses from the database.
 #[cfg(any(feature = "active", feature = "signer"))]
-pub(crate) fn get_all_addresses<P>(db_path: P) -> Result<Vec<(MultiSigner, AddressDetails)>>
+pub fn get_all_addresses<P>(db_path: P) -> Result<Vec<(MultiSigner, AddressDetails)>>
 where
     P: AsRef<Path>,
 {
@@ -112,6 +112,32 @@ where
         out.push((multisigner, address_details));
     }
     Ok(out)
+}
+
+#[cfg(any(feature = "active", feature = "signer"))]
+pub fn get_multisigner_by_address<P: AsRef<Path>>(
+    db_path: P,
+    address: &AddressKey,
+) -> Result<Option<MultiSigner>> {
+    use definitions::helpers::ecdsa_public_to_eth_address;
+
+    Ok(get_all_addresses(db_path)?.into_iter().find_map(|(m, a)| {
+        if a.encryption == Encryption::Ethereum {
+            if let MultiSigner::Ecdsa(ref public) = m {
+                if let Ok(addr) = ecdsa_public_to_eth_address(public) {
+                    if addr.as_ref() == address.key() {
+                        return Some(m);
+                    }
+                }
+            }
+        } else {
+            // TODO: for ecdsa address is not simply a public key
+            if address.key() == m.encode() {
+                return Some(m);
+            }
+        }
+        None
+    }))
 }
 
 /// Get all existing addresses for a given seed name from the database.
@@ -325,16 +351,18 @@ where
                 return Err(Error::SecretStringError(e));
             }
         },
-        Encryption::Ecdsa => match ecdsa::Pair::from_string(&full_address, None) {
-            Ok(a) => {
-                full_address.zeroize();
-                MultiSigner::Ecdsa(a.public())
+        Encryption::Ecdsa | Encryption::Ethereum => {
+            match ecdsa::Pair::from_string(&full_address, None) {
+                Ok(a) => {
+                    full_address.zeroize();
+                    MultiSigner::Ecdsa(a.public())
+                }
+                Err(e) => {
+                    full_address.zeroize();
+                    return Err(Error::SecretStringError(e));
+                }
             }
-            Err(e) => {
-                full_address.zeroize();
-                return Err(Error::SecretStringError(e));
-            }
-        },
+        }
     };
 
     let public_key = multisigner_to_public(&multisigner);
@@ -1323,11 +1351,18 @@ where
             address_key,
         });
     }
+    let public_key = multisigner_to_public(multisigner);
+
+    let style = address_details.encryption.identicon_style();
     let address = Address {
-        base58: print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix)),
+        base58: print_multisigner_as_base58_or_eth(
+            multisigner,
+            Some(network_specs.base58prefix),
+            address_details.encryption,
+        ),
         path: address_details.path.to_string(),
         has_pwd: address_details.has_pwd,
-        identicon: make_identicon_from_multisigner(multisigner),
+        identicon: make_identicon_from_multisigner(multisigner, style),
         seed_name: address_details.seed_name.to_string(),
         multiselect: None,
         secret_exposed: true,
@@ -1364,7 +1399,7 @@ where
             identity_history: IdentityHistory::get(
                 &address_details.seed_name,
                 &address_details.encryption,
-                public_key,
+                &public_key,
                 &address_details.path,
                 network_specs.genesis_hash,
             ),

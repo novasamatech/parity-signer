@@ -31,7 +31,7 @@ struct ScreenSelector: View {
             )
         case let .keys(value):
             KeyDetailsView(
-                forgetKeyActionHandler: ForgetKeySetAction(),
+                forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
                 viewModel: KeyDetailsViewModel(value),
                 actionModel: KeyDetailsActionModel(value, alert: data.alert, alertShow: alertShow),
                 exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value),
@@ -62,7 +62,7 @@ struct ScreenSelector: View {
             )
         case let .keyDetails(value):
             KeyDetailsPublicKeyView(
-                forgetKeyActionHandler: ForgetSingleKeyAction(),
+                forgetKeyActionHandler: ForgetSingleKeyAction(navigation: navigation),
                 viewModel: KeyDetailsPublicKeyViewModel(value),
                 actionModel: KeyDetailsPublicKeyActionModel(value),
                 exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value),

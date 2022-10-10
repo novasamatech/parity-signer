@@ -1,11 +1,12 @@
 use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 use sp_runtime::{generic::Era, MultiSigner};
 
-use definitions::helpers::make_identicon_from_account;
+use definitions::helpers::{make_identicon_from_account, make_identicon_from_id20, IdenticonStyle};
 use definitions::keyring::NetworkSpecsKey;
+
 use definitions::{
     crypto::Encryption,
-    helpers::{make_identicon_from_multisigner, pic_meta, print_multisigner_as_base58},
+    helpers::{make_identicon_from_multisigner, pic_meta, print_multisigner_as_base58_or_eth},
     history::MetaValuesDisplay,
     keyring::VerifierKey,
     navigation::{
@@ -119,6 +120,15 @@ impl<'a> Card<'a> {
                         identicon: make_identicon_from_account(id.to_owned()),
                     },
                 },
+                ParserCard::Id20 {
+                    id,
+                    base58prefix: _,
+                } => NavCard::IdCard {
+                    f: MSCId {
+                        base58: format!("0x{}", hex::encode(&id)),
+                        identicon: make_identicon_from_id20(id),
+                    },
+                },
                 ParserCard::None => NavCard::NoneCard,
                 ParserCard::IdentityField(variant) => {
                     NavCard::IdentityFieldCard { f: variant.clone() }
@@ -205,12 +215,16 @@ impl<'a> Card<'a> {
                 base58prefix,
             } => NavCard::AuthorPlainCard {
                 f: MSCAuthorPlain {
-                    base58: print_multisigner_as_base58(author, Some(*base58prefix)),
-                    identicon: make_identicon_from_multisigner(author),
+                    base58: print_multisigner_as_base58_or_eth(
+                        author,
+                        Some(*base58prefix),
+                        Encryption::Sr25519,
+                    ),
+                    identicon: make_identicon_from_multisigner(author, IdenticonStyle::Dots),
                 },
             },
             Card::AuthorPublicKey(author) => {
-                let identicon = make_identicon_from_multisigner(author);
+                let identicon = make_identicon_from_multisigner(author, IdenticonStyle::Dots);
                 let (public_key, encryption) = match author {
                     MultiSigner::Ed25519(p) => (hex::encode(&p), Encryption::Ed25519.show()),
                     MultiSigner::Sr25519(p) => (hex::encode(&p), Encryption::Sr25519.show()),
@@ -234,7 +248,7 @@ impl<'a> Card<'a> {
                     NavCard::VerifierCard {
                         f: MVerifierDetails {
                             public_key,
-                            identicon: make_identicon_from_multisigner(m),
+                            identicon: make_identicon_from_multisigner(m, IdenticonStyle::Dots),
                             encryption,
                         },
                     }
@@ -291,9 +305,14 @@ pub(crate) fn make_author_info(
     base58prefix: u16,
     address_details: &AddressDetails,
 ) -> Address {
+    let base58 =
+        print_multisigner_as_base58_or_eth(author, Some(base58prefix), address_details.encryption);
     Address {
-        base58: print_multisigner_as_base58(author, Some(base58prefix)),
-        identicon: make_identicon_from_multisigner(author),
+        base58,
+        identicon: make_identicon_from_multisigner(
+            author,
+            address_details.encryption.identicon_style(),
+        ),
         seed_name: address_details.seed_name.clone(),
         path: address_details.path.clone(),
         has_pwd: address_details.has_pwd,

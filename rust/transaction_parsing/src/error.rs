@@ -31,6 +31,10 @@ pub enum Error {
     #[error("Input is too short.")]
     TooShort,
 
+    /// Key corresponding to the address was not found in the db
+    #[error("Address {0} was not found in DB")]
+    AddrNotFound(String),
+
     /// All transactions are expected to be the Substrate ones, starting with
     /// hexadecimal `53`.
     ///
@@ -577,6 +581,12 @@ pub enum Error {
         /// network supported encryption
         encryption: Encryption,
     },
+
+    #[error(transparent)]
+    NotUtf8(#[from] std::str::Utf8Error),
+
+    #[error("Parser error: {0}")]
+    ParserError(String),
 }
 
 fn display_parsing_errors(network_name: &str, errors: &[(u32, parser::Error)]) -> String {

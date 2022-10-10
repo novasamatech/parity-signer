@@ -9,12 +9,14 @@ import SwiftUI
 
 final class ForgetSingleKeyAction {
     private let snackbarPresentation: BottomSnackbarPresentation
-    @EnvironmentObject private var navigation: NavigationCoordinator
+    private let navigation: NavigationCoordinator
 
     init(
-        snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation
+        snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
+        navigation: NavigationCoordinator
     ) {
         self.snackbarPresentation = snackbarPresentation
+        self.navigation = navigation
     }
 
     func forgetSingleKey(_: String) {

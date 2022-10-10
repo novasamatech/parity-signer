@@ -33,7 +33,7 @@ struct KeyDetailsPublicKeyView: View {
     @EnvironmentObject private var data: SignerDataModel
 
     init(
-        forgetKeyActionHandler: ForgetSingleKeyAction = ForgetSingleKeyAction(),
+        forgetKeyActionHandler: ForgetSingleKeyAction,
         viewModel: KeyDetailsPublicKeyViewModel,
         actionModel: KeyDetailsPublicKeyActionModel,
         exportPrivateKeyService: ExportPrivateKeyService,
@@ -100,6 +100,9 @@ struct KeyDetailsPublicKeyView: View {
                 .background(Asset.backgroundPrimary.swiftUIColor)
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
+        }
+        .onAppear {
+            navigation.performFake(navigation: .init(action: .rightButtonAction))
         }
         // Action sheet
         .fullScreenCover(
@@ -198,6 +201,7 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
         HStack {
             VStack {
                 KeyDetailsPublicKeyView(
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
                     exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
@@ -206,6 +210,7 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
             }
             VStack {
                 KeyDetailsPublicKeyView(
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
                     exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
@@ -214,6 +219,7 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
             }
             VStack {
                 KeyDetailsPublicKeyView(
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
                     exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
@@ -222,6 +228,7 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
             }
             VStack {
                 KeyDetailsPublicKeyView(
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                     viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
                     actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
                     exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
