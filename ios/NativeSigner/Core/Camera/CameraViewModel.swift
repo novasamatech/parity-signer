@@ -110,7 +110,7 @@ private extension CameraViewModel {
         callbackQueue.async {
             self.captured = self.bucket.count
         }
-        guard bucket.count + 1 >= total else { return }
+        guard total <= bucket.count else { return }
         decode(completeOperationPayload: bucket)
     }
 

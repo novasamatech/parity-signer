@@ -13,9 +13,9 @@ final class CameraPermissionHandler {
         case .authorized:
             completion(true)
         case .notDetermined:
-            AVCaptureDevice.requestAccess(for: .video) { _ in
+            AVCaptureDevice.requestAccess(for: .video) { isGranted in
                 DispatchQueue.main.async {
-                    completion(false)
+                    completion(isGranted)
                 }
             }
         case .denied,
