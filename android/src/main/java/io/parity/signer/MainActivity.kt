@@ -146,8 +146,8 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								modalData = actionResult.value?.modalData,
 								localNavAction = localNavAction.value,
 								alertState = shieldAlert,
-								button = signerDataModel::navigate,
 								signerDataModel = signerDataModel,
+								navigator = signerDataModel.navigator,
 							)
 						}
 					}

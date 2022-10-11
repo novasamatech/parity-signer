@@ -4,9 +4,12 @@ import androidx.compose.material.Colors
 import androidx.compose.ui.graphics.Color
 
 val Colors.backgroundPrimary: Color
-	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF1E1E23)
+	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF101015)
 
 val Colors.backgroundSecondary: Color
+	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF1E1E23)
+
+val Colors.backgroundTertiary: Color
 	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF2C2C30)
 
 val Colors.textSecondary: Color
