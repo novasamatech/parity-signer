@@ -1,5 +1,4 @@
-use crate::{LegacyFrame, RaptorqFrame};
-use anyhow::anyhow;
+use crate::{Error, LegacyFrame, RaptorqFrame, Result};
 use constants::CHUNK_SIZE;
 use raptorq::{self, EncodingPacket};
 use std::{collections::HashSet, convert::TryFrom};
@@ -49,10 +48,7 @@ pub enum Ready {
     Yes(Vec<u8>),
 }
 
-pub fn process_decoded_payload(
-    payload: Vec<u8>,
-    mut decoding: InProgress,
-) -> anyhow::Result<Ready> {
+pub fn process_decoded_payload(payload: Vec<u8>, mut decoding: InProgress) -> Result<Ready> {
     if let Ok(frame) = RaptorqFrame::try_from(payload.as_ref()) {
         let length = frame.size;
         let total = frame.total();
@@ -83,7 +79,7 @@ pub fn process_decoded_payload(
             }
             InProgress::Fountain(mut in_progress) => {
                 if in_progress.length != length {
-                    return Err(anyhow!("Was decoding fountain qr code with message length {}, got interrupted by fountain qr code with message length {}", in_progress.length, length));
+                    return Err(Error::ConflictingPayloads(in_progress.length, length));
                 }
 
                 in_progress.collect(block_number);
@@ -92,15 +88,13 @@ pub fn process_decoded_payload(
                     None => Ok(Ready::NotYet(InProgress::Fountain(in_progress))),
                 }
             }
-            InProgress::LegacyMulti(_) => Err(anyhow!(
-                "Was decoding legacy multi-element qr, and got interrupted by a fountain one."
-            )),
+            InProgress::LegacyMulti(_) => Err(Error::LegacyInterruptedByFountain),
         }
     } else if let Ok(frame) = LegacyFrame::try_from(payload.as_ref()) {
         let length = frame.total;
         let number = frame.index;
         if number >= length {
-            return Err(anyhow!("Number of element in legacy multi-element qr sequence exceeds expected sequence length."));
+            return Err(Error::LengthExceeded);
         }
         let contents = frame.data;
         let new_element = Element { number, contents };
@@ -115,17 +109,15 @@ pub fn process_decoded_payload(
                     None => Ok(Ready::NotYet(InProgress::LegacyMulti(collected))),
                 }
             }
-            InProgress::Fountain(_) => Err(anyhow!(
-                "Was decoding fountain qr code, and got interrupted by a legacy multi-element one."
-            )),
+            InProgress::Fountain(_) => Err(Error::FountainInterruptedByLegacy),
             InProgress::LegacyMulti(mut collected) => {
                 if collected.length != length {
-                    return Err(anyhow!("Was decoding legacy multi-element qr code with {} elements, got interrupted by legacy multi-element qr code with {} elements", collected.length, length));
+                    return Err(Error::ConflictingLegacyLengths(collected.length, length));
                 }
                 if !collected.elements.contains(&new_element) {
                     for x in collected.elements.iter() {
                         if x.number == number {
-                            return Err(anyhow!("Encountered two legacy multi-element qr code fragments with same number."));
+                            return Err(Error::SameNumber);
                         }
                     }
                     collected.elements.push(new_element);
@@ -141,9 +133,7 @@ pub fn process_decoded_payload(
     } else if let InProgress::None = decoding {
         Ok(Ready::Yes(payload))
     } else {
-        Err(anyhow!(
-            "Was reading dynamic qr, and got interrupted by a static one."
-        ))
+        Err(Error::DynamicInterruptedByStatic)
     }
 }
 

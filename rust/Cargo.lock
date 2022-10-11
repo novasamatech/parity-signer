@@ -2492,11 +2492,11 @@ dependencies = [
 name = "qr_reader_phone"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "constants",
  "hex",
  "nom",
  "raptorq",
+ "thiserror",
 ]
 
 [[package]]
