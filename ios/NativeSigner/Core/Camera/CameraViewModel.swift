@@ -1,5 +1,5 @@
 //
-//  CameraService.swift
+//  CameraViewModel.swift
 //  NativeSigner
 //
 //  Created by Alexander Slesarev on 20.7.2021.
