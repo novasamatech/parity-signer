@@ -8,10 +8,10 @@ edition = "2018"
 
 [dependencies]
 hex = "0.4.3"
-anyhow = "1.0.65"
 raptorq = "1.7.0"
 constants = {path = "../constants"}
 nom = "7.1.1"
+thiserror = "1.0.37"
 
 [lib]
 name = "qr_reader_phone"

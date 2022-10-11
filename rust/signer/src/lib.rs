@@ -115,7 +115,7 @@ fn update_seed_names(seed_names: Vec<String>) {
 /// Determines estimated required number of multiframe QR that should be gathered before decoding
 /// is attempted
 fn qrparser_get_packets_total(data: &str, cleaned: bool) -> anyhow::Result<u32, ErrorDisplayed> {
-    qr_reader_phone::get_length(data, cleaned).map_err(Into::into)
+    qr_reader_phone::get_length(data, cleaned).map_err(|e| e.to_string().into())
 }
 
 /// Attempts to convert QR data (transfered as json-like string) into decoded but not parsed UOS
@@ -126,8 +126,8 @@ fn qrparser_get_packets_total(data: &str, cleaned: bool) -> anyhow::Result<u32, 
 fn qrparser_try_decode_qr_sequence(
     data: &[String],
     cleaned: bool,
-) -> anyhow::Result<String, anyhow::Error> {
-    qr_reader_phone::decode_sequence(data, cleaned)
+) -> anyhow::Result<String, ErrorDisplayed> {
+    qr_reader_phone::decode_sequence(data, cleaned).map_err(|e| e.to_string().into())
 }
 
 /// Exports secret (private) key as QR code

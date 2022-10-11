@@ -1,24 +1,25 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use anyhow::anyhow;
 use std::convert::TryFrom;
 
+mod error;
 mod parser;
 pub mod process_payload;
 
 use crate::parser::{parse_qr_payload, LegacyFrame, RaptorqFrame};
+use error::{Error, Result};
 use process_payload::{process_decoded_payload, InProgress, Ready};
 
-pub fn get_payload(line: &str, cleaned: bool) -> anyhow::Result<Vec<u8>> {
+pub fn get_payload(line: &str, cleaned: bool) -> Result<Vec<u8>> {
     let payload = match cleaned {
         true => line,
         false => parse_qr_payload(line)?,
     };
-    hex::decode(payload).map_err(anyhow::Error::msg)
+    Ok(hex::decode(payload)?)
 }
 
-pub fn get_length(line: &str, cleaned: bool) -> anyhow::Result<u32> {
+pub fn get_length(line: &str, cleaned: bool) -> Result<u32> {
     let payload = get_payload(line, cleaned)?;
     if let Ok(frame) = RaptorqFrame::try_from(payload.as_ref()) {
         Ok(frame.total())
@@ -29,7 +30,7 @@ pub fn get_length(line: &str, cleaned: bool) -> anyhow::Result<u32> {
     }
 }
 
-pub fn decode_sequence(set: &[String], cleaned: bool) -> anyhow::Result<String> {
+pub fn decode_sequence(set: &[String], cleaned: bool) -> Result<String> {
     let mut out = Ready::NotYet(InProgress::None);
     let mut final_result: Option<String> = None;
     for x in set {
@@ -44,7 +45,7 @@ pub fn decode_sequence(set: &[String], cleaned: bool) -> anyhow::Result<String> 
     }
     match final_result {
         Some(a) => Ok(a),
-        None => Err(anyhow!("Was unable to decode on given dataset")),
+        None => Err(Error::UnableToDecode),
     }
 }
 
