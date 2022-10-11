@@ -10,9 +10,6 @@ import SwiftUI
 
 struct CameraView: View {
     @StateObject var model = CameraViewModel()
-    @State private var total: Int = 0
-    @State private var captured: Int = 0
-    @State private var resetCameraTrigger: Bool = false
     let navigationRequest: NavigationRequest
     let size = UIScreen.main.bounds.size.width
     var body: some View {
@@ -23,7 +20,6 @@ struct CameraView: View {
                         model.configure()
                     }
                     .onDisappear {
-                        print("shutdown camera")
                         UIApplication.shared.isIdleTimerDisabled = false
                         model.shutdown()
                     }
@@ -34,22 +30,8 @@ struct CameraView: View {
                             }
                         }
                     })
-                    .onChange(of: resetCameraTrigger, perform: { newResetCameraTrigger in
-                        if newResetCameraTrigger {
-                            model.reset()
-                            resetCameraTrigger = false
-                        }
-                    })
-                    .onReceive(model.$total, perform: { rTotal in
-                        total = rTotal
-                    })
-                    .onReceive(model.$captured, perform: { rCaptured in
-                        captured = rCaptured
-                        if rCaptured > 0 {
-                            UIApplication.shared.isIdleTimerDisabled = true
-                        } else {
-                            UIApplication.shared.isIdleTimerDisabled = false
-                        }
+                    .onChange(of: model.captured, perform: { newValue in
+                        UIApplication.shared.isIdleTimerDisabled = newValue > 0
                     })
                     .mask(
                         VStack {
@@ -70,10 +52,10 @@ struct CameraView: View {
                         }
                     )
                 Spacer()
-                if model.total > 0 {
+                if model.total > 1 {
                     MenuStack {
                         HeadingOverline(text: Localizable.CameraView.parsingMultidata.key).padding(.top, 12)
-                        ProgressView(value: min(Float(captured) / (Float(total) + 2), 1))
+                        ProgressView(value: min(Float(model.captured) / Float(model.total), 1))
                             .border(Asset.crypto400.swiftUIColor)
                             .foregroundColor(Asset.crypto400.swiftUIColor)
                             .padding(.vertical, 8)

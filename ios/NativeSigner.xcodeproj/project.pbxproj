@@ -46,7 +46,6 @@
 		2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BD526C1126C0053C1E0 /* Utils.swift */; };
 		2D7A7BE326C3FC250053C1E0 /* terms-and-conditions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BE226C3FC250053C1E0 /* terms-and-conditions.txt */; };
 		2D7A7BE726C410FF0053C1E0 /* privacy-policy.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BE626C410FF0053C1E0 /* privacy-policy.txt */; };
-		2DA5F80D2756304B00D8DD29 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F80C2756304B00D8DD29 /* Camera.swift */; };
 		2DA5F8232756621F00D8DD29 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8222756621F00D8DD29 /* Header.swift */; };
 		2DA5F8252756624000D8DD29 /* NavbarShield.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8242756624000D8DD29 /* NavbarShield.swift */; };
 		2DA5F8272756629600D8DD29 /* ScreenSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8262756629600D8DD29 /* ScreenSelector.swift */; };
@@ -123,6 +122,7 @@
 		6D019974289D183B00F4C317 /* UInt8+Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D019964289BF7D000F4C317 /* UInt8+Formatting.swift */; };
 		6D01997E289D238700F4C317 /* Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D01997D289D238700F4C317 /* Localizable.swift */; };
 		6D16685728F530F4008C664A /* CaptureDeviceConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D16685628F530F4008C664A /* CaptureDeviceConfigurator.swift */; };
+		6D16685D28F5C15C008C664A /* CameraVideoOutputDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D16685C28F5C15C008C664A /* CameraVideoOutputDelegate.swift */; };
 		6D17EF8328EDC951008626E9 /* Encryption+RawRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D17EF8228EDC951008626E9 /* Encryption+RawRepresentable.swift */; };
 		6D17EF8628EEEDDA008626E9 /* CameraPreviewUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D17EF8528EEEDDA008626E9 /* CameraPreviewUIView.swift */; };
 		6D2779C828B3D33100570055 /* NavigationBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779C728B3D33100570055 /* NavigationBarView.swift */; };
@@ -310,7 +310,6 @@
 		2D7A7BD526C1126C0053C1E0 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		2D7A7BE226C3FC250053C1E0 /* terms-and-conditions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "terms-and-conditions.txt"; sourceTree = "<group>"; };
 		2D7A7BE626C410FF0053C1E0 /* privacy-policy.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "privacy-policy.txt"; sourceTree = "<group>"; };
-		2DA5F80C2756304B00D8DD29 /* Camera.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
 		2DA5F8222756621F00D8DD29 /* Header.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		2DA5F8242756624000D8DD29 /* NavbarShield.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavbarShield.swift; sourceTree = "<group>"; };
 		2DA5F8262756629600D8DD29 /* ScreenSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenSelector.swift; sourceTree = "<group>"; };
@@ -392,6 +391,7 @@
 		6D019970289CA13000F4C317 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 		6D01997D289D238700F4C317 /* Localizable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Localizable.swift; sourceTree = "<group>"; };
 		6D16685628F530F4008C664A /* CaptureDeviceConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureDeviceConfigurator.swift; sourceTree = "<group>"; };
+		6D16685C28F5C15C008C664A /* CameraVideoOutputDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraVideoOutputDelegate.swift; sourceTree = "<group>"; };
 		6D17EF8228EDC951008626E9 /* Encryption+RawRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encryption+RawRepresentable.swift"; sourceTree = "<group>"; };
 		6D17EF8528EEEDDA008626E9 /* CameraPreviewUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewUIView.swift; sourceTree = "<group>"; };
 		6D2779C728B3D33100570055 /* NavigationBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarView.swift; sourceTree = "<group>"; };
@@ -1028,9 +1028,9 @@
 		6D6ACA3F28F0B383002FB03A /* Camera */ = {
 			isa = PBXGroup;
 			children = (
-				2DA5F80C2756304B00D8DD29 /* Camera.swift */,
 				6D6ACA4028F0B391002FB03A /* CameraPermissionHandler.swift */,
 				6D16685628F530F4008C664A /* CaptureDeviceConfigurator.swift */,
+				6D16685C28F5C15C008C664A /* CameraVideoOutputDelegate.swift */,
 			);
 			path = Camera;
 			sourceTree = "<group>";
@@ -1662,6 +1662,7 @@
 				6D2779C828B3D33100570055 /* NavigationBarView.swift in Sources */,
 				6D2D245728CF5C5200862726 /* PublicKeyActionsModal.swift in Sources */,
 				2DA5F87027566C3600D8DD29 /* TCNameVersion.swift in Sources */,
+				6D16685D28F5C15C008C664A /* CameraVideoOutputDelegate.swift in Sources */,
 				2DA5F89027590B3A00D8DD29 /* DocumentModal.swift in Sources */,
 				6D57DC4B289D614F00005C63 /* BackendNavigationAdapter.swift in Sources */,
 				6DC5643528B69355003D540B /* AccessControlProvidingAssembler.swift in Sources */,
@@ -1702,7 +1703,6 @@
 				2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */,
 				04197D27276A41E7003485D2 /* SettingsCardTemplate.swift in Sources */,
 				2DA5F89227590B4F00D8DD29 /* Documents.swift in Sources */,
-				2DA5F80D2756304B00D8DD29 /* Camera.swift in Sources */,
 				6DBF6E2928E47EE000CC959F /* ErrorBottomModalViewModel.swift in Sources */,
 				6D019974289D183B00F4C317 /* UInt8+Formatting.swift in Sources */,
 				2D48F3D2277A0AB2004B27BE /* HistoryCardExtended.swift in Sources */,

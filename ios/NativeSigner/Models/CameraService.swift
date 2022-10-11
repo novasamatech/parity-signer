@@ -5,22 +5,16 @@
 //  Created by Alexander Slesarev on 20.7.2021.
 //
 
-/// Logic behind the camera - boilerplate, parsing QRs into payloads,
-/// collection of payloads and their transfer to Rust decoder
-/// Some concurrency
-
 import AVKit
 import UIKit
-import Vision
 
-enum CameraSessionSetupResult {
-    case success
-    case notAuthorized
-    case configurationFailed
-}
+final class CameraViewModel: ObservableObject {
+    private enum CameraSessionSetupResult {
+        case success
+        case notAuthorized
+        case configurationFailed
+    }
 
-final class CameraService: NSObject {
-    @Published var isCameraUnavailable = true
     /// QR code payload decoded by Rust
     @Published var payload: String?
     /// Number of expected frames for given payload
@@ -30,81 +24,63 @@ final class CameraService: NSObject {
     /// Partial payload to decode, collection of payloads from individual QR codes
     private var bucket: [String] = []
 
-    let session = AVCaptureSession()
-    var isSessionRunning = false
-    var isConfigured = false
-    var setupResult: CameraSessionSetupResult = .success
+    let session: AVCaptureSession
+    private var isConfigured = false
+    private var setupResult: CameraSessionSetupResult = .success
 
     private let sessionQueue = DispatchQueue(label: "session queue")
     private let stitcherQueue = DispatchQueue.global(qos: .userInitiated)
     private let videoDataOutputQueue = DispatchQueue.global(qos: .userInteractive)
     private let callbackQueue = DispatchQueue.main
     private let captureDeviceConfigurator: CaptureDeviceConfiguring = CaptureDeviceConfigurator()
+    private let cameraPermissionHandler: CameraPermissionHandler
+    private let videoOutputDelegate: CameraVideoOutputDelegate
+
+    init(
+        session: AVCaptureSession = AVCaptureSession(),
+        cameraPermissionHandler: CameraPermissionHandler = CameraPermissionHandler(),
+        videoOutputDelegate: CameraVideoOutputDelegate = CameraVideoOutputDelegate()
+    ) {
+        self.session = session
+        self.cameraPermissionHandler = cameraPermissionHandler
+        self.videoOutputDelegate = videoOutputDelegate
+        videoOutputDelegate.set(updateReceiver: self)
+    }
 
     func configure() {
-        sessionQueue.async(execute: configureSession)
+        cameraPermissionHandler.checkForPermissions { [weak self] isGranted in
+            guard let self = self else { return }
+            self.setupResult = isGranted ? .success : .notAuthorized
+            self.sessionQueue.async(execute: self.configureSession)
+        }
     }
 
     func start() {
-        bucket = []
+        clearLocalState()
         sessionQueue.async(execute: startSession)
     }
 
-    func stop() {
-        guard isSessionRunning, setupResult == .success else { return }
+    func shutdown() {
+        guard session.isRunning, setupResult == .success else { return }
         sessionQueue.async(execute: stopSession)
     }
 
-    /// Empty bucket
-    func emptyBucket() {
+    func reset() {
         payload = nil
-        total = 0
-        captured = 0
-        bucket = []
+        clearLocalState()
     }
 }
 
-extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
-    func captureOutput(_: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from _: AVCaptureConnection) {
-        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
-            print("Failed to obtain pixelbuffer for this frame")
-            return
-        }
-
-        let imageRequestHandler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
-
-        do {
-            let detectionRequest = VNDetectBarcodesRequest(completionHandler: qrCodeDetection)
-            detectionRequest.symbologies = [.qr]
-            try imageRequestHandler.perform([detectionRequest])
-        } catch {
-            print("Failed to handle \(error)")
-        }
+extension CameraViewModel: QRPayloadUpdateReceiving {
+    func didReceive(update qrCodePayload: String) {
+        guard !bucket.contains(qrCodePayload) else { return }
+        stitcherQueue.async { self.handleNew(qrCodePayload: qrCodePayload) }
     }
 }
 
-private extension CameraService {
-    func qrCodeDetection(request: VNRequest, error: Error?) {
-        if error != nil {
-            print("QR code detection error: \(String(describing: error))")
-        }
-
-        guard
-            let qrCodeDescriptor = (request as? VNDetectBarcodesRequest)?.results?.first?
-            .barcodeDescriptor as? CIQRCodeDescriptor
-        else { return }
-
-        let qrPayloadAsString = qrCodeDescriptor.errorCorrectedPayload.map { String(format: "%02x", $0) }.joined()
-
-        stitcherQueue.async {
-            guard !self.bucket.contains(qrPayloadAsString) else { return }
-            self.handleNew(qrCodePayload: qrPayloadAsString)
-        }
-    }
-
+private extension CameraViewModel {
     func handleNew(qrCodePayload: String) {
-        if total == 0 {
-            // If `total == 0`, treat `qrCodePayload` as either start of new video QR or single QR code
+        if bucket.isEmpty {
             handleNewOperation(with: qrCodePayload)
         } else {
             appendToCurrentBucket(qrCodePayload: qrCodePayload)
@@ -143,7 +119,7 @@ private extension CameraService {
             let parsedPayload = try qrparserTryDecodeQrSequence(data: completeOperationPayload, cleaned: false)
             callbackQueue.async {
                 self.payload = parsedPayload
-                self.stop()
+                self.shutdown()
             }
         } catch {
             // give up when things go badly?
@@ -151,12 +127,12 @@ private extension CameraService {
     }
 }
 
-private extension CameraService {
+private extension CameraViewModel {
     func configureSession() {
         guard setupResult == .success else { return }
         let configurationResult = captureDeviceConfigurator.configure(
             session: session,
-            with: self,
+            with: videoOutputDelegate,
             videoOutputQueue: videoDataOutputQueue
         )
         if configurationResult {
@@ -169,21 +145,20 @@ private extension CameraService {
 
     func stopSession() {
         session.stopRunning()
-        isSessionRunning = session.isRunning
-        guard !isSessionRunning else { return }
-        callbackQueue.async {
-            self.isCameraUnavailable = true
-        }
     }
 
     func startSession() {
-        guard !isSessionRunning, isConfigured else { return }
+        guard !session.isRunning, isConfigured else { return }
         if setupResult == .success {
             session.startRunning()
-            isSessionRunning = session.isRunning
         }
+    }
+
+    func clearLocalState() {
         callbackQueue.async {
-            self.isCameraUnavailable = self.setupResult != .success
+            self.total = 0
+            self.captured = 0
+            self.bucket = []
         }
     }
 }
