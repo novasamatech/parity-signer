@@ -685,7 +685,7 @@ pub fn generate_qr_code<P: AsRef<Path>>(
     fps: u16,
     output_name: P,
 ) -> Result<()> {
-    Ok(transform_into_qr_apng(input, chunk_size, fps, output_name).map_err(Error::Qr)?)
+    transform_into_qr_apng(input, chunk_size, fps, output_name).map_err(Error::Qr)
 }
 
 /// Fetch data and assemble [`NetworkSpecsToSend`] with only URL address and
