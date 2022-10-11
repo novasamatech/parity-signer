@@ -2134,7 +2134,7 @@ fn process_hex_address_key_address_details(
 ) -> Result<(MultiSigner, AddressDetails)> {
     let address_key = AddressKey::from_hex(hex_address_key)?;
     let multisigner = get_multisigner_by_address(dbname, &address_key)?
-        .ok_or(Error::KeyNotFound(format!("0x{}", hex_address_key)))?;
+        .ok_or_else(|| Error::KeyNotFound(format!("0x{}", hex_address_key)))?;
     let address_details = db_handling::helpers::get_address_details(dbname, &address_key)?;
     Ok((multisigner, address_details))
 }
