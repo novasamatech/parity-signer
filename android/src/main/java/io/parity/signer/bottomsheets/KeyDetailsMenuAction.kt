@@ -100,14 +100,13 @@ private fun KeyDetailsGeneralMenu(
 				state.value = KeyDetailsMenuState.DELETE_CONFIRM
 			}
 		)
-
+		Spacer(modifier = Modifier.padding(bottom = 16.dp))
 		SecondaryButtonBottomSheet(
 			label = stringResource(R.string.generic_cancel),
-			modifier = Modifier.padding(vertical = 16.dp)
 		) {
 			navigator.backAction()
 		}
-		Spacer(modifier = Modifier.padding(bottom = 24.dp))
+		Spacer(modifier = Modifier.padding(bottom = 16.dp))
 	}
 }
 
@@ -121,16 +120,23 @@ private fun KeyDetailsDeleteConfirmMenu(
 	Column(
 		modifier = Modifier
             .fillMaxWidth()
-            .padding(start = sidePadding, end = sidePadding, top = 8.dp),
+            .padding(start = sidePadding, end = sidePadding, top = 32.dp),
 	) {
 
 		Text(
-			text = stringResource(R.string.export_private_key_confirm_title),
+			modifier = Modifier.fillMaxWidth(1f),
+			text = stringResource(R.string.remove_key_confirm_title),
 			color = MaterialTheme.colors.primary,
 			style = TypefaceNew.TitleL,
+			textAlign = TextAlign.Center,
 		)
 		Text(
-			modifier = Modifier.padding(top = 16.dp, bottom = 24.dp),
+			modifier = Modifier
+                .fillMaxWidth(1f)
+                .padding(
+                    top = 16.dp, bottom = 24.dp,
+                    start = 8.dp, end = 8.dp
+                ),
 			text = stringResource(R.string.remove_key_confirm_text),
 			color = MaterialTheme.colors.textSecondary,
 			style = TypefaceNew.BodyL,
@@ -139,7 +145,9 @@ private fun KeyDetailsDeleteConfirmMenu(
 		RowButtonsBottomSheet(
 			labelCancel = stringResource(R.string.generic_cancel),
 			labelCta = stringResource(R.string.remove_key_confirm_cta),
-			onClickedCancel = { navigator.backAction() },
+			onClickedCancel = {
+				navigator.backAction()
+												},
 			onClickedCta = { navigator.navigate(Action.REMOVE_KEY) },
 		)
 		Spacer(modifier = Modifier.padding(bottom = 24.dp))
@@ -156,8 +164,8 @@ private fun MenuItemForBottomSheet(
 ) {
 	Row(
 		modifier = Modifier
-            .padding(vertical = 8.dp)
             .clickable(onClick = onclick)
+            .padding(vertical = 8.dp)
             .fillMaxWidth(),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
@@ -165,7 +173,7 @@ private fun MenuItemForBottomSheet(
 			painter = painterResource(id = iconId),
 			contentDescription = null,
 			modifier = Modifier
-				.size(32.dp),
+				.size(28.dp),
 			tint = tint ?: MaterialTheme.colors.primary,
 		)
 		Spacer(modifier = Modifier.padding(end = 24.dp))

@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.CtaButtonBottomSheet
+import io.parity.signer.components.base.PrimaryButtonBottomSheet
 import io.parity.signer.components.base.SecondaryButtonBottomSheet
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.LocalNavRequest
@@ -57,7 +57,7 @@ fun ConfirmExportPrivateKeyAction(
 			textAlign = TextAlign.Center,
 		)
 
-		CtaButtonBottomSheet(stringResource(R.string.export_private_key_confirm_title)) {
+		PrimaryButtonBottomSheet(stringResource(R.string.export_private_key_confirm_title)) {
 			navigator.navigate(LocalNavRequest.ShowExportPrivateKey(publicKey))
 		}
 

@@ -4,7 +4,9 @@
 use sp_runtime::MultiSigner;
 
 use db_handling::db_transactions::TrDbColdStub;
-use definitions::{keyring::NetworkSpecsKey, navigation::MSCContent, users::AddressDetails};
+use definitions::{
+    crypto::Encryption, keyring::NetworkSpecsKey, navigation::MSCContent, users::AddressDetails,
+};
 
 mod sign_message;
 use sign_message::{
@@ -28,6 +30,7 @@ pub fn handle_sign(
     pwd_entry: &str,
     user_comment: &str,
     database_name: &str,
+    encryption: Encryption,
 ) -> Result<Vec<u8>> {
     create_signature_png(
         seed_phrase,
@@ -35,6 +38,7 @@ pub fn handle_sign(
         user_comment,
         database_name,
         checksum,
+        encryption,
     )
 }
 

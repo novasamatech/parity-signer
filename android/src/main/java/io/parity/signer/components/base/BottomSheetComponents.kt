@@ -21,7 +21,7 @@ import io.parity.signer.ui.theme.fill18
 import io.parity.signer.ui.theme.pink500
 
 @Composable
-fun CtaButtonBottomSheet(
+fun PrimaryButtonBottomSheet(
 	label: String,
 	modifier: Modifier = Modifier,
 	background: Color = MaterialTheme.colors.pink500,
@@ -41,7 +41,7 @@ fun CtaButtonBottomSheet(
 	) {
 		Text(
 			text = label,
-			color = MaterialTheme.colors.primary,
+			color = Color.White,
 			style = TypefaceNew.TitleS,
 			maxLines = 1,
 		)
@@ -98,7 +98,7 @@ fun RowButtonsBottomSheet(
 			)
 		}
 
-		Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+		Spacer(modifier = Modifier.padding(end = 8.dp))
 		Column(
 			modifier = Modifier
 				.clickable(onClick = onClickedCancel)
@@ -113,7 +113,7 @@ fun RowButtonsBottomSheet(
 		) {
 			Text(
 				text = labelCta,
-				color = MaterialTheme.colors.primary,
+				color = Color.White,
 				style = TypefaceNew.TitleS,
 				maxLines = 1,
 			)
@@ -137,7 +137,7 @@ private fun PreviewCtaButtons() {
 		Column(
 			modifier = Modifier.size(300.dp),
 		) {
-			CtaButtonBottomSheet("button") {}
+			PrimaryButtonBottomSheet("button") {}
 			RowButtonsBottomSheet(
 				labelCancel = "Cancel",
 				labelCta = "Apply",

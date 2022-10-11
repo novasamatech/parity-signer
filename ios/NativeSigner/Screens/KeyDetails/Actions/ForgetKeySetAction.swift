@@ -10,14 +10,16 @@ import SwiftUI
 final class ForgetKeySetAction {
     private let seedsMediator: SeedsMediating
     private let snackbarPresentation: BottomSnackbarPresentation
-    @EnvironmentObject private var navigation: NavigationCoordinator
+    private let navigation: NavigationCoordinator
 
     init(
         snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
-        seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+        seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+        navigation: NavigationCoordinator
     ) {
         self.snackbarPresentation = snackbarPresentation
         self.seedsMediator = seedsMediator
+        self.navigation = navigation
     }
 
     func forgetKeySet(_ keySet: String) {

@@ -11,6 +11,7 @@ struct ErrorBottomModalViewModel {
     let icon: Image?
     let title: String
     let content: String
+    let details: String?
     let primaryAction: ActionModel?
     let secondaryAction: ActionModel?
     let tertiaryAction: ActionModel?
@@ -19,6 +20,7 @@ struct ErrorBottomModalViewModel {
         icon: Image? = nil,
         title: String,
         content: String,
+        details: String? = nil,
         primaryAction: ActionModel? = nil,
         secondaryAction: ActionModel? = nil,
         tertiaryAction: ActionModel? = nil
@@ -26,6 +28,7 @@ struct ErrorBottomModalViewModel {
         self.icon = icon
         self.title = title
         self.content = content
+        self.details = details
         self.primaryAction = primaryAction
         self.secondaryAction = secondaryAction
         self.tertiaryAction = tertiaryAction
@@ -50,6 +53,18 @@ struct ErrorBottomModalViewModel {
             content: Localizable.PastConnectivity.Label.content.string,
             primaryAction: .init(label: Localizable.PastConnectivity.Action.back.key, action: backAction),
             tertiaryAction: .init(label: Localizable.PastConnectivity.Action.continue.key, action: continueAction)
+        )
+    }
+
+    static func alertError(
+        message: String,
+        _ action: @escaping @autoclosure () -> Void = {}()
+    ) -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.GenericErrorModal.Label.title.string,
+            content: Localizable.GenericErrorModal.Label.messagePrefix.string,
+            details: message,
+            secondaryAction: .init(label: Localizable.GenericErrorModal.Action.ok.key, action: action)
         )
     }
 }

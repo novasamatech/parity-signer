@@ -278,7 +278,10 @@ use sled::IVec;
 use sp_core::H256;
 use sp_runtime::MultiSigner;
 
-use crate::error::{Error, Result};
+use crate::{
+    error::{Error, Result},
+    helpers::IdenticonStyle,
+};
 
 #[cfg(feature = "signer")]
 use crate::helpers::{
@@ -597,7 +600,7 @@ impl VerifierValue {
             VerifierValue::Standard { m } => {
                 let public_key = hex::encode(multisigner_to_public(m));
                 let encryption = multisigner_to_encryption(m).show();
-                let identicon = make_identicon_from_multisigner(m);
+                let identicon = make_identicon_from_multisigner(m, IdenticonStyle::Dots);
 
                 MVerifierDetails {
                     public_key,

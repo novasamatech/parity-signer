@@ -24,6 +24,9 @@ pub enum Error {
     #[error(transparent)]
     Io(#[from] std::io::Error),
 
+    #[error(transparent)]
+    LibSecp(#[from] libsecp256k1::Error),
+
     /// Received public key length is different from the one expected for
     /// given encryption algorithm.
     #[error("Public key length does not match the encryption.")]

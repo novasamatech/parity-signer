@@ -12,11 +12,27 @@ struct NavbarShield: View {
     let alert: Bool
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+    @State private var isPresentingConnectivityAlert = false
+    @State private var isPresentingSecureAlert = false
+
+    private let resetWarningAction: ResetConnectivtyWarningsAction
+
+    init(
+        alert: Bool,
+        resetWarningAction: ResetConnectivtyWarningsAction
+    ) {
+        self.alert = alert
+        self.resetWarningAction = resetWarningAction
+    }
 
     var body: some View {
         Button(
             action: {
-                navigation.perform(navigation: .init(action: .shield))
+                if connectivityMediator.isConnectivityOn || alert {
+                    isPresentingConnectivityAlert.toggle()
+                } else {
+                    isPresentingSecureAlert.toggle()
+                }
             },
             label: {
                 if connectivityMediator.isConnectivityOn {
@@ -35,6 +51,24 @@ struct NavbarShield: View {
                     }
                 }
             }
+        ).fullScreenCover(
+            isPresented: $isPresentingConnectivityAlert
+        ) {
+            ErrorBottomModal(
+                viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
+                    continueAction: resetWarningAction.resetConnectivityWarnings()
+                ),
+                isShowingBottomAlert: $isPresentingConnectivityAlert
+            )
+            .clearModalBackground()
+        }
+        .alert(
+            Localizable.signerIsSecure.key,
+            isPresented: $isPresentingSecureAlert,
+            actions: {
+                Button(Localizable.Common.ok.key) {}
+            },
+            message: { Localizable.pleaseProceed.text }
         )
     }
 }

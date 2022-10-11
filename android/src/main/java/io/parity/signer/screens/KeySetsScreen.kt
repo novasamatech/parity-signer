@@ -11,11 +11,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import io.parity.signer.R
 import io.parity.signer.components.items.KeySetItem
-import io.parity.signer.components.base.CtaButtonBottomSheet
+import io.parity.signer.components.base.PrimaryButtonBottomSheet
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
@@ -52,7 +50,7 @@ fun KeySetsScreen(
 				}
 			}
 		}
-		CtaButtonBottomSheet(
+		PrimaryButtonBottomSheet(
 			label = stringResource(R.string.key_sets_screem_add_key_button),
 			modifier = Modifier.padding(24.dp),
 		) {

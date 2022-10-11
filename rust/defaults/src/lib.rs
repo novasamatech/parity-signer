@@ -195,7 +195,7 @@ pub fn default_chainspecs() -> Vec<NetworkSpecs> {
             base58prefix: x.base58prefix,
             color: x.color.to_string(),
             decimals: x.decimals,
-            encryption: x.encryption.clone(),
+            encryption: x.encryption,
             genesis_hash: x.genesis_hash,
             logo: x.logo.to_string(),
             name: x.name.to_string(),
@@ -233,7 +233,7 @@ pub fn default_chainspecs_to_send() -> Vec<NetworkSpecsToSend> {
             base58prefix: x.base58prefix,
             color: x.color.to_string(),
             decimals: x.decimals,
-            encryption: x.encryption.clone(),
+            encryption: x.encryption,
             genesis_hash: x.genesis_hash,
             logo: x.logo.to_string(),
             name: x.name.to_string(),
@@ -256,7 +256,7 @@ pub fn default_address_book() -> Vec<AddressBookEntry> {
             name: x.name.to_string(),
             genesis_hash: x.genesis_hash,
             address: x.address.to_string(),
-            encryption: x.encryption.clone(),
+            encryption: x.encryption,
             def: true,
         };
         out.push(new);
