@@ -287,12 +287,15 @@ pub enum Command {
         dst_file: PathBuf,
 
         /// Size of a chunk in a multiframe raptorq encoding.
+        #[arg(long, value_name = "CHUNK SIZE")]
         chunk_size: u16,
 
         /// FPS of a multiframe raptorq encoding
+        #[arg(long, value_name = "FPS OF VIDEO QR")]
         fps: u16,
 
         /// Number of keys to generate and export
+        #[arg(long, value_name = "NUMBER OF TEST KEYS")]
         keys_num: usize,
     },
 }
