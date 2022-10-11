@@ -1,5 +1,5 @@
 //
-//  CameraViewModel.swift
+//  CameraService.swift
 //  NativeSigner
 //
 //  Created by Alexander Slesarev on 20.7.2021.
@@ -8,7 +8,7 @@
 import AVKit
 import UIKit
 
-final class CameraViewModel: ObservableObject {
+final class CameraService: ObservableObject {
     private enum CameraSessionSetupResult {
         case success
         case notAuthorized
@@ -71,14 +71,14 @@ final class CameraViewModel: ObservableObject {
     }
 }
 
-extension CameraViewModel: QRPayloadUpdateReceiving {
+extension CameraService: QRPayloadUpdateReceiving {
     func didReceive(update qrCodePayload: String) {
         guard !bucket.contains(qrCodePayload) else { return }
         stitcherQueue.async { self.handleNew(qrCodePayload: qrCodePayload) }
     }
 }
 
-private extension CameraViewModel {
+private extension CameraService {
     func handleNew(qrCodePayload: String) {
         if bucket.isEmpty {
             handleNewOperation(with: qrCodePayload)
@@ -127,7 +127,7 @@ private extension CameraViewModel {
     }
 }
 
-private extension CameraViewModel {
+private extension CameraService {
     func configureSession() {
         guard setupResult == .success else { return }
         let configurationResult = captureDeviceConfigurator.configure(

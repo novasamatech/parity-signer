@@ -9,7 +9,7 @@ import AVFoundation
 import SwiftUI
 
 struct CameraView: View {
-    @StateObject var model = CameraViewModel()
+    @StateObject var model = CameraService()
     let navigationRequest: NavigationRequest
     let size = UIScreen.main.bounds.size.width
     var body: some View {
