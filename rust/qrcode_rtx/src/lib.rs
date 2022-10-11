@@ -56,7 +56,11 @@ fn make_qr_codes(data: Vec<Vec<u8>>) -> Result<Vec<QrCode>, Box<dyn std::error::
     Ok(out)
 }
 
-fn make_apng<P>(data: Vec<QrCode>, output_name: P) -> Result<(), Box<dyn std::error::Error>>
+fn make_apng<P>(
+    data: Vec<QrCode>,
+    output_name: P,
+    fps: u16,
+) -> Result<(), Box<dyn std::error::Error>>
 where
     P: AsRef<Path>,
 {
@@ -71,7 +75,7 @@ where
     encoder.set_color(png::ColorType::Indexed);
     encoder.set_palette(qr_palette());
     encoder.set_animated(frames_count, 0)?;
-    encoder.set_frame_delay(FPS_NOM, FPS_DEN)?;
+    encoder.set_frame_delay(FPS_NOM, fps)?;
     encoder.set_depth(png::BitDepth::One);
 
     let mut writer = encoder.write_header()?;
@@ -99,13 +103,14 @@ where
 pub fn transform_into_qr_apng<P>(
     input: &[u8],
     chunk_size: u16,
+    fps: u16,
     output_name: P,
 ) -> Result<(), Box<dyn std::error::Error>>
 where
     P: AsRef<Path>,
 {
     let data_packs = make_data_packs(input, chunk_size)?;
-    make_apng(make_qr_codes(data_packs)?, output_name)?;
+    make_apng(make_qr_codes(data_packs)?, output_name, fps)?;
     Ok(())
 }
 
@@ -121,6 +126,6 @@ where
             Err(e) => Err(Box::from(format!("Output error {}", e))),
         }
     } else {
-        transform_into_qr_apng(input, CHUNK_SIZE, output_name)
+        transform_into_qr_apng(input, CHUNK_SIZE, FPS_DEN, output_name)
     }
 }

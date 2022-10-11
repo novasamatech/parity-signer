@@ -1064,6 +1064,7 @@
 #![deny(unused)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
+use constants::FPS_DEN;
 use db_handling::{
     default_cold_release, default_hot,
     helpers::{prep_types, transfer_metadata_to_cold},
@@ -1073,7 +1074,7 @@ mod derivations;
 use derivations::process_derivations;
 pub mod fetch_metadata;
 pub mod helpers;
-use helpers::{debug_meta_at_block, generate_qr_code};
+use helpers::{debug_meta_at_block, generate_key_info_export_to_qr, generate_qr_code};
 pub mod interpret_specs;
 mod load;
 use load::{gen_load_meta, meta_default_file, unwasm};
@@ -1145,7 +1146,13 @@ pub fn full_run(command: Command) -> Result<()> {
                 panic!("path or hex data required");
             };
 
-            generate_qr_code(&data, chunk_size, dst_file)
+            generate_qr_code(&data, chunk_size, FPS_DEN, dst_file)
         }
+        Command::KeyInfoExportToQr {
+            dst_file,
+            chunk_size,
+            fps,
+            keys_num,
+        } => generate_key_info_export_to_qr(dst_file, chunk_size, fps, keys_num),
     }
 }

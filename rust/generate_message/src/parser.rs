@@ -280,6 +280,21 @@ pub enum Command {
         #[arg(long, value_name = "FILE")]
         dst_file: PathBuf,
     },
+
+    /// Produce a test key info export QR
+    KeyInfoExportToQr {
+        #[arg(long, value_name = "FILE PATH")]
+        dst_file: PathBuf,
+
+        /// Size of a chunk in a multiframe raptorq encoding.
+        chunk_size: u16,
+
+        /// FPS of a multiframe raptorq encoding
+        fps: u16,
+
+        /// Number of keys to generate and export
+        keys_num: usize,
+    },
 }
 
 /// Display data commands.

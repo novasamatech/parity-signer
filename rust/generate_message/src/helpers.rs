@@ -1,4 +1,5 @@
 //! Helpers
+use db_handling::identities::{AddrInfo, ExportAddrs, ExportAddrsV1};
 use parity_scale_codec::Encode;
 use qrcode_rtx::transform_into_qr_apng;
 use serde_json::{map::Map, value::Value};
@@ -652,13 +653,39 @@ where
     Ok(())
 }
 
+pub fn generate_key_info_export_to_qr<P: AsRef<Path>>(
+    output_name: P,
+    chunk_size: u16,
+    fps: u16,
+    keys_num: usize,
+) -> Result<()> {
+    let addrs: Vec<AddrInfo> = (0..keys_num)
+        .into_iter()
+        .map(|num| AddrInfo {
+            name: format!("a very long key name a very long key name number {}", num),
+            address: "0xdeadbeefdeadbeefdeadbeef".to_string(),
+            network: "polkadot".to_string(),
+            derivation_path: None,
+            encryption: Encryption::Sr25519,
+        })
+        .collect();
+
+    let export_addrs_v1 = ExportAddrsV1 { addrs };
+    let export_addrs = ExportAddrs::V1(export_addrs_v1);
+
+    let export_addrs_encoded = export_addrs.encode();
+
+    generate_qr_code(&export_addrs_encoded, chunk_size, fps, output_name)
+}
+
 /// Generate with data into a specified file.
 pub fn generate_qr_code<P: AsRef<Path>>(
     input: &[u8],
     chunk_size: u16,
+    fps: u16,
     output_name: P,
 ) -> Result<()> {
-    Ok(transform_into_qr_apng(input, chunk_size, output_name).map_err(Error::Qr)?)
+    Ok(transform_into_qr_apng(input, chunk_size, fps, output_name).map_err(Error::Qr)?)
 }
 
 /// Fetch data and assemble [`NetworkSpecsToSend`] with only URL address and
