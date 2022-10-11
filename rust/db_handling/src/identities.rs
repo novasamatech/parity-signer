@@ -180,6 +180,12 @@ pub fn get_multisigner_by_address<P: AsRef<Path>>(
     use definitions::helpers::ecdsa_public_to_eth_address;
 
     Ok(get_all_addresses(db_path)?.into_iter().find_map(|(m, a)| {
+        // TODO: Keys in the system should have disambiguous addressing
+        // the current state of events has to do with the fact
+        // that some parts of UI may be addressing eth keys by
+        // Ethereum addresses and other parts by public keys
+
+        // First check if an etherum address is being requested
         if a.encryption == Encryption::Ethereum {
             if let MultiSigner::Ecdsa(ref public) = m {
                 if let Ok(addr) = ecdsa_public_to_eth_address(public) {
@@ -188,11 +194,12 @@ pub fn get_multisigner_by_address<P: AsRef<Path>>(
                     }
                 }
             }
-        } else {
-            // TODO: for ecdsa address is not simply a public key
-            if address.key() == m.encode() {
-                return Some(m);
-            }
+        }
+
+        // TODO: for ecdsa address is not simply a public key
+        // Do a general check after Ethereum-specific one
+        if address.key() == m.encode() {
+            return Some(m);
         }
         None
     }))
