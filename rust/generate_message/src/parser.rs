@@ -272,7 +272,7 @@ pub enum Command {
         #[arg(long, value_name = "HEX ENCODED PAYLOAD")]
         hex: Option<String>,
 
-        /// Size of a chunk in a multiframe raptorq encoding
+        /// Size of a chunk in a multiframe RaptorQ encoding
         #[arg(long, default_value = "128", value_name = "SIZE OF CHUNK")]
         chunk_size: u16,
 
@@ -286,11 +286,11 @@ pub enum Command {
         #[arg(long, value_name = "FILE PATH")]
         dst_file: PathBuf,
 
-        /// Size of a chunk in a multiframe raptorq encoding.
+        /// Size of a chunk in a multiframe RaptorQ encoding.
         #[arg(long, value_name = "CHUNK SIZE")]
         chunk_size: u16,
 
-        /// FPS of a multiframe raptorq encoding
+        /// FPS of a multiframe RaptorQ encoding
         #[arg(long, value_name = "FPS OF VIDEO QR")]
         fps: u16,
 
