@@ -114,7 +114,7 @@ fn qr_payload(qr_content: &[u8]) -> Vec<u8> {
             .collect::<Vec<_>>(),
     )
     .unwrap();
-    
+
     qr_decoder
         .detect_and_decode(&mat, &mut points, &mut rect_image)
         .unwrap()
