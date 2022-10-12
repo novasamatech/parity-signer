@@ -15,6 +15,7 @@ import io.parity.signer.R
 import io.parity.signer.components.items.KeySetItem
 import io.parity.signer.components.base.PrimaryButtonBottomSheet
 import io.parity.signer.components.panels.BottomBar2
+import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.ui.helpers.PreviewData
@@ -56,7 +57,7 @@ fun KeySetsScreen(
 		) {
 			//callback
 		}
-		BottomBar2(navigator, footerButton)
+		BottomBar2(navigator, BottomBar2State.KEYS)
 	}
 }
 

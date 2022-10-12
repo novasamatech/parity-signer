@@ -1,6 +1,7 @@
 package io.parity.signer.components.panels
 
 import android.content.res.Configuration
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,15 +9,10 @@ import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarViewDay
-import androidx.compose.material.icons.filled.CropFree
-import androidx.compose.material.icons.filled.Pattern
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,13 +20,10 @@ import io.parity.signer.R
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.screens.KeySetViewModel
-import io.parity.signer.screens.KeySetsScreen
 import io.parity.signer.screens.KeySetsSelectViewModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.FooterButton
-import io.parity.signer.uniffi.actionGetName
 
 /**
  * Bar to be shown on the bottom of screen;
@@ -39,7 +32,7 @@ import io.parity.signer.uniffi.actionGetName
 @Composable
 fun BottomBar2(
 	navigator: Navigator,
-	footerButton: FooterButton?,
+	state: BottomBar2State,
 ) {
 	BottomAppBar(
 		backgroundColor = MaterialTheme.colors.backgroundSecondary,
@@ -51,50 +44,51 @@ fun BottomBar2(
 			modifier = Modifier.fillMaxWidth(1f)
 		) {
 			BottomBarButton2(
-				footerButton = footerButton,
 				navigator = navigator,
-				image = Icons.Default.Pattern,
+				iconId = R.drawable.ic_key_outlined_24,
 				action = Action.NAVBAR_KEYS,
 				labelResId = R.string.bottom_bar_label_key_sets,
+				isEnabled = state == BottomBar2State.KEYS,
 			)
 			BottomBarButton2(
-				footerButton = footerButton,
 				navigator = navigator,
-				image = Icons.Default.CropFree,
+				iconId = R.drawable.ic_qe_code_24,
 				action = Action.NAVBAR_SCAN,
 				labelResId = R.string.bottom_bar_label_scanner,
+				isEnabled = state == BottomBar2State.SCANNER,
 			)
 			BottomBarButton2(
-				footerButton = footerButton,
 				navigator = navigator,
-				image = Icons.Default.CalendarViewDay,
+				iconId = R.drawable.ic_view_agenda_outlined_24,
 				action = Action.NAVBAR_LOG,
 				labelResId = R.string.bottom_bar_label_logs,
+				isEnabled = state == BottomBar2State.LOGS,
 			)
 			BottomBarButton2(
-				footerButton = footerButton,
 				navigator = navigator,
-				image = Icons.Default.Settings,
+				iconId = R.drawable.ic_settings_outlined_24,
 				action = Action.NAVBAR_SETTINGS,
 				labelResId = R.string.bottom_bar_label_settings,
+				isEnabled = state == BottomBar2State.SETTINGS,
 			)
 		}
 	}
 }
+
+enum class BottomBar2State { KEYS, SCANNER, LOGS, SETTINGS }
 
 /**
  * Unified bottom bar button view for [BottomBar2]
  */
 @Composable
 fun BottomBarButton2(
-	footerButton: FooterButton?,
 	navigator: Navigator,
-	image: ImageVector,
+	@DrawableRes iconId: Int,
 	action: Action,
 	@StringRes labelResId: Int,
+	isEnabled: Boolean,
 ) {
-	val selected = footerButton == actionGetName(action)
-	val color = if (selected) {
+	val color = if (isEnabled) {
 		MaterialTheme.colors.pink500
 	} else {
 		MaterialTheme.colors.textTertiary
@@ -106,8 +100,8 @@ fun BottomBarButton2(
             .width(66.dp)
 	) {
 		Icon(
-			imageVector = image,
-			contentDescription = actionGetName(action).toString(),
+			painter = painterResource(id = iconId),
+			contentDescription = stringResource(id = labelResId),
 			tint = color,
 			modifier = Modifier.size(28.dp)
 		)
@@ -118,6 +112,7 @@ fun BottomBarButton2(
 		)
 	}
 }
+
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -146,7 +141,7 @@ private fun PreviewBottomBar2() {
 	)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			BottomBar2(EmptyNavigator(), null)
+			BottomBar2(EmptyNavigator(), BottomBar2State.KEYS)
 		}
 	}
 }

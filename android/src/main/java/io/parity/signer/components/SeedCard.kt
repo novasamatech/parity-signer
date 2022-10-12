@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.*
 
-@Deprecated("Use new SeedCardItem for new screens")
+@Deprecated("Use new KeySetItem for new screens")
 @Composable
 fun SeedCard(
 	seedName: String,
