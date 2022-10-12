@@ -1,5 +1,4 @@
 use crate::{Error, LegacyFrame, RaptorqFrame, Result};
-use constants::CHUNK_SIZE;
 use raptorq::{self, EncodingPacket};
 use std::{collections::HashSet, convert::TryFrom};
 
@@ -59,7 +58,7 @@ pub fn process_decoded_payload(payload: Vec<u8>, mut decoding: InProgress) -> Re
             InProgress::None => {
                 let config = raptorq::ObjectTransmissionInformation::with_defaults(
                     length as u64,
-                    CHUNK_SIZE,
+                    decoded_packet.data().len() as u16,
                 );
                 let mut decoder = raptorq::Decoder::new(config);
                 match try_fountain(decoded_packet, &mut decoder) {
