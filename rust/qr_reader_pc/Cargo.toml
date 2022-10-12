@@ -13,6 +13,6 @@ anyhow = "1.0.65"
 indicatif = "0.17.1"
 
 [dependencies.opencv]
-version = "0.69"
+version = "0.70"
 default-features = false
 features = ["objdetect", "videoio", "imgproc", "highgui"]
