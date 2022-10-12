@@ -114,10 +114,10 @@ fn qr_payload(qr_content: &[u8]) -> Vec<u8> {
             .collect::<Vec<_>>(),
     )
     .unwrap();
-    let codes = qr_decoder
+    
+    qr_decoder
         .detect_and_decode(&mat, &mut points, &mut rect_image)
-        .unwrap();
-    codes
+        .unwrap()
 }
 
 fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
