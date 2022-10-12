@@ -2,6 +2,7 @@ package io.parity.signer.screens
 
 import android.content.res.Configuration
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
@@ -25,14 +26,15 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
 import io.parity.signer.uniffi.*
 
-//old design screen was called SeedManager todo dmitry update
+/**
+ * Default main screen with list Seeds/root keys
+ */
 @Composable
 fun KeySetsScreen(
 	model: KeySetsSelectViewModel,
 	navigator: Navigator,
-	footerButton: FooterButton?,
 ) {
-	Column() {
+	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeaderTitle(R.string.key_sets_screem_title)
 		LazyColumn(
 			contentPadding = PaddingValues(horizontal = 12.dp),
@@ -50,7 +52,7 @@ fun KeySetsScreen(
 			label = stringResource(R.string.key_sets_screem_add_key_button),
 			modifier = Modifier.padding(24.dp),
 		) {
-			//callback
+			navigator.navigate(Action.RIGHT_BUTTON_ACTION) //new seed for this state
 		}
 		BottomBar2(navigator, BottomBar2State.KEYS)
 	}
@@ -131,7 +133,7 @@ private fun PreviewKeySetsSelectScreen() {
 	val mockModel = KeySetsSelectViewModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreen(mockModel, EmptyNavigator(), null)
+			KeySetsScreen(mockModel, EmptyNavigator())
 		}
 	}
 }

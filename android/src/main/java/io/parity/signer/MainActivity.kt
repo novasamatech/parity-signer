@@ -93,7 +93,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								.captionBarPadding()
 								.statusBarsPadding(),
 							topBar = {
-								if (NavigationMigrations.shouldShowTopBar(
+								if (NavigationMigrations.shouldShowBar(
 										localNavAction = localNavAction.value,
 										globalNavAction = actionResult.value
 									)
@@ -105,9 +105,15 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								}
 							},
 							bottomBar = {
-								if (actionResult.value?.footer == true) BottomBar(
-									signerDataModel = signerDataModel
-								)
+								if (NavigationMigrations.shouldShowBar(
+										localNavAction = localNavAction.value,
+										globalNavAction = actionResult.value
+									)
+								) {
+									if (actionResult.value?.footer == true) BottomBar(
+										signerDataModel = signerDataModel
+									)
+								}
 							},
 						) { innerPadding ->
 							Box(modifier = Modifier.padding(innerPadding)) {
