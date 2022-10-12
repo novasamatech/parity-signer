@@ -3,7 +3,7 @@ package io.parity.signer.models
 import android.util.Log
 import android.widget.Toast
 import io.parity.signer.BuildConfig
-import io.parity.signer.bottomsheets.PrivateKeyExportModel
+import io.parity.signer.bottomsheets.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components2.KeyCardModel
 import io.parity.signer.uniffi.Action

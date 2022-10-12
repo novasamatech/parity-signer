@@ -268,9 +268,7 @@ class SignerDataModel : ViewModel() {
 		) {
 			if (alertState.value != AlertState.Active) {
 				_alertState.value = AlertState.Active
-				if (onBoardingDone.value == OnBoardingState.Yes) historyDeviceWasOnline(
-					dbName
-				)
+				if (onBoardingDone.value == OnBoardingState.Yes) historyDeviceWasOnline(dbName)
 			}
 		} else {
 			if (alertState.value == AlertState.Active) {

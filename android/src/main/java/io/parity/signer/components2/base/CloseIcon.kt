@@ -38,7 +38,7 @@ fun CloseIcon(
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
 				.size(20.dp)
-				.clickable { onCloseClicked() }
+				.clickable(onClick = onCloseClicked)
 		)
 	}
 }

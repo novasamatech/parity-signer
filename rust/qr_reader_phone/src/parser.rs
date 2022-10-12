@@ -1,4 +1,3 @@
-use anyhow::anyhow;
 use nom::bits::complete::take as bit_take;
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take};
@@ -10,6 +9,8 @@ use nom::error::ErrorKind;
 use nom::number::complete::be_u16;
 use nom::sequence::{preceded, tuple};
 use nom::{bits, IResult};
+
+use crate::{Error, Result};
 
 pub(crate) struct RaptorqFrame {
     pub(crate) size: u32,
@@ -31,11 +32,11 @@ impl RaptorqFrame {
 }
 
 impl TryFrom<&[u8]> for RaptorqFrame {
-    type Error = anyhow::Error;
+    type Error = Error;
 
-    fn try_from(i: &[u8]) -> Result<Self, Self::Error> {
-        let (_, (size, payload)) = parse_raptor_frame(i)
-            .map_err(|e| e.map(|e| anyhow!("Unable to parse RaptorqFrame: {:?}", e.code)))?;
+    fn try_from(i: &[u8]) -> Result<Self> {
+        let (_, (size, payload)) =
+            parse_raptor_frame(i).map_err(|e| Error::RaptorqFrame(e.to_string()))?;
         Ok(Self {
             size,
             payload: payload.to_vec(),
@@ -50,11 +51,11 @@ pub(crate) struct LegacyFrame {
 }
 
 impl TryFrom<&[u8]> for LegacyFrame {
-    type Error = anyhow::Error;
+    type Error = Error;
 
-    fn try_from(i: &[u8]) -> Result<Self, Self::Error> {
-        let (_, (total, index, data)) = parse_legacy_frame(i)
-            .map_err(|e| e.map(|e| anyhow!("Unable to parse LegacyFrame: {:?}", e.code)))?;
+    fn try_from(i: &[u8]) -> Result<Self> {
+        let (_, (total, index, data)) =
+            parse_legacy_frame(i).map_err(|e| Error::LegacyFrame(e.to_string()))?;
         Ok(Self {
             total,
             index,
@@ -84,9 +85,9 @@ fn length_prefixed(prefix_bytes: u8) -> impl Fn(&str) -> IResult<&str, &str> {
 }
 
 /// Parse QR code envelope and return payload.
-pub(crate) fn parse_qr_payload(i: &str) -> anyhow::Result<&str> {
+pub(crate) fn parse_qr_payload(i: &str) -> Result<&str> {
     let (_, payload) = preceded(qr_prefix, alt((length_prefixed(2), length_prefixed(1))))(i)
-        .map_err(|e| e.map(|e| anyhow!("Unexpected qr content: {}", e.input.to_string())))?;
+        .map_err(|e| Error::UnexpectedData(e.to_string()))?;
     Ok(payload)
 }
 

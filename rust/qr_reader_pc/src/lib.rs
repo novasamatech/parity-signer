@@ -115,6 +115,9 @@ fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<Ma
     let mut frame = Mat::default();
     camera.read(&mut frame)?;
 
+    if frame.size()?.width > 0 {
+        highgui::imshow(window, &frame)?;
+    };
     Ok(frame)
 }
 
@@ -139,10 +142,7 @@ pub fn process_qr_image(
         highgui::imshow(window, &rect_image)?;
     };
     match code {
-        Ok(code) if !code.is_empty() => {
-            println!("code {}", code.len());
-            process_decoded_payload(code, decoding)
-        }
+        Ok(code) if !code.is_empty() => process_decoded_payload(code, decoding).map_err(Into::into),
         Ok(_) | Err(_) => Ok(Ready::NotYet(decoding)),
     }
 }
