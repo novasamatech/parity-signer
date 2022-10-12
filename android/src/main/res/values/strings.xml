@@ -15,6 +15,8 @@
 	<string name="qr_with_address_to_scan_description">QR with address to scan</string>
 	<string name="export_private_key_timer_label">Private Key will be hidden in</string>
 	<string name="description_close_button">Close button</string>
+	<string name="description_back_button">Back button</string>
+	<string name="description_menu_button">Menu button</string>
 	<string name="description_locked_icon">Locked account</string>
 	<string name="description_identicon">identicon</string>
 	<string name="description_expand_button">Expand button</string>

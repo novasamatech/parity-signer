@@ -24,6 +24,9 @@ import io.parity.signer.components.KeySelector
 import io.parity.signer.components.NetworkLogoName
 import io.parity.signer.components.SeedCard
 import io.parity.signer.models.AlertState
+import io.parity.signer.models.Navigator
+import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.increment
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
@@ -31,13 +34,16 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MKeys
 import kotlin.math.absoluteValue
 
-//todo remove old key retails
+//todo old screen is KeyManager
+/**
+ * Single Seed/Key set is selected is it's details
+ */
 @Composable
-fun KeyManager(
-	button: (action: Action, details: String) -> Unit,
-	increment: (Int, String) -> Unit,
+fun KeySetDetailsScreen(
 	mKeys: MKeys,
-	alertState: State<AlertState?>
+	navigator: Navigator,
+	signer: SignerDataModel,
+	alertState: State<AlertState?>,
 ) {
 	val rootKey = mKeys.root
 	val keySet = mKeys.set
@@ -53,11 +59,11 @@ fun KeyManager(
 						detectTapGestures(
 							onTap = {
 								if (rootKey.addressKey.isNotBlank())
-									button(Action.SELECT_KEY, rootKey.addressKey)
+									navigator.navigate(Action.SELECT_KEY, rootKey.addressKey)
 							},
 							onLongPress = {
 								if (rootKey.addressKey.isNotBlank())
-									button(Action.LONG_TAP, rootKey.addressKey)
+									navigator.navigate(Action.LONG_TAP, rootKey.addressKey)
 							}
 						)
 					}
@@ -69,7 +75,7 @@ fun KeyManager(
 						onDragStopped = {
 							if (offsetX.absoluteValue > 20f) {
 								if (rootKey.addressKey.isNotBlank())
-									button(Action.SWIPE, rootKey.addressKey)
+									navigator.navigate(Action.SWIPE, rootKey.addressKey)
 							}
 							offsetX = 0f
 						}
@@ -87,18 +93,18 @@ fun KeyManager(
 					selected = rootKey.multiselect,
 					swiped = rootKey.swiped,
 					increment = { number ->
-						increment(
+						signer.increment(
 							number,
 							rootKey.seedName
 						)
 					},
-					delete = { button(Action.REMOVE_KEY, "") }
+					delete = { navigator.navigate(Action.REMOVE_KEY, "") }
 				)
 			}
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier
-					.clickable { button(Action.NETWORK_SELECTOR, "") }
+					.clickable { navigator.navigate(Action.NETWORK_SELECTOR, "") }
 					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 					.background(MaterialTheme.colors.Bg100)
 					.fillMaxWidth()
@@ -129,9 +135,9 @@ fun KeyManager(
 				Spacer(Modifier.weight(1f, true))
 				IconButton(onClick = {
 					if (alertState.value == AlertState.None)
-						button(Action.NEW_KEY, "")
+						navigator.navigate(Action.NEW_KEY, "")
 					else
-						button(Action.SHIELD, "")
+						navigator.navigate(Action.SHIELD, "")
 				}) {
 					Icon(
 						Icons.Default.AddCircleOutline,
@@ -140,21 +146,21 @@ fun KeyManager(
 					)
 				}
 			}
-			KeySelector(
-				button,
-				{ number -> increment(number, rootKey.seedName) },
-				keySet,
-				multiselectMode,
-				rootKey.seedName,
-			)
+//			KeySelector(
+//				navigator.navigate,
+//				{ number -> signer.increment(number, rootKey.seedName) },
+//				keySet,
+//				multiselectMode,
+//				rootKey.seedName,
+//			)
 		}
 		if (multiselectMode) {
 			Column {
 				Spacer(Modifier.weight(1f))
 				BottomMultiselectBar(
 					count = multiselectCount,
-					delete = { button(Action.REMOVE_KEY, "") },
-					export = { button(Action.EXPORT_MULTI_SELECT, "") }
+					delete = { navigator.navigate(Action.REMOVE_KEY, "") },
+					export = { navigator.navigate(Action.EXPORT_MULTI_SELECT, "") }
 				)
 			}
 		}
