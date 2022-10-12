@@ -1902,9 +1902,9 @@ dependencies = [
  "hex",
  "image",
  "lazy_static",
+ "opencv",
  "parser",
  "pretty_assertions",
- "quircs",
  "regex",
  "sp-core",
  "sp-runtime",
@@ -1950,17 +1950,6 @@ dependencies = [
  "autocfg",
  "num-integer",
  "num-traits",
-]
-
-[[package]]
-name = "num-derive"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "876a53fff98e03a936a674b29568b0e605f06b29372c2489ff4de23f1949743d"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -2539,17 +2528,6 @@ name = "qrcodegen"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4339fc7a1021c9c1621d87f5e3505f2805c8c105420ba2f2a4df86814590c142"
-
-[[package]]
-name = "quircs"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "088cd18eb88277186050867dbfc7079eba83a753e4bc2b51c0feef6908679f4a"
-dependencies = [
- "num-derive",
- "num-traits",
- "thiserror",
-]
 
 [[package]]
 name = "quote"
