@@ -1,11 +1,13 @@
 package io.parity.signer.screens
 
 import android.content.res.Configuration
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -31,18 +33,11 @@ fun KeySetsScreen(
 	footerButton: FooterButton?,
 ) {
 	Column() {
-		Text(
-			text = stringResource(R.string.key_sets_screem_title),
-			color = MaterialTheme.colors.primary,
-			style = TypefaceNew.TitleS,
-			textAlign = TextAlign.Center,
-			modifier = Modifier
-				.fillMaxWidth(1f)
-				.padding(8.dp),
-		)
+		ScreenHeaderTitle(R.string.key_sets_screem_title)
 		LazyColumn(
 			contentPadding = PaddingValues(horizontal = 12.dp),
-			verticalArrangement = Arrangement.spacedBy(10.dp)
+			verticalArrangement = Arrangement.spacedBy(10.dp),
+			modifier = Modifier.weight(1f),
 		) {
 			val cards = model.keys
 			items(cards.size) { i ->
@@ -58,6 +53,23 @@ fun KeySetsScreen(
 			//callback
 		}
 		BottomBar2(navigator, BottomBar2State.KEYS)
+	}
+}
+
+@Composable
+private fun ScreenHeaderTitle(@StringRes stringId: Int) {
+	Box(
+		modifier = Modifier
+			.fillMaxWidth(1f)
+			.defaultMinSize(minHeight = 56.dp)
+	) {
+		Text(
+			text = stringResource(stringId),
+			color = MaterialTheme.colors.primary,
+			style = TypefaceNew.TitleS,
+			textAlign = TextAlign.Center,
+			modifier = Modifier.align(Alignment.Center)
+		)
 	}
 }
 
@@ -95,20 +107,28 @@ fun SeedNameCard.toSeedViewModel() =
 )
 @Composable
 private fun PreviewKeySetsSelectScreen() {
-	val mockModel = KeySetsSelectViewModel(
-		listOf(
-			KeySetViewModel(
-				"first seed name",
-				PreviewData.exampleIdenticon,
-				1.toUInt()
-			),
+	val keys = mutableListOf(
+		KeySetViewModel(
+			"first seed name",
+			PreviewData.exampleIdenticon,
+			1.toUInt()
+		),
+		KeySetViewModel(
+			"second seed name",
+			PreviewData.exampleIdenticon,
+			3.toUInt()
+		),
+	)
+	repeat(30) {
+		keys.add(
 			KeySetViewModel(
 				"second seed name",
 				PreviewData.exampleIdenticon,
 				3.toUInt()
-			),
+			)
 		)
-	)
+	}
+	val mockModel = KeySetsSelectViewModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			KeySetsScreen(mockModel, EmptyNavigator(), null)

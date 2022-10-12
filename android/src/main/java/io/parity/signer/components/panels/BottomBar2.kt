@@ -37,7 +37,7 @@ fun BottomBar2(
 	BottomAppBar(
 		backgroundColor = MaterialTheme.colors.backgroundSecondary,
 		elevation = 0.dp,
-		modifier = Modifier.height(56.dp)
+		modifier = Modifier.height(50.dp)
 	) {
 		Row(
 			horizontalArrangement = Arrangement.SpaceEvenly,
@@ -104,6 +104,7 @@ fun BottomBarButton2(
 			contentDescription = stringResource(id = labelResId),
 			tint = color,
 			modifier = Modifier.size(28.dp)
+				.padding(bottom = 2.dp)
 		)
 		Text(
 			text = stringResource(id = labelResId),

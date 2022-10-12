@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<plurals name="key_sets_item_derived_subtitle">
-		<item quantity="one">%1$d Key</item>
-		<item quantity="other">%1$d Keys</item>
+		<item quantity="one">%1$d Derived Key</item>
+		<item quantity="other">%1$d Derived Keys</item>
 	</plurals>
 </resources>
