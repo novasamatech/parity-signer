@@ -15,8 +15,7 @@ use opencv::{
     highgui,
     objdetect::QRCodeDetector,
     prelude::*,
-    videoio,
-    videoio::{CAP_PROP_FRAME_HEIGHT, CAP_PROP_FRAME_WIDTH},
+    videoio::{self, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FRAME_WIDTH},
     Result,
 };
 
@@ -135,15 +134,11 @@ pub fn process_qr_image(
 ) -> anyhow::Result<Ready> {
     let mut points = Mat::default();
     let mut rect_image = Mat::default();
-    let code = qr_decoder.detect_and_decode(&frame, &mut points, &mut rect_image);
-
-    let window = "video capture";
-    if rect_image.size()?.width > 0 {
-        highgui::imshow(window, &rect_image)?;
-    };
-    match code {
-        Ok(code) if !code.is_empty() => process_decoded_payload(code, decoding).map_err(Into::into),
-        Ok(_) | Err(_) => Ok(Ready::NotYet(decoding)),
+    let code = qr_decoder.detect_and_decode(&frame, &mut points, &mut rect_image)?;
+    if !code.is_empty() {
+        process_decoded_payload(code, decoding).map_err(Into::into)
+    } else {
+        Ok(Ready::NotYet(decoding))
     }
 }
 
@@ -205,6 +200,7 @@ pub fn arg_parser(arguments: Vec<String>) -> anyhow::Result<CameraSettings> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use image as _;
 
     #[test]
     fn get_camera_index() {
