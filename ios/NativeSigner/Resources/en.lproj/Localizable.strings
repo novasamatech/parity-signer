@@ -342,3 +342,4 @@
 "GenericErrorModal.Label.MessagePrefix" = "View the details below to find out more.";
 "GenericErrorModal.Action.Ok" = "OK";
 
+"Scanner.Label.Progress" = "From %d / %d captured frames";
