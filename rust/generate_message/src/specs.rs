@@ -522,6 +522,7 @@ mod tests {
     // networks could be reached at all the times, therefore this is currently
     // limited to three default networks that must be working always.
     #[test]
+    #[ignore]
     fn mass_fetch() {
         let address_set = [
             "wss://rpc.polkadot.io",
