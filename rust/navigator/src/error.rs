@@ -16,4 +16,7 @@ pub enum Error {
 
     #[error("DB not initialized.")]
     DbNotInitialized,
+
+    #[error("Key not found {0}")]
+    KeyNotFound(String),
 }

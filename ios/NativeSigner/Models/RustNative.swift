@@ -178,16 +178,4 @@ extension SignerDataModel {
             }
         }
     }
-
-    /// Acknowledge alert and reset it
-    func resetAlert() {
-        do {
-            try historyAcknowledgeWarnings(dbname: dbName)
-            checkAlert()
-            navigation.perform(navigation: .init(action: .goBack))
-        } catch {
-            print("History init failed! This will not do.")
-            alert = true
-        }
-    }
 }

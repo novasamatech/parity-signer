@@ -338,3 +338,8 @@
 "BackupModal.Label.Snackbar" = "Private Keys will be hidden in";
 
 "ErrorModal.Action.Ok" = "Got It";
+"GenericErrorModal.Label.Title" = "Something has gone wrong.";
+"GenericErrorModal.Label.MessagePrefix" = "View the details below to find out more.";
+"GenericErrorModal.Action.Ok" = "OK";
+
+"Scanner.Label.Progress" = "From %d / %d captured frames";

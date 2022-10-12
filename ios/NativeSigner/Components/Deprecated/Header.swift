@@ -15,6 +15,7 @@ struct Header: View {
     let alert: Bool
     let alertShow: () -> Void
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var data: SignerDataModel
 
     var body: some View {
         VStack {
@@ -85,7 +86,8 @@ struct Header: View {
                         }
                     )
                     NavbarShield(
-                        alert: alert
+                        alert: alert,
+                        resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
                     )
                 }
                 .frame(width: 72.0)

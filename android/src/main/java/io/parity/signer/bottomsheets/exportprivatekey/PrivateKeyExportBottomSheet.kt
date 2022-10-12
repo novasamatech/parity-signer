@@ -1,4 +1,4 @@
-package io.parity.signer.bottomsheets
+package io.parity.signer.bottomsheets.exportprivatekey
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.bottomsheets.PrivateKeyExportModel.Companion.SHOW_PRIVATE_KEY_TIMEOUT
+import io.parity.signer.bottomsheets.exportprivatekey.PrivateKeyExportModel.Companion.SHOW_PRIVATE_KEY_TIMEOUT
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components2.CircularCountDownTimer
 import io.parity.signer.components2.KeyCard
@@ -29,7 +29,9 @@ import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.appliedStroke
+import io.parity.signer.ui.theme.fill6
 
 @Composable
 fun PrivateKeyExportBottomSheet(
@@ -104,15 +106,12 @@ class PrivateKeyExportModel(
 }
 
 @Preview(
-	name = "day",
-	group = "themes",
-	uiMode = UI_MODE_NIGHT_NO,
-//	showBackground = true,
-//	backgroundColor = 0xFFFFFFFF,
+	name = "light", group = "themes", uiMode = UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
 )
 @Preview(
-	name = "dark theme", group = "themes", uiMode = UI_MODE_NIGHT_YES,
-	showBackground = true, backgroundColor = 0xFF000000
+	name = "dark", group = "themes", uiMode = UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
 private fun PreviewPrivateKeyExportBottomSheet() {

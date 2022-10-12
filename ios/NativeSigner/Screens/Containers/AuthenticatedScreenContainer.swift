@@ -25,7 +25,6 @@ struct AuthenticatedScreenContainer: View {
                     ScreenSelectorView()
                 }
                 ModalSelectorView()
-                AlertSelectorView()
             }
             .gesture(
                 DragGesture().updating($dragOffset, body: { value, _, _ in
@@ -49,5 +48,15 @@ struct AuthenticatedScreenContainer: View {
         )
         .environmentObject(snackBarPresentation)
         .bottomSnackbar(snackBarPresentation.viewModel, isPresented: $snackBarPresentation.isSnackbarPresented)
+        .fullScreenCover(
+            isPresented: $navigation.genericError.isPresented
+        ) {
+            ErrorBottomModal(
+                viewModel: .alertError(message: navigation.genericError.errorMessage),
+                dismissAction: navigation.perform(navigation: .init(action: .goBack)),
+                isShowingBottomAlert: $navigation.genericError.isPresented
+            )
+            .clearModalBackground()
+        }
     }
 }

@@ -103,10 +103,10 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // In some cases the command may contain token override as well.
             Content::Address { s: address } => {
                 // not allowed to proceed without encryption override defined
-                if let Some(ref encryption) = instruction.over.encryption {
+                if let Some(encryption) = instruction.over.encryption {
                     specs_d_u(
                         &address,
-                        encryption.clone(),
+                        encryption,
                         instruction.over.token(),
                         instruction.over.title.clone(),
                         &instruction.files_dir,
@@ -168,10 +168,10 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // In some cases the command may contain token override as well.
             Content::Address { s: address } => {
                 // not allowed to proceed without encryption override defined
-                if let Some(ref encryption) = instruction.over.encryption {
+                if let Some(encryption) = instruction.over.encryption {
                     specs_pt_u(
                         &address,
-                        encryption.clone(),
+                        encryption,
                         instruction.over.token(),
                         instruction.over.title,
                         false,
@@ -225,10 +225,10 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // In some cases the command may contain token override as well.
             Content::Address { s: address } => {
                 // not allowed to proceed without encryption override defined
-                if let Some(ref encryption) = instruction.over.encryption {
+                if let Some(encryption) = instruction.over.encryption {
                     specs_pt_u(
                         &address,
-                        encryption.clone(),
+                        encryption,
                         instruction.over.token(),
                         instruction.over.title,
                         true,

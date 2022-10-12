@@ -95,7 +95,7 @@ val CryptoTypography = Typography(
 		fontWeight = FontWeight.Medium,
 		fontSize = 12.sp,
 		lineHeight = 1.4.em
-	)
+	),
 )
 
 // Special font for network labels

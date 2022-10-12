@@ -232,7 +232,7 @@ struct KeyDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
             KeyDetailsView(
-                forgetKeyActionHandler: .init(),
+                forgetKeyActionHandler: .init(navigation: NavigationCoordinator()),
                 viewModel: .init(
                     keySummary: KeySummaryViewModel(
                         keyName: "Parity",

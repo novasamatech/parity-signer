@@ -1,4 +1,3 @@
-#![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
 use error::{ParserDecodingError, ParserMetadataError};
@@ -241,7 +240,6 @@ pub fn parse_set(
         short_specs,
         optional_mortal_flag,
     )?;
-    // try parsing method
     let method_cards_result = parse_method(method_data.to_vec(), metadata_bundle, short_specs);
     Ok((
         method_cards_result,
