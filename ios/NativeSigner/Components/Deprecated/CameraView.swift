@@ -10,11 +10,21 @@ import SwiftUI
 
 struct CameraView: View {
     @StateObject var model = CameraService()
-    let navigationRequest: NavigationRequest
+    @EnvironmentObject private var navigation: NavigationCoordinator
     let size = UIScreen.main.bounds.size.width
+    @Binding var isPresented: Bool
+
     var body: some View {
         ZStack {
             VStack {
+                NavigationBarView(
+                    viewModel: .init(leftButton: .xmark, backgroundColor: .clear),
+                    actionModel: .init(
+                        leftBarMenuAction: {
+                            isPresented.toggle()
+                        }
+                    )
+                )
                 CameraPreview(session: model.session)
                     .onAppear {
                         model.configure()
@@ -26,7 +36,7 @@ struct CameraView: View {
                     .onReceive(model.$payload, perform: { payload in
                         if payload != nil {
                             DispatchQueue.main.async {
-                                navigationRequest(.init(action: .transactionFetched, details: payload))
+                                navigation.perform(navigation: .init(action: .transactionFetched, details: payload))
                             }
                         }
                     })

@@ -25,10 +25,6 @@ struct ScreenSelector: View {
 
     var body: some View {
         switch screenData {
-        case .scan:
-            TransactionScreen(
-                navigationRequest: navigationRequest
-            )
         case let .keys(value):
             KeyDetailsView(
                 forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
@@ -126,6 +122,9 @@ struct ScreenSelector: View {
                 content: value,
                 navigationRequest: navigationRequest
             )
+        // Screens handled outside of Rust navigation
+        case .scan:
+            EmptyView()
         }
     }
 }
