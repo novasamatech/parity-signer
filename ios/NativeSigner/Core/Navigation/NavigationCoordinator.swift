@@ -72,11 +72,17 @@ final class NavigationCoordinator: ObservableObject {
 extension NavigationCoordinator {
     @discardableResult
     func performFake(navigation: Navigation) -> ActionResult {
-        backendActionPerformer.performBackend(
+        let result = backendActionPerformer.performBackend(
             action: navigation.action,
             details: navigation.details,
             seedPhrase: navigation.seedPhrase
-        ) ?? actionResult
+        )
+        switch result {
+        case let .success(action):
+            return action
+        case .failure:
+            return actionResult
+        }
     }
 
     func perform(navigation: Navigation, skipDebounce: Bool = false) {
@@ -85,17 +91,22 @@ extension NavigationCoordinator {
 
         isActionAvailable = false
 
-        guard let actionResult = backendActionPerformer.performBackend(
+        let result = backendActionPerformer.performBackend(
             action: navigation.action,
             details: navigation.details,
             seedPhrase: navigation.seedPhrase
-        ) else { return }
-
-        updateIntermediateNavigation(actionResult)
-        updateIntermediateDataModels(actionResult)
-        updateGlobalViews(actionResult)
-        self.actionResult = actionResult
-        updateTabBar()
+        )
+        switch result {
+        case let .success(actionResult):
+            updateIntermediateNavigation(actionResult)
+            updateIntermediateDataModels(actionResult)
+            updateGlobalViews(actionResult)
+            self.actionResult = actionResult
+            updateTabBar()
+        case let .failure(error):
+            genericError.errorMessage = error.description
+            genericError.isPresented = true
+        }
     }
 }
 
