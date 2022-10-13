@@ -87,6 +87,7 @@ fun ScreenSelector(
 			KeySetsScreen(
 				screenData.f.toKeySetsSelectViewModel(),
 				navigator = signerDataModel.navigator,
+				alertState = alertState,
 			)
 		}
 		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(

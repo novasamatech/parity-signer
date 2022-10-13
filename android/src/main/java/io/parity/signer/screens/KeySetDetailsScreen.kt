@@ -1,5 +1,6 @@
 package io.parity.signer.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -18,20 +19,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.BottomMultiselectBar
-import io.parity.signer.components.KeySelector
 import io.parity.signer.components.NetworkLogoName
 import io.parity.signer.components.SeedCard
-import io.parity.signer.models.AlertState
-import io.parity.signer.models.Navigator
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.increment
+import io.parity.signer.models.*
+import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.MKeys
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.uniffi.*
 import kotlin.math.absoluteValue
 
 //todo old screen is KeyManager
@@ -43,7 +42,7 @@ fun KeySetDetailsScreen(
 	mKeys: MKeys,
 	navigator: Navigator,
 	signer: SignerDataModel,
-	alertState: State<AlertState?>,
+	alertState: State<AlertState?>, //for shield icon
 ) {
 	val rootKey = mKeys.root
 	val keySet = mKeys.set
@@ -167,3 +166,51 @@ fun KeySetDetailsScreen(
 	}
 }
 
+data class KeySetDetailsViewModel(
+val set: List<MKeysCard>,
+val root: MSeedKeyCard,
+val network: MNetworkCard,
+val multiselectMode: Boolean,
+val multiselectCount: String,)
+
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewKeySetDetailsScreen() {
+	val keys = mutableListOf(
+		KeySetViewModel(
+			"first seed name",
+			PreviewData.exampleIdenticon,
+			1.toUInt()
+		),
+		KeySetViewModel(
+			"second seed name",
+			PreviewData.exampleIdenticon,
+			3.toUInt()
+		),
+	)
+	repeat(30) {
+		keys.add(
+			KeySetViewModel(
+				"second seed name",
+				PreviewData.exampleIdenticon,
+				3.toUInt()
+			)
+		)
+	}
+	val state = remember { mutableStateOf(AlertState.None) }
+	val mockModel = KeySetsSelectViewModel(keys)
+	SignerNewTheme {
+		Box(modifier = Modifier.size(350.dp, 550.dp)) {
+			KeySetsScreen(mockModel, EmptyNavigator(), state)
+		}
+	}
+}

@@ -9,7 +9,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,7 +67,7 @@ fun ScreenHeader(
 		//end
 		if (menuEnabled) {
 			Image(
-				imageVector = Icons.Filled.MoreVert,
+				imageVector = Icons.Filled.MoreHoriz,
 				contentDescription = stringResource(R.string.description_menu_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier

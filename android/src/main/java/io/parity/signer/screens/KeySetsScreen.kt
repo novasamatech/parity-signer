@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -16,6 +20,7 @@ import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.items.KeySetItem
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
+import io.parity.signer.models.AlertState
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.ui.helpers.PreviewData
@@ -31,30 +36,39 @@ import io.parity.signer.uniffi.SeedNameCard
 fun KeySetsScreen(
 	model: KeySetsSelectViewModel,
 	navigator: Navigator,
+	alertState: State<AlertState?>, //for shield icon
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
-		ScreenHeader(R.string.key_sets_screem_title,
+		ScreenHeader(
+			R.string.key_sets_screem_title,
 			backEnabled = false,
 			menuEnabled = false,
 			navigator = navigator
 		)
-		LazyColumn(
-			contentPadding = PaddingValues(horizontal = 12.dp),
-			verticalArrangement = Arrangement.spacedBy(10.dp),
-			modifier = Modifier.weight(1f),
-		) {
-			val cards = model.keys
-			items(cards.size) { i ->
-				KeySetItem(model = cards[i]) {
-					navigator.navigate(Action.SELECT_SEED, cards[i].seedName)
+		Box(modifier = Modifier.weight(1f)) {
+			LazyColumn(
+				contentPadding = PaddingValues(horizontal = 12.dp),
+				verticalArrangement = Arrangement.spacedBy(10.dp),
+			) {
+				val cards = model.keys
+				items(cards.size) { i ->
+					KeySetItem(model = cards[i]) {
+						navigator.navigate(Action.SELECT_SEED, cards[i].seedName)
+					}
+					if (i == cards.lastIndex) {
+						//to put elements under the button
+						Spacer(modifier = Modifier.padding(bottom = 100.dp))
+					}
 				}
 			}
-		}
-		PrimaryButtonBottomSheet(
-			label = stringResource(R.string.key_sets_screem_add_key_button),
-			modifier = Modifier.padding(24.dp),
-		) {
-			navigator.navigate(Action.RIGHT_BUTTON_ACTION) //new seed for this state
+			PrimaryButtonBottomSheet(
+				label = stringResource(R.string.key_sets_screem_add_key_button),
+				modifier = Modifier
+					.padding(24.dp)
+					.align(Alignment.BottomCenter),
+			) {
+				navigator.navigate(Action.RIGHT_BUTTON_ACTION) //new seed for this state
+			}
 		}
 		BottomBar2(navigator, BottomBar2State.KEYS)
 	}
@@ -115,10 +129,11 @@ private fun PreviewKeySetsSelectScreen() {
 			)
 		)
 	}
+	val state = remember { mutableStateOf(AlertState.None) }
 	val mockModel = KeySetsSelectViewModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreen(mockModel, EmptyNavigator())
+			KeySetsScreen(mockModel, EmptyNavigator(), state)
 		}
 	}
 }

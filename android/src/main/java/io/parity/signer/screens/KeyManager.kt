@@ -31,7 +31,7 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MKeys
 import kotlin.math.absoluteValue
 
-//todo remove old key retails
+//todo remove old key details
 @Composable
 fun KeyManager(
 	button: (action: Action, details: String) -> Unit,
