@@ -53,7 +53,7 @@ pub fn process_decoded_payload(payload: Vec<u8>, mut decoding: InProgress) -> Re
         let total = frame.total();
         let new_packet = frame.payload;
         let decoded_packet = EncodingPacket::deserialize(&new_packet);
-        let block_number = decoded_packet.payload_id().source_block_number() as usize;
+        let block_number = decoded_packet.payload_id().encoding_symbol_id() as usize;
         match decoding {
             InProgress::None => {
                 let config = raptorq::ObjectTransmissionInformation::with_defaults(

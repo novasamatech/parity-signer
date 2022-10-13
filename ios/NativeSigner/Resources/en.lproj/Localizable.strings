@@ -341,5 +341,8 @@
 "GenericErrorModal.Label.Title" = "Something has gone wrong.";
 "GenericErrorModal.Label.MessagePrefix" = "View the details below to find out more.";
 "GenericErrorModal.Action.Ok" = "OK";
-
 "Scanner.Label.Progress" = "From %d / %d captured frames";
+"Error.Navigation.Label.Prefix" = "Internal navigation error.";
+"Error.Navigation.Label.Message" = "Please restart Signer app and try again.\nInternal error description: %@";
+"Error.Navigation.Label.Suffix" = "Report an issue to Signer team via Github at: https://github.com/paritytech/parity-signer/";
+"Error.Navigation.Label.NoAction" = "No further action available from this state.\nLast action: \"%@\" details: \"%@\"";
