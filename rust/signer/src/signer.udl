@@ -1,6 +1,7 @@
 [Error]
 interface ErrorDisplayed {
     Str(string s);
+    MutexPoisoned();
 };
 
 dictionary MetaValuesDisplay {
@@ -538,11 +539,13 @@ interface ScreenData {
 namespace signer {
     FooterButton? action_get_name([ByRef] Action action);
 
+    [Throws=ErrorDisplayed]
     void init_navigation([ByRef] string dbname, sequence<string> seed_names);
 
     [Throws=ErrorDisplayed]
-    ActionResult? backend_action(Action action, [ByRef] string details, [ByRef] string seed_phrase);
+    ActionResult backend_action(Action action, [ByRef] string details, [ByRef] string seed_phrase);
 
+    [Throws=ErrorDisplayed]
     void update_seed_names(sequence<string> seed_names);
 
     [Throws=ErrorDisplayed]

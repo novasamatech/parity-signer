@@ -6,7 +6,7 @@
 
 //do we support mutex?
 use lazy_static::lazy_static;
-use std::sync::{Mutex, TryLockError};
+use std::sync::Mutex;
 
 use definitions::{keyring::NetworkSpecsKey, navigation::ActionResult};
 
@@ -21,6 +21,8 @@ use navstate::{Navstate, State};
 pub mod screens;
 #[cfg(test)]
 mod tests;
+
+pub use crate::error::{Error, Result};
 
 //TODO: multithread here some day!
 lazy_static! {
@@ -46,61 +48,35 @@ pub fn do_action(
     action: Action,
     details_str: &str,
     secret_seed_phrase: &str,
-) -> Result<Option<ActionResult>, String> {
+) -> Result<ActionResult> {
     //If can't lock - debounce failed, ignore action
     //
     //guard is defined here to outline lifetime properly
-    let guard = STATE.try_lock();
-    match guard {
-        Ok(mut state) => state
-            .perform(action, details_str, secret_seed_phrase)
-            .map(Some)
-            .map_err(|e| format!("{}", e)),
-        Err(TryLockError::Poisoned(_)) => {
-            //TODO: maybe more grace here?
-            //Maybe just silently restart navstate? But is it safe?
-            panic!("Concurrency error! Restart the app.");
-        }
-        Err(TryLockError::WouldBlock) => Ok(None),
-    }
+    let mut state = STATE.lock().map_err(|_| Error::MutexPoisoned)?;
+    state.perform(action, details_str, secret_seed_phrase)
 }
 
 /// Should be called in the beginning to recall things stored only by phone
-pub fn init_navigation(dbname: &str, seed_names: Vec<String>) {
+pub fn init_navigation(dbname: &str, seed_names: Vec<String>) -> Result<()> {
     //This operation has to happen; lock thread and do not ignore.
-    let guard = STATE.lock();
-    match guard {
-        Ok(mut navstate) => {
-            (*navstate).dbname = Some(dbname.to_string());
-            (*navstate).seed_names = seed_names;
-            match db_handling::helpers::get_all_networks(dbname) {
-                Ok(a) => {
-                    for x in a.iter() {
-                        (*navstate)
-                            .networks
-                            .push(NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption));
-                    }
-                }
-                Err(e) => println!("No networks could be fetched: {:?}", e),
-            };
-        }
-        Err(_) => {
-            //TODO: maybe more grace here?
-            panic!("Concurrency error! Restart the app.");
-        }
+    let mut navstate = STATE.lock().map_err(|_| Error::MutexPoisoned)?;
+    (*navstate).dbname = Some(dbname.to_string());
+    (*navstate).seed_names = seed_names;
+
+    let networks = db_handling::helpers::get_all_networks(dbname)?;
+    for x in &networks {
+        (*navstate)
+            .networks
+            .push(NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption));
     }
+
+    Ok(())
 }
 
 /// Should be called when seed names are modified in native to synchronize data
-pub fn update_seed_names(seed_names: Vec<String>) {
-    let guard = STATE.lock();
-    match guard {
-        Ok(mut navstate) => {
-            (*navstate).seed_names = seed_names;
-        }
-        Err(_) => {
-            //TODO: maybe more grace here?
-            panic!("Concurrency error! Restart the app.");
-        }
-    }
+pub fn update_seed_names(seed_names: Vec<String>) -> Result<()> {
+    let mut navstate = STATE.lock().map_err(|_| Error::MutexPoisoned)?;
+    (*navstate).seed_names = seed_names;
+
+    Ok(())
 }
