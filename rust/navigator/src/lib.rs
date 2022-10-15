@@ -8,7 +8,7 @@
 use lazy_static::lazy_static;
 use std::sync::Mutex;
 
-use definitions::{keyring::NetworkSpecsKey, navigation::ActionResult};
+use definitions::navigation::ActionResult;
 
 mod error;
 
@@ -17,7 +17,7 @@ pub use actions::Action;
 pub mod alerts;
 pub mod modals;
 mod navstate;
-use navstate::{Navstate, State};
+use navstate::State;
 pub mod screens;
 #[cfg(test)]
 mod tests;
@@ -26,17 +26,12 @@ pub use crate::error::{Error, Result};
 
 //TODO: multithread here some day!
 lazy_static! {
-/// Navigation state of the app
-///
-/// Navigation state is unsafe either way, since it has to persist
-/// No matter if here or beyond FFI
+    /// Navigation state of the app
+    ///
+    /// Navigation state is unsafe either way, since it has to persist
+    /// No matter if here or beyond FFI
     pub static ref STATE: Mutex<State> = Mutex::new(
-        State{
-            navstate: Navstate::new(),
-            dbname: None,
-            seed_names: Vec::new(),
-            networks: Vec::new(),
-        }
+        State::default()
     );
 }
 
@@ -49,34 +44,20 @@ pub fn do_action(
     details_str: &str,
     secret_seed_phrase: &str,
 ) -> Result<ActionResult> {
-    //If can't lock - debounce failed, ignore action
-    //
-    //guard is defined here to outline lifetime properly
-    let mut state = STATE.lock().map_err(|_| Error::MutexPoisoned)?;
-    state.perform(action, details_str, secret_seed_phrase)
+    let mut navstate = STATE.lock().map_err(|_| Error::MutexPoisoned)?;
+    navstate.perform(action, details_str, secret_seed_phrase)
 }
 
 /// Should be called in the beginning to recall things stored only by phone
 pub fn init_navigation(dbname: &str, seed_names: Vec<String>) -> Result<()> {
-    //This operation has to happen; lock thread and do not ignore.
     let mut navstate = STATE.lock().map_err(|_| Error::MutexPoisoned)?;
-    (*navstate).dbname = Some(dbname.to_string());
-    (*navstate).seed_names = seed_names;
-
-    let networks = db_handling::helpers::get_all_networks(dbname)?;
-    for x in &networks {
-        (*navstate)
-            .networks
-            .push(NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption));
-    }
-
-    Ok(())
+    navstate.init_navigation(dbname, seed_names)
 }
 
 /// Should be called when seed names are modified in native to synchronize data
 pub fn update_seed_names(seed_names: Vec<String>) -> Result<()> {
     let mut navstate = STATE.lock().map_err(|_| Error::MutexPoisoned)?;
-    (*navstate).seed_names = seed_names;
+    navstate.update_seed_names(seed_names);
 
     Ok(())
 }
