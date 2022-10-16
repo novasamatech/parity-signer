@@ -28,7 +28,7 @@ jobs:
         run:                  |
           sudo apt update
           sudo apt install -y clang libclang-dev
-          sudo pip3 install opencv-python-contrib
+          sudo pip3 install opencv-contrib-python
 
       - name:                 Install Rust stable toolchain
         uses:                 actions-rs/toolchain@v1.0.7
