@@ -11,6 +11,7 @@ use std::path::Path;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
+use definitions::navigation::MAddressCard;
 use definitions::{
     crypto::Encryption,
     helpers::{
@@ -165,13 +166,15 @@ where
             let style = address_details.encryption.identicon_style();
             let identicon = make_identicon_from_multisigner(&multisigner, style);
             MRawKey {
-                seed_name: address_details.seed_name,
+                address: Address {
+                    identicon,
+                    has_pwd: address_details.has_pwd,
+                    path: address_details.path,
+                    secret_exposed: address_details.secret_exposed,
+                    seed_name: address_details.seed_name,
+                },
                 address_key: hex::encode(address_key.key()),
                 public_key: hex::encode(public_key),
-                identicon,
-                has_pwd: address_details.has_pwd,
-                path: address_details.path,
-                secret_exposed: address_details.secret_exposed,
             }
         })
         .collect())
@@ -224,21 +227,28 @@ where
                 });
             }
             root_id = Some(MSeedKeyCard {
-                seed_name: seed_name.to_string(),
-                identicon,
+                address: Address {
+                    seed_name: address_details.seed_name,
+                    identicon,
+                    has_pwd: address_details.has_pwd,
+                    path: address_details.path,
+                    secret_exposed: address_details.secret_exposed,
+                },
                 address_key: hex::encode(address_key.key()),
                 base58,
                 swiped,
                 multiselect,
-                secret_exposed: address_details.secret_exposed,
             });
         } else {
             other_id.push((multisigner, address_details, identicon, swiped, multiselect))
         }
     }
     let root = root_id.unwrap_or(MSeedKeyCard {
-        seed_name: seed_name.to_string(),
-        identicon: EMPTY_PNG.to_vec(),
+        address: Address {
+            seed_name: seed_name.to_string(),
+            identicon: EMPTY_PNG.to_vec(),
+            ..Default::default()
+        },
         ..Default::default()
     });
     let set: Vec<_> = other_id
@@ -251,12 +261,15 @@ where
                     Some(network_specs.base58prefix),
                     address_details.encryption,
                 ),
-                identicon,
-                has_pwd: address_details.has_pwd,
-                path: address_details.path,
+                address: Address {
+                    seed_name: address_details.seed_name,
+                    identicon,
+                    has_pwd: address_details.has_pwd,
+                    path: address_details.path,
+                    secret_exposed: address_details.secret_exposed,
+                },
                 swiped,
                 multiselect,
-                secret_exposed: address_details.secret_exposed,
             },
         )
         .collect();
@@ -406,12 +419,10 @@ where
         }
     };
     let address = Address {
-        base58,
         path: address_details.path,
         has_pwd: address_details.has_pwd,
         identicon,
         seed_name: address_details.seed_name,
-        multiselect: None,
         secret_exposed: address_details.secret_exposed,
     };
 
@@ -425,6 +436,8 @@ where
         qr,
         pubkey: hex::encode(public_key),
         network_info,
+        base58,
+        multiselect: None,
         address,
     })
 }
@@ -512,14 +525,16 @@ where
                 address_details.encryption.identicon_style(),
             );
             let seed_name = seed_name.to_string();
-            let collision = Address {
-                base58,
-                path,
-                has_pwd,
-                identicon,
-                seed_name,
+            let collision = MAddressCard {
+                address: Address {
+                    path,
+                    has_pwd,
+                    identicon,
+                    seed_name,
+                    secret_exposed: address_details.secret_exposed,
+                },
                 multiselect: None,
-                secret_exposed: address_details.secret_exposed,
+                base58,
             };
 
             NavDerivationCheck {
@@ -607,14 +622,16 @@ where
                     &multisigner,
                     address_details.encryption.identicon_style(),
                 );
-                let collision_display = Address {
+                let collision_display = MAddressCard {
                     base58: address_base58,
-                    path: address_details.path,
-                    has_pwd: address_details.has_pwd,
-                    identicon,
-                    seed_name: seed_name.to_string(),
+                    address: Address {
+                        path: address_details.path,
+                        has_pwd: address_details.has_pwd,
+                        identicon,
+                        seed_name: seed_name.to_string(),
+                        secret_exposed: address_details.secret_exposed,
+                    },
                     multiselect: None,
-                    secret_exposed: address_details.secret_exposed,
                 };
                 NavDerivationCheck {
                     button_good: false,

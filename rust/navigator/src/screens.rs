@@ -8,6 +8,7 @@ use db_handling::{
     identities::get_multisigner_by_address,
     interface_signer::{first_network, SeedDraft},
 };
+use definitions::navigation::MAddressCard;
 use definitions::{
     crypto::Encryption,
     helpers::{make_identicon_from_multisigner, multisigner_to_public, IdenticonStyle},
@@ -99,7 +100,7 @@ pub struct TransactionState {
 ///State of screen generating sufficient crypto
 #[derive(Debug, Clone)]
 pub struct SufficientCryptoState {
-    key_selected: Option<(MultiSigner, AddressDetails, Address)>,
+    key_selected: Option<(MultiSigner, AddressDetails, MAddressCard)>,
     entered_info: EnteredInfo,
     content: transaction_signing::SufficientContent,
     counter: u8,
@@ -427,7 +428,7 @@ impl TransactionState {
         new_checksum: u32,
         content: TransactionCardSet,
         has_pwd: bool,
-        author_info: Address,
+        author_info: MAddressCard,
         network_info: NetworkSpecs,
     ) -> Self {
         let action = transaction_parsing::TransactionAction::Sign {
@@ -473,7 +474,7 @@ impl SufficientCryptoState {
     pub fn content(&self) -> transaction_signing::SufficientContent {
         self.content.to_owned()
     }
-    pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, Address)> {
+    pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, MAddressCard)> {
         self.key_selected.to_owned()
     }
     pub fn update(
@@ -489,14 +490,16 @@ impl SufficientCryptoState {
         };
 
         let identicon = make_identicon_from_multisigner(multisigner, style);
-        let author_info = Address {
+        let author_info = MAddressCard {
+            address: Address {
+                identicon,
+                seed_name: address_details.seed_name.clone(),
+                path: address_details.path.clone(),
+                has_pwd: address_details.has_pwd,
+                secret_exposed: address_details.secret_exposed,
+            },
             base58: hex::encode(multisigner_to_public(multisigner)),
-            identicon,
-            seed_name: address_details.seed_name.clone(),
-            path: address_details.path.clone(),
-            has_pwd: address_details.has_pwd,
             multiselect: None,
-            secret_exposed: address_details.secret_exposed,
         };
         Self {
             key_selected: Some((

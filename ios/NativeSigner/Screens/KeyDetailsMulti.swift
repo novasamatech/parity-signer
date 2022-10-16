@@ -16,7 +16,11 @@ struct KeyDetailsMulti: View {
     var body: some View {
         ScrollView {
             VStack {
-                AddressCard(address: content.keyDetails.address)
+                AddressCard(card: MAddressCard(
+                    base58: content.keyDetails.base58,
+                    address: content.keyDetails.address,
+                    multiselect: nil
+                ))
                 NetworkCard(
                     title: content.keyDetails.networkInfo.networkTitle,
                     logo: content.keyDetails.networkInfo.networkLogo

@@ -18,6 +18,7 @@ use db_handling::{
     identities::{remove_seed, try_create_address, try_create_seed},
     manage_history::{get_history, get_history_entry_by_order},
 };
+use definitions::navigation::MAddressCard;
 use definitions::{
     crypto::Encryption,
     history::{Entry, Event, SignDisplay, SignMessageDisplay},
@@ -344,14 +345,16 @@ fn can_sign_transaction_1() {
         ]),
         ..Default::default()
     };
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
-        secret_exposed: false,
+        address: Address {
+            identicon: alice_sr_alice().to_vec(),
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
 
     let network_info_known = NetworkSpecs {
@@ -601,14 +604,16 @@ fn can_sign_message_1() {
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
-        secret_exposed: false,
+        address: Address {
+            identicon: alice_sr_alice().to_vec(),
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
 
     let network_info_known = NetworkSpecs {
@@ -2493,14 +2498,16 @@ Identities:
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
-        secret_exposed: false,
+        address: Address {
+            identicon: alice_sr_alice().to_vec(),
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
     // TODO: let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
@@ -2804,14 +2811,16 @@ Identities:
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
-        identicon: alice_sr_root().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: String::new(),
-        has_pwd: false,
         multiselect: None,
-        secret_exposed: false,
+        address: Address {
+            identicon: alice_sr_root().to_vec(),
+            seed_name: "Alice".to_string(),
+            path: String::new(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
     // TODO let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
@@ -3018,14 +3027,16 @@ fn parse_transaction_alice_remarks_westend9122() {
         ]),
         ..Default::default()
     };
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
-        identicon: alice_sr_root().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: String::new(),
-        has_pwd: false,
         multiselect: None,
-        secret_exposed: false,
+        address: Address {
+            identicon: alice_sr_root().to_vec(),
+            seed_name: "Alice".to_string(),
+            path: String::new(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
     // TODO let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 

@@ -270,25 +270,12 @@ enum Action {
     "Nothing",
 };
 
-dictionary Identity {
-    string seed_name;
-    string address_key;
-    string public_key;
-    sequence<u8> identicon;
-    boolean has_pwd;
-    string path;
-    boolean is_multiselect;
-    string base58;
-};
-
 dictionary MSeedKeyCard {
-    string seed_name;
-    sequence<u8> identicon;
+    Address address;
     string address_key;
     string base58;
     boolean swiped;
     boolean multiselect;
-    boolean secret_exposed;
 };
 
 dictionary MNetworkCard {
@@ -305,14 +292,11 @@ dictionary MKeys {
 };
 
 dictionary MKeysCard {
+    Address address;
     string address_key;
     string base58;
-    sequence<u8> identicon;
-    boolean has_pwd;
-    string path;
     boolean swiped;
     boolean multiselect;
-    boolean secret_exposed;
 };
 
 dictionary MSettings {
@@ -334,7 +318,7 @@ dictionary History {
 
 dictionary MEventMaybeDecoded {
     Event event;
-    Address? signed_by;
+    MAddressCard? signed_by;
     TransactionCardSet? decoded;
     MVerifierDetails? verifier_details;
 };
@@ -347,7 +331,7 @@ dictionary MLogDetails {
 dictionary MTransaction {
     TransactionCardSet content;
     TransactionType ttype;
-    Address? author_info;
+    MAddressCard? author_info;
     MSCNetworkInfo? network_info;
 };
 
@@ -394,6 +378,8 @@ dictionary MKeyDetails {
     string pubkey;
     MSCNetworkInfo network_info;
     Address address;
+    string base58;
+    boolean? multiselect;
 };
 
 dictionary MNewSeed {
@@ -427,18 +413,22 @@ dictionary MDeriveKey {
 dictionary DerivationCheck {
     boolean button_good;
     DerivationDestination? where_to;
-    Address? collision;
+    MAddressCard? collision;
     string? error;
 };
 
 dictionary Address {
-    string base58;
     string path;
     boolean has_pwd;
     sequence<u8> identicon;
     string seed_name;
-    boolean? multiselect;
     boolean secret_exposed;
+};
+
+dictionary MAddressCard {
+    string base58;
+    Address address;
+    boolean? multiselect;
 };
 
 enum DerivationDestination {
@@ -482,13 +472,9 @@ dictionary MMetadataRecord {
 };
 
 dictionary MRawKey {
-    string seed_name;
+    Address address;
     string address_key;
     string public_key;
-    sequence<u8> identicon;
-    boolean has_pwd;
-    string path;
-    boolean secret_exposed;
 };
 
 dictionary MSignSufficientCrypto {
@@ -589,7 +575,7 @@ interface MSCContent {
 };
 
 dictionary MSufficientCryptoReady {
-    Address author_info;
+    MAddressCard author_info;
     sequence<u8> sufficient;
     MSCContent content;
 };
@@ -644,7 +630,7 @@ dictionary MSignatureReady {
 };
 
 dictionary MEnterPassword {
-    Address author_info;
+    MAddressCard author_info;
     u32 counter;
 };
 
@@ -762,7 +748,7 @@ dictionary MSCTxSpecPlain {
 
 [Enum]
 interface Card {
-    AuthorCard(Address f);
+    AuthorCard(MAddressCard f);
     AuthorPlainCard(MSCAuthorPlain f);
     AuthorPublicKeyCard(MVerifierDetails f);
     BalanceCard(MSCCurrency f);

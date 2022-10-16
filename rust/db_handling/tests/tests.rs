@@ -72,6 +72,7 @@ use db_handling::{
     },
 };
 use definitions::helpers::multisigner_to_public;
+use definitions::navigation::MAddressCard;
 
 #[cfg(feature = "test")]
 #[test]
@@ -124,59 +125,69 @@ fn print_all_ids() {
 
     let expected_keys = vec![
         MRawKey {
-            seed_name: "Alice".to_string(),
             address_key: "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                 .to_string(),
             public_key: "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                 .to_string(),
-            identicon: alice_sr_westend().to_vec(),
-            has_pwd: false,
-            path: "//westend".to_string(),
-            secret_exposed: false,
+            address: Address {
+                seed_name: "Alice".to_string(),
+                identicon: alice_sr_westend().to_vec(),
+                has_pwd: false,
+                path: "//westend".to_string(),
+                secret_exposed: false,
+            },
         },
         MRawKey {
-            seed_name: "Alice".to_string(),
             address_key: "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                 .to_string(),
             public_key: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                 .to_string(),
-            identicon: alice_sr_root().to_vec(),
-            has_pwd: false,
-            path: "".to_string(),
-            secret_exposed: false,
+            address: Address {
+                seed_name: "Alice".to_string(),
+                identicon: alice_sr_root().to_vec(),
+                has_pwd: false,
+                path: "".to_string(),
+                secret_exposed: false,
+            },
         },
         MRawKey {
-            seed_name: "Alice".to_string(),
             address_key: "0164a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                 .to_string(),
             public_key: "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                 .to_string(),
-            identicon: alice_sr_kusama().to_vec(),
-            has_pwd: false,
-            path: "//kusama".to_string(),
-            secret_exposed: false,
+            address: Address {
+                seed_name: "Alice".to_string(),
+                identicon: alice_sr_kusama().to_vec(),
+                has_pwd: false,
+                path: "//kusama".to_string(),
+                secret_exposed: false,
+            },
         },
         MRawKey {
-            seed_name: "Alice".to_string(),
             address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                 .to_string(),
             public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                 .to_string(),
-            identicon: alice_sr_alice().to_vec(),
-            has_pwd: false,
-            path: "//Alice".to_string(),
-            secret_exposed: false,
+            address: Address {
+                seed_name: "Alice".to_string(),
+                identicon: alice_sr_alice().to_vec(),
+                has_pwd: false,
+                path: "//Alice".to_string(),
+                secret_exposed: false,
+            },
         },
         MRawKey {
-            seed_name: "Alice".to_string(),
             address_key: "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                 .to_string(),
             public_key: "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                 .to_string(),
-            identicon: alice_sr_polkadot().to_vec(),
-            has_pwd: false,
-            path: "//polkadot".to_string(),
-            secret_exposed: false,
+            address: Address {
+                seed_name: "Alice".to_string(),
+                identicon: alice_sr_polkadot().to_vec(),
+                has_pwd: false,
+                path: "//polkadot".to_string(),
+                secret_exposed: false,
+            },
         },
     ];
 
@@ -203,37 +214,47 @@ fn print_ids_seed_name_network() {
     .unwrap();
     let expected_cards = (
         MSeedKeyCard {
-            seed_name: "Alice".to_string(),
-            identicon: alice_sr_root().to_vec(),
+            address: Address {
+                path: "".to_string(),
+                seed_name: "Alice".to_string(),
+                identicon: alice_sr_root().to_vec(),
+                secret_exposed: false,
+                has_pwd: false,
+            },
             address_key: "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                 .to_string(),
             base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
             swiped: false,
             multiselect: false,
-            secret_exposed: false,
         },
         vec![
             MKeysCard {
                 address_key: "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                     .to_string(),
                 base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
-                identicon: alice_sr_westend().to_vec(),
-                has_pwd: false,
-                path: "//westend".to_string(),
+                address: Address {
+                    identicon: alice_sr_westend().to_vec(),
+                    has_pwd: false,
+                    path: "//westend".to_string(),
+                    secret_exposed: false,
+                    seed_name: "Alice".to_string(),
+                },
                 swiped: false,
                 multiselect: false,
-                secret_exposed: false,
             },
             MKeysCard {
                 address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                     .to_string(),
                 base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                identicon: alice_sr_alice().to_vec(),
-                has_pwd: false,
-                path: "//Alice".to_string(),
                 swiped: false,
                 multiselect: false,
-                secret_exposed: false,
+                address: Address {
+                    identicon: alice_sr_alice().to_vec(),
+                    has_pwd: false,
+                    path: "//Alice".to_string(),
+                    secret_exposed: false,
+                    seed_name: "Alice".to_string(),
+                },
             },
         ],
     );
@@ -352,15 +373,15 @@ fn export_alice_westend() {
     let expected_key = MKeyDetails {
         qr: alice_westend_root_qr().to_vec(),
         pubkey: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a".to_string(),
+        base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
         address: Address {
-            base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
             identicon: alice_sr_root().to_vec(),
             seed_name: "Alice".to_string(),
             path: "".to_string(),
             has_pwd: false,
-            multiselect: None,
             secret_exposed: false,
         },
+        multiselect: None,
         network_info: MSCNetworkInfo {
             network_title: "Westend".to_string(),
             network_logo: "westend".to_string(),
@@ -517,14 +538,16 @@ fn derive_prep_alice_collided() {
         derivation_check: NavDerivationCheck {
             button_good: false,
             where_to: None,
-            collision: Some(Address {
+            collision: Some(MAddressCard {
                 base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                path: "//Alice".to_string(),
-                has_pwd: false,
-                identicon: alice_sr_alice().to_vec(),
-                seed_name: "Alice".to_string(),
                 multiselect: None,
-                secret_exposed: false,
+                address: Address {
+                    path: "//Alice".to_string(),
+                    has_pwd: false,
+                    identicon: alice_sr_alice().to_vec(),
+                    seed_name: "Alice".to_string(),
+                    secret_exposed: false,
+                },
             }),
             error: None,
         },
@@ -586,14 +609,16 @@ fn derive_prep_alice_collided_with_password() {
         derivation_check: NavDerivationCheck {
             button_good: false,
             where_to: None,
-            collision: Some(Address {
+            collision: Some(MAddressCard {
                 base58: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_string(),
-                path: "//secret".to_string(),
-                has_pwd: true,
-                identicon: alice_sr_secret_abracadabra().to_vec(),
-                seed_name: "Alice".to_string(),
                 multiselect: None,
-                secret_exposed: false,
+                address: Address {
+                    path: "//secret".to_string(),
+                    has_pwd: true,
+                    identicon: alice_sr_secret_abracadabra().to_vec(),
+                    seed_name: "Alice".to_string(),
+                    secret_exposed: false,
+                },
             }),
             error: None,
         },
@@ -747,14 +772,16 @@ fn path_is_known() {
     let expected_check = NavDerivationCheck {
         button_good: false,
         where_to: None,
-        collision: Some(Address {
+        collision: Some(MAddressCard {
             base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-            path: "//Alice".to_string(),
-            has_pwd: false,
-            identicon: alice_sr_alice().to_vec(),
-            seed_name: "Alice".to_string(),
             multiselect: None,
-            secret_exposed: false,
+            address: Address {
+                path: "//Alice".to_string(),
+                has_pwd: false,
+                identicon: alice_sr_alice().to_vec(),
+                seed_name: "Alice".to_string(),
+                secret_exposed: false,
+            },
         }),
         error: None,
     };

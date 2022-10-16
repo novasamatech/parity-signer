@@ -27,7 +27,7 @@ pub enum TransactionAction {
         content: TransactionCardSet,
         checksum: u32,
         has_pwd: bool,
-        author_info: Address,
+        author_info: MAddressCard,
         network_info: NetworkSpecs,
     },
     Stub {
@@ -132,28 +132,13 @@ pub enum ScreenData {
     KeyDetailsMulti { f: MKeyDetailsMulti },
 }
 
-#[derive(Clone, PartialEq, Eq)]
-pub struct Identity {
-    pub seed_name: String,
-    pub address_key: String,
-    pub public_key: String,
-    pub identicon: Vec<u8>,
-    pub has_pwd: bool,
-    pub path: String,
-    pub is_multiselect: bool,
-    pub base58: String,
-}
-
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MKeysCard {
+    pub address: Address,
     pub address_key: String,
     pub base58: String,
-    pub identicon: Vec<u8>,
-    pub has_pwd: bool,
-    pub path: String,
     pub swiped: bool,
     pub multiselect: bool,
-    pub secret_exposed: bool,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -165,13 +150,11 @@ pub struct MNetworkCard {
 // TODO: This has to have a custom default.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MSeedKeyCard {
-    pub seed_name: String,
-    pub identicon: Vec<u8>,
+    pub address: Address,
     pub address_key: String,
     pub base58: String,
     pub swiped: bool,
     pub multiselect: bool,
-    pub secret_exposed: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -207,7 +190,7 @@ pub struct MLog {
 pub struct MEventMaybeDecoded {
     pub event: Event,
     pub decoded: Option<TransactionCardSet>,
-    pub signed_by: Option<Address>,
+    pub signed_by: Option<MAddressCard>,
     pub verifier_details: Option<MVerifierDetails>,
 }
 
@@ -252,7 +235,7 @@ pub struct TransactionCardSet {
 pub struct MTransaction {
     pub content: TransactionCardSet,
     pub ttype: TransactionType,
-    pub author_info: Option<Address>,
+    pub author_info: Option<MAddressCard>,
     pub network_info: Option<MSCNetworkInfo>,
 }
 
@@ -273,6 +256,8 @@ pub struct MKeyDetails {
     pub qr: Vec<u8>,
     pub pubkey: String,
     pub network_info: MSCNetworkInfo,
+    pub base58: String,
+    pub multiselect: Option<bool>,
     pub address: Address,
 }
 
@@ -301,19 +286,24 @@ pub struct MRecoverSeedPhrase {
 pub struct DerivationCheck {
     pub button_good: bool,
     pub where_to: Option<DerivationDestination>,
-    pub collision: Option<Address>,
+    pub collision: Option<MAddressCard>,
     pub error: Option<String>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Address {
-    pub base58: String,
     pub path: String,
     pub has_pwd: bool,
     pub identicon: Vec<u8>,
     pub seed_name: String,
-    pub multiselect: Option<bool>,
     pub secret_exposed: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MAddressCard {
+    pub base58: String,
+    pub address: Address,
+    pub multiselect: Option<bool>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -374,13 +364,9 @@ pub struct MNetworkDetails {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MRawKey {
-    pub seed_name: String,
+    pub address: Address,
     pub address_key: String,
     pub public_key: String,
-    pub identicon: Vec<u8>,
-    pub has_pwd: bool,
-    pub path: String,
-    pub secret_exposed: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -417,7 +403,7 @@ pub enum MSCContent {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MSufficientCryptoReady {
-    pub author_info: Address,
+    pub author_info: MAddressCard,
     pub sufficient: Vec<u8>,
     pub content: MSCContent,
 }
@@ -495,7 +481,7 @@ pub struct MSignatureReady {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MEnterPassword {
-    pub author_info: Address,
+    pub author_info: MAddressCard,
     pub counter: u32,
 }
 
@@ -629,7 +615,7 @@ pub struct MSCTxSpecPlain {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Card {
-    AuthorCard { f: Address },
+    AuthorCard { f: MAddressCard },
     AuthorPlainCard { f: MSCAuthorPlain },
     AuthorPublicKeyCard { f: MVerifierDetails },
     BalanceCard { f: MSCCurrency },

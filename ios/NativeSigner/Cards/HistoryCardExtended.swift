@@ -97,10 +97,10 @@ struct HistoryCardExtended: View {
                 TransactionBlock(cards: event.decoded?.assemble() ?? [])
                 Localizable.signedBy.text
                 HStack {
-                    Identicon(identicon: event.signedBy?.identicon ?? [])
+                    Identicon(identicon: event.signedBy?.address.identicon ?? [])
                     VStack {
                         Text(value.signedBy.show())
-                        Text((event.signedBy?.seedName ?? "") + (event.signedBy?.path ?? ""))
+                        Text((event.signedBy?.address.seedName ?? "") + (event.signedBy?.address.path ?? ""))
                     }
                 }
                 Localizable.inNetwork.text
@@ -113,10 +113,10 @@ struct HistoryCardExtended: View {
                 TransactionBlock(cards: event.decoded?.assemble() ?? [])
                 Localizable.signedBy.text
                 HStack {
-                    Identicon(identicon: event.signedBy?.identicon ?? [])
+                    Identicon(identicon: event.signedBy?.address.identicon ?? [])
                     VStack {
                         Text(value.signedBy.show())
-                        Text((event.signedBy?.seedName ?? "") + (event.signedBy?.path ?? ""))
+                        Text((event.signedBy?.address.seedName ?? "") + (event.signedBy?.address.path ?? ""))
                     }
                 }
                 Localizable.inNetwork.text

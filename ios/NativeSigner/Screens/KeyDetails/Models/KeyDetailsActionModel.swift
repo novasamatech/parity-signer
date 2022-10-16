@@ -25,9 +25,9 @@ extension KeyDetailsActionModel {
     init(_ keys: MKeys, alert: Bool, alertShow: @escaping () -> Void) {
         addressKeyNavigation = .init(action: .selectKey, details: keys.root.addressKey)
         derivedKeysNavigation = keys.set
-            .sorted(by: { $0.path < $1.path })
+            .sorted(by: { $0.address.path < $1.address.path })
             .map { .init(action: .selectKey, details: $0.addressKey) }
         alertClosure = alert ? alertShow : nil
-        removeSeed = keys.root.seedName
+        removeSeed = keys.root.address.seedName
     }
 }

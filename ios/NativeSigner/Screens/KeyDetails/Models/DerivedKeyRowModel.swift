@@ -39,9 +39,9 @@ struct DerivedKeyRowViewModel: Equatable {
 
 extension DerivedKeyRowViewModel {
     init(_ key: MKeysCard) {
-        path = key.path
-        identicon = key.identicon
-        hasPassword = key.hasPwd
+        path = key.address.path
+        identicon = key.address.identicon
+        hasPassword = key.address.hasPwd
         base58 = key.base58.truncateMiddle(length: 8)
     }
 }

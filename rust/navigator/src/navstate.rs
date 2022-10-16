@@ -4,11 +4,11 @@ use db_handling::helpers::get_danger_status;
 use db_handling::identities::get_multisigner_by_address;
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
-    ActionResult, Address, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti,
-    MKeys, MLog, MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm,
-    MRecoverSeedName, MRecoverSeedPhrase, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings,
-    MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData,
-    RightButton, ScreenData, ScreenNameType, ShieldAlert, TransactionType,
+    ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
+    MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
+    MRecoverSeedPhrase, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
+    MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData,
+    ScreenNameType, ShieldAlert, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use std::fmt::Write;
@@ -1792,15 +1792,17 @@ impl State {
                     Screen::SignSufficientCrypto(ref s) => {
                         if let Some((_, _, author_info)) = s.key_selected() {
                             let content = content.clone();
-                            let author_info = Address {
-                                base58: author_info.base58,
-                                identicon: author_info.identicon,
-                                seed_name: author_info.seed_name,
-                                path: author_info.path,
-                                has_pwd: author_info.has_pwd,
-                                multiselect: None,
-                                secret_exposed: author_info.secret_exposed,
-                            };
+                            // let author_info = AuthorInfo{
+                            //     base58: author_info.base58,
+                            //     address: Address {
+                            //         identicon: author_info.identicon,
+                            //         seed_name: author_info.seed_name,
+                            //         path: author_info.path,
+                            //         has_pwd: author_info.has_pwd,
+                            //         secret_exposed: author_info.secret_exposed,
+                            // },
+                            //     multiselect: None
+                            // };
                             let f = MSufficientCryptoReady {
                                 author_info,
                                 sufficient: sufficient.clone(),

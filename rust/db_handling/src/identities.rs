@@ -54,6 +54,7 @@ use constants::ALICE_SEED_PHRASE;
 #[cfg(feature = "signer")]
 use constants::TRANSACTION;
 
+use definitions::helpers::print_multisigner_as_base58_or_eth;
 #[cfg(feature = "signer")]
 use definitions::helpers::{get_multisigner, unhex};
 #[cfg(feature = "active")]
@@ -69,7 +70,7 @@ use definitions::{
 };
 #[cfg(feature = "signer")]
 use definitions::{
-    helpers::{make_identicon_from_multisigner, print_multisigner_as_base58_or_eth},
+    helpers::make_identicon_from_multisigner,
     navigation::{Address, MKeyDetails, MSCNetworkInfo},
 };
 #[cfg(feature = "signer")]
@@ -1362,16 +1363,10 @@ where
 
     let style = address_details.encryption.identicon_style();
     let address = Address {
-        base58: print_multisigner_as_base58_or_eth(
-            multisigner,
-            Some(network_specs.base58prefix),
-            address_details.encryption,
-        ),
         path: address_details.path.to_string(),
         has_pwd: address_details.has_pwd,
         identicon: make_identicon_from_multisigner(multisigner, style),
         seed_name: address_details.seed_name.to_string(),
-        multiselect: None,
         secret_exposed: true,
     };
 
@@ -1435,6 +1430,12 @@ where
         qr,
         pubkey: hex::encode(public_key),
         network_info,
+        base58: print_multisigner_as_base58_or_eth(
+            multisigner,
+            Some(network_specs.base58prefix),
+            address_details.encryption,
+        ),
+        multiselect: None,
         address,
     })
 }
