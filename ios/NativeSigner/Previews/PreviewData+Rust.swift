@@ -38,7 +38,8 @@ extension PreviewData {
             seedName: "",
             secretExposed: false
         ),
-        base58: ""
+        base58: "",
+        multiselect: nil
     )
 
     static let exampleErrorMessage =

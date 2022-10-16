@@ -26,7 +26,7 @@ import io.parity.signer.components.IdentIcon
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
-import io.parity.signer.uniffi.Address
+import io.parity.signer.uniffi.MAddressCard
 
 
 @Composable
@@ -162,15 +162,15 @@ data class KeyCardModel(
 		/**
 		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
 		 */
-		fun fromAddress(address: Address, networkTitle: String): KeyCardModel =
+		fun fromAddress(address_card: MAddressCard, networkTitle: String): KeyCardModel =
 			KeyCardModel(
 				network = networkTitle,
-				base58 = address.base58,
-				path = address.path,
-				hasPwd = address.hasPwd,
-				identIcon = address.identicon,
-				seedName = address.seedName,
-				multiselect = address.multiselect,
+				base58 = address_card.base58,
+				path = address_card.address.path,
+				hasPwd = address_card.address.hasPwd,
+				identIcon = address_card.address.identicon,
+				seedName = address_card.address.seedName,
+				multiselect = address_card.multiselect,
 			)
 
 		fun createStub() = KeyCardModel(
