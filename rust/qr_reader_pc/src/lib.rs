@@ -8,14 +8,16 @@
 //! and extracting data from it.
 
 use anyhow::anyhow;
+use image::{GrayImage, ImageBuffer, Luma};
 use indicatif::ProgressBar;
 use qr_reader_phone::process_payload::{process_decoded_payload, InProgress, Ready};
 
 use opencv::{
     highgui,
-    objdetect::QRCodeDetector,
+    imgproc::{cvt_color, COLOR_BGR2GRAY},
     prelude::*,
-    videoio::{self, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FRAME_WIDTH},
+    videoio,
+    videoio::{CAP_PROP_FRAME_HEIGHT, CAP_PROP_FRAME_WIDTH},
     Result,
 };
 
@@ -53,7 +55,6 @@ pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String
     let mut out = Ready::NotYet(InProgress::None);
     let mut line = String::new();
 
-    let mut qr_decoder = QRCodeDetector::default()?;
     let pb = ProgressBar::new(1);
     loop {
         match out {
@@ -63,7 +64,7 @@ pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String
                     pb.set_position(f.collected() as u64)
                 }
                 out = match camera_capture(&mut camera, window) {
-                    Ok(img) => process_qr_image(&mut qr_decoder, &img, decoding)?,
+                    Ok(img) => process_qr_image(&img, decoding)?,
                     Err(_) => Ready::NotYet(decoding),
                 };
             }
@@ -110,14 +111,27 @@ fn create_camera(
     }
 }
 
-fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<Mat> {
+fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<GrayImage> {
     let mut frame = Mat::default();
     camera.read(&mut frame)?;
 
     if frame.size()?.width > 0 {
         highgui::imshow(window, &frame)?;
     };
-    Ok(frame)
+
+    let mut image: GrayImage = ImageBuffer::new(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    let mut ocv_gray_image = Mat::default();
+
+    cvt_color(&frame, &mut ocv_gray_image, COLOR_BGR2GRAY, 0)?;
+
+    for y in 0..ocv_gray_image.rows() {
+        for x in 0..ocv_gray_image.cols() {
+            let pixel: Luma<u8> = Luma([*ocv_gray_image.at_2d(y, x)?]);
+            image.put_pixel(x as u32, y as u32, pixel);
+        }
+    }
+
+    Ok(image)
 }
 
 /// Function for decoding QR grayscale image.
@@ -127,18 +141,18 @@ fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<Ma
 ///
 /// * `image` - Grayscale image containing QR and background
 /// * `decoding` - Stores accumulated payload data for animated QR.
-pub fn process_qr_image(
-    qr_decoder: &mut QRCodeDetector,
-    frame: &Mat,
-    decoding: InProgress,
-) -> anyhow::Result<Ready> {
-    let mut points = Mat::default();
-    let mut rect_image = Mat::default();
-    let code = qr_decoder.detect_and_decode(&frame, &mut points, &mut rect_image)?;
-    if !code.is_empty() {
-        process_decoded_payload(code, decoding).map_err(Into::into)
-    } else {
-        Ok(Ready::NotYet(decoding))
+pub fn process_qr_image(image: &GrayImage, decoding: InProgress) -> anyhow::Result<Ready> {
+    let mut qr_decoder = quircs::Quirc::new();
+    let codes = qr_decoder.identify(image.width() as usize, image.height() as usize, image);
+
+    match codes.last() {
+        Some(Ok(code)) => match code.decode() {
+            Ok(decoded) => process_decoded_payload(decoded.payload, decoding)
+                .map_err(|e| anyhow!(e.to_string())),
+            Err(_) => Ok(Ready::NotYet(decoding)),
+        },
+        Some(_) => Ok(Ready::NotYet(decoding)),
+        None => Ok(Ready::NotYet(decoding)),
     }
 }
 
@@ -200,7 +214,6 @@ pub fn arg_parser(arguments: Vec<String>) -> anyhow::Result<CameraSettings> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use image as _;
 
     #[test]
     fn get_camera_index() {

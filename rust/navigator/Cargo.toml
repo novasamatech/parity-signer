@@ -20,9 +20,9 @@ zeroize = "1.5.7"
 constants = { path = "../constants", features = ["test"] }
 image = { version = "0.24.4", default-features = false, features = ["ico"] }
 parser = { path = "../parser", default-features = false }
+quircs = { version = "0.10.0" }
 regex = { version = "1.6.0" }
 db_handling = {path = "../db_handling"}
-opencv = { version = "0.70", features = [ "objdetect" ] }
 
 pretty_assertions = "1"
 

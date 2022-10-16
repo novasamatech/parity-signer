@@ -1,6 +1,5 @@
 use image::{GenericImageView, GrayImage, ImageBuffer, Pixel};
 use lazy_static::lazy_static;
-use opencv::objdetect::{QRCodeDetector, QRCodeDetectorTrait};
 use regex::Regex;
 use sp_core::{blake2_256, Pair, H256};
 use sp_runtime::MultiSigner;
@@ -97,27 +96,9 @@ fn qr_payload(qr_content: &[u8]) -> Vec<u8> {
             gray_img.put_pixel(x, y, new_pixel);
         }
     }
-    let mut qr_decoder = QRCodeDetector::default().unwrap();
-
-    let mut points = opencv::prelude::Mat::default();
-    let mut rect_image = opencv::prelude::Mat::default();
-
-    let mat = opencv::prelude::Mat::from_slice_2d(
-        &gray_img
-            .rows()
-            .into_iter()
-            .map(|row| {
-                row.into_iter()
-                    .map(|l| l.channels()[0])
-                    .collect::<Vec<u8>>()
-            })
-            .collect::<Vec<_>>(),
-    )
-    .unwrap();
-
-    qr_decoder
-        .detect_and_decode(&mat, &mut points, &mut rect_image)
-        .unwrap()
+    let mut qr_decoder = quircs::Quirc::new();
+    let codes = qr_decoder.identify(image.width() as usize, image.height() as usize, &gray_img);
+    codes.last().unwrap().unwrap().decode().unwrap().payload
 }
 
 fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
