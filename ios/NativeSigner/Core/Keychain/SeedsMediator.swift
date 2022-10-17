@@ -100,7 +100,7 @@ final class SeedsMediator: SeedsMediating {
             if let authenticated = payload.authenticated {
                 signerDataModel.authenticated = authenticated
             }
-            updateSeedNames(seedNames: seedNames)
+            attemptToUpdate(seedNames: seedNames)
         case .failure:
             signerDataModel.authenticated = false
         }
@@ -118,7 +118,7 @@ final class SeedsMediator: SeedsMediating {
         case .success:
             seedNames.append(seedName)
             seedNames.sort()
-            updateSeedNames(seedNames: seedNames)
+            attemptToUpdate(seedNames: seedNames)
             signerDataModel.navigation.perform(navigation: .init(
                 action: .goForward,
                 details: createRoots ? Constants.true : Constants.false,
@@ -181,7 +181,7 @@ final class SeedsMediator: SeedsMediating {
             seedNames = seedNames
                 .filter { $0 != seedName }
                 .sorted()
-            updateSeedNames(seedNames: seedNames)
+            attemptToUpdate(seedNames: seedNames)
             signerDataModel.navigation.perform(navigation: .init(action: .removeSeed), skipDebounce: true)
         case .failure: ()
             // We should inform user with some dedicated UI state for that error, maybe just system alert
@@ -194,6 +194,14 @@ final class SeedsMediator: SeedsMediating {
 }
 
 private extension SeedsMediator {
+    func attemptToUpdate(seedNames: [String]) {
+        do {
+            try updateSeedNames(seedNames: seedNames)
+        } catch {
+            signerDataModel.authenticated = false
+        }
+    }
+
     func checkSeedPhraseCollision(seedPhrase: String) -> Bool {
         guard let seedPhraseAsData = seedPhrase.data(using: .utf8) else {
             // We should probably inform user that their data input can't be parsed
