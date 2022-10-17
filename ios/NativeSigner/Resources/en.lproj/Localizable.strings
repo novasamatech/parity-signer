@@ -346,3 +346,7 @@
 "Error.Navigation.Label.Message" = "Please restart Signer app and try again.\nInternal error description: %@";
 "Error.Navigation.Label.Suffix" = "Report an issue to Signer team via Github at: https://github.com/paritytech/parity-signer/";
 "Error.Navigation.Label.NoAction" = "No further action available from this state.\nLast action: \"%@\" details: \"%@\"";
+"Scanner.Label.Scan.Header" = "Scan QR code";
+"Scanner.Label.Scan.Message" = "Sign transaction, add network or update metadata";
+"Scanner.Action.Multiple" = "Scan Multiple";
+
