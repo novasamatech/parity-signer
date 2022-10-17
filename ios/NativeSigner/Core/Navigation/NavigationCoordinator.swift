@@ -49,7 +49,8 @@ final class NavigationCoordinator: ObservableObject {
     /// Currently error is based on `actionResult.alertData` component when app receives `.errorData(message)` value
     @Published var genericError = GenericErrorViewModel()
 
-    /// Enables to override old logic based on `ActionResult` to not include additional components in main view hierarchy
+    /// Enables to override old logic based on `ActionResult` to not include additional components in main view
+    /// hierarchy
     /// for screens with updated design approach.
     ///
     /// This will enable to slowly move into proper view hierachy in newer screens and then update navigation

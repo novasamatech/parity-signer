@@ -16,4 +16,10 @@ pub enum Error {
 
     #[error("Key not found {0}")]
     KeyNotFound(String),
+
+    #[error("Mutex poisoned")]
+    MutexPoisoned,
+
+    #[error("Data packing error: {0}")]
+    DataPacking(String),
 }
