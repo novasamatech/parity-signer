@@ -21,15 +21,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
-import io.parity.signer.screens.KeySetViewModel
+import io.parity.signer.screens.keysets.KeySetViewModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun KeySetItem(
-	model: KeySetViewModel,
-	onClick: () -> Unit = {},
+    model: KeySetViewModel,
+    onClick: () -> Unit = {},
 ) {
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),

@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
-import io.parity.signer.screens.KeySetViewModel
-import io.parity.signer.screens.KeySetsSelectViewModel
+import io.parity.signer.screens.keysets.KeySetViewModel
+import io.parity.signer.screens.keysets.KeySetsSelectViewModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action

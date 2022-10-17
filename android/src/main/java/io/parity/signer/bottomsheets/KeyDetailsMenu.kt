@@ -156,7 +156,7 @@ private fun KeyDetailsDeleteConfirmMenu(
 
 
 @Composable
-private fun MenuItemForBottomSheet(
+internal fun MenuItemForBottomSheet(
 	@DrawableRes iconId: Int,
 	label: String,
 	tint: Color? = null,
