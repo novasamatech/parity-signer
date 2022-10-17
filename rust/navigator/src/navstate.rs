@@ -32,12 +32,12 @@ use definitions::{
 use crate::error::{Error, Result};
 
 ///State of the app as remembered by backend
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub struct State {
-    pub navstate: Navstate,
-    pub dbname: Option<String>,
-    pub seed_names: Vec<String>,
-    pub networks: Vec<NetworkSpecsKey>,
+    navstate: Navstate,
+    dbname: Option<String>,
+    seed_names: Vec<String>,
+    networks: Vec<NetworkSpecsKey>,
 }
 
 ///Navigation state is completely defined here
@@ -65,6 +65,23 @@ impl Default for Navstate {
 }
 
 impl State {
+    pub fn init_navigation(&mut self, dbname: &str, seed_names: Vec<String>) -> Result<()> {
+        self.seed_names = seed_names;
+        self.dbname = Some(dbname.to_string());
+
+        let networks = db_handling::helpers::get_all_networks(dbname)?;
+        for x in &networks {
+            self.networks
+                .push(NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption));
+        }
+
+        Ok(())
+    }
+
+    pub fn update_seed_names(&mut self, seed_names: Vec<String>) {
+        self.seed_names = seed_names;
+    }
+
     fn handle_navbar_log(&self) -> (Navstate, String) {
         let mut new_navstate = self.navstate.to_owned();
         let errorline = String::new();

@@ -10,11 +10,11 @@ on:
 jobs:
   check:
     name:                     Cargo test on Ubuntu
-    runs-on:                  ubuntu-latest
+    runs-on:                  ubuntu-22.04
     steps:
 
       - name:                 Cancel Previous Runs
-        uses:                 styfle/cancel-workflow-action@9f10b1b9fa56e99e4c5d12c2a085c8a0c37ab0ac # 0.10.1
+        uses:                 styfle/cancel-workflow-action@b173b6ec0100793626c2d9e6b90435061f4fc3e5 # 0.11.0
         with:
           access_token:       ${{ github.token }}
 
@@ -50,7 +50,7 @@ jobs:
           use-tool-cache:     true
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@6720f05bc48b77f96918929a9019fb2203ff71f8 # v2.0.0
+        uses:                 Swatinem/rust-cache@22c9328bcba27aa81a32b1bef27c7e3c78052531 # v2.0.1
         with:
           workspaces:         rust -> rust/target
 
