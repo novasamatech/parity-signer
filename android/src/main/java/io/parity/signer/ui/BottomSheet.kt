@@ -3,13 +3,14 @@ package io.parity.signer.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.backgroundTertiary
 import kotlinx.coroutines.launch
@@ -95,9 +96,11 @@ interface BottomSheetPositionHandle {
 private fun BottomSheetContentWrapper(
 	content: @Composable () -> Unit,
 ) {
+	val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 	Box(
 		modifier = Modifier
 			.wrapContentHeight()
+			.heightIn(0.dp, screenHeight - 40.dp)
 			.fillMaxWidth()
 			.clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
 	) {

@@ -74,6 +74,7 @@ private fun KeyDetailsGeneralMenu(
 //			}
 //		)
 
+
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_private_key_28,
 			label = stringResource(R.string.menu_option_export_private_key),
@@ -147,7 +148,7 @@ private fun KeyDetailsDeleteConfirmMenu(
 			labelCta = stringResource(R.string.remove_key_confirm_cta),
 			onClickedCancel = {
 				navigator.backAction()
-												},
+			},
 			onClickedCta = { navigator.navigate(Action.REMOVE_KEY) },
 		)
 		Spacer(modifier = Modifier.padding(bottom = 24.dp))

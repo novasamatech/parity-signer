@@ -2,10 +2,7 @@ package io.parity.signer.bottomsheets.exportprivatekey
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -48,44 +45,51 @@ fun PrivateKeyExportBottomSheet(
 		BottomSheetHeader(stringResource(R.string.export_private_key_title)) {
 			navigator.backAction()
 		}
-		val qrRounding = 16.dp
-		val plateShape =
-			RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
+		//scrollable part if doesn't fit into screen
 		Column(
 			modifier = Modifier
-				.clip(plateShape)
-				.border(
-					BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-					plateShape
-				)
-				.background(MaterialTheme.colors.fill6, plateShape)
+				.verticalScroll(rememberScrollState())
+				.weight(weight =1f, fill = false)
 		) {
-			Box(
+			val qrRounding = 16.dp
+			val plateShape =
+				RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
+			Column(
 				modifier = Modifier
-					.fillMaxWidth(1f)
-					.aspectRatio(1.1f)
-					.background(
-						Color.White,
-						RoundedCornerShape(qrRounding)
-					),
-				contentAlignment = Alignment.Center,
+					.clip(plateShape)
+					.border(
+						BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+						plateShape
+					)
+					.background(MaterialTheme.colors.fill6, plateShape)
 			) {
-				Image(
-					bitmap = model.qrImage.intoImageBitmap(),
-					contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
-					contentScale = ContentScale.Fit,
-					modifier = Modifier.size(264.dp)
-				)
-			}
-			KeyCard(model.keyCard)
+				Box(
+					modifier = Modifier
+						.fillMaxWidth(1f)
+						.aspectRatio(1.1f)
+						.background(
+							Color.White,
+							RoundedCornerShape(qrRounding)
+						),
+					contentAlignment = Alignment.Center,
+				) {
+					Image(
+						bitmap = model.qrImage.intoImageBitmap(),
+						contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
+						contentScale = ContentScale.Fit,
+						modifier = Modifier.size(264.dp)
+					)
+				}
+				KeyCard(model.keyCard)
 
+			}
+			//autohide component
+			val timerText = stringResource(R.string.export_private_key_timer_label)
+			CircularCountDownTimer(
+				SHOW_PRIVATE_KEY_TIMEOUT,
+				timerText
+			) { navigator.backAction() }
 		}
-		//autohide component
-		val timerText = stringResource(R.string.export_private_key_timer_label)
-		CircularCountDownTimer(
-			SHOW_PRIVATE_KEY_TIMEOUT,
-			timerText
-		) { navigator.backAction() }
 	}
 }
 
