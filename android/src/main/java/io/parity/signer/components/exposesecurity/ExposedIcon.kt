@@ -55,7 +55,7 @@ private fun ExposedIconActive(
 	) {
 		Image(
 			painter = painterResource(id = R.drawable.ic_gpp_maybe_32),
-			contentDescription = stringResource(R.string.description_close_button),
+			contentDescription = stringResource(R.string.description_shield_exposed_icon),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier.size(32.dp),
 		)
@@ -75,7 +75,7 @@ private fun ExposedIconPast(navigator: Navigator,
 	) {
 		Image(
 			painter = painterResource(id = R.drawable.ic_wifi_32),
-			contentDescription = stringResource(R.string.description_close_button),
+			contentDescription = stringResource(R.string.description_shield_exposed_icon),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier.size(32.dp),
 		)
