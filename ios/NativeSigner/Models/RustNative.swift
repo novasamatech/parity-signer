@@ -85,7 +85,7 @@ final class SignerDataModel: ObservableObject {
             // if self.isConnectivityOn {
             // device_was_online(nil, self.dbName)
             // }
-            initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
+            try initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
             totalRefresh()
             seedsMediator.refreshSeeds()
         } catch {
@@ -102,7 +102,11 @@ private extension SignerDataModel {
     func finaliseInitialisation() {
         guard onboardingDone else { return }
         seedsMediator.refreshSeeds()
-        initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
+        do {
+            try initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
+        } catch {
+            print("InitNavigation has failed! This will not do.")
+        }
         totalRefresh()
     }
 }
@@ -119,7 +123,11 @@ extension SignerDataModel {
         databaseMediator.wipeDatabase()
         onboardingDone = false
         seedsMediator.seedNames = []
-        initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
+        do {
+            try initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
+        } catch {
+            print("InitNavigation has failed. This will not do.")
+        }
     }
 }
 
