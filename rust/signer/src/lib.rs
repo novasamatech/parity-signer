@@ -37,6 +37,18 @@ pub enum ErrorDisplayed {
         /// Error description
         s: String,
     },
+    MutexPoisoned,
+}
+
+impl From<navigator::Error> for ErrorDisplayed {
+    fn from(e: navigator::Error) -> Self {
+        match e {
+            navigator::Error::MutexPoisoned => Self::MutexPoisoned,
+            _ => Self::Str {
+                s: format!("{}", e),
+            },
+        }
+    }
 }
 
 impl From<anyhow::Error> for ErrorDisplayed {
@@ -95,21 +107,21 @@ fn backend_action(
     action: Action,
     details: &str,
     seed_phrase: &str,
-) -> Result<Option<ActionResult>, ErrorDisplayed> {
-    navigator::do_action(action, details, seed_phrase).map_err(|s| ErrorDisplayed::Str { s })
+) -> Result<ActionResult, ErrorDisplayed> {
+    Ok(navigator::do_action(action, details, seed_phrase)?)
 }
 
 /// Should be called once at start of the app and could be called on app reset
 ///
 /// Accepts list of seed names to avoid calling [`update_seed_names`] every time
-fn init_navigation(dbname: &str, seed_names: Vec<String>) {
-    navigator::init_navigation(dbname, seed_names)
+fn init_navigation(dbname: &str, seed_names: Vec<String>) -> Result<(), ErrorDisplayed> {
+    Ok(navigator::init_navigation(dbname, seed_names)?)
 }
 
 /// Should be called every time any change could have been done to seeds. Accepts updated list of
 /// seeds, completely disregards previously known list
-fn update_seed_names(seed_names: Vec<String>) {
-    navigator::update_seed_names(seed_names)
+fn update_seed_names(seed_names: Vec<String>) -> Result<(), ErrorDisplayed> {
+    Ok(navigator::update_seed_names(seed_names)?)
 }
 
 /// Determines estimated required number of multiframe QR that should be gathered before decoding
