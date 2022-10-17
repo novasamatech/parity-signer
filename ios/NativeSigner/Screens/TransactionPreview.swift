@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct TransactionPreview: View {
+    @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var data: SignerDataModel
     @State private var comment = ""
     @State private var offset: CGFloat = 0
     @State private var offsetOld: CGFloat = 0
     @FocusState private var focus: Bool
     let content: MTransaction
-    let sign: (String, String) -> Void
-    let navigationRequest: NavigationRequest
+
     var body: some View {
         VStack {
             TransactionBlock(cards: content.content.assemble())
@@ -65,7 +66,7 @@ struct TransactionPreview: View {
                             action: {
                                 focus = false
                                 if let seedName = content.authorInfo?.seedName {
-                                    sign(seedName, comment)
+                                    data.sign(seedName: seedName, comment: comment)
                                 }
                             }
                         )
@@ -73,7 +74,7 @@ struct TransactionPreview: View {
                         BigButton(
                             text: Localizable.TransactionPreview.approve.key,
                             action: {
-                                navigationRequest(.init(action: .goForward))
+                                navigation.perform(navigation: .init(action: .goForward))
                             }
                         )
                     case .read:
@@ -83,7 +84,7 @@ struct TransactionPreview: View {
                             text: Localizable.TransactionPreview.selectSeed.key,
                             isCrypto: true,
                             action: {
-                                navigationRequest(.init(action: .goForward))
+                                navigation.perform(navigation: .init(action: .goForward))
                             }
                         )
                     case .done:
@@ -96,7 +97,7 @@ struct TransactionPreview: View {
                             isDangerous: true,
                             action: {
                                 focus = false
-                                navigationRequest(.init(action: .goBack))
+                                navigation.perform(navigation: .init(action: .goBack))
                             }
                         )
                     }
