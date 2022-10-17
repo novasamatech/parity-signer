@@ -1792,17 +1792,6 @@ impl State {
                     Screen::SignSufficientCrypto(ref s) => {
                         if let Some((_, _, author_info)) = s.key_selected() {
                             let content = content.clone();
-                            // let author_info = AuthorInfo{
-                            //     base58: author_info.base58,
-                            //     address: Address {
-                            //         identicon: author_info.identicon,
-                            //         seed_name: author_info.seed_name,
-                            //         path: author_info.path,
-                            //         has_pwd: author_info.has_pwd,
-                            //         secret_exposed: author_info.secret_exposed,
-                            // },
-                            //     multiselect: None
-                            // };
                             let f = MSufficientCryptoReady {
                                 author_info,
                                 sufficient: sufficient.clone(),
