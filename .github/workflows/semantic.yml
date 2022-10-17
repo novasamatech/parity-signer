@@ -16,7 +16,7 @@ jobs:
     steps:
 
       # Documentation: https://github.com/amannn/action-semantic-pull-request
-      - uses:                 amannn/action-semantic-pull-request@570204e54c9030a6cb7ef781c492e76c1798d1c0 # v5.0.0
+      - uses:                 amannn/action-semantic-pull-request@570204e54c9030a6cb7ef781c492e76c1798d1c0 # v5.0.1
         env:
           GITHUB_TOKEN:       ${{ secrets.GITHUB_TOKEN }}
         with:
