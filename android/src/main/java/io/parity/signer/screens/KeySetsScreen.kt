@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonBottomSheet
 import io.parity.signer.components.base.ScreenHeader
+import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.items.KeySetItem
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
@@ -61,13 +62,16 @@ fun KeySetsScreen(
 					}
 				}
 			}
-			PrimaryButtonBottomSheet(
-				label = stringResource(R.string.key_sets_screem_add_key_button),
-				modifier = Modifier
-					.padding(24.dp)
-					.align(Alignment.BottomCenter),
-			) {
-				navigator.navigate(Action.RIGHT_BUTTON_ACTION) //new seed for this state
+			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+				ExposedIcon(alertState = alertState, navigator = navigator,
+					Modifier.align(Alignment.End).padding(end = 16.dp))
+				PrimaryButtonBottomSheet(
+					label = stringResource(R.string.key_sets_screem_add_key_button),
+					modifier = Modifier
+						.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)
+				) {
+					navigator.navigate(Action.RIGHT_BUTTON_ACTION) //new seed for this state
+				}
 			}
 		}
 		BottomBar2(navigator, BottomBar2State.KEYS)
@@ -129,7 +133,7 @@ private fun PreviewKeySetsSelectScreen() {
 			)
 		)
 	}
-	val state = remember { mutableStateOf(AlertState.None) }
+	val state = remember { mutableStateOf(AlertState.Past) }
 	val mockModel = KeySetsSelectViewModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {

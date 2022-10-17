@@ -46,7 +46,7 @@ fun KeySetDetailsScreenView(
 		//header network
 		Row() {
 			Column() {
-				Text(text =)
+//				Text(text =)
 			}
 		}
 		//divider
