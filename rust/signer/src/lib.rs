@@ -227,6 +227,13 @@ fn export_key_info(dbname: &str) -> anyhow::Result<MKeysInfoExport, String> {
     navigator::export_key_info(dbname).map_err(|e| format!("{}", e))
 }
 
+/// Encode binary info into qr code
+fn encode_to_qr(payload: &Vec<u8>) -> anyhow::Result<Vec<u8>, String> {
+    use qrcode_static::DataType;
+
+    qrcode_static::png_qr(payload, DataType::Regular).map_err(|e| format!("{}", e))
+}
+
 /// Must be called once to initialize logging from Rust in development mode.
 ///
 /// Do not use in production.

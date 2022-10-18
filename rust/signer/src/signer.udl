@@ -587,6 +587,9 @@ namespace signer {
     [Throws=ErrorDisplayed]
     MKeysInfoExport export_key_info([ByRef] string dbname);
 
+    [Throws=ErrorDisplayed]
+    sequence<u8> encode_to_qr([ByRef] sequence<u8> payload);
+
     void init_logging(string tag);
 };
 
