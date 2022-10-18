@@ -18,7 +18,7 @@ import io.parity.signer.ui.theme.SignerNewTheme
 fun BottomSheetHeader(header: String, onCancelClicked: () -> Unit) {
 	Row(
 		modifier = Modifier
-			.padding(top = 20.dp, bottom = 20.dp)
+			.padding(top = 20.dp, bottom = 20.dp, start = 24.dp, end = 16.dp)
 			.fillMaxWidth(),
 		verticalAlignment = Alignment.CenterVertically,
 	) {

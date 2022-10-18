@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,8 +39,7 @@ fun PrivateKeyExportBottomSheet(
 	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-			.fillMaxWidth()
-			.padding(start = sidePadding, end = sidePadding),
+			.fillMaxWidth(),
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		BottomSheetHeader(stringResource(R.string.export_private_key_title)) {
@@ -50,8 +50,9 @@ fun PrivateKeyExportBottomSheet(
 			modifier = Modifier
 				.verticalScroll(rememberScrollState())
 				.weight(weight =1f, fill = false)
+				.padding(start = sidePadding, end = sidePadding)
 		) {
-			val qrRounding = 16.dp
+			val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
 			val plateShape =
 				RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
 			Column(
@@ -81,7 +82,6 @@ fun PrivateKeyExportBottomSheet(
 					)
 				}
 				KeyCard(model.keyCard)
-
 			}
 			//autohide component
 			val timerText = stringResource(R.string.export_private_key_timer_label)
