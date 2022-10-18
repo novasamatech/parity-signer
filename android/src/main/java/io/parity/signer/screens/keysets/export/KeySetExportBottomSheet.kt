@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets
+package io.parity.signer.screens.keysets.export
 
 import android.content.res.Configuration
 import androidx.compose.foundation.*
@@ -11,18 +11,21 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
+import io.parity.signer.models.intoImageBitmap
+import io.parity.signer.screens.keysets.KeySetViewModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 
@@ -43,10 +46,10 @@ fun KeySetExportBottomSheet(seeds: Set<KeySetViewModel>) {
 		//scrollable part
 		Column(
 			modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .weight(weight = 1f, fill = false)
-                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                .background(MaterialTheme.colors.fill6, plateShape)
+				.verticalScroll(rememberScrollState())
+				.weight(weight = 1f, fill = false)
+				.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+				.background(MaterialTheme.colors.fill6, plateShape)
 		) {
 
 			animatedQrForBinary(seeds, Modifier.padding(8.dp))
@@ -133,6 +136,9 @@ private fun KeySetItemInExport(seed: KeySetViewModel) {
 private fun animatedQrForBinary(seeds: Set<KeySetViewModel>,
 																modifier: Modifier = Modifier) {
 	val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
+	val qrCodes = remember<List<List<UByte>>> { mutableListOf(mutableListOf<UByte>()) }
+	val currentCode = remember<List<UByte>> { mutableListOf()	}// todo dmitry
+
 	Box(
 		modifier = modifier
             .fillMaxWidth(1f)
@@ -143,14 +149,16 @@ private fun animatedQrForBinary(seeds: Set<KeySetViewModel>,
             ),
 		contentAlignment = Alignment.Center,
 	) {
-//		tood dmitry
-//		Image(
-//			bitmap = model.qrImage.intoImageBitmap(),
-//			contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
-//			contentScale = ContentScale.Fit,
-//			modifier = Modifier.size(264.dp)
-//		)
+	if (currentCode.isNotEmpty())
+		Image(
+			bitmap = currentCode.intoImageBitmap(),
+			contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
+			contentScale = ContentScale.Fit,
+			modifier = Modifier.size(264.dp)
+		)
 	}
+
+	//todo dmitry init service and request codes
 }
 
 
