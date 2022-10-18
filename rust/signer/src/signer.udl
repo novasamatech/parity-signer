@@ -270,14 +270,6 @@ enum Action {
     "Nothing",
 };
 
-dictionary MSeedKeyCard {
-    Address address;
-    string address_key;
-    string base58;
-    boolean swiped;
-    boolean multiselect;
-};
-
 dictionary MNetworkCard {
     string title;
     string logo;
@@ -285,7 +277,7 @@ dictionary MNetworkCard {
 
 dictionary MKeys {
     sequence<MKeysCard> set;
-    MSeedKeyCard root;
+    MKeysCard root;
     MNetworkCard network;
     boolean multiselect_mode;
     string multiselect_count;

@@ -132,7 +132,7 @@ pub enum ScreenData {
     KeyDetailsMulti { f: MKeyDetailsMulti },
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MKeysCard {
     pub address: Address,
     pub address_key: String,
@@ -147,20 +147,10 @@ pub struct MNetworkCard {
     pub logo: String,
 }
 
-// TODO: This has to have a custom default.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct MSeedKeyCard {
-    pub address: Address,
-    pub address_key: String,
-    pub base58: String,
-    pub swiped: bool,
-    pub multiselect: bool,
-}
-
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MKeys {
     pub set: Vec<MKeysCard>,
-    pub root: MSeedKeyCard,
+    pub root: MKeysCard,
     pub network: MNetworkCard,
     pub multiselect_mode: bool,
     pub multiselect_count: String,

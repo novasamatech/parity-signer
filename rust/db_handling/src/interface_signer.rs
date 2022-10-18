@@ -23,7 +23,7 @@ use definitions::{
         Address, DerivationCheck as NavDerivationCheck, DerivationDestination, DerivationEntry,
         DerivationPack, MBackup, MDeriveKey, MKeyDetails, MKeysCard, MMMNetwork, MMNetwork,
         MManageMetadata, MMetadataRecord, MNetworkDetails, MNetworkMenu, MNewSeedBackup, MRawKey,
-        MSCNetworkInfo, MSeedKeyCard, MTypesInfo, MVerifier, Network, SeedNameCard,
+        MSCNetworkInfo, MTypesInfo, MVerifier, Network, SeedNameCard,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier},
     qr_transfers::ContentLoadTypes,
@@ -194,7 +194,7 @@ pub fn print_identities_for_seed_name_and_network<P>(
     network_specs_key: &NetworkSpecsKey,
     swiped_key: Option<MultiSigner>,
     multiselect: Vec<MultiSigner>,
-) -> Result<(MSeedKeyCard, Vec<MKeysCard>, String, String)>
+) -> Result<(MKeysCard, Vec<MKeysCard>, String, String)>
 where
     P: AsRef<Path>,
 {
@@ -226,7 +226,7 @@ where
                     encryption: network_specs.encryption,
                 });
             }
-            root_id = Some(MSeedKeyCard {
+            root_id = Some(MKeysCard {
                 address: Address {
                     seed_name: address_details.seed_name,
                     identicon,
@@ -243,7 +243,7 @@ where
             other_id.push((multisigner, address_details, identicon, swiped, multiselect))
         }
     }
-    let root = root_id.unwrap_or(MSeedKeyCard {
+    let root = root_id.unwrap_or(MKeysCard {
         address: Address {
             seed_name: seed_name.to_string(),
             identicon: EMPTY_PNG.to_vec(),

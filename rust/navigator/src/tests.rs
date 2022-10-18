@@ -31,10 +31,10 @@ use definitions::{
         MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup,
         MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCCall, MSCContent,
         MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion,
-        MSCNetworkInfo, MSeedKeyCard, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
-        MSignatureReady, MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier,
-        MVerifierDetails, ModalData, Network, NetworkSpecsToSend, RightButton, ScreenData,
-        ScreenNameType, SeedNameCard, TransactionCard, TransactionCardSet, TransactionType,
+        MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
+        MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData,
+        Network, NetworkSpecsToSend, RightButton, ScreenData, ScreenNameType, SeedNameCard,
+        TransactionCard, TransactionCardSet, TransactionType,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -1896,7 +1896,7 @@ fn flow_test_1() {
                     swiped: false,
                     multiselect: false,
                 }],
-                root: MSeedKeyCard {
+                root: MKeysCard {
                     address: Address {
                         path: "".to_string(),
                         seed_name: "Portia".to_string(),
@@ -2693,7 +2693,7 @@ fn flow_test_1() {
                 }],
                 // since root == 'false' in do_action above.
                 // TODO: This has to be wrapped with Option<_>.
-                root: MSeedKeyCard {
+                root: MKeysCard {
                     address: Address {
                         seed_name: "Alice".to_string(),
                         identicon: empty_png().to_vec(),
@@ -2959,7 +2959,7 @@ fn flow_test_1() {
                 ],
                 // since root == 'false' in do_action above.
                 // TODO: This has to be wrapped with Option<_>.
-                root: MSeedKeyCard {
+                root: MKeysCard {
                     address: Address {
                         seed_name: "Alice".to_string(),
                         identicon: empty_png().to_vec(),
@@ -3034,7 +3034,7 @@ fn flow_test_1() {
                         },
                     },
                 ],
-                root: MSeedKeyCard {
+                root: MKeysCard {
                     address_key:
                         "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                             .to_string(),
@@ -3150,7 +3150,7 @@ fn flow_test_1() {
                         },
                     },
                 ],
-                root: MSeedKeyCard {
+                root: MKeysCard {
                     address: Address {
                         path: "".to_string(),
                         seed_name: "Alice".to_string(),
@@ -3521,7 +3521,7 @@ fn flow_test_1() {
                     swiped: false,
                     multiselect: false,
                 }],
-                root: MSeedKeyCard {
+                root: MKeysCard {
                     address: Address {
                         seed_name: "Alice".to_string(),
                         identicon: empty_png().to_vec(),
@@ -3718,7 +3718,7 @@ fn flow_test_1() {
                         multiselect: false,
                     },
                 ],
-                root: MSeedKeyCard {
+                root: MKeysCard {
                     address: Address {
                         path: "".to_string(),
                         seed_name: "Alice".to_string(),
@@ -3977,7 +3977,7 @@ fn flow_test_1() {
                         multiselect: false,
                     },
                 ],
-                root: MSeedKeyCard {
+                root: MKeysCard {
                     address: Address {
                         seed_name: "Alice".to_string(),
                         identicon: empty_png().to_vec(),
@@ -4499,7 +4499,7 @@ fn flow_test_1() {
                         multiselect: false,
                     },
                 ],
-                root: MSeedKeyCard {
+                root: MKeysCard {
                     address: Address {
                         path: "".to_string(),
                         seed_name: "Alice".to_string(),
@@ -4681,7 +4681,7 @@ fn flow_test_1() {
                         multiselect: false,
                     },
                 ],
-                root: MSeedKeyCard {
+                root: MKeysCard {
                     address: Address {
                         path: "".to_string(),
                         seed_name: "Alice".to_string(),
@@ -6014,7 +6014,7 @@ fn flow_test_1() {
                         seed_name: "Pepper".to_string(),
                     },
                 }],
-                root: MSeedKeyCard {
+                root: MKeysCard {
                     address: Address {
                         path: "".to_string(),
                         seed_name: "Pepper".to_string(),
@@ -6080,7 +6080,7 @@ fn flow_test_1() {
                         seed_name: "Pepper".to_string(),
                     },
                 }],
-                root: MSeedKeyCard {
+                root: MKeysCard {
                     address: Address {
                         seed_name: "Pepper".to_string(),
                         ..Default::default()
@@ -6449,7 +6449,7 @@ fn flow_test_1() {
                         seed_name: "Pepper".to_string(),
                     },
                 }],
-                root: MSeedKeyCard {
+                root: MKeysCard {
                     address: Address {
                         seed_name: "Pepper".to_string(),
                         ..Default::default()

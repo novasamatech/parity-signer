@@ -38,7 +38,7 @@ use definitions::{
         Address, DerivationCheck as NavDerivationCheck, DerivationDestination, DerivationEntry,
         DerivationPack, MBackup, MDeriveKey, MKeyDetails, MKeysCard, MMMNetwork, MMNetwork,
         MManageMetadata, MMetadataRecord, MNetworkDetails, MNetworkMenu, MRawKey, MSCNetworkInfo,
-        MSeedKeyCard, MTypesInfo, MVerifier, Network, NetworkSpecsToSend, SeedNameCard,
+        MTypesInfo, MVerifier, Network, NetworkSpecsToSend, SeedNameCard,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
     users::AddressDetails,
@@ -213,7 +213,7 @@ fn print_ids_seed_name_network() {
     )
     .unwrap();
     let expected_cards = (
-        MSeedKeyCard {
+        MKeysCard {
             address: Address {
                 path: "".to_string(),
                 seed_name: "Alice".to_string(),
