@@ -228,7 +228,7 @@ fn export_key_info(dbname: &str) -> anyhow::Result<MKeysInfoExport, String> {
 }
 
 /// Encode binary info into qr code
-fn encode_to_qr(payload: &Vec<u8>) -> anyhow::Result<Vec<u8>, String> {
+fn encode_to_qr(payload: &[u8]) -> anyhow::Result<Vec<u8>, String> {
     use qrcode_static::DataType;
 
     qrcode_static::png_qr(payload, DataType::Regular).map_err(|e| format!("{}", e))
