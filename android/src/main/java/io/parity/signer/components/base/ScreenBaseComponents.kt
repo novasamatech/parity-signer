@@ -9,11 +9,13 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -82,6 +84,56 @@ fun ScreenHeader(
 	}
 }
 
+@Composable
+fun ScreenHeaderClose(
+	title: String,
+	menuEnabled: Boolean,
+	onClose: () -> Unit = {},
+	onMenu: () -> Unit = {},
+) {
+	Row(
+		modifier = Modifier
+			.fillMaxWidth(1f)
+			.defaultMinSize(minHeight = 56.dp)
+	) {
+		Image(
+			imageVector = Icons.Filled.Close,
+			contentDescription = stringResource(R.string.description_back_button),
+			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+			modifier = Modifier
+				.padding(10.dp)
+				.size(24.dp)
+				.align(Alignment.CenterVertically)
+				.clickable(onClick = onClose)
+		)
+		//center
+		Text(
+			text = title,
+			color = MaterialTheme.colors.primary,
+			style = TypefaceNew.TitleS,
+			textAlign = TextAlign.Center,
+			modifier = Modifier
+				.align(Alignment.CenterVertically)
+				.weight(1f)
+		)
+		//end
+		if (menuEnabled) {
+			Image(
+				imageVector = Icons.Filled.MoreHoriz,
+				contentDescription = stringResource(R.string.description_menu_button),
+				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+				modifier = Modifier
+					.padding(10.dp)
+					.size(24.dp)
+					.align(Alignment.CenterVertically)
+					.clickable { onMenu() }
+			)
+		} else {
+			Spacer(modifier = Modifier.padding(start = 44.dp))
+		}
+	}
+}
+
 
 @Preview(
 	name = "day",
@@ -120,6 +172,10 @@ private fun PreviewScreenBaseComponent() {
 				backEnabled = false,
 				menuEnabled = false,
 				EmptyNavigator(),
+			)
+			ScreenHeaderClose(
+				stringResource(id = R.string.key_sets_screem_title),
+				menuEnabled = false,
 			)
 		}
 	}

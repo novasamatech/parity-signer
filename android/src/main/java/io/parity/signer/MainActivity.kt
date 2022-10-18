@@ -124,20 +124,20 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 									progress = progress,
 									captured = captured,
 									total = total,
-									button = signerDataModel::navigate,
+									button = signerDataModel.navigator::navigate,
 									signerDataModel = signerDataModel
 								)
 								ModalSelector(
 									modalData = actionResult.value?.modalData,
 									localNavAction = localNavAction.value,
 									alertState = shieldAlert,
-									button = signerDataModel::navigate,
+									button = signerDataModel.navigator::navigate,
 									signerDataModel = signerDataModel,
 								)
 								AlertSelector(
 									alert = actionResult.value?.alertData,
 									alertState = shieldAlert,
-									button = signerDataModel::navigate,
+									button = signerDataModel.navigator::navigate,
 									acknowledgeWarning = signerDataModel::acknowledgeWarning
 								)
 							}

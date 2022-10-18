@@ -4,4 +4,9 @@
 		<item quantity="one">%1$d Derived Key</item>
 		<item quantity="other">%1$d Derived Keys</item>
 	</plurals>
+
+	<plurals name="key_set_multiselect_title_some_selected">
+		<item quantity="one">%1$d Key Set Selected</item>
+		<item quantity="other">%1$d Key Sets Selected</item>
+	</plurals>
 </resources>

@@ -1,0 +1,158 @@
+package io.parity.signer.screens.keysets
+
+import android.content.res.Configuration
+import androidx.annotation.StringRes
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import io.parity.signer.R
+import io.parity.signer.components.base.ScreenHeaderClose
+import io.parity.signer.components.items.KeySetItemMultiselect
+import io.parity.signer.models.AlertState
+import io.parity.signer.models.EmptyNavigator
+import io.parity.signer.models.Navigator
+import io.parity.signer.ui.helpers.PreviewData
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.pink300
+import io.parity.signer.ui.theme.textDisabled
+
+/**
+ * Default main screen with list Seeds/root keys
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun KeySetsSelectExportScreen(
+	model: KeySetsSelectViewModel,
+	navigator: Navigator,
+) {
+	val selected = remember { mutableSetOf<KeySetViewModel>() }
+
+	Column(Modifier.background(MaterialTheme.colors.background)) {
+		ScreenHeaderClose(
+			if (selected.isEmpty()) {
+				stringResource(R.string.key_set_multiselect_title_none_selected)
+			} else {
+				pluralStringResource(
+					id = R.plurals.key_set_multiselect_title_some_selected,
+					count = selected.size,
+					selected.size,
+				)
+			},
+			menuEnabled = false,
+			onClose = {
+				//todo dmitry
+			},
+		)
+		LazyColumn(
+			contentPadding = PaddingValues(horizontal = 12.dp),
+			verticalArrangement = Arrangement.spacedBy(10.dp),
+			modifier = Modifier.weight(1f),
+		) {
+			val cards = model.keys
+			items(cards.size) { i ->
+				KeySetItemMultiselect(model = cards[i]) { checked, model ->
+					if (checked) selected.add(model) else selected.remove(model)
+				}
+			}
+		}
+		Row(
+			modifier = Modifier.height(48.dp),
+			verticalAlignment = Alignment.CenterVertically,
+		) {
+			ClickableLabel(
+				stringId = R.string.key_set_export_all_label,
+				isEnabled = true,
+				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+			) {
+				//todo dmitry
+			}
+			Spacer(modifier = Modifier.weight(1f))
+			ClickableLabel(
+				stringId = R.string.key_set_export_selected_label,
+				isEnabled = selected.isNotEmpty(),
+				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+			) {
+				//todo dmitry
+			}
+		}
+	}
+}
+
+@Composable
+fun ClickableLabel(
+	@StringRes stringId: Int,
+	isEnabled: Boolean,
+	modifier: Modifier = Modifier,
+	onClick: () -> Unit,
+) {
+	val modifier = if (isEnabled) {
+		modifier.clickable(onClick = onClick)
+	} else {
+		modifier
+	}
+	Text(
+		text = stringResource(id = stringId),
+		color = if (isEnabled) {
+			MaterialTheme.colors.pink300
+		} else {
+			MaterialTheme.colors.textDisabled
+		},
+		style = TypefaceNew.TitleS,
+		modifier = modifier,
+	)
+}
+
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewKeySetsSelectExportScreen() {
+	val keys = mutableListOf(
+		KeySetViewModel(
+			"first seed name",
+			PreviewData.exampleIdenticon,
+			1.toUInt()
+		),
+		KeySetViewModel(
+			"second seed name",
+			PreviewData.exampleIdenticon,
+			3.toUInt()
+		),
+	)
+	repeat(30) {
+		keys.add(
+			KeySetViewModel(
+				"second seed name",
+				PreviewData.exampleIdenticon,
+				3.toUInt()
+			)
+		)
+	}
+	val mockModel = KeySetsSelectViewModel(keys)
+	SignerNewTheme {
+		Box(modifier = Modifier.size(350.dp, 550.dp)) {
+			KeySetsSelectExportScreen(mockModel, EmptyNavigator())
+		}
+	}
+}
