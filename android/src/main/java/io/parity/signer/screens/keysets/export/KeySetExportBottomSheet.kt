@@ -98,7 +98,7 @@ fun KeySetExportBottomSheet(seeds: Set<KeySetViewModel>) {
 					Divider(
 						color = MaterialTheme.colors.appliedSeparator,
 						thickness = 1.dp,
-						modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+						startIndent = 16.dp,
 					)
 				}
 			}
