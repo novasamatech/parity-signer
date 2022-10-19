@@ -11,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -28,6 +29,8 @@ import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.screens.keysets.KeySetViewModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -65,12 +68,12 @@ fun KeySetExportBottomSheet(seeds: Set<KeySetViewModel>) {
 				)
 			Row(
 				modifier = Modifier
-                    .padding(8.dp)
-                    .border(
-                        BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-                        innerShape
-                    )
-                    .background(MaterialTheme.colors.fill6, innerShape)
+					.padding(8.dp)
+					.border(
+						BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+						innerShape
+					)
+					.background(MaterialTheme.colors.fill6, innerShape)
 
 			) {
 				Text(
@@ -78,16 +81,16 @@ fun KeySetExportBottomSheet(seeds: Set<KeySetViewModel>) {
 					color = MaterialTheme.colors.textTertiary,
 					style = TypefaceNew.CaptionM,
 					modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+						.weight(1f)
+						.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
 				)
 				Icon(
 					imageVector = Icons.Outlined.Info,
 					contentDescription = null,
 					tint = MaterialTheme.colors.pink300,
 					modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .padding(start = 18.dp, end = 18.dp)
+						.align(Alignment.CenterVertically)
+						.padding(start = 18.dp, end = 18.dp)
 				)
 			}
 			val seedList = seeds.toList()
@@ -133,32 +136,54 @@ private fun KeySetItemInExport(seed: KeySetViewModel) {
 }
 
 @Composable
-private fun animatedQrForBinary(seeds: Set<KeySetViewModel>,
-																modifier: Modifier = Modifier) {
+private fun animatedQrForBinary(
+	seeds: Set<KeySetViewModel>,
+	modifier: Modifier = Modifier
+) {
 	val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
-	val qrCodes = remember<List<List<UByte>>> { mutableListOf(mutableListOf<UByte>()) }
-	val currentCode = remember<List<UByte>> { mutableListOf()	}// todo dmitry
+	val DELAY = 500.milliseconds
+	val service = remember { KeySetsExportService() }
+	var qrCodes =
+		remember<List<List<UByte>>> { mutableListOf(mutableListOf<UByte>()) }
+	var currentCode = remember<List<UByte>> { mutableListOf() }
 
 	Box(
 		modifier = modifier
-            .fillMaxWidth(1f)
-            .aspectRatio(1.1f)
-            .background(
-                Color.White,
-                RoundedCornerShape(qrRounding)
-            ),
+			.fillMaxWidth(1f)
+			.aspectRatio(1.1f)
+			.background(
+				Color.White,
+				RoundedCornerShape(qrRounding)
+			),
 		contentAlignment = Alignment.Center,
 	) {
-	if (currentCode.isNotEmpty())
-		Image(
-			bitmap = currentCode.intoImageBitmap(),
-			contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
-			contentScale = ContentScale.Fit,
-			modifier = Modifier.size(264.dp)
-		)
+		if (currentCode.isNotEmpty()) {
+			Image(
+				bitmap = currentCode.intoImageBitmap(),
+				contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
+				contentScale = ContentScale.Fit,
+				modifier = Modifier.size(264.dp)
+			)
+		}
 	}
 
-	//todo dmitry init service and request codes
+	LaunchedEffect(key1 = seeds) {
+		qrCodes = service.getQrCodesList(seeds.toList())
+	}
+
+	LaunchedEffect(key1 = qrCodes) {
+		if (qrCodes.isEmpty()) return@LaunchedEffect
+		var index = 0
+		while (true) {
+			currentCode = qrCodes[index]
+			if (index < qrCodes.lastIndex) {
+				index++
+			} else {
+				index = 0
+			}
+			delay(DELAY)
+		}
+	}
 }
 
 
