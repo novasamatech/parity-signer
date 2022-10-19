@@ -81,7 +81,7 @@ fun ConfirmExportPrivateKeyAction(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewPrivateKeyExportBottomSheet() {
+private fun PreviewConfirmExportPrivateKeyAction() {
 	SignerNewTheme {
 		ConfirmExportPrivateKeyAction(
 			EmptyNavigator(),

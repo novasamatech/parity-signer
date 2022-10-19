@@ -178,7 +178,12 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 			}
 			OnBoardingState.No -> {
 				if (shieldAlert.value == AlertState.None) {
-					Scaffold { padding ->
+					Scaffold(
+						modifier = Modifier
+							.navigationBarsPadding()
+							.captionBarPadding()
+							.statusBarsPadding(),
+					) { padding ->
 						LandingView(
 							signerDataModel::onBoard,
 							modifier = Modifier.padding(padding)
@@ -187,7 +192,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				} else {
 					Box(
 						contentAlignment = Alignment.Center,
-						modifier = Modifier.padding(12.dp)
+						modifier = Modifier.padding(12.dp),
 					) {
 						Text(
 							"Please enable airplane mode",

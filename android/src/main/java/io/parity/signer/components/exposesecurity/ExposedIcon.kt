@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -56,7 +57,7 @@ private fun ExposedIconActive(
 		Image(
 			painter = painterResource(id = R.drawable.ic_gpp_maybe_32),
 			contentDescription = stringResource(R.string.description_shield_exposed_icon),
-			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+			colorFilter = ColorFilter.tint(Color.White),
 			modifier = Modifier.size(32.dp),
 		)
 	}
@@ -76,7 +77,7 @@ private fun ExposedIconPast(navigator: Navigator,
 		Image(
 			painter = painterResource(id = R.drawable.ic_wifi_32),
 			contentDescription = stringResource(R.string.description_shield_exposed_icon),
-			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+			colorFilter = ColorFilter.tint(Color.White),
 			modifier = Modifier.size(32.dp),
 		)
 	}
