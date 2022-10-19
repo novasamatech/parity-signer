@@ -29,25 +29,24 @@ import io.parity.signer.ui.theme.TypefaceNew
 @Composable
 fun ScreenHeader(
 	@StringRes stringId: Int?,
-	backEnabled: Boolean,
-	menuEnabled: Boolean,
-	navigator: Navigator
+	onback: (() -> Unit)? = null,
+	onMenu: (() -> Unit)? = null,
 ) {
 	Row(
 		modifier = Modifier
 			.fillMaxWidth(1f)
 			.defaultMinSize(minHeight = 56.dp)
 	) {
-		if (backEnabled) {
+		if (onback != null) {
 			Image(
 				imageVector = Icons.Filled.ChevronLeft,
 				contentDescription = stringResource(R.string.description_back_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
-					.padding(10.dp)
+					.clickable(onClick = onback)
+					.padding(16.dp)
 					.size(24.dp)
 					.align(Alignment.CenterVertically)
-					.clickable { navigator.backAction() }
 			)
 		} else {
 			Spacer(modifier = Modifier.padding(start = 44.dp))
@@ -67,16 +66,16 @@ fun ScreenHeader(
 			Spacer(modifier = Modifier.weight(1f))
 		}
 		//end
-		if (menuEnabled) {
+		if (onMenu != null) {
 			Image(
 				imageVector = Icons.Filled.MoreHoriz,
 				contentDescription = stringResource(R.string.description_menu_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
-					.padding(10.dp)
+					.clickable(onClick = onMenu)
+					.padding(14.dp)
 					.size(24.dp)
 					.align(Alignment.CenterVertically)
-					.clickable { navigator.backAction() }
 			)
 		} else {
 			Spacer(modifier = Modifier.padding(start = 44.dp))
@@ -87,9 +86,8 @@ fun ScreenHeader(
 @Composable
 fun ScreenHeaderClose(
 	title: String,
-	menuEnabled: Boolean,
-	onClose: () -> Unit = {},
-	onMenu: () -> Unit = {},
+	onClose: () -> Unit,
+	onMenu: (() -> Unit)? = null,
 ) {
 	Row(
 		modifier = Modifier
@@ -101,10 +99,10 @@ fun ScreenHeaderClose(
 			contentDescription = stringResource(R.string.description_back_button),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
-				.padding(10.dp)
+				.clickable(onClick = onClose)
+				.padding(16.dp)
 				.size(24.dp)
 				.align(Alignment.CenterVertically)
-				.clickable(onClick = onClose)
 		)
 		//center
 		Text(
@@ -117,16 +115,16 @@ fun ScreenHeaderClose(
 				.weight(1f)
 		)
 		//end
-		if (menuEnabled) {
+		if (onMenu != null) {
 			Image(
 				imageVector = Icons.Filled.MoreHoriz,
 				contentDescription = stringResource(R.string.description_menu_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
-					.padding(10.dp)
+					.clickable(onClick = onMenu)
+					.padding(14.dp)
 					.size(24.dp)
 					.align(Alignment.CenterVertically)
-					.clickable { onMenu() }
 			)
 		} else {
 			Spacer(modifier = Modifier.padding(start = 44.dp))
@@ -157,25 +155,23 @@ private fun PreviewScreenBaseComponent() {
 		) {
 			ScreenHeader(
 				null,
-				backEnabled = true,
-				menuEnabled = true,
-				EmptyNavigator(),
+				onback = {},
+				onMenu = {},
 			)
 			ScreenHeader(
 				R.string.key_sets_screem_title,
-				backEnabled = false,
-				menuEnabled = true,
-				EmptyNavigator(),
+				onback = null,
+				onMenu = {},
 			)
 			ScreenHeader(
 				R.string.key_sets_screem_title,
-				backEnabled = false,
-				menuEnabled = false,
-				EmptyNavigator(),
+				onback = null,
+				onMenu = null,
 			)
 			ScreenHeaderClose(
 				stringResource(id = R.string.key_sets_screem_title),
-				menuEnabled = false,
+				onClose = {},
+				onMenu = null,
 			)
 		}
 	}

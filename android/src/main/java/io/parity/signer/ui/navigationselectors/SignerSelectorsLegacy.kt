@@ -85,9 +85,9 @@ fun ScreenSelector(
 			resetScanValues = signerDataModel::resetScanValues,
 		)
 		is ScreenData.SeedSelector -> SignerNewTheme() {
-			KeySetsScreen(
+			KeySetsNavSubgraph(
 				screenData.f.toKeySetsSelectViewModel(),
-				navigator = signerDataModel.navigator,
+				rootNavigator = signerDataModel.navigator,
 				alertState = alertState,
 			)
 		}

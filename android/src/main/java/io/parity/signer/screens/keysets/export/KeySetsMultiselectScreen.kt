@@ -17,6 +17,8 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.items.KeySetItemMultiselect
@@ -25,6 +27,7 @@ import io.parity.signer.models.Navigator
 import io.parity.signer.screens.keysets.KeySetViewModel
 import io.parity.signer.screens.keysets.KeySetsSelectViewModel
 import io.parity.signer.ui.helpers.PreviewData
+import io.parity.signer.ui.navigationselectors.KeySetsNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
 import io.parity.signer.ui.theme.pink300
@@ -37,7 +40,7 @@ import io.parity.signer.ui.theme.textDisabled
 @Composable
 fun KeySetsSelectExportScreen(
 	model: KeySetsSelectViewModel,
-	navigator: Navigator,
+	navigator: NavController,
 ) {
 	val selected = remember { mutableSetOf<KeySetViewModel>() }
 
@@ -52,9 +55,8 @@ fun KeySetsSelectExportScreen(
 					selected.size,
 				)
 			},
-			menuEnabled = false,
 			onClose = {
-				//todo dmitry
+				navigator.navigate(KeySetsNavSubgraph.home)
 			},
 		)
 		LazyColumn(
@@ -78,7 +80,7 @@ fun KeySetsSelectExportScreen(
 				isEnabled = true,
 				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
 			) {
-				//todo dmitry
+				navigator.navigate(KeySetsNavSubgraph.exportResult)//todo dmitry
 			}
 			Spacer(modifier = Modifier.weight(1f))
 			ClickableLabel(
@@ -86,7 +88,7 @@ fun KeySetsSelectExportScreen(
 				isEnabled = selected.isNotEmpty(),
 				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
 			) {
-				//todo dmitry
+				navigator.navigate(KeySetsNavSubgraph.exportResult)//todo dmitry
 			}
 		}
 	}
@@ -152,7 +154,7 @@ private fun PreviewKeySetsSelectExportScreen() {
 	val mockModel = KeySetsSelectViewModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsSelectExportScreen(mockModel, EmptyNavigator())
+			KeySetsSelectExportScreen(mockModel, rememberNavController())
 		}
 	}
 }

@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import io.parity.signer.components.NetworkLogoName
 import io.parity.signer.models.*
 import io.parity.signer.ui.helpers.PreviewData
@@ -151,7 +152,7 @@ private fun PreviewKeySetDetailsScreen() {
 	val mockModel = KeySetsSelectViewModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreen(mockModel, EmptyNavigator(), state)
+			KeySetsScreen(mockModel, EmptyNavigator(), rememberNavController(), state)
 		}
 	}
 }
