@@ -1,4 +1,4 @@
-package io.parity.signer.components2.base
+package io.parity.signer.components.base
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -15,12 +15,16 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.fill18
+import io.parity.signer.ui.theme.pink500
 
 @Composable
 fun PrimaryButtonBottomSheet(
 	label: String,
 	modifier: Modifier = Modifier,
+	background: Color = MaterialTheme.colors.pink500,
 	onClicked: () -> Unit,
 ) {
 	Column(
@@ -70,14 +74,13 @@ fun SecondaryButtonBottomSheet(
 fun RowButtonsBottomSheet(
 	labelCancel: String,
 	labelCta: String,
-	isDangerCta: Boolean = false,
 	onClickedCancel: () -> Unit,
 	onClickedCta: () -> Unit,
 ) {
 	Row {
 		Column(
 			modifier = Modifier
-				.clickable(onClick = onClickedCancel)
+				.clickable(onClick = onClickedCta)
 				.background(
 					MaterialTheme.colors.fill18, RoundedCornerShape(
 						dimensionResource(id = R.dimen.buttonCornerRadius)
@@ -98,10 +101,11 @@ fun RowButtonsBottomSheet(
 		Spacer(modifier = Modifier.padding(end = 8.dp))
 		Column(
 			modifier = Modifier
-				.clickable(onClick = onClickedCta)
+				.clickable(onClick = onClickedCancel)
 				.background(
-					color = if (isDangerCta) MaterialTheme.colors.red400 else MaterialTheme.colors.pink500,
-					shape = RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
+					MaterialTheme.colors.pink500, RoundedCornerShape(
+						dimensionResource(id = R.dimen.buttonCornerRadius)
+					)
 				)
 				.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
 				.weight(1f),

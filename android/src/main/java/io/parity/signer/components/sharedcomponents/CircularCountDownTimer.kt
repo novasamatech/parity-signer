@@ -1,4 +1,4 @@
-package io.parity.signer.components2
+package io.parity.signer.components.sharedcomponents
 
 import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi

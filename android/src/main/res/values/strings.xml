@@ -15,7 +15,16 @@
 	<string name="qr_with_address_to_scan_description">QR with address to scan</string>
 	<string name="export_private_key_timer_label">Private Key will be hidden in</string>
 	<string name="description_close_button">Close button</string>
+	<string name="description_shield_exposed_icon">Shield exposed icon</string>
+	<string name="description_back_button">Back button</string>
+	<string name="description_menu_button">Menu button</string>
 	<string name="description_locked_icon">Locked account</string>
 	<string name="description_identicon">identicon</string>
 	<string name="description_expand_button">Expand button</string>
+	<string name="key_sets_screem_title">Key Sets</string>
+	<string name="key_sets_screem_add_key_button">Add Key Set</string>
+	<string name="bottom_bar_label_key_sets">Key Sets</string>
+	<string name="bottom_bar_label_scanner">Scanner</string>
+	<string name="bottom_bar_label_logs">Logs</string>
+	<string name="bottom_bar_label_settings">Settings</string>
 </resources>
