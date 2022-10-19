@@ -15,10 +15,33 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.backgroundTertiary
 import kotlinx.coroutines.launch
 
-
+/**
+ * For use in the same screen with content
+ */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BottomSheetWrapper(
+fun BottomSheetWrapperContent(
+	bottomSheetState: ModalBottomSheetState,
+	bottomSheetContent: @Composable () -> Unit,
+	mainContent: @Composable () -> Unit
+) {
+	ModalBottomSheetLayout(
+		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
+		sheetState = bottomSheetState,
+		sheetContent = {
+			BottomSheetContentWrapperInternal {
+				bottomSheetContent()
+			}
+		},
+		content = mainContent,
+	)
+}
+/**
+ * Used for screens controlled by central rust-based navigation system
+ */
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun BottomSheetWrapperRoot(
 	onClosedAction: () -> Unit = {},
 	bottomSheetContent: @Composable (state: BottomSheetPositionHandle) -> Unit,
 ) {
@@ -57,7 +80,7 @@ fun BottomSheetWrapper(
 		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
 		sheetState = modalBottomSheetState,
 		sheetContent = {
-			BottomSheetContentWrapper {
+			BottomSheetContentWrapperInternal {
 				bottomSheetContent(handle)
 			}
 		},
@@ -93,7 +116,7 @@ interface BottomSheetPositionHandle {
 }
 
 @Composable
-private fun BottomSheetContentWrapper(
+private fun BottomSheetContentWrapperInternal(
 	content: @Composable () -> Unit,
 ) {
 	val screenHeight = LocalConfiguration.current.screenHeightDp.dp
@@ -107,3 +130,6 @@ private fun BottomSheetContentWrapper(
 		content()
 	}
 }
+
+
+

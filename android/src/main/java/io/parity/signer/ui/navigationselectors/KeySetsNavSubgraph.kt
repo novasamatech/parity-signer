@@ -12,7 +12,7 @@ import io.parity.signer.screens.keysets.KeySetsScreen
 import io.parity.signer.screens.keysets.KeySetsSelectViewModel
 import io.parity.signer.screens.keysets.export.KeySetExportBottomSheet
 import io.parity.signer.screens.keysets.export.KeySetsSelectExportScreen
-import io.parity.signer.ui.BottomSheetWrapper
+import io.parity.signer.ui.BottomSheetWrapperRoot
 //todo dmitry check that bottomsheet doesn't cover title
 /**
  * Navigation Subgraph with compose nav controller for those Key Set screens which are not part of general
@@ -45,7 +45,7 @@ fun KeySetsNavSubgraph(
 				localNavigator = navController,
 				alertState = alertState,
 			)
-			BottomSheetWrapper(onClosedAction = {
+			BottomSheetWrapperRoot(onClosedAction = {
 				navController.navigate(
 					KeySetsNavSubgraph.home
 				)
@@ -64,7 +64,7 @@ fun KeySetsNavSubgraph(
 				model = model,
 				navigator = navController,
 			)
-			BottomSheetWrapper(onClosedAction = {
+			BottomSheetWrapperRoot(onClosedAction = {
 				navController.navigate(
 					KeySetsNavSubgraph.home
 				)

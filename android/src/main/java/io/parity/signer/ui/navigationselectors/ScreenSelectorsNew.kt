@@ -9,7 +9,6 @@ import io.parity.signer.models.LocalNavAction
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ModalData
 
 @Composable
@@ -26,7 +25,7 @@ fun BottomSheetSelector(
 
 			when (localNavAction) {
 				is LocalNavAction.ShowExportPrivateKey -> {
-					BottomSheetWrapper {
+					BottomSheetWrapperRoot {
 						PrivateKeyExportBottomSheet(
 							model = localNavAction.model,
 							navigator = localNavAction.navigator
@@ -39,7 +38,7 @@ fun BottomSheetSelector(
 		} else {
 			when (modalData) {
 				is ModalData.KeyDetailsAction ->
-					BottomSheetWrapper(onClosedAction = {
+					BottomSheetWrapperRoot(onClosedAction = {
 						navigator.backAction()
 					} ) {
 						KeyDetailsMenuAction(
