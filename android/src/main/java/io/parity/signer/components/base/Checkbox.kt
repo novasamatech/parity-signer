@@ -22,7 +22,7 @@ fun SignerCheckboxColors(
 	) {
 		DefaultCheckboxColors(
 			checkedBorderColor = checkedColor,
-			checkedBoxColor = checkedColor,
+			checkedBoxColor = checkedColor.copy(alpha = 0f),
 			checkedCheckmarkColor = checkedColor,
 			uncheckedCheckmarkColor = uncheckedColor.copy(alpha = 0f),
 			uncheckedBoxColor = checkedColor.copy(alpha = 0f),

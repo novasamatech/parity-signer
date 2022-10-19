@@ -41,6 +41,7 @@ fun KeySetItemMultiselect(
 		color = MaterialTheme.colors.backgroundSecondary,
 		modifier = Modifier.clickable(onClick = {
 			checkedState.value = !checkedState.value
+			onClick(checkedState.value, model)
 		}),
 	) {
 		Row(
@@ -76,9 +77,11 @@ fun KeySetItemMultiselect(
 			}
 			Checkbox(
 				checked = checkedState.value,
-				onCheckedChange = { c -> onClick(c, model) },
+				onCheckedChange = { c ->
+					checkedState.value = !checkedState.value
+					onClick(c, model)
+				},
 				colors = SignerCheckboxColors(),
-//				modifier = Modifier.padding(end = 16.dp), todo dmitry
 			)
 		}
 	}
@@ -103,6 +106,6 @@ private fun PreviewKeySetItemMultiselect() {
 		)
 		KeySetItemMultiselect(
 			model,
-		) {_,_ ->}
+		) { _, _ -> }
 	}
 }

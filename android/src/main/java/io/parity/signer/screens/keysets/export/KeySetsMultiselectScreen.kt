@@ -9,7 +9,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -42,17 +44,17 @@ fun KeySetsSelectExportScreen(
 	model: KeySetsSelectViewModel,
 	navigator: NavController,
 ) {
-	val selected = remember { mutableSetOf<KeySetViewModel>() }
+	val selected = remember { mutableStateOf(setOf<KeySetViewModel>()) }
 
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeaderClose(
-			if (selected.isEmpty()) {
+			if (selected.value.isEmpty()) {
 				stringResource(R.string.key_set_multiselect_title_none_selected)
 			} else {
 				pluralStringResource(
 					id = R.plurals.key_set_multiselect_title_some_selected,
-					count = selected.size,
-					selected.size,
+					count = selected.value.size,
+					selected.value.size,
 				)
 			},
 			onClose = {
@@ -67,7 +69,7 @@ fun KeySetsSelectExportScreen(
 			val cards = model.keys
 			items(cards.size) { i ->
 				KeySetItemMultiselect(model = cards[i]) { checked, model ->
-					if (checked) selected.add(model) else selected.remove(model)
+					if (checked) selected.value += model else selected.value -= model
 				}
 			}
 		}
@@ -85,7 +87,7 @@ fun KeySetsSelectExportScreen(
 			Spacer(modifier = Modifier.weight(1f))
 			ClickableLabel(
 				stringId = R.string.key_set_export_selected_label,
-				isEnabled = selected.isNotEmpty(),
+				isEnabled = selected.value.isNotEmpty(),
 				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
 			) {
 				navigator.navigate(KeySetsNavSubgraph.exportResult)//todo dmitry
