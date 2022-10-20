@@ -65,11 +65,12 @@ pub fn update_seed_names(seed_names: Vec<String>) -> Result<()> {
     Ok(())
 }
 
+/// Export key info with derivations.
 pub fn export_key_info(dbname: &str) -> Result<MKeysInfoExport> {
     let export_all_addrs = export_all_addrs(dbname)?;
 
-    let frames = make_data_packs(&export_all_addrs.encode(), 128)
-        .map_err(|e| Error::DataPacking(e.to_string()))?;
+    let data = [&[0x53, 0xde], export_all_addrs.encode().as_slice()].concat();
+    let frames = make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?;
 
     Ok(MKeysInfoExport { frames })
 }
