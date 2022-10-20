@@ -321,7 +321,7 @@ fn export_import_addrs() {
     )
     .unwrap();
 
-    let addrs = export_all_addrs(&dbname_from).unwrap();
+    let addrs = export_all_addrs(&dbname_from, None).unwrap();
 
     let addrs_expected = ExportAddrs::V1(ExportAddrsV1 {
         addrs: vec![SeedInfo {
@@ -382,7 +382,7 @@ fn export_import_addrs() {
 
     import_all_addrs(dbname_to, alice_hash_map, addrs).unwrap();
 
-    let addrs_new = export_all_addrs(&dbname_to).unwrap();
+    let addrs_new = export_all_addrs(&dbname_to, None).unwrap();
 
     assert_eq!(addrs_new, addrs_expected);
 }

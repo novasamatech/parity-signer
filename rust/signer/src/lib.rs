@@ -223,8 +223,11 @@ fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<
         .map_err(|e| format!("{}", e))
 }
 
-fn export_key_info(dbname: &str) -> anyhow::Result<MKeysInfoExport, String> {
-    navigator::export_key_info(dbname).map_err(|e| format!("{}", e))
+fn export_key_info(
+    dbname: &str,
+    selected_names: Option<Vec<String>>,
+) -> anyhow::Result<MKeysInfoExport, String> {
+    navigator::export_key_info(dbname, selected_names).map_err(|e| format!("{}", e))
 }
 
 /// Encode binary info into qr code

@@ -142,12 +142,21 @@ pub struct AddrInfo {
 
 /// Export all info about keys and their addresses known to Signer
 #[cfg(feature = "signer")]
-pub fn export_all_addrs<P: AsRef<Path>>(db_path: P) -> Result<ExportAddrs> {
+pub fn export_all_addrs<P: AsRef<Path>>(
+    db_path: P,
+    selected_names: Option<Vec<String>>,
+) -> Result<ExportAddrs> {
     let mut keys: HashMap<String, Vec<(MultiSigner, AddressDetails)>> = HashMap::new();
     let mut addrs = vec![];
 
     for (m, a) in get_all_addresses(&db_path)?.into_iter() {
-        keys.entry(a.seed_name.clone()).or_default().push((m, a));
+        if selected_names
+            .as_ref()
+            .map(|names| names.contains(&a.seed_name))
+            .unwrap_or(true)
+        {
+            keys.entry(a.seed_name.clone()).or_default().push((m, a));
+        }
     }
 
     for (name, keys) in &keys {
