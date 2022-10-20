@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct KeySetRow: View {
-    private let viewModel: KeySetViewModel
+    let viewModel: KeySetViewModel
+    @Binding var selectedItems: [KeySetViewModel]
+    @Binding var isExportKeysSelected: Bool
 
-    init(_ viewModel: KeySetViewModel) {
-        self.viewModel = viewModel
+    private var isItemSelected: Bool {
+        selectedItems.contains(viewModel)
     }
 
     var body: some View {
@@ -33,40 +35,60 @@ struct KeySetRow: View {
                     }
                 }
                 Spacer()
-                Asset.chevronRight.swiftUIImage
-                    .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                if isExportKeysSelected {
+                    isItemSelected ? Asset.checkmarkChecked.swiftUIImage : Asset.checkmarkUnchecked.swiftUIImage
+                } else {
+                    Asset.chevronRight.swiftUIImage
+                        .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                }
             }
             .padding(Spacing.medium)
         }
     }
 }
 
-struct KeySetRow_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack {
-            KeySetRow(
-                KeySetViewModel(
-                    keyName: "Parity",
-                    derivedKeys: "1 Derived Key",
-                    identicon: PreviewData.exampleIdenticon
+#if DEBUG
+    struct KeySetRow_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack {
+                KeySetRow(
+                    viewModel: KeySetViewModel(
+                        seed: PreviewData.seedNameCard,
+                        keyName: "Parity",
+                        derivedKeys: "1 Derived Key",
+                        identicon: PreviewData.exampleIdenticon
+                    ),
+                    selectedItems: Binding<[KeySetViewModel]>.constant([]),
+                    isExportKeysSelected: Binding<Bool>.constant(true)
                 )
-            )
-            KeySetRow(
-                KeySetViewModel(
-                    keyName: "Kusama",
-                    derivedKeys: nil,
-                    identicon: PreviewData.exampleIdenticon
+                KeySetRow(
+                    viewModel: KeySetViewModel(
+                        seed: PreviewData.seedNameCard,
+                        keyName: "Kusama",
+                        derivedKeys: nil,
+                        identicon: PreviewData.exampleIdenticon
+                    ),
+                    selectedItems: Binding<[KeySetViewModel]>.constant([]),
+                    isExportKeysSelected: Binding<Bool>.constant(false)
                 )
-            )
-            KeySetRow(
-                KeySetViewModel(
-                    keyName: "Dotsama crowdloans",
-                    derivedKeys: "3 Derived Keys",
-                    identicon: PreviewData.exampleIdenticon
+                KeySetRow(
+                    viewModel: KeySetViewModel(
+                        seed: PreviewData.seedNameCard,
+                        keyName: "Dotsama crowdloans",
+                        derivedKeys: "3 Derived Keys",
+                        identicon: PreviewData.exampleIdenticon
+                    ),
+                    selectedItems: Binding<[KeySetViewModel]>.constant([KeySetViewModel(
+                        seed: PreviewData.seedNameCard,
+                        keyName: "Dotsama crowdloans",
+                        derivedKeys: "3 Derived Keys",
+                        identicon: PreviewData.exampleIdenticon
+                    )]),
+                    isExportKeysSelected: Binding<Bool>.constant(true)
                 )
-            )
+            }
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
         }
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif

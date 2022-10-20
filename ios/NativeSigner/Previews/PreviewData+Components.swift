@@ -12,6 +12,10 @@ extension PreviewData {
         qrCode: PreviewData.exampleQRCode
     )
 
+    static let animatedQrCodeViewModel = AnimatedQRCodeViewModel(
+        qrCodes: [PreviewData.exampleQRCode, PreviewData.exampleQRCode]
+    )
+
     static let qrCodeAddressFooterViewModel = QRCodeAddressFooterViewModel(
         identicon: PreviewData.exampleIdenticon,
         rootKeyName: "Dotsama parachains",
@@ -90,5 +94,13 @@ extension PreviewData {
         derivedKeys: exampleDerivedKeyOverviews,
         seedPhrase: seedPhraseViewModel,
         qrCode: qrCodeContainerViewModel
+    )
+}
+
+extension PreviewData {
+    static let exampleExportMultipleKeysModal = ExportMultipleKeysModalViewModel(
+        qrCode: animatedQrCodeViewModel,
+        selectedItems: KeySetListViewModelBuilder().build(for: PreviewData.mseeds).list,
+        seeds: mseeds.seedNameCards
     )
 }

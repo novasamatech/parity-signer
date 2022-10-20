@@ -33,7 +33,7 @@ struct AuthenticatedScreenContainer: View {
                     }
                 })
             )
-            if navigation.actionResult.footer {
+            if navigation.actionResult.footer, navigation.selectedTab != .keys {
                 TabBarView(
                     selectedTab: $navigation.selectedTab
                 )

@@ -58,7 +58,7 @@ struct ScreenSelector: View {
             )
         case let .seedSelector(value):
             KeySetList(
-                viewModel: KeySetListViewModelBuilder().build(for: value)
+                viewModel: .init(listViewModel: KeySetListViewModelBuilder().build(for: value))
             )
         case let .keyDetails(value):
             KeyDetailsPublicKeyView(

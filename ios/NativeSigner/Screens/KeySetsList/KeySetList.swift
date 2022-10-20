@@ -8,13 +8,16 @@
 import SwiftUI
 
 struct KeySetList: View {
+    @ObservedObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @State private var isShowingNewSeedMenu = false
+    @State private var isShowingMoreMenu = false
+    @State private var isExportKeysSelected = false
 
-    private let viewModel: KeySetListViewModel
+    @State var selectedItems: [KeySetViewModel] = []
 
     init(
-        viewModel: KeySetListViewModel
+        viewModel: ViewModel
     ) {
         self.viewModel = viewModel
     }
@@ -29,62 +32,174 @@ struct KeySetList: View {
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
                         title: Localizable.KeySets.title.string,
+                        leftButton: isExportKeysSelected ? .xmark : .empty,
+                        rightButton: isExportKeysSelected ? .empty : .more,
                         backgroundColor: Asset.backgroundSystem.swiftUIColor
                     ),
                     actionModel: .init(
-                        rightBarMenuAction: { navigation.perform(navigation: .init(action: .rightButtonAction)) }
+                        leftBarMenuAction: {
+                            isExportKeysSelected.toggle()
+                            selectedItems.removeAll()
+                        },
+                        rightBarMenuAction: {
+                            isShowingMoreMenu.toggle()
+                        }
                     )
                 )
                 // Empty state
-                if viewModel.list.isEmpty {
+                if viewModel.listViewModel.list.isEmpty {
                     KeyListEmptyState()
                 } else {
                     // List of Key Sets
                     List {
                         ForEach(
-                            viewModel.list.sorted(by: { $0.keyName < $1.keyName }),
+                            viewModel.listViewModel.list.sorted(by: { $0.keyName < $1.keyName }),
                             id: \.keyName
-                        ) { keySet in
-                            KeySetRow(keySet).onTapGesture {
-                                navigation.perform(navigation: .init(action: .selectSeed, details: keySet.keyName))
-                            }
-                            .listRowBackground(Asset.backgroundSystem.swiftUIColor)
-                            .listRowSeparator(.hidden)
-                            .listRowInsets(.init(
-                                top: Spacing.extraExtraSmall,
-                                leading: Spacing.extraSmall,
-                                bottom: Spacing.extraExtraSmall,
-                                trailing: Spacing.extraSmall
-                            ))
-                        }
+                        ) { keyItem($0) }
                         Spacer()
                             .listRowBackground(Asset.backgroundSystem.swiftUIColor)
                             .listRowSeparator(.hidden)
-                            .frame(height: Heights.actionButton + Spacing.large)
+                            .frame(height: Heights.actionButton + Spacing.large + Heights.tabbarHeight)
                     }
                     .listStyle(.plain)
                     .hiddenScrollContent()
                 }
             }
-            // Add Key Set
-            PrimaryButton(
-                action: {
-                    // We need to call this conditionally, as if there are no seeds,
-                    // Rust does not expect `rightButtonAction` called before `addSeed` / `recoverSeed`
-                    if !viewModel.list.isEmpty {
-                        navigation.perform(navigation: .init(action: .rightButtonAction))
-                    }
-                    isShowingNewSeedMenu.toggle()
-                },
-                text: Localizable.KeySets.Action.add.key
-            )
-            .padding(Spacing.large)
+            VStack {
+                // Add Key Set
+                if !isExportKeysSelected {
+                    PrimaryButton(
+                        action: {
+                            // We need to call this conditionally, as if there are no seeds,
+                            // Rust does not expect `rightButtonAction` called before `addSeed` / `recoverSeed`
+                            if !viewModel.listViewModel.list.isEmpty {
+                                navigation.perform(navigation: .init(action: .rightButtonAction))
+                            }
+                            isShowingNewSeedMenu.toggle()
+                        },
+                        text: Localizable.KeySets.Action.add.key
+                    )
+                    .padding(Spacing.large)
+                }
+                TabBarView(
+                    selectedTab: $navigation.selectedTab
+                )
+            }
+            if isExportKeysSelected {
+                exportKeysOverlay
+            }
         }
         .fullScreenCover(isPresented: $isShowingNewSeedMenu) {
             AddKeySetModal(
                 isShowingNewSeedMenu: $isShowingNewSeedMenu
             )
             .clearModalBackground()
+        }
+        .fullScreenCover(isPresented: $isShowingMoreMenu) {
+            KeyListMoreMenuModal(
+                isPresented: $isShowingMoreMenu,
+                isExportKeysSelected: $isExportKeysSelected
+            )
+            .clearModalBackground()
+        }
+        .fullScreenCover(isPresented: $viewModel.isShowingKeysExportModal) {
+            switch viewModel.exportServiceResult {
+            case let .some(.success(viewModel)):
+                ExportMultipleKeysModal(
+                    isPresented: $viewModel.isShowingKeysExportModal,
+                    viewModel: ExportMultipleKeysModalViewModel(
+                        qrCode: viewModel,
+                        selectedItems: selectedItems,
+                        seeds: selectedItems.map(\.seed)
+                    )
+                )
+                .clearModalBackground()
+            default:
+                EmptyView()
+            }
+        }
+    }
+
+    func keyItem(_ viewModel: KeySetViewModel) -> some View {
+        KeySetRow(
+            viewModel: viewModel,
+            selectedItems: $selectedItems,
+            isExportKeysSelected: $isExportKeysSelected
+        )
+        .onTapGesture {
+            if isExportKeysSelected {
+                if selectedItems.contains(viewModel) {
+                    selectedItems.removeAll { $0 == viewModel }
+                } else {
+                    selectedItems.append(viewModel)
+                }
+            } else {
+                navigation.perform(navigation: .init(action: .selectSeed, details: viewModel.keyName))
+            }
+        }
+        .listRowBackground(Asset.backgroundSystem.swiftUIColor)
+        .listRowSeparator(.hidden)
+        .listRowInsets(.init(
+            top: Spacing.extraExtraSmall,
+            leading: Spacing.extraSmall,
+            bottom: Spacing.extraExtraSmall,
+            trailing: Spacing.extraSmall
+        ))
+    }
+
+    var exportKeysOverlay: some View {
+        HStack {
+            Button(action: {
+                selectedItems = viewModel.listViewModel.list
+                viewModel.prepareKeysExport(with: selectedItems)
+            }) {
+                Localizable.KeySets.More.Action.exportAll.text
+                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                    .font(Fontstyle.labelL.base)
+            }
+            .padding(.leading, Spacing.medium)
+            Spacer()
+            Button(action: {
+                viewModel.prepareKeysExport(with: selectedItems)
+            }) {
+                Localizable.KeySets.More.Action.exportSelected.text
+                    .foregroundColor(
+                        selectedItems.isEmpty ?
+                            Asset.textAndIconsDisabled.swiftUIColor :
+                            Asset.accentPink300
+                            .swiftUIColor
+                    )
+                    .font(Fontstyle.labelL.base)
+            }
+            .disabled(selectedItems.isEmpty)
+            .padding(.trailing, Spacing.medium)
+        }
+        .frame(height: Heights.tabbarHeight)
+        .background(Asset.backgroundSecondary.swiftUIColor)
+    }
+}
+
+extension KeySetList {
+    final class ViewModel: ObservableObject {
+        private let keysExportService: ExportMultipleKeysService
+        let listViewModel: KeySetListViewModel
+
+        @Published var exportServiceResult: Result<AnimatedQRCodeViewModel, ServiceError>?
+        @Published var isShowingKeysExportModal = false
+
+        init(
+            listViewModel: KeySetListViewModel,
+            keysExportService: ExportMultipleKeysService = ExportMultipleKeysService()
+        ) {
+            self.listViewModel = listViewModel
+            self.keysExportService = keysExportService
+        }
+
+        func prepareKeysExport(with items: [KeySetViewModel]) {
+            keysExportService.exportMultipleKeys(items: items.map(\.seed.seedName)) { result in
+                self.exportServiceResult = result
+                self.isShowingKeysExportModal = true
+            }
         }
     }
 }
@@ -111,49 +226,12 @@ private struct KeyListEmptyState: View {
 struct KeySetListPreview: PreviewProvider {
     static var previews: some View {
         KeySetList(
-            viewModel: KeySetListViewModelBuilder()
-                .build(
-                    for:
-                    MSeeds(
-                        seedNameCards: [
-                            SeedNameCard(
-                                seedName: "aaaa",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 3
-                            ),
-                            SeedNameCard(
-                                seedName: "bbbb",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 0
-                            ),
-                            SeedNameCard(
-                                seedName: "cccc",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 1
-                            ),
-                            SeedNameCard(
-                                seedName: "dddd",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 4
-                            ),
-                            SeedNameCard(
-                                seedName: "eeee",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 15
-                            ),
-                            SeedNameCard(
-                                seedName: "ffff",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 1
-                            ),
-                            SeedNameCard(
-                                seedName: "gggg",
-                                identicon: PreviewData.exampleIdenticon,
-                                derivedKeysCount: 0
-                            )
-                        ]
+            viewModel: .init(
+                listViewModel: KeySetListViewModelBuilder()
+                    .build(
+                        for: PreviewData.mseeds
                     )
-                )
+            )
         )
         .preferredColorScheme(.dark)
         .previewLayout(.sizeThatFits)

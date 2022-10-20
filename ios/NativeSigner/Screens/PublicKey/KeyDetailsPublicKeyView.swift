@@ -198,43 +198,35 @@ struct KeyDetailsPublicKeyView: View {
 
 struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
     static var previews: some View {
-        HStack {
-            VStack {
-                KeyDetailsPublicKeyView(
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(),
-                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
-                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
-                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
-                )
-            }
-            VStack {
-                KeyDetailsPublicKeyView(
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
-                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
-                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
-                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
-                )
-            }
-            VStack {
-                KeyDetailsPublicKeyView(
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
-                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
-                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
-                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
-                )
-            }
-            VStack {
-                KeyDetailsPublicKeyView(
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
-                    viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
-                    actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
-                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
-                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
-                )
-            }
+        Group {
+            KeyDetailsPublicKeyView(
+                forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                viewModel: PreviewData.exampleKeyDetailsPublicKey(),
+                actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
+                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
+                resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
+            )
+            KeyDetailsPublicKeyView(
+                forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
+                actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
+                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
+                resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
+            )
+            KeyDetailsPublicKeyView(
+                forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
+                actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
+                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
+                resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
+            )
+            KeyDetailsPublicKeyView(
+                forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
+                actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
+                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
+                resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
+            )
         }
         .previewLayout(.sizeThatFits)
         .preferredColorScheme(.dark)
