@@ -1,15 +1,20 @@
 package io.parity.signer.screens.keysets
 
 import android.content.res.Configuration
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -22,17 +27,19 @@ import io.parity.signer.components.base.PrimaryButtonBottomSheet
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.items.KeyDerivedItem
-import io.parity.signer.components.items.KeySetItem
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.models.*
-import io.parity.signer.ui.theme.*
-import io.parity.signer.uniffi.*
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.textDisabled
+import io.parity.signer.ui.theme.textTertiary
+import io.parity.signer.uniffi.Action
 
-//todo old screen is KeyManager
 /**
  * Single Seed/Key set is selected is it's details
- * For non-multiselect state
+ * For non-multiselect state,
+ * For multiselec screen KeyManager is still used
  */
 @Composable
 fun KeySetDetailsScreenView(
@@ -52,14 +59,16 @@ fun KeySetDetailsScreenView(
 				modifier = Modifier.verticalScroll(rememberScrollState())
 			) {
 				//seed
-				SeedKeyViewItem(model.root) //todo dmitry on click
+				SeedKeyViewItem(model.root) {
+					navigator.navigate(Action.SELECT_KEY, model.root.addressKey)
+				}
 				//filter row
 				Row(
 					modifier = Modifier.padding(horizontal = 24.dp),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					Text(
-						text = "Derived Keys",
+						text = stringResource(R.string.key_sets_details_screem_derived_subtitle), //todo dmitrz
 						color = MaterialTheme.colors.textTertiary,
 						style = TypefaceNew.BodyM,
 						modifier = Modifier.weight(1f),
@@ -72,9 +81,9 @@ fun KeySetDetailsScreenView(
 						tint = MaterialTheme.colors.textTertiary,
 					)
 				}
-				for(key in model.keys) {
+				for (key in model.keys) {
 					KeyDerivedItem(model = key) {
-						//todo dmitry on click
+						navigator.navigate(Action.SELECT_KEY, key.addressKey)
 					}
 				}
 			}
@@ -87,11 +96,11 @@ fun KeySetDetailsScreenView(
 						.padding(end = 16.dp)
 				)
 				PrimaryButtonBottomSheet(
-					label = stringResource(R.string.key_sets_screem_add_key_button), //todo dmitry new derived key
+					label = stringResource(R.string.key_sets_details_screem_create_derived_button),
 					modifier = Modifier
 						.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)
 				) {
-					navigator.navigate(Action.RIGHT_BUTTON_ACTION) //todo dmitry new derived key
+					navigator.navigate(Action.NEW_KEY, "") //new derived key
 				}
 			}
 		}
@@ -100,9 +109,13 @@ fun KeySetDetailsScreenView(
 }
 
 @Composable
-private fun SeedKeyViewItem(seedKeyModel: SeedKeyModel) {
+private fun SeedKeyViewItem(
+	seedKeyModel: SeedKeyModel,
+	onClick: Callback,
+) {
 	Row(
-		modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 24.dp),
+		modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 24.dp)
+			.clickable( onClick = onClick ),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Column(Modifier.weight(1f)) {
