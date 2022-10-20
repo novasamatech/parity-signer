@@ -8,71 +8,73 @@
 import SwiftUI
 
 struct ExportMultipleKeysModalViewModel: Equatable {
-    let qrCode: AnimatedQRCodeViewModel
     let selectedItems: [KeySetViewModel]
     let seeds: [SeedNameCard]
 }
 
 struct ExportMultipleKeysModal: View {
-    @State private var animateBackground: Bool = false
-
-    @Binding var isPresented: Bool
+    @ObservedObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    let viewModel: ExportMultipleKeysModalViewModel
 
     var body: some View {
         FullScreenRoundedModal(
             backgroundTapAction: {
                 animateDismissal()
             },
-            animateBackground: $animateBackground,
+            animateBackground: $viewModel.animateBackground,
             ignoredEdges: .bottom,
             content: {
-                VStack(alignment: .center) {
+                VStack {
                     // Header with X button
                     header
                         .padding([.leading], Spacing.large)
                         .padding([.trailing], Spacing.medium)
-                    // QR Code container
-                    VStack(spacing: 0) {
-                        AnimatedQRCodeView(viewModel: viewModel.qrCode)
-                            .padding(0.5)
-                            .fixedSize(horizontal: false, vertical: true)
-                        HStack {
-                            Localizable.KeysExport.KeySets.Label.info.text
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            Spacer().frame(maxWidth: Spacing.medium)
-                            Asset.infoIconBold.swiftUIImage
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
-                        }
-                        .padding()
-                        .font(Fontstyle.bodyM.base)
-                        .background(
-                            RoundedRectangle(cornerRadius: CornerRadius.small)
-                                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                                .background(Asset.fill6.swiftUIColor)
-                                .cornerRadius(CornerRadius.small)
-                        )
-                        .padding(.top, Spacing.extraSmall)
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: 0) {
-                                ForEach(
-                                    viewModel.selectedItems.sorted(by: { $0.keyName < $1.keyName }),
-                                    id: \.keyName
-                                ) { keyItem($0, isLast: $0 == viewModel.selectedItems.last) }
+                    ScrollView {
+                        VStack(alignment: .center) {
+                            // QR Code container
+                            VStack(spacing: 0) {
+                                AnimatedQRCodeView(viewModel: viewModel.qrCode)
+                                    .padding(0.5)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                HStack {
+                                    Localizable.KeysExport.KeySets.Label.info.text
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    Spacer().frame(maxWidth: Spacing.medium)
+                                    Asset.infoIconBold.swiftUIImage
+                                        .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                }
+                                .padding()
+                                .font(Fontstyle.bodyM.base)
+                                .background(
+                                    RoundedRectangle(cornerRadius: CornerRadius.small)
+                                        .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
+                                        .background(Asset.fill6.swiftUIColor)
+                                        .cornerRadius(CornerRadius.small)
+                                )
+                                .padding(.top, Spacing.extraSmall)
+                                // Keys list
+                                VStack(alignment: .leading, spacing: 0) {
+                                    ForEach(
+                                        viewModel.viewModel.selectedItems.sorted(by: { $0.keyName < $1.keyName }),
+                                        id: \.keyName
+                                    ) { keyItem($0, isLast: $0 == viewModel.viewModel.selectedItems.last) }
+                                }
+                                .padding(.top, Spacing.extraExtraSmall)
                             }
-                            .padding(.top, Spacing.extraExtraSmall)
+                            .padding(Spacing.extraSmall)
+                            .background(
+                                RoundedRectangle(cornerRadius: CornerRadius.medium)
+                                    .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
+                                    .background(Asset.fill6.swiftUIColor)
+                                    .cornerRadius(CornerRadius.medium)
+                            )
+                            .padding([.leading, .trailing], Spacing.medium)
                         }
                     }
-                    .padding(Spacing.extraSmall)
-                    .background(
-                        RoundedRectangle(cornerRadius: CornerRadius.medium)
-                            .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                            .background(Asset.fill6.swiftUIColor)
-                            .cornerRadius(CornerRadius.medium)
-                    )
-                    .padding([.leading, .trailing], Spacing.medium)
+                }
+                .onAppear {
+                    viewModel.prepareKeysExport()
                 }
             }
         )
@@ -80,9 +82,38 @@ struct ExportMultipleKeysModal: View {
 
     private func animateDismissal() {
         Animations.chainAnimation(
-            animateBackground.toggle(),
-            delayedAnimationClosure: isPresented.toggle()
+            viewModel.animateBackground.toggle(),
+            delayedAnimationClosure: viewModel.isPresented.toggle()
         )
+    }
+}
+
+extension ExportMultipleKeysModal {
+    final class ViewModel: ObservableObject {
+        private let keysExportService: ExportMultipleKeysService
+        let viewModel: ExportMultipleKeysModalViewModel
+
+        @Published var qrCode: AnimatedQRCodeViewModel = .init(qrCodes: [])
+        @Published var isShowingKeysExportModal = false
+        @Published var animateBackground: Bool = false
+
+        @Binding var isPresented: Bool
+
+        init(
+            viewModel: ExportMultipleKeysModalViewModel,
+            keysExportService: ExportMultipleKeysService = ExportMultipleKeysService(),
+            isPresented: Binding<Bool>
+        ) {
+            self.viewModel = viewModel
+            self.keysExportService = keysExportService
+            _isPresented = isPresented
+        }
+
+        func prepareKeysExport() {
+            keysExportService.exportMultipleKeys(items: viewModel.seeds.map(\.seedName)) { result in
+                self.qrCode = (try? result.get()) ?? .init(qrCodes: [])
+            }
+        }
     }
 }
 
@@ -99,7 +130,7 @@ private extension ExportMultipleKeysModal {
 
     var headerName: String {
         let localizableKey = Localizable.KeysExport.KeySets.Label.self
-        let count = viewModel.seeds.count
+        let count = viewModel.viewModel.seeds.count
         let suffix = count == 1 ? localizableKey.Header.Suffix.single.string : localizableKey.Header.Suffix.plural
             .string
         return localizableKey.header(String(count), suffix)
@@ -158,37 +189,45 @@ private struct ExportPrivateKeyAddressFooter: View {
     }
 }
 
-struct ExportMultipleKeysModal_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            VStack {
-                ExportMultipleKeysModal(
-                    isPresented: Binding<Bool>.constant(true),
-                    viewModel: PreviewData.exampleExportMultipleKeysModal
-                )
+#if DEBUG
+    struct ExportMultipleKeysModal_Previews: PreviewProvider {
+        static var previews: some View {
+            Group {
+                VStack {
+                    ExportMultipleKeysModal(
+                        viewModel: .init(
+                            viewModel: PreviewData.exampleExportMultipleKeysModal,
+                            isPresented: Binding<Bool>.constant(true)
+                        )
+                    )
+                }
+                .previewDevice("iPhone 11 Pro")
+                .background(.gray)
+                .preferredColorScheme(.dark)
+                VStack {
+                    ExportMultipleKeysModal(
+                        viewModel: .init(
+                            viewModel: PreviewData.exampleExportMultipleKeysModal,
+                            isPresented: Binding<Bool>.constant(true)
+                        )
+                    )
+                }
+                .previewDevice("iPod touch (7th generation)")
+                .background(.gray)
+                .preferredColorScheme(.dark)
+                VStack {
+                    ExportMultipleKeysModal(
+                        viewModel: .init(
+                            viewModel: PreviewData.exampleExportMultipleKeysModal,
+                            isPresented: Binding<Bool>.constant(true)
+                        )
+                    )
+                }
+                .previewDevice("iPhone 8")
+                .background(.gray)
+                .preferredColorScheme(.dark)
             }
-            .previewDevice("iPhone 11 Pro")
-            .background(.gray)
-            .preferredColorScheme(.dark)
-            VStack {
-                ExportMultipleKeysModal(
-                    isPresented: Binding<Bool>.constant(true),
-                    viewModel: PreviewData.exampleExportMultipleKeysModal
-                )
-            }
-            .previewDevice("iPod touch (7th generation)")
-            .background(.gray)
-            .preferredColorScheme(.dark)
-            VStack {
-                ExportMultipleKeysModal(
-                    isPresented: Binding<Bool>.constant(true),
-                    viewModel: PreviewData.exampleExportMultipleKeysModal
-                )
-            }
-            .previewDevice("iPhone 8")
-            .background(.gray)
-            .preferredColorScheme(.dark)
+            .environmentObject(NavigationCoordinator())
         }
-        .environmentObject(NavigationCoordinator())
     }
-}
+#endif

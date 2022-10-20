@@ -103,20 +103,16 @@ struct KeySetList: View {
             .clearModalBackground()
         }
         .fullScreenCover(isPresented: $viewModel.isShowingKeysExportModal) {
-            switch viewModel.exportServiceResult {
-            case let .some(.success(viewModel)):
-                ExportMultipleKeysModal(
-                    isPresented: $viewModel.isShowingKeysExportModal,
+            ExportMultipleKeysModal(
+                viewModel: .init(
                     viewModel: ExportMultipleKeysModalViewModel(
-                        qrCode: viewModel,
                         selectedItems: selectedItems,
                         seeds: selectedItems.map(\.seed)
-                    )
+                    ),
+                    isPresented: $viewModel.isShowingKeysExportModal
                 )
-                .clearModalBackground()
-            default:
-                EmptyView()
-            }
+            )
+            .clearModalBackground()
         }
     }
 
@@ -151,7 +147,7 @@ struct KeySetList: View {
         HStack {
             Button(action: {
                 selectedItems = viewModel.listViewModel.list
-                viewModel.prepareKeysExport(with: selectedItems)
+                viewModel.isShowingKeysExportModal.toggle()
             }) {
                 Localizable.KeySets.More.Action.exportAll.text
                     .foregroundColor(Asset.accentPink300.swiftUIColor)
@@ -160,7 +156,7 @@ struct KeySetList: View {
             .padding(.leading, Spacing.medium)
             Spacer()
             Button(action: {
-                viewModel.prepareKeysExport(with: selectedItems)
+                viewModel.isShowingKeysExportModal.toggle()
             }) {
                 Localizable.KeySets.More.Action.exportSelected.text
                     .foregroundColor(
@@ -181,25 +177,14 @@ struct KeySetList: View {
 
 extension KeySetList {
     final class ViewModel: ObservableObject {
-        private let keysExportService: ExportMultipleKeysService
         let listViewModel: KeySetListViewModel
 
-        @Published var exportServiceResult: Result<AnimatedQRCodeViewModel, ServiceError>?
         @Published var isShowingKeysExportModal = false
 
         init(
-            listViewModel: KeySetListViewModel,
-            keysExportService: ExportMultipleKeysService = ExportMultipleKeysService()
+            listViewModel: KeySetListViewModel
         ) {
             self.listViewModel = listViewModel
-            self.keysExportService = keysExportService
-        }
-
-        func prepareKeysExport(with items: [KeySetViewModel]) {
-            keysExportService.exportMultipleKeys(items: items.map(\.seed.seedName)) { result in
-                self.exportServiceResult = result
-                self.isShowingKeysExportModal = true
-            }
         }
     }
 }

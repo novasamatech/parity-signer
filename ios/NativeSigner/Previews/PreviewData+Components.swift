@@ -99,7 +99,6 @@ extension PreviewData {
 
 extension PreviewData {
     static let exampleExportMultipleKeysModal = ExportMultipleKeysModalViewModel(
-        qrCode: animatedQrCodeViewModel,
         selectedItems: KeySetListViewModelBuilder().build(for: PreviewData.mseeds).list,
         seeds: mseeds.seedNameCards
     )
