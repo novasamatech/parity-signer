@@ -27,15 +27,30 @@ fun KeySetsExportScreenFull(
 	val scope = rememberCoroutineScope()
 	BottomSheetWrapperContent(
 		bottomSheetState = modalBottomSheetState,
-		bottomSheetContent = { 	KeySetExportBottomSheet(
-			model.keys.toSet() //todo dmitry
-		) },
+		bottomSheetContent = {
+			KeySetExportResultBottomSheet(
+				seeds = model.keys.toSet(), //todo dmitry
+				onClose = { scope.launch { modalBottomSheetState.hide() }},
+			)
+		},
 		mainContent = {
 			KeySetsSelectExportScreenContent(
 				model = model,
 				onClose = onClose,
-				onExportSelected = { scope.launch { modalBottomSheetState.animateTo(ModalBottomSheetValue.Expanded) } }, //todo dmitry
-				onExportAll = { scope.launch { modalBottomSheetState.animateTo(ModalBottomSheetValue.Expanded) } },//todo dmitry
+				onExportSelected = {
+					scope.launch {
+						modalBottomSheetState.animateTo(
+							ModalBottomSheetValue.Expanded
+						)
+					}
+				}, //todo dmitry
+				onExportAll = {
+					scope.launch {
+						modalBottomSheetState.animateTo(
+							ModalBottomSheetValue.Expanded
+						)
+					}
+				},//todo dmitry
 			)
 		},
 	)

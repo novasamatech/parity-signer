@@ -13,9 +13,7 @@ import io.parity.signer.models.Navigator
 import io.parity.signer.screens.keysets.KeySetsMenuBottomSheet
 import io.parity.signer.screens.keysets.KeySetsScreen
 import io.parity.signer.screens.keysets.KeySetsSelectViewModel
-import io.parity.signer.screens.keysets.export.KeySetExportBottomSheet
 import io.parity.signer.screens.keysets.export.KeySetsExportScreenFull
-import io.parity.signer.screens.keysets.export.KeySetsSelectExportScreenContent
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
 //todo dmitry check that bottomsheet doesn't cover title

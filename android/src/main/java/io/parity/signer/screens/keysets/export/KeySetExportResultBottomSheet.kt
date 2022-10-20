@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -25,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
+import io.parity.signer.models.Callback
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.screens.keysets.KeySetViewModel
 import io.parity.signer.ui.helpers.PreviewData
@@ -34,14 +36,18 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun KeySetExportBottomSheet(seeds: Set<KeySetViewModel>) {
+fun KeySetExportResultBottomSheet(
+	seeds: Set<KeySetViewModel>,
+	onClose: Callback,
+) {
 	Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
-		BottomSheetHeader(header = pluralStringResource(
-			id = R.plurals.key_sets_export_qe_title,
-			count = seeds.size,
-			seeds.size,
-		),
-			onCancelClicked = {} //todo dmitry navigate close
+		BottomSheetHeader(
+			header = pluralStringResource(
+				id = R.plurals.key_sets_export_qe_title,
+				count = seeds.size,
+				seeds.size,
+			),
+			onCloseClicked = onClose
 		)
 		val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
 		val plateShape =
@@ -143,9 +149,9 @@ private fun animatedQrForBinary(
 	val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
 	val DELAY = 500.milliseconds
 	val service = remember { KeySetsExportService() }
-	var qrCodes =
-		remember<List<List<UByte>>> { mutableListOf(mutableListOf<UByte>()) }
-	var currentCode = remember<List<UByte>> { mutableListOf() }
+	val qrCodes =
+		remember { mutableStateOf(listOf(listOf<UByte>())) }
+	val currentCode = remember { mutableStateOf(listOf<UByte>()) }
 
 	Box(
 		modifier = modifier
@@ -157,9 +163,9 @@ private fun animatedQrForBinary(
 			),
 		contentAlignment = Alignment.Center,
 	) {
-		if (currentCode.isNotEmpty()) {
+		if (currentCode.value.isNotEmpty()) {
 			Image(
-				bitmap = currentCode.intoImageBitmap(),
+				bitmap = currentCode.value.intoImageBitmap(),
 				contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
 				contentScale = ContentScale.Fit,
 				modifier = Modifier.size(264.dp)
@@ -168,15 +174,15 @@ private fun animatedQrForBinary(
 	}
 
 	LaunchedEffect(key1 = seeds) {
-		qrCodes = service.getQrCodesList(seeds.toList())
+		qrCodes.value = service.getQrCodesList(seeds.toList())
 	}
 
-	LaunchedEffect(key1 = qrCodes) {
-		if (qrCodes.isEmpty()) return@LaunchedEffect
+	LaunchedEffect(key1 = qrCodes.value) {
+		if (qrCodes.value.isEmpty()) return@LaunchedEffect
 		var index = 0
 		while (true) {
-			currentCode = qrCodes[index]
-			if (index < qrCodes.lastIndex) {
+			currentCode.value = qrCodes.value[index]
+			if (index < qrCodes.value.lastIndex) {
 				index++
 			} else {
 				index = 0
@@ -197,7 +203,7 @@ private fun animatedQrForBinary(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewKeySetExportBottomSheet() {
+private fun PreviewKeySetExportResultBottomSheet() {
 	val keys = mutableSetOf(
 		KeySetViewModel(
 			"first seed name",
@@ -212,7 +218,7 @@ private fun PreviewKeySetExportBottomSheet() {
 	)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			KeySetExportBottomSheet(keys)
+			KeySetExportResultBottomSheet(keys, {})
 		}
 	}
 }
