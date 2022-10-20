@@ -23,10 +23,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.models.KeyCardModel
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
-import io.parity.signer.uniffi.Address
 
 
 @Composable
@@ -146,42 +145,6 @@ private fun showBase58Collapsible(model: KeyCardModel) {
 				tint = MaterialTheme.colors.textSecondary
 			)
 		}
-	}
-}
-
-data class KeyCardModel(
-	val network: String,
-	val base58: String,
-	val path: String,
-	val identIcon: List<UByte>,
-	val seedName: String,
-	val hasPwd: Boolean = false,
-	val multiselect: Boolean? = null,
-) {
-	companion object {
-		/**
-		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
-		 */
-		fun fromAddress(address: Address, networkTitle: String): KeyCardModel =
-			KeyCardModel(
-				network = networkTitle,
-				base58 = address.base58,
-				path = address.path,
-				hasPwd = address.hasPwd,
-				identIcon = address.identicon,
-				seedName = address.seedName,
-				multiselect = address.multiselect,
-			)
-
-		fun createStub() = KeyCardModel(
-			network = "Polkadot",
-			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
-			path = "//polkadot//path",
-			identIcon = PreviewData.exampleIdenticon,
-			seedName = "Seed Name",
-			hasPwd = false,
-			multiselect = null,
-		)
 	}
 }
 

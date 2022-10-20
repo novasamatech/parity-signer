@@ -16,10 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
-import io.parity.signer.components.NetworkLogoName
 import io.parity.signer.models.*
-import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -32,16 +29,10 @@ import io.parity.signer.uniffi.*
  */
 @Composable
 fun KeySetDetailsScreenView(
-	mKeys: MKeys,
+	model: KeySetDetailsViewModel,
 	navigator: Navigator,
-	signer: SignerDataModel,
 	alertState: State<AlertState?>, //for shield icon
 ) {
-	val rootKey = mKeys.root
-	val keySet = mKeys.set
-	val multiselectMode = mKeys.multiselectMode
-	val multiselectCount = mKeys.multiselectCount
-	var offsetX by remember { mutableStateOf(0f) }
 
 	Column {
 		//header network
@@ -54,18 +45,18 @@ fun KeySetDetailsScreenView(
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier
-				.clickable { navigator.navigate(Action.NETWORK_SELECTOR, "") }
-				.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-				.background(MaterialTheme.colors.Bg100)
-				.fillMaxWidth()
-				.padding(top = 8.dp, start = 20.dp, end = 12.dp)
+                .clickable { navigator.navigate(Action.NETWORK_SELECTOR, "") }
+                .padding(top = 3.dp, start = 12.dp, end = 12.dp)
+                .background(MaterialTheme.colors.Bg100)
+                .fillMaxWidth()
+                .padding(top = 8.dp, start = 20.dp, end = 12.dp)
 		) {
-			mKeys.network.let { network ->
-				NetworkLogoName(
-					logo = network.logo,
-					name = network.title
-				)
-			}
+//			mKeys.network.let { network ->
+//				NetworkLogoName(
+//					logo = network.logo,
+//					name = network.title
+//				)
+//			}
 			Spacer(Modifier.width(8.dp))
 			Icon(
 				Icons.Outlined.ExpandCircleDown,
@@ -77,9 +68,9 @@ fun KeySetDetailsScreenView(
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier
-				.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-				.fillMaxWidth(1f)
-				.padding(horizontal = 8.dp)
+                .padding(top = 3.dp, start = 12.dp, end = 12.dp)
+                .fillMaxWidth(1f)
+                .padding(horizontal = 8.dp)
 		) {
 			Text("DERIVED KEYS")
 			Spacer(Modifier.weight(1f, true))
@@ -106,16 +97,6 @@ fun KeySetDetailsScreenView(
 	}
 }
 
-
-data class KeySetDetailsViewModel(
-	val set: List<MKeysCard>,
-	val root: MSeedKeyCard,
-	val network: MNetworkCard,
-	val multiselectMode: Boolean,
-	val multiselectCount: String,
-)
-
-
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -127,32 +108,12 @@ data class KeySetDetailsViewModel(
 )
 @Composable
 private fun PreviewKeySetDetailsScreen() {
-	val keys = mutableListOf(
-		KeySetViewModel(
-			"first seed name",
-			PreviewData.exampleIdenticon,
-			1.toUInt()
-		),
-		KeySetViewModel(
-			"second seed name",
-			PreviewData.exampleIdenticon,
-			3.toUInt()
-		),
-	)
-	repeat(30) {
-		keys.add(
-			KeySetViewModel(
-				"second seed name",
-				PreviewData.exampleIdenticon,
-				3.toUInt()
-			)
-		)
-	}
-	val state = remember { mutableStateOf(AlertState.None) }
-	val mockModel = KeySetsSelectViewModel(keys)
+
+	val state = remember { mutableStateOf(AlertState.Active) }
+	val mockModel = KeySetDetailsViewModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreen(mockModel, EmptyNavigator(), rememberNavController(), state)
+			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state)
 		}
 	}
 }

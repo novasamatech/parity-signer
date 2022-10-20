@@ -1,6 +1,6 @@
 package io.parity.signer.screens.keysets.export
 
-import io.parity.signer.screens.keysets.KeySetViewModel
+import io.parity.signer.models.KeySetViewModel
 import io.parity.signer.ui.helpers.PreviewData
 
 

@@ -27,8 +27,8 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.models.Callback
+import io.parity.signer.models.KeySetViewModel
 import io.parity.signer.models.intoImageBitmap
-import io.parity.signer.screens.keysets.KeySetViewModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import kotlinx.coroutines.delay

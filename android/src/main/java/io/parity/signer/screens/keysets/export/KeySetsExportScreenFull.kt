@@ -8,8 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import io.parity.signer.models.Callback
-import io.parity.signer.screens.keysets.KeySetViewModel
-import io.parity.signer.screens.keysets.KeySetsSelectViewModel
+import io.parity.signer.models.KeySetViewModel
+import io.parity.signer.models.KeySetsSelectViewModel
 import io.parity.signer.ui.BottomSheetWrapperContent
 import kotlinx.coroutines.launch
 

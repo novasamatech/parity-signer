@@ -23,15 +23,11 @@ import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.items.KeySetItem
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
-import io.parity.signer.models.AlertState
-import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.Navigator
+import io.parity.signer.models.*
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.navigationselectors.KeySetsNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.MSeeds
-import io.parity.signer.uniffi.SeedNameCard
 
 /**
  * Default main screen with list Seeds/root keys
@@ -83,28 +79,6 @@ fun KeySetsScreen(
 		BottomBar2(rootNavigator, BottomBar2State.KEYS)
 	}
 }
-
-
-/**
- * Local copy of shared [MSeeds] class
- */
-data class KeySetsSelectViewModel(val keys: List<KeySetViewModel>)
-
-fun MSeeds.toKeySetsSelectViewModel() = KeySetsSelectViewModel(
-	seedNameCards.map { it.toSeedViewModel() }
-)
-
-/**
- * Local copy of shared [SeedNameCard] class
- */
-data class KeySetViewModel(
-	val seedName: String,
-	val identicon: List<UByte>,
-	val derivedKeysCount: UInt
-)
-
-fun SeedNameCard.toSeedViewModel() =
-	KeySetViewModel(seedName, identicon, derivedKeysCount)
 
 
 @Preview(
