@@ -27,11 +27,7 @@ import io.parity.signer.models.Callback
 import io.parity.signer.screens.keysets.KeySetViewModel
 import io.parity.signer.screens.keysets.KeySetsSelectViewModel
 import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.ui.navigationselectors.KeySetsNavSubgraph
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.TypefaceNew
-import io.parity.signer.ui.theme.pink300
-import io.parity.signer.ui.theme.textDisabled
+import io.parity.signer.ui.theme.*
 
 /**
  * Default main screen with list Seeds/root keys
@@ -72,7 +68,9 @@ fun KeySetsSelectExportScreenContent(
 			}
 		}
 		Row(
-			modifier = Modifier.height(48.dp),
+			modifier = Modifier
+				.height(48.dp)
+				.background(MaterialTheme.colors.backgroundSecondary),
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			ClickableLabel(
