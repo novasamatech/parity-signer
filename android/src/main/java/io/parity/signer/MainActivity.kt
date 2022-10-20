@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.BottomBar
-import io.parity.signer.components.TopBar
+import io.parity.signer.components.panels.TopBar
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.NavigationMigrations
 import io.parity.signer.models.SignerDataModel
@@ -93,7 +93,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								.captionBarPadding()
 								.statusBarsPadding(),
 							topBar = {
-								if (NavigationMigrations.shouldShowTopBar(
+								if (NavigationMigrations.shouldShowBar(
 										localNavAction = localNavAction.value,
 										globalNavAction = actionResult.value
 									)
@@ -105,9 +105,15 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								}
 							},
 							bottomBar = {
-								if (actionResult.value?.footer == true) BottomBar(
-									signerDataModel = signerDataModel
-								)
+								if (NavigationMigrations.shouldShowBar(
+										localNavAction = localNavAction.value,
+										globalNavAction = actionResult.value
+									)
+								) {
+									if (actionResult.value?.footer == true) BottomBar(
+										signerDataModel = signerDataModel
+									)
+								}
 							},
 						) { innerPadding ->
 							Box(modifier = Modifier.padding(innerPadding)) {
@@ -168,7 +174,12 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 			}
 			OnBoardingState.No -> {
 				if (shieldAlert.value == AlertState.None) {
-					Scaffold { padding ->
+					Scaffold(
+						modifier = Modifier
+							.navigationBarsPadding()
+							.captionBarPadding()
+							.statusBarsPadding(),
+					) { padding ->
 						LandingView(
 							signerDataModel::onBoard,
 							modifier = Modifier.padding(padding)
@@ -177,7 +188,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				} else {
 					Box(
 						contentAlignment = Alignment.Center,
-						modifier = Modifier.padding(12.dp)
+						modifier = Modifier.padding(12.dp),
 					) {
 						Text(
 							"Please enable airplane mode",

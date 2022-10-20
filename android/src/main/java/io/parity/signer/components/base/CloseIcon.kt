@@ -1,4 +1,4 @@
-package io.parity.signer.components2.base
+package io.parity.signer.components.base
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,6 +26,7 @@ fun CloseIcon(
 	Box(
 		modifier = modifier
 			.size(32.dp)
+			.clickable(onClick = onCloseClicked)
 			.background(
 				MaterialTheme.colors.fill18,
 				CircleShape
@@ -38,7 +39,6 @@ fun CloseIcon(
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
 				.size(20.dp)
-				.clickable(onClick = onCloseClicked)
 		)
 	}
 }

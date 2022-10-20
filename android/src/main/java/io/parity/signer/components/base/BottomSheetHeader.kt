@@ -1,4 +1,4 @@
-package io.parity.signer.components2.base
+package io.parity.signer.components.base
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Row
