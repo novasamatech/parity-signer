@@ -16,7 +16,6 @@ fun KeySetsExportScreenFull(
 	model: KeySetsSelectViewModel,
 	onClose: Callback,
 ) {
-	//todo dmitry handle back action for bottom sheet to close it
 	val modalBottomSheetState =
 		rememberModalBottomSheetState(
 			ModalBottomSheetValue.Hidden,

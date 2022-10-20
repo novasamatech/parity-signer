@@ -1,6 +1,7 @@
 package io.parity.signer.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -23,6 +24,12 @@ fun BottomSheetWrapperContent(
 	bottomSheetContent: @Composable () -> Unit,
 	mainContent: @Composable () -> Unit
 ) {
+	val scope = rememberCoroutineScope()
+
+	BackHandler(enabled = bottomSheetState.isVisible) {
+			scope.launch { bottomSheetState.hide() }
+	}
+
 	ModalBottomSheetLayout(
 		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
 		sheetState = bottomSheetState,
@@ -125,10 +132,10 @@ private fun BottomSheetContentWrapperInternal(
 	val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 	Box(
 		modifier = Modifier
-            .wrapContentHeight()
-            .heightIn(0.dp, screenHeight - 40.dp)
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
+			.wrapContentHeight()
+			.heightIn(0.dp, screenHeight - 40.dp)
+			.fillMaxWidth()
+			.clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
 	) {
 		content()
 	}
