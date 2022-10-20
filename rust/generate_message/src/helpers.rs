@@ -685,7 +685,7 @@ pub fn generate_key_info_export_to_qr<P: AsRef<Path>>(
     };
     let export_addrs = ExportAddrs::V1(export_addrs_v1);
 
-    let export_addrs_encoded = export_addrs.encode();
+    let export_addrs_encoded = [&[0x53, 0xff, 0xde], export_addrs.encode().as_slice()].concat();
 
     generate_qr_code(&export_addrs_encoded, chunk_size, fps, output_name)
 }
