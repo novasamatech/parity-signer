@@ -23,8 +23,8 @@ import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.items.KeySetItemMultiselect
 import io.parity.signer.models.Callback
-import io.parity.signer.models.KeySetViewModel
-import io.parity.signer.models.KeySetsSelectViewModel
+import io.parity.signer.models.KeySetModel
+import io.parity.signer.models.KeySetsSelectModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 
@@ -34,8 +34,8 @@ import io.parity.signer.ui.theme.*
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun KeySetsSelectExportScreenContent(
-	model: KeySetsSelectViewModel,
-	selected: MutableState<Set<KeySetViewModel>>,
+	model: KeySetsSelectModel,
+	selected: MutableState<Set<KeySetModel>>,
 	onClose: Callback,
 	onExportSelected: Callback,
 	onExportAll: Callback,
@@ -128,12 +128,12 @@ fun ClickableLabel(
 @Composable
 private fun PreviewKeySetsSelectExportScreen() {
 	val keys = mutableListOf(
-		KeySetViewModel(
+		KeySetModel(
 			"first seed name",
 			PreviewData.exampleIdenticon,
 			1.toUInt()
 		),
-		KeySetViewModel(
+		KeySetModel(
 			"second seed name",
 			PreviewData.exampleIdenticon,
 			3.toUInt()
@@ -141,17 +141,17 @@ private fun PreviewKeySetsSelectExportScreen() {
 	)
 	repeat(30) {
 		keys.add(
-			KeySetViewModel(
+			KeySetModel(
 				"second seed name",
 				PreviewData.exampleIdenticon,
 				3.toUInt()
 			)
 		)
 	}
-	val mockModel = KeySetsSelectViewModel(keys)
+	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			val selected = remember<MutableState<Set<KeySetViewModel>>> {
+			val selected = remember<MutableState<Set<KeySetModel>>> {
 				mutableStateOf(emptySet())
 			}
 			KeySetsSelectExportScreenContent(mockModel, selected, {}, {}, {})

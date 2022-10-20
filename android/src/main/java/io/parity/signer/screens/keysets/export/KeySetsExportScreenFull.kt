@@ -8,15 +8,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import io.parity.signer.models.Callback
-import io.parity.signer.models.KeySetViewModel
-import io.parity.signer.models.KeySetsSelectViewModel
+import io.parity.signer.models.KeySetModel
+import io.parity.signer.models.KeySetsSelectModel
 import io.parity.signer.ui.BottomSheetWrapperContent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun KeySetsExportScreenFull(
-	model: KeySetsSelectViewModel,
+	model: KeySetsSelectModel,
 	onClose: Callback,
 ) {
 	val modalBottomSheetState =
@@ -28,7 +28,7 @@ fun KeySetsExportScreenFull(
 		)
 	val scope = rememberCoroutineScope()
 
-	val selected = remember { mutableStateOf(setOf<KeySetViewModel>()) }
+	val selected = remember { mutableStateOf(setOf<KeySetModel>()) }
 
 	BottomSheetWrapperContent(
 		bottomSheetState = modalBottomSheetState,

@@ -34,7 +34,7 @@ import io.parity.signer.uniffi.Action
  */
 @Composable
 fun KeySetsScreen(
-	model: KeySetsSelectViewModel,
+	model: KeySetsSelectModel,
 	rootNavigator: Navigator,
 	localNavigator: NavController,
 	alertState: State<AlertState?>, //for shield icon
@@ -93,12 +93,12 @@ fun KeySetsScreen(
 @Composable
 private fun PreviewKeySetsSelectScreen() {
 	val keys = mutableListOf(
-		KeySetViewModel(
+		KeySetModel(
 			"first seed name",
 			PreviewData.exampleIdenticon,
 			1.toUInt()
 		),
-		KeySetViewModel(
+		KeySetModel(
 			"second seed name",
 			PreviewData.exampleIdenticon,
 			3.toUInt()
@@ -106,7 +106,7 @@ private fun PreviewKeySetsSelectScreen() {
 	)
 	repeat(30) {
 		keys.add(
-			KeySetViewModel(
+			KeySetModel(
 				"second seed name",
 				PreviewData.exampleIdenticon,
 				3.toUInt()
@@ -114,7 +114,7 @@ private fun PreviewKeySetsSelectScreen() {
 		)
 	}
 	val state = remember { mutableStateOf(AlertState.Past) }
-	val mockModel = KeySetsSelectViewModel(keys)
+	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			KeySetsScreen(mockModel, EmptyNavigator(), rememberNavController(), state)

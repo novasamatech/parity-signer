@@ -11,24 +11,16 @@ import io.parity.signer.uniffi.*
 /**
  * Local copy of shared [MKeys] class
  */
-data class KeySetDetailsViewModel(
-	val set: List<KeysViewModel>,
-	val root: SeedKeyViewModel,
-	val network: NetworkViewModel,
-){
+data class KeySetDetailsModel(
+	val keys: List<KeysModel>,
+	val root: SeedKeyModel,
+	val network: NetworkModel,
+) {
 	companion object {
-		fun createStub() : KeySetDetailsViewModel = KeySetDetailsViewModel(
-			set = listOf(
-				KeysViewModel(
-					addressKey = "address key",
-						base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
-						identicon = PreviewData.exampleIdenticon,
-						hasPwd = true,
-						path = "//polkadot//path2",
-						multiselect = false,
-						secretExposed = false,
-				),
-				KeysViewModel(
+		fun createStub() : KeySetDetailsModel = KeySetDetailsModel(
+			keys = listOf(
+				KeysModel.createStub(),
+				KeysModel(
 					addressKey = "address key2",
 					base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9sdfsdfsdfS1repo5EYjGG",
 					identicon = PreviewData.exampleIdenticon,
@@ -38,7 +30,7 @@ data class KeySetDetailsViewModel(
 					secretExposed = false,
 				),
 			),
-				root = SeedKeyViewModel(
+				root = SeedKeyModel(
 					seedName = "seed name",
 						identicon = PreviewData.exampleIdenticon,
 						addressKey = "address key",
@@ -47,21 +39,21 @@ data class KeySetDetailsViewModel(
 						multiselect = false,
 						secretExposed = false,
 				),
-				network = NetworkViewModel("network title", "network logo"),
+				network = NetworkModel("network title", "network logo"),
 		)
 	}
 }
 
-fun MKeys.toKeySetDetailsViewModel() = KeySetDetailsViewModel(
-	set = set.map { it.toKeysViewModel() },
-	root = root.toSeedKeyViewModel(),
-	network = network.toNetworkViewModel(),
+fun MKeys.toKeySetDetailsModel() = KeySetDetailsModel(
+	keys = set.map { it.toKeysModel() },
+	root = root.toSeedKeyModel(),
+	network = network.toNetworkModel(),
 )
 
 /**
  * Local copy of shared [MKeysCard] class
  */
-data class KeysViewModel(
+data class KeysModel(
 	val identicon: List<UByte>,
 	val addressKey: String,
 	val base58: String,
@@ -69,8 +61,20 @@ data class KeysViewModel(
 	val path: String,
 	val multiselect: Boolean,
 	val secretExposed: Boolean
-)
-fun MKeysCard.toKeysViewModel() = KeysViewModel(
+) {
+	companion object {
+		fun createStub() = 	KeysModel(
+			addressKey = "address key",
+			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
+			identicon = PreviewData.exampleIdenticon,
+			hasPwd = true,
+			path = "//polkadot//path2",
+			multiselect = false,
+			secretExposed = false,
+		)
+	}
+}
+fun MKeysCard.toKeysModel() = KeysModel(
 	addressKey = addressKey,
 	base58 = base58,
 	identicon = identicon,
@@ -83,7 +87,7 @@ fun MKeysCard.toKeysViewModel() = KeysViewModel(
 /**
  * Local copy of shared [MKeysCard] class
  */
-data class SeedKeyViewModel(
+data class SeedKeyModel(
 	val seedName: String,
 	val identicon: List<UByte>,
 	val addressKey: String,
@@ -92,7 +96,7 @@ data class SeedKeyViewModel(
 	val multiselect: Boolean,
 	val secretExposed: Boolean
 )
-fun MSeedKeyCard.toSeedKeyViewModel() = SeedKeyViewModel(
+fun MSeedKeyCard.toSeedKeyModel() = SeedKeyModel(
 	seedName = seedName,
 	identicon = identicon,
 	addressKey = addressKey,
@@ -105,11 +109,11 @@ fun MSeedKeyCard.toSeedKeyViewModel() = SeedKeyViewModel(
 /**
  * Local copy of shared [MNetworkCard] class
  */
-data class NetworkViewModel(
+data class NetworkModel(
 	val title: String,
 	val logo: String,
 )
-fun MNetworkCard.toNetworkViewModel() = NetworkViewModel(
+fun MNetworkCard.toNetworkModel() = NetworkModel(
 	title = title,
 	logo = logo,
 )
@@ -117,23 +121,23 @@ fun MNetworkCard.toNetworkViewModel() = NetworkViewModel(
 /**
  * Local copy of shared [MSeeds] class
  */
-data class KeySetsSelectViewModel(val keys: List<KeySetViewModel>)
+data class KeySetsSelectModel(val keys: List<KeySetModel>)
 
-fun MSeeds.toKeySetsSelectViewModel() = KeySetsSelectViewModel(
-	seedNameCards.map { it.toSeedViewModel() }
+fun MSeeds.toKeySetsSelectModel() = KeySetsSelectModel(
+	seedNameCards.map { it.toSeedModel() }
 )
 
 /**
  * Local copy of shared [SeedNameCard] class
  */
-data class KeySetViewModel(
+data class KeySetModel(
 	val seedName: String,
 	val identicon: List<UByte>,
 	val derivedKeysCount: UInt
 )
 
-fun SeedNameCard.toSeedViewModel() =
-	KeySetViewModel(seedName, identicon, derivedKeysCount)
+fun SeedNameCard.toSeedModel() =
+	KeySetModel(seedName, identicon, derivedKeysCount)
 
 
 data class KeyCardModel(

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.models.Callback
-import io.parity.signer.models.KeySetViewModel
+import io.parity.signer.models.KeySetModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
@@ -37,7 +37,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun KeySetExportResultBottomSheet(
-	seeds: Set<KeySetViewModel>,
+	seeds: Set<KeySetModel>,
 	onClose: Callback,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
@@ -117,7 +117,7 @@ fun KeySetExportResultBottomSheet(
 
 @Composable
 @OptIn(ExperimentalComposeUiApi::class)
-private fun KeySetItemInExport(seed: KeySetViewModel) {
+private fun KeySetItemInExport(seed: KeySetModel) {
 	Row(Modifier.padding(16.dp, top = 12.dp, bottom = 12.dp)) {
 		Text(
 			text = seed.seedName,
@@ -143,7 +143,7 @@ private fun KeySetItemInExport(seed: KeySetViewModel) {
 
 @Composable
 private fun animatedQrForBinary(
-	seeds: Set<KeySetViewModel>,
+	seeds: Set<KeySetModel>,
 	modifier: Modifier = Modifier
 ) {
 	val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
@@ -205,12 +205,12 @@ private fun animatedQrForBinary(
 @Composable
 private fun PreviewKeySetExportResultBottomSheet() {
 	val keys = mutableSetOf(
-		KeySetViewModel(
+		KeySetModel(
 			"first seed name",
 			PreviewData.exampleIdenticon,
 			1.toUInt()
 		),
-		KeySetViewModel(
+		KeySetModel(
 			"second seed name",
 			PreviewData.exampleIdenticon,
 			3.toUInt()

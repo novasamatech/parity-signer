@@ -1,25 +1,32 @@
 package io.parity.signer.screens.keysets
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircleOutline
-import androidx.compose.material.icons.outlined.ExpandCircleDown
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.parity.signer.R
+import io.parity.signer.components.base.PrimaryButtonBottomSheet
+import io.parity.signer.components.base.ScreenHeader
+import io.parity.signer.components.exposesecurity.ExposedIcon
+import io.parity.signer.components.items.KeyDerivedItem
+import io.parity.signer.components.items.KeySetItem
+import io.parity.signer.components.panels.BottomBar2
+import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.models.*
-import io.parity.signer.ui.theme.Action400
-import io.parity.signer.ui.theme.Bg100
-import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.*
 
 //todo old screen is KeyManager
@@ -29,71 +36,95 @@ import io.parity.signer.uniffi.*
  */
 @Composable
 fun KeySetDetailsScreenView(
-	model: KeySetDetailsViewModel,
+	model: KeySetDetailsModel,
 	navigator: Navigator,
 	alertState: State<AlertState?>, //for shield icon
 ) {
 
 	Column {
-		//header network
-		Row() {
-			Column() {
-//				Text(text =)
+		ScreenHeader(
+			stringId = null,
+			onback = { navigator.backAction() },
+			onMenu = { navigator.navigate(Action.RIGHT_BUTTON_ACTION) }
+		)
+		Box(modifier = Modifier.weight(1f)) {
+			Column(
+				modifier = Modifier.verticalScroll(rememberScrollState())
+			) {
+				//seed
+				SeedKeyViewItem(model.root) //todo dmitry on click
+				//filter row
+				Row(
+					modifier = Modifier.padding(horizontal = 24.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					Text(
+						text = "Derived Keys",
+						color = MaterialTheme.colors.textTertiary,
+						style = TypefaceNew.BodyM,
+						modifier = Modifier.weight(1f),
+					)
+					Icon(
+						painter = painterResource(id = R.drawable.ic_tune_28),
+						contentDescription = null,
+						modifier = Modifier
+							.size(28.dp),//todo dmitry on click
+						tint = MaterialTheme.colors.textTertiary,
+					)
+				}
+				for(key in model.keys) {
+					KeyDerivedItem(model = key) {
+						//todo dmitry on click
+					}
+				}
 			}
-		}
-		//divider
-		Row(
-			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier
-                .clickable { navigator.navigate(Action.NETWORK_SELECTOR, "") }
-                .padding(top = 3.dp, start = 12.dp, end = 12.dp)
-                .background(MaterialTheme.colors.Bg100)
-                .fillMaxWidth()
-                .padding(top = 8.dp, start = 20.dp, end = 12.dp)
-		) {
-//			mKeys.network.let { network ->
-//				NetworkLogoName(
-//					logo = network.logo,
-//					name = network.title
-//				)
-//			}
-			Spacer(Modifier.width(8.dp))
-			Icon(
-				Icons.Outlined.ExpandCircleDown,
-				"More networks",
-				tint = MaterialTheme.colors.Action400
-			)
-			Spacer(modifier = Modifier.weight(1f))
-		}
-		Row(
-			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier
-                .padding(top = 3.dp, start = 12.dp, end = 12.dp)
-                .fillMaxWidth(1f)
-                .padding(horizontal = 8.dp)
-		) {
-			Text("DERIVED KEYS")
-			Spacer(Modifier.weight(1f, true))
-			IconButton(onClick = {
-				if (alertState.value == AlertState.None)
-					navigator.navigate(Action.NEW_KEY, "")
-				else
-					navigator.navigate(Action.SHIELD, "")
-			}) {
-				Icon(
-					Icons.Default.AddCircleOutline,
-					contentDescription = "New derived key",
-					tint = MaterialTheme.colors.Action400
+
+			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+				ExposedIcon(
+					alertState = alertState, navigator = navigator,
+					Modifier
+						.align(Alignment.End)
+						.padding(end = 16.dp)
 				)
+				PrimaryButtonBottomSheet(
+					label = stringResource(R.string.key_sets_screem_add_key_button), //todo dmitry new derived key
+					modifier = Modifier
+						.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)
+				) {
+					navigator.navigate(Action.RIGHT_BUTTON_ACTION) //todo dmitry new derived key
+				}
 			}
 		}
-//			KeySelector(
-//				navigator.navigate,
-//				{ number -> signer.increment(number, rootKey.seedName) },
-//				keySet,
-//				multiselectMode,
-//				rootKey.seedName,
-//			)
+		BottomBar2(navigator, BottomBar2State.KEYS)
+	}
+}
+
+@Composable
+private fun SeedKeyViewItem(seedKeyModel: SeedKeyModel) {
+	Row(
+		modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 24.dp),
+		verticalAlignment = Alignment.CenterVertically,
+	) {
+		Column(Modifier.weight(1f)) {
+			Text(
+				text = seedKeyModel.seedName,
+				color = MaterialTheme.colors.primary,
+				style = TypefaceNew.TitleL,
+			)
+			Text(
+				text = seedKeyModel.base58.abbreviateString(8),
+				color = MaterialTheme.colors.textTertiary,
+				style = TypefaceNew.BodyM,
+			)
+		}
+		Image(
+			imageVector = Icons.Filled.ChevronRight,
+			contentDescription = null,
+			colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
+			modifier = Modifier
+				.padding(end = 16.dp)
+				.size(28.dp)
+		)
 	}
 }
 
@@ -110,7 +141,7 @@ fun KeySetDetailsScreenView(
 private fun PreviewKeySetDetailsScreen() {
 
 	val state = remember { mutableStateOf(AlertState.Active) }
-	val mockModel = KeySetDetailsViewModel.createStub()
+	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state)
