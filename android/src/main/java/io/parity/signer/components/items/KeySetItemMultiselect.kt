@@ -2,7 +2,6 @@ package io.parity.signer.components.items
 
 import SignerCheckboxColors
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,15 +9,10 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,15 +27,14 @@ import io.parity.signer.ui.theme.*
 @Composable
 fun KeySetItemMultiselect(
 	model: KeySetViewModel,
+	isSelected: Boolean = false,
 	onClick: (Boolean, KeySetViewModel) -> Unit,
 ) {
-	val checkedState = remember { mutableStateOf(false) }
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
 		color = MaterialTheme.colors.backgroundSecondary,
 		modifier = Modifier.clickable(onClick = {
-			checkedState.value = !checkedState.value
-			onClick(checkedState.value, model)
+			onClick(!isSelected, model)
 		}),
 	) {
 		Row(
@@ -76,11 +69,8 @@ fun KeySetItemMultiselect(
 				}
 			}
 			Checkbox(
-				checked = checkedState.value,
-				onCheckedChange = { c ->
-					checkedState.value = !checkedState.value
-					onClick(c, model)
-				},
+				checked = isSelected,
+				onCheckedChange = { c -> onClick(c, model) },
 				colors = SignerCheckboxColors(),
 			)
 		}

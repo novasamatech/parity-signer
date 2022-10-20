@@ -4,8 +4,11 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import io.parity.signer.models.Callback
+import io.parity.signer.screens.keysets.KeySetViewModel
 import io.parity.signer.screens.keysets.KeySetsSelectViewModel
 import io.parity.signer.ui.BottomSheetWrapperContent
 import kotlinx.coroutines.launch
@@ -24,17 +27,21 @@ fun KeySetsExportScreenFull(
 			}
 		)
 	val scope = rememberCoroutineScope()
+
+	val selected = remember { mutableStateOf(setOf<KeySetViewModel>()) }
+
 	BottomSheetWrapperContent(
 		bottomSheetState = modalBottomSheetState,
 		bottomSheetContent = {
 			KeySetExportResultBottomSheet(
-				seeds = model.keys.toSet(), //todo dmitry
+				seeds = selected.value,
 				onClose = { scope.launch { modalBottomSheetState.hide() }},
 			)
 		},
 		mainContent = {
 			KeySetsSelectExportScreenContent(
 				model = model,
+				selected = selected,
 				onClose = onClose,
 				onExportSelected = {
 					scope.launch {
@@ -42,14 +49,15 @@ fun KeySetsExportScreenFull(
 							ModalBottomSheetValue.Expanded
 						)
 					}
-				}, //todo dmitry
+				},
 				onExportAll = {
 					scope.launch {
+						selected.value = model.keys.toSet()
 						modalBottomSheetState.animateTo(
 							ModalBottomSheetValue.Expanded
 						)
 					}
-				},//todo dmitry
+				},
 			)
 		},
 	)

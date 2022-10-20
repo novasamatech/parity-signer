@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,12 +37,11 @@ import io.parity.signer.ui.theme.*
 @Composable
 fun KeySetsSelectExportScreenContent(
 	model: KeySetsSelectViewModel,
+	selected: MutableState<Set<KeySetViewModel>>,
 	onClose: Callback,
 	onExportSelected: Callback,
 	onExportAll: Callback,
 ) {
-	val selected = remember { mutableStateOf(setOf<KeySetViewModel>()) }
-
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeaderClose(
 			if (selected.value.isEmpty()) {
@@ -62,7 +62,10 @@ fun KeySetsSelectExportScreenContent(
 		) {
 			val cards = model.keys
 			items(cards.size) { i ->
-				KeySetItemMultiselect(model = cards[i]) { checked, model ->
+				KeySetItemMultiselect(
+					model = cards[i],
+					isSelected = selected.value.contains(cards[i])
+				) { checked, model ->
 					if (checked) selected.value += model else selected.value -= model
 				}
 			}
@@ -150,7 +153,10 @@ private fun PreviewKeySetsSelectExportScreen() {
 	val mockModel = KeySetsSelectViewModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsSelectExportScreenContent(mockModel, {}, {}, {},)
+			val selected = remember<MutableState<Set<KeySetViewModel>>> {
+				mutableStateOf(emptySet())
+			}
+			KeySetsSelectExportScreenContent(mockModel, selected, {}, {}, {})
 		}
 	}
 }
