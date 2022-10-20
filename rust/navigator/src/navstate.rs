@@ -72,7 +72,7 @@ impl State {
         let networks = db_handling::helpers::get_all_networks(dbname)?;
         for x in &networks {
             self.networks
-                .push(NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption));
+                .push(NetworkSpecsKey::from_parts(&x.specs.genesis_hash, &x.specs.encryption));
         }
 
         Ok(())
