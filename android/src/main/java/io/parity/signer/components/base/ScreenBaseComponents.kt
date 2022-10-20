@@ -43,8 +43,9 @@ fun ScreenHeader(
 				contentDescription = stringResource(R.string.description_back_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
+					.padding(horizontal = 8.dp)
 					.clickable(onClick = onback)
-					.padding(16.dp)
+					.padding(8.dp)
 					.size(24.dp)
 					.align(Alignment.CenterVertically)
 			)
@@ -72,8 +73,9 @@ fun ScreenHeader(
 				contentDescription = stringResource(R.string.description_menu_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
+					.padding(horizontal = 8.dp)
 					.clickable(onClick = onMenu)
-					.padding(14.dp)
+					.padding(8.dp)
 					.size(24.dp)
 					.align(Alignment.CenterVertically)
 			)
@@ -99,8 +101,9 @@ fun ScreenHeaderClose(
 			contentDescription = stringResource(R.string.description_back_button),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
+				.padding(horizontal = 8.dp)
 				.clickable(onClick = onClose)
-				.padding(16.dp)
+				.padding(8.dp)
 				.size(24.dp)
 				.align(Alignment.CenterVertically)
 		)
@@ -121,8 +124,9 @@ fun ScreenHeaderClose(
 				contentDescription = stringResource(R.string.description_menu_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
+					.padding(horizontal = 8.dp)
 					.clickable(onClick = onMenu)
-					.padding(14.dp)
+					.padding(8.dp)
 					.size(24.dp)
 					.align(Alignment.CenterVertically)
 			)
