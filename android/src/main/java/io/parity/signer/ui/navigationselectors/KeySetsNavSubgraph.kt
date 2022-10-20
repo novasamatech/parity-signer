@@ -1,7 +1,10 @@
 package io.parity.signer.ui.navigationselectors
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -11,8 +14,10 @@ import io.parity.signer.screens.keysets.KeySetsMenuBottomSheet
 import io.parity.signer.screens.keysets.KeySetsScreen
 import io.parity.signer.screens.keysets.KeySetsSelectViewModel
 import io.parity.signer.screens.keysets.export.KeySetExportBottomSheet
-import io.parity.signer.screens.keysets.export.KeySetsSelectExportScreen
+import io.parity.signer.screens.keysets.export.KeySetsExportScreenFull
+import io.parity.signer.screens.keysets.export.KeySetsSelectExportScreenContent
 import io.parity.signer.ui.BottomSheetWrapperRoot
+
 //todo dmitry check that bottomsheet doesn't cover title
 /**
  * Navigation Subgraph with compose nav controller for those Key Set screens which are not part of general
@@ -31,20 +36,24 @@ fun KeySetsNavSubgraph(
 	) {
 
 		composable(KeySetsNavSubgraph.home) {
-			KeySetsScreen(
-				model = model,
-				rootNavigator = rootNavigator,
-				localNavigator = navController,
-				alertState = alertState,
-			)
+			Box(modifier = Modifier.statusBarsPadding()) {
+				KeySetsScreen(
+					model = model,
+					rootNavigator = rootNavigator,
+					localNavigator = navController,
+					alertState = alertState,
+				)
+			}
 		}
 		composable(KeySetsNavSubgraph.homeMenu) {
-			KeySetsScreen(
-				model = model,
-				rootNavigator = rootNavigator,
-				localNavigator = navController,
-				alertState = alertState,
-			)
+			Box(modifier = Modifier.statusBarsPadding()) {
+				KeySetsScreen(
+					model = model,
+					rootNavigator = rootNavigator,
+					localNavigator = navController,
+					alertState = alertState,
+				)
+			}
 			BottomSheetWrapperRoot(onClosedAction = {
 				navController.navigate(
 					KeySetsNavSubgraph.home
@@ -53,26 +62,11 @@ fun KeySetsNavSubgraph(
 				KeySetsMenuBottomSheet(navigator = navController)
 			}
 		}
-		composable(KeySetsNavSubgraph.exportSelect) {
-			KeySetsSelectExportScreen(
+		composable(KeySetsNavSubgraph.export) {
+			KeySetsExportScreenFull(
 				model = model,
-				navigator = navController,
+				onClose = { navController.navigate(KeySetsNavSubgraph.home) },
 			)
-		}
-		composable(KeySetsNavSubgraph.exportResult) {
-			KeySetsSelectExportScreen(
-				model = model,
-				navigator = navController,
-			)
-			BottomSheetWrapperRoot(onClosedAction = {
-				navController.navigate(
-					KeySetsNavSubgraph.home
-				)
-			}) {
-				KeySetExportBottomSheet(
-					model.keys.toSet() //todo dmitry
-				)
-			}
 		}
 	}
 }
@@ -80,6 +74,5 @@ fun KeySetsNavSubgraph(
 object KeySetsNavSubgraph {
 	const val home = "keysets_home"
 	const val homeMenu = "keysets_menu"
-	const val exportSelect = "keysets_export_multiselect"
-	const val exportResult = "keysets_export_results"
+	const val export = "keysets_export"
 }

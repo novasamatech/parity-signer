@@ -152,6 +152,11 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								.navigationBarsPadding()
 								.captionBarPadding(),
 						) {
+							CombinedScreensSelector(
+								screenData = actionResult.value?.screenData
+								?: ScreenData.Documents,//default fallback
+								alertState = shieldAlert,
+								signerDataModel = signerDataModel)
 							BottomSheetSelector(
 								modalData = actionResult.value?.modalData,
 								localNavAction = localNavAction.value,

@@ -84,13 +84,7 @@ fun ScreenSelector(
 			processFrame = signerDataModel::processFrame,
 			resetScanValues = signerDataModel::resetScanValues,
 		)
-		is ScreenData.SeedSelector -> SignerNewTheme() {
-			KeySetsNavSubgraph(
-				screenData.f.toKeySetsSelectViewModel(),
-				rootNavigator = signerDataModel.navigator,
-				alertState = alertState,
-			)
-		}
+		is ScreenData.SeedSelector -> {} //shown in new selector
 		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
 			screenData.f,
 			button2

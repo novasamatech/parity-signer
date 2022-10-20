@@ -34,7 +34,7 @@ fun KeySetsMenuBottomSheet(
 			label = stringResource(R.string.menu_option_export_private_key),
 			tint = null,
 			onclick = {
-				navigator.navigate(KeySetsNavSubgraph.exportSelect) {
+				navigator.navigate(KeySetsNavSubgraph.export) {
 					popUpTo(KeySetsNavSubgraph.home)
 				}
 			}

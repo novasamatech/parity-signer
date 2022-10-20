@@ -1,10 +1,7 @@
 package io.parity.signer.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -17,6 +14,7 @@ import kotlinx.coroutines.launch
 
 /**
  * For use in the same screen with content
+ * .navigationBarsPadding().captionBarPadding() paddings should be added already
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -33,9 +31,14 @@ fun BottomSheetWrapperContent(
 				bottomSheetContent()
 			}
 		},
-		content = mainContent,
+		content = {
+			Box(Modifier.statusBarsPadding()) {
+				mainContent()
+			}
+		}
 	)
 }
+
 /**
  * Used for screens controlled by central rust-based navigation system
  */
@@ -122,10 +125,10 @@ private fun BottomSheetContentWrapperInternal(
 	val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 	Box(
 		modifier = Modifier
-			.wrapContentHeight()
-			.heightIn(0.dp, screenHeight - 40.dp)
-			.fillMaxWidth()
-			.clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
+            .wrapContentHeight()
+            .heightIn(0.dp, screenHeight - 40.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
 	) {
 		content()
 	}

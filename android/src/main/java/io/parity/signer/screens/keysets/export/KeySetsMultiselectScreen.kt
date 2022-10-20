@@ -11,7 +11,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -24,8 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.items.KeySetItemMultiselect
-import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.Navigator
+import io.parity.signer.models.Callback
 import io.parity.signer.screens.keysets.KeySetViewModel
 import io.parity.signer.screens.keysets.KeySetsSelectViewModel
 import io.parity.signer.ui.helpers.PreviewData
@@ -40,9 +38,11 @@ import io.parity.signer.ui.theme.textDisabled
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun KeySetsSelectExportScreen(
+fun KeySetsSelectExportScreenContent(
 	model: KeySetsSelectViewModel,
-	navigator: NavController,
+	onClose: Callback,
+	onExportSelected: Callback,
+	onExportAll: Callback,
 ) {
 	val selected = remember { mutableStateOf(setOf<KeySetViewModel>()) }
 
@@ -57,9 +57,7 @@ fun KeySetsSelectExportScreen(
 					selected.value.size,
 				)
 			},
-			onClose = {
-				navigator.navigate(KeySetsNavSubgraph.home)
-			},
+			onClose = onClose,
 		)
 		LazyColumn(
 			contentPadding = PaddingValues(horizontal = 12.dp),
@@ -81,17 +79,15 @@ fun KeySetsSelectExportScreen(
 				stringId = R.string.key_set_export_all_label,
 				isEnabled = true,
 				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-			) {
-				navigator.navigate(KeySetsNavSubgraph.exportResult)//todo dmitry
-			}
+				onClick = onExportAll,
+			)
 			Spacer(modifier = Modifier.weight(1f))
 			ClickableLabel(
 				stringId = R.string.key_set_export_selected_label,
 				isEnabled = selected.value.isNotEmpty(),
 				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-			) {
-				navigator.navigate(KeySetsNavSubgraph.exportResult)//todo dmitry
-			}
+				onClick = onExportSelected,
+			)
 		}
 	}
 }
@@ -156,7 +152,7 @@ private fun PreviewKeySetsSelectExportScreen() {
 	val mockModel = KeySetsSelectViewModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsSelectExportScreen(mockModel, rememberNavController())
+			KeySetsSelectExportScreenContent(mockModel, {}, {}, {},)
 		}
 	}
 }

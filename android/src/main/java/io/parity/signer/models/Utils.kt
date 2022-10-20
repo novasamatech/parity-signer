@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 
+typealias Callback = () -> Unit
+
 /**
  * Decodes from hex string into number array
  */
