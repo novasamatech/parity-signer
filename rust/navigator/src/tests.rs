@@ -1,9 +1,9 @@
 use image::{GenericImageView, GrayImage, ImageBuffer, Pixel};
 use lazy_static::lazy_static;
 use regex::Regex;
-use sp_core::{blake2_256, Pair, H256};
+use sp_core::{blake2_256, sr25519, Pair, H256};
 use sp_runtime::MultiSigner;
-use std::{convert::TryInto, str::FromStr};
+use std::{collections::HashMap, convert::TryInto, str::FromStr};
 
 use constants::{
     test_values::{
@@ -16,13 +16,20 @@ use constants::{
     },
     ALICE_SEED_PHRASE,
 };
-use db_handling::cold_default::{init_db, populate_cold_nav_test};
+use db_handling::{
+    cold_default::{init_db, populate_cold_nav_test},
+    identities::{
+        export_all_addrs, import_all_addrs, try_create_address, try_create_seed, AddrInfo,
+        ExportAddrs, ExportAddrsV1, SeedInfo,
+    },
+};
 use definitions::{
     crypto::Encryption,
     history::{
         Event, IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
         NetworkSpecsExport, SignDisplay, SignMessageDisplay, TypesDisplay, TypesExport,
     },
+    keyring::NetworkSpecsKey,
     navigation::{
         ActionResult, Address, AlertData, Card, DerivationCheck, DerivationDestination,
         DerivationEntry, DerivationPack, FooterButton, History, MBackup, MDeriveKey,
@@ -291,6 +298,93 @@ fn erase_public_keys(m: &mut ScreenData) {
             }
         }
     }
+}
+
+#[test]
+fn export_import_addrs() {
+    let dbname_from = "for_tests/export_import_addrs_from";
+    let dbname_to = "for_tests/export_import_addrs_to";
+    let polkadot_genesis =
+        H256::from_str("91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3").unwrap();
+
+    populate_cold_nav_test(dbname_from).unwrap();
+    populate_cold_nav_test(dbname_to).unwrap();
+    try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname_from).unwrap();
+    try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname_to).unwrap();
+
+    try_create_address(
+        "Alice",
+        ALICE_SEED_PHRASE,
+        "//polkadot//test",
+        &NetworkSpecsKey::from_parts(&polkadot_genesis, &Encryption::Sr25519),
+        dbname_from,
+    )
+    .unwrap();
+
+    let addrs = export_all_addrs(&dbname_from).unwrap();
+
+    let addrs_expected = ExportAddrs::V1(ExportAddrsV1 {
+        addrs: vec![SeedInfo {
+            name: "Alice".to_owned(),
+            multisigner: Some(
+                sr25519::Pair::from_phrase(ALICE_SEED_PHRASE, None)
+                    .unwrap()
+                    .0
+                    .public()
+                    .into(),
+            ),
+            derived_keys: vec![
+                AddrInfo {
+                    address: "14VVJt7kYNpPhz9UNLnxDu6GDJ4vG8i1KaCm4mqdQXtRKU8".to_owned(),
+                    derivation_path: Some("//polkadot//test".to_owned()),
+                    encryption: Encryption::Sr25519,
+                    genesis_hash: H256::from_str(
+                        "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+                    )
+                    .unwrap(),
+                },
+                AddrInfo {
+                    address: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_owned(),
+                    derivation_path: Some("//westend".to_owned()),
+                    encryption: Encryption::Sr25519,
+                    genesis_hash: H256::from_str(
+                        "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+                    )
+                    .unwrap(),
+                },
+                AddrInfo {
+                    address: "ErGkNDDPmnaRZKxwe4VBLonyBJVmucqURFMatEJTwktsuTv".to_owned(),
+                    derivation_path: Some("//kusama".to_owned()),
+                    encryption: Encryption::Sr25519,
+                    genesis_hash: H256::from_str(
+                        "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+                    )
+                    .unwrap(),
+                },
+                AddrInfo {
+                    address: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_owned(),
+                    derivation_path: Some("//polkadot".to_owned()),
+                    encryption: Encryption::Sr25519,
+
+                    genesis_hash: H256::from_str(
+                        "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+                    )
+                    .unwrap(),
+                },
+            ],
+        }],
+    });
+
+    assert_eq!(addrs, addrs_expected);
+
+    let mut alice_hash_map = HashMap::new();
+    alice_hash_map.insert("Alice".to_owned(), ALICE_SEED_PHRASE.to_owned());
+
+    import_all_addrs(dbname_to, alice_hash_map, addrs).unwrap();
+
+    let addrs_new = export_all_addrs(&dbname_to).unwrap();
+
+    assert_eq!(addrs_new, addrs_expected);
 }
 
 #[test]

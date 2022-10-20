@@ -44,7 +44,7 @@ use sp_core::H256;
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_runtime::MultiSigner;
-use std::path::Path;
+use std::{collections::HashMap, path::Path};
 #[cfg(any(feature = "active", feature = "signer"))]
 use zeroize::Zeroize;
 
@@ -97,61 +97,157 @@ lazy_static! {
     static ref REG_PATH: Regex = Regex::new(r"^(?P<path>(//?[^/]+)*)(///(?P<password>.+))?$").expect("known value");
 }
 
-#[derive(Encode, Decode)]
+#[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
 pub enum ExportAddrs {
     V1(ExportAddrsV1),
 }
 
-#[derive(Encode, Decode)]
+#[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
 pub struct ExportAddrsV1 {
-    pub addrs: Vec<AddrInfo>,
+    pub addrs: Vec<SeedInfo>,
 }
 
-#[derive(Encode, Decode)]
-pub struct AddrInfo {
-    /// Name of the key
+#[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
+pub struct SeedInfo {
+    /// Name of the seed.
     pub name: String,
 
+    /// Public key of the root key.
+    ///
+    /// `None` if user has created no root keys.
+    pub multisigner: Option<MultiSigner>,
+
+    /// Derived keys.
+    pub derived_keys: Vec<AddrInfo>,
+}
+
+#[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
+pub struct AddrInfo {
     /// Address in the network.
     ///
-    /// This is either `ss58` form for substrate-based chains or h160 form for ethereum based
+    /// This is either `ss58` form for substrate-based chains or
+    /// h160 form for ethereum based
     /// chains
     pub address: String,
-
-    /// Name of the network this key is used on in string form.
-    pub network: String,
 
     /// The derivation path of the key if user provided one
     pub derivation_path: Option<String>,
 
     /// The type of encryption in the network
     pub encryption: Encryption,
+
+    /// Genesis hash
+    pub genesis_hash: H256,
 }
 
 /// Export all info about keys and their addresses known to Signer
 #[cfg(feature = "signer")]
 pub fn export_all_addrs<P: AsRef<Path>>(db_path: P) -> Result<ExportAddrs> {
-    let addrs: Result<Vec<_>> = get_all_addresses(&db_path)?
-        .into_iter()
-        .map(|(m, a)| {
-            let network_specs = get_network_specs(&db_path, &a.network_id[0])?;
-            Ok(AddrInfo {
-                name: a.seed_name,
-                address: print_multisigner_as_base58_or_eth(
-                    &m,
-                    Some(network_specs.base58prefix),
-                    a.encryption,
-                ),
-                network: network_specs.name,
-                derivation_path: Some(a.path),
-                encryption: a.encryption,
-            })
-        })
-        .collect();
+    let mut keys: HashMap<String, Vec<(MultiSigner, AddressDetails)>> = HashMap::new();
+    let mut addrs = vec![];
 
-    let addrs = addrs?;
+    for (m, a) in get_all_addresses(&db_path)?.into_iter() {
+        keys.entry(a.seed_name.clone()).or_default().push((m, a));
+    }
+
+    for (name, keys) in &keys {
+        let mut derived_keys = vec![];
+
+        let multisigner = keys
+            .iter()
+            .find(|(_, a)| a.path.is_empty())
+            .map(|(m, _)| m)
+            .cloned();
+
+        for key in keys {
+            if key.1.path.is_empty() {
+                continue;
+            }
+
+            let specs = get_network_specs(&db_path, &key.1.network_id[0])?;
+            let address = print_multisigner_as_base58_or_eth(
+                &key.0,
+                Some(specs.base58prefix),
+                key.1.encryption,
+            );
+            derived_keys.push(AddrInfo {
+                address: address.clone(),
+                derivation_path: if key.1.path.is_empty() {
+                    None
+                } else {
+                    Some(key.1.path.to_owned())
+                },
+                encryption: key.1.encryption,
+                genesis_hash: specs.genesis_hash,
+            });
+        }
+
+        addrs.push(SeedInfo {
+            name: name.to_string(),
+            multisigner,
+            derived_keys,
+        });
+    }
 
     Ok(ExportAddrs::V1(ExportAddrsV1 { addrs }))
+}
+
+#[cfg(feature = "signer")]
+pub fn import_all_addrs<P: AsRef<Path>>(
+    db_path: P,
+    seed_phrases: HashMap<String, String>,
+    export_info: ExportAddrs,
+) -> Result<()> {
+    match export_info {
+        ExportAddrs::V1(v1) => import_all_addrs_v1(db_path, v1, seed_phrases),
+    }
+}
+
+#[cfg(feature = "signer")]
+fn import_all_addrs_v1<P: AsRef<Path>>(
+    db_path: P,
+    v1: ExportAddrsV1,
+    seeds: HashMap<String, String>,
+) -> Result<()> {
+    let mut sr25519_signers = HashMap::new();
+    let mut ed25519_signers = HashMap::new();
+    let mut ecdsa_signers = HashMap::new();
+
+    for (k, v) in &seeds {
+        let sr25519_public = sr25519::Pair::from_phrase(v, None).unwrap().0.public();
+        let ed25519_public = ed25519::Pair::from_phrase(v, None).unwrap().0.public();
+        let ecdsa_public = ecdsa::Pair::from_phrase(v, None).unwrap().0.public();
+        sr25519_signers.insert(sr25519_public, k);
+        ed25519_signers.insert(ed25519_public, k);
+        ecdsa_signers.insert(ecdsa_public, k);
+    }
+
+    for addr in &v1.addrs {
+        for derived_key in &addr.derived_keys {
+            if let Some(derivation_path) = &derived_key.derivation_path {
+                let seed_name = match addr.multisigner {
+                    Some(MultiSigner::Sr25519(p)) => sr25519_signers.get(&p),
+                    Some(MultiSigner::Ed25519(p)) => ed25519_signers.get(&p),
+                    Some(MultiSigner::Ecdsa(p)) => ecdsa_signers.get(&p),
+                    None => None,
+                };
+                if let Some(seed_name) = seed_name {
+                    let _ = try_create_address(
+                        seed_name,
+                        seeds.get(seed_name.as_str()).unwrap(),
+                        derivation_path,
+                        &NetworkSpecsKey::from_parts(
+                            &derived_key.genesis_hash,
+                            &derived_key.encryption,
+                        ),
+                        &db_path,
+                    );
+                }
+            }
+        }
+    }
+
+    Ok(())
 }
 
 /// Get all existing addresses from the database.

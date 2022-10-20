@@ -1,5 +1,5 @@
 //! Helpers
-use db_handling::identities::{AddrInfo, ExportAddrs, ExportAddrsV1};
+use db_handling::identities::{AddrInfo, ExportAddrs, ExportAddrsV1, SeedInfo};
 use parity_scale_codec::Encode;
 use qrcode_rtx::transform_into_qr_apng;
 use serde_json::{map::Map, value::Value};
@@ -659,18 +659,30 @@ pub fn generate_key_info_export_to_qr<P: AsRef<Path>>(
     fps: u16,
     keys_num: usize,
 ) -> Result<()> {
-    let addrs: Vec<AddrInfo> = (0..keys_num)
+    use sp_keyring::sr25519::Keyring;
+    use sp_runtime::MultiSigner;
+
+    let multisigner = Some(MultiSigner::from(Keyring::Alice.public()));
+    let name = "a very long key name a very long key name".to_owned();
+
+    let derived_keys: Vec<AddrInfo> = (0..keys_num)
         .into_iter()
         .map(|num| AddrInfo {
-            name: format!("a very long key name a very long key name number {}", num),
             address: "0xdeadbeefdeadbeefdeadbeef".to_string(),
-            network: "polkadot".to_string(),
-            derivation_path: None,
+            derivation_path: Some(format!("//this//is//a//path//{}", num)),
             encryption: Encryption::Sr25519,
+            genesis_hash: H256::default(),
         })
         .collect();
 
-    let export_addrs_v1 = ExportAddrsV1 { addrs };
+    let seed_info = SeedInfo {
+        name,
+        multisigner,
+        derived_keys,
+    };
+    let export_addrs_v1 = ExportAddrsV1 {
+        addrs: vec![seed_info],
+    };
     let export_addrs = ExportAddrs::V1(export_addrs_v1);
 
     let export_addrs_encoded = export_addrs.encode();
