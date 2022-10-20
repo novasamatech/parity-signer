@@ -547,7 +547,7 @@ where
 
 /// Prepare data for default addresses generation for a seed.
 ///
-/// Each network has a default derivation path, recorded in [`OrderedNetworkSpecs`]
+/// Each network has a default derivation path, recorded in [`NetworkSpecs`]
 /// field `path_id`, normally `path_id` is `//<network_name>`.
 ///
 /// This function prepares the generation of addresses with default derivation
@@ -635,7 +635,7 @@ where
 /// Accept seed into Signer: add default addresses for a seed in the Signer
 /// database.
 ///
-/// Each network has a default derivation path, recorded in [`OrderedNetworkSpecs`]
+/// Each network has a default derivation path, recorded in [`NetworkSpecs`]
 /// field `path_id`, normally `path_id` is `//<network_name>`.
 ///
 /// This function adds addresses with default derivation paths into the Signer
