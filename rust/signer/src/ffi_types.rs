@@ -10,7 +10,7 @@ pub use definitions::{
     metadata::MetaValues,
     navigation::*,
     network_specs::{
-        NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier, VerifierValue,
+        NetworkSpecs, OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue,
     },
 };
 pub use navigator::Action;

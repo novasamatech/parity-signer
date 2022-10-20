@@ -24,11 +24,13 @@ use definitions::{
     history::{Entry, Event, SignDisplay, SignMessageDisplay},
     keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey},
     navigation::{
-        Address, Card, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName,
-        MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion, MTypesInfo, MVerifierDetails,
-        NetworkSpecsToSend, TransactionCard, TransactionCardSet,
+        Address, Card, MMetadataRecord, MSCCall, MSCCurrency, MSCEnumVariantName, MSCEraMortal,
+        MSCFieldName, MSCId, MSCNameVersion, MTypesInfo, MVerifierDetails, NetworkSpecs,
+        TransactionCard, TransactionCardSet,
     },
-    network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
+    network_specs::{
+        CurrentVerifier, OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue,
+    },
     users::AddressDetails,
 };
 use transaction_parsing::{
@@ -98,25 +100,27 @@ fn print_db_content(dbname: &str) -> String {
         let _ = write!(&mut metadata_str, "\n    {}", x);
     }
 
-    let mut network_specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
+    let mut network_specs_set: Vec<(NetworkSpecsKey, OrderedNetworkSpecs)> = Vec::new();
     let chainspecs: Tree = database.open_tree(SPECSTREE).unwrap();
     for (network_specs_key_vec, network_specs_encoded) in chainspecs.iter().flatten() {
         let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
-        let network_specs =
-            NetworkSpecs::from_entry_with_key_checked(&network_specs_key, network_specs_encoded)
-                .unwrap();
+        let network_specs = OrderedNetworkSpecs::from_entry_with_key_checked(
+            &network_specs_key,
+            network_specs_encoded,
+        )
+        .unwrap();
         network_specs_set.push((network_specs_key, network_specs));
     }
-    network_specs_set.sort_by(|(_, a), (_, b)| a.title.cmp(&b.title));
+    network_specs_set.sort_by(|(_, a), (_, b)| a.specs.title.cmp(&b.specs.title));
     let mut network_specs_str = String::new();
     for (network_specs_key, network_specs) in network_specs_set.iter() {
         let _ = write!(
             &mut network_specs_str,
             "\n    {}: {} ({} with {})",
             hex::encode(network_specs_key.key()),
-            network_specs.title,
-            network_specs.name,
-            network_specs.encryption.show()
+            network_specs.specs.title,
+            network_specs.specs.name,
+            network_specs.specs.encryption.show()
         );
     }
 
@@ -357,22 +361,24 @@ fn can_sign_transaction_1() {
         },
     };
 
-    let network_info_known = NetworkSpecs {
-        base58prefix: 42,
-        color: "#660D35".to_string(),
-        decimals: 12,
-        encryption: Encryption::Sr25519,
-        genesis_hash: H256::from_str(
-            "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        )
-        .unwrap(),
-        logo: "westend".to_string(),
-        name: "westend".to_string(),
+    let network_info_known = OrderedNetworkSpecs {
+        specs: NetworkSpecs {
+            base58prefix: 42,
+            color: "#660D35".to_string(),
+            decimals: 12,
+            encryption: Encryption::Sr25519,
+            genesis_hash: H256::from_str(
+                "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            )
+            .unwrap(),
+            logo: "westend".to_string(),
+            name: "westend".to_string(),
+            path_id: "//westend".to_string(),
+            secondary_color: "#262626".to_string(),
+            title: "Westend".to_string(),
+            unit: "WND".to_string(),
+        },
         order: 2,
-        path_id: "//westend".to_string(),
-        secondary_color: "#262626".to_string(),
-        title: "Westend".to_string(),
-        unit: "WND".to_string(),
     };
 
     let output = produce_output(line, dbname);
@@ -395,7 +401,7 @@ fn can_sign_transaction_1() {
             PWD,
             USER_COMMENT,
             dbname,
-            network_info.encryption,
+            network_info.specs.encryption,
         ) {
             Ok(signature) => assert!(
                 (signature.len() == 130) && (signature.starts_with("01")),
@@ -440,7 +446,7 @@ fn can_sign_transaction_1() {
             PWD,
             USER_COMMENT,
             dbname,
-            network_info.encryption,
+            network_info.specs.encryption,
         );
         if let Err(e) = result {
             if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
@@ -616,22 +622,24 @@ fn can_sign_message_1() {
         },
     };
 
-    let network_info_known = NetworkSpecs {
-        base58prefix: 42,
-        color: "#660D35".to_string(),
-        decimals: 12,
-        encryption: Encryption::Sr25519,
-        genesis_hash: H256::from_str(
-            "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        )
-        .unwrap(),
-        logo: "westend".to_string(),
-        name: "westend".to_string(),
+    let network_info_known = OrderedNetworkSpecs {
+        specs: NetworkSpecs {
+            base58prefix: 42,
+            color: "#660D35".to_string(),
+            decimals: 12,
+            encryption: Encryption::Sr25519,
+            genesis_hash: H256::from_str(
+                "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            )
+            .unwrap(),
+            logo: "westend".to_string(),
+            name: "westend".to_string(),
+            path_id: "//westend".to_string(),
+            secondary_color: "#262626".to_string(),
+            title: "Westend".to_string(),
+            unit: "WND".to_string(),
+        },
         order: 2,
-        path_id: "//westend".to_string(),
-        secondary_color: "#262626".to_string(),
-        title: "Westend".to_string(),
-        unit: "WND".to_string(),
     };
 
     if let TransactionAction::Sign {
@@ -653,7 +661,7 @@ fn can_sign_message_1() {
             PWD,
             USER_COMMENT,
             dbname,
-            network_info.encryption,
+            network_info.specs.encryption,
         ) {
             Ok(signature) => assert_eq!(
                 signature.len(),
@@ -704,7 +712,7 @@ fn can_sign_message_1() {
             PWD,
             USER_COMMENT,
             dbname,
-            network_info.encryption,
+            network_info.specs.encryption,
         );
         if let Err(e) = result {
             if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
@@ -738,7 +746,7 @@ fn add_specs_westend_no_network_info_not_signed() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 42,
                     color: "#660D35".to_string(),
                     decimals: 12,
@@ -820,7 +828,7 @@ fn add_specs_westend_ed25519_not_signed() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 42,
                     color: "#660D35".to_string(),
                     decimals: 12,
@@ -1445,7 +1453,7 @@ fn dock_adventures_1() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1692,7 +1700,7 @@ Identities:
             index: 4,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1790,7 +1798,7 @@ fn dock_adventures_2() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -2036,7 +2044,7 @@ Identities:
             index: 3,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -2155,7 +2163,7 @@ Identities:
             index: 3,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -2529,7 +2537,7 @@ Identities:
             PWD,
             USER_COMMENT,
             dbname,
-            network_info.encryption,
+            network_info.specs.encryption,
         )
         .unwrap();
     } else {
@@ -2842,7 +2850,7 @@ Identities:
             PWD,
             USER_COMMENT,
             dbname,
-            network_info.encryption,
+            network_info.specs.encryption,
         )
         .unwrap();
     } else {
@@ -3422,7 +3430,7 @@ Identities:"#;
             index: 0,
             indent: 0,
             card: Card::AuthorPlainCard {
-                f: MSCAuthorPlain {
+                f: MSCId {
                     base58: "25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C".to_string(),
                     identicon: id_05().to_vec(),
                 },

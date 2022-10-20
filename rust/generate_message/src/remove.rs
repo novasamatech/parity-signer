@@ -38,7 +38,7 @@
 //! [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
 //! - network specs
-//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) from
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from
 //! [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
 //! - all associated metadata entries from [`METATREE`] if there are no other
 //! address book entries this metadata is associated with

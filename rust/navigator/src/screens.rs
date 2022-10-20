@@ -14,7 +14,7 @@ use definitions::{
     helpers::{make_identicon_from_multisigner, multisigner_to_public, IdenticonStyle},
     keyring::{AddressKey, NetworkSpecsKey},
     navigation::{Address, TransactionCardSet},
-    network_specs::NetworkSpecs,
+    network_specs::OrderedNetworkSpecs,
     users::AddressDetails,
 };
 use transaction_parsing;
@@ -120,7 +120,7 @@ pub struct EnteredInfo(pub String);
 
 impl KeysState {
     pub fn new(seed_name: &str, database_name: &str) -> Result<Self> {
-        let network_specs = first_network(database_name)?;
+        let network_specs = first_network(database_name)?.specs;
         Ok(Self {
             seed_name: seed_name.to_string(),
             network_specs_key: NetworkSpecsKey::from_parts(
@@ -429,7 +429,7 @@ impl TransactionState {
         content: TransactionCardSet,
         has_pwd: bool,
         author_info: MAddressCard,
-        network_info: NetworkSpecs,
+        network_info: OrderedNetworkSpecs,
     ) -> Self {
         let action = transaction_parsing::TransactionAction::Sign {
             content,

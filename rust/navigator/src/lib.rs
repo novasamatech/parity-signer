@@ -76,9 +76,10 @@ pub fn init_navigation(dbname: &str, seed_names: Vec<String>) {
             match db_handling::helpers::get_all_networks(dbname) {
                 Ok(a) => {
                     for x in a.iter() {
-                        (*navstate)
-                            .networks
-                            .push(NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption));
+                        (*navstate).networks.push(NetworkSpecsKey::from_parts(
+                            &x.specs.genesis_hash,
+                            &x.specs.encryption,
+                        ));
                     }
                 }
                 Err(e) => println!("No networks could be fetched: {:?}", e),

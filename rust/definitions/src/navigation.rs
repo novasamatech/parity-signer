@@ -1,10 +1,11 @@
 use sp_core::H256;
 
 use crate::{
-    crypto::Encryption, history::Event, keyring::NetworkSpecsKey, network_specs::NetworkSpecs,
+    crypto::Encryption, history::Event, keyring::NetworkSpecsKey,
+    network_specs::OrderedNetworkSpecs,
 };
 
-pub use crate::network_specs::NetworkSpecsToSend;
+pub use crate::network_specs::NetworkSpecs;
 
 #[derive(PartialEq, Eq, Clone)]
 pub struct SeedNameWithIdenticon {
@@ -19,7 +20,7 @@ pub struct SeedNameWithIdenticon {
 pub enum TransactionAction {
     Derivations {
         content: TransactionCardSet,
-        network_info: NetworkSpecs,
+        network_info: OrderedNetworkSpecs,
         checksum: u32,
         network_specs_key: NetworkSpecsKey,
     },
@@ -28,7 +29,7 @@ pub enum TransactionAction {
         checksum: u32,
         has_pwd: bool,
         author_info: MAddressCard,
-        network_info: NetworkSpecs,
+        network_info: OrderedNetworkSpecs,
     },
     Stub {
         s: TransactionCardSet,
@@ -439,15 +440,17 @@ pub struct Network {
     pub title: String,
 }
 
-impl From<NetworkSpecs> for Network {
-    fn from(n: NetworkSpecs) -> Self {
-        let key = hex::encode(NetworkSpecsKey::from_parts(&n.genesis_hash, &n.encryption).key());
+impl From<OrderedNetworkSpecs> for Network {
+    fn from(n: OrderedNetworkSpecs) -> Self {
+        let key = hex::encode(
+            NetworkSpecsKey::from_parts(&n.specs.genesis_hash, &n.specs.encryption).key(),
+        );
         Network {
             key,
-            logo: n.logo,
+            logo: n.specs.logo,
             order: n.order as u32,
             selected: false,
-            title: n.title,
+            title: n.specs.title,
         }
     }
 }
@@ -522,12 +525,6 @@ pub enum ModalData {
     KeyDetailsAction,
     LogComment,
     SelectSeed { f: MSeeds },
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct MSCAuthorPlain {
-    pub base58: String,
-    pub identicon: Vec<u8>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -606,7 +603,7 @@ pub struct MSCTxSpecPlain {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Card {
     AuthorCard { f: MAddressCard },
-    AuthorPlainCard { f: MSCAuthorPlain },
+    AuthorPlainCard { f: MSCId },
     AuthorPublicKeyCard { f: MVerifierDetails },
     BalanceCard { f: MSCCurrency },
     BitVecCard { f: String },
@@ -627,7 +624,7 @@ pub enum Card {
     NetworkGenesisHashCard { f: String },
     NetworkNameCard { f: String },
     NetworkInfoCard { f: MSCNetworkInfo },
-    NewSpecsCard { f: NetworkSpecsToSend },
+    NewSpecsCard { f: NetworkSpecs },
     NonceCard { f: String },
     NoneCard,
     PalletCard { f: String },

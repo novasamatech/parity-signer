@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SeedKeyCard: View {
     @EnvironmentObject private var data: SignerDataModel
-    var seedCard: MSeedKeyCard
+    var seedCard: MKeysCard
     var multiselectMode: Bool = false
     var body: some View {
         ZStack {

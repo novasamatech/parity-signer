@@ -33,10 +33,10 @@ use definitions::{
         MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion,
         MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
         MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData,
-        Network, NetworkSpecsToSend, RightButton, ScreenData, ScreenNameType, SeedNameCard,
+        Network, NetworkSpecs, RightButton, ScreenData, ScreenNameType, SeedNameCard,
         TransactionCard, TransactionCardSet, TransactionType,
     },
-    network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
+    network_specs::{OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
 
 use definitions::navigation::MAddressCard;
@@ -1034,7 +1034,8 @@ fn flow_test_1() {
                     timestamp: String::new(),
                     events: vec![Event::NetworkSpecsRemoved {
                         network_specs_display: NetworkSpecsDisplay {
-                            specs: NetworkSpecs {
+                            network: OrderedNetworkSpecs {
+                                specs: NetworkSpecs{
                                 base58prefix: 2,
                                 color: "#000".to_string(),
                                 decimals: 12,
@@ -1045,11 +1046,11 @@ fn flow_test_1() {
                                 .unwrap(),
                                 logo: "kusama".to_string(),
                                 name: "kusama".to_string(),
-                                order: 1,
                                 path_id: "//kusama".to_string(),
                                 secondary_color: "#262626".to_string(),
                                 title: "Kusama".to_string(),
-                                unit: "KSM".to_string(),
+                                unit: "KSM".to_string(),},
+                            order: 1,
                             },
                             valid_current_verifier: ValidCurrentVerifier::General,
                             general_verifier: Verifier { v: Some(VerifierValue::Standard { m: sr_multisigner_from_hex(hex_2) })},
@@ -1094,19 +1095,21 @@ fn flow_test_1() {
                 events: vec![MEventMaybeDecoded {
                     event: Event::NetworkSpecsRemoved {
                         network_specs_display: NetworkSpecsDisplay {
-                            specs: NetworkSpecs {
-                                base58prefix: 2,
-                                color: "#000".to_string(),
-                                decimals: 12,
-                                encryption: Encryption::Sr25519,
-                                genesis_hash: H256::from_str(genesis_hash).unwrap(),
-                                logo: "kusama".to_string(),
-                                name: "kusama".to_string(),
+                            network: OrderedNetworkSpecs {
+                                specs: NetworkSpecs {
+                                    base58prefix: 2,
+                                    color: "#000".to_string(),
+                                    decimals: 12,
+                                    encryption: Encryption::Sr25519,
+                                    genesis_hash: H256::from_str(genesis_hash).unwrap(),
+                                    logo: "kusama".to_string(),
+                                    name: "kusama".to_string(),
+                                    path_id: "//kusama".to_string(),
+                                    secondary_color: "#262626".to_string(),
+                                    title: "Kusama".to_string(),
+                                    unit: "KSM".to_string(),
+                                },
                                 order: 1,
-                                path_id: "//kusama".to_string(),
-                                secondary_color: "#262626".to_string(),
-                                title: "Kusama".to_string(),
-                                unit: "KSM".to_string(),
                             },
                             valid_current_verifier: ValidCurrentVerifier::General,
                             general_verifier: Verifier {
@@ -1215,7 +1218,7 @@ fn flow_test_1() {
                         index: 1,
                         indent: 0,
                         card: Card::NewSpecsCard {
-                            f: NetworkSpecsToSend {
+                            f: NetworkSpecs {
                                 base58prefix: 2,
                                 color: "#000".to_string(),
                                 decimals: 12,
@@ -1361,19 +1364,21 @@ fn flow_test_1() {
                     timestamp: String::new(),
                     events: vec![Event::NetworkSpecsAdded {
                         network_specs_display: NetworkSpecsDisplay {
-                            specs: NetworkSpecs {
-                                base58prefix: 2,
-                                color: "#000".to_string(),
-                                decimals: 12,
-                                encryption: Encryption::Sr25519,
-                                genesis_hash: H256::from_str(hhh).unwrap(),
-                                logo: "kusama".to_string(),
-                                name: "kusama".to_string(),
+                            network: OrderedNetworkSpecs {
+                                specs: NetworkSpecs {
+                                    base58prefix: 2,
+                                    color: "#000".to_string(),
+                                    decimals: 12,
+                                    encryption: Encryption::Sr25519,
+                                    genesis_hash: H256::from_str(hhh).unwrap(),
+                                    logo: "kusama".to_string(),
+                                    name: "kusama".to_string(),
+                                    path_id: "//kusama".to_string(),
+                                    secondary_color: "#262626".to_string(),
+                                    title: "Kusama".to_string(),
+                                    unit: "KSM".to_string(),
+                                },
                                 order: 2,
-                                path_id: "//kusama".to_string(),
-                                secondary_color: "#262626".to_string(),
-                                title: "Kusama".to_string(),
-                                unit: "KSM".to_string(),
                             },
                             valid_current_verifier: ValidCurrentVerifier::General,
                             general_verifier: Verifier {
@@ -1537,19 +1542,21 @@ fn flow_test_1() {
                     timestamp: String::new(),
                     events: vec![Event::NetworkSpecsAdded {
                         network_specs_display: NetworkSpecsDisplay {
-                            specs: NetworkSpecs {
-                                base58prefix: 2,
-                                color: "#000".to_string(),
-                                decimals: 12,
-                                encryption: Encryption::Sr25519,
-                                genesis_hash: H256::from_str(hhh).unwrap(),
-                                logo: "kusama".to_string(),
-                                name: "kusama".to_string(),
+                            network: OrderedNetworkSpecs {
+                                specs: NetworkSpecs {
+                                    base58prefix: 2,
+                                    color: "#000".to_string(),
+                                    decimals: 12,
+                                    encryption: Encryption::Sr25519,
+                                    genesis_hash: H256::from_str(hhh).unwrap(),
+                                    logo: "kusama".to_string(),
+                                    name: "kusama".to_string(),
+                                    path_id: "//kusama".to_string(),
+                                    secondary_color: "#262626".to_string(),
+                                    title: "Kusama".to_string(),
+                                    unit: "KSM".to_string(),
+                                },
                                 order: 2,
-                                path_id: "//kusama".to_string(),
-                                secondary_color: "#262626".to_string(),
-                                title: "Kusama".to_string(),
-                                unit: "KSM".to_string(),
                             },
                             valid_current_verifier: ValidCurrentVerifier::General,
                             general_verifier: Verifier {
@@ -1694,19 +1701,21 @@ fn flow_test_1() {
                     timestamp: String::new(),
                     events: vec![Event::NetworkSpecsAdded {
                         network_specs_display: NetworkSpecsDisplay {
-                            specs: NetworkSpecs {
-                                base58prefix: 2,
-                                color: "#000".to_string(),
-                                decimals: 12,
-                                encryption: Encryption::Sr25519,
-                                genesis_hash: H256::from_str(hhh).unwrap(),
-                                logo: "kusama".to_string(),
-                                name: "kusama".to_string(),
+                            network: OrderedNetworkSpecs {
+                                specs: NetworkSpecs {
+                                    base58prefix: 2,
+                                    color: "#000".to_string(),
+                                    decimals: 12,
+                                    encryption: Encryption::Sr25519,
+                                    genesis_hash: H256::from_str(hhh).unwrap(),
+                                    logo: "kusama".to_string(),
+                                    name: "kusama".to_string(),
+                                    path_id: "//kusama".to_string(),
+                                    secondary_color: "#262626".to_string(),
+                                    title: "Kusama".to_string(),
+                                    unit: "KSM".to_string(),
+                                },
                                 order: 2,
-                                path_id: "//kusama".to_string(),
-                                secondary_color: "#262626".to_string(),
-                                title: "Kusama".to_string(),
-                                unit: "KSM".to_string(),
                             },
                             valid_current_verifier: ValidCurrentVerifier::General,
                             general_verifier: Verifier {
@@ -5019,7 +5028,7 @@ fn flow_test_1() {
             f.log[0].events[0],
             Event::NetworkSpecsSigned {
                 network_specs_export: NetworkSpecsExport {
-                    specs_to_send: NetworkSpecsToSend {
+                    specs_to_send: NetworkSpecs {
                         base58prefix: 42,
                         color: "#660D35".to_string(),
                         decimals: 12,

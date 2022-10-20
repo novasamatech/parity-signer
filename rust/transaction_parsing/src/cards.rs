@@ -11,11 +11,11 @@ use definitions::{
     history::MetaValuesDisplay,
     keyring::VerifierKey,
     navigation::{
-        Address, Card as NavCard, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency,
-        MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCFieldNumber, MSCId, MSCNameVersion,
-        MSCNetworkInfo, MTypesInfo, MVerifierDetails, TransactionCard,
+        Address, Card as NavCard, MMetadataRecord, MSCCall, MSCCurrency, MSCEnumVariantName,
+        MSCEraMortal, MSCFieldName, MSCFieldNumber, MSCId, MSCNameVersion, MSCNetworkInfo,
+        MTypesInfo, MVerifierDetails, TransactionCard,
     },
-    network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue},
+    network_specs::{NetworkSpecs, OrderedNetworkSpecs, VerifierValue},
     qr_transfers::ContentLoadTypes,
     users::AddressDetails,
 };
@@ -40,8 +40,8 @@ pub(crate) enum Card<'a> {
     Verifier(&'a VerifierValue),
     Meta(MetaValuesDisplay),
     TypesInfo(ContentLoadTypes),
-    NewSpecs(&'a NetworkSpecsToSend),
-    NetworkInfo(&'a NetworkSpecs),
+    NewSpecs(&'a NetworkSpecs),
+    NetworkInfo(&'a OrderedNetworkSpecs),
     NetworkGenesisHash(&'a [u8]),
     Derivations(&'a [String]),
     Warning(Warning<'a>),
@@ -215,7 +215,7 @@ impl<'a> Card<'a> {
                 author,
                 base58prefix,
             } => NavCard::AuthorPlainCard {
-                f: MSCAuthorPlain {
+                f: MSCId {
                     base58: print_multisigner_as_base58_or_eth(
                         author,
                         Some(*base58prefix),
@@ -276,10 +276,11 @@ impl<'a> Card<'a> {
             Card::NewSpecs(x) => NavCard::NewSpecsCard { f: (*x).clone() },
             Card::NetworkInfo(x) => NavCard::NetworkInfoCard {
                 f: MSCNetworkInfo {
-                    network_title: x.title.clone(),
-                    network_logo: x.logo.clone(),
+                    network_title: x.specs.title.clone(),
+                    network_logo: x.specs.logo.clone(),
                     network_specs_key: hex::encode(
-                        NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption).key(),
+                        NetworkSpecsKey::from_parts(&x.specs.genesis_hash, &x.specs.encryption)
+                            .key(),
                     ),
                 },
             },

@@ -46,22 +46,12 @@ interface ValidCurrentVerifier {
     Custom(Verifier v);
 };
 
-dictionary NetworkSpecs {
-    u16 base58prefix;
-    string color;
-    u8 decimals;
-    Encryption encryption;
-    H256 genesis_hash;
-    string logo;
-    string name;
+dictionary OrderedNetworkSpecs {
+    NetworkSpecs specs;
     u8 order;
-    string path_id;
-    string secondary_color;
-    string title;
-    string unit;
 };
 
-dictionary NetworkSpecsToSend {
+dictionary NetworkSpecs {
     u16 base58prefix;
     string color;
     u8 decimals;
@@ -76,14 +66,14 @@ dictionary NetworkSpecsToSend {
 };
 
 dictionary NetworkSpecsDisplay {
-    NetworkSpecs specs;
+    OrderedNetworkSpecs network;
     ValidCurrentVerifier valid_current_verifier;
     Verifier general_verifier;
 };
 
 
 dictionary NetworkSpecsExport {
-    NetworkSpecsToSend specs_to_send;
+    NetworkSpecs specs_to_send;
     VerifierValue signed_by;
 };
 
@@ -671,11 +661,6 @@ interface ModalData {
     SelectSeed(MSeeds f);
 };
 
-dictionary MSCAuthorPlain {
-    string base58;
-    sequence<u8> identicon;
-};
-
 dictionary MSCCall {
     string method_name;
     string docs;
@@ -741,7 +726,7 @@ dictionary MSCTxSpecPlain {
 [Enum]
 interface Card {
     AuthorCard(MAddressCard f);
-    AuthorPlainCard(MSCAuthorPlain f);
+    AuthorPlainCard(MSCId f);
     AuthorPublicKeyCard(MVerifierDetails f);
     BalanceCard(MSCCurrency f);
     BitVecCard(string f);
@@ -762,7 +747,7 @@ interface Card {
     NetworkGenesisHashCard(string f);
     NetworkNameCard(string f);
     NetworkInfoCard(MSCNetworkInfo f);
-    NewSpecsCard(NetworkSpecsToSend f);
+    NewSpecsCard(NetworkSpecs f);
     NonceCard(string f);
     NoneCard();
     PalletCard(string f);

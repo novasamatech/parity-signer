@@ -148,7 +148,7 @@ fun HistoryCardExtended(
 				image = Icons.Default.QrCodeScanner,
 				line1 = timestamp,
 				line2 = "Network added",
-				line3 = eventVal.networkSpecsDisplay.specs.title,
+				line3 = eventVal.networkSpecsDisplay.network.specs.title,
 			)
 		}
 		is Event.NetworkSpecsRemoved -> {
@@ -156,7 +156,7 @@ fun HistoryCardExtended(
 				image = Icons.Default.Delete,
 				line1 = timestamp,
 				line2 = "Network removed",
-				line3 = eventVal.networkSpecsDisplay.specs.title
+				line3 = eventVal.networkSpecsDisplay.network.specs.title
 			)
 		}
 		is Event.NetworkVerifierSet -> {

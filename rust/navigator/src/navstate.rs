@@ -393,7 +393,7 @@ impl State {
                                         details_str,
                                         &t.get_comment(),
                                         dbname,
-                                        network_info.encryption,
+                                        network_info.specs.encryption,
                                     ) {
                                         Ok(a) => {
                                             seed.zeroize();
@@ -436,7 +436,7 @@ impl State {
                                 "",
                                 details_str,
                                 dbname,
-                                network_info.encryption,
+                                network_info.specs.encryption,
                             ) {
                                 Ok(a) => {
                                     new_navstate.modal = Modal::SignatureReady(a);
@@ -1505,10 +1505,14 @@ impl State {
                         ttype,
                         author_info,
                         network_info: network_info.map(|i| MSCNetworkInfo {
-                            network_title: i.title,
-                            network_logo: i.logo,
+                            network_title: i.specs.title,
+                            network_logo: i.specs.logo,
                             network_specs_key: hex::encode(
-                                NetworkSpecsKey::from_parts(&i.genesis_hash, &i.encryption).key(),
+                                NetworkSpecsKey::from_parts(
+                                    &i.specs.genesis_hash,
+                                    &i.specs.encryption,
+                                )
+                                .key(),
                             ),
                         }),
                     },
