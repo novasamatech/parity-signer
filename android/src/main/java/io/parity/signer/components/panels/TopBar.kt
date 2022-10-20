@@ -1,4 +1,4 @@
-package io.parity.signer.components
+package io.parity.signer.components.panels
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -12,6 +12,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.parity.signer.components.NavbarShield
+import io.parity.signer.components.SmallButton
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.navigate

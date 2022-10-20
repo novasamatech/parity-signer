@@ -33,16 +33,11 @@ protocol BackendNavigationPerforming: AnyObject {
 final class BackendNavigationAdapter: BackendNavigationPerforming {
     func performBackend(action: Action, details: String, seedPhrase: String) -> Result<ActionResult, NavigationError> {
         do {
-            guard let actionResult = try backendAction(
+            let actionResult = try backendAction(
                 action: action,
                 details: details,
                 seedPhrase: seedPhrase
-            ) else {
-                return .failure(.init(
-                    message: Localizable.Error.Navigation.Label
-                        .noAction(String(describing: action), details)
-                ))
-            }
+            )
             return .success(actionResult)
         } catch {
             return .failure(.init(message: Localizable.Error.Navigation.Label.message(error.localizedDescription)))

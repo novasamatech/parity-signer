@@ -5,8 +5,11 @@ import android.widget.Toast
 import io.parity.signer.BuildConfig
 import io.parity.signer.bottomsheets.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.components.NetworkCardModel
-import io.parity.signer.components2.KeyCardModel
-import io.parity.signer.uniffi.*
+import io.parity.signer.components.sharedcomponents.KeyCardModel
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.ScreenData
+import io.parity.signer.uniffi.backendAction
+import io.parity.signer.uniffi.generateSecretKeyQr
 import java.lang.RuntimeException
 
 
@@ -81,11 +84,7 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 				val viewModel = PrivateKeyExportModel(
 					qrImage = secretKeyDetailsQR.qr,
 					keyCard = KeyCardModel.fromAddress(
-						address_card = MAddressCard(
-							base58=secretKeyDetailsQR.base58,
-							multiselect=secretKeyDetailsQR.multiselect,
-							address=secretKeyDetailsQR.address,
-						),
+						address = secretKeyDetailsQR.address,
 						networkTitle = secretKeyDetailsQR.networkInfo.networkTitle
 					),
 					NetworkCardModel(secretKeyDetailsQR.networkInfo)

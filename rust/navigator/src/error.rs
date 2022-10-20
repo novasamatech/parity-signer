@@ -16,4 +16,7 @@ pub enum Error {
 
     #[error("Key not found {0}")]
     KeyNotFound(String),
+
+    #[error("Mutex poisoned")]
+    MutexPoisoned,
 }

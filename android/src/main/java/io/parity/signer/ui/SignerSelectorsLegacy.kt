@@ -83,10 +83,13 @@ fun ScreenSelector(
 			processFrame = signerDataModel::processFrame,
 			resetScanValues = signerDataModel::resetScanValues,
 		)
-		is ScreenData.SeedSelector -> SeedManager(
-			screenData.f,
-			button2
-		)
+		is ScreenData.SeedSelector -> SignerNewTheme() {
+			KeySetsScreen(
+				screenData.f.toKeySetsSelectViewModel(),
+				navigator = signerDataModel.navigator,
+				alertState = alertState,
+			)
+		}
 		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
 			screenData.f,
 			button2

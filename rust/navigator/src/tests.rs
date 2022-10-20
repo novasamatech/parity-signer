@@ -42,7 +42,7 @@ use definitions::{
 use definitions::navigation::MAddressCard;
 use pretty_assertions::assert_eq;
 
-use crate::{do_action, init_navigation, update_seed_names, Action};
+use crate::{navstate::State, Action};
 
 const ALICE: [u8; 32] = [
     212, 53, 147, 199, 21, 253, 211, 28, 97, 20, 26, 189, 4, 169, 159, 214, 130, 44, 133, 88, 133,
@@ -299,9 +299,10 @@ fn flow_test_1() {
     let dbname = "for_tests/flow_test_1";
     populate_cold_nav_test(dbname).unwrap();
     init_db(dbname, verifier_alice_sr25519()).unwrap();
-    init_navigation(dbname, Vec::new());
+    let mut state = State::default();
+    state.init_navigation(dbname, Vec::new()).unwrap();
 
-    let action = do_action(Action::Start, "", "").unwrap().unwrap();
+    let action = state.perform(Action::Start, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Select seed".to_string(),
         back: false,
@@ -321,7 +322,7 @@ fn flow_test_1() {
 
     let mut seed_selector_action = action;
 
-    let mut action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::NavbarLog, "", "").unwrap();
 
     erase_log_timestamps(&mut action.screen_data);
 
@@ -360,7 +361,7 @@ fn flow_test_1() {
 
     let mut current_log_action = action;
 
-    let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::GoBack, "", "").unwrap();
 
     erase_log_timestamps(&mut action.screen_data);
 
@@ -369,7 +370,7 @@ fn flow_test_1() {
         "GoBack on Log screen with no modals. Expected to remain where was.",
     );
 
-    let mut action = do_action(Action::GoForward, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::GoForward, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     assert_eq!(
@@ -377,9 +378,7 @@ fn flow_test_1() {
         "GoForward on Log screen with no modals. Expected to remain where was.",
     );
 
-    let mut action = do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
+    let mut action = state.perform(Action::RightButtonAction, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     if let Some(ref mut m) = action.modal_data {
         erase_modal_data_checksum(m);
@@ -423,7 +422,7 @@ fn flow_test_1() {
         "RightButton on Log screen with no modals. Expected same Log screen with LogRight modal"
     );
 
-    let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::GoBack, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     assert_eq!(
@@ -431,13 +430,9 @@ fn flow_test_1() {
         "GoBack on Log screen with LogRight modal. Expected to get Log screen with no modals"
     );
 
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
 
-    let mut action = do_action(Action::CreateLogComment, "", "")
-        .unwrap()
-        .unwrap();
+    let mut action = state.perform(Action::CreateLogComment, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     let expected_action = ActionResult {
         screen_label: String::new(),
@@ -470,7 +465,7 @@ fn flow_test_1() {
 
     assert_eq!(action, expected_action,
             "CreateLogComment on Log screen with LogRight modal. Expected same Log screen with LogComment modal");
-    let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::GoBack, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     assert_eq!(
@@ -478,14 +473,10 @@ fn flow_test_1() {
         "GoBack on Log screen with LogComment modal. Expected same Log screen with no modals"
     );
 
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    do_action(Action::CreateLogComment, "", "")
-        .unwrap()
-        .unwrap();
-    let mut action = do_action(Action::GoForward, "Remember this moment", "")
-        .unwrap()
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    state.perform(Action::CreateLogComment, "", "").unwrap();
+    let mut action = state
+        .perform(Action::GoForward, "Remember this moment", "")
         .unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
@@ -529,7 +520,7 @@ fn flow_test_1() {
 
     assert_eq!(action, expected_action, "GoForward on Log screen with LogComment modal. Expected updated Log screen with no modals.");
 
-    let mut action = do_action(Action::Shield, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::Shield, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     expected_action.alert_data = Some(AlertData::Shield { f: None });
@@ -539,10 +530,8 @@ fn flow_test_1() {
         "Shield on Log screen with no modal. Expected same Log screen with Shield alert.",
     );
 
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    let mut action = do_action(Action::ClearLog, "", "").unwrap().unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    let mut action = state.perform(Action::ClearLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     expected_action.screen_data = ScreenData::Log {
@@ -563,7 +552,7 @@ fn flow_test_1() {
         "ClearLog on Log screen with LogRight modal. Expected updated Log screen with no modals."
     );
 
-    let action = do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NavbarSettings, "", "").unwrap();
 
     let expected_action = ActionResult {
         screen_label: String::new(),
@@ -592,7 +581,7 @@ fn flow_test_1() {
 
     let current_settings_action = action;
 
-    let action = do_action(Action::BackupSeed, "", "").unwrap().unwrap();
+    let action = state.perform(Action::BackupSeed, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Select seed".to_string(),
         back: true,
@@ -614,15 +603,13 @@ fn flow_test_1() {
         "BackupSeed on Settings screen. Expected SelectSeedForBackup screen with no modals."
     );
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, current_settings_action,
         "GoBack on SelectSeedForBackup screen with no seeds available. Expected Settings screen with no modals."
     );
 
-    let action = do_action(Action::ViewGeneralVerifier, "", "")
-        .unwrap()
-        .unwrap();
+    let action = state.perform(Action::ViewGeneralVerifier, "", "").unwrap();
 
     let expected_action = ActionResult {
         screen_label: "VERIFIER CERTIFICATE".to_string(),
@@ -647,13 +634,13 @@ fn flow_test_1() {
         "ViewGeneralVerifier on Settings screen. Expected Verifier screen with no modals.",
     );
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, current_settings_action,
         "GoBack on Verifier screen. Expected Settings screen with no modals.",
     );
 
-    let action = do_action(Action::ShowDocuments, "", "").unwrap().unwrap();
+    let action = state.perform(Action::ShowDocuments, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "ABOUT".to_string(),
         back: true,
@@ -670,13 +657,13 @@ fn flow_test_1() {
         "ShowDocuments on Settings screen. Expected Documents screen with no modals.",
     );
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, current_settings_action,
         "GoBack on Documents screen. Expected Settings screen with no modals.",
     );
 
-    let action = do_action(Action::ManageNetworks, "", "").unwrap().unwrap();
+    let action = state.perform(Action::ManageNetworks, "", "").unwrap();
 
     let expected_action = ActionResult {
         screen_label: "MANAGE NETWORKS".to_string(),
@@ -723,20 +710,20 @@ fn flow_test_1() {
 
     let mut manage_networks_action = action;
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, current_settings_action,
         "GoBack on ManageNetworks screen. Expected Settings screen with no modals.",
     );
 
-    do_action(Action::ManageNetworks, "", "").unwrap().unwrap();
-    let action = do_action(
-        Action::GoForward,
-        "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    state.perform(Action::ManageNetworks, "", "").unwrap();
+    let action = state
+        .perform(
+            Action::GoForward,
+            "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+            "",
+        )
+        .unwrap();
     let expected_action = ActionResult {
         screen_label: "Network details".to_string(),
         back: true,
@@ -790,21 +777,20 @@ fn flow_test_1() {
 
     let kusama_action = action;
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, manage_networks_action,
         "GoBack on NetworkDetails screen. Expected ManageNetworks screen with no modals.",
     );
 
-    do_action(
-        Action::GoForward,
-        "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
-        "",
-    )
-    .unwrap();
-    let action = do_action(Action::ManageMetadata, "9130", "")
-        .unwrap()
+    state
+        .perform(
+            Action::GoForward,
+            "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+            "",
+        )
         .unwrap();
+    let action = state.perform(Action::ManageMetadata, "9130", "").unwrap();
 
     let mut kusama_action_modal = kusama_action.clone();
     kusama_action_modal.modal_data = Some(ModalData::ManageMetadata {
@@ -824,7 +810,7 @@ fn flow_test_1() {
     });
     assert_eq!(action, kusama_action_modal, "ManageMetadata on NetworkDetails screen for kusama sr25519 key. Expected NetworkDetails screen for kusama with ManageMetadata modal");
 
-    let action = do_action(Action::SignMetadata, "", "").unwrap().unwrap();
+    let action = state.perform(Action::SignMetadata, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Sign SufficientCrypto".to_string(),
         back: true,
@@ -841,16 +827,14 @@ fn flow_test_1() {
     assert_eq!(action, expected_action, "SignMetadata on NetworkDetails screen for kusama sr25519 key with ManageMetadata modal for version 9130. Expected SignSufficientCrypto screen for kusama9130 metadata with no modals");
     let sign_sufficient_crypto_action = expected_action;
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, kusama_action,
         "GoBack on SignSufficientCrypto screen. Expected NetworkDetails screen with no modals."
     );
 
-    do_action(Action::ManageMetadata, "9130", "")
-        .unwrap()
-        .unwrap();
-    let action = do_action(Action::RemoveMetadata, "", "").unwrap().unwrap();
+    state.perform(Action::ManageMetadata, "9130", "").unwrap();
+    let action = state.perform(Action::RemoveMetadata, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Network details".to_string(),
         back: true,
@@ -895,16 +879,12 @@ fn flow_test_1() {
 
     let kusama_action = action;
 
-    let action = do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
+    let action = state.perform(Action::RightButtonAction, "", "").unwrap();
     let mut expected_action = kusama_action.clone();
     expected_action.modal_data = Some(ModalData::NetworkDetailsMenu);
     assert_eq!(action, expected_action, "RightButton on NetworkDetails screen for kusama sr25519 key. Expected NetworkDetails screen for kusama with NetworkDetailsMenu modal");
 
-    let action = do_action(Action::SignNetworkSpecs, "", "")
-        .unwrap()
-        .unwrap();
+    let action = state.perform(Action::SignNetworkSpecs, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Sign SufficientCrypto".to_string(),
         back: true,
@@ -921,16 +901,14 @@ fn flow_test_1() {
 
     assert_eq!(action, expected_action, "SignNetworkSpecs on NetworkDetails screen for kusama sr25519 key with NetworkDetailsMenu modal. Expected SignSufficientCrypto screen for kusama specs with no modals.");
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, kusama_action,
         "GoBack on SignSufficientCrypto screen. Expected NetworkDetails screen with no modals."
     );
 
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    let action = do_action(Action::RemoveNetwork, "", "").unwrap().unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    let action = state.perform(Action::RemoveNetwork, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "MANAGE NETWORKS".to_string(),
         back: true,
@@ -966,9 +944,7 @@ fn flow_test_1() {
         "RemoveNetwork on NetworkDetails screen for kusama sr25519. Expected updated ManageNetworks screen with no modals"
     );
 
-    let action = do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
+    let action = state.perform(Action::RightButtonAction, "", "").unwrap();
     let mut expected_action = expected_action;
     expected_action.right_button = Some(RightButton::TypesInfo);
     expected_action.modal_data = Some(ModalData::TypesInfo {
@@ -986,7 +962,7 @@ fn flow_test_1() {
         "RightButton on ManageNetworks screen. Expected ManageNetworks screen with TypesInfo modal"
     );
 
-    let action = do_action(Action::SignTypes, "", "").unwrap().unwrap();
+    let action = state.perform(Action::SignTypes, "", "").unwrap();
 
     let expected_action = sign_sufficient_crypto_action;
     assert_eq!(
@@ -994,17 +970,15 @@ fn flow_test_1() {
         "SignTypes on ManageNetworks screen with TypesInfo modal. Expected SignSufficientCrypto screen for types with no modals."
     );
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, current_settings_action,
         "GoBack on SignSufficientCrypto screen. Expected Settings screen with no modals",
     );
 
-    do_action(Action::ManageNetworks, "", "").unwrap().unwrap();
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    let mut action = do_action(Action::RemoveTypes, "", "").unwrap().unwrap();
+    state.perform(Action::ManageNetworks, "", "").unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    let mut action = state.perform(Action::RemoveTypes, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     let mut expected_action = log_action.clone();
@@ -1078,7 +1052,7 @@ fn flow_test_1() {
 
     current_log_action = action;
 
-    let mut action = do_action(Action::ShowLogDetails, "2", "").unwrap().unwrap();
+    let mut action = state.perform(Action::ShowLogDetails, "2", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     let genesis_hash = "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe";
@@ -1133,17 +1107,15 @@ fn flow_test_1() {
         "ShowLogDetails on Log screen with order 2. Expected LogDetails screen with no modals"
     );
 
-    let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::GoBack, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     assert_eq!(
         action, current_log_action,
         "GoBack on ShowLogDetails screen. Expected Log screen with no modals.",
     );
 
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    let mut action = do_action(Action::ClearLog, "", "").unwrap().unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    let mut action = state.perform(Action::ClearLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     expected_action.screen_label = "".to_string();
@@ -1163,7 +1135,7 @@ fn flow_test_1() {
         "ClearLog on Log screen with LogRight modal. Expected updated Log screen with no modals."
     );
 
-    let action = do_action(Action::NavbarScan, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NavbarScan, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: String::new(),
         back: false,
@@ -1182,15 +1154,15 @@ fn flow_test_1() {
 
     let scan_action = action;
 
-    let action = do_action(
-        Action::TransactionFetched,
-        std::fs::read_to_string("for_tests/add_specs_kusama-sr25519_Alice-sr25519.txt")
-            .unwrap()
-            .trim(),
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    let action = state
+        .perform(
+            Action::TransactionFetched,
+            std::fs::read_to_string("for_tests/add_specs_kusama-sr25519_Alice-sr25519.txt")
+                .unwrap()
+                .trim(),
+            "",
+        )
+        .unwrap();
     let aaa = "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d".to_string();
     let genesis_hash = "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe";
     let expected_action = ActionResult {
@@ -1245,21 +1217,22 @@ fn flow_test_1() {
     };
     assert_eq!(action, expected_action, "TransactionFetched on Scan screen with add_specs info for kusama. Expected Transaction screen with no modals");
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, scan_action,
         "GoBack on Transaction screen. Expected Scan screen with no modals.",
     );
 
-    do_action(
-        Action::TransactionFetched,
-        std::fs::read_to_string("for_tests/add_specs_kusama-sr25519_Alice-sr25519.txt")
-            .unwrap()
-            .trim(),
-        "",
-    )
-    .unwrap();
-    let action = do_action(Action::GoForward, "", "").unwrap().unwrap();
+    state
+        .perform(
+            Action::TransactionFetched,
+            std::fs::read_to_string("for_tests/add_specs_kusama-sr25519_Alice-sr25519.txt")
+                .unwrap()
+                .trim(),
+            "",
+        )
+        .unwrap();
+    let action = state.perform(Action::GoForward, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Network details".to_string(),
         back: true,
@@ -1306,7 +1279,7 @@ fn flow_test_1() {
         "GoForward on Transaction screen with add specs stub. Expected NetworkDetails screen for kusama sr25519, with no modals"
     );
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "MANAGE NETWORKS".to_string(),
         back: true,
@@ -1348,10 +1321,10 @@ fn flow_test_1() {
 
     manage_networks_action = action;
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(action, current_settings_action, "GoBack on ManageNetworks screen, to see footer. Expected known Settings screen with no modals.");
 
-    let mut action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::NavbarLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     let mut expected_action = log_action.clone();
@@ -1403,16 +1376,16 @@ fn flow_test_1() {
         "Switched to Log from Settings. Expected updated Log screen with no modals.",
     );
 
-    do_action(Action::NavbarScan, "", "").unwrap().unwrap();
-    let action = do_action(
-        Action::TransactionFetched,
-        std::fs::read_to_string("for_tests/load_metadata_kusamaV9151_Alice-sr25519.txt")
-            .unwrap()
-            .trim(),
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    state.perform(Action::NavbarScan, "", "").unwrap();
+    let action = state
+        .perform(
+            Action::TransactionFetched,
+            std::fs::read_to_string("for_tests/load_metadata_kusamaV9151_Alice-sr25519.txt")
+                .unwrap()
+                .trim(),
+            "",
+        )
+        .unwrap();
 
     let aaa_2 = "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d".to_string();
     let meta_hash = "9a179da92949dd3ab3829177149ec83dc46fb009af10a45f955949b2a6693b46".to_string();
@@ -1464,7 +1437,7 @@ fn flow_test_1() {
         "TransactionFetched on Scan screen with load_metadata for kusama9151. Expected Transaction screen with no modals"
     );
 
-    let action = do_action(Action::GoForward, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoForward, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Network details".to_string(),
         back: true,
@@ -1515,9 +1488,9 @@ fn flow_test_1() {
         "GoForward on Transaction screen with load metadata stub. Expected NetworkDetails screen for kusama sr25519, updated with new metadata, with no modals"
     );
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    let mut action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
+    let mut action = state.perform(Action::NavbarLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     let mut expected_action = log_action.clone();
     expected_action.screen_data = ScreenData::Log {
@@ -1581,16 +1554,16 @@ fn flow_test_1() {
         "Switched to Log from Settings. Expected updated Log screen with no modals.",
     );
 
-    do_action(Action::NavbarScan, "", "").unwrap().unwrap();
-    let action = do_action(
-        Action::TransactionFetched,
-        std::fs::read_to_string("for_tests/load_types_Alice-sr25519.txt")
-            .unwrap()
-            .trim(),
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    state.perform(Action::NavbarScan, "", "").unwrap();
+    let action = state
+        .perform(
+            Action::TransactionFetched,
+            std::fs::read_to_string("for_tests/load_types_Alice-sr25519.txt")
+                .unwrap()
+                .trim(),
+            "",
+        )
+        .unwrap();
     let public_key = "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d".to_string();
     let types_hash =
         Some("d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string());
@@ -1648,14 +1621,14 @@ fn flow_test_1() {
         "TransactionFetched on Scan screen with load_types. Not that we really need them anymore. Expected Transaction screen with no modals."
     );
 
-    let action = do_action(Action::GoForward, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoForward, "", "").unwrap();
     assert_eq!(
         action, manage_networks_action,
         "GoForward on Transaction screen with load types stub. Expected known ManageNetworks screen with no modals."
     );
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    let mut action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
+    let mut action = state.perform(Action::NavbarLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     let mut expected_action = log_action;
     let hex_3 = "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb";
@@ -1740,10 +1713,8 @@ fn flow_test_1() {
         "Switched to Log from Settings. Expected updated Log screen with no modals.",
     );
 
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    let mut action = do_action(Action::ClearLog, "", "").unwrap().unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    let mut action = state.perform(Action::ClearLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     assert_eq!(
         action, empty_log,
@@ -1752,7 +1723,7 @@ fn flow_test_1() {
 
     current_log_action = action;
 
-    let action = do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NavbarKeys, "", "").unwrap();
 
     let expected_action = ActionResult {
         screen_label: "Select seed".to_string(),
@@ -1774,7 +1745,7 @@ fn flow_test_1() {
         "NavbarKeys on Log screen. Expected SeedSelector screen with NewSeedMenu modal",
     );
 
-    let action = do_action(Action::NewSeed, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NewSeed, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "New Seed".to_string(),
         back: true,
@@ -1795,14 +1766,14 @@ fn flow_test_1() {
 
     let new_seed_action = action;
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, seed_selector_action,
         "GoBack on NewSeed screen. Expected SeedSelector screen with no modals.",
     );
 
-    do_action(Action::NewSeed, "", "").unwrap().unwrap();
-    let mut action = do_action(Action::GoForward, "Portia", "").unwrap().unwrap();
+    state.perform(Action::NewSeed, "", "").unwrap();
+    let mut action = state.perform(Action::GoForward, "Portia", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "New Seed".to_string(),
         back: true,
@@ -1830,25 +1801,25 @@ fn flow_test_1() {
         "GoForward on NewSeed screen with non-empty seed name. Expected NewSeed screen with NewSeedBackup modal."
     );
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, new_seed_action,
         "GoBack on NewSeed screen with generated seed. Expected NewSeed screen with no modals."
     );
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(action, seed_selector_action, "GoBack on NewSeed screen with no modals, to see footer. Expected known SeedSelector screen with no modals");
 
-    let mut action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::NavbarLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     assert_eq!(
         action, current_log_action,
         "Switched to Log from SeedSelector after cancelling seed creation. Expected known Log screen with no modals.",
     );
 
-    do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
-    do_action(Action::NewSeed, "", "").unwrap().unwrap();
-    let mut action = do_action(Action::GoForward, "Portia", "").unwrap().unwrap();
+    state.perform(Action::NavbarKeys, "", "").unwrap();
+    state.perform(Action::NewSeed, "", "").unwrap();
+    let mut action = state.perform(Action::GoForward, "Portia", "").unwrap();
     let seed_phrase_portia = if let Some(ref mut m) = action.modal_data {
         erase_modal_seed_phrase_and_identicon(m)
     } else {
@@ -1879,8 +1850,8 @@ fn flow_test_1() {
         "GoForward on NewSeed screen with non-empty seed name. Expected NewSeed screen with NewSeedBackup modal."
     );
 
-    let mut action = do_action(Action::GoForward, "true", &seed_phrase_portia)
-        .unwrap()
+    let mut action = state
+        .perform(Action::GoForward, "true", &seed_phrase_portia)
         .unwrap();
     erase_base58_address_identicon(&mut action.screen_data);
     let expected_action = ActionResult {
@@ -1935,9 +1906,9 @@ fn flow_test_1() {
         "GoForward on NewSeed screen with NewSeedBackup modal active. Expected Keys screen with no modals."
     );
 
-    update_seed_names(vec![String::from("Portia")]);
+    state.update_seed_names(vec![String::from("Portia")]);
 
-    let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::GoBack, "", "").unwrap();
     erase_identicon(&mut action.screen_data);
 
     let expected_action = ActionResult {
@@ -1966,7 +1937,7 @@ fn flow_test_1() {
 
     seed_selector_action = action;
 
-    let mut action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::NavbarLog, "", "").unwrap();
     erase_public_keys(&mut action.screen_data);
     erase_log_timestamps(&mut action.screen_data);
 
@@ -2083,10 +2054,8 @@ fn flow_test_1() {
     };
     assert_eq!(action, expected_action);
 
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    let mut action = do_action(Action::ClearLog, "", "").unwrap().unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    let mut action = state.perform(Action::ClearLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     let expected_action = ActionResult {
@@ -2113,11 +2082,9 @@ fn flow_test_1() {
         "ClearLog on Log screen with LogRight modal. Expected updated Log screen with no modals"
     );
 
-    do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    let action = do_action(Action::RecoverSeed, "", "").unwrap().unwrap();
+    state.perform(Action::NavbarKeys, "", "").unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    let action = state.perform(Action::RecoverSeed, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
         back: true,
@@ -2139,18 +2106,16 @@ fn flow_test_1() {
         "RecoverSeed on SeedSelector screen with NewSeedMenu modal. Expected RecoverSeedName screen with no modals"
     );
 
-    let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::GoBack, "", "").unwrap();
     erase_identicon(&mut action.screen_data);
     assert_eq!(
         action, seed_selector_action,
         "GoBack on RecoverSeedName screen with no modals. Expected known SeedSelector screen"
     );
 
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    do_action(Action::RecoverSeed, "", "").unwrap().unwrap();
-    let action = do_action(Action::GoForward, "Portia", "").unwrap().unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    state.perform(Action::RecoverSeed, "", "").unwrap();
+    let action = state.perform(Action::GoForward, "Portia", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
         back: true,
@@ -2174,8 +2139,8 @@ fn flow_test_1() {
         "GoForward on RecoverSeedName screen using existing name. Expected RecoverSeedName screen with error."
     );
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    let action = do_action(Action::GoForward, "Alys", "").unwrap().unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
+    let action = state.perform(Action::GoForward, "Alys", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
         back: true,
@@ -2210,7 +2175,7 @@ fn flow_test_1() {
         "GoForward on RecoverSeedName screen using new name. Expected RecoverSeedPhrase screen with no modals."
     );
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
         back: true,
@@ -2232,7 +2197,7 @@ fn flow_test_1() {
         "GoBack on RecoverSeedPhrase screen. Expected RecoverSeedName screen with no modals and with retained name."
     );
 
-    let action = do_action(Action::GoForward, "Alice", "").unwrap().unwrap();
+    let action = state.perform(Action::GoForward, "Alice", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
         back: true,
@@ -2271,7 +2236,7 @@ fn flow_test_1() {
     );
 
     // Alice painstakingly recalls her seed phrase
-    let action = do_action(Action::TextEntry, " botto", "").unwrap().unwrap();
+    let action = state.perform(Action::TextEntry, " botto", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
         back: true,
@@ -2301,9 +2266,7 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::TextEntry, " botto ", "")
-        .unwrap()
-        .unwrap();
+    let action = state.perform(Action::TextEntry, " botto ", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
         back: true,
@@ -2342,9 +2305,7 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::TextEntry, " abstract ", "")
-        .unwrap()
-        .unwrap();
+    let action = state.perform(Action::TextEntry, " abstract ", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
         back: true,
@@ -2383,7 +2344,7 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::TextEntry, "", "").unwrap().unwrap();
+    let action = state.perform(Action::TextEntry, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
         back: true,
@@ -2422,11 +2383,11 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::TextEntry, " d", "").unwrap().unwrap();
+    state.perform(Action::TextEntry, " d", "").unwrap();
 
     // a cat interfered
-    let action = do_action(Action::TextEntry, " ddddddddddddddd", "")
-        .unwrap()
+    let action = state
+        .perform(Action::TextEntry, " ddddddddddddddd", "")
         .unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
@@ -2466,9 +2427,7 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::TextEntry, " dddddddd ", "")
-        .unwrap()
-        .unwrap();
+    let action = state.perform(Action::TextEntry, " dddddddd ", "").unwrap();
     assert_eq!(
         action, expected_action,
         concat!(
@@ -2477,11 +2436,11 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::TextEntry, " driv ", "").unwrap().unwrap();
-    do_action(Action::TextEntry, " obe ", "").unwrap().unwrap();
-    do_action(Action::TextEntry, " lake ", "").unwrap().unwrap();
-    do_action(Action::TextEntry, " curt ", "").unwrap().unwrap();
-    let action = do_action(Action::TextEntry, " som", "").unwrap().unwrap();
+    state.perform(Action::TextEntry, " driv ", "").unwrap();
+    state.perform(Action::TextEntry, " obe ", "").unwrap();
+    state.perform(Action::TextEntry, " lake ", "").unwrap();
+    state.perform(Action::TextEntry, " curt ", "").unwrap();
+    let action = state.perform(Action::TextEntry, " som", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
         back: true,
@@ -2517,7 +2476,7 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::TextEntry, " smo", "").unwrap().unwrap();
+    let action = state.perform(Action::TextEntry, " smo", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
         back: true,
@@ -2553,7 +2512,7 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::TextEntry, " smo ", "").unwrap().unwrap();
+    let action = state.perform(Action::TextEntry, " smo ", "").unwrap();
     assert_eq!(
         action, expected_action,
         concat!(
@@ -2562,7 +2521,7 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::PushWord, "smoke", "").unwrap().unwrap();
+    let action = state.perform(Action::PushWord, "smoke", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
         back: true,
@@ -2608,12 +2567,12 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::TextEntry, " bask ", "").unwrap().unwrap();
-    do_action(Action::TextEntry, " hold ", "").unwrap().unwrap();
-    do_action(Action::TextEntry, " race ", "").unwrap().unwrap();
-    do_action(Action::TextEntry, " lone ", "").unwrap().unwrap();
-    do_action(Action::TextEntry, " fit ", "").unwrap().unwrap();
-    let action = do_action(Action::TextEntry, " walk ", "").unwrap().unwrap();
+    state.perform(Action::TextEntry, " bask ", "").unwrap();
+    state.perform(Action::TextEntry, " hold ", "").unwrap();
+    state.perform(Action::TextEntry, " race ", "").unwrap();
+    state.perform(Action::TextEntry, " lone ", "").unwrap();
+    state.perform(Action::TextEntry, " fit ", "").unwrap();
+    let action = state.perform(Action::TextEntry, " walk ", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Recover Seed".to_string(),
         back: true,
@@ -2672,8 +2631,8 @@ fn flow_test_1() {
     // here the phone gets the finalized allowed seed, and needs to check it with strongbox, to see if the seed phrase already is known
     // can't model it here
 
-    let action = do_action(Action::GoForward, "false", ALICE_SEED_PHRASE)
-        .unwrap()
+    let action = state
+        .perform(Action::GoForward, "false", ALICE_SEED_PHRASE)
         .unwrap();
 
     let expected_action = ActionResult {
@@ -2700,7 +2659,7 @@ fn flow_test_1() {
                     swiped: false,
                     multiselect: false,
                 }],
-                // since root == 'false' in do_action above.
+                // since root == 'false' in state.perform above.
                 // TODO: This has to be wrapped with Option<_>.
                 root: MKeysCard {
                     address: Address {
@@ -2733,11 +2692,11 @@ fn flow_test_1() {
         )
     );
 
-    update_seed_names(vec![String::from("Portia"), String::from("Alice")]);
+    state.update_seed_names(vec![String::from("Portia"), String::from("Alice")]);
 
     let mut alice_polkadot_keys_action = action;
 
-    let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::GoBack, "", "").unwrap();
     erase_identicon(&mut action.screen_data);
     let expected_action = ActionResult {
         screen_label: "Select seed".to_string(),
@@ -2771,7 +2730,7 @@ fn flow_test_1() {
         "GoBack on Keys screen. Expected updated SeedSelector screen with no modals",
     );
 
-    let action = do_action(Action::SelectSeed, "Alice", "").unwrap().unwrap();
+    let action = state.perform(Action::SelectSeed, "Alice", "").unwrap();
     assert_eq!(
         action, alice_polkadot_keys_action,
         concat!(
@@ -2780,13 +2739,13 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(
-        Action::SelectKey,
-        "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    let action = state
+        .perform(
+            Action::SelectKey,
+            "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730",
+            "",
+        )
+        .unwrap();
 
     let expected_action = ActionResult {
         screen_label: "Derived Key".to_string(),
@@ -2826,13 +2785,13 @@ fn flow_test_1() {
         "SelectKey on Keys screen. Expected KeyDetails screen for Alice //polkadot key.",
     );
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, alice_polkadot_keys_action,
         "GoBack on KeyDetails screen. Expected known Keys screen for Alice polkadot keys.",
     );
 
-    let action = do_action(Action::NewKey, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NewKey, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Derive Key".to_string(),
         back: true,
@@ -2864,15 +2823,15 @@ fn flow_test_1() {
         "NewKey on Keys screen. Expected DeriveKey screen",
     );
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, alice_polkadot_keys_action,
         "GoBack on DeriveKey screen. Expected known Keys screen for Alice polkadot keys",
     );
 
-    do_action(Action::NewKey, "", "").unwrap().unwrap();
-    let action = do_action(Action::CheckPassword, "//secret//path///multipass", "")
-        .unwrap()
+    state.perform(Action::NewKey, "", "").unwrap();
+    let action = state
+        .perform(Action::CheckPassword, "//secret//path///multipass", "")
         .unwrap();
     let expected_action = ActionResult {
         screen_label: "Derive Key".to_string(),
@@ -2917,13 +2876,13 @@ fn flow_test_1() {
 
     // Plaintext secrets in json?
 
-    let action = do_action(
-        Action::GoForward,
-        "//secret//path///multipass",
-        ALICE_SEED_PHRASE,
-    )
-    .unwrap()
-    .unwrap();
+    let action = state
+        .perform(
+            Action::GoForward,
+            "//secret//path///multipass",
+            ALICE_SEED_PHRASE,
+        )
+        .unwrap();
 
     let expected_action = ActionResult {
         screen_label: String::new(),
@@ -2966,7 +2925,7 @@ fn flow_test_1() {
                         multiselect: false,
                     },
                 ],
-                // since root == 'false' in do_action above.
+                // since root == 'false' in state.perform above.
                 // TODO: This has to be wrapped with Option<_>.
                 root: MKeysCard {
                     address: Address {
@@ -2996,10 +2955,10 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::NewKey, "", "").unwrap().unwrap();
+    state.perform(Action::NewKey, "", "").unwrap();
     // trying to create the missing root
-    let action = do_action(Action::GoForward, "", ALICE_SEED_PHRASE)
-        .unwrap()
+    let action = state
+        .perform(Action::GoForward, "", ALICE_SEED_PHRASE)
         .unwrap();
 
     let expected_action = ActionResult {
@@ -3077,7 +3036,7 @@ fn flow_test_1() {
 
     alice_polkadot_keys_action = action;
 
-    let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::GoBack, "", "").unwrap();
     erase_identicon(&mut action.screen_data);
     let expected_action = ActionResult {
         screen_label: "Select seed".to_string(),
@@ -3114,10 +3073,8 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::SelectSeed, "Alice", "").unwrap().unwrap();
-    let action = do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
+    state.perform(Action::SelectSeed, "Alice", "").unwrap();
+    let action = state.perform(Action::RightButtonAction, "", "").unwrap();
     let mut expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
@@ -3195,7 +3152,7 @@ fn flow_test_1() {
         "RightButton on Keys screen. Expected SeedMenu modal to appear",
     );
 
-    let action = do_action(Action::BackupSeed, "", "").unwrap().unwrap();
+    let action = state.perform(Action::BackupSeed, "", "").unwrap();
     expected_action.modal_data = Some(ModalData::Backup {
         f: MBackup {
             seed_name: "Alice".to_string(),
@@ -3248,7 +3205,7 @@ fn flow_test_1() {
     // mock signal from phone; elsewise untestable;
     db_handling::manage_history::seed_name_was_shown(dbname, String::from("Alice")).unwrap();
 
-    let mut action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::NavbarLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     let expected_action = ActionResult {
         screen_label: String::new(),
@@ -3371,10 +3328,8 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    let mut action = do_action(Action::ClearLog, "", "").unwrap().unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    let mut action = state.perform(Action::ClearLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     assert_eq!(
         action, empty_log,
@@ -3384,14 +3339,10 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
-    do_action(Action::SelectSeed, "Portia", "")
-        .unwrap()
-        .unwrap();
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    let _action = do_action(Action::RemoveSeed, "", "").unwrap().unwrap();
+    state.perform(Action::NavbarKeys, "", "").unwrap();
+    state.perform(Action::SelectSeed, "Portia", "").unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    let _action = state.perform(Action::RemoveSeed, "", "").unwrap();
     /* TODO: this.
     let cut_real_json = cut_public_key(&timeless(&real_json));
 
@@ -3406,12 +3357,10 @@ fn flow_test_1() {
     */
     // Switching to log. Maybe we want to switch here to updated SeedSelector?
 
-    update_seed_names(vec![String::from("Alice")]);
+    state.update_seed_names(vec![String::from("Alice")]);
 
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    let mut action = do_action(Action::ClearLog, "", "").unwrap().unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    let mut action = state.perform(Action::ClearLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     assert_eq!(
         action, empty_log,
@@ -3421,7 +3370,7 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NavbarKeys, "", "").unwrap();
 
     let expected_action = ActionResult {
         screen_label: "Select seed".to_string(),
@@ -3447,8 +3396,8 @@ fn flow_test_1() {
         "NavbarKeys on Log screen. Expected updated SeedSelector screen with no modals",
     );
 
-    do_action(Action::SelectSeed, "Alice", "").unwrap().unwrap();
-    let action = do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
+    state.perform(Action::SelectSeed, "Alice", "").unwrap();
+    let action = state.perform(Action::NetworkSelector, "", "").unwrap();
     let mut expected_action = alice_polkadot_keys_action.clone();
     expected_action.modal_data = Some(ModalData::NetworkSelector {
         f: MNetworkMenu {
@@ -3489,7 +3438,7 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NetworkSelector, "", "").unwrap();
     assert_eq!(
         action, alice_polkadot_keys_action,
         concat!(
@@ -3498,14 +3447,14 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
-    let action = do_action(
-        Action::ChangeNetwork,
-        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    state.perform(Action::NetworkSelector, "", "").unwrap();
+    let action = state
+        .perform(
+            Action::ChangeNetwork,
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            "",
+        )
+        .unwrap();
     let expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
@@ -3555,8 +3504,8 @@ fn flow_test_1() {
         "ChangeNetwork on Keys screen. Expected Keys screen for Alice westend keys.",
     );
 
-    do_action(Action::NavbarScan, "", "").unwrap().unwrap();
-    let action = do_action(Action::TransactionFetched,"53ffde01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e141c2f2f416c6963653c2f2f416c6963652f77657374656e64582f2f416c6963652f7365637265742f2f7365637265740c2f2f300c2f2f31","").unwrap().unwrap();
+    state.perform(Action::NavbarScan, "", "").unwrap();
+    let action = state.perform(Action::TransactionFetched,"53ffde01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e141c2f2f416c6963653c2f2f416c6963652f77657374656e64582f2f416c6963652f7365637265742f2f7365637265740c2f2f300c2f2f31","").unwrap();
     let mut expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
@@ -3604,7 +3553,7 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::GoForward, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoForward, "", "").unwrap();
     expected_action.modal_data = Some(ModalData::SelectSeed {
         f: MSeeds {
             seed_name_cards: vec![SeedNameCard {
@@ -3623,8 +3572,8 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::GoForward, "Alice", ALICE_SEED_PHRASE)
-        .unwrap()
+    let action = state
+        .perform(Action::GoForward, "Alice", ALICE_SEED_PHRASE)
         .unwrap();
     let expected_action = ActionResult {
         screen_label: String::new(),
@@ -3765,14 +3714,14 @@ fn flow_test_1() {
 
     let mut alice_westend_keys_action = action;
 
-    do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
-    let action = do_action(
-        Action::ChangeNetwork,
-        "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
-        "",
-    )
-    .unwrap()
-    .unwrap(); // switching to polkadot, expect no changes
+    state.perform(Action::NetworkSelector, "", "").unwrap();
+    let action = state
+        .perform(
+            Action::ChangeNetwork,
+            "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+            "",
+        )
+        .unwrap(); // switching to polkadot, expect no changes
     assert_eq!(
         action, alice_polkadot_keys_action,
         concat!(
@@ -3781,20 +3730,21 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
-    do_action(
-        Action::ChangeNetwork,
-        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        "",
-    )
-    .unwrap();
-    let action = do_action(
-        Action::Swipe,
-        "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    state.perform(Action::NetworkSelector, "", "").unwrap();
+    state
+        .perform(
+            Action::ChangeNetwork,
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            "",
+        )
+        .unwrap();
+    let action = state
+        .perform(
+            Action::Swipe,
+            "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
+            "",
+        )
+        .unwrap();
 
     if let ScreenData::Keys { ref mut f } = keys_westend.screen_data {
         f.set[1].swiped = true;
@@ -3804,13 +3754,13 @@ fn flow_test_1() {
         "Swipe on Keys screen for Alice westend keys. Expected updated Keys screen.",
     );
     // unswipe
-    let action = do_action(
-        Action::Swipe,
-        "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    let action = state
+        .perform(
+            Action::Swipe,
+            "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
+            "",
+        )
+        .unwrap();
 
     assert_eq!(
         action, alice_westend_keys_action,
@@ -3820,20 +3770,21 @@ fn flow_test_1() {
         )
     );
 
-    do_action(
-        Action::Swipe,
-        "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
-        "",
-    )
-    .unwrap();
+    state
+        .perform(
+            Action::Swipe,
+            "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
+            "",
+        )
+        .unwrap();
     // swipe another
-    let action = do_action(
-        Action::Swipe,
-        "019cd20feb68e0535a6c1cdeead4601b652cf6af6d76baf370df26ee25adde0805",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    let action = state
+        .perform(
+            Action::Swipe,
+            "019cd20feb68e0535a6c1cdeead4601b652cf6af6d76baf370df26ee25adde0805",
+            "",
+        )
+        .unwrap();
 
     if let ScreenData::Keys { ref mut f } = keys_westend.screen_data {
         f.set[1].swiped = false;
@@ -3852,7 +3803,7 @@ fn flow_test_1() {
     }
 
     // remove swiped
-    let action = do_action(Action::RemoveKey, "", "").unwrap().unwrap();
+    let action = state.perform(Action::RemoveKey, "", "").unwrap();
     assert_eq!(
         action, keys_westend,
         "RemoveKey on Keys screen with swiped key. Expected updated Keys screen.",
@@ -3860,15 +3811,16 @@ fn flow_test_1() {
 
     // Note: after removal, stay on the Keys screen (previously went to log).
 
-    do_action(
-        Action::Swipe,
-        "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
-        "",
-    )
-    .unwrap();
+    state
+        .perform(
+            Action::Swipe,
+            "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
+            "",
+        )
+        .unwrap();
     // increment swiped `//westend`
-    let action = do_action(Action::Increment, "2", ALICE_SEED_PHRASE)
-        .unwrap()
+    let action = state
+        .perform(Action::Increment, "2", ALICE_SEED_PHRASE)
         .unwrap();
     let mut expected_action = ActionResult {
         screen_label: String::new(),
@@ -4010,14 +3962,15 @@ fn flow_test_1() {
         "Increment on Keys screen with swiped key. Expected updated Keys screen",
     );
 
-    do_action(
-        Action::Swipe,
-        "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
-        "",
-    )
-    .unwrap();
-    let action = do_action(Action::Increment, "1", ALICE_SEED_PHRASE)
-        .unwrap()
+    state
+        .perform(
+            Action::Swipe,
+            "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
+            "",
+        )
+        .unwrap();
+    let action = state
+        .perform(Action::Increment, "1", ALICE_SEED_PHRASE)
         .unwrap();
 
     if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
@@ -4046,13 +3999,13 @@ fn flow_test_1() {
     );
 
     // enter multi regime with LongTap
-    let action = do_action(
-        Action::LongTap,
-        "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    let action = state
+        .perform(
+            Action::LongTap,
+            "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e",
+            "",
+        )
+        .unwrap();
 
     if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
         f.set[4].multiselect = true;
@@ -4067,13 +4020,13 @@ fn flow_test_1() {
     );
 
     // select by SelectKey in multi
-    let action = do_action(
-        Action::SelectKey,
-        "012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    let action = state
+        .perform(
+            Action::SelectKey,
+            "012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972",
+            "",
+        )
+        .unwrap();
     if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
         f.set[1].multiselect = true;
         f.multiselect_mode = true;
@@ -4086,13 +4039,13 @@ fn flow_test_1() {
     );
 
     // deselect by SelectKey in multi
-    let action = do_action(
-        Action::SelectKey,
-        "012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    let action = state
+        .perform(
+            Action::SelectKey,
+            "012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972",
+            "",
+        )
+        .unwrap();
     if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
         f.set[1].multiselect = false;
         f.multiselect_count = "1".to_string();
@@ -4104,13 +4057,13 @@ fn flow_test_1() {
     );
 
     // deselect by LongTap in multi
-    let action = do_action(
-        Action::LongTap,
-        "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    let action = state
+        .perform(
+            Action::LongTap,
+            "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e",
+            "",
+        )
+        .unwrap();
     if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
         f.set[4].multiselect = false;
         f.multiselect_count = "0".to_string();
@@ -4123,38 +4076,43 @@ fn flow_test_1() {
 
     // Note: although multiselect count is 0, remain in multiselect mode
 
-    do_action(
-        Action::LongTap,
-        "0120c394d410893cac63d993fa71eb8247e6af9a29cda467e836efec678b9f6b7f",
-        "",
-    )
-    .unwrap();
-    do_action(
-        Action::LongTap,
-        "012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972",
-        "",
-    )
-    .unwrap();
-    do_action(
-        Action::LongTap,
-        "014e384fb30994d520094dce42086dbdd4977c11fb2f2cf9ca1c80056684934b08",
-        "",
-    )
-    .unwrap();
-    do_action(
-        Action::LongTap,
-        "01b606fc73f57f03cdb4c932d475ab426043e429cecc2ffff0d2672b0df8398c48",
-        "",
-    )
-    .unwrap();
-    do_action(
-        Action::LongTap,
-        "01e655361d12f3ccca5f128187cf3f5eea052be722746e392c8b498d0d18723470",
-        "",
-    )
-    .unwrap();
+    state
+        .perform(
+            Action::LongTap,
+            "0120c394d410893cac63d993fa71eb8247e6af9a29cda467e836efec678b9f6b7f",
+            "",
+        )
+        .unwrap();
+    state
+        .perform(
+            Action::LongTap,
+            "012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972",
+            "",
+        )
+        .unwrap();
+    state
+        .perform(
+            Action::LongTap,
+            "014e384fb30994d520094dce42086dbdd4977c11fb2f2cf9ca1c80056684934b08",
+            "",
+        )
+        .unwrap();
+    state
+        .perform(
+            Action::LongTap,
+            "01b606fc73f57f03cdb4c932d475ab426043e429cecc2ffff0d2672b0df8398c48",
+            "",
+        )
+        .unwrap();
+    state
+        .perform(
+            Action::LongTap,
+            "01e655361d12f3ccca5f128187cf3f5eea052be722746e392c8b498d0d18723470",
+            "",
+        )
+        .unwrap();
     // remove keys in multiselect mode
-    let action = do_action(Action::RemoveKey, "", "").unwrap().unwrap();
+    let action = state.perform(Action::RemoveKey, "", "").unwrap();
 
     if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
         f.set.remove(0);
@@ -4171,14 +4129,15 @@ fn flow_test_1() {
         "RemoveKey on Keys screen with multiselect mode. Expected updated Keys screen.",
     );
     // enter multiselect mode
-    do_action(
-        Action::LongTap,
-        "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
-        "",
-    )
-    .unwrap();
+    state
+        .perform(
+            Action::LongTap,
+            "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
+            "",
+        )
+        .unwrap();
     // select all
-    let action = do_action(Action::SelectAll, "", "").unwrap().unwrap();
+    let action = state.perform(Action::SelectAll, "", "").unwrap();
 
     if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
         for entry in f.set.iter_mut() {
@@ -4195,7 +4154,7 @@ fn flow_test_1() {
     );
 
     // deselect all
-    let action = do_action(Action::SelectAll, "", "").unwrap().unwrap();
+    let action = state.perform(Action::SelectAll, "", "").unwrap();
 
     if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
         for entry in f.set.iter_mut() {
@@ -4209,7 +4168,7 @@ fn flow_test_1() {
         "SelectAll on Keys screen with multiselect mode. Expected updated Keys screen.",
     );
     // exit multiselect mode
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
         f.multiselect_count = "".to_string();
         f.multiselect_mode = false;
@@ -4223,17 +4182,16 @@ fn flow_test_1() {
     alice_westend_keys_action = action;
 
     // enter multiselect mode
-    do_action(
-        Action::LongTap,
-        "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
-        "",
-    )
-    .unwrap();
-    // select all
-    do_action(Action::SelectAll, "", "").unwrap().unwrap();
-    let action = do_action(Action::ExportMultiSelect, "", "")
-        .unwrap()
+    state
+        .perform(
+            Action::LongTap,
+            "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
+            "",
+        )
         .unwrap();
+    // select all
+    state.perform(Action::SelectAll, "", "").unwrap();
+    let action = state.perform(Action::ExportMultiSelect, "", "").unwrap();
 
     let expected_action = ActionResult {
         screen_label: "Key".to_string(),
@@ -4282,7 +4240,7 @@ fn flow_test_1() {
 
     let unit1 = action;
 
-    let action = do_action(Action::NextUnit, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NextUnit, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Key".to_string(),
         back: true,
@@ -4331,7 +4289,7 @@ fn flow_test_1() {
 
     let unit2 = action;
 
-    let action = do_action(Action::NextUnit, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NextUnit, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Key".to_string(),
         back: true,
@@ -4379,37 +4337,37 @@ fn flow_test_1() {
 
     let unit3 = action;
 
-    let action = do_action(Action::NextUnit, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NextUnit, "", "").unwrap();
     assert_eq!(
         action, unit1,
         "ExportMultiSelect on Keys screen with multiselect mode. Expected KeyDetailsMulti screen"
     );
 
-    let action = do_action(Action::PreviousUnit, "", "").unwrap().unwrap();
+    let action = state.perform(Action::PreviousUnit, "", "").unwrap();
     assert_eq!(
         action, unit3,
         "ExportMultiSelect on Keys screen with multiselect mode. Expected KeyDetailsMulti screen"
     );
 
-    let action = do_action(Action::PreviousUnit, "", "").unwrap().unwrap();
+    let action = state.perform(Action::PreviousUnit, "", "").unwrap();
     assert_eq!(
         action, unit2,
         "ExportMultiSelect on Keys screen with multiselect mode. Expected KeyDetailsMulti screen"
     );
 
-    let action = do_action(Action::PreviousUnit, "", "").unwrap().unwrap();
+    let action = state.perform(Action::PreviousUnit, "", "").unwrap();
     assert_eq!(
         action, unit1,
         "ExportMultiSelect on Keys screen with multiselect mode. Expected KeyDetailsMulti screen"
     );
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, alice_westend_keys_action,
         "GoBack on KeyDetailsMulti screen. Expected Keys screen in plain mode",
     );
 
-    let action = do_action(Action::NewKey, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NewKey, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Derive Key".to_string(),
         back: true,
@@ -4441,16 +4399,16 @@ fn flow_test_1() {
         "NewKey on Keys screen. Expected DeriveKey screen",
     );
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, alice_westend_keys_action,
         "GoBack on DeriveKey screen. Expected Keys screen in plain mode.",
     );
 
-    do_action(Action::NewKey, "", "").unwrap().unwrap();
+    state.perform(Action::NewKey, "", "").unwrap();
     // create root derivation
-    let action = do_action(Action::GoForward, "", ALICE_SEED_PHRASE)
-        .unwrap()
+    let action = state
+        .perform(Action::GoForward, "", ALICE_SEED_PHRASE)
         .unwrap();
     let mut expected_action = ActionResult {
         screen_label: String::new(),
@@ -4541,14 +4499,15 @@ fn flow_test_1() {
     );
 
     // enter multiselect mode
-    do_action(
-        Action::LongTap,
-        "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
-        "",
-    )
-    .unwrap();
+    state
+        .perform(
+            Action::LongTap,
+            "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
+            "",
+        )
+        .unwrap();
     // select all
-    let action = do_action(Action::SelectAll, "", "").unwrap().unwrap();
+    let action = state.perform(Action::SelectAll, "", "").unwrap();
 
     if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
         for entry in f.set.iter_mut() {
@@ -4568,14 +4527,14 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    let action = do_action(
-        Action::SelectKey,
-        "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
+    let action = state
+        .perform(
+            Action::SelectKey,
+            "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
+            "",
+        )
+        .unwrap();
     let expected_action = ActionResult {
         screen_label: "Seed Key".to_string(),
         back: true,
@@ -4618,9 +4577,9 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
-    let action = do_action(Action::BackupSeed, "", "").unwrap().unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
+    state.perform(Action::NavbarSettings, "", "").unwrap();
+    let action = state.perform(Action::BackupSeed, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: "Select seed".to_string(),
         back: true,
@@ -4648,7 +4607,7 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::BackupSeed, "Alice", "").unwrap().unwrap();
+    let action = state.perform(Action::BackupSeed, "Alice", "").unwrap();
     let expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
@@ -4784,20 +4743,17 @@ fn flow_test_1() {
     // mock signal from phone
     db_handling::manage_history::seed_name_was_shown(dbname, String::from("Alice")).unwrap();
 
-    do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
-    do_action(Action::ManageNetworks, "", "").unwrap().unwrap();
-    do_action(
-        Action::GoForward,
-        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        "",
-    )
-    .unwrap();
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
+    state.perform(Action::NavbarSettings, "", "").unwrap();
+    state.perform(Action::ManageNetworks, "", "").unwrap();
+    state
+        .perform(
+            Action::GoForward,
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            "",
+        )
         .unwrap();
-    let action = do_action(Action::SignNetworkSpecs, "", "")
-        .unwrap()
-        .unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    let action = state.perform(Action::SignNetworkSpecs, "", "").unwrap();
     let mut expected_action = ActionResult {
         screen_label: "Sign SufficientCrypto".to_string(),
         back: true,
@@ -4928,13 +4884,13 @@ fn flow_test_1() {
         )
     );
 
-    let mut action = do_action(
-        Action::GoForward,
-        "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    let mut action = state
+        .perform(
+            Action::GoForward,
+            "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
+            "",
+        )
+        .unwrap();
     expected_action.modal_data = Some(ModalData::SufficientCryptoReady {
         f: MSufficientCryptoReady {
             author_info: MAddressCard {
@@ -5010,7 +4966,7 @@ fn flow_test_1() {
         std::env::set_current_dir("../../navigator").unwrap();
     }
 
-    let action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoBack, "", "").unwrap();
     assert_eq!(
         action, current_settings_action,
         concat!(
@@ -5019,7 +4975,7 @@ fn flow_test_1() {
         )
     );
 
-    let mut action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::NavbarLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     let alice_public_hex = "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a";
@@ -5073,10 +5029,8 @@ fn flow_test_1() {
             expected_action.screen_data
         );
     }
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    let mut action = do_action(Action::ClearLog, "", "").unwrap().unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    let mut action = state.perform(Action::ClearLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     assert_eq!(
         action, expected_action,
@@ -5086,25 +5040,24 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
-    do_action(Action::ManageNetworks, "", "").unwrap().unwrap();
-    do_action(
-        Action::GoForward,
-        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        "",
-    )
-    .unwrap();
-    do_action(Action::ManageMetadata, "9150", "")
-        .unwrap()
+    state.perform(Action::NavbarSettings, "", "").unwrap();
+    state.perform(Action::ManageNetworks, "", "").unwrap();
+    state
+        .perform(
+            Action::GoForward,
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            "",
+        )
         .unwrap();
-    do_action(Action::SignMetadata, "", "").unwrap().unwrap();
-    let mut action = do_action(
-        Action::GoForward,
-        "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    state.perform(Action::ManageMetadata, "9150", "").unwrap();
+    state.perform(Action::SignMetadata, "", "").unwrap();
+    let mut action = state
+        .perform(
+            Action::GoForward,
+            "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
+            "",
+        )
+        .unwrap();
     let expected_action = ActionResult {
         screen_label: "Sign SufficientCrypto".to_string(),
         back: true,
@@ -5293,8 +5246,8 @@ fn flow_test_1() {
         std::env::set_current_dir("../../navigator").unwrap();
     }
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    let action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
+    let action = state.perform(Action::NavbarLog, "", "").unwrap();
     if let ScreenData::Log { ref f } = action.screen_data {
         assert_eq!(
             f.log[0].events[0],
@@ -5321,24 +5274,20 @@ fn flow_test_1() {
     } else {
         panic!("Expected ScreenData::Log, got {:?}", action.screen_data);
     }
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    do_action(Action::ClearLog, "", "").unwrap().unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    state.perform(Action::ClearLog, "", "").unwrap();
 
-    do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
-    do_action(Action::ManageNetworks, "", "").unwrap().unwrap();
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
+    state.perform(Action::NavbarSettings, "", "").unwrap();
+    state.perform(Action::ManageNetworks, "", "").unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    state.perform(Action::SignTypes, "", "").unwrap();
+    let mut action = state
+        .perform(
+            Action::GoForward,
+            "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
+            "",
+        )
         .unwrap();
-    do_action(Action::SignTypes, "", "").unwrap().unwrap();
-    let mut action = do_action(
-        Action::GoForward,
-        "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
-        "",
-    )
-    .unwrap()
-    .unwrap();
     let sufficient = if let Some(ModalData::SufficientCryptoReady { ref mut f }) = action.modal_data
     {
         std::mem::take(&mut f.sufficient)
@@ -5410,8 +5359,8 @@ fn flow_test_1() {
         std::env::set_current_dir("../../navigator").unwrap();
     }
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    let action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
+    let action = state.perform(Action::NavbarLog, "", "").unwrap();
     if let ScreenData::Log { ref f } = action.screen_data {
         assert_eq!(
             f.log[0].events[0],
@@ -5437,14 +5386,12 @@ fn flow_test_1() {
         panic!("Expected ScreenData::Log, got {:?}", action.screen_data);
     }
 
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    do_action(Action::ClearLog, "", "").unwrap().unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    state.perform(Action::ClearLog, "", "").unwrap();
 
     // let's scan something!!! oops wrong network version
-    do_action(Action::NavbarScan, "", "").unwrap().unwrap();
-    let action = do_action(Action::TransactionFetched,"530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","").unwrap().unwrap();
+    state.perform(Action::NavbarScan, "", "").unwrap();
+    let action = state.perform(Action::TransactionFetched,"530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","").unwrap();
     let expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
@@ -5487,7 +5434,7 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::GoForward, "", "").unwrap().unwrap();
+    let action = state.perform(Action::GoForward, "", "").unwrap();
     assert_eq!(
         action, expected_action,
         concat!(
@@ -5498,10 +5445,10 @@ fn flow_test_1() {
     );
 
     // let's scan something real!!!
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
     let transaction_hex = "5301008266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235ea40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-    let action = do_action(Action::TransactionFetched, transaction_hex, "")
-        .unwrap()
+    let action = state
+        .perform(Action::TransactionFetched, transaction_hex, "")
         .unwrap();
     let docs = "53616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a6f726967696e206163636f756e742e0a0a393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a5b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e73666572".to_string();
 
@@ -5676,13 +5623,13 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(
-        Action::GoForward,
-        "Alice sends some cash",
-        ALICE_SEED_PHRASE,
-    )
-    .unwrap()
-    .unwrap();
+    let action = state
+        .perform(
+            Action::GoForward,
+            "Alice sends some cash",
+            ALICE_SEED_PHRASE,
+        )
+        .unwrap();
     let signature_hex = if let Some(ModalData::SignatureReady {
         f: MSignatureReady { signature },
     }) = action.modal_data
@@ -5701,7 +5648,7 @@ fn flow_test_1() {
         signature_hex
     );
 
-    let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::GoBack, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     let transaction = "a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33".to_string();
@@ -5753,7 +5700,7 @@ fn flow_test_1() {
         "GoBack from Transaction with SignatureReady modal. Expected Log.",
     );
 
-    let mut action = do_action(Action::ShowLogDetails, "1", "").unwrap().unwrap();
+    let mut action = state.perform(Action::ShowLogDetails, "1", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     //r#"{"screen":"LogDetails","screenLabel":"Event details","back":true,"footer":true,"footerButton":"Log","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"timestamp":"**","events":[{"event":"transaction_signed","payload":{"transaction":{"method":[{"index":0,"indent":0,"type":"pallet","payload":"Balances"},{"index":1,"indent":1,"type":"method","payload":{"method_name":"transfer_keep_alive","docs":"53616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a6f726967696e206163636f756e742e0a0a393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a5b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e73666572"}},{"index":2,"indent":2,"type":"field_name","payload":{"name":"dest","docs_field_name":"","path_type":"sp_runtime >> multiaddress >> MultiAddress","docs_type":""}},{"index":3,"indent":3,"type":"enum_variant_name","payload":{"name":"Id","docs_enum_variant":""}},{"index":4,"indent":4,"type":"Id","payload":{"base58":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty","identicon":"<bob>"}},{"index":5,"indent":2,"type":"field_name","payload":{"name":"value","docs_field_name":"","path_type":"","docs_type":""}},{"index":6,"indent":3,"type":"balance","payload":{"amount":"100.000000000","units":"mWND"}}],"extensions":[{"index":7,"indent":0,"type":"era","payload":{"era":"Mortal","phase":"27","period":"64"}},{"index":8,"indent":0,"type":"nonce","payload":"46"},{"index":9,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":10,"indent":0,"type":"name_version","payload":{"name":"westend","version":"9150"}},{"index":11,"indent":0,"type":"tx_version","payload":"5"},{"index":12,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"}]},"network_name":"westend","signed_by":{"public_key":"8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e","identicon":"<alice_sr25519_//Alice/secret//secret>","encryption":"sr25519"},"user_comment":"Alice sends some cash"}}]},"modalData":{},"alertData":{}}"#;
@@ -5767,19 +5714,17 @@ fn flow_test_1() {
     );
     */
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    do_action(Action::ClearLog, "", "").unwrap().unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    state.perform(Action::ClearLog, "", "").unwrap();
 
     // let's scan a text message
-    do_action(Action::NavbarScan, "", "").unwrap().unwrap();
+    state.perform(Action::NavbarScan, "", "").unwrap();
     let card_text = hex::encode(b"uuid-abcd");
     let sign_msg = hex::encode(b"<Bytes>uuid-abcd</Bytes>");
     let message_hex = format!("5301033efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", sign_msg);
-    let action = do_action(Action::TransactionFetched, &message_hex, "")
-        .unwrap()
+    let action = state
+        .perform(Action::TransactionFetched, &message_hex, "")
         .unwrap();
     let expected_action = ActionResult {
         screen_label: String::new(),
@@ -5833,8 +5778,8 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::GoForward, "text test", ALICE_SEED_PHRASE)
-        .unwrap()
+    let action = state
+        .perform(Action::GoForward, "text test", ALICE_SEED_PHRASE)
         .unwrap();
     let signature_hex = if let Some(ModalData::SignatureReady {
         f: MSignatureReady { ref signature },
@@ -5861,7 +5806,7 @@ fn flow_test_1() {
         signature_hex
     );
 
-    let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::GoBack, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     let signed_by = "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34";
     let expected_action = ActionResult {
@@ -5910,7 +5855,7 @@ fn flow_test_1() {
         "GoBack from Transaction with SignatureReady modal. Expected Log.",
     );
 
-    let mut action = do_action(Action::ShowLogDetails, "1", "").unwrap().unwrap();
+    let mut action = state.perform(Action::ShowLogDetails, "1", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     let expected_action = ActionResult {
         screen_label: "Event details".to_string(),
@@ -5956,18 +5901,14 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    do_action(Action::ClearLog, "", "").unwrap().unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    state.perform(Action::ClearLog, "", "").unwrap();
 
-    do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    do_action(Action::NewSeed, "", "").unwrap().unwrap();
-    let mut action = do_action(Action::GoForward, "Pepper", "").unwrap().unwrap();
+    state.perform(Action::NavbarKeys, "", "").unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    state.perform(Action::NewSeed, "", "").unwrap();
+    let mut action = state.perform(Action::GoForward, "Pepper", "").unwrap();
     let seed_phrase_pepper = cut_seed_remove_identicon(&mut action.modal_data);
     let expected_action = ActionResult {
         screen_label: "New Seed".to_string(),
@@ -5997,8 +5938,8 @@ fn flow_test_1() {
         )
     );
 
-    let mut action = do_action(Action::GoForward, "false", &seed_phrase_pepper)
-        .unwrap()
+    let mut action = state
+        .perform(Action::GoForward, "false", &seed_phrase_pepper)
         .unwrap();
     erase_base58_address_identicon(&mut action.screen_data);
     let expected_action = ActionResult {
@@ -6056,16 +5997,16 @@ fn flow_test_1() {
         )
     );
 
-    update_seed_names(vec![String::from("Alice"), String::from("Pepper")]);
+    state.update_seed_names(vec![String::from("Alice"), String::from("Pepper")]);
 
-    do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
-    let mut action = do_action(
-        Action::ChangeNetwork,
-        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        "",
-    )
-    .unwrap()
-    .unwrap();
+    state.perform(Action::NetworkSelector, "", "").unwrap();
+    let mut action = state
+        .perform(
+            Action::ChangeNetwork,
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            "",
+        )
+        .unwrap();
 
     let expected_action = ActionResult {
         screen_label: String::new(),
@@ -6124,14 +6065,14 @@ fn flow_test_1() {
         action, expected_action,
         "Changed network to westend. Expected Keys screen with no modals",
     );
-    do_action(Action::NavbarScan, "", "").unwrap().unwrap();
+    state.perform(Action::NavbarScan, "", "").unwrap();
 
     let transaction_hex_pepper = transaction_hex.replace(
         "8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e",
         &pepper_westend_public,
     );
-    let action = do_action(Action::TransactionFetched, &transaction_hex_pepper, "")
-        .unwrap()
+    let action = state
+        .perform(Action::TransactionFetched, &transaction_hex_pepper, "")
         .unwrap();
 
     let block_hash = "538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33".to_string();
@@ -6305,13 +6246,13 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(
-        Action::GoForward,
-        "Pepper also sends some cash",
-        &seed_phrase_pepper,
-    )
-    .unwrap()
-    .unwrap();
+    let action = state
+        .perform(
+            Action::GoForward,
+            "Pepper also sends some cash",
+            &seed_phrase_pepper,
+        )
+        .unwrap();
     let signature_hex = if let Some(ModalData::SignatureReady {
         f: MSignatureReady { ref signature },
     }) = action.modal_data
@@ -6341,28 +6282,25 @@ fn flow_test_1() {
         signature_hex
     );
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
+    state.perform(Action::GoBack, "", "").unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    state.perform(Action::ClearLog, "", "").unwrap();
+    state.perform(Action::NavbarKeys, "", "").unwrap();
+    state.perform(Action::SelectSeed, "Pepper", "").unwrap();
+    state.perform(Action::NetworkSelector, "", "").unwrap();
+    state
+        .perform(
+            Action::ChangeNetwork,
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            "",
+        )
         .unwrap();
-    do_action(Action::ClearLog, "", "").unwrap().unwrap();
-    do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
-    do_action(Action::SelectSeed, "Pepper", "")
-        .unwrap()
+    state
+        .perform(Action::Swipe, &format!("01{}", pepper_westend_public), "")
         .unwrap();
-    do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
-    do_action(
-        Action::ChangeNetwork,
-        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        "",
-    )
-    .unwrap();
-    do_action(Action::Swipe, &format!("01{}", pepper_westend_public), "")
-        .unwrap()
-        .unwrap();
-    do_action(Action::RemoveKey, "", "").unwrap().unwrap();
+    state.perform(Action::RemoveKey, "", "").unwrap();
 
-    let action = do_action(Action::NewKey, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NewKey, "", "").unwrap();
     let mut expected_action = ActionResult {
         screen_label: "Derive Key".to_string(),
         back: true,
@@ -6409,8 +6347,8 @@ fn flow_test_1() {
         panic!("");
     }
 
-    let action = do_action(Action::CheckPassword, "//0///secret", "")
-        .unwrap()
+    let action = state
+        .perform(Action::CheckPassword, "//0///secret", "")
         .unwrap();
     assert_eq!(
         action, expected_action,
@@ -6421,8 +6359,8 @@ fn flow_test_1() {
         )
     );
 
-    let mut action = do_action(Action::GoForward, "//0///secret", &seed_phrase_pepper)
-        .unwrap()
+    let mut action = state
+        .perform(Action::GoForward, "//0///secret", &seed_phrase_pepper)
         .unwrap();
     let (pepper_key0_public, pepper_key0_base58, pepper_key0_identicon) =
         if let ScreenData::Keys { ref f } = action.screen_data {
@@ -6484,13 +6422,13 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::NavbarScan, "", "").unwrap().unwrap();
+    state.perform(Action::NavbarScan, "", "").unwrap();
     let message_hex = message_hex.replace(
         "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
         &pepper_key0_public,
     );
-    let action = do_action(Action::TransactionFetched, &message_hex, "")
-        .unwrap()
+    let action = state
+        .perform(Action::TransactionFetched, &message_hex, "")
         .unwrap();
     let mut expected_action = ActionResult {
         screen_label: String::new(),
@@ -6542,13 +6480,13 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(
-        Action::GoForward,
-        "Pepper tries sending text from passworded account",
-        &seed_phrase_pepper,
-    )
-    .unwrap()
-    .unwrap();
+    let action = state
+        .perform(
+            Action::GoForward,
+            "Pepper tries sending text from passworded account",
+            &seed_phrase_pepper,
+        )
+        .unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
             author_info: MAddressCard {
@@ -6573,9 +6511,7 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::GoForward, "wrong_one", "")
-        .unwrap()
-        .unwrap();
+    let action = state.perform(Action::GoForward, "wrong_one", "").unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
             author_info: MAddressCard {
@@ -6604,10 +6540,8 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    let action = do_action(Action::GoForward, "wrong_two", "")
-        .unwrap()
-        .unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
+    let action = state.perform(Action::GoForward, "wrong_two", "").unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
             author_info: MAddressCard {
@@ -6632,10 +6566,8 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    let mut action = do_action(Action::GoForward, "wrong_three", "")
-        .unwrap()
-        .unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
+    let mut action = state.perform(Action::GoForward, "wrong_three", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     let verifier_value = VerifierValue::Standard {
@@ -6744,22 +6676,21 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    do_action(Action::ClearLog, "", "").unwrap().unwrap();
+    state.perform(Action::RightButtonAction, "", "").unwrap();
+    state.perform(Action::ClearLog, "", "").unwrap();
 
-    do_action(Action::NavbarScan, "", "").unwrap().unwrap();
-    do_action(Action::TransactionFetched, &message_hex, "")
-        .unwrap()
+    state.perform(Action::NavbarScan, "", "").unwrap();
+    state
+        .perform(Action::TransactionFetched, &message_hex, "")
         .unwrap();
-    do_action(
-        Action::GoForward,
-        "Pepper tries better",
-        &seed_phrase_pepper,
-    )
-    .unwrap();
-    let action = do_action(Action::GoForward, "secret", "").unwrap().unwrap();
+    state
+        .perform(
+            Action::GoForward,
+            "Pepper tries better",
+            &seed_phrase_pepper,
+        )
+        .unwrap();
+    let action = state.perform(Action::GoForward, "secret", "").unwrap();
     let signature_hex = if let Some(ModalData::SignatureReady {
         f: MSignatureReady { ref signature },
     }) = action.modal_data
@@ -6792,13 +6723,13 @@ fn flow_test_1() {
         signature_hex
     );
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
+    state.perform(Action::GoBack, "", "").unwrap();
 
     {
         // database got unavailable for some reason
         let _database = db_handling::helpers::open_db(dbname).unwrap();
 
-        let mut action = do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
+        let mut action = state.perform(Action::NavbarKeys, "", "").unwrap();
         let expected_alert = "Database error. Internal error. IO error: could not acquire lock on \"for_tests/flow_test_1/db\": Os {**}".to_string();
         let expected_action = ActionResult {
             screen_label: "Select seed".to_string(),
@@ -6826,7 +6757,7 @@ fn flow_test_1() {
             "Tried to switch from Log to Keys with unavailable database."
         );
 
-        let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+        let mut action = state.perform(Action::GoBack, "", "").unwrap();
 
         let expected_alert = "Database error. Internal error. IO error: could not acquire lock on \"for_tests/flow_test_1/db\": Os {**}".to_string();
         let expected_action = ActionResult {
@@ -6866,13 +6797,13 @@ fn flow_test_1() {
     }
 
     // Aaand, we are back
-    let action = do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NavbarSettings, "", "").unwrap();
     assert_eq!(
         action, current_settings_action,
         "Reload Settings. Expected known Settings screen with no errors.",
     );
 
-    let mut action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
+    let mut action = state.perform(Action::NavbarLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     let expected_action = ActionResult {
         screen_label: String::new(),
@@ -6915,7 +6846,7 @@ fn flow_test_1() {
 
     // no init after population
     populate_cold_nav_test(dbname).unwrap();
-    let action = do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
+    let action = state.perform(Action::NavbarSettings, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: String::new(),
         back: false,

@@ -79,7 +79,7 @@ _Only if you are importing a derived key, usually keys generated with `polkadot{
 In Parity Signer go to Keys, then press "Plus" icon in the top right of the screen, select "Recover seed", enter display name to identify your seed, press "Next", enter the seed phrase. Done, you've got your seed key imported!\
 If you are importing a derived key select the seed from which your key is derived, select account's network, press "Plus" icon next to "Derived keys", enter your derivation path.
 
-### What is a difference between seed key and derived key? Why should I use derived keys?
+### What is the difference between seed key and derived key? Why should I use derived keys?
 
 A seed key is a single key pair generated from a seed phrase. You can “grow” as many derived keys from a single seed by adding derivation paths to your seed phrase.
 

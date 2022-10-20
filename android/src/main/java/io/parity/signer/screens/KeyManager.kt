@@ -31,9 +31,8 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MKeys
 import kotlin.math.absoluteValue
 
-/**
- * Key manager screen
- */
+//old key details screen incmultiselect mode.
+//New version - KeySetDetailsScreen
 @Composable
 fun KeyManager(
 	button: (action: Action, details: String) -> Unit,

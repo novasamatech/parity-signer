@@ -17,8 +17,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components2.base.PrimaryButtonBottomSheet
-import io.parity.signer.components2.base.SecondaryButtonBottomSheet
+import io.parity.signer.components.base.PrimaryButtonBottomSheet
+import io.parity.signer.components.base.SecondaryButtonBottomSheet
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.LocalNavRequest
 import io.parity.signer.models.Navigator
@@ -81,7 +81,7 @@ fun ConfirmExportPrivateKeyAction(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewPrivateKeyExportBottomSheet() {
+private fun PreviewConfirmExportPrivateKeyAction() {
 	SignerNewTheme {
 		ConfirmExportPrivateKeyAction(
 			EmptyNavigator(),
