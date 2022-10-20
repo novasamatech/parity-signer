@@ -68,14 +68,14 @@ fun KeySetDetailsScreenView(
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					Text(
-						text = stringResource(R.string.key_sets_details_screem_derived_subtitle), //todo dmitrz
+						text = stringResource(R.string.key_sets_details_screem_derived_subtitle),
 						color = MaterialTheme.colors.textTertiary,
 						style = TypefaceNew.BodyM,
 						modifier = Modifier.weight(1f),
 					)
 					Icon(
 						painter = painterResource(id = R.drawable.ic_tune_28),
-						contentDescription = null, //todo dmitry
+						contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
 						modifier = Modifier
 							.clickable { navigator.navigate(Action.NETWORK_SELECTOR, "") }
 							.size(28.dp),
