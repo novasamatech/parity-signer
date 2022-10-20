@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -12,19 +13,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
-import io.parity.signer.models.KeySetModel
 import io.parity.signer.models.KeysModel
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 
 @Composable
@@ -49,14 +48,19 @@ fun KeyDerivedItem(
 				)
 			)
 			Column(Modifier.weight(1f)) {
-				Row() {
+				Row(verticalAlignment = Alignment.CenterVertically) {
 					Text(
 						text = model.path,
 						color = MaterialTheme.colors.primary,
 						style = TypefaceNew.LabelM,
 					)
 					if (model.hasPwd) {
-						//todo dmitry show lock icon
+						Icon(
+							painterResource(id = R.drawable.ic_lock_16),
+							contentDescription = stringResource(R.string.key_lock_item),
+							tint = MaterialTheme.colors.textTertiary,
+							modifier = Modifier.padding(start = 8.dp)
+						)
 					}
 				}
 				Spacer(modifier = Modifier.padding(top = 4.dp))

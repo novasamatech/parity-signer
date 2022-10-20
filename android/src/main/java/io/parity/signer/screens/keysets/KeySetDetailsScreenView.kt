@@ -47,7 +47,7 @@ fun KeySetDetailsScreenView(
 	navigator: Navigator,
 	alertState: State<AlertState?>, //for shield icon
 ) {
-
+//todo dmitry selecting multiple key is impossible now, update menu to open old screen for that
 	Column {
 		ScreenHeader(
 			stringId = null,
@@ -75,9 +75,10 @@ fun KeySetDetailsScreenView(
 					)
 					Icon(
 						painter = painterResource(id = R.drawable.ic_tune_28),
-						contentDescription = null,
+						contentDescription = null, //todo dmitry
 						modifier = Modifier
-							.size(28.dp),//todo dmitry on click
+							.clickable { navigator.navigate(Action.NETWORK_SELECTOR, "") }
+							.size(28.dp),
 						tint = MaterialTheme.colors.textTertiary,
 					)
 				}
