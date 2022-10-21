@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -35,39 +37,27 @@ fun KeyDetailsMenu(
 	) {
 
 		MenuItemForBottomSheet(
-			iconId = R.drawable.ic_networks_28,
-			label = stringResource(R.string.menu_option_address_on_other_networks),
-			tint = null,
+			Icons.Outlined.Circle,
+			label = stringResource(R.string.menu_option_select_key),
 			onclick = {
-				//
+				//todo dmitry
 			}
 		)
 
 
 		MenuItemForBottomSheet(
-			iconId = R.drawable.ic_private_key_28,
-			label = stringResource(R.string.menu_option_export_private_key),
-			tint = null,
+			iconId = R.drawable.ic_library_add_28,
+			label = stringResource(R.string.menu_option_derive_from_key),
 			onclick = {
 //				state.value = KeyDetailsMenuState.PRIVATE_KEY_CONFIRM
 			}
 		)
 
 		MenuItemForBottomSheet(
-			iconId = R.drawable.ic_blockchain_28,
-			label = stringResource(R.string.menu_option_change_keys_network),
-			tint = null,
+			iconId = R.drawable.ic_settings_backup_restore_28,
+			label = stringResource(R.string.menu_option_backup_key_set),
 			onclick = {
 				//
-			}
-		)
-
-		MenuItemForBottomSheet(
-			iconId = R.drawable.ic_ios_share_28,
-			label = stringResource(R.string.menu_option_export_private_key),
-			tint = null,
-			onclick = {
-
 			}
 		)
 

@@ -1,6 +1,7 @@
 package io.parity.signer.screens.keydetails
 
 import android.content.res.Configuration
+import android.graphics.drawable.VectorDrawable
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -61,8 +65,8 @@ private fun KeyDetailsGeneralMenu(
 	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = sidePadding, end = sidePadding, top = 8.dp),
+			.fillMaxWidth()
+			.padding(start = sidePadding, end = sidePadding, top = 8.dp),
 	) {
 
 //		MenuItemForBottomSheet(
@@ -120,8 +124,8 @@ private fun KeyDetailsDeleteConfirmMenu(
 	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = sidePadding, end = sidePadding, top = 32.dp),
+			.fillMaxWidth()
+			.padding(start = sidePadding, end = sidePadding, top = 32.dp),
 	) {
 
 		Text(
@@ -133,11 +137,11 @@ private fun KeyDetailsDeleteConfirmMenu(
 		)
 		Text(
 			modifier = Modifier
-                .fillMaxWidth(1f)
-                .padding(
-                    top = 16.dp, bottom = 24.dp,
-                    start = 8.dp, end = 8.dp
-                ),
+				.fillMaxWidth(1f)
+				.padding(
+					top = 16.dp, bottom = 24.dp,
+					start = 8.dp, end = 8.dp
+				),
 			text = stringResource(R.string.remove_key_confirm_text),
 			color = MaterialTheme.colors.textSecondary,
 			style = TypefaceNew.BodyL,
@@ -158,20 +162,46 @@ private fun KeyDetailsDeleteConfirmMenu(
 
 @Composable
 internal fun MenuItemForBottomSheet(
+	vector: ImageVector,
+	label: String,
+	tint: Color? = null,
+	onclick: () -> Unit
+) {
+	MenuItemForBottomSheetInternal(
+		onclick, rememberVectorPainter(vector),
+		tint, label
+	)
+}
+
+@Composable
+internal fun MenuItemForBottomSheet(
 	@DrawableRes iconId: Int,
 	label: String,
 	tint: Color? = null,
 	onclick: () -> Unit
 ) {
+		MenuItemForBottomSheetInternal(
+			onclick, painterResource(id = iconId),
+			tint, label
+		)
+}
+
+@Composable
+private fun MenuItemForBottomSheetInternal(
+	onclick: () -> Unit,
+	painter: Painter,
+	tint: Color?,
+	label: String
+) {
 	Row(
 		modifier = Modifier
-            .clickable(onClick = onclick)
-            .padding(vertical = 8.dp)
-            .fillMaxWidth(),
+			.clickable(onClick = onclick)
+			.padding(vertical = 8.dp)
+			.fillMaxWidth(),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Icon(
-			painter = painterResource(id = iconId),
+			painter = painter,
 			contentDescription = null,
 			modifier = Modifier
 				.size(28.dp),

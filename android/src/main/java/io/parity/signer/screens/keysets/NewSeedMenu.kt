@@ -21,34 +21,27 @@ fun NewSeedMenu(
 	alertState: State<AlertState?>,
 	navigator: Navigator,
 ) {
-	Column {
-		Surface(
-			color = MaterialTheme.colors.Bg000,
-			shape = MaterialTheme.shapes.modal
-		) {
-			Column(
-				modifier = Modifier.padding(20.dp)
-			) {
-				HeaderBar(line1 = "ADD SEED", line2 = "Select seed addition method")
-				BigButton(
-					text = "New seed",
-					action = {
-						if (alertState.value == AlertState.None)
-							navigator.navigate(Action.NEW_SEED)
-						else
-							navigator.navigate(Action.SHIELD)
-					})
-				BigButton(
-					text = "Recover seed",
-					action = {
-						if (alertState.value == AlertState.None)
-							navigator.navigate(Action.RECOVER_SEED)
-						else
-							navigator.navigate(Action.SHIELD)
-					},
-					isShaded = true
-				)
-			}
-		}
+	Column(
+		modifier = Modifier.padding(20.dp)
+	) {
+		HeaderBar(line1 = "ADD SEED", line2 = "Select seed addition method")
+		BigButton(
+			text = "New seed",
+			action = {
+				if (alertState.value == AlertState.None)
+					navigator.navigate(Action.NEW_SEED)
+				else
+					navigator.navigate(Action.SHIELD)
+			})
+		BigButton(
+			text = "Recover seed",
+			action = {
+				if (alertState.value == AlertState.None)
+					navigator.navigate(Action.RECOVER_SEED)
+				else
+					navigator.navigate(Action.SHIELD)
+			},
+			isShaded = true
+		)
 	}
 }
