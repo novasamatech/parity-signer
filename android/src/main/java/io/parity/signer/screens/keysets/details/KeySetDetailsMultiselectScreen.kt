@@ -42,18 +42,17 @@ import io.parity.signer.uniffi.Action
  * For multiselec screen KeyManager is still used
  */
 @Composable
-fun KeySetDetailsScreenView(
+fun KeySetDetailsMultiselectScreen(
 	model: KeySetDetailsModel,
 	navigator: Navigator,
 	alertState: State<AlertState?>, //for shield icon
-	onMenu: Callback,
 ) {
 //todo dmitry selecting multiple key is impossible now, update menu to open old screen for that
 	Column {
 		ScreenHeader(
 			stringId = null,
 			onback = { navigator.backAction() },
-			onMenu = onMenu, //navigator.navigate(Action.RIGHT_BUTTON_ACTION) was in rust navigation
+			onMenu = { navigator.navigate(Action.RIGHT_BUTTON_ACTION) }
 		)
 		Box(modifier = Modifier.weight(1f)) {
 			Column(
@@ -153,13 +152,13 @@ private fun SeedKeyViewItem(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewKeySetDetailsScreen() {
+private fun PreviewKeySetDetailsMultiselectScreen() {
 
 	val state = remember { mutableStateOf(AlertState.Active) }
 	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, {})
+			KeySetDetailsMultiselectScreen(mockModel, EmptyNavigator(), state, )
 		}
 	}
 }

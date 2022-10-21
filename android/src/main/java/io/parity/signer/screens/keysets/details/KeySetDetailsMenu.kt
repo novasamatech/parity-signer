@@ -1,6 +1,7 @@
 package io.parity.signer.screens.keysets.details
 
 import android.content.res.Configuration
+import android.telecom.Call
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,22 +33,26 @@ import io.parity.signer.uniffi.Action
  * Original [SeedMenu]
  */
 @Composable
-fun KeyDetailsMenu(
+fun KeySetDetailsMenu(
 	navigator: Navigator,
 	alertState: State<AlertState?>,
-	removeSeed: Callback,
+	removeSeed: () -> Unit,
 ) {
 	val state = remember {
 		mutableStateOf(KeySetDetailsMenuState.GENERAL)
 	}
 	when (state.value) {
-		KeySetDetailsMenuState.GENERAL -> KeyDetailsMenuGeneral(navigator, alertState)
+		KeySetDetailsMenuState.GENERAL -> KeyDetailsMenuGeneral(
+			navigator = navigator,
+			alertState = alertState,
+			onDeleteClicked = {state.value = KeySetDetailsMenuState.DELETE_CONFIRM},
+		)
 		KeySetDetailsMenuState.DELETE_CONFIRM -> KeyDetailsDeleteConfirmBottomSheet(
 			onCancel = { navigator.backAction() },
-			onRemoveKey = {
+			onRemoveKey = removeSeed
 //				navigator.navigate(Action.REMOVE_KEY) action that was there to show old confirmation screen.
-										removeSeed()
-										},
+
+										,
 		)
 	}
 }
@@ -57,6 +62,7 @@ fun KeyDetailsMenu(
 fun KeyDetailsMenuGeneral(
 	navigator: Navigator,
 	alertState: State<AlertState?>,
+	onDeleteClicked: Callback,
 ) {
 	val sidePadding = 24.dp
 	Column(
@@ -99,9 +105,7 @@ fun KeyDetailsMenuGeneral(
 			iconId = R.drawable.ic_backspace_28,
 			label = stringResource(R.string.menu_option_forget_delete_key),
 			tint = MaterialTheme.colors.red400,
-			onclick = {
-//				state.value = KeyDetailsMenuState.DELETE_CONFIRM
-			}
+			onclick = onDeleteClicked
 		)
 		Spacer(modifier = Modifier.padding(bottom = 16.dp))
 		SecondaryButtonBottomSheet(
@@ -132,7 +136,7 @@ private enum class KeySetDetailsMenuState {
 private fun PreviewKeyDetailsMenu() {
 	SignerNewTheme {
 		val state = remember { mutableStateOf(AlertState.None) }
-		KeyDetailsMenu(
+		KeySetDetailsMenu(
 			EmptyNavigator(), state, {},
 		)
 	}
