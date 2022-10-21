@@ -147,7 +147,7 @@ private fun animatedQrForBinary(
 	modifier: Modifier = Modifier
 ) {
 	val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
-	val DELAY = 500.milliseconds
+	val DELAY = 125.milliseconds //FPS 8
 	val service = remember { KeySetsExportService() }
 	val qrCodes =
 		remember { mutableStateOf(listOf(listOf<UByte>())) }
