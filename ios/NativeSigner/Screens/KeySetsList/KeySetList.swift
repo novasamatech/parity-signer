@@ -16,12 +16,6 @@ struct KeySetList: View {
 
     @State var selectedItems: [KeySetViewModel] = []
 
-    init(
-        viewModel: ViewModel
-    ) {
-        self.viewModel = viewModel
-    }
-
     var body: some View {
         ZStack(alignment: .bottom) {
             // Background color
@@ -102,7 +96,10 @@ struct KeySetList: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(isPresented: $viewModel.isShowingKeysExportModal) {
+        .fullScreenCover(
+            isPresented: $viewModel.isShowingKeysExportModal,
+            onDismiss: {}
+        ) {
             ExportMultipleKeysModal(
                 viewModel: .init(
                     viewModel: ExportMultipleKeysModalViewModel(

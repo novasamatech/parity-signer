@@ -13,7 +13,7 @@ struct ExportMultipleKeysModalViewModel: Equatable {
 }
 
 struct ExportMultipleKeysModal: View {
-    @ObservedObject var viewModel: ViewModel
+    @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
@@ -33,7 +33,7 @@ struct ExportMultipleKeysModal: View {
                         VStack(alignment: .center) {
                             // QR Code container
                             VStack(spacing: 0) {
-                                AnimatedQRCodeView(viewModel: viewModel.qrCode)
+                                AnimatedQRCodeView(viewModel: $viewModel.qrCode)
                                     .padding(0.5)
                                     .fixedSize(horizontal: false, vertical: true)
                                 HStack {
@@ -146,6 +146,7 @@ private extension ExportMultipleKeysModal {
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                 Text(viewModel.derivedKeys ?? "")
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                Spacer()
             }
             .font(Fontstyle.bodyM.base)
             Spacer()

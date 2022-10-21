@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AnimatedQRCodeViewModel: Equatable {
-    let qrCodes: [[UInt8]]
+    var qrCodes: [[UInt8]]
 }
 
 /// Component that displays given QR code with unifid insets
@@ -21,9 +21,9 @@ struct AnimatedQRCodeView: View {
         static let qrCodeWidthForStandardDevices: CGFloat = 232
     }
 
-    private let viewModel: AnimatedQRCodeViewModel
+    @Binding var viewModel: AnimatedQRCodeViewModel
     private let qrCodesGenerator: QRCodeImageGenerator
-    private var images: [UIImage]
+    @State private var images: [UIImage] = []
     @State private var currentImage: UIImage?
     @State private var timer = Timer
         .publish(every: Constants.animationFps, on: .main, in: .common)
@@ -31,13 +31,14 @@ struct AnimatedQRCodeView: View {
     @State private var imagesIterator: IndexingIterator<[UIImage]>
 
     init(
-        viewModel: AnimatedQRCodeViewModel,
+        viewModel: Binding<AnimatedQRCodeViewModel>,
         qrCodesGenerator: QRCodeImageGenerator = QRCodeImageGenerator()
     ) {
-        self.viewModel = viewModel
+        _viewModel = viewModel
         self.qrCodesGenerator = qrCodesGenerator
-        images = viewModel.qrCodes.map { qrCodesGenerator.generateQRCode(from: $0) }
+        let images = viewModel.qrCodes.wrappedValue.map { qrCodesGenerator.generateQRCode(from: $0) }
         imagesIterator = images.makeIterator()
+        self.images = images
     }
 
     var body: some View {
@@ -66,6 +67,12 @@ struct AnimatedQRCodeView: View {
                         currentImage = imagesIterator.next()
                     }
                 }
+                .onChange(of: viewModel) { newValue in
+                    stop()
+                    images = newValue.qrCodes.map { qrCodesGenerator.generateQRCode(from: $0) }
+                    imagesIterator = images.makeIterator()
+                    start()
+                }
         }
         .frame(maxWidth: .infinity, alignment: .center)
         .padding(
@@ -90,7 +97,7 @@ struct AnimatedQRCodeView_Previews: PreviewProvider {
         Group {
             VStack {
                 AnimatedQRCodeView(
-                    viewModel: PreviewData.animatedQrCodeViewModel
+                    viewModel: Binding<AnimatedQRCodeViewModel>.constant(PreviewData.animatedQrCodeViewModel)
                 )
             }
             .previewDevice("iPhone 11 Pro")
@@ -98,7 +105,7 @@ struct AnimatedQRCodeView_Previews: PreviewProvider {
             .preferredColorScheme(.dark)
             VStack {
                 AnimatedQRCodeView(
-                    viewModel: PreviewData.animatedQrCodeViewModel
+                    viewModel: Binding<AnimatedQRCodeViewModel>.constant(PreviewData.animatedQrCodeViewModel)
                 )
             }
             .previewDevice("iPod touch (7th generation)")
@@ -106,7 +113,7 @@ struct AnimatedQRCodeView_Previews: PreviewProvider {
             .preferredColorScheme(.dark)
             VStack {
                 AnimatedQRCodeView(
-                    viewModel: PreviewData.animatedQrCodeViewModel
+                    viewModel: Binding<AnimatedQRCodeViewModel>.constant(PreviewData.animatedQrCodeViewModel)
                 )
             }
             .previewDevice("iPhone 8")
