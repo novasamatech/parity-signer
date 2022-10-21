@@ -1,4 +1,4 @@
-package io.parity.signer.bottomsheets
+package io.parity.signer.screens.keydetails
 
 import android.content.res.Configuration
 import androidx.annotation.DrawableRes
@@ -175,12 +175,12 @@ internal fun MenuItemForBottomSheet(
 			contentDescription = null,
 			modifier = Modifier
 				.size(28.dp),
-			tint = tint ?: MaterialTheme.colors.primary,
+			tint = tint ?: MaterialTheme.colors.textSecondary,
 		)
 		Spacer(modifier = Modifier.padding(end = 24.dp))
 		Text(
 			text = label,
-			color = tint ?: MaterialTheme.colors.primary,
+			color = tint ?: MaterialTheme.colors.textSecondary,
 			style = TypefaceNew.TitleS,
 		)
 	}
