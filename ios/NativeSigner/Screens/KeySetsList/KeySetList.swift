@@ -113,6 +113,10 @@ struct KeySetList: View {
                 )
             )
             .clearModalBackground()
+            .onAppear {
+                selectedItems.removeAll()
+                isExportKeysSelected.toggle()
+            }
         }
     }
 
@@ -208,18 +212,20 @@ private struct KeyListEmptyState: View {
     }
 }
 
-struct KeySetListPreview: PreviewProvider {
-    static var previews: some View {
-        KeySetList(
-            viewModel: .init(
-                listViewModel: KeySetListViewModelBuilder()
-                    .build(
-                        for: PreviewData.mseeds
-                    )
+#if DEBUG
+    struct KeySetListPreview: PreviewProvider {
+        static var previews: some View {
+            KeySetList(
+                viewModel: .init(
+                    listViewModel: KeySetListViewModelBuilder()
+                        .build(
+                            for: PreviewData.mseeds
+                        )
+                )
             )
-        )
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-        .environmentObject(NavigationCoordinator())
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
+            .environmentObject(NavigationCoordinator())
+        }
     }
-}
+#endif
