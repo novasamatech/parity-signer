@@ -38,7 +38,7 @@ pub enum Command {
     /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
     /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
     /// - network specs
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
     /// from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
     /// - all associated metadata entries from [`METATREE`](constants::METATREE)
     /// if there are no other address book entries this metadata is associated
@@ -81,7 +81,7 @@ pub enum Command {
     /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
     /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
     /// - network specs
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
     /// from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
     /// - all associated metadata entries from [`METATREE`](constants::METATREE)
     /// if there are no other address book entries this metadata is associated
@@ -151,7 +151,7 @@ pub enum Command {
     ///
     /// Metadata is transferred only for the networks that are known to the cold
     /// database, i.e. the ones having
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
+    /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry in
     /// [`SPECSTREE`](constants::SPECSTREE).
     #[command(name = "transfer-meta")]
     TransferMetaToColdRelease {
@@ -180,8 +180,8 @@ pub enum Command {
     /// codes before the metadata becomes accessible from the node.
     ///
     /// Network name found in the metadata is used to find
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) for
-    /// the network. `NetworkSpecsToSend` are used to get genesis hash and to check
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) for
+    /// the network. `NetworkSpecs` are used to get genesis hash and to check
     /// base58 prefix, it the network metadata has base58 prefix inside.
     ///
     /// A raw bytes update payload file is generated in dedicated
@@ -713,7 +713,7 @@ pub struct Override {
     pub encryption: Option<Encryption>,
 
     /// Network title override, so that user can specify the network title in
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
     /// that determines under what title the network is displayed in the Signer
     #[arg(long)]
     pub title: Option<String>,

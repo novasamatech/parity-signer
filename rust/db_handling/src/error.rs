@@ -76,7 +76,7 @@ pub enum Error {
     /// [`CurrentVerifier`](definitions::network_specs::CurrentVerifier) under
     /// `verifier_key` in `VERIFIERS` tree of the database, however, the
     /// corresponding genesis hash is encountered in a
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry under
+    /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry under
     /// `network_specs_key` in `SPECSTREE` tree of the database.
     /// No network specs record can get into database without the verifier
     /// entry, and the verifier could not be removed while network specs still
@@ -323,7 +323,7 @@ pub enum Error {
     #[error("Types not found.")]
     TypesNotFound,
 
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) for a network
+    /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) for a network
     /// in `SPECSTREE` tree of the Signer database, searched by
     /// [`NetworkSpecsKey`].
     ///

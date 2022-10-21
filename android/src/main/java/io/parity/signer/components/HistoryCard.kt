@@ -125,22 +125,22 @@ fun HistoryCard(card: Event, timestamp: String) {
 			}
 		}
 		is Event.NetworkSpecsAdded -> {
-			card.networkSpecsDisplay.specs.let {
+			card.networkSpecsDisplay.network.let {
 				HistoryCardTemplate(
 					image = Icons.Default.QrCodeScanner,
 					line1 = timestamp,
 					line2 = "Network added",
-					line3 = it.title
+					line3 = it.specs.title
 				)
 			}
 		}
 		is Event.NetworkSpecsRemoved -> {
-			card.networkSpecsDisplay.specs.let {
+			card.networkSpecsDisplay.network.let {
 				HistoryCardTemplate(
 					image = Icons.Default.Delete,
 					line1 = timestamp,
 					line2 = "Network removed",
-					line3 = it.title
+					line3 = it.specs.title
 				)
 			}
 		}

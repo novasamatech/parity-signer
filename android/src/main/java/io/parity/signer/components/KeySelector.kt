@@ -18,7 +18,7 @@ fun KeySelector(
 	multiSelectMode: Boolean,
 	rootSeed: String,
 ) {
-	val addresses = keySet.sortedBy { it.path }
+	val addresses = keySet.sortedBy { it.address.path }
 	LazyColumn {
 		this.items(
 			items = addresses,

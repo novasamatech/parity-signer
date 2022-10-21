@@ -11,13 +11,17 @@ extension PreviewData {
     static let mkeys = MKeys(
         set: [],
         root: .init(
-            seedName: "",
-            identicon: [],
+            address: .init(
+                path: "",
+                hasPwd: false,
+                identicon: [],
+                seedName: "",
+                secretExposed: false
+            ),
             addressKey: "",
             base58: "",
             swiped: false,
-            multiselect: false,
-            secretExposed: false
+            multiselect: false
         ),
         network: .init(title: "", logo: ""),
         multiselectMode: false,
@@ -28,14 +32,14 @@ extension PreviewData {
         pubkey: "",
         networkInfo: .init(networkTitle: "", networkLogo: "", networkSpecsKey: ""),
         address: .init(
-            base58: "",
             path: "",
             hasPwd: false,
             identicon: [],
             seedName: "",
-            multiselect: nil,
             secretExposed: false
-        )
+        ),
+        base58: "",
+        multiselect: nil
     )
 
     static let exampleErrorMessage =

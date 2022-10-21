@@ -16,12 +16,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.Address
+import io.parity.signer.uniffi.MAddressCard
 import io.parity.signer.uniffi.MKeysCard
 import kotlin.math.absoluteValue
 
 @Composable
 fun KeyCardActive(
-	address: MKeysCard,
+	keys_card: MKeysCard,
 	rootSeed: String,
 	selectButton: () -> Unit,
 	longTapButton: () -> Unit,
@@ -65,18 +66,19 @@ fun KeyCardActive(
 				)
 		) {
 			KeyCardOld(
-				identity = Address(
-					base58 = address.base58,
-					path = address.path,
-					hasPwd = address.hasPwd,
-					identicon = address.identicon,
-					multiselect = address.multiselect,
-					secretExposed = address.secretExposed,
-					seedName = rootSeed
+				identity = MAddressCard(
+					base58 = keys_card.base58,
+					multiselect = keys_card.multiselect,
+					address = Address(
+					path = keys_card.address.path,
+					hasPwd = keys_card.address.hasPwd,
+					identicon = keys_card.address.identicon,
+					secretExposed = keys_card.address.secretExposed,
+					seedName = rootSeed)
 				), multiselectMode
 			)
 			Spacer(modifier = Modifier.weight(1f, true))
-			if (address.swiped) {
+			if (keys_card.swiped) {
 				SwipedButtons(increment, delete)
 			}
 		}

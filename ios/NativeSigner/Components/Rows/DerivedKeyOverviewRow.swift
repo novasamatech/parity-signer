@@ -25,9 +25,9 @@ struct DerivedKeyOverviewViewModel: Equatable {
 
 extension DerivedKeyOverviewViewModel {
     init(_ key: MKeysCard) {
-        path = key.path
-        identicon = key.identicon
-        hasPassword = key.hasPwd
+        path = key.address.path
+        identicon = key.address.identicon
+        hasPassword = key.address.hasPwd
     }
 }
 

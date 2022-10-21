@@ -57,7 +57,7 @@ pub struct MetaInfo {
     /// constant  
     ///
     /// If `SS58Prefix` constant is present in metadata, the prefix derived
-    /// from it is expected to match `base58prefix` from `NetworkSpecs`.  
+    /// from it is expected to match `base58prefix` from `OrderedNetworkSpecs`.
     pub optional_base58prefix: Option<u16>,
 
     /// Flag to indicate that extrinsic set from metadata with
@@ -81,7 +81,7 @@ pub struct MetaValues {
     /// constant  
     ///
     /// If `SS58Prefix` constant is present in metadata, the prefix derived
-    /// from it is expected to match `base58prefix` from `NetworkSpecs`.  
+    /// from it is expected to match `base58prefix` from `OrderedNetworkSpecs`.
     pub optional_base58prefix: Option<u16>,
 
     /// Flag to indicate that extrinsic set from metadata with
@@ -360,7 +360,7 @@ pub struct MetaSetElement {
     /// constant  
     ///
     /// If `SS58Prefix` constant is present in metadata, the prefix derived
-    /// from it is expected to match `base58prefix` from `NetworkSpecs`.  
+    /// from it is expected to match `base58prefix` from `OrderedNetworkSpecs`.
     optional_base58prefix: Option<u16>,
 
     /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
