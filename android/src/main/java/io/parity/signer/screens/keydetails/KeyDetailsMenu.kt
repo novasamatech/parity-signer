@@ -27,6 +27,7 @@ import io.parity.signer.R
 import io.parity.signer.bottomsheets.exportprivatekey.ConfirmExportPrivateKeyAction
 import io.parity.signer.components.base.RowButtonsBottomSheet
 import io.parity.signer.components.base.SecondaryButtonBottomSheet
+import io.parity.signer.models.Callback
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -47,8 +48,9 @@ fun KeyDetailsMenuAction(
 	when (state.value) {
 		KeyDetailsMenuState.GENERAL -> KeyDetailsGeneralMenu(navigator, state)
 
-		KeyDetailsMenuState.DELETE_CONFIRM -> KeyDetailsDeleteConfirmMenu(
-			navigator = navigator, state = state
+		KeyDetailsMenuState.DELETE_CONFIRM -> KeyDetailsDeleteConfirmBottomSheet(
+			onCancel = { navigator.backAction() },
+			onRemoveKey = { navigator.navigate(Action.REMOVE_KEY) },
 		)
 		KeyDetailsMenuState.PRIVATE_KEY_CONFIRM -> ConfirmExportPrivateKeyAction(
 			navigator = navigator,
@@ -117,9 +119,9 @@ private fun KeyDetailsGeneralMenu(
 
 
 @Composable
-private fun KeyDetailsDeleteConfirmMenu(
-	navigator: Navigator,
-	state: MutableState<KeyDetailsMenuState>
+fun KeyDetailsDeleteConfirmBottomSheet(
+	onCancel: Callback,
+	onRemoveKey: Callback,
 ) {
 	val sidePadding = 24.dp
 	Column(
@@ -150,10 +152,8 @@ private fun KeyDetailsDeleteConfirmMenu(
 		RowButtonsBottomSheet(
 			labelCancel = stringResource(R.string.generic_cancel),
 			labelCta = stringResource(R.string.remove_key_confirm_cta),
-			onClickedCancel = {
-				navigator.backAction()
-			},
-			onClickedCta = { navigator.navigate(Action.REMOVE_KEY) },
+			onClickedCancel = onCancel,
+			onClickedCta = onRemoveKey,
 		)
 		Spacer(modifier = Modifier.padding(bottom = 24.dp))
 	}
@@ -180,10 +180,10 @@ internal fun MenuItemForBottomSheet(
 	tint: Color? = null,
 	onclick: () -> Unit
 ) {
-		MenuItemForBottomSheetInternal(
-			onclick, painterResource(id = iconId),
-			tint, label
-		)
+	MenuItemForBottomSheetInternal(
+		onclick, painterResource(id = iconId),
+		tint, label
+	)
 }
 
 @Composable
@@ -254,10 +254,8 @@ private fun PreviewKeyDetailsGeneralMenu() {
 @Composable
 private fun PreviewKeyDetailsDeleteConfirmAction() {
 	SignerNewTheme {
-		KeyDetailsDeleteConfirmMenu(
-			EmptyNavigator(), remember {
-				mutableStateOf(KeyDetailsMenuState.DELETE_CONFIRM)
-			}
+		KeyDetailsDeleteConfirmBottomSheet(
+			{}, {},
 		)
 	}
 }

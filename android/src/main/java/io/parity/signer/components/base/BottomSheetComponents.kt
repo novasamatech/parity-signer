@@ -15,6 +15,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.*
 
 @Composable
@@ -22,7 +23,7 @@ fun PrimaryButtonBottomSheet(
 	label: String,
 	modifier: Modifier = Modifier,
 	background: Color = MaterialTheme.colors.pink500,
-	onClicked: () -> Unit,
+	onClicked: Callback,
 ) {
 	Column(
 		modifier = modifier
@@ -49,7 +50,7 @@ fun PrimaryButtonBottomSheet(
 fun SecondaryButtonBottomSheet(
 	label: String,
 	modifier: Modifier = Modifier,
-	onClicked: () -> Unit,
+	onClicked: Callback,
 ) {
 	Column(
 		modifier = modifier
@@ -71,8 +72,8 @@ fun SecondaryButtonBottomSheet(
 fun RowButtonsBottomSheet(
 	labelCancel: String,
 	labelCta: String,
-	onClickedCancel: () -> Unit,
-	onClickedCta: () -> Unit,
+	onClickedCancel: Callback,
+	onClickedCta: Callback,
 ) {
 	Row {
 		Column(

@@ -9,25 +9,54 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
 import io.parity.signer.components.base.SecondaryButtonBottomSheet
+import io.parity.signer.models.AlertState
+import io.parity.signer.models.Callback
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
+import io.parity.signer.screens.keydetails.KeyDetailsDeleteConfirmBottomSheet
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
-import io.parity.signer.ui.navigationselectors.KeySetsNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
+import io.parity.signer.uniffi.Action
 
-//todo dmitry find existing file
+/**
+ * Original [SeedMenu]
+ */
 @Composable
 fun KeyDetailsMenu(
 	navigator: Navigator,
+	alertState: State<AlertState?>,
+	removeSeed: Callback,
+) {
+	val state = remember {
+		mutableStateOf(KeySetDetailsMenuState.GENERAL)
+	}
+	when (state.value) {
+		KeySetDetailsMenuState.GENERAL -> KeyDetailsMenuGeneral(navigator, alertState)
+		KeySetDetailsMenuState.DELETE_CONFIRM -> KeyDetailsDeleteConfirmBottomSheet(
+			onCancel = { navigator.backAction() },
+			onRemoveKey = {
+//				navigator.navigate(Action.REMOVE_KEY) action that was there to show old confirmation screen.
+										removeSeed()
+										},
+		)
+	}
+}
+
+
+@Composable
+fun KeyDetailsMenuGeneral(
+	navigator: Navigator,
+	alertState: State<AlertState?>,
 ) {
 	val sidePadding = 24.dp
 	Column(
@@ -44,12 +73,14 @@ fun KeyDetailsMenu(
 			}
 		)
 
-
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_library_add_28,
 			label = stringResource(R.string.menu_option_derive_from_key),
 			onclick = {
-//				state.value = KeyDetailsMenuState.PRIVATE_KEY_CONFIRM
+				if (alertState.value == AlertState.None)
+					navigator.navigate(Action.NEW_KEY)
+				else
+					navigator.navigate(Action.SHIELD)
 			}
 		)
 
@@ -57,7 +88,10 @@ fun KeyDetailsMenu(
 			iconId = R.drawable.ic_settings_backup_restore_28,
 			label = stringResource(R.string.menu_option_backup_key_set),
 			onclick = {
-				//
+				if (alertState.value == AlertState.None)
+					navigator.navigate(Action.BACKUP_SEED)
+				else
+					navigator.navigate(Action.SHIELD)
 			}
 		)
 
@@ -80,6 +114,10 @@ fun KeyDetailsMenu(
 }
 
 
+private enum class KeySetDetailsMenuState {
+	GENERAL, DELETE_CONFIRM,
+}
+
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -93,8 +131,9 @@ fun KeyDetailsMenu(
 @Composable
 private fun PreviewKeyDetailsMenu() {
 	SignerNewTheme {
+		val state = remember { mutableStateOf(AlertState.None) }
 		KeyDetailsMenu(
-			EmptyNavigator(),
+			EmptyNavigator(), state, {},
 		)
 	}
 }
