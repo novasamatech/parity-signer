@@ -54,7 +54,7 @@ struct KeySetRow: View {
                 KeySetRow(
                     viewModel: KeySetViewModel(
                         seed: PreviewData.seedNameCard,
-                        keyName: "Parity",
+                        keyName: "Main Polkadot",
                         derivedKeys: "1 Derived Key",
                         identicon: PreviewData.exampleIdenticon
                     ),

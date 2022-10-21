@@ -62,11 +62,10 @@ struct KeyDetailsView: View {
                     // Main key cell
                     KeySummaryView(viewModel: viewModel.keySummary)
                         .padding(Padding.detailsCell)
-                        .contentShape(Rectangle())
+                        .keyDetailsListElement()
                         .onTapGesture {
                             navigation.perform(navigation: actionModel.addressKeyNavigation)
                         }
-                        .keyDetailsListElement()
                     // Header
                     HStack {
                         Localizable.KeyDetails.Label.derived.text
@@ -221,7 +220,7 @@ private struct KeySummaryView: View {
                     .font(Fontstyle.bodyM.base)
                     .lineLimit(1)
             }
-            Spacer().frame(maxWidth: .infinity)
+            Spacer()
             Asset.chevronRight.swiftUIImage
                 .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
         }
@@ -235,7 +234,7 @@ struct KeyDetailsView_Previews: PreviewProvider {
                 forgetKeyActionHandler: .init(navigation: NavigationCoordinator()),
                 viewModel: .init(
                     keySummary: KeySummaryViewModel(
-                        keyName: "Parity",
+                        keyName: "Main Polkadot",
                         base58: "15Gsc678...0HA04H0A"
                     ),
                     derivedKeys: [

@@ -61,7 +61,7 @@ extension PreviewData {
 
 extension PreviewData {
     static let exampleKeySummary = KeySummaryViewModel(
-        keyName: "Parity",
+        keyName: "Main Polkadot",
         base58: "15322Gsc678...0HA04H0A"
     )
 
