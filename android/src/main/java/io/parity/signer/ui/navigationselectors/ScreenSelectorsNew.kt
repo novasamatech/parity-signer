@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import io.parity.signer.bottomsheets.exportprivatekey.PrivateKeyExportBottomSheet
 import io.parity.signer.models.*
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
+import io.parity.signer.screens.keysets.NewSeedMenu
 import io.parity.signer.ui.navigationselectors.KeySetsNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.ModalData
@@ -57,10 +58,19 @@ fun BottomSheetSelector(
 				is ModalData.KeyDetailsAction ->
 					BottomSheetWrapperRoot(onClosedAction = {
 						navigator.backAction()
-					} ) {
+					}) {
 						KeyDetailsMenuAction(
 							navigator = navigator,
 							keyDetails = signerDataModel.lastOpenedKeyDetails
+						)
+					}
+				is ModalData.NewSeedMenu ->
+					BottomSheetWrapperRoot(onClosedAction = {
+						navigator.backAction()
+					}) {
+						NewSeedMenu(
+							alertState = alertState,
+							navigator = signerDataModel.navigator,
 						)
 					}
 				else -> {}

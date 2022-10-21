@@ -1,7 +1,6 @@
-package io.parity.signer.bottomsheets
+package io.parity.signer.screens.keysets
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -12,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.models.AlertState
+import io.parity.signer.models.Navigator
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
@@ -19,10 +19,9 @@ import io.parity.signer.uniffi.Action
 @Composable
 fun NewSeedMenu(
 	alertState: State<AlertState?>,
-	button: (Action) -> Unit
+	navigator: Navigator,
 ) {
 	Column {
-		Spacer(Modifier.weight(1f))
 		Surface(
 			color = MaterialTheme.colors.Bg000,
 			shape = MaterialTheme.shapes.modal
@@ -35,17 +34,17 @@ fun NewSeedMenu(
 					text = "New seed",
 					action = {
 						if (alertState.value == AlertState.None)
-							button(Action.NEW_SEED)
+							navigator.navigate(Action.NEW_SEED)
 						else
-							button(Action.SHIELD)
+							navigator.navigate(Action.SHIELD)
 					})
 				BigButton(
 					text = "Recover seed",
 					action = {
 						if (alertState.value == AlertState.None)
-							button(Action.RECOVER_SEED)
+							navigator.navigate(Action.RECOVER_SEED)
 						else
-							button(Action.SHIELD)
+							navigator.navigate(Action.SHIELD)
 					},
 					isShaded = true
 				)

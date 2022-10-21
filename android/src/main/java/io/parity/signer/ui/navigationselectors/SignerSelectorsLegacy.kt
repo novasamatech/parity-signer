@@ -10,7 +10,6 @@ import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
 import io.parity.signer.screens.keysets.*
-import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.ModalData
@@ -126,17 +125,12 @@ fun ModalSelector(
 		{ action, details -> button(action, details, "") }
 	if (localNavAction != null && localNavAction != LocalNavAction.None) {
 		when (localNavAction) {
-			is LocalNavAction.ShowExportPrivateKey -> {
-			}
+			is LocalNavAction.ShowExportPrivateKey -> {} //show in new selector
 			LocalNavAction.None -> {}
 		}
 	} else {
 		when (modalData) {
-			is ModalData.NewSeedMenu ->
-				NewSeedMenu(
-					alertState = alertState,
-					button = button1
-				)
+			is ModalData.NewSeedMenu -> {} //new bottom sheet
 			is ModalData.SeedMenu -> SeedMenu(
 				modalData.f,
 				alertState,
