@@ -26,14 +26,12 @@ fun KeySetDetailsNavSubgraph(
 	) {
 
 		composable(KeySetDetailsNavSubgraph.home) {
-			Box(modifier = Modifier.statusBarsPadding()) {
-				KeySetDetailsScreenFull(
-					model = model,
-					navigator = rootNavigator,
-					alertState = alertState,
-					onRemoveKeySet = { sigleton.removeSeed(model.root.seedName) } //todo dmitry check that it is the same as MSeedMenu('seed')
-				)
-			}
+			KeySetDetailsScreenFull(
+				model = model,
+				navigator = rootNavigator,
+				alertState = alertState,
+				onRemoveKeySet = { sigleton.removeSeed(model.root.seedName) } //todo dmitry check that it is the same as MSeedMenu('seed')
+			)
 		}
 		composable(KeySetDetailsNavSubgraph.multiselect) {
 			Box(modifier = Modifier.statusBarsPadding()) {

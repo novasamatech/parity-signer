@@ -32,6 +32,7 @@ import io.parity.signer.ui.navigationselectors.AlertSelector
 import io.parity.signer.ui.navigationselectors.ModalSelector
 import io.parity.signer.ui.navigationselectors.OnBoardingState
 import io.parity.signer.ui.navigationselectors.ScreenSelector
+import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.ScreenData
@@ -99,7 +100,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							topBar = {
 								if (NavigationMigrations.shouldShowBar(
 										localNavAction = localNavAction.value,
-										globalNavAction = actionResult.value
+										globalNavAction = actionResult.value,
 									)
 								) {
 									TopBar(
@@ -111,12 +112,10 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							bottomBar = {
 								if (NavigationMigrations.shouldShowBar(
 										localNavAction = localNavAction.value,
-										globalNavAction = actionResult.value
-									)
+										globalNavAction = actionResult.value,)
+									&& actionResult.value?.footer == true
 								) {
-									if (actionResult.value?.footer == true) BottomBar(
-										signerDataModel = signerDataModel
-									)
+									BottomBar(signerDataModel = signerDataModel)
 								}
 							},
 						) { innerPadding ->
@@ -147,23 +146,26 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							}
 						}
 						//new screens selectors
-						Box(
-							modifier = Modifier
-								.navigationBarsPadding()
-								.captionBarPadding(),
-						) {
-							CombinedScreensSelector(
-								screenData = actionResult.value?.screenData
-								?: ScreenData.Documents,//default fallback
-								alertState = shieldAlert,
-								signerDataModel = signerDataModel)
-							BottomSheetSelector(
-								modalData = actionResult.value?.modalData,
-								localNavAction = localNavAction.value,
-								alertState = shieldAlert,
-								signerDataModel = signerDataModel,
-								navigator = signerDataModel.navigator,
-							)
+						SignerNewTheme() {
+							Box(
+								modifier = Modifier
+									.navigationBarsPadding()
+									.captionBarPadding(),
+							) {
+								CombinedScreensSelector(
+									screenData = actionResult.value?.screenData
+										?: ScreenData.Documents,//default fallback
+									alertState = shieldAlert,
+									signerDataModel = signerDataModel
+								)
+								BottomSheetSelector(
+									modalData = actionResult.value?.modalData,
+									localNavAction = localNavAction.value,
+									alertState = shieldAlert,
+									signerDataModel = signerDataModel,
+									navigator = signerDataModel.navigator,
+								)
+							}
 						}
 					}
 				} else {

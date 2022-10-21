@@ -6,6 +6,7 @@ import io.parity.signer.bottomsheets.exportprivatekey.PrivateKeyExportBottomShee
 import io.parity.signer.models.*
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keysets.NewSeedMenu
+import io.parity.signer.ui.navigationselectors.KeySetDetailsNavSubgraph
 import io.parity.signer.ui.navigationselectors.KeySetsNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.ModalData
@@ -17,12 +18,24 @@ fun CombinedScreensSelector(
 	alertState: State<AlertState?>,
 	signerDataModel: SignerDataModel
 ) {
+	val rootNavigator = signerDataModel.navigator
+
 	when (screenData) {
-		is ScreenData.SeedSelector -> SignerNewTheme() {
-			KeySetsNavSubgraph(
-				screenData.f.toKeySetsSelectModel(),
-				rootNavigator = signerDataModel.navigator,
+		is ScreenData.SeedSelector -> {
+			SignerNewTheme() {
+				KeySetsNavSubgraph(
+					screenData.f.toKeySetsSelectModel(),
+					rootNavigator = rootNavigator,
+					alertState = alertState,
+				)
+			}
+		}
+		is ScreenData.Keys -> if (FeatureFlags.isEnabled(FeatureOption.NEW_KEY_SET_DETAILS)) {
+			KeySetDetailsNavSubgraph(
+				model = screenData.f.toKeySetDetailsModel(),
+				rootNavigator = rootNavigator,
 				alertState = alertState,
+				sigleton = signerDataModel,
 			)
 		}
 		else -> {} //old Selector showing them

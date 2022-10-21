@@ -7,6 +7,8 @@ object FeatureFlags {
 			FeatureOption.NEW_KEY_SET_DETAILS -> true
 		}
 	}
+
+	fun isDisabled(feature: FeatureOption): Boolean = !isEnabled(feature)
 }
 
 

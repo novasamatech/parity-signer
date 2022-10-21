@@ -44,12 +44,14 @@ fun ScreenSelector(
 			screenData.f,
 			button1,
 		)
-		is ScreenData.Keys -> KeyManager(
-			button = button2,
-			signerDataModel::increment,
-			screenData.f,
-			alertState
-		)
+		is ScreenData.Keys -> if (FeatureFlags.isDisabled(FeatureOption.NEW_KEY_SET_DETAILS)) {
+			KeyManager(
+				button = button2,
+				signerDataModel::increment,
+				screenData.f,
+				alertState
+			)
+		}
 		is ScreenData.Log -> HistoryScreen(screenData.f, button2)
 		is ScreenData.LogDetails -> LogDetails(screenData.f)
 		is ScreenData.ManageNetworks -> ManageNetworks(
@@ -132,12 +134,14 @@ fun ModalSelector(
 	} else {
 		when (modalData) {
 			is ModalData.NewSeedMenu -> {} //new bottom sheet
-			is ModalData.SeedMenu -> SeedMenu(
-				modalData.f,
-				alertState,
-				button1,
-				signerDataModel::removeSeed
-			)
+			is ModalData.SeedMenu -> if (FeatureFlags.isDisabled(FeatureOption.NEW_KEY_SET_DETAILS)) {
+				SeedMenu(
+					modalData.f,
+					alertState,
+					button1,
+					signerDataModel::removeSeed
+				)
+			}
 			is ModalData.NetworkSelector -> NetworkSelector(
 				modalData.f,
 				button2
