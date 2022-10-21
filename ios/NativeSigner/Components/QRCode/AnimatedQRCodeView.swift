@@ -15,7 +15,7 @@ struct AnimatedQRCodeViewModel: Equatable {
 /// Insets are adjusted for smaller devices
 struct AnimatedQRCodeView: View {
     private enum Constants {
-        static let animationFps = 0.04
+        static let animationFps = 0.125
         static let compactDeviceWidth: CGFloat = 320
         static let qrCodeWidthForSmallDevices: CGFloat = 216
         static let qrCodeWidthForStandardDevices: CGFloat = 232
