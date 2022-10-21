@@ -36,7 +36,7 @@ import io.parity.signer.uniffi.Action
 fun KeySetDetailsMenu(
 	navigator: Navigator,
 	alertState: State<AlertState?>,
-	removeSeed: () -> Unit,
+	removeSeed: Callback,
 ) {
 	val state = remember {
 		mutableStateOf(KeySetDetailsMenuState.GENERAL)
@@ -45,15 +45,14 @@ fun KeySetDetailsMenu(
 		KeySetDetailsMenuState.GENERAL -> KeyDetailsMenuGeneral(
 			navigator = navigator,
 			alertState = alertState,
-			onDeleteClicked = {state.value = KeySetDetailsMenuState.DELETE_CONFIRM},
+			onDeleteClicked = { state.value = KeySetDetailsMenuState.DELETE_CONFIRM },
 		)
-		KeySetDetailsMenuState.DELETE_CONFIRM -> KeyDetailsDeleteConfirmBottomSheet(
-			onCancel = { navigator.backAction() },
-			onRemoveKey = removeSeed
+		KeySetDetailsMenuState.DELETE_CONFIRM ->
+			KeyDetailsDeleteConfirmBottomSheet(
+				onCancel = { state.value = KeySetDetailsMenuState.GENERAL },
+				onRemoveKey = removeSeed,
 //				navigator.navigate(Action.REMOVE_KEY) action that was there to show old confirmation screen.
-
-										,
-		)
+			)
 	}
 }
 

@@ -78,7 +78,7 @@ fun RowButtonsBottomSheet(
 	Row {
 		Column(
 			modifier = Modifier
-				.clickable(onClick = onClickedCta)
+				.clickable(onClick = onClickedCancel)
 				.background(
 					MaterialTheme.colors.fill18, RoundedCornerShape(
 						dimensionResource(id = R.dimen.buttonCornerRadius)
@@ -99,7 +99,7 @@ fun RowButtonsBottomSheet(
 		Spacer(modifier = Modifier.padding(end = 8.dp))
 		Column(
 			modifier = Modifier
-				.clickable(onClick = onClickedCancel)
+				.clickable(onClick = onClickedCta)
 				.background(
 					MaterialTheme.colors.pink500, RoundedCornerShape(
 						dimensionResource(id = R.dimen.buttonCornerRadius)
