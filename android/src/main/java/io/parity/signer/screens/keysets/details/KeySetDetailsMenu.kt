@@ -30,13 +30,14 @@ import io.parity.signer.ui.theme.red400
 import io.parity.signer.uniffi.Action
 
 /**
- * Original [SeedMenu]
+ * Old was [SeedMenu]
  */
 @Composable
 fun KeySetDetailsMenu(
 	navigator: Navigator,
 	alertState: State<AlertState?>,
 	removeSeed: Callback,
+	onSelectKeysClicked: Callback,
 ) {
 	val state = remember {
 		mutableStateOf(KeySetDetailsMenuState.GENERAL)
@@ -46,6 +47,7 @@ fun KeySetDetailsMenu(
 			navigator = navigator,
 			alertState = alertState,
 			onDeleteClicked = { state.value = KeySetDetailsMenuState.DELETE_CONFIRM },
+			onSelectKeysClicked = onSelectKeysClicked,
 		)
 		KeySetDetailsMenuState.DELETE_CONFIRM ->
 			KeyDetailsDeleteConfirmBottomSheet(
@@ -61,6 +63,7 @@ fun KeySetDetailsMenu(
 fun KeyDetailsMenuGeneral(
 	navigator: Navigator,
 	alertState: State<AlertState?>,
+	onSelectKeysClicked: Callback,
 	onDeleteClicked: Callback,
 ) {
 	val sidePadding = 24.dp
@@ -73,9 +76,7 @@ fun KeyDetailsMenuGeneral(
 		MenuItemForBottomSheet(
 			Icons.Outlined.Circle,
 			label = stringResource(R.string.menu_option_select_key),
-			onclick = {
-				//todo dmitry
-			}
+			onclick = onSelectKeysClicked
 		)
 
 		MenuItemForBottomSheet(
@@ -136,7 +137,7 @@ private fun PreviewKeyDetailsMenu() {
 	SignerNewTheme {
 		val state = remember { mutableStateOf(AlertState.None) }
 		KeySetDetailsMenu(
-			EmptyNavigator(), state, {},
+			EmptyNavigator(), state, {}, {},
 		)
 	}
 }

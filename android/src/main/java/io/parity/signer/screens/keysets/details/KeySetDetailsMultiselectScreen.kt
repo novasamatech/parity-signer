@@ -41,13 +41,13 @@ import io.parity.signer.uniffi.Action
  * For non-multiselect state,
  * For multiselec screen KeyManager is still used
  */
+//todo dmitry finish this screen
 @Composable
 fun KeySetDetailsMultiselectScreen(
 	model: KeySetDetailsModel,
 	navigator: Navigator,
 	alertState: State<AlertState?>, //for shield icon
 ) {
-//todo dmitry selecting multiple key is impossible now, update menu to open old screen for that
 	Column {
 		ScreenHeader(
 			stringId = null,
@@ -105,7 +105,6 @@ fun KeySetDetailsMultiselectScreen(
 				}
 			}
 		}
-		BottomBar2(navigator, BottomBar2State.KEYS)
 	}
 }
 

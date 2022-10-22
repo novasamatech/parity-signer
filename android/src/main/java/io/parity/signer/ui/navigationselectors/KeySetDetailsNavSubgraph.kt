@@ -30,9 +30,10 @@ fun KeySetDetailsNavSubgraph(
 				model = model,
 				navigator = rootNavigator,
 				alertState = alertState,
+				navController,
 				onRemoveKeySet = {
 					sigleton.removeSeed(model.root.seedName)
-				}
+				},
 			)
 		}
 		composable(KeySetDetailsNavSubgraph.multiselect) {
