@@ -71,7 +71,7 @@ where
                     } else {
                         let author_card = (Card::Author {
                             author: &author_multi_signer,
-                            base58prefix: network_specs.base58prefix,
+                            base58prefix: network_specs.specs.base58prefix,
                             address_details: &address_details,
                         })
                         .card(&mut index, indent);
@@ -84,20 +84,20 @@ where
                 None => CardsPrep::ShowOnly(
                     (Card::AuthorPlain {
                         author: &author_multi_signer,
-                        base58prefix: network_specs.base58prefix,
+                        base58prefix: network_specs.specs.base58prefix,
                     })
                     .card(&mut index, indent),
                     Box::new((Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent)),
                 ),
             };
 
-            let short_specs = network_specs.short();
+            let short_specs = network_specs.specs.short();
             let (method_data, extensions_data) = cut_method_extensions(&parser_data)?;
 
             let meta_set = find_meta_set(&short_specs, &db_path)?;
             if meta_set.is_empty() {
                 return Err(Error::NoMetadata {
-                    name: network_specs.name,
+                    name: network_specs.specs.name,
                 });
             }
             let mut found_solution = None;
@@ -155,7 +155,7 @@ where
                                                 method: method_data,
                                                 extensions: extensions_data,
                                             },
-                                            &network_specs.name,
+                                            &network_specs.specs.name,
                                             &address_details.path,
                                             address_details.has_pwd,
                                             &author_multi_signer,
@@ -164,7 +164,7 @@ where
                                         let checksum = sign.store_and_get_checksum(&db_path)?;
                                         let author_info = make_author_info(
                                             &author_multi_signer,
-                                            network_specs.base58prefix,
+                                            network_specs.specs.base58prefix,
                                             &address_details,
                                         );
                                         let warning = possible_warning
@@ -211,7 +211,7 @@ where
                                             .map(|w| vec![w]);
                                         let author = Card::Author {
                                             author: &author_multi_signer,
-                                            base58prefix: network_specs.base58prefix,
+                                            base58prefix: network_specs.specs.base58prefix,
                                             address_details: &address_details,
                                         }
                                         .card(&mut index, indent);
@@ -254,7 +254,7 @@ where
             match found_solution {
                 Some(a) => Ok(a),
                 None => Err(Error::AllExtensionsParsingFailed {
-                    network_name: network_specs.name,
+                    network_name: network_specs.specs.name,
                     errors: error_collection,
                 }), // author: [], hint: [], error: []
             }
@@ -309,9 +309,9 @@ where
                     let mut specs_found = None;
                     for id in &address_details.network_id {
                         let specs = try_get_network_specs(&db_path, id)?;
-                        if let Some(specs) = specs {
-                            if specs.name == sign_display.network_name {
-                                specs_found = Some(specs);
+                        if let Some(ordered_specs) = specs {
+                            if ordered_specs.specs.name == sign_display.network_name {
+                                specs_found = Some(ordered_specs);
                             }
                         }
                     }
@@ -321,7 +321,7 @@ where
                             verifier_details,
                             Some(make_author_info(
                                 m,
-                                specs_found.base58prefix,
+                                specs_found.specs.base58prefix,
                                 &address_details,
                             )),
                             Some(decode_signable_from_history(sign_display, &db_path)?),

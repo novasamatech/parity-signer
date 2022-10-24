@@ -34,7 +34,7 @@ struct AuthenticatedScreenContainer: View {
                     }
                 })
             )
-            if navigation.actionResult.footer {
+            if navigation.actionResult.footer, navigation.selectedTab != .keys {
                 TabBarView(
                     selectedTab: $navigation.selectedTab
                 )
@@ -51,8 +51,10 @@ struct AuthenticatedScreenContainer: View {
                     navigation.performFake(navigation: .init(action: .navbarScan))
                     isShowingQRScanner = true
                 } else {
-                    // "Pretend" to go back to previous tab (as we don't change `selectedTab` when showing QR screen now), but do
-                    // it for real before dismissing QR code scanner to have dataset to display as we might have ventured
+                    // "Pretend" to go back to previous tab (as we don't change `selectedTab` when showing QR screen
+                    // now), but do
+                    // it for real before dismissing QR code scanner to have dataset to display as we might have
+                    // ventured
                     // into transaction details
                     if let action = navigation.selectedTab.action {
                         navigation.perform(navigation: .init(action: action))

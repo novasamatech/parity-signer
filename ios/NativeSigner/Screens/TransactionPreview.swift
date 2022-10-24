@@ -20,8 +20,8 @@ struct TransactionPreview: View {
         VStack {
             TransactionBlock(cards: content.content.assemble())
             VStack {
-                if let address = content.authorInfo {
-                    AddressCard(address: address)
+                if let authorInfo = content.authorInfo {
+                    AddressCard(card: authorInfo)
                 }
                 if let network = content.networkInfo {
                     NetworkCard(title: network.networkTitle, logo: network.networkLogo)
@@ -65,7 +65,7 @@ struct TransactionPreview: View {
                             isCrypto: true,
                             action: {
                                 focus = false
-                                if let seedName = content.authorInfo?.seedName {
+                                if let seedName = content.authorInfo?.address.seedName {
                                     data.sign(seedName: seedName, comment: comment)
                                 }
                             }

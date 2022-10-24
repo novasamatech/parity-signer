@@ -3,10 +3,10 @@ package io.parity.signer.components.transactionCards
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import io.parity.signer.uniffi.NetworkSpecsToSend
+import io.parity.signer.uniffi.NetworkSpecs
 
 @Composable
-fun TCNewSpecs(specs: NetworkSpecsToSend) {
+fun TCNewSpecs(specs: NetworkSpecs) {
 	Column {
 		Text("NEW NETWORK")
 		TCNameValueTemplate(name = "Network name:", value = specs.title)

@@ -80,8 +80,8 @@ fun KeyManager(
 					.fillMaxWidth()
 			) {
 				SeedCard(
-					seedName = rootKey.seedName,
-					identicon = rootKey.identicon,
+					seedName = rootKey.address.seedName,
+					identicon = rootKey.address.identicon,
 					base58 = rootKey.base58,
 					showAddress = true,
 					multiselectMode = multiselectMode,
@@ -90,7 +90,7 @@ fun KeyManager(
 					increment = { number ->
 						increment(
 							number,
-							rootKey.seedName
+							rootKey.address.seedName
 						)
 					},
 					delete = { button(Action.REMOVE_KEY, "") }
@@ -143,10 +143,10 @@ fun KeyManager(
 			}
 			KeySelector(
 				button,
-				{ number -> increment(number, rootKey.seedName) },
+				{ number -> increment(number, rootKey.address.seedName) },
 				keySet,
 				multiselectMode,
-				rootKey.seedName,
+				rootKey.address.seedName,
 			)
 		}
 		if (multiselectMode) {

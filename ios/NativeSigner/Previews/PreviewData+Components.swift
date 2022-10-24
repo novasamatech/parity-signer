@@ -12,6 +12,10 @@ extension PreviewData {
         qrCode: PreviewData.exampleQRCode
     )
 
+    static let animatedQrCodeViewModel = AnimatedQRCodeViewModel(
+        qrCodes: [PreviewData.exampleQRCode, PreviewData.exampleQRCode]
+    )
+
     static let qrCodeAddressFooterViewModel = QRCodeAddressFooterViewModel(
         identicon: PreviewData.exampleIdenticon,
         rootKeyName: "Dotsama parachains",
@@ -57,7 +61,7 @@ extension PreviewData {
 
 extension PreviewData {
     static let exampleKeySummary = KeySummaryViewModel(
-        keyName: "Parity",
+        keyName: "Main Polkadot",
         base58: "15322Gsc678...0HA04H0A"
     )
 
@@ -90,5 +94,12 @@ extension PreviewData {
         derivedKeys: exampleDerivedKeyOverviews,
         seedPhrase: seedPhraseViewModel,
         qrCode: qrCodeContainerViewModel
+    )
+}
+
+extension PreviewData {
+    static let exampleExportMultipleKeysModal = ExportMultipleKeysModalViewModel(
+        selectedItems: KeySetListViewModelBuilder().build(for: PreviewData.mseeds).list,
+        seeds: mseeds.seedNameCards
     )
 }

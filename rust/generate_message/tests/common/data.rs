@@ -3,14 +3,14 @@ use defaults::{default_types_content, test_metadata};
 use definitions::crypto::Encryption;
 use definitions::keyring::{AddressBookKey, MetaKey, NetworkSpecsKey};
 use definitions::metadata::AddressBookEntry;
-use definitions::network_specs::NetworkSpecsToSend;
+use definitions::network_specs::NetworkSpecs;
 use parity_scale_codec::Encode;
 use sled::Batch;
 use sp_core::H256;
 use std::str::FromStr;
 
-fn test_specs() -> NetworkSpecsToSend {
-    NetworkSpecsToSend {
+fn test_specs() -> NetworkSpecs {
+    NetworkSpecs {
         base58prefix: 0,
         color: String::from("#E6027A"),
         decimals: 10,

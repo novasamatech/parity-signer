@@ -4,11 +4,11 @@ use db_handling::helpers::get_danger_status;
 use db_handling::identities::get_multisigner_by_address;
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
-    ActionResult, Address, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti,
-    MKeys, MLog, MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm,
-    MRecoverSeedName, MRecoverSeedPhrase, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings,
-    MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData,
-    RightButton, ScreenData, ScreenNameType, ShieldAlert, TransactionType,
+    ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
+    MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
+    MRecoverSeedPhrase, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
+    MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData,
+    ScreenNameType, ShieldAlert, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use std::fmt::Write;
@@ -71,8 +71,10 @@ impl State {
 
         let networks = db_handling::helpers::get_all_networks(dbname)?;
         for x in &networks {
-            self.networks
-                .push(NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption));
+            self.networks.push(NetworkSpecsKey::from_parts(
+                &x.specs.genesis_hash,
+                &x.specs.encryption,
+            ));
         }
 
         Ok(())
@@ -410,7 +412,7 @@ impl State {
                                         details_str,
                                         &t.get_comment(),
                                         dbname,
-                                        network_info.encryption,
+                                        network_info.specs.encryption,
                                     ) {
                                         Ok(a) => {
                                             seed.zeroize();
@@ -453,7 +455,7 @@ impl State {
                                 "",
                                 details_str,
                                 dbname,
-                                network_info.encryption,
+                                network_info.specs.encryption,
                             ) {
                                 Ok(a) => {
                                     new_navstate.modal = Modal::SignatureReady(a);
@@ -1522,10 +1524,14 @@ impl State {
                         ttype,
                         author_info,
                         network_info: network_info.map(|i| MSCNetworkInfo {
-                            network_title: i.title,
-                            network_logo: i.logo,
+                            network_title: i.specs.title,
+                            network_logo: i.specs.logo,
                             network_specs_key: hex::encode(
-                                NetworkSpecsKey::from_parts(&i.genesis_hash, &i.encryption).key(),
+                                NetworkSpecsKey::from_parts(
+                                    &i.specs.genesis_hash,
+                                    &i.specs.encryption,
+                                )
+                                .key(),
                             ),
                         }),
                     },
@@ -1809,15 +1815,6 @@ impl State {
                     Screen::SignSufficientCrypto(ref s) => {
                         if let Some((_, _, author_info)) = s.key_selected() {
                             let content = content.clone();
-                            let author_info = Address {
-                                base58: author_info.base58,
-                                identicon: author_info.identicon,
-                                seed_name: author_info.seed_name,
-                                path: author_info.path,
-                                has_pwd: author_info.has_pwd,
-                                multiselect: None,
-                                secret_exposed: author_info.secret_exposed,
-                            };
                             let f = MSufficientCryptoReady {
                                 author_info,
                                 sufficient: sufficient.clone(),

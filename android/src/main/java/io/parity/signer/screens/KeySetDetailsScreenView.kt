@@ -108,7 +108,7 @@ fun KeySetDetailsScreenView(
 
 data class KeySetDetailsViewModel(
 	val set: List<MKeysCard>,
-	val root: MSeedKeyCard,
+	val root: MKeysCard,
 	val network: MNetworkCard,
 	val multiselectMode: Boolean,
 	val multiselectCount: String,

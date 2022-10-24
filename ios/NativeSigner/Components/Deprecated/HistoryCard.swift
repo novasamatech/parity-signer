@@ -95,7 +95,7 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: Localizable.HistoryCard.networkAdded.string,
-                line2: value.specs.title
+                line2: value.network.specs.title
             )
         case let .networkSpecsRemoved(value):
             HistoryCardTemplate(
@@ -103,7 +103,7 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: Localizable.HistoryCard.networkRemoved.string,
-                line2: value.specs.title
+                line2: value.network.specs.title
             )
         case let .networkVerifierSet(value):
             HistoryCardTemplate(

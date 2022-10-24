@@ -576,7 +576,7 @@ fn warn(name: &str, version: u32) {
 /// Metadata is retrieved from `.wasm` file itself. To get genesis hash needed
 /// to complete `load_metadata` payload and to check the metadata for
 /// consistency, network name found in the metadata is used to retrieve
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend).
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs).
 ///
 /// Optional key `-d`, if used, indicates that the metadata entry should **not**
 /// be added to the [`METATREE`] of the hot database.

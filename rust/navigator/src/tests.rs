@@ -1,9 +1,9 @@
 use image::{GenericImageView, GrayImage, ImageBuffer, Pixel};
 use lazy_static::lazy_static;
 use regex::Regex;
-use sp_core::{blake2_256, Pair, H256};
+use sp_core::{blake2_256, sr25519, Pair, H256};
 use sp_runtime::MultiSigner;
-use std::{convert::TryInto, str::FromStr};
+use std::{collections::HashMap, convert::TryInto, str::FromStr};
 
 use constants::{
     test_values::{
@@ -16,13 +16,20 @@ use constants::{
     },
     ALICE_SEED_PHRASE,
 };
-use db_handling::cold_default::{init_db, populate_cold_nav_test};
+use db_handling::{
+    cold_default::{init_db, populate_cold_nav_test},
+    identities::{
+        export_all_addrs, import_all_addrs, try_create_address, try_create_seed, AddrInfo,
+        ExportAddrs, ExportAddrsV1, SeedInfo,
+    },
+};
 use definitions::{
     crypto::Encryption,
     history::{
         Event, IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
         NetworkSpecsExport, SignDisplay, SignMessageDisplay, TypesDisplay, TypesExport,
     },
+    keyring::NetworkSpecsKey,
     navigation::{
         ActionResult, Address, AlertData, Card, DerivationCheck, DerivationDestination,
         DerivationEntry, DerivationPack, FooterButton, History, MBackup, MDeriveKey,
@@ -31,14 +38,15 @@ use definitions::{
         MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup,
         MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCCall, MSCContent,
         MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion,
-        MSCNetworkInfo, MSeedKeyCard, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
-        MSignatureReady, MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier,
-        MVerifierDetails, ModalData, Network, NetworkSpecsToSend, RightButton, ScreenData,
-        ScreenNameType, SeedNameCard, TransactionCard, TransactionCardSet, TransactionType,
+        MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
+        MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData,
+        Network, NetworkSpecs, RightButton, ScreenData, ScreenNameType, SeedNameCard,
+        TransactionCard, TransactionCardSet, TransactionType,
     },
-    network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
+    network_specs::{OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
 
+use definitions::navigation::MAddressCard;
 use pretty_assertions::assert_eq;
 
 use crate::{navstate::State, Action};
@@ -269,11 +277,11 @@ fn erase_modal_seed_phrase_and_identicon(m: &mut ModalData) -> String {
 fn erase_base58_address_identicon(m: &mut ScreenData) {
     if let ScreenData::Keys { f } = m {
         for key in f.set.iter_mut() {
-            key.identicon = vec![];
+            key.address.identicon = vec![];
             key.base58 = String::new();
             key.address_key = String::new();
         }
-        f.root.identicon = vec![];
+        f.root.address.identicon = vec![];
         f.root.base58 = String::new();
         f.root.address_key = String::new();
     } else {
@@ -291,6 +299,93 @@ fn erase_public_keys(m: &mut ScreenData) {
             }
         }
     }
+}
+
+#[test]
+fn export_import_addrs() {
+    let dbname_from = "for_tests/export_import_addrs_from";
+    let dbname_to = "for_tests/export_import_addrs_to";
+    let polkadot_genesis =
+        H256::from_str("91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3").unwrap();
+
+    populate_cold_nav_test(dbname_from).unwrap();
+    populate_cold_nav_test(dbname_to).unwrap();
+    try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname_from).unwrap();
+    try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname_to).unwrap();
+
+    try_create_address(
+        "Alice",
+        ALICE_SEED_PHRASE,
+        "//polkadot//test",
+        &NetworkSpecsKey::from_parts(&polkadot_genesis, &Encryption::Sr25519),
+        dbname_from,
+    )
+    .unwrap();
+
+    let addrs = export_all_addrs(&dbname_from, None).unwrap();
+
+    let addrs_expected = ExportAddrs::V1(ExportAddrsV1 {
+        addrs: vec![SeedInfo {
+            name: "Alice".to_owned(),
+            multisigner: Some(
+                sr25519::Pair::from_phrase(ALICE_SEED_PHRASE, None)
+                    .unwrap()
+                    .0
+                    .public()
+                    .into(),
+            ),
+            derived_keys: vec![
+                AddrInfo {
+                    address: "14VVJt7kYNpPhz9UNLnxDu6GDJ4vG8i1KaCm4mqdQXtRKU8".to_owned(),
+                    derivation_path: Some("//polkadot//test".to_owned()),
+                    encryption: Encryption::Sr25519,
+                    genesis_hash: H256::from_str(
+                        "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+                    )
+                    .unwrap(),
+                },
+                AddrInfo {
+                    address: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_owned(),
+                    derivation_path: Some("//westend".to_owned()),
+                    encryption: Encryption::Sr25519,
+                    genesis_hash: H256::from_str(
+                        "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+                    )
+                    .unwrap(),
+                },
+                AddrInfo {
+                    address: "ErGkNDDPmnaRZKxwe4VBLonyBJVmucqURFMatEJTwktsuTv".to_owned(),
+                    derivation_path: Some("//kusama".to_owned()),
+                    encryption: Encryption::Sr25519,
+                    genesis_hash: H256::from_str(
+                        "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+                    )
+                    .unwrap(),
+                },
+                AddrInfo {
+                    address: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_owned(),
+                    derivation_path: Some("//polkadot".to_owned()),
+                    encryption: Encryption::Sr25519,
+
+                    genesis_hash: H256::from_str(
+                        "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+                    )
+                    .unwrap(),
+                },
+            ],
+        }],
+    });
+
+    assert_eq!(addrs, addrs_expected);
+
+    let mut alice_hash_map = HashMap::new();
+    alice_hash_map.insert("Alice".to_owned(), ALICE_SEED_PHRASE.to_owned());
+
+    import_all_addrs(dbname_to, alice_hash_map, addrs).unwrap();
+
+    let addrs_new = export_all_addrs(&dbname_to, None).unwrap();
+
+    assert_eq!(addrs_new, addrs_expected);
 }
 
 #[test]
@@ -1007,7 +1102,8 @@ fn flow_test_1() {
                     timestamp: String::new(),
                     events: vec![Event::NetworkSpecsRemoved {
                         network_specs_display: NetworkSpecsDisplay {
-                            specs: NetworkSpecs {
+                            network: OrderedNetworkSpecs {
+                                specs: NetworkSpecs{
                                 base58prefix: 2,
                                 color: "#000".to_string(),
                                 decimals: 12,
@@ -1018,11 +1114,11 @@ fn flow_test_1() {
                                 .unwrap(),
                                 logo: "kusama".to_string(),
                                 name: "kusama".to_string(),
-                                order: 1,
                                 path_id: "//kusama".to_string(),
                                 secondary_color: "#262626".to_string(),
                                 title: "Kusama".to_string(),
-                                unit: "KSM".to_string(),
+                                unit: "KSM".to_string(),},
+                            order: 1,
                             },
                             valid_current_verifier: ValidCurrentVerifier::General,
                             general_verifier: Verifier { v: Some(VerifierValue::Standard { m: sr_multisigner_from_hex(hex_2) })},
@@ -1067,19 +1163,21 @@ fn flow_test_1() {
                 events: vec![MEventMaybeDecoded {
                     event: Event::NetworkSpecsRemoved {
                         network_specs_display: NetworkSpecsDisplay {
-                            specs: NetworkSpecs {
-                                base58prefix: 2,
-                                color: "#000".to_string(),
-                                decimals: 12,
-                                encryption: Encryption::Sr25519,
-                                genesis_hash: H256::from_str(genesis_hash).unwrap(),
-                                logo: "kusama".to_string(),
-                                name: "kusama".to_string(),
+                            network: OrderedNetworkSpecs {
+                                specs: NetworkSpecs {
+                                    base58prefix: 2,
+                                    color: "#000".to_string(),
+                                    decimals: 12,
+                                    encryption: Encryption::Sr25519,
+                                    genesis_hash: H256::from_str(genesis_hash).unwrap(),
+                                    logo: "kusama".to_string(),
+                                    name: "kusama".to_string(),
+                                    path_id: "//kusama".to_string(),
+                                    secondary_color: "#262626".to_string(),
+                                    title: "Kusama".to_string(),
+                                    unit: "KSM".to_string(),
+                                },
                                 order: 1,
-                                path_id: "//kusama".to_string(),
-                                secondary_color: "#262626".to_string(),
-                                title: "Kusama".to_string(),
-                                unit: "KSM".to_string(),
                             },
                             valid_current_verifier: ValidCurrentVerifier::General,
                             general_verifier: Verifier {
@@ -1186,7 +1284,7 @@ fn flow_test_1() {
                         index: 1,
                         indent: 0,
                         card: Card::NewSpecsCard {
-                            f: NetworkSpecsToSend {
+                            f: NetworkSpecs {
                                 base58prefix: 2,
                                 color: "#000".to_string(),
                                 decimals: 12,
@@ -1333,19 +1431,21 @@ fn flow_test_1() {
                     timestamp: String::new(),
                     events: vec![Event::NetworkSpecsAdded {
                         network_specs_display: NetworkSpecsDisplay {
-                            specs: NetworkSpecs {
-                                base58prefix: 2,
-                                color: "#000".to_string(),
-                                decimals: 12,
-                                encryption: Encryption::Sr25519,
-                                genesis_hash: H256::from_str(hhh).unwrap(),
-                                logo: "kusama".to_string(),
-                                name: "kusama".to_string(),
+                            network: OrderedNetworkSpecs {
+                                specs: NetworkSpecs {
+                                    base58prefix: 2,
+                                    color: "#000".to_string(),
+                                    decimals: 12,
+                                    encryption: Encryption::Sr25519,
+                                    genesis_hash: H256::from_str(hhh).unwrap(),
+                                    logo: "kusama".to_string(),
+                                    name: "kusama".to_string(),
+                                    path_id: "//kusama".to_string(),
+                                    secondary_color: "#262626".to_string(),
+                                    title: "Kusama".to_string(),
+                                    unit: "KSM".to_string(),
+                                },
                                 order: 2,
-                                path_id: "//kusama".to_string(),
-                                secondary_color: "#262626".to_string(),
-                                title: "Kusama".to_string(),
-                                unit: "KSM".to_string(),
                             },
                             valid_current_verifier: ValidCurrentVerifier::General,
                             general_verifier: Verifier {
@@ -1509,19 +1609,21 @@ fn flow_test_1() {
                     timestamp: String::new(),
                     events: vec![Event::NetworkSpecsAdded {
                         network_specs_display: NetworkSpecsDisplay {
-                            specs: NetworkSpecs {
-                                base58prefix: 2,
-                                color: "#000".to_string(),
-                                decimals: 12,
-                                encryption: Encryption::Sr25519,
-                                genesis_hash: H256::from_str(hhh).unwrap(),
-                                logo: "kusama".to_string(),
-                                name: "kusama".to_string(),
+                            network: OrderedNetworkSpecs {
+                                specs: NetworkSpecs {
+                                    base58prefix: 2,
+                                    color: "#000".to_string(),
+                                    decimals: 12,
+                                    encryption: Encryption::Sr25519,
+                                    genesis_hash: H256::from_str(hhh).unwrap(),
+                                    logo: "kusama".to_string(),
+                                    name: "kusama".to_string(),
+                                    path_id: "//kusama".to_string(),
+                                    secondary_color: "#262626".to_string(),
+                                    title: "Kusama".to_string(),
+                                    unit: "KSM".to_string(),
+                                },
                                 order: 2,
-                                path_id: "//kusama".to_string(),
-                                secondary_color: "#262626".to_string(),
-                                title: "Kusama".to_string(),
-                                unit: "KSM".to_string(),
                             },
                             valid_current_verifier: ValidCurrentVerifier::General,
                             general_verifier: Verifier {
@@ -1666,19 +1768,21 @@ fn flow_test_1() {
                     timestamp: String::new(),
                     events: vec![Event::NetworkSpecsAdded {
                         network_specs_display: NetworkSpecsDisplay {
-                            specs: NetworkSpecs {
-                                base58prefix: 2,
-                                color: "#000".to_string(),
-                                decimals: 12,
-                                encryption: Encryption::Sr25519,
-                                genesis_hash: H256::from_str(hhh).unwrap(),
-                                logo: "kusama".to_string(),
-                                name: "kusama".to_string(),
+                            network: OrderedNetworkSpecs {
+                                specs: NetworkSpecs {
+                                    base58prefix: 2,
+                                    color: "#000".to_string(),
+                                    decimals: 12,
+                                    encryption: Encryption::Sr25519,
+                                    genesis_hash: H256::from_str(hhh).unwrap(),
+                                    logo: "kusama".to_string(),
+                                    name: "kusama".to_string(),
+                                    path_id: "//kusama".to_string(),
+                                    secondary_color: "#262626".to_string(),
+                                    title: "Kusama".to_string(),
+                                    unit: "KSM".to_string(),
+                                },
                                 order: 2,
-                                path_id: "//kusama".to_string(),
-                                secondary_color: "#262626".to_string(),
-                                title: "Kusama".to_string(),
-                                unit: "KSM".to_string(),
                             },
                             valid_current_verifier: ValidCurrentVerifier::General,
                             general_verifier: Verifier {
@@ -1856,21 +1960,28 @@ fn flow_test_1() {
                 set: vec![MKeysCard {
                     address_key: String::new(),
                     base58: String::new(),
-                    identicon: vec![],
-                    has_pwd: false,
-                    path: "//polkadot".to_string(),
+                    address: Address {
+                        identicon: vec![],
+                        has_pwd: false,
+                        path: "//polkadot".to_string(),
+                        secret_exposed: false,
+                        seed_name: "Portia".to_string(),
+                    },
                     swiped: false,
                     multiselect: false,
-                    secret_exposed: false,
                 }],
-                root: MSeedKeyCard {
-                    seed_name: "Portia".to_string(),
-                    identicon: vec![],
+                root: MKeysCard {
+                    address: Address {
+                        path: "".to_string(),
+                        seed_name: "Portia".to_string(),
+                        identicon: vec![],
+                        secret_exposed: false,
+                        has_pwd: false,
+                    },
                     address_key: String::new(),
                     base58: String::new(),
                     swiped: false,
                     multiselect: false,
-                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
@@ -2632,18 +2743,24 @@ fn flow_test_1() {
                         "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                             .to_string(),
                     base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
-                    identicon: alice_sr_polkadot().to_vec(),
-                    has_pwd: false,
-                    path: "//polkadot".to_string(),
+                    address: Address {
+                        seed_name: "Alice".to_string(),
+                        identicon: alice_sr_polkadot().to_vec(),
+                        has_pwd: false,
+                        path: "//polkadot".to_string(),
+                        secret_exposed: false,
+                    },
                     swiped: false,
                     multiselect: false,
-                    secret_exposed: false,
                 }],
                 // since root == 'false' in state.perform above.
                 // TODO: This has to be wrapped with Option<_>.
-                root: MSeedKeyCard {
-                    seed_name: "Alice".to_string(),
-                    identicon: empty_png().to_vec(),
+                root: MKeysCard {
+                    address: Address {
+                        seed_name: "Alice".to_string(),
+                        identicon: empty_png().to_vec(),
+                        ..Default::default()
+                    },
                     ..Default::default()
                 },
                 network: MNetworkCard {
@@ -2737,14 +2854,14 @@ fn flow_test_1() {
                 pubkey: "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                     .to_string(),
                 address: Address {
-                    base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
                     identicon: alice_sr_polkadot().to_vec(),
                     seed_name: "Alice".to_string(),
                     path: "//polkadot".to_string(),
                     has_pwd: false,
-                    multiselect: None,
                     secret_exposed: false,
                 },
+                base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
+                multiselect: None,
                 network_info: MSCNetworkInfo {
                     network_title: "Polkadot".to_string(),
                     network_logo: "polkadot".to_string(),
@@ -2876,31 +2993,40 @@ fn flow_test_1() {
                             "01e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
                                 .to_string(),
                         base58: "16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb".to_string(),
-                        identicon: alice_sr_secret_path_multipass().to_vec(),
-                        has_pwd: true,
-                        path: "//secret//path".to_string(),
+                        address: Address {
+                            identicon: alice_sr_secret_path_multipass().to_vec(),
+                            has_pwd: true,
+                            path: "//secret//path".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                                 .to_string(),
                         base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
-                        identicon: alice_sr_polkadot().to_vec(),
-                        has_pwd: false,
-                        path: "//polkadot".to_string(),
+                        address: Address {
+                            identicon: alice_sr_polkadot().to_vec(),
+                            has_pwd: false,
+                            path: "//polkadot".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                 ],
                 // since root == 'false' in state.perform above.
                 // TODO: This has to be wrapped with Option<_>.
-                root: MSeedKeyCard {
-                    seed_name: "Alice".to_string(),
-                    identicon: empty_png().to_vec(),
+                root: MKeysCard {
+                    address: Address {
+                        seed_name: "Alice".to_string(),
+                        identicon: empty_png().to_vec(),
+                        ..Default::default()
+                    },
                     ..Default::default()
                 },
                 network: MNetworkCard {
@@ -2944,36 +3070,46 @@ fn flow_test_1() {
                             "01e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
                                 .to_string(),
                         base58: "16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb".to_string(),
-                        identicon: alice_sr_secret_path_multipass().to_vec(),
-                        has_pwd: true,
-                        path: "//secret//path".to_string(),
+                        address: Address {
+                            identicon: alice_sr_secret_path_multipass().to_vec(),
+                            has_pwd: true,
+                            path: "//secret//path".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                                 .to_string(),
                         base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
-                        identicon: alice_sr_polkadot().to_vec(),
-                        has_pwd: false,
-                        path: "//polkadot".to_string(),
-                        swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
+                        swiped: false,
+                        address: Address {
+                            identicon: alice_sr_polkadot().to_vec(),
+                            has_pwd: false,
+                            path: "//polkadot".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                     },
                 ],
-                root: MSeedKeyCard {
-                    seed_name: "Alice".to_string(),
-                    identicon: alice_sr_root().to_vec(),
+                root: MKeysCard {
                     address_key:
                         "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                             .to_string(),
                     base58: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_string(),
+                    address: Address {
+                        path: "".to_string(),
+                        seed_name: "Alice".to_string(),
+                        identicon: alice_sr_root().to_vec(),
+                        secret_exposed: false,
+                        has_pwd: false,
+                    },
                     swiped: false,
                     multiselect: false,
-                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
@@ -3048,36 +3184,46 @@ fn flow_test_1() {
                             "01e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
                                 .to_string(),
                         base58: "16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb".to_string(),
-                        identicon: alice_sr_secret_path_multipass().to_vec(),
-                        has_pwd: true,
-                        path: "//secret//path".to_string(),
                         swiped: false,
+                        address: Address {
+                            identicon: alice_sr_secret_path_multipass().to_vec(),
+                            has_pwd: true,
+                            path: "//secret//path".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                                 .to_string(),
                         base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
-                        identicon: alice_sr_polkadot().to_vec(),
-                        has_pwd: false,
-                        path: "//polkadot".to_string(),
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
+                        address: Address {
+                            identicon: alice_sr_polkadot().to_vec(),
+                            has_pwd: false,
+                            path: "//polkadot".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                     },
                 ],
-                root: MSeedKeyCard {
-                    seed_name: "Alice".to_string(),
-                    identicon: alice_sr_root().to_vec(),
+                root: MKeysCard {
+                    address: Address {
+                        path: "".to_string(),
+                        seed_name: "Alice".to_string(),
+                        identicon: alice_sr_root().to_vec(),
+                        secret_exposed: false,
+                        has_pwd: false,
+                    },
                     address_key:
                         "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                             .to_string(),
                     base58: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_string(),
                     swiped: false,
                     multiselect: false,
-                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
@@ -3417,16 +3563,22 @@ fn flow_test_1() {
                         "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                             .to_string(),
                     base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
-                    identicon: alice_sr_westend().to_vec(),
-                    has_pwd: false,
-                    path: "//westend".to_string(),
+                    address: Address {
+                        identicon: alice_sr_westend().to_vec(),
+                        has_pwd: false,
+                        path: "//westend".to_string(),
+                        secret_exposed: false,
+                        seed_name: "Alice".to_string(),
+                    },
                     swiped: false,
                     multiselect: false,
-                    secret_exposed: false,
                 }],
-                root: MSeedKeyCard {
-                    seed_name: "Alice".to_string(),
-                    identicon: empty_png().to_vec(),
+                root: MKeysCard {
+                    address: Address {
+                        seed_name: "Alice".to_string(),
+                        identicon: empty_png().to_vec(),
+                        ..Default::default()
+                    },
                     ..Default::default()
                 },
                 network: MNetworkCard {
@@ -3532,82 +3684,104 @@ fn flow_test_1() {
                             "012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972"
                                 .to_string(),
                         base58: "5D34dL5prEUaGNQtPPZ3yN5Y6BnkfXunKXXz6fo7ZJbLwRRH".to_string(),
-                        identicon: alice_sr_0().to_vec(),
-                        has_pwd: false,
-                        path: "//0".to_string(),
+                        address: Address {
+                            identicon: alice_sr_0().to_vec(),
+                            has_pwd: false,
+                            path: "//0".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                                 .to_string(),
                         base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
-                        identicon: alice_sr_westend().to_vec(),
-                        has_pwd: false,
-                        path: "//westend".to_string(),
+                        address: Address {
+                            identicon: alice_sr_westend().to_vec(),
+                            has_pwd: false,
+                            path: "//westend".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
                                 .to_string(),
                         base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
-                        identicon: alice_sr_alice_secret_secret().to_vec(),
-                        has_pwd: false,
-                        path: "//Alice/secret//secret".to_string(),
+                        address: Address {
+                            identicon: alice_sr_alice_secret_secret().to_vec(),
+                            has_pwd: false,
+                            path: "//Alice/secret//secret".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "019cd20feb68e0535a6c1cdeead4601b652cf6af6d76baf370df26ee25adde0805"
                                 .to_string(),
                         base58: "5FcKjDXS89U79cXvhksZ2pF5XBeafmSM8rqkDVoTHQcXd5Gq".to_string(),
-                        identicon: alice_sr_alice_westend().to_vec(),
-                        has_pwd: false,
-                        path: "//Alice/westend".to_string(),
+                        address: Address {
+                            identicon: alice_sr_alice_westend().to_vec(),
+                            has_pwd: false,
+                            path: "//Alice/westend".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "01b606fc73f57f03cdb4c932d475ab426043e429cecc2ffff0d2672b0df8398c48"
                                 .to_string(),
                         base58: "5GBNeWRhZc2jXu7D55rBimKYDk8PGk8itRYFTPfC8RJLKG5o".to_string(),
-                        identicon: alice_sr_1().to_vec(),
-                        has_pwd: false,
-                        path: "//1".to_string(),
+                        address: Address {
+                            identicon: alice_sr_1().to_vec(),
+                            has_pwd: false,
+                            path: "//1".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                                 .to_string(),
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        identicon: alice_sr_alice().to_vec(),
-                        has_pwd: false,
-                        path: "//Alice".to_string(),
+                        address: Address {
+                            identicon: alice_sr_alice().to_vec(),
+                            has_pwd: false,
+                            path: "//Alice".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                 ],
-                root: MSeedKeyCard {
-                    seed_name: "Alice".to_string(),
-                    identicon: empty_png().to_vec(),
+                root: MKeysCard {
+                    address: Address {
+                        path: "".to_string(),
+                        seed_name: "Alice".to_string(),
+                        identicon: empty_png().to_vec(),
+                        secret_exposed: false,
+                        has_pwd: false,
+                    },
                     address_key: String::new(),
                     base58: String::new(),
                     swiped: false,
                     multiselect: false,
-                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Westend".to_string(),
@@ -3757,89 +3931,113 @@ fn flow_test_1() {
                             "0120c394d410893cac63d993fa71eb8247e6af9a29cda467e836efec678b9f6b7f"
                                 .to_string(),
                         base58: "5CofVLAGjwvdGXvBiP6ddtZYMVbhT5Xke8ZrshUpj2ZXAnND".to_string(),
-                        identicon: alice_sr_westend_1().to_vec(),
-                        has_pwd: false,
-                        path: "//westend//1".to_string(),
+                        address: Address {
+                            identicon: alice_sr_westend_1().to_vec(),
+                            has_pwd: false,
+                            path: "//westend//1".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972"
                                 .to_string(),
                         base58: "5D34dL5prEUaGNQtPPZ3yN5Y6BnkfXunKXXz6fo7ZJbLwRRH".to_string(),
-                        identicon: alice_sr_0().to_vec(),
-                        has_pwd: false,
-                        path: "//0".to_string(),
+                        address: Address {
+                            identicon: alice_sr_0().to_vec(),
+                            has_pwd: false,
+                            path: "//0".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                                 .to_string(),
                         base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
-                        identicon: alice_sr_westend().to_vec(),
-                        has_pwd: false,
-                        path: "//westend".to_string(),
+                        address: Address {
+                            identicon: alice_sr_westend().to_vec(),
+                            has_pwd: false,
+                            path: "//westend".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
                                 .to_string(),
                         base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
-                        identicon: alice_sr_alice_secret_secret().to_vec(),
-                        has_pwd: false,
-                        path: "//Alice/secret//secret".to_string(),
+                        address: Address {
+                            identicon: alice_sr_alice_secret_secret().to_vec(),
+                            has_pwd: false,
+                            path: "//Alice/secret//secret".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "01b606fc73f57f03cdb4c932d475ab426043e429cecc2ffff0d2672b0df8398c48"
                                 .to_string(),
                         base58: "5GBNeWRhZc2jXu7D55rBimKYDk8PGk8itRYFTPfC8RJLKG5o".to_string(),
-                        identicon: alice_sr_1().to_vec(),
-                        has_pwd: false,
-                        path: "//1".to_string(),
+                        address: Address {
+                            identicon: alice_sr_1().to_vec(),
+                            has_pwd: false,
+                            path: "//1".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                                 .to_string(),
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        identicon: alice_sr_alice().to_vec(),
-                        has_pwd: false,
-                        path: "//Alice".to_string(),
+                        address: Address {
+                            identicon: alice_sr_alice().to_vec(),
+                            has_pwd: false,
+                            path: "//Alice".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "01e655361d12f3ccca5f128187cf3f5eea052be722746e392c8b498d0d18723470"
                                 .to_string(),
                         base58: "5HGiBcFgEBMgT6GEuo9SA98sBnGgwHtPKDXiUukT6aqCrKEx".to_string(),
-                        identicon: alice_sr_westend_0().to_vec(),
-                        has_pwd: false,
-                        path: "//westend//0".to_string(),
+                        address: Address {
+                            identicon: alice_sr_westend_0().to_vec(),
+                            has_pwd: false,
+                            path: "//westend//0".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                 ],
-                root: MSeedKeyCard {
-                    seed_name: "Alice".to_string(),
-                    identicon: empty_png().to_vec(),
+                root: MKeysCard {
+                    address: Address {
+                        seed_name: "Alice".to_string(),
+                        identicon: empty_png().to_vec(),
+                        ..Default::default()
+                    },
                     ..Default::default()
                 },
                 network: MNetworkCard {
@@ -3876,12 +4074,15 @@ fn flow_test_1() {
                 address_key: "014e384fb30994d520094dce42086dbdd4977c11fb2f2cf9ca1c80056684934b08"
                     .to_string(),
                 base58: "5DqGKX9v7uR92EvmNNmiETZ9PcDBrg2YRYukGhzXHEkKmpfx".to_string(),
-                identicon: alice_sr_westend_2().to_vec(),
-                has_pwd: false,
-                path: "//westend//2".to_string(),
+                address: Address {
+                    identicon: alice_sr_westend_2().to_vec(),
+                    has_pwd: false,
+                    path: "//westend//2".to_string(),
+                    secret_exposed: false,
+                    seed_name: "Alice".to_string(),
+                },
                 swiped: false,
                 multiselect: false,
-                secret_exposed: false,
             },
         );
     }
@@ -4099,15 +4300,15 @@ fn flow_test_1() {
                     qr: alice_westend_westend_qr().to_vec(),
                     pubkey: "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                         .to_string(),
+                    base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
                     address: Address {
-                        base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
                         identicon: alice_sr_westend().to_vec(),
                         seed_name: "Alice".to_string(),
                         path: "//westend".to_string(),
                         has_pwd: false,
-                        multiselect: None,
                         secret_exposed: false,
                     },
+                    multiselect: None,
                     network_info: MSCNetworkInfo {
                         network_title: "Westend".to_string(),
                         network_logo: "westend".to_string(),
@@ -4148,14 +4349,14 @@ fn flow_test_1() {
                     pubkey: "8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
                         .to_string(),
                     address: Address {
-                        base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
                         identicon: alice_sr_alice_secret_secret().to_vec(),
                         seed_name: "Alice".to_string(),
                         path: "//Alice/secret//secret".to_string(),
                         has_pwd: false,
-                        multiselect: None,
                         secret_exposed: false,
                     },
+                    multiselect: None,
+                    base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
                     network_info: MSCNetworkInfo {
                         network_title: "Westend".to_string(),
                         network_logo: "westend".to_string(),
@@ -4196,13 +4397,13 @@ fn flow_test_1() {
                     qr: alice_westend_alice_qr().to_vec(),
                     pubkey: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
+                    base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+                    multiselect: None,
                     address: Address {
-                        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                         identicon: alice_sr_alice().to_vec(),
                         seed_name: "Alice".to_string(),
                         path: "//Alice".to_string(),
                         has_pwd: false,
-                        multiselect: None,
                         secret_exposed: false,
                     },
                     network_info: MSCNetworkInfo {
@@ -4318,48 +4519,61 @@ fn flow_test_1() {
                             "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                                 .to_string(),
                         base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
-                        identicon: alice_sr_westend().to_vec(),
-                        has_pwd: false,
-                        path: "//westend".to_string(),
+                        address: Address {
+                            identicon: alice_sr_westend().to_vec(),
+                            has_pwd: false,
+                            path: "//westend".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
                                 .to_string(),
                         base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
-                        identicon: alice_sr_alice_secret_secret().to_vec(),
-                        has_pwd: false,
-                        path: "//Alice/secret//secret".to_string(),
+                        address: Address {
+                            identicon: alice_sr_alice_secret_secret().to_vec(),
+                            has_pwd: false,
+                            path: "//Alice/secret//secret".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                                 .to_string(),
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        identicon: alice_sr_alice().to_vec(),
-                        has_pwd: false,
-                        path: "//Alice".to_string(),
+                        address: Address {
+                            identicon: alice_sr_alice().to_vec(),
+                            has_pwd: false,
+                            path: "//Alice".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                 ],
-                root: MSeedKeyCard {
-                    seed_name: "Alice".to_string(),
-                    identicon: alice_sr_root().to_vec(),
+                root: MKeysCard {
+                    address: Address {
+                        path: "".to_string(),
+                        seed_name: "Alice".to_string(),
+                        identicon: alice_sr_root().to_vec(),
+                        secret_exposed: false,
+                        has_pwd: false,
+                    },
                     address_key:
                         "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                             .to_string(),
                     base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
                     swiped: false,
                     multiselect: false,
-                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Westend".to_string(),
@@ -4427,15 +4641,15 @@ fn flow_test_1() {
                 qr: alice_westend_root_qr().to_vec(),
                 pubkey: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                     .to_string(),
+                base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
                 address: Address {
-                    base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
                     identicon: alice_sr_root().to_vec(),
                     seed_name: "Alice".to_string(),
                     path: String::new(),
                     has_pwd: false,
-                    multiselect: None,
                     secret_exposed: false,
                 },
+                multiselect: None,
                 network_info: MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
@@ -4503,36 +4717,46 @@ fn flow_test_1() {
                             "01e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
                                 .to_string(),
                         base58: "16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb".to_string(),
-                        identicon: alice_sr_secret_path_multipass().to_vec(),
-                        has_pwd: true,
-                        path: "//secret//path".to_string(),
+                        address: Address {
+                            identicon: alice_sr_secret_path_multipass().to_vec(),
+                            has_pwd: true,
+                            path: "//secret//path".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                     MKeysCard {
                         address_key:
                             "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                                 .to_string(),
                         base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
-                        identicon: alice_sr_polkadot().to_vec(),
-                        has_pwd: false,
-                        path: "//polkadot".to_string(),
+                        address: Address {
+                            identicon: alice_sr_polkadot().to_vec(),
+                            has_pwd: false,
+                            path: "//polkadot".to_string(),
+                            secret_exposed: false,
+                            seed_name: "Alice".to_string(),
+                        },
                         swiped: false,
                         multiselect: false,
-                        secret_exposed: false,
                     },
                 ],
-                root: MSeedKeyCard {
-                    seed_name: "Alice".to_string(),
-                    identicon: alice_sr_root().to_vec(),
+                root: MKeysCard {
+                    address: Address {
+                        path: "".to_string(),
+                        seed_name: "Alice".to_string(),
+                        identicon: alice_sr_root().to_vec(),
+                        secret_exposed: false,
+                        has_pwd: false,
+                    },
                     address_key:
                         "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                             .to_string(),
                     base58: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_string(),
                     swiped: false,
                     multiselect: false,
-                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
@@ -4635,95 +4859,109 @@ fn flow_test_1() {
             f: MSignSufficientCrypto {
                 identities: vec![
                     MRawKey {
-                        seed_name: "Alice".to_string(),
                         address_key:
                             "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                                 .to_string(),
                         public_key:
                             "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                                 .to_string(),
-                        identicon: alice_sr_westend().to_vec(),
-                        has_pwd: false,
-                        path: "//westend".to_string(),
-                        secret_exposed: false,
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_westend().to_vec(),
+                            has_pwd: false,
+                            path: "//westend".to_string(),
+                            secret_exposed: false,
+                        },
                     },
                     MRawKey {
-                        seed_name: "Alice".to_string(),
                         address_key:
                             "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                                 .to_string(),
                         public_key:
                             "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                                 .to_string(),
-                        identicon: alice_sr_root().to_vec(),
-                        has_pwd: false,
-                        path: "".to_string(),
-                        secret_exposed: false,
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_root().to_vec(),
+                            has_pwd: false,
+                            path: "".to_string(),
+                            secret_exposed: false,
+                        },
                     },
                     MRawKey {
-                        seed_name: "Alice".to_string(),
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_kusama().to_vec(),
+                            has_pwd: false,
+                            path: "//kusama".to_string(),
+                            secret_exposed: false,
+                        },
                         address_key:
                             "0164a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                                 .to_string(),
                         public_key:
                             "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                                 .to_string(),
-                        identicon: alice_sr_kusama().to_vec(),
-                        has_pwd: false,
-                        path: "//kusama".to_string(),
-                        secret_exposed: false,
                     },
                     MRawKey {
-                        seed_name: "Alice".to_string(),
                         address_key:
                             "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
                                 .to_string(),
                         public_key:
                             "8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
                                 .to_string(),
-                        identicon: alice_sr_alice_secret_secret().to_vec(),
-                        has_pwd: false,
-                        path: "//Alice/secret//secret".to_string(),
-                        secret_exposed: false,
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_alice_secret_secret().to_vec(),
+                            has_pwd: false,
+                            path: "//Alice/secret//secret".to_string(),
+                            secret_exposed: false,
+                        },
                     },
                     MRawKey {
-                        seed_name: "Alice".to_string(),
                         address_key:
                             "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                                 .to_string(),
                         public_key:
                             "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                                 .to_string(),
-                        identicon: alice_sr_alice().to_vec(),
-                        has_pwd: false,
-                        path: "//Alice".to_string(),
-                        secret_exposed: false,
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_alice().to_vec(),
+                            has_pwd: false,
+                            path: "//Alice".to_string(),
+                            secret_exposed: false,
+                        },
                     },
                     MRawKey {
-                        seed_name: "Alice".to_string(),
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_secret_path_multipass().to_vec(),
+                            has_pwd: true,
+                            path: "//secret//path".to_string(),
+                            secret_exposed: false,
+                        },
                         address_key:
                             "01e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
                                 .to_string(),
                         public_key:
                             "e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
                                 .to_string(),
-                        identicon: alice_sr_secret_path_multipass().to_vec(),
-                        has_pwd: true,
-                        path: "//secret//path".to_string(),
-                        secret_exposed: false,
                     },
                     MRawKey {
-                        seed_name: "Alice".to_string(),
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_polkadot().to_vec(),
+                            has_pwd: false,
+                            path: "//polkadot".to_string(),
+                            secret_exposed: false,
+                        },
                         address_key:
                             "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                                 .to_string(),
                         public_key:
                             "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                                 .to_string(),
-                        identicon: alice_sr_polkadot().to_vec(),
-                        has_pwd: false,
-                        path: "//polkadot".to_string(),
-                        secret_exposed: false,
                     },
                 ],
             },
@@ -4749,15 +4987,18 @@ fn flow_test_1() {
         .unwrap();
     expected_action.modal_data = Some(ModalData::SufficientCryptoReady {
         f: MSufficientCryptoReady {
-            author_info: Address {
+            author_info: MAddressCard {
                 base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                     .to_string(),
-                identicon: alice_sr_root().to_vec(),
-                seed_name: "Alice".to_string(),
-                path: String::new(),
-                has_pwd: false,
                 multiselect: None,
-                secret_exposed: false,
+                address: Address {
+                    identicon: alice_sr_root().to_vec(),
+                    seed_name: "Alice".to_string(),
+                    path: String::new(),
+                    has_pwd: false,
+
+                    secret_exposed: false,
+                },
             },
             sufficient: vec![],
             content: MSCContent::AddSpecs {
@@ -4837,7 +5078,7 @@ fn flow_test_1() {
             f.log[0].events[0],
             Event::NetworkSpecsSigned {
                 network_specs_export: NetworkSpecsExport {
-                    specs_to_send: NetworkSpecsToSend {
+                    specs_to_send: NetworkSpecs {
                         base58prefix: 42,
                         color: "#660D35".to_string(),
                         decimals: 12,
@@ -4922,110 +5163,126 @@ fn flow_test_1() {
             f: MSignSufficientCrypto {
                 identities: vec![
                     MRawKey {
-                        seed_name: "Alice".to_string(),
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_westend().to_vec(),
+                            has_pwd: false,
+                            path: "//westend".to_string(),
+                            secret_exposed: false,
+                        },
                         address_key:
                             "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                                 .to_string(),
                         public_key:
                             "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                                 .to_string(),
-                        identicon: alice_sr_westend().to_vec(),
-                        has_pwd: false,
-                        path: "//westend".to_string(),
-                        secret_exposed: false,
                     },
                     MRawKey {
-                        seed_name: "Alice".to_string(),
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_root().to_vec(),
+                            has_pwd: false,
+                            path: "".to_string(),
+                            secret_exposed: false,
+                        },
                         address_key:
                             "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                                 .to_string(),
                         public_key:
                             "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                                 .to_string(),
-                        identicon: alice_sr_root().to_vec(),
-                        has_pwd: false,
-                        path: "".to_string(),
-                        secret_exposed: false,
                     },
                     MRawKey {
-                        seed_name: "Alice".to_string(),
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_kusama().to_vec(),
+                            has_pwd: false,
+                            path: "//kusama".to_string(),
+                            secret_exposed: false,
+                        },
                         address_key:
                             "0164a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                                 .to_string(),
                         public_key:
                             "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                                 .to_string(),
-                        identicon: alice_sr_kusama().to_vec(),
-                        has_pwd: false,
-                        path: "//kusama".to_string(),
-                        secret_exposed: false,
                     },
                     MRawKey {
-                        seed_name: "Alice".to_string(),
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_alice_secret_secret().to_vec(),
+                            has_pwd: false,
+                            path: "//Alice/secret//secret".to_string(),
+                            secret_exposed: false,
+                        },
                         address_key:
                             "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
                                 .to_string(),
                         public_key:
                             "8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
                                 .to_string(),
-                        identicon: alice_sr_alice_secret_secret().to_vec(),
-                        has_pwd: false,
-                        path: "//Alice/secret//secret".to_string(),
-                        secret_exposed: false,
                     },
                     MRawKey {
-                        seed_name: "Alice".to_string(),
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_alice().to_vec(),
+                            has_pwd: false,
+                            path: "//Alice".to_string(),
+                            secret_exposed: false,
+                        },
                         address_key:
                             "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                                 .to_string(),
                         public_key:
                             "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                                 .to_string(),
-                        identicon: alice_sr_alice().to_vec(),
-                        has_pwd: false,
-                        path: "//Alice".to_string(),
-                        secret_exposed: false,
                     },
                     MRawKey {
-                        seed_name: "Alice".to_string(),
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_secret_path_multipass().to_vec(),
+                            has_pwd: true,
+                            path: "//secret//path".to_string(),
+                            secret_exposed: false,
+                        },
                         address_key:
                             "01e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
                                 .to_string(),
                         public_key:
                             "e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
                                 .to_string(),
-                        identicon: alice_sr_secret_path_multipass().to_vec(),
-                        has_pwd: true,
-                        path: "//secret//path".to_string(),
-                        secret_exposed: false,
                     },
                     MRawKey {
-                        seed_name: "Alice".to_string(),
+                        address: Address {
+                            seed_name: "Alice".to_string(),
+                            identicon: alice_sr_polkadot().to_vec(),
+                            has_pwd: false,
+                            path: "//polkadot".to_string(),
+                            secret_exposed: false,
+                        },
                         address_key:
                             "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                                 .to_string(),
                         public_key:
                             "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                                 .to_string(),
-                        identicon: alice_sr_polkadot().to_vec(),
-                        has_pwd: false,
-                        path: "//polkadot".to_string(),
-                        secret_exposed: false,
                     },
                 ],
             },
         },
         modal_data: Some(ModalData::SufficientCryptoReady {
             f: MSufficientCryptoReady {
-                author_info: Address {
+                author_info: MAddressCard {
                     base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                         .to_string(),
-                    identicon: alice_sr_root().to_vec(),
-                    seed_name: "Alice".to_string(),
-                    path: String::new(),
-                    has_pwd: false,
                     multiselect: None,
-                    secret_exposed: false,
+                    address: Address {
+                        identicon: alice_sr_root().to_vec(),
+                        seed_name: "Alice".to_string(),
+                        path: String::new(),
+                        has_pwd: false,
+                        secret_exposed: false,
+                    },
                 },
                 sufficient: vec![],
                 content: MSCContent::LoadMetadata {
@@ -5139,15 +5396,18 @@ fn flow_test_1() {
 
     new_log_with_modal.modal_data = Some(ModalData::SufficientCryptoReady {
         f: MSufficientCryptoReady {
-            author_info: Address {
+            author_info: MAddressCard {
                 base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                     .to_string(),
-                identicon: alice_sr_root().to_vec(),
-                seed_name: "Alice".to_string(),
-                path: String::new(),
-                has_pwd: false,
                 multiselect: None,
-                secret_exposed: false,
+                address: Address {
+                    identicon: alice_sr_root().to_vec(),
+                    seed_name: "Alice".to_string(),
+                    path: String::new(),
+                    has_pwd: false,
+
+                    secret_exposed: false,
+                },
             },
             sufficient: vec![],
             content: MSCContent::LoadTypes {
@@ -5425,14 +5685,16 @@ fn flow_test_1() {
                     ..Default::default()
                 },
                 ttype: TransactionType::Sign,
-                author_info: Some(Address {
+                author_info: Some(MAddressCard {
                     base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
-                    identicon: alice_sr_alice_secret_secret().to_vec(),
-                    seed_name: "Alice".to_string(),
-                    path: "//Alice/secret//secret".to_string(),
-                    has_pwd: false,
                     multiselect: None,
-                    secret_exposed: false,
+                    address: Address {
+                        identicon: alice_sr_alice_secret_secret().to_vec(),
+                        seed_name: "Alice".to_string(),
+                        path: "//Alice/secret//secret".to_string(),
+                        has_pwd: false,
+                        secret_exposed: false,
+                    },
                 }),
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -5578,14 +5840,16 @@ fn flow_test_1() {
                     ..Default::default()
                 },
                 ttype: TransactionType::Sign,
-                author_info: Some(Address {
+                author_info: Some(MAddressCard {
                     base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
-                    identicon: alice_sr_westend().to_vec(),
-                    seed_name: "Alice".to_string(),
-                    path: "//westend".to_string(),
-                    has_pwd: false,
+                    address: Address {
+                        identicon: alice_sr_westend().to_vec(),
+                        seed_name: "Alice".to_string(),
+                        path: "//westend".to_string(),
+                        has_pwd: false,
+                        secret_exposed: false,
+                    },
                     multiselect: None,
-                    secret_exposed: false,
                 }),
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -5784,21 +6048,28 @@ fn flow_test_1() {
                 set: vec![MKeysCard {
                     address_key: String::new(),
                     base58: String::new(),
-                    identicon: vec![],
-                    has_pwd: false,
-                    path: "//polkadot".to_string(),
                     swiped: false,
                     multiselect: false,
-                    secret_exposed: false,
+                    address: Address {
+                        identicon: vec![],
+                        has_pwd: false,
+                        path: "//polkadot".to_string(),
+                        secret_exposed: false,
+                        seed_name: "Pepper".to_string(),
+                    },
                 }],
-                root: MSeedKeyCard {
-                    seed_name: "Pepper".to_string(),
-                    identicon: vec![],
+                root: MKeysCard {
+                    address: Address {
+                        path: "".to_string(),
+                        seed_name: "Pepper".to_string(),
+                        identicon: vec![],
+                        secret_exposed: false,
+                        has_pwd: false,
+                    },
                     address_key: String::new(),
                     base58: String::new(),
                     swiped: false,
                     multiselect: false,
-                    secret_exposed: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
@@ -5843,15 +6114,21 @@ fn flow_test_1() {
                 set: vec![MKeysCard {
                     address_key: String::new(),
                     base58: String::new(),
-                    identicon: vec![],
-                    has_pwd: false,
-                    path: "//westend".to_string(),
                     swiped: false,
                     multiselect: false,
-                    secret_exposed: false,
+                    address: Address {
+                        identicon: vec![],
+                        has_pwd: false,
+                        path: "//westend".to_string(),
+                        secret_exposed: false,
+                        seed_name: "Pepper".to_string(),
+                    },
                 }],
-                root: MSeedKeyCard {
-                    seed_name: "Pepper".to_string(),
+                root: MKeysCard {
+                    address: Address {
+                        seed_name: "Pepper".to_string(),
+                        ..Default::default()
+                    },
                     ..Default::default()
                 },
                 network: MNetworkCard {
@@ -5871,7 +6148,7 @@ fn flow_test_1() {
             (
                 f.set[0].address_key.strip_prefix("01").unwrap().to_string(),
                 f.set[0].base58.clone(),
-                f.set[0].identicon.clone(),
+                f.set[0].address.identicon.clone(),
             )
         } else {
             panic!();
@@ -6031,14 +6308,16 @@ fn flow_test_1() {
                     ..Default::default()
                 },
                 ttype: TransactionType::Sign,
-                author_info: Some(Address {
+                author_info: Some(MAddressCard {
                     base58: pepper_westend_base58,
-                    identicon: pepper_westend_identicon,
-                    seed_name: "Pepper".to_string(),
-                    path: "//westend".to_string(),
-                    has_pwd: false,
                     multiselect: None,
-                    secret_exposed: false,
+                    address: Address {
+                        identicon: pepper_westend_identicon,
+                        seed_name: "Pepper".to_string(),
+                        path: "//westend".to_string(),
+                        has_pwd: false,
+                        secret_exposed: false,
+                    },
                 }),
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -6182,7 +6461,7 @@ fn flow_test_1() {
             (
                 f.set[0].address_key.strip_prefix("01").unwrap().to_string(),
                 f.set[0].base58.clone(),
-                f.set[0].identicon.clone(),
+                f.set[0].address.identicon.clone(),
             )
         } else {
             panic!();
@@ -6201,15 +6480,21 @@ fn flow_test_1() {
                 set: vec![MKeysCard {
                     address_key: String::new(),
                     base58: String::new(),
-                    identicon: vec![],
-                    has_pwd: true,
-                    path: "//0".to_string(),
                     swiped: false,
                     multiselect: false,
-                    secret_exposed: false,
+                    address: Address {
+                        identicon: vec![],
+                        has_pwd: true,
+                        path: "//0".to_string(),
+                        secret_exposed: false,
+                        seed_name: "Pepper".to_string(),
+                    },
                 }],
-                root: MSeedKeyCard {
-                    seed_name: "Pepper".to_string(),
+                root: MKeysCard {
+                    address: Address {
+                        seed_name: "Pepper".to_string(),
+                        ..Default::default()
+                    },
                     ..Default::default()
                 },
                 network: MNetworkCard {
@@ -6257,14 +6542,16 @@ fn flow_test_1() {
                     ..Default::default()
                 },
                 ttype: TransactionType::Sign,
-                author_info: Some(Address {
+                author_info: Some(MAddressCard {
                     base58: pepper_key0_base58.clone(),
-                    identicon: pepper_key0_identicon.clone(),
-                    seed_name: "Pepper".to_string(),
-                    path: "//0".to_string(),
-                    has_pwd: true,
                     multiselect: None,
-                    secret_exposed: false,
+                    address: Address {
+                        identicon: pepper_key0_identicon.clone(),
+                        seed_name: "Pepper".to_string(),
+                        path: "//0".to_string(),
+                        has_pwd: true,
+                        secret_exposed: false,
+                    },
                 }),
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -6296,14 +6583,16 @@ fn flow_test_1() {
         .unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
-            author_info: Address {
+            author_info: MAddressCard {
                 base58: pepper_key0_base58.clone(),
-                identicon: pepper_key0_identicon.clone(),
-                seed_name: "Pepper".to_string(),
-                path: "//0".to_string(),
-                has_pwd: true,
                 multiselect: None,
-                secret_exposed: false,
+                address: Address {
+                    identicon: pepper_key0_identicon.clone(),
+                    seed_name: "Pepper".to_string(),
+                    path: "//0".to_string(),
+                    has_pwd: true,
+                    secret_exposed: false,
+                },
             },
             counter: 1,
         },
@@ -6319,14 +6608,16 @@ fn flow_test_1() {
     let action = state.perform(Action::GoForward, "wrong_one", "").unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
-            author_info: Address {
+            author_info: MAddressCard {
                 base58: pepper_key0_base58.clone(),
-                identicon: pepper_key0_identicon.clone(),
-                seed_name: "Pepper".to_string(),
-                path: "//0".to_string(),
-                has_pwd: true,
                 multiselect: None,
-                secret_exposed: false,
+                address: Address {
+                    identicon: pepper_key0_identicon.clone(),
+                    seed_name: "Pepper".to_string(),
+                    path: "//0".to_string(),
+                    has_pwd: true,
+                    secret_exposed: false,
+                },
             },
             counter: 2,
         },
@@ -6347,14 +6638,16 @@ fn flow_test_1() {
     let action = state.perform(Action::GoForward, "wrong_two", "").unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
-            author_info: Address {
+            author_info: MAddressCard {
                 base58: pepper_key0_base58,
-                identicon: pepper_key0_identicon,
-                seed_name: "Pepper".to_string(),
-                path: "//0".to_string(),
-                has_pwd: true,
                 multiselect: None,
-                secret_exposed: false,
+                address: Address {
+                    identicon: pepper_key0_identicon,
+                    seed_name: "Pepper".to_string(),
+                    path: "//0".to_string(),
+                    has_pwd: true,
+                    secret_exposed: false,
+                },
             },
             counter: 3,
         },

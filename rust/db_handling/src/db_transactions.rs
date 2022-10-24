@@ -32,7 +32,7 @@ use definitions::{
     keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey},
     metadata::MetaValues,
     network_specs::{
-        CurrentVerifier, NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier,
+        CurrentVerifier, NetworkSpecs, OrderedNetworkSpecs, ValidCurrentVerifier, Verifier,
         VerifierValue,
     },
     qr_transfers::ContentLoadTypes,
@@ -557,17 +557,17 @@ impl TrDbColdStub {
         self
     }
 
-    /// Prepare adding [`NetworkSpecs`] into the cold database:
+    /// Prepare adding [`OrderedNetworkSpecs`] into the cold database:
     ///
-    /// - Transform received in `add_specs` payload [`NetworkSpecsToSend`]
-    /// into [`NetworkSpecs`] by adding `order` field. Networks are always added
+    /// - Transform received in `add_specs` payload [`NetworkSpecs`]
+    /// into [`OrderedNetworkSpecs`] by adding `order` field. Networks are always added
     /// in the end of the network list, with order set to the total number of
     /// network specs entries currently in Signer. When a network is removed,
     /// the order of the remaining networks gets rearranged, see details in
     /// function [`remove_network`](crate::helpers::remove_network).
     /// - Add a (key, value) pair to the network specs additions queue in
     /// `network_specs_stub`. Key is [`NetworkSpecsKey`] in key form, value is
-    /// SCALE-encoded [`NetworkSpecs`].
+    /// SCALE-encoded [`OrderedNetworkSpecs`].
     /// - Add corresponding `Event::NetworkSpecsAdded(_)` into `history_stub`.
     /// - Add root address for the network if the [`AddressDetails`] entry with
     /// matching [`Encryption`](definitions::crypto::Encryption) already exists,
@@ -582,7 +582,7 @@ impl TrDbColdStub {
     /// specs are added.
     pub fn add_network_specs<P>(
         mut self,
-        network_specs_to_send: &NetworkSpecsToSend,
+        network_specs_to_send: &NetworkSpecs,
         valid_current_verifier: &ValidCurrentVerifier,
         general_verifier: &Verifier,
         db_path: P,
@@ -618,7 +618,7 @@ impl TrDbColdStub {
                 let (multisigner, mut address_details) =
                     AddressDetails::process_entry_with_key_checked(&address_key, address_entry)?;
                 if address_details.is_root()
-                    && (address_details.encryption == network_specs.encryption)
+                    && (address_details.encryption == network_specs.specs.encryption)
                     && !address_details.network_id.contains(&network_specs_key)
                 {
                     address_details
@@ -633,7 +633,7 @@ impl TrDbColdStub {
                             &address_details.encryption,
                             &multisigner_to_public(&multisigner),
                             &address_details.path,
-                            network_specs.genesis_hash,
+                            network_specs.specs.genesis_hash,
                         ),
                     });
                 }
@@ -642,7 +642,7 @@ impl TrDbColdStub {
         Ok(self)
     }
 
-    /// Prepare removing [`NetworkSpecs`] from the cold database:
+    /// Prepare removing [`OrderedNetworkSpecs`] from the cold database:
     ///
     /// - Add [`NetworkSpecsKey`] in key form to the network specs removal queue
     /// in `network_specs_stub`.
@@ -660,12 +660,14 @@ impl TrDbColdStub {
     /// interface when the properly verified network specs are loaded in Signer.
     pub fn remove_network_specs(
         mut self,
-        network_specs: &NetworkSpecs,
+        network_specs: &OrderedNetworkSpecs,
         valid_current_verifier: &ValidCurrentVerifier,
         general_verifier: &Verifier,
     ) -> Self {
-        let network_specs_key =
-            NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
+        let network_specs_key = NetworkSpecsKey::from_parts(
+            &network_specs.specs.genesis_hash,
+            &network_specs.specs.encryption,
+        );
         self.network_specs_stub = self.network_specs_stub.new_removal(network_specs_key.key());
         self.history_stub.push(Event::NetworkSpecsRemoved {
             network_specs_display: NetworkSpecsDisplay::get(
@@ -1040,7 +1042,7 @@ impl TrDbColdSign {
 ///
 /// - a set of derivations, that was checked when the derivation import was
 /// received by Signer
-/// - [`NetworkSpecs`] for the network in which the derivations will be used to
+/// - [`OrderedNetworkSpecs`] for the network in which the derivations will be used to
 /// generate addresses
 #[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
@@ -1050,13 +1052,13 @@ pub struct TrDbColdDerivations {
 
     /// network specs for the network in which to generate the derivations,
     /// from received `derivations` payload
-    network_specs: NetworkSpecs,
+    network_specs: OrderedNetworkSpecs,
 }
 
 #[cfg(feature = "signer")]
 impl TrDbColdDerivations {
     /// Construct [`TrDbColdDerivations`] from payload components.
-    pub fn generate(checked_derivations: &[String], network_specs: &NetworkSpecs) -> Self {
+    pub fn generate(checked_derivations: &[String], network_specs: &OrderedNetworkSpecs) -> Self {
         Self {
             checked_derivations: checked_derivations.to_owned(),
             network_specs: network_specs.to_owned(),
@@ -1095,7 +1097,7 @@ impl TrDbColdDerivations {
     }
 
     /// Get network specs
-    pub fn network_specs(&self) -> &NetworkSpecs {
+    pub fn network_specs(&self) -> &OrderedNetworkSpecs {
         &self.network_specs
     }
 

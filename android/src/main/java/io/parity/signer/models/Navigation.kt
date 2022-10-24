@@ -10,6 +10,7 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ScreenData
 import io.parity.signer.uniffi.backendAction
 import io.parity.signer.uniffi.generateSecretKeyQr
+import io.parity.signer.uniffi.MAddressCard
 import java.lang.RuntimeException
 
 
@@ -84,7 +85,11 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 				val viewModel = PrivateKeyExportModel(
 					qrImage = secretKeyDetailsQR.qr,
 					keyCard = KeyCardModel.fromAddress(
-						address = secretKeyDetailsQR.address,
+						address_card = MAddressCard(
+							address = secretKeyDetailsQR.address,
+							base58 = secretKeyDetailsQR.base58,
+							multiselect = secretKeyDetailsQR.multiselect
+						),
 						networkTitle = secretKeyDetailsQR.networkInfo.networkTitle
 					),
 					NetworkCardModel(secretKeyDetailsQR.networkInfo)

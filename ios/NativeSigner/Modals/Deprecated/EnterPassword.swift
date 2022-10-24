@@ -17,7 +17,7 @@ struct EnterPassword: View {
             RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg000.swiftUIColor)
             VStack {
                 HeaderBar(line1: Localizable.secretPath.key, line2: Localizable.Path.password.key)
-                AddressCard(address: content.authorInfo)
+                AddressCard(card: content.authorInfo)
                 if content.counter > 0 {
                     Text(Localizable.remainingAttempts(String(content.counter)))
                 }

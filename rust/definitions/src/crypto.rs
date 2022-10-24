@@ -10,8 +10,8 @@
 //! and data signature combined.  
 //!
 //! Networks are expected to use certain encryption algorithm [`Encryption`].
-//! This is reflected in [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
-//! and in [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+//! This is reflected in [`OrderedNetworkSpecs`](crate::network_specs::OrderedNetworkSpecs)
+//! and in [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
 //! field `encryption`, and also in corresponding database keys
 //! [`NetworkSpecsKey`](crate::keyring::NetworkSpecsKey).
 //! In principle, network could support more than one encryption algorithm,

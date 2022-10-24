@@ -9,7 +9,7 @@ use definitions::{
     helpers::unhex,
     keyring::{MetaKey, MetaKeyPrefix, NetworkSpecsKey},
     metadata::{MetaSetElement, MetaValues},
-    network_specs::{NetworkSpecs, NetworkSpecsToSend, ShortSpecs},
+    network_specs::{NetworkSpecs, OrderedNetworkSpecs, ShortSpecs},
 };
 use frame_metadata::RuntimeMetadata;
 use parser::{method::OlderMeta, MetadataBundle};
@@ -132,7 +132,7 @@ where
 }
 
 /// Function to check if the chain specs are already in the database
-pub fn specs_are_new<P>(new: &NetworkSpecsToSend, db_path: P) -> Result<bool>
+pub fn specs_are_new<P>(new: &NetworkSpecs, db_path: P) -> Result<bool>
 where
     P: AsRef<Path>,
 {
@@ -141,10 +141,11 @@ where
     let chainspecs = open_tree(&database, SPECSTREE)?;
     match chainspecs.get(network_specs_key.key())? {
         Some(encoded_known_network_specs) => {
-            let old = NetworkSpecs::from_entry_with_key_checked(
+            let old = OrderedNetworkSpecs::from_entry_with_key_checked(
                 &network_specs_key,
                 encoded_known_network_specs,
-            )?;
+            )?
+            .specs;
             if (old.base58prefix != new.base58prefix)
                 | (old.decimals != new.decimals)
                 | (old.encryption != new.encryption)

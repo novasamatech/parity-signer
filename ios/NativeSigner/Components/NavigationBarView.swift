@@ -42,7 +42,16 @@ struct NavigationBarViewModel: Equatable {
 }
 
 struct NavigationBarActionModel {
+    let leftBarMenuAction: (() -> Void)?
     let rightBarMenuAction: () -> Void
+
+    init(
+        leftBarMenuAction: (() -> Void)? = nil,
+        rightBarMenuAction: @escaping () -> Void
+    ) {
+        self.leftBarMenuAction = leftBarMenuAction
+        self.rightBarMenuAction = rightBarMenuAction
+    }
 }
 
 /// UI component that mimics system `NavigationView` and should be used as `NavigationBar` equivalent in `UIKit`
@@ -68,12 +77,12 @@ struct NavigationBarView: View {
                 Spacer().frame(width: Heights.navigationButton)
             case .arrow:
                 NavbarButton(
-                    action: { navigation.perform(navigation: .init(action: .goBack)) },
+                    action: leftButtonAction(),
                     icon: Asset.arrowBack.swiftUIImage
                 )
             case .xmark:
                 NavbarButton(
-                    action: { navigation.perform(navigation: .init(action: .goBack)) },
+                    action: leftButtonAction(),
                     icon: Asset.xmarkButton.swiftUIImage
                 )
             }
@@ -108,6 +117,11 @@ struct NavigationBarView: View {
         .frame(maxWidth: .infinity)
         .frame(height: Heights.navigationBarHeight)
         .background(viewModel.backgroundColor)
+    }
+
+    private func leftButtonAction() -> () -> Void {
+        actionModel.leftBarMenuAction ??
+            { navigation.perform(navigation: .init(action: .goBack)) }
     }
 }
 
