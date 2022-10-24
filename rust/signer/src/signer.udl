@@ -481,6 +481,10 @@ dictionary MManageNetworks {
     sequence<MMNetwork> networks;
 };
 
+dictionary MKeysInfoExport {
+    sequence<sequence<u8>> frames;
+};
+
 [Enum]
 interface ScreenData {
     Scan();
@@ -547,6 +551,12 @@ namespace signer {
 
     [Throws=ErrorDisplayed]
     void history_seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    MKeysInfoExport export_key_info([ByRef] string dbname, sequence<string>? selected_names);
+
+    [Throws=ErrorDisplayed]
+    sequence<u8> encode_to_qr([ByRef] sequence<u8> payload);
 
     void init_logging(string tag);
 };

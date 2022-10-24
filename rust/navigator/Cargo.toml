@@ -15,6 +15,8 @@ thiserror = "1.0.37"
 transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
 zeroize = "1.5.7"
+qrcode_rtx = { path = "../qrcode_rtx" }
+parity-scale-codec = "3.2.1"
 
 [dev-dependencies]
 constants = { path = "../constants", features = ["test"] }

@@ -14,15 +14,18 @@ struct KeySetListViewModel: Equatable {
 
 /// View model to render single row in `KeySetList`
 struct KeySetViewModel: Equatable {
+    let seed: SeedNameCard
     let keyName: String
     let derivedKeys: String?
     let identicon: [UInt8]
 
     init(
+        seed: SeedNameCard,
         keyName: String,
         derivedKeys: String?,
         identicon: [UInt8]
     ) {
+        self.seed = seed
         self.keyName = keyName
         self.derivedKeys = derivedKeys
         self.identicon = identicon
@@ -35,6 +38,7 @@ final class KeySetListViewModelBuilder {
         KeySetListViewModel(
             list: seed.seedNameCards.map {
                 KeySetViewModel(
+                    seed: $0,
                     keyName: $0.seedName,
                     derivedKeys: derivedKeys(for: $0),
                     identicon: $0.identicon

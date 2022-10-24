@@ -19,4 +19,7 @@ pub enum Error {
 
     #[error("Mutex poisoned")]
     MutexPoisoned,
+
+    #[error("Data packing error: {0}")]
+    DataPacking(String),
 }

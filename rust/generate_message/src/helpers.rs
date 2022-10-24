@@ -1,5 +1,7 @@
 //! Helpers
+use db_handling::identities::{AddrInfo, ExportAddrs, ExportAddrsV1, SeedInfo};
 use parity_scale_codec::Encode;
+use qrcode_rtx::transform_into_qr_apng;
 use serde_json::{map::Map, value::Value};
 use sled::Batch;
 use sp_core::H256;
@@ -645,6 +647,53 @@ where
     std::fs::write(f_path, hex::encode(meta_values.meta))?;
 
     Ok(())
+}
+
+pub fn generate_key_info_export_to_qr<P: AsRef<Path>>(
+    output_name: P,
+    chunk_size: u16,
+    fps: u16,
+    keys_num: usize,
+) -> Result<()> {
+    use sp_keyring::sr25519::Keyring;
+    use sp_runtime::MultiSigner;
+
+    let multisigner = Some(MultiSigner::from(Keyring::Alice.public()));
+    let name = "a very long key name a very long key name".to_owned();
+
+    let derived_keys: Vec<AddrInfo> = (0..keys_num)
+        .into_iter()
+        .map(|num| AddrInfo {
+            address: "0xdeadbeefdeadbeefdeadbeef".to_string(),
+            derivation_path: Some(format!("//this//is//a//path//{}", num)),
+            encryption: Encryption::Sr25519,
+            genesis_hash: H256::default(),
+        })
+        .collect();
+
+    let seed_info = SeedInfo {
+        name,
+        multisigner,
+        derived_keys,
+    };
+    let export_addrs_v1 = ExportAddrsV1 {
+        addrs: vec![seed_info],
+    };
+    let export_addrs = ExportAddrs::V1(export_addrs_v1);
+
+    let export_addrs_encoded = [&[0x53, 0xff, 0xde], export_addrs.encode().as_slice()].concat();
+
+    generate_qr_code(&export_addrs_encoded, chunk_size, fps, output_name)
+}
+
+/// Generate with data into a specified file.
+pub fn generate_qr_code<P: AsRef<Path>>(
+    input: &[u8],
+    chunk_size: u16,
+    fps: u16,
+    output_name: P,
+) -> Result<()> {
+    transform_into_qr_apng(input, chunk_size, fps, output_name).map_err(Error::Qr)
 }
 
 /// Fetch data and assemble [`NetworkSpecs`] with only URL address and
