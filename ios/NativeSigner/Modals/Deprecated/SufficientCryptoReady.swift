@@ -24,7 +24,7 @@ struct SufficientCryptoReady: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .padding(12)
-                AddressCard(address: content.authorInfo)
+                AddressCard(card: content.authorInfo)
                 switch content.content {
                 case let .addSpecs(network):
                     Localizable.signatureForNetworkSpecs.text

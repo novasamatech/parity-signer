@@ -1,10 +1,11 @@
 use sp_core::H256;
 
 use crate::{
-    crypto::Encryption, history::Event, keyring::NetworkSpecsKey, network_specs::NetworkSpecs,
+    crypto::Encryption, history::Event, keyring::NetworkSpecsKey,
+    network_specs::OrderedNetworkSpecs,
 };
 
-pub use crate::network_specs::NetworkSpecsToSend;
+pub use crate::network_specs::NetworkSpecs;
 
 #[derive(PartialEq, Eq, Clone)]
 pub struct SeedNameWithIdenticon {
@@ -19,7 +20,7 @@ pub struct SeedNameWithIdenticon {
 pub enum TransactionAction {
     Derivations {
         content: TransactionCardSet,
-        network_info: NetworkSpecs,
+        network_info: OrderedNetworkSpecs,
         checksum: u32,
         network_specs_key: NetworkSpecsKey,
     },
@@ -27,8 +28,8 @@ pub enum TransactionAction {
         content: TransactionCardSet,
         checksum: u32,
         has_pwd: bool,
-        author_info: Address,
-        network_info: NetworkSpecs,
+        author_info: MAddressCard,
+        network_info: OrderedNetworkSpecs,
     },
     Stub {
         s: TransactionCardSet,
@@ -132,28 +133,13 @@ pub enum ScreenData {
     KeyDetailsMulti { f: MKeyDetailsMulti },
 }
 
-#[derive(Clone, PartialEq, Eq)]
-pub struct Identity {
-    pub seed_name: String,
-    pub address_key: String,
-    pub public_key: String,
-    pub identicon: Vec<u8>,
-    pub has_pwd: bool,
-    pub path: String,
-    pub is_multiselect: bool,
-    pub base58: String,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MKeysCard {
+    pub address: Address,
     pub address_key: String,
     pub base58: String,
-    pub identicon: Vec<u8>,
-    pub has_pwd: bool,
-    pub path: String,
     pub swiped: bool,
     pub multiselect: bool,
-    pub secret_exposed: bool,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -162,22 +148,10 @@ pub struct MNetworkCard {
     pub logo: String,
 }
 
-// TODO: This has to have a custom default.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct MSeedKeyCard {
-    pub seed_name: String,
-    pub identicon: Vec<u8>,
-    pub address_key: String,
-    pub base58: String,
-    pub swiped: bool,
-    pub multiselect: bool,
-    pub secret_exposed: bool,
-}
-
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MKeys {
     pub set: Vec<MKeysCard>,
-    pub root: MSeedKeyCard,
+    pub root: MKeysCard,
     pub network: MNetworkCard,
     pub multiselect_mode: bool,
     pub multiselect_count: String,
@@ -207,7 +181,7 @@ pub struct MLog {
 pub struct MEventMaybeDecoded {
     pub event: Event,
     pub decoded: Option<TransactionCardSet>,
-    pub signed_by: Option<Address>,
+    pub signed_by: Option<MAddressCard>,
     pub verifier_details: Option<MVerifierDetails>,
 }
 
@@ -252,7 +226,7 @@ pub struct TransactionCardSet {
 pub struct MTransaction {
     pub content: TransactionCardSet,
     pub ttype: TransactionType,
-    pub author_info: Option<Address>,
+    pub author_info: Option<MAddressCard>,
     pub network_info: Option<MSCNetworkInfo>,
 }
 
@@ -273,6 +247,8 @@ pub struct MKeyDetails {
     pub qr: Vec<u8>,
     pub pubkey: String,
     pub network_info: MSCNetworkInfo,
+    pub base58: String,
+    pub multiselect: Option<bool>,
     pub address: Address,
 }
 
@@ -301,19 +277,24 @@ pub struct MRecoverSeedPhrase {
 pub struct DerivationCheck {
     pub button_good: bool,
     pub where_to: Option<DerivationDestination>,
-    pub collision: Option<Address>,
+    pub collision: Option<MAddressCard>,
     pub error: Option<String>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Address {
-    pub base58: String,
     pub path: String,
     pub has_pwd: bool,
     pub identicon: Vec<u8>,
     pub seed_name: String,
-    pub multiselect: Option<bool>,
     pub secret_exposed: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MAddressCard {
+    pub base58: String,
+    pub address: Address,
+    pub multiselect: Option<bool>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -374,13 +355,9 @@ pub struct MNetworkDetails {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MRawKey {
-    pub seed_name: String,
+    pub address: Address,
     pub address_key: String,
     pub public_key: String,
-    pub identicon: Vec<u8>,
-    pub has_pwd: bool,
-    pub path: String,
-    pub secret_exposed: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -417,7 +394,7 @@ pub enum MSCContent {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MSufficientCryptoReady {
-    pub author_info: Address,
+    pub author_info: MAddressCard,
     pub sufficient: Vec<u8>,
     pub content: MSCContent,
 }
@@ -463,15 +440,17 @@ pub struct Network {
     pub title: String,
 }
 
-impl From<NetworkSpecs> for Network {
-    fn from(n: NetworkSpecs) -> Self {
-        let key = hex::encode(NetworkSpecsKey::from_parts(&n.genesis_hash, &n.encryption).key());
+impl From<OrderedNetworkSpecs> for Network {
+    fn from(n: OrderedNetworkSpecs) -> Self {
+        let key = hex::encode(
+            NetworkSpecsKey::from_parts(&n.specs.genesis_hash, &n.specs.encryption).key(),
+        );
         Network {
             key,
-            logo: n.logo,
+            logo: n.specs.logo,
             order: n.order as u32,
             selected: false,
-            title: n.title,
+            title: n.specs.title,
         }
     }
 }
@@ -495,7 +474,7 @@ pub struct MSignatureReady {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MEnterPassword {
-    pub author_info: Address,
+    pub author_info: MAddressCard,
     pub counter: u32,
 }
 
@@ -546,12 +525,6 @@ pub enum ModalData {
     KeyDetailsAction,
     LogComment,
     SelectSeed { f: MSeeds },
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct MSCAuthorPlain {
-    pub base58: String,
-    pub identicon: Vec<u8>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -634,8 +607,8 @@ pub struct MKeysInfoExport {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Card {
-    AuthorCard { f: Address },
-    AuthorPlainCard { f: MSCAuthorPlain },
+    AuthorCard { f: MAddressCard },
+    AuthorPlainCard { f: MSCId },
     AuthorPublicKeyCard { f: MVerifierDetails },
     BalanceCard { f: MSCCurrency },
     BitVecCard { f: String },
@@ -656,7 +629,7 @@ pub enum Card {
     NetworkGenesisHashCard { f: String },
     NetworkNameCard { f: String },
     NetworkInfoCard { f: MSCNetworkInfo },
-    NewSpecsCard { f: NetworkSpecsToSend },
+    NewSpecsCard { f: NetworkSpecs },
     NonceCard { f: String },
     NoneCard,
     PalletCard { f: String },

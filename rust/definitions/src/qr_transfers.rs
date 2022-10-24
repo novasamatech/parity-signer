@@ -29,7 +29,7 @@ use crate::crypto::Encryption;
 use crate::error::Result;
 #[cfg(feature = "signer")]
 use crate::helpers::pic_types;
-use crate::network_specs::NetworkSpecsToSend;
+use crate::network_specs::NetworkSpecs;
 use crate::types::TypeEntry;
 use sp_core::H256;
 
@@ -109,12 +109,12 @@ pub struct ContentAddSpecs(Vec<u8>);
 
 #[derive(Decode, Encode)]
 struct DecodedContentAddSpecs {
-    specs: NetworkSpecsToSend,
+    specs: NetworkSpecs,
 }
 
 impl ContentAddSpecs {
-    /// Generate [`ContentAddSpecs`] from network specs [`NetworkSpecsToSend`].
-    pub fn generate(specs: &NetworkSpecsToSend) -> Self {
+    /// Generate [`ContentAddSpecs`] from network specs [`NetworkSpecs`].
+    pub fn generate(specs: &NetworkSpecs) -> Self {
         Self(
             DecodedContentAddSpecs {
                 specs: specs.to_owned(),
@@ -128,8 +128,8 @@ impl ContentAddSpecs {
         Self(slice.to_vec())
     }
 
-    /// Get network specs [`NetworkSpecsToSend`] from [`ContentAddSpecs`].
-    pub fn specs(&self) -> Result<NetworkSpecsToSend> {
+    /// Get network specs [`NetworkSpecs`] from [`ContentAddSpecs`].
+    pub fn specs(&self) -> Result<NetworkSpecs> {
         Ok(<DecodedContentAddSpecs>::decode(&mut &self.0[..])?.specs)
     }
 
@@ -151,7 +151,7 @@ impl ContentAddSpecs {
     /// other parts of the QR code.
     ///
     /// Note that it is different from `.to_sign()` function. Effectively, already
-    /// SCALE-encoded [`NetworkSpecsToSend`] are encoded second time as an opaque
+    /// SCALE-encoded [`NetworkSpecs`] are encoded second time as an opaque
     /// `Vec<u8>`. This is done to have encoded piece length announced at the
     /// beginning of the `u8` set, to simplify cutting the received message in Signer.
     pub fn to_transfer(&self) -> Vec<u8> {

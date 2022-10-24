@@ -92,7 +92,7 @@ pub enum Error {
     },
 
     /// `SPECSTREEPREP` tree of the hot database contains
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) entries
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entries
     /// with same network name, but different base58 prefix.
     #[error("Two different base58 entries for network {name}.")]
     TwoBase58ForName {
@@ -165,11 +165,11 @@ pub enum Error {
     /// corresponding [`NetworkSpecsKey`] could be built.
     ///
     /// `NetworkSpecsKey` has an associated
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) value
-    /// stored in `SPECSTREEPREP` tree of the hot database. `NetworkSpecsToSend`
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) value
+    /// stored in `SPECSTREEPREP` tree of the hot database. `NetworkSpecs`
     /// has field `name` with network name.
     ///
-    /// This error appears if the `name` from `NetworkSpecsToSend` differs from
+    /// This error appears if the `name` from `NetworkSpecs` differs from
     /// the `name` in `AddressBookEntry`.
     #[error(
         "Address book name {address_book_name} does not match the \
@@ -179,12 +179,12 @@ pub enum Error {
         /// name in [`AddressBookEntry`](definitions::metadata::AddressBookEntry)
         address_book_name: String,
 
-        /// name in [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+        /// name in [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
         specs_name: String,
     },
 
     #[error("network specs to send")]
-    NetworkSpecsToSend(NetworkSpecsKey),
+    NetworkSpecs(NetworkSpecsKey),
 
     /// `ADDRESS_BOOK` tree of the hot database contains
     /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) entries with same
@@ -447,7 +447,7 @@ pub enum Changed {
     GenesisHash { old: H256, new: H256 },
 
     /// Network decimals value in
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
     /// stored in `SPECSTREEPREP` tree of the hot database is different from
     /// the one fetched through a new RPC call.
     ///
@@ -455,7 +455,7 @@ pub enum Changed {
     Decimals { old: u8, new: u8 },
 
     /// Network decimals value in
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
     /// stored in `SPECSTREEPREP` tree of the hot database has some value,
     /// freshly fetched specs have no decimals.
     ///
@@ -466,7 +466,7 @@ pub enum Changed {
     /// Network name is stored in multiple places in the hot database:
     ///
     /// - in `name` field of network specs
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) stored
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) stored
     /// in `SPECSTREEPREP` tree
     /// - in `name` field of address book entry
     /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) stored in
@@ -484,7 +484,7 @@ pub enum Changed {
     Name { old: String, new: String },
 
     /// Network unit value in
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
     /// stored in `SPECSTREEPREP` tree of the hot database is different from
     /// the one fetched through a new RPC call.
     ///
@@ -492,7 +492,7 @@ pub enum Changed {
     Unit { old: String, new: String },
 
     /// Network unit value in
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
     /// stored in `SPECSTREEPREP` tree of the hot database has some value,
     /// freshly fetched specs have no unit.
     ///

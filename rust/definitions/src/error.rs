@@ -48,7 +48,7 @@ pub enum Error {
     },
 
     /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry stored under
+    /// [`OrderedNetworkSpecs`](crate::network_specs::OrderedNetworkSpecs) entry stored under
     /// this `NetworkSpecsKey` in `SPECSTREE` tree of the cold database
     /// contains `genesis_hash` field with a different genesis hash.
     #[error(
@@ -63,7 +63,7 @@ pub enum Error {
     },
 
     /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) entry
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry
     /// stored under this `NetworkSpecsKey` in `SPECSTREEPREP` tree of the hot
     /// database contains `encryption` field with a different [`Encryption`].
     #[error(
@@ -77,11 +77,11 @@ pub enum Error {
     },
 
     /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
-    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) entry
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry
     /// stored under this `NetworkSpecsKey` in `SPECSTREEPREP` tree of the hot
     /// database contains `genesis_hash` field with a different genesis hash.
     #[error(
-        "Network specs (NetworkSpecsToSend) entry with network specs key {} \
+        "Network specs (NetworkSpecs) entry with network specs key {} \
         has wrong genesis hash {}.",
         hex::encode(network_specs_key.key()),
         hex::encode(genesis_hash),

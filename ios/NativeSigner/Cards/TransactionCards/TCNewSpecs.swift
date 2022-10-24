@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TCNewSpecs: View {
-    var value: NetworkSpecsToSend
+    var value: NetworkSpecs
     var body: some View {
         VStack {
             Localizable.newNetwork.text

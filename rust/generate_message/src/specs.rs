@@ -246,7 +246,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
 /// `add-specs -f -a` for individual address book entry.
 ///
 /// - Get network specs
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) from
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from
 /// the database using information in address book entry
 /// - Output raw bytes payload file
 fn specs_f_a_element<P>(entry: &AddressBookEntry, db_path: P, files_dir: P) -> Result<()>
@@ -264,7 +264,7 @@ where
 ///
 /// - Get address book entry for the network using network address book `title`
 /// - Get network specs
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) from
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from
 /// the database using information in address book entry
 /// - Output raw bytes payload file
 fn specs_f_n<P>(
@@ -306,7 +306,7 @@ where
 ///
 /// - Fetch network information using RPC calls and interpret it
 /// - Construct
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) with
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) with
 /// fetched values, user overrides and defaults
 /// - Output raw bytes payload file
 fn specs_d_u<P>(
@@ -338,7 +338,7 @@ where
 ///
 /// - Search for an address book entry by address book title and get
 /// corresponding
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 /// - Fetch network specs through RPC calls and check that the network specs
 /// from the database are still valid
 /// - Modify network specs according to the overrides requested
@@ -351,7 +351,7 @@ where
 ///
 /// Network address book title for new address book entries is constructed as
 /// `<network_name>-<encryption>`. Field `title` in network specs
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend), i.e.
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs), i.e.
 /// the title under which Signer displays the network, is also constructed as
 /// `<network_name>-<encryption>` for non-default networks, unless overridden by
 /// the user.
@@ -463,7 +463,7 @@ where
 /// - Check that there is no entries with same genesis hash as was just fetched
 /// in the database
 /// - Construct
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) with
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) with
 /// fetched values, user overrides and defaults
 /// - Construct `AddressBookEntry`
 /// - Update the database (network specs and address book)

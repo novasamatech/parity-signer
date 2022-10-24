@@ -6,16 +6,17 @@ use db_handling::{
     cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
     manage_history::get_history,
 };
+use definitions::navigation::MAddressCard;
 use definitions::{
     crypto::Encryption,
     history::{Entry, Event},
     keyring::NetworkSpecsKey,
     navigation::{
-        Address, Card, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName,
-        MSCEraMortal, MSCId, MSCNameVersion, MTypesInfo, MVerifierDetails, NetworkSpecsToSend,
-        TransactionAction, TransactionCard, TransactionCardSet,
+        Address, Card, MMetadataRecord, MSCCall, MSCCurrency, MSCEnumVariantName, MSCEraMortal,
+        MSCId, MSCNameVersion, MTypesInfo, MVerifierDetails, NetworkSpecs, TransactionAction,
+        TransactionCard, TransactionCardSet,
     },
-    network_specs::{NetworkSpecs, Verifier, VerifierValue},
+    network_specs::{OrderedNetworkSpecs, Verifier, VerifierValue},
 };
 use pretty_assertions::assert_eq;
 use sp_core::H256;
@@ -47,23 +48,25 @@ fn entries_contain_event(entries: &[Entry], event: &Event) -> bool {
     entries.iter().flat_map(|e| &e.events).any(|e| e == event)
 }
 
-fn westend_spec() -> NetworkSpecs {
-    NetworkSpecs {
-        base58prefix: 42,
-        color: "#660D35".to_string(),
-        decimals: 12,
-        encryption: Encryption::Sr25519,
-        genesis_hash: H256::from_str(
-            "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        )
-        .unwrap(),
-        logo: "westend".to_string(),
-        name: "westend".to_string(),
+fn westend_spec() -> OrderedNetworkSpecs {
+    OrderedNetworkSpecs {
+        specs: NetworkSpecs {
+            base58prefix: 42,
+            color: "#660D35".to_string(),
+            decimals: 12,
+            encryption: Encryption::Sr25519,
+            genesis_hash: H256::from_str(
+                "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            )
+            .unwrap(),
+            logo: "westend".to_string(),
+            name: "westend".to_string(),
+            path_id: "//westend".to_string(),
+            secondary_color: "#262626".to_string(),
+            title: "Westend".to_string(),
+            unit: "WND".to_string(),
+        },
         order: 2,
-        path_id: "//westend".to_string(),
-        secondary_color: "#262626".to_string(),
-        title: "Westend".to_string(),
-        unit: "WND".to_string(),
     }
 }
 
@@ -99,7 +102,7 @@ fn add_specs_westend_no_network_info_not_signed() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 42,
                     color: "#660D35".to_string(),
                     decimals: 12,
@@ -649,31 +652,35 @@ fn parse_transaction_1() {
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
-        secret_exposed: false,
+        address: Address {
+            identicon: alice_sr_alice().to_vec(),
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
-    let network_info_known = NetworkSpecs {
-        base58prefix: 42,
-        color: "#660D35".to_string(),
-        decimals: 12,
-        encryption: Encryption::Sr25519,
-        genesis_hash: H256::from_str(
-            "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        )
-        .unwrap(),
-        logo: "westend".to_string(),
-        name: "westend".to_string(),
+    let network_info_known = OrderedNetworkSpecs {
+        specs: NetworkSpecs {
+            base58prefix: 42,
+            color: "#660D35".to_string(),
+            decimals: 12,
+            encryption: Encryption::Sr25519,
+            genesis_hash: H256::from_str(
+                "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            )
+            .unwrap(),
+            logo: "westend".to_string(),
+            name: "westend".to_string(),
+            path_id: "//westend".to_string(),
+            secondary_color: "#262626".to_string(),
+            title: "Westend".to_string(),
+            unit: "WND".to_string(),
+        },
         order: 2,
-        path_id: "//westend".to_string(),
-        secondary_color: "#262626".to_string(),
-        title: "Westend".to_string(),
-        unit: "WND".to_string(),
     };
     let output = produce_output(line, dbname);
     if let TransactionAction::Sign {
@@ -976,14 +983,16 @@ fn parse_transaction_2() {
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
-        secret_exposed: false,
+        address: Address {
+            identicon: alice_sr_alice().to_vec(),
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
     let network_info_known = westend_spec();
 
@@ -1134,14 +1143,16 @@ fn parse_transaction_3() {
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
-        secret_exposed: false,
+        address: Address {
+            identicon: alice_sr_alice().to_vec(),
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
     let network_info_known = westend_spec();
     let output = produce_output(line, dbname);
@@ -1373,7 +1384,7 @@ fn add_specs_dock_not_verified_db_not_verified() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1441,7 +1452,7 @@ fn add_specs_dock_alice_verified_db_not_verified() {
             index: 2,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1495,7 +1506,7 @@ fn add_specs_dock_not_verified_db_alice_verified() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1557,7 +1568,7 @@ fn add_specs_dock_both_verified_same() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1619,7 +1630,7 @@ fn add_specs_dock_both_verified_different() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1674,7 +1685,7 @@ fn add_specs_westend_ed25519_not_signed() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 42,
                     color: "#660D35".to_string(),
                     decimals: 12,
@@ -1764,7 +1775,7 @@ fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
             index: 2,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 42,
                     color: "#660D35".to_string(),
                     decimals: 12,
@@ -1846,7 +1857,7 @@ fn add_specs_westend_ed25519_both_verified_same() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 42,
                     color: "#660D35".to_string(),
                     decimals: 12,
@@ -1920,7 +1931,7 @@ fn parse_transaction_4_unknown_author() {
             index: 0,
             indent: 0,
             card: Card::AuthorPlainCard {
-                f: MSCAuthorPlain {
+                f: MSCId {
                     base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
                     identicon: bob().to_vec(),
                 },
@@ -2107,14 +2118,16 @@ fn parse_transaction_6_error_on_parsing() {
             index: 0,
             indent: 0,
             card: Card::AuthorCard {
-                f: Address {
+                f: MAddressCard {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    identicon: alice_sr_alice().to_vec(),
-                    seed_name: "Alice".to_string(),
-                    path: "//Alice".to_string(),
-                    has_pwd: false,
                     multiselect: None,
-                    secret_exposed: false,
+                    address: Address {
+                        identicon: alice_sr_alice().to_vec(),
+                        seed_name: "Alice".to_string(),
+                        path: "//Alice".to_string(),
+                        has_pwd: false,
+                        secret_exposed: false,
+                    },
                 },
             },
         }]),
@@ -2201,14 +2214,16 @@ fn parse_transaction_7_error_on_parsing() {
             index: 0,
             indent: 0,
             card: Card::AuthorCard {
-                f: Address {
+                f: MAddressCard {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    identicon: alice_sr_alice().to_vec(),
-                    seed_name: "Alice".to_string(),
-                    path: "//Alice".to_string(),
-                    has_pwd: false,
                     multiselect: None,
-                    secret_exposed: false,
+                    address: Address {
+                        identicon: alice_sr_alice().to_vec(),
+                        seed_name: "Alice".to_string(),
+                        path: "//Alice".to_string(),
+                        has_pwd: false,
+                        secret_exposed: false,
+                    },
                 },
             },
         }]),
@@ -2296,14 +2311,16 @@ fn parse_transaction_8_error_on_parsing() {
             index: 0,
             indent: 0,
             card: Card::AuthorCard {
-                f: Address {
+                f: MAddressCard {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    identicon: alice_sr_alice().to_vec(),
-                    seed_name: "Alice".to_string(),
-                    path: "//Alice".to_string(),
-                    has_pwd: false,
                     multiselect: None,
-                    secret_exposed: false,
+                    address: Address {
+                        identicon: alice_sr_alice().to_vec(),
+                        seed_name: "Alice".to_string(),
+                        path: "//Alice".to_string(),
+                        has_pwd: false,
+                        secret_exposed: false,
+                    },
                 },
             },
         }]),
@@ -2394,14 +2411,16 @@ fn parse_msg_1() {
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
-        secret_exposed: false,
+        address: Address {
+            identicon: alice_sr_alice().to_vec(),
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
 
     let network_info_known = westend_spec();

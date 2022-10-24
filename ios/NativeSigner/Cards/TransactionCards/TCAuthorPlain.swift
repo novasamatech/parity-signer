@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TCAuthorPlain: View {
-    var value: MscAuthorPlain
+    var value: MscId
     var body: some View {
         HStack {
             Identicon(identicon: value.identicon)

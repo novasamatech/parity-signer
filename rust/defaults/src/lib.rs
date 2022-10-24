@@ -13,7 +13,7 @@
 //!
 //! - general verifier `Verifier` set to `Some(VerifierValue)` with Parity
 //! public key as a verifier value
-//! - network specs `NetworkSpecs` for default networks
+//! - network specs `OrderedNetworkSpecs` for default networks
 //! - verifiers for default networks, set to
 //! `CurrentVerifier::Valid(ValidCurrentVerifier::General)`
 //! - two latest metadata versions for each of the default networks
@@ -27,7 +27,7 @@
 //!
 //! Default hot database contains:
 //!
-//! - network specs `NetworkSpecsToSend` for default networks
+//! - network specs `NetworkSpecs` for default networks
 //! - address book containing the data for default networks
 //! - default types information
 //!
@@ -73,7 +73,7 @@ use definitions::{
     crypto::Encryption,
     keyring::VerifierKey,
     metadata::{AddressBookEntry, MetaValues},
-    network_specs::{CurrentVerifier, NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier},
+    network_specs::{CurrentVerifier, NetworkSpecs, OrderedNetworkSpecs, ValidCurrentVerifier},
     qr_transfers::ContentLoadTypes,
     types::{Description, EnumVariant, EnumVariantType, StructField, TypeEntry},
 };
@@ -185,25 +185,27 @@ fn default_network_info() -> [DefaultNetworkInfo; 3] {
     ]
 }
 
-/// Generate network specs [`NetworkSpecs`] set for the default networks, for
+/// Generate network specs [`OrderedNetworkSpecs`] set for the default networks, for
 /// cold database
 #[cfg(feature = "active")]
-pub fn default_chainspecs() -> Vec<NetworkSpecs> {
-    let mut out: Vec<NetworkSpecs> = Vec::new();
+pub fn default_chainspecs() -> Vec<OrderedNetworkSpecs> {
+    let mut out: Vec<OrderedNetworkSpecs> = Vec::new();
     for x in default_network_info() {
-        let new = NetworkSpecs {
-            base58prefix: x.base58prefix,
-            color: x.color.to_string(),
-            decimals: x.decimals,
-            encryption: x.encryption,
-            genesis_hash: x.genesis_hash,
-            logo: x.logo.to_string(),
-            name: x.name.to_string(),
+        let new = OrderedNetworkSpecs {
+            specs: NetworkSpecs {
+                base58prefix: x.base58prefix,
+                color: x.color.to_string(),
+                decimals: x.decimals,
+                encryption: x.encryption,
+                genesis_hash: x.genesis_hash,
+                logo: x.logo.to_string(),
+                name: x.name.to_string(),
+                path_id: x.path_id.to_string(),
+                secondary_color: x.secondary_color.to_string(),
+                title: x.title.to_string(),
+                unit: x.unit.to_string(),
+            },
             order: x.order,
-            path_id: x.path_id.to_string(),
-            secondary_color: x.secondary_color.to_string(),
-            title: x.title.to_string(),
-            unit: x.unit.to_string(),
         };
         out.push(new);
     }
@@ -223,13 +225,13 @@ pub fn default_verifiers() -> Vec<(VerifierKey, CurrentVerifier)> {
     out
 }
 
-/// Generate network specs [`NetworkSpecsToSend`] set for the default networks,
+/// Generate network specs [`NetworkSpecs`] set for the default networks,
 /// for hot database
 #[cfg(feature = "active")]
-pub fn default_chainspecs_to_send() -> Vec<NetworkSpecsToSend> {
-    let mut out: Vec<NetworkSpecsToSend> = Vec::new();
+pub fn default_chainspecs_to_send() -> Vec<NetworkSpecs> {
+    let mut out: Vec<NetworkSpecs> = Vec::new();
     for x in default_network_info() {
-        let new = NetworkSpecsToSend {
+        let new = NetworkSpecs {
             base58prefix: x.base58prefix,
             color: x.color.to_string(),
             decimals: x.decimals,

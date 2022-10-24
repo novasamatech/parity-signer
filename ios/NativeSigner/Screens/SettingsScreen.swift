@@ -44,14 +44,16 @@ struct SettingsScreen: View {
                         }
                         VStack {
                             if content.publicKey != nil {
-                                AddressCard(address: Address(
+                                AddressCard(card: MAddressCard(
                                     base58: "encryption: " + (content.encryption ?? "unknown"),
-                                    path: content.publicKey?.truncateMiddle(length: 8) ?? "",
-                                    hasPwd: false,
-                                    identicon: content.identicon ?? [],
-                                    seedName: "",
-                                    multiselect: false,
-                                    secretExposed: false
+                                    address: Address(
+                                        path: content.publicKey?.truncateMiddle(length: 8) ?? "",
+                                        hasPwd: false,
+                                        identicon: content.identicon ?? [],
+                                        seedName: "",
+                                        secretExposed: false
+                                    ),
+                                    multiselect: false
                                 ))
                             } else {
                                 if let errorMessage = content.error {
@@ -62,14 +64,16 @@ struct SettingsScreen: View {
                                         .foregroundColor(Asset.signalDanger.swiftUIColor)
                                         .font(Fontstyle.body2.base)
                                 } else {
-                                    AddressCard(address: Address(
+                                    AddressCard(card: MAddressCard(
                                         base58: "",
-                                        path: "None",
-                                        hasPwd: false,
-                                        identicon: [],
-                                        seedName: "",
-                                        multiselect: false,
-                                        secretExposed: false
+                                        address: Address(
+                                            path: "None",
+                                            hasPwd: false,
+                                            identicon: [],
+                                            seedName: "",
+                                            secretExposed: false
+                                        ),
+                                        multiselect: false
                                     ))
                                 }
                             }

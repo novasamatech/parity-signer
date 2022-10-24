@@ -14,7 +14,7 @@
 //! fetched through RPC calls, empty by default
 //! - [`SETTREE`](constants::SETTREE) with types information
 //! - [`SPECSTREEPREP`](constants::SPECSTREEPREP) with network specs entries
-//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 use parity_scale_codec::Encode;
 use sled::Batch;
 
@@ -41,10 +41,10 @@ fn default_hot_address_book() -> Result<Batch> {
 }
 
 /// Make [`Batch`] with default
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 /// values, for [`SPECSTREEPREP`] tree, in purged database.
 ///
-/// - Add default `NetworkSpecsToSend` values
+/// - Add default `NetworkSpecs` values
 fn default_hot_network_specs_prep() -> Result<Batch> {
     let mut batch = Batch::default();
     for x in default_chainspecs_to_send().iter() {

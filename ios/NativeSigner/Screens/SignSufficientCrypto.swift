@@ -19,7 +19,7 @@ struct SignSufficientCrypto: View {
                     ForEach(content.identities, id: \.addressKey) { keyrecord in
                         Button(
                             action: {
-                                let seedPhrase = getSeed(keyrecord.seedName)
+                                let seedPhrase = getSeed(keyrecord.address.seedName)
                                 if !seedPhrase.isEmpty {
                                     navigationRequest(.init(
                                         action: .goForward,
@@ -30,14 +30,10 @@ struct SignSufficientCrypto: View {
                             },
                             label: {
                                 AddressCard(
-                                    address: Address(
+                                    card: MAddressCard(
                                         base58: keyrecord.publicKey,
-                                        path: keyrecord.path,
-                                        hasPwd: keyrecord.hasPwd,
-                                        identicon: keyrecord.identicon,
-                                        seedName: keyrecord.seedName,
-                                        multiselect: nil,
-                                        secretExposed: keyrecord.secretExposed
+                                        address: keyrecord.address,
+                                        multiselect: nil
                                     )
                                 )
                             }

@@ -54,9 +54,11 @@ use constants::ADDRTREE;
 use constants::ALICE_SEED_PHRASE;
 #[cfg(feature = "signer")]
 use constants::TRANSACTION;
-
+#[cfg(feature = "signer")]
+use definitions::helpers::print_multisigner_as_base58_or_eth;
 #[cfg(feature = "signer")]
 use definitions::helpers::{get_multisigner, unhex};
+use definitions::network_specs::NetworkSpecs;
 #[cfg(feature = "active")]
 use definitions::qr_transfers::ContentDerivations;
 #[cfg(any(feature = "active", feature = "signer"))]
@@ -65,12 +67,11 @@ use definitions::{
     helpers::multisigner_to_public,
     history::{Event, IdentityHistory},
     keyring::{AddressKey, NetworkSpecsKey},
-    network_specs::NetworkSpecs,
     users::AddressDetails,
 };
 #[cfg(feature = "signer")]
 use definitions::{
-    helpers::{make_identicon_from_multisigner, print_multisigner_as_base58_or_eth},
+    helpers::make_identicon_from_multisigner,
     navigation::{Address, MKeyDetails, MSCNetworkInfo},
 };
 #[cfg(feature = "signer")]
@@ -176,7 +177,7 @@ pub fn export_all_addrs<P: AsRef<Path>>(
             let specs = get_network_specs(&db_path, &key.1.network_id[0])?;
             let address = print_multisigner_as_base58_or_eth(
                 &key.0,
-                Some(specs.base58prefix),
+                Some(specs.specs.base58prefix),
                 key.1.encryption,
             );
             derived_keys.push(AddrInfo {
@@ -187,7 +188,7 @@ pub fn export_all_addrs<P: AsRef<Path>>(
                     Some(key.1.path.to_owned())
                 },
                 encryption: key.1.encryption,
-                genesis_hash: specs.genesis_hash,
+                genesis_hash: specs.specs.genesis_hash,
             });
         }
 
@@ -765,7 +766,7 @@ where
                 &db_path,
                 &address_prep,
                 "",
-                network_specs,
+                &network_specs.specs,
                 seed_name,
                 seed_phrase,
             )?;
@@ -779,8 +780,8 @@ where
         if let Ok(prep_data) = create_address(
             &db_path,
             &address_prep,
-            &network_specs.path_id,
-            network_specs,
+            &network_specs.specs.path_id,
+            &network_specs.specs,
             seed_name,
             seed_phrase,
         ) {
@@ -877,10 +878,10 @@ where
         let mut address_details = get_address_details(&db_path, &address_key)?;
         let identity_history = IdentityHistory::get(
             &address_details.seed_name,
-            &network_specs.encryption,
+            &network_specs.specs.encryption,
             &public_key,
             &address_details.path,
-            network_specs.genesis_hash,
+            network_specs.specs.genesis_hash,
         );
         events.push(Event::IdentityRemoved { identity_history });
         address_details
@@ -987,7 +988,7 @@ where
             &db_path,
             &identity_adds,
             &path,
-            &network_specs,
+            &network_specs.specs,
             &address_details.seed_name,
             seed_phrase,
         )?;
@@ -1177,7 +1178,7 @@ where
                 &db_path,
                 &Vec::new(), // a single address is created, no data to check against here
                 path,
-                &network_specs,
+                &network_specs.specs,
                 seed_name,
                 seed_phrase,
             )?;
@@ -1221,14 +1222,16 @@ where
     events.extend_from_slice(&prep_data.history_prep);
 
     for network_specs in get_all_networks(&db_path)?.iter() {
-        if (network_specs.name == "westend") && (network_specs.encryption == Encryption::Sr25519) {
+        if (network_specs.specs.name == "westend")
+            && (network_specs.specs.encryption == Encryption::Sr25519)
+        {
             // data for adding address with `//Alice` derivation path in Westend
             // network
             let prep_data = create_address(
                 &db_path,
                 &address_prep, // address
                 "//Alice",
-                network_specs,
+                &network_specs.specs,
                 "Alice",
                 ALICE_SEED_PHRASE,
             )?;
@@ -1327,7 +1330,7 @@ where
     // derivations data retrieved from the database
     let content_derivations = TrDbColdDerivations::from_storage(&db_path, checksum)?;
 
-    // [`NetworkSpecs`] for the network in which the addresses are generated
+    // [`OrderedNetworkSpecs`] for the network in which the addresses are generated
     let network_specs = content_derivations.network_specs();
 
     // Address preparation set, to be modified and used as `create_address`
@@ -1339,7 +1342,14 @@ where
 
     for path in content_derivations.checked_derivations().iter() {
         // try creating address for each of the derivations
-        match create_address(&db_path, &adds, path, network_specs, seed_name, seed_phrase) {
+        match create_address(
+            &db_path,
+            &adds,
+            path,
+            &network_specs.specs,
+            seed_name,
+            seed_phrase,
+        ) {
             // success, updating address preparation set and `Event` set
             Ok(prep_data) => {
                 adds = prep_data.address_prep;
@@ -1505,7 +1515,7 @@ where
     let public_key = &unhex(public_key)?;
     let network_specs_key = &NetworkSpecsKey::from_hex(network_specs_key_hex)?;
     let network_specs = get_network_specs(&db_path, network_specs_key)?;
-    let multisigner = &get_multisigner(public_key, &network_specs.encryption)?;
+    let multisigner = &get_multisigner(public_key, &network_specs.specs.encryption)?;
     let address_key = AddressKey::from_multisigner(multisigner);
     let address_details = get_address_details(&db_path, &address_key)?;
     if address_details.seed_name != expected_seed_name {
@@ -1525,22 +1535,16 @@ where
 
     let style = address_details.encryption.identicon_style();
     let address = Address {
-        base58: print_multisigner_as_base58_or_eth(
-            multisigner,
-            Some(network_specs.base58prefix),
-            address_details.encryption,
-        ),
         path: address_details.path.to_string(),
         has_pwd: address_details.has_pwd,
         identicon: make_identicon_from_multisigner(multisigner, style),
         seed_name: address_details.seed_name.to_string(),
-        multiselect: None,
         secret_exposed: true,
     };
 
     let network_info = MSCNetworkInfo {
-        network_title: network_specs.title,
-        network_logo: network_specs.logo,
+        network_title: network_specs.specs.title,
+        network_logo: network_specs.specs.logo,
         network_specs_key: network_specs_key_hex.to_owned(),
     };
 
@@ -1571,7 +1575,7 @@ where
                 &address_details.encryption,
                 &public_key,
                 &address_details.path,
-                network_specs.genesis_hash,
+                network_specs.specs.genesis_hash,
             ),
         }],
     )?;
@@ -1579,7 +1583,7 @@ where
     let mut qr = generate_secret_qr(
         multisigner,
         &address_details,
-        &network_specs.genesis_hash,
+        &network_specs.specs.genesis_hash,
         seed_phrase,
         key_password.as_deref(),
     )?;
@@ -1598,6 +1602,12 @@ where
         qr,
         pubkey: hex::encode(public_key),
         network_info,
+        base58: print_multisigner_as_base58_or_eth(
+            multisigner,
+            Some(network_specs.specs.base58prefix),
+            address_details.encryption,
+        ),
+        multiselect: None,
         address,
     })
 }

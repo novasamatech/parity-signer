@@ -66,7 +66,7 @@ fun TransactionPreview(
 					text = "Unlock key and sign",
 					action = {
 						signTransaction(
-							comment.value, transaction.authorInfo?.seedName ?: ""
+							comment.value, transaction.authorInfo?.address?.seedName ?: ""
 						)
 					}
 				)

@@ -2,7 +2,7 @@
 //!
 //! Cold database has following trees:  
 //!
-//! - `SPECSTREE`, for network specs `NetworkSpecs` entries, with keys
+//! - `SPECSTREE`, for network specs `OrderedNetworkSpecs` entries, with keys
 //! [`NetworkSpecsKey`]  
 //! - `VERIFIERS`, for network verifier [`CurrentVerifier`](crate::network_specs::CurrentVerifier)
 //! entries, with keys [`VerifierKey`]  
@@ -20,7 +20,7 @@
 //!
 //! Hot database has following trees:  
 //!
-//! - `SPECSTREEPREP`, for network specs [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+//! - `SPECSTREEPREP`, for network specs [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
 //! entries, with keys [`NetworkSpecsKey`]  
 //! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and
 //! prefix search with [`MetaKeyPrefix`]  
@@ -45,8 +45,8 @@ use crate::{
 /// Key in `SPECSTREE` tree (cold database) and in `SPECSPREPTREE` (hot database)  
 ///
 /// [`NetworkSpecsKey`] is used to retrieve the
-/// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) in cold database and
-/// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) in hot
+/// [`OrderedNetworkSpecs`](crate::network_specs::OrderedNetworkSpecs) in cold database and
+/// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) in hot
 /// database.  
 ///
 /// Key is derived from network genesis hash and encryption algorithm.  

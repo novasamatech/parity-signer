@@ -4,17 +4,18 @@ use sp_runtime::{generic::Era, MultiSigner};
 use definitions::helpers::{make_identicon_from_account, make_identicon_from_id20, IdenticonStyle};
 use definitions::keyring::NetworkSpecsKey;
 
+use definitions::navigation::MAddressCard;
 use definitions::{
     crypto::Encryption,
     helpers::{make_identicon_from_multisigner, pic_meta, print_multisigner_as_base58_or_eth},
     history::MetaValuesDisplay,
     keyring::VerifierKey,
     navigation::{
-        Address, Card as NavCard, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency,
-        MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCFieldNumber, MSCId, MSCNameVersion,
-        MSCNetworkInfo, MTypesInfo, MVerifierDetails, TransactionCard,
+        Address, Card as NavCard, MMetadataRecord, MSCCall, MSCCurrency, MSCEnumVariantName,
+        MSCEraMortal, MSCFieldName, MSCFieldNumber, MSCId, MSCNameVersion, MSCNetworkInfo,
+        MTypesInfo, MVerifierDetails, TransactionCard,
     },
-    network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue},
+    network_specs::{NetworkSpecs, OrderedNetworkSpecs, VerifierValue},
     qr_transfers::ContentLoadTypes,
     users::AddressDetails,
 };
@@ -39,8 +40,8 @@ pub(crate) enum Card<'a> {
     Verifier(&'a VerifierValue),
     Meta(MetaValuesDisplay),
     TypesInfo(ContentLoadTypes),
-    NewSpecs(&'a NetworkSpecsToSend),
-    NetworkInfo(&'a NetworkSpecs),
+    NewSpecs(&'a NetworkSpecs),
+    NetworkInfo(&'a OrderedNetworkSpecs),
     NetworkGenesisHash(&'a [u8]),
     Derivations(&'a [String]),
     Warning(Warning<'a>),
@@ -214,7 +215,7 @@ impl<'a> Card<'a> {
                 author,
                 base58prefix,
             } => NavCard::AuthorPlainCard {
-                f: MSCAuthorPlain {
+                f: MSCId {
                     base58: print_multisigner_as_base58_or_eth(
                         author,
                         Some(*base58prefix),
@@ -275,10 +276,11 @@ impl<'a> Card<'a> {
             Card::NewSpecs(x) => NavCard::NewSpecsCard { f: (*x).clone() },
             Card::NetworkInfo(x) => NavCard::NetworkInfoCard {
                 f: MSCNetworkInfo {
-                    network_title: x.title.clone(),
-                    network_logo: x.logo.clone(),
+                    network_title: x.specs.title.clone(),
+                    network_logo: x.specs.logo.clone(),
                     network_specs_key: hex::encode(
-                        NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption).key(),
+                        NetworkSpecsKey::from_parts(&x.specs.genesis_hash, &x.specs.encryption)
+                            .key(),
                     ),
                 },
             },
@@ -304,19 +306,21 @@ pub(crate) fn make_author_info(
     author: &MultiSigner,
     base58prefix: u16,
     address_details: &AddressDetails,
-) -> Address {
+) -> MAddressCard {
     let base58 =
         print_multisigner_as_base58_or_eth(author, Some(base58prefix), address_details.encryption);
-    Address {
+    MAddressCard {
         base58,
-        identicon: make_identicon_from_multisigner(
-            author,
-            address_details.encryption.identicon_style(),
-        ),
-        seed_name: address_details.seed_name.clone(),
-        path: address_details.path.clone(),
-        has_pwd: address_details.has_pwd,
+        address: Address {
+            identicon: make_identicon_from_multisigner(
+                author,
+                address_details.encryption.identicon_style(),
+            ),
+            seed_name: address_details.seed_name.clone(),
+            path: address_details.path.clone(),
+            has_pwd: address_details.has_pwd,
+            secret_exposed: address_details.secret_exposed,
+        },
         multiselect: None,
-        secret_exposed: address_details.secret_exposed,
     }
 }

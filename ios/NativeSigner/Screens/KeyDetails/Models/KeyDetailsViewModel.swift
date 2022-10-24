@@ -21,11 +21,11 @@ struct KeyDetailsViewModel: Equatable {
 
     init(_ keys: MKeys) {
         keySummary = KeySummaryViewModel(
-            keyName: keys.root.seedName,
+            keyName: keys.root.address.seedName,
             base58: keys.root.base58.truncateMiddle()
         )
         derivedKeys = keys.set
-            .sorted(by: { $0.path < $1.path })
+            .sorted(by: { $0.address.path < $1.address.path })
             .map {
                 DerivedKeyRowModel(
                     viewModel: DerivedKeyRowViewModel($0),

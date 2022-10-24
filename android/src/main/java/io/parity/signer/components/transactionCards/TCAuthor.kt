@@ -14,11 +14,12 @@ import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.ui.theme.Typography
 import io.parity.signer.uniffi.Address
+import io.parity.signer.uniffi.MAddressCard
 
 @Composable
-fun TCAuthor(author: Address) {
+fun TCAuthor(author: MAddressCard) {
 	Row {
-		IdentIcon(author.identicon)
+		IdentIcon(author.address.identicon)
 		Column {
 			Text(
 				"From: ",
@@ -27,16 +28,16 @@ fun TCAuthor(author: Address) {
 			)
 			Row {
 				Text(
-					author.seedName,
+					author.address.seedName,
 					style = MaterialTheme.typography.body1,
 					color = MaterialTheme.colors.Crypto400
 				)
 				Text(
-					author.path,
+					author.address.path,
 					style = Typography.body1,
 					color = MaterialTheme.colors.Crypto400
 				)
-				if (author.hasPwd) {
+				if (author.address.hasPwd) {
 					Text(
 						"///",
 						style = MaterialTheme.typography.body1,

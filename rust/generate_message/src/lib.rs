@@ -80,8 +80,8 @@
 //!     <tr>
 //!         <td><code>add_specs</code></td>
 //!         <td><code>ContentAddSpecs</code></td>
-//!         <td>SCALE encoded <code>NetworkSpecsToSend</code></td>
-//!         <td>double SCALE encoded <code>NetworkSpecsToSend</code></td>
+//!         <td>SCALE encoded <code>NetworkSpecs</code></td>
+//!         <td>double SCALE encoded <code>NetworkSpecs</code></td>
 //!     </tr>
 //!     <tr>
 //!         <td><code>load_metadata</code></td>
@@ -207,14 +207,14 @@
 //! - additional marker that the network is a default one, i.e. entry has not
 //! changed since the database generation
 //! - network title as it will be displayed in Signer, from
-//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 //!
 //! ## Show network specs for a network, as recorded in the hot database
 //!
 //! `$ cargo run show specs <ADDRESS BOOK TITLE>`
 //!
 //! Prints network address book title and corresponding
-//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 //! from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree of the hot
 //! database.
 //!
@@ -919,7 +919,7 @@
 //! [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
 //! - network specs
-//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 //! from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
 //! - all associated metadata entries from [`METATREE`](constants::METATREE)
 //! if there are no other address book entries this metadata is associated
@@ -978,7 +978,7 @@
 //!
 //! Metadata is transferred only for the networks that are known to the cold
 //! database, i.e. the ones having
-//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
+//! [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry in
 //! [`SPECSTREE`](constants::SPECSTREE).
 
 //! ## Make derivations import QR and/or hexadecimal string file
@@ -1017,8 +1017,8 @@
 //! codes before the metadata becomes accessible from the node.
 //!
 //! Network name found in the metadata is used to find
-//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) for
-//! the network. `NetworkSpecsToSend` are used to get genesis hash and to check
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) for
+//! the network. `NetworkSpecs` are used to get genesis hash and to check
 //! base58 prefix, it the network metadata has base58 prefix inside.
 //!
 //! A raw bytes update payload file is generated in dedicated
