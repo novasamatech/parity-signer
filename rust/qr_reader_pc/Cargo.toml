@@ -15,6 +15,6 @@ quircs = "0.10.0"
 indicatif = "0.17.1"
 
 [dependencies.opencv]
-version = "0.70"
+version = "0.71"
 default-features = false
 features = ["videoio", "imgproc", "highgui"]
