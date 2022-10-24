@@ -36,7 +36,7 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
     func test_build_singleDerivedKey_returnsExpectedModel() {
         // Given
         let name = "name"
-        let derivedKeys = "1 Derived Key"
+        let derivedKeys = "1 Key"
         let identicon: [UInt8] = [123]
         let seedNameCard = SeedNameCard(seedName: name, identicon: identicon, derivedKeysCount: 1)
         let expectedResult = KeySetListViewModel(
@@ -53,7 +53,7 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
     func test_build_multipleDerivedKeys_returnsExpectedModel() {
         // Given
         let name = "name"
-        let derivedKeys = "3 Derived Keys"
+        let derivedKeys = "3 Keys"
         let identicon: [UInt8] = [123]
         let seedNameCard = SeedNameCard(seedName: name, identicon: identicon, derivedKeysCount: 3)
         let expectedResult = KeySetListViewModel(
