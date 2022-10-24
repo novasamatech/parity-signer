@@ -257,6 +257,47 @@ pub enum Command {
         #[arg(long, default_value = EXPORT_FOLDER)]
         export_dir: PathBuf,
     },
+
+    /// Encode payload to multiframe QR
+    #[command(group(clap::ArgGroup::new("encodekey")
+                .required(true)
+                .args(&["path", "hex"])
+    ))]
+    EncodeToQr {
+        /// Path to a file to encode
+        #[arg(long, value_name = "FILE PATH")]
+        path: Option<PathBuf>,
+
+        /// Hex-encoded payload to encode
+        #[arg(long, value_name = "HEX ENCODED PAYLOAD")]
+        hex: Option<String>,
+
+        /// Size of a chunk in a multiframe RaptorQ encoding
+        #[arg(long, default_value = "128", value_name = "SIZE OF CHUNK")]
+        chunk_size: u16,
+
+        /// Destination file to write qr code to
+        #[arg(long, value_name = "FILE")]
+        dst_file: PathBuf,
+    },
+
+    /// Produce a test key info export QR
+    KeyInfoExportToQr {
+        #[arg(long, value_name = "FILE PATH")]
+        dst_file: PathBuf,
+
+        /// Size of a chunk in a multiframe RaptorQ encoding.
+        #[arg(long, value_name = "CHUNK SIZE")]
+        chunk_size: u16,
+
+        /// FPS of a multiframe RaptorQ encoding
+        #[arg(long, value_name = "FPS OF VIDEO QR")]
+        fps: u16,
+
+        /// Number of keys to generate and export
+        #[arg(long, value_name = "NUMBER OF TEST KEYS")]
+        keys_num: usize,
+    },
 }
 
 /// Display data commands.

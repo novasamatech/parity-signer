@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "checkmark_unchecked.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

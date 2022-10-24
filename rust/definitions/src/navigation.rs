@@ -601,6 +601,11 @@ pub struct MSCTxSpecPlain {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MKeysInfoExport {
+    pub frames: Vec<Vec<u8>>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Card {
     AuthorCard { f: MAddressCard },
     AuthorPlainCard { f: MSCId },

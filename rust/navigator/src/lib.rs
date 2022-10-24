@@ -4,11 +4,14 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
+use db_handling::identities::export_all_addrs;
 //do we support mutex?
 use lazy_static::lazy_static;
 use std::sync::Mutex;
 
-use definitions::navigation::ActionResult;
+use definitions::navigation::{ActionResult, MKeysInfoExport};
+use parity_scale_codec::Encode;
+use qrcode_rtx::make_data_packs;
 
 mod error;
 
@@ -60,4 +63,17 @@ pub fn update_seed_names(seed_names: Vec<String>) -> Result<()> {
     navstate.update_seed_names(seed_names);
 
     Ok(())
+}
+
+/// Export key info with derivations.
+pub fn export_key_info(
+    dbname: &str,
+    selected_names: Option<Vec<String>>,
+) -> Result<MKeysInfoExport> {
+    let export_all_addrs = export_all_addrs(dbname, selected_names)?;
+
+    let data = [&[0x53, 0xff, 0xde], export_all_addrs.encode().as_slice()].concat();
+    let frames = make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?;
+
+    Ok(MKeysInfoExport { frames })
 }

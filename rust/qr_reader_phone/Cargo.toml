@@ -9,7 +9,6 @@ edition = "2018"
 [dependencies]
 hex = "0.4.3"
 raptorq = "1.7.0"
-constants = {path = "../constants"}
 nom = "7.1.1"
 thiserror = "1.0.37"
 

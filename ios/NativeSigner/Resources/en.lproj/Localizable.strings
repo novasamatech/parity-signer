@@ -274,11 +274,14 @@
 
 "KeySets.Title" = "Key Sets";
 "KeySets.Action.Add" = "Add Key Set";
-"KeySets.Label.DerivedKeys.single" = "%@ Derived Key";
-"KeySets.Label.DerivedKeys.plural" = "%@ Derived Keys";
+"KeySets.Label.DerivedKeys.single" = "%@ Key";
+"KeySets.Label.DerivedKeys.plural" = "%@ Keys";
 "KeySets.Label.Empty.Title" = "You Don't Have\nAny Key Sets";
 "KeySets.Label.Empty.Subtitle" = "Add a new Key Set to Store Keys and Sign Transactions";
 
+"KeySets.More.Action.Export" = "Export Key Sets";
+"KeySets.More.Action.ExportAll" = "Export All";
+"KeySets.More.Action.ExportSelected" = "Export Selected";
 "KeySetsModal.Action.Select" = "Select Keys";
 "KeySetsModal.Action.Derive" = "Derive from Key";
 "KeySetsModal.Action.Backup" = "Backup Key Set";
@@ -346,3 +349,10 @@
 "Error.Navigation.Label.Message" = "Please restart Signer app and try again.\nInternal error description: %@";
 "Error.Navigation.Label.Suffix" = "Report an issue to Signer team via Github at: https://github.com/paritytech/parity-signer/";
 "Error.Navigation.Label.NoAction" = "No further action available from this state.\nLast action: \"%@\" details: \"%@\"";
+
+"KeysExport.KeySets.Label.Header" = "Export %@ %@";
+"KeysExport.KeySets.Label.Header.Suffix.Single" = "Key Set";
+"KeysExport.KeySets.Label.Header.Suffix.Plural" = "Key Sets";
+"KeysExport.KeySets.Label.Info" = "By scanning this QR code into your application you’ll export all keys from the Key Sets shown in the list below";
+"KeysExport.KeySets.Label.Key.Single" = "%@ Key";
+"KeysExport.KeySets.Label.Key.Plural" = "%@ Keys";

@@ -223,6 +223,20 @@ fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<
         .map_err(|e| format!("{}", e))
 }
 
+fn export_key_info(
+    dbname: &str,
+    selected_names: Option<Vec<String>>,
+) -> anyhow::Result<MKeysInfoExport, String> {
+    navigator::export_key_info(dbname, selected_names).map_err(|e| format!("{}", e))
+}
+
+/// Encode binary info into qr code
+fn encode_to_qr(payload: &[u8]) -> anyhow::Result<Vec<u8>, String> {
+    use qrcode_static::DataType;
+
+    qrcode_static::png_qr(payload, DataType::Regular).map_err(|e| format!("{}", e))
+}
+
 /// Must be called once to initialize logging from Rust in development mode.
 ///
 /// Do not use in production.
