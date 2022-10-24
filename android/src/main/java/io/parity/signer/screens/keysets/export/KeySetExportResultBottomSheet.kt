@@ -63,7 +63,7 @@ fun KeySetExportResultBottomSheet(
 				.background(MaterialTheme.colors.fill6, plateShape)
 		) {
 
-			animatedQrForBinary(seeds, Modifier.padding(8.dp))
+			AnimatedQrSeedInfo(seeds, Modifier.padding(8.dp))
 
 			val innerRounding =
 				dimensionResource(id = R.dimen.innerFramesCornerRadius)
@@ -142,62 +142,6 @@ private fun KeySetItemInExport(seed: KeySetModel) {
 		)
 	}
 }
-
-@Composable
-private fun animatedQrForBinary(
-	seeds: Set<KeySetModel>,
-	modifier: Modifier = Modifier
-) {
-	val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
-	val DELAY = 125.milliseconds //FPS 8
-	val service = remember { KeySetsExportService(ServiceLocator.backendLocator.uniffiInteractor) }
-	val qrCodes =
-		remember { mutableStateOf(listOf(listOf<UByte>())) }
-	val currentCode = remember { mutableStateOf(listOf<UByte>()) }
-
-	Box(
-		modifier = modifier
-			.fillMaxWidth(1f)
-			.aspectRatio(1.1f)
-			.background(
-				Color.White,
-				RoundedCornerShape(qrRounding)
-			),
-		contentAlignment = Alignment.Center,
-	) {
-		if (currentCode.value.isNotEmpty() || LocalInspectionMode.current) {
-			Image(
-				bitmap = if (LocalInspectionMode.current) {
-					PreviewData.exampleQRCode.intoImageBitmap()
-				} else {
-					currentCode.value.intoImageBitmap()
-				},
-				contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
-				contentScale = ContentScale.Fit,
-				modifier = Modifier.size(264.dp)
-			)
-		}
-	}
-
-	LaunchedEffect(key1 = seeds) {
-		service.getQrCodesList(seeds.toList())?.let { qrCodes.value = it }
-	}
-
-	LaunchedEffect(key1 = qrCodes.value) {
-		if (qrCodes.value.isEmpty()) return@LaunchedEffect
-		var index = 0
-		while (true) {
-			currentCode.value = qrCodes.value[index]
-			if (index < qrCodes.value.lastIndex) {
-				index++
-			} else {
-				index = 0
-			}
-			delay(DELAY)
-		}
-	}
-}
-
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
