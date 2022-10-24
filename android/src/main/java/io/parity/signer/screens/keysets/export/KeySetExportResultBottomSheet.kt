@@ -19,6 +19,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -26,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
+import io.parity.signer.dependencyGraph.ServiceLocator
 import io.parity.signer.models.Callback
 import io.parity.signer.models.KeySetModel
 import io.parity.signer.models.intoImageBitmap
@@ -148,7 +150,7 @@ private fun animatedQrForBinary(
 ) {
 	val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
 	val DELAY = 125.milliseconds //FPS 8
-	val service = remember { KeySetsExportService() }
+	val service = remember { KeySetsExportService(ServiceLocator.backendLocator.uniffiInteractor) }
 	val qrCodes =
 		remember { mutableStateOf(listOf(listOf<UByte>())) }
 	val currentCode = remember { mutableStateOf(listOf<UByte>()) }
@@ -163,9 +165,13 @@ private fun animatedQrForBinary(
 			),
 		contentAlignment = Alignment.Center,
 	) {
-		if (currentCode.value.isNotEmpty()) {
+		if (currentCode.value.isNotEmpty() || LocalInspectionMode.current) {
 			Image(
-				bitmap = currentCode.value.intoImageBitmap(),
+				bitmap = if (LocalInspectionMode.current) {
+					PreviewData.exampleQRCode.intoImageBitmap()
+				} else {
+					currentCode.value.intoImageBitmap()
+				},
 				contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
 				contentScale = ContentScale.Fit,
 				modifier = Modifier.size(264.dp)
@@ -174,7 +180,7 @@ private fun animatedQrForBinary(
 	}
 
 	LaunchedEffect(key1 = seeds) {
-		qrCodes.value = service.getQrCodesList(seeds.toList())
+		service.getQrCodesList(seeds.toList())?.let { qrCodes.value = it }
 	}
 
 	LaunchedEffect(key1 = qrCodes.value) {

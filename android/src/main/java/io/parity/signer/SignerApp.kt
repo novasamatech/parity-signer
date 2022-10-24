@@ -2,6 +2,7 @@ package io.parity.signer
 
 import android.app.Application
 import android.util.Log
+import io.parity.signer.dependencyGraph.ServiceLocator
 import io.parity.signer.uniffi.ErrorDisplayed
 import java.lang.Thread.UncaughtExceptionHandler
 
@@ -9,6 +10,7 @@ class SignerApp : Application() {
 	override fun onCreate() {
 		super.onCreate()
 		Thread.setDefaultUncaughtExceptionHandler(SignerExceptionHandler())
+		ServiceLocator.initBackendDeps(this)
 	}
 }
 

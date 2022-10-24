@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.models.*
-import io.parity.signer.screens.keysets.KeySetDetailsMultiselectScreen
+import io.parity.signer.screens.keysets.details.KeySetDetailsMultiselectScreen
 import io.parity.signer.screens.keysets.details.KeySetDetailsScreenFull
 
 @Composable

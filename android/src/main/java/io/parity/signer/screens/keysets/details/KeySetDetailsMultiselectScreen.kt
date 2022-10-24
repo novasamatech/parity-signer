@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets
+package io.parity.signer.screens.keysets.details
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -27,8 +27,6 @@ import io.parity.signer.components.base.PrimaryButtonBottomSheet
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.items.KeyDerivedItem
-import io.parity.signer.components.panels.BottomBar2
-import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.models.*
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew

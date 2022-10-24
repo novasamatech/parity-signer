@@ -48,7 +48,7 @@ fun KeySetDetailsScreenView(
 	alertState: State<AlertState?>, //for shield icon
 	onMenu: Callback,
 ) {
-//todo dmitry selecting multiple key is impossible now, update menu to open old screen for that
+//todo dmitry selecting multiple key is impossible now, finish multiple selection screen before enabling this screen feature in master
 	Column {
 		ScreenHeader(
 			stringId = null,

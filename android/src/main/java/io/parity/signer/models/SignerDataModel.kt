@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import io.parity.signer.components.Authentication
+import io.parity.signer.dependencyGraph.getDbNameFromContext
 import io.parity.signer.ui.navigationselectors.OnBoardingState
 import io.parity.signer.uniffi.*
 import org.json.JSONObject
@@ -128,7 +129,7 @@ class SignerDataModel : ViewModel() {
 	 */
 	fun lateInit() {
 		// Define local database name
-		dbName = context.applicationContext.filesDir.toString() + "/Database"
+		dbName = context.getDbNameFromContext()
 		authentication.context = context
 		hasStrongbox = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 			context
