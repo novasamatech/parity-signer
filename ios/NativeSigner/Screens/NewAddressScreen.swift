@@ -66,7 +66,7 @@ struct NewAddressScreen: View {
                                 .foregroundColor(Asset.text300.swiftUIColor)
                             Spacer()
                         }
-                        AddressCard(address: collision)
+                        AddressCard(card: collision)
                     }.padding(.bottom)
                 }
                 HStack {

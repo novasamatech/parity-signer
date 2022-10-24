@@ -151,7 +151,7 @@ pub(crate) fn sufficient_crypto_load_metadata(
     seed_phrase: &str,
     pwd_entry: &str,
 ) -> Result<(Vec<u8>, MSCContent)> {
-    let network_specs = get_network_specs(database_name, network_specs_key)?;
+    let network_specs = get_network_specs(database_name, network_specs_key)?.specs;
     let meta_values =
         get_meta_values_by_name_version(database_name, &network_specs.name, network_version)?;
     let load_meta_content =
@@ -204,7 +204,7 @@ pub(crate) fn sufficient_crypto_add_specs(
     seed_phrase: &str,
     pwd_entry: &str,
 ) -> Result<(Vec<u8>, MSCContent)> {
-    let network_specs_to_send = get_network_specs(database_name, network_specs_key)?.to_send();
+    let network_specs_to_send = get_network_specs(database_name, network_specs_key)?.specs;
     let add_specs_content = ContentAddSpecs::generate(&network_specs_to_send);
     let sufficient = match sufficient_crypto(
         multisigner,

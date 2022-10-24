@@ -22,6 +22,7 @@ import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg200
+import io.parity.signer.uniffi.MAddressCard
 import io.parity.signer.uniffi.MKeyDetails
 
 /**
@@ -42,7 +43,11 @@ fun ExportPublicKey(keyDetails: MKeyDetails) {
 				)
 				.fillMaxWidth()
 		) {
-			KeyCardOld(identity = keyDetails.address)
+			KeyCardOld(identity = MAddressCard(
+				address = keyDetails.address,
+				base58 = keyDetails.base58,
+				multiselect = keyDetails.multiselect,
+			))
 		}
 		Row(
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
@@ -62,7 +67,7 @@ fun ExportPublicKey(keyDetails: MKeyDetails) {
 		HeaderBar(line1 = "KEY DETAILS", line2 = "")
 		Row {
 			Text("Base58 key: ")
-			Text(keyDetails.address.base58)
+			Text(keyDetails.base58)
 		}
 		Row {
 			Text("Hex key: ")

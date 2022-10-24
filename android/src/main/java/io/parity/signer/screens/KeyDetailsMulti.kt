@@ -20,6 +20,7 @@ import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MAddressCard
 import io.parity.signer.uniffi.MKeyDetailsMulti
 
 @Composable
@@ -41,7 +42,11 @@ fun KeyDetailsMulti(
 				)
 				.fillMaxWidth()
 		) {
-			KeyCardOld(identity = keyDetailsMulti.keyDetails.address)
+			KeyCardOld(identity = MAddressCard(
+				address = keyDetailsMulti.keyDetails.address,
+				base58 = keyDetailsMulti.keyDetails.base58,
+				multiselect = keyDetailsMulti.keyDetails.multiselect
+			))
 		}
 		Row(
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)

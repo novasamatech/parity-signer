@@ -118,7 +118,7 @@ fn default_cold_metadata(purpose: Purpose) -> Result<Batch> {
 }
 
 /// Make [`Batch`] with default networks
-/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs), for
+/// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs), for
 /// [`SPECSTREE`] tree, in purged database.
 ///
 /// Adds default network specs entries.
@@ -126,7 +126,8 @@ fn default_cold_metadata(purpose: Purpose) -> Result<Batch> {
 fn default_cold_network_specs() -> Batch {
     let mut batch = Batch::default();
     for x in default_chainspecs().iter() {
-        let network_specs_key = NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption);
+        let network_specs_key =
+            NetworkSpecsKey::from_parts(&x.specs.genesis_hash, &x.specs.encryption);
         batch.insert(network_specs_key.key(), x.encode());
     }
     batch

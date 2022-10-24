@@ -39,7 +39,7 @@ final class ExportPrivateKeyService {
                 rootKeyName: keyDetails.address.seedName,
                 path: keyDetails.address.path,
                 network: keyDetails.networkInfo.networkTitle,
-                base58: keyDetails.address.base58
+                base58: keyDetails.base58
             )
         )
     }

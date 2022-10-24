@@ -43,7 +43,7 @@ final class PrivateKeyQRCodeService {
 
         return BackupModalViewModel(
             header: KeySummaryViewModel(
-                keyName: keys.root.seedName,
+                keyName: keys.root.address.seedName,
                 base58: keys.root.base58.truncateMiddle()
             ),
             derivedKeys: keys.set.map { DerivedKeyOverviewViewModel($0) },

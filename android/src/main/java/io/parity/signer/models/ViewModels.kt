@@ -13,11 +13,13 @@ import io.parity.signer.uniffi.*
  */
 data class KeySetDetailsModel(
 	val keys: List<KeysModel>,
-	val root: SeedKeyModel,
+	val root: KeysModel,
 	val network: NetworkModel,
+	val multiselectMode: Boolean,
+	val multiselectCount: String,
 ) {
 	companion object {
-		fun createStub() : KeySetDetailsModel = KeySetDetailsModel(
+		fun createStub(): KeySetDetailsModel = KeySetDetailsModel(
 			keys = listOf(
 				KeysModel.createStub(),
 				KeysModel(
@@ -28,26 +30,32 @@ data class KeySetDetailsModel(
 					path = "//polkadot//path3",
 					multiselect = false,
 					secretExposed = false,
+					seedName = "sdsdsd",
 				),
 			),
-				root = SeedKeyModel(
-					seedName = "seed name",
-						identicon = PreviewData.exampleIdenticon,
-						addressKey = "address key",
-						base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
-						swiped = false,
-						multiselect = false,
-						secretExposed = false,
-				),
-				network = NetworkModel("network title", "network logo"),
+			root = KeysModel(
+				identicon = PreviewData.exampleIdenticon,
+				addressKey = "address key",
+				base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
+				hasPwd = true,
+				path = "//polkadot",
+				multiselect = false,
+				secretExposed = false,
+				seedName = "sdsdsd",
+			),
+			network = NetworkModel("network title", "network logo"),
+			multiselectCount = "5",
+			multiselectMode = false,
 		)
 	}
 }
 
 fun MKeys.toKeySetDetailsModel() = KeySetDetailsModel(
 	keys = set.map { it.toKeysModel() },
-	root = root.toSeedKeyModel(),
+	root = root.toKeysModel(),
 	network = network.toNetworkModel(),
+	multiselectMode = multiselectMode,
+	multiselectCount = multiselectCount,
 )
 
 /**
@@ -56,6 +64,7 @@ fun MKeys.toKeySetDetailsModel() = KeySetDetailsModel(
 data class KeysModel(
 	val identicon: List<UByte>,
 	val addressKey: String,
+	val seedName: String,
 	val base58: String,
 	val hasPwd: Boolean,
 	val path: String,
@@ -63,7 +72,7 @@ data class KeysModel(
 	val secretExposed: Boolean
 ) {
 	companion object {
-		fun createStub() = 	KeysModel(
+		fun createStub() = KeysModel(
 			addressKey = "address key",
 			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
 			identicon = PreviewData.exampleIdenticon,
@@ -71,39 +80,20 @@ data class KeysModel(
 			path = "//polkadot//path2",
 			multiselect = false,
 			secretExposed = false,
+			seedName = "sdsdsd",
 		)
 	}
 }
+
 fun MKeysCard.toKeysModel() = KeysModel(
 	addressKey = addressKey,
 	base58 = base58,
-	identicon = identicon,
-	hasPwd = hasPwd,
-	path = path,
+	identicon = address.identicon,
+	hasPwd = address.hasPwd,
+	path = address.path,
 	multiselect = multiselect,
-	secretExposed = secretExposed,
-)
-
-/**
- * Local copy of shared [MKeysCard] class
- */
-data class SeedKeyModel(
-	val seedName: String,
-	val identicon: List<UByte>,
-	val addressKey: String,
-	val base58: String,
-	val swiped: Boolean,
-	val multiselect: Boolean,
-	val secretExposed: Boolean
-)
-fun MSeedKeyCard.toSeedKeyModel() = SeedKeyModel(
-	seedName = seedName,
-	identicon = identicon,
-	addressKey = addressKey,
-	base58 = base58,
-	swiped = swiped,
-	multiselect = multiselect,
-	secretExposed = secretExposed,
+	secretExposed = address.secretExposed,
+	seedName = address.seedName,
 )
 
 /**
@@ -113,6 +103,7 @@ data class NetworkModel(
 	val title: String,
 	val logo: String,
 )
+
 fun MNetworkCard.toNetworkModel() = NetworkModel(
 	title = title,
 	logo = logo,
@@ -153,15 +144,18 @@ data class KeyCardModel(
 		/**
 		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
 		 */
-		fun fromAddress(address: Address, networkTitle: String): KeyCardModel =
+		fun fromAddress(
+			address_card: MAddressCard,
+			networkTitle: String
+		): KeyCardModel =
 			KeyCardModel(
 				network = networkTitle,
-				base58 = address.base58,
-				path = address.path,
-				hasPwd = address.hasPwd,
-				identIcon = address.identicon,
-				seedName = address.seedName,
-				multiselect = address.multiselect,
+				base58 = address_card.base58,
+				path = address_card.address.path,
+				hasPwd = address_card.address.hasPwd,
+				identIcon = address_card.address.identicon,
+				seedName = address_card.address.seedName,
+				multiselect = address_card.multiselect,
 			)
 
 		fun createStub() = KeyCardModel(

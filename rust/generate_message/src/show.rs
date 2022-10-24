@@ -2,7 +2,7 @@
 use db_handling::helpers::try_get_meta_values_by_name_version;
 use definitions::{
     metadata::{AddressBookEntry, MetaValues},
-    network_specs::NetworkSpecsToSend,
+    network_specs::NetworkSpecs,
 };
 use sp_core::blake2_256;
 use std::path::Path;
@@ -71,7 +71,7 @@ pub fn show_metadata<P: AsRef<Path>>(db_path: P) -> Result<()> {
 /// - network encryption
 /// - additional marker that the network is a default one
 /// - network title as it will be displayed in Signer, from
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) in
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) in
 /// [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
 ///
 /// It could be called by:
@@ -98,7 +98,7 @@ where
     struct SetPart {
         title: String,
         address_book_entry: AddressBookEntry,
-        network_specs: NetworkSpecsToSend,
+        network_specs: NetworkSpecs,
     }
     let mut set: Vec<SetPart> = Vec::new();
     for (title, address_book_entry) in address_book_set.into_iter() {

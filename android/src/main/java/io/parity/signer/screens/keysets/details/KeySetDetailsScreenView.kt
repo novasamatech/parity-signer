@@ -112,7 +112,7 @@ fun KeySetDetailsScreenView(
 
 @Composable
 private fun SeedKeyViewItem(
-	seedKeyModel: SeedKeyModel,
+	seedKeyModel: KeysModel,
 	onClick: Callback,
 ) {
 	Row(

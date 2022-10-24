@@ -10,7 +10,7 @@ use definitions::{
     history::Event,
     keyring::{MetaKeyPrefix, VerifierKey},
     metadata::MetaValues,
-    network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier},
+    network_specs::{CurrentVerifier, OrderedNetworkSpecs, ValidCurrentVerifier, Verifier},
 };
 use parity_scale_codec::Decode;
 use sled::Tree;
@@ -18,7 +18,10 @@ use sled::Tree;
 use crate::cards::Warning;
 use crate::error::Result;
 
-fn print_affected(metadata_set: &[MetaValues], network_specs_set: &[NetworkSpecs]) -> String {
+fn print_affected(
+    metadata_set: &[MetaValues],
+    network_specs_set: &[OrderedNetworkSpecs],
+) -> String {
     let mut out_metadata = String::new();
     let mut out_network_specs = String::new();
     for (i, x) in metadata_set.iter().enumerate() {
@@ -31,7 +34,7 @@ fn print_affected(metadata_set: &[MetaValues], network_specs_set: &[NetworkSpecs
         if i > 0 {
             out_network_specs.push_str(", ");
         }
-        out_network_specs.push_str(&x.title);
+        out_network_specs.push_str(&x.specs.title);
     }
     if out_network_specs.is_empty() {
         out_network_specs = String::from("none");
@@ -49,27 +52,27 @@ fn collect_set(
     verifier_key: &VerifierKey,
     chainspecs: &Tree,
     metadata: &Tree,
-) -> Result<(Vec<MetaValues>, Vec<NetworkSpecs>)> {
+) -> Result<(Vec<MetaValues>, Vec<OrderedNetworkSpecs>)> {
     let mut metadata_set = Vec::new();
     let mut network_specs_set = Vec::new();
     let genesis_hash = verifier_key.genesis_hash();
     let mut name_found: Option<String> = None;
     for x in chainspecs.iter().flatten() {
-        let network_specs = NetworkSpecs::from_entry_checked(x)?;
-        if network_specs.genesis_hash.as_bytes() == &genesis_hash[..] {
+        let network_specs = OrderedNetworkSpecs::from_entry_checked(x)?;
+        if network_specs.specs.genesis_hash.as_bytes() == &genesis_hash[..] {
             name_found = match name_found {
                 Some(n) => {
-                    if n != network_specs.name {
+                    if n != network_specs.specs.name {
                         return Err(db_handling::Error::DifferentNamesSameGenesisHash {
                             name1: n,
-                            name2: network_specs.name,
-                            genesis_hash: network_specs.genesis_hash,
+                            name2: network_specs.specs.name,
+                            genesis_hash: network_specs.specs.genesis_hash,
                         }
                         .into());
                     }
                     Some(n)
                 }
-                None => Some(network_specs.name.to_string()),
+                None => Some(network_specs.specs.name.to_string()),
             };
             network_specs_set.push(network_specs);
         }
@@ -81,13 +84,13 @@ fn collect_set(
         }
     }
     metadata_set.sort_by(|a, b| a.version.cmp(&b.version));
-    network_specs_set.sort_by(|a, b| a.title.cmp(&b.title));
+    network_specs_set.sort_by(|a, b| a.specs.title.cmp(&b.specs.title));
     Ok((metadata_set, network_specs_set))
 }
 
 pub(crate) struct GeneralHold {
     pub(crate) metadata_set: Vec<MetaValues>,
-    pub(crate) network_specs_set: Vec<NetworkSpecs>,
+    pub(crate) network_specs_set: Vec<OrderedNetworkSpecs>,
     pub(crate) types: bool,
 }
 
@@ -130,7 +133,7 @@ impl GeneralHold {
         }
         let types = settings.contains_key(TYPES)?;
         metadata_set.sort_by(|a, b| a.name.cmp(&b.name));
-        network_specs_set.sort_by(|a, b| a.title.cmp(&b.title));
+        network_specs_set.sort_by(|a, b| a.specs.title.cmp(&b.specs.title));
         Ok(Self {
             metadata_set,
             network_specs_set,
@@ -171,7 +174,7 @@ impl GeneralHold {
 
 pub(crate) struct Hold {
     pub(crate) metadata_set: Vec<MetaValues>,
-    pub(crate) network_specs_set: Vec<NetworkSpecs>,
+    pub(crate) network_specs_set: Vec<OrderedNetworkSpecs>,
 }
 
 impl Hold {

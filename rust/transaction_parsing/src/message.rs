@@ -44,7 +44,7 @@ where
                             .card(&mut index, indent);
                         let sign = TrDbColdSign::generate(
                             SignContent::Message(message),
-                            &network_specs.name,
+                            &network_specs.specs.name,
                             &address_details.path,
                             address_details.has_pwd,
                             &author_multi_signer,
@@ -53,7 +53,7 @@ where
                         let checksum = sign.store_and_get_checksum(&db_path)?;
                         let author_info = make_author_info(
                             &author_multi_signer,
-                            network_specs.base58prefix,
+                            network_specs.specs.base58prefix,
                             &address_details,
                         );
                         let network_info = network_specs;
@@ -70,7 +70,7 @@ where
                     } else {
                         let author_card = Card::Author {
                             author: &author_multi_signer,
-                            base58prefix: network_specs.base58prefix,
+                            base58prefix: network_specs.specs.base58prefix,
                             address_details: &address_details,
                         }
                         .card(&mut index, indent);
@@ -94,7 +94,7 @@ where
                 None => {
                     let author_card = Card::AuthorPlain {
                         author: &author_multi_signer,
-                        base58prefix: network_specs.base58prefix,
+                        base58prefix: network_specs.specs.base58prefix,
                     }
                     .card(&mut index, indent);
                     let warning_card =

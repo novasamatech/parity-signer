@@ -1,7 +1,7 @@
 //! Fit network properties fetched via RPC call into data in expected format
 //!
 //! Fetched network properties contain data needed to make
-//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend), used
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs), used
 //! in [`ContentAddSpecs`](definitions::qr_transfers::ContentAddSpecs) payload.
 //!
 //! Network properties may contain:

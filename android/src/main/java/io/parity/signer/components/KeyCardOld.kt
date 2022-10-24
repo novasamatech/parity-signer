@@ -15,20 +15,21 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Address
+import io.parity.signer.uniffi.MAddressCard
 
 /**
  * A card to show key info; only visual things.
  */
 @Deprecated("Use KeyCard for new screens")
 @Composable
-fun KeyCardOld(identity: Address, multiselectMode: Boolean = false) {
+fun KeyCardOld(identity: MAddressCard, multiselectMode: Boolean = false) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
 			.padding(8.dp)
 	) {
 		Box(contentAlignment = Alignment.BottomEnd) {
-			IdentIcon(identity.identicon)
+			IdentIcon(identity.address.identicon)
 			if (multiselectMode) {
 				identity.multiselect?.let {
 					if (it) {
@@ -53,16 +54,16 @@ fun KeyCardOld(identity: Address, multiselectMode: Boolean = false) {
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Text(
-					identity.seedName,
+					identity.address.seedName,
 					color = MaterialTheme.colors.Text600,
 					style = MaterialTheme.typography.subtitle1
 				)
 				Text(
-					identity.path,
+					identity.address.path,
 					color = MaterialTheme.colors.Crypto400,
 					style = CryptoTypography.body2
 				)
-				if (identity.hasPwd) {
+				if (identity.address.hasPwd) {
 					Text(
 						"///",
 						color = MaterialTheme.colors.Crypto400,

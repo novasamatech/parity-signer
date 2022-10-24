@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.parity.signer.components.KeyCardOld
 import io.parity.signer.uniffi.Address
+import io.parity.signer.uniffi.MAddressCard
 import io.parity.signer.uniffi.MSignSufficientCrypto
 
 @Composable
@@ -23,17 +24,14 @@ fun SignSufficientCrypto(
 			items(identities.size) { index ->
 				val identity = identities[index]
 				Row(Modifier.clickable {
-					signSufficientCrypto(identity.seedName, identity.addressKey)
+					signSufficientCrypto(identity.address.seedName, identity.addressKey)
 				}) {
-					KeyCardOld(identity = Address(
+					KeyCardOld(identity = MAddressCard(
 						base58 = identity.publicKey,
-						path = identity.path,
-						hasPwd = identity.hasPwd,
-						identicon = identity.identicon,
-						seedName = identity.seedName,
-						secretExposed = identity.secretExposed,
+						address = identity.address,
 						multiselect = null
-					))
+					)
+					)
 				}
 			}
 		}

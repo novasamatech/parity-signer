@@ -12,6 +12,7 @@ use std::path::Path;
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, VERIFIERS};
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES};
 
+use definitions::network_specs::NetworkSpecs;
 #[cfg(feature = "signer")]
 use definitions::{
     danger::DangerRecord,
@@ -21,7 +22,7 @@ use definitions::{
     network_specs::{CurrentVerifier, ValidCurrentVerifier, Verifier},
 };
 use definitions::{
-    keyring::MetaKey, metadata::MetaValues, network_specs::NetworkSpecs,
+    keyring::MetaKey, metadata::MetaValues, network_specs::OrderedNetworkSpecs,
     qr_transfers::ContentLoadTypes, types::TypeEntry,
 };
 #[cfg(any(feature = "active", feature = "signer"))]
@@ -69,19 +70,19 @@ where
     Ok(out)
 }
 
-/// Get [`NetworkSpecs`] for all networks from the cold database.
+/// Get [`OrderedNetworkSpecs`] for all networks from the cold database.
 ///
 /// Function is used both on active and Signer side, but only for the cold
 /// database.
-pub fn get_all_networks<P>(db_path: P) -> Result<Vec<NetworkSpecs>>
+pub fn get_all_networks<P>(db_path: P) -> Result<Vec<OrderedNetworkSpecs>>
 where
     P: AsRef<Path>,
 {
     let database = open_db(&db_path)?;
     let chainspecs = open_tree(&database, SPECSTREE)?;
-    let mut out: Vec<NetworkSpecs> = Vec::new();
+    let mut out: Vec<OrderedNetworkSpecs> = Vec::new();
     for x in chainspecs.iter().flatten() {
-        out.push(NetworkSpecs::from_entry_checked(x)?)
+        out.push(OrderedNetworkSpecs::from_entry_checked(x)?)
     }
     Ok(out)
 }
@@ -185,7 +186,7 @@ pub struct SpecsInvariants {
     pub name: String,
 }
 
-/// Search for network genesis hash in [`NetworkSpecs`] entries in [`SPECSTREE`]
+/// Search for network genesis hash in [`OrderedNetworkSpecs`] entries in [`SPECSTREE`]
 /// of the Signer database.
 ///
 /// Genesis hash is calculated from network [`VerifierKey`] input.
@@ -203,34 +204,39 @@ pub struct SpecsInvariants {
 #[cfg(feature = "signer")]
 pub fn genesis_hash_in_specs(genesis_hash: H256, database: &Db) -> Result<Option<SpecsInvariants>> {
     let chainspecs = open_tree(database, SPECSTREE)?;
-    let mut specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
+    let mut specs_set: Vec<(NetworkSpecsKey, OrderedNetworkSpecs)> = Vec::new();
     let mut found_permanent_specs: Option<(u16, String)> = None;
     for (network_specs_key_vec, network_specs_encoded) in chainspecs.iter().flatten() {
         let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
-        let network_specs =
-            NetworkSpecs::from_entry_with_key_checked(&network_specs_key, network_specs_encoded)?;
-        if network_specs.genesis_hash.as_bytes() == &genesis_hash[..] {
+        let network_specs = OrderedNetworkSpecs::from_entry_with_key_checked(
+            &network_specs_key,
+            network_specs_encoded,
+        )?;
+        if network_specs.specs.genesis_hash.as_bytes() == &genesis_hash[..] {
             found_permanent_specs = match found_permanent_specs {
                 Some((base58prefix, name)) => {
-                    if base58prefix == network_specs.base58prefix {
-                        if name == network_specs.name {
+                    if base58prefix == network_specs.specs.base58prefix {
+                        if name == network_specs.specs.name {
                             Some((base58prefix, name))
                         } else {
                             return Err(Error::DifferentNamesSameGenesisHash {
                                 name1: name,
-                                name2: network_specs.name.to_string(),
-                                genesis_hash: network_specs.genesis_hash,
+                                name2: network_specs.specs.name.to_string(),
+                                genesis_hash: network_specs.specs.genesis_hash,
                             });
                         }
                     } else {
                         return Err(Error::DifferentBase58Specs {
-                            genesis_hash: network_specs.genesis_hash,
+                            genesis_hash: network_specs.specs.genesis_hash,
                             base58_1: base58prefix,
-                            base58_2: network_specs.base58prefix,
+                            base58_2: network_specs.specs.base58prefix,
                         });
                     }
                 }
-                None => Some((network_specs.base58prefix, network_specs.name.to_string())),
+                None => Some((
+                    network_specs.specs.base58prefix,
+                    network_specs.specs.name.to_string(),
+                )),
             };
             specs_set.push((network_specs_key, network_specs))
         }
@@ -238,10 +244,10 @@ pub fn genesis_hash_in_specs(genesis_hash: H256, database: &Db) -> Result<Option
     specs_set.sort_by(|a, b| a.1.order.cmp(&b.1.order));
     match specs_set.get(0) {
         Some(a) => Ok(Some(SpecsInvariants {
-            base58prefix: a.1.base58prefix,
+            base58prefix: a.1.specs.base58prefix,
             first_network_specs_key: a.0.to_owned(),
             genesis_hash,
-            name: a.1.name.to_string(),
+            name: a.1.specs.name.to_string(),
         })),
         None => Ok(None),
     }
@@ -314,15 +320,15 @@ where
     Ok(ContentLoadTypes::generate(&get_types(db_path)?))
 }
 
-/// Try to get network specs [`NetworkSpecs`] from the Signer database.
+/// Try to get network specs [`OrderedNetworkSpecs`] from the Signer database.
 ///
-/// If the [`NetworkSpecsKey`] and associated [`NetworkSpecs`] are not found in
+/// If the [`NetworkSpecsKey`] and associated [`OrderedNetworkSpecs`] are not found in
 /// the [`SPECSTREE`], the result is `Ok(None)`.
 #[cfg(feature = "signer")]
 pub fn try_get_network_specs<P>(
     db_path: P,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<Option<NetworkSpecs>>
+) -> Result<Option<OrderedNetworkSpecs>>
 where
     P: AsRef<Path>,
 {
@@ -331,17 +337,23 @@ where
     Ok(chainspecs
         .get(network_specs_key.key())?
         .map(|network_specs_encoded| {
-            NetworkSpecs::from_entry_with_key_checked(network_specs_key, network_specs_encoded)
+            OrderedNetworkSpecs::from_entry_with_key_checked(
+                network_specs_key,
+                network_specs_encoded,
+            )
         })
         .transpose()?)
 }
 
-/// Get network specs [`NetworkSpecs`] from the Signer database.
+/// Get network specs [`OrderedNetworkSpecs`] from the Signer database.
 ///
 /// Network specs here are expected to be found, not finding them results in an
 /// error.
 #[cfg(feature = "signer")]
-pub fn get_network_specs<P>(db_path: P, network_specs_key: &NetworkSpecsKey) -> Result<NetworkSpecs>
+pub fn get_network_specs<P>(
+    db_path: P,
+    network_specs_key: &NetworkSpecsKey,
+) -> Result<OrderedNetworkSpecs>
 where
     P: AsRef<Path>,
 {
@@ -463,7 +475,7 @@ where
 ///
 /// Function scans through [`METATREE`] tree of the hot database and transfers
 /// into [`METATREE`] tree of the cold database the metadata entries for the
-/// networks that already have the network specs [`NetworkSpecs`] entries in
+/// networks that already have the network specs [`OrderedNetworkSpecs`] entries in
 /// [`SPECSTREE`] of the cold database.
 ///
 /// Applicable only on the active side.
@@ -503,10 +515,10 @@ where
 ///
 /// Removing a network means:
 ///
-/// - Remove from [`SPECSTREE`] all [`NetworkSpecs`] that have genesis hash
+/// - Remove from [`SPECSTREE`] all [`OrderedNetworkSpecs`] that have genesis hash
 /// associated with given `NetworkSpecsKey`
 /// - Remove from [`METATREE`] all metadata entries corresponding to the network
-/// name, as found in `NetworkSpecs`
+/// name, as found in `OrderedNetworkSpecs`
 /// - Remove from [`ADDRTREE`] all addresses in the networks being removed
 /// - Modify `Verifier` data if necessary.
 ///
@@ -543,7 +555,7 @@ where
     let general_verifier = get_general_verifier(&db_path)?;
     let network_specs = get_network_specs(&db_path, network_specs_key)?;
 
-    let verifier_key = VerifierKey::from_parts(network_specs.genesis_hash);
+    let verifier_key = VerifierKey::from_parts(network_specs.specs.genesis_hash);
     let valid_current_verifier = get_valid_current_verifier(&verifier_key, &db_path)?;
 
     // modify verifier as needed
@@ -558,7 +570,7 @@ where
     }
 
     // scan through metadata tree to mark for removal all networks with target name
-    for meta_values in get_meta_values_by_name(&db_path, &network_specs.name)?.iter() {
+    for meta_values in get_meta_values_by_name(&db_path, &network_specs.specs.name)?.iter() {
         let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
         meta_batch.remove(meta_key.key());
         events.push(Event::MetadataRemoved {
@@ -576,8 +588,8 @@ where
         for (network_specs_key_vec, entry) in chainspecs.iter().flatten() {
             let x_network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
             let mut x_network_specs =
-                NetworkSpecs::from_entry_with_key_checked(&x_network_specs_key, entry)?;
-            if x_network_specs.genesis_hash == network_specs.genesis_hash {
+                OrderedNetworkSpecs::from_entry_with_key_checked(&x_network_specs_key, entry)?;
+            if x_network_specs.specs.genesis_hash == network_specs.specs.genesis_hash {
                 network_specs_batch.remove(x_network_specs_key.key());
                 events.push(Event::NetworkSpecsRemoved {
                     network_specs_display: NetworkSpecsDisplay::get(
@@ -605,7 +617,7 @@ where
                         &address_details.encryption,
                         &multisigner_to_public(&multisigner),
                         &address_details.path,
-                        network_specs.genesis_hash,
+                        network_specs.specs.genesis_hash,
                     );
                     events.push(Event::IdentityRemoved { identity_history });
                     address_details.network_id.retain(|id| id != key);
@@ -648,12 +660,12 @@ where
     P: AsRef<Path>,
 {
     let network_specs = get_network_specs(&db_path, network_specs_key)?;
-    let meta_key = MetaKey::from_parts(&network_specs.name, network_version);
+    let meta_key = MetaKey::from_parts(&network_specs.specs.name, network_version);
     let mut meta_batch = Batch::default();
     meta_batch.remove(meta_key.key());
 
     let meta_values =
-        get_meta_values_by_name_version(&db_path, &network_specs.name, network_version)?;
+        get_meta_values_by_name_version(&db_path, &network_specs.specs.name, network_version)?;
     let meta_values_display = MetaValuesDisplay::get(&meta_values);
     let history_batch = events_to_batch(
         &db_path,

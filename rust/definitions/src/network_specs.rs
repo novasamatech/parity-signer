@@ -3,9 +3,9 @@
 //! Signer could be used only for networks introduced to the database.  
 //!
 //! Each network has associated set of parameters called here network specs.
-//! Cold database stores [`NetworkSpecs`].  
-//! Hot database stores [`NetworkSpecsToSend`]. Air-gap transfers with
-//! `add_specs` payload also contain [`NetworkSpecsToSend`].
+//! Cold database stores [`OrderedNetworkSpecs`].
+//! Hot database stores [`NetworkSpecs`]. Air-gap transfers with
+//! `add_specs` payload also contain [`NetworkSpecs`].
 //! Network specs rarely change and are generally are introduced into
 //! Signer only once for each network.
 //!
@@ -196,20 +196,20 @@
 //!
 //! # Network specs in cold database
 //!
-//! [`NetworkSpecs`] are stored in `SPECSTREE` tree of the cold database,
-//! with [`NetworkSpecsKey`] in key form as a key and SCALE-encoded [`NetworkSpecs`]
+//! [`OrderedNetworkSpecs`] are stored in `SPECSTREE` tree of the cold database,
+//! with [`NetworkSpecsKey`] in key form as a key and SCALE-encoded [`OrderedNetworkSpecs`]
 //! as a value.  
 //!
-//! [`NetworkSpecs`] include both the `encryption` ([`Encryption`]) and network  
+//! [`OrderedNetworkSpecs`] include both the `encryption` ([`Encryption`]) and network
 //! genesis hash (`[u8; 32]`), that are used for [`NetworkSpecsKey`] generation.  
-//! [`NetworkSpecs`] retrieved for given [`NetworkSpecsKey`] always get checked
+//! [`OrderedNetworkSpecs`] retrieved for given [`NetworkSpecsKey`] always get checked
 //! for consistency.  
 //!
 //! If the network supports more than one encryption algorithm, each encryption
 //! corresponds to different [`NetworkSpecsKey`], and any or all of them could be
 //! coexisting in Signer simultaneously.  
 //!
-//! [`NetworkSpecs`] are generally expected to remain unchanged over time.  
+//! [`OrderedNetworkSpecs`] are generally expected to remain unchanged over time.
 //!
 //! ## Adding new network specs  
 //!
@@ -253,7 +253,7 @@
 //! To represent the balance-related values properly, each network has associated
 //! decimals and units. The balance-related values in, for example, transactions
 //! are integer numbers, and are formatted properly only during the transactions
-//! decoding. For this `decimals` and `unit` values from [`NetworkSpecs`] are used.
+//! decoding. For this `decimals` and `unit` values from [`OrderedNetworkSpecs`] are used.
 //! `decimals` indicate the order of magnitude, by which the token `unit`
 //! exceeds the integer representing unit (see examples below).
 //! Both `decimals` and `unit` values could be queried through RPC calls for each
@@ -298,46 +298,11 @@ use crate::navigation::MVerifierDetails;
 /// These network parameters must be in Signer database for the Signer to be
 /// able to operate with this network.
 #[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
-pub struct NetworkSpecs {
-    /// Network-specific prefix for address representation in
-    /// [base58 format](https://docs.rs/sp-core/6.0.0/sp_core/crypto/trait.Ss58Codec.html#method.to_ss58check_with_version)  
-    pub base58prefix: u16,
-
-    /// Network-associated color.  
-    /// Historically is there, not doing much at the moment.  
-    pub color: String,
-
-    /// Order of magnitude, by which the token unit exceeds the balance integer unit.  
-    /// Is used to display balance-related values properly.  
-    pub decimals: u8,
-
-    /// Encryption algorithm the network uses
-    pub encryption: Encryption,
-
-    /// Network genesis hash
-    pub genesis_hash: H256,
-
-    /// Network associated logo
-    pub logo: String,
-
-    /// Network name, as it appears in network metadata
-    pub name: String,
+pub struct OrderedNetworkSpecs {
+    pub specs: NetworkSpecs,
 
     /// Order in which the network is displayed by Signer
     pub order: u8,
-
-    /// Default derivation path for addresses in this network
-    pub path_id: String,
-
-    /// Network-associated secondary color.  
-    /// Historically is there, not doing much at the moment.  
-    pub secondary_color: String,
-
-    /// Network title, as it appears in Signer menus.
-    pub title: String,
-
-    /// Token name, to display balance-related values properly.  
-    pub unit: String,
 }
 
 /// Network parameters stored SCALE-encoded in the **hot** database
@@ -346,7 +311,7 @@ pub struct NetworkSpecs {
 ///
 /// These network parameters are sufficient to add network into Signer database.
 #[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
-pub struct NetworkSpecsToSend {
+pub struct NetworkSpecs {
     /// Network-specific prefix for address representation in
     /// [base58 format](https://docs.rs/sp-core/6.0.0/sp_core/crypto/trait.Ss58Codec.html#method.to_ss58check_with_version)  
     pub base58prefix: u16,
@@ -406,22 +371,59 @@ pub struct ShortSpecs {
     pub unit: String,
 }
 
+impl OrderedNetworkSpecs {
+    /// Gets [`OrderedNetworkSpecs`] from [`NetworkSpecsKey`] and associated value
+    /// from cold database tree `SPECSTREE`  
+    ///
+    /// Checks that there is no genesis hash or encryption mismatch between
+    /// key and specs content.  
+    pub fn from_entry_with_key_checked(
+        network_specs_key: &NetworkSpecsKey,
+        network_specs_encoded: IVec,
+    ) -> Result<Self> {
+        let (genesis_hash_vec, encryption) = network_specs_key.genesis_hash_encryption()?;
+        let ordered_specs = Self::decode(&mut &network_specs_encoded[..])?;
+        let network_specs = &ordered_specs.specs;
+        if &genesis_hash_vec[..] != network_specs.genesis_hash.as_bytes() {
+            return Err(Error::SpecsGenesisHashMismatch {
+                network_specs_key: network_specs_key.to_owned(),
+                genesis_hash: network_specs.genesis_hash,
+            });
+        }
+        if encryption != network_specs.encryption {
+            return Err(Error::SpecsToSendEncryptionMismatch {
+                network_specs_key: network_specs_key.to_owned(),
+                encryption: network_specs.encryption,
+            });
+        }
+        Ok(ordered_specs)
+    }
+
+    /// Gets [`OrderedNetworkSpecs`] from cold database tree `SPECSTREE` (key, value)
+    /// entry  
+    ///
+    /// Checks that there is no genesis hash or encryption mismatch between
+    /// key and specs content.  
+    pub fn from_entry_checked(
+        (network_specs_key_vec, network_specs_encoded): (IVec, IVec),
+    ) -> Result<Self> {
+        let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
+        Self::from_entry_with_key_checked(&network_specs_key, network_specs_encoded)
+    }
+}
+
 impl NetworkSpecs {
-    /// Makes [`NetworkSpecsToSend`] from [`NetworkSpecs`]
+    /// Makes [`OrderedNetworkSpecs`] from [`NetworkSpecs`],
+    /// needs `order` input
+    ///
+    /// `order` is network number on the list of networks in Signer.
+    ///
+    /// This happens when Signer receives new network specs through QR update.
     #[cfg(feature = "signer")]
-    pub fn to_send(&self) -> NetworkSpecsToSend {
-        NetworkSpecsToSend {
-            base58prefix: self.base58prefix,
-            color: self.color.to_string(),
-            decimals: self.decimals,
-            encryption: self.encryption.to_owned(),
-            genesis_hash: self.genesis_hash,
-            logo: self.logo.to_string(),
-            name: self.name.to_string(),
-            path_id: self.path_id.to_string(),
-            secondary_color: self.secondary_color.to_string(),
-            title: self.title.to_string(),
-            unit: self.unit.to_string(),
+    pub fn to_store(&self, order: u8) -> OrderedNetworkSpecs {
+        OrderedNetworkSpecs {
+            specs: self.to_owned(),
+            order,
         }
     }
 
@@ -437,71 +439,7 @@ impl NetworkSpecs {
         }
     }
 
-    /// Gets [`NetworkSpecs`] from [`NetworkSpecsKey`] and associated value
-    /// from cold database tree `SPECSTREE`  
-    ///
-    /// Checks that there is no genesis hash or encryption mismatch between
-    /// key and specs content.  
-    pub fn from_entry_with_key_checked(
-        network_specs_key: &NetworkSpecsKey,
-        network_specs_encoded: IVec,
-    ) -> Result<Self> {
-        let (genesis_hash_vec, encryption) = network_specs_key.genesis_hash_encryption()?;
-        let network_specs = Self::decode(&mut &network_specs_encoded[..])?;
-        if &genesis_hash_vec[..] != network_specs.genesis_hash.as_bytes() {
-            return Err(Error::SpecsGenesisHashMismatch {
-                network_specs_key: network_specs_key.to_owned(),
-                genesis_hash: network_specs.genesis_hash,
-            });
-        }
-        if encryption != network_specs.encryption {
-            return Err(Error::SpecsToSendEncryptionMismatch {
-                network_specs_key: network_specs_key.to_owned(),
-                encryption: network_specs.encryption,
-            });
-        }
-        Ok(network_specs)
-    }
-
-    /// Gets [`NetworkSpecs`] from cold database tree `SPECSTREE` (key, value)
-    /// entry  
-    ///
-    /// Checks that there is no genesis hash or encryption mismatch between
-    /// key and specs content.  
-    pub fn from_entry_checked(
-        (network_specs_key_vec, network_specs_encoded): (IVec, IVec),
-    ) -> Result<Self> {
-        let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
-        Self::from_entry_with_key_checked(&network_specs_key, network_specs_encoded)
-    }
-}
-
-impl NetworkSpecsToSend {
-    /// Makes [`NetworkSpecs`] from [`NetworkSpecsToSend`],
-    /// needs `order` input
-    ///
-    /// `order` is network number on the list of networks in Signer.
-    ///
-    /// This happens when Signer receives new network specs through QR update.
-    #[cfg(feature = "signer")]
-    pub fn to_store(&self, order: u8) -> NetworkSpecs {
-        NetworkSpecs {
-            base58prefix: self.base58prefix,
-            color: self.color.to_string(),
-            decimals: self.decimals,
-            encryption: self.encryption.to_owned(),
-            genesis_hash: self.genesis_hash,
-            logo: self.logo.to_string(),
-            name: self.name.to_string(),
-            order,
-            path_id: self.path_id.to_string(),
-            secondary_color: self.secondary_color.to_string(),
-            title: self.title.to_string(),
-            unit: self.unit.to_string(),
-        }
-    }
-
-    /// Gets [`NetworkSpecsToSend`] from [`NetworkSpecsKey`] and associated
+    /// Gets [`NetworkSpecs`] from [`NetworkSpecsKey`] and associated
     /// value from hot database tree `SPECSTREEPREP`  
     ///
     /// Checks that there is no genesis hash or encryption mismatch between
@@ -528,7 +466,7 @@ impl NetworkSpecsToSend {
         Ok(network_specs_to_send)
     }
 
-    /// Gets [`NetworkSpecsToSend`] from hot database tree `SPECSTREEPREP`
+    /// Gets [`NetworkSpecs`] from hot database tree `SPECSTREEPREP`
     /// (key, value) entry  
     ///
     /// Checks that there is no genesis hash or encryption mismatch between

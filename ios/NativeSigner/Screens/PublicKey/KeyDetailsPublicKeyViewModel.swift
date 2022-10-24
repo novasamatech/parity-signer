@@ -18,14 +18,14 @@ struct KeyDetailsPublicKeyViewModel: Equatable {
         qrCode = .init(qrCode: keyDetails.qr)
         rootFooter = keyDetails.isRootKey ? .init(
             keyName: keyDetails.address.seedName,
-            base58: keyDetails.address.base58
+            base58: keyDetails.base58
         ) : nil
         addressFooter = keyDetails.isRootKey ? nil : .init(
             identicon: keyDetails.address.identicon,
             rootKeyName: keyDetails.address.seedName,
             path: keyDetails.address.path,
             network: keyDetails.networkInfo.networkTitle,
-            base58: keyDetails.address.base58
+            base58: keyDetails.base58
         )
         isKeyExposed = keyDetails.address.secretExposed
         isRootKey = keyDetails.isRootKey

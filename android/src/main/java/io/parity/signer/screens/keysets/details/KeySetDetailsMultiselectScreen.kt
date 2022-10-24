@@ -110,7 +110,7 @@ fun KeySetDetailsMultiselectScreen(
 
 @Composable
 private fun SeedKeyViewItem(
-	seedKeyModel: SeedKeyModel,
+	seedKeyModel: KeysModel,
 	onClick: Callback,
 ) {
 	Row(

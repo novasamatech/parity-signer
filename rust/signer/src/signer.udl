@@ -47,22 +47,12 @@ interface ValidCurrentVerifier {
     Custom(Verifier v);
 };
 
-dictionary NetworkSpecs {
-    u16 base58prefix;
-    string color;
-    u8 decimals;
-    Encryption encryption;
-    H256 genesis_hash;
-    string logo;
-    string name;
+dictionary OrderedNetworkSpecs {
+    NetworkSpecs specs;
     u8 order;
-    string path_id;
-    string secondary_color;
-    string title;
-    string unit;
 };
 
-dictionary NetworkSpecsToSend {
+dictionary NetworkSpecs {
     u16 base58prefix;
     string color;
     u8 decimals;
@@ -77,14 +67,14 @@ dictionary NetworkSpecsToSend {
 };
 
 dictionary NetworkSpecsDisplay {
-    NetworkSpecs specs;
+    OrderedNetworkSpecs network;
     ValidCurrentVerifier valid_current_verifier;
     Verifier general_verifier;
 };
 
 
 dictionary NetworkSpecsExport {
-    NetworkSpecsToSend specs_to_send;
+    NetworkSpecs specs_to_send;
     VerifierValue signed_by;
 };
 
@@ -271,27 +261,6 @@ enum Action {
     "Nothing",
 };
 
-dictionary Identity {
-    string seed_name;
-    string address_key;
-    string public_key;
-    sequence<u8> identicon;
-    boolean has_pwd;
-    string path;
-    boolean is_multiselect;
-    string base58;
-};
-
-dictionary MSeedKeyCard {
-    string seed_name;
-    sequence<u8> identicon;
-    string address_key;
-    string base58;
-    boolean swiped;
-    boolean multiselect;
-    boolean secret_exposed;
-};
-
 dictionary MNetworkCard {
     string title;
     string logo;
@@ -299,21 +268,18 @@ dictionary MNetworkCard {
 
 dictionary MKeys {
     sequence<MKeysCard> set;
-    MSeedKeyCard root;
+    MKeysCard root;
     MNetworkCard network;
     boolean multiselect_mode;
     string multiselect_count;
 };
 
 dictionary MKeysCard {
+    Address address;
     string address_key;
     string base58;
-    sequence<u8> identicon;
-    boolean has_pwd;
-    string path;
     boolean swiped;
     boolean multiselect;
-    boolean secret_exposed;
 };
 
 dictionary MSettings {
@@ -335,7 +301,7 @@ dictionary History {
 
 dictionary MEventMaybeDecoded {
     Event event;
-    Address? signed_by;
+    MAddressCard? signed_by;
     TransactionCardSet? decoded;
     MVerifierDetails? verifier_details;
 };
@@ -348,7 +314,7 @@ dictionary MLogDetails {
 dictionary MTransaction {
     TransactionCardSet content;
     TransactionType ttype;
-    Address? author_info;
+    MAddressCard? author_info;
     MSCNetworkInfo? network_info;
 };
 
@@ -395,6 +361,8 @@ dictionary MKeyDetails {
     string pubkey;
     MSCNetworkInfo network_info;
     Address address;
+    string base58;
+    boolean? multiselect;
 };
 
 dictionary MNewSeed {
@@ -428,18 +396,22 @@ dictionary MDeriveKey {
 dictionary DerivationCheck {
     boolean button_good;
     DerivationDestination? where_to;
-    Address? collision;
+    MAddressCard? collision;
     string? error;
 };
 
 dictionary Address {
-    string base58;
     string path;
     boolean has_pwd;
     sequence<u8> identicon;
     string seed_name;
-    boolean? multiselect;
     boolean secret_exposed;
+};
+
+dictionary MAddressCard {
+    string base58;
+    Address address;
+    boolean? multiselect;
 };
 
 enum DerivationDestination {
@@ -483,13 +455,9 @@ dictionary MMetadataRecord {
 };
 
 dictionary MRawKey {
-    string seed_name;
+    Address address;
     string address_key;
     string public_key;
-    sequence<u8> identicon;
-    boolean has_pwd;
-    string path;
-    boolean secret_exposed;
 };
 
 dictionary MSignSufficientCrypto {
@@ -592,7 +560,7 @@ interface MSCContent {
 };
 
 dictionary MSufficientCryptoReady {
-    Address author_info;
+    MAddressCard author_info;
     sequence<u8> sufficient;
     MSCContent content;
 };
@@ -647,7 +615,7 @@ dictionary MSignatureReady {
 };
 
 dictionary MEnterPassword {
-    Address author_info;
+    MAddressCard author_info;
     u32 counter;
 };
 
@@ -694,11 +662,6 @@ interface ModalData {
     KeyDetailsAction();
     LogComment();
     SelectSeed(MSeeds f);
-};
-
-dictionary MSCAuthorPlain {
-    string base58;
-    sequence<u8> identicon;
 };
 
 dictionary MSCCall {
@@ -765,8 +728,8 @@ dictionary MSCTxSpecPlain {
 
 [Enum]
 interface Card {
-    AuthorCard(Address f);
-    AuthorPlainCard(MSCAuthorPlain f);
+    AuthorCard(MAddressCard f);
+    AuthorPlainCard(MSCId f);
     AuthorPublicKeyCard(MVerifierDetails f);
     BalanceCard(MSCCurrency f);
     BitVecCard(string f);
@@ -787,7 +750,7 @@ interface Card {
     NetworkGenesisHashCard(string f);
     NetworkNameCard(string f);
     NetworkInfoCard(MSCNetworkInfo f);
-    NewSpecsCard(NetworkSpecsToSend f);
+    NewSpecsCard(NetworkSpecs f);
     NonceCard(string f);
     NoneCard();
     PalletCard(string f);
