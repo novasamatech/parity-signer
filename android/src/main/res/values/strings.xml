@@ -8,6 +8,7 @@
 	<string name="export_private_key_confirm_text">A private key can be used to sign transactions. This key will be marked as a hot key after export.</string>
 	<string name="export_private_key_confirm_cta">Export Private Key</string>
 	<string name="menu_option_export_private_key">Export Private Key</string>
+	<string name="menu_option_export_key_sets">Export Key Sets</string>
 	<string name="menu_option_forget_delete_key">Delete</string>
 	<string name="menu_option_address_on_other_networks">Address on Other Networks</string>
 	<string name="menu_option_change_keys_network">Change this Key\'s Network</string>

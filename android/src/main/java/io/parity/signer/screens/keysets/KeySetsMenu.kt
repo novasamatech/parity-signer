@@ -31,7 +31,7 @@ fun KeySetsMenuBottomSheet(
 	) {
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_ios_share_28,
-			label = stringResource(R.string.menu_option_export_private_key),
+			label = stringResource(R.string.menu_option_export_key_sets),
 			tint = null,
 			onclick = {
 				navigator.navigate(KeySetsNavSubgraph.export) {
