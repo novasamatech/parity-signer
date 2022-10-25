@@ -10,11 +10,12 @@ class DateUtilsTest {
 
 	@Test
 	fun parseLogTimeProper() {
-		val date = DateUtils.parseLogTime("2014-11-10 11:45")
+		val date = DateUtils.parseLogTime("2014-11-10 13:45")
 		val expected = Calendar.Builder().setLocale(Locale.US)
 			.setDate(2014, 10, 10) //month is 0 based
-			.setTimeOfDay(11, 45, 0)
+			.setTimeOfDay(13, 45, 0)
 			.build()
+		assertEquals(date!!.get(Calendar.HOUR_OF_DAY), 13)
 		assertEquals(date!!.get(Calendar.YEAR), 2014)
 		assertEquals(expected,date)
 	}
