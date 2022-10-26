@@ -48,6 +48,7 @@ struct ExportPrivateKeyWarningModal: View {
                     )
                 }
                 .padding([.leading, .trailing], Spacing.large)
+                .padding(.bottom, Spacing.medium)
             }
         )
     }

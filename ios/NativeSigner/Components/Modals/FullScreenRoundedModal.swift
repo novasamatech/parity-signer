@@ -46,7 +46,7 @@ struct FullScreenRoundedModal<Content: View>: View {
                     .background(animateBackground ? Color.black.opacity(0.5) : .clear)
                     .onTapGesture(perform: backgroundTapAction)
                 VStack(alignment: .leading, spacing: Spacing.medium, content: content)
-                    .padding([.bottom, .top], Spacing.medium)
+                    .padding(.top, Spacing.medium)
                     .padding([.leading, .trailing], 0)
                     .background(Asset.backgroundTertiary.swiftUIColor)
                     .cornerRadius(radius: CornerRadius.medium, corners: [.topLeft, .topRight])

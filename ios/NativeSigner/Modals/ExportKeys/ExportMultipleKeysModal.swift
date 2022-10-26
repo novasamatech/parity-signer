@@ -7,9 +7,31 @@
 
 import SwiftUI
 
+extension QRCodeRootFooterViewModel {
+    init(_ keySummary: KeySummaryViewModel) {
+        keyName = keySummary.keyName
+        base58 = keySummary.base58
+    }
+}
+
+extension QRCodeAddressFooterViewModel {
+    init(_ derivedKey: DerivedKeyRowModel) {
+        identicon = derivedKey.viewModel.identicon
+        rootKeyName = derivedKey.viewModel.rootKeyName
+        path = derivedKey.viewModel.path
+        network = ""
+        base58 = derivedKey.viewModel.base58
+    }
+}
+
 struct ExportMultipleKeysModalViewModel: Equatable {
-    let selectedItems: [KeySetViewModel]
-    let seeds: [SeedNameCard]
+    enum SelectedItems: Equatable {
+        case keySets([KeySetViewModel])
+        case keys(key: KeySummaryViewModel?, derivedKeys: [DerivedKeyRowModel])
+    }
+
+    let selectedItems: SelectedItems
+    let seedNames: [String]
 }
 
 struct ExportMultipleKeysModal: View {
@@ -23,97 +45,87 @@ struct ExportMultipleKeysModal: View {
             },
             animateBackground: $viewModel.animateBackground,
             ignoredEdges: .bottom,
-            content: {
-                VStack {
-                    // Header with X button
-                    header
-                        .padding([.leading], Spacing.large)
-                        .padding([.trailing], Spacing.medium)
-                    ScrollView {
-                        VStack(alignment: .center) {
-                            // QR Code container
-                            VStack(spacing: 0) {
-                                AnimatedQRCodeView(viewModel: $viewModel.qrCode)
-                                    .padding(0.5)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                HStack {
-                                    Localizable.KeysExport.KeySets.Label.info.text
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                                    Spacer().frame(maxWidth: Spacing.medium)
-                                    Asset.infoIconBold.swiftUIImage
-                                        .foregroundColor(Asset.accentPink300.swiftUIColor)
-                                }
-                                .padding()
-                                .font(Fontstyle.bodyM.base)
-                                .background(
-                                    RoundedRectangle(cornerRadius: CornerRadius.small)
-                                        .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                                        .background(Asset.fill6.swiftUIColor)
-                                        .cornerRadius(CornerRadius.small)
-                                )
-                                .padding(.top, Spacing.extraSmall)
-                                // Keys list
-                                VStack(alignment: .leading, spacing: 0) {
-                                    ForEach(
-                                        viewModel.viewModel.selectedItems.sorted(by: { $0.keyName < $1.keyName }),
-                                        id: \.keyName
-                                    ) { keyItem($0, isLast: $0 == viewModel.viewModel.selectedItems.last) }
-                                }
-                                .padding(.top, Spacing.extraExtraSmall)
-                            }
-                            .padding(Spacing.extraSmall)
-                            .background(
-                                RoundedRectangle(cornerRadius: CornerRadius.medium)
-                                    .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                                    .background(Asset.fill6.swiftUIColor)
-                                    .cornerRadius(CornerRadius.medium)
-                            )
-                            .padding([.leading, .trailing], Spacing.medium)
+            content: { content }
+        )
+    }
+
+    var content: some View {
+        VStack {
+            // Header with X button
+            header
+                .padding([.leading], Spacing.large)
+                .padding([.trailing], Spacing.medium)
+            ScrollView {
+                VStack(alignment: .center) {
+                    // QR Code container
+                    VStack(spacing: 0) {
+                        AnimatedQRCodeView(viewModel: $viewModel.qrCode)
+                            .padding(0.5)
+                            .fixedSize(horizontal: false, vertical: true)
+                        HStack {
+                            Localizable.KeysExport.KeySets.Label.info.text
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            Spacer().frame(maxWidth: Spacing.medium)
+                            Asset.infoIconBold.swiftUIImage
+                                .foregroundColor(Asset.accentPink300.swiftUIColor)
                         }
+                        .padding()
+                        .font(Fontstyle.bodyM.base)
+                        .background(
+                            RoundedRectangle(cornerRadius: CornerRadius.small)
+                                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
+                                .background(Asset.fill6.swiftUIColor)
+                                .cornerRadius(CornerRadius.small)
+                        )
+                        .padding(.top, Spacing.extraSmall)
+                        // Keys list
+                        keyList
+                    }
+                    .padding(Spacing.extraSmall)
+                    .background(
+                        RoundedRectangle(cornerRadius: CornerRadius.medium)
+                            .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
+                            .background(Asset.fill6.swiftUIColor)
+                            .cornerRadius(CornerRadius.medium)
+                    )
+                    .padding([.leading, .trailing], Spacing.medium)
+                }
+            }
+            .padding(.bottom, Spacing.medium)
+        }
+        .onAppear {
+            viewModel.prepareKeysExport()
+        }
+    }
+
+    var keyList: some View {
+        LazyVStack(alignment: .leading, spacing: 0) {
+            switch viewModel.viewModel.selectedItems {
+            case let .keySets(keySets):
+                ForEach(
+                    keySets.sorted(by: { $0.keyName < $1.keyName }),
+                    id: \.keyName
+                ) { keyItem($0, isLast: $0 == keySets.last) }
+            case let .keys(key, derivedKeys):
+                if let key = key {
+                    QRCodeRootFooterView(viewModel: .init(key))
+                }
+                if key != nil, !derivedKeys.isEmpty {
+                    Divider()
+                }
+                ForEach(
+                    derivedKeys.sorted(by: { $0.viewModel.path < $1.viewModel.path }),
+                    id: \.viewModel.path
+                ) {
+                    QRCodeAddressFooterView(viewModel: .init($0))
+                    if $0 != derivedKeys.last {
+                        Divider()
                     }
                 }
-                .onAppear {
-                    viewModel.prepareKeysExport()
-                }
-            }
-        )
-    }
-
-    private func animateDismissal() {
-        Animations.chainAnimation(
-            viewModel.animateBackground.toggle(),
-            delayedAnimationClosure: viewModel.isPresented.toggle()
-        )
-    }
-}
-
-extension ExportMultipleKeysModal {
-    final class ViewModel: ObservableObject {
-        private let keysExportService: ExportMultipleKeysService
-        let viewModel: ExportMultipleKeysModalViewModel
-
-        @Published var qrCode: AnimatedQRCodeViewModel = .init(qrCodes: [])
-        @Published var isShowingKeysExportModal = false
-        @Published var animateBackground: Bool = false
-
-        @Binding var isPresented: Bool
-
-        init(
-            viewModel: ExportMultipleKeysModalViewModel,
-            keysExportService: ExportMultipleKeysService = ExportMultipleKeysService(),
-            isPresented: Binding<Bool>
-        ) {
-            self.viewModel = viewModel
-            self.keysExportService = keysExportService
-            _isPresented = isPresented
-        }
-
-        func prepareKeysExport() {
-            keysExportService.exportMultipleKeys(items: viewModel.seeds.map(\.seedName)) { result in
-                self.qrCode = (try? result.get()) ?? .init(qrCodes: [])
             }
         }
+        .padding(.top, Spacing.extraExtraSmall)
     }
 }
 
@@ -126,14 +138,6 @@ private extension ExportMultipleKeysModal {
             Spacer()
             CloseModalButton(action: animateDismissal)
         }
-    }
-
-    var headerName: String {
-        let localizableKey = Localizable.KeysExport.KeySets.Label.self
-        let count = viewModel.viewModel.seeds.count
-        let suffix = count == 1 ? localizableKey.Header.Suffix.single.string : localizableKey.Header.Suffix.plural
-            .string
-        return localizableKey.header(String(count), suffix)
     }
 
     func keyItem(_ viewModel: KeySetViewModel, isLast: Bool) -> some View {
@@ -187,6 +191,23 @@ private struct ExportPrivateKeyAddressFooter: View {
         }
         .padding([.leading, .trailing], Spacing.large)
         .padding([.top, .bottom], Spacing.extraSmall)
+    }
+}
+
+private extension ExportMultipleKeysModal {
+    var headerName: String {
+        let localizableKey = Localizable.KeysExport.KeySets.Label.self
+        let count = viewModel.viewModel.seedNames.count
+        let suffix = count == 1 ? localizableKey.Header.Suffix.single.string : localizableKey.Header.Suffix.plural
+            .string
+        return localizableKey.header(String(count), suffix)
+    }
+
+    func animateDismissal() {
+        Animations.chainAnimation(
+            viewModel.animateBackground.toggle(),
+            delayedAnimationClosure: viewModel.isPresented.toggle()
+        )
     }
 }
 

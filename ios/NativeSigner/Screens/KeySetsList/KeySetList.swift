@@ -97,14 +97,13 @@ struct KeySetList: View {
             .clearModalBackground()
         }
         .fullScreenCover(
-            isPresented: $viewModel.isShowingKeysExportModal,
-            onDismiss: {}
+            isPresented: $viewModel.isShowingKeysExportModal
         ) {
             ExportMultipleKeysModal(
                 viewModel: .init(
                     viewModel: ExportMultipleKeysModalViewModel(
-                        selectedItems: selectedItems,
-                        seeds: selectedItems.map(\.seed)
+                        selectedItems: .keySets(selectedItems),
+                        seedNames: selectedItems.map(\.seed.seedName)
                     ),
                     isPresented: $viewModel.isShowingKeysExportModal
                 )

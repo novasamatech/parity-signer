@@ -23,17 +23,24 @@ struct DerivedKeyRowViewModel: Equatable {
     let path: String
     let hasPassword: Bool
     let base58: String
+    // for Keys Export
+    let seedName: String
+    let rootKeyName: String
 
     init(
         identicon: [UInt8],
         path: String,
         hasPassword: Bool,
-        base58: String
+        base58: String,
+        seedName: String = "",
+        rootKeyName: String = ""
     ) {
         self.identicon = identicon
         self.path = path
         self.hasPassword = hasPassword
-        self.base58 = base58.truncateMiddle(length: 8)
+        self.base58 = base58
+        self.seedName = seedName
+        self.rootKeyName = rootKeyName
     }
 }
 
@@ -42,6 +49,8 @@ extension DerivedKeyRowViewModel {
         path = key.address.path
         identicon = key.address.identicon
         hasPassword = key.address.hasPwd
-        base58 = key.base58.truncateMiddle(length: 8)
+        base58 = key.base58
+        seedName = key.addressKey
+        rootKeyName = key.address.seedName
     }
 }

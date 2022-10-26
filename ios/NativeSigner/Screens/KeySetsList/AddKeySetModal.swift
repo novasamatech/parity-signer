@@ -56,7 +56,7 @@ struct AddKeySetModal: View {
                     )
                 }
                 .padding([.leading, .trailing], Spacing.large)
-                .padding(.bottom, Spacing.small)
+                .padding(.bottom, Spacing.small + Spacing.medium)
             }
         )
     }
