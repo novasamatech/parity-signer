@@ -12,7 +12,6 @@ import io.parity.signer.uniffi.VerifierValue
 
 /**
  * Selector for rendering history cards in general list;
- * could easily be moved to backend later: TODO
  */
 @Composable
 fun HistoryCard(card: Event, timestamp: String) {

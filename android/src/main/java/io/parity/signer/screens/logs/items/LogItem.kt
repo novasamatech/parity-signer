@@ -2,16 +2,18 @@ package io.parity.signer.screens.logs.items
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import io.parity.signer.screens.keysets.KeySetsMenuBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 
 @Composable
 fun LogItem() {
+ Row() {
 
+ }
 }
 
 
