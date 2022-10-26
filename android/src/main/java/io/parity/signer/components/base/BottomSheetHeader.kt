@@ -15,10 +15,10 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.SignerNewTheme
 
 @Composable
-fun BottomSheetHeader(header: String, onCancelClicked: () -> Unit) {
+fun BottomSheetHeader(header: String, onCloseClicked: () -> Unit) {
 	Row(
 		modifier = Modifier
-			.padding(top = 20.dp, bottom = 20.dp)
+			.padding(top = 20.dp, bottom = 20.dp, start = 24.dp, end = 16.dp)
 			.fillMaxWidth(),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
@@ -28,7 +28,7 @@ fun BottomSheetHeader(header: String, onCancelClicked: () -> Unit) {
 			style = MaterialTheme.typography.h3,
 		)
 		Spacer(modifier = Modifier.weight(1.0f))
-		CloseIcon(onCloseClicked = onCancelClicked)
+		CloseIcon(onCloseClicked = onCloseClicked)
 	}
 }
 

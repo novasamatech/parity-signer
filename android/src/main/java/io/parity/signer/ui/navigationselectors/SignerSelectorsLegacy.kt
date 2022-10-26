@@ -1,4 +1,4 @@
-package io.parity.signer.ui
+package io.parity.signer.ui.navigationselectors
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -9,7 +9,8 @@ import io.parity.signer.bottomsheets.*
 import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
-import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.screens.keysets.*
+import io.parity.signer.screens.keysets.details.SeedMenu
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.ModalData
@@ -43,12 +44,14 @@ fun ScreenSelector(
 			screenData.f,
 			button1,
 		)
-		is ScreenData.Keys -> KeyManager(
-			button = button2,
-			signerDataModel::increment,
-			screenData.f,
-			alertState
-		)
+		is ScreenData.Keys -> if (FeatureFlags.isDisabled(FeatureOption.NEW_KEY_SET_DETAILS)) {
+			KeyManager(
+				button = button2,
+				signerDataModel::increment,
+				screenData.f,
+				alertState
+			)
+		}
 		is ScreenData.Log -> HistoryScreen(screenData.f, button2)
 		is ScreenData.LogDetails -> LogDetails(screenData.f)
 		is ScreenData.ManageNetworks -> ManageNetworks(
@@ -83,13 +86,7 @@ fun ScreenSelector(
 			processFrame = signerDataModel::processFrame,
 			resetScanValues = signerDataModel::resetScanValues,
 		)
-		is ScreenData.SeedSelector -> SignerNewTheme() {
-			KeySetsScreen(
-				screenData.f.toKeySetsSelectViewModel(),
-				navigator = signerDataModel.navigator,
-				alertState = alertState,
-			)
-		}
+		is ScreenData.SeedSelector -> {} //shown in new selector
 		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
 			screenData.f,
 			button2
@@ -131,23 +128,20 @@ fun ModalSelector(
 		{ action, details -> button(action, details, "") }
 	if (localNavAction != null && localNavAction != LocalNavAction.None) {
 		when (localNavAction) {
-			is LocalNavAction.ShowExportPrivateKey -> {
-			}
+			is LocalNavAction.ShowExportPrivateKey -> {} //show in new selector
 			LocalNavAction.None -> {}
 		}
 	} else {
 		when (modalData) {
-			is ModalData.NewSeedMenu ->
-				NewSeedMenu(
-					alertState = alertState,
-					button = button1
+			is ModalData.NewSeedMenu -> {} //new bottom sheet
+			is ModalData.SeedMenu -> if (FeatureFlags.isDisabled(FeatureOption.NEW_KEY_SET_DETAILS)) {
+				SeedMenu(
+					modalData.f,
+					alertState,
+					button1,
+					signerDataModel::removeSeed
 				)
-			is ModalData.SeedMenu -> SeedMenu(
-				modalData.f,
-				alertState,
-				button1,
-				signerDataModel::removeSeed
-			)
+			}
 			is ModalData.NetworkSelector -> NetworkSelector(
 				modalData.f,
 				button2
