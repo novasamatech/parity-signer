@@ -9,11 +9,13 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,25 +29,25 @@ import io.parity.signer.ui.theme.TypefaceNew
 @Composable
 fun ScreenHeader(
 	@StringRes stringId: Int?,
-	backEnabled: Boolean,
-	menuEnabled: Boolean,
-	navigator: Navigator
+	onback: (() -> Unit)? = null,
+	onMenu: (() -> Unit)? = null,
 ) {
 	Row(
 		modifier = Modifier
 			.fillMaxWidth(1f)
 			.defaultMinSize(minHeight = 56.dp)
 	) {
-		if (backEnabled) {
+		if (onback != null) {
 			Image(
 				imageVector = Icons.Filled.ChevronLeft,
 				contentDescription = stringResource(R.string.description_back_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
-					.padding(10.dp)
+					.padding(horizontal = 8.dp)
+					.clickable(onClick = onback)
+					.padding(8.dp)
 					.size(24.dp)
 					.align(Alignment.CenterVertically)
-					.clickable { navigator.backAction() }
 			)
 		} else {
 			Spacer(modifier = Modifier.padding(start = 44.dp))
@@ -65,16 +67,68 @@ fun ScreenHeader(
 			Spacer(modifier = Modifier.weight(1f))
 		}
 		//end
-		if (menuEnabled) {
+		if (onMenu != null) {
 			Image(
 				imageVector = Icons.Filled.MoreHoriz,
 				contentDescription = stringResource(R.string.description_menu_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
-					.padding(10.dp)
+					.padding(horizontal = 8.dp)
+					.clickable(onClick = onMenu)
+					.padding(8.dp)
 					.size(24.dp)
 					.align(Alignment.CenterVertically)
-					.clickable { navigator.backAction() }
+			)
+		} else {
+			Spacer(modifier = Modifier.padding(start = 44.dp))
+		}
+	}
+}
+
+@Composable
+fun ScreenHeaderClose(
+	title: String,
+	onClose: () -> Unit,
+	onMenu: (() -> Unit)? = null,
+) {
+	Row(
+		modifier = Modifier
+			.fillMaxWidth(1f)
+			.defaultMinSize(minHeight = 56.dp)
+	) {
+		Image(
+			imageVector = Icons.Filled.Close,
+			contentDescription = stringResource(R.string.description_back_button),
+			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+			modifier = Modifier
+				.padding(horizontal = 8.dp)
+				.clickable(onClick = onClose)
+				.padding(8.dp)
+				.size(24.dp)
+				.align(Alignment.CenterVertically)
+		)
+		//center
+		Text(
+			text = title,
+			color = MaterialTheme.colors.primary,
+			style = TypefaceNew.TitleS,
+			textAlign = TextAlign.Center,
+			modifier = Modifier
+				.align(Alignment.CenterVertically)
+				.weight(1f)
+		)
+		//end
+		if (onMenu != null) {
+			Image(
+				imageVector = Icons.Filled.MoreHoriz,
+				contentDescription = stringResource(R.string.description_menu_button),
+				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+				modifier = Modifier
+					.padding(horizontal = 8.dp)
+					.clickable(onClick = onMenu)
+					.padding(8.dp)
+					.size(24.dp)
+					.align(Alignment.CenterVertically)
 			)
 		} else {
 			Spacer(modifier = Modifier.padding(start = 44.dp))
@@ -105,21 +159,23 @@ private fun PreviewScreenBaseComponent() {
 		) {
 			ScreenHeader(
 				null,
-				backEnabled = true,
-				menuEnabled = true,
-				EmptyNavigator(),
+				onback = {},
+				onMenu = {},
 			)
 			ScreenHeader(
 				R.string.key_sets_screem_title,
-				backEnabled = false,
-				menuEnabled = true,
-				EmptyNavigator(),
+				onback = null,
+				onMenu = {},
 			)
 			ScreenHeader(
 				R.string.key_sets_screem_title,
-				backEnabled = false,
-				menuEnabled = false,
-				EmptyNavigator(),
+				onback = null,
+				onMenu = null,
+			)
+			ScreenHeaderClose(
+				stringResource(id = R.string.key_sets_screem_title),
+				onClose = {},
+				onMenu = null,
 			)
 		}
 	}

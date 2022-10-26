@@ -8,6 +8,7 @@
 	<string name="export_private_key_confirm_text">A private key can be used to sign transactions. This key will be marked as a hot key after export.</string>
 	<string name="export_private_key_confirm_cta">Export Private Key</string>
 	<string name="menu_option_export_private_key">Export Private Key</string>
+	<string name="menu_option_export_key_sets">Export Key Sets</string>
 	<string name="menu_option_forget_delete_key">Delete</string>
 	<string name="menu_option_address_on_other_networks">Address on Other Networks</string>
 	<string name="menu_option_change_keys_network">Change this Key\'s Network</string>
@@ -23,8 +24,19 @@
 	<string name="description_expand_button">Expand button</string>
 	<string name="key_sets_screem_title">Key Sets</string>
 	<string name="key_sets_screem_add_key_button">Add Key Set</string>
+	<string name="key_sets_details_screem_create_derived_button">Create Derived Key</string>
 	<string name="bottom_bar_label_key_sets">Key Sets</string>
 	<string name="bottom_bar_label_scanner">Scanner</string>
 	<string name="bottom_bar_label_logs">Logs</string>
 	<string name="bottom_bar_label_settings">Settings</string>
+	<string name="key_set_multiselect_title_none_selected">Select Key Set</string>
+	<string name="key_set_export_all_label">Export All</string>
+	<string name="key_set_export_selected_label">Export Selected</string>
+	<string name="key_set_export_description_content">By scanning this QR code into your application you’ll export all keys from the Key Sets shown in the list below</string>
+	<string name="key_sets_details_screem_derived_subtitle">Derived Keys</string>
+	<string name="key_lock_item">Locked key</string>
+	<string name="key_sets_details_screem_filter_icon_description">Network filter button</string>
+  <string name="menu_option_select_key">Select Keys</string>
+	<string name="menu_option_derive_from_key">Derive from Key</string>
+	<string name="menu_option_backup_key_set">Backup Key Set</string>
 </resources>

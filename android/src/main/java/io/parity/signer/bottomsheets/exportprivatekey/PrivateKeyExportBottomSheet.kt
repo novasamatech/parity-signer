@@ -2,10 +2,7 @@ package io.parity.signer.bottomsheets.exportprivatekey
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -15,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,9 +21,9 @@ import io.parity.signer.bottomsheets.exportprivatekey.PrivateKeyExportModel.Comp
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components.sharedcomponents.CircularCountDownTimer
 import io.parity.signer.components.sharedcomponents.KeyCard
-import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.models.EmptyNavigator
+import io.parity.signer.models.KeyCardModel
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
@@ -41,51 +39,57 @@ fun PrivateKeyExportBottomSheet(
 	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-			.fillMaxWidth()
-			.padding(start = sidePadding, end = sidePadding),
+			.fillMaxWidth(),
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		BottomSheetHeader(stringResource(R.string.export_private_key_title)) {
 			navigator.backAction()
 		}
-		val qrRounding = 16.dp
-		val plateShape =
-			RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
+		//scrollable part if doesn't fit into screen
 		Column(
 			modifier = Modifier
-				.clip(plateShape)
-				.border(
-					BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-					plateShape
-				)
-				.background(MaterialTheme.colors.fill6, plateShape)
+				.verticalScroll(rememberScrollState())
+				.weight(weight =1f, fill = false)
+				.padding(start = sidePadding, end = sidePadding)
 		) {
-			Box(
+			val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
+			val plateShape =
+				RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
+			Column(
 				modifier = Modifier
-					.fillMaxWidth(1f)
-					.aspectRatio(1.1f)
-					.background(
-						Color.White,
-						RoundedCornerShape(qrRounding)
-					),
-				contentAlignment = Alignment.Center,
+					.clip(plateShape)
+					.border(
+						BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+						plateShape
+					)
+					.background(MaterialTheme.colors.fill6, plateShape)
 			) {
-				Image(
-					bitmap = model.qrImage.intoImageBitmap(),
-					contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
-					contentScale = ContentScale.Fit,
-					modifier = Modifier.size(264.dp)
-				)
+				Box(
+					modifier = Modifier
+						.fillMaxWidth(1f)
+						.aspectRatio(1.1f)
+						.background(
+							Color.White,
+							RoundedCornerShape(qrRounding)
+						),
+					contentAlignment = Alignment.Center,
+				) {
+					Image(
+						bitmap = model.qrImage.intoImageBitmap(),
+						contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
+						contentScale = ContentScale.Fit,
+						modifier = Modifier.size(264.dp)
+					)
+				}
+				KeyCard(model.keyCard)
 			}
-			KeyCard(model.keyCard)
-
+			//autohide component
+			val timerText = stringResource(R.string.export_private_key_timer_label)
+			CircularCountDownTimer(
+				SHOW_PRIVATE_KEY_TIMEOUT,
+				timerText
+			) { navigator.backAction() }
 		}
-		//autohide component
-		val timerText = stringResource(R.string.export_private_key_timer_label)
-		CircularCountDownTimer(
-			SHOW_PRIVATE_KEY_TIMEOUT,
-			timerText
-		) { navigator.backAction() }
 	}
 }
 

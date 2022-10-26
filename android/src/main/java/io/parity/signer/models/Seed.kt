@@ -100,7 +100,7 @@ fun SignerDataModel.removeSeed(seedName: String) {
 		try {
 			sharedPreferences.edit().remove(seedName).apply()
 			refreshSeedNames()
-			navigate(Action.REMOVE_SEED)
+			navigator.navigate(Action.REMOVE_SEED)
 		} catch (e: java.lang.Exception) {
 			Log.d("remove seed error", e.toString())
 			Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
