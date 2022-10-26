@@ -86,7 +86,7 @@ jobs:
 
       # deploy
       - name:                 Deploy rustdocs and user-docs
-        uses:                 peaceiris/actions-gh-pages@068dc23d9710f1ba62e86896f84735d869951305 # v3.8.0
+        uses:                 peaceiris/actions-gh-pages@de7ea6f8efb354206b205ef54722213d99067935 # v3.8.0
         # published only from master AND if the triggerer is not dependabot
         # https://github.com/dependabot/dependabot-core/issues/3253#issuecomment-797125425
         if:                   ${{ github.ref == 'refs/heads/master' && github.actor != 'dependabot[bot]' }}
