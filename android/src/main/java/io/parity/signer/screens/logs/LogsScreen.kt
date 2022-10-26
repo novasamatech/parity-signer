@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import io.parity.signer.components.HistoryCard
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.models.Navigator
@@ -18,6 +17,7 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.Event
 import io.parity.signer.uniffi.History
 import io.parity.signer.uniffi.MLog
+import java.time.DayOfWeek
 
 
 @Composable
@@ -33,18 +33,25 @@ fun LogsScreen(
 					items = model.logs,
 					key = { it.hashCode() }
 				) { item ->
-					Row(
-						Modifier.clickable {
-							navigator.navigate(
-								Action.SHOW_LOG_DETAILS,
-								item.logGroupId.toString()
-							)
-						}
-					) {
+					when(item) {
+						is LogsListEntry.LogEntryModel -> {
+							Box(
+								Modifier.clickable {
+									navigator.navigate(
+										Action.SHOW_LOG_DETAILS,
+										item.logGroupId.toString()
+									)
+								}
+							) {
 //							HistoryCard( //todo dmitry item create
 //								item,
 //								timestamp
 //							)
+							}
+						}
+						is LogsListEntry.TimeSeparatorModel -> {
+							//todo dmitry
+						}
 					}
 				}
 			}
@@ -63,8 +70,15 @@ fun LogItem(
 data class LogsScreenModel(val logs: List<LogsListEntry>)
 
 fun MLog.toLogListEntries(): List<LogsListEntry> {
-	val logs: Sequence<LogsListEntry.LogEntryModel> = log.asSequence().flatMap { it.toLogEntryModels() }
-	val added = log.flatMapC
+	val logs: Sequence<LogsListEntry.LogEntryModel> =
+		log.asSequence().flatMap { it.toLogEntryModels() }
+	val result = mutableListOf<LogsListEntry>()
+
+	logs.forEach {
+		//todo dmitry add dates
+		result.add(it)
+	}
+	return result.toList()
 }
 
 
@@ -77,10 +91,12 @@ sealed class LogsListEntry {
 	) : LogsListEntry()
 
 	data class TimeSeparatorModel(
-		val timestamp: String,
+		val month: String,
+		val dayOfWeek: Byte,
+		val year: Int,
 	) : LogsListEntry()
 }
 
-fun History.toLogEntryModels(): List<LogEntryModel> =
-	events.map { LogEntryModel(timestamp, order, it) }
+fun History.toLogEntryModels(): List<LogsListEntry.LogEntryModel> =
+	events.map { LogsListEntry.LogEntryModel(timestamp, order, it) }
 

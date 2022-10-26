@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.Composable
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.encodeHex
+import io.parity.signer.screens.logs.items.HistoryCardTemplate
 import io.parity.signer.uniffi.Event
 import io.parity.signer.uniffi.MEventMaybeDecoded
 import io.parity.signer.uniffi.ValidCurrentVerifier

@@ -1,4 +1,4 @@
-package io.parity.signer.components
+package io.parity.signer.screens.logs.items
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
