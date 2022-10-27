@@ -1,11 +1,8 @@
 package io.parity.signer.screens.keysetdetails.export
 
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -19,19 +16,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonBottomSheet
 import io.parity.signer.components.base.ScreenHeader
+import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.items.KeyDerivedItem
 import io.parity.signer.models.*
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.TypefaceNew
-import io.parity.signer.ui.theme.textDisabled
-import io.parity.signer.ui.theme.textTertiary
+import io.parity.signer.screens.keysets.export.ClickableLabel
+import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
 
 /**
@@ -47,61 +44,72 @@ fun KeySetDetailsMultiselectScreen(
 	alertState: State<AlertState?>, //for shield icon
 ) {
 	Column {
-		ScreenHeader(
-			stringId = null,
-			onback = { navigator.backAction() },
-			onMenu = { navigator.navigate(Action.RIGHT_BUTTON_ACTION) }
-		)
-		Box(modifier = Modifier.weight(1f)) {
-			Column(
-				modifier = Modifier.verticalScroll(rememberScrollState())
-			) {
-				//seed
-				SeedKeyViewItem(model.root) {
-					navigator.navigate(Action.SELECT_KEY, model.root.addressKey)
-				}
-				//filter row
-				Row(
-					modifier = Modifier.padding(horizontal = 24.dp),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					Text(
-						text = stringResource(R.string.key_sets_details_screem_derived_subtitle),
-						color = MaterialTheme.colors.textTertiary,
-						style = TypefaceNew.BodyM,
-						modifier = Modifier.weight(1f),
-					)
-					Icon(
-						painter = painterResource(id = R.drawable.ic_tune_28),
-						contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
-						modifier = Modifier
-							.clickable { navigator.navigate(Action.NETWORK_SELECTOR, "") }
-							.size(28.dp),
-						tint = MaterialTheme.colors.textTertiary,
-					)
-				}
-				for (key in model.keys) {
-					KeyDerivedItem(model = key) {
-						navigator.navigate(Action.SELECT_KEY, key.addressKey)
-					}
-				}
-			}
-
-			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-				ExposedIcon(
-					alertState = alertState, navigator = navigator,
-					Modifier
-						.align(Alignment.End)
-						.padding(end = 16.dp)
+		ScreenHeaderClose(
+			if (selected.value.isEmpty()) {
+				stringResource(R.string.key_set_multiselect_title_none_selected) //todo dmitry update dmitry update strings and below
+			} else {
+				pluralStringResource(
+					id = R.plurals.key_set_multiselect_title_some_selected,
+					count = selected.value.size,
+					selected.value.size,
 				)
-				PrimaryButtonBottomSheet(
-					label = stringResource(R.string.key_sets_details_screem_create_derived_button),
+			},
+			onClose = onClose,
+		)
+		Column(
+			modifier = Modifier
+				.weight(1f)
+				.verticalScroll(rememberScrollState())
+		) {
+			//seed
+			SeedKeyViewItem(model.root) {
+				navigator.navigate(Action.SELECT_KEY, model.root.addressKey)
+			}
+			//filter row
+			Row(
+				modifier = Modifier.padding(horizontal = 24.dp),
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				Text(
+					text = stringResource(R.string.key_sets_details_screem_derived_subtitle),
+					color = MaterialTheme.colors.textTertiary,
+					style = TypefaceNew.BodyM,
+					modifier = Modifier.weight(1f),
+				)
+				Icon(
+					painter = painterResource(id = R.drawable.ic_tune_28),
+					contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
 					modifier = Modifier
-						.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)
-				) {
-					navigator.navigate(Action.NEW_KEY, "") //new derived key
+						.clickable { navigator.navigate(Action.NETWORK_SELECTOR, "") }
+						.size(28.dp),
+					tint = MaterialTheme.colors.textTertiary,
+				)
+			}
+			for (key in model.keys) {
+				KeyDerivedItem(model = key) {
+					navigator.navigate(Action.SELECT_KEY, key.addressKey)
 				}
 			}
+		}
+		Row(
+			modifier = Modifier
+				.height(48.dp)
+				.background(MaterialTheme.colors.backgroundSecondary),
+			verticalAlignment = Alignment.CenterVertically,
+		) {
+			ClickableLabel(
+				stringId = R.string.key_set_export_all_label,
+				isEnabled = true,
+				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+				onClick = {},//todo dmitry
+			)
+			Spacer(modifier = Modifier.weight(1f))
+			ClickableLabel(
+				stringId = R.string.key_set_export_selected_label,
+				isEnabled = true, //selected.value.isNotEmpty(),
+				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+				onClick = {}//todo dmitry,
+			)
 		}
 	}
 }
@@ -112,8 +120,9 @@ private fun SeedKeyViewItem(
 	onClick: Callback,
 ) {
 	Row(
-		modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 24.dp)
-			.clickable( onClick = onClick ),
+		modifier = Modifier
+			.padding(top = 16.dp, bottom = 16.dp, start = 24.dp)
+			.clickable(onClick = onClick),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Column(Modifier.weight(1f)) {
@@ -155,7 +164,7 @@ private fun PreviewKeySetDetailsMultiselectScreen() {
 	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsMultiselectScreen(mockModel, EmptyNavigator(), state, )
+			KeySetDetailsMultiselectScreen(mockModel, EmptyNavigator(), state)
 		}
 	}
 }
