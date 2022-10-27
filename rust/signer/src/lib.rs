@@ -230,6 +230,9 @@ fn export_key_info(
     navigator::export_key_info(dbname, selected_names).map_err(|e| format!("{}", e))
 }
 
+fn keys_by_seed_name(dbname: &str, seed_name: &str) -> anyhow::Result<MKeysNew, String> {
+    navigator::keys_by_seed_name(dbname, seed_name).map_err(|e| format!("{}", e))
+}
 /// Encode binary info into qr code
 fn encode_to_qr(payload: &[u8]) -> anyhow::Result<Vec<u8>, String> {
     use qrcode_static::DataType;

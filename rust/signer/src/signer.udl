@@ -556,9 +556,22 @@ namespace signer {
     MKeysInfoExport export_key_info([ByRef] string dbname, record<DOMString, sequence<PathAndNetwork>>? selected_names);
 
     [Throws=ErrorDisplayed]
+    MKeysNew keys_by_seed_name([ByRef] string dbname, [ByRef] string seed_name);
+
+    [Throws=ErrorDisplayed]
     sequence<u8> encode_to_qr([ByRef] sequence<u8> payload);
 
     void init_logging(string tag);
+};
+
+dictionary MKeysNew {
+    MAddressCard? root;
+    sequence<MKeyAndNetworkCard> set;
+};
+
+dictionary MKeyAndNetworkCard {
+    MKeysCard key;
+    MSCNetworkInfo network;
 };
 
 dictionary PathAndNetwork {
