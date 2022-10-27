@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets
+package io.parity.signer.screens.keysetdetails
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -48,7 +48,6 @@ fun KeySetDetailsScreenView(
 	alertState: State<AlertState?>, //for shield icon
 	onMenu: Callback,
 ) {
-//todo dmitry selecting multiple key is impossible now, finish multiple selection screen before enabling this screen feature in master
 	Column {
 		ScreenHeader(
 			stringId = null,

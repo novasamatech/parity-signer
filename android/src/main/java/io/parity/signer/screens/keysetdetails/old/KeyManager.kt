@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets
+package io.parity.signer.screens.keysetdetails.old
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

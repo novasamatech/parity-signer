@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets.details
+package io.parity.signer.screens.keysetdetails.old
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +12,6 @@ import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.models.AlertState
-import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
