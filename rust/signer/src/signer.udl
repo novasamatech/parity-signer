@@ -553,7 +553,7 @@ namespace signer {
     void history_seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
 
     [Throws=ErrorDisplayed]
-    MKeysInfoExport export_key_info([ByRef] string dbname, sequence<string>? selected_names);
+    MKeysInfoExport export_key_info([ByRef] string dbname, record<DOMString, sequence<PathAndNetwork>>? selected_names);
 
     [Throws=ErrorDisplayed]
     sequence<u8> encode_to_qr([ByRef] sequence<u8> payload);
@@ -561,6 +561,10 @@ namespace signer {
     void init_logging(string tag);
 };
 
+dictionary PathAndNetwork {
+    string derivation;
+    string network_specs_key;
+};
 
 [Enum]
 interface MSCContent {

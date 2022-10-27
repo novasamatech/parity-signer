@@ -25,7 +25,7 @@
 mod ffi_types;
 
 use crate::ffi_types::*;
-use std::{fmt::Display, str::FromStr};
+use std::{collections::HashMap, fmt::Display, str::FromStr};
 
 /// Container for severe error message
 ///
@@ -225,7 +225,7 @@ fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<
 
 fn export_key_info(
     dbname: &str,
-    selected_names: Option<Vec<String>>,
+    selected_names: Option<HashMap<String, Vec<PathAndNetwork>>>,
 ) -> anyhow::Result<MKeysInfoExport, String> {
     navigator::export_key_info(dbname, selected_names).map_err(|e| format!("{}", e))
 }

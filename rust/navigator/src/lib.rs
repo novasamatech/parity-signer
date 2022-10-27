@@ -7,9 +7,9 @@
 use db_handling::identities::export_all_addrs;
 //do we support mutex?
 use lazy_static::lazy_static;
-use std::sync::Mutex;
+use std::{collections::HashMap, sync::Mutex};
 
-use definitions::navigation::{ActionResult, MKeysInfoExport};
+use definitions::navigation::{ActionResult, MKeysInfoExport, MKeysNew, PathAndNetwork};
 use parity_scale_codec::Encode;
 use qrcode_rtx::make_data_packs;
 
@@ -68,7 +68,7 @@ pub fn update_seed_names(seed_names: Vec<String>) -> Result<()> {
 /// Export key info with derivations.
 pub fn export_key_info(
     dbname: &str,
-    selected_names: Option<Vec<String>>,
+    selected_names: Option<HashMap<String, Vec<PathAndNetwork>>>,
 ) -> Result<MKeysInfoExport> {
     let export_all_addrs = export_all_addrs(dbname, selected_names)?;
 
@@ -76,4 +76,11 @@ pub fn export_key_info(
     let frames = make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?;
 
     Ok(MKeysInfoExport { frames })
+}
+
+/// Get keys by seed name
+pub fn keys_by_seed_name(dbname: &str, seed_name: &str) -> Result<MKeysNew> {
+    Ok(db_handling::interface_signer::keys_by_seed_name(
+        dbname, seed_name,
+    )?)
 }

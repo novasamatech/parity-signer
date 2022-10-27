@@ -142,6 +142,18 @@ pub struct MKeysCard {
     pub multiselect: bool,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MKeysNew {
+    pub root: Option<MAddressCard>,
+    pub set: Vec<MKeyAndNetworkCard>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MKeyAndNetworkCard {
+    pub key: MKeysCard,
+    pub network: MSCNetworkInfo,
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MNetworkCard {
     pub title: String,
@@ -383,6 +395,12 @@ pub struct MMNetwork {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MManageNetworks {
     pub networks: Vec<MMNetwork>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PathAndNetwork {
+    pub derivation: String,
+    pub network_specs_key: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
