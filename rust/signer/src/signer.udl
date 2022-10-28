@@ -553,7 +553,7 @@ namespace signer {
     void history_seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
 
     [Throws=ErrorDisplayed]
-    MKeysInfoExport export_key_info([ByRef] string dbname, record<DOMString, ExportedSet>? selected_names);
+    MKeysInfoExport export_key_info([ByRef] string dbname, record<DOMString, ExportedSet> selected_names);
 
     [Throws=ErrorDisplayed]
     MKeysNew keys_by_seed_name([ByRef] string dbname, [ByRef] string seed_name);

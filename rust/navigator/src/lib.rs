@@ -68,7 +68,7 @@ pub fn update_seed_names(seed_names: Vec<String>) -> Result<()> {
 /// Export key info with derivations.
 pub fn export_key_info(
     dbname: &str,
-    selected_names: Option<HashMap<String, ExportedSet>>,
+    selected_names: HashMap<String, ExportedSet>,
 ) -> Result<MKeysInfoExport> {
     let export_all_addrs = export_all_addrs(dbname, selected_names)?;
 

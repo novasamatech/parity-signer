@@ -147,17 +147,13 @@ pub struct AddrInfo {
 #[cfg(feature = "signer")]
 pub fn export_all_addrs<P: AsRef<Path>>(
     db_path: P,
-    selected_keys: Option<HashMap<String, ExportedSet>>,
+    selected_keys: HashMap<String, ExportedSet>,
 ) -> Result<ExportAddrs> {
     let mut keys: HashMap<String, Vec<(MultiSigner, AddressDetails)>> = HashMap::new();
     let mut addrs = vec![];
 
     for (m, a) in get_all_addresses(&db_path)?.into_iter() {
-        if selected_keys
-            .as_ref()
-            .map(|names| names.contains_key(&a.seed_name))
-            .unwrap_or(true)
-        {
+        if selected_keys.contains_key(&a.seed_name) {
             keys.entry(a.seed_name.clone()).or_default().push((m, a));
         }
     }
@@ -176,11 +172,7 @@ pub fn export_all_addrs<P: AsRef<Path>>(
                 continue;
             }
 
-            if let Some(selected_derivations) = selected_keys
-                .as_ref()
-                .map(|m| m.get(name))
-                .unwrap_or_default()
-            {
+            if let Some(selected_derivations) = selected_keys.get(name) {
                 let mut selected = false;
 
                 match selected_derivations {
