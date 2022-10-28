@@ -33,7 +33,7 @@ use definitions::{
     keyring::NetworkSpecsKey,
     navigation::{
         ActionResult, Address, AlertData, Card, DerivationCheck, DerivationDestination,
-        DerivationEntry, DerivationPack, FooterButton, History, MBackup, MDeriveKey,
+        DerivationEntry, DerivationPack, ExportedSet, FooterButton, History, MBackup, MDeriveKey,
         MEnterPassword, MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog,
         MLogDetails, MLogRight, MMMNetwork, MMNetwork, MManageMetadata, MManageNetworks,
         MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup,
@@ -388,10 +388,12 @@ fn export_import_addrs() {
 
     selected_hashmap.insert(
         "Alice".to_owned(),
-        vec![PathAndNetwork {
-            derivation: "//polkadot".to_owned(),
-            network_specs_key: hex::encode(network_specs_key.encode()),
-        }],
+        ExportedSet::Selected {
+            s: vec![PathAndNetwork {
+                derivation: "//polkadot".to_owned(),
+                network_specs_key: hex::encode(network_specs_key.encode()),
+            }],
+        },
     );
     let addrs_filtered = export_all_addrs(dbname_from, Some(selected_hashmap)).unwrap();
 
