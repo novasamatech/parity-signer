@@ -40,14 +40,14 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun KeysWithSeedExportResultBottomSheet(
-	seeds: Set<KeySetModel>,
+	seeds: Set<String>,
 	onClose: Callback,
 ) {
 	//todo dmitry migrate to keys and reuse qr code logic
 	Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
 		BottomSheetHeader(
 			header = pluralStringResource(
-				id = R.plurals.key_sets_export_qe_title,
+				id = R.plurals.key_export_title,
 				count = seeds.size,
 				seeds.size,
 			),

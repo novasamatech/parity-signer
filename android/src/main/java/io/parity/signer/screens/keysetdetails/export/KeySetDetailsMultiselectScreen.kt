@@ -41,15 +41,14 @@ import io.parity.signer.uniffi.Action
 fun KeySetDetailsMultiselectScreen(
 	model: KeySetDetailsModel,
 	navigator: Navigator,
-	alertState: State<AlertState?>, //for shield icon
 ) {
 	Column {
 		ScreenHeaderClose(
 			if (selected.value.isEmpty()) {
-				stringResource(R.string.key_set_multiselect_title_none_selected) //todo dmitry update dmitry update strings and below
+				stringResource(R.string.key_set_details_multiselect_title_none_selected)
 			} else {
 				pluralStringResource(
-					id = R.plurals.key_set_multiselect_title_some_selected,
+					id = R.plurals.key_export_title,
 					count = selected.value.size,
 					selected.value.size,
 				)
