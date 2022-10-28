@@ -8,15 +8,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import io.parity.signer.models.Callback
-import io.parity.signer.models.KeySetModel
-import io.parity.signer.models.KeySetsSelectModel
+import io.parity.signer.models.KeySetDetailsModel
 import io.parity.signer.ui.BottomSheetWrapperContent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun KeySetDetailExportScreenFull(
-	model: KeySetsSelectModel,
+fun KeySetDetailsExportScreenFull(
+	model: KeySetDetailsModel,
 	onClose: Callback,
 ) {
 	val modalBottomSheetState =
@@ -33,8 +32,9 @@ fun KeySetDetailExportScreenFull(
 	BottomSheetWrapperContent(
 		bottomSheetState = modalBottomSheetState,
 		bottomSheetContent = {
-			KeysWithSeedExportResultBottomSheet(
+			KeySetDetailsExportResultBottomSheet(
 				seeds = selected.value,
+				model = model,
 				onClose = { scope.launch { modalBottomSheetState.hide() }},
 			)
 		},
@@ -52,7 +52,8 @@ fun KeySetDetailExportScreenFull(
 				},
 				onExportAll = {
 					scope.launch {
-						selected.value = model.keys.toSet()
+						selected.value = //todo dmitry compare with ios
+							model.keys.map { it.addressKey }.toSet() + model.root.addressKey
 						modalBottomSheetState.animateTo(
 							ModalBottomSheetValue.Expanded
 						)

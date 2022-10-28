@@ -11,15 +11,9 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -27,19 +21,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
-import io.parity.signer.dependencyGraph.ServiceLocator
 import io.parity.signer.models.Callback
+import io.parity.signer.models.KeySetDetailsModel
 import io.parity.signer.models.KeySetModel
-import io.parity.signer.models.intoImageBitmap
-import io.parity.signer.screens.keysets.export.AnimatedQrSeedInfo
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
-import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun KeysWithSeedExportResultBottomSheet(
+fun KeySetDetailsExportResultBottomSheet(
+	model: KeySetDetailsModel,
 	seeds: Set<String>,
 	onClose: Callback,
 ) {
@@ -65,7 +56,7 @@ fun KeysWithSeedExportResultBottomSheet(
 				.background(MaterialTheme.colors.fill6, plateShape)
 		) {
 
-			AnimatedQrSeedInfo(seeds, Modifier.padding(8.dp))
+//			AnimatedQrSeedInfo(seeds, Modifier.padding(8.dp))
 
 			val innerRounding =
 				dimensionResource(id = R.dimen.innerFramesCornerRadius)
@@ -155,7 +146,7 @@ private fun KeySetItemInExport(seed: KeySetModel) {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewKeysWithSeedExportResultBottomSheet() {
+private fun PreviewKeySetDetailsExportResultBottomSheet() {
 	val keys = mutableSetOf(
 		KeySetModel(
 			"first seed name",
@@ -170,7 +161,7 @@ private fun PreviewKeysWithSeedExportResultBottomSheet() {
 	)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			KeysWithSeedExportResultBottomSheet(keys, {})
+			KeySetDetailsExportResultBottomSheet(keys, {})
 		}
 	}
 }
