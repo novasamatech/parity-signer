@@ -9,7 +9,7 @@ use db_handling::identities::export_all_addrs;
 use lazy_static::lazy_static;
 use std::{collections::HashMap, sync::Mutex};
 
-use definitions::navigation::{ActionResult, MKeysInfoExport, MKeysNew, PathAndNetwork};
+use definitions::navigation::{ActionResult, ExportedSet, MKeysInfoExport, MKeysNew};
 use parity_scale_codec::Encode;
 use qrcode_rtx::make_data_packs;
 
@@ -68,7 +68,7 @@ pub fn update_seed_names(seed_names: Vec<String>) -> Result<()> {
 /// Export key info with derivations.
 pub fn export_key_info(
     dbname: &str,
-    selected_names: Option<HashMap<String, Vec<PathAndNetwork>>>,
+    selected_names: Option<HashMap<String, ExportedSet>>,
 ) -> Result<MKeysInfoExport> {
     let export_all_addrs = export_all_addrs(dbname, selected_names)?;
 

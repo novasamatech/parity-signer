@@ -398,6 +398,12 @@ pub struct MManageNetworks {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ExportedSet {
+    All,
+    Selected { s: Vec<PathAndNetwork> },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PathAndNetwork {
     pub derivation: String,
     pub network_specs_key: String,

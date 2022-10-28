@@ -225,7 +225,7 @@ fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<
 
 fn export_key_info(
     dbname: &str,
-    selected_names: Option<HashMap<String, Vec<PathAndNetwork>>>,
+    selected_names: Option<HashMap<String, ExportedSet>>,
 ) -> anyhow::Result<MKeysInfoExport, String> {
     navigator::export_key_info(dbname, selected_names).map_err(|e| format!("{}", e))
 }

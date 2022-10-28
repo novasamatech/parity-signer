@@ -59,7 +59,7 @@ use definitions::helpers::print_multisigner_as_base58_or_eth;
 #[cfg(feature = "signer")]
 use definitions::helpers::{get_multisigner, unhex};
 #[cfg(feature = "signer")]
-use definitions::navigation::PathAndNetwork;
+use definitions::navigation::ExportedSet;
 use definitions::network_specs::NetworkSpecs;
 #[cfg(feature = "active")]
 use definitions::qr_transfers::ContentDerivations;
@@ -147,7 +147,7 @@ pub struct AddrInfo {
 #[cfg(feature = "signer")]
 pub fn export_all_addrs<P: AsRef<Path>>(
     db_path: P,
-    selected_keys: Option<HashMap<String, Vec<PathAndNetwork>>>,
+    selected_keys: Option<HashMap<String, ExportedSet>>,
 ) -> Result<ExportAddrs> {
     let mut keys: HashMap<String, Vec<(MultiSigner, AddressDetails)>> = HashMap::new();
     let mut addrs = vec![];
@@ -183,13 +183,20 @@ pub fn export_all_addrs<P: AsRef<Path>>(
             {
                 let mut selected = false;
 
-                for selected_derivation in selected_derivations {
-                    if selected_derivation.derivation == key.1.path
-                        && selected_derivation.network_specs_key
-                            == hex::encode(key.1.network_id[0].encode())
-                    {
-                        selected = true;
-                        break;
+                match selected_derivations {
+                    ExportedSet::All => selected = true,
+                    ExportedSet::Selected {
+                        s: selected_derivations,
+                    } => {
+                        for selected_derivation in selected_derivations {
+                            if selected_derivation.derivation == key.1.path
+                                && selected_derivation.network_specs_key
+                                    == hex::encode(key.1.network_id[0].encode())
+                            {
+                                selected = true;
+                                break;
+                            }
+                        }
                     }
                 }
 
