@@ -110,13 +110,16 @@ fun KeySetDetailsScreenView(
 }
 
 @Composable
-private fun SeedKeyViewItem(
+	/**
+	 * Not clickable item - disabled automatically
+	 */
+fun SeedKeyViewItem(
 	seedKeyModel: KeysModel,
-	onClick: Callback,
+	onClick: Callback?,
 ) {
 	Row(
 		modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 24.dp)
-			.clickable( onClick = onClick ),
+			.apply { if (onClick != null) clickable(onClick = onClick) }, //todo dmitry test
 		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Column(Modifier.weight(1f)) {

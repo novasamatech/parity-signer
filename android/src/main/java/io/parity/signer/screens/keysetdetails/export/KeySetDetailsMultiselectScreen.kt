@@ -1,6 +1,5 @@
 package io.parity.signer.screens.keysetdetails.export
 
-import SignerCheckboxColors
 import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -18,6 +17,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.items.KeyDerivedItemMultiselect
 import io.parity.signer.models.*
+import io.parity.signer.screens.keysetdetails.SeedKeyViewItem
 import io.parity.signer.screens.keysets.export.ClickableLabel
 import io.parity.signer.ui.theme.*
 
@@ -55,11 +55,7 @@ fun KeySetDetailsMultiselectScreen(
 				.verticalScroll(rememberScrollState())
 		) {
 			//seed
-			SeedKeySelectViewItem(model = model.root,
-				isSelected = selected.value.contains(model.root.addressKey), //todo dmitry addressKey?
-			) { isSelected, key ->
-				if (isSelected) selected.value += key else selected.value -= key
-			}
+			SeedKeyViewItem(model.root, null) //todo dmitry make grey colors
 			//filter row
 			Row(
 				modifier = Modifier.padding(horizontal = 24.dp),
@@ -106,45 +102,6 @@ fun KeySetDetailsMultiselectScreen(
 				isEnabled = true, //selected.value.isNotEmpty(),
 				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
 				onClick = onExportSelected,
-			)
-		}
-	}
-}
-
-@Composable
-private fun SeedKeySelectViewItem(
-	model: KeysModel,
-	isSelected: Boolean = false,
-	onClick: (Boolean, String) -> Unit,
-) {
-	Surface(modifier = Modifier.clickable {
-		onClick(
-			!isSelected,
-			model.seedName
-		)
-	}) { //todo dmitry addressKey?
-		Row(
-			modifier = Modifier
-				.padding(top = 16.dp, bottom = 16.dp, start = 24.dp)
-				.clickable(onClick = onClick),
-			verticalAlignment = Alignment.CenterVertically,
-		) {
-			Column(Modifier.weight(1f)) {
-				Text(
-					text = model.seedName,
-					color = MaterialTheme.colors.primary,
-					style = TypefaceNew.TitleL,
-				)
-				Text(
-					text = model.base58.abbreviateString(8),
-					color = MaterialTheme.colors.textTertiary,
-					style = TypefaceNew.BodyM,
-				)
-			}
-			Checkbox(
-				checked = isSelected,
-				onCheckedChange = { c -> onClick(c, model.seedName) },
-				colors = SignerCheckboxColors(),
 			)
 		}
 	}
