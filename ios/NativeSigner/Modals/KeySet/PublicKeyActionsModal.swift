@@ -76,6 +76,7 @@ struct PublicKeyActionsModal: View {
                 }
                 .padding([.leading, .trailing], Spacing.large)
                 .padding(.top, -Spacing.extraSmall)
+                .padding(.bottom, Spacing.medium)
             }
         )
     }

@@ -10,6 +10,7 @@ import SwiftUI
 struct KeySetList: View {
     @ObservedObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject var appState: AppState
     @State private var isShowingNewSeedMenu = false
     @State private var isShowingMoreMenu = false
     @State private var isExportKeysSelected = false
@@ -97,14 +98,13 @@ struct KeySetList: View {
             .clearModalBackground()
         }
         .fullScreenCover(
-            isPresented: $viewModel.isShowingKeysExportModal,
-            onDismiss: {}
+            isPresented: $viewModel.isShowingKeysExportModal
         ) {
             ExportMultipleKeysModal(
                 viewModel: .init(
                     viewModel: ExportMultipleKeysModalViewModel(
-                        selectedItems: selectedItems,
-                        seeds: selectedItems.map(\.seed)
+                        selectedItems: .keySets(selectedItems),
+                        seedNames: selectedItems.map(\.seed.seedName)
                     ),
                     isPresented: $viewModel.isShowingKeysExportModal
                 )
@@ -131,7 +131,16 @@ struct KeySetList: View {
                     selectedItems.append(viewModel)
                 }
             } else {
-                navigation.perform(navigation: .init(action: .selectSeed, details: viewModel.keyName))
+                self.viewModel.loadKeysInformation(for: viewModel.keyName) { result in
+                    switch result {
+                    case let .success(keysData):
+                        appState.userData.keysData = keysData
+                        navigation.perform(navigation: .init(action: .selectSeed, details: viewModel.keyName))
+                    case .failure:
+                        ()
+                    }
+                }
+                navigation.performFake(navigation: .init(action: .selectSeed, details: viewModel.keyName))
             }
         }
         .listRowBackground(Asset.backgroundSystem.swiftUIColor)
@@ -179,13 +188,23 @@ struct KeySetList: View {
 extension KeySetList {
     final class ViewModel: ObservableObject {
         let listViewModel: KeySetListViewModel
+        let keyDetailsService: KeyDetailsService
 
         @Published var isShowingKeysExportModal = false
 
         init(
-            listViewModel: KeySetListViewModel
+            listViewModel: KeySetListViewModel,
+            keyDetailsService: KeyDetailsService = KeyDetailsService()
         ) {
             self.listViewModel = listViewModel
+            self.keyDetailsService = keyDetailsService
+        }
+
+        func loadKeysInformation(
+            for seedName: String,
+            _ completion: @escaping (Result<MKeysNew, ServiceError>) -> Void
+        ) {
+            keyDetailsService.getKeys(for: seedName, completion)
         }
     }
 }

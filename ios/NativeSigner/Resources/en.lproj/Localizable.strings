@@ -282,7 +282,7 @@
 "KeySets.More.Action.Export" = "Export Key Sets";
 "KeySets.More.Action.ExportAll" = "Export All";
 "KeySets.More.Action.ExportSelected" = "Export Selected";
-"KeySetsModal.Action.Select" = "Select Keys";
+"KeySetsModal.Action.Export" = "Export Keys";
 "KeySetsModal.Action.Derive" = "Derive from Key";
 "KeySetsModal.Action.Backup" = "Backup Key Set";
 "KeySetsModal.Action.Delete" = "Delete";
@@ -300,6 +300,12 @@
 
 "KeyDetails.Label.Derived" = "Derived keys";
 "KeyDetails.Action.Create" = "Create Derived key";
+"KeyDetails.Overlay.Label.Title" = "%@ %@ selected";
+"KeyDetails.Overlay.Label.Key.Single" = "key";
+"KeyDetails.Overlay.Label.Key.Plural" = "keys";
+"KeyDetails.Overlay.Action.Delete" = "Delete";
+"KeyDetails.Overlay.Action.SelectAll" = "Select All";
+"KeyDetails.Overlay.Action.Export" = "Export";
 
 "PublicKeyDetails.Label.Title" = "Public Key";
 "PublicKeyDetails.Label.Subtitle" = "Derived Key";
