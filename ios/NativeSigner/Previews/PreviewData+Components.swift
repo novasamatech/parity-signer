@@ -42,8 +42,7 @@ extension PreviewData {
     ) -> KeyDetailsPublicKeyViewModel {
         KeyDetailsPublicKeyViewModel(
             qrCode: qrCodeContainerViewModel,
-            addressFooter: isRootKey ? nil : qrCodeAddressFooterViewModel,
-            rootFooter: isRootKey ? qrCodeRootFooterViewModel : nil,
+            footer: isRootKey ? .root(qrCodeRootFooterViewModel) : .address(qrCodeAddressFooterViewModel),
             isKeyExposed: isKeyExposed,
             isRootKey: isRootKey
         )
@@ -99,7 +98,7 @@ extension PreviewData {
 
 extension PreviewData {
     static let exampleExportMultipleKeysModal = ExportMultipleKeysModalViewModel(
-        selectedItems: KeySetListViewModelBuilder().build(for: PreviewData.mseeds).list,
-        seeds: mseeds.seedNameCards
+        selectedItems: .keySets(KeySetListViewModelBuilder().build(for: PreviewData.mseeds).list),
+        seedNames: mseeds.seedNameCards.map(\.seedName)
     )
 }

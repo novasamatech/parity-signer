@@ -1,5 +1,6 @@
 use image::{GenericImageView, GrayImage, ImageBuffer, Pixel};
 use lazy_static::lazy_static;
+use parity_scale_codec::Encode;
 use regex::Regex;
 use sp_core::{blake2_256, sr25519, Pair, H256};
 use sp_runtime::MultiSigner;
@@ -32,7 +33,7 @@ use definitions::{
     keyring::NetworkSpecsKey,
     navigation::{
         ActionResult, Address, AlertData, Card, DerivationCheck, DerivationDestination,
-        DerivationEntry, DerivationPack, FooterButton, History, MBackup, MDeriveKey,
+        DerivationEntry, DerivationPack, ExportedSet, FooterButton, History, MBackup, MDeriveKey,
         MEnterPassword, MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog,
         MLogDetails, MLogRight, MMMNetwork, MMNetwork, MManageMetadata, MManageNetworks,
         MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup,
@@ -40,8 +41,8 @@ use definitions::{
         MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion,
         MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
         MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData,
-        Network, NetworkSpecs, RightButton, ScreenData, ScreenNameType, SeedNameCard,
-        TransactionCard, TransactionCardSet, TransactionType,
+        Network, NetworkSpecs, PathAndNetwork, RightButton, ScreenData, ScreenNameType,
+        SeedNameCard, TransactionCard, TransactionCardSet, TransactionType,
     },
     network_specs::{OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -322,7 +323,8 @@ fn export_import_addrs() {
     )
     .unwrap();
 
-    let addrs = export_all_addrs(&dbname_from, None).unwrap();
+    let selected = HashMap::from([("Alice".to_owned(), ExportedSet::All)]);
+    let addrs = export_all_addrs(&dbname_from, selected.clone()).unwrap();
 
     let addrs_expected = ExportAddrs::V1(ExportAddrsV1 {
         addrs: vec![SeedInfo {
@@ -378,12 +380,52 @@ fn export_import_addrs() {
 
     assert_eq!(addrs, addrs_expected);
 
+    let mut selected_hashmap = HashMap::new();
+    let polkadot_genesis =
+        H256::from_str("0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3")
+            .unwrap();
+
+    let network_specs_key = NetworkSpecsKey::from_parts(&polkadot_genesis, &Encryption::Sr25519);
+
+    selected_hashmap.insert(
+        "Alice".to_owned(),
+        ExportedSet::Selected {
+            s: vec![PathAndNetwork {
+                derivation: "//polkadot".to_owned(),
+                network_specs_key: hex::encode(network_specs_key.encode()),
+            }],
+        },
+    );
+    let addrs_filtered = export_all_addrs(dbname_from, selected_hashmap).unwrap();
+
+    let addrs_expected_filtered = ExportAddrs::V1(ExportAddrsV1 {
+        addrs: vec![SeedInfo {
+            name: "Alice".to_owned(),
+            multisigner: Some(
+                sr25519::Pair::from_phrase(ALICE_SEED_PHRASE, None)
+                    .unwrap()
+                    .0
+                    .public()
+                    .into(),
+            ),
+            derived_keys: vec![AddrInfo {
+                address: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_owned(),
+                derivation_path: Some("//polkadot".to_owned()),
+                encryption: Encryption::Sr25519,
+
+                genesis_hash: polkadot_genesis,
+            }],
+        }],
+    });
+
+    assert_eq!(addrs_filtered, addrs_expected_filtered);
+
     let mut alice_hash_map = HashMap::new();
     alice_hash_map.insert("Alice".to_owned(), ALICE_SEED_PHRASE.to_owned());
 
     import_all_addrs(dbname_to, alice_hash_map, addrs).unwrap();
 
-    let addrs_new = export_all_addrs(&dbname_to, None).unwrap();
+    let addrs_new = export_all_addrs(&dbname_to, selected).unwrap();
 
     assert_eq!(addrs_new, addrs_expected);
 }

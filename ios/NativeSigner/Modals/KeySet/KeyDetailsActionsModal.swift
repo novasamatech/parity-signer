@@ -12,6 +12,7 @@ struct KeyDetailsActionsModal: View {
     @Binding var isShowingActionSheet: Bool
     @Binding var shouldPresentRemoveConfirmationModal: Bool
     @Binding var shouldPresentBackupModal: Bool
+    @Binding var shouldPresentSelectionOverlay: Bool
     @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
@@ -20,15 +21,13 @@ struct KeyDetailsActionsModal: View {
             animateBackground: $animateBackground,
             content: {
                 VStack(alignment: .leading, spacing: 0) {
+                    // Export Keys
                     ActionSheetButton(
-                        action: {
-                            animateDismissal {
-                                navigation.perform(navigation: .init(action: .newSeed))
-                            }
-                        },
+                        action: { animateDismissal { shouldPresentSelectionOverlay.toggle() } },
                         icon: Asset.selectUnselected.swiftUIImage,
-                        text: Localizable.KeySetsModal.Action.select.key
+                        text: Localizable.KeySetsModal.Action.export.key
                     )
+                    // Derive Keys
                     ActionSheetButton(
                         action: {
                             animateDismissal {
@@ -62,6 +61,7 @@ struct KeyDetailsActionsModal: View {
                 }
                 .padding([.leading, .trailing], Spacing.large)
                 .padding(.top, -Spacing.extraSmall)
+                .padding(.bottom, Spacing.medium)
             }
         )
         .onAppear {
