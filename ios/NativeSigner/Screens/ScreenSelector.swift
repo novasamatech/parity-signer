@@ -32,21 +32,15 @@ struct ScreenSelector: View {
                 navigationRequest: navigationRequest
             )
         case let .keys(value):
-            if let keysData = appState.userData.keysData {
-                KeyDetailsView(
-                    viewModel: .init(
-                        dataModel: KeyDetailsDataModel(value),
-                        keysData: keysData,
-                        exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value)
-                    ),
-                    forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
-                    resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
-                )
-            } else {
-                // Can't happen, but we need to unwrap safely
-                EmptyView()
-            }
-
+            KeyDetailsView(
+                viewModel: .init(
+                    dataModel: KeyDetailsDataModel(value),
+                    keysData: appState.userData.keysData,
+                    exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value)
+                ),
+                forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
+                resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
+            )
         case let .settings(value):
             SettingsScreen(
                 content: value,
