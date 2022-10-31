@@ -24,10 +24,13 @@ class UniffiInteractor(private val dbName: String) {
 		}
 	}
 
-	suspend fun exportKeyInfo(keysToExport: List<String>): UniffiResult<MKeysInfoExport> =
+	suspend fun exportKeyInfoAll(seedsToExport: List<String>): UniffiResult<MKeysInfoExport> =
 		withContext(Dispatchers.IO) {
 			try {
-				val keyInfo = exportKeyInfo(dbName, keysToExport)
+				val keyInfo = exportKeyInfo(
+					dbname = dbName,
+					selectedNames = seedsToExport.associateWith { ExportedSet.All },
+				)
 				UniffiResult.Success(keyInfo)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
