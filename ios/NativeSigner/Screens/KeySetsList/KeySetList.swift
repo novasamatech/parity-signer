@@ -140,7 +140,6 @@ struct KeySetList: View {
                         ()
                     }
                 }
-                navigation.performFake(navigation: .init(action: .selectSeed, details: viewModel.keyName))
             }
         }
         .listRowBackground(Asset.backgroundSystem.swiftUIColor)
