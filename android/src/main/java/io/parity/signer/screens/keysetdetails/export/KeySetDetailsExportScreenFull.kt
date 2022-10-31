@@ -33,7 +33,7 @@ fun KeySetDetailsExportScreenFull(
 		bottomSheetState = modalBottomSheetState,
 		bottomSheetContent = {
 			KeySetDetailsExportResultBottomSheet(
-				seeds = selected.value,
+				selectedKeys = selected.value,
 				model = model,
 				onClose = { scope.launch { modalBottomSheetState.hide() }},
 			)

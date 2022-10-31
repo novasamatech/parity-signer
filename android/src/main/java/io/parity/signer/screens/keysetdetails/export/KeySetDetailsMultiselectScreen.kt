@@ -120,7 +120,7 @@ private fun SeedKeySelectViewItem(
 	Surface(modifier = Modifier.clickable {
 		onClick(
 			!isSelected,
-			model.addressKey
+			model.seedName
 		)
 	}) { //todo dmitry addressKey?
 		Row(
@@ -143,7 +143,7 @@ private fun SeedKeySelectViewItem(
 			}
 			Checkbox(
 				checked = isSelected,
-				onCheckedChange = { c -> onClick(c, model.addressKey) },
+				onCheckedChange = { c -> onClick(c, model.seedName) },
 				colors = SignerCheckboxColors(),
 			)
 		}

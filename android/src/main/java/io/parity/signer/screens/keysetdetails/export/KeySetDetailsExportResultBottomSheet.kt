@@ -31,7 +31,7 @@ import io.parity.signer.ui.theme.*
 @Composable
 fun KeySetDetailsExportResultBottomSheet(
 	model: KeySetDetailsModel,
-	seeds: Set<String>,
+	selectedKeys: Set<String>,
 	onClose: Callback,
 ) {
 	//todo dmitry migrate to keys and reuse qr code logic
@@ -39,8 +39,8 @@ fun KeySetDetailsExportResultBottomSheet(
 		BottomSheetHeader(
 			header = pluralStringResource(
 				id = R.plurals.key_export_title,
-				count = seeds.size,
-				seeds.size,
+				count = selectedKeys.size,
+				selectedKeys.size,
 			),
 			onCloseClicked = onClose
 		)
@@ -56,6 +56,7 @@ fun KeySetDetailsExportResultBottomSheet(
 				.background(MaterialTheme.colors.fill6, plateShape)
 		) {
 
+//			todo dmitry make it generic
 //			AnimatedQrSeedInfo(seeds, Modifier.padding(8.dp))
 
 			val innerRounding =
@@ -94,10 +95,20 @@ fun KeySetDetailsExportResultBottomSheet(
 						.padding(start = 18.dp, end = 18.dp)
 				)
 			}
-			val seedList = seeds.toList()
+			if (selectedKeys.contains(model.root.addressKey)) {
+				//todo dmitry add root key view
+				if (selectedKeys.size > 1) {
+					Divider(
+						color = MaterialTheme.colors.appliedSeparator,
+						thickness = 1.dp,
+						startIndent = 16.dp,
+					)
+				}
+			}
+			val seedList = selectedKeys.toList()
 			for (i in 0..seedList.lastIndex) {
 				val seed = seedList[i]
-				KeySetItemInExport(seed)
+//				KeySetItemInExport(seed) todo dmitry key item
 				if (i != seedList.lastIndex) {
 					Divider(
 						color = MaterialTheme.colors.appliedSeparator,
@@ -147,21 +158,11 @@ private fun KeySetItemInExport(seed: KeySetModel) {
 )
 @Composable
 private fun PreviewKeySetDetailsExportResultBottomSheet() {
-	val keys = mutableSetOf(
-		KeySetModel(
-			"first seed name",
-			PreviewData.exampleIdenticon,
-			1.toUInt()
-		),
-		KeySetModel(
-			"second seed name",
-			PreviewData.exampleIdenticon,
-			3.toUInt()
-		),
-	)
+val model = KeySetDetailsModel.createStub()
+	val selected = setOf(model.keys[2].addressKey)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			KeySetDetailsExportResultBottomSheet(keys, {})
+			KeySetDetailsExportResultBottomSheet(model, selected, {})
 		}
 	}
 }
