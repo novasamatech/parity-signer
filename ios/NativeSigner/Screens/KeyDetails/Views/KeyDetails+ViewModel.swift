@@ -12,7 +12,10 @@ extension KeyDetailsView {
         let dataModel: KeyDetailsDataModel
         let keyDetailsService: KeyDetailsService
         let exportPrivateKeyService: PrivateKeyQRCodeService
-        var keysData: MKeysNew
+
+        /// `MKwysNew` will currently be `nil` when navigating through given navigation path:
+        /// `.newSeed` -> `.keys`, data will be filled on `onAppear`, so this can remain optional
+        var keysData: MKeysNew?
         private weak var appState: AppState!
         @Published var shouldPresentRemoveConfirmationModal = false
         @Published var shouldPresentBackupModal = false
@@ -27,7 +30,7 @@ extension KeyDetailsView {
 
         init(
             dataModel: KeyDetailsDataModel,
-            keysData: MKeysNew,
+            keysData: MKeysNew?,
             exportPrivateKeyService: PrivateKeyQRCodeService,
             keyDetailsService: KeyDetailsService = KeyDetailsService()
         ) {
@@ -44,7 +47,10 @@ extension KeyDetailsView {
         func keyExportModel() -> ExportMultipleKeysModalViewModel {
             let derivedKeys: [DerivedKeyExportModel] = dataModel.derivedKeys
                 .filter { selectedSeeds.contains($0.viewModel.path) }
-                .map { DerivedKeyExportModel(viewModel: $0.viewModel, keyData: keyData(for: $0.viewModel.path)) }
+                .compactMap {
+                    guard let keyData = keyData(for: $0.viewModel.path) else { return nil }
+                    return DerivedKeyExportModel(viewModel: $0.viewModel, keyData: keyData)
+                }
             return ExportMultipleKeysModalViewModel(
                 selectedItems: .keys(
                     key: dataModel.keySummary,
@@ -88,7 +94,7 @@ extension KeyDetailsView {
 }
 
 private extension KeyDetailsView.ViewModel {
-    func keyData(for path: String) -> MKeyAndNetworkCard! {
-        keysData.set.first(where: { $0.key.address.path == path })
+    func keyData(for path: String) -> MKeyAndNetworkCard? {
+        keysData?.set.first(where: { $0.key.address.path == path })
     }
 }
