@@ -27,6 +27,36 @@ extension PreviewData {
         multiselectMode: false,
         multiselectCount: ""
     )
+
+    static let mKeyAndNetworkCard = MKeyAndNetworkCard(key: .init(
+        address: .init(
+            path: "",
+            hasPwd: false,
+            identicon: [],
+            seedName: "",
+            secretExposed: false
+        ),
+        addressKey: "",
+        base58: "",
+        swiped: false,
+        multiselect: false
+    ), network: .init(networkTitle: "", networkLogo: "", networkSpecsKey: ""))
+
+    static let mKeyNew = MKeysNew(
+        root: MAddressCard(
+            base58: "",
+            address: .init(
+                path: "",
+                hasPwd: false,
+                identicon: PreviewData.exampleIdenticon,
+                seedName: "",
+                secretExposed: false
+            ),
+            multiselect: false
+        ),
+        set: []
+    )
+
     static let mkeyDetails = MKeyDetails(
         qr: [],
         pubkey: "",

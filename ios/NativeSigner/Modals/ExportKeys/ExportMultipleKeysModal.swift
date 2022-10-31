@@ -15,11 +15,11 @@ extension QRCodeRootFooterViewModel {
 }
 
 extension QRCodeAddressFooterViewModel {
-    init(_ derivedKey: DerivedKeyRowModel) {
+    init(_ derivedKey: DerivedKeyExportModel) {
         identicon = derivedKey.viewModel.identicon
         rootKeyName = derivedKey.viewModel.rootKeyName
         path = derivedKey.viewModel.path
-        network = ""
+        network = derivedKey.keyData.network.networkTitle
         base58 = derivedKey.viewModel.base58
     }
 }
@@ -27,7 +27,7 @@ extension QRCodeAddressFooterViewModel {
 struct ExportMultipleKeysModalViewModel: Equatable {
     enum SelectedItems: Equatable {
         case keySets([KeySetViewModel])
-        case keys(key: KeySummaryViewModel?, derivedKeys: [DerivedKeyRowModel])
+        case keys(key: KeySummaryViewModel, derivedKeys: [DerivedKeyExportModel])
     }
 
     let selectedItems: SelectedItems
@@ -91,8 +91,8 @@ struct ExportMultipleKeysModal: View {
                     )
                     .padding([.leading, .trailing], Spacing.medium)
                 }
+                .padding(.bottom, Spacing.medium)
             }
-            .padding(.bottom, Spacing.medium)
         }
         .onAppear {
             viewModel.prepareKeysExport()
@@ -108,12 +108,8 @@ struct ExportMultipleKeysModal: View {
                     id: \.keyName
                 ) { keyItem($0, isLast: $0 == keySets.last) }
             case let .keys(key, derivedKeys):
-                if let key = key {
-                    QRCodeRootFooterView(viewModel: .init(key))
-                }
-                if key != nil, !derivedKeys.isEmpty {
-                    Divider()
-                }
+                QRCodeRootFooterView(viewModel: .init(key))
+                Divider()
                 ForEach(
                     derivedKeys.sorted(by: { $0.viewModel.path < $1.viewModel.path }),
                     id: \.viewModel.path

@@ -10,6 +10,8 @@ import SwiftUI
 struct ScreenSelector: View {
     @EnvironmentObject private var data: SignerDataModel
     @EnvironmentObject var navigation: NavigationCoordinator
+    @EnvironmentObject var appState: AppState
+
     let screenData: ScreenData
     let navigationRequest: NavigationRequest
     let getSeed: (String) -> String
@@ -30,13 +32,21 @@ struct ScreenSelector: View {
                 navigationRequest: navigationRequest
             )
         case let .keys(value):
-            KeyDetailsView(
-                forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
-                viewModel: KeyDetailsViewModel(value),
-                actionModel: KeyDetailsActionModel(value, alert: data.alert, alertShow: alertShow),
-                exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value),
-                resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
-            )
+            if let keysData = appState.userData.keysData {
+                KeyDetailsView(
+                    viewModel: .init(
+                        dataModel: KeyDetailsDataModel(value),
+                        keysData: keysData,
+                        exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value)
+                    ),
+                    forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
+                    resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
+                )
+            } else {
+                // Can't happen, but we need to unwrap safely
+                EmptyView()
+            }
+
         case let .settings(value):
             SettingsScreen(
                 content: value,

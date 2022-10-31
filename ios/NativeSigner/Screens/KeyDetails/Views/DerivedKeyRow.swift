@@ -13,7 +13,7 @@ struct DerivedKeyRow: View {
     @Binding var isPresentingSelectionOverlay: Bool
 
     private var isItemSelected: Bool {
-        selectedSeeds.contains(viewModel.seedName)
+        selectedSeeds.contains(viewModel.path)
     }
 
     var body: some View {
@@ -37,7 +37,12 @@ struct DerivedKeyRow: View {
             Spacer()
             VStack(alignment: .center) {
                 if isPresentingSelectionOverlay {
-                    isItemSelected ? Asset.checkmarkChecked.swiftUIImage : Asset.checkmarkUnchecked.swiftUIImage
+                    if isItemSelected {
+                        Asset.checkmarkChecked.swiftUIImage
+                    } else {
+                        Asset.checkmarkUnchecked.swiftUIImage
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    }
                 } else {
                     Asset.chevronRight.swiftUIImage
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
@@ -70,7 +75,6 @@ struct DerivedKeyRow_Previews: PreviewProvider {
                     path: "// polkadot",
                     hasPassword: false,
                     base58: "15Gsc678654FDSG0HA04H0A",
-                    seedName: "name",
                     rootKeyName: ""
                 ),
                 selectedSeeds: Binding<[String]>.constant(["name"]),
@@ -81,8 +85,7 @@ struct DerivedKeyRow_Previews: PreviewProvider {
                     identicon: PreviewData.exampleIdenticon,
                     path: "// astar",
                     hasPassword: false,
-                    base58: "15Gsc678654FDSG0HA04H0A",
-                    seedName: "name"
+                    base58: "15Gsc678654FDSG0HA04H0A"
                 ),
                 selectedSeeds: Binding<[String]>.constant([]),
                 isPresentingSelectionOverlay: Binding<Bool>.constant(true)
@@ -92,8 +95,7 @@ struct DerivedKeyRow_Previews: PreviewProvider {
                     identicon: PreviewData.exampleIdenticon,
                     path: "// kusama",
                     hasPassword: true,
-                    base58: "15Gsc678654FDSG0HA04H0A",
-                    seedName: "name"
+                    base58: "15Gsc678654FDSG0HA04H0A"
                 ),
                 selectedSeeds: Binding<[String]>.constant([]),
                 isPresentingSelectionOverlay: Binding<Bool>.constant(false)
@@ -103,8 +105,7 @@ struct DerivedKeyRow_Previews: PreviewProvider {
                     identicon: PreviewData.exampleIdenticon,
                     path: "// kusama // verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
                     hasPassword: true,
-                    base58: "15Gsc678654FDSG0HA04H0A",
-                    seedName: "name"
+                    base58: "15Gsc678654FDSG0HA04H0A"
                 ),
                 selectedSeeds: Binding<[String]>.constant([]),
                 isPresentingSelectionOverlay: Binding<Bool>.constant(false)

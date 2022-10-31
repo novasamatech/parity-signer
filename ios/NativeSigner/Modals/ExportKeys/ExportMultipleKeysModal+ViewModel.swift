@@ -29,8 +29,18 @@ extension ExportMultipleKeysModal {
         }
 
         func prepareKeysExport() {
-            keysExportService.exportMultipleKeys(items: viewModel.seedNames) { result in
+            let completion: (Result<AnimatedQRCodeViewModel, ServiceError>) -> Void = { result in
                 self.qrCode = (try? result.get()) ?? .init(qrCodes: [])
+            }
+            switch viewModel.selectedItems {
+            case .keySets:
+                keysExportService.exportMultipleKeySets(seedNames: viewModel.seedNames, completion)
+            case let .keys(key, derivedKeys):
+                keysExportService.exportRootWithDerivedKeys(
+                    seedName: key.keyName,
+                    keys: derivedKeys.map(\.keyData),
+                    completion
+                )
             }
         }
     }
