@@ -6,7 +6,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.models.*
-import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectScreen
 import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenFull
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportScreenFull
 
@@ -35,11 +34,11 @@ fun KeySetDetailsNavSubgraph(
 			)
 		}
 		composable(KeySetDetailsNavSubgraph.multiselect) {
-				KeySetDetailsExportScreenFull(
-					model = model,
-					onClose = {}, //todo dmitry
-				)
-			}
+			KeySetDetailsExportScreenFull(
+				model = model,
+				onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
+			)
+		}
 	}
 }
 

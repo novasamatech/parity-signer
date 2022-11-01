@@ -95,16 +95,12 @@ fun KeySetDetailsExportResultBottomSheet(
 						.padding(start = 18.dp, end = 18.dp)
 				)
 			}
-			if (selectedKeys.contains(model.root.addressKey)) {
 				//todo dmitry add root key view
-				if (selectedKeys.size > 1) {
 					Divider(
 						color = MaterialTheme.colors.appliedSeparator,
 						thickness = 1.dp,
 						startIndent = 16.dp,
 					)
-				}
-			}
 			val seedList = selectedKeys.toList()
 			for (i in 0..seedList.lastIndex) {
 				val seed = seedList[i]

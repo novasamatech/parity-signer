@@ -52,7 +52,7 @@ fun KeySetDetailsExportScreenFull(
 				},
 				onExportAll = {
 					scope.launch {
-						selected.value = //todo dmitry compare with ios
+						selected.value =
 							model.keys.map { it.addressKey }.toSet() + model.root.addressKey
 						modalBottomSheetState.animateTo(
 							ModalBottomSheetValue.Expanded

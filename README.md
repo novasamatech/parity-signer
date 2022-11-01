@@ -1,4 +1,4 @@
-<div align="center">
+0<div align="center">
 
 ![Logo Black](docs/src/res/logo-black.svg#gh-light-mode-only)
 ![Logo White](docs/src/res/logo-white.svg#gh-dark-mode-only)

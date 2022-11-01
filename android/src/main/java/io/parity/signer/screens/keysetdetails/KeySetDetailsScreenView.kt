@@ -119,7 +119,9 @@ fun SeedKeyViewItem(
 ) {
 	Row(
 		modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 24.dp)
-			.apply { if (onClick != null) clickable(onClick = onClick) }, //todo dmitry test
+			.conditional(onClick != null) {
+				clickable(onClick = onClick!!)
+			},
 		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Column(Modifier.weight(1f)) {

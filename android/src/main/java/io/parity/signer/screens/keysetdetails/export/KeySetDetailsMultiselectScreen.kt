@@ -99,7 +99,7 @@ fun KeySetDetailsMultiselectScreen(
 			Spacer(modifier = Modifier.weight(1f))
 			ClickableLabel(
 				stringId = R.string.key_set_export_selected_label,
-				isEnabled = true, //selected.value.isNotEmpty(),
+				isEnabled = selected.value.isNotEmpty(),
 				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
 				onClick = onExportSelected,
 			)
