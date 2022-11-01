@@ -39,14 +39,16 @@ class UniffiInteractor(private val dbName: String) {
 
 	suspend fun exportSeedWithKeys(
 		seed: String,
-		derivationsAndNetworkSpecs: List<Pair<String,String>>
+		derivedKeyAddr: List<String>
 	): UniffiResult<MKeysInfoExport> =
 		withContext(Dispatchers.IO) {
 			try {
+				val keys = keysBySeedName(dbName, seed)
 				val keyInfo = exportKeyInfo(
 					dbname = dbName,
 					selectedNames = mapOf(seed to ExportedSet.Selected(
-						s = derivationsAndNetworkSpecs.map { PathAndNetwork(it.first, it.second) }
+						s = derivedKeyAddr.map { keyAddr -> PathAndNetwork(keyAddr,
+							keys.set.find { it.key.addressKey == keyAddr }!!.network.networkSpecsKey) }
 					)),
 				)
 				UniffiResult.Success(keyInfo)

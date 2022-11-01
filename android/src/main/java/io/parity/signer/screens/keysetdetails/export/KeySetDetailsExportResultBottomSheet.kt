@@ -68,7 +68,7 @@ fun KeySetDetailsExportResultBottomSheet(
 				)
 			} else {
 				AnimatedQrKeysInfo(
-					input = KeySetDetailsExportService.GetQrCodesListRequest(model.root.seedName, model.network,
+					input = KeySetDetailsExportService.GetQrCodesListRequest(model.root.seedName,
 					model.keys.filter { selectedKeys.contains(it.addressKey) }),
 					provider = KeySetDetailsExportService(),
 					modifier = Modifier.padding(8.dp)

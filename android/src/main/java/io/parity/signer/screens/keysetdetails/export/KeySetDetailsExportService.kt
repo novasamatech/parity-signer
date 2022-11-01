@@ -8,21 +8,22 @@ import io.parity.signer.models.KeyModel
 import io.parity.signer.models.NetworkModel
 
 
-class KeySetDetailsExportService() :
+class KeySetDetailsExportService :
 	AnimatedQrKeysProvider<KeySetDetailsExportService.GetQrCodesListRequest> {
 	private val uniffiInteractor: UniffiInteractor =
 		ServiceLocator.backendLocator.uniffiInteractor
+
 	override suspend fun getQrCodesList(input: GetQrCodesListRequest): List<List<UByte>>? {
-		return uniffiInteractor.exportSeedWithKeys(input.seedName,
-			input.keys.map { key -> key.addressKey to input.networkModel.title }) //todo dmitry network title is wrong
-				.mapError()
+		return uniffiInteractor.exportSeedWithKeys(
+			input.seedName,
+			input.keys.map { key -> key.addressKey })
+			.mapError()
 			?.let { keyInfo -> uniffiInteractor.encodeToQrImages(keyInfo.frames) }
 			?.mapError()
 	}
 
 	data class GetQrCodesListRequest(
 		val seedName: String,
-		val networkModel: NetworkModel,
 		val keys: List<KeyModel>,
 	)
 }
