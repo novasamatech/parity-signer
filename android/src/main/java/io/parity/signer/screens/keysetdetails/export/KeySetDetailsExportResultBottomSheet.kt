@@ -155,7 +155,7 @@ private fun KeySetItemInExport(seed: KeySetModel) {
 @Composable
 private fun PreviewKeySetDetailsExportResultBottomSheet() {
 val model = KeySetDetailsModel.createStub()
-	val selected = setOf(model.keys[2].addressKey)
+	val selected = setOf(model.keys[0].addressKey)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
 			KeySetDetailsExportResultBottomSheet(model, selected, {})

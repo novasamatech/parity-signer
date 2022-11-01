@@ -25,7 +25,10 @@ import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
 import io.parity.signer.models.KeysModel
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.textDisabled
+import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun KeyDerivedItem(
