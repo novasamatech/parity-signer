@@ -11,8 +11,8 @@ object NavigationMigrations {
 										globalNavAction: ActionResult?): Boolean {
 
 		return when (globalNavAction?.screenData) {
-			is ScreenData.SeedSelector -> false;
-			is ScreenData.Keys -> FeatureFlags.isDisabled(FeatureOption.NEW_KEY_SET_DETAILS)
+			is ScreenData.SeedSelector -> false
+			is ScreenData.Keys -> false
 			else ->  true
 		}
 	}

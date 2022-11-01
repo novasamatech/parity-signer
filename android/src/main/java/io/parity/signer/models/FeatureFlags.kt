@@ -3,8 +3,7 @@ package io.parity.signer.models
 object FeatureFlags {
 	fun isEnabled(feature: FeatureOption): Boolean {
 		return when (feature) {
-//			FeatureOption.EXPORT_SECRET_KEY -> true
-			FeatureOption.NEW_KEY_SET_DETAILS -> true
+			FeatureOption.EXPORT_SECRET_KEY -> true
 		}
 	}
 
@@ -13,5 +12,5 @@ object FeatureFlags {
 
 
 enum class FeatureOption {
-//	EXPORT_SECRET_KEY,
-	NEW_KEY_SET_DETAILS, }
+	EXPORT_SECRET_KEY,
+}
