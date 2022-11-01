@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets.export
+package io.parity.signer.components.qrcode
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,21 +16,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.dependencyGraph.ServiceLocator
-import io.parity.signer.models.KeySetModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(ExperimentalUnsignedTypes::class)
 @Composable
-fun AnimatedQrSeedInfo(
-	seeds: Set<KeySetModel>,
+fun <T> AnimatedQrKeysInfo(
+	input: T,
+	provider: AnimatedQrKeysProvider<T>,
 	modifier: Modifier = Modifier
 ) {
 	val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
@@ -49,16 +48,7 @@ fun AnimatedQrSeedInfo(
 			),
 		contentAlignment = Alignment.Center,
 	) {
-		val currentImage = currentCode.value
-		if (LocalInspectionMode.current) {
-			Image(
-				bitmap =
-				PreviewData.exampleQRCode.intoImageBitmap(),
-				contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
-				contentScale = ContentScale.Fit,
-				modifier = Modifier.size(264.dp)
-			)
-		} else if (currentImage != null) {
+		currentCode.value?.let { currentImage ->
 			Image(
 				bitmap = currentImage,
 				contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
@@ -68,10 +58,8 @@ fun AnimatedQrSeedInfo(
 		}
 	}
 
-	LaunchedEffect(key1 = seeds) {
-		val service =
-			KeySetsExportService(ServiceLocator.backendLocator.uniffiInteractor)
-		service.getQrCodesList(seeds.toList())
+	LaunchedEffect(key1 = input) {
+		provider.getQrCodesList(input)
 			?.map { it.intoImageBitmap() }
 			?.let { qrCodes.value = it }
 	}
@@ -88,5 +76,16 @@ fun AnimatedQrSeedInfo(
 			}
 			delay(DELAY)
 		}
+	}
+}
+
+
+interface AnimatedQrKeysProvider<T> {
+	suspend fun getQrCodesList(input: T): List<List<UByte>>?
+}
+
+class EmptyAnimatedQrKeysProvider : AnimatedQrKeysProvider<Any> {
+	override suspend fun getQrCodesList(input: Any): List<List<UByte>>? {
+		return listOf(PreviewData.exampleQRCode)
 	}
 }

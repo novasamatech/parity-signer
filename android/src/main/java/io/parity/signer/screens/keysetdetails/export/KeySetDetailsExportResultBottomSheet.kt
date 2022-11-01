@@ -59,7 +59,7 @@ fun KeySetDetailsExportResultBottomSheet(
 		) {
 
 //			todo dmitry make it generic
-//			AnimatedQrSeedInfo(seeds, Modifier.padding(8.dp))
+//			AnimatedQrKeysInfo(seeds, Modifier.padding(8.dp))
 
 			val innerRounding =
 				dimensionResource(id = R.dimen.innerFramesCornerRadius)
