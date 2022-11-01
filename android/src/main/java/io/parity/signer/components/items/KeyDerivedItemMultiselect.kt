@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
-import io.parity.signer.models.KeysModel
+import io.parity.signer.models.KeyModel
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
@@ -28,7 +28,7 @@ import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun KeyDerivedItemMultiselect(
-	model: KeysModel,
+	model: KeyModel,
 	isSelected: Boolean = false,
 	onClick: (Boolean, String) -> Unit,
 ) {
@@ -95,7 +95,7 @@ fun KeyDerivedItemMultiselect(
 private fun PreviewKeyDerivedItemMultiselect() {
 	SignerNewTheme {
 		KeyDerivedItemMultiselect(
-			model = KeysModel.createStub(),
+			model = KeyModel.createStub(),
 			onClick = {_,_ -> },
 		)
 	}

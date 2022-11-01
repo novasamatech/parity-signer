@@ -70,7 +70,7 @@ fun KeyCard(model: KeyCardModel) {
 
 			Spacer(Modifier.padding(top = 10.dp))
 
-			showBase58Collapsible(model)
+			showBase58Collapsible(model.base58)
 		}
 
 		Spacer(Modifier.weight(1f))
@@ -118,7 +118,23 @@ fun KeyCard(model: KeyCardModel) {
 }
 
 @Composable
-private fun showBase58Collapsible(model: KeyCardModel) {
+fun KeySeedCard(seedTitle: String, base58: String) {
+	Column(
+		Modifier
+			.fillMaxWidth()
+			.padding(16.dp)
+	) {
+		Text(
+			seedTitle,
+			color = MaterialTheme.colors.primary,
+			style = TypefaceNew.LabelS,
+		)
+		showBase58Collapsible(base58)
+	}
+}
+
+@Composable
+private fun showBase58Collapsible(base58: String) {
 	val expanded = remember { mutableStateOf(false) }
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
@@ -126,13 +142,13 @@ private fun showBase58Collapsible(model: KeyCardModel) {
 	) {
 		if (expanded.value) {
 			Text(
-				model.base58,
+				base58,
 				color = MaterialTheme.colors.textTertiary,
 				style = TypefaceNew.BodyM
 			)
 		} else {
 			Text(
-				model.base58.abbreviateString(8),
+				base58.abbreviateString(8),
 				color = MaterialTheme.colors.textTertiary,
 				style = TypefaceNew.BodyM,
 				maxLines = 1,
@@ -151,13 +167,11 @@ private fun showBase58Collapsible(model: KeyCardModel) {
 
 @Preview(
 	name = "day",
-	group = "themes",
 	uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true,
 )
 @Preview(
 	name = "dark theme",
-	group = "themes",
 	uiMode = Configuration.UI_MODE_NIGHT_YES,
 	backgroundColor = 0xFFFFFFFF
 )
@@ -165,5 +179,24 @@ private fun showBase58Collapsible(model: KeyCardModel) {
 private fun PreviewKeyCard() {
 	SignerNewTheme {
 		KeyCard(model = KeyCardModel.createStub())
+	}
+}
+
+@Preview(
+	name = "day",
+	uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true,
+)
+@Preview(
+	name = "dark theme",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	backgroundColor = 0xFFFFFFFF
+)
+@Composable
+private fun PreviewKeySeedCard() {
+	SignerNewTheme {
+		KeySeedCard(seedTitle = "Seed title",
+			base58 = KeyCardModel.createStub().base58,
+		)
 	}
 }

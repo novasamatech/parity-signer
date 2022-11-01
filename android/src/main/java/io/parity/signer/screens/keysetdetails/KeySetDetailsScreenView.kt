@@ -121,7 +121,7 @@ fun KeySetDetailsScreenView(
  */
 @Composable
 fun SeedKeyViewItem(
-	seedKeyModel: KeysModel,
+	seedKeyModel: KeyModel,
 	onClick: Callback?,
 ) {
 	Surface(

@@ -21,10 +21,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
+import io.parity.signer.components.sharedcomponents.KeyCard
+import io.parity.signer.components.sharedcomponents.KeySeedCard
 import io.parity.signer.models.Callback
+import io.parity.signer.models.KeyCardModel
 import io.parity.signer.models.KeySetDetailsModel
 import io.parity.signer.models.KeySetModel
-import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -50,10 +52,10 @@ fun KeySetDetailsExportResultBottomSheet(
 		//scrollable part
 		Column(
 			modifier = Modifier
-				.verticalScroll(rememberScrollState())
-				.weight(weight = 1f, fill = false)
-				.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-				.background(MaterialTheme.colors.fill6, plateShape)
+                .verticalScroll(rememberScrollState())
+                .weight(weight = 1f, fill = false)
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                .background(MaterialTheme.colors.fill6, plateShape)
 		) {
 
 //			todo dmitry make it generic
@@ -70,12 +72,12 @@ fun KeySetDetailsExportResultBottomSheet(
 				)
 			Row(
 				modifier = Modifier
-					.padding(8.dp)
-					.border(
-						BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-						innerShape
-					)
-					.background(MaterialTheme.colors.fill6, innerShape)
+                    .padding(8.dp)
+                    .border(
+                        BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+                        innerShape
+                    )
+                    .background(MaterialTheme.colors.fill6, innerShape)
 
 			) {
 				Text(
@@ -83,28 +85,34 @@ fun KeySetDetailsExportResultBottomSheet(
 					color = MaterialTheme.colors.textTertiary,
 					style = TypefaceNew.CaptionM,
 					modifier = Modifier
-						.weight(1f)
-						.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+                        .weight(1f)
+                        .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
 				)
 				Icon(
 					imageVector = Icons.Outlined.Info,
 					contentDescription = null,
 					tint = MaterialTheme.colors.pink300,
 					modifier = Modifier
-						.align(Alignment.CenterVertically)
-						.padding(start = 18.dp, end = 18.dp)
+                        .align(Alignment.CenterVertically)
+                        .padding(start = 18.dp, end = 18.dp)
 				)
 			}
-				//todo dmitry add root key view
-					Divider(
-						color = MaterialTheme.colors.appliedSeparator,
-						thickness = 1.dp,
-						startIndent = 16.dp,
-					)
+			KeySeedCard(
+				seedTitle = model.root.seedName,
+				base58 = model.root.base58,
+			)
+			Divider(
+				color = MaterialTheme.colors.appliedSeparator,
+				thickness = 1.dp,
+				startIndent = 16.dp,
+			)
 			val seedList = selectedKeys.toList()
 			for (i in 0..seedList.lastIndex) {
 				val seed = seedList[i]
-//				KeySetItemInExport(seed) todo dmitry key item
+				val keyModel = model.keys.first { it.addressKey == seed }
+				KeyCard(
+					KeyCardModel.fromKeyModel(keyModel, model.network.title),
+				)
 				if (i != seedList.lastIndex) {
 					Divider(
 						color = MaterialTheme.colors.appliedSeparator,
@@ -154,8 +162,11 @@ private fun KeySetItemInExport(seed: KeySetModel) {
 )
 @Composable
 private fun PreviewKeySetDetailsExportResultBottomSheet() {
-val model = KeySetDetailsModel.createStub()
-	val selected = setOf(model.keys[0].addressKey)
+	val model = KeySetDetailsModel.createStub()
+	val selected = setOf(
+		model.keys[0].addressKey,
+		model.keys[1].addressKey,
+	)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
 			KeySetDetailsExportResultBottomSheet(model, selected, {})
