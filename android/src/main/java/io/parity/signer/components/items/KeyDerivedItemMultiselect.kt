@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -33,8 +34,8 @@ fun KeyDerivedItemMultiselect(
 ) {
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
-		color = MaterialTheme.colors.backgroundSecondary,
-		modifier = Modifier.clickable { onClick(!isSelected, model.addressKey) },
+		color = Color.Transparent,
+		modifier = Modifier.clickable { onClick(!isSelected, model.addressKey) }
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -74,6 +75,8 @@ fun KeyDerivedItemMultiselect(
 				checked = isSelected,
 				onCheckedChange = { c -> onClick(c, model.addressKey) },
 				colors = SignerCheckboxColors(),
+				modifier = Modifier
+					.padding(end = 8.dp)
 			)
 		}
 	}

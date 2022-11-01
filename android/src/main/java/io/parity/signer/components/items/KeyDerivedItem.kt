@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -33,7 +34,7 @@ fun KeyDerivedItem(
 ) {
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
-		color = MaterialTheme.colors.backgroundSecondary,
+		color = Color.Transparent,
 		modifier = Modifier.clickable(onClick = onClick),
 	) {
 		Row(
