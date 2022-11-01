@@ -3,11 +3,13 @@ package io.parity.signer.screens.keysets.export
 import io.parity.signer.backend.UniffiInteractor
 import io.parity.signer.backend.mapError
 import io.parity.signer.components.qrcode.AnimatedQrKeysProvider
+import io.parity.signer.dependencyGraph.ServiceLocator
 import io.parity.signer.models.KeySetModel
 
 
-class KeySetsExportService(private val uniffiInteractor: UniffiInteractor):
-	AnimatedQrKeysProvider<List<KeySetModel>> {
+class KeySetsExportService : AnimatedQrKeysProvider<List<KeySetModel>> {
+	private val uniffiInteractor: UniffiInteractor =
+		ServiceLocator.backendLocator.uniffiInteractor
 
 	override suspend fun getQrCodesList(input: List<KeySetModel>): List<List<UByte>>? {
 		val keyInfo =

@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -21,6 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
+import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
+import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
 import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.sharedcomponents.KeySeedCard
 import io.parity.signer.models.Callback
@@ -36,7 +39,6 @@ fun KeySetDetailsExportResultBottomSheet(
 	selectedKeys: Set<String>,
 	onClose: Callback,
 ) {
-	//todo dmitry migrate to keys and reuse qr code logic
 	Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
 		BottomSheetHeader(
 			header = pluralStringResource(
@@ -57,9 +59,21 @@ fun KeySetDetailsExportResultBottomSheet(
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                 .background(MaterialTheme.colors.fill6, plateShape)
 		) {
-
 //			todo dmitry make it generic
-//			AnimatedQrKeysInfo(seeds, Modifier.padding(8.dp))
+			if (LocalInspectionMode.current) {
+				AnimatedQrKeysInfo(
+					input = Unit,
+					provider = EmptyAnimatedQrKeysProvider(),
+					modifier = Modifier.padding(8.dp)
+				)
+			} else {
+				AnimatedQrKeysInfo(
+					input = KeySetDetailsExportService.GetQrCodesListRequest(model.root.seedName, model.network,
+					model.keys.filter { selectedKeys.contains(it.addressKey) }),
+					provider = KeySetDetailsExportService(),
+					modifier = Modifier.padding(8.dp)
+				)
+			}
 
 			val innerRounding =
 				dimensionResource(id = R.dimen.innerFramesCornerRadius)

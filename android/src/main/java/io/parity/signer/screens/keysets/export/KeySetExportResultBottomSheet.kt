@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
+import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
 import io.parity.signer.dependencyGraph.ServiceLocator
 import io.parity.signer.models.Callback
 import io.parity.signer.models.KeySetModel
@@ -55,11 +57,19 @@ fun KeySetExportResultBottomSheet(
 				.background(MaterialTheme.colors.fill6, plateShape)
 		) {
 
-			AnimatedQrKeysInfo(
-				seeds.toList(),
-				KeySetsExportService(ServiceLocator.backendLocator.uniffiInteractor),
-				Modifier.padding(8.dp)
-			)
+			if (LocalInspectionMode.current) {
+				AnimatedQrKeysInfo(
+					input = seeds.toList(),
+					provider = EmptyAnimatedQrKeysProvider(),
+					modifier = Modifier.padding(8.dp)
+				)
+			} else {
+				AnimatedQrKeysInfo(
+					input = seeds.toList(),
+					provider = KeySetsExportService(),
+					modifier = Modifier.padding(8.dp)
+				)
+			}
 
 			val innerRounding =
 				dimensionResource(id = R.dimen.innerFramesCornerRadius)

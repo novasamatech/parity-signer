@@ -85,7 +85,7 @@ interface AnimatedQrKeysProvider<T> {
 }
 
 class EmptyAnimatedQrKeysProvider : AnimatedQrKeysProvider<Any> {
-	override suspend fun getQrCodesList(input: Any): List<List<UByte>>? {
+	override suspend fun getQrCodesList(input: Any): List<List<UByte>> {
 		return listOf(PreviewData.exampleQRCode)
 	}
 }
