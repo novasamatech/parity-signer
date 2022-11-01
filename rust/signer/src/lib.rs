@@ -25,7 +25,7 @@
 mod ffi_types;
 
 use crate::ffi_types::*;
-use std::{fmt::Display, str::FromStr};
+use std::{collections::HashMap, fmt::Display, str::FromStr};
 
 /// Container for severe error message
 ///
@@ -225,11 +225,14 @@ fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<
 
 fn export_key_info(
     dbname: &str,
-    selected_names: Option<Vec<String>>,
+    selected_names: HashMap<String, ExportedSet>,
 ) -> anyhow::Result<MKeysInfoExport, String> {
     navigator::export_key_info(dbname, selected_names).map_err(|e| format!("{}", e))
 }
 
+fn keys_by_seed_name(dbname: &str, seed_name: &str) -> anyhow::Result<MKeysNew, String> {
+    navigator::keys_by_seed_name(dbname, seed_name).map_err(|e| format!("{}", e))
+}
 /// Encode binary info into qr code
 fn encode_to_qr(payload: &[u8]) -> anyhow::Result<Vec<u8>, String> {
     use qrcode_static::DataType;

@@ -11,6 +11,7 @@ import SwiftUI
 struct NativeSignerApp: App {
     @StateObject var connectivityMediator = ConnectivityMediator()
     @StateObject var navigation = NavigationCoordinator()
+    @StateObject var appState = AppState()
 
     var body: some Scene {
         WindowGroup {
@@ -22,6 +23,7 @@ struct NativeSignerApp: App {
             .background(Asset.bg100.swiftUIColor)
             .environmentObject(navigation)
             .environmentObject(connectivityMediator)
+            .environmentObject(appState)
         }
     }
 }

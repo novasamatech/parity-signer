@@ -63,11 +63,11 @@ struct KeyDetailsPublicKeyView: View {
                     VStack(spacing: 0) {
                         QRCodeContainerView(viewModel: viewModel.qrCode)
                             .padding(0.5)
-                        if let addressFooter = viewModel.addressFooter {
-                            QRCodeAddressFooterView(viewModel: addressFooter)
-                        }
-                        if let rootFooter = viewModel.rootFooter {
-                            QRCodeRootFooterView(viewModel: rootFooter)
+                        switch viewModel.footer {
+                        case let .address(viewModel):
+                            QRCodeAddressFooterView(viewModel: viewModel)
+                        case let .root(viewModel):
+                            QRCodeRootFooterView(viewModel: viewModel)
                         }
                     }
                     .background(

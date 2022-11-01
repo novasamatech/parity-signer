@@ -116,9 +116,7 @@ struct BackupModal: View {
                     )
                     snackbar.isSnackbarPresented = true
                 }
-                .padding(.bottom, -Spacing.medium)
                 .bottomSnackbar(snackbar.viewModel, isPresented: $snackbar.isSnackbarPresented, autodismissCounter: 60)
-                .padding(.bottom, -Spacing.medium)
             }
         )
     }
