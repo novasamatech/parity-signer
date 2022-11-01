@@ -26,7 +26,6 @@ import io.parity.signer.ui.theme.*
  * For non-multiselect state,
  * For multiselec screen KeyManager is still used
  */
-//todo dmitry finish this screen
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun KeySetDetailsMultiselectScreen(

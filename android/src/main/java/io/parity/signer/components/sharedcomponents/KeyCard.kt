@@ -136,6 +136,7 @@ fun KeySeedCard(seedTitle: String, base58: String) {
 @Composable
 private fun showBase58Collapsible(base58: String) {
 	val expanded = remember { mutableStateOf(false) }
+	//todo dmitry fix if true we get extra space below
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier.clickable { expanded.value = !expanded.value }
