@@ -59,7 +59,6 @@ fun KeySetDetailsExportResultBottomSheet(
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                 .background(MaterialTheme.colors.fill6, plateShape)
 		) {
-//			todo dmitry make it generic
 			if (LocalInspectionMode.current) {
 				AnimatedQrKeysInfo(
 					input = Unit,

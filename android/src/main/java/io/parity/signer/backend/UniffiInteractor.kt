@@ -44,12 +44,16 @@ class UniffiInteractor(private val dbName: String) {
 		withContext(Dispatchers.IO) {
 			try {
 				val keys = keysBySeedName(dbName, seed)
+				val pathAndNetworks = derivedKeyAddr.map { keyAddr ->
+					val key = keys.set.find { it.key.addressKey == keyAddr }!!
+					PathAndNetwork(
+						key.key.address.path,
+						key.network.networkSpecsKey
+					)
+				}
 				val keyInfo = exportKeyInfo(
 					dbname = dbName,
-					selectedNames = mapOf(seed to ExportedSet.Selected(
-						s = derivedKeyAddr.map { keyAddr -> PathAndNetwork(keyAddr,
-							keys.set.find { it.key.addressKey == keyAddr }!!.network.networkSpecsKey) }
-					)),
+					selectedNames = mapOf(seed to ExportedSet.Selected(pathAndNetworks)),
 				)
 				UniffiResult.Success(keyInfo)
 			} catch (e: ErrorDisplayed) {

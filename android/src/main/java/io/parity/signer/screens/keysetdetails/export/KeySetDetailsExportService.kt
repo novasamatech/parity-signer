@@ -15,8 +15,8 @@ class KeySetDetailsExportService :
 
 	override suspend fun getQrCodesList(input: GetQrCodesListRequest): List<List<UByte>>? {
 		return uniffiInteractor.exportSeedWithKeys(
-			input.seedName,
-			input.keys.map { key -> key.addressKey })
+			seed = input.seedName,
+			derivedKeyAddr = input.keys.map { key -> key.addressKey })
 			.mapError()
 			?.let { keyInfo -> uniffiInteractor.encodeToQrImages(keyInfo.frames) }
 			?.mapError()
