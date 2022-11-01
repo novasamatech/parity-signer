@@ -109,10 +109,10 @@ fun KeySetDetailsScreenView(
 	}
 }
 
+/**
+ * Not clickable item - disabled automatically
+ */
 @Composable
-	/**
-	 * Not clickable item - disabled automatically
-	 */
 fun SeedKeyViewItem(
 	seedKeyModel: KeysModel,
 	onClick: Callback?,
@@ -125,23 +125,25 @@ fun SeedKeyViewItem(
 		Column(Modifier.weight(1f)) {
 			Text(
 				text = seedKeyModel.seedName,
-				color = MaterialTheme.colors.primary,
+				color = if (onClick != null) MaterialTheme.colors.primary else MaterialTheme.colors.textDisabled,
 				style = TypefaceNew.TitleL,
 			)
 			Text(
 				text = seedKeyModel.base58.abbreviateString(8),
-				color = MaterialTheme.colors.textTertiary,
+				color = if (onClick != null) MaterialTheme.colors.textTertiary else MaterialTheme.colors.textDisabled,
 				style = TypefaceNew.BodyM,
 			)
 		}
-		Image(
-			imageVector = Icons.Filled.ChevronRight,
-			contentDescription = null,
-			colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
-			modifier = Modifier
-				.padding(end = 16.dp)
-				.size(28.dp)
-		)
+		if (onClick != null) {
+			Image(
+				imageVector = Icons.Filled.ChevronRight,
+				contentDescription = null,
+				colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
+				modifier = Modifier
+					.padding(end = 16.dp)
+					.size(28.dp)
+			)
+		}
 	}
 }
 

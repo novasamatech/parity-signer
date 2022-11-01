@@ -55,7 +55,7 @@ fun KeySetDetailsMultiselectScreen(
 				.verticalScroll(rememberScrollState())
 		) {
 			//seed
-			SeedKeyViewItem(model.root, null) //todo dmitry make grey colors
+			SeedKeyViewItem(model.root, null)
 			//filter row
 			Row(
 				modifier = Modifier.padding(horizontal = 24.dp),
@@ -119,11 +119,11 @@ fun KeySetDetailsMultiselectScreen(
 @Composable
 private fun PreviewKeySetDetailsMultiselectScreen() {
 
-	val state = remember { mutableStateOf(AlertState.Active) }
-	val mockModel = KeySetDetailsModel.createStub()
+	val stabModel = KeySetDetailsModel.createStub()
+	val state = remember { mutableStateOf(setOf(stabModel.keys[1].addressKey)) }
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsMultiselectScreen(mockModel, EmptyNavigator(), state)
+			KeySetDetailsMultiselectScreen(stabModel, state, {}, {}, {})
 		}
 	}
 }
