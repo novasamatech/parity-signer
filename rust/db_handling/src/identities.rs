@@ -58,6 +58,8 @@ use constants::TRANSACTION;
 use definitions::helpers::print_multisigner_as_base58_or_eth;
 #[cfg(feature = "signer")]
 use definitions::helpers::{get_multisigner, unhex};
+#[cfg(feature = "signer")]
+use definitions::navigation::ExportedSet;
 use definitions::network_specs::NetworkSpecs;
 #[cfg(feature = "active")]
 use definitions::qr_transfers::ContentDerivations;
@@ -145,17 +147,13 @@ pub struct AddrInfo {
 #[cfg(feature = "signer")]
 pub fn export_all_addrs<P: AsRef<Path>>(
     db_path: P,
-    selected_names: Option<Vec<String>>,
+    selected_keys: HashMap<String, ExportedSet>,
 ) -> Result<ExportAddrs> {
     let mut keys: HashMap<String, Vec<(MultiSigner, AddressDetails)>> = HashMap::new();
     let mut addrs = vec![];
 
     for (m, a) in get_all_addresses(&db_path)?.into_iter() {
-        if selected_names
-            .as_ref()
-            .map(|names| names.contains(&a.seed_name))
-            .unwrap_or(true)
-        {
+        if selected_keys.contains_key(&a.seed_name) {
             keys.entry(a.seed_name.clone()).or_default().push((m, a));
         }
     }
@@ -172,6 +170,31 @@ pub fn export_all_addrs<P: AsRef<Path>>(
         for key in keys {
             if key.1.path.is_empty() {
                 continue;
+            }
+
+            if let Some(selected_derivations) = selected_keys.get(name) {
+                let mut selected = false;
+
+                match selected_derivations {
+                    ExportedSet::All => selected = true,
+                    ExportedSet::Selected {
+                        s: selected_derivations,
+                    } => {
+                        for selected_derivation in selected_derivations {
+                            if selected_derivation.derivation == key.1.path
+                                && selected_derivation.network_specs_key
+                                    == hex::encode(key.1.network_id[0].encode())
+                            {
+                                selected = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if !selected {
+                    continue;
+                }
             }
 
             let specs = get_network_specs(&db_path, &key.1.network_id[0])?;

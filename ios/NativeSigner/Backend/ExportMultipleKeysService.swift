@@ -26,14 +26,39 @@ final class ExportMultipleKeysService {
         self.callbackQueue = callbackQueue
     }
 
-    func exportMultipleKeys(
-        items: [String]? = nil,
+    func exportMultipleKeySets(
+        seedNames: [String],
+        _ completion: @escaping (Result<AnimatedQRCodeViewModel, ServiceError>) -> Void
+    ) {
+        let selectedItems: [String: ExportedSet] = Dictionary(
+            uniqueKeysWithValues: seedNames
+                .map { ($0, ExportedSet.all) }
+        )
+        export(selectedItems: selectedItems, completion)
+    }
+
+    func exportRootWithDerivedKeys(
+        seedName: String,
+        keys: [MKeyAndNetworkCard],
+        _ completion: @escaping (Result<AnimatedQRCodeViewModel, ServiceError>) -> Void
+    ) {
+        let selectedItems: [String: ExportedSet] = [
+            seedName: .selected(s: keys.map(\.asPathAndNetwork))
+        ]
+        export(selectedItems: selectedItems, completion)
+    }
+
+    private func export(
+        selectedItems: [String: ExportedSet],
         _ completion: @escaping (Result<AnimatedQRCodeViewModel, ServiceError>) -> Void
     ) {
         callQueue.async {
             let result: Result<AnimatedQRCodeViewModel, ServiceError>
             do {
-                let qrCodes = try exportKeyInfo(dbname: DatabaseMediator().databaseName, selectedNames: items).frames
+                let qrCodes = try exportKeyInfo(
+                    dbname: self.databaseMediator.databaseName,
+                    selectedNames: selectedItems
+                ).frames
                 result = .success(AnimatedQRCodeViewModel(qrCodes: qrCodes))
             } catch {
                 result = .failure(.unknown)

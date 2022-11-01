@@ -123,6 +123,7 @@
 		6D01997E289D238700F4C317 /* Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D01997D289D238700F4C317 /* Localizable.swift */; };
 		6D042AF22901B3FB00B3F4F7 /* QRCodeImageGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D042AF12901B3FB00B3F4F7 /* QRCodeImageGenerator.swift */; };
 		6D042AF42901B40400B3F4F7 /* ExportMultipleKeysModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D042AF32901B40400B3F4F7 /* ExportMultipleKeysModal.swift */; };
+		6D0FA73B2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0FA73A2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift */; };
 		6D16685728F530F4008C664A /* CaptureDeviceConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D16685628F530F4008C664A /* CaptureDeviceConfigurator.swift */; };
 		6D16685D28F5C15C008C664A /* CameraVideoOutputDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D16685C28F5C15C008C664A /* CameraVideoOutputDelegate.swift */; };
 		6D17EF8328EDC951008626E9 /* Encryption+RawRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D17EF8228EDC951008626E9 /* Encryption+RawRepresentable.swift */; };
@@ -193,6 +194,11 @@
 		6D95E97528B500EE00E28A11 /* Heights.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D95E97428B500EE00E28A11 /* Heights.swift */; };
 		6D95E97828B6250B00E28A11 /* ClearBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D95E97728B6250B00E28A11 /* ClearBackgroundView.swift */; };
 		6D95E97A28B6282D00E28A11 /* MenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D95E97928B6282D00E28A11 /* MenuButton.swift */; };
+		6DA501CC290A48190096DA4E /* KeyDetails+ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501CB290A48190096DA4E /* KeyDetails+ViewModel.swift */; };
+		6DA501D4290BC55A0096DA4E /* KeyDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */; };
+		6DA501D7290BECBE0096DA4E /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D6290BECBE0096DA4E /* AppState.swift */; };
+		6DA501D9290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D8290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift */; };
+		6DA501DB290F16280096DA4E /* KeyDetails+SelectionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */; };
 		6DBD21F2289A74EE005D539B /* FileManagingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */; };
 		6DBD21F4289A77DE005D539B /* BundleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F3289A77DE005D539B /* BundleProtocol.swift */; };
 		6DBD21FA289A7A26005D539B /* DatabaseMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F9289A7A26005D539B /* DatabaseMediator.swift */; };
@@ -228,8 +234,7 @@
 		6DDEF13F28AE7C57004CA2FD /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF13E28AE7C57004CA2FD /* PrimaryButton.swift */; };
 		6DDEF14328AE8794004CA2FD /* SecondaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF14228AE8794004CA2FD /* SecondaryButton.swift */; };
 		6DDEF14528AE87A7004CA2FD /* EmptyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF14428AE87A7004CA2FD /* EmptyButton.swift */; };
-		6DE8466A28BF6EA20051346A /* KeyDetailsActionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466928BF6EA20051346A /* KeyDetailsActionModel.swift */; };
-		6DE8466C28BF6EB10051346A /* KeyDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466B28BF6EB10051346A /* KeyDetailsViewModel.swift */; };
+		6DE8466C28BF6EB10051346A /* KeyDetailsDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466B28BF6EB10051346A /* KeyDetailsDataModel.swift */; };
 		6DE8466E28BF73E40051346A /* DerivedKeyRowModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */; };
 		6DEA1B1528D4587200D170B7 /* SeedPhraseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEA1B1428D4587200D170B7 /* SeedPhraseView.swift */; };
 		6DEA1B1728D4593100D170B7 /* RobotoMono-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DEA1B1628D4592B00D170B7 /* RobotoMono-Bold.ttf */; };
@@ -396,6 +401,7 @@
 		6D01997D289D238700F4C317 /* Localizable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Localizable.swift; sourceTree = "<group>"; };
 		6D042AF12901B3FB00B3F4F7 /* QRCodeImageGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeImageGenerator.swift; sourceTree = "<group>"; };
 		6D042AF32901B40400B3F4F7 /* ExportMultipleKeysModal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExportMultipleKeysModal.swift; sourceTree = "<group>"; };
+		6D0FA73A2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExportMultipleKeysModal+ViewModel.swift"; sourceTree = "<group>"; };
 		6D16685628F530F4008C664A /* CaptureDeviceConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureDeviceConfigurator.swift; sourceTree = "<group>"; };
 		6D16685C28F5C15C008C664A /* CameraVideoOutputDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraVideoOutputDelegate.swift; sourceTree = "<group>"; };
 		6D17EF8228EDC951008626E9 /* Encryption+RawRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encryption+RawRepresentable.swift"; sourceTree = "<group>"; };
@@ -466,6 +472,11 @@
 		6D95E97428B500EE00E28A11 /* Heights.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Heights.swift; sourceTree = "<group>"; };
 		6D95E97728B6250B00E28A11 /* ClearBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearBackgroundView.swift; sourceTree = "<group>"; };
 		6D95E97928B6282D00E28A11 /* MenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuButton.swift; sourceTree = "<group>"; };
+		6DA501CB290A48190096DA4E /* KeyDetails+ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyDetails+ViewModel.swift"; sourceTree = "<group>"; };
+		6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsService.swift; sourceTree = "<group>"; };
+		6DA501D6290BECBE0096DA4E /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		6DA501D8290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKeyAndNetworkCard+PathAndNetwork.swift"; sourceTree = "<group>"; };
+		6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyDetails+SelectionOverlay.swift"; sourceTree = "<group>"; };
 		6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagingProtocol.swift; sourceTree = "<group>"; };
 		6DBD21F3289A77DE005D539B /* BundleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleProtocol.swift; sourceTree = "<group>"; };
 		6DBD21F9289A7A26005D539B /* DatabaseMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseMediator.swift; sourceTree = "<group>"; };
@@ -503,8 +514,7 @@
 		6DDEF13E28AE7C57004CA2FD /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		6DDEF14228AE8794004CA2FD /* SecondaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryButton.swift; sourceTree = "<group>"; };
 		6DDEF14428AE87A7004CA2FD /* EmptyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyButton.swift; sourceTree = "<group>"; };
-		6DE8466928BF6EA20051346A /* KeyDetailsActionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsActionModel.swift; sourceTree = "<group>"; };
-		6DE8466B28BF6EB10051346A /* KeyDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsViewModel.swift; sourceTree = "<group>"; };
+		6DE8466B28BF6EB10051346A /* KeyDetailsDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsDataModel.swift; sourceTree = "<group>"; };
 		6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyRowModel.swift; sourceTree = "<group>"; };
 		6DE8467028C0FA1E0051346A /* ExportPrivateKeyWarningModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportPrivateKeyWarningModal.swift; sourceTree = "<group>"; };
 		6DEA1B1428D4587200D170B7 /* SeedPhraseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedPhraseView.swift; sourceTree = "<group>"; };
@@ -847,6 +857,7 @@
 				6D2D244A28CCAD4100862726 /* ExportPrivateKeyService.swift */,
 				6D42793628DB147800C141DC /* PrivateKeyQRCodeService.swift */,
 				6DEFB53128FEE42D00762219 /* ExportMultipleKeysService.swift */,
+				6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */,
 			);
 			path = Backend;
 			sourceTree = "<group>";
@@ -924,6 +935,7 @@
 		6D5801CE28991301006C41D8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				6DA501D5290BECB60096DA4E /* Data */,
 				6DEFB52B28FEC94000762219 /* QRCode */,
 				6D6ACA3F28F0B383002FB03A /* Camera */,
 				6DC5643128B68FB2003D540B /* Keychain */,
@@ -1139,6 +1151,25 @@
 			path = Modals;
 			sourceTree = "<group>";
 		};
+		6DA501CA290A47930096DA4E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */,
+				6DC5643F28B929EA003D540B /* KeyDetailsView.swift */,
+				6DA501CB290A48190096DA4E /* KeyDetails+ViewModel.swift */,
+				6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		6DA501D5290BECB60096DA4E /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				6DA501D6290BECBE0096DA4E /* AppState.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
 		6DBD21F5289A7983005D539B /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -1206,10 +1237,9 @@
 		6DC5643E28B929E0003D540B /* KeyDetails */ = {
 			isa = PBXGroup;
 			children = (
+				6DA501CA290A47930096DA4E /* Views */,
 				6D6430F228CB447100342E37 /* Actions */,
 				6DE8466828BF6E9B0051346A /* Models */,
-				6DC5643F28B929EA003D540B /* KeyDetailsView.swift */,
-				6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */,
 			);
 			path = KeyDetails;
 			sourceTree = "<group>";
@@ -1299,9 +1329,9 @@
 		6DE8466828BF6E9B0051346A /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				6DE8466928BF6EA20051346A /* KeyDetailsActionModel.swift */,
-				6DE8466B28BF6EB10051346A /* KeyDetailsViewModel.swift */,
+				6DE8466B28BF6EB10051346A /* KeyDetailsDataModel.swift */,
 				6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */,
+				6DA501D8290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1355,6 +1385,7 @@
 			isa = PBXGroup;
 			children = (
 				6D042AF32901B40400B3F4F7 /* ExportMultipleKeysModal.swift */,
+				6D0FA73A2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift */,
 			);
 			path = ExportKeys;
 			sourceTree = "<group>";
@@ -1615,6 +1646,7 @@
 				6DD9FF1928C8C9B000FB6195 /* Animations.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
 				6D57DC4D289D652400005C63 /* Dispatching.swift in Sources */,
+				6DA501DB290F16280096DA4E /* KeyDetails+SelectionOverlay.swift in Sources */,
 				6D01996C289C974C00F4C317 /* HeaderViewContainer.swift in Sources */,
 				2D48F3D8277B95A3004B27BE /* TransactionBlock.swift in Sources */,
 				2DA5F86827566C3600D8DD29 /* TCAuthor.swift in Sources */,
@@ -1625,6 +1657,7 @@
 				2D48F3A0276C8D5E004B27BE /* LogMenu.swift in Sources */,
 				6DDEF14328AE8794004CA2FD /* SecondaryButton.swift in Sources */,
 				2DAA82A127885BAF002917C0 /* TCDefault.swift in Sources */,
+				6D0FA73B2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift in Sources */,
 				2DAA82A327885C2E002917C0 /* TCIdentityField.swift in Sources */,
 				6DE8466E28BF73E40051346A /* DerivedKeyRowModel.swift in Sources */,
 				2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */,
@@ -1640,6 +1673,7 @@
 				2DA5F88E2757694A00D8DD29 /* LandingView.swift in Sources */,
 				2DA5F8822756A2DE00D8DD29 /* AddressCard.swift in Sources */,
 				6D5801D728991F11006C41D8 /* RuntimePropertiesProvider.swift in Sources */,
+				6DA501D9290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift in Sources */,
 				2DA5F8252756624000D8DD29 /* NavbarShield.swift in Sources */,
 				6DDEF11428AD12FA004CA2FD /* Tab.swift in Sources */,
 				6D6430F628CB460A00342E37 /* ServiceLocator.swift in Sources */,
@@ -1664,7 +1698,6 @@
 				2DA5F86F27566C3600D8DD29 /* TCTXSpec.swift in Sources */,
 				2DA5F8412756687200D8DD29 /* TransactionCardView.swift in Sources */,
 				6D6E99DB28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift in Sources */,
-				6DE8466A28BF6EA20051346A /* KeyDetailsActionModel.swift in Sources */,
 				6D95E97A28B6282D00E28A11 /* MenuButton.swift in Sources */,
 				2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */,
 				6D2D244F28CE5C1B00862726 /* NavbarActionButton.swift in Sources */,
@@ -1739,6 +1772,7 @@
 				6DEFB52F28FEDA9B00762219 /* AnimatedQRCodeView.swift in Sources */,
 				6D88CFF028C60815001FB0A1 /* CloseModalButton.swift in Sources */,
 				2D48F3B02770AD83004B27BE /* ManageMetadata.swift in Sources */,
+				6DA501CC290A48190096DA4E /* KeyDetails+ViewModel.swift in Sources */,
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,
 				2DAA8299278738C0002917C0 /* SelectSeed.swift in Sources */,
 				2D48F3E0278305AE004B27BE /* LogComment.swift in Sources */,
@@ -1787,6 +1821,7 @@
 				2DAA82AD2788678F002917C0 /* TCNetworkName.swift in Sources */,
 				2D48F35B2760E5DF004B27BE /* RecoverSeedPhrase.swift in Sources */,
 				6D17EF8628EEEDDA008626E9 /* CameraPreviewUIView.swift in Sources */,
+				6DA501D4290BC55A0096DA4E /* KeyDetailsService.swift in Sources */,
 				6D4C0756289B369200B2EE48 /* Assets.swift in Sources */,
 				2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */,
 				2DAA82912786FA4B002917C0 /* KeyDetailsMulti.swift in Sources */,
@@ -1803,11 +1838,12 @@
 				6D8045DE28D087D400237F8C /* QRCodeRootFooterView.swift in Sources */,
 				6D42793728DB147800C141DC /* PrivateKeyQRCodeService.swift in Sources */,
 				6D5801D928991F48006C41D8 /* ProcessInfoProtocol.swift in Sources */,
+				6DA501D7290BECBE0096DA4E /* AppState.swift in Sources */,
 				2DAA82A527885D4A002917C0 /* TCTipPlain.swift in Sources */,
 				6D019972289D183200F4C317 /* Navigation.swift in Sources */,
 				2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */,
 				2DA5F83F275667CF00D8DD29 /* HistoryCardTemplate.swift in Sources */,
-				6DE8466C28BF6EB10051346A /* KeyDetailsViewModel.swift in Sources */,
+				6DE8466C28BF6EB10051346A /* KeyDetailsDataModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
