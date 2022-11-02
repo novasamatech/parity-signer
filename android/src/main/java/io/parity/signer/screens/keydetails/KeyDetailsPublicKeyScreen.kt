@@ -61,12 +61,12 @@ fun KeyDetailsPublicKeyScreen(
 					RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
 				Column(
 					modifier = Modifier
+						.padding(horizontal = 24.dp, vertical = 50.dp)
 						.clip(plateShape)
 						.border(
 							BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
 							plateShape
 						)
-						.padding(horizontal = 24.dp, vertical = 50.dp) //todo dmitry check order modifiers
 						.background(MaterialTheme.colors.fill6, plateShape)
 				) {
 					Box(

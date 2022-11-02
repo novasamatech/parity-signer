@@ -212,9 +212,9 @@ fun MKeyDetails.toKeyDetailsModel() =
 	KeyDetailsModel(
 		qr = qr, pubkey = pubkey, networkInfo = networkInfo.toNetworkInfoModel(),
 		address = KeyCardModel.fromAddress(
-			address,
-			networkInfo.networkTitle,
-			base58
+			address = address,
+			base58 = base58,
+			networkTitle = networkInfo.networkTitle,
 		),
 		base58 = base58
 	)
