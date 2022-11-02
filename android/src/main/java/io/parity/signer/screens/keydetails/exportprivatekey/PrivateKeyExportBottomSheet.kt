@@ -1,4 +1,4 @@
-package io.parity.signer.bottomsheets.exportprivatekey
+package io.parity.signer.screens.keydetails.exportprivatekey
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -17,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.bottomsheets.exportprivatekey.PrivateKeyExportModel.Companion.SHOW_PRIVATE_KEY_TIMEOUT
+import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel.Companion.SHOW_PRIVATE_KEY_TIMEOUT
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components.sharedcomponents.CircularCountDownTimer
 import io.parity.signer.components.sharedcomponents.KeyCard
@@ -33,8 +33,8 @@ import io.parity.signer.ui.theme.fill6
 
 @Composable
 fun PrivateKeyExportBottomSheet(
-	model: PrivateKeyExportModel,
-	navigator: Navigator,
+    model: PrivateKeyExportModel,
+    navigator: Navigator,
 ) {
 	val sidePadding = 24.dp
 	Column(
