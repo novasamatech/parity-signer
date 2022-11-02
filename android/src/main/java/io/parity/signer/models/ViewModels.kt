@@ -158,6 +158,21 @@ data class KeyCardModel(
 				multiselect = address_card.multiselect,
 			)
 
+		fun fromAddress(
+			address: Address,
+			base58: String,
+			networkTitle: String
+		): KeyCardModel =
+			KeyCardModel(
+				network = networkTitle,
+				base58 = base58,
+				path = address.path,
+				hasPwd = address.hasPwd,
+				identIcon = address.identicon,
+				seedName = address.seedName,
+				multiselect = false,
+			)
+
 		fun createStub() = KeyCardModel(
 			network = "Polkadot",
 			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
@@ -169,3 +184,39 @@ data class KeyCardModel(
 		)
 	}
 }
+
+/**
+ * Local copy of shared [MKeyDetails] class
+ */
+data class KeyDetailsModel(
+	val qr: List<UByte>,
+	val pubkey: String,
+	val networkInfo: NetworkInfoModel,
+	val address: KeyCardModel,
+	val base58: String,
+) {
+	val isRootKey = address.path.isEmpty()
+}
+fun MKeyDetails.toKeyDetailsModel() =
+	KeyDetailsModel(
+		qr = qr, pubkey = pubkey, networkInfo = networkInfo.toNetworkInfoModel(),
+		address = KeyCardModel.fromAddress(
+			address,
+			networkInfo.networkTitle,
+			base58
+		),
+		base58 = base58
+	)
+
+/**
+ * Local copy of shared [MscNetworkInfo] class
+ */
+data class NetworkInfoModel(
+	val networkTitle: String,
+	val networkLogo: String,
+	val networkSpecsKey: String
+)
+
+fun MscNetworkInfo.toNetworkInfoModel() =
+	NetworkInfoModel(networkTitle, networkLogo, networkSpecsKey)
+
