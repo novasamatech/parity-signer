@@ -1,7 +1,6 @@
 package io.parity.signer.screens.keydetails
 
 import android.content.res.Configuration
-import android.graphics.drawable.VectorDrawable
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,7 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.bottomsheets.exportprivatekey.ConfirmExportPrivateKeyAction
+import io.parity.signer.screens.keydetails.exportprivatekey.ConfirmExportPrivateKeyMenu
 import io.parity.signer.components.base.RowButtonsBottomSheet
 import io.parity.signer.components.base.SecondaryButtonBottomSheet
 import io.parity.signer.models.Callback
@@ -52,7 +51,7 @@ fun KeyDetailsMenuAction(
 			onCancel = { navigator.backAction() },
 			onRemoveKey = { navigator.navigate(Action.REMOVE_KEY) },
 		)
-		KeyDetailsMenuState.PRIVATE_KEY_CONFIRM -> ConfirmExportPrivateKeyAction(
+		KeyDetailsMenuState.PRIVATE_KEY_CONFIRM -> ConfirmExportPrivateKeyMenu(
 			navigator = navigator,
 			publicKey = keyDetails!!.pubkey,
 		)
