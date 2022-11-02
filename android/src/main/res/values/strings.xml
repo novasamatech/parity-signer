@@ -23,6 +23,8 @@
 	<string name="description_identicon">identicon</string>
 	<string name="description_expand_button">Expand button</string>
 	<string name="key_sets_screem_title">Key Sets</string>
+	<string name="key_details_public_export_title">Public Key</string>
+	<string name="key_details_public_export_derived_subtitle">Derived Key</string>
 	<string name="key_sets_screem_add_key_button">Add Key Set</string>
 	<string name="key_sets_details_screem_create_derived_button">Create Derived Key</string>
 	<string name="bottom_bar_label_key_sets">Key Sets</string>

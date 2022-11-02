@@ -145,13 +145,14 @@ data class KeyCardModel(
 		fun fromKeyModel(model: KeyModel, networkTitle: String): KeyCardModel =
 			KeyCardModel(
 				network = networkTitle,
-					base58 = model.base58,
-					path = model.path,
-					identIcon = model.identicon,
-					seedName = model.seedName,
-					hasPwd = model.hasPwd,
-					multiselect = model.multiselect,
+				base58 = model.base58,
+				path = model.path,
+				identIcon = model.identicon,
+				seedName = model.seedName,
+				hasPwd = model.hasPwd,
+				multiselect = model.multiselect,
 			)
+
 		/**
 		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
 		 */
@@ -207,7 +208,41 @@ data class KeyDetailsModel(
 	val base58: String,
 ) {
 	val isRootKey = address.path.isEmpty()
+
+	companion object {
+		fun createStubDerived(): KeyDetailsModel {
+			val keyCard = KeyCardModel.createStub()
+			return KeyDetailsModel(
+				qr = PreviewData.exampleQRCode,
+				pubkey = "public key",
+				networkInfo = NetworkInfoModel(
+					"network title",
+					"network logo", "network specs"
+				),
+				address = keyCard,
+				base58 = keyCard.base58,
+			)
+		}
+
+		fun createStubRoot(): KeyDetailsModel {
+			val keyCard = KeyCardModel.createStub()
+			return KeyDetailsModel(
+				qr = PreviewData.exampleQRCode,
+				pubkey = "public key",
+				networkInfo = NetworkInfoModel(
+					"network title",
+					"network logo", "network specs"
+				),
+				address = KeyCardModel(
+					keyCard.network, keyCard.base58, "",
+					keyCard.identIcon, keyCard.seedName, false
+				),
+				base58 = keyCard.base58,
+			)
+		}
+	}
 }
+
 fun MKeyDetails.toKeyDetailsModel() =
 	KeyDetailsModel(
 		qr = qr, pubkey = pubkey, networkInfo = networkInfo.toNetworkInfoModel(),
@@ -228,6 +263,7 @@ data class NetworkInfoModel(
 	val networkLogo: String,
 	val networkSpecsKey: String
 )
+
 fun MscNetworkInfo.toNetworkInfoModel() =
 	NetworkInfoModel(networkTitle, networkLogo, networkSpecsKey)
 

@@ -45,7 +45,6 @@ fun CombinedScreensSelector(
 				KeyDetailsPublicKeyScreen(
 					model = screenData.f.toKeyDetailsModel(),
 					rootNavigator = rootNavigator,
-					alertState = alertState,
 				)
 			}
 		else -> {} //old Selector showing them

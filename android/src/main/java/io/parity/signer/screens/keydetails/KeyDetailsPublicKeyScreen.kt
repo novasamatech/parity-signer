@@ -37,18 +37,19 @@ import io.parity.signer.uniffi.Action
 /**
  * Default main screen with list Seeds/root keys
  */
-//todo dmitry ios logic is in KeyDetailsPublicKeyViewModel
-//todo dmitry test this screen
 @Composable
 fun KeyDetailsPublicKeyScreen(
 	model: KeyDetailsModel,
 	rootNavigator: Navigator,
-	alertState: State<AlertState?>, //for shield icon
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeaderClose(
-			stringResource(id = R.string.key_sets_screem_title),
-			//todo dmitry add subtitle if root key
+			stringResource(id = R.string.key_details_public_export_title),
+			if (model.isRootKey) {
+				null
+			} else {
+				stringResource(id = R.string.key_details_public_export_derived_subtitle)
+			},
 			onClose = { rootNavigator.backAction() },
 			onMenu = { rootNavigator.navigate(Action.RIGHT_BUTTON_ACTION) }
 		)
@@ -96,14 +97,6 @@ fun KeyDetailsPublicKeyScreen(
 					}
 				}
 			}
-			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-				ExposedIcon(
-					alertState = alertState, navigator = rootNavigator,
-					Modifier
-						.align(Alignment.End)
-						.padding(end = 16.dp)
-				)
-			}
 		}
 	}
 }
@@ -119,34 +112,32 @@ fun KeyDetailsPublicKeyScreen(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewKeyDetailsScreen() {
-	val keys = mutableListOf(
-		KeySetModel(
-			"first seed name",
-			PreviewData.exampleIdenticon,
-			1.toUInt()
-		),
-		KeySetModel(
-			"second seed name",
-			PreviewData.exampleIdenticon,
-			3.toUInt()
-		),
-	)
-	repeat(30) {
-		keys.add(
-			KeySetModel(
-				"second seed name",
-				PreviewData.exampleIdenticon,
-				3.toUInt()
-			)
-		)
-	}
+private fun PreviewKeyDetailsScreenDerived() {
 	val state = remember { mutableStateOf(AlertState.Past) }
-	val mockModel = KeySetsSelectModel(keys)
+	val mockModel = KeyDetailsModel.createStubDerived()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			//todo dmitry do preview
-//			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator(), rememberNavController(), state)
+			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator(), )
+		}
+	}
+}
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewKeyDetailsScreenRoot() {
+	val state = remember { mutableStateOf(AlertState.Past) }
+	val mockModel = KeyDetailsModel.createStubRoot()
+	SignerNewTheme {
+		Box(modifier = Modifier.size(350.dp, 550.dp)) {
+			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator(), )
 		}
 	}
 }

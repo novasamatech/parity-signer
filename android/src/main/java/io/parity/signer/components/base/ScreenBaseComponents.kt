@@ -25,6 +25,7 @@ import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.textSecondary
 
 @Composable
 fun ScreenHeader(
@@ -88,6 +89,7 @@ fun ScreenHeader(
 @Composable
 fun ScreenHeaderClose(
 	title: String,
+	subtitle: String? = null,
 	onClose: () -> Unit,
 	onMenu: (() -> Unit)? = null,
 ) {
@@ -108,15 +110,28 @@ fun ScreenHeaderClose(
 				.align(Alignment.CenterVertically)
 		)
 		//center
-		Text(
-			text = title,
-			color = MaterialTheme.colors.primary,
-			style = TypefaceNew.TitleS,
-			textAlign = TextAlign.Center,
+		Column(
 			modifier = Modifier
 				.align(Alignment.CenterVertically)
 				.weight(1f)
-		)
+		) {
+			Text(
+				text = title,
+				color = MaterialTheme.colors.primary,
+				style = TypefaceNew.TitleS,
+				textAlign = TextAlign.Center,
+				modifier = Modifier.fillMaxWidth(1f),
+			)
+			if (subtitle != null) {
+				Text(
+					text = subtitle,
+					color = MaterialTheme.colors.textSecondary,
+					style = TypefaceNew.CaptionS,
+					textAlign = TextAlign.Center,
+					modifier = Modifier.fillMaxWidth(1f),
+				)
+			}
+		}
 		//end
 		if (onMenu != null) {
 			Image(
@@ -176,6 +191,12 @@ private fun PreviewScreenBaseComponent() {
 				stringResource(id = R.string.key_sets_screem_title),
 				onClose = {},
 				onMenu = null,
+			)
+			ScreenHeaderClose(
+				stringResource(id = R.string.key_sets_screem_title),
+				"subtitle",
+				onClose = {},
+				onMenu = {},
 			)
 		}
 	}
