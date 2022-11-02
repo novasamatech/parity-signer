@@ -206,6 +206,7 @@ data class KeyDetailsModel(
 	val networkInfo: NetworkInfoModel,
 	val address: KeyCardModel,
 	val base58: String,
+	val secretExposed: Boolean,
 ) {
 	val isRootKey = address.path.isEmpty()
 
@@ -221,6 +222,7 @@ data class KeyDetailsModel(
 				),
 				address = keyCard,
 				base58 = keyCard.base58,
+				secretExposed = true,
 			)
 		}
 
@@ -238,6 +240,7 @@ data class KeyDetailsModel(
 					keyCard.identIcon, keyCard.seedName, false
 				),
 				base58 = keyCard.base58,
+				secretExposed = true,
 			)
 		}
 	}
@@ -251,7 +254,8 @@ fun MKeyDetails.toKeyDetailsModel() =
 			base58 = base58,
 			networkTitle = networkInfo.networkTitle,
 		),
-		base58 = base58
+		base58 = base58,
+		secretExposed = address.secretExposed,
 	)
 
 

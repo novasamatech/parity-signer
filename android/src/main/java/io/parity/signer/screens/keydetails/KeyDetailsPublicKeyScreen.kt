@@ -4,9 +4,12 @@ import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -19,19 +22,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.PrimaryButtonBottomSheet
-import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.ScreenHeaderClose
-import io.parity.signer.components.exposesecurity.ExposedIcon
-import io.parity.signer.components.panels.BottomBar2
-import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.sharedcomponents.KeySeedCard
 import io.parity.signer.models.*
-import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.appliedStroke
-import io.parity.signer.ui.theme.fill6
+import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
 
 /**
@@ -62,7 +57,7 @@ fun KeyDetailsPublicKeyScreen(
 					RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
 				Column(
 					modifier = Modifier
-						.padding(horizontal = 24.dp, vertical = 50.dp)
+						.padding(start = 24.dp, end = 24.dp, top = 50.dp, bottom = 8.dp )
 						.clip(plateShape)
 						.border(
 							BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
@@ -96,8 +91,45 @@ fun KeyDetailsPublicKeyScreen(
 						KeyCard(model.address)
 					}
 				}
+				if (model.secretExposed) {
+					ExposedKeyAlarm()
+				}
 			}
 		}
+	}
+}
+
+@Composable
+private fun ExposedKeyAlarm() {
+	val innerRoun = dimensionResource(id = R.dimen.innerFramesCornerRadius)
+	val innerShape =
+		RoundedCornerShape(innerRoun, innerRoun, innerRoun, innerRoun)
+	Row(
+		modifier = Modifier
+			.padding(vertical = 8.dp, horizontal = 24.dp)
+			.border(
+				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+				innerShape
+			)
+			.background(MaterialTheme.colors.fill6, innerShape)
+
+	) {
+		Text(
+			text = stringResource(R.string.key_details_exposed_notification_label),
+			color = MaterialTheme.colors.primary,
+			style = TypefaceNew.BodyM,
+			modifier = Modifier
+				.weight(1f)
+				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+		)
+		Icon(
+			imageVector = Icons.Outlined.Info,
+			contentDescription = null,
+			tint = MaterialTheme.colors.red500,
+			modifier = Modifier
+				.align(Alignment.CenterVertically)
+				.padding(start = 18.dp, end = 18.dp)
+		)
 	}
 }
 
@@ -116,8 +148,8 @@ private fun PreviewKeyDetailsScreenDerived() {
 	val state = remember { mutableStateOf(AlertState.Past) }
 	val mockModel = KeyDetailsModel.createStubDerived()
 	SignerNewTheme {
-		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator(), )
+		Box(modifier = Modifier.size(350.dp, 700.dp)) {
+			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator())
 		}
 	}
 }
@@ -136,8 +168,8 @@ private fun PreviewKeyDetailsScreenRoot() {
 	val state = remember { mutableStateOf(AlertState.Past) }
 	val mockModel = KeyDetailsModel.createStubRoot()
 	SignerNewTheme {
-		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator(), )
+		Box(modifier = Modifier.size(350.dp, 700.dp)) {
+			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator())
 		}
 	}
 }
