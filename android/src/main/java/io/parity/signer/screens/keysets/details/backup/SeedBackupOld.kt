@@ -1,4 +1,4 @@
-package io.parity.signer.bottomsheets
+package io.parity.signer.screens.keysets.details.backup
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,7 +18,6 @@ import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.MBackup
-import io.parity.signer.uniffi.MscNetworkInfo
 import kotlinx.coroutines.delay
 
 @Composable
