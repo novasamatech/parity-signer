@@ -147,7 +147,7 @@ struct KeyDetailsView: View {
             // List of derived keys
             ForEach(
                 viewModel.dataModel.derivedKeys,
-                id: \.viewModel.path
+                id: \.viewModel.addressKey
             ) { deriveKey in
                 DerivedKeyRow(
                     viewModel: deriveKey.viewModel,

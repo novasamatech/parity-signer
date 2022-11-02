@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets
+package io.parity.signer.screens.keysetdetails
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
@@ -17,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,7 +50,6 @@ fun KeySetDetailsScreenView(
 	alertState: State<AlertState?>, //for shield icon
 	onMenu: Callback,
 ) {
-//todo dmitry selecting multiple key is impossible now, finish multiple selection screen before enabling this screen feature in master
 	Column {
 		ScreenHeader(
 			stringId = null,
@@ -78,8 +79,13 @@ fun KeySetDetailsScreenView(
 						painter = painterResource(id = R.drawable.ic_tune_28),
 						contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
 						modifier = Modifier
-							.clickable { navigator.navigate(Action.NETWORK_SELECTOR, "") }
-							.size(28.dp),
+                            .clickable {
+                                navigator.navigate(
+                                    Action.NETWORK_SELECTOR,
+                                    ""
+                                )
+                            }
+                            .size(28.dp),
 						tint = MaterialTheme.colors.textTertiary,
 					)
 				}
@@ -93,9 +99,9 @@ fun KeySetDetailsScreenView(
 			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
 				ExposedIcon(
 					alertState = alertState, navigator = navigator,
-					Modifier
-						.align(Alignment.End)
-						.padding(end = 16.dp)
+                    Modifier
+                        .align(Alignment.End)
+                        .padding(end = 16.dp)
 				)
 				PrimaryButtonBottomSheet(
 					label = stringResource(R.string.key_sets_details_screem_create_derived_button),
@@ -110,36 +116,50 @@ fun KeySetDetailsScreenView(
 	}
 }
 
+/**
+ * Not clickable item - disabled automatically
+ */
 @Composable
-private fun SeedKeyViewItem(
-	seedKeyModel: KeysModel,
-	onClick: Callback,
+fun SeedKeyViewItem(
+	seedKeyModel: KeyModel,
+	onClick: Callback?,
 ) {
-	Row(
-		modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 24.dp)
-			.clickable( onClick = onClick ),
-		verticalAlignment = Alignment.CenterVertically,
-	) {
-		Column(Modifier.weight(1f)) {
-			Text(
-				text = seedKeyModel.seedName,
-				color = MaterialTheme.colors.primary,
-				style = TypefaceNew.TitleL,
-			)
-			Text(
-				text = seedKeyModel.base58.abbreviateString(8),
-				color = MaterialTheme.colors.textTertiary,
-				style = TypefaceNew.BodyM,
-			)
-		}
-		Image(
-			imageVector = Icons.Filled.ChevronRight,
-			contentDescription = null,
-			colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
+	Surface(
+		modifier = Modifier
+			.conditional(onClick != null) {
+				clickable(onClick = onClick!!)
+			},
+		color = Color.Transparent,
+	)
+	{
+		Row(
 			modifier = Modifier
-				.padding(end = 16.dp)
-				.size(28.dp)
-		)
+				.padding(top = 16.dp, bottom = 16.dp, start = 24.dp),
+			verticalAlignment = Alignment.CenterVertically,
+		) {
+			Column(Modifier.weight(1f)) {
+				Text(
+					text = seedKeyModel.seedName,
+					color = if (onClick != null) MaterialTheme.colors.primary else MaterialTheme.colors.textDisabled,
+					style = TypefaceNew.TitleL,
+				)
+				Text(
+					text = seedKeyModel.base58.abbreviateString(8),
+					color = if (onClick != null) MaterialTheme.colors.textTertiary else MaterialTheme.colors.textDisabled,
+					style = TypefaceNew.BodyM,
+				)
+			}
+			if (onClick != null) {
+				Image(
+					imageVector = Icons.Filled.ChevronRight,
+					contentDescription = null,
+					colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
+					modifier = Modifier
+                        .padding(end = 16.dp)
+                        .size(28.dp)
+				)
+			}
+		}
 	}
 }
 
