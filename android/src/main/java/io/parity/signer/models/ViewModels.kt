@@ -219,6 +219,7 @@ fun MKeyDetails.toKeyDetailsModel() =
 		base58 = base58
 	)
 
+
 /**
  * Local copy of shared [MscNetworkInfo] class
  */
@@ -227,7 +228,6 @@ data class NetworkInfoModel(
 	val networkLogo: String,
 	val networkSpecsKey: String
 )
-
 fun MscNetworkInfo.toNetworkInfoModel() =
 	NetworkInfoModel(networkTitle, networkLogo, networkSpecsKey)
 

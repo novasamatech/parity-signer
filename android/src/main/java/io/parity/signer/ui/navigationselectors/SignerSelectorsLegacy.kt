@@ -9,7 +9,6 @@ import io.parity.signer.bottomsheets.*
 import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
-import io.parity.signer.screens.keydetails.ExportPublicKey
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.ModalData
@@ -38,7 +37,7 @@ fun ScreenSelector(
 			checkPath = signerDataModel::checkPath,
 		)
 		ScreenData.Documents -> Documents()
-		is ScreenData.KeyDetails -> ExportPublicKey(screenData.f)
+		is ScreenData.KeyDetails -> {}//migrated
 		is ScreenData.KeyDetailsMulti -> KeyDetailsMulti(
 			screenData.f,
 			button1,
