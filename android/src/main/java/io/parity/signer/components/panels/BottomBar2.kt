@@ -18,9 +18,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.models.EmptyNavigator
+import io.parity.signer.models.KeySetModel
+import io.parity.signer.models.KeySetsSelectModel
 import io.parity.signer.models.Navigator
-import io.parity.signer.screens.KeySetViewModel
-import io.parity.signer.screens.KeySetsSelectViewModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
@@ -126,14 +126,14 @@ fun BottomBarButton2(
 )
 @Composable
 private fun PreviewBottomBar2() {
-	val mockModel = KeySetsSelectViewModel(
+	val mockModel = KeySetsSelectModel(
 		listOf(
-			KeySetViewModel(
+			KeySetModel(
 				"first seed name",
 				PreviewData.exampleIdenticon,
 				1.toUInt()
 			),
-			KeySetViewModel(
+			KeySetModel(
 				"second seed name",
 				PreviewData.exampleIdenticon,
 				3.toUInt()

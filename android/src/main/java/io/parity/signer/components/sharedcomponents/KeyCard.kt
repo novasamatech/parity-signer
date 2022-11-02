@@ -23,10 +23,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.models.KeyCardModel
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
-import io.parity.signer.uniffi.MAddressCard
 
 
 @Composable
@@ -71,7 +70,7 @@ fun KeyCard(model: KeyCardModel) {
 
 			Spacer(Modifier.padding(top = 10.dp))
 
-			showBase58Collapsible(model)
+			showBase58Collapsible(model.base58)
 		}
 
 		Spacer(Modifier.weight(1f))
@@ -119,21 +118,38 @@ fun KeyCard(model: KeyCardModel) {
 }
 
 @Composable
-private fun showBase58Collapsible(model: KeyCardModel) {
+fun KeySeedCard(seedTitle: String, base58: String) {
+	Column(
+		Modifier
+			.fillMaxWidth()
+			.padding(16.dp)
+	) {
+		Text(
+			seedTitle,
+			color = MaterialTheme.colors.primary,
+			style = TypefaceNew.LabelS,
+		)
+		showBase58Collapsible(base58)
+	}
+}
+
+@Composable
+private fun showBase58Collapsible(base58: String) {
 	val expanded = remember { mutableStateOf(false) }
+	//todo dmitry fix if true we get extra space below
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier.clickable { expanded.value = !expanded.value }
 	) {
 		if (expanded.value) {
 			Text(
-				model.base58,
+				base58,
 				color = MaterialTheme.colors.textTertiary,
 				style = TypefaceNew.BodyM
 			)
 		} else {
 			Text(
-				model.base58.abbreviateString(8),
+				base58.abbreviateString(8),
 				color = MaterialTheme.colors.textTertiary,
 				style = TypefaceNew.BodyM,
 				maxLines = 1,
@@ -149,52 +165,14 @@ private fun showBase58Collapsible(model: KeyCardModel) {
 	}
 }
 
-data class KeyCardModel(
-	val network: String,
-	val base58: String,
-	val path: String,
-	val identIcon: List<UByte>,
-	val seedName: String,
-	val hasPwd: Boolean = false,
-	val multiselect: Boolean? = null,
-) {
-	companion object {
-		/**
-		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
-		 */
-		fun fromAddress(address_card: MAddressCard, networkTitle: String): KeyCardModel =
-			KeyCardModel(
-				network = networkTitle,
-				base58 = address_card.base58,
-				path = address_card.address.path,
-				hasPwd = address_card.address.hasPwd,
-				identIcon = address_card.address.identicon,
-				seedName = address_card.address.seedName,
-				multiselect = address_card.multiselect,
-			)
-
-		fun createStub() = KeyCardModel(
-			network = "Polkadot",
-			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
-			path = "//polkadot//path",
-			identIcon = PreviewData.exampleIdenticon,
-			seedName = "Seed Name",
-			hasPwd = false,
-			multiselect = null,
-		)
-	}
-}
-
 
 @Preview(
 	name = "day",
-	group = "themes",
 	uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true,
 )
 @Preview(
 	name = "dark theme",
-	group = "themes",
 	uiMode = Configuration.UI_MODE_NIGHT_YES,
 	backgroundColor = 0xFFFFFFFF
 )
@@ -202,5 +180,24 @@ data class KeyCardModel(
 private fun PreviewKeyCard() {
 	SignerNewTheme {
 		KeyCard(model = KeyCardModel.createStub())
+	}
+}
+
+@Preview(
+	name = "day",
+	uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true,
+)
+@Preview(
+	name = "dark theme",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	backgroundColor = 0xFFFFFFFF
+)
+@Composable
+private fun PreviewKeySeedCard() {
+	SignerNewTheme {
+		KeySeedCard(seedTitle = "Seed title",
+			base58 = KeyCardModel.createStub().base58,
+		)
 	}
 }

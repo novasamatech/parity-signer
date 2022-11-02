@@ -21,14 +21,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
-import io.parity.signer.screens.KeySetViewModel
+import io.parity.signer.models.KeySetModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun KeySetItem(
-	model: KeySetViewModel,
+	model: KeySetModel,
 	onClick: () -> Unit = {},
 ) {
 	Surface(
@@ -91,7 +91,7 @@ fun KeySetItem(
 private fun PreviewKeySetItem() {
 	SignerNewTheme {
 		KeySetItem(
-			KeySetViewModel(
+			KeySetModel(
 				"My special key set",
 				PreviewData.exampleIdenticon,
 				2.toUInt()

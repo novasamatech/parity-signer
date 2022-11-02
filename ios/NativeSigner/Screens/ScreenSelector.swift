@@ -10,6 +10,8 @@ import SwiftUI
 struct ScreenSelector: View {
     @EnvironmentObject private var data: SignerDataModel
     @EnvironmentObject var navigation: NavigationCoordinator
+    @EnvironmentObject var appState: AppState
+
     let screenData: ScreenData
     let navigationRequest: NavigationRequest
     let getSeed: (String) -> String
@@ -26,10 +28,12 @@ struct ScreenSelector: View {
         switch screenData {
         case let .keys(value):
             KeyDetailsView(
+                viewModel: .init(
+                    dataModel: KeyDetailsDataModel(value),
+                    keysData: appState.userData.keysData,
+                    exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value)
+                ),
                 forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
-                viewModel: KeyDetailsViewModel(value),
-                actionModel: KeyDetailsActionModel(value, alert: data.alert, alertShow: alertShow),
-                exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value),
                 resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
             )
         case let .settings(value):

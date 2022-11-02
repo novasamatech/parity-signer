@@ -1,23 +1,57 @@
 package io.parity.signer.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.CircleShape
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.backgroundTertiary
 import kotlinx.coroutines.launch
 
-
+/**
+ * For use in the same screen with content
+ * .navigationBarsPadding().captionBarPadding() paddings should be added already
+ */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BottomSheetWrapper(
+fun BottomSheetWrapperContent(
+	bottomSheetState: ModalBottomSheetState,
+	bottomSheetContent: @Composable () -> Unit,
+	mainContent: @Composable () -> Unit
+) {
+	val scope = rememberCoroutineScope()
+
+	BackHandler(enabled = bottomSheetState.isVisible) {
+			scope.launch { bottomSheetState.hide() }
+	}
+
+	ModalBottomSheetLayout(
+		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
+		sheetState = bottomSheetState,
+		sheetContent = {
+			BottomSheetContentWrapperInternal {
+				bottomSheetContent()
+			}
+		},
+		content = {
+			Box(Modifier.statusBarsPadding()) {
+				mainContent()
+			}
+		}
+	)
+}
+
+/**
+ * Used for screens controlled by central rust-based navigation system
+ */
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun BottomSheetWrapperRoot(
 	onClosedAction: () -> Unit = {},
 	bottomSheetContent: @Composable (state: BottomSheetPositionHandle) -> Unit,
 ) {
@@ -56,7 +90,7 @@ fun BottomSheetWrapper(
 		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
 		sheetState = modalBottomSheetState,
 		sheetContent = {
-			BottomSheetContentWrapper {
+			BottomSheetContentWrapperInternal {
 				bottomSheetContent(handle)
 			}
 		},
@@ -92,15 +126,20 @@ interface BottomSheetPositionHandle {
 }
 
 @Composable
-private fun BottomSheetContentWrapper(
+private fun BottomSheetContentWrapperInternal(
 	content: @Composable () -> Unit,
 ) {
+	val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 	Box(
 		modifier = Modifier
 			.wrapContentHeight()
+			.heightIn(0.dp, screenHeight - 40.dp)
 			.fillMaxWidth()
 			.clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
 	) {
 		content()
 	}
 }
+
+
+

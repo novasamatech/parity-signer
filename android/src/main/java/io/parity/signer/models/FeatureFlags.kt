@@ -6,7 +6,11 @@ object FeatureFlags {
 			FeatureOption.EXPORT_SECRET_KEY -> true
 		}
 	}
+
+	fun isDisabled(feature: FeatureOption): Boolean = !isEnabled(feature)
 }
 
 
-enum class FeatureOption { EXPORT_SECRET_KEY }
+enum class FeatureOption {
+	EXPORT_SECRET_KEY,
+}

@@ -8,39 +8,48 @@
 import Foundation
 
 struct KeyDetailsPublicKeyViewModel: Equatable {
+    enum Footer: Equatable {
+        case root(QRCodeRootFooterViewModel)
+        case address(QRCodeAddressFooterViewModel)
+    }
+
     let qrCode: QRCodeContainerViewModel
-    let addressFooter: QRCodeAddressFooterViewModel?
-    let rootFooter: QRCodeRootFooterViewModel?
+    let footer: Footer
     let isKeyExposed: Bool
     let isRootKey: Bool
 
     init(_ keyDetails: MKeyDetails) {
         qrCode = .init(qrCode: keyDetails.qr)
-        rootFooter = keyDetails.isRootKey ? .init(
-            keyName: keyDetails.address.seedName,
-            base58: keyDetails.base58
-        ) : nil
-        addressFooter = keyDetails.isRootKey ? nil : .init(
-            identicon: keyDetails.address.identicon,
-            rootKeyName: keyDetails.address.seedName,
-            path: keyDetails.address.path,
-            network: keyDetails.networkInfo.networkTitle,
-            base58: keyDetails.base58
-        )
+        if keyDetails.isRootKey {
+            footer = .root(
+                .init(
+                    keyName: keyDetails.address.seedName,
+                    base58: keyDetails.base58
+                )
+            )
+        } else {
+            footer = .address(
+                .init(
+                    identicon: keyDetails.address.identicon,
+                    rootKeyName: keyDetails.address.seedName,
+                    path: keyDetails.address.path,
+                    network: keyDetails.networkInfo.networkTitle,
+                    base58: keyDetails.base58
+                )
+            )
+        }
         isKeyExposed = keyDetails.address.secretExposed
         isRootKey = keyDetails.isRootKey
     }
 
     init(
         qrCode: QRCodeContainerViewModel,
-        addressFooter: QRCodeAddressFooterViewModel?,
-        rootFooter: QRCodeRootFooterViewModel?,
+        footer: Footer,
         isKeyExposed: Bool,
         isRootKey: Bool
     ) {
         self.qrCode = qrCode
-        self.addressFooter = addressFooter
-        self.rootFooter = rootFooter
+        self.footer = footer
         self.isKeyExposed = isKeyExposed
         self.isRootKey = isRootKey
     }

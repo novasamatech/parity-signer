@@ -1,4 +1,4 @@
-package io.parity.signer.bottomsheets
+package io.parity.signer.screens.keydetails
 
 import android.content.res.Configuration
 import androidx.annotation.DrawableRes
@@ -14,15 +14,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.bottomsheets.exportprivatekey.ConfirmExportPrivateKeyAction
+import io.parity.signer.screens.keydetails.exportprivatekey.ConfirmExportPrivateKeyMenu
 import io.parity.signer.components.base.RowButtonsBottomSheet
 import io.parity.signer.components.base.SecondaryButtonBottomSheet
+import io.parity.signer.models.Callback
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -43,10 +47,11 @@ fun KeyDetailsMenuAction(
 	when (state.value) {
 		KeyDetailsMenuState.GENERAL -> KeyDetailsGeneralMenu(navigator, state)
 
-		KeyDetailsMenuState.DELETE_CONFIRM -> KeyDetailsDeleteConfirmMenu(
-			navigator = navigator, state = state
+		KeyDetailsMenuState.DELETE_CONFIRM -> KeyDetailsDeleteConfirmBottomSheet(
+			onCancel = { navigator.backAction() },
+			onRemoveKey = { navigator.navigate(Action.REMOVE_KEY) },
 		)
-		KeyDetailsMenuState.PRIVATE_KEY_CONFIRM -> ConfirmExportPrivateKeyAction(
+		KeyDetailsMenuState.PRIVATE_KEY_CONFIRM -> ConfirmExportPrivateKeyMenu(
 			navigator = navigator,
 			publicKey = keyDetails!!.pubkey,
 		)
@@ -61,8 +66,8 @@ private fun KeyDetailsGeneralMenu(
 	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = sidePadding, end = sidePadding, top = 8.dp),
+			.fillMaxWidth()
+			.padding(start = sidePadding, end = sidePadding, top = 8.dp),
 	) {
 
 //		MenuItemForBottomSheet(
@@ -73,6 +78,7 @@ private fun KeyDetailsGeneralMenu(
 //				//
 //			}
 //		)
+
 
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_private_key_28,
@@ -112,15 +118,15 @@ private fun KeyDetailsGeneralMenu(
 
 
 @Composable
-private fun KeyDetailsDeleteConfirmMenu(
-	navigator: Navigator,
-	state: MutableState<KeyDetailsMenuState>
+fun KeyDetailsDeleteConfirmBottomSheet(
+	onCancel: Callback,
+	onRemoveKey: Callback,
 ) {
 	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = sidePadding, end = sidePadding, top = 32.dp),
+			.fillMaxWidth()
+			.padding(start = sidePadding, end = sidePadding, top = 32.dp),
 	) {
 
 		Text(
@@ -132,11 +138,11 @@ private fun KeyDetailsDeleteConfirmMenu(
 		)
 		Text(
 			modifier = Modifier
-                .fillMaxWidth(1f)
-                .padding(
-                    top = 16.dp, bottom = 24.dp,
-                    start = 8.dp, end = 8.dp
-                ),
+				.fillMaxWidth(1f)
+				.padding(
+					top = 16.dp, bottom = 24.dp,
+					start = 8.dp, end = 8.dp
+				),
 			text = stringResource(R.string.remove_key_confirm_text),
 			color = MaterialTheme.colors.textSecondary,
 			style = TypefaceNew.BodyL,
@@ -145,10 +151,8 @@ private fun KeyDetailsDeleteConfirmMenu(
 		RowButtonsBottomSheet(
 			labelCancel = stringResource(R.string.generic_cancel),
 			labelCta = stringResource(R.string.remove_key_confirm_cta),
-			onClickedCancel = {
-				navigator.backAction()
-												},
-			onClickedCta = { navigator.navigate(Action.REMOVE_KEY) },
+			onClickedCancel = onCancel,
+			onClickedCta = onRemoveKey,
 		)
 		Spacer(modifier = Modifier.padding(bottom = 24.dp))
 	}
@@ -156,30 +160,56 @@ private fun KeyDetailsDeleteConfirmMenu(
 
 
 @Composable
-private fun MenuItemForBottomSheet(
+internal fun MenuItemForBottomSheet(
+	vector: ImageVector,
+	label: String,
+	tint: Color? = null,
+	onclick: () -> Unit
+) {
+	MenuItemForBottomSheetInternal(
+		onclick, rememberVectorPainter(vector),
+		tint, label
+	)
+}
+
+@Composable
+internal fun MenuItemForBottomSheet(
 	@DrawableRes iconId: Int,
 	label: String,
 	tint: Color? = null,
 	onclick: () -> Unit
 ) {
+	MenuItemForBottomSheetInternal(
+		onclick, painterResource(id = iconId),
+		tint, label
+	)
+}
+
+@Composable
+private fun MenuItemForBottomSheetInternal(
+	onclick: () -> Unit,
+	painter: Painter,
+	tint: Color?,
+	label: String
+) {
 	Row(
 		modifier = Modifier
-            .clickable(onClick = onclick)
-            .padding(vertical = 8.dp)
-            .fillMaxWidth(),
+			.clickable(onClick = onclick)
+			.padding(vertical = 8.dp)
+			.fillMaxWidth(),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Icon(
-			painter = painterResource(id = iconId),
+			painter = painter,
 			contentDescription = null,
 			modifier = Modifier
 				.size(28.dp),
-			tint = tint ?: MaterialTheme.colors.primary,
+			tint = tint ?: MaterialTheme.colors.textSecondary,
 		)
 		Spacer(modifier = Modifier.padding(end = 24.dp))
 		Text(
 			text = label,
-			color = tint ?: MaterialTheme.colors.primary,
+			color = tint ?: MaterialTheme.colors.textSecondary,
 			style = TypefaceNew.TitleS,
 		)
 	}
@@ -223,10 +253,8 @@ private fun PreviewKeyDetailsGeneralMenu() {
 @Composable
 private fun PreviewKeyDetailsDeleteConfirmAction() {
 	SignerNewTheme {
-		KeyDetailsDeleteConfirmMenu(
-			EmptyNavigator(), remember {
-				mutableStateOf(KeyDetailsMenuState.DELETE_CONFIRM)
-			}
+		KeyDetailsDeleteConfirmBottomSheet(
+			{}, {},
 		)
 	}
 }

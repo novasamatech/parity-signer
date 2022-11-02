@@ -1,4 +1,4 @@
-package io.parity.signer.bottomsheets.exportprivatekey
+package io.parity.signer.screens.keydetails.exportprivatekey
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
@@ -27,7 +27,7 @@ import io.parity.signer.ui.theme.TypefaceNew
 import io.parity.signer.ui.theme.textSecondary
 
 @Composable
-fun ConfirmExportPrivateKeyAction(
+fun ConfirmExportPrivateKeyMenu(
 	navigator: Navigator,
 	publicKey: String,
 ) {
@@ -81,9 +81,9 @@ fun ConfirmExportPrivateKeyAction(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewConfirmExportPrivateKeyAction() {
+private fun PreviewConfirmExportPrivateKeyMenu() {
 	SignerNewTheme {
-		ConfirmExportPrivateKeyAction(
+		ConfirmExportPrivateKeyMenu(
 			EmptyNavigator(),
 			"pubkey"
 		)

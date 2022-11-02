@@ -553,7 +553,10 @@ namespace signer {
     void history_seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
 
     [Throws=ErrorDisplayed]
-    MKeysInfoExport export_key_info([ByRef] string dbname, sequence<string>? selected_names);
+    MKeysInfoExport export_key_info([ByRef] string dbname, record<DOMString, ExportedSet> selected_names);
+
+    [Throws=ErrorDisplayed]
+    MKeysNew keys_by_seed_name([ByRef] string dbname, [ByRef] string seed_name);
 
     [Throws=ErrorDisplayed]
     sequence<u8> encode_to_qr([ByRef] sequence<u8> payload);
@@ -561,6 +564,26 @@ namespace signer {
     void init_logging(string tag);
 };
 
+dictionary MKeysNew {
+    MAddressCard? root;
+    sequence<MKeyAndNetworkCard> set;
+};
+
+dictionary MKeyAndNetworkCard {
+    MKeysCard key;
+    MSCNetworkInfo network;
+};
+
+dictionary PathAndNetwork {
+    string derivation;
+    string network_specs_key;
+};
+
+[Enum]
+interface ExportedSet {
+    All();
+    Selected(sequence<PathAndNetwork> s);
+};
 
 [Enum]
 interface MSCContent {
