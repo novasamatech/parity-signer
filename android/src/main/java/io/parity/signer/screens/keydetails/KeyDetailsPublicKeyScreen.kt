@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -46,9 +48,11 @@ fun KeyDetailsPublicKeyScreen(
 			onMenu = { rootNavigator.navigate(Action.RIGHT_BUTTON_ACTION) }
 		)
 		Box(modifier = Modifier.weight(1f)) {
-	Column() {
-		//todo dmitry scrollable content for full screen
-	}
+			Column(
+				modifier = Modifier.verticalScroll(rememberScrollState())
+			) {
+				//todo dmitry scrollable content for full screen
+			}
 			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
 				ExposedIcon(
 					alertState = alertState, navigator = rootNavigator,
