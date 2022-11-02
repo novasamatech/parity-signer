@@ -1,16 +1,13 @@
 package io.parity.signer.ui.navigationselectors
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.models.*
-import io.parity.signer.screens.keysets.details.KeySetDetailsMultiselectScreen
-import io.parity.signer.screens.keysets.details.KeySetDetailsScreenFull
+import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenFull
+import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportScreenFull
 
 @Composable
 fun KeySetDetailsNavSubgraph(
@@ -30,20 +27,17 @@ fun KeySetDetailsNavSubgraph(
 				model = model,
 				navigator = rootNavigator,
 				alertState = alertState,
-				navController,
+				navController = navController,
 				onRemoveKeySet = {
 					sigleton.removeSeed(model.root.seedName)
 				},
 			)
 		}
 		composable(KeySetDetailsNavSubgraph.multiselect) {
-			Box(modifier = Modifier.statusBarsPadding()) {
-				KeySetDetailsMultiselectScreen(
-					model = model,
-					navigator = rootNavigator,
-					alertState = alertState,
-				)
-			}
+			KeySetDetailsExportScreenFull(
+				model = model,
+				onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
+			)
 		}
 	}
 }

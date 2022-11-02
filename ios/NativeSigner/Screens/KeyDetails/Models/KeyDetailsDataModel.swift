@@ -37,7 +37,7 @@ struct KeyDetailsDataModel: Equatable {
             base58: keys.root.base58
         )
         derivedKeys = keys.set
-            .sorted(by: { $0.address.path < $1.address.path })
+            .sorted(by: { $0.address.path < $1.address.path && $0.addressKey < $1.addressKey })
             .map {
                 DerivedKeyRowModel(
                     viewModel: DerivedKeyRowViewModel($0),
