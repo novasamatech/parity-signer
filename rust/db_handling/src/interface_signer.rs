@@ -11,7 +11,7 @@ use std::path::Path;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
-use definitions::navigation::MAddressCard;
+use definitions::navigation::{MAddressCard, MKeyAndNetworkCard, MKeysNew};
 use definitions::network_specs::NetworkSpecs;
 use definitions::{
     crypto::Encryption,
@@ -179,6 +179,74 @@ where
             }
         })
         .collect())
+}
+
+pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<MKeysNew> {
+    let (root, derived): (Vec<_>, Vec<_>) = get_addresses_by_seed_name(&db_path, seed_name)?
+        .into_iter()
+        .partition(|(_, address)| address.is_root());
+
+    let root = root.get(0).map(|root| {
+        let address = Address {
+            has_pwd: false,
+            path: String::new(),
+            seed_name: seed_name.to_string(),
+            identicon: make_identicon_from_multisigner(
+                &root.0,
+                root.1.encryption.identicon_style(),
+            ),
+            secret_exposed: root.1.secret_exposed,
+        };
+        MAddressCard {
+            base58: print_multisigner_as_base58_or_eth(&root.0, None, root.1.encryption),
+            address,
+            multiselect: None,
+        }
+    });
+
+    let set: Result<_> = derived
+        .into_iter()
+        .map(|(multisigner, address_details)| -> Result<_> {
+            let network_specs = get_network_specs(&db_path, &address_details.network_id[0])?;
+            let identicon = make_identicon_from_multisigner(
+                &multisigner,
+                network_specs.specs.encryption.identicon_style(),
+            );
+            let base58 = print_multisigner_as_base58_or_eth(
+                &multisigner,
+                Some(network_specs.specs.base58prefix),
+                network_specs.specs.encryption,
+            );
+            let address_key = hex::encode(AddressKey::from_multisigner(&multisigner).key());
+            let address = Address {
+                path: address_details.path,
+                has_pwd: address_details.has_pwd,
+                identicon,
+                secret_exposed: address_details.secret_exposed,
+                seed_name: seed_name.to_owned(),
+            };
+            let key = MKeysCard {
+                address,
+                base58,
+                address_key,
+                swiped: false,
+                multiselect: false,
+            };
+            let network_specs_key = NetworkSpecsKey::from_parts(
+                &network_specs.specs.genesis_hash,
+                &network_specs.specs.encryption,
+            );
+            let network = MSCNetworkInfo {
+                network_title: network_specs.specs.title,
+                network_logo: network_specs.specs.logo,
+                network_specs_key: hex::encode(network_specs_key.encode()),
+            };
+
+            Ok(MKeyAndNetworkCard { key, network })
+        })
+        .collect();
+
+    Ok(MKeysNew { root, set: set? })
 }
 
 /// Return `Vec` with address-associated public data for all addresses from the

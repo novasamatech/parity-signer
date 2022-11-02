@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets.details
+package io.parity.signer.screens.keysetdetails
 
 import android.content.res.Configuration
 import android.telecom.Call
