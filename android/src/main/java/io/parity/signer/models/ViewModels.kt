@@ -12,8 +12,8 @@ import io.parity.signer.uniffi.*
  * Local copy of shared [MKeys] class
  */
 data class KeySetDetailsModel(
-	val keys: List<KeysModel>,
-	val root: KeysModel,
+	val keys: List<KeyModel>,
+	val root: KeyModel,
 	val network: NetworkModel,
 	val multiselectMode: Boolean,
 	val multiselectCount: String,
@@ -21,8 +21,8 @@ data class KeySetDetailsModel(
 	companion object {
 		fun createStub(): KeySetDetailsModel = KeySetDetailsModel(
 			keys = listOf(
-				KeysModel.createStub(),
-				KeysModel(
+				KeyModel.createStub(),
+				KeyModel(
 					addressKey = "address key2",
 					base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9sdfsdfsdfS1repo5EYjGG",
 					identicon = PreviewData.exampleIdenticon,
@@ -33,7 +33,7 @@ data class KeySetDetailsModel(
 					seedName = "sdsdsd",
 				),
 			),
-			root = KeysModel(
+			root = KeyModel(
 				identicon = PreviewData.exampleIdenticon,
 				addressKey = "address key",
 				base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
@@ -61,7 +61,7 @@ fun MKeys.toKeySetDetailsModel() = KeySetDetailsModel(
 /**
  * Local copy of shared [MKeysCard] class
  */
-data class KeysModel(
+data class KeyModel(
 	val identicon: List<UByte>,
 	val addressKey: String,
 	val seedName: String,
@@ -72,7 +72,7 @@ data class KeysModel(
 	val secretExposed: Boolean
 ) {
 	companion object {
-		fun createStub() = KeysModel(
+		fun createStub() = KeyModel(
 			addressKey = "address key",
 			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
 			identicon = PreviewData.exampleIdenticon,
@@ -85,7 +85,7 @@ data class KeysModel(
 	}
 }
 
-fun MKeysCard.toKeysModel() = KeysModel(
+fun MKeysCard.toKeysModel() = KeyModel(
 	addressKey = addressKey,
 	base58 = base58,
 	identicon = address.identicon,
@@ -141,6 +141,17 @@ data class KeyCardModel(
 	val multiselect: Boolean? = null,
 ) {
 	companion object {
+
+		fun fromKeyModel(model: KeyModel, networkTitle: String): KeyCardModel =
+			KeyCardModel(
+				network = networkTitle,
+					base58 = model.base58,
+					path = model.path,
+					identIcon = model.identicon,
+					seedName = model.seedName,
+					hasPwd = model.hasPwd,
+					multiselect = model.multiselect,
+			)
 		/**
 		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
 		 */

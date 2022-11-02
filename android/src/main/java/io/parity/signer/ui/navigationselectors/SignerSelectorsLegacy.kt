@@ -10,8 +10,6 @@ import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
 import io.parity.signer.screens.keydetails.ExportPublicKey
-import io.parity.signer.screens.keysets.*
-import io.parity.signer.screens.keysets.details.SeedMenu
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.ModalData
@@ -45,14 +43,7 @@ fun ScreenSelector(
 			screenData.f,
 			button1,
 		)
-		is ScreenData.Keys -> if (FeatureFlags.isDisabled(FeatureOption.NEW_KEY_SET_DETAILS)) {
-			KeyManager(
-				button = button2,
-				signerDataModel::increment,
-				screenData.f,
-				alertState
-			)
-		}
+		is ScreenData.Keys -> {} //migrated to new selector
 		is ScreenData.Log -> HistoryScreen(screenData.f, button2)
 		is ScreenData.LogDetails -> LogDetails(screenData.f)
 		is ScreenData.ManageNetworks -> ManageNetworks(
@@ -135,14 +126,7 @@ fun ModalSelector(
 	} else {
 		when (modalData) {
 			is ModalData.NewSeedMenu -> {} //new bottom sheet
-			is ModalData.SeedMenu -> if (FeatureFlags.isDisabled(FeatureOption.NEW_KEY_SET_DETAILS)) {
-				SeedMenu(
-					modalData.f,
-					alertState,
-					button1,
-					signerDataModel::removeSeed
-				)
-			}
+			is ModalData.SeedMenu -> {} //migrated
 			is ModalData.NetworkSelector -> NetworkSelector(
 				modalData.f,
 				button2
