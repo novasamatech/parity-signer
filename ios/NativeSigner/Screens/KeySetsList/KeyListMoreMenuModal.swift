@@ -39,7 +39,7 @@ struct KeyListMoreMenuModal: View {
                     )
                 }
                 .padding([.leading, .trailing], Spacing.large)
-                .padding(.bottom, Spacing.small)
+                .padding(.bottom, Spacing.extraSmall + Spacing.medium)
             }
         )
     }

@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct DerivedKeyRow: View {
-    private let viewModel: DerivedKeyRowViewModel
+    let viewModel: DerivedKeyRowViewModel
+    @Binding var selectedSeeds: [String]
+    @Binding var isPresentingSelectionOverlay: Bool
 
-    init(_ viewModel: DerivedKeyRowViewModel) {
-        self.viewModel = viewModel
+    private var isItemSelected: Bool {
+        selectedSeeds.contains(viewModel.path)
     }
 
     var body: some View {
@@ -26,7 +28,7 @@ struct DerivedKeyRow: View {
                 Spacer().frame(height: Spacing.extraExtraSmall)
                 HStack(spacing: Spacing.extraExtraSmall) {
                     Asset.derivedKeyAddress.swiftUIImage
-                    Text(viewModel.base58)
+                    Text(viewModel.base58.truncateMiddle())
                         .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                         .font(Fontstyle.bodyM.base)
                         .lineLimit(1)
@@ -34,10 +36,19 @@ struct DerivedKeyRow: View {
             }
             Spacer()
             VStack(alignment: .center) {
-                Asset.chevronRight.swiftUIImage
-                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                    .padding(.trailing, Spacing.large)
+                if isPresentingSelectionOverlay {
+                    if isItemSelected {
+                        Asset.checkmarkChecked.swiftUIImage
+                    } else {
+                        Asset.checkmarkUnchecked.swiftUIImage
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    }
+                } else {
+                    Asset.chevronRight.swiftUIImage
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                }
             }
+            .padding(.trailing, Spacing.large)
             .frame(minHeight: .zero, maxHeight: .infinity)
         }
         .padding([.top, .bottom], Spacing.medium)
@@ -59,36 +70,45 @@ struct DerivedKeyRow_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
             DerivedKeyRow(
-                DerivedKeyRowViewModel(
+                viewModel: DerivedKeyRowViewModel(
                     identicon: PreviewData.exampleIdenticon,
                     path: "// polkadot",
                     hasPassword: false,
-                    base58: "15Gsc678654FDSG0HA04H0A"
-                )
+                    base58: "15Gsc678654FDSG0HA04H0A",
+                    rootKeyName: ""
+                ),
+                selectedSeeds: Binding<[String]>.constant(["name"]),
+                isPresentingSelectionOverlay: Binding<Bool>.constant(true)
             )
             DerivedKeyRow(
-                DerivedKeyRowViewModel(
+                viewModel: DerivedKeyRowViewModel(
                     identicon: PreviewData.exampleIdenticon,
                     path: "// astar",
                     hasPassword: false,
                     base58: "15Gsc678654FDSG0HA04H0A"
-                )
+                ),
+                selectedSeeds: Binding<[String]>.constant([]),
+                isPresentingSelectionOverlay: Binding<Bool>.constant(true)
             )
             DerivedKeyRow(
-                DerivedKeyRowViewModel(
+                viewModel: DerivedKeyRowViewModel(
                     identicon: PreviewData.exampleIdenticon,
                     path: "// kusama",
                     hasPassword: true,
                     base58: "15Gsc678654FDSG0HA04H0A"
-                )
+                ),
+                selectedSeeds: Binding<[String]>.constant([]),
+                isPresentingSelectionOverlay: Binding<Bool>.constant(false)
             )
             DerivedKeyRow(
-                DerivedKeyRowViewModel(
+                viewModel: DerivedKeyRowViewModel(
                     identicon: PreviewData.exampleIdenticon,
                     path: "// kusama // verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
                     hasPassword: true,
                     base58: "15Gsc678654FDSG0HA04H0A"
-                )
+                ),
+                selectedSeeds: Binding<[String]>.constant([]),
+                isPresentingSelectionOverlay: Binding<Bool>.constant(false)
             )
         }
         .preferredColorScheme(.dark)

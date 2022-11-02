@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -22,18 +23,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
-import io.parity.signer.models.KeysModel
+import io.parity.signer.models.KeyModel
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.textDisabled
+import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun KeyDerivedItem(
-	model: KeysModel,
+	model: KeyModel,
 	onClick: () -> Unit = {},
 ) {
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
-		color = MaterialTheme.colors.backgroundSecondary,
+		color = Color.Transparent,
 		modifier = Modifier.clickable(onClick = onClick),
 	) {
 		Row(
@@ -95,7 +99,7 @@ fun KeyDerivedItem(
 private fun PreviewKeyDerivedItem() {
 	SignerNewTheme {
 		KeyDerivedItem(
-			KeysModel.createStub()
+			KeyModel.createStub()
 		)
 	}
 }

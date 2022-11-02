@@ -14,4 +14,9 @@
 		<item quantity="one">Export %1$d Key Set</item>
 		<item quantity="other">Export %1$d Key Sets</item>
 	</plurals>
+
+	<plurals name="key_export_title">
+		<item quantity="one">Export %1$d Key</item>
+		<item quantity="other">Export %1$d Keys</item>
+	</plurals>
 </resources>

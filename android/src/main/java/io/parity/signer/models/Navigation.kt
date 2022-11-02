@@ -3,7 +3,7 @@ package io.parity.signer.models
 import android.util.Log
 import android.widget.Toast
 import io.parity.signer.BuildConfig
-import io.parity.signer.bottomsheets.exportprivatekey.PrivateKeyExportModel
+import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ScreenData
@@ -147,8 +147,8 @@ class EmptyNavigator : Navigator {
 sealed class LocalNavAction {
 	object None : LocalNavAction()
 	class ShowExportPrivateKey(
-		val model: PrivateKeyExportModel,
-		val navigator: SignerNavigator
+        val model: PrivateKeyExportModel,
+        val navigator: SignerNavigator
 	) : LocalNavAction()
 }
 
