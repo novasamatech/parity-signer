@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets.details
+package io.parity.signer.screens.keysetdetails
 
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
@@ -6,7 +6,6 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.navigation.NavController
 import io.parity.signer.models.*
-import io.parity.signer.screens.keysets.KeySetDetailsScreenView
 import io.parity.signer.ui.BottomSheetWrapperContent
 import io.parity.signer.ui.navigationselectors.KeySetDetailsNavSubgraph
 import kotlinx.coroutines.launch
