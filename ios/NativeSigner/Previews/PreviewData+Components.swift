@@ -102,3 +102,91 @@ extension PreviewData {
         seedNames: mseeds.seedNameCards.map(\.seedName)
     )
 }
+
+extension PreviewData {
+//    static let keyDetails: KeyDetailsDataModel = .init(
+//        keySummary: KeySummaryViewModel(
+//            keyName: "Main Polkadot",
+//            base58: "15Gsc678...0HA04H0A"
+//        ),
+//        derivedKeys: [
+//            DerivedKeyRowModel(
+//                viewModel: DerivedKeyRowViewModel(
+//                    identicon: PreviewData.exampleIdenticon,
+//                    path: "// polkadot",
+//                    hasPassword: false,
+//                    base58: "15Gsc678654FDSG0HA04H0A"
+//                ),
+//                actionModel: DerivedKeyActionModel(
+//                    tapAction: .init(action: .rightButtonAction)
+//                )
+//            ),
+//            DerivedKeyRowModel(
+//                viewModel: DerivedKeyRowViewModel(
+//                    identicon: PreviewData.exampleIdenticon,
+//                    path: "// polkadot",
+//                    hasPassword: false,
+//                    base58: "15Gsc678654FDSG0HA04H0A"
+//                ),
+//                actionModel: DerivedKeyActionModel(
+//                    tapAction: .init(action: .rightButtonAction)
+//                )
+//            ),
+//            DerivedKeyRowModel(
+//                viewModel: DerivedKeyRowViewModel(
+//                    identicon: PreviewData.exampleIdenticon,
+//                    path: "//astar//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
+//                    hasPassword: true,
+//                    base58: "15Gsc678654FDSG0HA04H0A"
+//                ),
+//                actionModel: DerivedKeyActionModel(
+//                    tapAction: .init(action: .rightButtonAction)
+//                )
+//            ),
+//            DerivedKeyRowModel(
+//                viewModel: DerivedKeyRowViewModel(
+//                    identicon: PreviewData.exampleIdenticon,
+//                    path: "//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
+//                    hasPassword: false,
+//                    base58: "15Gsc678654FDSG0HA04H0A"
+//                ),
+//                actionModel: DerivedKeyActionModel(
+//                    tapAction: .init(action: .rightButtonAction)
+//                )
+//            ),
+//            DerivedKeyRowModel(
+//                viewModel: DerivedKeyRowViewModel(
+//                    identicon: PreviewData.exampleIdenticon,
+//                    path: "// acala",
+//                    hasPassword: true,
+//                    base58: "15Gsc678654FDSG0HA04H0A"
+//                ),
+//                actionModel: DerivedKeyActionModel(
+//                    tapAction: .init(action: .rightButtonAction)
+//                )
+//            ),
+//            DerivedKeyRowModel(
+//                viewModel: DerivedKeyRowViewModel(
+//                    identicon: PreviewData.exampleIdenticon,
+//                    path: "// moonbeam",
+//                    hasPassword: true,
+//                    base58: "15Gsc678654FDSG0HA04H0A"
+//                ),
+//                actionModel: DerivedKeyActionModel(
+//                    tapAction: .init(action: .rightButtonAction)
+//                )
+//            ),
+//            DerivedKeyRowModel(
+//                viewModel: DerivedKeyRowViewModel(
+//                    identicon: PreviewData.exampleIdenticon,
+//                    path: "// kilt",
+//                    hasPassword: true,
+//                    base58: "15Gsc6786546423FDSG0HA04H0A"
+//                ),
+//                actionModel: DerivedKeyActionModel(
+//                    tapAction: .init(action: .rightButtonAction)
+//                )
+//            )
+//        ]
+//    )
+}

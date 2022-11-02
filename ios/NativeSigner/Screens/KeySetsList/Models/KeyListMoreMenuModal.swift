@@ -50,7 +50,7 @@ struct KeyListMoreMenuModal: View {
             delayedAnimationClosure: {
                 isPresented.toggle()
                 completion()
-            }()
+            }
         )
     }
 }

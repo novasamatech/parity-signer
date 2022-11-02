@@ -15,7 +15,7 @@ enum Animations {
     ///   - delayedAnimationClosure: closure to be called when second, delayed animation is finished
     static func chainAnimation(
         _ firstAnimationClosure: @autoclosure () -> Void,
-        delayedAnimationClosure: @escaping @autoclosure () -> Void
+        delayedAnimationClosure: @escaping () -> Void
     ) {
         withAnimation(
             Animation.easeIn(duration: AnimationDuration.standard)

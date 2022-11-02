@@ -76,7 +76,7 @@ struct KeyDetailsActionsModal: View {
             delayedAnimationClosure: {
                 isShowingActionSheet.toggle()
                 completion()
-            }()
+            }
         )
     }
 }

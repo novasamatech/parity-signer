@@ -86,7 +86,7 @@ struct HorizontalActionsBottomModal: View {
             delayedAnimationClosure: {
                 isShowingBottomAlert.toggle()
                 completion()
-            }()
+            }
         )
     }
 }

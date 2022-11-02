@@ -67,7 +67,7 @@ struct AddKeySetModal: View {
             delayedAnimationClosure: {
                 isShowingNewSeedMenu.toggle()
                 completion()
-            }()
+            }
         )
     }
 }

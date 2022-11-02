@@ -20,11 +20,6 @@ struct ModalSelector: View {
 
     var body: some View {
         switch modalData {
-        case let .networkSelector(value):
-            NetworkManager(
-                content: value,
-                navigationRequest: navigationRequest
-            )
         case let .passwordConfirm(value):
             PasswordConfirm(
                 content: value,
@@ -78,6 +73,8 @@ struct ModalSelector: View {
                 navigationRequest: navigationRequest
             )
         // Handled in native navigation
+        case .networkSelector:
+            EmptyView()
         case .backup:
             EmptyView()
         case .keyDetailsAction:

@@ -23,10 +23,14 @@ enum Heights {
     static let actionSheetButton: CGFloat = 44
     /// Height for cell container for Key Set collection element
     static let keyCellContainer: CGFloat = 72
-    /// Height for `Identicon` when used in list collections
+    /// Height for `Identicon` when used in list collections, 36 pt
     static let identiconInCell: CGFloat = 36
+    /// Height for `Network Logo` when used in list collections, 36 pt
+    static let networkLogoInCell: CGFloat = 36
     static let tabbarHeight: CGFloat = 49
     static let errorModalIconContainer: CGFloat = 80
+    /// Height for element in Network Filter modal
+    static let networkFilterItem: CGFloat = 48
 }
 
 enum Sizes {

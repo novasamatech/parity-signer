@@ -97,7 +97,7 @@ struct ErrorBottomModal: View {
             delayedAnimationClosure: {
                 isShowingBottomAlert.toggle()
                 completion()
-            }()
+            }
         )
     }
 }

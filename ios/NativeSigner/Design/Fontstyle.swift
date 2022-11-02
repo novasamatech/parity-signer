@@ -106,7 +106,6 @@ extension Fontstyle {
             return FontFamily.RobotoMono.medium.swiftUIFont(size: 14)
         case .subtitle2:
             return FontFamily.RobotoMono.medium.swiftUIFont(size: 13)
-
         case .bodyM:
             return FontFamily.RobotoMono.bold.swiftUIFont(size: 13)
 

@@ -59,6 +59,6 @@ extension KeyDetailsView {
     }
 
     func selectAll() {
-        viewModel.selectedSeeds = viewModel.dataModel.derivedKeys.map(\.viewModel.path)
+        viewModel.selectedSeeds = viewModel.derivedKeys.map(\.viewModel.path)
     }
 }

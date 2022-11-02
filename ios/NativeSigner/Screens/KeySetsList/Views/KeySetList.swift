@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct KeySetList: View {
-    @ObservedObject var viewModel: ViewModel
+    @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject var appState: AppState
     @State private var isShowingNewSeedMenu = false
@@ -181,30 +181,6 @@ struct KeySetList: View {
         }
         .frame(height: Heights.tabbarHeight)
         .background(Asset.backgroundSecondary.swiftUIColor)
-    }
-}
-
-extension KeySetList {
-    final class ViewModel: ObservableObject {
-        let listViewModel: KeySetListViewModel
-        let keyDetailsService: KeyDetailsService
-
-        @Published var isShowingKeysExportModal = false
-
-        init(
-            listViewModel: KeySetListViewModel,
-            keyDetailsService: KeyDetailsService = KeyDetailsService()
-        ) {
-            self.listViewModel = listViewModel
-            self.keyDetailsService = keyDetailsService
-        }
-
-        func loadKeysInformation(
-            for seedName: String,
-            _ completion: @escaping (Result<MKeysNew, ServiceError>) -> Void
-        ) {
-            keyDetailsService.getKeys(for: seedName, completion)
-        }
     }
 }
 

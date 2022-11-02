@@ -87,7 +87,7 @@ struct PublicKeyActionsModal: View {
             delayedAnimationClosure: {
                 isShowingActionSheet.toggle()
                 completion()
-            }()
+            }
         )
     }
 }
