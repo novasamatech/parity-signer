@@ -31,13 +31,13 @@ import io.parity.signer.ui.theme.*
 @Composable
 fun KeyCard(model: KeyCardModel) {
 	Row(
-		Modifier
-			.fillMaxWidth()
-			.padding(16.dp)
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
 	) {
 
 		//left
-		Column() {
+		Column(Modifier.weight(1f)) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically
 			) {
@@ -70,10 +70,11 @@ fun KeyCard(model: KeyCardModel) {
 
 			Spacer(Modifier.padding(top = 10.dp))
 
-			showBase58Collapsible(model.base58)
+			Box(modifier = Modifier.padding(end = 24.dp)) {
+				showBase58Collapsible(model.base58)
+			}
 		}
 
-		Spacer(Modifier.weight(1f))
 
 		//right()
 		Column(horizontalAlignment = Alignment.End) {
@@ -100,11 +101,11 @@ fun KeyCard(model: KeyCardModel) {
 
 			Box(
 				modifier = Modifier
-					.background(
-						MaterialTheme.colors.fill12,
-						RoundedCornerShape(12.dp)
-					)
-					.padding(horizontal = 8.dp, vertical = 2.dp),
+                    .background(
+                        MaterialTheme.colors.fill12,
+                        RoundedCornerShape(12.dp)
+                    )
+                    .padding(horizontal = 8.dp, vertical = 2.dp),
 				contentAlignment = Alignment.Center,
 			) {
 				Text(
@@ -120,9 +121,9 @@ fun KeyCard(model: KeyCardModel) {
 @Composable
 fun KeySeedCard(seedTitle: String, base58: String) {
 	Column(
-		Modifier
-			.fillMaxWidth()
-			.padding(16.dp)
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
 	) {
 		Text(
 			seedTitle,
@@ -136,7 +137,6 @@ fun KeySeedCard(seedTitle: String, base58: String) {
 @Composable
 private fun showBase58Collapsible(base58: String) {
 	val expanded = remember { mutableStateOf(false) }
-	//todo dmitry fix if true we get extra space below
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier.clickable { expanded.value = !expanded.value }
@@ -196,7 +196,8 @@ private fun PreviewKeyCard() {
 @Composable
 private fun PreviewKeySeedCard() {
 	SignerNewTheme {
-		KeySeedCard(seedTitle = "Seed title",
+		KeySeedCard(
+			seedTitle = "Seed title",
 			base58 = KeyCardModel.createStub().base58,
 		)
 	}
