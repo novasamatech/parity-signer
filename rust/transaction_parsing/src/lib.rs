@@ -1,7 +1,8 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use definitions::navigation::TransactionCardSet;
+use definitions::{helpers::unhex, navigation::TransactionCardSet};
+use parity_scale_codec::{Decode, Encode};
 use std::path::Path;
 
 pub use definitions::navigation::{StubNav, TransactionAction};
@@ -67,8 +68,39 @@ where
     }
 }
 
-fn parse_transaction_bulk<P: AsRef<Path>>(_payload: &str, _dbname: P) -> Result<TransactionAction> {
-    todo!()
+#[derive(Clone, Encode, Decode)]
+pub enum TransactionBulk {
+    V1(TransactionBulkV1),
+}
+
+#[derive(Clone, Encode, Decode)]
+pub struct TransactionBulkV1 {
+    encoded_transactions: Vec<Vec<u8>>,
+}
+
+fn parse_transaction_bulk<P: AsRef<Path>>(payload: &str, dbname: P) -> Result<TransactionAction> {
+    let decoded_data = unhex(payload)?;
+
+    let bulk = TransactionBulk::decode(&mut &decoded_data[3..])?;
+
+    match bulk {
+        TransactionBulk::V1(b) => {
+            let mut actions = vec![];
+
+            for t in &b.encoded_transactions {
+                let encoded = hex::encode(t);
+                let action = parse_transaction(&encoded, &dbname)?;
+                if let TransactionAction::Sign { action, .. } = action {
+                    actions.push(action);
+                }
+            }
+
+            Ok(TransactionAction::SignBulk {
+                actions,
+                checksum: 0,
+            })
+        }
+    }
 }
 
 pub fn produce_output<P>(payload: &str, dbname: P) -> TransactionAction
