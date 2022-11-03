@@ -10,23 +10,27 @@ import SwiftUI
 struct TransactionPreview: View {
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var data: SignerDataModel
+    @StateObject var viewModel: ViewModel
     @State private var comment = ""
     @State private var offset: CGFloat = 0
     @State private var offsetOld: CGFloat = 0
     @FocusState private var focus: Bool
-    let content: MTransaction
 
     var body: some View {
         VStack {
-            TransactionBlock(cards: content.content.assemble())
+            NavigationBarView(
+                viewModel: .init(title: Localizable.TransactionPreview.Label.title.string, leftButton: .arrow),
+                actionModel: .init(leftBarMenuAction: viewModel.onBackButtonTap, rightBarMenuAction: {})
+            )
+            TransactionBlock(cards: viewModel.content.content.assemble())
             VStack {
-                if let authorInfo = content.authorInfo {
+                if let authorInfo = viewModel.content.authorInfo {
                     AddressCard(card: authorInfo)
                 }
-                if let network = content.networkInfo {
+                if let network = viewModel.content.networkInfo {
                     NetworkCard(title: network.networkTitle, logo: network.networkLogo)
                 }
-                if content.ttype == .sign {
+                if viewModel.content.ttype == .sign {
                     HStack {
                         Localizable.logNote.text.font(Fontstyle.overline.base)
                             .foregroundColor(Asset.text400.swiftUIColor)
@@ -57,7 +61,7 @@ struct TransactionPreview: View {
                 }
                 Spacer()
                 VStack {
-                    switch content.ttype {
+                    switch viewModel.content.ttype {
                     case .sign:
                         BigButton(
                             text: Localizable.TransactionPreview.unlockSign.key,
@@ -65,7 +69,7 @@ struct TransactionPreview: View {
                             isCrypto: true,
                             action: {
                                 focus = false
-                                if let seedName = content.authorInfo?.address.seedName {
+                                if let seedName = viewModel.content.authorInfo?.address.seedName {
                                     data.sign(seedName: seedName, comment: comment)
                                 }
                             }
@@ -90,7 +94,7 @@ struct TransactionPreview: View {
                     case .done:
                         EmptyView()
                     }
-                    if content.ttype != .done {
+                    if viewModel.content.ttype != .done {
                         BigButton(
                             text: Localizable.TransactionPreview.decline.key,
                             isShaded: true,
@@ -117,6 +121,30 @@ struct TransactionPreview: View {
                     self.offset = 0
                 }
         )
+    }
+}
+
+extension TransactionPreview {
+    final class ViewModel: ObservableObject {
+        @Binding var isPresented: Bool
+        private weak var navigation: NavigationCoordinator!
+        let content: MTransaction
+
+        init(
+            isPresented: Binding<Bool>,
+            content: MTransaction
+        ) {
+            _isPresented = isPresented
+            self.content = content
+        }
+
+        func use(navigation: NavigationCoordinator) {
+            self.navigation = navigation
+        }
+
+        func onBackButtonTap() {
+            isPresented.toggle()
+        }
     }
 }
 

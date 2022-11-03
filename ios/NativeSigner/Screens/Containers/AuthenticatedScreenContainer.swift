@@ -41,7 +41,11 @@ struct AuthenticatedScreenContainer: View {
             }
         }
         .bottomEdgeOverlay(
-            overlayView: CameraView(isPresented: $navigation.shouldPresentQRScanner),
+            overlayView: CameraView(
+                viewModel: .init(
+                    isPresented: $navigation.shouldPresentQRScanner
+                )
+            ),
             isPresented: $isShowingQRScanner
         )
         .onReceive(navigation.$shouldPresentQRScanner) { shouldPresent in

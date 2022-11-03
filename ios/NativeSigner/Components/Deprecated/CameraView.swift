@@ -10,29 +10,16 @@ import SwiftUI
 
 struct CameraView: View {
     @StateObject var model = CameraService()
+    @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @Binding var isPresented: Bool
     @Environment(\.safeAreaInsets) private var safeAreaInsets
-    @State var isPresentingTransactionPreview: Bool = false
-    @State var mTransaction: MTransaction!
 
     var body: some View {
         ZStack {
             // Full screen camera preview
             CameraPreview(session: model.session)
                 .onReceive(model.$payload) { payload in
-                    guard payload != nil, !isPresentingTransactionPreview else { return }
-                    let actionResult = navigation.performFake(
-                        navigation: .init(
-                            action: .transactionFetched,
-                            details: payload
-                        )
-                    )
-                    if case let .transaction(value) = actionResult.screenData {
-                        mTransaction = value
-                        isPresentingTransactionPreview = true
-                        model.shutdown()
-                    }
+                    viewModel.checkForTransactionNavigation(payload, model: model)
                 }
                 .onChange(of: model.captured) { newValue in
                     UIApplication.shared.isIdleTimerDisabled = newValue > 0
@@ -46,7 +33,7 @@ struct CameraView: View {
                         HStack {
                             CameraButton(
                                 action: {
-                                    isPresented.toggle()
+                                    viewModel.isPresented.toggle()
                                 },
                                 icon: Asset.xmarkButton.swiftUIImage
                             )
@@ -88,6 +75,7 @@ struct CameraView: View {
                                 .font(Fontstyle.bodyL.base)
                                 .multilineTextAlignment(.center)
                         }
+                        .foregroundColor(Asset.accentForegroundText.swiftUIColor)
                         .padding([.leading, .trailing], Spacing.componentSpacer)
                         Spacer()
                     }
@@ -118,13 +106,12 @@ struct CameraView: View {
                         )
                     }
                 }
-//                .padding(.leading, safeAreaInsets.leading + Spacing.extraLarge)
-//                .padding(.trailing, safeAreaInsets.trailing + Spacing.extraLarge)
             }
         }
         .ignoresSafeArea(edges: [.top, .bottom])
         .onAppear {
             model.configure()
+            viewModel.use(navigation: navigation)
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
@@ -132,10 +119,54 @@ struct CameraView: View {
         }
 
         .background(Asset.bg100.swiftUIColor)
-        .fullScreenCover(isPresented: $isPresentingTransactionPreview) {
-            TransactionPreview(
-                content: mTransaction
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingTransactionPreview,
+            onDismiss: { model.start() }
+        ) {
+            if let transaction = viewModel.mTransaction {
+                TransactionPreview(
+                    viewModel: .init(
+                        isPresented: $viewModel.isPresentingTransactionPreview,
+                        content: transaction
+                    )
+                )
+            } else {
+                EmptyView()
+            }
+        }
+    }
+}
+
+extension CameraView {
+    final class ViewModel: ObservableObject {
+        @Published var isPresentingTransactionPreview: Bool = false
+        @Published var mTransaction: MTransaction?
+        @Binding var isPresented: Bool
+        private weak var navigation: NavigationCoordinator!
+
+        init(
+            isPresented: Binding<Bool>
+        ) {
+            _isPresented = isPresented
+        }
+
+        func use(navigation: NavigationCoordinator) {
+            self.navigation = navigation
+        }
+
+        func checkForTransactionNavigation(_ payload: String?, model: CameraService) {
+            guard payload != nil, !isPresentingTransactionPreview else { return }
+            let actionResult = navigation.performFake(
+                navigation: .init(
+                    action: .transactionFetched,
+                    details: payload
+                )
             )
+            if case let .transaction(value) = actionResult.screenData {
+                mTransaction = value
+                isPresentingTransactionPreview = true
+                model.shutdown()
+            }
         }
     }
 }
