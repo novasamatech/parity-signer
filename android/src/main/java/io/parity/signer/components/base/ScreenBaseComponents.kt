@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
-import io.parity.signer.ui.theme.textSecondary
+import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun ScreenHeader(
@@ -122,8 +122,8 @@ fun ScreenHeaderClose(
 			if (subtitle != null) {
 				Text(
 					text = subtitle,
-					color = MaterialTheme.colors.textSecondary,
-					style = TypefaceNew.CaptionS,
+					color = MaterialTheme.colors.textTertiary,
+					style = TypefaceNew.CaptionM,
 					textAlign = TextAlign.Center,
 					modifier = Modifier.fillMaxWidth(1f),
 				)
