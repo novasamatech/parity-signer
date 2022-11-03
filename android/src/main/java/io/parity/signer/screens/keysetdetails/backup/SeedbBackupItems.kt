@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets.details.backup
+package io.parity.signer.screens.keysetdetails.backup
 
 import io.parity.signer.uniffi.MBackup
 import io.parity.signer.uniffi.DerivationPack
