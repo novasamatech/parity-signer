@@ -54,10 +54,10 @@ fun KeySetDetailsExportResultBottomSheet(
 		//scrollable part
 		Column(
 			modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .weight(weight = 1f, fill = false)
-                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                .background(MaterialTheme.colors.fill6, plateShape)
+				.verticalScroll(rememberScrollState())
+				.weight(weight = 1f, fill = false)
+				.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+				.background(MaterialTheme.colors.fill6, plateShape)
 		) {
 			if (LocalInspectionMode.current) {
 				AnimatedQrKeysInfo(
@@ -68,29 +68,23 @@ fun KeySetDetailsExportResultBottomSheet(
 			} else {
 				AnimatedQrKeysInfo(
 					input = KeySetDetailsExportService.GetQrCodesListRequest(model.root.seedName,
-					model.keys.filter { selectedKeys.contains(it.addressKey) }),
+						model.keys.filter { selectedKeys.contains(it.addressKey) }),
 					provider = KeySetDetailsExportService(),
 					modifier = Modifier.padding(8.dp)
 				)
 			}
 
-			val innerRounding =
-				dimensionResource(id = R.dimen.innerFramesCornerRadius)
+			val innerRoun = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 			val innerShape =
-				RoundedCornerShape(
-					innerRounding,
-					innerRounding,
-					innerRounding,
-					innerRounding
-				)
+				RoundedCornerShape(innerRoun, innerRoun, innerRoun, innerRoun)
 			Row(
 				modifier = Modifier
-                    .padding(8.dp)
-                    .border(
-                        BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-                        innerShape
-                    )
-                    .background(MaterialTheme.colors.fill6, innerShape)
+					.padding(8.dp)
+					.border(
+						BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+						innerShape
+					)
+					.background(MaterialTheme.colors.fill6, innerShape)
 
 			) {
 				Text(
@@ -98,16 +92,16 @@ fun KeySetDetailsExportResultBottomSheet(
 					color = MaterialTheme.colors.textTertiary,
 					style = TypefaceNew.CaptionM,
 					modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+						.weight(1f)
+						.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
 				)
 				Icon(
 					imageVector = Icons.Outlined.Info,
 					contentDescription = null,
 					tint = MaterialTheme.colors.pink300,
 					modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .padding(start = 18.dp, end = 18.dp)
+						.align(Alignment.CenterVertically)
+						.padding(start = 18.dp, end = 18.dp)
 				)
 			}
 			KeySeedCard(

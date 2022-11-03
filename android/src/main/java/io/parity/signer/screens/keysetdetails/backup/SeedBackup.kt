@@ -23,7 +23,7 @@ fun SeedBackupFullOverlayScreen(
 	singleton: SignerDataModel,
 ) {
 	BottomSheetWrapperRoot {
-		SeedBackupBottomSheet(model, singleton)
+		SeedBackupBottomSheet(model, singleton, {})
 	}
 }
 
