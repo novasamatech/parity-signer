@@ -20,16 +20,7 @@ import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.MBackup
 import kotlinx.coroutines.delay
 
-@Composable
-fun KeepScreenOn() {
-	val currentView = LocalView.current
-	DisposableEffect(Unit) {
-		currentView.keepScreenOn = true
-		onDispose {
-			currentView.keepScreenOn = false
-		}
-	}
-}
+
 
 /**
  * Modal to show seed phrase. Dangerous place.
