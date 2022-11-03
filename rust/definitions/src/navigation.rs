@@ -13,6 +13,14 @@ pub struct SeedNameWithIdenticon {
     pub identicon: Vec<u8>,
 }
 
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub struct TransactionSignAction {
+    pub content: TransactionCardSet,
+    pub has_pwd: bool,
+    pub author_info: MAddressCard,
+    pub network_info: OrderedNetworkSpecs,
+}
+
 /// Enum containing card sets for four different outcomes:
 /// importing derivations (Derivations), signing (Sign),
 /// accepting (Stub) and reading, for example, in case of an error (Read)
@@ -25,11 +33,12 @@ pub enum TransactionAction {
         network_specs_key: NetworkSpecsKey,
     },
     Sign {
-        content: TransactionCardSet,
+        action: TransactionSignAction,
         checksum: u32,
-        has_pwd: bool,
-        author_info: MAddressCard,
-        network_info: OrderedNetworkSpecs,
+    },
+    SignBulk {
+        actions: Vec<TransactionSignAction>,
+        checksum: u32,
     },
     Stub {
         s: TransactionCardSet,

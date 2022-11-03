@@ -8,7 +8,7 @@ use definitions::navigation::{
     MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
     MRecoverSeedPhrase, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
     MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData,
-    ScreenNameType, ShieldAlert, TransactionType,
+    ScreenNameType, ShieldAlert, TransactionSignAction, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use std::fmt::Write;
@@ -396,11 +396,14 @@ impl State {
             Screen::Transaction(ref t) => {
                 match t.action() {
                     transaction_parsing::TransactionAction::Sign {
-                        content,
+                        action:
+                            TransactionSignAction {
+                                content,
+                                has_pwd,
+                                author_info,
+                                network_info,
+                            },
                         checksum,
-                        has_pwd,
-                        author_info,
-                        network_info,
                     } => {
                         if has_pwd {
                             match self.navstate.modal {
@@ -496,6 +499,9 @@ impl State {
                             let _ = write!(&mut errorline, "{}", e);
                         }
                     },
+                    transaction_parsing::TransactionAction::SignBulk { .. } => {
+                        todo!()
+                    }
                     transaction_parsing::TransactionAction::Read { .. } => {
                         println!("GoForward does nothing here")
                     }
@@ -1505,9 +1511,13 @@ impl State {
                         Some(network_info),
                     ),
                     TransactionAction::Sign {
-                        content,
-                        author_info,
-                        network_info,
+                        action:
+                            TransactionSignAction {
+                                content,
+                                author_info,
+                                network_info,
+                                ..
+                            },
                         ..
                     } => (
                         content,
@@ -1515,6 +1525,7 @@ impl State {
                         Some(author_info),
                         Some(network_info),
                     ),
+                    TransactionAction::SignBulk { .. } => todo!(),
                     TransactionAction::Stub { s, .. } => (s, TransactionType::Stub, None, None),
                     TransactionAction::Read { r } => (r, TransactionType::Read, None, None),
                 };
@@ -1764,11 +1775,8 @@ impl State {
             Modal::EnterPassword => match new_navstate.screen {
                 Screen::Transaction(ref t) => {
                     if let transaction_parsing::TransactionAction::Sign {
-                        content: _,
-                        checksum: _,
-                        has_pwd: _,
-                        author_info,
-                        network_info: _,
+                        action: TransactionSignAction { author_info, .. },
+                        ..
                     } = t.action()
                     {
                         Some(ModalData::EnterPassword {

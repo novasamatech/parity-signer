@@ -6,7 +6,7 @@ use db_handling::{
     cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
     manage_history::get_history,
 };
-use definitions::navigation::MAddressCard;
+use definitions::navigation::{MAddressCard, TransactionSignAction};
 use definitions::{
     crypto::Encryption,
     history::{Entry, Event},
@@ -684,11 +684,14 @@ fn parse_transaction_1() {
     };
     let output = produce_output(line, dbname);
     if let TransactionAction::Sign {
-        content,
-        checksum: _,
-        has_pwd,
-        author_info,
-        network_info,
+        action:
+            TransactionSignAction {
+                content,
+                has_pwd,
+                author_info,
+                network_info,
+            },
+        ..
     } = output
     {
         assert_eq!(content, content_known);
@@ -998,11 +1001,14 @@ fn parse_transaction_2() {
 
     let action = produce_output(line, dbname);
     if let TransactionAction::Sign {
-        content,
-        checksum: _,
-        has_pwd,
-        author_info,
-        network_info,
+        action:
+            TransactionSignAction {
+                content,
+                has_pwd,
+                author_info,
+                network_info,
+            },
+        ..
     } = action
     {
         assert_eq!(content, content_known);
@@ -1157,11 +1163,14 @@ fn parse_transaction_3() {
     let network_info_known = westend_spec();
     let output = produce_output(line, dbname);
     if let TransactionAction::Sign {
-        content,
-        checksum: _,
-        has_pwd,
-        author_info,
-        network_info,
+        action:
+            TransactionSignAction {
+                content,
+                has_pwd,
+                author_info,
+                network_info,
+            },
+        ..
     } = output
     {
         assert_eq!(content, content_known);
@@ -2427,11 +2436,14 @@ fn parse_msg_1() {
     let action = produce_output(&line, dbname);
 
     if let TransactionAction::Sign {
-        content: set,
-        checksum: _,
-        has_pwd,
-        author_info,
-        network_info,
+        action:
+            TransactionSignAction {
+                content: set,
+                has_pwd,
+                author_info,
+                network_info,
+            },
+        ..
     } = action
     {
         assert_eq!(set, set_expected);

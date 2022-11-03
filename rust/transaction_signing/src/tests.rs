@@ -18,7 +18,7 @@ use db_handling::{
     identities::{remove_seed, try_create_address, try_create_seed},
     manage_history::{get_history, get_history_entry_by_order},
 };
-use definitions::navigation::MAddressCard;
+use definitions::navigation::{MAddressCard, TransactionSignAction};
 use definitions::{
     crypto::Encryption,
     history::{Entry, Event, SignDisplay, SignMessageDisplay},
@@ -383,11 +383,14 @@ fn can_sign_transaction_1() {
 
     let output = produce_output(line, dbname);
     if let TransactionAction::Sign {
-        content: set,
+        action:
+            TransactionSignAction {
+                content: set,
+                has_pwd,
+                author_info,
+                network_info,
+            },
         checksum,
-        has_pwd,
-        author_info,
-        network_info,
     } = output
     {
         assert_eq!(set, set_expected);
@@ -643,11 +646,14 @@ fn can_sign_message_1() {
     };
 
     if let TransactionAction::Sign {
-        content,
+        action:
+            TransactionSignAction {
+                content,
+                has_pwd,
+                author_info,
+                network_info,
+            },
         checksum,
-        has_pwd,
-        author_info,
-        network_info,
     } = output
     {
         assert_eq!(content, content_known);
@@ -2520,11 +2526,14 @@ Identities:
     // TODO: let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
     if let TransactionAction::Sign {
-        content,
+        action:
+            TransactionSignAction {
+                content,
+                has_pwd,
+                author_info,
+                network_info,
+            },
         checksum,
-        has_pwd,
-        author_info,
-        network_info,
     } = output
     {
         assert_eq!(content, content_known);
@@ -2833,11 +2842,14 @@ Identities:
     // TODO let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
     if let TransactionAction::Sign {
-        content,
+        action:
+            TransactionSignAction {
+                content,
+                has_pwd,
+                author_info,
+                network_info,
+            },
         checksum,
-        has_pwd,
-        author_info,
-        network_info,
     } = output
     {
         assert_eq!(content, content_known);
@@ -3049,11 +3061,14 @@ fn parse_transaction_alice_remarks_westend9122() {
     // TODO let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
     if let TransactionAction::Sign {
-        content,
-        checksum: _,
-        has_pwd,
-        author_info,
-        network_info: _,
+        action:
+            TransactionSignAction {
+                content,
+                has_pwd,
+                author_info,
+                ..
+            },
+        ..
     } = output
     {
         assert_eq!(content, content_known);

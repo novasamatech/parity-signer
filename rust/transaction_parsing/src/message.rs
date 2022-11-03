@@ -4,7 +4,7 @@ use db_handling::{
 };
 use definitions::{
     keyring::{AddressKey, NetworkSpecsKey},
-    navigation::TransactionCardSet,
+    navigation::{TransactionCardSet, TransactionSignAction},
 };
 use nom::bytes::complete::{tag, take_until};
 use parser::cards::ParserCard;
@@ -58,14 +58,16 @@ where
                         );
                         let network_info = network_specs;
                         Ok(TransactionAction::Sign {
-                            content: TransactionCardSet {
-                                message: Some(vec![message_card]),
-                                ..Default::default()
+                            action: TransactionSignAction {
+                                content: TransactionCardSet {
+                                    message: Some(vec![message_card]),
+                                    ..Default::default()
+                                },
+                                has_pwd: address_details.has_pwd,
+                                author_info,
+                                network_info,
                             },
                             checksum,
-                            has_pwd: address_details.has_pwd,
-                            author_info,
-                            network_info,
                         })
                     } else {
                         let author_card = Card::Author {

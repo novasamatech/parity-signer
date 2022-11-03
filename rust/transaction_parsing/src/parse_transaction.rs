@@ -5,7 +5,7 @@ use db_handling::{
 use definitions::{
     history::{Entry, Event, SignDisplay},
     keyring::{AddressKey, NetworkSpecsKey},
-    navigation::{MEventMaybeDecoded, TransactionCard, TransactionCardSet},
+    navigation::{MEventMaybeDecoded, TransactionCard, TransactionCardSet, TransactionSignAction},
     network_specs::VerifierValue,
     users::AddressDetails,
 };
@@ -179,11 +179,13 @@ where
                                             ..Default::default()
                                         };
                                         Some(TransactionAction::Sign {
-                                            content,
+                                            action: TransactionSignAction {
+                                                content,
+                                                has_pwd: address_details.has_pwd,
+                                                author_info,
+                                                network_info: network_specs.clone(),
+                                            },
                                             checksum,
-                                            has_pwd: address_details.has_pwd,
-                                            author_info,
-                                            network_info: network_specs.clone(),
                                         })
                                     }
                                     CardsPrep::ShowOnly(author_card, warning_card) => {

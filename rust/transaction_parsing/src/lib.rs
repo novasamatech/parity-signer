@@ -58,12 +58,17 @@ where
     match &data_hex[4..6] {
         "00" | "02" => parse_transaction(data_hex, db_path),
         "03" => process_message(data_hex, db_path),
+        "04" => parse_transaction_bulk(data_hex, db_path),
         "80" => load_metadata(data_hex, db_path),
         "81" => load_types(data_hex, db_path),
         "c1" => add_specs(data_hex, db_path),
         "de" => process_derivations(data_hex, db_path),
         _ => Err(Error::PayloadNotSupported(data_hex[4..6].to_string())),
     }
+}
+
+fn parse_transaction_bulk<P: AsRef<Path>>(_payload: &str, _dbname: P) -> Result<TransactionAction> {
+    todo!()
 }
 
 pub fn produce_output<P>(payload: &str, dbname: P) -> TransactionAction

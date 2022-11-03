@@ -8,7 +8,7 @@ use db_handling::{
     identities::get_multisigner_by_address,
     interface_signer::{first_network, SeedDraft},
 };
-use definitions::navigation::MAddressCard;
+use definitions::navigation::{MAddressCard, TransactionSignAction};
 use definitions::{
     crypto::Encryption,
     helpers::{make_identicon_from_multisigner, multisigner_to_public, IdenticonStyle},
@@ -432,11 +432,13 @@ impl TransactionState {
         network_info: OrderedNetworkSpecs,
     ) -> Self {
         let action = transaction_parsing::TransactionAction::Sign {
-            content,
+            action: TransactionSignAction {
+                content,
+                has_pwd,
+                author_info,
+                network_info,
+            },
             checksum: new_checksum,
-            has_pwd,
-            author_info,
-            network_info,
         };
         Self {
             entered_info: self.entered_info.to_owned(),
