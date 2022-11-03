@@ -131,7 +131,7 @@ fun ModalSelector(
 				modalData.f,
 				button2
 			)
-			is ModalData.Backup -> SeedBackup(
+			is ModalData.Backup -> SeedBackup( //todo dmitry
 				modalData.f,
 				getSeedForBackup = signerDataModel::getSeedForBackup
 			)
