@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.*
 import io.parity.signer.ui.theme.Bg200
@@ -24,9 +23,10 @@ import kotlinx.coroutines.delay
 
 /**
  * Modal to show seed phrase. Dangerous place.
+ * todo dmitry remove
  */
 @Composable
-fun SeedBackup(
+fun SeedBackupOld(
 	backup: MBackup,
 	getSeedForBackup: (String, (String) -> Unit, (SeedBoxStatus) -> Unit) -> Unit
 ) {

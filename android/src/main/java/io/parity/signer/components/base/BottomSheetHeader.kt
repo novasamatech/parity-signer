@@ -1,6 +1,7 @@
 package io.parity.signer.components.base
 
 import android.content.res.Configuration
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
@@ -8,8 +9,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.parity.signer.R
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
 import io.parity.signer.ui.theme.textSecondary
@@ -32,6 +35,7 @@ fun BottomSheetHeader(
 				color = MaterialTheme.colors.primary,
 				style = TypefaceNew.TitleS,
 			)
+			//todo dmitry if subtitle paddings should be smaller
 			if (subtitile != null) {
 				Text(
 					text = subtitile,
@@ -45,6 +49,16 @@ fun BottomSheetHeader(
 	}
 }
 
+//todo dmitry finish
+@Composable
+fun BottomSheetSubtitle(@StringRes id: Int) {
+	Text(
+		text = stringResource(id),
+		color = MaterialTheme.colors.primary,
+		style = TypefaceNew.BodyL,
+		modifier = Modifier.padding(vertical = 6.dp)
+	)
+}
 
 @Preview(
 	name = "day",
@@ -67,6 +81,8 @@ private fun PreviewHeaderWithClose() {
 			BottomSheetHeader(title = "Title") {}
 			Divider()
 			BottomSheetHeader(title = "Title", subtitile = "With subtitle") {}
+			Divider()
+			BottomSheetSubtitle(R.string.subtitle_secret_recovery_phrase)
 		}
 	}
 }

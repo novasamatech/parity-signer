@@ -50,4 +50,6 @@
 	<string name="auth_error_security_update_required">Security update is required</string>
 	<string name="auth_error_unsupported">Security update is required</string>
 	<string name="auth_error_status_unknown">Authentication system failure</string>
+	<string name="subtitle_secret_recovery_phrase">Secret Recovery Phrase</string>
+	<string name="subtitle_derived_keys">Derived Keys</string>
 </resources>
