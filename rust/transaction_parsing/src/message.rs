@@ -1,5 +1,5 @@
 use db_handling::{
-    db_transactions::{SignContent, TrDbColdSign},
+    db_transactions::{SignContent, TrDbColdSign, TrDbColdSignOne},
     helpers::{try_get_address_details, try_get_network_specs},
 };
 use definitions::{
@@ -42,7 +42,7 @@ where
                     if address_details.network_id.contains(&network_specs_key) {
                         let message_card = Card::ParserCard(&ParserCard::Text(display_msg))
                             .card(&mut index, indent);
-                        let sign = TrDbColdSign::generate(
+                        let sign = TrDbColdSignOne::generate(
                             SignContent::Message(message),
                             &network_specs.specs.name,
                             &address_details.path,
@@ -50,6 +50,7 @@ where
                             &author_multi_signer,
                             Vec::new(),
                         );
+                        let sign: TrDbColdSign = sign.into();
                         let checksum = sign.store_and_get_checksum(&db_path)?;
                         let author_info = make_author_info(
                             &author_multi_signer,

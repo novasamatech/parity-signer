@@ -814,6 +814,138 @@ impl Default for TrDbColdStub {
 #[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 pub struct TrDbColdSign {
+    pub signing_bulk: Vec<TrDbColdSignOne>,
+}
+
+#[cfg(feature = "signer")]
+impl TrDbColdSign {
+    /// Recover [`TrDbColdSign`] from storage in the cold database.
+    ///
+    /// Function requires correct checksum to make sure the signable transaction
+    /// is still the one that was shown to the user previously, and no
+    /// changes to the database have occured.
+    ///
+    /// [`TRANSACTION`] tree is **not** cleared in the process. User is allowed
+    /// to try entering password several times, for all this time the
+    /// transaction remains in the database.
+    pub fn from_storage<P: AsRef<Path>>(db_path: P, checksum: u32) -> Result<Self> {
+        let sign_encoded = {
+            let database = open_db(&db_path)?;
+            verify_checksum(&database, checksum)?;
+            let transaction = open_tree(&database, TRANSACTION)?;
+            match transaction.get(SIGN)? {
+                Some(a) => a,
+                None => return Err(Error::Sign),
+            }
+        };
+        Ok(Self::decode(&mut &sign_encoded[..])?)
+    }
+
+    /// Put SCALE-encoded [`TrDbColdSign`] into storage in the [`TRANSACTION`]
+    /// tree of the cold database under the key [`SIGN`].
+    ///
+    /// Function returns `u32` checksum. This checksum is needed to recover
+    /// stored [`TrDbColdSign`] using `from_storage` method.
+    ///
+    /// The [`TRANSACTION`] tree is cleared prior to adding data to storage.
+    pub fn store_and_get_checksum<P: AsRef<Path>>(&self, db_path: P) -> Result<u32> {
+        let mut transaction_batch = make_batch_clear_tree(&db_path, TRANSACTION)?;
+        transaction_batch.insert(SIGN, self.encode());
+        TrDbCold::new()
+            .set_transaction(transaction_batch) // clear transaction tree
+            .apply(&db_path)?;
+        let database = open_db(&db_path)?;
+        Ok(database.checksum()?)
+    }
+
+    /// Use [`TrDbColdSign`] to add history log data into the cold database.
+    ///
+    /// Possible history log entries are:
+    ///
+    /// - `Event::TransactionSigned(_)` and `Event::MessageSigned(_)` for the
+    /// cases when the signature was generated and displayed through the user
+    /// interface
+    /// - `Event::TransactionSignError(_)` and `Event::MessageSignError(_)` for
+    /// the cases when the user has entered the wrong password and no signature
+    /// was generated. Signer current policy is to log all wrong password entry
+    /// attempts.
+    ///
+    /// Required input:
+    ///
+    /// - `wrong_password` flag; for entries with `true` value the signature
+    /// was not generated, because user has entered the wrong password;
+    /// - user-added text comment for the transaction
+    /// - database name, into which the data is added
+    ///
+    /// Function returns database checksum, to be collected and re-used in case
+    /// of wrong password entry.
+    ///
+    /// If the password entered is correct, the [`TRANSACTION`] tree gets
+    /// cleared.
+    pub fn apply<P: AsRef<Path>>(
+        self,
+        wrong_password: bool,
+        user_comment: &str,
+        db_path: P,
+    ) -> Result<u32> {
+        let mut history = vec![];
+        let mut for_transaction = Batch::default();
+        for s in &self.signing_bulk {
+            let signed_by = VerifierValue::Standard { m: s.multisigner() };
+            history.append(&mut s.history.clone());
+            match &s.content {
+                SignContent::Transaction { method, extensions } => {
+                    let transaction = [method.encode(), extensions.clone()].concat();
+                    let sign_display =
+                        SignDisplay::get(&transaction, &s.network_name, &signed_by, user_comment);
+                    if wrong_password {
+                        history.push(Event::TransactionSignError { sign_display })
+                    } else {
+                        history.push(Event::TransactionSigned { sign_display });
+                        for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
+                    }
+                }
+                SignContent::Message(message) => {
+                    let sign_message_display = SignMessageDisplay::get(
+                        &message,
+                        &s.network_name,
+                        &signed_by,
+                        user_comment,
+                    );
+                    if wrong_password {
+                        history.push(Event::MessageSignError {
+                            sign_message_display,
+                        })
+                    } else {
+                        history.push(Event::MessageSigned {
+                            sign_message_display,
+                        });
+                        for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
+                    }
+                }
+            }
+        }
+        TrDbCold::new()
+            .set_history(events_to_batch(&db_path, history)?)
+            .set_transaction(for_transaction)
+            .apply(&db_path)?;
+        let database = open_db(&db_path)?;
+        Ok(database.checksum()?)
+    }
+}
+
+#[cfg(feature = "signer")]
+impl From<TrDbColdSignOne> for TrDbColdSign {
+    fn from(t: TrDbColdSignOne) -> Self {
+        Self {
+            signing_bulk: vec![t],
+        }
+    }
+}
+
+#[cfg(feature = "signer")]
+#[derive(Debug, Decode, Encode)]
+pub struct TrDbColdSignOne {
     /// data to sign
     content: SignContent,
 
@@ -862,7 +994,7 @@ pub enum SignContent {
 }
 
 #[cfg(feature = "signer")]
-impl TrDbColdSign {
+impl TrDbColdSignOne {
     /// Construct [`TrDbColdSign`] from components.
     ///
     /// Required input:
@@ -890,31 +1022,6 @@ impl TrDbColdSign {
         }
     }
 
-    /// Recover [`TrDbColdSign`] from storage in the cold database.
-    ///
-    /// Function requires correct checksum to make sure the signable transaction
-    /// is still the one that was shown to the user previously, and no
-    /// changes to the database have occured.
-    ///
-    /// [`TRANSACTION`] tree is **not** cleared in the process. User is allowed
-    /// to try entering password several times, for all this time the
-    /// transaction remains in the database.
-    pub fn from_storage<P>(db_path: P, checksum: u32) -> Result<Self>
-    where
-        P: AsRef<Path>,
-    {
-        let sign_encoded = {
-            let database = open_db(&db_path)?;
-            verify_checksum(&database, checksum)?;
-            let transaction = open_tree(&database, TRANSACTION)?;
-            match transaction.get(SIGN)? {
-                Some(a) => a,
-                None => return Err(Error::Sign),
-            }
-        };
-        Ok(Self::decode(&mut &sign_encoded[..])?)
-    }
-
     /// Get transaction content.
     pub fn content(&self) -> &SignContent {
         &self.content
@@ -933,94 +1040,6 @@ impl TrDbColdSign {
     /// Get [`MultiSigner`] value
     pub fn multisigner(&self) -> MultiSigner {
         self.multisigner.to_owned()
-    }
-
-    /// Put SCALE-encoded [`TrDbColdSign`] into storage in the [`TRANSACTION`]
-    /// tree of the cold database under the key [`SIGN`].
-    ///
-    /// Function returns `u32` checksum. This checksum is needed to recover
-    /// stored [`TrDbColdSign`] using `from_storage` method.
-    ///
-    /// The [`TRANSACTION`] tree is cleared prior to adding data to storage.
-    pub fn store_and_get_checksum<P>(&self, db_path: P) -> Result<u32>
-    where
-        P: AsRef<Path>,
-    {
-        let mut transaction_batch = make_batch_clear_tree(&db_path, TRANSACTION)?;
-        transaction_batch.insert(SIGN, self.encode());
-        TrDbCold::new()
-            .set_transaction(transaction_batch) // clear transaction tree
-            .apply(&db_path)?;
-        let database = open_db(&db_path)?;
-        Ok(database.checksum()?)
-    }
-
-    /// Use [`TrDbColdSign`] to add history log data into the cold database.
-    ///
-    /// Possible history log entries are:
-    ///
-    /// - `Event::TransactionSigned(_)` and `Event::MessageSigned(_)` for the
-    /// cases when the signature was generated and displayed through the user
-    /// interface
-    /// - `Event::TransactionSignError(_)` and `Event::MessageSignError(_)` for
-    /// the cases when the user has entered the wrong password and no signature
-    /// was generated. Signer current policy is to log all wrong password entry
-    /// attempts.
-    ///
-    /// Required input:
-    ///
-    /// - `wrong_password` flag; for entries with `true` value the signature
-    /// was not generated, because user has entered the wrong password;
-    /// - user-added text comment for the transaction
-    /// - database name, into which the data is added
-    ///
-    /// Function returns database checksum, to be collected and re-used in case
-    /// of wrong password entry.
-    ///
-    /// If the password entered is correct, the [`TRANSACTION`] tree gets
-    /// cleared.
-    pub fn apply<P>(self, wrong_password: bool, user_comment: &str, db_path: P) -> Result<u32>
-    where
-        P: AsRef<Path>,
-    {
-        let signed_by = VerifierValue::Standard {
-            m: self.multisigner(),
-        };
-        let mut history = self.history;
-        let mut for_transaction = Batch::default();
-        match self.content {
-            SignContent::Transaction { method, extensions } => {
-                let transaction = [method.encode(), extensions].concat();
-                let sign_display =
-                    SignDisplay::get(&transaction, &self.network_name, &signed_by, user_comment);
-                if wrong_password {
-                    history.push(Event::TransactionSignError { sign_display })
-                } else {
-                    history.push(Event::TransactionSigned { sign_display });
-                    for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
-                }
-            }
-            SignContent::Message(message) => {
-                let sign_message_display =
-                    SignMessageDisplay::get(&message, &self.network_name, &signed_by, user_comment);
-                if wrong_password {
-                    history.push(Event::MessageSignError {
-                        sign_message_display,
-                    })
-                } else {
-                    history.push(Event::MessageSigned {
-                        sign_message_display,
-                    });
-                    for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
-                }
-            }
-        }
-        TrDbCold::new()
-            .set_history(events_to_batch(&db_path, history)?)
-            .set_transaction(for_transaction)
-            .apply(&db_path)?;
-        let database = open_db(&db_path)?;
-        Ok(database.checksum()?)
     }
 }
 

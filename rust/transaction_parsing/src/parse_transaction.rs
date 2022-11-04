@@ -1,5 +1,5 @@
 use db_handling::{
-    db_transactions::{SignContent, TrDbColdSign},
+    db_transactions::{SignContent, TrDbColdSign, TrDbColdSignOne},
     helpers::{try_get_address_details, try_get_network_specs},
 };
 use definitions::{
@@ -150,7 +150,7 @@ where
                             Ok(a) => {
                                 found_solution = match cards_prep {
                                     CardsPrep::SignProceed(address_details, possible_warning) => {
-                                        let sign = TrDbColdSign::generate(
+                                        let sign = TrDbColdSignOne::generate(
                                             SignContent::Transaction {
                                                 method: method_data,
                                                 extensions: extensions_data,
@@ -161,6 +161,7 @@ where
                                             &author_multi_signer,
                                             history,
                                         );
+                                        let sign: TrDbColdSign = sign.into();
                                         let checksum = sign.store_and_get_checksum(&db_path)?;
                                         let author_info = make_author_info(
                                             &author_multi_signer,

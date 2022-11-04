@@ -492,7 +492,7 @@ interface ScreenData {
     Settings(MSettings f);
     Log(MLog f);
     LogDetails(MLogDetails f);
-    Transaction(MTransaction f);
+    Transaction(sequence<MTransaction> f);
     SeedSelector(MSeeds f);
     KeyDetails(MKeyDetails f);
     NewSeed(MNewSeed f);

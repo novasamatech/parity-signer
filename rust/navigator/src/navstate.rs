@@ -1530,7 +1530,7 @@ impl State {
                     TransactionAction::Read { r } => (r, TransactionType::Read, None, None),
                 };
                 ScreenData::Transaction {
-                    f: MTransaction {
+                    f: vec![MTransaction {
                         content,
                         ttype,
                         author_info,
@@ -1545,7 +1545,7 @@ impl State {
                                 .key(),
                             ),
                         }),
-                    },
+                    }],
                 }
             }
             Screen::SeedSelector => {

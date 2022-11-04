@@ -126,7 +126,7 @@ pub enum ScreenData {
     Settings { f: MSettings },
     Log { f: MLog },
     LogDetails { f: MLogDetails },
-    Transaction { f: MTransaction },
+    Transaction { f: Vec<MTransaction> },
     SeedSelector { f: MSeeds },
     KeyDetails { f: MKeyDetails },
     NewSeed { f: MNewSeed },

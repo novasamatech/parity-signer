@@ -1309,7 +1309,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     verifier: Some(vec![TransactionCard {
                         index: 0,
@@ -1346,7 +1346,7 @@ fn flow_test_1() {
                 ttype: TransactionType::Stub,
                 author_info: None,
                 network_info: None,
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -1533,7 +1533,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     verifier: Some(vec![TransactionCard {
                         index: 0,
@@ -1563,7 +1563,7 @@ fn flow_test_1() {
                 ttype: TransactionType::Stub,
                 author_info: None,
                 network_info: None,
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -1711,7 +1711,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     verifier: Some(vec![TransactionCard {
                         index: 0,
@@ -1747,7 +1747,7 @@ fn flow_test_1() {
                 ttype: TransactionType::Stub,
                 author_info: None,
                 network_info: None,
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -3650,7 +3650,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     importing_derivations: Some(vec![TransactionCard {
                         index: 0,
@@ -3676,7 +3676,7 @@ fn flow_test_1() {
                         "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                 }),
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -5536,7 +5536,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     error: Some(vec![TransactionCard {
                         index: 0,
@@ -5557,7 +5557,7 @@ fn flow_test_1() {
                 ttype: TransactionType::Read,
                 author_info: None,
                 network_info: None,
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -5597,7 +5597,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     method: Some(vec![
                         TransactionCard {
@@ -5745,7 +5745,7 @@ fn flow_test_1() {
                         "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                 }),
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -5870,7 +5870,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     message: Some(vec![TransactionCard {
                         index: 0,
@@ -5900,7 +5900,7 @@ fn flow_test_1() {
                         "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                 }),
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -6220,7 +6220,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     method: Some(vec![
                         TransactionCard {
@@ -6368,7 +6368,7 @@ fn flow_test_1() {
                         "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                 }),
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -6574,7 +6574,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     message: Some(vec![TransactionCard {
                         index: 0,
@@ -6602,7 +6602,7 @@ fn flow_test_1() {
                         "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                 }),
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,

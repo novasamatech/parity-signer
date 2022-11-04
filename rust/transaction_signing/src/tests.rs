@@ -37,7 +37,7 @@ use transaction_parsing::{
     entry_to_transactions_with_decoding, produce_output, StubNav, TransactionAction,
 };
 
-use crate::{handle_stub, sign_transaction::create_signature, Error, Result};
+use crate::{handle_stub, sign_transaction::create_signatures, Error, Result};
 
 const PWD: &str = "";
 const USER_COMMENT: &str = "";
@@ -62,7 +62,7 @@ fn sign_action_test(
     dbname: &str,
     encryption: Encryption,
 ) -> Result<String> {
-    create_signature(
+    create_signatures(
         seed_phrase,
         pwd_entry,
         user_comment,
@@ -70,6 +70,7 @@ fn sign_action_test(
         checksum,
         encryption,
     )
+    .map(|a| a[0].clone())
 }
 
 fn identicon_to_str(identicon: &[u8]) -> &str {
