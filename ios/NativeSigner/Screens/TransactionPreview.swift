@@ -7,10 +7,13 @@
 
 import SwiftUI
 
+struct TransactionWrapper: Identifiable {
+    let id = UUID()
+    let content: MTransaction
+}
+
 struct TransactionPreview: View {
     @State private var comment = ""
-    @State private var offset: CGFloat = 0
-    @State private var offsetOld: CGFloat = 0
     @FocusState private var focus: Bool
     let content: [MTransaction]
     let sign: (String, String) -> Void
@@ -18,12 +21,23 @@ struct TransactionPreview: View {
 
     var body: some View {
         VStack {
-            ForEach(
-                content,
-                id: \.content
-            ) { singleTransaction(content: $0) }
+            NavigationBarView(
+                viewModel: .init(title: Localizable.TransactionPreview.Label.title.string, leftButton: .xmark),
+                actionModel: .init(
+                    leftBarMenuAction: { navigationRequest(.init(action: .goBack)) },
+                    rightBarMenuAction: {}
+                )
+            )
+            ScrollView {
+                ForEach(
+                    content.map { TransactionWrapper(content: $0) },
+                    id: \.id
+                ) { singleTransaction(content: $0.content)
+                    .padding(.horizontal, Spacing.medium)
+                    .frame(width: UIScreen.main.bounds.width)
+                }
+            }
             VStack {
-                Spacer()
                 // CTAs
                 VStack {
                     switch content.first?.ttype {
@@ -77,17 +91,7 @@ struct TransactionPreview: View {
             .padding(.top, -10)
             .padding(.horizontal, 16)
         }
-        .offset(x: 0, y: offset + offsetOld)
-        .gesture(
-            DragGesture()
-                .onChanged { drag in
-                    self.offset = drag.translation.height
-                }
-                .onEnded { drag in
-                    self.offsetOld += drag.translation.height
-                    self.offset = 0
-                }
-        )
+        .frame(width: UIScreen.main.bounds.width)
     }
 
     @ViewBuilder

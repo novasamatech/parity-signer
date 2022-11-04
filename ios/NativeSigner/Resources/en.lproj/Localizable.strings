@@ -362,3 +362,5 @@
 "KeysExport.KeySets.Label.Info" = "By scanning this QR code into your application you’ll export all keys from the Key Sets shown in the list below";
 "KeysExport.KeySets.Label.Key.Single" = "%@ Key";
 "KeysExport.KeySets.Label.Key.Plural" = "%@ Keys";
+
+"TransactionPreview.Label.Title" = "Transactions";
