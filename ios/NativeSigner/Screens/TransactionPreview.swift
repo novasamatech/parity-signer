@@ -12,51 +12,21 @@ struct TransactionPreview: View {
     @State private var offset: CGFloat = 0
     @State private var offsetOld: CGFloat = 0
     @FocusState private var focus: Bool
-    let content: MTransaction
+    let content: [MTransaction]
     let sign: (String, String) -> Void
     let navigationRequest: NavigationRequest
+
     var body: some View {
         VStack {
-            TransactionBlock(cards: content.content.assemble())
+            ForEach(
+                content,
+                id: \.content
+            ) { singleTransaction(content: $0) }
             VStack {
-                if let authorInfo = content.authorInfo {
-                    AddressCard(card: authorInfo)
-                }
-                if let network = content.networkInfo {
-                    NetworkCard(title: network.networkTitle, logo: network.networkLogo)
-                }
-                if content.ttype == .sign {
-                    HStack {
-                        Localizable.logNote.text.font(Fontstyle.overline.base)
-                            .foregroundColor(Asset.text400.swiftUIColor)
-                        Spacer()
-                    }
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 8).stroke(Asset.border400.swiftUIColor).frame(height: 39)
-                        TextField(
-                            Localizable.comment.string,
-                            text: $comment,
-                            prompt: Localizable.commentNotPublished.text
-                        )
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                        .background(Asset.bg100.swiftUIColor)
-                        .font(Fontstyle.body2.base)
-                        .focused($focus)
-                        .onDisappear {
-                            focus = false
-                        }
-                        .padding(.horizontal, 8)
-                    }
-                    HStack {
-                        Localizable.visibleOnlyOnThisDevice.text
-                            .font(Fontstyle.subtitle1.base)
-                            .padding(.bottom)
-                        Spacer()
-                    }
-                }
                 Spacer()
+                // CTAs
                 VStack {
-                    switch content.ttype {
+                    switch content.first?.ttype {
                     case .sign:
                         BigButton(
                             text: Localizable.TransactionPreview.unlockSign.key,
@@ -64,7 +34,7 @@ struct TransactionPreview: View {
                             isCrypto: true,
                             action: {
                                 focus = false
-                                if let seedName = content.authorInfo?.address.seedName {
+                                if let seedName = content.first?.authorInfo?.address.seedName {
                                     sign(seedName, comment)
                                 }
                             }
@@ -88,8 +58,10 @@ struct TransactionPreview: View {
                         )
                     case .done:
                         EmptyView()
+                    default:
+                        EmptyView()
                     }
-                    if content.ttype != .done {
+                    if content.first?.ttype != .done {
                         BigButton(
                             text: Localizable.TransactionPreview.decline.key,
                             isShaded: true,
@@ -116,6 +88,48 @@ struct TransactionPreview: View {
                     self.offset = 0
                 }
         )
+    }
+
+    @ViewBuilder
+    func singleTransaction(content: MTransaction) -> some View {
+        VStack {
+            TransactionBlock(cards: content.content.assemble())
+            if let authorInfo = content.authorInfo {
+                AddressCard(card: authorInfo)
+            }
+            if let network = content.networkInfo {
+                NetworkCard(title: network.networkTitle, logo: network.networkLogo)
+            }
+            if content.ttype == .sign {
+                HStack {
+                    Localizable.logNote.text.font(Fontstyle.overline.base)
+                        .foregroundColor(Asset.text400.swiftUIColor)
+                    Spacer()
+                }
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8).stroke(Asset.border400.swiftUIColor).frame(height: 39)
+                    TextField(
+                        Localizable.comment.string,
+                        text: $comment,
+                        prompt: Localizable.commentNotPublished.text
+                    )
+                    .foregroundColor(Asset.text400.swiftUIColor)
+                    .background(Asset.bg100.swiftUIColor)
+                    .font(Fontstyle.body2.base)
+                    .focused($focus)
+                    .onDisappear {
+                        focus = false
+                    }
+                    .padding(.horizontal, 8)
+                }
+                HStack {
+                    Localizable.visibleOnlyOnThisDevice.text
+                        .font(Fontstyle.subtitle1.base)
+                        .padding(.bottom)
+                    Spacer()
+                }
+            }
+        }
     }
 }
 
