@@ -1499,17 +1499,17 @@ impl State {
             }
             Screen::Scan => ScreenData::Scan,
             Screen::Transaction(ref t) => {
-                let (content, ttype, author_info, network_info) = match t.action() {
+                let f = match t.action() {
                     TransactionAction::Derivations {
                         content,
                         network_info,
                         ..
-                    } => (
+                    } => vec![MTransaction {
                         content,
-                        TransactionType::ImportDerivations,
-                        None,
-                        Some(network_info),
-                    ),
+                        ttype: TransactionType::ImportDerivations,
+                        author_info: None,
+                        network_info: Some(network_info.into()),
+                    }],
                     TransactionAction::Sign {
                         action:
                             TransactionSignAction {
@@ -1519,34 +1519,35 @@ impl State {
                                 ..
                             },
                         ..
-                    } => (
+                    } => vec![MTransaction {
                         content,
-                        TransactionType::Sign,
-                        Some(author_info),
-                        Some(network_info),
-                    ),
-                    TransactionAction::SignBulk { .. } => todo!(),
-                    TransactionAction::Stub { s, .. } => (s, TransactionType::Stub, None, None),
-                    TransactionAction::Read { r } => (r, TransactionType::Read, None, None),
-                };
-                ScreenData::Transaction {
-                    f: vec![MTransaction {
-                        content,
-                        ttype,
-                        author_info,
-                        network_info: network_info.map(|i| MSCNetworkInfo {
-                            network_title: i.specs.title,
-                            network_logo: i.specs.logo,
-                            network_specs_key: hex::encode(
-                                NetworkSpecsKey::from_parts(
-                                    &i.specs.genesis_hash,
-                                    &i.specs.encryption,
-                                )
-                                .key(),
-                            ),
-                        }),
+                        ttype: TransactionType::Sign,
+                        author_info: Some(author_info),
+                        network_info: Some(network_info.into()),
                     }],
-                }
+                    TransactionAction::SignBulk { actions, .. } => actions
+                        .iter()
+                        .map(|a| MTransaction {
+                            content: a.content.clone(),
+                            ttype: TransactionType::Sign,
+                            author_info: Some(a.author_info.clone()),
+                            network_info: Some(a.network_info.clone().into()),
+                        })
+                        .collect(),
+                    TransactionAction::Stub { s, .. } => vec![MTransaction {
+                        content: s,
+                        ttype: TransactionType::Stub,
+                        author_info: None,
+                        network_info: None,
+                    }],
+                    TransactionAction::Read { r } => vec![MTransaction {
+                        content: r,
+                        ttype: TransactionType::Read,
+                        author_info: None,
+                        network_info: None,
+                    }],
+                };
+                ScreenData::Transaction { f }
             }
             Screen::SeedSelector => {
                 let seed_name_cards =

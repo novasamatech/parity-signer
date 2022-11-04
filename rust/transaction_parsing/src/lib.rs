@@ -79,6 +79,7 @@ fn parse_transaction_bulk<P: AsRef<Path>>(payload: &str, dbname: P) -> Result<Tr
 
             for t in &b.encoded_transactions {
                 let encoded = hex::encode(t);
+                let encoded = "53".to_string() + &encoded;
                 let action = parse_transaction(&encoded, &dbname)?;
                 if let TransactionAction::Sign { action, .. } = action {
                     actions.push(action);

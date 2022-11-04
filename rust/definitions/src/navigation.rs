@@ -620,6 +620,18 @@ pub struct MSCNetworkInfo {
     pub network_specs_key: String,
 }
 
+impl From<OrderedNetworkSpecs> for MSCNetworkInfo {
+    fn from(o: OrderedNetworkSpecs) -> Self {
+        MSCNetworkInfo {
+            network_title: o.specs.title,
+            network_logo: o.specs.logo,
+            network_specs_key: hex::encode(
+                NetworkSpecsKey::from_parts(&o.specs.genesis_hash, &o.specs.encryption).key(),
+            ),
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MSCTip {
     pub amount: String,
