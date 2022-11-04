@@ -15,22 +15,22 @@ struct TransactionWrapper: Identifiable {
 struct TransactionPreview: View {
     @State private var comment = ""
     @FocusState private var focus: Bool
-    let content: [MTransaction]
-    let sign: (String, String) -> Void
-    let navigationRequest: NavigationRequest
+    @StateObject var viewModel: ViewModel
+    @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var data: SignerDataModel
 
     var body: some View {
         VStack {
             NavigationBarView(
                 viewModel: .init(title: Localizable.TransactionPreview.Label.title.string, leftButton: .xmark),
                 actionModel: .init(
-                    leftBarMenuAction: { navigationRequest(.init(action: .goBack)) },
+                    leftBarMenuAction: { viewModel.onBackButtonTap() },
                     rightBarMenuAction: {}
                 )
             )
             ScrollView {
                 ForEach(
-                    content.map { TransactionWrapper(content: $0) },
+                    viewModel.dataModel,
                     id: \.id
                 ) { singleTransaction(content: $0.content)
                     .padding(.horizontal, Spacing.medium)
@@ -40,7 +40,7 @@ struct TransactionPreview: View {
             VStack {
                 // CTAs
                 VStack {
-                    switch content.first?.ttype {
+                    switch viewModel.dataModel.first?.content.ttype {
                     case .sign:
                         BigButton(
                             text: Localizable.TransactionPreview.unlockSign.key,
@@ -48,41 +48,37 @@ struct TransactionPreview: View {
                             isCrypto: true,
                             action: {
                                 focus = false
-                                if let seedName = content.first?.authorInfo?.address.seedName {
-                                    sign(seedName, comment)
-                                }
+                                viewModel.sign(with: comment)
                             }
                         )
                     case .stub:
                         BigButton(
                             text: Localizable.TransactionPreview.approve.key,
                             action: {
-                                navigationRequest(.init(action: .goForward))
+                                navigation.perform(navigation: .init(action: .goForward))
                             }
                         )
-                    case .read:
-                        EmptyView()
                     case .importDerivations:
                         BigButton(
                             text: Localizable.TransactionPreview.selectSeed.key,
                             isCrypto: true,
                             action: {
-                                navigationRequest(.init(action: .goForward))
+                                navigation.perform(navigation: .init(action: .goForward))
                             }
                         )
-                    case .done:
-                        EmptyView()
-                    default:
+                    case .read,
+                         .done,
+                         .none:
                         EmptyView()
                     }
-                    if content.first?.ttype != .done {
+                    if viewModel.dataModel.first?.content.ttype != .done {
                         BigButton(
                             text: Localizable.TransactionPreview.decline.key,
                             isShaded: true,
                             isDangerous: true,
                             action: {
                                 focus = false
-                                navigationRequest(.init(action: .goBack))
+                                navigation.perform(navigation: .init(action: .goBack))
                             }
                         )
                     }
@@ -90,6 +86,9 @@ struct TransactionPreview: View {
             }
             .padding(.top, -10)
             .padding(.horizontal, 16)
+        }
+        .onAppear {
+            viewModel.use(navigation: navigation)
         }
         .frame(width: UIScreen.main.bounds.width)
     }
@@ -134,6 +133,53 @@ struct TransactionPreview: View {
                     Spacer()
                 }
             }
+        }
+    }
+}
+
+extension TransactionPreview {
+    final class ViewModel: ObservableObject {
+        private weak var navigation: NavigationCoordinator!
+        private weak var data: SignerDataModel!
+        private let seedsMediator: SeedsMediating
+
+        let dataModel: [TransactionWrapper]
+
+        init(
+            content: [MTransaction],
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+        ) {
+            dataModel = content.map { TransactionWrapper(content: $0) }
+            self.seedsMediator = seedsMediator
+        }
+
+        func use(navigation: NavigationCoordinator) {
+            self.navigation = navigation
+        }
+
+        func use(data: SignerDataModel) {
+            self.data = data
+        }
+
+        func onBackButtonTap() {
+            navigation.perform(navigation: .init(action: .goBack))
+        }
+
+        func sign(with comment: String) {
+            let seedNames = Set(dataModel.compactMap { $0.content.authorInfo?.address.seedName })
+            let seedPhrasesDictionary = seedsMediator.getSeeds(seedNames: seedNames)
+            navigation.perform(
+                navigation:
+                .init(
+                    action: .goForward,
+                    details: comment,
+                    seedPhrase: formattedPhrase(from: seedPhrasesDictionary)
+                )
+            )
+        }
+
+        private func formattedPhrase(from dictionary: [String: String]) -> String {
+            dictionary.reduce(into: "") { $0 += "\($1.key) \($1.value)\n" }
         }
     }
 }
