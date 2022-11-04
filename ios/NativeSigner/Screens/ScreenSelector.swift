@@ -28,8 +28,8 @@ struct ScreenSelector: View {
         switch screenData {
         case let .keys(value):
             KeyDetailsView(
+                dataModel: KeyDetailsDataModel(value),
                 viewModel: .init(
-                    dataModel: KeyDetailsDataModel(value),
                     keysData: appState.userData.keysData,
                     exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value)
                 ),

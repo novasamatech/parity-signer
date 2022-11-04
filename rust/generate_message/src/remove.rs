@@ -84,7 +84,7 @@ where
             let mut network_specs_prep_batch = Batch::default();
 
             // get `ADDRESS_BOOK` entry for the title
-            let address_book_entry = get_address_book_entry(&network_title, &db_path.as_ref())?;
+            let address_book_entry = get_address_book_entry(&network_title, db_path.as_ref())?;
 
             // make `NetworkSpecsKey` using data in `ADDRESS_BOOK` entry
             let network_specs_key = NetworkSpecsKey::from_parts(
