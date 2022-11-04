@@ -9,21 +9,18 @@ import SwiftUI
 
 struct TransactionBlock: View {
     var cards: [TransactionCard]
-    let size = UIScreen.main.bounds.size.width
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).stroke(Asset.crypto400.swiftUIColor)
-            ScrollView {
-                LazyVStack {
-                    ForEach(cards, id: \.index) { card in
-                        TransactionCardView(card: card)
-                    }
+            VStack {
+                ForEach(cards, id: \.index) { card in
+                    TransactionCardView(card: card)
                 }
-                .padding(16)
             }
+            .padding(16)
         }
         .padding(12)
-        .frame(width: size, height: size)
+        .frame(width: UIScreen.main.bounds.size.width)
     }
 }
 

@@ -98,6 +98,7 @@ struct TransactionPreview: View {
     func singleTransaction(content: MTransaction) -> some View {
         VStack {
             TransactionBlock(cards: content.content.assemble())
+                .padding(.bottom, Spacing.medium)
             if let authorInfo = content.authorInfo {
                 AddressCard(card: authorInfo)
             }
