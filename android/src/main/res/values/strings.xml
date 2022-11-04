@@ -40,4 +40,14 @@
   <string name="menu_option_select_key">Select Keys</string>
 	<string name="menu_option_derive_from_key">Derive from Key</string>
 	<string name="menu_option_backup_key_set">Backup Key Set</string>
+    <string name="unlock_device_title">UNLOCK SIGNER</string>
+	<string name="unlock_device_subtitle">Please authenticate yourself</string>
+	<string name="auth_error_message">Authentication error: %s</string>
+	<string name="auth_failed_message">Authentication failed</string>
+	<string name="auth_error_no_hardware">Insufficient security features available on this device.</string>
+	<string name="auth_error_hardware_unavailable">Security features are currently unavailable.</string>
+	<string name="auth_error_none_enrolled">Authentication system not enrolled; please enable password, pin code or biometric authentication</string>
+	<string name="auth_error_security_update_required">Security update is required</string>
+	<string name="auth_error_unsupported">Security update is required</string>
+	<string name="auth_error_status_unknown">Authentication system failure</string>
 </resources>

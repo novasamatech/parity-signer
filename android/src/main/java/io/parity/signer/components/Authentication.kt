@@ -6,6 +6,7 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import io.parity.signer.R
 
 
 class Authentication(val setAuth: (Boolean) -> Unit) {
@@ -18,8 +19,8 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 
 		val promptInfo =
 				BiometricPrompt.PromptInfo.Builder()
-					.setTitle("UNLOCK SIGNER")
-					.setSubtitle("Please authenticate yourself")
+					.setTitle(context.getString(R.string.unlock_device_title))
+					.setSubtitle(context.getString(R.string.unlock_device_subtitle))
 					.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK)
 					.build()
 
@@ -39,7 +40,7 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 							super.onAuthenticationError(errorCode, errString)
 							Toast.makeText(
 								context,
-								"Authentication error: $errString", Toast.LENGTH_SHORT
+								context.getString(R.string.auth_error_message, errString), Toast.LENGTH_SHORT
 							)
 								.show()
 							setAuth(false)
@@ -56,7 +57,7 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 						override fun onAuthenticationFailed() {
 							super.onAuthenticationFailed()
 							Toast.makeText(
-								context, "Authentication failed",
+								context, context.getString(R.string.auth_failed_message),
 								Toast.LENGTH_SHORT
 							)
 								.show()
@@ -68,8 +69,7 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 			}
 			BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
 				Toast.makeText(
-					context,
-					"Insufficient security features available on this device.",
+					context, context.getString(R.string.auth_error_no_hardware),
 					Toast.LENGTH_LONG
 				).show()
 				return
@@ -77,48 +77,41 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 			BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
 				Toast.makeText(
 					context,
-					"Security features are currently unavailable.",
+					context.getString(R.string.auth_error_hardware_unavailable),
 					Toast.LENGTH_LONG
 				).show()
 				return
 			}
 			BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
 				Toast.makeText(
-					context,
-					"Authentication system not enrolled; please enable " +
-						"password, pin code or biometric authentication",
+					context, context.getString(R.string.auth_error_none_enrolled),
 					Toast.LENGTH_LONG
 				).show()
 				return
 			}
 			BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED -> {
 				Toast.makeText(
-					context,
-					"Security update is required",
+					context, context.getString(R.string.auth_error_security_update_required),
 					Toast.LENGTH_LONG
 				).show()
 				return
 			}
 			BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> {
 				Toast.makeText(
-					context,
-					"Security update is required",
+					context, context.getString(R.string.auth_error_unsupported),
 					Toast.LENGTH_LONG
 				).show()
 				return
 			}
 			BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> {
 				Toast.makeText(
-					context,
-					"Authentication system failure",
+					context, context.getString(R.string.auth_error_status_unknown),
 					Toast.LENGTH_LONG
 				).show()
 				return
 			}
 		}
-
 	}
-
 
 }
 
