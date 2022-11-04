@@ -5,8 +5,8 @@ use parity_scale_codec::Decode;
 use pretty_assertions::assert_eq;
 
 fn metadata(filename: &str) -> RuntimeMetadata {
-    let metadata_hex = std::fs::read_to_string(&filename).unwrap();
-    let metadata_vec = hex::decode(&metadata_hex.trim()).unwrap()[4..].to_vec();
+    let metadata_hex = std::fs::read_to_string(filename).unwrap();
+    let metadata_vec = hex::decode(metadata_hex.trim()).unwrap()[4..].to_vec();
     RuntimeMetadata::decode(&mut &metadata_vec[..]).unwrap()
 }
 

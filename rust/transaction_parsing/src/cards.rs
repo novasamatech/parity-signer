@@ -126,7 +126,7 @@ impl<'a> Card<'a> {
                     base58prefix: _,
                 } => NavCard::IdCard {
                     f: MSCId {
-                        base58: format!("0x{}", hex::encode(&id)),
+                        base58: format!("0x{}", hex::encode(id)),
                         identicon: make_identicon_from_id20(id),
                     },
                 },
@@ -227,9 +227,9 @@ impl<'a> Card<'a> {
             Card::AuthorPublicKey(author) => {
                 let identicon = make_identicon_from_multisigner(author, IdenticonStyle::Dots);
                 let (public_key, encryption) = match author {
-                    MultiSigner::Ed25519(p) => (hex::encode(&p), Encryption::Ed25519.show()),
-                    MultiSigner::Sr25519(p) => (hex::encode(&p), Encryption::Sr25519.show()),
-                    MultiSigner::Ecdsa(p) => (hex::encode(&p), Encryption::Ecdsa.show()),
+                    MultiSigner::Ed25519(p) => (hex::encode(p), Encryption::Ed25519.show()),
+                    MultiSigner::Sr25519(p) => (hex::encode(p), Encryption::Sr25519.show()),
+                    MultiSigner::Ecdsa(p) => (hex::encode(p), Encryption::Ecdsa.show()),
                 };
                 NavCard::AuthorPublicKeyCard {
                     f: MVerifierDetails {
@@ -242,9 +242,9 @@ impl<'a> Card<'a> {
             Card::Verifier(x) => match x {
                 VerifierValue::Standard { m } => {
                     let (public_key, encryption) = match m {
-                        MultiSigner::Ed25519(p) => (hex::encode(&p), Encryption::Ed25519.show()),
-                        MultiSigner::Sr25519(p) => (hex::encode(&p), Encryption::Sr25519.show()),
-                        MultiSigner::Ecdsa(p) => (hex::encode(&p), Encryption::Ecdsa.show()),
+                        MultiSigner::Ed25519(p) => (hex::encode(p), Encryption::Ed25519.show()),
+                        MultiSigner::Sr25519(p) => (hex::encode(p), Encryption::Sr25519.show()),
+                        MultiSigner::Ecdsa(p) => (hex::encode(p), Encryption::Ecdsa.show()),
                     };
                     NavCard::VerifierCard {
                         f: MVerifierDetails {
@@ -259,7 +259,7 @@ impl<'a> Card<'a> {
                 f: MMetadataRecord {
                     specname: x.name.clone(),
                     specs_version: x.version.to_string(),
-                    meta_hash: hex::encode(&x.meta_hash),
+                    meta_hash: hex::encode(x.meta_hash),
                     meta_id_pic: pic_meta(x.meta_hash.as_bytes()),
                 },
             },
