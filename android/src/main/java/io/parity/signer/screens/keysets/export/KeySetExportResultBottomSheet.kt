@@ -24,7 +24,6 @@ import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
-import io.parity.signer.dependencyGraph.ServiceLocator
 import io.parity.signer.models.Callback
 import io.parity.signer.models.KeySetModel
 import io.parity.signer.ui.helpers.PreviewData
@@ -38,7 +37,7 @@ fun KeySetExportResultBottomSheet(
 ) {
 	Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
 		BottomSheetHeader(
-			header = pluralStringResource(
+			title = pluralStringResource(
 				id = R.plurals.key_sets_export_qe_title,
 				count = seeds.size,
 				seeds.size,

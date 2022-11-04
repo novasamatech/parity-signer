@@ -10,11 +10,11 @@ import io.parity.signer.uniffi.updateSeedNames
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 
-suspend fun SignerDataModel.getSeedPhraseForBackup(seedName: String,
-): String {
-		authentication.authenticate(activity) { //todo dmitry do suspend function
-			val seedPhrase = getSeed(seedName, backup = true)
-			return seedPhrase
-		}
-	suspendCancellableCoroutine<> {  }
-}
+//suspend fun SignerDataModel.getSeedPhraseForBackup(seedName: String,
+//): String {
+//		authentication.authenticate(activity) { //todo dmitry do suspend function
+//			val seedPhrase = getSeed(seedName, backup = true)
+//			return seedPhrase
+//		}
+//	suspendCancellableCoroutine<> {  }
+//}

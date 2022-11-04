@@ -41,7 +41,7 @@ fun KeySetDetailsExportResultBottomSheet(
 ) {
 	Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
 		BottomSheetHeader(
-			header = pluralStringResource(
+			title = pluralStringResource(
 				id = R.plurals.key_export_title,
 				count = selectedKeys.size,
 				selectedKeys.size,
