@@ -147,7 +147,7 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
         }
         "5301" => {
             let into_signature: [u8; 64] = match &transaction_hex[4..6] {
-                "03" => hex::decode(&signature_hex).unwrap().try_into().unwrap(), // raw message
+                "03" => hex::decode(signature_hex).unwrap().try_into().unwrap(), // raw message
                 _ => {
                     assert!(
                         signature_hex.starts_with("01"),
@@ -324,7 +324,7 @@ fn export_import_addrs() {
     .unwrap();
 
     let selected = HashMap::from([("Alice".to_owned(), ExportedSet::All)]);
-    let addrs = export_all_addrs(&dbname_from, selected.clone()).unwrap();
+    let addrs = export_all_addrs(dbname_from, selected.clone()).unwrap();
 
     let addrs_expected = ExportAddrs::V1(ExportAddrsV1 {
         addrs: vec![SeedInfo {
@@ -425,7 +425,7 @@ fn export_import_addrs() {
 
     import_all_addrs(dbname_to, alice_hash_map, addrs).unwrap();
 
-    let addrs_new = export_all_addrs(&dbname_to, selected).unwrap();
+    let addrs_new = export_all_addrs(dbname_to, selected).unwrap();
 
     assert_eq!(addrs_new, addrs_expected);
 }

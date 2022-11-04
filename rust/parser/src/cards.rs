@@ -78,7 +78,7 @@ impl ParserCard {
             ParserCard::Id20 {
                 id,
                 base58prefix: _,
-            } => readable(indent, "Id", &format!("0x{}", hex::encode(&id))),
+            } => readable(indent, "Id", &format!("0x{}", hex::encode(id))),
             ParserCard::None => readable(indent, "none", ""),
             ParserCard::IdentityField(variant) => readable(indent, "identity_field", variant),
             ParserCard::BitVec(bv) => readable(indent, "bitvec", bv),
