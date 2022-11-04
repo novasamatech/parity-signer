@@ -52,12 +52,12 @@ fun NetworkCard(
 
 class NetworkCardModel(
 	val networkTitle: String,
-	val networkLogo: String
+	val networkLogo: String,
 ) {
 
 	constructor(network: MscNetworkInfo) : this(
 		network.networkTitle,
-		network.networkLogo
+		network.networkLogo,
 	)
 }
 
@@ -66,7 +66,7 @@ class NetworkCardModel(
 internal class NetworkCardPreviewParameter :
 	PreviewParameterProvider<NetworkCardModel> {
 	override val values: Sequence<NetworkCardModel> = sequenceOf(
-		NetworkCardModel("Network Title", "Network Logo")
+		NetworkCardModel("Network Title", "Network Logo", )
 	)
 }
 

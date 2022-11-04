@@ -1,13 +1,12 @@
-package io.parity.signer.ui
+package io.parity.signer.ui.navigationselectors
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import io.parity.signer.bottomsheets.exportprivatekey.PrivateKeyExportBottomSheet
+import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
 import io.parity.signer.models.*
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keysets.NewSeedMenu
-import io.parity.signer.ui.navigationselectors.KeySetDetailsNavSubgraph
-import io.parity.signer.ui.navigationselectors.KeySetsNavSubgraph
+import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.ModalData
 import io.parity.signer.uniffi.ScreenData
@@ -30,14 +29,13 @@ fun CombinedScreensSelector(
 				)
 			}
 		}
-		is ScreenData.Keys -> if (FeatureFlags.isEnabled(FeatureOption.NEW_KEY_SET_DETAILS)) {
+		is ScreenData.Keys ->
 			KeySetDetailsNavSubgraph(
 				model = screenData.f.toKeySetDetailsModel(),
 				rootNavigator = rootNavigator,
 				alertState = alertState,
 				sigleton = signerDataModel,
 			)
-		}
 		else -> {} //old Selector showing them
 	}
 }

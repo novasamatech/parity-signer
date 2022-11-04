@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets.export
+package io.parity.signer.screens.keysetdetails.export
 
 import android.content.res.Configuration
 import androidx.compose.foundation.*
@@ -24,24 +24,27 @@ import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
-import io.parity.signer.dependencyGraph.ServiceLocator
+import io.parity.signer.components.sharedcomponents.KeyCard
+import io.parity.signer.components.sharedcomponents.KeySeedCard
 import io.parity.signer.models.Callback
+import io.parity.signer.models.KeyCardModel
+import io.parity.signer.models.KeySetDetailsModel
 import io.parity.signer.models.KeySetModel
-import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun KeySetExportResultBottomSheet(
-	seeds: Set<KeySetModel>,
+fun KeySetDetailsExportResultBottomSheet(
+	model: KeySetDetailsModel,
+	selectedKeys: Set<String>,
 	onClose: Callback,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
 		BottomSheetHeader(
 			header = pluralStringResource(
-				id = R.plurals.key_sets_export_qe_title,
-				count = seeds.size,
-				seeds.size,
+				id = R.plurals.key_export_title,
+				count = selectedKeys.size,
+				selectedKeys.size,
 			),
 			onCloseClicked = onClose
 		)
@@ -51,22 +54,22 @@ fun KeySetExportResultBottomSheet(
 		//scrollable part
 		Column(
 			modifier = Modifier
-				.verticalScroll(rememberScrollState())
-				.weight(weight = 1f, fill = false)
-				.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-				.background(MaterialTheme.colors.fill6, plateShape)
+                .verticalScroll(rememberScrollState())
+                .weight(weight = 1f, fill = false)
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                .background(MaterialTheme.colors.fill6, plateShape)
 		) {
-
 			if (LocalInspectionMode.current) {
 				AnimatedQrKeysInfo(
-					input = seeds.toList(),
+					input = Unit,
 					provider = EmptyAnimatedQrKeysProvider(),
 					modifier = Modifier.padding(8.dp)
 				)
 			} else {
 				AnimatedQrKeysInfo(
-					input = seeds.toList(),
-					provider = KeySetsExportService(),
+					input = KeySetDetailsExportService.GetQrCodesListRequest(model.root.seedName,
+					model.keys.filter { selectedKeys.contains(it.addressKey) }),
+					provider = KeySetDetailsExportService(),
 					modifier = Modifier.padding(8.dp)
 				)
 			}
@@ -82,34 +85,47 @@ fun KeySetExportResultBottomSheet(
 				)
 			Row(
 				modifier = Modifier
-					.padding(8.dp)
-					.border(
-						BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-						innerShape
-					)
-					.background(MaterialTheme.colors.fill6, innerShape)
+                    .padding(8.dp)
+                    .border(
+                        BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+                        innerShape
+                    )
+                    .background(MaterialTheme.colors.fill6, innerShape)
+
 			) {
 				Text(
 					text = stringResource(R.string.key_set_export_description_content),
 					color = MaterialTheme.colors.textTertiary,
 					style = TypefaceNew.CaptionM,
 					modifier = Modifier
-						.weight(1f)
-						.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+                        .weight(1f)
+                        .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
 				)
 				Icon(
 					imageVector = Icons.Outlined.Info,
 					contentDescription = null,
 					tint = MaterialTheme.colors.pink300,
 					modifier = Modifier
-						.align(Alignment.CenterVertically)
-						.padding(start = 18.dp, end = 18.dp)
+                        .align(Alignment.CenterVertically)
+                        .padding(start = 18.dp, end = 18.dp)
 				)
 			}
-			val seedList = seeds.toList()
+			KeySeedCard(
+				seedTitle = model.root.seedName,
+				base58 = model.root.base58,
+			)
+			Divider(
+				color = MaterialTheme.colors.appliedSeparator,
+				thickness = 1.dp,
+				startIndent = 16.dp,
+			)
+			val seedList = selectedKeys.toList()
 			for (i in 0..seedList.lastIndex) {
 				val seed = seedList[i]
-				KeySetItemInExport(seed)
+				val keyModel = model.keys.first { it.addressKey == seed }
+				KeyCard(
+					KeyCardModel.fromKeyModel(keyModel, model.network.title),
+				)
 				if (i != seedList.lastIndex) {
 					Divider(
 						color = MaterialTheme.colors.appliedSeparator,
@@ -158,22 +174,15 @@ private fun KeySetItemInExport(seed: KeySetModel) {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewKeySetExportResultBottomSheet() {
-	val keys = mutableSetOf(
-		KeySetModel(
-			"first seed name",
-			PreviewData.exampleIdenticon,
-			1.toUInt()
-		),
-		KeySetModel(
-			"second seed name",
-			PreviewData.exampleIdenticon,
-			3.toUInt()
-		),
+private fun PreviewKeySetDetailsExportResultBottomSheet() {
+	val model = KeySetDetailsModel.createStub()
+	val selected = setOf(
+		model.keys[0].addressKey,
+		model.keys[1].addressKey,
 	)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			KeySetExportResultBottomSheet(keys, {})
+			KeySetDetailsExportResultBottomSheet(model, selected, {})
 		}
 	}
 }

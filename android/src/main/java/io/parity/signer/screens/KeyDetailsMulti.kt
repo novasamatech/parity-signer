@@ -23,6 +23,10 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MAddressCard
 import io.parity.signer.uniffi.MKeyDetailsMulti
 
+/**
+ * This screen is replaced by animated qr bottom sheet
+ * todo remove it
+ */
 @Composable
 fun KeyDetailsMulti(
 	keyDetailsMulti: MKeyDetailsMulti,

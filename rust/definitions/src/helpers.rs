@@ -96,7 +96,7 @@ pub fn make_identicon_from_multisigner(
 pub fn make_identicon_from_id20(id: &[u8; 20]) -> Vec<u8> {
     use eth_blockies::eth_blockies_png_data;
 
-    let account = format!("0x{}", hex::encode(&id));
+    let account = format!("0x{}", hex::encode(id));
     let dimension = (IDENTICON_IMG_SIZE, IDENTICON_IMG_SIZE);
     let compressed_output = false;
     eth_blockies_png_data(account, dimension, compressed_output)

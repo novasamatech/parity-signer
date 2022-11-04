@@ -1,21 +1,18 @@
 package io.parity.signer.components.items
 
+import SignerCheckboxColors
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -27,18 +24,18 @@ import io.parity.signer.models.KeyModel
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
-import io.parity.signer.ui.theme.textDisabled
 import io.parity.signer.ui.theme.textTertiary
 
 @Composable
-fun KeyDerivedItem(
+fun KeyDerivedItemMultiselect(
 	model: KeyModel,
-	onClick: () -> Unit = {},
+	isSelected: Boolean = false,
+	onClick: (Boolean, String) -> Unit,
 ) {
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
 		color = Color.Transparent,
-		modifier = Modifier.clickable(onClick = onClick),
+		modifier = Modifier.clickable { onClick(!isSelected, model.addressKey) }
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -74,13 +71,12 @@ fun KeyDerivedItem(
 					style = TypefaceNew.BodyM,
 				)
 			}
-			Image(
-				imageVector = Icons.Filled.ChevronRight,
-				contentDescription = null,
-				colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
+			Checkbox(
+				checked = isSelected,
+				onCheckedChange = { c -> onClick(c, model.addressKey) },
+				colors = SignerCheckboxColors(),
 				modifier = Modifier
-					.padding(end = 16.dp)
-					.size(28.dp)
+					.padding(end = 8.dp)
 			)
 		}
 	}
@@ -96,10 +92,11 @@ fun KeyDerivedItem(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewKeyDerivedItem() {
+private fun PreviewKeyDerivedItemMultiselect() {
 	SignerNewTheme {
-		KeyDerivedItem(
-			KeyModel.createStub()
+		KeyDerivedItemMultiselect(
+			model = KeyModel.createStub(),
+			onClick = {_,_ -> },
 		)
 	}
 }

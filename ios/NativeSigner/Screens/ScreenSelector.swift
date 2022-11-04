@@ -33,6 +33,7 @@ struct ScreenSelector: View {
             )
         case let .keys(value):
             KeyDetailsView(
+                dataModel: KeyDetailsDataModel(value),
                 viewModel: .init(
                     keyName: value.root.address.seedName,
                     exportPrivateKeyService: PrivateKeyQRCodeService(

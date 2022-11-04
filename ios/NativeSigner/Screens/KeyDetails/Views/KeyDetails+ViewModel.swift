@@ -61,6 +61,22 @@ extension KeyDetailsView {
             self.navigation = navigation
         }
 
+        func keyExportModel(dataModel: KeyDetailsDataModel) -> ExportMultipleKeysModalViewModel {
+            let derivedKeys: [DerivedKeyExportModel] = dataModel.derivedKeys
+                .filter { selectedSeeds.contains($0.viewModel.path) }
+                .compactMap {
+                    guard let keyData = keyData(for: $0.viewModel.path) else { return nil }
+                    return DerivedKeyExportModel(viewModel: $0.viewModel, keyData: keyData)
+                }
+            return ExportMultipleKeysModalViewModel(
+                selectedItems: .keys(
+                    key: dataModel.keySummary,
+                    derivedKeys: derivedKeys
+                ),
+                seedNames: selectedSeeds
+            )
+        }
+
         func refreshDerivedKeys() {
             guard let keysData = keysData else { return }
             let sortedDerivedKeys = keysData.set
@@ -88,8 +104,8 @@ extension KeyDetailsView {
             removeSeed = keysData.root?.address.seedName ?? ""
         }
 
-        func refreshData() {
-            keyDetailsService.getKeys(for: keyName) { result in
+        func refreshData(dataModel: KeyDetailsDataModel) {
+            keyDetailsService.getKeys(for: dataModel.keySummary.keyName) { result in
                 if case let .success(keysData) = result {
                     self.appState.userData.keysData = keysData
                     self.keysData = keysData

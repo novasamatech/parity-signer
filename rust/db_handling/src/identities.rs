@@ -1662,7 +1662,7 @@ fn generate_secret_qr(
     let qr = png_qr_from_string(
         &format!(
             "secret:0x{}:{}",
-            hex::encode(&secret),
+            hex::encode(secret),
             hex::encode(genesis_hash)
         ),
         DataType::Sensitive,
