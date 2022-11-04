@@ -483,7 +483,7 @@ where
                     "{}:{}:0x{}",
                     prefix,
                     base58,
-                    hex::encode(&network_specs.genesis_hash)
+                    hex::encode(network_specs.genesis_hash)
                 ),
                 DataType::Regular,
             )
