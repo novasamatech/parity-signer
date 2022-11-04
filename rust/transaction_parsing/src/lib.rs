@@ -1,8 +1,9 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
+use db_handling::identities::TransactionBulk;
 use definitions::{helpers::unhex, navigation::TransactionCardSet};
-use parity_scale_codec::{Decode, Encode};
+use parity_scale_codec::Decode;
 use std::path::Path;
 
 pub use definitions::navigation::{StubNav, TransactionAction};
@@ -67,17 +68,6 @@ where
         _ => Err(Error::PayloadNotSupported(data_hex[4..6].to_string())),
     }
 }
-
-#[derive(Clone, Encode, Decode)]
-pub enum TransactionBulk {
-    V1(TransactionBulkV1),
-}
-
-#[derive(Clone, Encode, Decode)]
-pub struct TransactionBulkV1 {
-    encoded_transactions: Vec<Vec<u8>>,
-}
-
 fn parse_transaction_bulk<P: AsRef<Path>>(payload: &str, dbname: P) -> Result<TransactionAction> {
     let decoded_data = unhex(payload)?;
 

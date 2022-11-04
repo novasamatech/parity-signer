@@ -1,5 +1,7 @@
 //! Helpers
-use db_handling::identities::{AddrInfo, ExportAddrs, ExportAddrsV1, SeedInfo};
+use db_handling::identities::{
+    AddrInfo, ExportAddrs, ExportAddrsV1, SeedInfo, TransactionBulk, TransactionBulkV1,
+};
 use parity_scale_codec::Encode;
 use qrcode_rtx::transform_into_qr_apng;
 use serde_json::{map::Map, value::Value};
@@ -684,6 +686,30 @@ pub fn generate_key_info_export_to_qr<P: AsRef<Path>>(
     let export_addrs_encoded = [&[0x53, 0xff, 0xde], export_addrs.encode().as_slice()].concat();
 
     generate_qr_code(&export_addrs_encoded, chunk_size, fps, output_name)
+}
+
+/// Generate Bulk Transaction Signing payload for testing
+pub fn generate_bulk_transaction_qr<P: AsRef<Path>>(
+    dst_file: P,
+    tx_count: usize,
+    chunk_size: u16,
+    from: String,
+) -> Result<()> {
+    let encoded_transactions = (0..tx_count).map(|_| {
+
+    let line = "0100".to_string() + &from + 
+      "a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+        hex::decode(line).unwrap()
+    })
+    .collect();
+    let v1_bulk = TransactionBulkV1 {
+        encoded_transactions,
+    };
+    let bulk = TransactionBulk::V1(v1_bulk);
+
+    let payload = [&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat();
+
+    generate_qr_code(&payload, chunk_size, 8, dst_file)
 }
 
 /// Generate with data into a specified file.

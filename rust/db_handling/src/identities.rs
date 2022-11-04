@@ -100,6 +100,16 @@ lazy_static! {
     static ref REG_PATH: Regex = Regex::new(r"^(?P<path>(//?[^/]+)*)(///(?P<password>.+))?$").expect("known value");
 }
 
+#[derive(Clone, Encode, Decode)]
+pub enum TransactionBulk {
+    V1(TransactionBulkV1),
+}
+
+#[derive(Clone, Encode, Decode)]
+pub struct TransactionBulkV1 {
+    pub encoded_transactions: Vec<Vec<u8>>,
+}
+
 #[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
 pub enum ExportAddrs {
     V1(ExportAddrsV1),
