@@ -32,6 +32,7 @@ fun BackupPhraseBox(seedPhrase: String) {
 		mainAxisSize = SizeMode.Expand,
 		mainAxisAlignment = FlowMainAxisAlignment.SpaceBetween,
 		modifier = Modifier
+			.padding(16.dp)
 			.background(MaterialTheme.colors.fill6, innerShape)
 			.padding(12.dp),
 	) {

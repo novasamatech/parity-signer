@@ -34,7 +34,7 @@ fun CombinedScreensSelector(
 				model = screenData.f.toKeySetDetailsModel(),
 				rootNavigator = rootNavigator,
 				alertState = alertState,
-				sigleton = signerDataModel,
+				singleton = signerDataModel,
 			)
 		else -> {} //old Selector showing them
 	}

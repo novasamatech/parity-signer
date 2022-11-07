@@ -98,7 +98,6 @@ fun KeyDetailsMenuGeneral(
 			onclick = {
 				if (alertState.value == AlertState.None)
 					onBackupClicked()
-//					navigator.navigate(Action.BACKUP_SEED) todo dmitry was for old screen
 				else
 					navigator.navigate(Action.SHIELD)
 			}

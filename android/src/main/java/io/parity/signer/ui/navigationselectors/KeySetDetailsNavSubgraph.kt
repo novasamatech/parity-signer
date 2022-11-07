@@ -1,20 +1,28 @@
 package io.parity.signer.ui.navigationselectors
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.models.*
 import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenFull
+import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenView
+import io.parity.signer.screens.keysetdetails.backup.SeedBackupFullOverlayScreen
+import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportScreenFull
+import kotlinx.coroutines.launch
 
 @Composable
 fun KeySetDetailsNavSubgraph(
 	model: KeySetDetailsModel,
 	rootNavigator: Navigator,
 	alertState: State<AlertState?>, //for shield icon
-	sigleton: SignerDataModel,
+	singleton: SignerDataModel,
 ) {
 	val navController = rememberNavController()
 	NavHost(
@@ -29,7 +37,7 @@ fun KeySetDetailsNavSubgraph(
 				navController = navController,
 				alertState = alertState,
 				onRemoveKeySet = {
-					sigleton.removeSeed(model.root.seedName)
+					singleton.removeSeed(model.root.seedName)
 				},
 			)
 		}
@@ -40,15 +48,19 @@ fun KeySetDetailsNavSubgraph(
 			)
 		}
 		composable(KeySetDetailsNavSubgraph.backup) {
-			KeySetDetailsScreenFull(
-				model = model,
-				navigator = rootNavigator,
-				alertState = alertState,
-				navController = navController,
-				onRemoveKeySet = { },
-			)
-			KeySetDetailsExportScreenFull(
-				model = model,
+			//background
+			Box(Modifier.statusBarsPadding()) {
+				KeySetDetailsScreenView(
+					model = model,
+					navigator = EmptyNavigator(),
+					alertState = alertState,
+					onMenu = {},
+				)
+			}
+			//content
+			SeedBackupFullOverlayScreen(
+				model = model.toSeedBackupModel(),
+				getSeedPhraseForBackup = singleton::getSeedPhraseForBackup,
 				onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
 			)
 		}

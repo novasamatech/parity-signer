@@ -89,13 +89,14 @@ fun KeyDerivedItem(
 @Composable
 fun SlimKeyItem(model: KeyModel) {
 	Row(
+		modifier = Modifier.fillMaxWidth(1f),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
 		IdentIcon(
 			identicon = model.identicon, size = 36.dp, modifier = Modifier.padding(
 				top = 16.dp,
 				bottom = 16.dp,
-				start = 16.dp,
+				start = 24.dp,
 				end = 12.dp
 			)
 		)
