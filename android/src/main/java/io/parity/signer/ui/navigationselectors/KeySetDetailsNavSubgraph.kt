@@ -2,7 +2,6 @@ package io.parity.signer.ui.navigationselectors
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
@@ -12,10 +11,9 @@ import androidx.navigation.compose.rememberNavController
 import io.parity.signer.models.*
 import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenFull
 import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenView
-import io.parity.signer.screens.keysetdetails.backup.SeedBackupFullOverlayScreen
+import io.parity.signer.screens.keysetdetails.backup.SeedBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportScreenFull
-import kotlinx.coroutines.launch
 
 @Composable
 fun KeySetDetailsNavSubgraph(
@@ -58,7 +56,7 @@ fun KeySetDetailsNavSubgraph(
 				)
 			}
 			//content
-			SeedBackupFullOverlayScreen(
+			SeedBackupFullOverlayBottomSheet(
 				model = model.toSeedBackupModel(),
 				getSeedPhraseForBackup = singleton::getSeedPhraseForBackup,
 				onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },

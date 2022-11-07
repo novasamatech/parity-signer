@@ -27,7 +27,7 @@ import io.parity.signer.ui.theme.SignerNewTheme
 
 
 @Composable
-fun SeedBackupFullOverlayScreen(
+fun SeedBackupFullOverlayBottomSheet(
 	model: SeedBackupModel,
 	getSeedPhraseForBackup: suspend (String) -> String?,
 	onClose: Callback,
@@ -123,7 +123,7 @@ private fun PreviewSeedBackupFullOverlayScreen() {
 	val model = KeySetDetailsModel.createStub().toSeedBackupModel()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			SeedBackupFullOverlayScreen(model,
+			SeedBackupFullOverlayBottomSheet(model,
 				{ _ -> " some long words some some" }, {})
 		}
 	}

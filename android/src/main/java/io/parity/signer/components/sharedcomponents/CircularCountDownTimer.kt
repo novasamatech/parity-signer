@@ -70,13 +70,14 @@ fun CircularCountDownTimer(
 			)
 		}
 	}
-	if (timeLeft <= 0) {
-		onTimeOutAction()
-	}
+
 	LaunchedEffect(key1 = Unit) {
 		while (timeLeft > 0) {
 			delay(1.seconds)
 			timeLeft -= 1
+			if (timeLeft == 0) {
+				onTimeOutAction()
+			}
 		}
 	}
 }
@@ -134,13 +135,14 @@ fun SnackBarCircularCountDownTimer(
 			)
 		}
 	}
-	if (timeLeft <= 0) {
-		onTimeOutAction()
-	}
+
 	LaunchedEffect(key1 = Unit) {
 		while (timeLeft > 0) {
 			delay(1.seconds)
 			timeLeft -= 1
+			if (timeLeft == 0) {
+				onTimeOutAction()
+			}
 		}
 	}
 }
