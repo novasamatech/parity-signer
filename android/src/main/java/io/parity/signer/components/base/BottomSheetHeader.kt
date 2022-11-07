@@ -25,7 +25,7 @@ fun BottomSheetHeader(
 ) {
 	Row(
 		modifier = Modifier
-			.padding(top = 20.dp, bottom = 20.dp, start = 24.dp, end = 16.dp)
+			.padding(start = 24.dp, end = 16.dp)
 			.fillMaxWidth(),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
@@ -35,7 +35,6 @@ fun BottomSheetHeader(
 				color = MaterialTheme.colors.primary,
 				style = TypefaceNew.TitleS,
 			)
-			//todo dmitry if subtitle paddings should be smaller
 			if (subtitile != null) {
 				Text(
 					text = subtitile,
@@ -45,7 +44,8 @@ fun BottomSheetHeader(
 			}
 		}
 		Spacer(modifier = Modifier.weight(1.0f))
-		CloseIcon(onCloseClicked = onCloseClicked)
+		CloseIcon(modifier = Modifier.padding(vertical = 20.dp),
+			onCloseClicked = onCloseClicked)
 	}
 }
 
