@@ -94,7 +94,8 @@ private fun PreviewKeySetDetailsExportResultBottomSheet() {
 	val model = KeySetDetailsModel.createStub().toSeedBackupModel()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			SeedBackupBottomSheet(model, { _ -> " some long workds" }, {})
+			SeedBackupBottomSheet(model,
+				{ _ -> " some long words some some" }, {})
 		}
 	}
 }

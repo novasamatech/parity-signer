@@ -16,6 +16,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.flowlayout.FlowMainAxisAlignment
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.SizeMode
 import io.parity.signer.R
 import io.parity.signer.ui.theme.*
 
@@ -25,20 +28,15 @@ fun BackupPhraseBox(seedPhrase: String) {
 	val innerRoun = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 	val innerShape =
 		RoundedCornerShape(innerRoun, innerRoun, innerRoun, innerRoun)
-	LazyVerticalGrid(
-		columns = GridCells.Adaptive(128.dp),
+	FlowRow(
+		mainAxisSize = SizeMode.Expand,
+		mainAxisAlignment = FlowMainAxisAlignment.SpaceBetween,
 		modifier = Modifier
-			.padding(8.dp)
-			.background(MaterialTheme.colors.fill6, innerShape),
-		contentPadding = PaddingValues(
-			start = 12.dp,
-			top = 12.dp,
-			end = 12.dp,
-			bottom = 12.dp,
-		),
+			.background(MaterialTheme.colors.fill6, innerShape)
+			.padding(12.dp),
 	) {
 		val words = seedPhrase.split(" ")
-		items(words.size) { index ->
+		for (index in 0..words.lastIndex) {
 			BackupPhraseItem(index = index + 1, word = words[index])
 		}
 	}
@@ -47,7 +45,7 @@ fun BackupPhraseBox(seedPhrase: String) {
 
 @Composable
 private fun BackupPhraseItem(index: Int, word: String) {
-	Row() {
+	Row(Modifier.defaultMinSize(minWidth = 100.dp)) {
 		Text(
 			text = index.toString(),
 			color = MaterialTheme.colors.textDisabled,
@@ -77,6 +75,6 @@ private fun BackupPhraseItem(index: Int, word: String) {
 @Composable
 private fun PreviewBackupPhraseBox() {
 	SignerNewTheme {
-		BackupPhraseBox("some workds used for secret special long text here to see how printed")
+		BackupPhraseBox("some workds used for secret veryverylong special long text here to see how printed")
 	}
 }
