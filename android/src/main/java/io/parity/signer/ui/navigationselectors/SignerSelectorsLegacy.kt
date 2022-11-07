@@ -131,10 +131,7 @@ fun ModalSelector(
 				modalData.f,
 				button2
 			)
-			is ModalData.Backup -> SeedBackupOld( //todo dmitry
-				modalData.f,
-				getSeedForBackup = signerDataModel::getSeedForBackup
-			)
+			is ModalData.Backup -> {} //new screen is part of key details subgraph
 			is ModalData.PasswordConfirm -> PasswordConfirm(
 				modalData.f,
 				signerDataModel = signerDataModel

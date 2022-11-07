@@ -23,7 +23,7 @@ import kotlinx.coroutines.delay
 
 /**
  * Modal to show seed phrase. Dangerous place.
- * todo dmitry remove, use [SeedBackup] instead
+ * todo dmitry remove, used [SeedBackup] instead
  */
 @Composable
 fun SeedBackupOld(

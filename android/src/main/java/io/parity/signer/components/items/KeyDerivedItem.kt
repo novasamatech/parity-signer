@@ -86,6 +86,34 @@ fun KeyDerivedItem(
 	}
 }
 
+@Composable
+fun SlimKeyItem(model: KeyModel) {
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+	) {
+		IdentIcon(
+			identicon = model.identicon, size = 36.dp, modifier = Modifier.padding(
+				top = 16.dp,
+				bottom = 16.dp,
+				start = 16.dp,
+				end = 12.dp
+			)
+		)
+		Text(
+			text = model.path,
+			color = MaterialTheme.colors.primary,
+			style = TypefaceNew.LabelM,
+		)
+		if (model.hasPwd) {
+			Icon(
+				painterResource(id = R.drawable.ic_lock_16),
+				contentDescription = stringResource(R.string.key_lock_item),
+				tint = MaterialTheme.colors.textTertiary,
+				modifier = Modifier.padding(start = 8.dp)
+			)
+		}
+	}
+}
 
 @Preview(
 	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -99,6 +127,24 @@ fun KeyDerivedItem(
 private fun PreviewKeyDerivedItem() {
 	SignerNewTheme {
 		KeyDerivedItem(
+			KeyModel.createStub()
+		)
+	}
+}
+
+
+@Preview(
+	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewSlimKeyItem() {
+	SignerNewTheme {
+		SlimKeyItem(
 			KeyModel.createStub()
 		)
 	}

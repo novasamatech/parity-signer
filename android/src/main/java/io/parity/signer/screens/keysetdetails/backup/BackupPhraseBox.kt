@@ -26,7 +26,7 @@ fun BackupPhraseBox(seedPhrase: String) {
 	val innerShape =
 		RoundedCornerShape(innerRoun, innerRoun, innerRoun, innerRoun)
 	LazyVerticalGrid(
-		columns = GridCells.Fixed(3),
+		columns = GridCells.Adaptive(128.dp),
 		modifier = Modifier
 			.padding(8.dp)
 			.background(MaterialTheme.colors.fill6, innerShape),

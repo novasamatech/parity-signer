@@ -26,8 +26,8 @@ fun KeySetDetailsNavSubgraph(
 			KeySetDetailsScreenFull(
 				model = model,
 				navigator = rootNavigator,
-				alertState = alertState,
 				navController = navController,
+				alertState = alertState,
 				onRemoveKeySet = {
 					sigleton.removeSeed(model.root.seedName)
 				},
@@ -39,10 +39,24 @@ fun KeySetDetailsNavSubgraph(
 				onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
 			)
 		}
+		composable(KeySetDetailsNavSubgraph.backup) {
+			KeySetDetailsScreenFull(
+				model = model,
+				navigator = rootNavigator,
+				alertState = alertState,
+				navController = navController,
+				onRemoveKeySet = { },
+			)
+			KeySetDetailsExportScreenFull(
+				model = model,
+				onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
+			)
+		}
 	}
 }
 
 object KeySetDetailsNavSubgraph {
 	const val home = "keyset_details_home"
 	const val multiselect = "keyset_details_multiselect"
+	const val backup = "keyset_details_backup"
 }

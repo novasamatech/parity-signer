@@ -1,7 +1,6 @@
 package io.parity.signer.screens.keysetdetails
 
 import android.content.res.Configuration
-import android.telecom.Call
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,6 +37,7 @@ fun KeySetDetailsMenu(
 	alertState: State<AlertState?>,
 	removeSeed: Callback,
 	onSelectKeysClicked: Callback,
+	onBackupClicked: Callback,
 ) {
 	val state = remember {
 		mutableStateOf(KeySetDetailsMenuState.GENERAL)
@@ -48,6 +48,7 @@ fun KeySetDetailsMenu(
 			alertState = alertState,
 			onDeleteClicked = { state.value = KeySetDetailsMenuState.DELETE_CONFIRM },
 			onSelectKeysClicked = onSelectKeysClicked,
+			onBackupClicked = onBackupClicked,
 		)
 		KeySetDetailsMenuState.DELETE_CONFIRM ->
 			KeyDetailsDeleteConfirmBottomSheet(
@@ -64,6 +65,7 @@ fun KeyDetailsMenuGeneral(
 	navigator: Navigator,
 	alertState: State<AlertState?>,
 	onSelectKeysClicked: Callback,
+	onBackupClicked: Callback,
 	onDeleteClicked: Callback,
 ) {
 	val sidePadding = 24.dp
@@ -95,7 +97,8 @@ fun KeyDetailsMenuGeneral(
 			label = stringResource(R.string.menu_option_backup_key_set),
 			onclick = {
 				if (alertState.value == AlertState.None)
-					navigator.navigate(Action.BACKUP_SEED)
+					onBackupClicked()
+//					navigator.navigate(Action.BACKUP_SEED) todo dmitry was for old screen
 				else
 					navigator.navigate(Action.SHIELD)
 			}
@@ -137,7 +140,7 @@ private fun PreviewKeyDetailsMenu() {
 	SignerNewTheme {
 		val state = remember { mutableStateOf(AlertState.None) }
 		KeySetDetailsMenu(
-			EmptyNavigator(), state, {}, {},
+			EmptyNavigator(), state, {}, {}, {},
 		)
 	}
 }
