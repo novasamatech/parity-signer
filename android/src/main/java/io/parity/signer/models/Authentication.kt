@@ -149,8 +149,8 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 									context,
 									context.getString(R.string.auth_error_message, errString),
 									Toast.LENGTH_SHORT
-								)
-									.show()
+								).show()
+
 								setAuth(false)
 								continuation.resumeWith(Result.success(AuthResult.AuthError))
 							}

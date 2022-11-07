@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import io.parity.signer.components.BigButton
@@ -78,8 +79,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		val localNavAction = signerDataModel.localNavAction.observeAsState()
 
 		when (onBoardingDone.value) {
-			OnBoardingState.Yes -> {
-
+			OnboardingWasShown.Yes -> {
 				if (authenticated.value == true) {
 					BackHandler {
 						signerDataModel.navigator.backAction()
@@ -167,7 +167,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					Column(verticalArrangement = Arrangement.Center) {
 						Spacer(Modifier.weight(0.5f))
 						BigButton(
-							text = "Unlock app",
+							text = stringResource(R.string.unlock_app_button),
 							action = {
 								signerDataModel.authentication.authenticate(signerDataModel.activity) {
 									signerDataModel.totalRefresh()
@@ -178,7 +178,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					}
 				}
 			}
-			OnBoardingState.No -> {
+			OnboardingWasShown.No -> {
 				if (shieldAlert.value == AlertState.None) {
 					Scaffold(
 						modifier = Modifier
@@ -203,14 +203,14 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					}
 				}
 			}
-			OnBoardingState.InProgress -> {
+			OnboardingWasShown.InProgress -> {
 				if (authenticated.value == true) {
 					WaitingScreen()
 				} else {
 					Column(verticalArrangement = Arrangement.Center) {
 						Spacer(Modifier.weight(0.5f))
 						BigButton(
-							text = "Unlock app",
+							text = stringResource(R.string.unlock_app_button),
 							action = {
 								signerDataModel.lateInit()
 							}

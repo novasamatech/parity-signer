@@ -53,4 +53,5 @@
 	<string name="subtitle_secret_recovery_phrase">Secret Recovery Phrase</string>
 	<string name="subtitle_derived_keys">Derived Keys</string>
     <string name="seed_backup_autohide_title">Backup info will be hidden in</string>
+	<string name="unlock_app_button">Unlock app</string>
 </resources>

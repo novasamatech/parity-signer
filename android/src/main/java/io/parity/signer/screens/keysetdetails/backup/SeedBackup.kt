@@ -1,6 +1,7 @@
 package io.parity.signer.screens.keysetdetails.backup
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -74,10 +75,7 @@ private fun SeedBackupBottomSheet(
 
 	LaunchedEffect(Unit) {
 		val phrase = getSeedPhraseForBackup(model.seedName)
-		if (phrase == null) {
-			submitErrorState("error authenticate to get backup data")
-			onClose()
-		} else {
+		if (phrase != null) {
 			seedPhrase = phrase
 		}
 	}

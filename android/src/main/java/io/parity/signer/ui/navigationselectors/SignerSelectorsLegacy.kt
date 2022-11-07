@@ -199,7 +199,7 @@ fun AlertSelector(
 	}
 }
 
-enum class OnBoardingState {
+enum class OnboardingWasShown {
 	InProgress,
 	No,
 	Yes;
