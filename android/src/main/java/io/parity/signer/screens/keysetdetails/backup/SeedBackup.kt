@@ -1,7 +1,6 @@
 package io.parity.signer.screens.keysetdetails.backup
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15,11 +14,13 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.base.BottomSheetSubtitle
+import io.parity.signer.components.base.SignerBottomSheetDivider
 import io.parity.signer.components.items.SlimKeyItem
 import io.parity.signer.components.sharedcomponents.SnackBarCircularCountDownTimer
+import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.Callback
 import io.parity.signer.models.KeySetDetailsModel
-import io.parity.signer.models.submitErrorState
+import io.parity.signer.models.abbreviateString
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -56,18 +57,25 @@ private fun SeedBackupBottomSheet(
 	}
 	Column() {
 		//header
-		BottomSheetHeader(title = model.seedName, onCloseClicked = onClose)
+		BottomSheetHeader(
+			title = model.seedName,
+			subtitile = model.seedBase58.abbreviateString(BASE58_STYLE_ABBREVIATE),
+			onCloseClicked = onClose,)
 		Column(
 			modifier = Modifier
 				.verticalScroll(rememberScrollState()),
 		) {
+			SignerBottomSheetDivider()
 			// phrase
 			BottomSheetSubtitle(R.string.subtitle_secret_recovery_phrase)
 			BackupPhraseBox(seedPhrase)
 			//derived keys
 			BottomSheetSubtitle(R.string.subtitle_derived_keys)
-			for (item in model.derivations) {
-				SlimKeyItem(model = item)
+			for (index in 0..model.derivations.lastIndex) {
+				SlimKeyItem(model = model.derivations[index])
+				if (index != model.derivations.lastIndex) {
+					SignerBottomSheetDivider()
+				}
 			}
 			Spacer(modifier = Modifier.size(height = 80.dp, width = 1.dp))
 		}

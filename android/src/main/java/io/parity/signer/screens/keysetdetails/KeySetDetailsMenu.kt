@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Circle
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,6 +27,7 @@ import io.parity.signer.uniffi.Action
 
 /**
  * Old was [SeedMenu]
+ * //todo dmitry fix behaviour than when confirmation state closed - it opens conformation on next button click
  */
 @Composable
 fun KeySetDetailsMenu(
@@ -43,13 +41,16 @@ fun KeySetDetailsMenu(
 		mutableStateOf(KeySetDetailsMenuState.GENERAL)
 	}
 	when (state.value) {
-		KeySetDetailsMenuState.GENERAL -> KeyDetailsMenuGeneral(
-			navigator = navigator,
-			alertState = alertState,
-			onDeleteClicked = { state.value = KeySetDetailsMenuState.DELETE_CONFIRM },
-			onSelectKeysClicked = onSelectKeysClicked,
-			onBackupClicked = onBackupClicked,
-		)
+		KeySetDetailsMenuState.GENERAL ->
+			KeyDetailsMenuGeneral(
+				navigator = navigator,
+				alertState = alertState,
+				onDeleteClicked = {
+					state.value = KeySetDetailsMenuState.DELETE_CONFIRM
+				},
+				onSelectKeysClicked = onSelectKeysClicked,
+				onBackupClicked = onBackupClicked,
+			)
 		KeySetDetailsMenuState.DELETE_CONFIRM ->
 			KeyDetailsDeleteConfirmBottomSheet(
 				onCancel = { state.value = KeySetDetailsMenuState.GENERAL },
@@ -71,8 +72,8 @@ fun KeyDetailsMenuGeneral(
 	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-			.fillMaxWidth()
-			.padding(start = sidePadding, end = sidePadding, top = 8.dp),
+            .fillMaxWidth()
+            .padding(start = sidePadding, end = sidePadding, top = 8.dp),
 	) {
 
 		MenuItemForBottomSheet(

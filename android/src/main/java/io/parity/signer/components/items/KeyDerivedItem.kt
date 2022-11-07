@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.KeyModel
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -69,7 +70,7 @@ fun KeyDerivedItem(
 				}
 				Spacer(modifier = Modifier.padding(top = 4.dp))
 				Text(
-					text = model.base58.abbreviateString(8),
+					text = model.base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
 					color = MaterialTheme.colors.textTertiary,
 					style = TypefaceNew.BodyM,
 				)
