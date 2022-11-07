@@ -53,7 +53,7 @@ class SignerDataModel : ViewModel() {
 
 	// Authenticator to call!
 	internal var authentication: Authentication =
-		Authentication(setAuth = { _authenticated.value = it })
+		Authentication(setAuth = { _authenticated.value = it }) //todo dmitry check that we don't show unlock under current screen for new screens
 
 	// Camera stuff
 	internal var bucket = arrayOf<String>()
