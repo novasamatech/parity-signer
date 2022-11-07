@@ -166,20 +166,20 @@ extension TransactionPreview {
         }
 
         func sign(with comment: String) {
-            let seedNames = Set(dataModel.compactMap { $0.content.authorInfo?.address.seedName })
-            let seedPhrasesDictionary = seedsMediator.getSeeds(seedNames: seedNames)
+            let seedNames = dataModel.compactMap { $0.content.authorInfo?.address.seedName }
+            let seedPhrasesDictionary = seedsMediator.getSeeds(seedNames: Set(seedNames))
             navigation.perform(
                 navigation:
                 .init(
                     action: .goForward,
                     details: comment,
-                    seedPhrase: formattedPhrase(from: seedPhrasesDictionary)
+                    seedPhrase: formattedPhrase(seedNames: seedNames, with: seedPhrasesDictionary)
                 )
             )
         }
 
-        private func formattedPhrase(from dictionary: [String: String]) -> String {
-            dictionary.reduce(into: "") { $0 += "\($1.key) \($1.value)\n" }
+        private func formattedPhrase(seedNames: [String], with dictionary: [String: String]) -> String {
+            seedNames.reduce(into: "") { $0 += "\($1) \(dictionary[$1] ?? "")\n" }
         }
     }
 }
