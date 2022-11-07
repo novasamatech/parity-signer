@@ -60,17 +60,22 @@ private fun SeedBackupBottomSheet(
 		BottomSheetHeader(
 			title = model.seedName,
 			subtitile = model.seedBase58.abbreviateString(BASE58_STYLE_ABBREVIATE),
-			onCloseClicked = onClose,)
+			onCloseClicked = onClose,
+		)
+		SignerBottomSheetDivider()
 		Column(
 			modifier = Modifier
 				.verticalScroll(rememberScrollState()),
 		) {
-			SignerBottomSheetDivider()
 			// phrase
+			Spacer(modifier = Modifier.padding(top = 14.dp))
 			BottomSheetSubtitle(R.string.subtitle_secret_recovery_phrase)
+			Spacer(modifier = Modifier.padding(top = 14.dp))
 			BackupPhraseBox(seedPhrase)
 			//derived keys
+			Spacer(modifier = Modifier.padding(top = 22.dp))
 			BottomSheetSubtitle(R.string.subtitle_derived_keys)
+			Spacer(modifier = Modifier.padding(top = 14.dp))
 			for (index in 0..model.derivations.lastIndex) {
 				SlimKeyItem(model = model.derivations[index])
 				if (index != model.derivations.lastIndex) {

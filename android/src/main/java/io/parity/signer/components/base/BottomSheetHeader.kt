@@ -55,7 +55,7 @@ fun BottomSheetSubtitle(@StringRes id: Int) {
 		text = stringResource(id),
 		color = MaterialTheme.colors.primary,
 		style = TypefaceNew.BodyL,
-		modifier = Modifier.padding(start = 24.dp, top = 6.dp, bottom = 6.dp)
+		modifier = Modifier.padding(start = 24.dp)
 	)
 }
 
