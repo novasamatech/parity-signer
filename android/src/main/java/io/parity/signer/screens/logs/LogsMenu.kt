@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.components.base.SecondaryButtonBottomSheet
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.Callback
@@ -44,7 +45,7 @@ fun LogsMenu(
 			onDeleteClicked = { state.value = LogsState.DELETE_CONFIRM },
 		)
 		LogsState.DELETE_CONFIRM ->
-			KeyDetailsDeleteConfirmBottomSheet( //todo dmitry different dialog "Clear Log?"
+			LogeMenuDeleteConfirm(
 				onCancel = { state.value = LogsState.GENERAL },
 				onRemoveKey = { navigator.navigate(Action.CLEAR_LOG) }
 			)
@@ -85,6 +86,19 @@ private fun LogsMenuGeneral(
 	}
 }
 
+@Composable
+fun LogeMenuDeleteConfirm(
+	onCancel: Callback,
+	onRemoveKey: Callback,
+) {
+	BottomSheetConfirmDialog(
+		title = stringResource(R.string.remove_key_confirm_title),
+		message = stringResource(R.string.remove_key_confirm_text),
+		ctaLabel = stringResource(R.string.remove_key_confirm_cta),
+		onCancel = onCancel,
+		onCta = onRemoveKey,
+	)
+}
 
 private enum class LogsState {
 	GENERAL, DELETE_CONFIRM,

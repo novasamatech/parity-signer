@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.components.base.SecondaryButtonBottomSheet
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.Callback
@@ -47,14 +48,26 @@ fun KeySetDetailsMenu(
 			onSelectKeysClicked = onSelectKeysClicked,
 		)
 		KeySetDetailsMenuState.DELETE_CONFIRM ->
-			KeyDetailsDeleteConfirmBottomSheet(
+			KeySetDeleteConfirmBottomSheet(
 				onCancel = { state.value = KeySetDetailsMenuState.GENERAL },
 				onRemoveKey = removeSeed,
-//				navigator.navigate(Action.REMOVE_KEY) action that was there to show old confirmation screen.
 			)
 	}
 }
 
+@Composable
+fun KeySetDeleteConfirmBottomSheet(
+	onCancel: Callback,
+	onRemoveKey: Callback,
+) {
+	BottomSheetConfirmDialog(
+		title = stringResource(R.string.remove_key_set_confirm_title),
+		message = stringResource(R.string.remove_key_set_confirm_text),
+		ctaLabel = stringResource(R.string.remove_key_set_confirm_cta),
+		onCancel = onCancel,
+		onCta = onRemoveKey,
+	)
+}
 
 @Composable
 fun KeyDetailsMenuGeneral(

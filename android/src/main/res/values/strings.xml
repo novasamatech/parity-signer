@@ -3,6 +3,9 @@
 	<string name="remove_key_confirm_title">Forget this key?</string>
 	<string name="remove_key_confirm_text">This key will be removed for this network. Are you sure?</string>
 	<string name="remove_key_confirm_cta">Remove key</string>
+	<string name="remove_key_set_confirm_title">Forget this Key Set?</string>
+	<string name="remove_key_set_confirm_text">This Key Set will be removed for all networks. This cannot be reversed.  Are you sure you wish to proceed?</string>
+	<string name="remove_key_set_confirm_cta">Remove</string>
 	<string name="generic_cancel">Cancel</string>
 	<string name="export_private_key_confirm_title">Export Private Key</string>
 	<string name="export_private_key_confirm_text">A private key can be used to sign transactions. This key will be marked as a hot key after export.</string>
