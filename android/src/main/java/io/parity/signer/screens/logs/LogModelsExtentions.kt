@@ -9,7 +9,6 @@ import io.parity.signer.models.toLogDateString
 import io.parity.signer.models.toLogTimeString
 import io.parity.signer.screens.logs.items.LogsListEntryModel
 import io.parity.signer.uniffi.*
-import java.util.Calendar
 
 
 data class LogsScreenModel(val logs: List<LogsListEntryModel>)
@@ -18,13 +17,12 @@ data class LogsScreenModel(val logs: List<LogsListEntryModel>)
 fun MLog.toLogsScreenModel(): LogsScreenModel {
 	val result = mutableListOf<LogsListEntryModel>()
 
-	var date: Calendar? = null
-	var lastShownDay: String? = null
-
 	log.forEach { (order, rustTimestamp, listOfEvents) ->
-		date = DateUtils.parseLogTime(rustTimestamp)
+		val date = DateUtils.parseLogTime(rustTimestamp)
 		val dayString = date?.toLogDateString()
 		val timeString = date?.toLogTimeString()
+		var lastShownDay: String? = null
+
 		listOfEvents.forEach { event ->
 			if (lastShownDay != dayString && dayString != null) {
 				result.add(LogsListEntryModel.TimeSeparatorModel(dayString))
@@ -110,22 +108,21 @@ fun Event.getViewMessage(): String? {
 		is Event.NetworkSpecsRemoved -> this.networkSpecsDisplay.network.specs.title
 		is Event.NetworkSpecsSigned -> this.networkSpecsExport.specsToSend.title
 		is Event.NetworkVerifierSet -> {
-			var line3 = when (val ver = this.networkVerifierDisplay.validCurrentVerifier) {
+			val verifier = when (val ver = this.networkVerifierDisplay.validCurrentVerifier) {
 				is ValidCurrentVerifier.Custom -> {
-					when (val v = ver.v.v) {
-						is VerifierValue.Standard -> "custom"
+					when (ver.v.v) {
+						is VerifierValue.Standard -> stringResource(id = R.string.log_message_network_custom)
 						null -> ""
 					}
 				}
 				ValidCurrentVerifier.General -> {
-					when (val v = this.networkVerifierDisplay.generalVerifier.v) {
-						is VerifierValue.Standard -> "general"
+					when (this.networkVerifierDisplay.generalVerifier.v) {
+						is VerifierValue.Standard ->  stringResource(id = R.string.log_message_network_general)
 						null -> ""
 					}
 				}
 			}
-			line3 += " for network with genesis hash " + this.networkVerifierDisplay.genesisHash.toUByteArray()
-			line3
+			stringResource(R.string.log_message_network_verifier, verifier, this.networkVerifierDisplay.genesisHash.toUByteArray())
 		}
 		Event.ResetDangerRecord -> ""
 		is Event.SecretWasExported -> this.identityHistory.seedName + this.identityHistory.path
