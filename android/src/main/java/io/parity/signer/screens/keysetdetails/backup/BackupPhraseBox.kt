@@ -1,40 +1,61 @@
 package io.parity.signer.screens.keysetdetails.backup
 
 import android.content.res.Configuration
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.SizeMode
 import io.parity.signer.R
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.fill6
+import io.parity.signer.ui.theme.textDisabled
+import io.parity.signer.ui.theme.textSecondary
 
+private val RobotoFontFamily = FontFamily(
+	Font(R.font.robotomono_regular, FontWeight.Medium),
+	Font(R.font.robotomono_bold, FontWeight.Bold),
+)
+private val PhraseNumberStyle: TextStyle = TextStyle(
+	fontFamily = RobotoFontFamily,
+	fontWeight = FontWeight.Normal,
+	fontSize = 13.sp
+)
+private val PhraseWordStyle: TextStyle = TextStyle(
+	fontFamily = RobotoFontFamily,
+	fontWeight = FontWeight.Bold,
+	fontSize = 13.sp
+)
 
 @Composable
 fun BackupPhraseBox(seedPhrase: String) {
-	val innerRoun = dimensionResource(id = R.dimen.innerFramesCornerRadius)
+	val innerRound = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 	val innerShape =
-		RoundedCornerShape(innerRoun, innerRoun, innerRoun, innerRoun)
+		RoundedCornerShape(innerRound, innerRound, innerRound, innerRound)
 	FlowRow(
 		mainAxisSize = SizeMode.Expand,
 		mainAxisAlignment = FlowMainAxisAlignment.SpaceBetween,
 		modifier = Modifier
-			.padding(horizontal = 16.dp)
-			.background(MaterialTheme.colors.fill6, innerShape)
-			.padding(12.dp),
+            .padding(horizontal = 16.dp)
+            .background(MaterialTheme.colors.fill6, innerShape)
+            .padding(16.dp),
 	) {
 		val words = seedPhrase.split(" ")
 		for (index in 0..words.lastIndex) {
@@ -46,11 +67,14 @@ fun BackupPhraseBox(seedPhrase: String) {
 
 @Composable
 private fun BackupPhraseItem(index: Int, word: String) {
-	Row(Modifier.defaultMinSize(minWidth = 100.dp)) {
+	Row(Modifier
+		.defaultMinSize(minWidth = 100.dp)
+		.padding(vertical = 2.dp)
+	) {
 		Text(
 			text = index.toString(),
 			color = MaterialTheme.colors.textDisabled,
-			style = TypefaceNew.CaptionM,
+			style = PhraseNumberStyle,
 			textAlign = TextAlign.End,
 			modifier = Modifier.defaultMinSize(minWidth = 16.dp)
 		)
@@ -58,7 +82,7 @@ private fun BackupPhraseItem(index: Int, word: String) {
 		Text(
 			text = word,
 			color = MaterialTheme.colors.textSecondary,
-			style = TypefaceNew.CaptionM,
+			style = PhraseWordStyle,
 		)
 	}
 }
