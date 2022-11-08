@@ -11,7 +11,6 @@ import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.TransactionPreviewField
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.encodeHex
-import io.parity.signer.screens.logs.items.HistoryCardTemplateOld
 import io.parity.signer.uniffi.Event
 import io.parity.signer.uniffi.MEventMaybeDecoded
 import io.parity.signer.uniffi.ValidCurrentVerifier
