@@ -2,6 +2,7 @@ package io.parity.signer.screens.logs.items
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
 import io.parity.signer.ui.theme.red400
@@ -20,19 +22,18 @@ import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun LogItem(
-	title: String,
-	message: String,
-	time: String,
-	isDanger: Boolean = false,
+	model: LogsListEntryModel.LogEntryModel,
+	onClick: Callback,
 ) {
 	Column(
-        Modifier
-            .fillMaxWidth(1f)
-            .padding(vertical = 8.dp, horizontal = 24.dp)
+		Modifier
+			.fillMaxWidth(1f)
+			.clickable(onClick = onClick)
+			.padding(vertical = 8.dp, horizontal = 24.dp)
 	) {
 		Text(
-			text = title,
-			color = if (isDanger) {
+			text = model.title,
+			color = if (model.isDanger) {
 				MaterialTheme.colors.red400
 			} else {
 				MaterialTheme.colors.primary
@@ -44,14 +45,14 @@ fun LogItem(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			Text(
-				text = message,
+				text = model.message,
 				color = MaterialTheme.colors.textTertiary,
 				style = TypefaceNew.BodyM,
 				modifier = Modifier.weight(1f)
 			)
 			Spacer(modifier = Modifier.padding(start = 8.dp))
 			Text(
-				text = time,
+				text = model.timeStr,
 				color = MaterialTheme.colors.textTertiary,
 				style = TypefaceNew.BodyM,
 			)
@@ -65,13 +66,28 @@ fun LogItem(
 }
 
 @Composable
-fun LogItemDate(date: String) {
+fun LogItemDate(model: LogsListEntryModel.TimeSeparatorModel) {
 	Text(
-		text = date,
+		text = model.dateStr,
 		color = MaterialTheme.colors.textTertiary,
 		style = TypefaceNew.BodyM,
 		modifier = Modifier.padding(vertical = 8.dp, horizontal = 24.dp)
 	)
+}
+
+sealed class LogsListEntryModel {
+	data class LogEntryModel(
+		//id of this group of events, not unique per event
+		val logGroupId: UInt,
+		val title: String,
+		val message: String,
+		val timeStr: String,
+		val isDanger: Boolean,
+	) : LogsListEntryModel()
+
+	data class TimeSeparatorModel(
+		val dateStr: String,
+	) : LogsListEntryModel()
 }
 
 @Preview(
@@ -87,13 +103,17 @@ fun LogItemDate(date: String) {
 private fun PreviewLogItem() {
 	SignerNewTheme {
 		Column() {
-			LogItemDate(date = "Jun 20")
+			LogItemDate(LogsListEntryModel.TimeSeparatorModel("Jun 20"))
 			LogItem(
-				title = "Database initiated",
-				message = "Message of database init happened very long 2 lines",
-				time = "10:42",
+				LogsListEntryModel.LogEntryModel(
+					title = "Database initiated",
+					message = "Message of database init happened very long 2 lines",
+					timeStr = "10:42",
+					isDanger = false,
+					logGroupId = 23.toUInt(),
+				),
+				{}
 			)
-
 		}
 	}
 }

@@ -1,7 +1,10 @@
 package io.parity.signer.ui.navigationselectors
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.ui.Modifier
 import io.parity.signer.models.*
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
@@ -39,10 +42,12 @@ fun CombinedScreensSelector(
 				sigleton = signerDataModel,
 			)
 		is ScreenData.Log ->
-			LogsScreen(
-				model = screenData.f.toLogsScreenModel(),
-				navigator = rootNavigator,
-			)
+			Box(Modifier.statusBarsPadding()) {
+				LogsScreen(
+					model = screenData.f.toLogsScreenModel(),
+					navigator = rootNavigator,
+				)
+			}
 		else -> {} //old Selector showing them
 	}
 }
