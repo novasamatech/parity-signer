@@ -4,6 +4,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import io.parity.signer.R
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.Event
@@ -14,21 +16,21 @@ import io.parity.signer.uniffi.VerifierValue
  * Selector for rendering history cards in general list;
  */
 @Composable
-fun HistoryCard(card: Event, timestamp: String) {
+fun HistoryCardSelectorOld(card: Event, timestamp: String) {
 	when (card) {
 		is Event.DatabaseInitiated -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Smartphone,
 				line1 = timestamp,
-				line2 = "Database initiated",
+				line2 = stringResource(R.string.log_title_database_initiated),
 				line3 = ""
 			)
 		}
 		is Event.DeviceWasOnline -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Dangerous,
 				line1 = timestamp,
-				line2 = "Device was connected to network",
+				line2 = stringResource(R.string.log_title_device_was_online),
 				line3 = "",
 				danger = true
 			)
@@ -36,10 +38,10 @@ fun HistoryCard(card: Event, timestamp: String) {
 		is Event.GeneralVerifierSet -> {
 			card.verifier.v.let {
 				if (it is VerifierValue.Standard) {
-					HistoryCardTemplate(
+					HistoryCardTemplateOld(
 						image = Icons.Default.Shield,
 						line1 = timestamp,
-						line2 = "General verifier set",
+						line2 = stringResource(R.string.log_title_general_virifier_set),
 						line3 = it.m.getOrElse(0) { "" }
 							.abbreviateString(8) + it.m.getOrElse(1) { "" }
 					)
@@ -47,98 +49,98 @@ fun HistoryCard(card: Event, timestamp: String) {
 			}
 		}
 		is Event.HistoryCleared -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.DeleteForever,
 				line1 = timestamp,
-				line2 = "History cleared",
+				line2 = stringResource(R.string.log_title_history_cleared),
 				line3 = ""
 			)
 		}
 		is Event.IdentitiesWiped -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Delete,
 				line1 = timestamp,
-				line2 = "All keys were wiped",
+				line2 = stringResource(R.string.log_title_identities_wiped),
 				line3 = ""
 			)
 		}
 		is Event.IdentityAdded -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Pattern,
 				line1 = timestamp,
-				line2 = "Key created",
+				line2 = stringResource(R.string.log_title_identity_added),
 				line3 = card.identityHistory.seedName + card.identityHistory.path
 			)
 		}
 		is Event.IdentityRemoved -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Delete,
 				line1 = timestamp,
-				line2 = "Key removed",
+				line2 = stringResource(R.string.log_title_identity_removed),
 				line3 = card.identityHistory.seedName + card.identityHistory.path
 			)
 		}
 		is Event.SecretWasExported -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.WbSunny,
 				line1 = timestamp,
-				line2 = "Secret was exported",
+				line2 = stringResource(R.string.log_title_secret_was_exported),
 				line3 = card.identityHistory.seedName + card.identityHistory.path
 			)
 		}
 		is Event.MessageSignError -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
-				line2 = "Message signing error!",
+				line2 = stringResource(R.string.log_title_messages_error),
 				line3 = card.signMessageDisplay.userComment,
 				danger = true
 			)
 		}
 		is Event.MessageSigned -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Done,
 				line1 = timestamp,
-				line2 = "Generated signature for message",
+				line2 = stringResource(R.string.log_title_message_signed),
 				line3 = card.signMessageDisplay.userComment
 			)
 		}
 		is Event.MetadataAdded -> {
 			card.metaValuesDisplay.let {
-				HistoryCardTemplate(
+				HistoryCardTemplateOld(
 					image = Icons.Default.QrCodeScanner,
 					line1 = timestamp,
-					line2 = "Metadata added",
+					line2 = stringResource(R.string.log_title_metadata_added),
 					line3 = it.name + " version " + it.version
 				)
 			}
 		}
 		is Event.MetadataRemoved -> {
 			card.metaValuesDisplay.let {
-				HistoryCardTemplate(
+				HistoryCardTemplateOld(
 					image = Icons.Default.Delete,
 					line1 = timestamp,
-					line2 = "Metadata removed",
+					line2 = stringResource(R.string.log_title_metadata_removed),
 					line3 = it.name + " version " + it.version
 				)
 			}
 		}
 		is Event.NetworkSpecsAdded -> {
 			card.networkSpecsDisplay.network.let {
-				HistoryCardTemplate(
+				HistoryCardTemplateOld(
 					image = Icons.Default.QrCodeScanner,
 					line1 = timestamp,
-					line2 = "Network added",
+					line2 = stringResource(R.string.log_title_network_added),
 					line3 = it.specs.title
 				)
 			}
 		}
 		is Event.NetworkSpecsRemoved -> {
 			card.networkSpecsDisplay.network.let {
-				HistoryCardTemplate(
+				HistoryCardTemplateOld(
 					image = Icons.Default.Delete,
 					line1 = timestamp,
-					line2 = "Network removed",
+					line2 = stringResource(R.string.log_title_network_removed),
 					line3 = it.specs.title
 				)
 			}
@@ -163,140 +165,140 @@ fun HistoryCard(card: Event, timestamp: String) {
 			line3 += " for network with genesis hash " + card.networkVerifierDisplay.genesisHash.toUByteArray()
 				.toByteArray().encodeHex()
 			card.networkVerifierDisplay.genesisHash.let {
-				HistoryCardTemplate(
+				HistoryCardTemplateOld(
 					image = Icons.Default.Shield,
 					line1 = timestamp,
-					line2 = "Network verifier set",
+					line2 = stringResource(R.string.log_title_network_verifier_set),
 					line3 = line3
 				)
 			}
 		}
 		is Event.ResetDangerRecord -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.DeleteForever,
 				line1 = timestamp,
-				line2 = "Warnings acknowledged",
+				line2 = stringResource(R.string.log_title_reset_danger_record),
 				line3 = "",
 				danger = true
 			)
 		}
 		is Event.SeedCreated -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Pattern,
 				line1 = timestamp,
-				line2 = "Seed created",
+				line2 = stringResource(R.string.log_title_seed_created),
 				line3 = card.seedCreated
 			)
 		}
 		is Event.SeedRemoved -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Outlined.Delete,
 				line1 = timestamp,
-				line2 = "Seed removed",
+				line2 = stringResource(R.string.log_title_seed_removed),
 				line3 = card.seedName
 			)
 		}
 		is Event.SeedNameWasShown -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
-				line2 = "Seed was shown",
+				line2 = stringResource(R.string.log_title_seed_name_was_shown),
 				line3 = card.seedNameWasShown
 			)
 		}
 		is Event.NetworkSpecsSigned -> {
 			card.networkSpecsExport.specsToSend.let {
-				HistoryCardTemplate(
+				HistoryCardTemplateOld(
 					image = Icons.Default.Verified,
 					line1 = timestamp,
-					line2 = "Network specs signed",
+					line2 = stringResource(R.string.log_title_network_specs_signed),
 					line3 = it.title
 				)
 			}
 		}
 		is Event.MetadataSigned -> {
 			card.metaValuesExport.let {
-				HistoryCardTemplate(
+				HistoryCardTemplateOld(
 					image = Icons.Default.Verified,
 					line1 = timestamp,
-					line2 = "Meta signed",
+					line2 = stringResource(R.string.log_title_metadata_signed),
 					line3 = it.name + it.version
 				)
 			}
 		}
 		is Event.TypesSigned -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Verified,
 				line1 = timestamp,
-				line2 = "Types signed",
+				line2 = stringResource(R.string.log_title_types_signed),
 				line3 = ""
 			)
 		}
 		is Event.SystemEntry -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
-				line2 = "System entry",
+				line2 = stringResource(R.string.log_title_system_entry),
 				line3 = card.systemEntry
 			)
 		}
 		is Event.TransactionSignError -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Dangerous,
 				line1 = timestamp,
-				line2 = "Signing failure",
+				line2 = stringResource(R.string.log_title_transaction_sign_error),
 				line3 = card.signDisplay.userComment,
 				danger = true
 			)
 		}
 		is Event.TransactionSigned -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Done,
 				line1 = timestamp,
-				line2 = "Transaction signed",
+				line2 = stringResource(R.string.log_title_transaction_signed),
 				line3 = card.signDisplay.userComment
 			)
 		}
 		is Event.TypesAdded -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.QrCodeScanner,
 				line1 = timestamp,
-				line2 = "New types info loaded",
+				line2 = stringResource(R.string.log_title_types_added),
 				line3 = ""
 			)
 		}
 		is Event.TypesRemoved -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Remove,
 				line1 = timestamp,
-				line2 = "Types info removed",
+				line2 = stringResource(R.string.log_title_types_removed),
 				line3 = "",
 				danger = true
 			)
 		}
 		is Event.UserEntry -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Note,
 				line1 = timestamp,
-				line2 = "User entry",
+				line2 = stringResource(R.string.log_title_user_entry),
 				line3 = card.userEntry
 			)
 		}
 		is Event.Warning -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
-				line2 = "Warning!",
+				line2 = stringResource(R.string.log_title_warning),
 				line3 = card.warning,
 				danger = true
 			)
 		}
 		is Event.WrongPassword -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
-				line2 = "Wrong password entered",
-				line3 = "operation declined",
+				line2 = stringResource(R.string.log_title_wrong_password),
+				line3 = stringResource(R.string.log_message_wrong_passowrd),
 				danger = true
 			)
 		}

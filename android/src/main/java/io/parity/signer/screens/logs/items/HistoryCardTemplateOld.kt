@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.*
 
 @Composable
-fun HistoryCardTemplate(
+fun HistoryCardTemplateOld(
 	image: ImageVector,
 	line1: String,
 	line2: String,

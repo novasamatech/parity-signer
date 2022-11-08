@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import io.parity.signer.screens.logs.items.HistoryCard
+import io.parity.signer.screens.logs.items.HistoryCardSelectorOld
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MLog
 
@@ -35,7 +35,7 @@ fun HistoryScreen(
 							)
 						}
 					) {
-						HistoryCard(
+						HistoryCardSelectorOld(
 							item,
 							timestamp
 						)
