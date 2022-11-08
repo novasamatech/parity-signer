@@ -9,7 +9,7 @@ object DateUtils {
 	fun parseLogTime(rustDateTimeString: String): Calendar? {
 		return try {
 			val calendar = Calendar.getInstance()
-			val sdf = SimpleDateFormat("yyyy-MM-dd hh:mm", Locale.ENGLISH)
+			val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH)
 			calendar.time = sdf.parse(rustDateTimeString) ?: return null
 			calendar
 		} catch (e: ParseException) {
@@ -24,5 +24,5 @@ fun Calendar.toLogDateString(): String {
 }
 
 fun Calendar.toLogTimeString(): String {
-	return SimpleDateFormat("hh:mm", Locale.ENGLISH).format(this.time)
+	return SimpleDateFormat("HH:mm", Locale.ENGLISH).format(this.time)
 }
