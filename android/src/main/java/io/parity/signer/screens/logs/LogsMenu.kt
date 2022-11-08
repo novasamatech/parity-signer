@@ -1,13 +1,14 @@
-package io.parity.signer.screens.keysetdetails
+package io.parity.signer.screens.logs
 
 import android.content.res.Configuration
-import android.telecom.Call
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.HdrPlus
+import androidx.compose.material.icons.filled.PlusOne
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -29,38 +30,30 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
 import io.parity.signer.uniffi.Action
 
+
 @Composable
-fun KeySetDetailsMenu(
+fun LogsMenu(
 	navigator: Navigator,
-	alertState: State<AlertState?>,
-	removeSeed: Callback,
-	onSelectKeysClicked: Callback,
 ) {
 	val state = remember {
-		mutableStateOf(KeySetDetailsMenuState.GENERAL)
+		mutableStateOf(LogsState.GENERAL)
 	}
 	when (state.value) {
-		KeySetDetailsMenuState.GENERAL -> KeyDetailsMenuGeneral(
+		LogsState.GENERAL -> LogsMenuGeneral(
 			navigator = navigator,
-			alertState = alertState,
-			onDeleteClicked = { state.value = KeySetDetailsMenuState.DELETE_CONFIRM },
-			onSelectKeysClicked = onSelectKeysClicked,
+			onDeleteClicked = { state.value = LogsState.DELETE_CONFIRM },
 		)
-		KeySetDetailsMenuState.DELETE_CONFIRM ->
-			KeyDetailsDeleteConfirmBottomSheet(
-				onCancel = { state.value = KeySetDetailsMenuState.GENERAL },
-				onRemoveKey = removeSeed,
-//				navigator.navigate(Action.REMOVE_KEY) action that was there to show old confirmation screen.
+		LogsState.DELETE_CONFIRM ->
+			KeyDetailsDeleteConfirmBottomSheet( //todo dmitry different dialog "Clear Log?"
+				onCancel = { state.value = LogsState.GENERAL },
+				onRemoveKey = { navigator.navigate(Action.CREATE_LOG_COMMENT) }
 			)
 	}
 }
 
-
 @Composable
-fun KeyDetailsMenuGeneral(
+private fun LogsMenuGeneral(
 	navigator: Navigator,
-	alertState: State<AlertState?>,
-	onSelectKeysClicked: Callback,
 	onDeleteClicked: Callback,
 ) {
 	val sidePadding = 24.dp
@@ -71,36 +64,14 @@ fun KeyDetailsMenuGeneral(
 	) {
 
 		MenuItemForBottomSheet(
-			Icons.Outlined.Circle,
-			label = stringResource(R.string.menu_option_select_key),
-			onclick = onSelectKeysClicked
-		)
-
-		MenuItemForBottomSheet(
-			iconId = R.drawable.ic_library_add_28,
-			label = stringResource(R.string.menu_option_derive_from_key),
-			onclick = {
-				if (alertState.value == AlertState.None)
-					navigator.navigate(Action.NEW_KEY)
-				else
-					navigator.navigate(Action.SHIELD)
-			}
-		)
-
-		MenuItemForBottomSheet(
-			iconId = R.drawable.ic_settings_backup_restore_28,
-			label = stringResource(R.string.menu_option_backup_key_set),
-			onclick = {
-				if (alertState.value == AlertState.None)
-					navigator.navigate(Action.BACKUP_SEED)
-				else
-					navigator.navigate(Action.SHIELD)
-			}
+			iconId = R.drawable.ic_add_28,
+			label = stringResource(R.string.menu_option_add_note),
+			onclick = { navigator.navigate(Action.CREATE_LOG_COMMENT) }
 		)
 
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_backspace_28,
-			label = stringResource(R.string.menu_option_forget_delete_key),
+			label = stringResource(R.string.menu_option_clear_logs),
 			tint = MaterialTheme.colors.red400,
 			onclick = onDeleteClicked
 		)
@@ -115,7 +86,7 @@ fun KeyDetailsMenuGeneral(
 }
 
 
-private enum class KeySetDetailsMenuState {
+private enum class LogsState {
 	GENERAL, DELETE_CONFIRM,
 }
 
@@ -130,11 +101,10 @@ private enum class KeySetDetailsMenuState {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewKeyDetailsMenu() {
+private fun PreviewLogsMenu() {
 	SignerNewTheme {
-		val state = remember { mutableStateOf(AlertState.None) }
-		KeySetDetailsMenu(
-			EmptyNavigator(), state, {}, {},
+		LogsMenu(
+			EmptyNavigator(),
 		)
 	}
 }

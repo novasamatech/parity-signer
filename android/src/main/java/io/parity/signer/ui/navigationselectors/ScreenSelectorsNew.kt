@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import io.parity.signer.bottomsheets.LogComment
 import io.parity.signer.models.*
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
 import io.parity.signer.screens.keysets.NewSeedMenu
+import io.parity.signer.screens.logs.LogsMenu
 import io.parity.signer.screens.logs.LogsScreen
 import io.parity.signer.screens.logs.toLogsScreenModel
 import io.parity.signer.ui.BottomSheetWrapperRoot
@@ -75,7 +77,6 @@ fun BottomSheetSelector(
 				}
 				LocalNavAction.None -> {}
 			}
-
 		} else {
 			when (modalData) {
 				is ModalData.KeyDetailsAction ->
@@ -87,6 +88,7 @@ fun BottomSheetSelector(
 							keyDetails = signerDataModel.lastOpenedKeyDetails
 						)
 					}
+				//todo change design to new
 				is ModalData.NewSeedMenu ->
 					BottomSheetWrapperRoot(onClosedAction = {
 						navigator.backAction()
@@ -96,9 +98,20 @@ fun BottomSheetSelector(
 							navigator = signerDataModel.navigator,
 						)
 					}
+				is ModalData.LogRight ->
+					BottomSheetWrapperRoot(onClosedAction = {
+						navigator.backAction()
+					}) {
+						LogsMenu(
+							navigator = signerDataModel.navigator,
+						)
+					}
+				//todo update design
+				is ModalData.LogComment -> LogComment(signerDataModel = signerDataModel)
 				else -> {}
 			}
 		}
 	}
 }
+
 

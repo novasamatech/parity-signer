@@ -9,7 +9,6 @@ import io.parity.signer.bottomsheets.*
 import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
-import io.parity.signer.screens.logs.HistoryScreen
 import io.parity.signer.screens.logs.logdetails.LogDetails
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
@@ -149,10 +148,7 @@ fun ModalSelector(
 				modalData.f,
 				button2,
 			)
-			is ModalData.LogRight -> LogMenu(
-				modalData.f,
-				signerDataModel = signerDataModel
-			)
+			is ModalData.LogRight -> {} //migrated to bottom sheet
 			is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(
 				signerDataModel = signerDataModel
 			)
@@ -171,7 +167,7 @@ fun ModalSelector(
 				modalData.f,
 				signerDataModel = signerDataModel
 			)
-			is ModalData.LogComment -> LogComment(signerDataModel = signerDataModel)
+			is ModalData.LogComment -> {} //moved to new sheet
 			is ModalData.SelectSeed -> {
 				SelectSeed(modalData.f, signerDataModel = signerDataModel)
 			}
