@@ -45,7 +45,6 @@ fun ScreenSelector(
 		)
 		is ScreenData.Keys -> {} //migrated to new selector
 		is ScreenData.Log -> {} //migrated to new selector
-		// HistoryScreen(screenData.f, button2) todo dmitry remove
 		is ScreenData.LogDetails -> LogDetails(screenData.f)
 		is ScreenData.ManageNetworks -> ManageNetworks(
 			screenData.f,
