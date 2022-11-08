@@ -1,4 +1,4 @@
-package io.parity.signer.screens
+package io.parity.signer.screens.logs
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -11,6 +11,9 @@ import io.parity.signer.screens.logs.items.HistoryCardSelectorOld
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MLog
 
+/**
+ * todo dmitry remove it use LogsScreen
+ */
 @Composable
 fun HistoryScreen(
 	mLog: MLog,

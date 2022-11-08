@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.red500
 import io.parity.signer.ui.theme.textTertiary
 
 @Composable
@@ -22,6 +23,7 @@ fun LogItem(
 	title: String,
 	message: String,
 	time: String,
+	isDanger: Boolean = false,
 ) {
 	Column(
         Modifier
@@ -30,7 +32,11 @@ fun LogItem(
 	) {
 		Text(
 			text = title,
-			color = MaterialTheme.colors.primary,
+			color = if (isDanger) {
+				MaterialTheme.colors.red500
+			} else {
+				MaterialTheme.colors.primary
+			},
 			style = TypefaceNew.TitleS,
 		)
 		Spacer(modifier = Modifier.padding(top = 8.dp))
