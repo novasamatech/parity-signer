@@ -46,7 +46,7 @@ fun LogsMenu(
 		LogsState.DELETE_CONFIRM ->
 			KeyDetailsDeleteConfirmBottomSheet( //todo dmitry different dialog "Clear Log?"
 				onCancel = { state.value = LogsState.GENERAL },
-				onRemoveKey = { navigator.navigate(Action.CREATE_LOG_COMMENT) }
+				onRemoveKey = { navigator.navigate(Action.CLEAR_LOG) }
 			)
 	}
 }
