@@ -7,15 +7,15 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ui.theme.*
-import java.util.Calendar
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun LogItem(
@@ -23,26 +23,31 @@ fun LogItem(
 	message: String,
 	time: String,
 ) {
-	Column(Modifier.padding(vertical = 16.dp, horizontal = 24.dp)) {
+	Column(
+        Modifier
+            .fillMaxWidth(1f)
+            .padding(vertical = 8.dp, horizontal = 24.dp)
+	) {
 		Text(
 			text = title,
 			color = MaterialTheme.colors.primary,
 			style = TypefaceNew.TitleS,
 		)
+		Spacer(modifier = Modifier.padding(top = 8.dp))
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			Text(
 				text = message,
 				color = MaterialTheme.colors.textTertiary,
-				style = TypefaceNew.TitleS,
+				style = TypefaceNew.BodyM,
 				modifier = Modifier.weight(1f)
 			)
 			Spacer(modifier = Modifier.padding(start = 8.dp))
 			Text(
 				text = time,
 				color = MaterialTheme.colors.textTertiary,
-				style = TypefaceNew.TitleS,
+				style = TypefaceNew.BodyM,
 			)
 			Image(
 				imageVector = Icons.Filled.ChevronRight,
@@ -56,6 +61,15 @@ fun LogItem(
 	}
 }
 
+@Composable
+fun LogItemDate(date: String) {
+	Text(
+		text = date,
+		color = MaterialTheme.colors.textTertiary,
+		style = TypefaceNew.BodyM,
+		modifier = Modifier.padding(vertical = 8.dp, horizontal = 24.dp)
+	)
+}
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -69,10 +83,14 @@ fun LogItem(
 @Composable
 private fun PreviewLogItem() {
 	SignerNewTheme {
-		LogItem(
-			title = "Database initiated",
-			message = "Message of database init happened very long 2 lines",
-			time = "10:42",
-		)
+		Column() {
+			LogItemDate(date = "Jun 20")
+			LogItem(
+				title = "Database initiated",
+				message = "Message of database init happened very long 2 lines",
+				time = "10:42",
+			)
+
+		}
 	}
 }
