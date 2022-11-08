@@ -4,10 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import io.parity.signer.R
 import io.parity.signer.models.DateUtils
+import io.parity.signer.models.abbreviateString
+import io.parity.signer.models.toLogDateString
+import io.parity.signer.models.toLogTimeString
 import io.parity.signer.screens.logs.items.LogsListEntryModel
-import io.parity.signer.uniffi.Event
-import io.parity.signer.uniffi.History
-import io.parity.signer.uniffi.MLog
+import io.parity.signer.uniffi.*
 import java.util.Calendar
 
 
@@ -22,10 +23,10 @@ fun MLog.toLogsScreenModel(): LogsScreenModel {
 
 	log.forEach { (order, rustTimestamp, listOfEvents) ->
 		date = DateUtils.parseLogTime(rustTimestamp)
-		val dayString = "some"//date.some todo dmitry
-		val timeString = "10:42" // DateUtils todo dmitry
+		val dayString = date?.toLogDateString()
+		val timeString = date?.toLogTimeString()
 		listOfEvents.forEach { event ->
-			if (lastShownDay != dayString) {
+			if (lastShownDay != dayString && dayString != null) {
 				result.add(LogsListEntryModel.TimeSeparatorModel(dayString))
 				lastShownDay = dayString
 			}
@@ -33,8 +34,8 @@ fun MLog.toLogsScreenModel(): LogsScreenModel {
 				LogsListEntryModel.LogEntryModel(
 					logGroupId = order,
 					title = event.getViewTitle(),
-					message = event.getViewMessage(),
-					timeStr = timeString,
+					message = event.getViewMessage() ?: "",
+					timeStr = timeString ?: "",
 					isDanger = event.isDanger(),
 				)
 			)
@@ -48,76 +49,110 @@ fun MLog.toLogsScreenModel(): LogsScreenModel {
 fun Event.getViewTitle(): String {
 	return when (this) {
 		Event.DatabaseInitiated -> stringResource(R.string.log_title_database_initiated)
-		else -> "some"
-//		Event.DeviceWasOnline -> TODO()
-//		is Event.GeneralVerifierSet -> TODO()
-//		Event.HistoryCleared -> TODO()
-//		Event.IdentitiesWiped -> TODO()
-//		is Event.IdentityAdded -> TODO()
-//		is Event.IdentityRemoved -> TODO()
-//		is Event.MessageSignError -> TODO()
-//		is Event.MessageSigned -> TODO()
-//		is Event.MetadataAdded -> TODO()
-//		is Event.MetadataRemoved -> TODO()
-//		is Event.MetadataSigned -> TODO()
-//		is Event.NetworkSpecsAdded -> TODO()
-//		is Event.NetworkSpecsRemoved -> TODO()
-//		is Event.NetworkSpecsSigned -> TODO()
-//		is Event.NetworkVerifierSet -> TODO()
-//		Event.ResetDangerRecord -> TODO()
-//		is Event.SecretWasExported -> TODO()
-//		is Event.SeedCreated -> TODO()
-//		is Event.SeedNameWasShown -> TODO()
-//		is Event.SeedRemoved -> TODO()
-//		is Event.SystemEntry -> TODO()
-//		is Event.TransactionSignError -> TODO()
-//		is Event.TransactionSigned -> TODO()
-//		is Event.TypesAdded -> TODO()
-//		is Event.TypesRemoved -> TODO()
-//		is Event.TypesSigned -> TODO()
-//		is Event.UserEntry -> TODO()
-//		is Event.Warning -> TODO()
-//		Event.WrongPassword -> TODO()
+		Event.DeviceWasOnline -> stringResource(R.string.log_title_device_was_online)
+		is Event.GeneralVerifierSet -> stringResource(R.string.log_title_general_virifier_set)
+		Event.HistoryCleared -> stringResource(R.string.log_title_history_cleared)
+		Event.IdentitiesWiped -> stringResource(R.string.log_title_identities_wiped)
+		is Event.IdentityAdded -> stringResource(R.string.log_title_identity_added)
+		is Event.IdentityRemoved -> stringResource(R.string.log_title_identity_removed)
+		is Event.MessageSignError -> stringResource(R.string.log_title_messages_error)
+		is Event.MessageSigned -> stringResource(R.string.log_title_message_signed)
+		is Event.MetadataAdded -> stringResource(R.string.log_title_metadata_added)
+		is Event.MetadataRemoved -> stringResource(R.string.log_title_metadata_removed)
+		is Event.MetadataSigned -> stringResource(R.string.log_title_metadata_signed)
+		is Event.NetworkSpecsAdded -> stringResource(R.string.log_title_network_added)
+		is Event.NetworkSpecsRemoved -> stringResource(R.string.log_title_network_removed)
+		is Event.NetworkSpecsSigned -> stringResource(R.string.log_title_network_specs_signed)
+		is Event.NetworkVerifierSet -> stringResource(R.string.log_title_network_verifier_set)
+		Event.ResetDangerRecord -> stringResource(R.string.log_title_reset_danger_record)
+		is Event.SecretWasExported -> stringResource(R.string.log_title_secret_was_exported)
+		is Event.SeedCreated -> stringResource(R.string.log_title_seed_created)
+		is Event.SeedNameWasShown -> stringResource(R.string.log_title_seed_name_was_shown)
+		is Event.SeedRemoved -> stringResource(R.string.log_title_seed_removed)
+		is Event.SystemEntry -> stringResource(R.string.log_title_system_entry)
+		is Event.TransactionSignError -> stringResource(R.string.log_title_transaction_sign_error)
+		is Event.TransactionSigned -> stringResource(R.string.log_title_transaction_signed)
+		is Event.TypesAdded -> stringResource(R.string.log_title_types_added)
+		is Event.TypesRemoved -> stringResource(R.string.log_title_types_removed)
+		is Event.TypesSigned -> stringResource(R.string.log_title_types_signed)
+		is Event.UserEntry -> stringResource(R.string.log_title_user_entry)
+		is Event.Warning -> stringResource(R.string.log_title_warning)
+		Event.WrongPassword -> stringResource(R.string.log_title_wrong_password)
 	}
 }
 
+/**
+ * Null when item was not created in legacy History screen
+ */
 @Composable
-fun Event.getViewMessage(): String {
+fun Event.getViewMessage(): String? {
 	return when (this) {
-		else -> "some"
-//		Event.DatabaseInitiated -> TODO()
-//		Event.DeviceWasOnline -> TODO()
-//		is Event.GeneralVerifierSet -> TODO()
-//		Event.HistoryCleared -> TODO()
-//		Event.IdentitiesWiped -> TODO()
-//		is Event.IdentityAdded -> TODO()
-//		is Event.IdentityRemoved -> TODO()
-//		is Event.MessageSignError -> TODO()
-//		is Event.MessageSigned -> TODO()
-//		is Event.MetadataAdded -> TODO()
-//		is Event.MetadataRemoved -> TODO()
-//		is Event.MetadataSigned -> TODO()
-//		is Event.NetworkSpecsAdded -> TODO()
-//		is Event.NetworkSpecsRemoved -> TODO()
-//		is Event.NetworkSpecsSigned -> TODO()
-//		is Event.NetworkVerifierSet -> TODO()
-//		Event.ResetDangerRecord -> TODO()
-//		is Event.SecretWasExported -> TODO()
-//		is Event.SeedCreated -> TODO()
-//		is Event.SeedNameWasShown -> TODO()
-//		is Event.SeedRemoved -> TODO()
-//		is Event.SystemEntry -> TODO()
-//		is Event.TransactionSignError -> TODO()
-//		is Event.TransactionSigned -> TODO()
-//		is Event.TypesAdded -> TODO()
-//		is Event.TypesRemoved -> TODO()
-//		is Event.TypesSigned -> TODO()
-//		is Event.UserEntry -> TODO()
-//		is Event.Warning -> TODO()
-//		Event.WrongPassword -> TODO()
+		Event.DatabaseInitiated -> ""
+		Event.DeviceWasOnline -> ""
+		is Event.GeneralVerifierSet -> {
+			this.verifier.v.let {
+				if (it is VerifierValue.Standard) {
+					it.m.getOrElse(0) { "" }
+						.abbreviateString(8) + it.m.getOrElse(1) { "" }
+				} else null
+			}
+		}
+		Event.HistoryCleared -> ""
+		Event.IdentitiesWiped -> ""
+		is Event.IdentityAdded -> this.identityHistory.seedName + this.identityHistory.path
+		is Event.IdentityRemoved -> this.identityHistory.seedName + this.identityHistory.path
+		is Event.MessageSignError -> this.signMessageDisplay.userComment
+		is Event.MessageSigned -> this.signMessageDisplay.userComment
+		is Event.MetadataAdded -> stringResource(R.string.log_message_metadata, this.metaValuesDisplay.name, this.metaValuesDisplay.version)
+		is Event.MetadataRemoved -> stringResource(R.string.log_message_metadata, this.metaValuesDisplay.name, this.metaValuesDisplay.version)
+		is Event.MetadataSigned -> this.metaValuesExport.name + this.metaValuesExport.version
+		is Event.NetworkSpecsAdded -> this.networkSpecsDisplay.network.specs.title
+		is Event.NetworkSpecsRemoved -> this.networkSpecsDisplay.network.specs.title
+		is Event.NetworkSpecsSigned -> this.networkSpecsExport.specsToSend.title
+		is Event.NetworkVerifierSet -> {
+			var line3 = when (val ver = this.networkVerifierDisplay.validCurrentVerifier) {
+				is ValidCurrentVerifier.Custom -> {
+					when (val v = ver.v.v) {
+						is VerifierValue.Standard -> "custom"
+						null -> ""
+					}
+				}
+				ValidCurrentVerifier.General -> {
+					when (val v = this.networkVerifierDisplay.generalVerifier.v) {
+						is VerifierValue.Standard -> "general"
+						null -> ""
+					}
+				}
+			}
+			line3 += " for network with genesis hash " + this.networkVerifierDisplay.genesisHash.toUByteArray()
+			line3
+		}
+		Event.ResetDangerRecord -> ""
+		is Event.SecretWasExported -> this.identityHistory.seedName + this.identityHistory.path
+		is Event.SeedCreated -> this.seedCreated
+		is Event.SeedNameWasShown -> this.seedNameWasShown
+		is Event.SeedRemoved -> this.seedName
+		is Event.SystemEntry -> this.systemEntry
+		is Event.TransactionSignError -> this.signDisplay.userComment
+		is Event.TransactionSigned -> this.signDisplay.userComment
+		is Event.TypesAdded -> ""
+		is Event.TypesRemoved -> ""
+		is Event.TypesSigned -> ""
+		is Event.UserEntry -> this.userEntry
+		is Event.Warning -> this.warning
+		Event.WrongPassword -> stringResource(R.string.log_message_wrong_passowrd)
 	}
 }
 
 fun Event.isDanger(): Boolean {
-	return false //todo dmitry
+	return when (this) {
+		Event.DeviceWasOnline -> true
+		is Event.MessageSignError -> true
+		Event.ResetDangerRecord -> true
+		is Event.TransactionSignError -> true
+		is Event.TypesRemoved -> true
+		is Event.Warning -> true
+		Event.WrongPassword -> true
+		else -> false
+	}
 }

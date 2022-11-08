@@ -111,7 +111,7 @@ fun HistoryCardSelectorOld(card: Event, timestamp: String) {
 					image = Icons.Default.QrCodeScanner,
 					line1 = timestamp,
 					line2 = stringResource(R.string.log_title_metadata_added),
-					line3 = it.name + " version " + it.version
+					line3 = stringResource(R.string.log_message_metadata, it.name, it.version)
 				)
 			}
 		}
@@ -121,7 +121,7 @@ fun HistoryCardSelectorOld(card: Event, timestamp: String) {
 					image = Icons.Default.Delete,
 					line1 = timestamp,
 					line2 = stringResource(R.string.log_title_metadata_removed),
-					line3 = it.name + " version " + it.version
+					line3 = stringResource(R.string.log_message_metadata, it.name, it.version)
 				)
 			}
 		}

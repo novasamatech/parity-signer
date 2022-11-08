@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.Callback
@@ -40,7 +42,7 @@ fun LogItem(
 			},
 			style = TypefaceNew.TitleS,
 		)
-		Spacer(modifier = Modifier.padding(top = 8.dp))
+		Spacer(modifier = Modifier.padding(top = 4.dp))
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
@@ -67,12 +69,13 @@ fun LogItem(
 
 @Composable
 fun LogItemDate(model: LogsListEntryModel.TimeSeparatorModel) {
-	Text(
-		text = model.dateStr,
-		color = MaterialTheme.colors.textTertiary,
-		style = TypefaceNew.BodyM,
-		modifier = Modifier.padding(vertical = 8.dp, horizontal = 24.dp)
-	)
+		Text(
+			text = model.dateStr,
+			color = MaterialTheme.colors.textTertiary,
+			style = TypefaceNew.BodyM,
+			modifier = Modifier
+				.padding(vertical = 8.dp, horizontal = 24.dp),
+		)
 }
 
 sealed class LogsListEntryModel {
@@ -102,8 +105,9 @@ sealed class LogsListEntryModel {
 @Composable
 private fun PreviewLogItem() {
 	SignerNewTheme {
-		Column() {
+		Column {
 			LogItemDate(LogsListEntryModel.TimeSeparatorModel("Jun 20"))
+			Divider()
 			LogItem(
 				LogsListEntryModel.LogEntryModel(
 					title = "Database initiated",

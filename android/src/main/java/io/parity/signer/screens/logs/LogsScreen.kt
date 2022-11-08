@@ -16,7 +16,7 @@ import io.parity.signer.screens.logs.items.LogItemDate
 import io.parity.signer.screens.logs.items.LogsListEntryModel
 import io.parity.signer.uniffi.Action
 
-
+//todo dmitry fix menu
 @Composable
 fun LogsScreen(
 	model: LogsScreenModel,
