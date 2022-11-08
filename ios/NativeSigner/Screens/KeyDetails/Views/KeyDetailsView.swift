@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct KeyDetailsView: View {
+    let dataModel: KeyDetailsDataModel
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
@@ -42,7 +43,7 @@ struct KeyDetailsView: View {
             } else {
                 PrimaryButton(
                     action: {
-                        navigation.perform(navigation: viewModel.dataModel.createDerivedKey)
+                        navigation.perform(navigation: dataModel.createDerivedKey)
                     },
                     text: Localizable.KeyDetails.Action.create.key
                 )
@@ -51,7 +52,7 @@ struct KeyDetailsView: View {
         }
         .onAppear {
             viewModel.set(appState: appState)
-            viewModel.refreshData()
+            viewModel.refreshData(dataModel: dataModel)
         }
         .fullScreenCover(
             isPresented: $viewModel.isShowingActionSheet,
@@ -68,7 +69,7 @@ struct KeyDetailsView: View {
         .fullScreenCover(isPresented: $viewModel.isShowingRemoveConfirmation) {
             HorizontalActionsBottomModal(
                 viewModel: .forgetKeySet,
-                mainAction: forgetKeyActionHandler.forgetKeySet(viewModel.dataModel.removeSeed),
+                mainAction: forgetKeyActionHandler.forgetKeySet(dataModel.removeSeed),
                 // We need to fake right button action here or Rust machine will break
                 // In old UI, if you dismiss equivalent of this modal, underlying modal would still be there,
                 // so we need to inform Rust we actually hid it
@@ -104,7 +105,7 @@ struct KeyDetailsView: View {
         ) {
             ExportMultipleKeysModal(
                 viewModel: .init(
-                    viewModel: viewModel.keyExportModel(),
+                    viewModel: viewModel.keyExportModel(dataModel: dataModel),
                     isPresented: $viewModel.isShowingKeysExportModal
                 )
             )
@@ -120,14 +121,14 @@ struct KeyDetailsView: View {
         List {
             // Main key cell
             KeySummaryView(
-                viewModel: viewModel.dataModel.keySummary,
+                viewModel: dataModel.keySummary,
                 isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
             )
             .padding(Padding.detailsCell)
             .keyDetailsListElement()
             .onTapGesture {
                 if !viewModel.isPresentingSelectionOverlay {
-                    navigation.perform(navigation: viewModel.dataModel.addressKeyNavigation)
+                    navigation.perform(navigation: dataModel.addressKeyNavigation)
                 }
             }
             // Header
@@ -146,7 +147,7 @@ struct KeyDetailsView: View {
             .keyDetailsListElement()
             // List of derived keys
             ForEach(
-                viewModel.dataModel.derivedKeys,
+                dataModel.derivedKeys,
                 id: \.viewModel.addressKey
             ) { deriveKey in
                 DerivedKeyRow(
@@ -228,92 +229,92 @@ private struct KeySummaryView: View {
         static var previews: some View {
             VStack {
                 KeyDetailsView(
-                    viewModel: .init(
-                        dataModel: .init(
-                            keySummary: KeySummaryViewModel(
-                                keyName: "Main Polkadot",
-                                base58: "15Gsc678...0HA04H0A"
-                            ),
-                            derivedKeys: [
-                                DerivedKeyRowModel(
-                                    viewModel: DerivedKeyRowViewModel(
-                                        identicon: PreviewData.exampleIdenticon,
-                                        path: "// polkadot",
-                                        hasPassword: false,
-                                        base58: "15Gsc678654FDSG0HA04H0A"
-                                    ),
-                                    actionModel: DerivedKeyActionModel(
-                                        tapAction: .init(action: .rightButtonAction)
-                                    )
-                                ),
-                                DerivedKeyRowModel(
-                                    viewModel: DerivedKeyRowViewModel(
-                                        identicon: PreviewData.exampleIdenticon,
-                                        path: "// polkadot",
-                                        hasPassword: false,
-                                        base58: "15Gsc678654FDSG0HA04H0A"
-                                    ),
-                                    actionModel: DerivedKeyActionModel(
-                                        tapAction: .init(action: .rightButtonAction)
-                                    )
-                                ),
-                                DerivedKeyRowModel(
-                                    viewModel: DerivedKeyRowViewModel(
-                                        identicon: PreviewData.exampleIdenticon,
-                                        path: "//astar//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
-                                        hasPassword: true,
-                                        base58: "15Gsc678654FDSG0HA04H0A"
-                                    ),
-                                    actionModel: DerivedKeyActionModel(
-                                        tapAction: .init(action: .rightButtonAction)
-                                    )
-                                ),
-                                DerivedKeyRowModel(
-                                    viewModel: DerivedKeyRowViewModel(
-                                        identicon: PreviewData.exampleIdenticon,
-                                        path: "//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
-                                        hasPassword: false,
-                                        base58: "15Gsc678654FDSG0HA04H0A"
-                                    ),
-                                    actionModel: DerivedKeyActionModel(
-                                        tapAction: .init(action: .rightButtonAction)
-                                    )
-                                ),
-                                DerivedKeyRowModel(
-                                    viewModel: DerivedKeyRowViewModel(
-                                        identicon: PreviewData.exampleIdenticon,
-                                        path: "// acala",
-                                        hasPassword: true,
-                                        base58: "15Gsc678654FDSG0HA04H0A"
-                                    ),
-                                    actionModel: DerivedKeyActionModel(
-                                        tapAction: .init(action: .rightButtonAction)
-                                    )
-                                ),
-                                DerivedKeyRowModel(
-                                    viewModel: DerivedKeyRowViewModel(
-                                        identicon: PreviewData.exampleIdenticon,
-                                        path: "// moonbeam",
-                                        hasPassword: true,
-                                        base58: "15Gsc678654FDSG0HA04H0A"
-                                    ),
-                                    actionModel: DerivedKeyActionModel(
-                                        tapAction: .init(action: .rightButtonAction)
-                                    )
-                                ),
-                                DerivedKeyRowModel(
-                                    viewModel: DerivedKeyRowViewModel(
-                                        identicon: PreviewData.exampleIdenticon,
-                                        path: "// kilt",
-                                        hasPassword: true,
-                                        base58: "15Gsc6786546423FDSG0HA04H0A"
-                                    ),
-                                    actionModel: DerivedKeyActionModel(
-                                        tapAction: .init(action: .rightButtonAction)
-                                    )
-                                )
-                            ]
+                    dataModel: .init(
+                        keySummary: KeySummaryViewModel(
+                            keyName: "Main Polkadot",
+                            base58: "15Gsc678...0HA04H0A"
                         ),
+                        derivedKeys: [
+                            DerivedKeyRowModel(
+                                viewModel: DerivedKeyRowViewModel(
+                                    identicon: PreviewData.exampleIdenticon,
+                                    path: "// polkadot",
+                                    hasPassword: false,
+                                    base58: "15Gsc678654FDSG0HA04H0A"
+                                ),
+                                actionModel: DerivedKeyActionModel(
+                                    tapAction: .init(action: .rightButtonAction)
+                                )
+                            ),
+                            DerivedKeyRowModel(
+                                viewModel: DerivedKeyRowViewModel(
+                                    identicon: PreviewData.exampleIdenticon,
+                                    path: "// polkadot",
+                                    hasPassword: false,
+                                    base58: "15Gsc678654FDSG0HA04H0A"
+                                ),
+                                actionModel: DerivedKeyActionModel(
+                                    tapAction: .init(action: .rightButtonAction)
+                                )
+                            ),
+                            DerivedKeyRowModel(
+                                viewModel: DerivedKeyRowViewModel(
+                                    identicon: PreviewData.exampleIdenticon,
+                                    path: "//astar//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
+                                    hasPassword: true,
+                                    base58: "15Gsc678654FDSG0HA04H0A"
+                                ),
+                                actionModel: DerivedKeyActionModel(
+                                    tapAction: .init(action: .rightButtonAction)
+                                )
+                            ),
+                            DerivedKeyRowModel(
+                                viewModel: DerivedKeyRowViewModel(
+                                    identicon: PreviewData.exampleIdenticon,
+                                    path: "//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
+                                    hasPassword: false,
+                                    base58: "15Gsc678654FDSG0HA04H0A"
+                                ),
+                                actionModel: DerivedKeyActionModel(
+                                    tapAction: .init(action: .rightButtonAction)
+                                )
+                            ),
+                            DerivedKeyRowModel(
+                                viewModel: DerivedKeyRowViewModel(
+                                    identicon: PreviewData.exampleIdenticon,
+                                    path: "// acala",
+                                    hasPassword: true,
+                                    base58: "15Gsc678654FDSG0HA04H0A"
+                                ),
+                                actionModel: DerivedKeyActionModel(
+                                    tapAction: .init(action: .rightButtonAction)
+                                )
+                            ),
+                            DerivedKeyRowModel(
+                                viewModel: DerivedKeyRowViewModel(
+                                    identicon: PreviewData.exampleIdenticon,
+                                    path: "// moonbeam",
+                                    hasPassword: true,
+                                    base58: "15Gsc678654FDSG0HA04H0A"
+                                ),
+                                actionModel: DerivedKeyActionModel(
+                                    tapAction: .init(action: .rightButtonAction)
+                                )
+                            ),
+                            DerivedKeyRowModel(
+                                viewModel: DerivedKeyRowViewModel(
+                                    identicon: PreviewData.exampleIdenticon,
+                                    path: "// kilt",
+                                    hasPassword: true,
+                                    base58: "15Gsc6786546423FDSG0HA04H0A"
+                                ),
+                                actionModel: DerivedKeyActionModel(
+                                    tapAction: .init(action: .rightButtonAction)
+                                )
+                            )
+                        ]
+                    ),
+                    viewModel: .init(
                         keysData: PreviewData.mKeyNew,
                         exportPrivateKeyService: PrivateKeyQRCodeService(
                             navigation: NavigationCoordinator(),
