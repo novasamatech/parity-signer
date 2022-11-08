@@ -17,7 +17,7 @@ class DateUtilsTest {
 			.build()
 		assertEquals(date!!.get(Calendar.HOUR_OF_DAY), 13)
 		assertEquals(date!!.get(Calendar.YEAR), 2014)
-		assertEquals(expected,date)
+		assertEquals(expected, date)
 	}
 
 	@Test
@@ -32,5 +32,17 @@ class DateUtilsTest {
 		assertThrows("expected", java.lang.RuntimeException::class.java) {
 			val date = DateUtils.parseLogTime("2914-11-10")
 		}
+	}
+
+	@Test
+	fun dateMatch() {
+		val date = DateUtils.parseLogTime("2014-11-10 13:45")!!
+		assertEquals("Nov 10", date.toLogDateString())
+	}
+
+	@Test
+	fun timeMatch() {
+		val date = DateUtils.parseLogTime("2014-11-10 13:45")!!
+		assertEquals("13:45", date.toLogTimeString())
 	}
 }

@@ -111,9 +111,8 @@ private fun PreviewLogItem() {
 					timeStr = "10:42",
 					isDanger = false,
 					logGroupId = 23.toUInt(),
-				),
-				{}
-			)
+				)
+			) {}
 		}
 	}
 }
