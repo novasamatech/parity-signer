@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
-import io.parity.signer.ui.theme.red500
+import io.parity.signer.ui.theme.red400
 import io.parity.signer.ui.theme.textTertiary
 
 @Composable
@@ -33,7 +33,7 @@ fun LogItem(
 		Text(
 			text = title,
 			color = if (isDanger) {
-				MaterialTheme.colors.red500
+				MaterialTheme.colors.red400
 			} else {
 				MaterialTheme.colors.primary
 			},
@@ -59,9 +59,6 @@ fun LogItem(
 				imageVector = Icons.Filled.ChevronRight,
 				contentDescription = null,
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
-//				modifier = Modifier
-//					.size(28.dp)
-//					.padding(end = 8.dp)
 			)
 		}
 	}
