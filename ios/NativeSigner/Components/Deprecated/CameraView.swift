@@ -127,7 +127,7 @@ struct CameraView: View {
                 TransactionPreview(
                     viewModel: .init(
                         isPresented: $viewModel.isPresentingTransactionPreview,
-                        content: transaction
+                        content: [transaction]
                     )
                 )
             } else {
