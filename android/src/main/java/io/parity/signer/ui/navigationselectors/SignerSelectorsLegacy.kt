@@ -9,6 +9,7 @@ import io.parity.signer.bottomsheets.*
 import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
+import io.parity.signer.screens.scan.ScanScreenOld
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.ModalData
@@ -68,7 +69,7 @@ fun ScreenSelector(
 			button = signerDataModel::navigate,
 			addSeed = signerDataModel::addSeed
 		)
-		ScreenData.Scan -> ScanScreen(
+		ScreenData.Scan -> ScanScreenOld(
 			progress = progress,
 			captured = captured,
 			total = total,

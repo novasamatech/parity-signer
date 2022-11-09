@@ -1,4 +1,4 @@
-package io.parity.signer.screens
+package io.parity.signer.screens.scan
 
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -29,7 +29,7 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
-import io.parity.signer.components.ScanProgressBar
+import io.parity.signer.components.ScanProgressBarOld
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.uniffi.Action
 
@@ -48,7 +48,7 @@ fun KeepScreenOn() {
  * Main scanner screen. One of navigation roots.
  */
 @Composable
-fun ScanScreen(
+fun ScanScreenOld(
 	progress: State<Float?>,
 	captured: State<Int?>,
 	total: State<Int?>,
@@ -142,7 +142,7 @@ fun ScanScreen(
 			verticalArrangement = Arrangement.Bottom,
 			modifier = Modifier.fillMaxSize()
 		) {
-			ScanProgressBar(
+			ScanProgressBarOld(
 				progress = progress,
 				captured = captured,
 				total = total,

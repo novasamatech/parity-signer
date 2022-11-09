@@ -21,7 +21,7 @@ import io.parity.signer.ui.theme.Text600
 import io.parity.signer.ui.theme.modal
 
 @Composable
-fun ScanProgressBar(
+fun ScanProgressBarOld(
 	progress: State<Float?>,
 	captured: State<Int?>,
 	total: State<Int?>,
