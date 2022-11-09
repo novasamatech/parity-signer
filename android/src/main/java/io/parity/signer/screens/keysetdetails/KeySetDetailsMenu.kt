@@ -8,27 +8,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Circle
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.components.base.SecondaryButtonBottomSheet
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.Callback
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
-import io.parity.signer.screens.keydetails.KeyDetailsDeleteConfirmBottomSheet
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
 import io.parity.signer.uniffi.Action
 
-/**
- * Old was [SeedMenu]
- * //todo dmitry fix behaviour than when confirmation state closed - it opens conformation on next button click
- */
 @Composable
 fun KeySetDetailsMenu(
 	navigator: Navigator,
@@ -52,14 +51,27 @@ fun KeySetDetailsMenu(
 				onBackupClicked = onBackupClicked,
 			)
 		KeySetDetailsMenuState.DELETE_CONFIRM ->
-			KeyDetailsDeleteConfirmBottomSheet(
+			KeySetDeleteConfirmBottomSheet(
 				onCancel = { state.value = KeySetDetailsMenuState.GENERAL },
 				onRemoveKey = removeSeed,
-//				navigator.navigate(Action.REMOVE_KEY) action that was there to show old confirmation screen.
 			)
 	}
 }
 
+//todo dmitry switch state back to general if sheet is closed
+@Composable
+fun KeySetDeleteConfirmBottomSheet(
+	onCancel: Callback,
+	onRemoveKey: Callback,
+) {
+	BottomSheetConfirmDialog(
+		title = stringResource(R.string.remove_key_set_confirm_title),
+		message = stringResource(R.string.remove_key_set_confirm_text),
+		ctaLabel = stringResource(R.string.remove_key_set_confirm_cta),
+		onCancel = onCancel,
+		onCta = onRemoveKey,
+	)
+}
 
 @Composable
 fun KeyDetailsMenuGeneral(
@@ -110,7 +122,7 @@ fun KeyDetailsMenuGeneral(
 			tint = MaterialTheme.colors.red400,
 			onclick = onDeleteClicked
 		)
-		Spacer(modifier = Modifier.padding(bottom = 16.dp))
+		Spacer(modifier = Modifier.padding(bottom = 8.dp))
 		SecondaryButtonBottomSheet(
 			label = stringResource(R.string.generic_cancel),
 		) {

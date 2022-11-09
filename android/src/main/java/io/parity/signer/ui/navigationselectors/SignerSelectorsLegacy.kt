@@ -10,6 +10,7 @@ import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
 import io.parity.signer.screens.scan.ScanScreenOld
+import io.parity.signer.screens.logs.logdetails.LogDetails
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.ModalData
@@ -38,13 +39,13 @@ fun ScreenSelector(
 			checkPath = signerDataModel::checkPath,
 		)
 		ScreenData.Documents -> Documents()
-		is ScreenData.KeyDetails -> ExportPublicKey(screenData.f)
+		is ScreenData.KeyDetails -> {}//migrated
 		is ScreenData.KeyDetailsMulti -> KeyDetailsMulti(
 			screenData.f,
 			button1,
 		)
 		is ScreenData.Keys -> {} //migrated to new selector
-		is ScreenData.Log -> HistoryScreen(screenData.f, button2)
+		is ScreenData.Log -> {} //migrated to new selector
 		is ScreenData.LogDetails -> LogDetails(screenData.f)
 		is ScreenData.ManageNetworks -> ManageNetworks(
 			screenData.f,
@@ -144,10 +145,7 @@ fun ModalSelector(
 				modalData.f,
 				button2,
 			)
-			is ModalData.LogRight -> LogMenu(
-				modalData.f,
-				signerDataModel = signerDataModel
-			)
+			is ModalData.LogRight -> {} //migrated to bottom sheet
 			is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(
 				signerDataModel = signerDataModel
 			)
@@ -166,7 +164,7 @@ fun ModalSelector(
 				modalData.f,
 				signerDataModel = signerDataModel
 			)
-			is ModalData.LogComment -> LogComment(signerDataModel = signerDataModel)
+			is ModalData.LogComment -> {} //moved to new sheet
 			is ModalData.SelectSeed -> {
 				SelectSeed(modalData.f, signerDataModel = signerDataModel)
 			}

@@ -39,7 +39,7 @@ fun KeySetsMenuBottomSheet(
 				}
 			}
 		)
-		Spacer(modifier = Modifier.padding(bottom = 16.dp))
+		Spacer(modifier = Modifier.padding(bottom = 8.dp))
 		SecondaryButtonBottomSheet(
 			label = stringResource(R.string.generic_cancel),
 		) {
