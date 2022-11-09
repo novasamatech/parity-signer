@@ -41,15 +41,20 @@ import io.parity.signer.uniffi.Action
 //todo dmitry add kep scree on from phrase box like in old screen
 @Composable
 fun ScanScreen(
-	model: KeySetDetailsModel,
-	navigator: Navigator,
-	onMenu: Callback,
+	onClose: Callback
 ) {
 	Box() {
-
+		ScanHeader(onClose)
 	}
 }
 
+
+@Composable
+fun ScanHeader(onClose: Callback) {
+	Row() {
+
+	}
+}
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
