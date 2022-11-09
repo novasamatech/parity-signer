@@ -125,7 +125,7 @@ fn print_db_content(dbname: &str) -> String {
     }
 
     let settings: Tree = database.open_tree(SETTREE).unwrap();
-    let general_verifier_encoded = settings.get(&GENERALVERIFIER).unwrap().unwrap();
+    let general_verifier_encoded = settings.get(GENERALVERIFIER).unwrap().unwrap();
     let general_verifier = Verifier::decode(&mut &general_verifier_encoded[..]).unwrap();
 
     let mut verifiers_set: Vec<String> = Vec::new();

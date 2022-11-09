@@ -9,7 +9,6 @@ import Foundation
 
 extension KeyDetailsView {
     final class ViewModel: ObservableObject {
-        let dataModel: KeyDetailsDataModel
         let keyDetailsService: KeyDetailsService
         let exportPrivateKeyService: PrivateKeyQRCodeService
 
@@ -29,12 +28,10 @@ extension KeyDetailsView {
         @Published var selectedSeeds: [String] = []
 
         init(
-            dataModel: KeyDetailsDataModel,
             keysData: MKeysNew?,
             exportPrivateKeyService: PrivateKeyQRCodeService,
             keyDetailsService: KeyDetailsService = KeyDetailsService()
         ) {
-            self.dataModel = dataModel
             self.keysData = keysData
             self.exportPrivateKeyService = exportPrivateKeyService
             self.keyDetailsService = keyDetailsService
@@ -44,7 +41,7 @@ extension KeyDetailsView {
             self.appState = appState
         }
 
-        func keyExportModel() -> ExportMultipleKeysModalViewModel {
+        func keyExportModel(dataModel: KeyDetailsDataModel) -> ExportMultipleKeysModalViewModel {
             let derivedKeys: [DerivedKeyExportModel] = dataModel.derivedKeys
                 .filter { selectedSeeds.contains($0.viewModel.path) }
                 .compactMap {
@@ -60,7 +57,7 @@ extension KeyDetailsView {
             )
         }
 
-        func refreshData() {
+        func refreshData(dataModel: KeyDetailsDataModel) {
             keyDetailsService.getKeys(for: dataModel.keySummary.keyName) { result in
                 if case let .success(keysData) = result {
                     self.appState.userData.keysData = keysData
