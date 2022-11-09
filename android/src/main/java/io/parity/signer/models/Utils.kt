@@ -29,6 +29,7 @@ fun String.abbreviateString(length: Int): String {
 		this
 	}
 }
+const val BASE58_STYLE_ABBREVIATE = 8
 
 /**
  * Encodes number array into string

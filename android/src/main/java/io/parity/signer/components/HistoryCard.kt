@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.Composable
+import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.Event
@@ -42,7 +43,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 						line1 = timestamp,
 						line2 = "General verifier set",
 						line3 = it.m.getOrElse(0) { "" }
-							.abbreviateString(8) + it.m.getOrElse(1) { "" }
+							.abbreviateString(BASE58_STYLE_ABBREVIATE) + it.m.getOrElse(1) { "" }
 					)
 				}
 			}

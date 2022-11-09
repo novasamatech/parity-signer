@@ -21,20 +21,18 @@ fun CombinedScreensSelector(
 
 	when (screenData) {
 		is ScreenData.SeedSelector -> {
-			SignerNewTheme() {
-				KeySetsNavSubgraph(
-					screenData.f.toKeySetsSelectModel(),
-					rootNavigator = rootNavigator,
-					alertState = alertState,
-				)
-			}
+			KeySetsNavSubgraph(
+				screenData.f.toKeySetsSelectModel(),
+				rootNavigator = rootNavigator,
+				alertState = alertState,
+			)
 		}
 		is ScreenData.Keys ->
 			KeySetDetailsNavSubgraph(
 				model = screenData.f.toKeySetDetailsModel(),
 				rootNavigator = rootNavigator,
 				alertState = alertState,
-				sigleton = signerDataModel,
+				singleton = signerDataModel,
 			)
 		else -> {} //old Selector showing them
 	}

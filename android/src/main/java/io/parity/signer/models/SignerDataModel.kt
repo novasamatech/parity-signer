@@ -15,9 +15,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import io.parity.signer.components.Authentication
 import io.parity.signer.dependencyGraph.getDbNameFromContext
-import io.parity.signer.ui.navigationselectors.OnBoardingState
+import io.parity.signer.ui.navigationselectors.OnboardingWasShown
 import io.parity.signer.uniffi.*
 import org.json.JSONObject
 import java.io.File
@@ -31,7 +30,7 @@ class SignerDataModel : ViewModel() {
 	private val REQUEST_CODE_PERMISSIONS = 10
 
 	// Internal model values
-	private val _onBoardingDone = MutableLiveData(OnBoardingState.InProgress)
+	private val _onBoardingDone = MutableLiveData(OnboardingWasShown.InProgress)
 
 	// TODO: something about this
 	// It leaks context objects,
@@ -44,7 +43,8 @@ class SignerDataModel : ViewModel() {
 	val navigator by lazy { SignerNavigator(this) }
 
 	// Alert
-	private val _alertState: MutableLiveData<AlertState> = MutableLiveData(AlertState.None)
+	private val _alertState: MutableLiveData<AlertState> =
+		MutableLiveData(AlertState.None)
 
 	// Current key details, after rust API will migrate to REST-like should not store this value here.
 	internal var lastOpenedKeyDetails: MKeyDetails? = null
@@ -54,7 +54,7 @@ class SignerDataModel : ViewModel() {
 
 	// Authenticator to call!
 	internal var authentication: Authentication =
-		Authentication(setAuth = { _authenticated.value = it })
+		Authentication(setAuth = { _authenticated.postValue(it) })
 
 	// Camera stuff
 	internal var bucket = arrayOf<String>()
@@ -105,7 +105,7 @@ class SignerDataModel : ViewModel() {
 
 	// Observables for screens state
 
-	val onBoardingDone: LiveData<OnBoardingState> = _onBoardingDone
+	val onBoardingDone: LiveData<OnboardingWasShown> = _onBoardingDone
 	val authenticated: LiveData<Boolean> = _authenticated
 
 	val alertState: LiveData<AlertState> = _alertState
@@ -269,11 +269,13 @@ class SignerDataModel : ViewModel() {
 		) {
 			if (alertState.value != AlertState.Active) {
 				_alertState.value = AlertState.Active
-				if (onBoardingDone.value == OnBoardingState.Yes) historyDeviceWasOnline(dbName)
+				if (onBoardingDone.value == OnboardingWasShown.Yes) {
+					historyDeviceWasOnline(dbName)
+				}
 			}
 		} else {
 			if (alertState.value == AlertState.Active) {
-				_alertState.value = if (onBoardingDone.value == OnBoardingState.Yes)
+				_alertState.value = if (onBoardingDone.value == OnboardingWasShown.Yes)
 					AlertState.Past else AlertState.None
 			}
 		}
@@ -307,7 +309,7 @@ class SignerDataModel : ViewModel() {
 	fun totalRefresh() {
 		val checkRefresh = File(dbName).exists()
 		if (checkRefresh) _onBoardingDone.value =
-			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No
+			OnboardingWasShown.Yes else _onBoardingDone.value = OnboardingWasShown.No
 		if (checkRefresh) {
 			getAlertState()
 			isAirplaneOn()
