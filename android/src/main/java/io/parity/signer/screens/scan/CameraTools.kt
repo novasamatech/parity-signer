@@ -3,7 +3,7 @@ package io.parity.signer.screens.scan
 import androidx.compose.runtime.Composable
 
 @Composable
-private fun requestCameraPermission() {
+private fun RequestCameraPermission() {
 	//todo dmitry
 //	when {
 //		ContextCompat.checkSelfPermission(

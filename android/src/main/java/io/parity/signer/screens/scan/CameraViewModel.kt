@@ -1,8 +1,12 @@
 package io.parity.signer.screens.scan
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.util.Log
 import androidx.camera.core.ImageProxy
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -32,6 +36,25 @@ class CameraViewModel(): ViewModel() {
 	// Camera stuff
 	internal var bucket = arrayOf<String>()
 	internal var payload: String = ""
+
+
+//	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+//	private val REQUEST_CODE_PERMISSIONS = 10
+//	private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+//		ContextCompat.checkSelfPermission(
+//			context, it
+//		) == PackageManager.PERMISSION_GRANTED
+//	}
+//
+//	internal fun handleCameraPermissions() {//todo dmitry remove
+//		if (!allPermissionsGranted()) {
+//			ActivityCompat.requestPermissions(
+//				activity,
+//				REQUIRED_PERMISSIONS,
+//				REQUEST_CODE_PERMISSIONS
+//			)
+//		}
+//	}
 
 	/**
 	 * Barcode detecting function.

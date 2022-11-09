@@ -26,8 +26,6 @@ import java.io.FileOutputStream
  * This is single object to handle all interactions with backend
  */
 class SignerDataModel : ViewModel() {
-	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-	private val REQUEST_CODE_PERMISSIONS = 10
 
 	// Internal model values
 	private val _onBoardingDone = MutableLiveData(OnboardingWasShown.InProgress)
@@ -266,23 +264,6 @@ class SignerDataModel : ViewModel() {
 				_alertState.value = if (onBoardingDone.value == OnboardingWasShown.Yes)
 					AlertState.Past else AlertState.None
 			}
-		}
-	}
-
-
-	private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-		ContextCompat.checkSelfPermission(
-			context, it
-		) == PackageManager.PERMISSION_GRANTED
-	}
-
-	internal fun handleCameraPermissions() {//todo dmitry remove
-		if (!allPermissionsGranted()) {
-			ActivityCompat.requestPermissions(
-				activity,
-				REQUIRED_PERMISSIONS,
-				REQUEST_CODE_PERMISSIONS
-			)
 		}
 	}
 
