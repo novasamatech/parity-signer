@@ -72,7 +72,7 @@ fun KeyCard(model: KeyCardModel) {
 			Spacer(Modifier.padding(top = 10.dp))
 
 			Box(modifier = Modifier.padding(end = 24.dp)) {
-				showBase58Collapsible(model.base58)
+				ShowBase58Collapsible(model.base58)
 			}
 		}
 
@@ -131,12 +131,12 @@ fun KeySeedCard(seedTitle: String, base58: String) {
 			color = MaterialTheme.colors.primary,
 			style = TypefaceNew.LabelS,
 		)
-		showBase58Collapsible(base58)
+		ShowBase58Collapsible(base58)
 	}
 }
 
 @Composable
-private fun showBase58Collapsible(base58: String) {
+private fun ShowBase58Collapsible(base58: String) {
 	val expanded = remember { mutableStateOf(false) }
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
