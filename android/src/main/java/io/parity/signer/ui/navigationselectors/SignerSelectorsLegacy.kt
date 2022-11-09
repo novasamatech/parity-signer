@@ -20,9 +20,6 @@ import io.parity.signer.uniffi.ScreenData
 fun ScreenSelector(
 	screenData: ScreenData,
 	alertState: State<AlertState?>,
-	progress: State<Float?>,
-	captured: State<Int?>,
-	total: State<Int?>,
 	button: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
@@ -70,15 +67,16 @@ fun ScreenSelector(
 			button = signerDataModel::navigate,
 			addSeed = signerDataModel::addSeed
 		)
-		ScreenData.Scan -> ScanScreenOld(
-			progress = progress,
-			captured = captured,
-			total = total,
-			button = signerDataModel::navigate,
-			handleCameraPermissions = signerDataModel::handleCameraPermissions,
-			processFrame = signerDataModel::processFrame,
-			resetScanValues = signerDataModel::resetScanValues,
-		)
+		ScreenData.Scan -> {} //shown in new selector
+//		 ScanScreenOld( //todo dmitry
+//			progress = progress,
+//			captured = captured,
+//			total = total,
+//			button = signerDataModel::navigate,
+//			handleCameraPermissions = signerDataModel::handleCameraPermissions,
+//			processFrame = signerDataModel::processFrame,
+//			resetScanValues = signerDataModel::resetScanValues,
+//		)
 		is ScreenData.SeedSelector -> {} //shown in new selector
 		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
 			screenData.f,

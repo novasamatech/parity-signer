@@ -56,13 +56,6 @@ class SignerDataModel : ViewModel() {
 	internal var authentication: Authentication =
 		Authentication(setAuth = { _authenticated.postValue(it) })
 
-	// Camera stuff
-	internal var bucket = arrayOf<String>()
-	internal var payload: String = ""
-	internal val _total = MutableLiveData<Int?>(null)
-	internal val _captured = MutableLiveData<Int?>(null)
-	internal val _progress = MutableLiveData(0.0f)
-
 	// Transaction
 	internal var action = JSONObject()
 
@@ -95,11 +88,6 @@ class SignerDataModel : ViewModel() {
 	internal var dbName: String = ""
 	private val keyStore = "AndroidKeyStore"
 	internal lateinit var sharedPreferences: SharedPreferences
-
-	// Observables for model data
-	internal val total: LiveData<Int?> = _total
-	internal val captured: LiveData<Int?> = _captured
-	val progress: LiveData<Float> = _progress
 
 	val seedNames: LiveData<Array<String>> = _seedNames
 
@@ -288,7 +276,7 @@ class SignerDataModel : ViewModel() {
 		) == PackageManager.PERMISSION_GRANTED
 	}
 
-	internal fun handleCameraPermissions() {
+	internal fun handleCameraPermissions() {//todo dmitry remove
 		if (!allPermissionsGranted()) {
 			ActivityCompat.requestPermissions(
 				activity,

@@ -72,9 +72,6 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		val authenticated = signerDataModel.authenticated.observeAsState()
 		val actionResult = signerDataModel.actionResult.observeAsState()
 		val shieldAlert = signerDataModel.alertState.observeAsState()
-		val progress = signerDataModel.progress.observeAsState()
-		val captured = signerDataModel.captured.observeAsState()
-		val total = signerDataModel.total.observeAsState()
 		val localNavAction = signerDataModel.localNavAction.observeAsState()
 
 		when (onBoardingDone.value) {
@@ -119,9 +116,6 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 									screenData = actionResult.value?.screenData
 										?: ScreenData.Documents,//default fallback
 									alertState = shieldAlert,
-									progress = progress,
-									captured = captured,
-									total = total,
 									button = signerDataModel.navigator::navigate,
 									signerDataModel = signerDataModel
 								)
