@@ -19,8 +19,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.flowlayout.SizeMode
 import io.parity.signer.R
 import io.parity.signer.models.submitErrorState
 import io.parity.signer.ui.theme.*
@@ -105,7 +103,7 @@ fun SnackBarCircularCountDownTimer(
 		modifier = modifier
 			.fillMaxWidth(1f)
 			.padding(horizontal = 8.dp, vertical = 16.dp)
-			.background(MaterialTheme.colors.fill12, innerShape)
+			.background(MaterialTheme.colors.snackBarBackground, innerShape)
 			.padding(12.dp),
 		verticalAlignment = Alignment.CenterVertically
 	) {
