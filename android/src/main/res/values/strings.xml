@@ -26,6 +26,8 @@
 	<string name="description_identicon">identicon</string>
 	<string name="description_expand_button">Expand button</string>
 	<string name="key_sets_screem_title">Key Sets</string>
+	<string name="key_details_public_export_title">Public Key</string>
+	<string name="key_details_public_export_derived_subtitle">Derived Key</string>
 	<string name="key_sets_screem_add_key_button">Add Key Set</string>
 	<string name="key_sets_details_screem_create_derived_button">Create Derived Key</string>
 	<string name="bottom_bar_label_key_sets">Key Sets</string>
@@ -37,6 +39,7 @@
 	<string name="key_set_export_all_label">Export All</string>
 	<string name="key_set_export_selected_label">Export Selected</string>
 	<string name="key_set_export_description_content">By scanning this QR code into your application you’ll export all keys from the Key Sets shown in the list below</string>
+	<string name="key_details_exposed_notification_label">This key is marked HOT because its root private key has been exported.</string>
 	<string name="key_sets_details_screem_derived_subtitle">Derived Keys</string>
 	<string name="key_lock_item">Locked key</string>
 	<string name="key_sets_details_screem_filter_icon_description">Network filter button</string>

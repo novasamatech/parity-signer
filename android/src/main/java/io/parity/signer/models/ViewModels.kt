@@ -145,13 +145,14 @@ data class KeyCardModel(
 		fun fromKeyModel(model: KeyModel, networkTitle: String): KeyCardModel =
 			KeyCardModel(
 				network = networkTitle,
-					base58 = model.base58,
-					path = model.path,
-					identIcon = model.identicon,
-					seedName = model.seedName,
-					hasPwd = model.hasPwd,
-					multiselect = model.multiselect,
+				base58 = model.base58,
+				path = model.path,
+				identIcon = model.identicon,
+				seedName = model.seedName,
+				hasPwd = model.hasPwd,
+				multiselect = model.multiselect,
 			)
+
 		/**
 		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
 		 */
@@ -169,6 +170,21 @@ data class KeyCardModel(
 				multiselect = address_card.multiselect,
 			)
 
+		fun fromAddress(
+			address: Address,
+			base58: String,
+			networkTitle: String
+		): KeyCardModel =
+			KeyCardModel(
+				network = networkTitle,
+				base58 = base58,
+				path = address.path,
+				hasPwd = address.hasPwd,
+				identIcon = address.identicon,
+				seedName = address.seedName,
+				multiselect = false,
+			)
+
 		fun createStub() = KeyCardModel(
 			network = "Polkadot",
 			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
@@ -180,3 +196,78 @@ data class KeyCardModel(
 		)
 	}
 }
+
+/**
+ * Local copy of shared [MKeyDetails] class
+ */
+data class KeyDetailsModel(
+	val qr: List<UByte>,
+	val pubkey: String,
+	val networkInfo: NetworkInfoModel,
+	val address: KeyCardModel,
+	val base58: String,
+	val secretExposed: Boolean,
+) {
+	val isRootKey = address.path.isEmpty()
+
+	companion object {
+		fun createStubDerived(): KeyDetailsModel {
+			val keyCard = KeyCardModel.createStub()
+			return KeyDetailsModel(
+				qr = PreviewData.exampleQRCode,
+				pubkey = "public key",
+				networkInfo = NetworkInfoModel(
+					"network title",
+					"network logo", "network specs"
+				),
+				address = keyCard,
+				base58 = keyCard.base58,
+				secretExposed = true,
+			)
+		}
+
+		fun createStubRoot(): KeyDetailsModel {
+			val keyCard = KeyCardModel.createStub()
+			return KeyDetailsModel(
+				qr = PreviewData.exampleQRCode,
+				pubkey = "public key",
+				networkInfo = NetworkInfoModel(
+					"network title",
+					"network logo", "network specs"
+				),
+				address = KeyCardModel(
+					keyCard.network, keyCard.base58, "",
+					keyCard.identIcon, keyCard.seedName, false
+				),
+				base58 = keyCard.base58,
+				secretExposed = true,
+			)
+		}
+	}
+}
+
+fun MKeyDetails.toKeyDetailsModel() =
+	KeyDetailsModel(
+		qr = qr, pubkey = pubkey, networkInfo = networkInfo.toNetworkInfoModel(),
+		address = KeyCardModel.fromAddress(
+			address = address,
+			base58 = base58,
+			networkTitle = networkInfo.networkTitle,
+		),
+		base58 = base58,
+		secretExposed = address.secretExposed,
+	)
+
+
+/**
+ * Local copy of shared [MscNetworkInfo] class
+ */
+data class NetworkInfoModel(
+	val networkTitle: String,
+	val networkLogo: String,
+	val networkSpecsKey: String
+)
+
+fun MscNetworkInfo.toNetworkInfoModel() =
+	NetworkInfoModel(networkTitle, networkLogo, networkSpecsKey)
+

@@ -38,7 +38,7 @@ fun ScreenSelector(
 			checkPath = signerDataModel::checkPath,
 		)
 		ScreenData.Documents -> Documents()
-		is ScreenData.KeyDetails -> ExportPublicKey(screenData.f)
+		is ScreenData.KeyDetails -> {}//migrated
 		is ScreenData.KeyDetailsMulti -> KeyDetailsMulti(
 			screenData.f,
 			button1,

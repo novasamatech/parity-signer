@@ -9,6 +9,7 @@ import io.parity.signer.bottomsheets.LogComment
 import io.parity.signer.models.*
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
+import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
 import io.parity.signer.screens.keysets.NewSeedMenu
 import io.parity.signer.screens.logs.LogsMenu
 import io.parity.signer.screens.logs.LogsScreen
@@ -41,6 +42,13 @@ fun CombinedScreensSelector(
 				alertState = alertState,
 				singleton = signerDataModel,
 			)
+		is ScreenData.KeyDetails ->
+			Box(modifier = Modifier.statusBarsPadding()) {
+				KeyDetailsPublicKeyScreen(
+					model = screenData.f.toKeyDetailsModel(),
+					rootNavigator = rootNavigator,
+				)
+			}
 		is ScreenData.Log ->
 			Box(Modifier.statusBarsPadding()) {
 				LogsScreen(
