@@ -29,9 +29,9 @@ fun LogItem(
 ) {
 	Row(
 		modifier = Modifier
-			.fillMaxWidth(1f)
-			.clickable(onClick = onClick)
-			.padding(vertical = 8.dp, horizontal = 24.dp),
+            .fillMaxWidth(1f)
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp, horizontal = 24.dp),
 		verticalAlignment = Alignment.Bottom,
 	) {
 		Column(modifier = Modifier.weight(1f)) {
@@ -44,13 +44,15 @@ fun LogItem(
 				},
 				style = TypefaceNew.TitleS,
 			)
-			Spacer(modifier = Modifier.padding(top = 4.dp))
+			if (model.message.isNotBlank()) {
+				Spacer(modifier = Modifier.padding(top = 4.dp))
 
-			Text(
-				text = model.message,
-				color = MaterialTheme.colors.textTertiary,
-				style = TypefaceNew.BodyM,
-			)
+				Text(
+					text = model.message,
+					color = MaterialTheme.colors.textTertiary,
+					style = TypefaceNew.BodyM,
+				)
+			}
 		}
 		Spacer(modifier = Modifier.padding(start = 8.dp))
 		Text(
