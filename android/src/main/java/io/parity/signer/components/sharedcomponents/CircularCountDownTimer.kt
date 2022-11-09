@@ -15,6 +15,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -109,7 +110,7 @@ fun SnackBarCircularCountDownTimer(
 	) {
 		Text(
 			text = text,
-			color = MaterialTheme.colors.textSecondary,
+			color = Color.White,
 			style = TypefaceNew.BodyL,
 			modifier = Modifier.weight(1f)
 		)
@@ -128,7 +129,7 @@ fun SnackBarCircularCountDownTimer(
 			)
 			Text(
 				text = timeLeft.toString(),
-				color = MaterialTheme.colors.primary,
+				color = Color.White,
 				style = TypefaceNew.LabelS,
 			)
 		}

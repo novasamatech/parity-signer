@@ -68,7 +68,7 @@ fun BackupPhraseBox(seedPhrase: String) {
 @Composable
 private fun BackupPhraseItem(index: Int, word: String) {
 	Row(Modifier
-		.defaultMinSize(minWidth = 100.dp)
+		.defaultMinSize(minWidth = 100.dp, minHeight = 24.dp)
 		.padding(vertical = 2.dp)
 	) {
 		Text(

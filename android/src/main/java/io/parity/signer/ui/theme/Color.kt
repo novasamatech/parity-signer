@@ -7,7 +7,10 @@ import androidx.compose.ui.graphics.Color
  * Our color schema is shared with iOS and not mapped to android [androidx.compose.material.MaterialTheme] so mainly defined here
  */
 
-val Colors.backgroundPrimary: Color
+val Colors.backgroundSystem: Color //to be renamed - used for seed list only now
+	get() = if (isLight) Color(0xFFF3F3F2) else Color(0xFF101015)
+
+val Colors.backgroundPrimary: Color // it's in android theme - background
 	get() = if (isLight) Color(0xFFFFFFFF) else Color(0xFF101015)
 
 val Colors.backgroundSecondary: Color
@@ -71,4 +74,5 @@ val Colors.red500: Color
 	get() = Color(0xFFFE8D81)
 
 val Colors.snackBarBackground: Color
-	get() = Color(0x1FFFFFFF)
+	get() = Color(0xFF454549)
+
