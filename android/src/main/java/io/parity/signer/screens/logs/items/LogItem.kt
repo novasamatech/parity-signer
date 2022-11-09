@@ -27,55 +27,54 @@ fun LogItem(
 	model: LogsListEntryModel.LogEntryModel,
 	onClick: Callback,
 ) {
-	Column(
-		Modifier
+	Row(
+		modifier = Modifier
 			.fillMaxWidth(1f)
 			.clickable(onClick = onClick)
-			.padding(vertical = 8.dp, horizontal = 24.dp)
+			.padding(vertical = 8.dp, horizontal = 24.dp),
+		verticalAlignment = Alignment.Bottom,
 	) {
-		Text(
-			text = model.title,
-			color = if (model.isDanger) {
-				MaterialTheme.colors.red400
-			} else {
-				MaterialTheme.colors.primary
-			},
-			style = TypefaceNew.TitleS,
-		)
-		Spacer(modifier = Modifier.padding(top = 4.dp))
-		Row(
-			verticalAlignment = Alignment.CenterVertically,
-		) {
+		Column(modifier = Modifier.weight(1f)) {
+			Text(
+				text = model.title,
+				color = if (model.isDanger) {
+					MaterialTheme.colors.red400
+				} else {
+					MaterialTheme.colors.primary
+				},
+				style = TypefaceNew.TitleS,
+			)
+			Spacer(modifier = Modifier.padding(top = 4.dp))
+
 			Text(
 				text = model.message,
 				color = MaterialTheme.colors.textTertiary,
 				style = TypefaceNew.BodyM,
-				modifier = Modifier.weight(1f)
-			)
-			Spacer(modifier = Modifier.padding(start = 8.dp))
-			Text(
-				text = model.timeStr,
-				color = MaterialTheme.colors.textTertiary,
-				style = TypefaceNew.BodyM,
-			)
-			Image(
-				imageVector = Icons.Filled.ChevronRight,
-				contentDescription = null,
-				colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
 			)
 		}
+		Spacer(modifier = Modifier.padding(start = 8.dp))
+		Text(
+			text = model.timeStr,
+			color = MaterialTheme.colors.textTertiary,
+			style = TypefaceNew.BodyM,
+		)
+		Image(
+			imageVector = Icons.Filled.ChevronRight,
+			contentDescription = null,
+			colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
+		)
 	}
 }
 
 @Composable
 fun LogItemDate(model: LogsListEntryModel.TimeSeparatorModel) {
-		Text(
-			text = model.dateStr,
-			color = MaterialTheme.colors.textTertiary,
-			style = TypefaceNew.BodyM,
-			modifier = Modifier
-				.padding(vertical = 8.dp, horizontal = 24.dp),
-		)
+	Text(
+		text = model.dateStr,
+		color = MaterialTheme.colors.textTertiary,
+		style = TypefaceNew.BodyM,
+		modifier = Modifier
+			.padding(vertical = 8.dp, horizontal = 24.dp),
+	)
 }
 
 sealed class LogsListEntryModel {
