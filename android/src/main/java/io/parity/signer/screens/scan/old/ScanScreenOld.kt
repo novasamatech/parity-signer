@@ -29,20 +29,10 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
+import io.parity.signer.components.KeepScreenOn
 import io.parity.signer.components.ScanProgressBarOld
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.uniffi.Action
-
-@Composable
-fun KeepScreenOn() {
-	val currentView = LocalView.current
-	DisposableEffect(Unit) {
-		currentView.keepScreenOn = true
-		onDispose {
-			currentView.keepScreenOn = false
-		}
-	}
-}
 
 /**
  * Main scanner screen. One of navigation roots.
