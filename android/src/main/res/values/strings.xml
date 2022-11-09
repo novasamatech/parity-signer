@@ -82,4 +82,18 @@
 	<string name="menu_option_add_note">Add Note</string>
 	<string name="menu_option_clear_logs">Clear Logs</string>
 
+    <string name="unlock_device_title">UNLOCK SIGNER</string>
+	<string name="unlock_device_subtitle">Please authenticate yourself</string>
+	<string name="auth_error_message">Authentication error: %s</string>
+	<string name="auth_failed_message">Authentication failed</string>
+	<string name="auth_error_no_hardware">Insufficient security features available on this device.</string>
+	<string name="auth_error_hardware_unavailable">Security features are currently unavailable.</string>
+	<string name="auth_error_none_enrolled">Authentication system not enrolled; please enable password, pin code or biometric authentication</string>
+	<string name="auth_error_security_update_required">Security update is required</string>
+	<string name="auth_error_unsupported">Security update is required</string>
+	<string name="auth_error_status_unknown">Authentication system failure</string>
+	<string name="subtitle_secret_recovery_phrase">Secret Recovery Phrase</string>
+	<string name="subtitle_derived_keys">Derived Keys</string>
+    <string name="seed_backup_autohide_title">Backup info will be hidden in</string>
+	<string name="unlock_app_button">Unlock app</string>
 </resources>

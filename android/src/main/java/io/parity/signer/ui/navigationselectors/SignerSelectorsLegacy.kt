@@ -131,10 +131,7 @@ fun ModalSelector(
 				modalData.f,
 				button2
 			)
-			is ModalData.Backup -> SeedBackup(
-				modalData.f,
-				getSeedForBackup = signerDataModel::getSeedForBackup
-			)
+			is ModalData.Backup -> {} //new screen is part of key details subgraph
 			is ModalData.PasswordConfirm -> PasswordConfirm(
 				modalData.f,
 				signerDataModel = signerDataModel
@@ -200,7 +197,7 @@ fun AlertSelector(
 	}
 }
 
-enum class OnBoardingState {
+enum class OnboardingWasShown {
 	InProgress,
 	No,
 	Yes;

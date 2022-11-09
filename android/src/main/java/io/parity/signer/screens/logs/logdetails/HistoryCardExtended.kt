@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.Composable
 import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.TransactionPreviewField
+import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.Event
@@ -59,7 +60,7 @@ fun HistoryCardExtended(
 				line1 = timestamp,
 				line2 = "General verifier set",
 				line3 = hex.getOrElse(0) { "" }
-					.abbreviateString(8) + hex.getOrElse(1) { "" }
+					.abbreviateString(BASE58_STYLE_ABBREVIATE) + hex.getOrElse(1) { "" }
 			)
 		}
 		is Event.HistoryCleared -> {

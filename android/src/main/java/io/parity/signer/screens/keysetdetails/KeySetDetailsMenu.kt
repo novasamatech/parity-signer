@@ -1,7 +1,6 @@
 package io.parity.signer.screens.keysetdetails
 
 import android.content.res.Configuration
-import android.telecom.Call
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +23,6 @@ import io.parity.signer.models.AlertState
 import io.parity.signer.models.Callback
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
-import io.parity.signer.screens.keydetails.KeyDetailsDeleteConfirmBottomSheet
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
@@ -36,17 +34,22 @@ fun KeySetDetailsMenu(
 	alertState: State<AlertState?>,
 	removeSeed: Callback,
 	onSelectKeysClicked: Callback,
+	onBackupClicked: Callback,
 ) {
 	val state = remember {
 		mutableStateOf(KeySetDetailsMenuState.GENERAL)
 	}
 	when (state.value) {
-		KeySetDetailsMenuState.GENERAL -> KeyDetailsMenuGeneral(
-			navigator = navigator,
-			alertState = alertState,
-			onDeleteClicked = { state.value = KeySetDetailsMenuState.DELETE_CONFIRM },
-			onSelectKeysClicked = onSelectKeysClicked,
-		)
+		KeySetDetailsMenuState.GENERAL ->
+			KeyDetailsMenuGeneral(
+				navigator = navigator,
+				alertState = alertState,
+				onDeleteClicked = {
+					state.value = KeySetDetailsMenuState.DELETE_CONFIRM
+				},
+				onSelectKeysClicked = onSelectKeysClicked,
+				onBackupClicked = onBackupClicked,
+			)
 		KeySetDetailsMenuState.DELETE_CONFIRM ->
 			KeySetDeleteConfirmBottomSheet(
 				onCancel = { state.value = KeySetDetailsMenuState.GENERAL },
@@ -55,6 +58,7 @@ fun KeySetDetailsMenu(
 	}
 }
 
+//todo dmitry switch state back to general if sheet is closed
 @Composable
 fun KeySetDeleteConfirmBottomSheet(
 	onCancel: Callback,
@@ -74,13 +78,14 @@ fun KeyDetailsMenuGeneral(
 	navigator: Navigator,
 	alertState: State<AlertState?>,
 	onSelectKeysClicked: Callback,
+	onBackupClicked: Callback,
 	onDeleteClicked: Callback,
 ) {
 	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-			.fillMaxWidth()
-			.padding(start = sidePadding, end = sidePadding, top = 8.dp),
+            .fillMaxWidth()
+            .padding(start = sidePadding, end = sidePadding, top = 8.dp),
 	) {
 
 		MenuItemForBottomSheet(
@@ -105,7 +110,7 @@ fun KeyDetailsMenuGeneral(
 			label = stringResource(R.string.menu_option_backup_key_set),
 			onclick = {
 				if (alertState.value == AlertState.None)
-					navigator.navigate(Action.BACKUP_SEED)
+					onBackupClicked()
 				else
 					navigator.navigate(Action.SHIELD)
 			}
@@ -147,7 +152,7 @@ private fun PreviewKeyDetailsMenu() {
 	SignerNewTheme {
 		val state = remember { mutableStateOf(AlertState.None) }
 		KeySetDetailsMenu(
-			EmptyNavigator(), state, {}, {},
+			EmptyNavigator(), state, {}, {}, {},
 		)
 	}
 }

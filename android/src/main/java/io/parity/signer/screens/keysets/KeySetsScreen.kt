@@ -27,6 +27,7 @@ import io.parity.signer.models.*
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.navigationselectors.KeySetsNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.backgroundSystem
 import io.parity.signer.uniffi.Action
 
 /**
@@ -39,7 +40,7 @@ fun KeySetsScreen(
 	localNavigator: NavController,
 	alertState: State<AlertState?>, //for shield icon
 ) {
-	Column(Modifier.background(MaterialTheme.colors.background)) {
+	Column(Modifier.background(MaterialTheme.colors.backgroundSystem)) {
 		ScreenHeader(
 			R.string.key_sets_screem_title,
 			onMenu = { localNavigator.navigate(KeySetsNavSubgraph.homeMenu) }
