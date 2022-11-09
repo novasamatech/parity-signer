@@ -17,11 +17,11 @@ data class LogsScreenModel(val logs: List<LogsListEntryModel>)
 fun MLog.toLogsScreenModel(): LogsScreenModel {
 	val result = mutableListOf<LogsListEntryModel>()
 
+	var lastShownDay: String? = null
 	log.forEach { (order, rustTimestamp, listOfEvents) ->
 		val date = DateUtils.parseLogTime(rustTimestamp)
 		val dayString = date?.toLogDateString()
 		val timeString = date?.toLogTimeString()
-		var lastShownDay: String? = null
 
 		listOfEvents.forEach { event ->
 			if (lastShownDay != dayString && dayString != null) {
