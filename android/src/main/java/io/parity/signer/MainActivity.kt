@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
 @ExperimentalAnimationApi
 @Composable
 fun SignerApp(signerDataModel: SignerDataModel) {
-	SignerOldTheme {
+	SignerNewTheme {
 		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 		val authenticated = signerDataModel.authenticated.observeAsState()
 		val actionResult = signerDataModel.actionResult.observeAsState()
@@ -87,61 +87,62 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					// Structure to contain all app
 					Box {
 						//screens before redesign
-						Scaffold(
-							modifier = Modifier
-								.navigationBarsPadding()
-								.captionBarPadding()
-								.statusBarsPadding(),
-							topBar = {
-								if (NavigationMigrations.shouldShowBar(
-										localNavAction = localNavAction.value,
-										globalNavAction = actionResult.value,
-									)
-								) {
-									TopBar(
-										signerDataModel = signerDataModel,
+						SignerOldTheme {
+							Scaffold(
+								modifier = Modifier
+									.navigationBarsPadding()
+									.captionBarPadding()
+									.statusBarsPadding(),
+								topBar = {
+									if (NavigationMigrations.shouldShowBar(
+											localNavAction = localNavAction.value,
+											globalNavAction = actionResult.value,
+										)
+									) {
+										TopBar(
+											signerDataModel = signerDataModel,
+											alertState = shieldAlert,
+										)
+									}
+								},
+								bottomBar = {
+									if (NavigationMigrations.shouldShowBar(
+											localNavAction = localNavAction.value,
+											globalNavAction = actionResult.value,
+										)
+										&& actionResult.value?.footer == true
+									) {
+										BottomBar(signerDataModel = signerDataModel)
+									}
+								},
+							) { innerPadding ->
+								Box(modifier = Modifier.padding(innerPadding)) {
+									ScreenSelector(
+										screenData = actionResult.value?.screenData
+											?: ScreenData.Documents,//default fallback
 										alertState = shieldAlert,
+										progress = progress,
+										captured = captured,
+										total = total,
+										button = signerDataModel.navigator::navigate,
+										signerDataModel = signerDataModel
+									)
+									ModalSelector(
+										modalData = actionResult.value?.modalData,
+										localNavAction = localNavAction.value,
+										alertState = shieldAlert,
+										button = signerDataModel.navigator::navigate,
+										signerDataModel = signerDataModel,
+									)
+									AlertSelector(
+										alert = actionResult.value?.alertData,
+										alertState = shieldAlert,
+										button = signerDataModel.navigator::navigate,
+										acknowledgeWarning = signerDataModel::acknowledgeWarning
 									)
 								}
-							},
-							bottomBar = {
-								if (NavigationMigrations.shouldShowBar(
-										localNavAction = localNavAction.value,
-										globalNavAction = actionResult.value,)
-									&& actionResult.value?.footer == true
-								) {
-									BottomBar(signerDataModel = signerDataModel)
-								}
-							},
-						) { innerPadding ->
-							Box(modifier = Modifier.padding(innerPadding)) {
-								ScreenSelector(
-									screenData = actionResult.value?.screenData
-										?: ScreenData.Documents,//default fallback
-									alertState = shieldAlert,
-									progress = progress,
-									captured = captured,
-									total = total,
-									button = signerDataModel.navigator::navigate,
-									signerDataModel = signerDataModel
-								)
-								ModalSelector(
-									modalData = actionResult.value?.modalData,
-									localNavAction = localNavAction.value,
-									alertState = shieldAlert,
-									button = signerDataModel.navigator::navigate,
-									signerDataModel = signerDataModel,
-								)
-								AlertSelector(
-									alert = actionResult.value?.alertData,
-									alertState = shieldAlert,
-									button = signerDataModel.navigator::navigate,
-									acknowledgeWarning = signerDataModel::acknowledgeWarning
-								)
 							}
-						}
-						//new screens selectors
-						SignerNewTheme() {
+							//new screens selectors
 							Box(
 								modifier = Modifier
 									.navigationBarsPadding()
