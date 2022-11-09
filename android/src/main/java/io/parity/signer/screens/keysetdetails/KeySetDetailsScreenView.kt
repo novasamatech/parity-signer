@@ -144,7 +144,7 @@ fun SeedKeyViewItem(
 					style = TypefaceNew.TitleL,
 				)
 				Text(
-					text = seedKeyModel.base58.abbreviateString(8),
+					text = seedKeyModel.base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
 					color = if (onClick != null) MaterialTheme.colors.textTertiary else MaterialTheme.colors.textDisabled,
 					style = TypefaceNew.BodyM,
 				)
