@@ -12,6 +12,7 @@ import io.parity.signer.uniffi.qrparserTryDecodeQrSequence
 /**
  * Barcode detecting function.
  * This uses experimental features
+ * todo dmitry migrate to new viewmodel
  */
 @SuppressLint("UnsafeOptInUsageError")
 fun SignerDataModel.processFrame(

@@ -43,121 +43,13 @@ import io.parity.signer.uniffi.Action
 fun ScanScreen(
 	model: KeySetDetailsModel,
 	navigator: Navigator,
-	alertState: State<AlertState?>, //for shield icon
 	onMenu: Callback,
 ) {
-	Column {
-		ScreenHeader(
-			stringId = null,
-			onback = { navigator.backAction() },
-			onMenu = onMenu, //navigator.navigate(Action.RIGHT_BUTTON_ACTION) was in rust navigation
-		)
-		Box(modifier = Modifier.weight(1f)) {
-			Column(
-				modifier = Modifier.verticalScroll(rememberScrollState())
-			) {
-				//seed
-				SeedKeyViewItem(model.root) {
-					navigator.navigate(Action.SELECT_KEY, model.root.addressKey)
-				}
-				//filter row
-				Row(
-					modifier = Modifier.padding(horizontal = 24.dp),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					Text(
-						text = stringResource(R.string.key_sets_details_screem_derived_subtitle),
-						color = MaterialTheme.colors.textTertiary,
-						style = TypefaceNew.BodyM,
-						modifier = Modifier.weight(1f),
-					)
-					Icon(
-						painter = painterResource(id = R.drawable.ic_tune_28),
-						contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
-						modifier = Modifier
-                            .clickable {
-                                navigator.navigate(
-                                    Action.NETWORK_SELECTOR,
-                                    ""
-                                )
-                            }
-                            .size(28.dp),
-						tint = MaterialTheme.colors.textTertiary,
-					)
-				}
-				for (key in model.keys) {
-					KeyDerivedItem(model = key) {
-						navigator.navigate(Action.SELECT_KEY, key.addressKey)
-					}
-				}
-			}
+	Box() {
 
-			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-				ExposedIcon(
-					alertState = alertState, navigator = navigator,
-                    Modifier
-                        .align(Alignment.End)
-                        .padding(end = 16.dp)
-				)
-				PrimaryButtonBottomSheet(
-					label = stringResource(R.string.key_sets_details_screem_create_derived_button),
-					modifier = Modifier
-						.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)
-				) {
-					navigator.navigate(Action.NEW_KEY, "") //new derived key
-				}
-			}
-		}
-		BottomBar2(navigator, BottomBar2State.KEYS)
 	}
 }
 
-/**
- * Not clickable item - disabled automatically
- */
-@Composable
-fun SeedKeyViewItem(
-	seedKeyModel: KeyModel,
-	onClick: Callback?,
-) {
-	Surface(
-		modifier = Modifier
-			.conditional(onClick != null) {
-				clickable(onClick = onClick!!)
-			},
-		color = Color.Transparent,
-	)
-	{
-		Row(
-			modifier = Modifier
-				.padding(top = 16.dp, bottom = 16.dp, start = 24.dp),
-			verticalAlignment = Alignment.CenterVertically,
-		) {
-			Column(Modifier.weight(1f)) {
-				Text(
-					text = seedKeyModel.seedName,
-					color = if (onClick != null) MaterialTheme.colors.primary else MaterialTheme.colors.textDisabled,
-					style = TypefaceNew.TitleL,
-				)
-				Text(
-					text = seedKeyModel.base58.abbreviateString(8),
-					color = if (onClick != null) MaterialTheme.colors.textTertiary else MaterialTheme.colors.textDisabled,
-					style = TypefaceNew.BodyM,
-				)
-			}
-			if (onClick != null) {
-				Image(
-					imageVector = Icons.Filled.ChevronRight,
-					contentDescription = null,
-					colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
-					modifier = Modifier
-                        .padding(end = 16.dp)
-                        .size(28.dp)
-				)
-			}
-		}
-	}
-}
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -170,12 +62,10 @@ fun SeedKeyViewItem(
 )
 @Composable
 private fun PreviewScanScreen() {
-
-	val state = remember { mutableStateOf(AlertState.Active) }
 	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			ScanScreen(mockModel, EmptyNavigator(), state, {})
+			ScanScreen(mockModel, EmptyNavigator(), {})
 		}
 	}
 }
