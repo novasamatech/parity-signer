@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -119,6 +120,14 @@ fun RowButtonsBottomSheet(
 	}
 }
 
+@Composable
+fun SignerBottomSheetDivider() {
+	Divider(
+		color = MaterialTheme.colors.appliedSeparator,
+		thickness = 1.dp,
+		startIndent = 16.dp,
+	)
+}
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -143,6 +152,7 @@ private fun PreviewCtaButtons() {
 				onClickedCta = {},
 			)
 			SecondaryButtonBottomSheet("Secondary Bottom Sheet") {}
+			SignerBottomSheetDivider()
 		}
 	}
 }

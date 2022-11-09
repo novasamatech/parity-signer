@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.KeyCardModel
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.*
@@ -149,7 +150,7 @@ private fun showBase58Collapsible(base58: String) {
 			)
 		} else {
 			Text(
-				base58.abbreviateString(8),
+				base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
 				color = MaterialTheme.colors.textTertiary,
 				style = TypefaceNew.BodyM,
 				maxLines = 1,

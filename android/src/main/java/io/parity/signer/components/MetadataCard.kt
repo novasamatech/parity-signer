@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.uniffi.MMetadataRecord
 
@@ -22,7 +23,7 @@ fun MetadataCard(metadataRecord: MMetadataRecord) {
 		Spacer(Modifier.width(20.dp))
 		Column {
 			Text("hash")
-			Text(metadataRecord.metaHash.abbreviateString(8))
+			Text(metadataRecord.metaHash.abbreviateString(BASE58_STYLE_ABBREVIATE))
 		}
 	}
 }

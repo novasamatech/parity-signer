@@ -36,7 +36,7 @@ fun BottomBar2(
 ) {
 	BottomAppBar(
 		backgroundColor = MaterialTheme.colors.backgroundSecondary,
-		elevation = 0.dp,
+		elevation = 8.dp,
 		modifier = Modifier.height(50.dp)
 	) {
 		Row(
