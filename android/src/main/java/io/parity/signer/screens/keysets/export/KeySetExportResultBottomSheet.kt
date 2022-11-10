@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -22,9 +21,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
+import io.parity.signer.components.base.SignerBottomSheetDivider
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
-import io.parity.signer.dependencyGraph.ServiceLocator
 import io.parity.signer.models.Callback
 import io.parity.signer.models.KeySetModel
 import io.parity.signer.ui.helpers.PreviewData
@@ -38,7 +37,7 @@ fun KeySetExportResultBottomSheet(
 ) {
 	Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
 		BottomSheetHeader(
-			header = pluralStringResource(
+			title = pluralStringResource(
 				id = R.plurals.key_sets_export_qe_title,
 				count = seeds.size,
 				seeds.size,
@@ -111,11 +110,7 @@ fun KeySetExportResultBottomSheet(
 				val seed = seedList[i]
 				KeySetItemInExport(seed)
 				if (i != seedList.lastIndex) {
-					Divider(
-						color = MaterialTheme.colors.appliedSeparator,
-						thickness = 1.dp,
-						startIndent = 16.dp,
-					)
+					SignerBottomSheetDivider()
 				}
 			}
 		}

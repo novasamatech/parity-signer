@@ -1,10 +1,10 @@
-package io.parity.signer.screens
+package io.parity.signer.screens.logs.logdetails
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import io.parity.signer.components.HistoryCardExtended
+import io.parity.signer.screens.logs.logdetails.HistoryCardExtended
 import io.parity.signer.uniffi.MLogDetails
 
 @Composable

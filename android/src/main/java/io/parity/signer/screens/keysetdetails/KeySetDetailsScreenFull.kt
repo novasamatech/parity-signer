@@ -15,8 +15,8 @@ import kotlinx.coroutines.launch
 fun KeySetDetailsScreenFull(
 	model: KeySetDetailsModel,
 	navigator: Navigator,
-	alertState: State<AlertState?>, //for shield icon
 	navController: NavController,
+	alertState: State<AlertState?>, //for shield icon
 	onRemoveKeySet: Callback,
 ) {
 	val bottomSheetState =
@@ -38,6 +38,10 @@ fun KeySetDetailsScreenFull(
 				onSelectKeysClicked = {
 					scope.launch { bottomSheetState.hide() }
 					navController.navigate(KeySetDetailsNavSubgraph.multiselect)
+				},
+				onBackupClicked = {
+					scope.launch { bottomSheetState.hide() }
+					navController.navigate(KeySetDetailsNavSubgraph.backup)
 				},
 			)
 		},

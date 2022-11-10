@@ -110,6 +110,7 @@ fun SignerDataModel.removeSeed(seedName: String) {
 
 /**
  * All logic required to prepare seed box in seed backup screen
+ * todo used only for old backup screen, can be removed
  */
 fun SignerDataModel.getSeedForBackup(
 	seedName: String,
