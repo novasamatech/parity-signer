@@ -11,6 +11,7 @@ import SwiftUI
 struct CameraView: View {
     @StateObject var model = CameraService()
     @StateObject var viewModel: ViewModel
+    @StateObject var progressViewModel: ProgressSnackbarViewModel = ProgressSnackbarViewModel()
     @EnvironmentObject private var navigation: NavigationCoordinator
     @Environment(\.safeAreaInsets) private var safeAreaInsets
 
@@ -21,39 +22,43 @@ struct CameraView: View {
                 .onReceive(model.$payload) { payload in
                     viewModel.checkForTransactionNavigation(payload, model: model)
                 }
+                .onChange(of: model.total) { total in
+                    progressViewModel.total = total
+                    if total > 1, viewModel.isPresentingProgressSnackbar == false, !viewModel.isScanningMultiple {
+                        viewModel.isPresentingProgressSnackbar = true
+                    }
+                }
                 .onChange(of: model.captured) { newValue in
+                    progressViewModel.current = newValue
                     UIApplication.shared.isIdleTimerDisabled = newValue > 0
                 }
             VStack {
-                ZStack {
+                ZStack(alignment: .bottom) {
                     // Blur overlay
                     Rectangle()
                         .background(.regularMaterial)
                     VStack {
-                        HStack {
+                        HStack(spacing: Spacing.small) {
                             CameraButton(
-                                action: {
-                                    viewModel.isPresented.toggle()
-                                },
+                                action: { viewModel.isPresented.toggle() },
                                 icon: Asset.xmarkButton.swiftUIImage
                             )
                             Spacer()
-                            CapsuleButton(
-                                action: {},
-                                icon: Asset.scanMultiple.swiftUIImage,
-                                title: Localizable.Scanner.Action.multiple.string,
-                                isPressed: false
-                            )
-                            Spacer()
                             CameraButton(
                                 action: {
-                                    model.toggleTorch()
+                                    model.isMultipleTransactionMode.toggle()
+                                    viewModel.onScanMultipleTap()
                                 },
+                                icon: Asset.scanMultiple.swiftUIImage,
+                                isPressed: $viewModel.isScanningMultiple
+                            )
+                            CameraButton(
+                                action: { model.toggleTorch() },
                                 icon: Asset.torchOff.swiftUIImage,
                                 isPressed: $model.isTorchOn
                             )
                         }
-                        .padding([.leading, .trailing], Spacing.extraExtraLarge)
+                        .padding([.leading, .trailing], Spacing.medium)
                         .padding(.top, Spacing.medium + safeAreaInsets.top)
                         // Camera cutout
                         ZStack {
@@ -69,9 +74,9 @@ struct CameraView: View {
                         .padding([.top, .bottom], Spacing.componentSpacer)
                         // Text description
                         VStack(spacing: Spacing.small) {
-                            Localizable.Scanner.Label.Scan.header.text
+                            Text(viewModel.header)
                                 .font(Fontstyle.titleL.base)
-                            Localizable.Scanner.Label.Scan.message.text
+                            Text(viewModel.message)
                                 .font(Fontstyle.bodyL.base)
                                 .multilineTextAlignment(.center)
                         }
@@ -79,34 +84,25 @@ struct CameraView: View {
                         .padding([.leading, .trailing], Spacing.componentSpacer)
                         Spacer()
                     }
-                }
-//                .compositingGroup()
-            }
-            if model.total > 1 {
-                MenuStack {
-                    HeadingOverline(text: Localizable.CameraView.parsingMultidata.key)
-                        .padding(.top, Spacing.small)
-                    ProgressView(value: min(Float(model.captured) / Float(model.total), 1))
-                        .border(Asset.crypto400.swiftUIColor)
-                        .foregroundColor(Asset.crypto400.swiftUIColor)
-                        .padding(.vertical, Spacing.extraSmall)
-                    Text(Localizable.Scanner.Label.progress(model.captured, model.total))
-                        .font(Fontstyle.subtitle1.base)
-                        .foregroundColor(Asset.text600.swiftUIColor)
-                    Localizable.pleaseHoldStill.text
-                        .font(Fontstyle.subtitle2.base)
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                    MenuButtonsStack {
-                        BigButton(
-                            text: Localizable.CameraView.startOver.key,
-                            isShaded: true,
-                            action: {
-                                model.reset()
-                            }
-                        )
+                    if viewModel.isScanningMultiple, !model.multipleTransactions.isEmpty {
+                        VStack(spacing: 0) {
+                            multipleTransactionOverlay
+                            Asset.backgroundSecondaryDarkOnly.swiftUIColor
+                                .frame(height: safeAreaInsets.bottom)
+                        }
+                        .transition(.move(edge: .bottom))
                     }
                 }
             }
+            .onAppear {
+                progressViewModel.title = Localizable.Scanner.Label.multipart.string
+                progressViewModel.cancelActionTitle = Localizable.Scanner.Action.cancel.string
+                progressViewModel.cancelAction = {
+                    model.reset()
+                    viewModel.isPresentingProgressSnackbar = false
+                }
+            }
+            .bottomProgressSnackbar(progressViewModel, isPresented: $viewModel.isPresentingProgressSnackbar)
         }
         .ignoresSafeArea(edges: [.top, .bottom])
         .onAppear {
@@ -117,7 +113,6 @@ struct CameraView: View {
             UIApplication.shared.isIdleTimerDisabled = false
             model.shutdown()
         }
-
         .background(Asset.bg100.swiftUIColor)
         .fullScreenCover(
             isPresented: $viewModel.isPresentingTransactionPreview,
@@ -135,12 +130,45 @@ struct CameraView: View {
             }
         }
     }
+
+    var multipleTransactionOverlay: some View {
+        HStack(alignment: .center) {
+            Text(signText())
+                .font(Fontstyle.titleS.base)
+                .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                .padding(.top, Spacing.medium)
+            Spacer()
+            CapsuleButton(
+                action: {
+                    // TODO: Agree with backend what to do
+                },
+                icon: Asset.arrowForward.swiftUIImage,
+                title: Localizable.Scanner.Action.sign.string
+            )
+            .padding(.top, Spacing.extraSmall)
+        }
+        .padding(.leading, Spacing.medium)
+        .padding(.trailing, Spacing.extraSmall)
+        .frame(height: Heights.bottomBarHeight)
+        .background(Asset.backgroundSecondaryDarkOnly.swiftUIColor)
+    }
+
+    func signText() -> String {
+        let key = Localizable.Scanner.Label.self
+        let suffix = (model.multipleTransactions.count > 1 ? key.SignMultiple.Suffix.plural : key.SignMultiple.Suffix.single).string
+        return key.signMultiple(model.multipleTransactions.count, suffix)
+    }
 }
 
 extension CameraView {
     final class ViewModel: ObservableObject {
         @Published var isPresentingTransactionPreview: Bool = false
+        @Published var isPresentingProgressSnackbar: Bool = false
+        @Published var isScanningMultiple: Bool = false
         @Published var mTransaction: MTransaction?
+        @Published var header: String = Localizable.Scanner.Label.Scan.Main.header.string
+        @Published var message: String = Localizable.Scanner.Label.Scan.Main.message.string
+
         @Binding var isPresented: Bool
         private weak var navigation: NavigationCoordinator!
 
@@ -166,6 +194,19 @@ extension CameraView {
                 mTransaction = value
                 isPresentingTransactionPreview = true
                 model.shutdown()
+            }
+        }
+
+        func onScanMultipleTap() {
+            isScanningMultiple.toggle()
+            updateTexts()
+        }
+
+        private func updateTexts() {
+            let key = Localizable.Scanner.Label.Scan.self
+            withAnimation {
+                header = (isScanningMultiple ? key.Multiple.header : key.Main.header).string
+                message = (isScanningMultiple ? key.Multiple.message : key.Main.message).string
             }
         }
     }

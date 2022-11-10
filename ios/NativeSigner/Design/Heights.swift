@@ -28,6 +28,10 @@ enum Heights {
     static let tabbarHeight: CGFloat = 49
     static let tabbarAssetHeight: CGFloat = 28
     static let errorModalIconContainer: CGFloat = 80
+    /// All variants of `ProgressSnackbar`, 96 pt
+    static let progressSnackbarHeight: CGFloat = 96
+    static let bottomBarHeight: CGFloat = 56
+    static let capsuleButton: CGFloat = 40
 }
 
 enum Sizes {

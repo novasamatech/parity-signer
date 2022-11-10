@@ -11,33 +11,30 @@ struct CapsuleButton: View {
     private let action: () -> Void
     private let icon: Image
     private let title: String
-    @State var isPressed: Bool
 
     init(
         action: @escaping () -> Void,
         icon: Image,
-        title: String,
-        isPressed: Bool = false
+        title: String
     ) {
         self.action = action
         self.icon = icon
         self.title = title
-        self.isPressed = isPressed
     }
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: Spacing.extraSmall) {
-                icon
                 Text(title)
                     .font(Fontstyle.labelM.base)
+                icon
             }
-            .foregroundColor(isPressed ? Asset.accentPink500.swiftUIColor : Asset.accentForegroundText.swiftUIColor)
+            .foregroundColor(Asset.accentForegroundText.swiftUIColor)
         }
-        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-        .padding([.top, .bottom], Spacing.extraSmall)
-        .padding([.leading, .trailing], Spacing.medium)
-        .background(isPressed ? Asset.accentForegroundText.swiftUIColor : Asset.fill30LightOnly.swiftUIColor)
+        .padding([.leading], Spacing.medium)
+        .padding([.trailing], Spacing.small)
+        .frame(height: Heights.capsuleButton)
+        .background(Asset.accentPink500.swiftUIColor)
         .clipShape(Capsule())
     }
 }
@@ -48,17 +45,11 @@ struct CapsuleButton_Previews: PreviewProvider {
             Spacer()
             CapsuleButton(
                 action: {},
-                icon: Asset.scanMultiple.swiftUIImage,
-                title: Localizable.Scanner.Action.multiple.string
-            )
-            CapsuleButton(
-                action: {},
-                icon: Asset.scanMultiple.swiftUIImage,
-                title: Localizable.Scanner.Action.multiple.string,
-                isPressed: true
+                icon: Asset.arrowForward.swiftUIImage,
+                title: Localizable.Scanner.Action.sign.string
             )
             Spacer()
         }
-        .background(.gray)
+        .background(.black)
     }
 }
