@@ -133,26 +133,26 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 									acknowledgeWarning = signerDataModel::acknowledgeWarning
 								)
 							}
-							//new screens selectors
-							Box(
-								modifier = Modifier
-									.navigationBarsPadding()
-									.captionBarPadding(),
-							) {
-								CombinedScreensSelector(
-									screenData = actionResult.value?.screenData
-										?: ScreenData.Documents,//default fallback
-									alertState = shieldAlert,
-									signerDataModel = signerDataModel
-								)
-								BottomSheetSelector(
-									modalData = actionResult.value?.modalData,
-									localNavAction = localNavAction.value,
-									alertState = shieldAlert,
-									signerDataModel = signerDataModel,
-									navigator = signerDataModel.navigator,
-								)
-							}
+						}
+						//new screens selectors
+						Box(
+							modifier = Modifier
+								.navigationBarsPadding()
+								.captionBarPadding(),
+						) {
+							CombinedScreensSelector(
+								screenData = actionResult.value?.screenData
+									?: ScreenData.Documents,//default fallback
+								alertState = shieldAlert,
+								signerDataModel = signerDataModel
+							)
+							BottomSheetSelector(
+								modalData = actionResult.value?.modalData,
+								localNavAction = localNavAction.value,
+								alertState = shieldAlert,
+								signerDataModel = signerDataModel,
+								navigator = signerDataModel.navigator,
+							)
 						}
 					}
 				} else {
