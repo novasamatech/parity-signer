@@ -31,7 +31,7 @@ class CameraViewModel(): ViewModel() {
 	// Observables for model data
 	internal val total: LiveData<Int?> = _total
 	internal val captured: LiveData<Int?> = _captured
-	val progress: LiveData<Float> = _progress
+	internal val progress: LiveData<Float> = _progress
 
 	// Camera stuff
 	internal var bucket = arrayOf<String>()

@@ -27,6 +27,7 @@ import io.parity.signer.components.KeepScreenOn
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.models.Callback
 import io.parity.signer.models.KeySetDetailsModel
+import io.parity.signer.screens.scan.items.CameraMultiSignIcon
 import io.parity.signer.ui.theme.SignerNewTheme
 import kotlinx.coroutines.launch
 
@@ -44,7 +45,9 @@ fun ScanScreen(
 	val lifecycleOwner = LocalLifecycleOwner.current
 
 
-	Box(Modifier.fillMaxSize(1f).background(Color.White)) {
+	Box(
+		Modifier
+			.fillMaxSize(1f)) {
 		ScanHeader(onClose)
 		CameraView()
 	}
@@ -86,9 +89,12 @@ private fun CameraView() {
 
 @Composable
 fun ScanHeader(onClose: Callback) {
-	Row() {
+	Row(Modifier.fillMaxWidth(1f)) {
 		CloseIcon(modifier = Modifier.padding(vertical = 20.dp),
 			onCloseClicked = onClose)
+		Spacer(modifier = Modifier.weight(1f))
+		CameraMultiSignIcon(isEnabled = false,
+		onClick = {}) //todo Dmitry
 	}
 }
 
