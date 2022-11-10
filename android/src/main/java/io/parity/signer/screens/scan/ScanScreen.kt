@@ -1,6 +1,7 @@
 package io.parity.signer.screens.scan
 
 import android.content.res.Configuration
+import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -20,7 +21,11 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -44,6 +49,8 @@ import io.parity.signer.models.KeySetDetailsModel
 import io.parity.signer.screens.scan.items.CameraMultiSignIcon
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.fill24
+import io.parity.signer.ui.theme.fill30
 import kotlinx.coroutines.launch
 
 //todo dmitry add kep scree on from phrase box like in old screen
@@ -58,24 +65,43 @@ fun ScanScreen(
 	val total = viewModel.total.observeAsState()
 
 	Box(
-		Modifier
-			.fillMaxSize(1f)
-			.background(MaterialTheme.colors.background)
+        Modifier
+            .fillMaxSize(1f)
+            .background(MaterialTheme.colors.background)
 	) {
-		CameraViewPermission()
+
+			CameraViewPermission(viewModel)
 		ScanHeader(onClose)
 	}
 	KeepScreenOn()
 }
 
+
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-private fun CameraViewPermission() {
+private fun CameraViewPermission(viewModel: CameraViewModel) {
+	if (LocalInspectionMode.current) return
 
 	val cameraPermissionState =
 		rememberPermissionState(android.Manifest.permission.CAMERA)
 	if (cameraPermissionState.status.isGranted) {
-		CameraViewInternal()
+
+		Box(
+			modifier = Modifier
+//				.blur(radius = 18.dp)
+				.drawBehind {
+					drawRoundRect(color = Color.Transparent,
+						topLeft = Offset(100.dp.toPx(),100.dp.toPx())
+					)
+				}
+				.background(MaterialTheme.colors.fill30)
+
+
+		) {
+			CameraViewInternal(viewModel)
+		}
+
+
 	} else {
 		Column {
 			if (cameraPermissionState.status.shouldShowRationale) {
@@ -101,10 +127,7 @@ private fun CameraViewPermission() {
 }
 
 @Composable
-private fun CameraViewInternal() {
-	if (LocalInspectionMode.current) return
-
-	val viewModel: CameraViewModel = viewModel()
+private fun CameraViewInternal(viewModel: CameraViewModel) {
 	val lifecycleOwner = LocalLifecycleOwner.current
 	val context = LocalContext.current
 	val cameraProviderFuture =
@@ -113,14 +136,19 @@ private fun CameraViewInternal() {
 	AndroidView(
 		factory = { context ->
 			val executor = ContextCompat.getMainExecutor(context)
-			val previewView = PreviewView(context)
+			val previewView = PreviewView(context).apply {
+				this.scaleType = PreviewView.ScaleType.FILL_CENTER
+				layoutParams = ViewGroup.LayoutParams(
+					ViewGroup.LayoutParams.MATCH_PARENT,
+					ViewGroup.LayoutParams.MATCH_PARENT
+				)
+			}
 			// mlkit docs: The default option is not recommended because it tries
 			// to scan all barcode formats, which is slow.
 			val options = BarcodeScannerOptions.Builder()
 				.setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
 
 			val barcodeScanner = BarcodeScanning.getClient(options)
-
 
 			cameraProviderFuture.addListener({
 				val cameraProvider = cameraProviderFuture.get()
@@ -152,13 +180,6 @@ private fun CameraViewInternal() {
 			}, executor)
 			previewView
 		},
-		Modifier
-			.padding(bottom = 24.dp)
-			.border(
-				BorderStroke(1.dp, MaterialTheme.colors.Crypto400),
-				RoundedCornerShape(8.dp)
-			)
-			.clip(RoundedCornerShape(8.dp))
 	)
 }
 

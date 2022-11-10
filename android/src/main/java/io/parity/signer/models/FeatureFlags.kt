@@ -4,6 +4,7 @@ object FeatureFlags {
 	fun isEnabled(feature: FeatureOption): Boolean {
 		return when (feature) {
 			FeatureOption.EXPORT_SECRET_KEY -> true
+			FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT -> true
 		}
 	}
 
@@ -12,5 +13,6 @@ object FeatureFlags {
 
 
 enum class FeatureOption {
+	SKIP_UNLOCK_FOR_DEVELOPMENT,
 	EXPORT_SECRET_KEY,
 }
