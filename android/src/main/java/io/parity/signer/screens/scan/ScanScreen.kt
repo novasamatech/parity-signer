@@ -2,6 +2,7 @@ package io.parity.signer.screens.scan
 
 import android.content.res.Configuration
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -11,6 +12,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -42,7 +44,7 @@ fun ScanScreen(
 	val lifecycleOwner = LocalLifecycleOwner.current
 
 
-	Box {
+	Box(Modifier.fillMaxSize(1f).background(Color.White)) {
 		ScanHeader(onClose)
 		CameraView()
 	}
@@ -51,7 +53,7 @@ fun ScanScreen(
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun CameraView() {
+private fun CameraView() {
 	if (LocalInspectionMode.current) return
 
 	val context = LocalContext.current

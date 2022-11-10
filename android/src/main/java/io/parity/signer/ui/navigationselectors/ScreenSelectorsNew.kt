@@ -23,47 +23,52 @@ import io.parity.signer.uniffi.ScreenData
 @Composable
 fun CombinedScreensSelector(
 	screenData: ScreenData,
+	localNavAction: LocalNavAction?,
 	alertState: State<AlertState?>,
 	signerDataModel: SignerDataModel
 ) {
 	val rootNavigator = signerDataModel.navigator
 
-	when (screenData) {
-		is ScreenData.SeedSelector -> {
-			KeySetsNavSubgraph(
-				screenData.f.toKeySetsSelectModel(),
-				rootNavigator = rootNavigator,
-				alertState = alertState,
+	when (localNavAction) {
+		LocalNavAction.ShowScan ->
+		Box(Modifier.statusBarsPadding()) {
+			ScanScreen(
+				onClose = { rootNavigator.backAction() }
 			)
 		}
-		is ScreenData.Keys ->
-			KeySetDetailsNavSubgraph(
-				model = screenData.f.toKeySetDetailsModel(),
-				rootNavigator = rootNavigator,
-				alertState = alertState,
-				singleton = signerDataModel,
-			)
-		is ScreenData.KeyDetails ->
-			Box(modifier = Modifier.statusBarsPadding()) {
-				KeyDetailsPublicKeyScreen(
-					model = screenData.f.toKeyDetailsModel(),
+		else -> when (screenData) {
+			is ScreenData.SeedSelector -> {
+				KeySetsNavSubgraph(
+					screenData.f.toKeySetsSelectModel(),
 					rootNavigator = rootNavigator,
+					alertState = alertState,
 				)
 			}
-		is ScreenData.Log ->
-			Box(Modifier.statusBarsPadding()) {
-				LogsScreen(
-					model = screenData.f.toLogsScreenModel(),
-					navigator = rootNavigator,
+			is ScreenData.Keys ->
+				KeySetDetailsNavSubgraph(
+					model = screenData.f.toKeySetDetailsModel(),
+					rootNavigator = rootNavigator,
+					alertState = alertState,
+					singleton = signerDataModel,
 				)
-			}
-		is ScreenData.Scan ->
-			Box(Modifier.statusBarsPadding()) {
-				ScanScreen(
-					onClose = { rootNavigator.backAction() }
-				)
-			}
-		else -> {} //old Selector showing them
+			is ScreenData.KeyDetails ->
+				Box(modifier = Modifier.statusBarsPadding()) {
+					KeyDetailsPublicKeyScreen(
+						model = screenData.f.toKeyDetailsModel(),
+						rootNavigator = rootNavigator,
+					)
+				}
+			is ScreenData.Log ->
+				Box(Modifier.statusBarsPadding()) {
+					LogsScreen(
+						model = screenData.f.toLogsScreenModel(),
+						navigator = rootNavigator,
+					)
+				}
+			is ScreenData.Scan -> throw RuntimeException("how did you get there? Local navigation should be used everywhere")
+
+			else -> {} //old Selector showing them
+		}
 	}
 }
 
@@ -88,7 +93,7 @@ fun BottomSheetSelector(
 						)
 					}
 				}
-				LocalNavAction.None -> {}
+				else -> {}
 			}
 		} else {
 			when (modalData) {

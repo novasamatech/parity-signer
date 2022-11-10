@@ -46,10 +46,16 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 			singleton._localNavAction.value = LocalNavAction.None
 		}
 
+		if (button == Action.NAVBAR_SCAN) {
+			//swop rust-side navigation call to a local one so back navigation would work and move us back to where we came from
+			navigate(LocalNavRequest.ShowScan)
+			return
+		}
+
 		try {
 			val navigationAction = backendAction(button, details, seedPhrase)
 			//Workaround while Rust state machine is keeping state inside as it's needed for exporting private key in different screen
-			if (navigationAction?.screenData is ScreenData.KeyDetails) {
+			if (navigationAction.screenData is ScreenData.KeyDetails) {
 				singleton.lastOpenedKeyDetails =
 					(navigationAction.screenData as ScreenData.KeyDetails).f
 			}
@@ -81,7 +87,7 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 					seedPhrase = singleton.getSeed(keyDetails.address.seedName),
 					keyPassword = null
 				)
-				val viewModel = PrivateKeyExportModel(
+				val model = PrivateKeyExportModel(
 					qrImage = secretKeyDetailsQR.qr,
 					keyCard = KeyCardModel.fromAddress(
 						address_card = MAddressCard(
@@ -96,9 +102,11 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 				navigate(Action.GO_BACK) // close bottom sheet from rust stack
 				singleton._localNavAction.value =
 					LocalNavAction.ShowExportPrivateKey(
-						viewModel, singleton.navigator
+						model, singleton.navigator
 					)
 			}
+			LocalNavRequest.ShowScan -> singleton._localNavAction.value =
+				LocalNavAction.ShowScan
 		}
 	}
 
@@ -146,12 +154,15 @@ class EmptyNavigator : Navigator {
 
 sealed class LocalNavAction {
 	object None : LocalNavAction()
-	class ShowExportPrivateKey(
+	class ShowExportPrivateKey( //todo dmitry refactor this to show this screen right on old screen without global navigation
         val model: PrivateKeyExportModel,
         val navigator: SignerNavigator
 	) : LocalNavAction()
+	//todo dmitry
+	object ShowScan: LocalNavAction()
 }
 
 sealed class LocalNavRequest {
 	class ShowExportPrivateKey(val publicKey: String) : LocalNavRequest()
+	object ShowScan : LocalNavRequest()
 }

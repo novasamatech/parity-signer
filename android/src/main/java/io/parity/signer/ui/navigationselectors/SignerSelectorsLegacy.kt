@@ -114,13 +114,12 @@ fun ModalSelector(
 	button: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
-	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 	val button2: (Action, String) -> Unit =
 		{ action, details -> button(action, details, "") }
 	if (localNavAction != null && localNavAction != LocalNavAction.None) {
 		when (localNavAction) {
 			is LocalNavAction.ShowExportPrivateKey -> {} //show in new selector
-			LocalNavAction.None -> {}
+			else -> {}
 		}
 	} else {
 		when (modalData) {

@@ -143,6 +143,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							CombinedScreensSelector(
 								screenData = actionResult.value?.screenData
 									?: ScreenData.Documents,//default fallback
+								localNavAction = localNavAction.value,
 								alertState = shieldAlert,
 								signerDataModel = signerDataModel
 							)
