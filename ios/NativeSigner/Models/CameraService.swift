@@ -18,6 +18,7 @@ final class CameraService: ObservableObject {
 
     /// QR codes payloads for multiple transactions
     @Published var multipleTransactions: [String] = []
+    /// Informs whether camera service should handle individual QR code batch scanning
     @Published var isMultipleTransactionMode: Bool = false
 
     /// QR code payload decoded by Rust
@@ -106,8 +107,10 @@ private extension CameraService {
     }
 
     func multiTransactionOperation(with qrCodePayload: String) {
-        guard let parsedPayload = try? qrparserTryDecodeQrSequence(data: [qrCodePayload], cleaned: false) else { return }
+        guard let parsedPayload = try? qrparserTryDecodeQrSequence(data: [qrCodePayload], cleaned: false)
+        else { return }
         callbackQueue.async {
+            guard !self.multipleTransactions.contains(parsedPayload) else { return }
             self.multipleTransactions.append(parsedPayload)
         }
     }

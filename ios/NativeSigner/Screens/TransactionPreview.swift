@@ -166,6 +166,7 @@ extension TransactionPreview {
 
         func onBackButtonTap() {
             navigation.performFake(navigation: .init(action: .goBack))
+            isPresented.toggle()
         }
 
         func sign(with comment: String) {

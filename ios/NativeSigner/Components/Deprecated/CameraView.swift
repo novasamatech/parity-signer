@@ -46,8 +46,7 @@ struct CameraView: View {
                             Spacer()
                             CameraButton(
                                 action: {
-                                    model.isMultipleTransactionMode.toggle()
-                                    viewModel.onScanMultipleTap()
+                                    viewModel.onScanMultipleTap(model: model)
                                 },
                                 icon: Asset.scanMultiple.swiftUIImage,
                                 isPressed: $viewModel.isScanningMultiple
@@ -93,6 +92,7 @@ struct CameraView: View {
                         .transition(.move(edge: .bottom))
                     }
                 }
+                .compositingGroup()
             }
             .onAppear {
                 progressViewModel.title = Localizable.Scanner.Label.multipart.string
@@ -116,18 +116,17 @@ struct CameraView: View {
         .background(Asset.bg100.swiftUIColor)
         .fullScreenCover(
             isPresented: $viewModel.isPresentingTransactionPreview,
-            onDismiss: { model.start() }
-        ) {
-            if let transaction = viewModel.mTransaction {
-                TransactionPreview(
-                    viewModel: .init(
-                        isPresented: $viewModel.isPresentingTransactionPreview,
-                        content: [transaction]
-                    )
-                )
-            } else {
-                EmptyView()
+            onDismiss: {
+                model.multipleTransactions = []
+                model.start()
             }
+        ) {
+            TransactionPreview(
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingTransactionPreview,
+                    content: viewModel.transactions
+                )
+            )
         }
     }
 
@@ -140,7 +139,7 @@ struct CameraView: View {
             Spacer()
             CapsuleButton(
                 action: {
-                    // TODO: Agree with backend what to do
+                    viewModel.onMultipleTransactionSign(model.multipleTransactions, model: model)
                 },
                 icon: Asset.arrowForward.swiftUIImage,
                 title: Localizable.Scanner.Action.sign.string
@@ -155,7 +154,10 @@ struct CameraView: View {
 
     func signText() -> String {
         let key = Localizable.Scanner.Label.self
-        let suffix = (model.multipleTransactions.count > 1 ? key.SignMultiple.Suffix.plural : key.SignMultiple.Suffix.single).string
+        let suffix = (
+            model.multipleTransactions.count > 1 ? key.SignMultiple.Suffix.plural : key.SignMultiple.Suffix
+                .single
+        ).string
         return key.signMultiple(model.multipleTransactions.count, suffix)
     }
 }
@@ -165,7 +167,7 @@ extension CameraView {
         @Published var isPresentingTransactionPreview: Bool = false
         @Published var isPresentingProgressSnackbar: Bool = false
         @Published var isScanningMultiple: Bool = false
-        @Published var mTransaction: MTransaction?
+        @Published var transactions: [MTransaction] = []
         @Published var header: String = Localizable.Scanner.Label.Scan.Main.header.string
         @Published var message: String = Localizable.Scanner.Label.Scan.Main.message.string
 
@@ -182,7 +184,7 @@ extension CameraView {
             self.navigation = navigation
         }
 
-        func checkForTransactionNavigation(_ payload: String?, model: CameraService) {
+        func checkForTransactionNavigation(_ payload: String?, model _: CameraService) {
             guard payload != nil, !isPresentingTransactionPreview else { return }
             let actionResult = navigation.performFake(
                 navigation: .init(
@@ -191,13 +193,31 @@ extension CameraView {
                 )
             )
             if case let .transaction(value) = actionResult.screenData {
-                mTransaction = value
+                transactions = [value]
                 isPresentingTransactionPreview = true
-                model.shutdown()
             }
         }
 
-        func onScanMultipleTap() {
+        func onMultipleTransactionSign(_ payloads: [String], model _: CameraService) {
+            var transactions: [MTransaction] = []
+            for payload in payloads {
+                let actionResult = navigation.performFake(
+                    navigation: .init(
+                        action: .transactionFetched,
+                        details: payload
+                    )
+                )
+                if case let .transaction(value) = actionResult.screenData {
+                    transactions.append(value)
+                }
+            }
+            self.transactions = transactions
+            isPresentingTransactionPreview = true
+        }
+
+        func onScanMultipleTap(model: CameraService) {
+            model.multipleTransactions = []
+            model.isMultipleTransactionMode.toggle()
             isScanningMultiple.toggle()
             updateTexts()
         }
