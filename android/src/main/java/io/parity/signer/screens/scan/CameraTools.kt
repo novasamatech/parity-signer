@@ -1,7 +1,11 @@
 package io.parity.signer.screens.scan
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -10,16 +14,18 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.fill30
 
 @Composable
 fun TransparentClipLayout(
 	modifier: Modifier = Modifier,
 ) {
-	val width = 300.dp
-	val height = 200.dp
+	val width = 280.dp
+	val height = 280.dp
 	val offsetY = 150.dp
-
 
 	val offsetInPx: Float
 	val widthInPx: Float
@@ -31,7 +37,10 @@ fun TransparentClipLayout(
 		heightInPx = height.toPx()
 	}
 
-	Canvas(modifier = modifier) {
+	val background = MaterialTheme.colors.fill30
+	val roundClip = remember { 56.dp }
+
+	Canvas(modifier = modifier.fillMaxSize()) {
 
 		val canvasWidth = size.width
 
@@ -39,7 +48,7 @@ fun TransparentClipLayout(
 			val checkPoint = saveLayer(null, null)
 
 			// Destination
-			drawRect(Color(0x77000000))
+			drawRect(background)
 
 			// Source
 			drawRoundRect(
@@ -48,11 +57,29 @@ fun TransparentClipLayout(
 					y = offsetInPx
 				),
 				size = Size(widthInPx, heightInPx),
-				cornerRadius = CornerRadius(30f,30f),
+				cornerRadius = CornerRadius(roundClip.toPx(),roundClip.toPx()),
 				color = Color.Transparent,
 				blendMode = BlendMode.Clear
 			)
 			restoreToCount(checkPoint)
 		}
+	}
+}
+
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xB0FFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewTransparentClipLayout() {
+
+	SignerNewTheme {
+		TransparentClipLayout()
 	}
 }
