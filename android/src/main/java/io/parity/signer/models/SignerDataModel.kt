@@ -158,13 +158,18 @@ class SignerDataModel : ViewModel() {
 		// Imitate ios behavior
 		Log.e("ENCRY", "$context $keyStore $masterKey")
 		authentication.authenticate(activity) {
-			sharedPreferences = EncryptedSharedPreferences(
-				context,
-				keyStore,
-				masterKey,
-				EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-				EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-			)
+			sharedPreferences =
+				if (FeatureFlags.isEnabled(FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT)) {
+					context.getSharedPreferences("FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT", Context.MODE_PRIVATE)
+				} else {
+					EncryptedSharedPreferences(
+						context,
+						keyStore,
+						masterKey,
+						EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+						EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+					)
+				}
 			totalRefresh()
 		}
 	}
