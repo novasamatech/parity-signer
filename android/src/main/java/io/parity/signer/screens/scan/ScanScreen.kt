@@ -53,7 +53,6 @@ import io.parity.signer.ui.theme.fill24
 import io.parity.signer.ui.theme.fill30
 import kotlinx.coroutines.launch
 
-//todo dmitry add kep scree on from phrase box like in old screen
 @Composable
 fun ScanScreen(
 	onClose: Callback
@@ -71,7 +70,7 @@ fun ScanScreen(
 		CameraViewPermission(viewModel)
 		ScanHeader(Modifier.statusBarsPadding(), onClose)
 		if (captured.value != null) {
-			ScanProgressBar(captured, total)
+			ScanProgressBar(captured, total) { viewModel.resetScanValues() }
 		}
 	}
 	KeepScreenOn()
