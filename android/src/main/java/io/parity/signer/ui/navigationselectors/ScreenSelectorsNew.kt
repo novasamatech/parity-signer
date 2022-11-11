@@ -31,11 +31,9 @@ fun CombinedScreensSelector(
 
 	when (localNavAction) {
 		LocalNavAction.ShowScan ->
-		Box(Modifier.statusBarsPadding()) {
 			ScanScreen(
 				onClose = { rootNavigator.backAction() }
 			)
-		}
 		else -> when (screenData) {
 			is ScreenData.SeedSelector -> {
 				KeySetsNavSubgraph(

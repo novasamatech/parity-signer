@@ -60,18 +60,19 @@ fun ScanScreen(
 ) {
 	val viewModel: CameraViewModel = viewModel()
 
-	val progress = viewModel.progress.observeAsState()
 	val captured = viewModel.captured.observeAsState()
 	val total = viewModel.total.observeAsState()
 
 	Box(
-        Modifier
-            .fillMaxSize(1f)
-            .background(MaterialTheme.colors.background)
+		Modifier
+			.fillMaxSize(1f)
+			.background(MaterialTheme.colors.background)
 	) {
-
-			CameraViewPermission(viewModel)
-		ScanHeader(onClose)
+		CameraViewPermission(viewModel)
+		ScanHeader(Modifier.statusBarsPadding(), onClose)
+		if (captured.value != null) {
+			ScanProgressBar(captured, total)
+		}
 	}
 	KeepScreenOn()
 }
@@ -85,23 +86,8 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 	val cameraPermissionState =
 		rememberPermissionState(android.Manifest.permission.CAMERA)
 	if (cameraPermissionState.status.isGranted) {
-
-		Box(
-			modifier = Modifier
-//				.blur(radius = 18.dp)
-				.drawBehind {
-					drawRoundRect(color = Color.Transparent,
-						topLeft = Offset(100.dp.toPx(),100.dp.toPx())
-					)
-				}
-				.background(MaterialTheme.colors.fill30)
-
-
-		) {
-			CameraViewInternal(viewModel)
-		}
-
-
+		CameraViewInternal(viewModel)
+		TransparentClipLayout()
 	} else {
 		Column {
 			if (cameraPermissionState.status.shouldShowRationale) {
@@ -185,8 +171,9 @@ private fun CameraViewInternal(viewModel: CameraViewModel) {
 
 
 @Composable
-fun ScanHeader(onClose: Callback) {
-	Row(Modifier.fillMaxWidth(1f)) {
+fun ScanHeader(modifier: Modifier = Modifier,
+							 onClose: Callback) {
+	Row(modifier.fillMaxWidth(1f)) {
 		CloseIcon(
 			modifier = Modifier.padding(vertical = 20.dp),
 			onCloseClicked = onClose

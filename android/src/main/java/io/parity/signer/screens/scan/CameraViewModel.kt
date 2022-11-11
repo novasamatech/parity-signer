@@ -27,34 +27,14 @@ class CameraViewModel(): ViewModel() {
 
 	internal val _total = MutableLiveData<Int?>(null)
 	internal val _captured = MutableLiveData<Int?>(null)
-	internal val _progress = MutableLiveData(0.0f)
 	// Observables for model data
 	internal val total: LiveData<Int?> = _total
 	internal val captured: LiveData<Int?> = _captured
-	internal val progress: LiveData<Float> = _progress
 
 	// Camera stuff
 	internal var bucket = arrayOf<String>()
 	internal var payload: String = ""
 
-
-//	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-//	private val REQUEST_CODE_PERMISSIONS = 10
-//	private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-//		ContextCompat.checkSelfPermission(
-//			context, it
-//		) == PackageManager.PERMISSION_GRANTED
-//	}
-//
-//	internal fun handleCameraPermissions() {//todo dmitry remove
-//		if (!allPermissionsGranted()) {
-//			ActivityCompat.requestPermissions(
-//				activity,
-//				REQUIRED_PERMISSIONS,
-//				REQUEST_CODE_PERMISSIONS
-//			)
-//		}
-//	}
 
 	/**
 	 * Barcode detecting function.
@@ -115,16 +95,6 @@ class CameraViewModel(): ViewModel() {
 								}
 							}
 							_captured.value = bucket.size
-							_progress.value = (
-								(
-									captured.value ?: 0
-									).toFloat() / (
-									(
-										total.value
-											?: 1
-										).toFloat()
-									)
-								)
 							Log.d("captured", captured.value.toString())
 						}
 					}
@@ -145,7 +115,6 @@ class CameraViewModel(): ViewModel() {
 		bucket = arrayOf()
 		_captured.value = null
 		_total.value = null
-		_progress.value = 0.0f
 	}
 
 }
