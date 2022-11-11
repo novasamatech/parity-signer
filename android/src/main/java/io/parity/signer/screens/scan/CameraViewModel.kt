@@ -48,7 +48,7 @@ class CameraViewModel(): ViewModel() {
 		if (imageProxy.image == null) return
 		val inputImage = InputImage.fromMediaImage(
 			imageProxy.image!!,
-			imageProxy.imageInfo.rotationDegrees
+			imageProxy.imageInfo.rotationDegrees,
 		)
 
 		barcodeScanner.process(inputImage)

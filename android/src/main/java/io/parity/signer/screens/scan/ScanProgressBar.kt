@@ -47,10 +47,10 @@ fun ScanProgressBar(
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			Column(Modifier.weight(1f)) {
-				Text(text = "title")
-				Text(text = "subtitle")
+				Text(text = "Multipart data")
+				Text(text = "24 / 255 complete")
 			}
-			Text(text = "Cancel",
+			Text(text = "Cancel",//pink bold
 			modifier = Modifier.padding(8.dp).clickable(onClick = onCancel),
 			)
 		}
