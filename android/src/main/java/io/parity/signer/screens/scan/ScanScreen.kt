@@ -53,6 +53,7 @@ import io.parity.signer.ui.theme.fill24
 import io.parity.signer.ui.theme.fill30
 import kotlinx.coroutines.launch
 
+//todo dmitry check rust side of where I can navigate to from camera screen and handle it there.
 @Composable
 fun ScanScreen(
 	onClose: Callback
