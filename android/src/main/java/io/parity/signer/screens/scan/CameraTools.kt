@@ -12,57 +12,95 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.fill30
+import io.parity.signer.ui.theme.pink500
 
 @Composable
 fun TransparentClipLayout(
 	modifier: Modifier = Modifier,
 ) {
-	val width = 280.dp
-	val height = 280.dp
-	val offsetY = 150.dp
+	val offsetY = remember { 150.dp }
+	val sidePadding = remember { 48.dp }
 
 	val offsetInPx: Float
-	val widthInPx: Float
-	val heightInPx: Float
+	val sidePaddingInPX: Float
 
 	with(LocalDensity.current) {
 		offsetInPx = offsetY.toPx()
-		widthInPx = width.toPx()
-		heightInPx = height.toPx()
+		sidePaddingInPX = sidePadding.toPx()
 	}
 
 	val background = MaterialTheme.colors.fill30
+	val frameColor = MaterialTheme.colors.pink500
 	val roundClip = remember { 56.dp }
-//todo dmitry on top the same square with rounded quater with 1/3 in center cutted
 
 	Canvas(modifier = modifier.fillMaxSize()) {
 
 		val canvasWidth = size.width
+		val smallestSide = minOf(size.height, size.width)
+		val sideInPx = smallestSide - 2 * sidePaddingInPX
 
 		with(drawContext.canvas.nativeCanvas) {
+			//full screen blur
 			val checkPoint = saveLayer(null, null)
-
 			// Destination
 			drawRect(background)
 
 			// Source
 			drawRoundRect(
 				topLeft = Offset(
-					x = (canvasWidth - widthInPx) / 2,
+					x = (canvasWidth - sideInPx) / 2,
 					y = offsetInPx
 				),
-				size = Size(widthInPx, heightInPx),
-				cornerRadius = CornerRadius(roundClip.toPx(),roundClip.toPx()),
+				size = Size(sideInPx, sideInPx),
+				cornerRadius = CornerRadius(roundClip.toPx(), roundClip.toPx()),
 				color = Color.Transparent,
 				blendMode = BlendMode.Clear
 			)
 			restoreToCount(checkPoint)
+
+			//draw frame
+			val checkPointFrame = saveLayer(null, null)
+			val frameThikness = 4.dp.toPx()
+			drawRoundRect(
+				topLeft = Offset(
+					x = (canvasWidth - sideInPx) / 2,
+					y = offsetInPx
+				),
+				size = Size(sideInPx, sideInPx),
+				cornerRadius = CornerRadius(roundClip.toPx(), roundClip.toPx()),
+				color = frameColor,
+				style = Stroke(width = frameThikness)
+			)
+			//cutout horizontal
+			drawRect(
+				topLeft = Offset(
+					x = (canvasWidth - sideInPx) / 2 - frameThikness , //to overcover full width
+					y = offsetInPx + sideInPx/3
+				),
+				size = Size(width = sideInPx + frameThikness*2, height = sideInPx/3),
+				color = Color.Transparent,
+				blendMode = BlendMode.Clear
+			)
+			//cutout vertical
+			drawRect(
+				topLeft = Offset(
+					x = (canvasWidth - sideInPx) / 2 + sideInPx/3,
+					y = offsetInPx - frameThikness
+				),
+				size = Size(sideInPx/3, sideInPx + frameThikness*2),
+				color = Color.Transparent,
+				blendMode = BlendMode.Clear
+			)
+			restoreToCount(checkPointFrame)
+
 		}
 	}
 }
