@@ -39,6 +39,7 @@ fun TransparentClipLayout(
 
 	val background = MaterialTheme.colors.fill30
 	val roundClip = remember { 56.dp }
+//todo dmitry on top the same square with rounded quater with 1/3 in center cutted
 
 	Canvas(modifier = modifier.fillMaxSize()) {
 

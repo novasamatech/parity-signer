@@ -18,7 +18,7 @@ import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.TransactionType
 
 @Composable
-fun TransactionPreview(
+fun TransactionPreviewOld(
 	transaction: MTransaction,
 	button: (action: Action, details: String, seedPhrase: String) -> Unit,
 	signTransaction: (comment: String, seedName: String) -> Unit
@@ -27,7 +27,6 @@ fun TransactionPreview(
 	val comment = remember { mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
-
 	Column(
 		Modifier.verticalScroll(rememberScrollState())
 	) {
