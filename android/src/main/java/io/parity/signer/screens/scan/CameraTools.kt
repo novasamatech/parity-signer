@@ -1,6 +1,7 @@
 package io.parity.signer.screens.scan
 
 import android.content.res.Configuration
+import android.graphics.RectF
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
@@ -54,9 +55,10 @@ fun TransparentClipLayout(
 			drawRect(background)
 
 			// Source
+			val topLeftClipX = (canvasWidth - sideInPx) / 2
 			drawRoundRect(
 				topLeft = Offset(
-					x = (canvasWidth - sideInPx) / 2,
+					x = topLeftClipX,
 					y = offsetInPx
 				),
 				size = Size(sideInPx, sideInPx),
@@ -67,11 +69,20 @@ fun TransparentClipLayout(
 			restoreToCount(checkPoint)
 
 			//draw frame
-			val checkPointFrame = saveLayer(null, null)
 			val frameThikness = 4.dp.toPx()
+			val checkPointFrame = saveLayer(RectF(
+				/* left = */
+				topLeftClipX - frameThikness,
+				/* top = */
+				offsetInPx- frameThikness,
+				/* right = */
+				topLeftClipX + frameThikness*2,
+				/* bottom = */
+				offsetInPx + frameThikness*2,
+			), null)
 			drawRoundRect(
 				topLeft = Offset(
-					x = (canvasWidth - sideInPx) / 2,
+					x = topLeftClipX,
 					y = offsetInPx
 				),
 				size = Size(sideInPx, sideInPx),
@@ -82,7 +93,7 @@ fun TransparentClipLayout(
 			//cutout horizontal
 			drawRect(
 				topLeft = Offset(
-					x = (canvasWidth - sideInPx) / 2 - frameThikness , //to overcover full width
+					x = topLeftClipX - frameThikness , //to overcover full width
 					y = offsetInPx + sideInPx/3
 				),
 				size = Size(width = sideInPx + frameThikness*2, height = sideInPx/3),
@@ -92,7 +103,7 @@ fun TransparentClipLayout(
 			//cutout vertical
 			drawRect(
 				topLeft = Offset(
-					x = (canvasWidth - sideInPx) / 2 + sideInPx/3,
+					x = topLeftClipX + sideInPx/3,
 					y = offsetInPx - frameThikness
 				),
 				size = Size(sideInPx/3, sideInPx + frameThikness*2),
