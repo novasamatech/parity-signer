@@ -38,7 +38,34 @@ fun CameraMultiSignIcon(
 	) {
 		Image(
 			painterResource(id = R.drawable.ic_filter_none),
-			contentDescription = stringResource(R.string.description_close_button),
+			contentDescription = stringResource(R.string.description_multisign_mode),
+			colorFilter = ColorFilter.tint(
+				if (isEnabled) MaterialTheme.colors.pink500
+				else MaterialTheme.colors.primary
+			),
+			modifier = Modifier.size(20.dp)
+		)
+	}
+}
+
+@Composable
+fun CameraLightIcon(
+	isEnabled: Boolean,
+	modifier: Modifier = Modifier,
+	onClick: Callback,
+) {
+	Box(
+		modifier = modifier
+			.size(32.dp)
+			.clickable(onClick = onClick)
+			.background(
+				if (isEnabled) Color.White else MaterialTheme.colors.fill30, CircleShape
+			),
+		contentAlignment = Alignment.Center,
+	) {
+		Image(
+			painterResource(id = R.drawable.ic_lamp_28),
+			contentDescription = stringResource(R.string.description_camera_tourch_enable),
 			colorFilter = ColorFilter.tint(
 				if (isEnabled) MaterialTheme.colors.pink500
 				else MaterialTheme.colors.primary

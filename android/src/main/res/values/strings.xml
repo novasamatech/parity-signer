@@ -99,4 +99,6 @@
 	<string name="subtitle_derived_keys">Derived Keys</string>
     <string name="seed_backup_autohide_title">Backup info will be hidden in</string>
 	<string name="unlock_app_button">Unlock app</string>
+    <string name="description_multisign_mode">multi sign mode</string>
+	<string name="description_camera_tourch_enable">camera tourch button</string>
 </resources>

@@ -46,6 +46,7 @@ import io.parity.signer.components.KeepScreenOn
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.models.Callback
 import io.parity.signer.models.KeySetDetailsModel
+import io.parity.signer.screens.scan.items.CameraLightIcon
 import io.parity.signer.screens.scan.items.CameraMultiSignIcon
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -173,16 +174,23 @@ private fun CameraViewInternal(viewModel: CameraViewModel) {
 @Composable
 fun ScanHeader(modifier: Modifier = Modifier,
 							 onClose: Callback) {
-	Row(modifier.fillMaxWidth(1f)) {
+	Row(
+		modifier
+			.fillMaxWidth(1f)
+			.padding(horizontal = 16.dp)) {
 		CloseIcon(
-			modifier = Modifier.padding(vertical = 20.dp),
 			onCloseClicked = onClose
 		)
 		Spacer(modifier = Modifier.weight(1f))
 		CameraMultiSignIcon(isEnabled = false,
 			onClick = {}) //todo Dmitry
+		Spacer(modifier = Modifier.padding(end = 8.dp))
+		CameraLightIcon(isEnabled = false,
+			onClick = {}) //todo Dmitry
+
+		}
 	}
-}
+
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
