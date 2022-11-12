@@ -16,14 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonBottomSheet
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SecondaryButtonBottomSheet
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.models.Callback
-import io.parity.signer.screens.keysets.KeySetsMenuBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.fill6
 
@@ -50,7 +48,7 @@ fun MetadataUpdateScreen(model: MetadataUpdateModel,
 			val plateShape =
 				RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
 
-			Text("Verifier Metadata")
+			Text(stringResource(R.string.metadata_subtitle_keys))
 			Column(
 				Modifier
 					.background(MaterialTheme.colors.fill6, plateShape)
@@ -64,7 +62,7 @@ fun MetadataUpdateScreen(model: MetadataUpdateModel,
 					Text(text = "scr....")
 				}
 			}
-			Text("Add Metadata")
+			Text(stringResource(R.string.metadata_subtitle_add_metadata))
 			Column(
 				Modifier
 					.background(MaterialTheme.colors.fill6, plateShape)

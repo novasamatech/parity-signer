@@ -103,4 +103,6 @@
 	<string name="description_camera_tourch_enable">camera tourch button</string>
 	<string name="screen_title_update_metadata">Update metadata</string>
 	<string name="approve_confirm_button">Approve</string>
+	<string name="metadata_subtitle_keys">Verifier Metadata</string>
+	<string name="metadata_subtitle_add_metadata">Add Metadata</string>
 </resources>
