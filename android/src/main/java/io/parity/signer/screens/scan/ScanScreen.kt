@@ -172,7 +172,7 @@ private fun CameraViewInternal(viewModel: CameraViewModel) {
 
 
 @Composable
-fun ScanHeader(modifier: Modifier = Modifier,
+private fun ScanHeader(modifier: Modifier = Modifier,
 							 onClose: Callback) {
 	Row(
 		modifier

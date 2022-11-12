@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
-import io.parity.signer.components.base.SignerBottomSheetDivider
+import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
 import io.parity.signer.components.sharedcomponents.KeyCard
@@ -108,7 +108,7 @@ fun KeySetDetailsExportResultBottomSheet(
 				seedTitle = model.root.seedName,
 				base58 = model.root.base58,
 			)
-			SignerBottomSheetDivider()
+			SignerDivider()
 			val seedList = selectedKeys.toList()
 			for (i in 0..seedList.lastIndex) {
 				val seed = seedList[i]
@@ -117,7 +117,7 @@ fun KeySetDetailsExportResultBottomSheet(
 					KeyCardModel.fromKeyModel(keyModel, model.network.title),
 				)
 				if (i != seedList.lastIndex) {
-					SignerBottomSheetDivider()
+					SignerDivider()
 				}
 			}
 		}
