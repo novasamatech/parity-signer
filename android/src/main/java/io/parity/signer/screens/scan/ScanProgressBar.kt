@@ -23,7 +23,6 @@ import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.*
 
 
-//todo dmitry new progress bar
 @Composable
 fun ScanProgressBar(
 	captured: State<Int?>,
