@@ -119,7 +119,7 @@ fun MetadataUpdatedScreen(
 				SignerDivider()
 				Spacer(modifier = Modifier.padding(top = 12.dp))
 				Text(
-					model.metadataHash,
+					text = model.metadataHash,
 					color = MaterialTheme.colors.primary,
 					style = TypefaceNew.BodyL,
 				)

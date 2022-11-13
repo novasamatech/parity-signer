@@ -113,4 +113,6 @@
 	<string name="update_metadata_keyword_key">Key</string>
 	<string name="update_metadata_keyword_crypto">Crypto</string>
 	<string name="update_metadata_keyword_metadata">Metadata</string>
+	<string name="scan_progress_bar_title">Multipart data</string>
+	<string name="scan_progress_bar_progress">%1$d / %2$d complete</string>
 </resources>

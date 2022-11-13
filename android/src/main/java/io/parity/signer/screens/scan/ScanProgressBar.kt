@@ -15,14 +15,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.models.Callback
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.fill12
-import io.parity.signer.ui.theme.fill18
-import io.parity.signer.ui.theme.pink300
+import io.parity.signer.ui.theme.*
 
 
 //todo dmitry new progress bar
@@ -40,18 +38,31 @@ fun ScanProgressBar(
 		RoundedCornerShape(innerRound, innerRound, innerRound, innerRound)
 	Column(
 		modifier = Modifier
-            .fillMaxWidth(1f)
-            .padding(start = 8.dp, end = 8.dp, bottom = 16.dp, top = 8.dp)
-            .background(MaterialTheme.colors.fill12, innerShape)
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 20.dp),
+			.fillMaxWidth(1f)
+			.padding(start = 8.dp, end = 8.dp, bottom = 16.dp, top = 8.dp)
+			.background(MaterialTheme.colors.fill12, innerShape)
+			.padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 20.dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			Column(Modifier.weight(1f)) {
-				Text(text = "Multipart data")
-				Text(text = "24 / 255 complete")
+				Text(
+					text = stringResource(R.string.scan_progress_bar_title),
+					color = MaterialTheme.colors.primary,
+					style = TypefaceNew.BodyL,
+				)
+				Text(
+					text = stringResource(R.string.scan_progress_bar_progress),
+					color = MaterialTheme.colors.textTertiary,
+					style = TypefaceNew.CaptionM,
+				)
 			}
-			Text(text = "Cancel",//pink bold
-			modifier = Modifier.padding(8.dp).clickable(onClick = onCancel),
+			Text(
+				text = stringResource(id = R.string.generic_cancel),
+				color = MaterialTheme.colors.pink500,
+				style = TypefaceNew.LabelM,
+				modifier = Modifier
+					.padding(8.dp)
+					.clickable(onClick = onCancel),
 			)
 		}
 		Spacer(modifier = Modifier.padding(top = 12.dp))
