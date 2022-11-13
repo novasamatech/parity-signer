@@ -110,4 +110,7 @@
 	<string name="camera_screen_description_single">Sign transaction, add network or update metadata</string>
 <!--	todo dmitry paste text for multimode-->
 	<string name="camera_screen_description_multimode">Sign transaction, add network or update metadata</string>
+	<string name="update_metadata_keyword_key">Key</string>
+	<string name="update_metadata_keyword_crypto">Crypto</string>
+	<string name="update_metadata_keyword_metadata">Metadata</string>
 </resources>

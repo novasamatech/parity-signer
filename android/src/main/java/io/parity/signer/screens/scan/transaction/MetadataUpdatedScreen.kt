@@ -2,10 +2,7 @@ package io.parity.signer.screens.scan.transaction
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -16,27 +13,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonBottomSheet
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SecondaryButtonBottomSheet
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.models.Callback
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.fill6
+import io.parity.signer.ui.theme.*
 
 
 /**
  * Approval request for metadata update
  */
 @Composable
-fun MetadataUpdateScreen(model: MetadataUpdateModel,
-												 onBack: Callback,
+fun MetadataUpdatedScreen(
+	model: MetadataUpdateModel,
+	onCancel: Callback,
+	onApprove: Callback,
 ) {
 	Column() {
 		ScreenHeader(
 			stringId = R.string.screen_title_update_metadata,
-			onBack = onBack
+			onBack = onCancel
 		)
 
 		Column(
@@ -48,42 +47,114 @@ fun MetadataUpdateScreen(model: MetadataUpdateModel,
 			val plateShape =
 				RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
 
-			Text(stringResource(R.string.metadata_subtitle_keys))
+			//verifier
+			Text(
+				text = stringResource(R.string.metadata_subtitle_keys),
+				color = MaterialTheme.colors.textSecondary,
+				style = TypefaceNew.LabelM,
+				modifier = Modifier.padding(top = 24.dp, start = 24.dp, end = 24.dp),
+			)
 			Column(
 				Modifier
+					.padding(horizontal = 8.dp)
 					.background(MaterialTheme.colors.fill6, plateShape)
+					.padding(horizontal = 16.dp, vertical = 12.dp)
 			) {
-				Text("Key")
-				Text("sdfsdfsdf")
+				Text(
+					stringResource(R.string.update_metadata_keyword_key),
+					color = MaterialTheme.colors.textTertiary,
+					style = TypefaceNew.BodyL,
+				)
+				Spacer(modifier = Modifier.padding(top = 8.dp))
+				Text(
+					model.verifierKey,
+					color = MaterialTheme.colors.primary,
+					style = TypefaceNew.BodyL,
+				)
+				Spacer(modifier = Modifier.padding(top = 12.dp))
 				SignerDivider()
+				Spacer(modifier = Modifier.padding(top = 12.dp))
 				Row(Modifier.fillMaxWidth()) {
-					Text(text = "Crypto")
+					Text(
+						text = stringResource(R.string.update_metadata_keyword_crypto),
+						color = MaterialTheme.colors.textTertiary,
+						style = TypefaceNew.BodyL,
+					)
 					Spacer(modifier = Modifier.weight(1f))
-					Text(text = "scr....")
+					Text(
+						text = model.verifierAlg,
+						color = MaterialTheme.colors.primary,
+						style = TypefaceNew.BodyL,
+					)
 				}
 			}
-			Text(stringResource(R.string.metadata_subtitle_add_metadata))
+
+//metadata
+			Text(
+				text = stringResource(R.string.metadata_subtitle_add_metadata),
+				color = MaterialTheme.colors.textSecondary,
+				style = TypefaceNew.LabelM,
+				modifier = Modifier.padding(top = 12.dp, start = 24.dp, end = 24.dp),
+			)
 			Column(
 				Modifier
+					.padding(horizontal = 8.dp)
 					.background(MaterialTheme.colors.fill6, plateShape)
+					.padding(horizontal = 16.dp, vertical = 12.dp)
 			) {
-
+				Row(Modifier.fillMaxWidth()) {
+					Text(
+						text = stringResource(R.string.update_metadata_keyword_metadata),
+						color = MaterialTheme.colors.textTertiary,
+						style = TypefaceNew.BodyL,
+					)
+					Spacer(modifier = Modifier.weight(1f))
+					Text(
+						text = model.metadataName,
+						color = MaterialTheme.colors.primary,
+						style = TypefaceNew.BodyL,
+					)
+				}
+				Spacer(modifier = Modifier.padding(top = 12.dp))
+				SignerDivider()
+				Spacer(modifier = Modifier.padding(top = 12.dp))
+				Text(
+					model.metadataHash,
+					color = MaterialTheme.colors.primary,
+					style = TypefaceNew.BodyL,
+				)
 			}
 		}
-		PrimaryButtonBottomSheet(label = stringResource(R.string.approve_confirm_button)) {
-			//todo dmitry approve action
-		}
-		SecondaryButtonBottomSheet(label = stringResource(id = R.string.generic_cancel)) {
-			//todo dmitry approve action
-		}
+		PrimaryButtonBottomSheet(
+			label = stringResource(R.string.approve_confirm_button),
+			modifier = Modifier.padding(horizontal = 24.dp),
+			onClicked = onApprove
+		)
+		SecondaryButtonBottomSheet(
+			label = stringResource(id = R.string.generic_cancel),
+			modifier = Modifier.padding(horizontal = 24.dp),
+			onClicked = onCancel
+		)
+		Spacer(modifier = Modifier.padding(top = 40.dp))
 	}
 }
 
 
 data class MetadataUpdateModel(
+	val verifierKey: String,
+	val verifierAlg: String,
 	val metadataName: String,
 	val metadataHash: String,
-)
+) {
+	companion object {
+		fun createStub() = MetadataUpdateModel(
+			metadataName = "Westend 9230",
+			metadataHash = "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
+			verifierKey = "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
+			verifierAlg = "sr25519"
+		)
+	}
+}
 
 
 @Preview(
@@ -97,10 +168,10 @@ data class MetadataUpdateModel(
 )
 @Composable
 private fun PreviewMetadataUpdateScreen() {
-	val model = MetadataUpdateModel("scrpr", "sdfkjskfdjksjdfks")
+	val model = MetadataUpdateModel.createStub()
 	SignerNewTheme {
-		MetadataUpdateScreen(
-			model, {},
+		MetadataUpdatedScreen(
+			model, {}, {},
 		)
 	}
 }
