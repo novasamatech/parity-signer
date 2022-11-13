@@ -6,11 +6,8 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
@@ -20,16 +17,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -42,16 +36,15 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
+import io.parity.signer.R
 import io.parity.signer.components.KeepScreenOn
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.models.Callback
 import io.parity.signer.models.KeySetDetailsModel
 import io.parity.signer.screens.scan.items.CameraLightIcon
 import io.parity.signer.screens.scan.items.CameraMultiSignIcon
-import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.fill24
-import io.parity.signer.ui.theme.fill30
+import io.parity.signer.ui.theme.TypefaceNew
 import kotlinx.coroutines.launch
 
 //todo dmitry check rust side of where I can navigate to from camera screen and handle it there.
@@ -63,6 +56,7 @@ fun ScanScreen(
 
 	val captured = viewModel.captured.observeAsState()
 	val total = viewModel.total.observeAsState()
+	val isMultimode = viewModel.isMultiscanMode.observeAsState()
 
 	Box(
 		Modifier
@@ -73,6 +67,31 @@ fun ScanScreen(
 		ScanHeader(Modifier.statusBarsPadding(), onClose)
 		if (captured.value != null) {
 			ScanProgressBar(captured, total) { viewModel.resetScanValues() }
+		}
+		Row(
+			Modifier.fillMaxSize(1f),
+			verticalAlignment = Alignment.Bottom,
+		) {
+			Text(
+				text = stringResource(
+					if (isMultimode.value == true) {
+						R.string.camera_screen_header_multimode
+					} else {
+						R.string.camera_screen_header_single
+					}
+				),
+				color = Color.White,
+				style = TypefaceNew.TitleL,
+			)
+			Text(text = stringResource(
+				if (isMultimode.value == true) {
+					R.string.camera_screen_description_multimode
+				} else {
+					R.string.camera_screen_description_single
+				}),
+				color = Color.White,
+				style = TypefaceNew.TitleS,)
+			Spacer(modifier = Modifier.padding(bottom = 76.dp))
 		}
 	}
 	KeepScreenOn()
@@ -172,12 +191,15 @@ private fun CameraViewInternal(viewModel: CameraViewModel) {
 
 
 @Composable
-private fun ScanHeader(modifier: Modifier = Modifier,
-							 onClose: Callback) {
+private fun ScanHeader(
+	modifier: Modifier = Modifier,
+	onClose: Callback
+) {
 	Row(
 		modifier
 			.fillMaxWidth(1f)
-			.padding(horizontal = 16.dp)) {
+			.padding(horizontal = 16.dp)
+	) {
 		CloseIcon(
 			onCloseClicked = onClose
 		)
@@ -188,8 +210,8 @@ private fun ScanHeader(modifier: Modifier = Modifier,
 		CameraLightIcon(isEnabled = false,
 			onClick = {}) //todo Dmitry
 
-		}
 	}
+}
 
 
 @Preview(

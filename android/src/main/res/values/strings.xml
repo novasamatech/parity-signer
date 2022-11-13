@@ -105,4 +105,9 @@
 	<string name="approve_confirm_button">Approve</string>
 	<string name="metadata_subtitle_keys">Verifier Metadata</string>
 	<string name="metadata_subtitle_add_metadata">Add Metadata</string>
+    <string name="camera_screen_header_single">Scan QR code</string>
+	<string name="camera_screen_header_multimode">Scan QR code</string>
+	<string name="camera_screen_description_single">Sign transaction, add network or update metadata</string>
+<!--	todo dmitry paste text for multimode-->
+	<string name="camera_screen_description_multimode">Sign transaction, add network or update metadata</string>
 </resources>

@@ -25,6 +25,9 @@ class CameraViewModel(): ViewModel() {
 
 	val navigator = EmptyNavigator() //todo dmitry do I need it?
 
+	val isMultiscanMode = MutableLiveData<Boolean>(false)
+	val isTourchEnabled = MutableLiveData<Boolean>(false)
+
 	internal val _total = MutableLiveData<Int?>(null)
 	internal val _captured = MutableLiveData<Int?>(null)
 	// Observables for model data
