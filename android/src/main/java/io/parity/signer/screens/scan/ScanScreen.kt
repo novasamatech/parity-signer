@@ -47,7 +47,6 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
 import kotlinx.coroutines.launch
 
-//todo dmitry check rust side of where I can navigate to from camera screen and handle it there.
 @Composable
 fun ScanScreen(
 	onClose: Callback
@@ -69,7 +68,7 @@ fun ScanScreen(
 			ScanProgressBar(captured, total) { viewModel.resetScanValues() }
 		}
 		Row(
-			Modifier.fillMaxSize(1f),
+			Modifier.fillMaxSize(1f).padding(horizontal = 48.dp),
 			verticalAlignment = Alignment.Bottom,
 		) {
 			Text(

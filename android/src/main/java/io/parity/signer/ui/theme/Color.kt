@@ -76,3 +76,9 @@ val Colors.red500: Color
 val Colors.snackBarBackground: Color
 	get() = Color(0xFF454549)
 
+val Colors.forcedFill30: Color
+	get() = Color(0x4DFFFFFF)
+
+val Colors.forcedFill40: Color
+	get() = Color(0x66FFFFFF)
+

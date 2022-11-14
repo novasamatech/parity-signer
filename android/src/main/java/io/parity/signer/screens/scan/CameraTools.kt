@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.fill30
+import io.parity.signer.ui.theme.forcedFill40
 import io.parity.signer.ui.theme.pink500
 
 @Composable
@@ -38,7 +39,7 @@ fun TransparentClipLayout(
 		sidePaddingInPX = sidePadding.toPx()
 	}
 
-	val background = MaterialTheme.colors.fill30
+	val background = MaterialTheme.colors.forcedFill40
 	val frameColor = MaterialTheme.colors.pink500
 	val roundClip = remember { 56.dp }
 
@@ -69,7 +70,7 @@ fun TransparentClipLayout(
 			restoreToCount(checkPoint)
 
 			//draw frame
-			val frameThikness = 4.dp.toPx()
+			val frameThikness = 8.dp.toPx()
 			val checkPointFrame = saveLayer(RectF(
 				/* left = */
 				topLeftClipX - frameThikness,
