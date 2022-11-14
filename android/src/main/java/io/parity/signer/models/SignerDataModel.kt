@@ -1,21 +1,18 @@
 package io.parity.signer.models
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import io.parity.signer.dependencyGraph.getDbNameFromContext
+import io.parity.signer.dependencygraph.getDbNameFromContext
 import io.parity.signer.ui.navigationselectors.OnboardingWasShown
 import io.parity.signer.uniffi.*
 import org.json.JSONObject

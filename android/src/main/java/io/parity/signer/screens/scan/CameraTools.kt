@@ -28,7 +28,7 @@ import io.parity.signer.ui.theme.pink500
 fun TransparentClipLayout(
 	modifier: Modifier = Modifier,
 ) {
-	val offsetY = remember { 150.dp }
+	val offsetY = remember { 140.dp }
 	val sidePadding = remember { 48.dp }
 
 	val offsetInPx: Float
