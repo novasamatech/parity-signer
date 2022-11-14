@@ -10,6 +10,7 @@ import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
 import io.parity.signer.screens.logs.logdetails.LogDetails
+import io.parity.signer.screens.scan.transaction.TransactionPreviewOld
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.ModalData

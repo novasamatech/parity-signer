@@ -1,4 +1,4 @@
-package io.parity.signer.screens
+package io.parity.signer.screens.scan.transaction
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
