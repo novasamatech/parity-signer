@@ -46,11 +46,13 @@ import io.parity.signer.screens.scan.items.CameraLightIcon
 import io.parity.signer.screens.scan.items.CameraMultiSignIcon
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.uniffi.MTransaction
 import kotlinx.coroutines.launch
 
 @Composable
 fun ScanScreen(
-	onClose: Callback
+	onClose: Callback,
+	onNavigateToTransaction: (MTransaction) -> Unit,
 ) {
 	val viewModel: CameraViewModel = viewModel()
 
@@ -88,17 +90,19 @@ fun ScanScreen(
 				modifier = Modifier.fillMaxWidth(1f),
 			)
 			Spacer(modifier = Modifier.padding(bottom = 12.dp))
-			Text(text = stringResource(
-				if (isMultimode.value == true) {
-					R.string.camera_screen_description_multimode
-				} else {
-					R.string.camera_screen_description_single
-				}),
+			Text(
+				text = stringResource(
+					if (isMultimode.value == true) {
+						R.string.camera_screen_description_multimode
+					} else {
+						R.string.camera_screen_description_single
+					}
+				),
 				color = Color.White,
 				style = TypefaceNew.TitleS,
 				textAlign = TextAlign.Center,
 				modifier = Modifier.fillMaxWidth(1f),
-				)
+			)
 			Spacer(modifier = Modifier.padding(bottom = 76.dp))
 		}
 	}
@@ -236,7 +240,7 @@ private fun PreviewScanScreen() {
 	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			ScanScreen({})
+			ScanScreen({}, {_->})
 		}
 	}
 }
