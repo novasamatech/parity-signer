@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -67,10 +68,12 @@ fun ScanScreen(
 		if (captured.value != null) {
 			ScanProgressBar(captured, total) { viewModel.resetScanValues() }
 		}
-		Row(
-			Modifier.fillMaxSize(1f).padding(horizontal = 48.dp),
-			verticalAlignment = Alignment.Bottom,
+		Column(
+			Modifier
+				.fillMaxSize(1f)
+				.padding(horizontal = 48.dp),
 		) {
+			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = stringResource(
 					if (isMultimode.value == true) {
@@ -81,7 +84,10 @@ fun ScanScreen(
 				),
 				color = Color.White,
 				style = TypefaceNew.TitleL,
+				textAlign = TextAlign.Center,
+				modifier = Modifier.fillMaxWidth(1f),
 			)
+			Spacer(modifier = Modifier.padding(bottom = 12.dp))
 			Text(text = stringResource(
 				if (isMultimode.value == true) {
 					R.string.camera_screen_description_multimode
@@ -89,7 +95,10 @@ fun ScanScreen(
 					R.string.camera_screen_description_single
 				}),
 				color = Color.White,
-				style = TypefaceNew.TitleS,)
+				style = TypefaceNew.TitleS,
+				textAlign = TextAlign.Center,
+				modifier = Modifier.fillMaxWidth(1f),
+				)
 			Spacer(modifier = Modifier.padding(bottom = 76.dp))
 		}
 	}
