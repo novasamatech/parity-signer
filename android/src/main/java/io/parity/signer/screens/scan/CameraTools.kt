@@ -74,10 +74,10 @@ fun TransparentClipLayout(
 			val checkPointFrame = saveLayer(null, null)
 			drawRoundRect(
 				topLeft = Offset(
-					x = topLeftClipX + frameThikness/2,
-					y = offsetInPx+ frameThikness/2
+					x = topLeftClipX,
+					y = offsetInPx,
 				),
-				size = Size(sideInPx - frameThikness, sideInPx - frameThikness),
+				size = Size(sideInPx, sideInPx),
 				cornerRadius = CornerRadius(roundClip.toPx(), roundClip.toPx()),
 				color = frameColor,
 				style = Stroke(width = frameThikness)
