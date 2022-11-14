@@ -65,7 +65,6 @@
 "Importing derivations:" = "Importing derivations:";
 "in network" = "in network";
 "items selected" = "items selected";
-"key:" = "key:";
 
 "log.uppercased" = "LOG";
 "LOG NOTE" = "LOG NOTE";
@@ -258,13 +257,6 @@
 "ExportAddress.header" = "KEY DETAILS";
 "NewSeed.Generate" = "Generate seed phrase";
 
-"TransactionPreview.UnlockSign" = "Unlock key and sign";
-"TransactionPreview.Approve" = "Approve";
-"TransactionPreview.SelectSeed" = "Select seed";
-"TransactionPreview.Decline" = "Decline";
-"CameraView.parsingMultidata" = "PARSING MULTIPART DATA";
-"CameraView.startOver" = "Start over";
-
 // Copy for updated design
 
 "TabBar.Keys" = "Keys";
@@ -362,7 +354,6 @@
 "KeysExport.KeySets.Label.Key.Single" = "%@ Key";
 "KeysExport.KeySets.Label.Key.Plural" = "%@ Keys";
 
-"TransactionPreview.Label.Title" = "Transaction";
 
 "Scanner.Label.Scan.Main.Header" = "Scan QR code";
 "Scanner.Label.Scan.Main.Message" = "Sign transaction, add network or update metadata";
@@ -375,3 +366,16 @@
 "Scanner.Label.SignMultiple" = "Sign %d %@";
 "Scanner.Label.SignMultiple.Suffix.single" = "Transaction";
 "Scanner.Label.SignMultiple.Suffix.plural" = "Transactions";
+
+"TransactionPreview.Label.Title" = "Transaction";
+"TransactionPreview.Action.UnlockSign" = "Unlock key and sign";
+"TransactionPreview.Action.Approve" = "Approve";
+"TransactionPreview.Action.SelectSeed" = "Select seed";
+"TransactionPreview.Action.Cancel" = "Cancel";
+"CameraView.parsingMultidata" = "PARSING MULTIPART DATA";
+"CameraView.startOver" = "Start over";
+
+
+"Transaction.Metadata.Verifier.Label.Key" = "Key";
+"Transaction.Metadata.Verifier.Label.Crypto" = "Crypto";
+

@@ -38,50 +38,8 @@ struct TransactionPreview: View {
                 }
             }
             VStack {
-                // CTAs
-                VStack {
-                    switch viewModel.dataModel.first?.content.ttype {
-                    case .sign:
-                        BigButton(
-                            text: Localizable.TransactionPreview.unlockSign.key,
-                            isShaded: false,
-                            isCrypto: true,
-                            action: {
-                                focus = false
-                                viewModel.sign(with: comment)
-                            }
-                        )
-                    case .stub:
-                        BigButton(
-                            text: Localizable.TransactionPreview.approve.key,
-                            action: {
-                                navigation.perform(navigation: .init(action: .goForward))
-                            }
-                        )
-                    case .importDerivations:
-                        BigButton(
-                            text: Localizable.TransactionPreview.selectSeed.key,
-                            isCrypto: true,
-                            action: {
-                                navigation.perform(navigation: .init(action: .goForward))
-                            }
-                        )
-                    case .read,
-                         .done,
-                         .none:
-                        EmptyView()
-                    }
-                    if viewModel.dataModel.first?.content.ttype != .done {
-                        BigButton(
-                            text: Localizable.TransactionPreview.decline.key,
-                            isShaded: true,
-                            isDangerous: true,
-                            action: {
-                                focus = false
-                                navigation.perform(navigation: .init(action: .goBack))
-                            }
-                        )
-                    }
+                if let content = viewModel.dataModel.first?.content {
+                    actions(content: content)
                 }
             }
             .padding(.top, -10)
@@ -90,6 +48,7 @@ struct TransactionPreview: View {
         .onAppear {
             viewModel.use(navigation: navigation)
         }
+        .background(Asset.backgroundPrimary.swiftUIColor)
         .frame(width: UIScreen.main.bounds.width)
     }
 
@@ -132,6 +91,51 @@ struct TransactionPreview: View {
                         .padding(.bottom)
                     Spacer()
                 }
+            }
+        }
+    }
+
+    @ViewBuilder
+    func actions(content: MTransaction) -> some View {
+        // CTAs
+        VStack {
+            switch content.ttype {
+            case .sign:
+                PrimaryButton(
+                    action: {
+                        focus = false
+                        viewModel.sign(with: comment)
+                    }, text: Localizable.TransactionPreview.Action.unlockSign.key, style: .primary()
+                )
+            case .stub:
+                PrimaryButton(
+                    action: {
+                        navigation.perform(navigation: .init(action: .goForward))
+                    },
+                    text: Localizable.TransactionPreview.Action.approve.key,
+                    style: .primary()
+                )
+            case .importDerivations:
+                PrimaryButton(
+                    action: {
+                        navigation.perform(navigation: .init(action: .goForward))
+                    },
+                    text: Localizable.TransactionPreview.Action.selectSeed.key,
+                    style: .primary()
+                )
+            case .read,
+                 .done:
+                EmptyView()
+            }
+            if viewModel.dataModel.first?.content.ttype != .done {
+                EmptyButton(
+                    action: {
+                        focus = false
+                        navigation.perform(navigation: .init(action: .goBack))
+
+                    },
+                    text: Localizable.TransactionPreview.Action.cancel.key
+                )
             }
         }
     }
