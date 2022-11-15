@@ -20,7 +20,7 @@ parity-scale-codec = "3.2.1"
 
 [dev-dependencies]
 constants = { path = "../constants", features = ["test"] }
-image = { version = "0.24.4", default-features = false, features = ["ico"] }
+image = { version = "0.24.5", default-features = false, features = ["ico"] }
 parser = { path = "../parser", default-features = false }
 quircs = { version = "0.10.0" }
 regex = { version = "1.7.0" }
