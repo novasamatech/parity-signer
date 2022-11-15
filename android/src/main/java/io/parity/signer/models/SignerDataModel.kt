@@ -7,14 +7,14 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import io.parity.signer.dependencygraph.getDbNameFromContext
 import io.parity.signer.ui.navigationselectors.OnboardingWasShown
 import io.parity.signer.uniffi.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
@@ -25,7 +25,7 @@ import java.io.FileOutputStream
 class SignerDataModel : ViewModel() {
 
 	// Internal model values
-	private val _onBoardingDone = MutableLiveData(OnboardingWasShown.InProgress)
+	private val _onBoardingDone = MutableStateFlow(OnboardingWasShown.InProgress)
 
 	// TODO: something about this
 	// It leaks context objects,
@@ -38,18 +38,18 @@ class SignerDataModel : ViewModel() {
 	val navigator by lazy { SignerNavigator(this) }
 
 	// Alert
-	private val _alertState: MutableLiveData<AlertState> =
-		MutableLiveData(AlertState.None)
+	private val _alertState: MutableStateFlow<AlertState> =
+		MutableStateFlow(AlertState.None)
 
 	// Current key details, after rust API will migrate to REST-like should not store this value here.
 	internal var lastOpenedKeyDetails: MKeyDetails? = null
 
 	// State of the app being unlocked
-	private val _authenticated = MutableLiveData(false)
+	private val _authenticated = MutableStateFlow(false)
 
 	// Authenticator to call!
 	internal var authentication: Authentication =
-		Authentication(setAuth = { _authenticated.postValue(it) })
+		Authentication(setAuth = { _authenticated.value = it })
 
 	// Transaction
 	internal var action = JSONObject()
@@ -57,11 +57,10 @@ class SignerDataModel : ViewModel() {
 	// Internal storage for model data:
 
 	// Seeds
-	internal val _seedNames = MutableLiveData(arrayOf<String>())
+	internal val _seedNames = MutableStateFlow(arrayOf<String>())
 
 	// Navigator
-	// TODO: consider extracting components as separate livedata
-	internal val _actionResult = MutableLiveData(
+	internal val _actionResult = MutableStateFlow(
 		ActionResult(
 			screenLabel = "",
 			back = false,
@@ -75,7 +74,7 @@ class SignerDataModel : ViewModel() {
 		)
 	)
 
-	internal val _localNavAction = MutableLiveData<LocalNavAction>(
+	internal val _localNavAction = MutableStateFlow<LocalNavAction>(
 		LocalNavAction.None
 	)
 
@@ -84,18 +83,18 @@ class SignerDataModel : ViewModel() {
 	private val keyStore = "AndroidKeyStore"
 	internal lateinit var sharedPreferences: SharedPreferences
 
-	val seedNames: LiveData<Array<String>> = _seedNames
+	val seedNames: StateFlow<Array<String>> = _seedNames
 
 	// Observables for screens state
 
-	val onBoardingDone: LiveData<OnboardingWasShown> = _onBoardingDone
-	val authenticated: LiveData<Boolean> = _authenticated
+	val onBoardingDone: StateFlow<OnboardingWasShown> = _onBoardingDone
+	val authenticated: StateFlow<Boolean> = _authenticated
 
-	val alertState: LiveData<AlertState> = _alertState
+	val alertState: StateFlow<AlertState> = _alertState
 
-	val actionResult: LiveData<ActionResult> = _actionResult
+	val actionResult: StateFlow<ActionResult> = _actionResult
 
-	val localNavAction: LiveData<LocalNavAction> = _localNavAction
+	val localNavAction: StateFlow<LocalNavAction> = _localNavAction
 
 	// MARK: init boilerplate begin
 

@@ -1,21 +1,13 @@
 package io.parity.signer.screens.scan
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
 import android.util.Log
 import androidx.camera.core.ImageProxy
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
 import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.encodeHex
-import io.parity.signer.models.navigate
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.qrparserGetPacketsTotal
 import io.parity.signer.uniffi.qrparserTryDecodeQrSequence

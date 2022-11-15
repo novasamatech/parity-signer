@@ -13,7 +13,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -68,15 +68,15 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun SignerApp(signerDataModel: SignerDataModel) {
 	SignerNewTheme {
-		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
-		val authenticated = signerDataModel.authenticated.observeAsState()
-		val actionResult = signerDataModel.actionResult.observeAsState()
-		val shieldAlert = signerDataModel.alertState.observeAsState()
-		val localNavAction = signerDataModel.localNavAction.observeAsState()
+		val onBoardingDone = signerDataModel.onBoardingDone.collectAsState()
+		val authenticated = signerDataModel.authenticated.collectAsState()
+		val actionResult = signerDataModel.actionResult.collectAsState()
+		val shieldAlert = signerDataModel.alertState.collectAsState()
+		val localNavAction = signerDataModel.localNavAction.collectAsState()
 
 		when (onBoardingDone.value) {
 			OnboardingWasShown.Yes -> {
-				if (authenticated.value == true) {
+				if (authenticated.value) {
 					BackHandler {
 						signerDataModel.navigator.backAction()
 					}
