@@ -31,10 +31,7 @@ fun CombinedScreensSelector(
 
 	when (localNavAction) {
 		LocalNavAction.ShowScan ->
-			ScanScreen(
-				onClose = { rootNavigator.backAction() },
-				onNavigateToTransaction = { mTransition ->  } //todo dmitry this should be opened only from subgraph
-			)
+			ScanNavSubgraph(signerDataModel = signerDataModel, rootNavigator = rootNavigator)
 		else -> when (screenData) {
 			is ScreenData.SeedSelector -> {
 				KeySetsNavSubgraph(

@@ -51,25 +51,18 @@ fun ScanNavSubgraph(
 						navController.navigate(ScanNavSubgraph.camera)
 					},
 					onFinish = {
-						//todo handle subsequent modals
+						//todo dmitry handle subsequent modals
 //						rust/navigator/src/navstate.rs:396
 						rootNavigator.navigate(Action.GO_FORWARD, "", "")
 					},
 					signTransaction = signerDataModel::signTransaction,
 				)
 			}
-//			BottomSheetWrapperRoot(onClosedAction = {
-//				navController.navigate(
-//					KeySetsNavSubgraph.home
-//				)
-//			}) {
-//				KeySetsMenuBottomSheet(navigator = navController)
-//			}
 		}
 	}
 }
 
-object ScanNavSubgraph {
+private object ScanNavSubgraph {
 	const val camera = "scan_camera"
 	const val transaction = "scan_transaction"
 }
