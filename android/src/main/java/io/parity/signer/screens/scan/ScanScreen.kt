@@ -12,11 +12,8 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,6 +38,7 @@ import io.parity.signer.R
 import io.parity.signer.components.KeepScreenOn
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.models.Callback
+import io.parity.signer.models.FeatureOption
 import io.parity.signer.models.KeySetDetailsModel
 import io.parity.signer.screens.scan.items.CameraLightIcon
 import io.parity.signer.screens.scan.items.CameraMultiSignIcon
@@ -56,9 +54,9 @@ fun ScanScreen(
 ) {
 	val viewModel: CameraViewModel = viewModel()
 
-	val captured = viewModel.captured.observeAsState()
-	val total = viewModel.total.observeAsState()
-	val isMultimode = viewModel.isMultiscanMode.observeAsState()
+	val captured = viewModel.captured.collectAsState()
+	val total = viewModel.total.collectAsState()
+	val isMultimode = viewModel.isMultiscanMode.collectAsState()
 
 	Box(
 		Modifier
@@ -78,7 +76,7 @@ fun ScanScreen(
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = stringResource(
-					if (isMultimode.value == true) {
+					if (isMultimode.value) {
 						R.string.camera_screen_header_multimode
 					} else {
 						R.string.camera_screen_header_single
@@ -92,7 +90,7 @@ fun ScanScreen(
 			Spacer(modifier = Modifier.padding(bottom = 12.dp))
 			Text(
 				text = stringResource(
-					if (isMultimode.value == true) {
+					if (isMultimode.value) {
 						R.string.camera_screen_description_multimode
 					} else {
 						R.string.camera_screen_description_single
@@ -205,8 +203,10 @@ private fun CameraViewInternal(viewModel: CameraViewModel) {
 @Composable
 private fun ScanHeader(
 	modifier: Modifier = Modifier,
-	onClose: Callback
+	onClose: Callback,
 ) {
+	val viewModel: CameraViewModel = viewModel()
+	val tourchEnabled = viewModel.isTourchEnabled.collectAsState()
 	Row(
 		modifier
 			.fillMaxWidth(1f)
@@ -216,11 +216,13 @@ private fun ScanHeader(
 			onCloseClicked = onClose
 		)
 		Spacer(modifier = Modifier.weight(1f))
-		CameraMultiSignIcon(isEnabled = false,
-			onClick = {}) //todo Dmitry
+		if (FeatureOption.MULTI_TRANSACTION_CAMERA.isEnabled()) {
+			CameraMultiSignIcon(isEnabled = false,
+				onClick = {}) //todo Dmitry
+		}
 		Spacer(modifier = Modifier.padding(end = 8.dp))
-		CameraLightIcon(isEnabled = false,
-			onClick = {}) //todo Dmitry
+		CameraLightIcon(isEnabled = tourchEnabled.value == true,
+			onClick = {viewModel.isTourchEnabled.value = !tourchEnabled.value}) //todo Dmitry
 
 	}
 }

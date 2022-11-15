@@ -8,8 +8,9 @@ object FeatureFlags {
 		if (!BuildConfig.DEBUG) return false
 
 		return when (feature) {
-			FeatureOption.EXPORT_SECRET_KEY -> false //unused
 			FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT -> true
+			FeatureOption.MULTI_TRANSACTION_CAMERA -> false
+			FeatureOption.EXPORT_SECRET_KEY -> false //unused
 		}
 	}
 
@@ -19,5 +20,8 @@ object FeatureFlags {
 
 enum class FeatureOption {
 	SKIP_UNLOCK_FOR_DEVELOPMENT,
-	EXPORT_SECRET_KEY,
+	MULTI_TRANSACTION_CAMERA,
+	EXPORT_SECRET_KEY; //unused as sample
+
+	fun isEnabled() = FeatureFlags.isEnabled(this)
 }

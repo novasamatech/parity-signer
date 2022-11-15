@@ -19,20 +19,23 @@ import io.parity.signer.models.navigate
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.qrparserGetPacketsTotal
 import io.parity.signer.uniffi.qrparserTryDecodeQrSequence
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 
 class CameraViewModel(): ViewModel() {
 
 	val navigator = EmptyNavigator() //todo dmitry do I need it?
 
-	val isMultiscanMode = MutableLiveData<Boolean>(false)
-	val isTourchEnabled = MutableLiveData<Boolean>(false)
+	val isMultiscanMode = MutableStateFlow(false)
+	val isTourchEnabled = MutableStateFlow<Boolean>(false)
 
-	internal val _total = MutableLiveData<Int?>(null)
-	internal val _captured = MutableLiveData<Int?>(null)
+	internal val _total = MutableStateFlow<Int?>(null)
+	internal val _captured = MutableStateFlow<Int?>(null)
 	// Observables for model data
-	internal val total: LiveData<Int?> = _total
-	internal val captured: LiveData<Int?> = _captured
+	internal val total: StateFlow<Int?> = _total.asStateFlow()
+	internal val captured: StateFlow<Int?> = _captured.asStateFlow()
 
 	// Camera stuff
 	internal var bucket = arrayOf<String>()

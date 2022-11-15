@@ -32,7 +32,8 @@ fun CombinedScreensSelector(
 	when (localNavAction) {
 		LocalNavAction.ShowScan ->
 			ScanScreen(
-				onClose = { rootNavigator.backAction() }
+				onClose = { rootNavigator.backAction() },
+				onNavigateToTransaction = { mTransition ->  } //todo dmitry this should be opened only from subgraph
 			)
 		else -> when (screenData) {
 			is ScreenData.SeedSelector -> {
