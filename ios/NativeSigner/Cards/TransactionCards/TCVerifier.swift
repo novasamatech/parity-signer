@@ -15,12 +15,12 @@ struct TCVerifier: View {
             Localizable.verifierCertificate.text
                 .font(Fontstyle.bodyL.base)
                 .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                .padding(.leading, Spacing.large)
+                .padding(.leading, Spacing.medium)
                 .padding(.bottom, Spacing.extraExtraSmall)
             VStack {
                 VStack(spacing: Spacing.small) {
                     VStack(alignment: .leading, spacing: Spacing.extraSmall) {
-                        Localizable.Transaction.Metadata.Verifier.Label.key.text
+                        Localizable.Transaction.Verifier.Label.key.text
                             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                         Text(value.publicKey)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
@@ -28,7 +28,7 @@ struct TCVerifier: View {
                     Divider()
                     VStack(alignment: .leading) {
                         HStack {
-                            Localizable.Transaction.Metadata.Verifier.Label.crypto.text
+                            Localizable.Transaction.Verifier.Label.crypto.text
                                 .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                             Spacer()
                             Text(value.encryption)
@@ -38,9 +38,8 @@ struct TCVerifier: View {
                 }
                 .padding(Spacing.medium)
             }
-            .background(Asset.fill6Solid.swiftUIColor)
+            .background(Asset.fill6.swiftUIColor)
             .cornerRadius(CornerRadius.medium)
-            .padding(Spacing.extraExtraSmall)
         }
     }
 }

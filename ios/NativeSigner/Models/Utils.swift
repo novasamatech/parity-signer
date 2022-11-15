@@ -52,15 +52,6 @@ extension AttributedString {
     }
 }
 
-extension TransactionCardSet {
-    func assemble() -> [TransactionCard] {
-        [author, error, extensions, importingDerivations, message, meta, method, newSpecs, verifier, warning, typesInfo]
-            .compactMap { $0 }
-            .flatMap { $0 }
-            .sorted { $0.index < $1.index }
-    }
-}
-
 extension MRecoverSeedPhrase {
     func draftPhrase() -> String {
         draft.joined(separator: " ")

@@ -1,5 +1,5 @@
 //
-//  TCNameValueTemplate.swift
+//  TCNamedValueCard.swift
 //  NativeSigner
 //
 //  Created by Alexander Slesarev on 7.1.2022.
@@ -7,24 +7,23 @@
 
 import SwiftUI
 
-struct TCNameValueTemplate: View {
+struct TCNamedValueCard: View {
     let name: String
     let value: String
     var body: some View {
         HStack {
             Text(name)
-                .foregroundColor(Asset.text400.swiftUIColor)
-                .font(Fontstyle.body2.base)
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
             Text(value)
-                .foregroundColor(Asset.text600.swiftUIColor)
-                .font(Fontstyle.body2.base)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
             Spacer()
         }
+        .font(Fontstyle.bodyL.base)
     }
 }
 
-// struct TCNameValueTemplate_Previews: PreviewProvider {
-//    static var previews: some View {
-//        TCNameValueTemplate()
-//    }
-// }
+struct TCNamedValueCard_Previews: PreviewProvider {
+    static var previews: some View {
+        TCNamedValueCard(name: "Name", value: "value")
+    }
+}

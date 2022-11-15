@@ -34,7 +34,6 @@
 		2D48F3D02777A823004B27BE /* NewSeedBackupModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */; };
 		2D48F3D2277A0AB2004B27BE /* HistoryCardExtended.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */; };
 		2D48F3D6277B94C4004B27BE /* Identicon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D5277B94C4004B27BE /* Identicon.swift */; };
-		2D48F3D8277B95A3004B27BE /* TransactionBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D7277B95A3004B27BE /* TransactionBlock.swift */; };
 		2D48F3DC277E3CAA004B27BE /* MultiselectBottomControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */; };
 		2D48F3DE277E4BEC004B27BE /* SmallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DD277E4BEC004B27BE /* SmallButton.swift */; };
 		2D48F3E0278305AE004B27BE /* LogComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DF278305AE004B27BE /* LogComment.swift */; };
@@ -61,7 +60,6 @@
 		2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F84727566C3600D8DD29 /* TCFieldName.swift */; };
 		2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F84827566C3600D8DD29 /* TCTypesInfo.swift */; };
 		2DA5F86027566C3600D8DD29 /* TCAuthorPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F84927566C3600D8DD29 /* TCAuthorPublicKey.swift */; };
-		2DA5F86127566C3600D8DD29 /* TCBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F84A27566C3600D8DD29 /* TCBalance.swift */; };
 		2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F84B27566C3600D8DD29 /* TCEnumVariantName.swift */; };
 		2DA5F86327566C3600D8DD29 /* TCCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F84C27566C3600D8DD29 /* TCCall.swift */; };
 		2DA5F86427566C3600D8DD29 /* TCError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F84D27566C3600D8DD29 /* TCError.swift */; };
@@ -71,15 +69,9 @@
 		2DA5F86827566C3600D8DD29 /* TCAuthor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85127566C3600D8DD29 /* TCAuthor.swift */; };
 		2DA5F86927566C3600D8DD29 /* TCEraImmortal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85227566C3600D8DD29 /* TCEraImmortal.swift */; };
 		2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85327566C3600D8DD29 /* TCNewSpecs.swift */; };
-		2DA5F86B27566C3600D8DD29 /* TCTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85427566C3600D8DD29 /* TCTip.swift */; };
-		2DA5F86C27566C3600D8DD29 /* TCPallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85527566C3600D8DD29 /* TCPallet.swift */; };
 		2DA5F86D27566C3600D8DD29 /* TCAuthorPlain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85627566C3600D8DD29 /* TCAuthorPlain.swift */; };
 		2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85727566C3600D8DD29 /* TCWarning.swift */; };
-		2DA5F86F27566C3600D8DD29 /* TCTXSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85827566C3600D8DD29 /* TCTXSpec.swift */; };
-		2DA5F87027566C3600D8DD29 /* TCNameVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85927566C3600D8DD29 /* TCNameVersion.swift */; };
-		2DA5F87127566C3600D8DD29 /* TCVarName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85A27566C3600D8DD29 /* TCVarName.swift */; };
 		2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85B27566C3600D8DD29 /* TCFieldNumber.swift */; };
-		2DA5F87327566C3600D8DD29 /* TCBlockHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85C27566C3600D8DD29 /* TCBlockHash.swift */; };
 		2DA5F87427566C3600D8DD29 /* TCEraMortal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85D27566C3600D8DD29 /* TCEraMortal.swift */; };
 		2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */; };
 		2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */; };
@@ -97,16 +89,10 @@
 		2DAA82912786FA4B002917C0 /* KeyDetailsMulti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82902786FA4B002917C0 /* KeyDetailsMulti.swift */; };
 		2DAA829327873027002917C0 /* TCDerivations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829227873027002917C0 /* TCDerivations.swift */; };
 		2DAA8299278738C0002917C0 /* SelectSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA8298278738C0002917C0 /* SelectSeed.swift */; };
-		2DAA829B2788596C002917C0 /* TCNonce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829A2788596C002917C0 /* TCNonce.swift */; };
 		2DAA829D27885A67002917C0 /* TCMeta.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829C27885A67002917C0 /* TCMeta.swift */; };
-		2DAA829F27885B39002917C0 /* TCBitVec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829E27885B39002917C0 /* TCBitVec.swift */; };
 		2DAA82A127885BAF002917C0 /* TCDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82A027885BAF002917C0 /* TCDefault.swift */; };
-		2DAA82A327885C2E002917C0 /* TCIdentityField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82A227885C2E002917C0 /* TCIdentityField.swift */; };
-		2DAA82A527885D4A002917C0 /* TCTipPlain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82A427885D4A002917C0 /* TCTipPlain.swift */; };
 		2DAA82A727885E73002917C0 /* TCNameValueTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82A627885E73002917C0 /* TCNameValueTemplate.swift */; };
 		2DAA82A927885FCF002917C0 /* TCTXSpecPlain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82A827885FCF002917C0 /* TCTXSpecPlain.swift */; };
-		2DAA82AB27886734002917C0 /* TCGenesisHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82AA27886734002917C0 /* TCGenesisHash.swift */; };
-		2DAA82AD2788678F002917C0 /* TCNetworkName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82AC2788678F002917C0 /* TCNetworkName.swift */; };
 		2DAA82AF278874F3002917C0 /* NetworkLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82AE278874F3002917C0 /* NetworkLogo.swift */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */; };
@@ -244,6 +230,7 @@
 		6DEFB52828FEA1C200762219 /* KeyListMoreMenuModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEFB52728FEA1C200762219 /* KeyListMoreMenuModal.swift */; };
 		6DEFB52F28FEDA9B00762219 /* AnimatedQRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEFB52E28FEDA9B00762219 /* AnimatedQRCodeView.swift */; };
 		6DEFB53228FEE42D00762219 /* ExportMultipleKeysService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEFB53128FEE42D00762219 /* ExportMultipleKeysService.swift */; };
+		6DF5E7A02922DDAD00F2B5B4 /* TransactionCardSet+TransactionCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF5E79F2922DDAD00F2B5B4 /* TransactionCardSet+TransactionCards.swift */; };
 		6DF7257828BE0E08007CD9B6 /* DerivedKeyRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */; };
 		6DF7751B28B399AC0040012E /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7751A28B399AC0040012E /* CornerRadius.swift */; };
 		6DF7751E28B39F630040012E /* KeySetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7751D28B39F630040012E /* KeySetRow.swift */; };
@@ -309,7 +296,6 @@
 		2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSeedBackupModal.swift; sourceTree = "<group>"; };
 		2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCardExtended.swift; sourceTree = "<group>"; };
 		2D48F3D5277B94C4004B27BE /* Identicon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identicon.swift; sourceTree = "<group>"; };
-		2D48F3D7277B95A3004B27BE /* TransactionBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionBlock.swift; sourceTree = "<group>"; };
 		2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiselectBottomControl.swift; sourceTree = "<group>"; };
 		2D48F3DD277E4BEC004B27BE /* SmallButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallButton.swift; sourceTree = "<group>"; };
 		2D48F3DF278305AE004B27BE /* LogComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogComment.swift; sourceTree = "<group>"; };
@@ -337,7 +323,6 @@
 		2DA5F84727566C3600D8DD29 /* TCFieldName.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCFieldName.swift; sourceTree = "<group>"; };
 		2DA5F84827566C3600D8DD29 /* TCTypesInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCTypesInfo.swift; sourceTree = "<group>"; };
 		2DA5F84927566C3600D8DD29 /* TCAuthorPublicKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCAuthorPublicKey.swift; sourceTree = "<group>"; };
-		2DA5F84A27566C3600D8DD29 /* TCBalance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCBalance.swift; sourceTree = "<group>"; };
 		2DA5F84B27566C3600D8DD29 /* TCEnumVariantName.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEnumVariantName.swift; sourceTree = "<group>"; };
 		2DA5F84C27566C3600D8DD29 /* TCCall.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCCall.swift; sourceTree = "<group>"; };
 		2DA5F84D27566C3600D8DD29 /* TCError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCError.swift; sourceTree = "<group>"; };
@@ -347,15 +332,9 @@
 		2DA5F85127566C3600D8DD29 /* TCAuthor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCAuthor.swift; sourceTree = "<group>"; };
 		2DA5F85227566C3600D8DD29 /* TCEraImmortal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraImmortal.swift; sourceTree = "<group>"; };
 		2DA5F85327566C3600D8DD29 /* TCNewSpecs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCNewSpecs.swift; sourceTree = "<group>"; };
-		2DA5F85427566C3600D8DD29 /* TCTip.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCTip.swift; sourceTree = "<group>"; };
-		2DA5F85527566C3600D8DD29 /* TCPallet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCPallet.swift; sourceTree = "<group>"; };
 		2DA5F85627566C3600D8DD29 /* TCAuthorPlain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCAuthorPlain.swift; sourceTree = "<group>"; };
 		2DA5F85727566C3600D8DD29 /* TCWarning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCWarning.swift; sourceTree = "<group>"; };
-		2DA5F85827566C3600D8DD29 /* TCTXSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCTXSpec.swift; sourceTree = "<group>"; };
-		2DA5F85927566C3600D8DD29 /* TCNameVersion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCNameVersion.swift; sourceTree = "<group>"; };
-		2DA5F85A27566C3600D8DD29 /* TCVarName.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCVarName.swift; sourceTree = "<group>"; };
 		2DA5F85B27566C3600D8DD29 /* TCFieldNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCFieldNumber.swift; sourceTree = "<group>"; };
-		2DA5F85C27566C3600D8DD29 /* TCBlockHash.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCBlockHash.swift; sourceTree = "<group>"; };
 		2DA5F85D27566C3600D8DD29 /* TCEraMortal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraMortal.swift; sourceTree = "<group>"; };
 		2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPreview.swift; sourceTree = "<group>"; };
 		2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeedCardForManager.swift; sourceTree = "<group>"; };
@@ -373,16 +352,10 @@
 		2DAA82902786FA4B002917C0 /* KeyDetailsMulti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsMulti.swift; sourceTree = "<group>"; };
 		2DAA829227873027002917C0 /* TCDerivations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCDerivations.swift; sourceTree = "<group>"; };
 		2DAA8298278738C0002917C0 /* SelectSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSeed.swift; sourceTree = "<group>"; };
-		2DAA829A2788596C002917C0 /* TCNonce.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNonce.swift; sourceTree = "<group>"; };
 		2DAA829C27885A67002917C0 /* TCMeta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCMeta.swift; sourceTree = "<group>"; };
-		2DAA829E27885B39002917C0 /* TCBitVec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCBitVec.swift; sourceTree = "<group>"; };
 		2DAA82A027885BAF002917C0 /* TCDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCDefault.swift; sourceTree = "<group>"; };
-		2DAA82A227885C2E002917C0 /* TCIdentityField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCIdentityField.swift; sourceTree = "<group>"; };
-		2DAA82A427885D4A002917C0 /* TCTipPlain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTipPlain.swift; sourceTree = "<group>"; };
 		2DAA82A627885E73002917C0 /* TCNameValueTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNameValueTemplate.swift; sourceTree = "<group>"; };
 		2DAA82A827885FCF002917C0 /* TCTXSpecPlain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTXSpecPlain.swift; sourceTree = "<group>"; };
-		2DAA82AA27886734002917C0 /* TCGenesisHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCGenesisHash.swift; sourceTree = "<group>"; };
-		2DAA82AC2788678F002917C0 /* TCNetworkName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNetworkName.swift; sourceTree = "<group>"; };
 		2DAA82AE278874F3002917C0 /* NetworkLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLogo.swift; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
@@ -528,6 +501,7 @@
 		6DEFB52728FEA1C200762219 /* KeyListMoreMenuModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyListMoreMenuModal.swift; sourceTree = "<group>"; };
 		6DEFB52E28FEDA9B00762219 /* AnimatedQRCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedQRCodeView.swift; sourceTree = "<group>"; };
 		6DEFB53128FEE42D00762219 /* ExportMultipleKeysService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportMultipleKeysService.swift; sourceTree = "<group>"; };
+		6DF5E79F2922DDAD00F2B5B4 /* TransactionCardSet+TransactionCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionCardSet+TransactionCards.swift"; sourceTree = "<group>"; };
 		6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyRow.swift; sourceTree = "<group>"; };
 		6DF7751A28B399AC0040012E /* CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadius.swift; sourceTree = "<group>"; };
 		6DF7751D28B39F630040012E /* KeySetRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetRow.swift; sourceTree = "<group>"; };
@@ -667,37 +641,24 @@
 				2DA5F84727566C3600D8DD29 /* TCFieldName.swift */,
 				2DA5F84827566C3600D8DD29 /* TCTypesInfo.swift */,
 				2DA5F84927566C3600D8DD29 /* TCAuthorPublicKey.swift */,
-				2DA5F84A27566C3600D8DD29 /* TCBalance.swift */,
 				2DA5F84B27566C3600D8DD29 /* TCEnumVariantName.swift */,
 				2DA5F84C27566C3600D8DD29 /* TCCall.swift */,
 				2DAA829227873027002917C0 /* TCDerivations.swift */,
 				2DA5F84D27566C3600D8DD29 /* TCError.swift */,
 				2DA5F84E27566C3600D8DD29 /* TCID.swift */,
 				2DA5F84F27566C3600D8DD29 /* TCText.swift */,
-				2DAA829A2788596C002917C0 /* TCNonce.swift */,
 				2DA5F85027566C3600D8DD29 /* TCVerifier.swift */,
 				2DA5F85127566C3600D8DD29 /* TCAuthor.swift */,
 				2DA5F85227566C3600D8DD29 /* TCEraImmortal.swift */,
 				2DA5F85327566C3600D8DD29 /* TCNewSpecs.swift */,
 				2DAA829C27885A67002917C0 /* TCMeta.swift */,
-				2DAA829E27885B39002917C0 /* TCBitVec.swift */,
-				2DA5F85427566C3600D8DD29 /* TCTip.swift */,
-				2DAA82A427885D4A002917C0 /* TCTipPlain.swift */,
 				2DAA82A827885FCF002917C0 /* TCTXSpecPlain.swift */,
-				2DAA82AA27886734002917C0 /* TCGenesisHash.swift */,
-				2DAA82AC2788678F002917C0 /* TCNetworkName.swift */,
-				2DA5F85527566C3600D8DD29 /* TCPallet.swift */,
 				2DAA82A627885E73002917C0 /* TCNameValueTemplate.swift */,
 				2DA5F85627566C3600D8DD29 /* TCAuthorPlain.swift */,
 				2DA5F85727566C3600D8DD29 /* TCWarning.swift */,
 				2DAA82A027885BAF002917C0 /* TCDefault.swift */,
-				2DAA82A227885C2E002917C0 /* TCIdentityField.swift */,
-				2DA5F85827566C3600D8DD29 /* TCTXSpec.swift */,
-				2DA5F85927566C3600D8DD29 /* TCNameVersion.swift */,
 				2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */,
-				2DA5F85A27566C3600D8DD29 /* TCVarName.swift */,
 				2DA5F85B27566C3600D8DD29 /* TCFieldNumber.swift */,
-				2DA5F85C27566C3600D8DD29 /* TCBlockHash.swift */,
 				2DA5F85D27566C3600D8DD29 /* TCEraMortal.swift */,
 			);
 			path = TransactionCards;
@@ -778,6 +739,7 @@
 				2D7A7BD526C1126C0053C1E0 /* Utils.swift */,
 				2D72B4F926EF7D1C0081E879 /* Seeds.swift */,
 				2DA5F89127590B4F00D8DD29 /* Documents.swift */,
+				6DF5E79F2922DDAD00F2B5B4 /* TransactionCardSet+TransactionCards.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1074,7 +1036,6 @@
 				04197D2A276BA40C003485D2 /* MenuElements.swift */,
 				04197D2C276BB683003485D2 /* StyleModiefiers.swift */,
 				2D48F3D5277B94C4004B27BE /* Identicon.swift */,
-				2D48F3D7277B95A3004B27BE /* TransactionBlock.swift */,
 				2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */,
 				0452BC562767B26600C6DD37 /* Buttons.swift */,
 				2D48F3DD277E4BEC004B27BE /* SmallButton.swift */,
@@ -1666,7 +1627,6 @@
 				6D57DC4D289D652400005C63 /* Dispatching.swift in Sources */,
 				6DA501DB290F16280096DA4E /* KeyDetails+SelectionOverlay.swift in Sources */,
 				6D01996C289C974C00F4C317 /* HeaderViewContainer.swift in Sources */,
-				2D48F3D8277B95A3004B27BE /* TransactionBlock.swift in Sources */,
 				2DA5F86827566C3600D8DD29 /* TCAuthor.swift in Sources */,
 				2DA5F87427566C3600D8DD29 /* TCEraMortal.swift in Sources */,
 				2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */,
@@ -1676,7 +1636,6 @@
 				6DDEF14328AE8794004CA2FD /* SecondaryButton.swift in Sources */,
 				2DAA82A127885BAF002917C0 /* TCDefault.swift in Sources */,
 				6D0FA73B2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift in Sources */,
-				2DAA82A327885C2E002917C0 /* TCIdentityField.swift in Sources */,
 				6DE8466E28BF73E40051346A /* DerivedKeyRowModel.swift in Sources */,
 				2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */,
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
@@ -1713,7 +1672,6 @@
 				2DA5F8312756652600D8DD29 /* CameraView.swift in Sources */,
 				6D6430F828CB662B00342E37 /* ExportPrivateKeyModal.swift in Sources */,
 				6DDEF11028AD105F004CA2FD /* TabBarView.swift in Sources */,
-				2DA5F86F27566C3600D8DD29 /* TCTXSpec.swift in Sources */,
 				2DA5F8412756687200D8DD29 /* TransactionCardView.swift in Sources */,
 				6D6E99DB28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift in Sources */,
 				6D95E97A28B6282D00E28A11 /* MenuButton.swift in Sources */,
@@ -1721,7 +1679,6 @@
 				6D2D244F28CE5C1B00862726 /* NavbarActionButton.swift in Sources */,
 				6D84442128D3267A0072FBAC /* ForgetSingleKeyAction.swift in Sources */,
 				6DBF6E4B28EC51D600CC959F /* GenericError.swift in Sources */,
-				2DAA829B2788596C002917C0 /* TCNonce.swift in Sources */,
 				2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */,
 				2D6A9F84278C8275000DAE64 /* TCNetworkInfo.swift in Sources */,
 				6DFAF36E28AF846C0048763B /* PreviewData.swift in Sources */,
@@ -1735,20 +1692,19 @@
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
 				6DC5643028B65B9C003D540B /* AnimationDuration.swift in Sources */,
 				2DA5F88A2757692F00D8DD29 /* NewSeedScreen.swift in Sources */,
+				6DF5E7A02922DDAD00F2B5B4 /* TransactionCardSet+TransactionCards.swift in Sources */,
 				6DBF6E2228E1FB6F00CC959F /* PreviewData+Rust.swift in Sources */,
 				2DA5F86727566C3600D8DD29 /* TCVerifier.swift in Sources */,
 				2DA5F8392756666C00D8DD29 /* EventDetails.swift in Sources */,
 				6DBD21F4289A77DE005D539B /* BundleProtocol.swift in Sources */,
 				6D2779C828B3D33100570055 /* NavigationBarView.swift in Sources */,
 				6D2D245728CF5C5200862726 /* PublicKeyActionsModal.swift in Sources */,
-				2DA5F87027566C3600D8DD29 /* TCNameVersion.swift in Sources */,
 				6D16685D28F5C15C008C664A /* CameraVideoOutputDelegate.swift in Sources */,
 				2DA5F89027590B3A00D8DD29 /* DocumentModal.swift in Sources */,
 				6D57DC4B289D614F00005C63 /* BackendNavigationAdapter.swift in Sources */,
 				6DC5643528B69355003D540B /* AccessControlProvidingAssembler.swift in Sources */,
 				2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */,
 				6D019968289C937600F4C317 /* AuthenticatedScreenContainer.swift in Sources */,
-				2DA5F86B27566C3600D8DD29 /* TCTip.swift in Sources */,
 				6D16685728F530F4008C664A /* CaptureDeviceConfigurator.swift in Sources */,
 				2DA5F8272756629600D8DD29 /* ScreenSelector.swift in Sources */,
 				6D8045D928D0761E00237F8C /* QRCodeAddressFooterView.swift in Sources */,
@@ -1756,7 +1712,6 @@
 				6DDEF14528AE87A7004CA2FD /* EmptyButton.swift in Sources */,
 				2DA5F8332756653B00D8DD29 /* CameraPreview.swift in Sources */,
 				2DA5F8862756A44600D8DD29 /* AddressCardControls.swift in Sources */,
-				2DAA82AB27886734002917C0 /* TCGenesisHash.swift in Sources */,
 				2DA5F82F2756635A00D8DD29 /* HistoryScreen.swift in Sources */,
 				2DAA82A727885E73002917C0 /* TCNameValueTemplate.swift in Sources */,
 				6D5801E7289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift in Sources */,
@@ -1780,7 +1735,6 @@
 				6D84442428D3424F0072FBAC /* HiddenScrollContainerModifier.swift in Sources */,
 				2D48F3D02777A823004B27BE /* NewSeedBackupModal.swift in Sources */,
 				6D5801D12899130E006C41D8 /* PathMonitorProtocol.swift in Sources */,
-				2DAA829F27885B39002917C0 /* TCBitVec.swift in Sources */,
 				6D16687F28F86DE0008C664A /* CameraButton.swift in Sources */,
 				6D6ACA4128F0B391002FB03A /* CameraPermissionHandler.swift in Sources */,
 				2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */,
@@ -1823,22 +1777,17 @@
 				6D019973289D183600F4C317 /* NavigationCoordinator.swift in Sources */,
 				6D2D245228CE5F2D00862726 /* KeyDetailsPublicKeyView.swift in Sources */,
 				6DBF6E2B28E58D7900CC959F /* ResetConnectivtyWarningsAction.swift in Sources */,
-				2DA5F86127566C3600D8DD29 /* TCBalance.swift in Sources */,
 				6D95E97328B4F42300E28A11 /* ActionButton.swift in Sources */,
-				2DA5F87127566C3600D8DD29 /* TCVarName.swift in Sources */,
 				2D48F398276A200F004B27BE /* EnterPassword.swift in Sources */,
 				2D48F3A827708670004B27BE /* NetworkDetails.swift in Sources */,
 				2DAA829D27885A67002917C0 /* TCMeta.swift in Sources */,
-				2DA5F86C27566C3600D8DD29 /* TCPallet.swift in Sources */,
 				2D48F396276A2003004B27BE /* SignatureReady.swift in Sources */,
 				2DA5F898275F865400D8DD29 /* ModalSelector.swift in Sources */,
-				2DA5F87327566C3600D8DD29 /* TCBlockHash.swift in Sources */,
 				6D2779CA28B3E58600570055 /* KeySetListViewModelBuilder.swift in Sources */,
 				2DA5F86027566C3600D8DD29 /* TCAuthorPublicKey.swift in Sources */,
 				2D48F36F2767419D004B27BE /* PasswordConfirm.swift in Sources */,
 				6DDEF13F28AE7C57004CA2FD /* PrimaryButton.swift in Sources */,
 				6D4C0753289AC36100B2EE48 /* Fonts.swift in Sources */,
-				2DAA82AD2788678F002917C0 /* TCNetworkName.swift in Sources */,
 				2D48F35B2760E5DF004B27BE /* RecoverSeedPhrase.swift in Sources */,
 				6D17EF8628EEEDDA008626E9 /* CameraPreviewUIView.swift in Sources */,
 				6DA501D4290BC55A0096DA4E /* KeyDetailsService.swift in Sources */,
@@ -1859,7 +1808,6 @@
 				6D42793728DB147800C141DC /* PrivateKeyQRCodeService.swift in Sources */,
 				6D5801D928991F48006C41D8 /* ProcessInfoProtocol.swift in Sources */,
 				6DA501D7290BECBE0096DA4E /* AppState.swift in Sources */,
-				2DAA82A527885D4A002917C0 /* TCTipPlain.swift in Sources */,
 				6D019972289D183200F4C317 /* Navigation.swift in Sources */,
 				2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */,
 				2DA5F83F275667CF00D8DD29 /* HistoryCardTemplate.swift in Sources */,

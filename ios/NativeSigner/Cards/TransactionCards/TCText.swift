@@ -18,8 +18,8 @@ struct TCText: View {
     }
 }
 
-// struct TCText_Previews: PreviewProvider {
-//    static var previews: some View {
-//        TCText()
-//    }
-// }
+struct TCText_Previews: PreviewProvider {
+    static var previews: some View {
+        TCText(text: "body text possible markdown support")
+    }
+}

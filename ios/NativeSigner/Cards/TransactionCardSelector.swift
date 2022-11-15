@@ -12,18 +12,17 @@ struct TransactionCardSelector: View {
     var body: some View {
         HStack {
             switch card.card {
-            case let .authorCard(author):
+            // Author
+            case let .authorCard(author): // Not present on new designs
                 TCAuthor(author: author)
-            case let .authorPlainCard(value):
+            case let .authorPlainCard(value): // Not present on new designs
                 TCAuthorPlain(value: value)
-            case let .authorPublicKeyCard(value):
+            case let .authorPublicKeyCard(value): // Not present on new designs
                 TCAuthorPublicKey(value: value)
+
+            // Cards ?
             case let .balanceCard(value):
-                TCBalance(value: value)
-            case let .bitVecCard(text):
-                TCBitVec(content: text)
-            case let .blockHashCard(text):
-                TCBlockHash(text: text)
+                TCNamedValueCard(name: "", value: [value.amount, value.units].joined(separator: " "))
             case let .callCard(value):
                 TCCall(value: value)
             case let .defaultCard(text):
@@ -36,52 +35,67 @@ struct TransactionCardSelector: View {
                 TCEraImmortal()
             case let .eraMortalCard(eraMortal):
                 TCEraMortal(eraMortal: eraMortal)
-            case let .errorCard(text):
-                TCError(text: text)
+
+            // Fields?
             case let .fieldNameCard(value):
                 TCFieldName(value: value)
             case let .fieldNumberCard(value):
                 TCFieldNumber(value: value)
             case let .idCard(value):
                 TCID(value: value)
-            case let .identityFieldCard(text):
-                TCIdentityField(content: text)
-            case let .metaCard(value):
-                TCMeta(content: value)
-            case let .nameVersionCard(value):
-                TCNameVersion(value: value)
             case let .networkInfoCard(value):
                 TCNetworkInfo(content: value)
             case let .newSpecsCard(value):
-                TCNewSpecs(value: value)
-            case let .nonceCard(text):
-                TCNonce(content: text)
-            case .noneCard:
-                Localizable.noneCapitalised.text
-            case let .palletCard(text):
-                TCPallet(text: text)
+                TCAddNewNetwork(value: value)
             case let .textCard(text):
                 TCText(text: text)
-            case let .tipCard(value):
-                TCTip(value: value)
-            case let .tipPlainCard(text):
-                TCTipPlain(content: text)
-            case let .txSpecCard(value):
-                TCTXSpec(value: value)
             case let .txSpecPlainCard(value):
                 TCTXSpecPlain(content: value)
             case let .typesInfoCard(value):
                 TCTypesInfo(content: value)
-            case let .varNameCard(text):
-                TCVarName(text: text)
-            case let .verifierCard(value):
+
+            // Sections
+            case let .metaCard(value): // Used when scanning metadata update
+                TCMeta(value: value)
+            case let .verifierCard(value): // Used in metadata update, adding new network
                 TCVerifier(value: value)
+
+            // Error handling
+            case let .errorCard(text):
+                TCError(text: text)
             case let .warningCard(text):
                 TCWarning(text: text)
+
+            // Simple values
+            case let .bitVecCard(text):
+                TCNamedValueCard(name: Localizable.TCName.bitVec.string, value: text)
+            case let .blockHashCard(text):
+                TCNamedValueCard(name: Localizable.TCName.blockHash.string, value: text)
+            case let .identityFieldCard(text):
+                TCNamedValueCard(name: Localizable.TCName.identityField.string, value: text)
+            case let .nameVersionCard(value):
+                TCNamedValueCard(name: value.name, value: value.version)
+            case let .nonceCard(text):
+                TCNamedValueCard(name: Localizable.TCName.nonce.string, value: text)
+            case let .palletCard(text):
+                TCNamedValueCard(name: Localizable.TCName.pallet.string, value: text)
+            case let .tipCard(value):
+                TCNamedValueCard(
+                    name: Localizable.TCName.tip.string,
+                    value: [value.amount, value.units].joined(separator: " ")
+                )
+            case let .tipPlainCard(text):
+                TCNamedValueCard(name: Localizable.TCName.tip.string, value: text)
+            case let .txSpecCard(value):
+                TCNamedValueCard(name: Localizable.TCName.TxVersion.uppercased.string, value: value)
             case let .networkGenesisHashCard(text):
-                TCGenesisHash(content: text)
+                TCNamedValueCard(name: Localizable.TCName.genesisHash.string, value: text)
             case let .networkNameCard(text):
-                TCNetworkName(content: text)
+                TCNamedValueCard(name: Localizable.TCName.networkName.string, value: text)
+            case let .varNameCard(text):
+                TCNamedValueCard(name: "", value: text)
+            case .noneCard:
+                TCNamedValueCard(name: Localizable.noneCapitalised.string, value: "")
             }
         }
     }

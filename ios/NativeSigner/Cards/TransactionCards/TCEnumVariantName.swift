@@ -39,8 +39,8 @@ struct TCEnumVariantName: View {
     }
 }
 
-// struct TCEnumVariantName_Previews: PreviewProvider {
-// static var previews: some View {
-// TCEnumVariantName()
-// }
-// }
+struct TCEnumVariantName_Previews: PreviewProvider {
+    static var previews: some View {
+        TCEnumVariantName(value: MscEnumVariantName(name: "Name", docsEnumVariant: "docsEnumVariant"))
+    }
+}

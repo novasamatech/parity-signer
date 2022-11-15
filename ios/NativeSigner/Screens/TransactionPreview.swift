@@ -29,34 +29,24 @@ struct TransactionPreview: View {
                 )
             )
             ScrollView {
-                ForEach(
-                    viewModel.dataModel,
-                    id: \.id
-                ) { singleTransaction(content: $0.content)
-                    .padding(.horizontal, Spacing.medium)
-                    .frame(width: UIScreen.main.bounds.width)
-                }
+                ForEach(viewModel.dataModel, id: \.id) { singleTransaction(content: $0.content) }
             }
-            VStack {
-                if let content = viewModel.dataModel.first?.content {
-                    actions(content: content)
-                }
-            }
-            .padding(.top, -10)
-            .padding(.horizontal, 16)
+            actions(transactionType: viewModel.dataModel.first?.content.ttype)
         }
         .onAppear {
             viewModel.use(navigation: navigation)
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .frame(width: UIScreen.main.bounds.width)
     }
 
     @ViewBuilder
     func singleTransaction(content: MTransaction) -> some View {
         VStack {
-            TransactionBlock(cards: content.content.assemble())
-                .padding(.bottom, Spacing.medium)
+            VStack {
+                ForEach(content.content.asSortedCards(), id: \.index) { card in
+                    TransactionCardView(card: card)
+                }
+            }
             if let authorInfo = content.authorInfo {
                 AddressCard(card: authorInfo)
             }
@@ -64,80 +54,79 @@ struct TransactionPreview: View {
                 NetworkCard(title: network.networkTitle, logo: network.networkLogo)
             }
             if content.ttype == .sign {
-                HStack {
-                    Localizable.logNote.text.font(Fontstyle.overline.base)
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                    Spacer()
-                }
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8).stroke(Asset.border400.swiftUIColor).frame(height: 39)
-                    TextField(
-                        Localizable.comment.string,
-                        text: $comment,
-                        prompt: Localizable.commentNotPublished.text
-                    )
-                    .foregroundColor(Asset.text400.swiftUIColor)
-                    .background(Asset.bg100.swiftUIColor)
-                    .font(Fontstyle.body2.base)
-                    .focused($focus)
-                    .onDisappear {
-                        focus = false
-                    }
-                    .padding(.horizontal, 8)
-                }
-                HStack {
-                    Localizable.visibleOnlyOnThisDevice.text
-                        .font(Fontstyle.subtitle1.base)
-                        .padding(.bottom)
-                    Spacer()
-                }
+                signContent()
             }
+        }
+        .padding(.horizontal, Spacing.extraSmall)
+    }
+
+    @ViewBuilder
+    func signContent() -> some View {
+        HStack {
+            Localizable.logNote.text.font(Fontstyle.overline.base)
+                .foregroundColor(Asset.text400.swiftUIColor)
+            Spacer()
+        }
+        ZStack {
+            RoundedRectangle(cornerRadius: 8).stroke(Asset.border400.swiftUIColor).frame(height: 39)
+            TextField(
+                Localizable.comment.string,
+                text: $comment,
+                prompt: Localizable.commentNotPublished.text
+            )
+            .foregroundColor(Asset.text400.swiftUIColor)
+            .background(Asset.bg100.swiftUIColor)
+            .font(Fontstyle.body2.base)
+            .focused($focus)
+            .onDisappear {
+                focus = false
+            }
+            .padding(.horizontal, Spacing.extraSmall)
+        }
+        HStack {
+            Localizable.visibleOnlyOnThisDevice.text
+                .font(Fontstyle.subtitle1.base)
+                .padding(.bottom)
+            Spacer()
         }
     }
 
     @ViewBuilder
-    func actions(content: MTransaction) -> some View {
-        // CTAs
+    func actions(transactionType: TransactionType?) -> some View {
         VStack {
-            switch content.ttype {
+            switch transactionType {
             case .sign:
                 PrimaryButton(
                     action: {
                         focus = false
                         viewModel.sign(with: comment)
-                    }, text: Localizable.TransactionPreview.Action.unlockSign.key, style: .primary()
-                )
-            case .stub:
-                PrimaryButton(
-                    action: {
-                        navigation.perform(navigation: .init(action: .goForward))
                     },
-                    text: Localizable.TransactionPreview.Action.approve.key,
+                    text: Localizable.TransactionPreview.Action.unlockSign.key,
                     style: .primary()
                 )
-            case .importDerivations:
+            case .stub,
+                 .importDerivations:
                 PrimaryButton(
-                    action: {
-                        navigation.perform(navigation: .init(action: .goForward))
-                    },
-                    text: Localizable.TransactionPreview.Action.selectSeed.key,
+                    action: viewModel.onApproveTap,
+                    text: transactionType == .stub ? Localizable.TransactionPreview.Action.approve.key : Localizable
+                        .TransactionPreview.Action.selectSeed.key,
                     style: .primary()
                 )
             case .read,
-                 .done:
+                 .done,
+                 .none:
                 EmptyView()
             }
-            if viewModel.dataModel.first?.content.ttype != .done {
+            if transactionType != .done {
                 EmptyButton(
-                    action: {
-                        focus = false
-                        navigation.perform(navigation: .init(action: .goBack))
-
-                    },
+                    action: viewModel.onCancelTap,
                     text: Localizable.TransactionPreview.Action.cancel.key
                 )
             }
         }
+        .padding(.horizontal, Spacing.large)
+        .padding(.bottom, Spacing.medium)
+        .padding(.top, Spacing.extraSmall)
     }
 }
 
@@ -171,6 +160,15 @@ extension TransactionPreview {
         func onBackButtonTap() {
             navigation.performFake(navigation: .init(action: .goBack))
             isPresented.toggle()
+        }
+
+        func onCancelTap() {
+            navigation.performFake(navigation: .init(action: .goBack))
+            isPresented.toggle()
+        }
+
+        func onApproveTap() {
+            navigation.perform(navigation: .init(action: .goForward))
         }
 
         func sign(with comment: String) {

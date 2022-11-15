@@ -29,8 +29,14 @@ struct TCAuthor: View {
     }
 }
 
-// struct TCAuthor_Previews: PreviewProvider {
-//    static var previews: some View {
-//        TCAuthor()
-//    }
-// }
+struct TCAuthor_Previews: PreviewProvider {
+    static var previews: some View {
+        TCAuthor(
+            author: MAddressCard(
+                base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
+                address: PreviewData.address,
+                multiselect: true
+            )
+        )
+    }
+}

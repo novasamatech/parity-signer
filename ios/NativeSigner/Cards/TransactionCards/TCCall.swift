@@ -18,7 +18,7 @@ struct TCCall: View {
             label: {
                 VStack {
                     HStack {
-                        TCNameValueTemplate(name: Localizable.TCName.method.string, value: value.methodName)
+                        TCNamedValueCard(name: Localizable.TCName.method.string, value: value.methodName)
                         if !value.docs.isEmpty {
                             Localizable.questionMark.text
                                 .foregroundColor(Asset.action400.swiftUIColor)
@@ -38,8 +38,8 @@ struct TCCall: View {
     }
 }
 
-// struct TCCall_Previews: PreviewProvider {
-// static var previews: some View {
-// TCCall()
-// }
-// }
+struct TCCall_Previews: PreviewProvider {
+    static var previews: some View {
+        TCCall(value: MscCall(methodName: "method name", docs: "docs"))
+    }
+}

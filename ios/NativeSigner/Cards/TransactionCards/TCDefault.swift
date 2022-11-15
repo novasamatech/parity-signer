@@ -10,7 +10,9 @@ import SwiftUI
 struct TCDefault: View {
     let content: String
     var body: some View {
-        Text(content).foregroundColor(Asset.text600.swiftUIColor).font(Fontstyle.body2.base)
+        Text(content)
+            .foregroundColor(Asset.text600.swiftUIColor)
+            .font(Fontstyle.body2.base)
     }
 }
 

@@ -28,8 +28,8 @@ struct TCDerivations: View {
     }
 }
 
-// struct TCDerivations_Previews: PreviewProvider {
-// static var previews: some View {
-// TCDerivations()
-// }
-// }
+struct TCDerivations_Previews: PreviewProvider {
+    static var previews: some View {
+        TCDerivations(value: ["Derivation 1", "Derivation 2"])
+    }
+}
