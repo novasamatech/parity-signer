@@ -60,9 +60,7 @@ class MainActivity : AppCompatActivity() {
 	}
 }
 
-/**
- * Main app component - hosts navhost, Rust-based source of truth, etc.
- */
+
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
@@ -126,12 +124,6 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 									button = signerDataModel.navigator::navigate,
 									signerDataModel = signerDataModel,
 								)
-								AlertSelector(
-									alert = actionResult.value?.alertData,
-									alertState = shieldAlert,
-									button = signerDataModel.navigator::navigate,
-									acknowledgeWarning = signerDataModel::acknowledgeWarning
-								)
 							}
 						}
 						//new screens selectors
@@ -141,18 +133,24 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								.captionBarPadding(),
 						) {
 							CombinedScreensSelector(
-								screenData = actionResult.value?.screenData
+								screenData = actionResult.value.screenData
 									?: ScreenData.Documents,//default fallback
 								localNavAction = localNavAction.value,
 								alertState = shieldAlert,
 								signerDataModel = signerDataModel
 							)
 							BottomSheetSelector(
-								modalData = actionResult.value?.modalData,
+								modalData = actionResult.value.modalData,
 								localNavAction = localNavAction.value,
 								alertState = shieldAlert,
 								signerDataModel = signerDataModel,
 								navigator = signerDataModel.navigator,
+							)
+							AlertSelector(
+								alert = actionResult.value.alertData,
+								alertState = shieldAlert,
+								button = signerDataModel.navigator::navigate,
+								acknowledgeWarning = signerDataModel::acknowledgeWarning
 							)
 						}
 					}
@@ -197,7 +195,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				}
 			}
 			OnboardingWasShown.InProgress -> {
-				if (authenticated.value == true) {
+				if (authenticated.value) {
 					WaitingScreen()
 				} else {
 					Column(verticalArrangement = Arrangement.Center) {
@@ -212,7 +210,6 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					}
 				}
 			}
-			null -> WaitingScreen()
 		}
 	}
 }
