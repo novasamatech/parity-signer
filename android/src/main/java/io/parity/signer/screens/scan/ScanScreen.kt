@@ -43,7 +43,7 @@ import io.parity.signer.screens.scan.items.CameraMultiSignIcon
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
 import io.parity.signer.uniffi.MTransaction
-import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @Composable
@@ -60,17 +60,18 @@ fun ScanScreen(
 
 	LaunchedEffect(key1 = isMultimode) {
 		if (!isMultimode) {
-			viewModel.navigationState.filterIsInstance<CameraViewModel.CameraNavModel.TransitionNavigation>()
+			viewModel.pendingPayloads
+				.filter { it.isEmpty() }
 				.collect {
-					onNavigateToTransaction(it.transactions)
+					val transactions = viewModel.getTransactionsFromPendingPayload()
+					onNavigateToTransaction(transactions)
 				}
 		}
 	}
-
 	Box(
-		Modifier
-			.fillMaxSize(1f)
-			.background(MaterialTheme.colors.background)
+        Modifier
+            .fillMaxSize(1f)
+            .background(MaterialTheme.colors.background)
 	) {
 		CameraViewPermission(viewModel)
 		ScanHeader(Modifier.statusBarsPadding(), onClose)
@@ -79,9 +80,9 @@ fun ScanScreen(
 			ScanProgressBar(captured, total) { viewModel.resetScanValues() }
 		}
 		Column(
-			Modifier
-				.fillMaxSize(1f)
-				.padding(horizontal = 48.dp),
+            Modifier
+                .fillMaxSize(1f)
+                .padding(horizontal = 48.dp),
 		) {
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
@@ -218,9 +219,9 @@ private fun ScanHeader(
 	val viewModel: CameraViewModel = viewModel()
 	val tourchEnabled = viewModel.isTourchEnabled.collectAsState()
 	Row(
-		modifier
-			.fillMaxWidth(1f)
-			.padding(horizontal = 16.dp)
+        modifier
+            .fillMaxWidth(1f)
+            .padding(horizontal = 16.dp)
 	) {
 		CloseIcon(
 			onCloseClicked = onClose
