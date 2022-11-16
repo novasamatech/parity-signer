@@ -141,9 +141,9 @@ internal fun ScanHeader(
 			onClick = {
 				viewModel.isTourchEnabled.value = !tourchEnabled
 			}) //todo Dmitry implement in viewmodel
-
 	}
 }
+
 
 
 @Preview(

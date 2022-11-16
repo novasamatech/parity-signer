@@ -34,12 +34,7 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import io.parity.signer.R
 import io.parity.signer.components.KeepScreenOn
-import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.models.Callback
-import io.parity.signer.models.FeatureOption
-import io.parity.signer.models.KeySetDetailsModel
-import io.parity.signer.screens.scan.items.CameraLightIcon
-import io.parity.signer.screens.scan.items.CameraMultiSignIcon
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
 import io.parity.signer.uniffi.MTransaction
@@ -59,7 +54,7 @@ fun ScanScreen(
 
 	LaunchedEffect(key1 = isMultimode) {
 		if (!isMultimode) {
-			viewModel.pendingPayloads
+			viewModel.pendingTransactionPayloads
 				.filter { it.isEmpty() }
 				.collect {
 					val transactions = viewModel.getTransactionsFromPendingPayload()
@@ -68,53 +63,73 @@ fun ScanScreen(
 		}
 	}
 	Box(
-        Modifier
-            .fillMaxSize(1f)
-            .background(MaterialTheme.colors.background)
+		Modifier
+			.fillMaxSize(1f)
+			.background(MaterialTheme.colors.background)
 	) {
 		CameraViewPermission(viewModel)
 		ScanHeader(Modifier.statusBarsPadding(), onClose)
 
-		captured?.let { captured ->
-			ScanProgressBar(captured, total) { viewModel.resetScanValues() }
-		}
-		Column(
-            Modifier
-                .fillMaxSize(1f)
-                .padding(horizontal = 48.dp),
-		) {
-			Spacer(modifier = Modifier.weight(1f))
-			Text(
-				text = stringResource(
-					if (isMultimode) {
-						R.string.camera_screen_header_multimode
-					} else {
-						R.string.camera_screen_header_single
-					}
-				),
-				color = Color.White,
-				style = TypefaceNew.TitleL,
-				textAlign = TextAlign.Center,
-				modifier = Modifier.fillMaxWidth(1f),
+		CameraBottomText(isMultimode)
+		val capturedCpy = captured
+		if (capturedCpy != null) {
+			ScanProgressBar(capturedCpy, total) { viewModel.resetScanValues() }
+		} else {
+			CameraMultiModProceed(
+				isMultimode = viewModel.isMultiscanMode.collectAsState(),
+				pendingTransactions = viewModel.pendingTransactionPayloads.collectAsState(),
 			)
-			Spacer(modifier = Modifier.padding(bottom = 12.dp))
-			Text(
-				text = stringResource(
-					if (isMultimode) {
-						R.string.camera_screen_description_multimode
-					} else {
-						R.string.camera_screen_description_single
-					}
-				),
-				color = Color.White,
-				style = TypefaceNew.TitleS,
-				textAlign = TextAlign.Center,
-				modifier = Modifier.fillMaxWidth(1f),
-			)
-			Spacer(modifier = Modifier.padding(bottom = 76.dp))
 		}
 	}
 	KeepScreenOn()
+}
+
+@Composable
+private fun CameraMultiModProceed(
+	isMultimode: State<Boolean>,
+	pendingTransactions: State<List<String>>,
+) {
+	//todo dmitry for multimode implement
+
+}
+
+@Composable
+private fun CameraBottomText(isMultimode: Boolean) {
+	Column(
+		Modifier
+			.fillMaxSize(1f)
+			.padding(horizontal = 48.dp),
+	) {
+		Spacer(modifier = Modifier.weight(1f))
+		Text(
+			text = stringResource(
+				if (isMultimode) {
+					R.string.camera_screen_header_multimode
+				} else {
+					R.string.camera_screen_header_single
+				}
+			),
+			color = Color.White,
+			style = TypefaceNew.TitleL,
+			textAlign = TextAlign.Center,
+			modifier = Modifier.fillMaxWidth(1f),
+		)
+		Spacer(modifier = Modifier.padding(bottom = 12.dp))
+		Text(
+			text = stringResource(
+				if (isMultimode) {
+					R.string.camera_screen_description_multimode
+				} else {
+					R.string.camera_screen_description_single
+				}
+			),
+			color = Color.White,
+			style = TypefaceNew.TitleS,
+			textAlign = TextAlign.Center,
+			modifier = Modifier.fillMaxWidth(1f),
+		)
+		Spacer(modifier = Modifier.padding(bottom = 76.dp))
+	}
 }
 
 

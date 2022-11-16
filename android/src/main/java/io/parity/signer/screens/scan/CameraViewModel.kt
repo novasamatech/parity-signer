@@ -24,7 +24,7 @@ class CameraViewModel() : ViewModel() {
 	val isTourchEnabled = MutableStateFlow<Boolean>(false)
 
 	private val _pendingPayloads = MutableStateFlow<List<String>>(emptyList())
-	val pendingPayloads: StateFlow<List<String>> = _pendingPayloads.asStateFlow()
+	val pendingTransactionPayloads: StateFlow<List<String>> = _pendingPayloads.asStateFlow()
 
 	private val _total = MutableStateFlow<Int?>(null)
 	private val _captured = MutableStateFlow<Int?>(null)
@@ -116,7 +116,7 @@ class CameraViewModel() : ViewModel() {
 	}
 
 	suspend fun getTransactionsFromPendingPayload(): List<MTransaction> {
-		val allResults = pendingPayloads.value.map { payload ->
+		val allResults = pendingTransactionPayloads.value.map { payload ->
 			uniffiInteractor.navigate(Action.TRANSACTION_FETCHED, payload)
 		}
 		//todo handle error cases and show ot user?
