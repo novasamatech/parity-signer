@@ -33,10 +33,6 @@ pub enum TransactionAction {
         network_specs_key: NetworkSpecsKey,
     },
     Sign {
-        action: TransactionSignAction,
-        checksum: u32,
-    },
-    SignBulk {
         actions: Vec<TransactionSignAction>,
         checksum: u32,
     },

@@ -59,7 +59,7 @@ where
                         );
                         let network_info = network_specs;
                         Ok(TransactionAction::Sign {
-                            action: TransactionSignAction {
+                            actions: vec![TransactionSignAction {
                                 content: TransactionCardSet {
                                     message: Some(vec![message_card]),
                                     ..Default::default()
@@ -67,7 +67,7 @@ where
                                 has_pwd: address_details.has_pwd,
                                 author_info,
                                 network_info,
-                            },
+                            }],
                             checksum,
                         })
                     } else {

@@ -11,6 +11,9 @@ pub enum Error {
     #[error(transparent)]
     TransactionParsing(#[from] transaction_parsing::Error),
 
+    #[error(transparent)]
+    Hex(#[from] hex::FromHexError),
+
     #[error("DB not initialized.")]
     DbNotInitialized,
 
@@ -22,4 +25,10 @@ pub enum Error {
 
     #[error("Data packing error: {0}")]
     DataPacking(String),
+
+    #[error("Tx Action not sign")]
+    TxActionNotSign,
+
+    #[error("Number of seeds provided does not match number of txs in a bulk")]
+    SeedsNumMismatch,
 }

@@ -1,8 +1,13 @@
 //!List of all screens
+use std::path::Path;
+
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
-use crate::error::{Error, Result};
+use crate::{
+    error::{Error, Result},
+    states::TransactionState,
+};
 use db_handling::{
     helpers::get_address_details,
     identities::get_multisigner_by_address,
@@ -86,15 +91,6 @@ pub struct DeriveState {
     entered_info: EnteredInfo,
     keys_state: KeysState,
     collision: Option<(MultiSigner, AddressDetails)>,
-}
-
-///State of transaction screen
-#[derive(Clone, Debug)]
-pub struct TransactionState {
-    entered_info: EnteredInfo,
-    action: transaction_parsing::TransactionAction,
-    comment: String,
-    counter: u8,
 }
 
 ///State of screen generating sufficient crypto
@@ -395,72 +391,6 @@ impl DeriveState {
             keys_state: self.blank_keys_state(),
             collision: Some((multisigner.to_owned(), address_details.to_owned())),
         }
-    }
-}
-
-impl TransactionState {
-    pub fn new(details_str: &str, dbname: &str) -> Self {
-        Self {
-            entered_info: EnteredInfo("".to_string()),
-            action: transaction_parsing::produce_output(details_str, dbname),
-            comment: "".to_string(),
-            counter: 1,
-        }
-    }
-    pub fn update_seed(&self, new_secret_string: &str) -> Self {
-        Self {
-            entered_info: EnteredInfo(new_secret_string.to_string()),
-            action: self.action(),
-            comment: self.comment.to_string(),
-            counter: self.counter,
-        }
-    }
-    pub fn add_comment(&self, comment: &str) -> Self {
-        Self {
-            entered_info: self.entered_info.to_owned(),
-            action: self.action(),
-            comment: comment.to_string(),
-            counter: self.counter,
-        }
-    }
-    pub fn update_checksum_sign(
-        &self,
-        new_checksum: u32,
-        content: TransactionCardSet,
-        has_pwd: bool,
-        author_info: MAddressCard,
-        network_info: OrderedNetworkSpecs,
-    ) -> Self {
-        let action = transaction_parsing::TransactionAction::Sign {
-            action: TransactionSignAction {
-                content,
-                has_pwd,
-                author_info,
-                network_info,
-            },
-            checksum: new_checksum,
-        };
-        Self {
-            entered_info: self.entered_info.to_owned(),
-            action,
-            comment: self.comment.to_string(),
-            counter: self.counter + 1,
-        }
-    }
-    pub fn action(&self) -> transaction_parsing::TransactionAction {
-        self.action.to_owned()
-    }
-    pub fn seed(&self) -> String {
-        self.entered_info.0.to_string()
-    }
-    pub fn get_comment(&self) -> String {
-        self.comment.to_owned()
-    }
-    pub fn ok(&self) -> bool {
-        self.counter < MAX_COUNT_SET
-    }
-    pub fn counter(&self) -> u8 {
-        self.counter
     }
 }
 

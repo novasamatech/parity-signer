@@ -20,8 +20,9 @@ use crate::alerts::Alert;
 use crate::modals::Modal;
 use crate::screens::{
     AddressState, AddressStateMulti, DeriveState, KeysState, RecoverSeedPhraseState, Screen,
-    SpecialtyKeysState, SufficientCryptoState, TransactionState,
+    SpecialtyKeysState, SufficientCryptoState,
 };
+use crate::states::{SignResult, TransactionState};
 use db_handling::interface_signer::{get_all_seed_names_with_identicons, guess};
 use definitions::{
     keyring::{AddressKey, NetworkSpecsKey},
@@ -395,78 +396,34 @@ impl State {
             }
             Screen::Transaction(ref t) => {
                 match t.action() {
-                    transaction_parsing::TransactionAction::Sign {
-                        action:
-                            TransactionSignAction {
-                                content,
-                                has_pwd,
-                                author_info,
-                                network_info,
-                            },
-                        checksum,
-                    } => {
-                        if has_pwd {
-                            match self.navstate.modal {
-                                Modal::EnterPassword => {
-                                    let mut seed = t.seed();
-                                    match transaction_signing::handle_sign(
-                                        checksum,
-                                        &seed,
-                                        details_str,
-                                        &t.get_comment(),
-                                        dbname,
-                                        network_info.specs.encryption,
-                                    ) {
-                                        Ok(a) => {
-                                            seed.zeroize();
-                                            new_navstate.modal = Modal::SignatureReady(a);
-                                        }
-                                        Err(e) => {
-                                            seed.zeroize();
-                                            if let transaction_signing::Error::WrongPasswordNewChecksum(c) = e {
-                                                if t.ok() {
-                                                    new_navstate.screen = Screen::Transaction(
-                                                        Box::new(t.update_checksum_sign(
-                                                            c,
-                                                            content,
-                                                            has_pwd,
-                                                            author_info,
-                                                            network_info,
-                                                        )),
-                                                    );
-                                                } else {
-                                                    new_navstate =
-                                                        Navstate::clean_screen(Screen::Log);
-                                                }
+                    transaction_parsing::TransactionAction::Sign { .. } => {
+                        t.update_seeds(secret_seed_phrase);
+                        if let Modal::EnterPassword = self.navstate.modal {
+                            t.password_entered(details_str);
+                        }
+
+                        match t.handle_sign(dbname) {
+                            Ok((result, new)) => {
+                                match result {
+                                    SignResult::RequestPassword { idx, counter } => {
+                                        match self.navstate.modal {
+                                            Modal::EnterPassword => {
+                                                let pass = details_str;
                                             }
-                                            new_navstate.alert = Alert::Error;
-                                            let _ = write!(&mut errorline, "{}", e);
+                                            _ => {
+                                                new_navstate.modal = Modal::EnterPassword;
+                                            }
                                         }
                                     }
-                                }
-                                _ => {
-                                    new_navstate.screen = Screen::Transaction(Box::new(
-                                        t.add_comment(details_str).update_seed(secret_seed_phrase),
-                                    ));
-                                    new_navstate.modal = Modal::EnterPassword;
-                                }
+                                    SignResult::Ready { signatures } => {
+                                        new_navstate.modal = Modal::SignatureReady(vec![]);
+                                    }
+                                };
+                                new_navstate.screen = Screen::Transaction(Box::new(new));
                             }
-                        } else {
-                            match transaction_signing::handle_sign(
-                                checksum,
-                                secret_seed_phrase,
-                                "",
-                                details_str,
-                                dbname,
-                                network_info.specs.encryption,
-                            ) {
-                                Ok(a) => {
-                                    new_navstate.modal = Modal::SignatureReady(a);
-                                }
-                                Err(e) => {
-                                    new_navstate.alert = Alert::Error;
-                                    let _ = write!(&mut errorline, "{}", e);
-                                }
+                            Err(e) => {
+                                new_navstate.alert = Alert::Error;
+                                let _ = write!(&mut errorline, "{}", e);
                             }
                         }
                     }
@@ -474,20 +431,20 @@ impl State {
                         s: _,
                         u: checksum,
                         stub: stub_nav,
-                    } => match transaction_signing::handle_stub(checksum, dbname) {
+                    } => match transaction_signing::handle_stub(*checksum, dbname) {
                         Ok(()) => match stub_nav {
                             transaction_parsing::StubNav::AddSpecs {
                                 n: network_specs_key,
                             } => {
                                 new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
-                                    network_specs_key,
+                                    network_specs_key.clone(),
                                 ));
                             }
                             transaction_parsing::StubNav::LoadMeta {
                                 l: network_specs_key,
                             } => {
                                 new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
-                                    network_specs_key,
+                                    network_specs_key.clone(),
                                 ));
                             }
                             transaction_parsing::StubNav::LoadTypes => {
@@ -499,9 +456,6 @@ impl State {
                             let _ = write!(&mut errorline, "{}", e);
                         }
                     },
-                    transaction_parsing::TransactionAction::SignBulk { .. } => {
-                        todo!()
-                    }
                     transaction_parsing::TransactionAction::Read { .. } => {
                         println!("GoForward does nothing here")
                     }
@@ -516,7 +470,7 @@ impl State {
                                 // details_str is seed_name
                                 // `secret_seed_phrase` is `seed_phrase`
                                 match db_handling::identities::import_derivations(
-                                    checksum,
+                                    *checksum,
                                     details_str,
                                     secret_seed_phrase,
                                     dbname,
@@ -1505,27 +1459,12 @@ impl State {
                         network_info,
                         ..
                     } => vec![MTransaction {
-                        content,
+                        content: content.clone(),
                         ttype: TransactionType::ImportDerivations,
                         author_info: None,
-                        network_info: Some(network_info.into()),
+                        network_info: Some(network_info.clone().into()),
                     }],
-                    TransactionAction::Sign {
-                        action:
-                            TransactionSignAction {
-                                content,
-                                author_info,
-                                network_info,
-                                ..
-                            },
-                        ..
-                    } => vec![MTransaction {
-                        content,
-                        ttype: TransactionType::Sign,
-                        author_info: Some(author_info),
-                        network_info: Some(network_info.into()),
-                    }],
-                    TransactionAction::SignBulk { actions, .. } => actions
+                    TransactionAction::Sign { actions, .. } => actions
                         .iter()
                         .map(|a| MTransaction {
                             content: a.content.clone(),
@@ -1535,13 +1474,13 @@ impl State {
                         })
                         .collect(),
                     TransactionAction::Stub { s, .. } => vec![MTransaction {
-                        content: s,
+                        content: s.clone(),
                         ttype: TransactionType::Stub,
                         author_info: None,
                         network_info: None,
                     }],
                     TransactionAction::Read { r } => vec![MTransaction {
-                        content: r,
+                        content: r.clone(),
                         ttype: TransactionType::Read,
                         author_info: None,
                         network_info: None,
@@ -1775,11 +1714,7 @@ impl State {
             }),
             Modal::EnterPassword => match new_navstate.screen {
                 Screen::Transaction(ref t) => {
-                    if let transaction_parsing::TransactionAction::Sign {
-                        action: TransactionSignAction { author_info, .. },
-                        ..
-                    } = t.action()
-                    {
+                    if let Some(author_info) = t.current_password_author_info() {
                         Some(ModalData::EnterPassword {
                             f: MEnterPassword {
                                 author_info,

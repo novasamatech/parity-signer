@@ -40,7 +40,11 @@ enum CardsPrep<'a> {
 /// i.e. it starts with 53****, followed by author address, followed by actual transaction piece,
 /// followed by extrinsics, concluded with chain genesis hash
 
-pub(crate) fn parse_transaction<P>(data_hex: &str, db_path: P) -> Result<TransactionAction>
+pub(crate) fn parse_transaction<P>(
+    data_hex: &str,
+    db_path: P,
+    in_bulk: bool,
+) -> Result<TransactionAction>
 where
     P: AsRef<Path>,
 {
@@ -150,7 +154,7 @@ where
                             Ok(a) => {
                                 found_solution = match cards_prep {
                                     CardsPrep::SignProceed(address_details, possible_warning) => {
-                                        let sign = TrDbColdSignOne::generate(
+                                        let sign_one = TrDbColdSignOne::generate(
                                             SignContent::Transaction {
                                                 method: method_data,
                                                 extensions: extensions_data,
@@ -161,7 +165,9 @@ where
                                             &author_multi_signer,
                                             history,
                                         );
-                                        let sign: TrDbColdSign = sign.into();
+                                        let mut sign = TrDbColdSign::from_storage(&db_path, None)?
+                                            .unwrap_or_default();
+                                        sign.signing_bulk.push(sign_one);
                                         let checksum = sign.store_and_get_checksum(&db_path)?;
                                         let author_info = make_author_info(
                                             &author_multi_signer,
@@ -180,12 +186,12 @@ where
                                             ..Default::default()
                                         };
                                         Some(TransactionAction::Sign {
-                                            action: TransactionSignAction {
+                                            actions: vec![TransactionSignAction {
                                                 content,
                                                 has_pwd: address_details.has_pwd,
                                                 author_info,
                                                 network_info: network_specs.clone(),
-                                            },
+                                            }],
                                             checksum,
                                         })
                                     }

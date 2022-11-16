@@ -1157,11 +1157,12 @@ pub fn full_run(command: Command) -> Result<()> {
             fps,
             keys_num,
         } => generate_key_info_export_to_qr(dst_file, chunk_size, fps, keys_num),
-        Command::BulkTransactionQr {
+        Command::BulkTransactionTestPayload {
             dst_file,
             tx_count,
             chunk_size,
             from,
-        } => generate_bulk_transaction_qr(dst_file, tx_count, chunk_size, from),
+            output_format,
+        } => generate_bulk_transaction_qr(dst_file, tx_count, chunk_size, from, output_format),
     }
 }

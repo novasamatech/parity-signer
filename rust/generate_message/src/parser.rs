@@ -300,7 +300,7 @@ pub enum Command {
     },
 
     /// Produce a bulk tx signing QR
-    BulkTransactionQr {
+    BulkTransactionTestPayload {
         #[arg(long, value_name = "FILE PATH")]
         dst_file: PathBuf,
 
@@ -315,6 +315,10 @@ pub enum Command {
         /// AccountId of transaction in hex form.
         #[arg(long, value_name = "ADDRESS")]
         from: String,
+
+        /// Qr or File
+        #[arg(long, value_name = "OUTPUT FORMAT")]
+        output_format: Goal,
     },
 }
 

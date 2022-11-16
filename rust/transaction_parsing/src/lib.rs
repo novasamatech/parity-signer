@@ -58,7 +58,7 @@ where
     }
 
     match &data_hex[4..6] {
-        "00" | "02" => parse_transaction(data_hex, db_path),
+        "00" | "02" => parse_transaction(data_hex, db_path, false),
         "03" => process_message(data_hex, db_path),
         "04" => parse_transaction_bulk(data_hex, db_path),
         "80" => load_metadata(data_hex, db_path),
@@ -80,13 +80,13 @@ fn parse_transaction_bulk<P: AsRef<Path>>(payload: &str, dbname: P) -> Result<Tr
             for t in &b.encoded_transactions {
                 let encoded = hex::encode(t);
                 let encoded = "53".to_string() + &encoded;
-                let action = parse_transaction(&encoded, &dbname)?;
-                if let TransactionAction::Sign { action, .. } = action {
-                    actions.push(action);
+                let action = parse_transaction(&encoded, &dbname, true)?;
+                if let TransactionAction::Sign { actions: a, .. } = action {
+                    actions.push(a[0].clone());
                 }
             }
 
-            Ok(TransactionAction::SignBulk {
+            Ok(TransactionAction::Sign {
                 actions,
                 checksum: 0,
             })

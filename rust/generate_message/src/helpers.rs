@@ -27,7 +27,7 @@ use definitions::{
 use crate::error::{Changed, Error, NotHexActive, Result, SpecsError};
 use crate::fetch_metadata::{fetch_info, fetch_info_with_network_specs, fetch_meta_at_block};
 use crate::interpret_specs::{check_specs, interpret_properties, TokenFetch};
-use crate::parser::Token;
+use crate::parser::{Goal, Token};
 
 /// Get [`AddressBookEntry`] from the database for given address book title.
 pub fn get_address_book_entry<P>(title: &str, db_path: P) -> Result<AddressBookEntry>
@@ -694,6 +694,7 @@ pub fn generate_bulk_transaction_qr<P: AsRef<Path>>(
     tx_count: usize,
     chunk_size: u16,
     from: String,
+    output_format: Goal,
 ) -> Result<()> {
     let encoded_transactions = (0..tx_count).map(|_| {
 
@@ -711,7 +712,13 @@ let line = "0102".to_string() +
 
     let payload = [&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat();
 
-    generate_qr_code(&payload, chunk_size, 8, dst_file)
+    match output_format {
+        Goal::Qr => generate_qr_code(&payload, chunk_size, 8, dst_file)?,
+        Goal::Text => std::fs::write(dst_file, hex::encode(payload))?,
+        Goal::Both => todo!(),
+    };
+
+    Ok(())
 }
 
 /// Generate with data into a specified file.

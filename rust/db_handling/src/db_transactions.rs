@@ -812,7 +812,7 @@ impl Default for TrDbColdStub {
 /// - relevant history [`Event`] set: warnings that were shown during the
 /// parsing
 #[cfg(feature = "signer")]
-#[derive(Debug, Decode, Encode)]
+#[derive(Debug, Decode, Default, Encode)]
 pub struct TrDbColdSign {
     pub signing_bulk: Vec<TrDbColdSignOne>,
 }
@@ -828,17 +828,19 @@ impl TrDbColdSign {
     /// [`TRANSACTION`] tree is **not** cleared in the process. User is allowed
     /// to try entering password several times, for all this time the
     /// transaction remains in the database.
-    pub fn from_storage<P: AsRef<Path>>(db_path: P, checksum: u32) -> Result<Self> {
+    pub fn from_storage<P: AsRef<Path>>(db_path: P, checksum: Option<u32>) -> Result<Option<Self>> {
         let sign_encoded = {
             let database = open_db(&db_path)?;
-            verify_checksum(&database, checksum)?;
+            if let Some(checksum) = checksum {
+                verify_checksum(&database, checksum)?;
+            }
             let transaction = open_tree(&database, TRANSACTION)?;
             match transaction.get(SIGN)? {
                 Some(a) => a,
-                None => return Err(Error::Sign),
+                None => return Ok(None),
             }
         };
-        Ok(Self::decode(&mut &sign_encoded[..])?)
+        Ok(Some(Self::decode(&mut &sign_encoded[..])?))
     }
 
     /// Put SCALE-encoded [`TrDbColdSign`] into storage in the [`TRANSACTION`]
@@ -879,45 +881,42 @@ impl TrDbColdSign {
     ///
     /// Function returns database checksum, to be collected and re-used in case
     /// of wrong password entry.
-    ///
-    /// If the password entered is correct, the [`TRANSACTION`] tree gets
-    /// cleared.
     pub fn apply<P: AsRef<Path>>(
         self,
         wrong_password: bool,
         user_comment: &str,
+        idx: usize,
         db_path: P,
     ) -> Result<u32> {
         let mut history = vec![];
-        let mut for_transaction = Batch::default();
-        for s in &self.signing_bulk {
-            let signed_by = VerifierValue::Standard { m: s.multisigner() };
-            history.append(&mut s.history.clone());
-            match &s.content {
-                SignContent::Transaction { method, extensions } => {
-                    let transaction = [method.encode(), extensions.clone()].concat();
-                    let sign_display =
-                        SignDisplay::get(&transaction, &s.network_name, &signed_by, user_comment);
-                    if wrong_password {
-                        history.push(Event::TransactionSignError { sign_display })
-                    } else {
-                        history.push(Event::TransactionSigned { sign_display });
-                        for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
-                    }
+        let for_transaction = Batch::default();
+        let s = &self.signing_bulk[idx];
+        let signed_by = VerifierValue::Standard { m: s.multisigner() };
+        history.append(&mut s.history.clone());
+        match &s.content {
+            SignContent::Transaction { method, extensions } => {
+                let transaction = [method.encode(), extensions.clone()].concat();
+                let sign_display =
+                    SignDisplay::get(&transaction, &s.network_name, &signed_by, user_comment);
+                if wrong_password {
+                    history.push(Event::TransactionSignError { sign_display })
+                } else {
+                    history.push(Event::TransactionSigned { sign_display });
+                    //for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
                 }
-                SignContent::Message(message) => {
-                    let sign_message_display =
-                        SignMessageDisplay::get(message, &s.network_name, &signed_by, user_comment);
-                    if wrong_password {
-                        history.push(Event::MessageSignError {
-                            sign_message_display,
-                        })
-                    } else {
-                        history.push(Event::MessageSigned {
-                            sign_message_display,
-                        });
-                        for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
-                    }
+            }
+            SignContent::Message(message) => {
+                let sign_message_display =
+                    SignMessageDisplay::get(message, &s.network_name, &signed_by, user_comment);
+                if wrong_password {
+                    history.push(Event::MessageSignError {
+                        sign_message_display,
+                    })
+                } else {
+                    history.push(Event::MessageSigned {
+                        sign_message_display,
+                    });
+                    //for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
                 }
             }
         }
