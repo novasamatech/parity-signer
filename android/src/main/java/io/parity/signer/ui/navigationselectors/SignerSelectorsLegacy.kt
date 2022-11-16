@@ -2,6 +2,7 @@ package io.parity.signer.ui.navigationselectors
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.alerts.ShieldAlert
@@ -26,7 +27,7 @@ fun ScreenSelector(
 	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 	val button2: (Action, String) -> Unit =
 		{ action, details -> button(action, details, "") }
-	val seedNames = signerDataModel.seedNames.value ?: emptyArray()
+	val seedNames = signerDataModel.seedNames.collectAsState()
 
 	when (screenData) {
 		is ScreenData.DeriveKey -> NewAddressScreen(
@@ -55,12 +56,12 @@ fun ScreenSelector(
 		is ScreenData.NewSeed -> NewSeedScreen(
 			screenData.f,
 			signerDataModel::navigate,
-			seedNames
+			seedNames.value
 		)
 		is ScreenData.RecoverSeedName -> RecoverSeedName(
 			screenData.f,
 			signerDataModel::navigate,
-			seedNames
+			seedNames.value
 		)
 		is ScreenData.RecoverSeedPhrase -> RecoverSeedPhrase(
 			recoverSeedPhrase = screenData.f,
