@@ -112,8 +112,6 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 
 	override fun backAction() {
 		if (singleton.localNavAction.value !is LocalNavAction.None) {
-			//todo support navigation stack from compose NavHostController
-			// rather than going all the way back to rust navigation
 			singleton._localNavAction.value = LocalNavAction.None
 		} else {
 			backRustNavigation()
@@ -123,13 +121,13 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 	private fun backRustNavigation() {
 		val lastRustNavAction = singleton.actionResult.value
 		if (
-			lastRustNavAction?.alertData == null &&
-			lastRustNavAction?.modalData == null &&
+			lastRustNavAction.alertData == null &&
+			lastRustNavAction.modalData == null &&
 			(
-				lastRustNavAction?.screenData is ScreenData.Log ||
-					lastRustNavAction?.screenData is ScreenData.Scan ||
-					lastRustNavAction?.screenData is ScreenData.SeedSelector ||
-					lastRustNavAction?.screenData is ScreenData.Settings
+				lastRustNavAction.screenData is ScreenData.Log ||
+					lastRustNavAction.screenData is ScreenData.Scan ||
+					lastRustNavAction.screenData is ScreenData.SeedSelector ||
+					lastRustNavAction.screenData is ScreenData.Settings
 				)
 		) {
 			singleton.activity.moveTaskToBack(true)
