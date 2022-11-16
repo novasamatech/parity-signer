@@ -8,10 +8,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -165,8 +162,13 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 					onDismissRequest = { },
 					confirmButton = {
 						val scope = rememberCoroutineScope()
-						Button(onClick = { scope.launch { cameraPermissionState.launchPermissionRequest() } }) {
-							Text(text = stringResource(R.string.generic_ok))
+						Button(
+							colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background),
+							onClick = { scope.launch { cameraPermissionState.launchPermissionRequest() }
+// todo dmitry dismiss												dism
+												},
+						) {
+							Text(text = stringResource(R.string.generic_ok))//todo dmitry back window for ok. Fix it.
 						}
 					},
 					title = { Text(text = stringResource(R.string.camera_jastification_title)) },
