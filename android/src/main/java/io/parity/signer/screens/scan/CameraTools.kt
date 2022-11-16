@@ -1,11 +1,12 @@
 package io.parity.signer.screens.scan
 
 import android.content.res.Configuration
-import android.graphics.RectF
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -19,13 +20,19 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import io.parity.signer.components.base.CloseIcon
+import io.parity.signer.models.Callback
+import io.parity.signer.models.FeatureOption
+import io.parity.signer.screens.scan.items.CameraLightIcon
+import io.parity.signer.screens.scan.items.CameraMultiSignIcon
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.fill30
 import io.parity.signer.ui.theme.forcedFill40
 import io.parity.signer.ui.theme.pink500
 
 @Composable
-fun TransparentClipLayout(
+internal fun TransparentClipLayout(
 	modifier: Modifier = Modifier,
 ) {
 	val offsetY = remember { 140.dp }
@@ -105,6 +112,36 @@ fun TransparentClipLayout(
 			restoreToCount(checkPointFrame)
 
 		}
+	}
+}
+
+@Composable
+internal fun ScanHeader(
+	modifier: Modifier = Modifier,
+	onClose: Callback,
+) {
+	val viewModel: CameraViewModel = viewModel()
+	val tourchEnabled by viewModel.isTourchEnabled.collectAsState()
+	val multiMode by viewModel.isMultiscanMode.collectAsState()
+	Row(
+		modifier
+			.fillMaxWidth(1f)
+			.padding(horizontal = 16.dp)
+	) {
+		CloseIcon(
+			onCloseClicked = onClose
+		)
+		Spacer(modifier = Modifier.weight(1f))
+		if (FeatureOption.MULTI_TRANSACTION_CAMERA.isEnabled()) {
+			CameraMultiSignIcon(isEnabled = multiMode,
+				onClick = { viewModel.isMultiscanMode.value = !multiMode })
+		}
+		Spacer(modifier = Modifier.padding(end = 8.dp))
+		CameraLightIcon(isEnabled = tourchEnabled,
+			onClick = {
+				viewModel.isTourchEnabled.value = !tourchEnabled
+			}) //todo Dmitry implement in viewmodel
+
 	}
 }
 

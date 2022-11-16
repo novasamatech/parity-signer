@@ -57,7 +57,6 @@ fun ScanScreen(
 	val total by viewModel.total.collectAsState()
 	val isMultimode by viewModel.isMultiscanMode.collectAsState()
 
-
 	LaunchedEffect(key1 = isMultimode) {
 		if (!isMultimode) {
 			viewModel.pendingPayloads
@@ -137,14 +136,14 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 					confirmButton = {
 						val scope = rememberCoroutineScope()
 						Button(onClick = { scope.launch { cameraPermissionState.launchPermissionRequest() } }) {
-							Text(text = "OK")
+							Text(text = stringResource(R.string.generic_ok))
 						}
 					},
-					title = { Text(text = "Camera required!") },
-					text = { Text(text = "To work with QR code we need camera permission, this is main functionality of this app!") },
+					title = { Text(text = stringResource(R.string.camera_jastification_title)) },
+					text = { Text(text = stringResource(R.string.camera_jastification_message)) },
 				)
 			} else {
-				Text("Camera permission not granted")
+				Text(stringResource(R.string.camera_no_permission_text))
 				LaunchedEffect(key1 = Unit) {
 					launch { cameraPermissionState.launchPermissionRequest() }
 				}
@@ -174,7 +173,6 @@ private fun CameraViewInternal(viewModel: CameraViewModel) {
 			// to scan all barcode formats, which is slow.
 			val options = BarcodeScannerOptions.Builder()
 				.setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
-
 			val barcodeScanner = BarcodeScanning.getClient(options)
 
 			cameraProviderFuture.addListener({
@@ -205,40 +203,10 @@ private fun CameraViewInternal(viewModel: CameraViewModel) {
 					preview
 				)
 			}, executor)
+
 			previewView
 		},
 	)
-}
-
-
-@Composable
-private fun ScanHeader(
-	modifier: Modifier = Modifier,
-	onClose: Callback,
-) {
-	val viewModel: CameraViewModel = viewModel()
-	val tourchEnabled by viewModel.isTourchEnabled.collectAsState()
-	val multiMode by viewModel.isMultiscanMode.collectAsState()
-	Row(
-        modifier
-            .fillMaxWidth(1f)
-            .padding(horizontal = 16.dp)
-	) {
-		CloseIcon(
-			onCloseClicked = onClose
-		)
-		Spacer(modifier = Modifier.weight(1f))
-		if (FeatureOption.MULTI_TRANSACTION_CAMERA.isEnabled()) {
-			CameraMultiSignIcon(isEnabled = multiMode,
-				onClick = {	viewModel.isMultiscanMode.value = !multiMode})
-		}
-		Spacer(modifier = Modifier.padding(end = 8.dp))
-		CameraLightIcon(isEnabled = tourchEnabled,
-			onClick = {
-				viewModel.isTourchEnabled.value = !tourchEnabled
-			}) //todo Dmitry implement in viewmodel
-
-	}
 }
 
 
@@ -253,7 +221,6 @@ private fun ScanHeader(
 )
 @Composable
 private fun PreviewScanScreen() {
-	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			ScanScreen({}, { _ -> })
