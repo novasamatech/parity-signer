@@ -45,15 +45,21 @@ fun ScanNavSubgraph(
 		composable(ScanNavSubgraph.transaction) {
 			Box(modifier = Modifier.statusBarsPadding()) {
 				TransactionPreviewEdited(
-					transaction = currentTransaction.first()!!, //todo dmutry
+					transaction = currentTransaction.first()!!, //todo dmutry multuimode support missing yet
 					onBack = {
 						//was navigate(Action.GO_BACK, "", "")
 						navController.navigate(ScanNavSubgraph.camera)
 					},
 					onFinish = {
+						rootNavigator.navigate(Action.GO_FORWARD) //todo dmitry put modals below to new selector
 						//todo dmitry handle subsequent modals
 //						rust/navigator/src/navstate.rs:396
-						rootNavigator.navigate(Action.GO_FORWARD, "", "")
+//						val navResult = uniffiinteractor.ProcessBatchTransactions(some_all) and handle
+							//Modal::EnterPassword
+						//Modal::SignatureReady(a);
+						//Screen::Transaction( can come with updated checksub
+						//success will clear to log
+						//alert error
 					},
 					signTransaction = signerDataModel::signTransaction,
 				)
