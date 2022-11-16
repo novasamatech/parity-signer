@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Address
@@ -77,7 +78,7 @@ fun KeyCardOld(identity: MAddressCard, multiselectMode: Boolean = false) {
 				}
 			}
 			Text(
-				identity.base58.abbreviateString(8),
+				identity.base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
 				color = MaterialTheme.colors.Text400,
 				style = CryptoTypography.body2
 			)

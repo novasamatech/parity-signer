@@ -1,7 +1,6 @@
 package io.parity.signer.screens.keysetdetails
 
 import android.content.res.Configuration
-import android.telecom.Call
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,59 +17,75 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.components.base.SecondaryButtonBottomSheet
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.Callback
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
-import io.parity.signer.screens.keydetails.KeyDetailsDeleteConfirmBottomSheet
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
 import io.parity.signer.uniffi.Action
 
-/**
- * Old was [SeedMenu]
- */
 @Composable
 fun KeySetDetailsMenu(
 	navigator: Navigator,
 	alertState: State<AlertState?>,
 	removeSeed: Callback,
 	onSelectKeysClicked: Callback,
+	onBackupClicked: Callback,
 ) {
 	val state = remember {
 		mutableStateOf(KeySetDetailsMenuState.GENERAL)
 	}
 	when (state.value) {
-		KeySetDetailsMenuState.GENERAL -> KeyDetailsMenuGeneral(
-			navigator = navigator,
-			alertState = alertState,
-			onDeleteClicked = { state.value = KeySetDetailsMenuState.DELETE_CONFIRM },
-			onSelectKeysClicked = onSelectKeysClicked,
-		)
+		KeySetDetailsMenuState.GENERAL ->
+			KeyDetailsMenuGeneral(
+				navigator = navigator,
+				alertState = alertState,
+				onDeleteClicked = {
+					state.value = KeySetDetailsMenuState.DELETE_CONFIRM
+				},
+				onSelectKeysClicked = onSelectKeysClicked,
+				onBackupClicked = onBackupClicked,
+			)
 		KeySetDetailsMenuState.DELETE_CONFIRM ->
-			KeyDetailsDeleteConfirmBottomSheet(
+			KeySetDeleteConfirmBottomSheet(
 				onCancel = { state.value = KeySetDetailsMenuState.GENERAL },
 				onRemoveKey = removeSeed,
-//				navigator.navigate(Action.REMOVE_KEY) action that was there to show old confirmation screen.
 			)
 	}
 }
 
+//todo dmitry switch state back to general if sheet is closed
+@Composable
+fun KeySetDeleteConfirmBottomSheet(
+	onCancel: Callback,
+	onRemoveKey: Callback,
+) {
+	BottomSheetConfirmDialog(
+		title = stringResource(R.string.remove_key_set_confirm_title),
+		message = stringResource(R.string.remove_key_set_confirm_text),
+		ctaLabel = stringResource(R.string.remove_key_set_confirm_cta),
+		onCancel = onCancel,
+		onCta = onRemoveKey,
+	)
+}
 
 @Composable
 fun KeyDetailsMenuGeneral(
 	navigator: Navigator,
 	alertState: State<AlertState?>,
 	onSelectKeysClicked: Callback,
+	onBackupClicked: Callback,
 	onDeleteClicked: Callback,
 ) {
 	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-			.fillMaxWidth()
-			.padding(start = sidePadding, end = sidePadding, top = 8.dp),
+            .fillMaxWidth()
+            .padding(start = sidePadding, end = sidePadding, top = 8.dp),
 	) {
 
 		MenuItemForBottomSheet(
@@ -95,7 +110,7 @@ fun KeyDetailsMenuGeneral(
 			label = stringResource(R.string.menu_option_backup_key_set),
 			onclick = {
 				if (alertState.value == AlertState.None)
-					navigator.navigate(Action.BACKUP_SEED)
+					onBackupClicked()
 				else
 					navigator.navigate(Action.SHIELD)
 			}
@@ -107,7 +122,7 @@ fun KeyDetailsMenuGeneral(
 			tint = MaterialTheme.colors.red400,
 			onclick = onDeleteClicked
 		)
-		Spacer(modifier = Modifier.padding(bottom = 16.dp))
+		Spacer(modifier = Modifier.padding(bottom = 8.dp))
 		SecondaryButtonBottomSheet(
 			label = stringResource(R.string.generic_cancel),
 		) {
@@ -137,7 +152,7 @@ private fun PreviewKeyDetailsMenu() {
 	SignerNewTheme {
 		val state = remember { mutableStateOf(AlertState.None) }
 		KeySetDetailsMenu(
-			EmptyNavigator(), state, {}, {},
+			EmptyNavigator(), state, {}, {}, {},
 		)
 	}
 }

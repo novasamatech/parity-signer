@@ -50,7 +50,7 @@ jobs:
           use-tool-cache:     true
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@22c9328bcba27aa81a32b1bef27c7e3c78052531 # v2.0.1
+        uses:                 Swatinem/rust-cache@359a70e43a0bb8a13953b04a90f76428b4959bb6 # v2.2.0
         with:
           workspaces:         rust -> rust/target
 

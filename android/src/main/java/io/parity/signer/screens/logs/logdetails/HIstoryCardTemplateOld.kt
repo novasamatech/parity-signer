@@ -1,4 +1,4 @@
-package io.parity.signer.components
+package io.parity.signer.screens.logs.logdetails
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.*
 
 @Composable
-fun HistoryCardTemplate(
+fun HistoryCardTemplateOld(
 	image: ImageVector,
 	line1: String,
 	line2: String,

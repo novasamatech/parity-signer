@@ -7,10 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.screens.keydetails.exportprivatekey.ConfirmExportPrivateKeyMenu
 import io.parity.signer.components.base.RowButtonsBottomSheet
 import io.parity.signer.components.base.SecondaryButtonBottomSheet
@@ -106,7 +104,7 @@ private fun KeyDetailsGeneralMenu(
 				state.value = KeyDetailsMenuState.DELETE_CONFIRM
 			}
 		)
-		Spacer(modifier = Modifier.padding(bottom = 16.dp))
+		Spacer(modifier = Modifier.padding(bottom = 8.dp))
 		SecondaryButtonBottomSheet(
 			label = stringResource(R.string.generic_cancel),
 		) {
@@ -122,40 +120,13 @@ fun KeyDetailsDeleteConfirmBottomSheet(
 	onCancel: Callback,
 	onRemoveKey: Callback,
 ) {
-	val sidePadding = 24.dp
-	Column(
-		modifier = Modifier
-			.fillMaxWidth()
-			.padding(start = sidePadding, end = sidePadding, top = 32.dp),
-	) {
-
-		Text(
-			modifier = Modifier.fillMaxWidth(1f),
-			text = stringResource(R.string.remove_key_confirm_title),
-			color = MaterialTheme.colors.primary,
-			style = TypefaceNew.TitleL,
-			textAlign = TextAlign.Center,
-		)
-		Text(
-			modifier = Modifier
-				.fillMaxWidth(1f)
-				.padding(
-					top = 16.dp, bottom = 24.dp,
-					start = 8.dp, end = 8.dp
-				),
-			text = stringResource(R.string.remove_key_confirm_text),
-			color = MaterialTheme.colors.textSecondary,
-			style = TypefaceNew.BodyL,
-			textAlign = TextAlign.Center,
-		)
-		RowButtonsBottomSheet(
-			labelCancel = stringResource(R.string.generic_cancel),
-			labelCta = stringResource(R.string.remove_key_confirm_cta),
-			onClickedCancel = onCancel,
-			onClickedCta = onRemoveKey,
-		)
-		Spacer(modifier = Modifier.padding(bottom = 24.dp))
-	}
+	BottomSheetConfirmDialog(
+		title = stringResource(R.string.remove_key_confirm_title),
+		message = stringResource(R.string.remove_key_confirm_text),
+		ctaLabel = stringResource(R.string.remove_key_confirm_cta),
+		onCancel = onCancel,
+		onCta = onRemoveKey,
+	)
 }
 
 

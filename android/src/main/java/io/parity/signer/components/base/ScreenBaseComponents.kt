@@ -15,16 +15,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun ScreenHeader(
@@ -88,6 +86,7 @@ fun ScreenHeader(
 @Composable
 fun ScreenHeaderClose(
 	title: String,
+	subtitle: String? = null,
 	onClose: () -> Unit,
 	onMenu: (() -> Unit)? = null,
 ) {
@@ -108,15 +107,28 @@ fun ScreenHeaderClose(
 				.align(Alignment.CenterVertically)
 		)
 		//center
-		Text(
-			text = title,
-			color = MaterialTheme.colors.primary,
-			style = TypefaceNew.TitleS,
-			textAlign = TextAlign.Center,
+		Column(
 			modifier = Modifier
 				.align(Alignment.CenterVertically)
 				.weight(1f)
-		)
+		) {
+			Text(
+				text = title,
+				color = MaterialTheme.colors.primary,
+				style = TypefaceNew.TitleS,
+				textAlign = TextAlign.Center,
+				modifier = Modifier.fillMaxWidth(1f),
+			)
+			if (subtitle != null) {
+				Text(
+					text = subtitle,
+					color = MaterialTheme.colors.textTertiary,
+					style = TypefaceNew.CaptionM,
+					textAlign = TextAlign.Center,
+					modifier = Modifier.fillMaxWidth(1f),
+				)
+			}
+		}
 		//end
 		if (onMenu != null) {
 			Image(
@@ -176,6 +188,12 @@ private fun PreviewScreenBaseComponent() {
 				stringResource(id = R.string.key_sets_screem_title),
 				onClose = {},
 				onMenu = null,
+			)
+			ScreenHeaderClose(
+				stringResource(id = R.string.key_sets_screem_title),
+				"subtitle",
+				onClose = {},
+				onMenu = {},
 			)
 		}
 	}

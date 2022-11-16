@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import io.parity.signer.components.BigButton
@@ -28,7 +29,6 @@ import io.parity.signer.screens.LandingView
 import io.parity.signer.screens.WaitingScreen
 import io.parity.signer.ui.navigationselectors.*
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.ScreenData
 import io.parity.signer.uniffi.initLogging
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 @ExperimentalAnimationApi
 @Composable
 fun SignerApp(signerDataModel: SignerDataModel) {
-	SignerOldTheme {
+	SignerNewTheme {
 		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 		val authenticated = signerDataModel.authenticated.observeAsState()
 		val actionResult = signerDataModel.actionResult.observeAsState()
@@ -78,8 +78,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		val localNavAction = signerDataModel.localNavAction.observeAsState()
 
 		when (onBoardingDone.value) {
-			OnBoardingState.Yes -> {
-
+			OnboardingWasShown.Yes -> {
 				if (authenticated.value == true) {
 					BackHandler {
 						signerDataModel.navigator.backAction()
@@ -107,7 +106,8 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							bottomBar = {
 								if (NavigationMigrations.shouldShowBar(
 										localNavAction = localNavAction.value,
-										globalNavAction = actionResult.value,)
+										globalNavAction = actionResult.value,
+									)
 									&& actionResult.value?.footer == true
 								) {
 									BottomBar(signerDataModel = signerDataModel)
@@ -141,33 +141,31 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							}
 						}
 						//new screens selectors
-						SignerNewTheme() {
-							Box(
-								modifier = Modifier
-									.navigationBarsPadding()
-									.captionBarPadding(),
-							) {
-								CombinedScreensSelector(
-									screenData = actionResult.value?.screenData
-										?: ScreenData.Documents,//default fallback
-									alertState = shieldAlert,
-									signerDataModel = signerDataModel
-								)
-								BottomSheetSelector(
-									modalData = actionResult.value?.modalData,
-									localNavAction = localNavAction.value,
-									alertState = shieldAlert,
-									signerDataModel = signerDataModel,
-									navigator = signerDataModel.navigator,
-								)
-							}
+						Box(
+							modifier = Modifier
+								.navigationBarsPadding()
+								.captionBarPadding(),
+						) {
+							CombinedScreensSelector(
+								screenData = actionResult.value?.screenData
+									?: ScreenData.Documents,//default fallback
+								alertState = shieldAlert,
+								signerDataModel = signerDataModel
+							)
+							BottomSheetSelector(
+								modalData = actionResult.value?.modalData,
+								localNavAction = localNavAction.value,
+								alertState = shieldAlert,
+								signerDataModel = signerDataModel,
+								navigator = signerDataModel.navigator,
+							)
 						}
 					}
 				} else {
 					Column(verticalArrangement = Arrangement.Center) {
 						Spacer(Modifier.weight(0.5f))
 						BigButton(
-							text = "Unlock app",
+							text = stringResource(R.string.unlock_app_button),
 							action = {
 								signerDataModel.authentication.authenticate(signerDataModel.activity) {
 									signerDataModel.totalRefresh()
@@ -178,7 +176,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					}
 				}
 			}
-			OnBoardingState.No -> {
+			OnboardingWasShown.No -> {
 				if (shieldAlert.value == AlertState.None) {
 					Scaffold(
 						modifier = Modifier
@@ -203,14 +201,14 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					}
 				}
 			}
-			OnBoardingState.InProgress -> {
+			OnboardingWasShown.InProgress -> {
 				if (authenticated.value == true) {
 					WaitingScreen()
 				} else {
 					Column(verticalArrangement = Arrangement.Center) {
 						Spacer(Modifier.weight(0.5f))
 						BigButton(
-							text = "Unlock app",
+							text = stringResource(R.string.unlock_app_button),
 							action = {
 								signerDataModel.lateInit()
 							}
