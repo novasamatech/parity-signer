@@ -14,7 +14,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
@@ -27,7 +26,6 @@ import io.parity.signer.models.FeatureOption
 import io.parity.signer.screens.scan.items.CameraLightIcon
 import io.parity.signer.screens.scan.items.CameraMultiSignIcon
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.fill30
 import io.parity.signer.ui.theme.forcedFill40
 import io.parity.signer.ui.theme.pink500
 
@@ -92,20 +90,23 @@ internal fun TransparentClipLayout(
 			//cutout horizontal
 			drawRect(
 				topLeft = Offset(
-					x = topLeftClipX - frameThikness , //to overcover full width
-					y = offsetInPx + sideInPx/3
+					x = topLeftClipX - frameThikness, //to overcover full width
+					y = offsetInPx + sideInPx / 3
 				),
-				size = Size(width = sideInPx + frameThikness*2, height = sideInPx/3),
+				size = Size(
+					width = sideInPx + frameThikness * 2,
+					height = sideInPx / 3
+				),
 				color = Color.Transparent,
 				blendMode = BlendMode.Clear
 			)
 			//cutout vertical
 			drawRect(
 				topLeft = Offset(
-					x = topLeftClipX + sideInPx/3,
+					x = topLeftClipX + sideInPx / 3,
 					y = offsetInPx - frameThikness
 				),
-				size = Size(sideInPx/3, sideInPx + frameThikness*2),
+				size = Size(sideInPx / 3, sideInPx + frameThikness * 2),
 				color = Color.Transparent,
 				blendMode = BlendMode.Clear
 			)
@@ -121,7 +122,7 @@ internal fun ScanHeader(
 	onClose: Callback,
 ) {
 	val viewModel: CameraViewModel = viewModel()
-	val tourchEnabled by viewModel.isTourchEnabled.collectAsState()
+	val torchEnabled by viewModel.isTorchEnabled.collectAsState()
 	val multiMode by viewModel.isMultiscanMode.collectAsState()
 	Row(
 		modifier
@@ -137,13 +138,12 @@ internal fun ScanHeader(
 				onClick = { viewModel.isMultiscanMode.value = !multiMode })
 		}
 		Spacer(modifier = Modifier.padding(end = 8.dp))
-		CameraLightIcon(isEnabled = tourchEnabled,
+		CameraLightIcon(isEnabled = torchEnabled,
 			onClick = {
-				viewModel.isTourchEnabled.value = !tourchEnabled
-			}) //todo Dmitry implement in viewmodel
+				viewModel.isTorchEnabled.value = !torchEnabled
+			})
 	}
 }
-
 
 
 @Preview(

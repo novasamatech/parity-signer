@@ -65,9 +65,9 @@ fun ScanScreen(
 	}
 
 	Box(
-        Modifier
-            .fillMaxSize(1f)
-            .background(MaterialTheme.colors.background)
+		Modifier
+			.fillMaxSize(1f)
+			.background(MaterialTheme.colors.background)
 	) {
 		CameraViewPermission(viewModel)
 		ScanHeader(Modifier.statusBarsPadding(), onClose)
@@ -111,9 +111,9 @@ private fun CameraMultiModProceed(
 @Composable
 private fun CameraBottomText(isMultimode: Boolean) {
 	Column(
-        Modifier
-            .fillMaxSize(1f)
-            .padding(horizontal = 48.dp),
+		Modifier
+			.fillMaxSize(1f)
+			.padding(horizontal = 48.dp),
 	) {
 		Spacer(modifier = Modifier.weight(1f))
 		Text(
@@ -188,6 +188,7 @@ private fun CameraViewInternal(viewModel: CameraViewModel) {
 	val context = LocalContext.current
 	val cameraProviderFuture =
 		remember { ProcessCameraProvider.getInstance(context) }
+	val coroutineScope = rememberCoroutineScope()
 
 	AndroidView(
 		factory = { context ->
@@ -226,14 +227,20 @@ private fun CameraViewInternal(viewModel: CameraViewModel) {
 					}
 
 				cameraProvider.unbindAll()
-				cameraProvider.bindToLifecycle(
+				val camera = cameraProvider.bindToLifecycle(
 					lifecycleOwner,
 					cameraSelector,
 					imageAnalysis,
 					preview
 				)
+				if (camera.cameraInfo.hasFlashUnit()) {
+					coroutineScope.launch {
+						viewModel.isTorchEnabled.collect {
+							camera.cameraControl.enableTorch(it)
+						}
+					}
+				}
 			}, executor)
-
 			previewView
 		},
 	)

@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 class CameraViewModel() : ViewModel() {
 
 	val isMultiscanMode = MutableStateFlow(false)
-	val isTourchEnabled = MutableStateFlow<Boolean>(false)
+	val isTorchEnabled = MutableStateFlow<Boolean>(false)
 
 	private val _pendingPayloads = MutableStateFlow<List<String>>(emptyList())
 	val pendingTransactionPayloads: StateFlow<List<String>> = _pendingPayloads.asStateFlow()
