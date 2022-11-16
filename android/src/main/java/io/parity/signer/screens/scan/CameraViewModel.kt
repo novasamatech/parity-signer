@@ -33,11 +33,11 @@ class CameraViewModel() : ViewModel() {
 	internal val total: StateFlow<Int?> = _total.asStateFlow()
 	internal val captured: StateFlow<Int?> = _captured.asStateFlow()
 
-	// Camera stuff
-	private var bucket = arrayOf<String>()
-	private var payload: String = ""
 
-	val uniffiInteractor = ServiceLocator.backendLocator.uniffiInteractor
+	// payload of currently scanned qr codes for multiqr transaction like metadata update.
+	private var currentMultiQrTransaction = arrayOf<String>()
+
+	private val uniffiInteractor = ServiceLocator.backendLocator.uniffiInteractor
 
 	/**
 	 * Barcode detecting function.
@@ -58,14 +58,14 @@ class CameraViewModel() : ViewModel() {
 			.addOnSuccessListener { barcodes ->
 				barcodes.forEach {
 					val payloadString = it?.rawBytes?.encodeHex()
-					if (!(bucket.contains(payloadString) || payloadString.isNullOrEmpty())) {
+					if (!(currentMultiQrTransaction.contains(payloadString) || payloadString.isNullOrEmpty())) {
 						if (total.value == null) {
 							try {
 								val proposeTotal =
 									qrparserGetPacketsTotal(payloadString, true).toInt()
 								if (proposeTotal == 1) {
 									try {
-										payload = qrparserTryDecodeQrSequence(
+										val payload = qrparserTryDecodeQrSequence(
 											listOf(payloadString),
 											true
 										)
@@ -75,18 +75,18 @@ class CameraViewModel() : ViewModel() {
 										Log.e("Single frame decode failed", e.toString())
 									}
 								} else {
-									bucket += payloadString
+									currentMultiQrTransaction += payloadString
 									_total.value = proposeTotal
 								}
 							} catch (e: java.lang.Exception) {
 								Log.e("QR sequence length estimation", e.toString())
 							}
 						} else {
-							bucket += payloadString
-							if ((bucket.size + 1) >= (total.value ?: 0)) {
+							currentMultiQrTransaction += payloadString
+							if ((currentMultiQrTransaction.size + 1) >= (total.value ?: 0)) {
 								try {
-									payload = qrparserTryDecodeQrSequence(
-										bucket.toList(),
+									val payload = qrparserTryDecodeQrSequence(
+										currentMultiQrTransaction.toList(),
 										true
 									)
 									if (payload.isNotEmpty()) {
@@ -97,7 +97,7 @@ class CameraViewModel() : ViewModel() {
 									Log.e("failed to parse sequence", e.toString())
 								}
 							}
-							_captured.value = bucket.size
+							_captured.value = currentMultiQrTransaction.size
 							Log.d("captured", captured.value.toString())
 						}
 					}
@@ -131,7 +131,7 @@ class CameraViewModel() : ViewModel() {
 	 * Clears camera progress
 	 */
 	fun resetScanValues() {
-		bucket = arrayOf()
+		currentMultiQrTransaction = arrayOf()
 		_captured.value = null
 		_total.value = null
 	}
