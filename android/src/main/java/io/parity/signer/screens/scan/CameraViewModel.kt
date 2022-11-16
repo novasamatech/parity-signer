@@ -6,9 +6,11 @@ import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
-import io.parity.signer.models.EmptyNavigator
+import io.parity.signer.backend.UniffiResult
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.qrparserGetPacketsTotal
 import io.parity.signer.uniffi.qrparserTryDecodeQrSequence
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,23 +18,26 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 
-class CameraViewModel(): ViewModel() {
-
-	val navigator = EmptyNavigator() //todo dmitry do I need it?
+class CameraViewModel() : ViewModel() {
 
 	val isMultiscanMode = MutableStateFlow(false)
 	val isTourchEnabled = MutableStateFlow<Boolean>(false)
 
-	internal val _total = MutableStateFlow<Int?>(null)
-	internal val _captured = MutableStateFlow<Int?>(null)
+	private val _pendingPayloads = MutableStateFlow<List<String>>(emptyList())
+	val pendingPayloads: StateFlow<List<String>> = _pendingPayloads.asStateFlow()
+
+	private val _total = MutableStateFlow<Int?>(null)
+	private val _captured = MutableStateFlow<Int?>(null)
+
 	// Observables for model data
 	internal val total: StateFlow<Int?> = _total.asStateFlow()
 	internal val captured: StateFlow<Int?> = _captured.asStateFlow()
 
 	// Camera stuff
-	internal var bucket = arrayOf<String>()
-	internal var payload: String = ""
+	private var bucket = arrayOf<String>()
+	private var payload: String = ""
 
+	val uniffiInteractor = ServiceLocator.backendLocator.uniffiInteractor
 
 	/**
 	 * Barcode detecting function.
@@ -65,7 +70,7 @@ class CameraViewModel(): ViewModel() {
 											true
 										)
 										resetScanValues()
-										navigator.navigate(Action.TRANSACTION_FETCHED, payload)
+										addPendingTransaction(payload)
 									} catch (e: java.lang.Exception) {
 										Log.e("Single frame decode failed", e.toString())
 									}
@@ -86,7 +91,7 @@ class CameraViewModel(): ViewModel() {
 									)
 									if (payload.isNotEmpty()) {
 										resetScanValues()
-										navigator.navigate(Action.TRANSACTION_FETCHED, payload)
+										addPendingTransaction(payload)
 									}
 								} catch (e: java.lang.Exception) {
 									Log.e("failed to parse sequence", e.toString())
@@ -106,6 +111,22 @@ class CameraViewModel(): ViewModel() {
 			}
 	}
 
+	private fun addPendingTransaction(payload: String) {
+		_pendingPayloads.value = _pendingPayloads.value + payload
+	}
+
+	suspend fun getTransactionsFromPendingPayload(): List<MTransaction> {
+		val allResults = pendingPayloads.value.map { payload ->
+			uniffiInteractor.navigate(Action.TRANSACTION_FETCHED, payload)
+		}
+		//todo handle error cases and show ot user?
+		allResults.filterIsInstance<UniffiResult.Error<Any>>().forEach { error ->
+			Log.e("Camera scan", "transaction parsing failed, ${error.error.message}")
+		}
+		return allResults.filterIsInstance<UniffiResult.Success<MTransaction>>()
+			.map { it.result }
+	}
+
 	/**
 	 * Clears camera progress
 	 */
@@ -115,4 +136,9 @@ class CameraViewModel(): ViewModel() {
 		_total.value = null
 	}
 
+	sealed class CameraNavModel {
+		object None : CameraNavModel()
+		data class TransitionNavigation(val transactions: List<MTransaction>) :
+			CameraNavModel()
+	}
 }

@@ -25,12 +25,12 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 fun ScanProgressBar(
-	captured: State<Int?>,
-	total: State<Int?>,
+	captured: Int,
+	total: Int?,
 	onCancel: Callback,
 ) {
 	val progress =
-		(captured.value ?: 0).toFloat() / ((total.value ?: 1).toFloat())
+		captured.toFloat() / (total ?: 1).toFloat()
 
 	val innerRound = dimensionResource(id = R.dimen.qrShapeCornerRadius)
 	val innerShape =
@@ -86,10 +86,7 @@ fun ScanProgressBar(
 )
 @Composable
 private fun PreviewScanProgressBar() {
-	val captured = remember { mutableStateOf(20) }
-	val total = remember { mutableStateOf(50) }
-
 	SignerNewTheme {
-		ScanProgressBar(captured, total, {})
+		ScanProgressBar(20, 50, {})
 	}
 }

@@ -43,18 +43,29 @@ import io.parity.signer.screens.scan.items.CameraMultiSignIcon
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
 import io.parity.signer.uniffi.MTransaction
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 
 @Composable
 fun ScanScreen(
 	onClose: Callback,
-	onNavigateToTransaction: (MTransaction) -> Unit,
+	onNavigateToTransaction: (List<MTransaction>) -> Unit,
 ) {
 	val viewModel: CameraViewModel = viewModel()
 
-	val captured = viewModel.captured.collectAsState()
-	val total = viewModel.total.collectAsState()
-	val isMultimode = viewModel.isMultiscanMode.collectAsState()
+	val captured by viewModel.captured.collectAsState()
+	val total by viewModel.total.collectAsState()
+	val isMultimode by viewModel.isMultiscanMode.collectAsState()
+
+
+	LaunchedEffect(key1 = isMultimode) {
+		if (!isMultimode) {
+			viewModel.navigationState.filterIsInstance<CameraViewModel.CameraNavModel.TransitionNavigation>()
+				.collect {
+					onNavigateToTransaction(it.transactions)
+				}
+		}
+	}
 
 	Box(
 		Modifier
@@ -63,7 +74,8 @@ fun ScanScreen(
 	) {
 		CameraViewPermission(viewModel)
 		ScanHeader(Modifier.statusBarsPadding(), onClose)
-		if (captured.value != null) {
+
+		captured?.let { captured ->
 			ScanProgressBar(captured, total) { viewModel.resetScanValues() }
 		}
 		Column(
@@ -74,7 +86,7 @@ fun ScanScreen(
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = stringResource(
-					if (isMultimode.value) {
+					if (isMultimode) {
 						R.string.camera_screen_header_multimode
 					} else {
 						R.string.camera_screen_header_single
@@ -88,7 +100,7 @@ fun ScanScreen(
 			Spacer(modifier = Modifier.padding(bottom = 12.dp))
 			Text(
 				text = stringResource(
-					if (isMultimode.value) {
+					if (isMultimode) {
 						R.string.camera_screen_description_multimode
 					} else {
 						R.string.camera_screen_description_single
@@ -219,8 +231,10 @@ private fun ScanHeader(
 				onClick = {}) //todo Dmitry
 		}
 		Spacer(modifier = Modifier.padding(end = 8.dp))
-		CameraLightIcon(isEnabled = tourchEnabled.value == true,
-			onClick = {viewModel.isTourchEnabled.value = !tourchEnabled.value}) //todo Dmitry
+		CameraLightIcon(isEnabled = tourchEnabled.value,
+			onClick = {
+				viewModel.isTourchEnabled.value = !tourchEnabled.value
+			}) //todo Dmitry implement in viewmodel
 
 	}
 }
@@ -240,7 +254,7 @@ private fun PreviewScanScreen() {
 	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			ScanScreen({}, {_->})
+			ScanScreen({}, { _ -> })
 		}
 	}
 }

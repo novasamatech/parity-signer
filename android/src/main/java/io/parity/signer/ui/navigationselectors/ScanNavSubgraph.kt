@@ -31,7 +31,7 @@ fun ScanNavSubgraph(
 		startDestination = ScanNavSubgraph.camera,
 	) {
 
-		var currentTransaction: MTransaction? = null
+		var currentTransaction: List<MTransaction?> = emptyList()
 
 		composable(ScanNavSubgraph.camera) {
 			ScanScreen(
@@ -45,7 +45,7 @@ fun ScanNavSubgraph(
 		composable(ScanNavSubgraph.transaction) {
 			Box(modifier = Modifier.statusBarsPadding()) {
 				TransactionPreviewEdited(
-					transaction = currentTransaction!!,
+					transaction = currentTransaction.first()!!, //todo dmutry
 					onBack = {
 						//was navigate(Action.GO_BACK, "", "")
 						navController.navigate(ScanNavSubgraph.camera)
