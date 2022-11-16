@@ -54,6 +54,7 @@ fun ScanScreen(
 
 	LaunchedEffect(key1 = isMultimode) {
 		if (!isMultimode) {
+			//if multimode - on button click reaction should be handled
 			viewModel.pendingTransactionPayloads
 				.filter { it.isEmpty() }
 				.collect {
@@ -62,22 +63,24 @@ fun ScanScreen(
 				}
 		}
 	}
+
 	Box(
-		Modifier
-			.fillMaxSize(1f)
-			.background(MaterialTheme.colors.background)
+        Modifier
+            .fillMaxSize(1f)
+            .background(MaterialTheme.colors.background)
 	) {
 		CameraViewPermission(viewModel)
 		ScanHeader(Modifier.statusBarsPadding(), onClose)
-
 		CameraBottomText(isMultimode)
 		val capturedCpy = captured
 		if (capturedCpy != null) {
 			ScanProgressBar(capturedCpy, total) { viewModel.resetScanValues() }
 		} else {
 			CameraMultiModProceed(
+				viewModel = viewModel,
 				isMultimode = viewModel.isMultiscanMode.collectAsState(),
 				pendingTransactions = viewModel.pendingTransactionPayloads.collectAsState(),
+				onNavigateToTransaction = onNavigateToTransaction,
 			)
 		}
 	}
@@ -86,19 +89,31 @@ fun ScanScreen(
 
 @Composable
 private fun CameraMultiModProceed(
+	viewModel: CameraViewModel,
 	isMultimode: State<Boolean>,
 	pendingTransactions: State<List<String>>,
+	onNavigateToTransaction: (List<MTransaction>) -> Unit,
 ) {
-	//todo dmitry for multimode implement
-
+	//todo dmitry for multimode implement UI
+	if (isMultimode.value && pendingTransactions.value.isNotEmpty()) {
+		val coroutineScope = rememberCoroutineScope()
+		Button(onClick = {
+			coroutineScope.launch {
+				val transactions = viewModel.getTransactionsFromPendingPayload()
+				onNavigateToTransaction(transactions)
+			}
+		}) {
+			Text(text = "some")
+		}
+	}
 }
 
 @Composable
 private fun CameraBottomText(isMultimode: Boolean) {
 	Column(
-		Modifier
-			.fillMaxSize(1f)
-			.padding(horizontal = 48.dp),
+        Modifier
+            .fillMaxSize(1f)
+            .padding(horizontal = 48.dp),
 	) {
 		Spacer(modifier = Modifier.weight(1f))
 		Text(
