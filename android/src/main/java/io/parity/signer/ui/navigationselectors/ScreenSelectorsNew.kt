@@ -61,7 +61,8 @@ fun CombinedScreensSelector(
 						navigator = rootNavigator,
 					)
 				}
-			is ScreenData.Scan -> throw RuntimeException("how did you get there? Local navigation should be used everywhere")
+			is ScreenData.Scan, is ScreenData.Transaction ->
+				submitErrorState("Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph")
 
 			else -> {} //old Selector showing them
 		}

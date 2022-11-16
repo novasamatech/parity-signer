@@ -67,16 +67,13 @@ fun ScreenSelector(
 			button = signerDataModel::navigate,
 			addSeed = signerDataModel::addSeed
 		)
-		ScreenData.Scan -> {} //shown in new selector
-//		 ScanScreenOld( //todo dmitry
-//			progress = progress,
-//			captured = captured,
-//			total = total,
-//			button = signerDataModel::navigate,
-//			handleCameraPermissions = signerDataModel::handleCameraPermissions,
-//			processFrame = signerDataModel::processFrame,
-//			resetScanValues = signerDataModel::resetScanValues,
-//		)
+		ScreenData.Scan -> {} //in new selector
+		is ScreenData.Transaction -> {} //in new selector
+//			TransactionPreviewOld(
+//				screenData.f,
+//				signerDataModel::navigate,
+//				signerDataModel::signTransaction
+//			)
 		is ScreenData.SeedSelector -> {} //shown in new selector
 		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
 			screenData.f,
@@ -94,11 +91,7 @@ fun ScreenSelector(
 			screenData.f,
 			signerDataModel::signSufficientCrypto
 		)
-		is ScreenData.Transaction -> TransactionPreviewOld(
-			screenData.f,
-			signerDataModel::navigate,
-			signerDataModel::signTransaction
-		)
+
 		is ScreenData.VVerifier -> VerifierScreen(
 			screenData.f,
 			signerDataModel::wipeToJailbreak

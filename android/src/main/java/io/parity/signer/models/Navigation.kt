@@ -158,7 +158,6 @@ sealed class LocalNavAction {
         val model: PrivateKeyExportModel,
         val navigator: SignerNavigator
 	) : LocalNavAction()
-	//todo dmitry
 	object ShowScan: LocalNavAction()
 }
 

@@ -217,7 +217,8 @@ private fun ScanHeader(
 	onClose: Callback,
 ) {
 	val viewModel: CameraViewModel = viewModel()
-	val tourchEnabled = viewModel.isTourchEnabled.collectAsState()
+	val tourchEnabled by viewModel.isTourchEnabled.collectAsState()
+	val multiMode by viewModel.isMultiscanMode.collectAsState()
 	Row(
         modifier
             .fillMaxWidth(1f)
@@ -228,13 +229,13 @@ private fun ScanHeader(
 		)
 		Spacer(modifier = Modifier.weight(1f))
 		if (FeatureOption.MULTI_TRANSACTION_CAMERA.isEnabled()) {
-			CameraMultiSignIcon(isEnabled = false,
-				onClick = {}) //todo Dmitry
+			CameraMultiSignIcon(isEnabled = multiMode,
+				onClick = {	viewModel.isMultiscanMode.value = !multiMode})
 		}
 		Spacer(modifier = Modifier.padding(end = 8.dp))
-		CameraLightIcon(isEnabled = tourchEnabled.value,
+		CameraLightIcon(isEnabled = tourchEnabled,
 			onClick = {
-				viewModel.isTourchEnabled.value = !tourchEnabled.value
+				viewModel.isTourchEnabled.value = !tourchEnabled
 			}) //todo Dmitry implement in viewmodel
 
 	}
