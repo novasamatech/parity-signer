@@ -92,17 +92,17 @@ private fun CameraMultiModProceed(
 	onNavigateToTransaction: (List<MTransaction>) -> Unit,
 ) {
 	//todo multisign for multimode implement UI
-	if (isMultimode.value && pendingTransactions.value.isNotEmpty()) {
-		val coroutineScope = rememberCoroutineScope()
-		Button(onClick = {
-			coroutineScope.launch {
-				val transactions = viewModel.getTransactionsFromPendingPayload()
-				onNavigateToTransaction(transactions)
-			}
-		}) {
-			Text(text = "some")
-		}
-	}
+//	if (isMultimode.value && pendingTransactions.value.isNotEmpty()) {
+//		val coroutineScope = rememberCoroutineScope()
+//		Button(onClick = {
+//			coroutineScope.launch {
+//				val transactions = viewModel.getTransactionsFromPendingPayload()
+//				onNavigateToTransaction(transactions)
+//			}
+//		}) {
+//			Text(text = "some")
+//		}
+//	}
 }
 
 @Composable
@@ -159,32 +159,31 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 	if (cameraPermissionState.status.isGranted) {
 		CameraViewInternal(viewModel)
 		TransparentClipLayout()
-	} else {
-		Column {
-			if (cameraPermissionState.status.shouldShowRationale && !rationalShown.value) {
-				AlertDialog(
-					onDismissRequest = { },
-					confirmButton = {
-						val scope = rememberCoroutineScope()
-						Button(
-							colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background),
-							onClick = {
-								scope.launch { cameraPermissionState.launchPermissionRequest() }
-								rationalShown.value = true
-							},
-						) {
-							Text(text = stringResource(R.string.generic_ok))
-						}
+	} else if (cameraPermissionState.status.shouldShowRationale
+		&& !rationalShown.value) {
+		AlertDialog(
+			onDismissRequest = {
+				rationalShown.value = true
+			},
+			confirmButton = {
+				val scope = rememberCoroutineScope()
+				Button(
+					colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background),
+					onClick = {
+						scope.launch { cameraPermissionState.launchPermissionRequest() }
+						rationalShown.value = true
 					},
-					title = { Text(text = stringResource(R.string.camera_jastification_title)) },
-					text = { Text(text = stringResource(R.string.camera_jastification_message)) },
-				)
-			} else {
-				Text(stringResource(R.string.camera_no_permission_text))
-				LaunchedEffect(key1 = Unit) {
-					launch { cameraPermissionState.launchPermissionRequest() }
+				) {
+					Text(text = stringResource(R.string.generic_ok))
 				}
-			}
+			},
+			title = { Text(text = stringResource(R.string.camera_jastification_title)) },
+			text = { Text(text = stringResource(R.string.camera_jastification_message)) },
+		)
+	} else {
+		Text(stringResource(R.string.camera_no_permission_text))
+		LaunchedEffect(key1 = Unit) {
+			launch { cameraPermissionState.launchPermissionRequest() }
 		}
 	}
 }

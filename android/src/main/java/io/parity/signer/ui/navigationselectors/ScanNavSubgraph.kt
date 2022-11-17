@@ -35,7 +35,7 @@ fun ScanNavSubgraph(
 
 		composable(ScanNavSubgraph.camera) {
 			ScanScreen(
-				onClose = { rootNavigator.backAction() },
+				onClose = { rootNavigator.backAction() },//todo dmitry check it properly closed
 				onNavigateToTransaction = { transaction ->
 					currentTransaction = transaction
 					navController.navigate(ScanNavSubgraph.transaction)
