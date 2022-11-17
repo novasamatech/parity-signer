@@ -27,17 +27,21 @@ protocol DatabaseMediating: AnyObject {
 final class DatabaseMediator: DatabaseMediating {
     private enum Constants {
         static let resource = "Database"
-        static let resourcePath = "/Documents/Database"
-
-        static func databasePath() -> String {
-            NSHomeDirectory() + Constants.resourcePath
-        }
     }
 
     private let bundle: BundleProtocol
     private let fileManager: FileManagingProtocol
 
-    var databaseName: String { Constants.databasePath() }
+    var databaseName: String { databasePath }
+
+    private var databasePath: String {
+        let documentsURL = try? fileManager.url(
+            for: .documentDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: false)
+        return documentsURL?.appendingPathComponent(Constants.resource).path ?? ""
+    }
 
     init(
         bundle: BundleProtocol = Bundle.main,
@@ -47,8 +51,10 @@ final class DatabaseMediator: DatabaseMediating {
         self.fileManager = fileManager
     }
 
+
     func isDatabaseAvailable() -> Bool {
-        fileManager.fileExists(atPath: DatabaseMediator.Constants.databasePath())
+        fileManager.fileExists(atPath: databasePath)
+        FileManager.default.isReadableFile(atPath: databasePath)
     }
 
     func recreateDatabaseFile() -> Bool {
@@ -58,10 +64,10 @@ final class DatabaseMediator: DatabaseMediating {
                 for: .documentDirectory,
                 in: .userDomainMask,
                 appropriateFor: nil,
-                create: false
+                create: true
             )
             destination.appendPathComponent(Constants.resource)
-            if fileManager.fileExists(atPath: Constants.databasePath()) {
+            if fileManager.fileExists(atPath: databasePath) {
                 do {
                     try fileManager.removeItem(at: destination)
                 } catch {
@@ -79,15 +85,9 @@ final class DatabaseMediator: DatabaseMediating {
 
     @discardableResult
     func wipeDatabase() -> Bool {
+        guard isDatabaseAvailable() else { return true }
         do {
-            var destination = try fileManager.url(
-                for: .documentDirectory,
-                in: .userDomainMask,
-                appropriateFor: nil,
-                create: false
-            )
-            destination.appendPathComponent(DatabaseMediator.Constants.resource)
-            try fileManager.removeItem(at: destination)
+            try fileManager.removeItem(atPath: databasePath)
             return true
         } catch {
             print("FileManager failed to delete databse")
