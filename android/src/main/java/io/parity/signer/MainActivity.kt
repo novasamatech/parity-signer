@@ -31,14 +31,10 @@ import io.parity.signer.ui.navigationselectors.*
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.ScreenData
-import io.parity.signer.uniffi.initLogging
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 class MainActivity : AppCompatActivity() {
-	init {
-		initLogging("SIGNER_RUST_LOG")
-	}
 
 	// rust library is initialized inside data model
 	private val signerDataModel by viewModels<SignerDataModel>()
@@ -139,26 +135,26 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 									acknowledgeWarning = signerDataModel::acknowledgeWarning
 								)
 							}
-							//new screens selectors
-							Box(
-								modifier = Modifier
-									.navigationBarsPadding()
-									.captionBarPadding(),
-							) {
-								CombinedScreensSelector(
-									screenData = actionResult.value?.screenData
-										?: ScreenData.Documents,//default fallback
-									alertState = shieldAlert,
-									signerDataModel = signerDataModel
-								)
-								BottomSheetSelector(
-									modalData = actionResult.value?.modalData,
-									localNavAction = localNavAction.value,
-									alertState = shieldAlert,
-									signerDataModel = signerDataModel,
-									navigator = signerDataModel.navigator,
-								)
-							}
+						}
+						//new screens selectors
+						Box(
+							modifier = Modifier
+								.navigationBarsPadding()
+								.captionBarPadding(),
+						) {
+							CombinedScreensSelector(
+								screenData = actionResult.value?.screenData
+									?: ScreenData.Documents,//default fallback
+								alertState = shieldAlert,
+								signerDataModel = signerDataModel
+							)
+							BottomSheetSelector(
+								modalData = actionResult.value?.modalData,
+								localNavAction = localNavAction.value,
+								alertState = shieldAlert,
+								signerDataModel = signerDataModel,
+								navigator = signerDataModel.navigator,
+							)
 						}
 					}
 				} else {
