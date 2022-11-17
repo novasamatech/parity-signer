@@ -150,6 +150,9 @@ private fun CameraBottomText(isMultimode: Boolean) {
 private fun CameraViewPermission(viewModel: CameraViewModel) {
 	if (LocalInspectionMode.current) return
 
+	val rationalShown = remember {
+		mutableStateOf(false)
+	}
 	val cameraPermissionState =
 		rememberPermissionState(android.Manifest.permission.CAMERA)
 	if (cameraPermissionState.status.isGranted) {
@@ -157,18 +160,21 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 		TransparentClipLayout()
 	} else {
 		Column {
-			if (cameraPermissionState.status.shouldShowRationale) {
+			if (cameraPermissionState.status.shouldShowRationale && !rationalShown.value) {
 				AlertDialog(
 					onDismissRequest = { },
 					confirmButton = {
 						val scope = rememberCoroutineScope()
 						Button(
 							colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background),
-							onClick = { scope.launch { cameraPermissionState.launchPermissionRequest() }
-// todo dmitry dismiss												dism
-												},
+							onClick = {
+								scope.launch {
+									cameraPermissionState.launchPermissionRequest()
+									rationalShown.value = true
+								}
+							},
 						) {
-							Text(text = stringResource(R.string.generic_ok))//todo dmitry back window for ok. Fix it.
+							Text(text = stringResource(R.string.generic_ok))
 						}
 					},
 					title = { Text(text = stringResource(R.string.camera_jastification_title)) },
