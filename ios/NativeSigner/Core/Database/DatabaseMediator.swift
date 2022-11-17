@@ -39,7 +39,8 @@ final class DatabaseMediator: DatabaseMediating {
             for: .documentDirectory,
             in: .userDomainMask,
             appropriateFor: nil,
-            create: false)
+            create: false
+        )
         return documentsURL?.appendingPathComponent(Constants.resource).path ?? ""
     }
 
@@ -51,10 +52,8 @@ final class DatabaseMediator: DatabaseMediating {
         self.fileManager = fileManager
     }
 
-
     func isDatabaseAvailable() -> Bool {
         fileManager.fileExists(atPath: databasePath)
-        FileManager.default.isReadableFile(atPath: databasePath)
     }
 
     func recreateDatabaseFile() -> Bool {
