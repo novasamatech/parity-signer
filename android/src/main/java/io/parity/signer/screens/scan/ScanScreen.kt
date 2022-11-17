@@ -91,7 +91,7 @@ private fun CameraMultiModProceed(
 	pendingTransactions: State<List<String>>,
 	onNavigateToTransaction: (List<MTransaction>) -> Unit,
 ) {
-	//todo dmitry for multimode implement UI
+	//todo multisign for multimode implement UI
 	if (isMultimode.value && pendingTransactions.value.isNotEmpty()) {
 		val coroutineScope = rememberCoroutineScope()
 		Button(onClick = {
@@ -153,6 +153,7 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 	val rationalShown = remember {
 		mutableStateOf(false)
 	}
+	//todo dmitry test it properly
 	val cameraPermissionState =
 		rememberPermissionState(android.Manifest.permission.CAMERA)
 	if (cameraPermissionState.status.isGranted) {
@@ -168,10 +169,8 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 						Button(
 							colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background),
 							onClick = {
-								scope.launch {
-									cameraPermissionState.launchPermissionRequest()
-									rationalShown.value = true
-								}
+								scope.launch { cameraPermissionState.launchPermissionRequest() }
+								rationalShown.value = true
 							},
 						) {
 							Text(text = stringResource(R.string.generic_ok))
