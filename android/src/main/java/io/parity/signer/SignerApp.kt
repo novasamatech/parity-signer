@@ -4,11 +4,13 @@ import android.app.Application
 import android.util.Log
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.uniffi.ErrorDisplayed
+import io.parity.signer.uniffi.initLogging
 import java.lang.Thread.UncaughtExceptionHandler
 
 class SignerApp : Application() {
 	override fun onCreate() {
 		super.onCreate()
+		initLogging("SIGNER_RUST_LOG")
 		Thread.setDefaultUncaughtExceptionHandler(SignerExceptionHandler())
 		ServiceLocator.initBackendDeps(this)
 	}
