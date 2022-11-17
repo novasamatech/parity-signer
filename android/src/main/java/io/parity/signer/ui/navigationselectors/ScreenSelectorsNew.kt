@@ -30,8 +30,12 @@ fun CombinedScreensSelector(
 	val rootNavigator = signerDataModel.navigator
 
 	when (localNavAction) {
-		LocalNavAction.ShowScan ->
-			ScanNavSubgraph(signerDataModel = signerDataModel, rootNavigator = rootNavigator)
+		LocalNavAction.ShowScan -> {
+			ScanNavSubgraph(
+				signerDataModel = signerDataModel,
+				rootNavigator = rootNavigator
+			)
+		}
 		else -> when (screenData) {
 			is ScreenData.SeedSelector -> {
 				KeySetsNavSubgraph(

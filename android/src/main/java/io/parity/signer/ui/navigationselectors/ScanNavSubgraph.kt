@@ -31,7 +31,7 @@ fun ScanNavSubgraph(
 		startDestination = ScanNavSubgraph.camera,
 	) {
 
-		var currentTransaction: List<MTransaction?> = emptyList()
+		var currentTransaction: List<MTransaction> = emptyList()  //todo pass it properly
 
 		composable(ScanNavSubgraph.camera) {
 			ScanScreen(
