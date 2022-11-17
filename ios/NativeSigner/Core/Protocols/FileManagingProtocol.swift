@@ -20,6 +20,8 @@ protocol FileManagingProtocol: AnyObject {
     /// - Parameter URL: A file URL specifying the file or directory to remove. If the URL specifies a directory, the
     // contents of that directory are recursively removed.
     func removeItem(at URL: URL) throws
+    /// Removes the file or directory at the specified path.
+    func removeItem(atPath path: String) throws
 
     /// Copies the file at the specified URL to a new location synchronously.
     /// - Parameters:
