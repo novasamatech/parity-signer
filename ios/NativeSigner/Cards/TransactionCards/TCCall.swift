@@ -21,20 +21,19 @@ struct TCCall: View {
                         TCNamedValueCard(name: Localizable.TCName.method.string, value: value.methodName)
                         if !value.docs.isEmpty {
                             Localizable.questionMark.text
-                                .foregroundColor(Asset.action400.swiftUIColor)
+                                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                         }
                     }
                     if showDoc {
-                        Text(
-                            AttributedString(fromHexDocs: value.docs) ??
-                                AttributedString(Localizable.Error.docsParsing.string)
-                        )
-                        .foregroundColor(Asset.text600.swiftUIColor)
-                        .multilineTextAlignment(.leading)
+                        Text.markdownWithFallback(value.docs)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .multilineTextAlignment(.leading)
                     }
                 }
+                .font(Fontstyle.bodyL.base)
             }
-        ).disabled(value.docs.isEmpty)
+        )
+        .disabled(value.docs.isEmpty)
     }
 }
 

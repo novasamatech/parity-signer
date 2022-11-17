@@ -39,19 +39,6 @@ extension Data {
     }
 }
 
-/// Decode markdown object from hex-encoded string passed in JSON
-extension AttributedString {
-    init?(fromHexDocs string: String) {
-        try? self.init(
-            markdown: Data(fromHexEncodedString: string) ?? Data(),
-            options: AttributedString.MarkdownParsingOptions(
-                interpretedSyntax: .inlineOnlyPreservingWhitespace,
-                failurePolicy: .returnPartiallyParsedIfPossible
-            )
-        )
-    }
-}
-
 extension MRecoverSeedPhrase {
     func draftPhrase() -> String {
         draft.joined(separator: " ")

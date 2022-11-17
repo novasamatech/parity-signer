@@ -12,7 +12,7 @@ struct TransactionCardSelector: View {
     var body: some View {
         HStack {
             switch card.card {
-            // Author
+            // Author cards with identicon and variable description
             case let .authorCard(author): // Not present on new designs
                 TCAuthor(author: author)
             case let .authorPlainCard(value): // Not present on new designs
@@ -20,45 +20,28 @@ struct TransactionCardSelector: View {
             case let .authorPublicKeyCard(value): // Not present on new designs
                 TCAuthorPublicKey(value: value)
 
-            // Cards ?
-            case let .balanceCard(value):
-                TCNamedValueCard(name: "", value: [value.amount, value.units].joined(separator: " "))
+            // Foldable Markdown values on tap
             case let .callCard(value):
                 TCCall(value: value)
-            case let .defaultCard(text):
-                TCDefault(content: text)
-            case let .derivationsCard(value):
-                TCDerivations(value: value)
             case let .enumVariantNameCard(value):
                 TCEnumVariantName(value: value)
-            case .eraImmortalCard:
-                TCEraImmortal()
-            case let .eraMortalCard(eraMortal):
-                TCEraMortal(eraMortal: eraMortal)
-
-            // Fields?
             case let .fieldNameCard(value):
                 TCFieldName(value: value)
             case let .fieldNumberCard(value):
                 TCFieldNumber(value: value)
-            case let .idCard(value):
-                TCID(value: value)
-            case let .networkInfoCard(value):
-                TCNetworkInfo(content: value)
-            case let .newSpecsCard(value):
-                TCAddNewNetwork(value: value)
-            case let .textCard(text):
-                TCText(text: text)
-            case let .txSpecPlainCard(value):
-                TCTXSpecPlain(content: value)
-            case let .typesInfoCard(value):
-                TCTypesInfo(content: value)
 
             // Sections
-            case let .metaCard(value): // Used when scanning metadata update
+            case let .newSpecsCard(value): // User when adding new network, redesigned
+                TCAddNewNetwork(value: value)
+            case let .metaCard(value): // Used when scanning metadata update, redesigned
                 TCMeta(value: value)
-            case let .verifierCard(value): // Used in metadata update, adding new network
+            case let .verifierCard(value): // Used in metadata update, adding new network, redesigned
                 TCVerifier(value: value)
+            case let .derivationsCard(value): // Not present on new designs
+                TCDerivations(value: value)
+            case let .txSpecPlainCard(value): // Unknown network information for given transaction, not present on new
+                // designs
+                TCTXSpecPlain(content: value)
 
             // Error handling
             case let .errorCard(text):
@@ -66,11 +49,31 @@ struct TransactionCardSelector: View {
             case let .warningCard(text):
                 TCWarning(text: text)
 
-            // Simple values
+            // List values
+            case let .eraMortalCard(content):
+                TCEraMortal(content: content)
+
+            // Simple values with identicons / icons / markdown
+            case let .idCard(value): // Not present in new designs
+                TCID(value: value)
+            case let .networkInfoCard(value): // Not present in new designs
+                TCNetworkInfo(content: value)
+            case let .typesInfoCard(value): // Not present in new designs
+                TCTypesInfo(content: value)
+            case let .textCard(text): // Markdown text field, not present on new designs
+                TCText(text: text)
+
+            // Simple values - redesigned
+            case let .balanceCard(value):
+                TCNamedValueCard(value: [value.amount, value.units].joined(separator: " "))
             case let .bitVecCard(text):
                 TCNamedValueCard(name: Localizable.TCName.bitVec.string, value: text)
             case let .blockHashCard(text):
                 TCNamedValueCard(name: Localizable.TCName.blockHash.string, value: text)
+            case let .defaultCard(text):
+                TCNamedValueCard(value: text)
+            case .eraImmortalCard:
+                TCNamedValueCard(name: Localizable.immortalTransaction.string)
             case let .identityFieldCard(text):
                 TCNamedValueCard(name: Localizable.TCName.identityField.string, value: text)
             case let .nameVersionCard(value):
@@ -93,9 +96,9 @@ struct TransactionCardSelector: View {
             case let .networkNameCard(text):
                 TCNamedValueCard(name: Localizable.TCName.networkName.string, value: text)
             case let .varNameCard(text):
-                TCNamedValueCard(name: "", value: text)
+                TCNamedValueCard(value: text)
             case .noneCard:
-                TCNamedValueCard(name: Localizable.noneCapitalised.string, value: "")
+                TCNamedValueCard(name: Localizable.noneCapitalised.string)
             }
         }
     }

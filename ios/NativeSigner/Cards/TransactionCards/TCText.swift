@@ -11,8 +11,8 @@ struct TCText: View {
     let text: String
     var body: some View {
         HStack {
-            Text(AttributedString(fromHexDocs: text) ?? AttributedString(text))
-                .foregroundColor(Asset.text600.swiftUIColor).font(Fontstyle.body2.base)
+            Text(AttributedString.build(fromHexDocs: text) ?? AttributedString(text))
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).font(Fontstyle.bodyL.base)
             Spacer()
         }
     }

@@ -19,30 +19,25 @@ struct TCFieldName: View {
                 VStack {
                     HStack {
                         Text(value.name)
-                            .foregroundColor(Asset.text600.swiftUIColor)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         Spacer()
                         if (value.docsFieldName + value.pathType + value.docsType).isEmpty {
                             Localizable.questionMark.text
-                                .foregroundColor(Asset.action400.swiftUIColor)
+                                .foregroundColor(Asset.accentPink300.swiftUIColor)
                         }
                     }
                     if showDoc {
                         VStack {
                             Text(Localizable.TCField.path(value.pathType))
-                                .foregroundColor(Asset.text600.swiftUIColor)
-                            Text(
-                                AttributedString(fromHexDocs: value.docsFieldName) ??
-                                    AttributedString(Localizable.Error.docsParsing.string)
-                            )
-                            .foregroundColor(Asset.text600.swiftUIColor)
-                            Text(
-                                AttributedString(fromHexDocs: value.docsType) ??
-                                    AttributedString(Localizable.Error.docsParsing.string)
-                            )
-                            .foregroundColor(Asset.text600.swiftUIColor)
+                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            Text.markdownWithFallback(value.docsFieldName)
+                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            Text.markdownWithFallback(value.docsType)
+                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         }
                     }
                 }
+                .font(Fontstyle.bodyL.base)
             }
         )
         .disabled((value.docsFieldName + value.pathType + value.docsType).isEmpty)

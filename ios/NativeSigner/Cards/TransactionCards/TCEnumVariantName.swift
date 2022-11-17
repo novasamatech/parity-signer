@@ -19,21 +19,19 @@ struct TCEnumVariantName: View {
                 VStack {
                     HStack {
                         Text(value.name)
-                            .foregroundColor(Asset.text600.swiftUIColor)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         Spacer()
                         if !value.docsEnumVariant.isEmpty {
                             Localizable.questionMark.text
-                                .foregroundColor(Asset.action400.swiftUIColor)
+                                .foregroundColor(Asset.accentPink300.swiftUIColor)
                         }
                     }
                     if showDoc {
-                        Text(
-                            AttributedString(fromHexDocs: value.docsEnumVariant) ??
-                                AttributedString(Localizable.Error.docsParsing.string)
-                        )
-                        .foregroundColor(Asset.text600.swiftUIColor)
+                        Text.markdownWithFallback(value.docsEnumVariant)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     }
                 }
+                .font(Fontstyle.bodyL.base)
             }
         ).disabled(value.docsEnumVariant.isEmpty)
     }

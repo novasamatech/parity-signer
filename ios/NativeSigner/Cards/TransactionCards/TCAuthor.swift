@@ -14,18 +14,23 @@ struct TCAuthor: View {
             Identicon(identicon: author.address.identicon)
             VStack(alignment: .leading) {
                 Localizable.from.text
-                    .foregroundColor(Asset.text400.swiftUIColor)
-                Text(
-                    author.address.seedName + author.address
-                        .path + (author.address.hasPwd == true ? Localizable.Path.delimeter.string : "")
-                )
-                .foregroundColor(Asset.crypto400.swiftUIColor)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(Fontstyle.bodyL.base)
+                Text(author.formattedAddress)
+                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                    .font(Fontstyle.bodyL.base)
                 Text(author.base58)
-                    .font(.caption2)
-                    .foregroundColor(Asset.text600.swiftUIColor)
+                    .font(Fontstyle.captionS.base)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
             }
             Spacer()
         }
+    }
+}
+
+private extension MAddressCard {
+    var formattedAddress: String {
+        [address.seedName, address.path, address.hasPwd == true ? Localizable.Path.delimeter.string : ""].joined()
     }
 }
 

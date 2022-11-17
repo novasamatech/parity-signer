@@ -8,14 +8,27 @@
 import SwiftUI
 
 struct TCNamedValueCard: View {
-    let name: String
-    let value: String
+    let name: String?
+    let value: String?
+
+    init(
+        name: String? = nil,
+        value: String? = nil
+    ) {
+        self.name = name
+        self.value = value
+    }
+
     var body: some View {
         HStack {
-            Text(name)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-            Text(value)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+            if let name = name {
+                Text(name)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            }
+            if let value = value {
+                Text(value)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+            }
             Spacer()
         }
         .font(Fontstyle.bodyL.base)

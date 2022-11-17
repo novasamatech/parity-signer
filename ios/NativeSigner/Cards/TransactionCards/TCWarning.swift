@@ -16,7 +16,8 @@ struct TCWarning: View {
             Text(text)
                 .foregroundColor(Asset.signalDanger.swiftUIColor).font(Fontstyle.body2.base)
             Spacer()
-        }.background(Asset.bgDanger.swiftUIColor)
+        }
+        .background(Asset.bgDanger.swiftUIColor)
     }
 }
 

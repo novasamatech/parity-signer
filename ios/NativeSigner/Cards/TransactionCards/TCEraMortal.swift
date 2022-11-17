@@ -8,17 +8,17 @@
 import SwiftUI
 
 struct TCEraMortal: View {
-    var eraMortal: MscEraMortal
+    var content: MscEraMortal
     var body: some View {
         VStack {
-            TCNamedValueCard(name: Localizable.TCName.phase.string, value: eraMortal.phase)
-            TCNamedValueCard(name: Localizable.TCName.period.string, value: eraMortal.period)
+            TCNamedValueCard(name: Localizable.TCName.phase.string, value: content.phase)
+            TCNamedValueCard(name: Localizable.TCName.period.string, value: content.period)
         }
     }
 }
 
-// struct TCEraMortalNonce_Previews: PreviewProvider {
-// static var previews: some View {
-// TCEraMortalNonce()
-// }
-// }
+struct TCEraMortal_Previews: PreviewProvider {
+    static var previews: some View {
+        TCEraMortal(content: MscEraMortal(era: "era", phase: "phase", period: "period"))
+    }
+}

@@ -25,16 +25,13 @@ struct TCTypesInfo: View {
 struct TCTypesInfo_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            TCTypesInfo(content: MTypesInfo(
-                typesOnFile: false,
-                typesHash: "typesHas",
-                typesIdPic: PreviewData.exampleIdenticon
-            ))
-            TCTypesInfo(content: MTypesInfo(
-                typesOnFile: true,
-                typesHash: "typesHas",
-                typesIdPic: PreviewData.exampleIdenticon
-            ))
+            TCTypesInfo(
+                content: MTypesInfo(
+                    typesOnFile: false,
+                    typesHash: "typesHas",
+                    typesIdPic: PreviewData.exampleIdenticon
+                )
+            )
         }
     }
 }

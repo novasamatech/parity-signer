@@ -14,10 +14,11 @@ struct TCAuthorPublicKey: View {
             Identicon(identicon: value.identicon)
             VStack(alignment: .leading) {
                 Text(Localizable.TCAuthor.signedWith(value.encryption))
-                    .foregroundColor(Asset.text400.swiftUIColor).font(Fontstyle.body2.base)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(Fontstyle.bodyL.base)
                 Text(value.publicKey)
-                    .font(Fontstyle.body2.crypto)
-                    .foregroundColor(Asset.crypto400.swiftUIColor)
+                    .font(Fontstyle.captionM.base)
+                    .foregroundColor(Asset.accentPink300.swiftUIColor)
             }
             Spacer()
         }

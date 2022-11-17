@@ -11,8 +11,10 @@ struct TCTXSpecPlain: View {
     let content: MscTxSpecPlain
     var body: some View {
         HStack {
-            VStack {
+            VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                 Localizable.unknownNetwork.text
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(Fontstyle.bodyL.base)
                 TCNamedValueCard(
                     name: Localizable.TCName.genesisHash.string,
                     value: content.networkGenesisHash.formattedAsString
