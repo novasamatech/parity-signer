@@ -84,7 +84,6 @@ final class DatabaseMediator: DatabaseMediating {
 
     @discardableResult
     func wipeDatabase() -> Bool {
-        guard isDatabaseAvailable() else { return true }
         do {
             try fileManager.removeItem(atPath: databasePath)
             return true
