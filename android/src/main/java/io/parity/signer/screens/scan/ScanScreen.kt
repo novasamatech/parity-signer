@@ -53,7 +53,7 @@ fun ScanScreen(
 		if (!isMultimode) {
 			//if multimode - on button click reaction should be handled
 			viewModel.pendingTransactionPayloads
-				.filter { it.isEmpty() }
+				.filter { it.isNotEmpty() }
 				.collect {
 					val transactions = viewModel.getTransactionsFromPendingPayload()
 					onNavigateToTransaction(transactions)
@@ -198,12 +198,13 @@ private fun CameraViewInternal(viewModel: CameraViewModel) {
 
 	AndroidView(
 		factory = { context ->
+
 			val executor = ContextCompat.getMainExecutor(context)
 			val previewView = PreviewView(context).apply {
 				this.scaleType = PreviewView.ScaleType.FILL_CENTER
 				layoutParams = ViewGroup.LayoutParams(
 					ViewGroup.LayoutParams.MATCH_PARENT,
-					ViewGroup.LayoutParams.MATCH_PARENT
+					ViewGroup.LayoutParams.MATCH_PARENT,
 				)
 			}
 			// mlkit docs: The default option is not recommended because it tries

@@ -31,11 +31,11 @@ fun ScanNavSubgraph(
 		startDestination = ScanNavSubgraph.camera,
 	) {
 
-		var currentTransaction: List<MTransaction> = emptyList()  //todo pass it properly
+		var currentTransaction: List<MTransaction> = emptyList()  //todo dmitry pass it properly
 
 		composable(ScanNavSubgraph.camera) {
 			ScanScreen(
-				onClose = { rootNavigator.backAction() },//todo dmitry check it properly closed
+				onClose = { rootNavigator.backAction() },
 				onNavigateToTransaction = { transaction ->
 					currentTransaction = transaction
 					navController.navigate(ScanNavSubgraph.transaction)
