@@ -3,8 +3,8 @@ package io.parity.signer.ui.navigationselectors
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,6 +13,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.signTransaction
 import io.parity.signer.screens.scan.ScanScreen
 import io.parity.signer.screens.scan.transaction.TransactionPreviewEdited
+import io.parity.signer.ui.ScanViewModel
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MTransaction
 
@@ -25,19 +26,18 @@ fun ScanNavSubgraph(
 	signerDataModel: SignerDataModel,
 	rootNavigator: Navigator,
 ) {
+	val scanViewModel : ScanViewModel = viewModel()
 	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
 		startDestination = ScanNavSubgraph.camera,
 	) {
 
-		var currentTransaction: List<MTransaction> = emptyList()  //todo dmitry pass it properly
-
 		composable(ScanNavSubgraph.camera) {
 			ScanScreen(
 				onClose = { rootNavigator.backAction() },
 				onNavigateToTransaction = { transaction ->
-					currentTransaction = transaction
+					scanViewModel.pendingTransactions = transaction
 					navController.navigate(ScanNavSubgraph.transaction)
 				}
 			)
@@ -45,13 +45,14 @@ fun ScanNavSubgraph(
 		composable(ScanNavSubgraph.transaction) {
 			Box(modifier = Modifier.statusBarsPadding()) {
 				TransactionPreviewEdited(
-					transaction = currentTransaction.first()!!, //todo multisign support missing yet
+					transaction = scanViewModel.pendingTransactions.first(), //todo multisign support missing yet
 					onBack = {
 						//was navigate(Action.GO_BACK, "", "")
 						navController.navigate(ScanNavSubgraph.camera)
 					},
 					onFinish = {
 						rootNavigator.navigate(Action.GO_FORWARD) //todo dmitry put modals below to new selector
+						scanViewModel.pendingTransactions = emptyList()
 						// todo multisign handle subsequent modals
 //						rust/navigator/src/navstate.rs:396
 //						val navResult = uniffiinteractor.ProcessBatchTransactions(some_all) and handle
