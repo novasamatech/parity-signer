@@ -51,16 +51,16 @@ fun ScanNavSubgraph(
 						navController.navigate(ScanNavSubgraph.camera)
 					},
 					onFinish = {
-						rootNavigator.navigate(Action.GO_FORWARD) //todo dmitry put modals below to new selector
+						rootNavigator.navigate(Action.GO_FORWARD)
 						scanViewModel.pendingTransactions = emptyList()
 						// todo multisign handle subsequent modals
 //						rust/navigator/src/navstate.rs:396
 //						val navResult = uniffiinteractor.ProcessBatchTransactions(some_all) and handle
 							//Modal::EnterPassword
 						//Modal::SignatureReady(a);
-						//Screen::Transaction( can come with updated checksub
+						//Screen::Transaction( can come with updated checksum
 						//success will clear to log
-						//alert error
+										 // alert error
 					},
 					signTransaction = signerDataModel::signTransaction,
 				)

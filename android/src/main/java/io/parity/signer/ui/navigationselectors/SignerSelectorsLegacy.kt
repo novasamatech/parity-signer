@@ -20,12 +20,12 @@ import io.parity.signer.uniffi.ScreenData
 fun ScreenSelector(
 	screenData: ScreenData,
 	alertState: State<AlertState?>,
-	button: (Action, String, String) -> Unit,
+	navigate: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
-	val button1: (Action) -> Unit = { action -> button(action, "", "") }
+	val button1: (Action) -> Unit = { action -> navigate(action, "", "") }
 	val button2: (Action, String) -> Unit =
-		{ action, details -> button(action, details, "") }
+		{ action, details -> navigate(action, details, "") }
 	val seedNames = signerDataModel.seedNames.collectAsState()
 
 	when (screenData) {
@@ -104,11 +104,11 @@ fun ModalSelector(
 	modalData: ModalData?,
 	localNavAction: LocalNavAction?,
 	alertState: State<AlertState?>,
-	button: (Action, String, String) -> Unit,
+	navigate: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
 	val button2: (Action, String) -> Unit =
-		{ action, details -> button(action, details, "") }
+		{ action, details -> navigate(action, details, "") }
 	if (localNavAction != null && localNavAction != LocalNavAction.None) {
 		when (localNavAction) {
 			is LocalNavAction.ShowExportPrivateKey -> {} //show in new selector
@@ -127,14 +127,8 @@ fun ModalSelector(
 				modalData.f,
 				signerDataModel = signerDataModel
 			)
-			is ModalData.SignatureReady -> SignatureReady(
-				modalData.f,
-				signerDataModel = signerDataModel
-			)
-			is ModalData.EnterPassword -> EnterPassword(
-				modalData.f,
-				button2,
-			)
+			is ModalData.SignatureReady -> {} //in new selector
+			is ModalData.EnterPassword -> {} //in new selector
 			is ModalData.LogRight -> {} //migrated to bottom sheet
 			is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(
 				signerDataModel = signerDataModel

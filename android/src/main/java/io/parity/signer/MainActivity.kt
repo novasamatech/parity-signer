@@ -110,14 +110,14 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 									screenData = actionResult.value?.screenData
 										?: ScreenData.Documents,//default fallback
 									alertState = shieldAlert,
-									button = signerDataModel.navigator::navigate,
+									navigate = signerDataModel.navigator::navigate,
 									signerDataModel = signerDataModel
 								)
 								ModalSelector(
 									modalData = actionResult.value?.modalData,
 									localNavAction = localNavAction.value,
 									alertState = shieldAlert,
-									button = signerDataModel.navigator::navigate,
+									navigate = signerDataModel.navigator::navigate,
 									signerDataModel = signerDataModel,
 								)
 							}

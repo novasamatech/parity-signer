@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import io.parity.signer.bottomsheets.EnterPassword
 import io.parity.signer.bottomsheets.LogComment
+import io.parity.signer.bottomsheets.SignatureReady
 import io.parity.signer.models.*
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
@@ -107,8 +109,8 @@ fun BottomSheetSelector(
 							keyDetails = signerDataModel.lastOpenedKeyDetails
 						)
 					}
-				//todo change design to new
 				is ModalData.NewSeedMenu ->
+					//old design
 					BottomSheetWrapperRoot(onClosedAction = {
 						navigator.backAction()
 					}) {
@@ -125,7 +127,16 @@ fun BottomSheetSelector(
 							navigator = signerDataModel.navigator,
 						)
 					}
-				//todo update design
+				//old design
+				is ModalData.SignatureReady -> SignatureReady(
+					modalData.f,
+					signerDataModel = signerDataModel
+				)
+				//old design
+				is ModalData.EnterPassword -> EnterPassword(
+					modalData.f,
+				) { action, string -> navigator.navigate(action, string) }
+				//old design
 				is ModalData.LogComment -> LogComment(signerDataModel = signerDataModel)
 				else -> {}
 			}
