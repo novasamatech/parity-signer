@@ -101,6 +101,30 @@ lazy_static! {
 }
 
 #[derive(Clone, Encode, Decode)]
+pub enum SignaturesBulk {
+    #[codec(index = 4)]
+    V1(SignaturesBulkV1),
+}
+
+impl From<SignaturesBulkV1> for SignaturesBulk {
+    fn from(s: SignaturesBulkV1) -> Self {
+        Self::V1(s)
+    }
+}
+
+#[derive(Clone, Encode, Decode)]
+pub struct SignaturesBulkV1 {
+    /// `MultiSignature`s in encoded form.
+    signatures: Vec<Vec<u8>>,
+}
+
+impl From<Vec<Vec<u8>>> for SignaturesBulkV1 {
+    fn from(signatures: Vec<Vec<u8>>) -> Self {
+        Self { signatures }
+    }
+}
+
+#[derive(Clone, Encode, Decode)]
 pub enum TransactionBulk {
     V1(TransactionBulkV1),
 }

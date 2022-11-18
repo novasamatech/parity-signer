@@ -18,6 +18,8 @@ definitions = { path = "../definitions", default-features = false, features = ["
 navigator = { path = "../navigator", default-features = false }
 qr_reader_phone = { path = "../qr_reader_phone" }
 qrcode_static = { path = "../qrcode_static" }
+oslog = "0.2.0"
+log = "0.4.17"
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
 env_logger = "0.9"

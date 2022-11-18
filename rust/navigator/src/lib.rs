@@ -4,12 +4,14 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use db_handling::identities::export_all_addrs;
+use db_handling::identities::{export_all_addrs, SignaturesBulk, SignaturesBulkV1};
 //do we support mutex?
 use lazy_static::lazy_static;
 use std::{collections::HashMap, sync::Mutex};
 
-use definitions::navigation::{ActionResult, ExportedSet, MKeysInfoExport, MKeysNew};
+use definitions::navigation::{
+    ActionResult, ExportedSet, MKeysInfoExport, MKeysNew, MSignatureReady,
+};
 use parity_scale_codec::Encode;
 use qrcode_rtx::make_data_packs;
 
@@ -77,6 +79,21 @@ pub fn export_key_info(
     let frames = make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?;
 
     Ok(MKeysInfoExport { frames })
+}
+
+/// Export signatures bulk.
+pub fn export_signatues_bulk(signatures: Vec<Vec<u8>>) -> Result<MSignatureReady> {
+    let signatures = if signatures.len() > 1 {
+        let v1: SignaturesBulkV1 = signatures.into();
+        let v1: SignaturesBulk = v1.into();
+        let data = v1.encode();
+        let frames = make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?;
+        frames
+    } else {
+        vec![signatures[0].clone()]
+    };
+
+    Ok(MSignatureReady { signatures })
 }
 
 /// Get keys by seed name

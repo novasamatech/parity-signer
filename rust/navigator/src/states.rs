@@ -66,7 +66,12 @@ pub struct TransactionState {
 
 impl TransactionState {
     pub fn current_password_author_info(&self) -> Option<MAddressCard> {
-        None
+        match &self.action {
+            transaction_parsing::TransactionAction::Sign { actions, .. } => {
+                Some((&actions[self.currently_signing]).author_info.clone())
+            }
+            _ => None,
+        }
     }
 
     pub fn new<P: AsRef<Path>>(details_str: &str, dbname: P) -> Self {
@@ -83,7 +88,9 @@ impl TransactionState {
 
     pub fn update_seeds(&self, seeds: &str) -> Self {
         let mut new = self.clone();
-        new.seeds = seeds.lines().map(|seed| seed.to_string()).collect();
+        if new.seeds.is_empty() {
+            new.seeds = seeds.lines().map(|seed| seed.to_string()).collect();
+        }
         new
     }
 
@@ -125,6 +132,8 @@ impl TransactionState {
     pub fn handle_sign<P: AsRef<Path>>(&self, db_path: P) -> Result<(SignResult, Self)> {
         let mut new = self.clone();
 
+        log::error!("here");
+
         if let transaction_parsing::TransactionAction::Sign { actions, checksum } = &self.action {
             if self.seeds.len() != actions.len() {
                 return Err(crate::Error::SeedsNumMismatch(self.seeds.concat()));
@@ -155,6 +164,7 @@ impl TransactionState {
                 } else {
                     ""
                 };
+
                 match transaction_signing::create_signature(
                     &new.seeds[new.currently_signing],
                     password,

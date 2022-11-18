@@ -17,6 +17,7 @@ use zeroize::Zeroize;
 
 use crate::actions::Action;
 use crate::alerts::Alert;
+use crate::export_signatues_bulk;
 use crate::modals::Modal;
 use crate::screens::{
     AddressState, AddressStateMulti, DeriveState, KeysState, RecoverSeedPhraseState, Screen,
@@ -400,8 +401,8 @@ impl State {
                         let mut new = t.update_seeds(secret_seed_phrase);
                         if let Modal::EnterPassword = self.navstate.modal {
                             new = new.password_entered(details_str);
+                            new_navstate.modal = Modal::Empty;
                         }
-
                         match new.handle_sign(dbname) {
                             Ok((result, new)) => {
                                 match result {
@@ -413,8 +414,7 @@ impl State {
                                         }
                                     }
                                     SignResult::Ready { signatures } => {
-                                        new_navstate.modal =
-                                            Modal::SignatureReady(signatures.clone());
+                                        new_navstate.modal = Modal::SignatureReady(signatures);
                                     }
                                 };
                                 new_navstate.screen = Screen::Transaction(Box::new(new));
@@ -1706,9 +1706,7 @@ impl State {
                 _ => None,
             },
             Modal::SignatureReady(ref a) => Some(ModalData::SignatureReady {
-                f: MSignatureReady {
-                    signatures: a.clone(),
-                },
+                f: export_signatues_bulk(a.clone())?,
             }),
             Modal::EnterPassword => match new_navstate.screen {
                 Screen::Transaction(ref t) => {

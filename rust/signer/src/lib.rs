@@ -115,6 +115,15 @@ fn backend_action(
 ///
 /// Accepts list of seed names to avoid calling [`update_seed_names`] every time
 fn init_navigation(dbname: &str, seed_names: Vec<String>) -> Result<(), ErrorDisplayed> {
+    use log::LevelFilter;
+    use oslog::OsLogger;
+
+    OsLogger::new("io.parity.signer")
+        .level_filter(LevelFilter::Debug)
+        .category_level_filter("Settings", LevelFilter::Trace)
+        .init()
+        .unwrap();
+
     Ok(navigator::init_navigation(dbname, seed_names)?)
 }
 
