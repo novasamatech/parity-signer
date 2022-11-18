@@ -464,7 +464,7 @@ fn bulk_signing_test_passworded() {
     assert_eq!(result, SignResult::RequestPassword { idx: 0, counter: 0 });
 
     // A wrong password is provided.
-    let tx_state = tx_state.password_entered("password_wrong").unwrap();
+    let tx_state = tx_state.password_entered("password_wrong");
 
     let (result, tx_state) = tx_state.handle_sign(dbname).unwrap();
 
@@ -472,7 +472,7 @@ fn bulk_signing_test_passworded() {
     assert_eq!(result, SignResult::RequestPassword { idx: 0, counter: 0 });
 
     // A correct password is provided.
-    let tx_state = tx_state.password_entered("password123").unwrap();
+    let tx_state = tx_state.password_entered("password123");
     let (result, tx_state) = tx_state.handle_sign(dbname).unwrap();
 
     // Two first transactions for the first key are signed,
@@ -481,7 +481,7 @@ fn bulk_signing_test_passworded() {
     assert_eq!(result, SignResult::RequestPassword { idx: 2, counter: 0 });
 
     // Password is provided.
-    let tx_state = tx_state.password_entered("password345").unwrap();
+    let tx_state = tx_state.password_entered("password345");
     let (result, _) = tx_state.handle_sign(dbname).unwrap();
 
     // All signatures are ready, check them.

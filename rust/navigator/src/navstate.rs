@@ -6,9 +6,9 @@ use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
     ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
     MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
-    MRecoverSeedPhrase, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
-    MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData,
-    ScreenNameType, ShieldAlert, TransactionSignAction, TransactionType,
+    MRecoverSeedPhrase, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
+    MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData, ScreenNameType,
+    ShieldAlert, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use std::fmt::Write;
@@ -397,26 +397,24 @@ impl State {
             Screen::Transaction(ref t) => {
                 match t.action() {
                     transaction_parsing::TransactionAction::Sign { .. } => {
-                        t.update_seeds(secret_seed_phrase);
+                        let mut new = t.update_seeds(secret_seed_phrase);
                         if let Modal::EnterPassword = self.navstate.modal {
-                            t.password_entered(details_str);
+                            new = new.password_entered(details_str);
                         }
 
-                        match t.handle_sign(dbname) {
+                        match new.handle_sign(dbname) {
                             Ok((result, new)) => {
                                 match result {
-                                    SignResult::RequestPassword { idx, counter } => {
+                                    SignResult::RequestPassword { .. } => {
                                         match self.navstate.modal {
-                                            Modal::EnterPassword => {
-                                                let pass = details_str;
-                                            }
                                             _ => {
                                                 new_navstate.modal = Modal::EnterPassword;
                                             }
                                         }
                                     }
                                     SignResult::Ready { signatures } => {
-                                        new_navstate.modal = Modal::SignatureReady(vec![]);
+                                        new_navstate.modal =
+                                            Modal::SignatureReady(signatures.clone());
                                     }
                                 };
                                 new_navstate.screen = Screen::Transaction(Box::new(new));
@@ -1709,7 +1707,7 @@ impl State {
             },
             Modal::SignatureReady(ref a) => Some(ModalData::SignatureReady {
                 f: MSignatureReady {
-                    signature: a.to_vec(),
+                    signatures: a.clone(),
                 },
             }),
             Modal::EnterPassword => match new_navstate.screen {

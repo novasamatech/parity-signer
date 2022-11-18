@@ -498,7 +498,7 @@ pub struct MPasswordConfirm {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MSignatureReady {
-    pub signature: Vec<u8>,
+    pub signatures: Vec<Vec<u8>>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

@@ -10,7 +10,7 @@ pub enum Modal {
     SeedMenu,
     NetworkSelector(NetworkSpecsKey),
     PasswordConfirm,
-    SignatureReady(Vec<u8>),
+    SignatureReady(Vec<Vec<u8>>),
     EnterPassword,
     LogComment,
     LogRight,

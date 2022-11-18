@@ -179,7 +179,7 @@ extension TransactionPreview {
         }
 
         private func formattedPhrase(seedNames: [String], with dictionary: [String: String]) -> String {
-            seedNames.reduce(into: "") { $0 += "\($1) \(dictionary[$1] ?? "")\n" }
+            seedNames.reduce(into: "") { $0 += "\(dictionary[$1] ?? "")\n" }
         }
     }
 }

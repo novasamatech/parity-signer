@@ -29,6 +29,9 @@ pub enum Error {
     #[error("Tx Action not sign")]
     TxActionNotSign,
 
-    #[error("Number of seeds provided does not match number of txs in a bulk")]
-    SeedsNumMismatch,
+    #[error("Number of seeds provided does not match number of txs in a bulk <{0}>")]
+    SeedsNumMismatch(String),
+
+    #[error(transparent)]
+    TransactionSigning(#[from] transaction_signing::Error),
 }

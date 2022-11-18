@@ -644,7 +644,7 @@ dictionary MPasswordConfirm {
 };
 
 dictionary MSignatureReady {
-    sequence<u8> signature;
+    sequence<sequence<u8>> signatures;
 };
 
 dictionary MEnterPassword {

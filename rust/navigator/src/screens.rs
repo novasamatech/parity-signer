@@ -1,5 +1,4 @@
 //!List of all screens
-use std::path::Path;
 
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
@@ -13,16 +12,14 @@ use db_handling::{
     identities::get_multisigner_by_address,
     interface_signer::{first_network, SeedDraft},
 };
-use definitions::navigation::{MAddressCard, TransactionSignAction};
+use definitions::navigation::MAddressCard;
 use definitions::{
     crypto::Encryption,
     helpers::{make_identicon_from_multisigner, multisigner_to_public, IdenticonStyle},
     keyring::{AddressKey, NetworkSpecsKey},
-    navigation::{Address, TransactionCardSet},
-    network_specs::OrderedNetworkSpecs,
+    navigation::Address,
     users::AddressDetails,
 };
-use transaction_parsing;
 use transaction_signing;
 
 const MAX_COUNT_SET: u8 = 3;

@@ -9,21 +9,58 @@ use crate::Result;
 
 const MAX_COUNT_SET: u8 = 3;
 
+/// The result of a step within the signing protocol
+/// between the user and the Signer.
 #[derive(Debug, Clone, PartialEq)]
 pub enum SignResult {
+    /// A password for one of the passworded keys is requested.
     RequestPassword { idx: usize, counter: u8 },
+
+    /// All signatures are ready.
     Ready { signatures: Vec<Vec<u8>> },
 }
 
-/// State of transaction screen
+/// State of transaction screen.
+///
+/// In general case Signer may sign a bulk of transactions
+/// (more than one) and any subset of the transactions within
+/// a bulk may be signed by the passworded keys. This structure
+/// implements an interactive protocol between Signer and the user
+/// where user repeatedly enters all necessary passwords until all
+/// transactions are successfully signed or a password entry limit
+/// occurs.
+///
+/// If the same passworded key is used to sign more than one
+/// transaction in the bulk the password for this key is only
+/// requested once.
+///
+/// In case when no transactions in the bulk are signed by passworded
+/// key the result becomes available to the user right away minimizing
+/// the amount of user actions necessary.
 #[derive(Clone, Debug)]
 pub struct TransactionState {
+    /// The vector of seeds per-transcation being signed.
+    /// Since it is possible that signer is signing more than
+    /// one transaction (a bulk) this is a `Vec`.
     seeds: Vec<String>,
+
+    /// Passwords for the accounts.
     passwords: HashMap<(String, String), String>,
+
+    /// The `TransactionAction` being processed.
     action: transaction_parsing::TransactionAction,
-    comment: String,
+
+    /// User-provided comments for each transaction.
+    comments: Vec<String>,
+
+    /// Failed password entries counter for the tx
+    /// currently being signed if any.
     counter: u8,
+
+    /// The index of the transaction being currently signed.
     currently_signing: usize,
+
+    /// Accumulates already-produced signatures.
     signatures: Vec<Vec<u8>>,
 }
 
@@ -37,7 +74,7 @@ impl TransactionState {
             seeds: vec![],
             passwords: HashMap::new(),
             action: transaction_parsing::produce_output(details_str, dbname),
-            comment: "".to_string(),
+            comments: vec![],
             counter: 0,
             currently_signing: 0,
             signatures: vec![],
@@ -51,8 +88,7 @@ impl TransactionState {
     }
 
     pub fn add_comment(&self, comment: &str) -> Self {
-        let mut new = self.clone();
-        new.comment = comment.to_owned();
+        let new = self.clone();
         new
     }
 
@@ -91,7 +127,7 @@ impl TransactionState {
 
         if let transaction_parsing::TransactionAction::Sign { actions, checksum } = &self.action {
             if self.seeds.len() != actions.len() {
-                return Err(crate::Error::SeedsNumMismatch);
+                return Err(crate::Error::SeedsNumMismatch(self.seeds.concat()));
             }
 
             loop {
@@ -145,7 +181,7 @@ impl TransactionState {
                                 new,
                             ));
                         } else {
-                            panic!("{}", e);
+                            return Err(crate::Error::TransactionSigning(e));
                         }
                     }
                 }
@@ -162,7 +198,7 @@ impl TransactionState {
         ))
     }
 
-    pub fn password_entered(&self, pwd: &str) -> Result<Self> {
+    pub fn password_entered(&self, pwd: &str) -> Self {
         let mut new = self.clone();
 
         if let transaction_parsing::TransactionAction::Sign {
@@ -175,11 +211,11 @@ impl TransactionState {
             new.passwords
                 .insert((current.to_string(), base58), pwd.to_string());
         }
-        Ok(new)
+        new
     }
 
     pub fn get_comment(&self) -> String {
-        self.comment.to_owned()
+        String::new()
     }
 
     pub fn ok(&self) -> bool {
