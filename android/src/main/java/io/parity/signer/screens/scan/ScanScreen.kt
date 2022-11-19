@@ -181,7 +181,16 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 			text = { Text(text = stringResource(R.string.camera_jastification_message)) },
 		)
 	} else {
-		Text(stringResource(R.string.camera_no_permission_text))
+		Text(
+			text = stringResource(R.string.camera_no_permission_text),
+			color = MaterialTheme.colors.primary,
+			style = TypefaceNew.BodyL,
+			textAlign = TextAlign.Center,
+			modifier = Modifier
+				.fillMaxWidth(1f)
+				.padding(top = 150.dp),
+		)
+		rationalShown.value = true
 		LaunchedEffect(key1 = Unit) {
 			launch { cameraPermissionState.launchPermissionRequest() }
 		}
