@@ -35,14 +35,12 @@ final class SignerDataModel: ObservableObject {
 
     private let bundle: BundleProtocol
     private let databaseMediator: DatabaseMediating
-    private let fileManager: FileManagingProtocol
 
     init(
         navigation: NavigationCoordinator = NavigationCoordinator(),
         connectivityMediator: ConnectivityMediator = ConnectivityMediator(),
         bundle: BundleProtocol = Bundle.main,
         databaseMediator: DatabaseMediating = DatabaseMediator(),
-        fileManager: FileManagingProtocol = FileManager.default,
         seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
     ) {
         self.navigation = navigation
@@ -50,7 +48,6 @@ final class SignerDataModel: ObservableObject {
         self.seedsMediator = seedsMediator
         self.bundle = bundle
         self.databaseMediator = databaseMediator
-        self.fileManager = fileManager
         onboardingDone = databaseMediator.isDatabaseAvailable()
 
         seedsMediator.set(signerDataModel: self)
@@ -68,7 +65,10 @@ final class SignerDataModel: ObservableObject {
     /// Should be called once on factory-new state of the app
     /// Populates database with starting values
     func onboard(jailbreak: Bool = false) {
-        guard !connectivityMediator.isConnectivityOn else { return }
+        guard !connectivityMediator.isConnectivityOn else {
+            alert = true
+            return
+        }
         wipe()
         guard databaseMediator.recreateDatabaseFile() else {
             print("Database could not be recreated")
@@ -100,14 +100,20 @@ private extension SignerDataModel {
     }
 
     func finaliseInitialisation() {
-        guard onboardingDone else { return }
-        seedsMediator.refreshSeeds()
-        do {
-            try initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
-        } catch {
-            print("InitNavigation has failed! This will not do.")
+        if onboardingDone {
+            seedsMediator.refreshSeeds()
+            do {
+                try initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
+            } catch {
+                print("InitNavigation has failed! This will not do.")
+            }
+            totalRefresh()
+        } else {
+            // remove secrets first
+            seedsMediator.removeAllSeeds()
+            // then everything else
+            databaseMediator.wipeDatabase()
         }
-        totalRefresh()
     }
 }
 
