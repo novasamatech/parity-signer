@@ -37,7 +37,7 @@ use transaction_parsing::{
     entry_to_transactions_with_decoding, produce_output, StubNav, TransactionAction,
 };
 
-use crate::{handle_stub, sign_transaction::create_signatures, Error, Result};
+use crate::{handle_stub, sign_transaction::create_signature, Error, Result};
 
 const PWD: &str = "";
 const USER_COMMENT: &str = "";
@@ -62,15 +62,16 @@ fn sign_action_test(
     dbname: &str,
     encryption: Encryption,
 ) -> Result<String> {
-    create_signatures(
+    create_signature(
         seed_phrase,
         pwd_entry,
         user_comment,
         dbname,
         checksum,
+        0,
         encryption,
     )
-    .map(|a| a[0].clone())
+    .map(|r| r.0)
 }
 
 fn identicon_to_str(identicon: &[u8]) -> &str {
@@ -383,20 +384,18 @@ fn can_sign_transaction_1() {
     };
 
     let output = produce_output(line, dbname);
-    if let TransactionAction::Sign {
-        action:
-            TransactionSignAction {
-                content: set,
-                has_pwd,
-                author_info,
-                network_info,
-            },
-        checksum,
-    } = output
-    {
-        assert_eq!(set, set_expected);
-        assert_eq!(author_info, author_info_known);
-        assert_eq!(network_info, network_info_known);
+    if let TransactionAction::Sign { actions, checksum } = output {
+        let TransactionSignAction {
+            content: set,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+
+        assert_eq!(actions.len(), 1);
+        assert_eq!(set, &set_expected);
+        assert_eq!(author_info, &author_info_known);
+        assert_eq!(network_info, &network_info_known);
         assert!(!has_pwd, "Expected no password");
 
         match sign_action_test(
@@ -646,20 +645,17 @@ fn can_sign_message_1() {
         order: 2,
     };
 
-    if let TransactionAction::Sign {
-        action:
-            TransactionSignAction {
-                content,
-                has_pwd,
-                author_info,
-                network_info,
-            },
-        checksum,
-    } = output
-    {
-        assert_eq!(content, content_known);
-        assert_eq!(author_info, author_info_known);
-        assert_eq!(network_info, network_info_known);
+    if let TransactionAction::Sign { actions, checksum } = output {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
+        assert_eq!(network_info, &network_info_known);
         assert!(!has_pwd, "Expected no password");
 
         match sign_action_test(
@@ -787,7 +783,7 @@ fn add_specs_westend_no_network_info_not_signed() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before = print_db_content(dbname);
@@ -869,7 +865,7 @@ fn add_specs_westend_ed25519_not_signed() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before =
@@ -1105,7 +1101,7 @@ fn load_westend9070() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before =
@@ -1240,7 +1236,7 @@ fn load_known_types_upd_general_verifier() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before =
@@ -1358,7 +1354,7 @@ fn load_new_types_verified() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before = print_db_content(dbname)
@@ -1495,7 +1491,7 @@ fn dock_adventures_1() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before =
@@ -1618,7 +1614,7 @@ Identities:
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         handle_stub(checksum, dbname).unwrap();
@@ -1742,7 +1738,7 @@ Identities:
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         handle_stub(checksum, dbname).unwrap();
@@ -1840,7 +1836,7 @@ fn dock_adventures_2() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before = print_db_content(dbname)
@@ -1965,7 +1961,7 @@ Identities:
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         handle_stub(checksum, dbname).unwrap();
@@ -2087,7 +2083,7 @@ Identities:
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         handle_stub(checksum, dbname).unwrap();
@@ -2205,7 +2201,7 @@ Identities:
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         handle_stub(checksum, dbname).unwrap();
@@ -2299,7 +2295,7 @@ fn can_parse_westend_with_v14() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before =
@@ -2526,19 +2522,16 @@ Identities:
     };
     // TODO: let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
-    if let TransactionAction::Sign {
-        action:
-            TransactionSignAction {
-                content,
-                has_pwd,
-                author_info,
-                network_info,
-            },
-        checksum,
-    } = output
-    {
-        assert_eq!(content, content_known);
-        assert_eq!(author_info, author_info_known);
+    if let TransactionAction::Sign { actions, checksum } = output {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
         // TODO: assert_eq!(network_info, network_info_known);
         assert!(!has_pwd, "Expected no password");
         sign_action_test(
@@ -2842,19 +2835,17 @@ Identities:
     };
     // TODO let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
-    if let TransactionAction::Sign {
-        action:
-            TransactionSignAction {
-                content,
-                has_pwd,
-                author_info,
-                network_info,
-            },
-        checksum,
-    } = output
-    {
-        assert_eq!(content, content_known);
-        assert_eq!(author_info, author_info_known);
+    if let TransactionAction::Sign { actions, checksum } = output {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
         // TODO assert_eq!(network_info, network_info_known);
         assert!(!has_pwd, "Expected no password");
         sign_action_test(
@@ -2942,7 +2933,7 @@ fn parse_transaction_alice_remarks_westend9122() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
         handle_stub(checksum, dbname).unwrap();
     } else {
@@ -3061,19 +3052,16 @@ fn parse_transaction_alice_remarks_westend9122() {
     };
     // TODO let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
-    if let TransactionAction::Sign {
-        action:
-            TransactionSignAction {
-                content,
-                has_pwd,
-                author_info,
-                ..
-            },
-        ..
-    } = output
-    {
-        assert_eq!(content, content_known);
-        assert_eq!(author_info, author_info_known);
+    if let TransactionAction::Sign { actions, .. } = output {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            ..
+        } = &actions[0];
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
         // TODO: assert_eq!(network_info == network_info_known);
         assert!(!has_pwd, "Expected no password");
     } else {
@@ -3157,7 +3145,7 @@ fn proper_hold_display() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
     } else {
         panic!("Wrong action: {:?}", output)
@@ -3218,7 +3206,7 @@ Identities:
     };
 
     if let TransactionAction::Read { r: reply } = output {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -3359,7 +3347,7 @@ Identities:
     };
 
     if let TransactionAction::Read { r: reply } = output {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -3380,7 +3368,7 @@ Identities:
     };
 
     if let TransactionAction::Read { r: reply } = output {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -3587,7 +3575,7 @@ Identities:"#;
     };
 
     if let TransactionAction::Read { r: content } = output {
-        assert_eq!(content, content_known);
+        assert_eq!(*content, content_known);
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -3662,7 +3650,7 @@ fn shell_no_token_warning_on_metadata() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
     } else {
         panic!("Wrong action: {:?}", output)

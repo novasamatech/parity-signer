@@ -77,19 +77,22 @@ fn parse_transaction_bulk<P: AsRef<Path>>(payload: &str, dbname: P) -> Result<Tr
         TransactionBulk::V1(b) => {
             let mut actions = vec![];
 
+            let mut checksum = 0;
             for t in &b.encoded_transactions {
                 let encoded = hex::encode(t);
                 let encoded = "53".to_string() + &encoded;
                 let action = parse_transaction(&encoded, &dbname, true)?;
-                if let TransactionAction::Sign { actions: a, .. } = action {
+                if let TransactionAction::Sign {
+                    actions: a,
+                    checksum: c,
+                } = action
+                {
+                    checksum = c;
                     actions.push(a[0].clone());
                 }
             }
 
-            Ok(TransactionAction::Sign {
-                actions,
-                checksum: 0,
-            })
+            Ok(TransactionAction::Sign { actions, checksum })
         }
     }
 }
@@ -101,10 +104,10 @@ where
     match handle_scanner_input(payload, dbname) {
         Ok(out) => out,
         Err(e) => TransactionAction::Read {
-            r: TransactionCardSet {
+            r: Box::new(TransactionCardSet {
                 error: Some(vec![Card::Error(e).card(&mut 0, 0)]),
                 ..Default::default()
-            },
+            }),
         },
     }
 }

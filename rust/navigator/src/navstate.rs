@@ -6,7 +6,7 @@ use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
     ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
     MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
-    MRecoverSeedPhrase, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
+    MRecoverSeedPhrase, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
     MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData, ScreenNameType,
     ShieldAlert, TransactionType,
 };
@@ -398,7 +398,8 @@ impl State {
             Screen::Transaction(ref t) => {
                 match t.action() {
                     transaction_parsing::TransactionAction::Sign { .. } => {
-                        let mut new = t.update_seeds(secret_seed_phrase);
+                        let new = t.update_seeds(secret_seed_phrase);
+                        let mut new = new.update_comments(details_str);
                         if let Modal::EnterPassword = self.navstate.modal {
                             new = new.password_entered(details_str);
                             new_navstate.modal = Modal::Empty;
@@ -406,18 +407,24 @@ impl State {
                         match new.handle_sign(dbname) {
                             Ok((result, new)) => {
                                 match result {
-                                    SignResult::RequestPassword { .. } => {
-                                        match self.navstate.modal {
-                                            _ => {
-                                                new_navstate.modal = Modal::EnterPassword;
-                                            }
+                                    SignResult::RequestPassword { counter, .. } => {
+                                        if counter > 1 {
+                                            new_navstate.alert = Alert::Error;
+                                            let _ = write!(&mut errorline, "Wrong password.");
                                         }
+                                        new_navstate.modal = Modal::EnterPassword;
                                     }
                                     SignResult::Ready { signatures } => {
                                         new_navstate.modal = Modal::SignatureReady(signatures);
                                     }
                                 };
-                                new_navstate.screen = Screen::Transaction(Box::new(new));
+                                if t.ok() {
+                                    new_navstate.screen = Screen::Transaction(Box::new(new));
+                                } else {
+                                    new_navstate = Navstate::clean_screen(Screen::Log);
+
+                                    new_navstate.alert = Alert::Error;
+                                }
                             }
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
@@ -477,7 +484,7 @@ impl State {
                                         new_navstate = Navstate::clean_screen(Screen::Keys(
                                             KeysState::new_in_network(
                                                 details_str,
-                                                &network_specs_key,
+                                                network_specs_key,
                                             ),
                                         ));
                                     }
@@ -1457,10 +1464,10 @@ impl State {
                         network_info,
                         ..
                     } => vec![MTransaction {
-                        content: content.clone(),
+                        content: *content.clone(),
                         ttype: TransactionType::ImportDerivations,
                         author_info: None,
-                        network_info: Some(network_info.clone().into()),
+                        network_info: Some(network_info.as_ref().clone().into()),
                     }],
                     TransactionAction::Sign { actions, .. } => actions
                         .iter()
@@ -1472,13 +1479,13 @@ impl State {
                         })
                         .collect(),
                     TransactionAction::Stub { s, .. } => vec![MTransaction {
-                        content: s.clone(),
+                        content: *s.clone(),
                         ttype: TransactionType::Stub,
                         author_info: None,
                         network_info: None,
                     }],
                     TransactionAction::Read { r } => vec![MTransaction {
-                        content: r.clone(),
+                        content: *r.clone(),
                         ttype: TransactionType::Read,
                         author_info: None,
                         network_info: None,
@@ -1710,16 +1717,13 @@ impl State {
             }),
             Modal::EnterPassword => match new_navstate.screen {
                 Screen::Transaction(ref t) => {
-                    if let Some(author_info) = t.current_password_author_info() {
-                        Some(ModalData::EnterPassword {
+                    t.current_password_author_info()
+                        .map(|author_info| ModalData::EnterPassword {
                             f: MEnterPassword {
                                 author_info,
                                 counter: t.counter() as u32,
                             },
                         })
-                    } else {
-                        None
-                    }
                 }
                 Screen::SignSufficientCrypto(ref s) => {
                     if let Some((_, _, author_info)) = s.key_selected() {

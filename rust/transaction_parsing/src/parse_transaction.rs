@@ -43,7 +43,7 @@ enum CardsPrep<'a> {
 pub(crate) fn parse_transaction<P>(
     data_hex: &str,
     db_path: P,
-    in_bulk: bool,
+    _in_bulk: bool,
 ) -> Result<TransactionAction>
 where
     P: AsRef<Path>,
@@ -201,13 +201,13 @@ where
                                         let method = Some(into_cards(&a, &mut index));
                                         let extensions =
                                             Some(into_cards(&extensions_cards, &mut index));
-                                        let r = TransactionCardSet {
+                                        let r = Box::new(TransactionCardSet {
                                             author,
                                             warning,
                                             method,
                                             extensions,
                                             ..Default::default()
-                                        };
+                                        });
                                         Some(TransactionAction::Read { r })
                                     }
                                 };
@@ -226,13 +226,13 @@ where
                                         .card(&mut index, indent);
                                         let error = Card::Error(e.into()).card(&mut index, indent);
                                         let extensions = into_cards(&extensions_cards, &mut index);
-                                        let r = TransactionCardSet {
+                                        let r = Box::new(TransactionCardSet {
                                             author: Some(vec![author]),
                                             error: Some(vec![error]),
                                             warning,
                                             extensions: Some(extensions),
                                             ..Default::default()
-                                        };
+                                        });
                                         Some(TransactionAction::Read { r })
                                     }
                                     CardsPrep::ShowOnly(author_card, warning_card) => {
@@ -243,13 +243,13 @@ where
                                         ]);
                                         let extensions =
                                             Some(into_cards(&extensions_cards, &mut index));
-                                        let r = TransactionCardSet {
+                                        let r = Box::new(TransactionCardSet {
                                             author,
                                             warning,
                                             error,
                                             extensions,
                                             ..Default::default()
-                                        };
+                                        });
                                         Some(TransactionAction::Read { r })
                                     }
                                 };
@@ -279,11 +279,11 @@ where
             let author = Some(vec![author_card]);
             let error = Some(vec![error_card]);
 
-            let r = TransactionCardSet {
+            let r = Box::new(TransactionCardSet {
                 author,
                 error,
                 ..Default::default()
-            };
+            });
 
             Ok(TransactionAction::Read { r })
         }

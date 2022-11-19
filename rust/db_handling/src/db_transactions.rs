@@ -814,6 +814,7 @@ impl Default for TrDbColdStub {
 #[cfg(feature = "signer")]
 #[derive(Debug, Decode, Default, Encode)]
 pub struct TrDbColdSign {
+    /// Bulk of transactions to sign.
     pub signing_bulk: Vec<TrDbColdSignOne>,
 }
 
@@ -821,9 +822,10 @@ pub struct TrDbColdSign {
 impl TrDbColdSign {
     /// Recover [`TrDbColdSign`] from storage in the cold database.
     ///
-    /// Function requires correct checksum to make sure the signable transaction
-    /// is still the one that was shown to the user previously, and no
-    /// changes to the database have occured.
+    /// Function requires an optional correct checksum to make sure
+    /// the signable transaction is still the one that was shown to
+    /// the user previously, and no changes to the database have occured.
+    /// While parsing a bulk no checksum is provided and no checks are done.
     ///
     /// [`TRANSACTION`] tree is **not** cleared in the process. User is allowed
     /// to try entering password several times, for all this time the
@@ -877,6 +879,7 @@ impl TrDbColdSign {
     /// - `wrong_password` flag; for entries with `true` value the signature
     /// was not generated, because user has entered the wrong password;
     /// - user-added text comment for the transaction
+    /// - index of the transaction in the bulk
     /// - database name, into which the data is added
     ///
     /// Function returns database checksum, to be collected and re-used in case
@@ -889,7 +892,7 @@ impl TrDbColdSign {
         db_path: P,
     ) -> Result<u32> {
         let mut history = vec![];
-        let for_transaction = Batch::default();
+        let mut for_transaction = Batch::default();
         let s = &self.signing_bulk[idx];
         let signed_by = VerifierValue::Standard { m: s.multisigner() };
         history.append(&mut s.history.clone());
@@ -902,7 +905,11 @@ impl TrDbColdSign {
                     history.push(Event::TransactionSignError { sign_display })
                 } else {
                     history.push(Event::TransactionSigned { sign_display });
-                    //for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
+                    // if this is the last transaction in the bulk and the password was right,
+                    // all is done and the DB can be cleared.
+                    if idx == self.signing_bulk.len() - 1 {
+                        for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
+                    }
                 }
             }
             SignContent::Message(message) => {
@@ -916,7 +923,11 @@ impl TrDbColdSign {
                     history.push(Event::MessageSigned {
                         sign_message_display,
                     });
-                    //for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
+                    // if this is the last transaction in the bulk and the password was right,
+                    // all is done and the DB can be cleared.
+                    if idx == self.signing_bulk.len() - 1 {
+                        for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
+                    }
                 }
             }
         }

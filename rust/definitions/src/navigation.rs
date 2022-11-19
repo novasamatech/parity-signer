@@ -27,8 +27,8 @@ pub struct TransactionSignAction {
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum TransactionAction {
     Derivations {
-        content: TransactionCardSet,
-        network_info: OrderedNetworkSpecs,
+        content: Box<TransactionCardSet>,
+        network_info: Box<OrderedNetworkSpecs>,
         checksum: u32,
         network_specs_key: NetworkSpecsKey,
     },
@@ -37,12 +37,12 @@ pub enum TransactionAction {
         checksum: u32,
     },
     Stub {
-        s: TransactionCardSet,
+        s: Box<TransactionCardSet>,
         u: u32,
         stub: StubNav,
     },
     Read {
-        r: TransactionCardSet,
+        r: Box<TransactionCardSet>,
     },
 }
 

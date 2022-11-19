@@ -1915,7 +1915,6 @@ dependencies = [
  "hex",
  "image",
  "lazy_static",
- "log",
  "parity-scale-codec",
  "parser",
  "pretty_assertions",

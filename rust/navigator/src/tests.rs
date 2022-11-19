@@ -321,7 +321,7 @@ fn bulk_signing_test_unpassworded() {
     // utilities function.
     let encoded_transactions_prefixed: Vec<_> = encoded_transactions
         .iter()
-        .map(|tx| "53".to_string() + &hex::encode(&tx))
+        .map(|tx| "53".to_string() + &hex::encode(tx))
         .collect();
 
     let bulk = TransactionBulk::V1(TransactionBulkV1 {
@@ -335,7 +335,7 @@ fn bulk_signing_test_unpassworded() {
 
     try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
 
-    let tx_state = TransactionState::new(&hex::encode(payload), &dbname);
+    let tx_state = TransactionState::new(&hex::encode(payload), dbname);
 
     let tx_state = tx_state.update_seeds(&seeds);
 
@@ -347,6 +347,7 @@ fn bulk_signing_test_unpassworded() {
         assert_eq!(signatures.len(), 2);
 
         for (tx, signature) in encoded_transactions_prefixed.iter().zip(signatures.iter()) {
+            println!("signature len {}", signature.len());
             assert!(signature_is_good(tx, &hex::encode(signature)));
         }
     } else {
@@ -425,7 +426,7 @@ fn bulk_signing_test_passworded() {
 
     // Prepare transactions and put them in the bulk.
     let tx_passworded_123_1 =
-        "0102".to_string() + &alice_westend_password123_public + tx + WESTEND_GENESIS;
+        "0102".to_string() + alice_westend_password123_public + tx + WESTEND_GENESIS;
 
     let tx_passworded_123_2 = tx_passworded_123_1.clone();
 
@@ -442,7 +443,7 @@ fn bulk_signing_test_passworded() {
     // utilities function.
     let encoded_transactions_prefixed: Vec<_> = encoded_transactions
         .iter()
-        .map(|tx| "53".to_string() + &hex::encode(&tx))
+        .map(|tx| "53".to_string() + &hex::encode(tx))
         .collect();
 
     let bulk = TransactionBulk::V1(TransactionBulkV1 {
@@ -451,7 +452,7 @@ fn bulk_signing_test_passworded() {
 
     let payload = [&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat();
 
-    let tx_state = TransactionState::new(&hex::encode(payload), &dbname);
+    let tx_state = TransactionState::new(&hex::encode(payload), dbname);
     let tx_state = tx_state.update_seeds(&format!(
         "{}\n{}\n{}",
         ALICE_SEED_PHRASE, ALICE_SEED_PHRASE, ALICE_SEED_PHRASE
@@ -461,7 +462,7 @@ fn bulk_signing_test_passworded() {
     let (result, tx_state) = tx_state.handle_sign(dbname).unwrap();
 
     // The password is requested.
-    assert_eq!(result, SignResult::RequestPassword { idx: 0, counter: 0 });
+    assert_eq!(result, SignResult::RequestPassword { idx: 0, counter: 1 });
 
     // A wrong password is provided.
     let tx_state = tx_state.password_entered("password_wrong");
@@ -469,7 +470,7 @@ fn bulk_signing_test_passworded() {
     let (result, tx_state) = tx_state.handle_sign(dbname).unwrap();
 
     // A password is requested another time.
-    assert_eq!(result, SignResult::RequestPassword { idx: 0, counter: 0 });
+    assert_eq!(result, SignResult::RequestPassword { idx: 0, counter: 2 });
 
     // A correct password is provided.
     let tx_state = tx_state.password_entered("password123");
@@ -478,7 +479,7 @@ fn bulk_signing_test_passworded() {
     // Two first transactions for the first key are signed,
     // password is requested for the second transaction.
     // A password is requested for the third transaction for the password `password345`.
-    assert_eq!(result, SignResult::RequestPassword { idx: 2, counter: 0 });
+    assert_eq!(result, SignResult::RequestPassword { idx: 2, counter: 1 });
 
     // Password is provided.
     let tx_state = tx_state.password_entered("password345");
@@ -516,7 +517,7 @@ fn bulk_signing_test_passworded() {
                             signed_by: VerifierValue::Standard {
                                 m: password345_multisigner,
                             },
-                            user_comment: "user_comment".to_string(),
+                            user_comment: "".to_string(),
                         }
                     }]
                 }
@@ -532,7 +533,7 @@ fn bulk_signing_test_passworded() {
                             signed_by: VerifierValue::Standard {
                                 m: password123_multisigner.clone(),
                             },
-                            user_comment: "user_comment".to_string(),
+                            user_comment: "".to_string(),
                         }
                     }]
                 }
@@ -548,7 +549,7 @@ fn bulk_signing_test_passworded() {
                             signed_by: VerifierValue::Standard {
                                 m: password123_multisigner.clone(),
                             },
-                            user_comment: "user_comment".to_string(),
+                            user_comment: "".to_string(),
                         }
                     }]
                 }
@@ -562,9 +563,9 @@ fn bulk_signing_test_passworded() {
                             transaction: hex::decode(tx).unwrap(),
                             network_name: "westend".to_string(),
                             signed_by: VerifierValue::Standard {
-                                m: password123_multisigner.clone(),
+                                m: password123_multisigner,
                             },
-                            user_comment: "user_comment".to_string(),
+                            user_comment: "".to_string(),
                         }
                     }]
                 }
@@ -5343,6 +5344,7 @@ fn flow_test_1() {
             action.modal_data
         );
     };
+    println!("hex::encode {}", hex::encode(&sufficient));
     let sufficient_hex = hex::encode(qr_payload(&sufficient));
 
     let mut new_log_with_modal = expected_action.clone();
@@ -6047,10 +6049,10 @@ fn flow_test_1() {
         )
         .unwrap();
     let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { signature },
+        f: MSignatureReady { signatures },
     }) = action.modal_data
     {
-        String::from_utf8(qr_payload(&signature)).unwrap()
+        hex::encode(&signatures[0])
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -6198,10 +6200,10 @@ fn flow_test_1() {
         .perform(Action::GoForward, "text test", ALICE_SEED_PHRASE)
         .unwrap();
     let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { ref signature },
+        f: MSignatureReady { ref signatures },
     }) = action.modal_data
     {
-        String::from_utf8(qr_payload(signature)).unwrap()
+        hex::encode(&signatures[0])
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -6670,16 +6672,16 @@ fn flow_test_1() {
         )
         .unwrap();
     let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { ref signature },
+        f: MSignatureReady { ref signatures },
     }) = action.modal_data
     {
         expected_action.modal_data = Some(ModalData::SignatureReady {
             f: MSignatureReady {
-                signature: signature.clone(),
+                signatures: signatures.clone(),
             },
         });
 
-        String::from_utf8(qr_payload(signature)).unwrap()
+        hex::encode(&signatures[0])
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -7108,16 +7110,16 @@ fn flow_test_1() {
         .unwrap();
     let action = state.perform(Action::GoForward, "secret", "").unwrap();
     let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { ref signature },
+        f: MSignatureReady { ref signatures },
     }) = action.modal_data
     {
         text_sign_action.modal_data = Some(ModalData::SignatureReady {
             f: MSignatureReady {
-                signature: signature.clone(),
+                signatures: signatures.clone(),
             },
         });
 
-        String::from_utf8(qr_payload(signature)).unwrap()
+        hex::encode(&signatures[0])
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",

@@ -45,11 +45,11 @@ where
                     let warning_card_2 = Card::Warning(Warning::UpdatingTypes).card(&mut index, 0);
                     let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
                     Ok(TransactionAction::Stub {
-                        s: TransactionCardSet {
+                        s: Box::new(TransactionCardSet {
                             warning: Some(vec![warning_card_1, warning_card_2]),
                             types_info: Some(vec![types_card]),
                             ..Default::default()
-                        },
+                        }),
                         u: checksum,
                         stub: StubNav::LoadTypes,
                     })
@@ -78,12 +78,12 @@ where
                     let warning_card = Card::Warning(Warning::UpdatingTypes).card(&mut index, 0);
                     let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
                     Ok(TransactionAction::Stub {
-                        s: TransactionCardSet {
+                        s: Box::new(TransactionCardSet {
                             verifier: Some(vec![verifier_card]),
                             warning: Some(vec![warning_card]),
                             types_info: Some(vec![types_card]),
                             ..Default::default()
-                        },
+                        }),
                         u: checksum,
                         stub: StubNav::LoadTypes,
                     })
@@ -114,12 +114,12 @@ where
                         let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
                         let checksum = stub.store_and_get_checksum(&db_path)?;
                         Ok(TransactionAction::Stub {
-                            s: TransactionCardSet {
+                            s: Box::new(TransactionCardSet {
                                 verifier: Some(vec![verifier_card]),
                                 warning: Some(vec![warning_card_1, warning_card_2]),
                                 types_info: Some(vec![types_card]),
                                 ..Default::default()
-                            },
+                            }),
                             u: checksum,
                             stub: StubNav::LoadTypes,
                         })

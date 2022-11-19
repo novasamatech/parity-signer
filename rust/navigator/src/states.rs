@@ -1,9 +1,6 @@
 use std::{collections::HashMap, path::Path};
 
-use definitions::{
-    navigation::{MAddressCard, TransactionCardSet},
-    network_specs::OrderedNetworkSpecs,
-};
+use definitions::navigation::MAddressCard;
 
 use crate::Result;
 
@@ -11,7 +8,7 @@ const MAX_COUNT_SET: u8 = 3;
 
 /// The result of a step within the signing protocol
 /// between the user and the Signer.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SignResult {
     /// A password for one of the passworded keys is requested.
     RequestPassword { idx: usize, counter: u8 },
@@ -68,7 +65,7 @@ impl TransactionState {
     pub fn current_password_author_info(&self) -> Option<MAddressCard> {
         match &self.action {
             transaction_parsing::TransactionAction::Sign { actions, .. } => {
-                Some((&actions[self.currently_signing]).author_info.clone())
+                Some(actions[self.currently_signing].author_info.clone())
             }
             _ => None,
         }
@@ -80,7 +77,7 @@ impl TransactionState {
             passwords: HashMap::new(),
             action: transaction_parsing::produce_output(details_str, dbname),
             comments: vec![],
-            counter: 0,
+            counter: 1,
             currently_signing: 0,
             signatures: vec![],
         }
@@ -94,37 +91,31 @@ impl TransactionState {
         new
     }
 
-    pub fn add_comment(&self, comment: &str) -> Self {
-        let new = self.clone();
+    pub fn update_comments(&self, comments: &str) -> Self {
+        let mut new = self.clone();
+        if new.comments.is_empty() {
+            new.comments = comments
+                .lines()
+                .map(|comment| comment.to_string())
+                .collect();
+        }
         new
     }
 
-    pub fn update_checksum_sign(
-        &self,
-        new_checksum: u32,
-        content: TransactionCardSet,
-        has_pwd: bool,
-        author_info: MAddressCard,
-        network_info: OrderedNetworkSpecs,
-    ) {
-        /*
-        let action = transaction_parsing::TransactionAction::Sign {
-            action: TransactionSignAction {
-                content,
-                has_pwd,
-                author_info,
-                network_info,
-            },
-            checksum: new_checksum,
-        };
-        Self {
-            entered_info: self.entered_info.to_owned(),
-            action,
-            comment: self.comment.to_string(),
-            counter: self.counter + 1,
+    pub fn update_checksum_sign(&self, new_checksum: u32) -> Self {
+        let mut new = self.clone();
+        new.counter += 1;
+
+        if let transaction_parsing::TransactionAction::Sign {
+            actions: _,
+            checksum,
+        } = &mut new.action
+        {
+            *checksum = new_checksum;
         }
-        */
+        new
     }
+
     pub fn action(&self) -> &transaction_parsing::TransactionAction {
         &self.action
     }
@@ -132,9 +123,8 @@ impl TransactionState {
     pub fn handle_sign<P: AsRef<Path>>(&self, db_path: P) -> Result<(SignResult, Self)> {
         let mut new = self.clone();
 
-        log::error!("here");
-
-        if let transaction_parsing::TransactionAction::Sign { actions, checksum } = &self.action {
+        if let transaction_parsing::TransactionAction::Sign { actions, checksum } = &mut new.action
+        {
             if self.seeds.len() != actions.len() {
                 return Err(crate::Error::SeedsNumMismatch(self.seeds.concat()));
             }
@@ -155,7 +145,7 @@ impl TransactionState {
                             return Ok((
                                 SignResult::RequestPassword {
                                     idx: new.currently_signing,
-                                    counter: 0,
+                                    counter: 1,
                                 },
                                 new,
                             ));
@@ -168,25 +158,34 @@ impl TransactionState {
                 match transaction_signing::create_signature(
                     &new.seeds[new.currently_signing],
                     password,
-                    "user_comment",
+                    new.comments
+                        .get(new.currently_signing)
+                        .map(|s| s.as_str())
+                        .unwrap_or_else(|| ""),
                     &db_path,
                     *checksum,
                     new.currently_signing,
                     action.network_info.specs.encryption,
                 ) {
-                    Ok(signature) => {
+                    Ok((signature, new_checksum)) => {
                         new.currently_signing += 1;
+                        new.counter = 0;
+                        *checksum = new_checksum;
                         new.signatures.push(hex::decode(signature)?);
                         if new.currently_signing == self.seeds.len() {
                             break;
                         }
                     }
                     Err(e) => {
-                        if let transaction_signing::Error::WrongPasswordNewChecksum(_) = e {
+                        if let transaction_signing::Error::WrongPasswordNewChecksum(new_checksum) =
+                            e
+                        {
+                            new = new.update_checksum_sign(new_checksum);
+
                             return Ok((
                                 SignResult::RequestPassword {
                                     idx: new.currently_signing,
-                                    counter: 0,
+                                    counter: new.counter,
                                 },
                                 new,
                             ));

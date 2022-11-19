@@ -23,7 +23,7 @@ pub fn create_signature<P: AsRef<Path>>(
     checksum: u32,
     idx: usize,
     encryption: Encryption,
-) -> Result<String> {
+) -> Result<(String, u32)> {
     let sign = TrDbColdSign::from_storage(&database_name, Some(checksum))?
         .ok_or(db_handling::Error::Sign)?;
     let pwd = {
@@ -60,8 +60,8 @@ pub fn create_signature<P: AsRef<Path>>(
     ) {
         Ok(s) => {
             full_address.zeroize();
-            sign.apply(false, user_comment, idx, database_name)?;
-            Ok(s.multi_signature())
+            let c = sign.apply(false, user_comment, idx, database_name)?;
+            Ok((s.multi_signature(), c))
         }
         Err(e) => {
             full_address.zeroize();
@@ -78,14 +78,14 @@ pub fn create_signature<P: AsRef<Path>>(
         SignContent::Transaction {
             method: _,
             extensions: _,
-        } => hex::encode(signature.encode()),
-        SignContent::Message(_) => match signature {
+        } => hex::encode(signature.0.encode()),
+        SignContent::Message(_) => match signature.0 {
             MultiSignature::Sr25519(a) => hex::encode(a),
             MultiSignature::Ed25519(a) => hex::encode(a),
             MultiSignature::Ecdsa(a) => hex::encode(a),
         },
     };
-    Ok(encoded)
+    Ok((encoded, signature.1))
 }
 
 pub fn create_signature_png(
@@ -106,6 +106,6 @@ pub fn create_signature_png(
         idx,
         encryption,
     )?;
-    let qr_data = png_qr_from_string(&hex_result, DataType::Regular)?;
+    let qr_data = png_qr_from_string(&hex_result.0, DataType::Regular)?;
     Ok(qr_data)
 }

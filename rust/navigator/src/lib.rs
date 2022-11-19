@@ -87,8 +87,8 @@ pub fn export_signatues_bulk(signatures: Vec<Vec<u8>>) -> Result<MSignatureReady
         let v1: SignaturesBulkV1 = signatures.into();
         let v1: SignaturesBulk = v1.into();
         let data = v1.encode();
-        let frames = make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?;
-        frames
+
+        make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?
     } else {
         vec![signatures[0].clone()]
     };

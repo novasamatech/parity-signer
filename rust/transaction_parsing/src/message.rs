@@ -84,13 +84,13 @@ where
                         let network_card =
                             Card::NetworkInfo(&network_specs).card(&mut index, indent);
                         Ok(TransactionAction::Read {
-                            r: TransactionCardSet {
+                            r: Box::new(TransactionCardSet {
                                 author: Some(vec![author_card]),
                                 warning: Some(vec![warning_card]),
                                 message: Some(vec![message_card]),
                                 new_specs: Some(vec![network_card]),
                                 ..Default::default()
-                            },
+                            }),
                         })
                     }
                 }
@@ -106,13 +106,13 @@ where
                         Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
                     let network_card = Card::NetworkInfo(&network_specs).card(&mut index, indent);
                     Ok(TransactionAction::Read {
-                        r: TransactionCardSet {
+                        r: Box::new(TransactionCardSet {
                             author: Some(vec![author_card]),
                             warning: Some(vec![warning_card]),
                             message: Some(vec![message_card]),
                             new_specs: Some(vec![network_card]),
                             ..Default::default()
-                        },
+                        }),
                     })
                 }
             }
@@ -129,13 +129,13 @@ where
             let network_card =
                 Card::NetworkGenesisHash(genesis_hash.as_ref()).card(&mut index, indent);
             Ok(TransactionAction::Read {
-                r: TransactionCardSet {
+                r: Box::new(TransactionCardSet {
                     author: Some(vec![author_card]),
                     error: Some(vec![error_card]),
                     message: Some(vec![message_card]),
                     new_specs: Some(vec![network_card]),
                     ..Default::default()
-                },
+                }),
             })
         }
     }
