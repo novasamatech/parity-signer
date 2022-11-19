@@ -62,9 +62,9 @@ fun ScanScreen(
 	}
 
 	Box(
-		Modifier
-			.fillMaxSize(1f)
-			.background(MaterialTheme.colors.background)
+        Modifier
+            .fillMaxSize(1f)
+            .background(MaterialTheme.colors.background)
 	) {
 		CameraViewPermission(viewModel)
 		ScanHeader(Modifier.statusBarsPadding(), onClose)
@@ -108,9 +108,9 @@ private fun CameraMultiModProceed(
 @Composable
 private fun CameraBottomText(isMultimode: Boolean) {
 	Column(
-		Modifier
-			.fillMaxSize(1f)
-			.padding(horizontal = 48.dp),
+        Modifier
+            .fillMaxSize(1f)
+            .padding(horizontal = 48.dp),
 	) {
 		Spacer(modifier = Modifier.weight(1f))
 		Text(
@@ -153,14 +153,14 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 	val rationalShown = remember {
 		mutableStateOf(false)
 	}
-	//todo dmitry test it properly
 	val cameraPermissionState =
 		rememberPermissionState(android.Manifest.permission.CAMERA)
 	if (cameraPermissionState.status.isGranted) {
 		CameraViewInternal(viewModel)
 		TransparentClipLayout()
 	} else if (cameraPermissionState.status.shouldShowRationale
-		&& !rationalShown.value) {
+		&& !rationalShown.value
+	) {
 		AlertDialog(
 			onDismissRequest = {
 				rationalShown.value = true
@@ -187,8 +187,8 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 			style = TypefaceNew.BodyL,
 			textAlign = TextAlign.Center,
 			modifier = Modifier
-				.fillMaxWidth(1f)
-				.padding(top = 150.dp),
+                .fillMaxWidth(1f)
+                .padding(top = 150.dp),
 		)
 		rationalShown.value = true
 		LaunchedEffect(key1 = Unit) {
