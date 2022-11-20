@@ -750,17 +750,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dashmap"
-version = "5.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "391b56fbd302e585b7a9494fb70e40949567b1cf9003a8e4a6041a1687c26573"
-dependencies = [
- "cfg-if",
- "hashbrown 0.12.3",
- "lock_api",
-]
-
-[[package]]
 name = "db_handling"
 version = "0.1.0"
 dependencies = [
@@ -2105,17 +2094,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "21326818e99cfe6ce1e524c2a805c189a99b5ae555a35d19f9a284b427d86afa"
 
 [[package]]
-name = "oslog"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "80d2043d1f61d77cb2f4b1f7b7b2295f40507f5f8e9d1c8bf10a1ca5f97a3969"
-dependencies = [
- "cc",
- "dashmap",
- "log",
-]
-
-[[package]]
 name = "output_vt100"
 version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3153,7 +3131,6 @@ dependencies = [
  "hex",
  "log",
  "navigator",
- "oslog",
  "qr_reader_phone",
  "qrcode_static",
  "sp-core",

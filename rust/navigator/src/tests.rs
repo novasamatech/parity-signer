@@ -347,7 +347,6 @@ fn bulk_signing_test_unpassworded() {
         assert_eq!(signatures.len(), 2);
 
         for (tx, signature) in encoded_transactions_prefixed.iter().zip(signatures.iter()) {
-            println!("signature len {}", signature.len());
             assert!(signature_is_good(tx, &hex::encode(signature)));
         }
     } else {
@@ -5344,7 +5343,6 @@ fn flow_test_1() {
             action.modal_data
         );
     };
-    println!("hex::encode {}", hex::encode(&sufficient));
     let sufficient_hex = hex::encode(qr_payload(&sufficient));
 
     let mut new_log_with_modal = expected_action.clone();
