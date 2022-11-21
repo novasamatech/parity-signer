@@ -6050,7 +6050,7 @@ fn flow_test_1() {
         f: MSignatureReady { signatures },
     }) = action.modal_data
     {
-        hex::encode(&signatures[0])
+        String::from_utf8(signatures[0].clone()).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -6201,7 +6201,7 @@ fn flow_test_1() {
         f: MSignatureReady { ref signatures },
     }) = action.modal_data
     {
-        hex::encode(&signatures[0])
+        String::from_utf8(signatures[0].clone()).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -6679,7 +6679,7 @@ fn flow_test_1() {
             },
         });
 
-        hex::encode(&signatures[0])
+        String::from_utf8(signatures[0].clone()).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -7117,7 +7117,7 @@ fn flow_test_1() {
             },
         });
 
-        hex::encode(&signatures[0])
+        String::from_utf8(signatures[0].clone()).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",

@@ -90,7 +90,7 @@ pub fn export_signatues_bulk(signatures: Vec<Vec<u8>>) -> Result<MSignatureReady
 
         make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?
     } else {
-        vec![signatures[0].clone()]
+        vec![hex::encode(&signatures[0]).as_bytes().into()]
     };
 
     Ok(MSignatureReady { signatures })
