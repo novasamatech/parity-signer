@@ -261,6 +261,7 @@
 "TransactionPreview.UnlockSign" = "Unlock key and sign";
 "TransactionPreview.Approve" = "Approve";
 "TransactionPreview.SelectSeed" = "Select seed";
+"TransactionPreview.ImportKeys" = "Import keys";
 "TransactionPreview.Decline" = "Decline";
 "CameraView.parsingMultidata" = "PARSING MULTIPART DATA";
 "CameraView.startOver" = "Start over";

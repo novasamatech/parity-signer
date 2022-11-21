@@ -2,6 +2,7 @@ use crate::UniffiCustomTypeConverter;
 use definitions::helpers::{multisigner_to_encryption, multisigner_to_public};
 pub use definitions::{
     crypto::Encryption,
+    derivations::{DerivedKeyPreview, SeedKeysPreview},
     history::{
         Event, IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
         NetworkSpecsExport, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay,

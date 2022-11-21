@@ -30,6 +30,7 @@ use definitions::{
     qr_transfers::ContentLoadTypes,
     users::AddressDetails,
 };
+
 use qrcode_static::{png_qr_from_string, DataType};
 
 use crate::helpers::{

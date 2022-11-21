@@ -80,7 +80,7 @@ struct TransactionPreview: View {
                         EmptyView()
                     case .importDerivations:
                         BigButton(
-                            text: Localizable.TransactionPreview.selectSeed.key,
+                            text: Localizable.TransactionPreview.importKeys.key,
                             isCrypto: true,
                             action: {
                                 navigationRequest(.init(action: .goForward))

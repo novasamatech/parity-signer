@@ -4,6 +4,7 @@ use sp_runtime::{generic::Era, MultiSigner};
 use definitions::helpers::{make_identicon_from_account, make_identicon_from_id20, IdenticonStyle};
 use definitions::keyring::NetworkSpecsKey;
 
+use definitions::derivations::SeedKeysPreview;
 use definitions::navigation::MAddressCard;
 use definitions::{
     crypto::Encryption,
@@ -43,7 +44,7 @@ pub(crate) enum Card<'a> {
     NewSpecs(&'a NetworkSpecs),
     NetworkInfo(&'a OrderedNetworkSpecs),
     NetworkGenesisHash(&'a [u8]),
-    Derivations(&'a [String]),
+    Derivations(&'a [SeedKeysPreview]),
     Warning(Warning<'a>),
     Error(Error),
 }

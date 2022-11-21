@@ -547,7 +547,7 @@ fn parse_transaction_1() {
                 card: Card::CallCard {
                     f: MSCCall {
                         method_name: "transfer_keep_alive".to_string(),
-                        docs: "2053616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a206f726967696e206163636f756e742e0a0a20393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a205b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e736665720a2023203c7765696768743e0a202d2043686561706572207468616e207472616e736665722062656361757365206163636f756e742063616e6e6f74206265206b696c6c65642e0a202d2042617365205765696768743a2035312e3420c2b5730a202d204442205765696768743a2031205265616420616e64203120577269746520746f2064657374202873656e64657220697320696e206f7665726c617920616c7265616479290a20233c2f7765696768743e".to_string(), 
+                        docs: "2053616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a206f726967696e206163636f756e742e0a0a20393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a205b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e736665720a2023203c7765696768743e0a202d2043686561706572207468616e207472616e736665722062656361757365206163636f756e742063616e6e6f74206265206b696c6c65642e0a202d2042617365205765696768743a2035312e3420c2b5730a202d204442205765696768743a2031205265616420616e64203120577269746520746f2064657374202873656e64657220697320696e206f7665726c617920616c7265616479290a20233c2f7765696768743e".to_string(),
                     },
                 },
             },
@@ -1327,7 +1327,7 @@ fn load_westend9000_already_in_db_alice_signed_bad_general_verifier() {
         error: Some(vec![TransactionCard {
             index: 0,
             indent: 0,
-            card: Card::ErrorCard { f:  "Bad input data. Network westend is verified by the general verifier which currently is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: ed25519. Received load_metadata message is verified by public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Changing the general verifier or changing the network verifier to custom would require wipe and reset of Signer.".to_string() } 
+            card: Card::ErrorCard { f:  "Bad input data. Network westend is verified by the general verifier which currently is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: ed25519. Received load_metadata message is verified by public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Changing the general verifier or changing the network verifier to custom would require wipe and reset of Signer.".to_string() }
         }]),
         ..Default::default()
     };
@@ -2479,30 +2479,15 @@ fn import_derivations() {
         importing_derivations: Some(vec![TransactionCard {
             index: 0,
             indent: 0,
-            card: Card::DerivationsCard {
-                f: vec![
-                    "//Alice".to_string(),
-                    "//Alice/westend".to_string(),
-                    "//Alice/secret//secret".to_string(),
-                    "//0".to_string(),
-                    "//1".to_string(),
-                ],
-            },
+            card: Card::DerivationsCard { f: vec![] },
         }]),
         ..Default::default()
     };
 
-    let network_info_known = westend_spec();
+    let _network_info_known = westend_spec();
     let action = produce_output(line, dbname);
-    if let TransactionAction::Derivations {
-        content: set,
-        network_info,
-        checksum: _,
-        network_specs_key: _,
-    } = action
-    {
+    if let TransactionAction::Derivations { content: set } = action {
         assert_eq!(set, set_expected);
-        assert_eq!(network_info, network_info_known);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -2518,32 +2503,15 @@ fn import_derivations_some_passworded() {
         importing_derivations: Some(vec![TransactionCard {
             index: 0,
             indent: 0,
-            card: Card::DerivationsCard {
-                f: vec![
-                    "//Alice".to_string(),
-                    "//Alice/westend".to_string(),
-                    "//Alice/secret//secret".to_string(),
-                    "//0".to_string(),
-                    "//1".to_string(),
-                    "//Alice///my_secret_password".to_string(),
-                    "///000".to_string(),
-                ],
-            },
+            card: Card::DerivationsCard { f: vec![] },
         }]),
         ..Default::default()
     };
 
-    let network_info_known = westend_spec();
+    let _network_info_known = westend_spec();
     let action = produce_output(line, dbname);
-    if let TransactionAction::Derivations {
-        content: set,
-        network_info,
-        checksum: _,
-        network_specs_key: _,
-    } = action
-    {
+    if let TransactionAction::Derivations { content: set } = action {
         assert_eq!(set, set_expected);
-        assert_eq!(network_info, network_info_known);
     } else {
         panic!("Wrong action {:?}", action)
     }

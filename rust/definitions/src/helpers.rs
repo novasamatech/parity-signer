@@ -209,6 +209,26 @@ fn print_ethereum_address(public: &ecdsa::Public) -> String {
     format!("0x{:?}", HexDisplay::from(&account.as_bytes()))
 }
 
+fn base58_or_eth_to_multisigner(
+    base58_or_eth: String,
+    encryption: Encryption,
+) -> Result<MultiSigner> {
+    match encryption {
+        Encryption::Ed25519 => {
+            let pubkey = ed25519::Public::from_ss58check(&base58_or_eth).unwrap();
+            Ok(MultiSigner::Ed25519(pubkey))
+        }
+        Encryption::Sr25519 => {
+            let pubkey = sr25519::Public::from_ss58check(&base58_or_eth).unwrap();
+            Ok(MultiSigner::Sr25519(pubkey))
+        }
+        Encryption::Ethereum | Encryption::Ecdsa => {
+            let pubkey = ecdsa::Public::from_ss58check(&base58_or_eth).unwrap();
+            Ok(MultiSigner::Ecdsa(pubkey))
+        }
+    }
+}
+
 /// Print id pic for metadata hash
 ///
 /// Currently uses PNG identicon generator, could be changed later.
@@ -230,6 +250,7 @@ mod tests {
     use super::*;
     use pretty_assertions::assert_eq;
     use sp_core::Pair;
+    use sp_runtime::MultiSigner::Sr25519;
 
     #[test]
     fn test_eth_account_1() {
@@ -257,5 +278,21 @@ mod tests {
             print_ethereum_address(&public_key),
             "0x420e9f260b40af7e49440cead3069f8e82a5230f",
         )
+    }
+
+    #[test]
+    fn test_ss85_to_multisigner() {
+        let secret_key =
+            hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a")
+                .unwrap();
+        let encryption = Encryption::Sr25519;
+        let public = sr25519::Pair::from_seed_slice(&secret_key)
+            .unwrap()
+            .public();
+        let multisigner = Sr25519(public);
+
+        let ss58 = print_multisigner_as_base58_or_eth(&multisigner, None, encryption);
+        let result = base58_or_eth_to_multisigner(ss58, Encryption::Sr25519).unwrap();
+        assert_eq!(result, multisigner);
     }
 }

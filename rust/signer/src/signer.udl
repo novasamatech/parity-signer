@@ -346,6 +346,19 @@ dictionary TransactionCardSet {
     sequence<TransactionCard>? types_info;
 };
 
+dictionary SeedKeysPreview {
+    string name;
+    MultiSigner? multisigner;
+    sequence<DerivedKeyPreview> derived_keys;
+};
+
+dictionary DerivedKeyPreview {
+    string address;
+    string? derivation_path;
+    Encryption encryption;
+    H256 genesis_hash;
+};
+
 dictionary SeedNameCard {
     string seed_name;
     sequence<u8> identicon;
@@ -528,6 +541,9 @@ namespace signer {
 
     [Throws=ErrorDisplayed]
     MKeyDetails generate_secret_key_qr([ByRef] string dbname, [ByRef] string public_key, [ByRef] string expected_seed_name, [ByRef] string network_specs_key, [ByRef] string seed_phrase, string? key_password);
+
+    [Throws=ErrorDisplayed]
+    void import_derivations([ByRef] string dbname, record<string, string> seeds, sequence<SeedKeysPreview> seed_derived_keys);
 
     DerivationCheck substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
 
@@ -769,7 +785,7 @@ interface Card {
     BlockHashCard(string f);
     CallCard(MSCCall f);
     DefaultCard(string f);
-    DerivationsCard(sequence<string> f);
+    DerivationsCard(sequence<SeedKeysPreview> f);
     EnumVariantNameCard(MSCEnumVariantName f);
     EraImmortalCard();
     EraMortalCard(MSCEraMortal f);

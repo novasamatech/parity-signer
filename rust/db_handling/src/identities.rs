@@ -54,6 +54,7 @@ use constants::ADDRTREE;
 use constants::ALICE_SEED_PHRASE;
 #[cfg(feature = "signer")]
 use constants::TRANSACTION;
+use definitions::derivations::SeedKeysPreview;
 #[cfg(feature = "signer")]
 use definitions::helpers::print_multisigner_as_base58_or_eth;
 #[cfg(feature = "signer")]
@@ -228,18 +229,7 @@ pub fn export_all_addrs<P: AsRef<Path>>(
 #[cfg(feature = "signer")]
 pub fn import_all_addrs<P: AsRef<Path>>(
     db_path: P,
-    seed_phrases: HashMap<String, String>,
-    export_info: ExportAddrs,
-) -> Result<()> {
-    match export_info {
-        ExportAddrs::V1(v1) => import_all_addrs_v1(db_path, v1, seed_phrases),
-    }
-}
-
-#[cfg(feature = "signer")]
-fn import_all_addrs_v1<P: AsRef<Path>>(
-    db_path: P,
-    v1: ExportAddrsV1,
+    seed_derived_keys: Vec<SeedKeysPreview>,
     seeds: HashMap<String, String>,
 ) -> Result<()> {
     let mut sr25519_signers = HashMap::new();
@@ -255,7 +245,7 @@ fn import_all_addrs_v1<P: AsRef<Path>>(
         ecdsa_signers.insert(ecdsa_public, k);
     }
 
-    for addr in &v1.addrs {
+    for addr in &seed_derived_keys {
         for derived_key in &addr.derived_keys {
             if let Some(derivation_path) = &derived_key.derivation_path {
                 let seed_name = match addr.multisigner {

@@ -393,34 +393,33 @@ impl State {
                     }
                 }
             }
-            Screen::Transaction(ref t) => {
-                match t.action() {
-                    transaction_parsing::TransactionAction::Sign {
-                        content,
-                        checksum,
-                        has_pwd,
-                        author_info,
-                        network_info,
-                    } => {
-                        if has_pwd {
-                            match self.navstate.modal {
-                                Modal::EnterPassword => {
-                                    let mut seed = t.seed();
-                                    match transaction_signing::handle_sign(
-                                        checksum,
-                                        &seed,
-                                        details_str,
-                                        &t.get_comment(),
-                                        dbname,
-                                        network_info.specs.encryption,
-                                    ) {
-                                        Ok(a) => {
-                                            seed.zeroize();
-                                            new_navstate.modal = Modal::SignatureReady(a);
-                                        }
-                                        Err(e) => {
-                                            seed.zeroize();
-                                            if let transaction_signing::Error::WrongPasswordNewChecksum(c) = e {
+            Screen::Transaction(ref t) => match t.action() {
+                transaction_parsing::TransactionAction::Sign {
+                    content,
+                    checksum,
+                    has_pwd,
+                    author_info,
+                    network_info,
+                } => {
+                    if has_pwd {
+                        match self.navstate.modal {
+                            Modal::EnterPassword => {
+                                let mut seed = t.seed();
+                                match transaction_signing::handle_sign(
+                                    checksum,
+                                    &seed,
+                                    details_str,
+                                    &t.get_comment(),
+                                    dbname,
+                                    network_info.specs.encryption,
+                                ) {
+                                    Ok(a) => {
+                                        seed.zeroize();
+                                        new_navstate.modal = Modal::SignatureReady(a);
+                                    }
+                                    Err(e) => {
+                                        seed.zeroize();
+                                        if let transaction_signing::Error::WrongPasswordNewChecksum(c) = e {
                                                 if t.ok() {
                                                     new_navstate.screen = Screen::Transaction(
                                                         Box::new(t.update_checksum_sign(
@@ -436,113 +435,71 @@ impl State {
                                                         Navstate::clean_screen(Screen::Log);
                                                 }
                                             }
-                                            new_navstate.alert = Alert::Error;
-                                            let _ = write!(&mut errorline, "{}", e);
-                                        }
-                                    }
-                                }
-                                _ => {
-                                    new_navstate.screen = Screen::Transaction(Box::new(
-                                        t.add_comment(details_str).update_seed(secret_seed_phrase),
-                                    ));
-                                    new_navstate.modal = Modal::EnterPassword;
-                                }
-                            }
-                        } else {
-                            match transaction_signing::handle_sign(
-                                checksum,
-                                secret_seed_phrase,
-                                "",
-                                details_str,
-                                dbname,
-                                network_info.specs.encryption,
-                            ) {
-                                Ok(a) => {
-                                    new_navstate.modal = Modal::SignatureReady(a);
-                                }
-                                Err(e) => {
-                                    new_navstate.alert = Alert::Error;
-                                    let _ = write!(&mut errorline, "{}", e);
-                                }
-                            }
-                        }
-                    }
-                    transaction_parsing::TransactionAction::Stub {
-                        s: _,
-                        u: checksum,
-                        stub: stub_nav,
-                    } => match transaction_signing::handle_stub(checksum, dbname) {
-                        Ok(()) => match stub_nav {
-                            transaction_parsing::StubNav::AddSpecs {
-                                n: network_specs_key,
-                            } => {
-                                new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
-                                    network_specs_key,
-                                ));
-                            }
-                            transaction_parsing::StubNav::LoadMeta {
-                                l: network_specs_key,
-                            } => {
-                                new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
-                                    network_specs_key,
-                                ));
-                            }
-                            transaction_parsing::StubNav::LoadTypes => {
-                                new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
-                            }
-                        },
-                        Err(e) => {
-                            new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
-                        }
-                    },
-                    transaction_parsing::TransactionAction::Read { .. } => {
-                        println!("GoForward does nothing here")
-                    }
-                    transaction_parsing::TransactionAction::Derivations {
-                        content: _,
-                        network_info: _,
-                        checksum,
-                        network_specs_key,
-                    } => {
-                        match self.navstate.modal {
-                            Modal::SelectSeed => {
-                                // details_str is seed_name
-                                // `secret_seed_phrase` is `seed_phrase`
-                                match db_handling::identities::import_derivations(
-                                    checksum,
-                                    details_str,
-                                    secret_seed_phrase,
-                                    dbname,
-                                ) {
-                                    Ok(()) => {
-                                        new_navstate = Navstate::clean_screen(Screen::Keys(
-                                            KeysState::new_in_network(
-                                                details_str,
-                                                &network_specs_key,
-                                            ),
-                                        ));
-                                    }
-                                    Err(e) => {
                                         new_navstate.alert = Alert::Error;
                                         let _ = write!(&mut errorline, "{}", e);
                                     }
                                 }
                             }
-                            Modal::Empty => {
-                                if self.seed_names.is_empty() {
-                                    new_navstate.alert = Alert::Error;
-
-                                    let _ = write!(&mut errorline, "No known seeds");
-                                } else {
-                                    new_navstate.modal = Modal::SelectSeed;
-                                }
+                            _ => {
+                                new_navstate.screen = Screen::Transaction(Box::new(
+                                    t.add_comment(details_str).update_seed(secret_seed_phrase),
+                                ));
+                                new_navstate.modal = Modal::EnterPassword;
                             }
-                            _ => println!("GoForward does nothing here"),
+                        }
+                    } else {
+                        match transaction_signing::handle_sign(
+                            checksum,
+                            secret_seed_phrase,
+                            "",
+                            details_str,
+                            dbname,
+                            network_info.specs.encryption,
+                        ) {
+                            Ok(a) => {
+                                new_navstate.modal = Modal::SignatureReady(a);
+                            }
+                            Err(e) => {
+                                new_navstate.alert = Alert::Error;
+                                let _ = write!(&mut errorline, "{}", e);
+                            }
                         }
                     }
                 }
-            }
+                transaction_parsing::TransactionAction::Stub {
+                    s: _,
+                    u: checksum,
+                    stub: stub_nav,
+                } => match transaction_signing::handle_stub(checksum, dbname) {
+                    Ok(()) => match stub_nav {
+                        transaction_parsing::StubNav::AddSpecs {
+                            n: network_specs_key,
+                        } => {
+                            new_navstate =
+                                Navstate::clean_screen(Screen::NetworkDetails(network_specs_key));
+                        }
+                        transaction_parsing::StubNav::LoadMeta {
+                            l: network_specs_key,
+                        } => {
+                            new_navstate =
+                                Navstate::clean_screen(Screen::NetworkDetails(network_specs_key));
+                        }
+                        transaction_parsing::StubNav::LoadTypes => {
+                            new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
+                        }
+                    },
+                    Err(e) => {
+                        new_navstate.alert = Alert::Error;
+                        let _ = write!(&mut errorline, "{}", e);
+                    }
+                },
+                transaction_parsing::TransactionAction::Read { .. } => {
+                    println!("GoForward does nothing here")
+                }
+                transaction_parsing::TransactionAction::Derivations { .. } => {
+                    println!("ToDo: use api call to import derivations")
+                }
+            },
             Screen::ManageNetworks => match NetworkSpecsKey::from_hex(details_str) {
                 Ok(network_specs_key) => {
                     new_navstate = Navstate::clean_screen(Screen::NetworkDetails(network_specs_key))
@@ -1494,16 +1451,9 @@ impl State {
             Screen::Scan => ScreenData::Scan,
             Screen::Transaction(ref t) => {
                 let (content, ttype, author_info, network_info) = match t.action() {
-                    TransactionAction::Derivations {
-                        content,
-                        network_info,
-                        ..
-                    } => (
-                        content,
-                        TransactionType::ImportDerivations,
-                        None,
-                        Some(network_info),
-                    ),
+                    TransactionAction::Derivations { content, .. } => {
+                        (content, TransactionType::ImportDerivations, None, None)
+                    }
                     TransactionAction::Sign {
                         content,
                         author_info,
