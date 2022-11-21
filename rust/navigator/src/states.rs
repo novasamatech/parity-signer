@@ -186,7 +186,7 @@ impl TransactionState {
                 }
             }
         } else {
-            return Err(Error::TxActionNotSign);
+            Err(Error::TxActionNotSign)
         }
     }
 
