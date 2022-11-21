@@ -400,7 +400,6 @@ impl State {
                     transaction_parsing::TransactionAction::Sign { .. } => {
                         let mut new = t.clone();
                         new.update_seeds(secret_seed_phrase);
-                        new.update_comments(details_str);
                         if let Modal::EnterPassword = self.navstate.modal {
                             new.password_entered(details_str);
                             new_navstate.modal = Modal::Empty;

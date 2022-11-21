@@ -1,7 +1,8 @@
 use std::{collections::HashMap, path::Path};
 
 use definitions::navigation::MAddressCard;
-use transaction_parsing::TransactionAction;
+use transaction_parsing::{produce_output, TransactionAction};
+use transaction_signing::Error as SignError;
 
 use crate::{Error, Result};
 
@@ -42,8 +43,8 @@ pub struct TransactionState {
     /// one transaction (a bulk) this is a `Vec`.
     seeds: Vec<String>,
 
-    /// Passwords for the accounts.
-    passwords: HashMap<(String, String), String>,
+    /// Passwords for the accounts. Key is the ss58 addr.
+    passwords: HashMap<String, String>,
 
     /// The `TransactionAction` being processed.
     action: TransactionAction,
@@ -75,10 +76,10 @@ impl TransactionState {
     pub fn new<P: AsRef<Path>>(details_str: &str, dbname: P) -> Self {
         Self {
             seeds: vec![],
-            passwords: HashMap::new(),
-            action: transaction_parsing::produce_output(details_str, dbname),
-            comments: vec![],
+            action: produce_output(details_str, dbname),
             counter: 1,
+            passwords: HashMap::new(),
+            comments: vec![],
             currently_signing: 0,
             signatures: vec![],
         }
@@ -100,11 +101,7 @@ impl TransactionState {
     }
 
     pub fn update_checksum_sign(&mut self, new_checksum: u32) {
-        if let TransactionAction::Sign {
-            actions: _,
-            checksum,
-        } = &mut self.action
-        {
+        if let TransactionAction::Sign { checksum, .. } = &mut self.action {
             *checksum = new_checksum;
         }
     }
@@ -113,6 +110,7 @@ impl TransactionState {
         &self.action
     }
 
+    /// Try to further progress the signing of transactions.
     pub fn handle_sign<P: AsRef<Path>>(&mut self, db_path: P) -> Result<SignResult> {
         if let TransactionAction::Sign { actions, checksum } = &mut self.action {
             if self.seeds.len() != actions.len() {
@@ -120,16 +118,12 @@ impl TransactionState {
             }
 
             loop {
+                // Get the tx currently being signed.
                 let action = &actions[self.currently_signing];
-                if self.signatures.len() == actions.len() {
-                    break;
-                }
+
+                // Get the password; if there is none, request one.
                 let password = if action.has_pwd {
-                    let seed = &self.seeds[self.currently_signing];
-                    match self
-                        .passwords
-                        .get(&(seed.to_string(), action.author_info.base58.clone()))
-                    {
+                    match self.passwords.get(&action.author_info.base58) {
                         Some(pwd) => pwd,
                         None => {
                             return Ok(SignResult::RequestPassword {
@@ -142,6 +136,7 @@ impl TransactionState {
                     ""
                 };
 
+                // Try to sign it.
                 match transaction_signing::create_signature(
                     &self.seeds[self.currently_signing],
                     password,
@@ -155,27 +150,37 @@ impl TransactionState {
                     action.network_info.specs.encryption,
                 ) {
                     Ok((signature, new_checksum)) => {
+                        // If signed successfully progress to the
+                        // next transaction in the bulk.
                         self.currently_signing += 1;
                         self.counter = 1;
                         *checksum = new_checksum;
                         self.signatures.push(hex::decode(signature)?);
+
+                        // If this is the last tx, return
+                        //
                         if self.currently_signing == self.seeds.len() {
-                            break;
+                            return Ok(SignResult::Ready {
+                                signatures: self.signatures.clone(),
+                            });
                         }
                     }
                     Err(e) => {
-                        if let transaction_signing::Error::WrongPasswordNewChecksum(new_checksum) =
-                            e
-                        {
-                            self.update_checksum_sign(new_checksum);
-                            self.counter += 1;
+                        match e {
+                            SignError::WrongPasswordNewChecksum(new_checksum) => {
+                                // Password was not correct, re-request it.
+                                self.update_checksum_sign(new_checksum);
+                                self.counter += 1;
 
-                            return Ok(SignResult::RequestPassword {
-                                idx: self.currently_signing,
-                                counter: self.counter,
-                            });
-                        } else {
-                            return Err(Error::TransactionSigning(e));
+                                return Ok(SignResult::RequestPassword {
+                                    idx: self.currently_signing,
+                                    counter: self.counter,
+                                });
+                            }
+                            _ => {
+                                // Other signing error happened.
+                                return Err(Error::TransactionSigning(e));
+                            }
                         }
                     }
                 }
@@ -183,23 +188,13 @@ impl TransactionState {
         } else {
             return Err(Error::TxActionNotSign);
         }
-
-        Ok(SignResult::Ready {
-            signatures: self.signatures.clone(),
-        })
     }
 
     pub fn password_entered(&mut self, pwd: &str) {
         if let TransactionAction::Sign { actions, .. } = &self.action {
-            let current = &self.seeds[self.currently_signing];
             let base58 = actions[self.currently_signing].author_info.base58.clone();
-            self.passwords
-                .insert((current.to_string(), base58), pwd.to_string());
+            self.passwords.insert(base58, pwd.to_string());
         }
-    }
-
-    pub fn get_comment(&self) -> String {
-        String::new()
     }
 
     pub fn ok(&self) -> bool {
