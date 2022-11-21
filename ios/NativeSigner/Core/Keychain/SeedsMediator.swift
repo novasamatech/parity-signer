@@ -22,7 +22,7 @@ protocol SeedsMediating: AnyObject {
     /// This should be turned to `private` in future refactors
     var seedNames: [String] { get set }
     /// Sets weak dependency to parent due to current architecture limitation (we should not store this class in
-    // `SignerDataModel`)
+    /// `SignerDataModel`)
     /// - Parameter signerDataModel: reference to `SignerDataModel`
     func set(signerDataModel: SignerDataModel)
     /// Get all seed names from secure storage
@@ -125,7 +125,8 @@ final class SeedsMediator: SeedsMediating {
                 details: createRoots ? Constants.true : Constants.false,
                 seedPhrase: seedPhrase
             ))
-        case .failure: ()
+        case .failure:
+            ()
             // We should inform user with some dedicated UI state for that error, maybe just system alert
         }
     }
@@ -195,7 +196,8 @@ final class SeedsMediator: SeedsMediating {
                 .sorted()
             attemptToUpdate(seedNames: seedNames)
             signerDataModel.navigation.perform(navigation: .init(action: .removeSeed), skipDebounce: true)
-        case .failure: ()
+        case .failure:
+            ()
             // We should inform user with some dedicated UI state for that error, maybe just system alert
         }
     }

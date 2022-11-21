@@ -41,7 +41,7 @@ final class NavigationCoordinator: ObservableObject {
     /// Stores view model of currently selected tab
     ///
     /// This should preceed information from `ActionResult.footerButton` as `FooterButton` enum contains also `back`
-    // value which is irrelevant to bottom navigation system that mimics system `TabView`
+    /// value which is irrelevant to bottom navigation system that mimics system `TabView`
     /// This should be removed once navigation is moved to native system.
     @Published var selectedTab: Tab = .keys
 
