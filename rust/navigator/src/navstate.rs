@@ -398,14 +398,15 @@ impl State {
             Screen::Transaction(ref t) => {
                 match t.action() {
                     transaction_parsing::TransactionAction::Sign { .. } => {
-                        let new = t.update_seeds(secret_seed_phrase);
-                        let mut new = new.update_comments(details_str);
+                        let mut new = t.clone();
+                        new.update_seeds(secret_seed_phrase);
+                        new.update_comments(details_str);
                         if let Modal::EnterPassword = self.navstate.modal {
-                            new = new.password_entered(details_str);
+                            new.password_entered(details_str);
                             new_navstate.modal = Modal::Empty;
                         }
                         match new.handle_sign(dbname) {
-                            Ok((result, new)) => {
+                            Ok(result) => {
                                 match result {
                                     SignResult::RequestPassword { counter, .. } => {
                                         if counter > 1 {
@@ -419,7 +420,7 @@ impl State {
                                     }
                                 };
                                 if t.ok() {
-                                    new_navstate.screen = Screen::Transaction(Box::new(new));
+                                    new_navstate.screen = Screen::Transaction(new);
                                 } else {
                                     new_navstate = Navstate::clean_screen(Screen::Log);
 

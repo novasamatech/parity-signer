@@ -13,11 +13,19 @@ pub struct SeedNameWithIdenticon {
     pub identicon: Vec<u8>,
 }
 
+/// A single transaction signing action.
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct TransactionSignAction {
+    /// Parsed contents of the transaction.
     pub content: TransactionCardSet,
+
+    /// If this transaction should be signed with a passworded key.
     pub has_pwd: bool,
+
+    /// Information about the signing key of this transaction.
     pub author_info: MAddressCard,
+
+    /// Info about the network this tx happens on.
     pub network_info: OrderedNetworkSpecs,
 }
 
@@ -496,8 +504,10 @@ pub struct MPasswordConfirm {
     pub cropped_path: String,
 }
 
+/// Data about signatures that are ready.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MSignatureReady {
+    /// Frames of the animated QR code that should be displayed by the UI.
     pub signatures: Vec<Vec<u8>>,
 }
 

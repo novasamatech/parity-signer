@@ -1,8 +1,9 @@
 use std::{collections::HashMap, path::Path};
 
 use definitions::navigation::MAddressCard;
+use transaction_parsing::TransactionAction;
 
-use crate::Result;
+use crate::{Error, Result};
 
 const MAX_COUNT_SET: u8 = 3;
 
@@ -45,7 +46,7 @@ pub struct TransactionState {
     passwords: HashMap<(String, String), String>,
 
     /// The `TransactionAction` being processed.
-    action: transaction_parsing::TransactionAction,
+    action: TransactionAction,
 
     /// User-provided comments for each transaction.
     comments: Vec<String>,
@@ -64,7 +65,7 @@ pub struct TransactionState {
 impl TransactionState {
     pub fn current_password_author_info(&self) -> Option<MAddressCard> {
         match &self.action {
-            transaction_parsing::TransactionAction::Sign { actions, .. } => {
+            TransactionAction::Sign { actions, .. } => {
                 Some(actions[self.currently_signing].author_info.clone())
             }
             _ => None,
@@ -83,72 +84,58 @@ impl TransactionState {
         }
     }
 
-    pub fn update_seeds(&self, seeds: &str) -> Self {
-        let mut new = self.clone();
-        if new.seeds.is_empty() {
-            new.seeds = seeds.lines().map(|seed| seed.to_string()).collect();
+    pub fn update_seeds(&mut self, seeds: &str) {
+        if self.seeds.is_empty() {
+            self.seeds = seeds.lines().map(|seed| seed.to_string()).collect();
         }
-        new
     }
 
-    pub fn update_comments(&self, comments: &str) -> Self {
-        let mut new = self.clone();
-        if new.comments.is_empty() {
-            new.comments = comments
+    pub fn update_comments(&mut self, comments: &str) {
+        if self.comments.is_empty() {
+            self.comments = comments
                 .lines()
                 .map(|comment| comment.to_string())
                 .collect();
         }
-        new
     }
 
-    pub fn update_checksum_sign(&self, new_checksum: u32) -> Self {
-        let mut new = self.clone();
-        new.counter += 1;
-
-        if let transaction_parsing::TransactionAction::Sign {
+    pub fn update_checksum_sign(&mut self, new_checksum: u32) {
+        if let TransactionAction::Sign {
             actions: _,
             checksum,
-        } = &mut new.action
+        } = &mut self.action
         {
             *checksum = new_checksum;
         }
-        new
     }
 
-    pub fn action(&self) -> &transaction_parsing::TransactionAction {
+    pub fn action(&self) -> &TransactionAction {
         &self.action
     }
 
-    pub fn handle_sign<P: AsRef<Path>>(&self, db_path: P) -> Result<(SignResult, Self)> {
-        let mut new = self.clone();
-
-        if let transaction_parsing::TransactionAction::Sign { actions, checksum } = &mut new.action
-        {
+    pub fn handle_sign<P: AsRef<Path>>(&mut self, db_path: P) -> Result<SignResult> {
+        if let TransactionAction::Sign { actions, checksum } = &mut self.action {
             if self.seeds.len() != actions.len() {
-                return Err(crate::Error::SeedsNumMismatch(self.seeds.concat()));
+                return Err(Error::SeedsNumMismatch(self.seeds.len(), actions.len()));
             }
 
             loop {
-                let action = &actions[new.currently_signing];
-                if new.signatures.len() == actions.len() {
+                let action = &actions[self.currently_signing];
+                if self.signatures.len() == actions.len() {
                     break;
                 }
                 let password = if action.has_pwd {
-                    let seed = &self.seeds[new.currently_signing];
+                    let seed = &self.seeds[self.currently_signing];
                     match self
                         .passwords
                         .get(&(seed.to_string(), action.author_info.base58.clone()))
                     {
                         Some(pwd) => pwd,
                         None => {
-                            return Ok((
-                                SignResult::RequestPassword {
-                                    idx: new.currently_signing,
-                                    counter: 1,
-                                },
-                                new,
-                            ));
+                            return Ok(SignResult::RequestPassword {
+                                idx: self.currently_signing,
+                                counter: self.counter,
+                            });
                         }
                     }
                 } else {
@@ -156,23 +143,23 @@ impl TransactionState {
                 };
 
                 match transaction_signing::create_signature(
-                    &new.seeds[new.currently_signing],
+                    &self.seeds[self.currently_signing],
                     password,
-                    new.comments
-                        .get(new.currently_signing)
+                    self.comments
+                        .get(self.currently_signing)
                         .map(|s| s.as_str())
                         .unwrap_or_else(|| ""),
                     &db_path,
                     *checksum,
-                    new.currently_signing,
+                    self.currently_signing,
                     action.network_info.specs.encryption,
                 ) {
                     Ok((signature, new_checksum)) => {
-                        new.currently_signing += 1;
-                        new.counter = 0;
+                        self.currently_signing += 1;
+                        self.counter = 1;
                         *checksum = new_checksum;
-                        new.signatures.push(hex::decode(signature)?);
-                        if new.currently_signing == self.seeds.len() {
+                        self.signatures.push(hex::decode(signature)?);
+                        if self.currently_signing == self.seeds.len() {
                             break;
                         }
                     }
@@ -180,47 +167,35 @@ impl TransactionState {
                         if let transaction_signing::Error::WrongPasswordNewChecksum(new_checksum) =
                             e
                         {
-                            new = new.update_checksum_sign(new_checksum);
+                            self.update_checksum_sign(new_checksum);
+                            self.counter += 1;
 
-                            return Ok((
-                                SignResult::RequestPassword {
-                                    idx: new.currently_signing,
-                                    counter: new.counter,
-                                },
-                                new,
-                            ));
+                            return Ok(SignResult::RequestPassword {
+                                idx: self.currently_signing,
+                                counter: self.counter,
+                            });
                         } else {
-                            return Err(crate::Error::TransactionSigning(e));
+                            return Err(Error::TransactionSigning(e));
                         }
                     }
                 }
             }
         } else {
-            return Err(crate::Error::TxActionNotSign);
+            return Err(Error::TxActionNotSign);
         }
 
-        Ok((
-            SignResult::Ready {
-                signatures: new.signatures.clone(),
-            },
-            new,
-        ))
+        Ok(SignResult::Ready {
+            signatures: self.signatures.clone(),
+        })
     }
 
-    pub fn password_entered(&self, pwd: &str) -> Self {
-        let mut new = self.clone();
-
-        if let transaction_parsing::TransactionAction::Sign {
-            actions,
-            checksum: _,
-        } = &self.action
-        {
+    pub fn password_entered(&mut self, pwd: &str) {
+        if let TransactionAction::Sign { actions, .. } = &self.action {
             let current = &self.seeds[self.currently_signing];
             let base58 = actions[self.currently_signing].author_info.base58.clone();
-            new.passwords
+            self.passwords
                 .insert((current.to_string(), base58), pwd.to_string());
         }
-        new
     }
 
     pub fn get_comment(&self) -> String {

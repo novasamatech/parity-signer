@@ -335,13 +335,13 @@ fn bulk_signing_test_unpassworded() {
 
     try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
 
-    let tx_state = TransactionState::new(&hex::encode(payload), dbname);
+    let mut tx_state = TransactionState::new(&hex::encode(payload), dbname);
 
-    let tx_state = tx_state.update_seeds(&seeds);
+    tx_state.update_seeds(&seeds);
 
     // Two passwordless transactions are signed with no further
     // interactions.
-    let (result, _) = tx_state.handle_sign(dbname).unwrap();
+    let result = tx_state.handle_sign(dbname).unwrap();
 
     if let SignResult::Ready { signatures } = result {
         assert_eq!(signatures.len(), 2);
@@ -451,29 +451,29 @@ fn bulk_signing_test_passworded() {
 
     let payload = [&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat();
 
-    let tx_state = TransactionState::new(&hex::encode(payload), dbname);
-    let tx_state = tx_state.update_seeds(&format!(
+    let mut tx_state = TransactionState::new(&hex::encode(payload), dbname);
+    tx_state.update_seeds(&format!(
         "{}\n{}\n{}",
         ALICE_SEED_PHRASE, ALICE_SEED_PHRASE, ALICE_SEED_PHRASE
     ));
 
     // Begin signing process.
-    let (result, tx_state) = tx_state.handle_sign(dbname).unwrap();
+    let result = tx_state.handle_sign(dbname).unwrap();
 
     // The password is requested.
     assert_eq!(result, SignResult::RequestPassword { idx: 0, counter: 1 });
 
     // A wrong password is provided.
-    let tx_state = tx_state.password_entered("password_wrong");
+    tx_state.password_entered("password_wrong");
 
-    let (result, tx_state) = tx_state.handle_sign(dbname).unwrap();
+    let result = tx_state.handle_sign(dbname).unwrap();
 
     // A password is requested another time.
     assert_eq!(result, SignResult::RequestPassword { idx: 0, counter: 2 });
 
     // A correct password is provided.
-    let tx_state = tx_state.password_entered("password123");
-    let (result, tx_state) = tx_state.handle_sign(dbname).unwrap();
+    tx_state.password_entered("password123");
+    let result = tx_state.handle_sign(dbname).unwrap();
 
     // Two first transactions for the first key are signed,
     // password is requested for the second transaction.
@@ -481,8 +481,8 @@ fn bulk_signing_test_passworded() {
     assert_eq!(result, SignResult::RequestPassword { idx: 2, counter: 1 });
 
     // Password is provided.
-    let tx_state = tx_state.password_entered("password345");
-    let (result, _) = tx_state.handle_sign(dbname).unwrap();
+    tx_state.password_entered("password345");
+    let result = tx_state.handle_sign(dbname).unwrap();
 
     // All signatures are ready, check them.
     if let SignResult::Ready { signatures } = result {
