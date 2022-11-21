@@ -58,8 +58,8 @@ excluded: # paths to ignore during linting. Takes precedence over `included`.
 # binary rules can set their severity level
 
 closure_body_length:
-  warning: 100
-  error: 110
+  warning: 150
+  error: 170
 
 cyclomatic_complexity:
   ignores_case_statements: true
@@ -81,8 +81,8 @@ force_try:
   severity: warning
 
 function_body_length:
-  warning: 30
-  error: 40
+  warning: 45
+  error: 55
 
 function_parameter_count:
   warning: 6
