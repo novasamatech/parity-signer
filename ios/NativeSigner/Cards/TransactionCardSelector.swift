@@ -21,11 +21,11 @@ struct TransactionCardSelector: View {
                 TCAuthorPublicKey(value: value)
 
             // Foldable Markdown values on tap
-            case let .callCard(value):
+            case let .callCard(value): // This is used to present `Method` and provides details on tap
                 TCCall(value: value)
             case let .enumVariantNameCard(value):
                 TCEnumVariantName(value: value)
-            case let .fieldNameCard(value):
+            case let .fieldNameCard(value): // Presents `dest` or `value` indentent values
                 TCFieldName(value: value)
             case let .fieldNumberCard(value):
                 TCFieldNumber(value: value)
@@ -54,7 +54,7 @@ struct TransactionCardSelector: View {
                 TCEraMortal(content: content)
 
             // Simple values with identicons / icons / markdown
-            case let .idCard(value): // Not present in new designs
+            case let .idCard(value): // ID card, new designs present it without identicon
                 TCID(value: value)
             case let .networkInfoCard(value): // Not present in new designs
                 TCNetworkInfo(content: value)

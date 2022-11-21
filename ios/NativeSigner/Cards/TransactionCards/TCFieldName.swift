@@ -21,7 +21,7 @@ struct TCFieldName: View {
                         Text(value.name)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         Spacer()
-                        if (value.docsFieldName + value.pathType + value.docsType).isEmpty {
+                        if !(value.docsFieldName + value.pathType + value.docsType).isEmpty {
                             Localizable.questionMark.text
                                 .foregroundColor(Asset.accentPink300.swiftUIColor)
                         }
@@ -30,9 +30,9 @@ struct TCFieldName: View {
                         VStack {
                             Text(Localizable.TCField.path(value.pathType))
                                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            Text.markdownWithFallback(value.docsFieldName)
+                            Text.markdownWithFallback(value.docsFieldName, allowsEmptyValue: true)
                                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            Text.markdownWithFallback(value.docsType)
+                            Text.markdownWithFallback(value.docsType, allowsEmptyValue: true)
                                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         }
                     }

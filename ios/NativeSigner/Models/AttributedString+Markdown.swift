@@ -11,14 +11,17 @@ import Foundation
 /// EDIT: I needed to correct it to return nil if string would end up empty, as without it,
 /// no fallback would work as invalid markdown would result in valid but empty `AttributedString`
 extension AttributedString {
-    static func build(fromHexDocs string: String) -> AttributedString? {
+    static func build(fromHexDocs string: String, allowsEmptyValue: Bool = false) -> AttributedString? {
         if let result = try? self.init(
             markdown: Data(fromHexEncodedString: string) ?? Data(),
             options: AttributedString.MarkdownParsingOptions(
                 interpretedSyntax: .inlineOnlyPreservingWhitespace,
                 failurePolicy: .returnPartiallyParsedIfPossible
             )
-        ), !result.characters.isEmpty {
+        ) {
+            if !allowsEmptyValue, result.characters.isEmpty {
+                return nil
+            }
             return result
         } else {
             return nil

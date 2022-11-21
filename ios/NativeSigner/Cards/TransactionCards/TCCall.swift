@@ -21,13 +21,15 @@ struct TCCall: View {
                         TCNamedValueCard(name: Localizable.TCName.method.string, value: value.methodName)
                         if !value.docs.isEmpty {
                             Localizable.questionMark.text
-                                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                .foregroundColor(Asset.accentPink300.swiftUIColor)
                         }
                     }
                     if showDoc {
-                        Text.markdownWithFallback(value.docs)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            .multilineTextAlignment(.leading)
+                        withAnimation {
+                            Text.markdownWithFallback(value.docs)
+                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                .multilineTextAlignment(.leading)
+                        }
                     }
                 }
                 .font(Fontstyle.bodyL.base)
@@ -39,6 +41,6 @@ struct TCCall: View {
 
 struct TCCall_Previews: PreviewProvider {
     static var previews: some View {
-        TCCall(value: MscCall(methodName: "method name", docs: "docs"))
+        TCCall(value: MscCall(methodName: "method name", docs: PreviewData.exampleMarkdownDocs))
     }
 }

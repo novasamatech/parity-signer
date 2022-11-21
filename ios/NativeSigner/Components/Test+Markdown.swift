@@ -9,9 +9,9 @@ import SwiftUI
 
 extension Text {
     @ViewBuilder
-    static func markdownWithFallback(_ value: String) -> Text {
+    static func markdownWithFallback(_ value: String, allowsEmptyValue: Bool = true) -> Text {
         Text(
-            AttributedString.build(fromHexDocs: value) ??
+            AttributedString.build(fromHexDocs: value, allowsEmptyValue: allowsEmptyValue) ??
                 AttributedString(Localizable.Error.docsParsing.string)
         )
     }
