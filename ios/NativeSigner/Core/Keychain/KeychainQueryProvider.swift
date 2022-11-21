@@ -49,7 +49,8 @@ final class KeychainQueryProvider: KeychainQueryProviding {
             dictionary[kSecAttrAccount] = seedName
             dictionary[kSecValueData] = finalSeedPhrase // actual data for given `Account`
             dictionary[kSecReturnData] = true
-        case .deleteAll: ()
+        case .deleteAll:
+            ()
         }
         return dictionary as CFDictionary
     }

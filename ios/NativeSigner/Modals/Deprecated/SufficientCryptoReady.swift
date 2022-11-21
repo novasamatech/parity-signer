@@ -29,7 +29,7 @@ struct SufficientCryptoReady: View {
                 case let .addSpecs(network):
                     Localizable.signatureForNetworkSpecs.text
                     NetworkCard(title: network.networkTitle, logo: network.networkLogo)
-                case .loadTypes(types: _, pic: _):
+                case .loadTypes:
                     Localizable.signatureForTypes.text
                 case let .loadMetadata(name: name, version: version):
                     Localizable.signatureForMetadataUpdate.text
