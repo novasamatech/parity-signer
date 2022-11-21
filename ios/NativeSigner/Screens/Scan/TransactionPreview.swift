@@ -22,7 +22,7 @@ struct TransactionPreview: View {
     var body: some View {
         VStack {
             NavigationBarView(
-                viewModel: .init(title: Localizable.TransactionPreview.Label.title.string, leftButton: .xmark),
+                viewModel: .init(title: title(), leftButton: .xmark),
                 actionModel: .init(
                     leftBarMenuAction: { viewModel.onBackButtonTap() },
                     rightBarMenuAction: {}
@@ -42,6 +42,7 @@ struct TransactionPreview: View {
     @ViewBuilder
     func singleTransaction(content: MTransaction) -> some View {
         VStack {
+            TransactionSummaryView(renderable: .init(content), onTransactionDetailsTap: {})
             VStack {
                 ForEach(content.content.asSortedCards(), id: \.index) { card in
                     TransactionCardView(card: card)
@@ -128,6 +129,12 @@ struct TransactionPreview: View {
         .padding(.bottom, Spacing.medium)
         .padding(.top, Spacing.extraSmall)
     }
+
+    func title() -> String {
+        viewModel.dataModel.count == 1 ?
+            Localizable.TransactionSign.Label.Header.single.string :
+            Localizable.TransactionSign.Label.Header.multiple(viewModel.dataModel.count)
+    }
 }
 
 extension TransactionPreview {
@@ -186,8 +193,14 @@ extension TransactionPreview {
     }
 }
 
-// struct TransactionPreview_Previews: PreviewProvider {
-// static var previews: some View {
-// TransactionPreview()
-// }
-// }
+struct TransactionPreview_Previews: PreviewProvider {
+    static var previews: some View {
+        TransactionPreview(viewModel: .init(
+            isPresented: Binding<Bool>.constant(true),
+            content: [PreviewData.signTransaction]
+        ))
+        .environmentObject(NavigationCoordinator())
+        .environmentObject(SignerDataModel())
+        .preferredColorScheme(.dark)
+    }
+}
