@@ -17,7 +17,7 @@ fun WaitingScreen() {
 		Text("Please wait...")
 		CircularProgressIndicator()
 		Image(
-			painter = painterResource(id = R.drawable.icon),
+			painter = painterResource(id = R.drawable.app_logo),
 			contentDescription = "Icon"
 		)
 	}
