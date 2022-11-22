@@ -1,4 +1,4 @@
-package io.parity.signer.screens
+package io.parity.signer.screens.keysets.create
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
