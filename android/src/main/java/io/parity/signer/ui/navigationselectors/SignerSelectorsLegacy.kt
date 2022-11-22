@@ -96,7 +96,7 @@ fun ScreenSelector(
 			signerDataModel::signSufficientCrypto
 		)
 		is ScreenData.Transaction -> TransactionPreview(
-			screenData.f.first(), //todo show all multiple transactions
+			screenData.f,
 			signerDataModel::navigate,
 			signerDataModel::signTransaction
 		)
