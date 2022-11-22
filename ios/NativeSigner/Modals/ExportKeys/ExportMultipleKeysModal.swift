@@ -72,23 +72,13 @@ struct ExportMultipleKeysModal: View {
                         }
                         .padding()
                         .font(Fontstyle.bodyM.base)
-                        .background(
-                            RoundedRectangle(cornerRadius: CornerRadius.small)
-                                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                                .background(Asset.fill6.swiftUIColor)
-                                .cornerRadius(CornerRadius.small)
-                        )
+                        .strokeContainerBackground(CornerRadius.small)
                         .padding(.top, Spacing.extraSmall)
                         // Keys list
                         keyList
                     }
                     .padding(Spacing.extraSmall)
-                    .background(
-                        RoundedRectangle(cornerRadius: CornerRadius.medium)
-                            .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                            .background(Asset.fill6.swiftUIColor)
-                            .cornerRadius(CornerRadius.medium)
-                    )
+                    .strokeContainerBackground()
                     .padding([.leading, .trailing], Spacing.medium)
                 }
                 .padding(.bottom, Spacing.medium)

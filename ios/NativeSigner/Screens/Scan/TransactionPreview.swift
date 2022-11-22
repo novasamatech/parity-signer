@@ -51,26 +51,41 @@ struct TransactionPreview: View {
 
     @ViewBuilder
     func singleTransaction(content: MTransaction) -> some View {
-        VStack {
+        VStack(spacing: 0) {
             TransactionSummaryView(
                 renderable: .init(content),
                 onTransactionDetailsTap: {
                     viewModel.presentDetails(for: content)
                 }
             )
+            .padding(.horizontal, Spacing.medium)
+            if let signature = viewModel.signature {
+                VStack(alignment: .leading, spacing: Spacing.small) {
+                    Localizable.TransactionSign.Label.signCode.text
+                        .font(Fontstyle.bodyL.base)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    AnimatedQRCodeView(
+                        viewModel: Binding<AnimatedQRCodeViewModel>
+                            .constant(.init(qrCodes: [signature.signature]))
+                    )
+                }
+                .padding(.horizontal, Spacing.large)
+                .padding(.top, Spacing.large)
+            }
+
             if content.ttype != .sign {
                 VStack {
                     ForEach(content.content.asSortedCards(), id: \.index) { card in
                         TransactionCardView(card: card)
                     }
                 }
+                .padding(.horizontal, Spacing.medium)
             }
             // To be deleted or replaced with new log note footer
 //            if content.ttype == .sign {
 //                signContent()
 //            }
         }
-        .padding(.horizontal, Spacing.extraSmall)
     }
 
     @ViewBuilder

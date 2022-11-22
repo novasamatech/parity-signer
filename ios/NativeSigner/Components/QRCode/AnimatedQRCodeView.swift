@@ -37,8 +37,8 @@ struct AnimatedQRCodeView: View {
         _viewModel = viewModel
         self.qrCodesGenerator = qrCodesGenerator
         let images = viewModel.qrCodes.wrappedValue.map { qrCodesGenerator.generateQRCode(from: $0) }
-        imagesIterator = images.makeIterator()
-        self.images = images
+        _imagesIterator = State(wrappedValue: images.makeIterator())
+        _images = State(wrappedValue: images)
     }
 
     var body: some View {
@@ -74,7 +74,7 @@ struct AnimatedQRCodeView: View {
                     start()
                 }
         }
-        .frame(maxWidth: .infinity, alignment: .center)
+//        .frame(maxWidth: .infinity, alignment: .center)
         .padding(
             UIScreen.main.bounds.width == Constants.compactDeviceWidth ? Spacing.large : Spacing
                 .extraExtraLarge

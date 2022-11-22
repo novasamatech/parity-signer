@@ -54,8 +54,6 @@ struct TransactionCardSelector: View {
                 TCEraMortal(content: content)
 
             // Simple values with identicons / icons / markdown
-            case let .idCard(value): // ID card, new designs present it without identicon
-                TCID(value: value)
             case let .networkInfoCard(value): // Not present in new designs
                 TCNetworkInfo(content: value)
             case let .typesInfoCard(value): // Not present in new designs
@@ -74,6 +72,8 @@ struct TransactionCardSelector: View {
                 TCNamedValueCard(value: text)
             case .eraImmortalCard:
                 TCNamedValueCard(name: Localizable.immortalTransaction.string)
+            case let .idCard(value): // ID card, new designs present it without identicon
+                TCID(value: value)
             case let .identityFieldCard(text):
                 TCNamedValueCard(name: Localizable.TCName.identityField.string, value: text)
             case let .nameVersionCard(value):

@@ -54,12 +54,7 @@ struct ErrorBottomModal: View {
                             .font(Fontstyle.bodyL.base)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(Spacing.medium)
-                            .background(
-                                RoundedRectangle(cornerRadius: CornerRadius.medium)
-                                    .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                                    .background(Asset.fill6.swiftUIColor)
-                                    .cornerRadius(CornerRadius.medium)
-                            )
+                            .strokeContainerBackground()
                             .padding(.top, Spacing.extraSmall)
                     }
                     VStack {

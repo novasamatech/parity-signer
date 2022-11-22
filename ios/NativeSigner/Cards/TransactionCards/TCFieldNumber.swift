@@ -22,18 +22,23 @@ struct TCFieldNumber: View {
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         Spacer()
                         if value.displayableValue.isEmpty {
-                            Localizable.questionMark.text
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
+                            Asset.questionCircle.swiftUIImage
+                                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
                         }
                     }
                     if showDoc {
-                        VStack(alignment: .leading) {
-                            Text(Localizable.TCField.path(value.pathType))
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
-                            Text.markdownWithFallback(value.docsFieldNumber)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            Text.markdownWithFallback(value.docsType)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        withAnimation {
+                            VStack(alignment: .leading) {
+                                Text(Localizable.TCField.path(value.pathType))
+                                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                Text.markdownWithFallback(value.docsFieldNumber)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                Text.markdownWithFallback(value.docsType)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            }
+                            .padding(.horizontal, Spacing.medium)
+                            .padding(.vertical, Spacing.small)
+                            .strokeContainerBackground()
                         }
                     }
                 }
@@ -55,7 +60,7 @@ struct TCFieldNumber_Previews: PreviewProvider {
             number: "number",
             docsFieldNumber: "docsFieldNumber",
             pathType: "pathType",
-            docsType: "docsType"
+            docsType: PreviewData.exampleMarkdownDocs
         ))
     }
 }

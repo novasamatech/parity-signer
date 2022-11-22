@@ -21,26 +21,36 @@ struct TCFieldName: View {
                         Text(value.name)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         Spacer()
-                        if !(value.docsFieldName + value.pathType + value.docsType).isEmpty {
-                            Localizable.questionMark.text
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
+                        if hasDetails {
+                            Asset.questionCircle.swiftUIImage
+                                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
                         }
                     }
                     if showDoc {
-                        VStack {
+                        VStack(alignment: .leading) {
                             Text(Localizable.TCField.path(value.pathType))
                                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             Text.markdownWithFallback(value.docsFieldName, allowsEmptyValue: true)
                                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             Text.markdownWithFallback(value.docsType, allowsEmptyValue: true)
                                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            HStack {
+                                Spacer()
+                            }
                         }
+                        .padding(.horizontal, Spacing.medium)
+                        .padding(.vertical, Spacing.small)
+                        .strokeContainerBackground()
                     }
                 }
                 .font(Fontstyle.bodyL.base)
             }
         )
-        .disabled((value.docsFieldName + value.pathType + value.docsType).isEmpty)
+        .disabled(!hasDetails)
+    }
+
+    private var hasDetails: Bool {
+        !(value.docsFieldName + value.pathType + value.docsType).isEmpty
     }
 }
 
@@ -48,13 +58,7 @@ struct TCFieldName_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
             TCFieldName(value: MscFieldName(
-                name: "Name",
-                docsFieldName: "docsfieldname",
-                pathType: "pathType",
-                docsType: "docsType"
-            ))
-            TCFieldName(value: MscFieldName(
-                name: "Name",
+                name: "Namefdsfds",
                 docsFieldName: "docsfieldname",
                 pathType: "pathType",
                 docsType: "docsType"

@@ -20,15 +20,22 @@ struct TCCall: View {
                     HStack {
                         TCNamedValueCard(name: Localizable.TCName.method.string, value: value.methodName)
                         if !value.docs.isEmpty {
-                            Localizable.questionMark.text
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
+                            Asset.questionCircle.swiftUIImage
+                                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
                         }
                     }
                     if showDoc {
                         withAnimation {
-                            Text.markdownWithFallback(value.docs)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                                .multilineTextAlignment(.leading)
+                            VStack(alignment: .leading) {
+                                Text.markdownWithFallback(value.docs)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                HStack {
+                                    Spacer()
+                                }
+                            }
+                            .padding(.horizontal, Spacing.medium)
+                            .padding(.vertical, Spacing.small)
+                            .strokeContainerBackground()
                         }
                     }
                 }

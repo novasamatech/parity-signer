@@ -23,9 +23,9 @@ struct TransactionSummaryView: View {
                         ForEach(renderable.summary.asRenderable, id: \.id) { row in
                             HStack(spacing: Spacing.extraSmall) {
                                 Text(row.key)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                                Text(row.value)
                                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                Text(row.value)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             }
                             .font(Fontstyle.captionM.base)
                         }
