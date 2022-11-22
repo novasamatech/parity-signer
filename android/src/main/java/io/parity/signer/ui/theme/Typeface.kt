@@ -5,7 +5,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import io.parity.signer.R
@@ -29,7 +28,7 @@ private val RobotoFontFamily = FontFamily(
 )
 
 // Set of Material typography styles to start with
-@Deprecated("new design use ")
+@Deprecated("new SignerTypeface")
 val Typography = Typography(
 	h1 = TextStyle(
 		fontFamily = InterFontFamily,
@@ -114,7 +113,7 @@ val Web3Typography = Typography(
 /**
  * Our Typefase schema is shared with iOS and not mapped to android [androidx.compose.material.Typography] so mainly defined here
  */
-object TypefaceNew {
+object SignerTypeface {
 	val TitleXl = TextStyle(
 		fontFamily = InterFontFamily,
 		fontWeight = FontWeight.Bold,

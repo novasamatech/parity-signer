@@ -23,14 +23,15 @@ import io.parity.signer.ui.theme.*
 fun PrimaryButtonBottomSheet(
 	label: String,
 	modifier: Modifier = Modifier,
-	background: Color = MaterialTheme.colors.pink500,
+	isNeutral: Boolean = false,
 	onClicked: Callback,
 ) {
 	Column(
 		modifier = modifier
 			.clickable(onClick = onClicked)
 			.background(
-				MaterialTheme.colors.pink500, RoundedCornerShape(
+				if (isNeutral) MaterialTheme.colors.fill18 else MaterialTheme.colors.pink500,
+				RoundedCornerShape(
 					dimensionResource(id = R.dimen.buttonCornerRadius)
 				)
 			)
@@ -41,7 +42,7 @@ fun PrimaryButtonBottomSheet(
 		Text(
 			text = label,
 			color = Color.White,
-			style = TypefaceNew.TitleS,
+			style = SignerTypeface.TitleS,
 			maxLines = 1,
 		)
 	}
@@ -63,7 +64,7 @@ fun SecondaryButtonBottomSheet(
 		Text(
 			text = label,
 			color = MaterialTheme.colors.textSecondary,
-			style = TypefaceNew.TitleS,
+			style = SignerTypeface.TitleS,
 			maxLines = 1,
 		)
 	}
@@ -92,7 +93,7 @@ fun RowButtonsBottomSheet(
 			Text(
 				text = labelCancel,
 				color = MaterialTheme.colors.primary,
-				style = TypefaceNew.TitleS,
+				style = SignerTypeface.TitleS,
 				maxLines = 1,
 			)
 		}
@@ -113,7 +114,7 @@ fun RowButtonsBottomSheet(
 			Text(
 				text = labelCta,
 				color = Color.White,
-				style = TypefaceNew.TitleS,
+				style = SignerTypeface.TitleS,
 				maxLines = 1,
 			)
 		}
