@@ -99,4 +99,7 @@
 	<string name="subtitle_derived_keys">Derived Keys</string>
     <string name="seed_backup_autohide_title">Backup info will be hidden in</string>
 	<string name="unlock_app_button">Unlock app</string>
+	<string name="add_key_set_menu_title">Add Key Set</string>
+	<string name="add_key_set_menu_add">Add new Key Set</string>
+	<string name="add_key_set_menu_recover">Recover Key Set</string>
 </resources>

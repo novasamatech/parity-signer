@@ -94,7 +94,6 @@ fun BottomSheetSelector(
 							keyDetails = signerDataModel.lastOpenedKeyDetails
 						)
 					}
-				//todo change design to new
 				is ModalData.NewSeedMenu ->
 					BottomSheetWrapperRoot(onClosedAction = {
 						navigator.backAction()

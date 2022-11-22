@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
 import io.parity.signer.ui.theme.textSecondary
@@ -21,10 +22,11 @@ import io.parity.signer.ui.theme.textSecondary
 fun BottomSheetHeader(
 	title: String,
 	subtitile: String? = null,
-	onCloseClicked: () -> Unit
+	modifier: Modifier = Modifier,
+	onCloseClicked: Callback?
 ) {
 	Row(
-		modifier = Modifier
+		modifier = modifier
 			.padding(start = 24.dp, end = 16.dp)
 			.fillMaxWidth(),
 		verticalAlignment = Alignment.CenterVertically,
@@ -44,8 +46,12 @@ fun BottomSheetHeader(
 			}
 		}
 		Spacer(modifier = Modifier.weight(1.0f))
-		CloseIcon(modifier = Modifier.padding(vertical = 20.dp),
-			onCloseClicked = onCloseClicked)
+		if (onCloseClicked != null) {
+			CloseIcon(
+				modifier = Modifier.padding(vertical = 20.dp),
+				onCloseClicked = onCloseClicked
+			)
+		}
 	}
 }
 

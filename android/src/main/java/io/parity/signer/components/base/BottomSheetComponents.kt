@@ -121,11 +121,12 @@ fun RowButtonsBottomSheet(
 }
 
 @Composable
-fun SignerBottomSheetDivider() {
+fun SignerBottomSheetDivider(modifier: Modifier = Modifier) {
 	Divider(
 		color = MaterialTheme.colors.appliedSeparator,
 		thickness = 1.dp,
 		startIndent = 16.dp,
+		modifier = modifier,
 	)
 }
 
