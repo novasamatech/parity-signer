@@ -59,7 +59,11 @@ fun ScanScreen(
 				.filter { it.isNotEmpty() }
 				.collect {
 					val transactions = viewModel.getTransactionsFromPendingPayload()
-					onNavigateToTransaction(transactions)
+					if (transactions.isNotEmpty()) {
+						onNavigateToTransaction(transactions)
+					} else {
+						viewModel.resetPendingTransactions()
+					}
 				}
 		}
 	}
@@ -74,9 +78,11 @@ fun ScanScreen(
 		ScanHeader(Modifier.statusBarsPadding(), onClose)
 		val capturedCpy = captured
 		if (capturedCpy != null) {
-			Box(modifier = Modifier
-                .fillMaxSize(1f)
-                .align(Alignment.BottomCenter)) {
+			Box(
+				modifier = Modifier
+                    .fillMaxSize(1f)
+                    .align(Alignment.BottomCenter)
+			) {
 				ScanProgressBar(capturedCpy, total) { viewModel.resetScanValues() }
 			}
 		} else {

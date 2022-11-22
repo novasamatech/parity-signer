@@ -9,10 +9,7 @@ import com.google.mlkit.vision.common.InputImage
 import io.parity.signer.backend.UniffiResult
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.encodeHex
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.MTransaction
-import io.parity.signer.uniffi.qrparserGetPacketsTotal
-import io.parity.signer.uniffi.qrparserTryDecodeQrSequence
+import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -123,8 +120,8 @@ class CameraViewModel() : ViewModel() {
 		allResults.filterIsInstance<UniffiResult.Error<Any>>().forEach { error ->
 			Log.e("Camera scan", "transaction parsing failed, ${error.error.message}")
 		}
-		return allResults.filterIsInstance<UniffiResult.Success<MTransaction>>()
-			.map { it.result }
+		return allResults.filterIsInstance<UniffiResult.Success<ActionResult>>()
+			.mapNotNull { (it.result.screenData as? ScreenData.Transaction)?.f }
 	}
 
 	/**
@@ -134,6 +131,10 @@ class CameraViewModel() : ViewModel() {
 		currentMultiQrTransaction = arrayOf()
 		_captured.value = null
 		_total.value = null
+	}
+
+	fun resetPendingTransactions() {
+		_pendingPayloads.value = emptySet()
 	}
 
 	sealed class CameraNavModel {
