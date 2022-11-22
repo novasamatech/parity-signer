@@ -60,6 +60,7 @@ fun ScanScreen(
 				.collect {
 					val transactions = viewModel.getTransactionsFromPendingPayload()
 					if (transactions.isNotEmpty()) {
+						//scanned qr codes is signer transaction qr code
 						onNavigateToTransaction(transactions)
 					} else {
 						viewModel.resetPendingTransactions()
@@ -69,9 +70,9 @@ fun ScanScreen(
 	}
 
 	Box(
-        Modifier
-            .fillMaxSize(1f)
-            .background(MaterialTheme.colors.background)
+		Modifier
+			.fillMaxSize(1f)
+			.background(MaterialTheme.colors.background)
 	) {
 		CameraViewPermission(viewModel)
 		CameraBottomText(isMultimode)
@@ -80,8 +81,8 @@ fun ScanScreen(
 		if (capturedCpy != null) {
 			Box(
 				modifier = Modifier
-                    .fillMaxSize(1f)
-                    .align(Alignment.BottomCenter)
+					.fillMaxSize(1f)
+					.align(Alignment.BottomCenter)
 			) {
 				ScanProgressBar(capturedCpy, total) { viewModel.resetScanValues() }
 			}
@@ -121,9 +122,9 @@ private fun CameraMultiModProceed(
 @Composable
 private fun CameraBottomText(isMultimode: Boolean) {
 	Column(
-        Modifier
-            .fillMaxSize(1f)
-            .padding(horizontal = 48.dp),
+		Modifier
+			.fillMaxSize(1f)
+			.padding(horizontal = 48.dp),
 	) {
 		Spacer(modifier = Modifier.weight(1f))
 		Text(
@@ -200,8 +201,8 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 			style = TypefaceNew.BodyL,
 			textAlign = TextAlign.Center,
 			modifier = Modifier
-                .fillMaxWidth(1f)
-                .padding(top = 150.dp),
+				.fillMaxWidth(1f)
+				.padding(top = 150.dp),
 		)
 		rationalShown.value = true
 		LaunchedEffect(key1 = Unit) {
