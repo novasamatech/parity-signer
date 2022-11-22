@@ -10,7 +10,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -70,30 +69,29 @@ fun ScanScreen(
 	}
 
 	Box(
-		Modifier
-			.fillMaxSize(1f)
-			.background(MaterialTheme.colors.background)
+        Modifier
+            .fillMaxSize(1f)
+            .background(MaterialTheme.colors.background)
 	) {
 		CameraViewPermission(viewModel)
 		CameraBottomText(isMultimode)
-		ScanHeader(Modifier.statusBarsPadding(), onClose)
-		val capturedCpy = captured
-		if (capturedCpy != null) {
-			Box(
-				modifier = Modifier
-					.fillMaxSize(1f)
-					.align(Alignment.BottomCenter)
-			) {
+		Column(
+		) {
+			ScanHeader(Modifier.statusBarsPadding(), onClose)
+			Spacer(modifier = Modifier.weight(1f))
+			val capturedCpy = captured
+			if (capturedCpy != null) {
 				ScanProgressBar(capturedCpy, total) { viewModel.resetScanValues() }
+			} else {
+				CameraMultiModProceed(
+					viewModel = viewModel,
+					isMultimode = viewModel.isMultiscanMode.collectAsState(),
+					pendingTransactions = viewModel.pendingTransactionPayloads.collectAsState(),
+					onNavigateToTransaction = onNavigateToTransaction,
+				)
 			}
-		} else {
-			CameraMultiModProceed(
-				viewModel = viewModel,
-				isMultimode = viewModel.isMultiscanMode.collectAsState(),
-				pendingTransactions = viewModel.pendingTransactionPayloads.collectAsState(),
-				onNavigateToTransaction = onNavigateToTransaction,
-			)
 		}
+
 	}
 	KeepScreenOn()
 }
@@ -122,9 +120,9 @@ private fun CameraMultiModProceed(
 @Composable
 private fun CameraBottomText(isMultimode: Boolean) {
 	Column(
-		Modifier
-			.fillMaxSize(1f)
-			.padding(horizontal = 48.dp),
+        Modifier
+            .fillMaxSize(1f)
+            .padding(horizontal = 48.dp),
 	) {
 		Spacer(modifier = Modifier.weight(1f))
 		Text(
@@ -201,8 +199,8 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 			style = TypefaceNew.BodyL,
 			textAlign = TextAlign.Center,
 			modifier = Modifier
-				.fillMaxWidth(1f)
-				.padding(top = 150.dp),
+                .fillMaxWidth(1f)
+                .padding(top = 150.dp),
 		)
 		rationalShown.value = true
 		LaunchedEffect(key1 = Unit) {
