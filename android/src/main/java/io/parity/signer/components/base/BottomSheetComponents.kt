@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.models.Callback
@@ -121,12 +122,14 @@ fun RowButtonsBottomSheet(
 }
 
 @Composable
-fun SignerBottomSheetDivider(modifier: Modifier = Modifier) {
+fun SignerBottomSheetDivider(
+	modifier: Modifier = Modifier,
+	padding: Dp = 16.dp,
+) {
 	Divider(
 		color = MaterialTheme.colors.appliedSeparator,
 		thickness = 1.dp,
-		startIndent = 16.dp,
-		modifier = modifier,
+		modifier = modifier.padding(horizontal = padding),
 	)
 }
 
