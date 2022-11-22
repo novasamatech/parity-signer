@@ -1,15 +1,16 @@
 package io.parity.signer.screens.scan
 
 import android.content.res.Configuration
+import android.util.Log
 import android.view.ViewGroup
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -32,11 +33,13 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import io.parity.signer.R
 import io.parity.signer.components.KeepScreenOn
 import io.parity.signer.models.Callback
+import io.parity.signer.ui.helpers.afterMeasured
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.TypefaceNew
 import io.parity.signer.uniffi.MTransaction
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun ScanScreen(
@@ -67,11 +70,15 @@ fun ScanScreen(
             .background(MaterialTheme.colors.background)
 	) {
 		CameraViewPermission(viewModel)
-		ScanHeader(Modifier.statusBarsPadding(), onClose)
 		CameraBottomText(isMultimode)
+		ScanHeader(Modifier.statusBarsPadding(), onClose)
 		val capturedCpy = captured
 		if (capturedCpy != null) {
-			ScanProgressBar(capturedCpy, total) { viewModel.resetScanValues() }
+			Box(modifier = Modifier
+                .fillMaxSize(1f)
+                .align(Alignment.BottomCenter)) {
+				ScanProgressBar(capturedCpy, total) { viewModel.resetScanValues() }
+			}
 		} else {
 			CameraMultiModProceed(
 				viewModel = viewModel,
@@ -88,7 +95,7 @@ fun ScanScreen(
 private fun CameraMultiModProceed(
 	viewModel: CameraViewModel,
 	isMultimode: State<Boolean>,
-	pendingTransactions: State<List<String>>,
+	pendingTransactions: State<Set<String>>,
 	onNavigateToTransaction: (List<MTransaction>) -> Unit,
 ) {
 	//todo multisign for multimode implement UI
@@ -249,11 +256,29 @@ private fun CameraViewInternal(viewModel: CameraViewModel) {
 					imageAnalysis,
 					preview
 				)
+				//torch control
 				if (camera.cameraInfo.hasFlashUnit()) {
 					coroutineScope.launch {
 						viewModel.isTorchEnabled.collect {
 							camera.cameraControl.enableTorch(it)
 						}
+					}
+				}
+				//autofocus
+				previewView.afterMeasured {
+					val autoFocusPoint = SurfaceOrientedMeteringPointFactory(1f, 1f)
+						.createPoint(.5f, .5f)
+					try {
+						val autoFocusAction = FocusMeteringAction.Builder(
+							autoFocusPoint,
+							FocusMeteringAction.FLAG_AF
+						).apply {
+							//start auto-focusing every second
+							setAutoCancelDuration(1, TimeUnit.SECONDS)
+						}.build()
+						camera.cameraControl.startFocusAndMetering(autoFocusAction)
+					} catch (e: CameraInfoUnavailableException) {
+						Log.d("ERROR", "cannot access camera", e)
 					}
 				}
 			}, executor)

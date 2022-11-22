@@ -23,8 +23,8 @@ class CameraViewModel() : ViewModel() {
 	val isMultiscanMode = MutableStateFlow(false)
 	val isTorchEnabled = MutableStateFlow<Boolean>(false)
 
-	private val _pendingPayloads = MutableStateFlow<List<String>>(emptyList())
-	val pendingTransactionPayloads: StateFlow<List<String>> = _pendingPayloads.asStateFlow()
+	private val _pendingPayloads = MutableStateFlow<Set<String>>(emptySet())
+	val pendingTransactionPayloads: StateFlow<Set<String>> = _pendingPayloads.asStateFlow()
 
 	private val _total = MutableStateFlow<Int?>(null)
 	private val _captured = MutableStateFlow<Int?>(null)
