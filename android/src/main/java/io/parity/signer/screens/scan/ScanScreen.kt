@@ -69,15 +69,18 @@ fun ScanScreen(
 	}
 
 	Box(
-        Modifier
-            .fillMaxSize(1f)
-            .background(MaterialTheme.colors.background)
+		Modifier
+			.fillMaxSize(1f)
+			.background(MaterialTheme.colors.background)
 	) {
 		CameraViewPermission(viewModel)
 		CameraBottomText(isMultimode)
-		Column(
-		) {
-			ScanHeader(Modifier.statusBarsPadding(), onClose)
+		Column() {
+			Spacer(modifier = Modifier
+				.statusBarsPadding()
+				.padding(top = 12.dp))
+			ScanHeader(onClose = onClose)
+
 			Spacer(modifier = Modifier.weight(1f))
 			val capturedCpy = captured
 			if (capturedCpy != null) {
@@ -120,11 +123,12 @@ private fun CameraMultiModProceed(
 @Composable
 private fun CameraBottomText(isMultimode: Boolean) {
 	Column(
-        Modifier
-            .fillMaxSize(1f)
-            .padding(horizontal = 48.dp),
+		Modifier
+			.fillMaxSize(1f)
+			.padding(horizontal = 48.dp),
 	) {
-		Spacer(modifier = Modifier.weight(1f))
+		Spacer(modifier = Modifier.padding(top = 400.dp))
+		Spacer(modifier = Modifier.weight(0.6f))
 		Text(
 			text = stringResource(
 				if (isMultimode) {
@@ -152,7 +156,7 @@ private fun CameraBottomText(isMultimode: Boolean) {
 			textAlign = TextAlign.Center,
 			modifier = Modifier.fillMaxWidth(1f),
 		)
-		Spacer(modifier = Modifier.padding(bottom = 76.dp))
+		Spacer(modifier = Modifier.weight(0.3f))
 	}
 }
 
@@ -199,8 +203,8 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 			style = TypefaceNew.BodyL,
 			textAlign = TextAlign.Center,
 			modifier = Modifier
-                .fillMaxWidth(1f)
-                .padding(top = 150.dp),
+				.fillMaxWidth(1f)
+				.padding(top = 150.dp),
 		)
 		rationalShown.value = true
 		LaunchedEffect(key1 = Unit) {
@@ -308,5 +312,21 @@ private fun PreviewScanScreen() {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			ScanScreen({}, { _ -> })
 		}
+	}
+}
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewBottomText() {
+	SignerNewTheme {
+		CameraBottomText(isMultimode = false)
 	}
 }
