@@ -37,31 +37,44 @@ struct TransactionPreview: View {
             viewModel.use(navigation: navigation)
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
+        .bottomEdgeOverlay(
+            overlayView:
+            TransactionDetailsView(
+                viewModel: .init(
+                    isPresented: $viewModel.isDetailsPresented,
+                    transaction: viewModel.selectedDetails
+                )
+            ),
+            isPresented: $viewModel.isDetailsPresented
+        )
     }
 
     @ViewBuilder
     func singleTransaction(content: MTransaction) -> some View {
         VStack {
-            TransactionSummaryView(renderable: .init(content), onTransactionDetailsTap: {})
-            VStack {
-                ForEach(content.content.asSortedCards(), id: \.index) { card in
-                    TransactionCardView(card: card)
+            TransactionSummaryView(
+                renderable: .init(content),
+                onTransactionDetailsTap: {
+                    viewModel.presentDetails(for: content)
+                }
+            )
+            if content.ttype != .sign {
+                VStack {
+                    ForEach(content.content.asSortedCards(), id: \.index) { card in
+                        TransactionCardView(card: card)
+                    }
                 }
             }
-            if let authorInfo = content.authorInfo {
-                AddressCard(card: authorInfo)
-            }
-            if let network = content.networkInfo {
-                NetworkCard(title: network.networkTitle, logo: network.networkLogo)
-            }
-            if content.ttype == .sign {
-                signContent()
-            }
+            // To be deleted or replaced with new log note footer
+//            if content.ttype == .sign {
+//                signContent()
+//            }
         }
         .padding(.horizontal, Spacing.extraSmall)
     }
 
     @ViewBuilder
+    /// To be deleted
     func signContent() -> some View {
         HStack {
             Localizable.logNote.text.font(Fontstyle.overline.base)
@@ -100,10 +113,10 @@ struct TransactionPreview: View {
                 PrimaryButton(
                     action: {
                         focus = false
-                        viewModel.sign(with: comment)
+                        viewModel.onBackButtonTap()
                     },
-                    text: Localizable.TransactionPreview.Action.unlockSign.key,
-                    style: .primary()
+                    text: Localizable.TransactionPreview.Action.done.key,
+                    style: .secondary()
                 )
             case .stub,
                  .importDerivations:
@@ -118,7 +131,7 @@ struct TransactionPreview: View {
                  .none:
                 EmptyView()
             }
-            if transactionType != .done {
+            if ![.done, .sign].contains(transactionType) {
                 EmptyButton(
                     action: viewModel.onCancelTap,
                     text: Localizable.TransactionPreview.Action.cancel.key
@@ -140,19 +153,24 @@ struct TransactionPreview: View {
 extension TransactionPreview {
     final class ViewModel: ObservableObject {
         @Binding var isPresented: Bool
+        @Published var isDetailsPresented: Bool = false
+        @Published var selectedDetails: MTransaction!
         private weak var navigation: NavigationCoordinator!
         private weak var data: SignerDataModel!
         private let seedsMediator: SeedsMediating
 
         let dataModel: [TransactionWrapper]
+        let signature: MSignatureReady?
 
         init(
             isPresented: Binding<Bool>,
             content: [MTransaction],
+            signature: MSignatureReady?,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             _isPresented = isPresented
             dataModel = content.map { TransactionWrapper(content: $0) }
+            self.signature = signature
             self.seedsMediator = seedsMediator
         }
 
@@ -190,6 +208,11 @@ extension TransactionPreview {
                 )
             )
         }
+
+        func presentDetails(for content: MTransaction) {
+            selectedDetails = content
+            isDetailsPresented = true
+        }
     }
 }
 
@@ -197,7 +220,8 @@ struct TransactionPreview_Previews: PreviewProvider {
     static var previews: some View {
         TransactionPreview(viewModel: .init(
             isPresented: Binding<Bool>.constant(true),
-            content: [PreviewData.signTransaction]
+            content: [PreviewData.signTransaction],
+            signature: nil
         ))
         .environmentObject(NavigationCoordinator())
         .environmentObject(SignerDataModel())

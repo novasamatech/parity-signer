@@ -11,9 +11,9 @@ struct TCID: View {
     var value: MscId
     var body: some View {
         HStack {
-            Identicon(identicon: value.identicon)
             Text(value.base58)
-                .foregroundColor(Asset.text600.swiftUIColor).font(Fontstyle.bodyL.crypto)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .font(Fontstyle.bodyL.base)
             Spacer()
         }
     }

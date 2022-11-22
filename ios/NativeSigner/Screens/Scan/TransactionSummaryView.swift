@@ -58,15 +58,17 @@ struct TransactionSummaryView: View {
                             )
                             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                             .font(Fontstyle.bodyM.base)
-                            .onTapGesture {
-                                withAnimation {
-                                    isShowingFullAddress = true
-                                }
-                            }
+
                             if !isShowingFullAddress {
                                 Asset.chevronDown.swiftUIImage
                                     .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                                     .padding(.leading, Spacing.extraExtraSmall)
+                            }
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation {
+                                isShowingFullAddress = true
                             }
                         }
                     }

@@ -124,7 +124,8 @@ struct CameraView: View {
             TransactionPreview(
                 viewModel: .init(
                     isPresented: $viewModel.isPresentingTransactionPreview,
-                    content: viewModel.transactions
+                    content: viewModel.transactions,
+                    signature: viewModel.signature
                 )
             )
         }
@@ -168,16 +169,20 @@ extension CameraView {
         @Published var isPresentingProgressSnackbar: Bool = false
         @Published var isScanningMultiple: Bool = false
         @Published var transactions: [MTransaction] = []
+        @Published var signature: MSignatureReady?
         @Published var header: String = Localizable.Scanner.Label.Scan.Main.header.string
         @Published var message: String = Localizable.Scanner.Label.Scan.Main.message.string
 
         @Binding var isPresented: Bool
         private weak var navigation: NavigationCoordinator!
+        private let seedsMediator: SeedsMediating
 
         init(
-            isPresented: Binding<Bool>
+            isPresented: Binding<Bool>,
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             _isPresented = isPresented
+            self.seedsMediator = seedsMediator
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -192,9 +197,31 @@ extension CameraView {
                     details: payload
                 )
             )
-            if case let .transaction(value) = actionResult.screenData {
-                transactions = [value]
-                isPresentingTransactionPreview = true
+            if case let .transaction(transaction) = actionResult.screenData {
+                switch transaction.ttype {
+                case .sign:
+                    let seedName = transaction.authorInfo?.address.seedName ?? ""
+                    let seedPhrase = seedsMediator.getSeed(seedName: seedName)
+                    let actionResult = navigation.performFake(
+                        navigation:
+                        .init(
+                            action: .goForward,
+                            details: "",
+                            seedPhrase: seedPhrase
+                        )
+                    )
+                    if case let .signatureReady(value) = actionResult.modalData {
+                        signature = value
+                        transactions = [transaction]
+                        isPresentingTransactionPreview = true
+                    }
+                    if case .enterPassword = actionResult.modalData {
+                        // To be implemented
+                    }
+                default:
+                    transactions = [transaction]
+                    isPresentingTransactionPreview = true
+                }
             }
         }
 

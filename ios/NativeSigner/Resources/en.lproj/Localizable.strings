@@ -369,6 +369,7 @@
 "TransactionPreview.Action.Approve" = "Approve";
 "TransactionPreview.Action.SelectSeed" = "Select seed";
 "TransactionPreview.Action.Cancel" = "Cancel";
+"TransactionPreview.Action.Done" = "Done";
 "CameraView.parsingMultidata" = "PARSING MULTIPART DATA";
 "CameraView.startOver" = "Start over";
 

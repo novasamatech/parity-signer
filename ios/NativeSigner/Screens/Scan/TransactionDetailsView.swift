@@ -23,7 +23,7 @@ struct TransactionDetailsView: View {
             )
             ScrollView {
                 VStack {
-                    ForEach(viewModel.transaction.content.content.asSortedCards(), id: \.index) { card in
+                    ForEach(viewModel.transaction.content.asSortedCards(), id: \.index) { card in
                         TransactionCardView(card: card)
                     }
                 }
@@ -43,11 +43,11 @@ extension TransactionDetailsView {
         @Binding var isPresented: Bool
         private weak var navigation: NavigationCoordinator!
 
-        let transaction: TransactionWrapper
+        let transaction: MTransaction
 
         init(
             isPresented: Binding<Bool>,
-            transaction: TransactionWrapper
+            transaction: MTransaction
         ) {
             _isPresented = isPresented
             self.transaction = transaction
