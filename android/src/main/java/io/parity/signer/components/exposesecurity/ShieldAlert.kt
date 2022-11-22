@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import io.parity.signer.components.AlertComponent
 import io.parity.signer.models.AlertState
+import io.parity.signer.models.Callback
 import io.parity.signer.uniffi.Action
 
 @Composable
@@ -11,7 +12,7 @@ fun ShieldAlert(
 	// shieldAlert: ShieldAlert, // TODO: use this instead of alertstate
 	alertState: State<AlertState?>,
 	button: (Action) -> Unit,
-	acknowledgeWarning: () -> Unit
+	acknowledgeWarning: Callback,
 ) {
 	when (alertState.value) {
 		AlertState.Active -> {

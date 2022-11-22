@@ -177,7 +177,7 @@ fun AlertSelector(
 	alert: AlertData?,
 	alertState: State<AlertState?>,
 	button: (Action, String, String) -> Unit,
-	acknowledgeWarning: () -> Unit
+	acknowledgeWarning: Callback
 ) {
 	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 
