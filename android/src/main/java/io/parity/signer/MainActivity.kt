@@ -128,12 +128,6 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 									button = signerDataModel.navigator::navigate,
 									signerDataModel = signerDataModel,
 								)
-								AlertSelector(
-									alert = actionResult.value?.alertData,
-									alertState = shieldAlert,
-									button = signerDataModel.navigator::navigate,
-									acknowledgeWarning = signerDataModel::acknowledgeWarning
-								)
 							}
 						}
 						//new screens selectors
@@ -154,6 +148,12 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								alertState = shieldAlert,
 								signerDataModel = signerDataModel,
 								navigator = signerDataModel.navigator,
+							)
+							AlertSelector(
+								alert = actionResult.value?.alertData,
+								alertState = shieldAlert,
+								navigate = signerDataModel.navigator::navigate,
+								acknowledgeWarning = signerDataModel::acknowledgeWarning
 							)
 						}
 					}
