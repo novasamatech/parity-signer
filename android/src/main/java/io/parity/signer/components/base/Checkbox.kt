@@ -1,11 +1,13 @@
 import android.content.res.Configuration
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,16 +39,21 @@ fun SignerCheckbox(
 			.clickable(onClick = onClicked),
 		contentAlignment = Alignment.Center,
 	) {
-		Image(
-			painter = painterResource(
-				id = if (isChecked)
-					R.drawable.circle_checked_24 else R.drawable.circle_unckecked_24
-			),
-			contentDescription = stringResource(R.string.description_checkbox),
-			colorFilter = ColorFilter.tint(if (isChecked) checkedColor else uncheckedColor),
-			modifier = Modifier
-				.size(24.dp)
-		)
+		Crossfade(
+			targetState = isChecked,
+			animationSpec = tween(durationMillis = 150),
+		) { isChecked ->
+			Image(
+				painter = painterResource(
+					id = if (isChecked)
+						R.drawable.circle_checked_24 else R.drawable.circle_unckecked_24
+				),
+				contentDescription = stringResource(R.string.description_checkbox),
+				colorFilter = ColorFilter.tint(if (isChecked) checkedColor else uncheckedColor),
+				modifier = Modifier
+					.size(24.dp)
+			)
+		}
 	}
 }
 
