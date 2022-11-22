@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonBottomSheet
+import io.parity.signer.components.base.SecondaryButtonBottomSheet
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -60,10 +61,10 @@ fun ExposedNowBottomSheet(
 
 			)
 
-		PrimaryButtonBottomSheet(
+		SecondaryButtonBottomSheet(
 			label = stringResource(R.string.general_got_it),
 			modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
-			isNeutral = true,
+			withBackground = true,
 		) {
 			close()
 		}
