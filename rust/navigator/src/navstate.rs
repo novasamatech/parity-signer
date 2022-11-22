@@ -900,11 +900,9 @@ impl State {
         let mut new_navstate = self.navstate.clone();
         let errorline = String::new();
 
-        if let Screen::Scan = self.navstate.screen {
-            new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
-                TransactionState::new(details_str, dbname),
-            )));
-        }
+        new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
+            TransactionState::new(details_str, dbname),
+        )));
 
         (new_navstate, errorline)
     }
