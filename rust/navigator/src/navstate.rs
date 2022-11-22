@@ -897,10 +897,9 @@ impl State {
     }
 
     fn handle_transaction_fetched(&self, dbname: &str, details_str: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
         let errorline = String::new();
 
-        new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
+        let new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
             TransactionState::new(details_str, dbname),
         )));
 
