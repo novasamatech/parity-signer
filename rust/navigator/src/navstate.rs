@@ -407,11 +407,7 @@ impl State {
                         match new.handle_sign(dbname) {
                             Ok(result) => {
                                 match result {
-                                    SignResult::RequestPassword { counter, .. } => {
-                                        if counter > 1 {
-                                            new_navstate.alert = Alert::Error;
-                                            let _ = write!(&mut errorline, "Wrong password.");
-                                        }
+                                    SignResult::RequestPassword { .. } => {
                                         new_navstate.modal = Modal::EnterPassword;
                                     }
                                     SignResult::Ready { signatures } => {
@@ -422,8 +418,6 @@ impl State {
                                     new_navstate.screen = Screen::Transaction(new);
                                 } else {
                                     new_navstate = Navstate::clean_screen(Screen::Log);
-
-                                    new_navstate.alert = Alert::Error;
                                 }
                             }
                             Err(e) => {

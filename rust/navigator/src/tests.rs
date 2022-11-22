@@ -6944,9 +6944,7 @@ fn flow_test_1() {
             counter: 2,
         },
     });
-    expected_action.alert_data = Some(AlertData::ErrorData {
-        f: "Wrong password.".to_string(),
-    });
+    expected_action.alert_data = None;
 
     assert_eq!(
         action, expected_action,
@@ -6956,7 +6954,6 @@ fn flow_test_1() {
         )
     );
 
-    state.perform(Action::GoBack, "", "").unwrap();
     let action = state.perform(Action::GoForward, "wrong_two", "").unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
@@ -6982,7 +6979,6 @@ fn flow_test_1() {
         )
     );
 
-    state.perform(Action::GoBack, "", "").unwrap();
     let mut action = state.perform(Action::GoForward, "wrong_three", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
@@ -7076,9 +7072,7 @@ fn flow_test_1() {
             },
         },
         modal_data: None,
-        alert_data: Some(AlertData::ErrorData {
-            f: "Wrong password.".to_string(),
-        }),
+        alert_data: None,
     };
 
     assert_eq!(
