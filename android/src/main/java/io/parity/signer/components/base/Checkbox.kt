@@ -1,126 +1,71 @@
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
+import android.content.res.Configuration
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import io.parity.signer.R
+import io.parity.signer.models.Callback
+import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.pink300
 import io.parity.signer.ui.theme.textTertiary
 
+/**
+ * Our custom ios style checkbox
+ */
 @Composable
-fun SignerCheckboxColors(
+fun SignerCheckbox(
+	isChecked: Boolean,
+	modifier: Modifier = Modifier,
 	checkedColor: Color = MaterialTheme.colors.pink300,
 	uncheckedColor: Color = MaterialTheme.colors.textTertiary,
-	disabledColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
-	disabledIndeterminateColor: Color = checkedColor.copy(alpha = ContentAlpha.disabled)
-): CheckboxColors {
-	return remember(
-		checkedColor,
-		uncheckedColor,
-		disabledColor,
-		disabledIndeterminateColor,
+	onClicked: Callback,
+) {
+	Box(
+		modifier = modifier
+			.size(32.dp)
+			.clickable(onClick = onClicked),
+		contentAlignment = Alignment.Center,
 	) {
-		DefaultCheckboxColors(
-			checkedBorderColor = checkedColor,
-			checkedBoxColor = checkedColor.copy(alpha = 0f),
-			checkedCheckmarkColor = checkedColor,
-			uncheckedCheckmarkColor = uncheckedColor.copy(alpha = 0f),
-			uncheckedBoxColor = checkedColor.copy(alpha = 0f),
-			disabledCheckedBoxColor = disabledColor,
-			disabledUncheckedBoxColor = disabledColor.copy(alpha = 0f),
-			disabledIndeterminateBoxColor = disabledIndeterminateColor,
-			uncheckedBorderColor = uncheckedColor,
-			disabledBorderColor = disabledColor,
-			disabledIndeterminateBorderColor = disabledIndeterminateColor,
+		Image(
+			painter = painterResource(
+				id = if (isChecked)
+					R.drawable.circle_checked_24 else R.drawable.circle_unckecked_24
+			),
+			contentDescription = stringResource(R.string.description_checkbox),
+			colorFilter = ColorFilter.tint(if (isChecked) checkedColor else uncheckedColor),
+			modifier = Modifier
+				.size(24.dp)
 		)
 	}
 }
 
-
-@Stable
-private class DefaultCheckboxColors(
-	private val checkedCheckmarkColor: Color,
-	private val uncheckedCheckmarkColor: Color,
-	private val checkedBoxColor: Color,
-	private val uncheckedBoxColor: Color,
-	private val disabledCheckedBoxColor: Color,
-	private val disabledUncheckedBoxColor: Color,
-	private val disabledIndeterminateBoxColor: Color,
-	private val checkedBorderColor: Color,
-	private val uncheckedBorderColor: Color,
-	private val disabledBorderColor: Color,
-	private val disabledIndeterminateBorderColor: Color
-) : CheckboxColors {
-	private val BoxInDuration = 50
-	private val BoxOutDuration = 100
-
-	@Composable
-	override fun checkmarkColor(state: ToggleableState): State<Color> {
-		val target = if (state == ToggleableState.Off) {
-			uncheckedCheckmarkColor
-		} else {
-			checkedCheckmarkColor
-		}
-
-		val duration =
-			if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
-		return animateColorAsState(target, tween(durationMillis = duration))
-	}
-
-	@Composable
-	override fun boxColor(
-		enabled: Boolean,
-		state: ToggleableState
-	): State<Color> {
-		val target = if (enabled) {
-			when (state) {
-				ToggleableState.On, ToggleableState.Indeterminate -> checkedBoxColor
-				ToggleableState.Off -> uncheckedBoxColor
+@Preview(
+	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewSignerCheckbox() {
+	SignerNewTheme {
+		Column() {
+			SignerCheckbox(isChecked = true) {
 			}
-		} else {
-			when (state) {
-				ToggleableState.On -> disabledCheckedBoxColor
-				ToggleableState.Indeterminate -> disabledIndeterminateBoxColor
-				ToggleableState.Off -> disabledUncheckedBoxColor
+			SignerCheckbox(isChecked = false) {
 			}
-		}
-
-		// If not enabled 'snap' to the disabled state, as there should be no animations between
-		// enabled / disabled.
-		return if (enabled) {
-			val duration =
-				if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
-			animateColorAsState(target, tween(durationMillis = duration))
-		} else {
-			rememberUpdatedState(target)
-		}
-	}
-
-	@Composable
-	override fun borderColor(
-		enabled: Boolean,
-		state: ToggleableState
-	): State<Color> {
-		val target = if (enabled) {
-			when (state) {
-				ToggleableState.On, ToggleableState.Indeterminate -> checkedBorderColor
-				ToggleableState.Off -> uncheckedBorderColor
-			}
-		} else {
-			when (state) {
-				ToggleableState.Indeterminate -> disabledIndeterminateBorderColor
-				ToggleableState.On, ToggleableState.Off -> disabledBorderColor
-			}
-		}
-
-		// If not enabled 'snap' to the disabled state, as there should be no animations between
-		// enabled / disabled.
-		return if (enabled) {
-			val duration =
-				if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
-			animateColorAsState(target, tween(durationMillis = duration))
-		} else {
-			rememberUpdatedState(target)
 		}
 	}
 }
