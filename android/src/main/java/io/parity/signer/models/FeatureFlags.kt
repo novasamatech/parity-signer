@@ -8,7 +8,7 @@ object FeatureFlags {
 		if (!BuildConfig.DEBUG) return false
 
 		return when (feature) {
-			FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT -> true
+			FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT -> false
 			FeatureOption.MULTI_TRANSACTION_CAMERA -> false
 			FeatureOption.EXPORT_SECRET_KEY -> false //unused
 		}
