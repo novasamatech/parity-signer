@@ -23,7 +23,7 @@ import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.LocalNavRequest
 import io.parity.signer.models.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textSecondary
 
 @Composable
@@ -47,13 +47,13 @@ fun ConfirmExportPrivateKeyMenu(
 		Text(
 			text = stringResource(R.string.export_private_key_confirm_title),
 			color = MaterialTheme.colors.primary,
-			style = TypefaceNew.TitleL,
+			style = SignerTypeface.TitleL,
 		)
 		Text(
 			modifier = Modifier.padding(top = 16.dp, bottom = 24.dp),
 			text = stringResource(R.string.export_private_key_confirm_text),
 			color = MaterialTheme.colors.textSecondary,
-			style = TypefaceNew.BodyL,
+			style = SignerTypeface.BodyL,
 			textAlign = TextAlign.Center,
 		)
 
