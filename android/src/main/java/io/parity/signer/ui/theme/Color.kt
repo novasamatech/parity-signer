@@ -80,5 +80,5 @@ val Colors.forcedFill30: Color
 	get() = Color(0x4DFFFFFF)
 
 val Colors.forcedFill40: Color
-	get() = Color(0x66FFFFFF)
+	get() = Color(0x66000000)
 

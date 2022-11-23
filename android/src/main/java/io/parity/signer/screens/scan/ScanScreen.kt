@@ -172,8 +172,10 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 	val cameraPermissionState =
 		rememberPermissionState(android.Manifest.permission.CAMERA)
 	if (cameraPermissionState.status.isGranted) {
+		//camera content itself!
 		CameraViewInternal(viewModel)
 		TransparentClipLayout()
+
 	} else if (cameraPermissionState.status.shouldShowRationale
 		&& !rationalShown.value
 	) {
