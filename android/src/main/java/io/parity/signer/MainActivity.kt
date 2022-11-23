@@ -44,7 +44,9 @@ class MainActivity : AppCompatActivity() {
 		signerDataModel.context = applicationContext
 		signerDataModel.activity = this
 
-		signerDataModel.lateInit()
+		if (savedInstanceState == null) {
+			signerDataModel.lateInit()
+		}
 
 		//remove automatic insets so bottom sheet can dimm status bar, other views will add their paddings if needed.
 		WindowCompat.setDecorFitsSystemWindows(window, false)
