@@ -9,11 +9,10 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.DotsIndicator
 import io.parity.signer.models.*
@@ -28,31 +27,39 @@ fun NewKeySetScreen(
 	rootNavigator: Navigator,
 	seedNames: Array<String>
 ) {
-	val keySetName = remember {
-		mutableStateOf("")
-	}
+	var keySetName by remember { mutableStateOf("") }
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		Row() {
 			//close
+			Spacer(modifier = Modifier.weight(1f))
 			DotsIndicator(totalDots = 2, selectedIndex = 1)
+			Spacer(modifier = Modifier.weight(1f))
 			//next button
 		}
 
-		Text(text = stringResource(R.string.new_key_set_title),
+		Text(
+			text = stringResource(R.string.new_key_set_title),
 			color = MaterialTheme.colors.primary,
 			style = TypefaceNew.TitleL,
 		)
-		Text(text = stringResource(R.string.new_key_set_subtitle),
+		Text(
+			text = stringResource(R.string.new_key_set_subtitle),
 			color = MaterialTheme.colors.primary,
 			style = TypefaceNew.LabelM,
 		)
-		TextField(value = , onValueChange = )
-//edit text here
-		Text(text = stringResource(R.string.new_key_set_description),
+		//todo dmitry request focus
+		TextField(
+			value = "",
+			onValueChange = { newStr -> keySetName = newStr },
+//			keyboardActions = KeyboardActions(), todo dmitry
+//			textStyle = LocalTextStyle.current,
+
+		)
+		Text(
+			text = stringResource(R.string.new_key_set_description),
 			color = MaterialTheme.colors.textSecondary,
 			style = TypefaceNew.CaptionM,
 		)
-
 	}
 }
 
@@ -69,8 +76,6 @@ fun NewKeySetScreen(
 @Composable
 private fun PreviewNewKeySetScreen() {
 	SignerNewTheme {
-		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			NewKeySetScreen(EmptyNavigator(), arrayOf())
-		}
+		NewKeySetScreen(EmptyNavigator(), arrayOf())
 	}
 }
