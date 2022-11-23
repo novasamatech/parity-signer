@@ -19,6 +19,7 @@ struct AnimatedQRCodeView: View {
         static let compactDeviceWidth: CGFloat = 320
         static let qrCodeWidthForSmallDevices: CGFloat = 216
         static let qrCodeWidthForStandardDevices: CGFloat = 232
+        static let qrCodeWidthForLargerDevices: CGFloat = 320
     }
 
     @Binding var viewModel: AnimatedQRCodeViewModel
@@ -50,7 +51,7 @@ struct AnimatedQRCodeView: View {
                 .frame(
                     minWidth: Constants.qrCodeWidthForSmallDevices,
                     idealWidth: Constants.qrCodeWidthForStandardDevices,
-                    maxWidth: Constants.qrCodeWidthForStandardDevices,
+                    maxWidth: Constants.qrCodeWidthForLargerDevices,
                     alignment: .center
                 )
                 .onAppear {
@@ -74,12 +75,11 @@ struct AnimatedQRCodeView: View {
                     start()
                 }
         }
-//        .frame(maxWidth: .infinity, alignment: .center)
+        .frame(maxWidth: .infinity, alignment: .center)
         .padding(
-            UIScreen.main.bounds.width == Constants.compactDeviceWidth ? Spacing.large : Spacing
-                .extraExtraLarge
+            UIScreen.main.bounds.width == Constants.compactDeviceWidth ? Spacing.large : Spacing.x3Large
         )
-        .background(.white)
+        .background(Asset.backgroundSystemLightOnly.swiftUIColor)
         .cornerRadius(CornerRadius.medium)
     }
 

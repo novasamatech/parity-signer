@@ -26,6 +26,7 @@ enum Heights {
     /// Height for `Identicon` when used in list collections
     static let identiconInCell: CGFloat = 36
     static let tabbarHeight: CGFloat = 49
+    static let textFieldHeight: CGFloat = 48
     static let tabbarAssetHeight: CGFloat = 28
     static let errorModalIconContainer: CGFloat = 80
     /// All variants of `ProgressSnackbar`, 96 pt

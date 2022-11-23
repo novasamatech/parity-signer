@@ -391,6 +391,8 @@
 "TransactionSign.Label.Sign" = "Sign With";
 "TransactionSign.Label.SignCode" = "Sign Transaction";
 "TransactionSign.Action.Done" = "Done";
+"TransactionSign.Action.Note" = "Add Log Note";
+
 "TransactionSign.Label.Details.Pallet" = "Pallet";
 "TransactionSign.Label.Details.Method" = "Method";
 "TransactionSign.Label.Details.Destination" = "Dest";

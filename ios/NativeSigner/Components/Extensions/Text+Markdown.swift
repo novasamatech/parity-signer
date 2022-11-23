@@ -1,5 +1,5 @@
 //
-//  Test+Markdown.swift
+//  Text+Markdown.swift
 //  NativeSigner
 //
 //  Created by Krzysztof Rodak on 15/11/2022.

@@ -15,6 +15,7 @@ struct TransactionWrapper: Identifiable {
 struct TransactionPreview: View {
     @State private var comment = ""
     @FocusState private var focus: Bool
+    @State private var isLogNoteVisible: Bool = false
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var data: SignerDataModel
@@ -30,8 +31,23 @@ struct TransactionPreview: View {
             )
             ScrollView {
                 ForEach(viewModel.dataModel, id: \.id) { singleTransaction(content: $0.content) }
+                // QR Code
+                if let signature = viewModel.signature {
+                    VStack(alignment: .leading, spacing: Spacing.small) {
+                        Localizable.TransactionSign.Label.signCode.text
+                            .font(Fontstyle.bodyL.base)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        AnimatedQRCodeView(
+                            viewModel: Binding<AnimatedQRCodeViewModel>
+                                .constant(.init(qrCodes: [signature.signature]))
+                        )
+                    }
+                    .padding(.horizontal, Spacing.large)
+                    .padding(.top, Spacing.large)
+                }
+                logNote()
+                actions(transactionType: viewModel.dataModel.first?.content.ttype)
             }
-            actions(transactionType: viewModel.dataModel.first?.content.ttype)
         }
         .onAppear {
             viewModel.use(navigation: navigation)
@@ -51,29 +67,18 @@ struct TransactionPreview: View {
 
     @ViewBuilder
     func singleTransaction(content: MTransaction) -> some View {
-        VStack(spacing: 0) {
-            TransactionSummaryView(
-                renderable: .init(content),
-                onTransactionDetailsTap: {
-                    viewModel.presentDetails(for: content)
-                }
-            )
-            .padding(.horizontal, Spacing.medium)
-            if let signature = viewModel.signature {
-                VStack(alignment: .leading, spacing: Spacing.small) {
-                    Localizable.TransactionSign.Label.signCode.text
-                        .font(Fontstyle.bodyL.base)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    AnimatedQRCodeView(
-                        viewModel: Binding<AnimatedQRCodeViewModel>
-                            .constant(.init(qrCodes: [signature.signature]))
-                    )
-                }
-                .padding(.horizontal, Spacing.large)
-                .padding(.top, Spacing.large)
-            }
-
-            if content.ttype != .sign {
+        VStack(alignment: .leading, spacing: 0) {
+            switch content.ttype {
+            case .sign:
+                // Rounded corner summary card
+                TransactionSummaryView(
+                    renderable: .init(content),
+                    onTransactionDetailsTap: {
+                        viewModel.presentDetails(for: content)
+                    }
+                )
+                .padding(.horizontal, Spacing.medium)
+            default:
                 VStack {
                     ForEach(content.content.asSortedCards(), id: \.index) { card in
                         TransactionCardView(card: card)
@@ -81,18 +86,48 @@ struct TransactionPreview: View {
                 }
                 .padding(.horizontal, Spacing.medium)
             }
-            // To be deleted or replaced with new log note footer
-//            if content.ttype == .sign {
-//                signContent()
-//            }
         }
+    }
+
+    @ViewBuilder
+    func logNote() -> some View {
+        // Log Note
+        VStack(alignment: .leading) {
+            if isLogNoteVisible {
+                VStack(alignment: .leading) {
+                    Localizable.TransactionSign.Action.note.text
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .font(Fontstyle.bodyL.base)
+                    TextField("", text: $comment)
+                        .primaryTextFieldStyle(
+                            Localizable.TransactionSign.Action.note.string,
+                            text: $comment
+                        )
+                        .focused($focus)
+                }
+            } else {
+                InlineButton(
+                    action: {
+                        withAnimation {
+                            isLogNoteVisible = true
+                        }
+                    },
+                    icon: Asset.add.swiftUIImage,
+                    text: Localizable.TransactionSign.Action.note.string
+                )
+            }
+        }
+        .animation(.easeInOut, value: isLogNoteVisible)
+        .padding(.horizontal, Spacing.large)
+        .padding(.vertical, Spacing.medium)
     }
 
     @ViewBuilder
     /// To be deleted
     func signContent() -> some View {
         HStack {
-            Localizable.logNote.text.font(Fontstyle.overline.base)
+            Localizable.logNote.text
+                .font(Fontstyle.overline.base)
                 .foregroundColor(Asset.text400.swiftUIColor)
             Spacer()
         }
@@ -236,7 +271,7 @@ struct TransactionPreview_Previews: PreviewProvider {
         TransactionPreview(viewModel: .init(
             isPresented: Binding<Bool>.constant(true),
             content: [PreviewData.signTransaction],
-            signature: nil
+            signature: MSignatureReady(signature: PreviewData.exampleQRCode)
         ))
         .environmentObject(NavigationCoordinator())
         .environmentObject(SignerDataModel())
