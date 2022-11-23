@@ -24,22 +24,37 @@ import io.parity.signer.ui.theme.*
 fun PrimaryButtonBottomSheet(
 	label: String,
 	modifier: Modifier = Modifier,
+	isEnabled: Boolean = true,
 	onClicked: Callback,
 ) {
 	Column(
 		modifier = modifier
-            .clickable(onClick = onClicked)
-            .background(
-                MaterialTheme.colors.pink500,
-                RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
-            )
-            .fillMaxWidth()
-            .padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)),
+			.run {
+				if (isEnabled) {
+					clickable(onClick = onClicked)
+				} else {
+					this
+				}
+			}
+			.background(
+				if (isEnabled) {
+					MaterialTheme.colors.pink500
+				} else {
+					MaterialTheme.colors.fill6
+				},
+				RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
+			)
+			.fillMaxWidth()
+			.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)),
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		Text(
 			text = label,
-			color = Color.White,
+			color = if (isEnabled) {
+				Color.White
+			} else {
+				MaterialTheme.colors.textDisabled
+			},
 			style = SignerTypeface.TitleS,
 			maxLines = 1,
 		)
@@ -55,19 +70,19 @@ fun SecondaryButtonBottomSheet(
 ) {
 	Column(
 		modifier = modifier
-            .clickable(onClick = onClicked)
-            .run {
-                if (withBackground) {
-                    background(
-                        MaterialTheme.colors.fill18,
-                        RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius)),
-                    )
-                } else {
-									this
-								}
-            }
-            .padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
-            .fillMaxWidth(),
+			.clickable(onClick = onClicked)
+			.run {
+				if (withBackground) {
+					background(
+						MaterialTheme.colors.fill18,
+						RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius)),
+					)
+				} else {
+					this
+				}
+			}
+			.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
+			.fillMaxWidth(),
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
 		Text(
@@ -89,14 +104,14 @@ fun RowButtonsBottomSheet(
 	Row {
 		Column(
 			modifier = Modifier
-                .clickable(onClick = onClickedCancel)
-                .background(
-                    MaterialTheme.colors.fill18, RoundedCornerShape(
-                        dimensionResource(id = R.dimen.buttonCornerRadius)
-                    )
-                )
-                .padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
-                .weight(1f),
+				.clickable(onClick = onClickedCancel)
+				.background(
+					MaterialTheme.colors.fill18, RoundedCornerShape(
+						dimensionResource(id = R.dimen.buttonCornerRadius)
+					)
+				)
+				.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
+				.weight(1f),
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			Text(
@@ -110,14 +125,14 @@ fun RowButtonsBottomSheet(
 		Spacer(modifier = Modifier.padding(end = 8.dp))
 		Column(
 			modifier = Modifier
-                .clickable(onClick = onClickedCta)
-                .background(
-                    MaterialTheme.colors.pink500, RoundedCornerShape(
-                        dimensionResource(id = R.dimen.buttonCornerRadius)
-                    )
-                )
-                .padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
-                .weight(1f),
+				.clickable(onClick = onClickedCta)
+				.background(
+					MaterialTheme.colors.pink500, RoundedCornerShape(
+						dimensionResource(id = R.dimen.buttonCornerRadius)
+					)
+				)
+				.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
+				.weight(1f),
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			Text(
@@ -165,7 +180,10 @@ private fun PreviewCtaButtons() {
 				onClickedCta = {},
 			)
 			SecondaryButtonBottomSheet("Secondary Bottom Sheet") {}
-			SecondaryButtonBottomSheet("Secondary with background", withBackground = true) {}
+			SecondaryButtonBottomSheet(
+				"Secondary with background",
+				withBackground = true
+			) {}
 			SignerBottomSheetDivider()
 		}
 	}

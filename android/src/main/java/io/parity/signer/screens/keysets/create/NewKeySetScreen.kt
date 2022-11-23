@@ -14,11 +14,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import io.parity.signer.R
 import io.parity.signer.components.base.DotsIndicator
+import io.parity.signer.components.base.PrimaryButtonBottomSheet
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textSecondary
+import io.parity.signer.uniffi.Action
 
 /**
  * 1/2 stage to create new key set
@@ -30,6 +32,7 @@ fun NewKeySetScreen(
 	seedNames: Array<String>
 ) {
 	var keySetName by remember { mutableStateOf("") }
+	val canProceed = keySetName.isNotEmpty() && !seedNames.contains(keySetName)
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		Row() {
 			//close
@@ -37,6 +40,11 @@ fun NewKeySetScreen(
 			DotsIndicator(totalDots = 2, selectedIndex = 1)
 			Spacer(modifier = Modifier.weight(1f))
 			//next button
+			PrimaryButtonBottomSheet(label = stringResource(R.string.button_next),
+			isEnabled = canProceed,
+			) {
+				if (canProceed) rootNavigator.navigate(Action.GO_FORWARD, keySetName)
+			}
 		}
 
 		Text(
