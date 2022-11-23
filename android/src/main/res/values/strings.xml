@@ -102,4 +102,7 @@
 	<string name="add_key_set_menu_title">Add Key Set</string>
 	<string name="add_key_set_menu_add">Add new Key Set</string>
 	<string name="add_key_set_menu_recover">Recover Key Set</string>
+    <string name="new_key_set_title">Key Set Name</string>
+	<string name="new_key_set_subtitle">Enter a name that will help you identify this key set</string>
+	<string name="new_key_set_description">Enter a name that will help you identify this key set</string>
 </resources>
