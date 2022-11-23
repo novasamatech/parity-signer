@@ -1,6 +1,6 @@
 package io.parity.signer.components.items
 
-import SignerCheckboxColors
+import SignerCheckbox
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,13 +75,13 @@ fun KeyDerivedItemMultiselect(
 					style = SignerTypeface.BodyM,
 				)
 			}
-			Checkbox(
-				checked = isSelected,
-				onCheckedChange = { c -> onClick(c, model.addressKey) },
-				colors = SignerCheckboxColors(),
+			SignerCheckbox(
+				isChecked = isSelected,
 				modifier = Modifier
 					.padding(end = 8.dp)
-			)
+			) {
+				onClick(!isSelected, model.addressKey)
+			}
 		}
 	}
 }
@@ -97,7 +100,7 @@ private fun PreviewKeyDerivedItemMultiselect() {
 	SignerNewTheme {
 		KeyDerivedItemMultiselect(
 			model = KeyModel.createStub(),
-			onClick = {_,_ -> },
+			onClick = { _, _ -> },
 		)
 	}
 }
