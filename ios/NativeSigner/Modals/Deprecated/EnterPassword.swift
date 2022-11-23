@@ -10,7 +10,7 @@ import SwiftUI
 struct EnterPassword: View {
     var content: MEnterPassword
     let navigationRequest: NavigationRequest
-    @ObservedObject var keyboardOffsetAdapter = KeyboardOffsetAdapter()
+    @StateObject var keyboardOffsetAdapter = KeyboardOffsetAdapter()
     @State private var password: String = ""
     @FocusState private var focused: Bool
     @State var animateBackground: Bool = false
@@ -44,9 +44,6 @@ struct EnterPassword: View {
                             .submitLabel(.done)
                             .focused($focused)
                             .padding(8)
-                            .onAppear {
-                                focused = true
-                            }
                     }
                 }
                 BigButton(
@@ -66,6 +63,9 @@ struct EnterPassword: View {
                         navigationRequest(.init(action: .goBack))
                     }
                 )
+            }
+            .onAppear {
+                focused = true
             }
             .padding(Spacing.medium)
             .cornerRadius(CornerRadius.extraSmall)
