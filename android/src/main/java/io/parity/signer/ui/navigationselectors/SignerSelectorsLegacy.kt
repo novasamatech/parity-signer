@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
-import io.parity.signer.alerts.ShieldAlert
+import io.parity.signer.components.exposesecurity.ShieldAlert
 import io.parity.signer.bottomsheets.*
 import io.parity.signer.components.Documents
 import io.parity.signer.models.*
@@ -176,10 +176,10 @@ fun ModalSelector(
 fun AlertSelector(
 	alert: AlertData?,
 	alertState: State<AlertState?>,
-	button: (Action, String, String) -> Unit,
-	acknowledgeWarning: () -> Unit
+	navigate: (Action, String, String) -> Unit,
+	acknowledgeWarning: Callback
 ) {
-	val button1: (Action) -> Unit = { action -> button(action, "", "") }
+	val button1: (Action) -> Unit = { action -> navigate(action, "", "") }
 
 	when (alert) {
 		AlertData.Confirm -> Confirm(button = button1)
@@ -188,9 +188,9 @@ fun AlertSelector(
 			button = button1
 		)
 		is AlertData.Shield -> ShieldAlert(
-			// alert.f, // TODO: use this instead
+			// alert.f,
 			alertState = alertState,
-			button = button1,
+			navigateBack = { button1(Action.GO_BACK) },
 			acknowledgeWarning = acknowledgeWarning
 		)
 		null -> {}

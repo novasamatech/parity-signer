@@ -13,12 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.red400
 import io.parity.signer.ui.theme.textTertiary
 
@@ -42,7 +41,7 @@ fun LogItem(
 				} else {
 					MaterialTheme.colors.primary
 				},
-				style = TypefaceNew.TitleS,
+				style = SignerTypeface.TitleS,
 			)
 			if (model.message.isNotBlank()) {
 				Spacer(modifier = Modifier.padding(top = 4.dp))
@@ -50,7 +49,7 @@ fun LogItem(
 				Text(
 					text = model.message,
 					color = MaterialTheme.colors.textTertiary,
-					style = TypefaceNew.BodyM,
+					style = SignerTypeface.BodyM,
 				)
 			}
 		}
@@ -58,7 +57,7 @@ fun LogItem(
 		Text(
 			text = model.timeStr,
 			color = MaterialTheme.colors.textTertiary,
-			style = TypefaceNew.BodyM,
+			style = SignerTypeface.BodyM,
 		)
 		Image(
 			imageVector = Icons.Filled.ChevronRight,
@@ -73,7 +72,7 @@ fun LogItemDate(model: LogsListEntryModel.TimeSeparatorModel) {
 	Text(
 		text = model.dateStr,
 		color = MaterialTheme.colors.textTertiary,
-		style = TypefaceNew.BodyM,
+		style = SignerTypeface.BodyM,
 		modifier = Modifier
 			.padding(vertical = 8.dp, horizontal = 24.dp),
 	)
