@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textSecondary
 
 @Composable
@@ -35,13 +35,13 @@ fun BottomSheetHeader(
 			Text(
 				text = title,
 				color = MaterialTheme.colors.primary,
-				style = TypefaceNew.TitleS,
+				style = SignerTypeface.TitleS,
 			)
 			if (subtitile != null) {
 				Text(
 					text = subtitile,
 					color = MaterialTheme.colors.textSecondary,
-					style = TypefaceNew.BodyM,
+					style = SignerTypeface.BodyM,
 				)
 			}
 		}
@@ -60,7 +60,7 @@ fun BottomSheetSubtitle(@StringRes id: Int) {
 	Text(
 		text = stringResource(id),
 		color = MaterialTheme.colors.primary,
-		style = TypefaceNew.BodyL,
+		style = SignerTypeface.BodyL,
 		modifier = Modifier.padding(start = 24.dp)
 	)
 }

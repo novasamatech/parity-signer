@@ -16,19 +16,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.screens.keydetails.exportprivatekey.ConfirmExportPrivateKeyMenu
-import io.parity.signer.components.base.RowButtonsBottomSheet
 import io.parity.signer.components.base.SecondaryButtonBottomSheet
 import io.parity.signer.models.Callback
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.red400
 import io.parity.signer.ui.theme.textSecondary
 import io.parity.signer.uniffi.Action
@@ -181,7 +179,7 @@ private fun MenuItemForBottomSheetInternal(
 		Text(
 			text = label,
 			color = tint ?: MaterialTheme.colors.textSecondary,
-			style = TypefaceNew.TitleS,
+			style = SignerTypeface.TitleS,
 		)
 	}
 }

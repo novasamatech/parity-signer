@@ -47,7 +47,7 @@ fun CircularCountDownTimer(
 		Text(
 			text = text,
 			color = MaterialTheme.colors.textSecondary,
-			style = TypefaceNew.BodyL,
+			style = SignerTypeface.BodyL,
 		)
 		Box(
 			modifier = Modifier.padding(start = 8.dp),
@@ -65,7 +65,7 @@ fun CircularCountDownTimer(
 			Text(
 				text = timeLeft.toString(),
 				color = MaterialTheme.colors.primary,
-				style = TypefaceNew.LabelS,
+				style = SignerTypeface.LabelS,
 			)
 		}
 	}
@@ -111,7 +111,7 @@ fun SnackBarCircularCountDownTimer(
 		Text(
 			text = text,
 			color = Color.White,
-			style = TypefaceNew.BodyL,
+			style = SignerTypeface.BodyL,
 			modifier = Modifier.weight(1f)
 		)
 		Box(
@@ -130,7 +130,7 @@ fun SnackBarCircularCountDownTimer(
 			Text(
 				text = timeLeft.toString(),
 				color = Color.White,
-				style = TypefaceNew.LabelS,
+				style = SignerTypeface.LabelS,
 			)
 		}
 	}

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -17,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textSecondary
 
 
@@ -40,7 +39,7 @@ fun BottomSheetConfirmDialog(
 			modifier = Modifier.fillMaxWidth(1f),
 			text = title,
 			color = MaterialTheme.colors.primary,
-			style = TypefaceNew.TitleL,
+			style = SignerTypeface.TitleL,
 			textAlign = TextAlign.Center,
 		)
 		Text(
@@ -52,7 +51,7 @@ fun BottomSheetConfirmDialog(
                 ),
 			text = message,
 			color = MaterialTheme.colors.textSecondary,
-			style = TypefaceNew.BodyL,
+			style = SignerTypeface.BodyL,
 			textAlign = TextAlign.Center,
 		)
 		RowButtonsBottomSheet(
