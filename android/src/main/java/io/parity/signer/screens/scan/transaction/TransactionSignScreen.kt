@@ -51,7 +51,7 @@ fun TransactionSignScreen(
 			Text(
 				text = stringResource(R.string.metadata_subtitle_keys),
 				color = MaterialTheme.colors.textSecondary,
-				style = TypefaceNew.LabelM,
+				style = SignerTypeface.LabelM,
 				modifier = Modifier.padding(top = 24.dp, start = 24.dp, end = 24.dp),
 			)
 			Column(
@@ -63,13 +63,13 @@ fun TransactionSignScreen(
 				Text(
 					stringResource(R.string.update_metadata_keyword_key),
 					color = MaterialTheme.colors.textTertiary,
-					style = TypefaceNew.BodyL,
+					style = SignerTypeface.BodyL,
 				)
 				Spacer(modifier = Modifier.padding(top = 8.dp))
 				Text(
 					model.verifierKey,
 					color = MaterialTheme.colors.primary,
-					style = TypefaceNew.BodyL,
+					style = SignerTypeface.BodyL,
 				)
 				Spacer(modifier = Modifier.padding(top = 12.dp))
 				SignerDivider()
@@ -78,13 +78,13 @@ fun TransactionSignScreen(
 					Text(
 						text = stringResource(R.string.update_metadata_keyword_crypto),
 						color = MaterialTheme.colors.textTertiary,
-						style = TypefaceNew.BodyL,
+						style = SignerTypeface.BodyL,
 					)
 					Spacer(modifier = Modifier.weight(1f))
 					Text(
 						text = model.verifierAlg,
 						color = MaterialTheme.colors.primary,
-						style = TypefaceNew.BodyL,
+						style = SignerTypeface.BodyL,
 					)
 				}
 			}
@@ -93,7 +93,7 @@ fun TransactionSignScreen(
 			Text(
 				text = stringResource(R.string.metadata_subtitle_add_metadata),
 				color = MaterialTheme.colors.textSecondary,
-				style = TypefaceNew.LabelM,
+				style = SignerTypeface.LabelM,
 				modifier = Modifier.padding(top = 12.dp, start = 24.dp, end = 24.dp),
 			)
 			Column(
@@ -106,13 +106,13 @@ fun TransactionSignScreen(
 					Text(
 						text = stringResource(R.string.update_metadata_keyword_metadata),
 						color = MaterialTheme.colors.textTertiary,
-						style = TypefaceNew.BodyL,
+						style = SignerTypeface.BodyL,
 					)
 					Spacer(modifier = Modifier.weight(1f))
 					Text(
 						text = model.metadataName,
 						color = MaterialTheme.colors.primary,
-						style = TypefaceNew.BodyL,
+						style = SignerTypeface.BodyL,
 					)
 				}
 				Spacer(modifier = Modifier.padding(top = 12.dp))
@@ -121,7 +121,7 @@ fun TransactionSignScreen(
 				Text(
 					text = model.metadataHash,
 					color = MaterialTheme.colors.primary,
-					style = TypefaceNew.BodyL,
+					style = SignerTypeface.BodyL,
 				)
 			}
 		}

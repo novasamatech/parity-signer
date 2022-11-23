@@ -27,7 +27,7 @@ import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.KeyModel
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textDisabled
 import io.parity.signer.ui.theme.textTertiary
 
@@ -57,7 +57,7 @@ fun KeyDerivedItem(
 					Text(
 						text = model.path,
 						color = MaterialTheme.colors.primary,
-						style = TypefaceNew.LabelM,
+						style = SignerTypeface.LabelM,
 					)
 					if (model.hasPwd) {
 						Icon(
@@ -72,7 +72,7 @@ fun KeyDerivedItem(
 				Text(
 					text = model.base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
 					color = MaterialTheme.colors.textTertiary,
-					style = TypefaceNew.BodyM,
+					style = SignerTypeface.BodyM,
 				)
 			}
 			Image(
@@ -104,7 +104,7 @@ fun SlimKeyItem(model: KeyModel) {
 		Text(
 			text = model.path,
 			color = MaterialTheme.colors.primary,
-			style = TypefaceNew.LabelM,
+			style = SignerTypeface.LabelM,
 		)
 		if (model.hasPwd) {
 			Icon(

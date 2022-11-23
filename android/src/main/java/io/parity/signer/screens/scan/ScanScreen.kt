@@ -34,7 +34,7 @@ import io.parity.signer.components.KeepScreenOn
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.helpers.afterMeasured
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.uniffi.MTransaction
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
@@ -138,7 +138,7 @@ private fun CameraBottomText(isMultimode: Boolean) {
 				}
 			),
 			color = Color.White,
-			style = TypefaceNew.TitleL,
+			style = SignerTypeface.TitleL,
 			textAlign = TextAlign.Center,
 			modifier = Modifier.fillMaxWidth(1f),
 		)
@@ -152,7 +152,7 @@ private fun CameraBottomText(isMultimode: Boolean) {
 				}
 			),
 			color = Color.White,
-			style = TypefaceNew.TitleS,
+			style = SignerTypeface.TitleS,
 			textAlign = TextAlign.Center,
 			modifier = Modifier.fillMaxWidth(1f),
 		)
@@ -202,7 +202,7 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 		Text(
 			text = stringResource(R.string.camera_no_permission_text),
 			color = MaterialTheme.colors.primary,
-			style = TypefaceNew.BodyL,
+			style = SignerTypeface.BodyL,
 			textAlign = TextAlign.Center,
 			modifier = Modifier
 				.fillMaxWidth(1f)

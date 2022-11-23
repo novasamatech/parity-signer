@@ -13,7 +13,6 @@ import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.ui.theme.Typography
-import io.parity.signer.uniffi.Address
 import io.parity.signer.uniffi.MAddressCard
 
 @Composable

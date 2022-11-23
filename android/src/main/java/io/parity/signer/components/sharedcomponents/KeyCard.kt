@@ -46,13 +46,13 @@ fun KeyCard(model: KeyCardModel) {
 				Text(
 					model.path,
 					color = MaterialTheme.colors.textSecondary,
-					style = TypefaceNew.CaptionM,
+					style = SignerTypeface.CaptionM,
 				)
 				if (model.hasPwd) {
 					Text(
 						" •••• ",
 						color = MaterialTheme.colors.textSecondary,
-						style = TypefaceNew.CaptionM,
+						style = SignerTypeface.CaptionM,
 					)
 					Icon(
 						Icons.Default.Lock,
@@ -67,7 +67,7 @@ fun KeyCard(model: KeyCardModel) {
 			Text(
 				model.seedName,
 				color = MaterialTheme.colors.primary,
-				style = TypefaceNew.LabelS,
+				style = SignerTypeface.LabelS,
 			)
 
 			Spacer(Modifier.padding(top = 10.dp))
@@ -113,7 +113,7 @@ fun KeyCard(model: KeyCardModel) {
 				Text(
 					model.network,
 					color = MaterialTheme.colors.textTertiary,
-					style = TypefaceNew.CaptionM,
+					style = SignerTypeface.CaptionM,
 				)
 			}
 		}
@@ -130,7 +130,7 @@ fun KeySeedCard(seedTitle: String, base58: String) {
 		Text(
 			seedTitle,
 			color = MaterialTheme.colors.primary,
-			style = TypefaceNew.LabelS,
+			style = SignerTypeface.LabelS,
 		)
 		ShowBase58Collapsible(base58)
 	}
@@ -148,13 +148,13 @@ private fun ShowBase58Collapsible(base58: String) {
 			Text(
 				base58,
 				color = MaterialTheme.colors.textTertiary,
-				style = TypefaceNew.BodyM
+				style = SignerTypeface.BodyM
 			)
 		} else {
 			Text(
 				base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
 				color = MaterialTheme.colors.textTertiary,
-				style = TypefaceNew.BodyM,
+				style = SignerTypeface.BodyM,
 				maxLines = 1,
 			)
 			Spacer(modifier = Modifier.padding(horizontal = 4.dp))

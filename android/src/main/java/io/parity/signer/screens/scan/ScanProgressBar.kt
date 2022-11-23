@@ -47,18 +47,18 @@ fun ScanProgressBar(
 				Text(
 					text = stringResource(R.string.scan_progress_bar_title),
 					color = MaterialTheme.colors.primary,
-					style = TypefaceNew.BodyL,
+					style = SignerTypeface.BodyL,
 				)
 				Text(
 					text = stringResource(R.string.scan_progress_bar_progress, captured, total ?: -1),
 					color = MaterialTheme.colors.textTertiary,
-					style = TypefaceNew.CaptionM,
+					style = SignerTypeface.CaptionM,
 				)
 			}
 			Text(
 				text = stringResource(id = R.string.generic_cancel),
 				color = MaterialTheme.colors.pink500,
-				style = TypefaceNew.LabelM,
+				style = SignerTypeface.LabelM,
 				modifier = Modifier
 					.padding(8.dp)
 					.clickable(onClick = onCancel),

@@ -63,7 +63,7 @@ fun KeySetDetailsMultiselectScreen(
 				Text(
 					text = stringResource(R.string.key_sets_details_screem_derived_subtitle),
 					color = MaterialTheme.colors.textDisabled,
-					style = TypefaceNew.BodyM,
+					style = SignerTypeface.BodyM,
 					modifier = Modifier.weight(1f),
 				)
 				Icon(

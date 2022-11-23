@@ -147,7 +147,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							AlertSelector(
 								alert = actionResult.value.alertData,
 								alertState = shieldAlert,
-								button = signerDataModel.navigator::navigate,
+								navigate = signerDataModel.navigator::navigate,
 								acknowledgeWarning = signerDataModel::acknowledgeWarning
 							)
 						}
