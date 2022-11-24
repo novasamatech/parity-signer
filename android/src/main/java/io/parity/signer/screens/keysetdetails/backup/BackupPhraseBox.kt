@@ -24,6 +24,7 @@ import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.SizeMode
 import io.parity.signer.R
+import io.parity.signer.components.KeepScreenOn
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.fill6
 import io.parity.signer.ui.theme.textDisabled
@@ -53,15 +54,17 @@ fun BackupPhraseBox(seedPhrase: String) {
 		mainAxisSize = SizeMode.Expand,
 		mainAxisAlignment = FlowMainAxisAlignment.SpaceBetween,
 		modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .background(MaterialTheme.colors.fill6, innerShape)
-            .padding(16.dp),
+			.padding(horizontal = 16.dp)
+			.background(MaterialTheme.colors.fill6, innerShape)
+			.padding(16.dp),
 	) {
 		val words = seedPhrase.split(" ")
 		for (index in 0..words.lastIndex) {
 			BackupPhraseItem(index = index + 1, word = words[index])
 		}
 	}
+
+	KeepScreenOn()
 }
 
 

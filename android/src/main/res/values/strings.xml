@@ -44,7 +44,7 @@
 	<string name="key_sets_details_screem_derived_subtitle">Derived Keys</string>
 	<string name="key_lock_item">Locked key</string>
 	<string name="key_sets_details_screem_filter_icon_description">Network filter button</string>
-  <string name="menu_option_select_key">Select Keys</string>
+	<string name="menu_option_select_key">Select Keys</string>
 	<string name="menu_option_derive_from_key">Derive from Key</string>
 	<string name="menu_option_backup_key_set">Backup Key Set</string>
 	<string name="log_title_database_initiated">Database initiated</string>
@@ -85,8 +85,7 @@
 	<string name="log_message_network_custom">custom</string>
 	<string name="menu_option_add_note">Add Note</string>
 	<string name="menu_option_clear_logs">Clear Logs</string>
-
-    <string name="unlock_device_title">UNLOCK SIGNER</string>
+	<string name="unlock_device_title">UNLOCK SIGNER</string>
 	<string name="unlock_device_subtitle">Please authenticate yourself</string>
 	<string name="auth_error_message">Authentication error: %s</string>
 	<string name="auth_failed_message">Authentication failed</string>
@@ -98,8 +97,27 @@
 	<string name="auth_error_status_unknown">Authentication system failure</string>
 	<string name="subtitle_secret_recovery_phrase">Secret Recovery Phrase</string>
 	<string name="subtitle_derived_keys">Derived Keys</string>
-    <string name="seed_backup_autohide_title">Backup info will be hidden in</string>
+	<string name="seed_backup_autohide_title">Backup info will be hidden in</string>
 	<string name="unlock_app_button">Unlock app</string>
+	<string name="description_multisign_mode">multi sign mode</string>
+	<string name="description_camera_tourch_enable">camera tourch button</string>
+	<string name="screen_title_update_metadata">Update metadata</string>
+	<string name="approve_confirm_button">Approve</string>
+	<string name="metadata_subtitle_keys">Verifier Metadata</string>
+	<string name="metadata_subtitle_add_metadata">Add Metadata</string>
+	<string name="camera_screen_header_single">Scan QR code</string>
+	<string name="camera_screen_header_multimode">Scan Multiple Single  QR codes</string>
+	<string name="camera_screen_description_single">Sign transaction, add network or update metadata</string>
+	<string name="camera_screen_description_multimode">Press the Sign button when you’re done scanning</string>
+	<string name="update_metadata_keyword_key">Key</string>
+	<string name="update_metadata_keyword_crypto">Crypto</string>
+	<string name="update_metadata_keyword_metadata">Metadata</string>
+	<string name="scan_progress_bar_title">Multipart data</string>
+	<string name="scan_progress_bar_progress">%1$d / %2$d complete</string>
+    <string name="generic_ok">OK</string>
+	<string name="camera_jastification_title">Camera required!</string>
+	<string name="camera_jastification_message">To work with QR code we need camera permission, this is main functionality of this app!</string>
+	<string name="camera_no_permission_text">Camera permission not granted</string>
     <string name="general_got_it">Got it</string>
 	<string name="exposed_now_title">Network Connected</string>
 	<string name="exposed_now_message">Signer detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.</string>

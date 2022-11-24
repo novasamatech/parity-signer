@@ -1,4 +1,4 @@
-package io.parity.signer.screens
+package io.parity.signer.screens.scan.old
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
@@ -18,7 +18,7 @@ import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.TransactionType
 
 @Composable
-fun TransactionPreview(
+fun TransactionPreviewOld(
 	transactions: List<MTransaction>,
 	button: (action: Action, details: String, seedPhrase: String) -> Unit,
 	signTransaction: (comment: String, seedName: String) -> Unit

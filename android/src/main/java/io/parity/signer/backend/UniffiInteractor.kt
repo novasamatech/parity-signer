@@ -14,8 +14,8 @@ class UniffiInteractor(private val dbName: String) {
 
 	suspend fun navigate(
 		action: Action,
-		details: String,
-		seedPhrase: String
+		details: String = "",
+		seedPhrase: String = "",
 	): UniffiResult<ActionResult> = withContext(Dispatchers.IO) {
 		try {
 			UniffiResult.Success(backendAction(action, details, seedPhrase))

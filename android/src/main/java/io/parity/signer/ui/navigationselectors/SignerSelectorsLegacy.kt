@@ -2,6 +2,7 @@ package io.parity.signer.ui.navigationselectors
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.components.exposesecurity.ShieldAlert
@@ -19,16 +20,13 @@ import io.parity.signer.uniffi.ScreenData
 fun ScreenSelector(
 	screenData: ScreenData,
 	alertState: State<AlertState?>,
-	progress: State<Float?>,
-	captured: State<Int?>,
-	total: State<Int?>,
-	button: (Action, String, String) -> Unit,
+	navigate: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
-	val button1: (Action) -> Unit = { action -> button(action, "", "") }
+	val button1: (Action) -> Unit = { action -> navigate(action, "", "") }
 	val button2: (Action, String) -> Unit =
-		{ action, details -> button(action, details, "") }
-	val seedNames = signerDataModel.seedNames.value ?: emptyArray()
+		{ action, details -> navigate(action, details, "") }
+	val seedNames = signerDataModel.seedNames.collectAsState()
 
 	when (screenData) {
 		is ScreenData.DeriveKey -> NewAddressScreen(
@@ -57,27 +55,25 @@ fun ScreenSelector(
 		is ScreenData.NewSeed -> NewSeedScreen(
 			screenData.f,
 			signerDataModel::navigate,
-			seedNames
+			seedNames.value
 		)
 		is ScreenData.RecoverSeedName -> RecoverSeedName(
 			screenData.f,
 			signerDataModel::navigate,
-			seedNames
+			seedNames.value
 		)
 		is ScreenData.RecoverSeedPhrase -> RecoverSeedPhrase(
 			recoverSeedPhrase = screenData.f,
 			button = signerDataModel::navigate,
 			addSeed = signerDataModel::addSeed
 		)
-		ScreenData.Scan -> ScanScreen(
-			progress = progress,
-			captured = captured,
-			total = total,
-			button = signerDataModel::navigate,
-			handleCameraPermissions = signerDataModel::handleCameraPermissions,
-			processFrame = signerDataModel::processFrame,
-			resetScanValues = signerDataModel::resetScanValues,
-		)
+		ScreenData.Scan -> {} //in new selector
+		is ScreenData.Transaction -> {} //in new selector
+//			TransactionPreviewOld(
+//				screenData.f,
+//				signerDataModel::navigate,
+//				signerDataModel::signTransaction
+//			)
 		is ScreenData.SeedSelector -> {} //shown in new selector
 		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
 			screenData.f,
@@ -95,11 +91,7 @@ fun ScreenSelector(
 			screenData.f,
 			signerDataModel::signSufficientCrypto
 		)
-		is ScreenData.Transaction -> TransactionPreview(
-			screenData.f,
-			signerDataModel::navigate,
-			signerDataModel::signTransaction
-		)
+
 		is ScreenData.VVerifier -> VerifierScreen(
 			screenData.f,
 			signerDataModel::wipeToJailbreak
@@ -112,16 +104,15 @@ fun ModalSelector(
 	modalData: ModalData?,
 	localNavAction: LocalNavAction?,
 	alertState: State<AlertState?>,
-	button: (Action, String, String) -> Unit,
+	navigate: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
-	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 	val button2: (Action, String) -> Unit =
-		{ action, details -> button(action, details, "") }
+		{ action, details -> navigate(action, details, "") }
 	if (localNavAction != null && localNavAction != LocalNavAction.None) {
 		when (localNavAction) {
 			is LocalNavAction.ShowExportPrivateKey -> {} //show in new selector
-			LocalNavAction.None -> {}
+			else -> {}
 		}
 	} else {
 		when (modalData) {
@@ -136,14 +127,8 @@ fun ModalSelector(
 				modalData.f,
 				signerDataModel = signerDataModel
 			)
-			is ModalData.SignatureReady -> SignatureReady(
-				modalData.f,
-				signerDataModel = signerDataModel
-			)
-			is ModalData.EnterPassword -> EnterPassword(
-				modalData.f,
-				button2,
-			)
+			is ModalData.SignatureReady -> {} //in new selector
+			is ModalData.EnterPassword -> {} //in new selector
 			is ModalData.LogRight -> {} //migrated to bottom sheet
 			is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(
 				signerDataModel = signerDataModel

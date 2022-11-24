@@ -130,7 +130,7 @@ fun RowButtonsBottomSheet(
 }
 
 @Composable
-fun SignerBottomSheetDivider() {
+fun SignerDivider() {
 	Divider(
 		color = MaterialTheme.colors.appliedSeparator,
 		thickness = 1.dp,
@@ -162,7 +162,7 @@ private fun PreviewCtaButtons() {
 			)
 			SecondaryButtonBottomSheet("Secondary Bottom Sheet") {}
 			SecondaryButtonBottomSheet("Secondary with background", withBackground = true) {}
-			SignerBottomSheetDivider()
+			SignerDivider()
 		}
 	}
 }
