@@ -17,7 +17,7 @@ use zeroize::Zeroize;
 
 use crate::actions::Action;
 use crate::alerts::Alert;
-use crate::export_signatues_bulk;
+use crate::export_signatures_bulk;
 use crate::modals::Modal;
 use crate::screens::{
     AddressState, AddressStateMulti, DeriveState, KeysState, RecoverSeedPhraseState, Screen,
@@ -1707,7 +1707,7 @@ impl State {
                 _ => None,
             },
             Modal::SignatureReady(ref a) => Some(ModalData::SignatureReady {
-                f: export_signatues_bulk(a.clone())?,
+                f: export_signatures_bulk(a)?,
             }),
             Modal::EnterPassword => match new_navstate.screen {
                 Screen::Transaction(ref t) => {

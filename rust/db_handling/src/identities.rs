@@ -42,6 +42,7 @@ use sled::Batch;
 use sp_core::H256;
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
+use sp_runtime::MultiSignature;
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_runtime::MultiSigner;
 use std::{collections::HashMap, path::Path};
@@ -114,13 +115,15 @@ impl From<SignaturesBulkV1> for SignaturesBulk {
 
 #[derive(Clone, Encode, Decode)]
 pub struct SignaturesBulkV1 {
-    /// `MultiSignature`s in encoded form.
-    signatures: Vec<Vec<u8>>,
+    /// Array of signatures.
+    signatures: Vec<MultiSignature>,
 }
 
-impl From<Vec<Vec<u8>>> for SignaturesBulkV1 {
-    fn from(signatures: Vec<Vec<u8>>) -> Self {
-        Self { signatures }
+impl From<&[MultiSignature]> for SignaturesBulkV1 {
+    fn from(signatures: &[MultiSignature]) -> Self {
+        Self {
+            signatures: signatures.to_owned(),
+        }
     }
 }
 

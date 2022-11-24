@@ -1,8 +1,9 @@
 use std::{collections::HashMap, path::Path};
 
 use definitions::navigation::MAddressCard;
+use sp_runtime::MultiSignature;
 use transaction_parsing::{produce_output, TransactionAction};
-use transaction_signing::Error as SignError;
+use transaction_signing::{Error as SignError, SignatureType};
 
 use crate::{Error, Result};
 
@@ -16,7 +17,9 @@ pub enum SignResult {
     RequestPassword { idx: usize, counter: u8 },
 
     /// All signatures are ready.
-    Ready { signatures: Vec<Vec<u8>> },
+    Ready {
+        signatures: Vec<(MultiSignature, SignatureType)>,
+    },
 }
 
 /// State of transaction screen.
@@ -60,7 +63,7 @@ pub struct TransactionState {
     currently_signing: usize,
 
     /// Accumulates already-produced signatures.
-    signatures: Vec<Vec<u8>>,
+    signatures: Vec<(MultiSignature, SignatureType)>,
 }
 
 impl TransactionState {
@@ -149,13 +152,16 @@ impl TransactionState {
                     self.currently_signing,
                     action.network_info.specs.encryption,
                 ) {
-                    Ok((signature, new_checksum)) => {
+                    Ok(signature_and_checksum) => {
                         // If signed successfully progress to the
                         // next transaction in the bulk.
                         self.currently_signing += 1;
                         self.counter = 1;
-                        *checksum = new_checksum;
-                        self.signatures.push(hex::decode(signature)?);
+                        *checksum = signature_and_checksum.new_checksum();
+                        self.signatures.push((
+                            signature_and_checksum.signature().clone(),
+                            signature_and_checksum.signature_type(),
+                        ));
 
                         // If this is the last tx, return
                         //

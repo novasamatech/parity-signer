@@ -7,7 +7,9 @@
 use db_handling::identities::{export_all_addrs, SignaturesBulk, SignaturesBulkV1};
 //do we support mutex?
 use lazy_static::lazy_static;
+use sp_runtime::MultiSignature;
 use std::{collections::HashMap, sync::Mutex};
+use transaction_signing::SignatureType;
 
 use definitions::navigation::{
     ActionResult, ExportedSet, MKeysInfoExport, MKeysNew, MSignatureReady,
@@ -82,15 +84,30 @@ pub fn export_key_info(
 }
 
 /// Export signatures bulk.
-pub fn export_signatues_bulk(signatures: Vec<Vec<u8>>) -> Result<MSignatureReady> {
+pub fn export_signatures_bulk(
+    signatures: &[(MultiSignature, SignatureType)],
+) -> Result<MSignatureReady> {
     let signatures = if signatures.len() > 1 {
-        let v1: SignaturesBulkV1 = signatures.into();
+        let v1: SignaturesBulkV1 = signatures
+            .iter()
+            .map(|s| s.0.clone())
+            .collect::<Vec<_>>()
+            .as_slice()
+            .into();
         let v1: SignaturesBulk = v1.into();
         let data = v1.encode();
 
         make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?
     } else {
-        vec![hex::encode(&signatures[0]).as_bytes().into()]
+        let encoded = match signatures[0].1 {
+            SignatureType::Transaction => hex::encode(&signatures[0].0.encode()),
+            SignatureType::Message => match &signatures[0].0 {
+                MultiSignature::Ed25519(a) => hex::encode(a),
+                MultiSignature::Sr25519(a) => hex::encode(a),
+                MultiSignature::Ecdsa(a) => hex::encode(a),
+            },
+        };
+        vec![encoded.as_bytes().into()]
     };
 
     Ok(MSignatureReady { signatures })

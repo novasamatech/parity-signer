@@ -12,9 +12,47 @@ use qrcode_static::{png_qr_from_string, DataType};
 use crate::sign_message::sign_as_address_key;
 use crate::{Error, Result};
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SignatureType {
+    Transaction,
+    Message,
+}
+
+pub struct SignatureAndChecksum {
+    signature_type: SignatureType,
+    signature: MultiSignature,
+    new_checksum: u32,
+}
+
+impl SignatureAndChecksum {
+    pub fn new_checksum(&self) -> u32 {
+        self.new_checksum
+    }
+
+    pub fn signature(&self) -> &MultiSignature {
+        &self.signature
+    }
+
+    pub fn signature_type(&self) -> SignatureType {
+        self.signature_type
+    }
+}
+
+impl ToString for SignatureAndChecksum {
+    fn to_string(&self) -> String {
+        match self.signature_type {
+            SignatureType::Transaction => hex::encode(self.signature.encode()),
+            SignatureType::Message => match &self.signature {
+                MultiSignature::Ed25519(a) => hex::encode(a),
+                MultiSignature::Sr25519(a) => hex::encode(a),
+                MultiSignature::Ecdsa(a) => hex::encode(a),
+            },
+        }
+    }
+}
+
 /// Function to create signatures using RN output action line, and user entered pin and password.
 /// Also needs database name to fetch saved transaction and key.
-
 pub fn create_signature<P: AsRef<Path>>(
     seed_phrase: &str,
     pwd_entry: &str,
@@ -23,7 +61,7 @@ pub fn create_signature<P: AsRef<Path>>(
     checksum: u32,
     idx: usize,
     encryption: Encryption,
-) -> Result<(String, u32)> {
+) -> Result<SignatureAndChecksum> {
     let sign = TrDbColdSign::from_storage(&database_name, Some(checksum))?
         .ok_or(db_handling::Error::Sign)?;
     let pwd = {
@@ -74,18 +112,18 @@ pub fn create_signature<P: AsRef<Path>>(
         }
     }?;
 
-    let encoded = match &content {
+    let signature_type = match &content {
         SignContent::Transaction {
             method: _,
             extensions: _,
-        } => hex::encode(signature.0.encode()),
-        SignContent::Message(_) => match signature.0 {
-            MultiSignature::Sr25519(a) => hex::encode(a),
-            MultiSignature::Ed25519(a) => hex::encode(a),
-            MultiSignature::Ecdsa(a) => hex::encode(a),
-        },
+        } => SignatureType::Transaction,
+        SignContent::Message(_) => SignatureType::Message,
     };
-    Ok((encoded, signature.1))
+    Ok(SignatureAndChecksum {
+        signature_type,
+        signature: signature.0,
+        new_checksum: signature.1,
+    })
 }
 
 pub fn create_signature_png(
@@ -97,7 +135,7 @@ pub fn create_signature_png(
     idx: usize,
     encryption: Encryption,
 ) -> Result<Vec<u8>> {
-    let hex_result = create_signature(
+    let signature = create_signature(
         seed_phrase,
         pwd_entry,
         user_comment,
@@ -106,6 +144,6 @@ pub fn create_signature_png(
         idx,
         encryption,
     )?;
-    let qr_data = png_qr_from_string(&hex_result.0, DataType::Regular)?;
+    let qr_data = png_qr_from_string(&signature.to_string(), DataType::Regular)?;
     Ok(qr_data)
 }

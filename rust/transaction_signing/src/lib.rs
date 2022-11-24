@@ -20,7 +20,7 @@ mod tests;
 mod error;
 pub use error::{Error, Result};
 
-pub use sign_transaction::create_signature;
+pub use sign_transaction::{create_signature, SignatureAndChecksum, SignatureType};
 
 pub fn handle_stub(checksum: u32, database_name: &str) -> Result<()> {
     Ok(TrDbColdStub::from_storage(database_name, checksum)?.apply(database_name)?)

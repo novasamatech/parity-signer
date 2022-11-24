@@ -347,7 +347,7 @@ fn bulk_signing_test_unpassworded() {
         assert_eq!(signatures.len(), 2);
 
         for (tx, signature) in encoded_transactions_prefixed.iter().zip(signatures.iter()) {
-            assert!(signature_is_good(tx, &hex::encode(signature)));
+            assert!(signature_is_good(tx, &hex::encode(signature.0.encode())));
         }
     } else {
         panic!("Unexpected sign result {:?}", result);
@@ -489,7 +489,7 @@ fn bulk_signing_test_passworded() {
         assert_eq!(signatures.len(), 3);
 
         for (tx, signature) in encoded_transactions_prefixed.iter().zip(signatures.iter()) {
-            assert!(signature_is_good(tx, &hex::encode(signature)));
+            assert!(signature_is_good(tx, &hex::encode(signature.0.encode())));
         }
     } else {
         panic!("Unexpected sign result: {:?}", result);

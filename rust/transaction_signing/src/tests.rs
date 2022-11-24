@@ -71,7 +71,7 @@ fn sign_action_test(
         0,
         encryption,
     )
-    .map(|r| r.0)
+    .map(|r| r.to_string())
 }
 
 fn identicon_to_str(identicon: &[u8]) -> &str {
