@@ -27,6 +27,19 @@ fun PrimaryButtonBottomSheet(
 	isEnabled: Boolean = true,
 	onClicked: Callback,
 ) {
+	PrimaryButtonNotWide(
+		label, modifier.fillMaxWidth(1f),
+		isEnabled, onClicked
+	)
+}
+
+@Composable
+fun PrimaryButtonNotWide(
+	label: String,
+	modifier: Modifier = Modifier,
+	isEnabled: Boolean = true,
+	onClicked: Callback
+) {
 	Column(
 		modifier = modifier
 			.run {
@@ -44,7 +57,6 @@ fun PrimaryButtonBottomSheet(
 				},
 				RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
 			)
-			.fillMaxWidth()
 			.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)),
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
@@ -176,7 +188,7 @@ private fun PreviewCtaButtons() {
 			RowButtonsBottomSheet(
 				labelCancel = "Cancel",
 				labelCta = "Apply",
-				onClickedCancel = { },
+				onClickedCancel = {},
 				onClickedCta = {},
 			)
 			SecondaryButtonBottomSheet("Secondary Bottom Sheet") {}
@@ -184,6 +196,7 @@ private fun PreviewCtaButtons() {
 				"Secondary with background",
 				withBackground = true
 			) {}
+			PrimaryButtonNotWide(label = "primary slim") {}
 			SignerBottomSheetDivider()
 		}
 	}
