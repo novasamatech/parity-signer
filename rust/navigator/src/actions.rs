@@ -4,7 +4,7 @@
 //use crate::navstate::{Navstate, State};
 
 ///All actions
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Eq, Debug)]
 pub enum Action {
     Start,
     NavbarLog,

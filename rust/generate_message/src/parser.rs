@@ -1,5 +1,5 @@
 //! Command line parser for the client
-use constants::FOLDER;
+use constants::{COLD_DB_NAME_RELEASE, EXPORT_FOLDER, FOLDER, HOT_DB_NAME};
 use definitions::{
     crypto::{Encryption, SufficientCrypto},
     helpers::unhex,
@@ -22,8 +22,14 @@ pub struct Cli {
 #[derive(Debug, Subcommand)]
 pub enum Command {
     /// Display content of the a given tree of the hot database
-    #[clap(subcommand)]
-    Show(Show),
+    Show {
+        #[clap(subcommand)]
+        s: Show,
+
+        /// Path to the hot database
+        #[arg(long= "hot-db-path", global = true, value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        db_path: PathBuf,
+    },
 
     /// Prepare payload for add-specs update
     ///
@@ -32,7 +38,7 @@ pub enum Command {
     /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
     /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
     /// - network specs
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
     /// from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
     /// - all associated metadata entries from [`METATREE`](constants::METATREE)
     /// if there are no other address book entries this metadata is associated
@@ -40,19 +46,27 @@ pub enum Command {
     /// - all associated meta block history entries from
     /// [`META_HISTORY`](constants::META_HISTORY) if there are no other address book
     /// entries this block history entries are associated with
-    #[clap(name = "add-specs")]
+    #[command(name = "add-specs")]
     Specs {
         #[clap(flatten)]
         s: InstructionSpecs,
     },
 
     /// Prepare payload for load-metadata update
-    #[clap(name = "load-metadata")]
+    #[command(name = "load-metadata")]
     Load(InstructionMeta),
 
     /// Prepare payload for load-types update
-    #[clap(name = "load-types")]
-    Types,
+    #[command(name = "load-types")]
+    Types {
+        /// Path to hot db
+        #[arg(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        db_path: PathBuf,
+
+        /// Folder to save payloads ready for signing
+        #[arg(long, value_name = "FOLDER_PATH", default_value = FOLDER)]
+        files_dir: PathBuf,
+    },
 
     /// Complete update generation according
     Make(Make),
@@ -67,7 +81,7 @@ pub enum Command {
     /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
     /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
     /// - network specs
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
     /// from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
     /// - all associated metadata entries from [`METATREE`](constants::METATREE)
     /// if there are no other address book entries this metadata is associated
@@ -75,8 +89,14 @@ pub enum Command {
     /// - all associated meta block history entries from
     /// [`META_HISTORY`](constants::META_HISTORY) if there are no other address book
     /// entries this block history entries are associated with
-    #[clap(subcommand)]
-    Remove(Remove),
+    Remove {
+        #[clap(subcommand)]
+        r: Remove,
+
+        /// Path to the hot database
+        #[arg(long="hot-db-path", global=true, value_name="HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        db_path: PathBuf,
+    },
 
     /// Restore hot database to default state
     ///
@@ -93,7 +113,11 @@ pub enum Command {
     /// [`META_HISTORY`](constants::META_HISTORY)
     ///
     /// Default networks are Polkadot, Kusama, and Westend.
-    RestoreDefaults,
+    RestoreDefaults {
+        /// Path to hot db
+        #[arg(long = "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        db_path: PathBuf,
+    },
 
     /// Generate release cold database at optionally provided path
     ///
@@ -127,12 +151,17 @@ pub enum Command {
     ///
     /// Metadata is transferred only for the networks that are known to the cold
     /// database, i.e. the ones having
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
+    /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry in
     /// [`SPECSTREE`](constants::SPECSTREE).
-    #[clap(name = "transfer-meta")]
+    #[command(name = "transfer-meta")]
     TransferMetaToColdRelease {
         /// Path to release db
-        path: Option<PathBuf>,
+        #[arg(long, value_name = "COLD_DB_PATH", default_value = COLD_DB_NAME_RELEASE)]
+        cold_db: PathBuf,
+
+        /// Path to hot db
+        #[arg(long, value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        hot_db: PathBuf,
     },
 
     /// Make derivations import QR and/or hexadecimal string file
@@ -151,8 +180,8 @@ pub enum Command {
     /// codes before the metadata becomes accessible from the node.
     ///
     /// Network name found in the metadata is used to find
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) for
-    /// the network. `NetworkSpecsToSend` are used to get genesis hash and to check
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) for
+    /// the network. `NetworkSpecs` are used to get genesis hash and to check
     /// base58 prefix, it the network metadata has base58 prefix inside.
     ///
     /// A raw bytes update payload file is generated in dedicated
@@ -167,12 +196,20 @@ pub enum Command {
     /// added if the same metadata is later fetched from a node.
     Unwasm {
         /// WASM file
-        #[clap(long, short)]
+        #[arg(long, short)]
         filename: String,
 
         /// update the DB.
-        #[clap(long, short)]
+        #[arg(long, short)]
         update_db: bool,
+
+        /// Hot database path
+        #[arg(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        db_path: PathBuf,
+
+        /// Folder to save payloads ready for signing
+        #[arg(long, default_value = FOLDER)]
+        files_dir: PathBuf,
     },
 
     /// Make file with hexadecimal metadata for defaults release metadata set
@@ -185,12 +222,20 @@ pub enum Command {
     /// hexadecimal network metadata.
     MetaDefaultFile {
         /// File name
-        #[clap(long, value_name = "NETWORK NAME")]
+        #[arg(long, value_name = "NETWORK NAME")]
         name: String,
 
         /// Version
-        #[clap(long, value_name = "NETWORK VERSION")]
+        #[arg(long, value_name = "NETWORK VERSION")]
         version: u32,
+
+        /// Hot database path
+        #[arg(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+        db_path: PathBuf,
+
+        /// Folder to save completed update messages
+        #[arg(long, default_value = EXPORT_FOLDER)]
+        export_dir: PathBuf,
     },
 
     /// Create file with network metadata at block hash
@@ -201,12 +246,57 @@ pub enum Command {
     /// This command does not address or update the hot database.
     MetaAtBlock {
         /// URL of the chain RPC point
-        #[clap(long, value_name = "RPC URL")]
+        #[arg(long, value_name = "RPC URL")]
         url: String,
 
         /// Hash of the block at which meta is asked
-        #[clap(long, value_name = "BLOCK HASH")]
+        #[arg(long, value_name = "BLOCK HASH")]
         block_hash: String,
+
+        /// Folder to save completed update messages
+        #[arg(long, default_value = EXPORT_FOLDER)]
+        export_dir: PathBuf,
+    },
+
+    /// Encode payload to multiframe QR
+    #[command(group(clap::ArgGroup::new("encodekey")
+                .required(true)
+                .args(&["path", "hex"])
+    ))]
+    EncodeToQr {
+        /// Path to a file to encode
+        #[arg(long, value_name = "FILE PATH")]
+        path: Option<PathBuf>,
+
+        /// Hex-encoded payload to encode
+        #[arg(long, value_name = "HEX ENCODED PAYLOAD")]
+        hex: Option<String>,
+
+        /// Size of a chunk in a multiframe RaptorQ encoding
+        #[arg(long, default_value = "128", value_name = "SIZE OF CHUNK")]
+        chunk_size: u16,
+
+        /// Destination file to write qr code to
+        #[arg(long, value_name = "FILE")]
+        dst_file: PathBuf,
+    },
+
+    /// Produce a test key info export QR
+    KeyInfoExportToQr {
+        #[arg(long, value_name = "FILE PATH")]
+        dst_file: PathBuf,
+
+        /// Size of a chunk in a multiframe RaptorQ encoding.
+        #[arg(long, value_name = "CHUNK SIZE")]
+        chunk_size: u16,
+
+        /// FPS of a multiframe RaptorQ encoding
+        #[arg(long, value_name = "FPS OF VIDEO QR")]
+        fps: u16,
+
+        /// Number of keys to generate and export
+        #[arg(long, value_name = "NUMBER OF TEST KEYS")]
+        keys_num: usize,
     },
 }
 
@@ -221,7 +311,7 @@ pub enum Show {
 
     /// Show network specs from entry.
     Specs {
-        #[clap(value_name = "ADDRESS BOOK TITLE")]
+        #[arg(value_name = "ADDRESS BOOK TITLE")]
         /// Address book title
         s: String,
     },
@@ -229,7 +319,7 @@ pub enum Show {
     /// Check that external file is valid network metadata and search for
     /// similar entry in hot database
     CheckFile {
-        #[clap(value_name = "METADATA FILE")]
+        #[arg(value_name = "METADATA FILE")]
         /// Path to metadata file
         s: String,
     },
@@ -238,7 +328,7 @@ pub enum Show {
     BlockHistory,
 }
 
-/// Command details for `load_metadata`.
+/// Command details for `load-metadata`.
 #[derive(clap::Args, Debug)]
 pub struct InstructionMeta {
     /// Setting key, as read from command line
@@ -248,6 +338,14 @@ pub struct InstructionMeta {
     /// Reference key, as read from command line
     #[clap(flatten)]
     pub content: ContentArgs,
+
+    /// Path to the hot database
+    #[arg(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+    pub db: PathBuf,
+
+    /// Folder to save payloads ready for signing
+    #[arg(long, default_value = FOLDER)]
+    pub files_dir: PathBuf,
 }
 
 impl From<SetFlags> for Set {
@@ -263,9 +361,9 @@ impl From<SetFlags> for Set {
     }
 }
 
-/// Command details for `add_specs`.
+/// Command details for `add-specs`.
 #[derive(clap::Args, Debug)]
-#[clap(group(clap::ArgGroup::new("referencekey")
+#[command(group(clap::ArgGroup::new("referencekey")
                 .required(true)
                 .args(&["all", "name", "address"])
 ))]
@@ -273,30 +371,38 @@ pub struct InstructionSpecs {
     #[clap(flatten)]
     pub set: SetFlags,
 
-    /// Overrides, relevant only for `add_specs` command
+    /// Overrides, relevant only for `add-specs` command
     #[clap(flatten)]
     pub over: Override,
 
     #[clap(flatten)]
     pub content: ContentArgs,
+
+    /// Path to the hot database
+    #[arg(long = "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+    pub db: PathBuf,
+
+    /// Folder to save payloads ready for signing
+    #[arg(long, default_value = FOLDER)]
+    pub files_dir: PathBuf,
 }
 
 #[derive(clap::Args, Debug, Default, Clone)]
 pub struct ContentArgs {
     /// Deal with all relevant database entries
-    #[clap(long, short)]
+    #[arg(long, short)]
     pub all: bool,
 
     /// Process only a specified network
-    #[clap(long, short)]
+    #[arg(long, short)]
     pub name: Option<String>,
 
     /// Process only the network referred to by URL address
-    #[clap(short = 'u', long = "url")]
+    #[arg(short = 'u', long = "url")]
     pub address: Option<String>,
 
     /// Skip errors
-    #[clap(long)]
+    #[arg(long)]
     pub pass_errors: bool,
 }
 
@@ -313,12 +419,12 @@ impl From<ContentArgs> for Content {
     }
 }
 
-/// Reference key for `load_metadata` and `add_specs` commands.
+/// Reference key for `load-metadata` and `add-specs` commands.
 #[derive(Subcommand, Debug)]
 pub enum Content {
     /// Deal with all relevant database entries
     All {
-        #[clap(short)]
+        #[arg(short)]
         /// Skip errors
         pass_errors: bool,
     },
@@ -326,73 +432,73 @@ pub enum Content {
     /// Process only a specified network
     Name {
         /// network name or network address book title
-        #[clap(long, short)]
+        #[arg(long, short)]
         s: String,
     },
 
     /// Process only the network referred to by URL address
     Address {
         /// Network address
-        #[clap(long, short)]
+        #[arg(long, short)]
         s: String,
     },
 }
 
-/// Setting key for `load_metadata` and `add_specs` commands.
+/// Setting key for `load-metadata` and `add-specs` commands.
 #[derive(clap::ValueEnum, Clone, Debug)]
 pub enum Set {
     /// Key `-d`: do **not** update the database, make RPC calls, and produce
     /// output files
-    #[clap(name = "-d")]
+    #[value(name = "-d")]
     D,
 
     /// Key `-f`: do **not** run RPC calls, produce output files from database
     /// as it is
-    #[clap(name = "-f")]
+    #[value(name = "-f")]
     F,
 
     /// Key `-k`: update database through RPC calls, produce output files only
     /// for **updated** database entries
-    #[clap(name = "-k")]
+    #[value(name = "-k")]
     K,
 
     /// Key `-p`: update database through RPC calls, do **not** produce any
     /// output files
-    #[clap(name = "-p")]
+    #[value(name = "-p")]
     P,
 
     /// Key `-t` (no setting key defaults here): update database through RPC
     /// calls, produce output files
-    #[clap(name = "-t")]
+    #[value(name = "-t")]
     T,
 }
 
 #[derive(clap::Args, Default, Clone, Debug)]
-#[clap(group(clap::ArgGroup::new("setflags")
+#[command(group(clap::ArgGroup::new("setflags")
                 .required(true)
                 .args(&["d", "f", "k", "p", "t"])
 ))]
 pub struct SetFlags {
     /// do not update the database, make RPC calls, and produce output files
-    #[clap(short = 'd')]
+    #[arg(short = 'd')]
     pub d: bool,
 
     /// do not run RPC calls, produce output files from database as it is
-    #[clap(short = 'f')]
+    #[arg(short = 'f')]
     pub f: bool,
 
     /// update database through RPC calls, produce output files only
     /// for updated database entries
-    #[clap(short = 'k')]
+    #[arg(short = 'k')]
     pub k: bool,
 
     /// update database through RPC calls, do **not** produce any output files
-    #[clap(short = 'p')]
+    #[arg(short = 'p')]
     pub p: bool,
 
     /// (no setting key defaults here): update database through RPC
     /// calls, produce output files
-    #[clap(short = 't')]
+    #[arg(short = 't')]
     pub t: bool,
 }
 
@@ -406,14 +512,14 @@ impl std::fmt::Display for Set {
 #[derive(clap::Args, Debug)]
 pub struct Make {
     /// payload
-    #[clap(long, name = "msg", value_parser)]
+    #[arg(long)]
     pub msg: Msg,
 
-    #[clap(long, name = "payload")]
+    #[arg(long)]
     pub payload: PathBuf,
 
     /// target output format
-    #[clap(long, name = "goal", value_parser, default_value_t = Goal::Both)]
+    #[arg(long, default_value_t = Goal::Both)]
     pub goal: Goal,
 
     #[clap(flatten)]
@@ -426,21 +532,25 @@ pub struct Make {
     pub sufficient: Sufficient,
 
     /// who is signing the payload
-    #[clap(long, name = "crypto", value_parser = encryption_from_args)]
+    #[arg(long, value_name = "crypto", value_parser = encryption_from_args)]
     pub crypto: Option<Encryption>,
 
     /// output name override
-    #[clap(long, name = "name")]
+    #[arg(long, value_name = "name")]
     pub name: Option<PathBuf>,
+
+    /// Folder to save payloads ready for signing
+    #[arg(long, default_value = FOLDER)]
+    pub files_dir: PathBuf,
+
+    /// Folder to save completed update messages
+    #[arg(long, default_value = EXPORT_FOLDER)]
+    pub export_dir: PathBuf,
 }
 
 impl Make {
     pub fn payload(&self) -> Result<Vec<u8>> {
-        Ok(std::fs::read(&format!(
-            "{}/{}",
-            FOLDER,
-            self.payload.to_string_lossy()
-        ))?)
+        Ok(std::fs::read(&self.files_dir.join(&self.payload))?)
     }
 
     pub fn crypto(&self) -> Result<Crypto> {
@@ -450,8 +560,8 @@ impl Make {
         ) {
             (Some(hex), None) => Some(unhex(hex)?),
             (None, Some(path)) => {
-                let sufficient_filename = format!("{}/{}", FOLDER, path);
-                Some(std::fs::read(&sufficient_filename)?)
+                let sufficient_filename = &self.files_dir.join(path);
+                Some(std::fs::read(sufficient_filename)?)
             }
             _ => None,
         } {
@@ -459,15 +569,15 @@ impl Make {
             return Ok(Crypto::Sufficient { s });
         }
         let verifier_public_key = match (
-            &self.verifier.verifier_alice,
+            self.verifier.verifier_alice,
             &self.verifier.verifier_hex,
             &self.verifier.verifier_file,
         ) {
-            (Some(e), None, None) => return Ok(Crypto::Alice { e: e.clone() }),
+            (Some(e), None, None) => return Ok(Crypto::Alice { e }),
             (None, Some(hex), None) => unhex(hex)?,
             (None, None, Some(path)) => {
-                let verifier_filename = format!("{}/{}", FOLDER, path.to_string_lossy());
-                std::fs::read(&verifier_filename)?
+                let verifier_filename = &self.files_dir.join(path);
+                std::fs::read(verifier_filename)?
             }
             f => {
                 if self.signature.signature_file.is_none() && self.signature.signature_hex.is_none()
@@ -485,14 +595,14 @@ impl Make {
         ) {
             (Some(hex), None) => unhex(hex)?,
             (None, Some(path)) => {
-                let signature_filename = format!("{}/{}", FOLDER, path);
-                std::fs::read(&signature_filename)?
+                let signature_filename = &self.files_dir.join(path);
+                std::fs::read(signature_filename)?
             }
             f => panic!("mutually exclusive flags: {:?}", f),
         };
 
         Ok(Crypto::Sufficient {
-            s: into_sufficient(verifier_public_key, signature, self.crypto.clone().unwrap())?,
+            s: into_sufficient(verifier_public_key, signature, self.crypto.unwrap())?,
         })
     }
 }
@@ -523,21 +633,21 @@ impl std::fmt::Display for Goal {
 
 /// Verifier-to-be, for `make` and `sign` commands.
 #[derive(clap::Args, Debug, Clone)]
-#[clap(group(clap::ArgGroup::new("verifier")
-                .args(&["alice", "HEX", "FILE"])
+#[command(group(clap::ArgGroup::new("verifier")
+                .args(&["verifier_alice", "verifier_hex", "verifier_file"])
         ))]
 pub struct Verifier {
     /// Use Alice key with a specified encryption scheme
-    #[clap(long, name = "alice", value_parser = encryption_from_args)]
-    verifier_alice: Option<Encryption>,
+    #[arg(long, value_name = "alice", value_parser = encryption_from_args)]
+    pub verifier_alice: Option<Encryption>,
 
     /// Specify Verifier as a hex string argument
-    #[clap(long, name = "HEX")]
-    verifier_hex: Option<String>,
+    #[arg(long, value_name = "HEX")]
+    pub verifier_hex: Option<String>,
 
     /// Read Verifier from a file
-    #[clap(long, name = "FILE")]
-    verifier_file: Option<PathBuf>,
+    #[arg(long, value_name = "FILE")]
+    pub verifier_file: Option<PathBuf>,
 }
 
 /// Verifier-to-be, for `make` and `sign` commands.
@@ -557,31 +667,31 @@ pub enum Crypto {
 }
 
 #[derive(clap::Args, Debug, Clone)]
-#[clap(group(clap::ArgGroup::new("signature")
-                .args(&["signature-hex", "signature-file"])
+#[command(group(clap::ArgGroup::new("signature")
+                .args(&["signature_hex", "signature_file"])
         ))]
 pub struct Signature {
     /// Supply signature in hex format as command line argument
-    #[clap(long, value_name = "HEX")]
-    signature_hex: Option<String>,
+    #[arg(long, value_name = "HEX")]
+    pub signature_hex: Option<String>,
 
     /// Read signature from a file
-    #[clap(long, value_name = "FILE")]
-    signature_file: Option<String>,
+    #[arg(long, value_name = "FILE")]
+    pub signature_file: Option<String>,
 }
 
 #[derive(clap::Args, Debug, Clone)]
-#[clap(group(clap::ArgGroup::new("sufficient")
-                .args(&["sufficient-hex", "sufficient-file"])
+#[command(group(clap::ArgGroup::new("sufficient")
+                .args(&["sufficient_hex", "sufficient_file"])
         ))]
 pub struct Sufficient {
     /// Supply signature in hex format as command line argument
-    #[clap(long, value_name = "HEX")]
-    sufficient_hex: Option<String>,
+    #[arg(long, value_name = "HEX")]
+    pub sufficient_hex: Option<String>,
 
     /// Read signature from a file
-    #[clap(long, value_name = "FILE")]
-    sufficient_file: Option<String>,
+    #[arg(long, value_name = "FILE")]
+    pub sufficient_file: Option<String>,
 }
 /// Payload for `make` and `sign` commands.
 ///
@@ -590,13 +700,13 @@ pub struct Sufficient {
 /// Payload content details are described in [`definitions::qr_transfers`].
 #[derive(clap::ValueEnum, Clone, Debug)]
 pub enum Msg {
-    /// `load_types` payload
+    /// `load-types` payload
     LoadTypes,
 
-    /// `load_metadata` payload
+    /// `load-metadata` payload
     LoadMetadata,
 
-    /// `add_specs` payload
+    /// `add-specs` payload
     AddSpecs,
 }
 
@@ -618,31 +728,35 @@ pub enum Remove {
 #[derive(clap::Args, Clone, Debug)]
 pub struct Derivations {
     /// Target output format
-    #[clap(long, value_parser)]
+    #[arg(long)]
     pub goal: Goal,
 
     /// Address book title for network in which addresses with imported
     /// derivations will be made in Signer
-    #[clap(long)]
+    #[arg(long)]
     pub title: String,
 
     /// Contents of the payload file
-    #[clap(long)]
+    #[arg(long)]
     pub derivations: String,
+
+    /// Path to the hot database
+    #[arg(long= "hot-db-path", value_name = "HOT_DB_PATH", default_value = HOT_DB_NAME)]
+    pub db: PathBuf,
 }
 
-/// Overrides for `add_specs` command.
+/// Overrides for `add-specs` command.
 #[derive(Args, Debug)]
 pub struct Override {
     /// [`Encryption`] override to specify encryption algorithm used by a new
     /// network or to add another encryption algorithm in known network.
-    #[clap(long, value_parser = encryption_from_args)]
+    #[arg(long, value_parser = encryption_from_args)]
     pub encryption: Option<Encryption>,
 
     /// Network title override, so that user can specify the network title in
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
     /// that determines under what title the network is displayed in the Signer
-    #[clap(long)]
+    #[arg(long)]
     pub title: Option<String>,
 
     /// Token override to specify decimals used to display balance in
@@ -653,7 +767,7 @@ pub struct Override {
     /// - network has no database record yet
     /// - network has multiple decimals and unit values, those were retrieved as
     /// arrays of equal size.
-    #[clap(long)]
+    #[arg(long)]
     pub token_decimals: Option<u8>,
 
     /// Token override to specify units used to display balance in
@@ -664,7 +778,7 @@ pub struct Override {
     /// - network has no database record yet
     /// - network has multiple decimals and unit values, those were retrieved as
     /// arrays of equal size.
-    #[clap(long)]
+    #[arg(long)]
     pub token_unit: Option<String>,
 }
 
@@ -685,7 +799,10 @@ fn encryption_from_args(s: &str) -> std::result::Result<Encryption, &'static str
         "ed25519" => Ok(Encryption::Ed25519),
         "sr25519" => Ok(Encryption::Sr25519),
         "ecdsa" => Ok(Encryption::Ecdsa),
-        _ => Err("unexpected encryption type, expected `ed25519`, `sr25519` or `ecdsa`"),
+        "ethereum" => Ok(Encryption::Ethereum),
+        _ => {
+            Err("unexpected encryption type, expected `ed25519`, `sr25519`, `ecdsa` or `ethereum`")
+        }
     }
 }
 
@@ -737,7 +854,7 @@ fn into_sufficient(
             let signature = sr25519::Signature::from_raw(into_sign);
             Ok(SufficientCrypto::Sr25519 { public, signature })
         }
-        Encryption::Ecdsa => {
+        Encryption::Ecdsa | Encryption::Ethereum => {
             let into_pubkey = vec_to_pubkey_array(verifier_public_key)?;
             let public = ecdsa::Public::from_raw(into_pubkey);
             let into_sign = vec_to_signature_array(signature)?;

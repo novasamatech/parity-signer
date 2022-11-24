@@ -2,7 +2,7 @@
 //!
 //! Cold database has following trees:  
 //!
-//! - `SPECSTREE`, for network specs `NetworkSpecs` entries, with keys
+//! - `SPECSTREE`, for network specs `OrderedNetworkSpecs` entries, with keys
 //! [`NetworkSpecsKey`]  
 //! - `VERIFIERS`, for network verifier [`CurrentVerifier`](crate::network_specs::CurrentVerifier)
 //! entries, with keys [`VerifierKey`]  
@@ -20,7 +20,7 @@
 //!
 //! Hot database has following trees:  
 //!
-//! - `SPECSTREEPREP`, for network specs [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+//! - `SPECSTREEPREP`, for network specs [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
 //! entries, with keys [`NetworkSpecsKey`]  
 //! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and
 //! prefix search with [`MetaKeyPrefix`]  
@@ -37,7 +37,6 @@ use sp_runtime::MultiSigner;
 
 #[cfg(feature = "signer")]
 use crate::helpers::{get_multisigner, unhex};
-#[cfg(feature = "active")]
 use crate::{
     crypto::Encryption,
     error::{Error, Result},
@@ -46,8 +45,8 @@ use crate::{
 /// Key in `SPECSTREE` tree (cold database) and in `SPECSPREPTREE` (hot database)  
 ///
 /// [`NetworkSpecsKey`] is used to retrieve the
-/// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) in cold database and
-/// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) in hot
+/// [`OrderedNetworkSpecs`](crate::network_specs::OrderedNetworkSpecs) in cold database and
+/// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) in hot
 /// database.  
 ///
 /// Key is derived from network genesis hash and encryption algorithm.  
@@ -55,7 +54,7 @@ use crate::{
 /// Network could support more than one encryption algorithm. In this case
 /// there would be more than one database entry with different
 /// [`NetworkSpecsKey`] values. Such entries do not conflict.  
-#[derive(Decode, Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub struct NetworkSpecsKey(Vec<u8>);
 
 /// Decoded `NetworkSpecsKey` content, encryption-based variants with vector
@@ -65,6 +64,7 @@ enum NetworkSpecsKeyContent {
     Ed25519(H256),
     Sr25519(H256),
     Ecdsa(H256),
+    Ethereum(H256),
 }
 
 impl NetworkSpecsKey {
@@ -75,6 +75,7 @@ impl NetworkSpecsKey {
             Encryption::Ed25519 => NetworkSpecsKeyContent::Ed25519(*genesis_hash),
             Encryption::Sr25519 => NetworkSpecsKeyContent::Sr25519(*genesis_hash),
             Encryption::Ecdsa => NetworkSpecsKeyContent::Ecdsa(*genesis_hash),
+            Encryption::Ethereum => NetworkSpecsKeyContent::Ethereum(*genesis_hash),
         };
         Self(network_key_content.encode())
     }
@@ -103,6 +104,7 @@ impl NetworkSpecsKey {
             NetworkSpecsKeyContent::Ed25519(b) => Ok((b, Encryption::Ed25519)),
             NetworkSpecsKeyContent::Sr25519(b) => Ok((b, Encryption::Sr25519)),
             NetworkSpecsKeyContent::Ecdsa(b) => Ok((b, Encryption::Ecdsa)),
+            NetworkSpecsKeyContent::Ethereum(b) => Ok((b, Encryption::Ethereum)),
         }
     }
 
@@ -123,7 +125,7 @@ impl NetworkSpecsKey {
 ///
 /// - network specs, for any encryption algorithm  
 /// - network metadata
-#[derive(Decode, Encode, Debug, Clone, PartialEq)]
+#[derive(Decode, Encode, Debug, Clone, PartialEq, Eq)]
 pub struct VerifierKey(H256);
 
 impl VerifierKey {
@@ -180,7 +182,7 @@ impl VerifierKey {
 /// For the user interface these addresses would appear as separate entities,
 /// however, the database stores them under same [`AddressKey`], with a set of
 /// allowed networks.  
-#[derive(Decode, Encode, Debug, PartialEq, Clone)]
+#[derive(Decode, Encode, Debug, PartialEq, Eq, Clone)]
 pub struct AddressKey(Vec<u8>);
 
 /// Decoded `AddressKey` content, struct with `MultiSigner` inside  
@@ -347,7 +349,7 @@ impl MetaKeyPrefix {
 ///
 /// Order is generated from the number of the history entry in the database
 /// `HISTORY` tree.  
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Order(u32);
 
 impl Order {
@@ -434,7 +436,7 @@ mod tests {
     #[test]
     fn error_in_network_specs_key_signer() {
         let network_specs_key_hex =
-            "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+            "0450e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
         let network_specs_key = NetworkSpecsKey::from_hex(network_specs_key_hex).unwrap();
         let error = network_specs_key.genesis_hash_encryption().unwrap_err();
         if let Error::CodecError(_) = error {
@@ -446,7 +448,7 @@ mod tests {
     #[test]
     fn error_in_network_specs_key_active() {
         let network_specs_key_hex =
-            "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+            "0450e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
         let network_specs_key =
             NetworkSpecsKey::from_ivec(&IVec::from(hex::decode(network_specs_key_hex).unwrap()));
         let error = network_specs_key.genesis_hash_encryption().unwrap_err();

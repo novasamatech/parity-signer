@@ -30,7 +30,7 @@ use crate::{
     keyring::VerifierKey,
     metadata::MetaValues,
     network_specs::{
-        NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier, VerifierValue,
+        NetworkSpecs, OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue,
     },
     qr_transfers::ContentLoadTypes,
 };
@@ -38,7 +38,7 @@ use crate::{
 /// Event content for importing or removing metadata of a known network
 ///
 /// Contains network name, network version, metadata hash.
-#[derive(Debug, Decode, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Eq, Clone)]
 pub struct MetaValuesDisplay {
     pub name: String,
     pub version: u32,
@@ -70,7 +70,7 @@ impl MetaValuesDisplay {
 /// Effectively records that network metadata was signed by user.
 /// Contains network name, network version, metadata hash, and [`VerifierValue`]
 /// of address used for `SufficientCrypto` generation.  
-#[derive(Debug, Decode, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Eq, Clone)]
 pub struct MetaValuesExport {
     pub name: String,
     pub version: u32,
@@ -101,24 +101,24 @@ impl MetaValuesExport {
 }
 
 /// Event content for importing or removing network specs  
-#[derive(Debug, Decode, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Eq, Clone)]
 pub struct NetworkSpecsDisplay {
-    pub specs: NetworkSpecs,
+    pub network: OrderedNetworkSpecs,
     pub valid_current_verifier: ValidCurrentVerifier,
     pub general_verifier: Verifier,
 }
 
 impl NetworkSpecsDisplay {
-    /// Generate [`NetworkSpecsDisplay`] from [`NetworkSpecs`],
+    /// Generate [`NetworkSpecsDisplay`] from [`OrderedNetworkSpecs`],
     /// network-associated [`ValidCurrentVerifier`], and
     /// general verifier [`Verifier`]
     pub fn get(
-        specs: &NetworkSpecs,
+        specs: &OrderedNetworkSpecs,
         valid_current_verifier: &ValidCurrentVerifier,
         general_verifier: &Verifier,
     ) -> Self {
         Self {
-            specs: specs.to_owned(),
+            network: specs.to_owned(),
             valid_current_verifier: valid_current_verifier.to_owned(),
             general_verifier: general_verifier.to_owned(),
         }
@@ -129,18 +129,18 @@ impl NetworkSpecsDisplay {
 /// QR code for `add_specs` message  
 ///
 /// Effectively records that network specs were signed by user.
-/// Contains [`NetworkSpecsToSend`] and [`VerifierValue`] of address used for
+/// Contains [`NetworkSpecs`] and [`VerifierValue`] of address used for
 /// `SufficientCrypto` generation.  
-#[derive(Debug, Decode, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Eq, Clone)]
 pub struct NetworkSpecsExport {
-    pub specs_to_send: NetworkSpecsToSend,
+    pub specs_to_send: NetworkSpecs,
     pub signed_by: VerifierValue,
 }
 
 impl NetworkSpecsExport {
-    /// Generate [`NetworkSpecsExport`] from [`NetworkSpecsToSend`] and
+    /// Generate [`NetworkSpecsExport`] from [`NetworkSpecs`] and
     /// [`VerifierValue`] of address used for `SufficientCrypto` generation.  
-    pub fn get(specs_to_send: &NetworkSpecsToSend, signed_by: &VerifierValue) -> Self {
+    pub fn get(specs_to_send: &NetworkSpecs, signed_by: &VerifierValue) -> Self {
         Self {
             specs_to_send: specs_to_send.to_owned(),
             signed_by: signed_by.to_owned(),
@@ -149,7 +149,7 @@ impl NetworkSpecsExport {
 }
 
 /// Event content for setting network verifier
-#[derive(Debug, Decode, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Eq, Clone)]
 pub struct NetworkVerifierDisplay {
     pub genesis_hash: H256,
     pub valid_current_verifier: ValidCurrentVerifier,
@@ -176,7 +176,7 @@ impl NetworkVerifierDisplay {
 /// Event content for importing or removing types information
 ///
 /// Contains hash of SCALE-encoded types data and types information [`Verifier`].
-#[derive(Debug, Decode, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Eq, Clone)]
 pub struct TypesDisplay {
     pub types_hash: H256,
     pub verifier: Verifier,
@@ -205,7 +205,7 @@ impl TypesDisplay {
 ///
 /// Effectively records that types information was signed by user.
 /// used for `SufficientCrypto` generation.  
-#[derive(Debug, Decode, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Eq, Clone)]
 pub struct TypesExport {
     /// Hash of SCALE-encoded types data
     pub types_hash: H256,
@@ -232,7 +232,7 @@ impl TypesExport {
 }
 
 /// Event content for address generation or removal.
-#[derive(Debug, Decode, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Eq, Clone)]
 pub struct IdentityHistory {
     /// The name of the seed.
     pub seed_name: String,
@@ -283,7 +283,7 @@ impl IdentityHistory {
 
 /// History log information about transactions, both successfully signed and
 /// the ones with wrong password entered by user
-#[derive(Debug, Decode, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Eq, Clone)]
 pub struct SignDisplay {
     /// raw `Vec<u8>` transaction that user either tried to sign or signed  
     pub transaction: Vec<u8>,
@@ -357,7 +357,7 @@ impl SignDisplay {
 
 /// History log information about messages, both successfully signed and
 /// the ones with wrong password entered by user
-#[derive(Debug, Decode, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Eq, Clone)]
 pub struct SignMessageDisplay {
     /// decoded message
     pub message: String,
@@ -391,7 +391,7 @@ impl SignMessageDisplay {
 }
 
 /// Events that could be recorded in the history log
-#[derive(PartialEq, Debug, Decode, Encode, Clone)]
+#[derive(PartialEq, Eq, Debug, Decode, Encode, Clone)]
 #[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum Event {
     /// Network metadata was added
@@ -488,6 +488,9 @@ pub enum Event {
     /// text on screen (stored value here is the seed name)
     SeedNameWasShown { seed_name_was_shown: String }, // for individual seed_name
 
+    /// User has generated QR code for secret key export
+    SecretWasExported { identity_history: IdentityHistory },
+
     /// A warning was produces and displayed to user
     Warning { warning: String },
 
@@ -548,19 +551,21 @@ pub fn all_events_preview() -> Vec<Event> {
             .expect("known value")
             .try_into()
             .expect("known value");
-    let network_specs = NetworkSpecs {
-        base58prefix: 42,
-        color: String::from("#660D35"),
-        decimals: 12,
-        encryption: Encryption::Sr25519,
-        genesis_hash: sp_core::H256::from(known_value),
-        logo: String::from("westend"),
-        name: String::from("westend"),
+    let ordered_network_specs = OrderedNetworkSpecs {
+        specs: NetworkSpecs {
+            base58prefix: 42,
+            color: String::from("#660D35"),
+            decimals: 12,
+            encryption: Encryption::Sr25519,
+            genesis_hash: sp_core::H256::from(known_value),
+            logo: String::from("westend"),
+            name: String::from("westend"),
+            path_id: String::from("//westend"),
+            secondary_color: String::from("#262626"),
+            title: String::from("Westend"),
+            unit: String::from("WND"),
+        },
         order: 3,
-        path_id: String::from("//westend"),
-        secondary_color: String::from("#262626"),
-        title: String::from("Westend"),
-        unit: String::from("WND"),
     };
     vec![
         Event::MetadataAdded {
@@ -574,27 +579,27 @@ pub fn all_events_preview() -> Vec<Event> {
         },
         Event::NetworkSpecsAdded {
             network_specs_display: NetworkSpecsDisplay::get(
-                &network_specs,
+                &ordered_network_specs,
                 &valid_current_verifier,
                 &verifier,
             ),
         },
         Event::NetworkSpecsRemoved {
             network_specs_display: NetworkSpecsDisplay::get(
-                &network_specs,
+                &ordered_network_specs,
                 &valid_current_verifier,
                 &verifier,
             ),
         },
         Event::NetworkSpecsSigned {
             network_specs_export: NetworkSpecsExport::get(
-                &network_specs.to_send(),
+                &ordered_network_specs.specs,
                 &verifier_value,
             ),
         },
         Event::NetworkVerifierSet {
             network_verifier_display: NetworkVerifierDisplay::get(
-                &VerifierKey::from_parts(network_specs.genesis_hash),
+                &VerifierKey::from_parts(ordered_network_specs.specs.genesis_hash),
                 &valid_current_verifier,
                 &verifier,
             ),
@@ -649,7 +654,7 @@ pub fn all_events_preview() -> Vec<Event> {
                 &Encryption::Sr25519,
                 &public,
                 "//",
-                network_specs.genesis_hash,
+                ordered_network_specs.specs.genesis_hash,
             ),
         },
         Event::IdentityRemoved {
@@ -658,7 +663,7 @@ pub fn all_events_preview() -> Vec<Event> {
                 &Encryption::Sr25519,
                 &public,
                 "//",
-                network_specs.genesis_hash,
+                ordered_network_specs.specs.genesis_hash,
             ),
         },
         Event::IdentitiesWiped,
@@ -669,6 +674,15 @@ pub fn all_events_preview() -> Vec<Event> {
         },
         Event::SeedNameWasShown {
             seed_name_was_shown: String::from("AliceSecretSeed"),
+        },
+        Event::SecretWasExported {
+            identity_history: IdentityHistory::get(
+                "Alice",
+                &Encryption::Sr25519,
+                &public,
+                "//1",
+                ordered_network_specs.specs.genesis_hash,
+            ),
         },
         Event::Warning {
             warning: String::from("Received network information is not verified."),

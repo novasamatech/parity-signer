@@ -10,6 +10,7 @@ use definitions::{
     users::AddressDetails,
 };
 use parser::{cut_method_extensions, decoding_commons::OutputCard, parse_extensions, parse_method};
+use std::path::Path;
 
 use crate::cards::{make_author_info, Card, Warning};
 use crate::error::{Error, Result};
@@ -39,9 +40,12 @@ enum CardsPrep<'a> {
 /// i.e. it starts with 53****, followed by author address, followed by actual transaction piece,
 /// followed by extrinsics, concluded with chain genesis hash
 
-pub(crate) fn parse_transaction(data_hex: &str, database_name: &str) -> Result<TransactionAction> {
+pub(crate) fn parse_transaction<P>(data_hex: &str, db_path: P) -> Result<TransactionAction>
+where
+    P: AsRef<Path>,
+{
     let (author_multi_signer, parser_data, genesis_hash, encryption) =
-        multisigner_msg_genesis_encryption(data_hex)?;
+        multisigner_msg_genesis_encryption(&db_path, data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
     // Some(true/false) should be here by the standard; should stay None for now, as currently existing transactions apparently do not comply to standard.
@@ -55,19 +59,19 @@ pub(crate) fn parse_transaction(data_hex: &str, database_name: &str) -> Result<T
     let mut index: u32 = 0;
     let indent: u32 = 0;
 
-    match try_get_network_specs(database_name, &network_specs_key)? {
+    match try_get_network_specs(&db_path, &network_specs_key)? {
         Some(network_specs) => {
             let address_key = AddressKey::from_multisigner(&author_multi_signer);
             let mut history: Vec<Event> = Vec::new();
 
-            let mut cards_prep = match try_get_address_details(database_name, &address_key)? {
+            let mut cards_prep = match try_get_address_details(&db_path, &address_key)? {
                 Some(address_details) => {
                     if address_details.network_id.contains(&network_specs_key) {
                         CardsPrep::SignProceed(address_details, None)
                     } else {
                         let author_card = (Card::Author {
                             author: &author_multi_signer,
-                            base58prefix: network_specs.base58prefix,
+                            base58prefix: network_specs.specs.base58prefix,
                             address_details: &address_details,
                         })
                         .card(&mut index, indent);
@@ -80,23 +84,20 @@ pub(crate) fn parse_transaction(data_hex: &str, database_name: &str) -> Result<T
                 None => CardsPrep::ShowOnly(
                     (Card::AuthorPlain {
                         author: &author_multi_signer,
-                        base58prefix: network_specs.base58prefix,
+                        base58prefix: network_specs.specs.base58prefix,
                     })
                     .card(&mut index, indent),
                     Box::new((Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent)),
                 ),
             };
 
-            let short_specs = network_specs.short();
-            let (method_data, extensions_data) = match cut_method_extensions(&parser_data) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::SeparateMethodExtensions),
-            };
+            let short_specs = network_specs.specs.short();
+            let (method_data, extensions_data) = cut_method_extensions(&parser_data)?;
 
-            let meta_set = find_meta_set(&short_specs, database_name)?;
+            let meta_set = find_meta_set(&short_specs, &db_path)?;
             if meta_set.is_empty() {
                 return Err(Error::NoMetadata {
-                    name: network_specs.name,
+                    name: network_specs.specs.name,
                 });
             }
             let mut found_solution = None;
@@ -104,7 +105,7 @@ pub(crate) fn parse_transaction(data_hex: &str, database_name: &str) -> Result<T
             let latest_version = meta_set[0].version();
             for (i, x) in meta_set.iter().enumerate() {
                 let used_version = x.version();
-                let metadata_bundle = bundle_from_meta_set_element(x, database_name)?;
+                let metadata_bundle = bundle_from_meta_set_element(x, &db_path)?;
                 match parse_extensions(
                     extensions_data.to_vec(),
                     &metadata_bundle,
@@ -154,17 +155,16 @@ pub(crate) fn parse_transaction(data_hex: &str, database_name: &str) -> Result<T
                                                 method: method_data,
                                                 extensions: extensions_data,
                                             },
-                                            &network_specs.name,
+                                            &network_specs.specs.name,
                                             &address_details.path,
                                             address_details.has_pwd,
                                             &author_multi_signer,
                                             history,
                                         );
-                                        let checksum =
-                                            sign.store_and_get_checksum(database_name)?;
+                                        let checksum = sign.store_and_get_checksum(&db_path)?;
                                         let author_info = make_author_info(
                                             &author_multi_signer,
-                                            network_specs.base58prefix,
+                                            network_specs.specs.base58prefix,
                                             &address_details,
                                         );
                                         let warning = possible_warning
@@ -211,7 +211,7 @@ pub(crate) fn parse_transaction(data_hex: &str, database_name: &str) -> Result<T
                                             .map(|w| vec![w]);
                                         let author = Card::Author {
                                             author: &author_multi_signer,
-                                            base58prefix: network_specs.base58prefix,
+                                            base58prefix: network_specs.specs.base58prefix,
                                             address_details: &address_details,
                                         }
                                         .card(&mut index, indent);
@@ -254,7 +254,7 @@ pub(crate) fn parse_transaction(data_hex: &str, database_name: &str) -> Result<T
             match found_solution {
                 Some(a) => Ok(a),
                 None => Err(Error::AllExtensionsParsingFailed {
-                    network_name: network_specs.name,
+                    network_name: network_specs.specs.name,
                     errors: error_collection,
                 }), // author: [], hint: [], error: []
             }
@@ -287,10 +287,13 @@ fn into_cards(set: &[OutputCard], index: &mut u32) -> Vec<TransactionCard> {
         .collect()
 }
 
-pub fn entry_to_transactions_with_decoding(
+pub fn entry_to_transactions_with_decoding<P>(
     entry: Entry,
-    database_name: &str,
-) -> Result<Vec<MEventMaybeDecoded>> {
+    db_path: P,
+) -> Result<Vec<MEventMaybeDecoded>>
+where
+    P: AsRef<Path>,
+{
     let mut res = Vec::new();
 
     // TODO: insanely bad code.
@@ -302,14 +305,13 @@ pub fn entry_to_transactions_with_decoding(
                 let address_key = AddressKey::from_multisigner(m);
                 let verifier_details = Some(sign_display.signed_by.show_card());
 
-                if let Some(address_details) = try_get_address_details(database_name, &address_key)?
-                {
+                if let Some(address_details) = try_get_address_details(&db_path, &address_key)? {
                     let mut specs_found = None;
                     for id in &address_details.network_id {
-                        let specs = try_get_network_specs(database_name, id)?;
-                        if let Some(specs) = specs {
-                            if specs.name == sign_display.network_name {
-                                specs_found = Some(specs);
+                        let specs = try_get_network_specs(&db_path, id)?;
+                        if let Some(ordered_specs) = specs {
+                            if ordered_specs.specs.name == sign_display.network_name {
+                                specs_found = Some(ordered_specs);
                             }
                         }
                     }
@@ -319,10 +321,10 @@ pub fn entry_to_transactions_with_decoding(
                             verifier_details,
                             Some(make_author_info(
                                 m,
-                                specs_found.base58prefix,
+                                specs_found.specs.base58prefix,
                                 &address_details,
                             )),
-                            Some(decode_signable_from_history(sign_display, database_name)?),
+                            Some(decode_signable_from_history(sign_display, &db_path)?),
                         )
                     } else {
                         (verifier_details, None, None)
@@ -344,14 +346,17 @@ pub fn entry_to_transactions_with_decoding(
     Ok(res)
 }
 
-pub(crate) fn decode_signable_from_history(
+pub(crate) fn decode_signable_from_history<P>(
     found_signable: &SignDisplay,
-    database_name: &str,
-) -> Result<TransactionCardSet> {
+    db_path: P,
+) -> Result<TransactionCardSet>
+where
+    P: AsRef<Path>,
+{
     let (parser_data, network_name, encryption) = found_signable.transaction_network_encryption();
 
-    let short_specs = specs_by_name(&network_name, &encryption, database_name)?.short();
-    let meta_set = find_meta_set(&short_specs, database_name)?;
+    let short_specs = specs_by_name(&network_name, &encryption, &db_path)?.short();
+    let meta_set = find_meta_set(&short_specs, &db_path)?;
     if meta_set.is_empty() {
         return Err(Error::HistoricalMetadata { name: network_name });
     }
@@ -365,7 +370,7 @@ pub(crate) fn decode_signable_from_history(
 
     for x in meta_set.iter() {
         let used_version = x.version();
-        let metadata_bundle = bundle_from_meta_set_element(x, database_name)?;
+        let metadata_bundle = bundle_from_meta_set_element(x, &db_path)?;
 
         match parse_extensions(
             extensions_data.to_vec(),

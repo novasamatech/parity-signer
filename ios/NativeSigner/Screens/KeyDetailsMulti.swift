@@ -16,7 +16,11 @@ struct KeyDetailsMulti: View {
     var body: some View {
         ScrollView {
             VStack {
-                AddressCard(address: content.keyDetails.address)
+                AddressCard(card: MAddressCard(
+                    base58: content.keyDetails.base58,
+                    address: content.keyDetails.address,
+                    multiselect: nil
+                ))
                 NetworkCard(
                     title: content.keyDetails.networkInfo.networkTitle,
                     logo: content.keyDetails.networkInfo.networkLogo
@@ -28,7 +32,7 @@ struct KeyDetailsMulti: View {
                     .onAppear {
                         offset = 0
                     }
-                Text("Key " + content.currentNumber + " out of " + content.outOf)
+                Text(Localizable.Key.outOf(content.currentNumber, content.outOf))
             }
         }
         .gesture(

@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct SeedCardForManager: View {
-    @EnvironmentObject var data: SignerDataModel
+    @EnvironmentObject private var data: SignerDataModel
     var seedNameCard: SeedNameCard
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4).foregroundColor(Asset.bg200.swiftUIColor).frame(height: 47)
+            RoundedRectangle(cornerRadius: 4)
+                .foregroundColor(Asset.bg200.swiftUIColor)
+                .frame(height: 47)
             HStack {
                 Identicon(identicon: seedNameCard.identicon)
                 VStack(alignment: .leading) {

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HistoryScreen: View {
-    @EnvironmentObject var data: SignerDataModel
+    @EnvironmentObject private var data: SignerDataModel
     let content: MLog
     let navigationRequest: NavigationRequest
     var body: some View {
@@ -30,7 +30,7 @@ struct HistoryScreen: View {
                                     event: event,
                                     timestamp: history.timestamp.padding(toLength: 16, withPad: " ", startingAt: 0)
                                 )
-                                .foregroundColor(Color("Text400"))
+                                .foregroundColor(Asset.text400.swiftUIColor)
                             }
                         )
                     }

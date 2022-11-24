@@ -18,7 +18,7 @@
 //!
 //! Example command line to generate derivations import QR:
 //!
-//! `$ cargo run derivations -qr -title westend-sr25519 -payload
+//! `$ cargo run derivations -qr --title westend-sr25519 -payload
 //! my_westend_set.txt`
 use db_handling::identities::prepare_derivations_import;
 use qrcode_rtx::make_pretty_qr;
@@ -40,7 +40,7 @@ use crate::parser::{Derivations, Goal};
 /// and genesis hash.
 pub fn process_derivations(x: Derivations) -> Result<()> {
     // get network information from the database, by network address book title
-    let address_book_entry = get_address_book_entry(&x.title)?;
+    let address_book_entry = get_address_book_entry(&x.title, x.db)?;
 
     // prepare `ContentDerivations`
     let content = prepare_derivations_import(

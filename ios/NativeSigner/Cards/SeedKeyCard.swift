@@ -8,15 +8,17 @@
 import SwiftUI
 
 struct SeedKeyCard: View {
-    @EnvironmentObject var data: SignerDataModel
-    var seedCard: MSeedKeyCard
+    @EnvironmentObject private var data: SignerDataModel
+    var seedCard: MKeysCard
     var multiselectMode: Bool = false
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4).foregroundColor(Asset.bg200.swiftUIColor).frame(height: 47)
+            RoundedRectangle(cornerRadius: 4)
+                .foregroundColor(Asset.bg200.swiftUIColor)
+                .frame(height: 47)
             HStack {
                 ZStack {
-                    Identicon(identicon: seedCard.identicon)
+                    Identicon(identicon: seedCard.address.identicon)
                     if multiselectMode, !seedCard.base58.isEmpty {
                         VStack {
                             Spacer()
@@ -29,7 +31,7 @@ struct SeedKeyCard: View {
                     }
                 }.frame(width: 30, height: 30)
                 VStack(alignment: .leading) {
-                    Text(seedCard.seedName)
+                    Text(seedCard.address.seedName)
                         .foregroundColor(Asset.text600.swiftUIColor)
                         .font(Fontstyle.subtitle1.base)
                     Text(seedCard.base58.truncateMiddle(length: 8))

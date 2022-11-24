@@ -16,12 +16,14 @@ struct NewSeedScreen: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text("DISPLAY NAME").font(Fontstyle.overline.base).foregroundColor(Asset.text500.swiftUIColor)
+            Localizable.displayName.text
+                .font(Fontstyle.overline.base)
+                .foregroundColor(Asset.text500.swiftUIColor)
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(Asset.border400.swiftUIColor)
                     .frame(height: 39)
-                TextField("Seed", text: $seedName, prompt: Text("Seed name"))
+                TextField(Localizable.seed.string, text: $seedName, prompt: Localizable.seedName.text)
                     .focused($nameFocused)
                     .foregroundColor(Asset.text600.swiftUIColor)
                     .font(Fontstyle.body2.base)
@@ -39,10 +41,10 @@ struct NewSeedScreen: View {
                     })
                     .padding(.horizontal, 8)
             }
-            Text("Display name is visible only on this device").font(.callout)
+            Localizable.displayNameIsVisibleOnlyOnThisDevice.text.font(.callout)
             Spacer()
             BigButton(
-                text: "Generate seed phrase",
+                text: Localizable.NewSeed.generate.key,
                 action: {
                     nameFocused = false
                     navigationRequest(.init(action: .goForward, details: seedName))

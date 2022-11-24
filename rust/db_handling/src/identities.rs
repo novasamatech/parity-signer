@@ -33,17 +33,18 @@
 #[cfg(feature = "signer")]
 use bip39::{Language, Mnemonic, MnemonicType};
 use lazy_static::lazy_static;
-#[cfg(feature = "signer")]
+use parity_scale_codec::Decode;
+#[cfg(any(feature = "active", feature = "signer"))]
 use parity_scale_codec::Encode;
 use regex::Regex;
 #[cfg(feature = "signer")]
 use sled::Batch;
-#[cfg(feature = "active")]
 use sp_core::H256;
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_runtime::MultiSigner;
+use std::{collections::HashMap, path::Path};
 #[cfg(any(feature = "active", feature = "signer"))]
 use zeroize::Zeroize;
 
@@ -53,7 +54,13 @@ use constants::ADDRTREE;
 use constants::ALICE_SEED_PHRASE;
 #[cfg(feature = "signer")]
 use constants::TRANSACTION;
-
+#[cfg(feature = "signer")]
+use definitions::helpers::print_multisigner_as_base58_or_eth;
+#[cfg(feature = "signer")]
+use definitions::helpers::{get_multisigner, unhex};
+#[cfg(feature = "signer")]
+use definitions::navigation::ExportedSet;
+use definitions::network_specs::NetworkSpecs;
 #[cfg(feature = "active")]
 use definitions::qr_transfers::ContentDerivations;
 #[cfg(any(feature = "active", feature = "signer"))]
@@ -62,9 +69,15 @@ use definitions::{
     helpers::multisigner_to_public,
     history::{Event, IdentityHistory},
     keyring::{AddressKey, NetworkSpecsKey},
-    network_specs::NetworkSpecs,
     users::AddressDetails,
 };
+#[cfg(feature = "signer")]
+use definitions::{
+    helpers::make_identicon_from_multisigner,
+    navigation::{Address, MKeyDetails, MSCNetworkInfo},
+};
+#[cfg(feature = "signer")]
+use qrcode_static::{png_qr_from_string, DataType};
 
 #[cfg(any(feature = "active", feature = "signer"))]
 use crate::{
@@ -87,10 +100,196 @@ lazy_static! {
     static ref REG_PATH: Regex = Regex::new(r"^(?P<path>(//?[^/]+)*)(///(?P<password>.+))?$").expect("known value");
 }
 
-/// Get all existing addresses from the database.
+#[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
+pub enum ExportAddrs {
+    V1(ExportAddrsV1),
+}
+
+#[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
+pub struct ExportAddrsV1 {
+    pub addrs: Vec<SeedInfo>,
+}
+
+#[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
+pub struct SeedInfo {
+    /// Name of the seed.
+    pub name: String,
+
+    /// Public key of the root key.
+    ///
+    /// `None` if user has created no root keys.
+    pub multisigner: Option<MultiSigner>,
+
+    /// Derived keys.
+    pub derived_keys: Vec<AddrInfo>,
+}
+
+#[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
+pub struct AddrInfo {
+    /// Address in the network.
+    ///
+    /// This is either `ss58` form for substrate-based chains or
+    /// h160 form for ethereum based
+    /// chains
+    pub address: String,
+
+    /// The derivation path of the key if user provided one
+    pub derivation_path: Option<String>,
+
+    /// The type of encryption in the network
+    pub encryption: Encryption,
+
+    /// Genesis hash
+    pub genesis_hash: H256,
+}
+
+/// Export all info about keys and their addresses known to Signer
 #[cfg(feature = "signer")]
-pub(crate) fn get_all_addresses(database_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>> {
-    let database = open_db(database_name)?;
+pub fn export_all_addrs<P: AsRef<Path>>(
+    db_path: P,
+    selected_keys: HashMap<String, ExportedSet>,
+) -> Result<ExportAddrs> {
+    let mut keys: HashMap<String, Vec<(MultiSigner, AddressDetails)>> = HashMap::new();
+    let mut addrs = vec![];
+
+    for (m, a) in get_all_addresses(&db_path)?.into_iter() {
+        if selected_keys.contains_key(&a.seed_name) {
+            keys.entry(a.seed_name.clone()).or_default().push((m, a));
+        }
+    }
+
+    for (name, keys) in &keys {
+        let mut derived_keys = vec![];
+
+        let multisigner = keys
+            .iter()
+            .find(|(_, a)| a.path.is_empty())
+            .map(|(m, _)| m)
+            .cloned();
+
+        for key in keys {
+            if key.1.path.is_empty() {
+                continue;
+            }
+
+            if let Some(selected_derivations) = selected_keys.get(name) {
+                let mut selected = false;
+
+                match selected_derivations {
+                    ExportedSet::All => selected = true,
+                    ExportedSet::Selected {
+                        s: selected_derivations,
+                    } => {
+                        for selected_derivation in selected_derivations {
+                            if selected_derivation.derivation == key.1.path
+                                && selected_derivation.network_specs_key
+                                    == hex::encode(key.1.network_id[0].encode())
+                            {
+                                selected = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if !selected {
+                    continue;
+                }
+            }
+
+            let specs = get_network_specs(&db_path, &key.1.network_id[0])?;
+            let address = print_multisigner_as_base58_or_eth(
+                &key.0,
+                Some(specs.specs.base58prefix),
+                key.1.encryption,
+            );
+            derived_keys.push(AddrInfo {
+                address: address.clone(),
+                derivation_path: if key.1.path.is_empty() {
+                    None
+                } else {
+                    Some(key.1.path.to_owned())
+                },
+                encryption: key.1.encryption,
+                genesis_hash: specs.specs.genesis_hash,
+            });
+        }
+
+        addrs.push(SeedInfo {
+            name: name.to_string(),
+            multisigner,
+            derived_keys,
+        });
+    }
+
+    Ok(ExportAddrs::V1(ExportAddrsV1 { addrs }))
+}
+
+#[cfg(feature = "signer")]
+pub fn import_all_addrs<P: AsRef<Path>>(
+    db_path: P,
+    seed_phrases: HashMap<String, String>,
+    export_info: ExportAddrs,
+) -> Result<()> {
+    match export_info {
+        ExportAddrs::V1(v1) => import_all_addrs_v1(db_path, v1, seed_phrases),
+    }
+}
+
+#[cfg(feature = "signer")]
+fn import_all_addrs_v1<P: AsRef<Path>>(
+    db_path: P,
+    v1: ExportAddrsV1,
+    seeds: HashMap<String, String>,
+) -> Result<()> {
+    let mut sr25519_signers = HashMap::new();
+    let mut ed25519_signers = HashMap::new();
+    let mut ecdsa_signers = HashMap::new();
+
+    for (k, v) in &seeds {
+        let sr25519_public = sr25519::Pair::from_phrase(v, None).unwrap().0.public();
+        let ed25519_public = ed25519::Pair::from_phrase(v, None).unwrap().0.public();
+        let ecdsa_public = ecdsa::Pair::from_phrase(v, None).unwrap().0.public();
+        sr25519_signers.insert(sr25519_public, k);
+        ed25519_signers.insert(ed25519_public, k);
+        ecdsa_signers.insert(ecdsa_public, k);
+    }
+
+    for addr in &v1.addrs {
+        for derived_key in &addr.derived_keys {
+            if let Some(derivation_path) = &derived_key.derivation_path {
+                let seed_name = match addr.multisigner {
+                    Some(MultiSigner::Sr25519(p)) => sr25519_signers.get(&p),
+                    Some(MultiSigner::Ed25519(p)) => ed25519_signers.get(&p),
+                    Some(MultiSigner::Ecdsa(p)) => ecdsa_signers.get(&p),
+                    None => None,
+                };
+                if let Some(seed_name) = seed_name {
+                    let _ = try_create_address(
+                        seed_name,
+                        seeds.get(seed_name.as_str()).unwrap(),
+                        derivation_path,
+                        &NetworkSpecsKey::from_parts(
+                            &derived_key.genesis_hash,
+                            &derived_key.encryption,
+                        ),
+                        &db_path,
+                    );
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+/// Get all existing addresses from the database.
+#[cfg(any(feature = "active", feature = "signer"))]
+pub fn get_all_addresses<P>(db_path: P) -> Result<Vec<(MultiSigner, AddressDetails)>>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(&db_path)?;
     let identities = open_tree(&database, ADDRTREE)?;
     let mut out: Vec<(MultiSigner, AddressDetails)> = Vec::new();
     for (address_key_vec, address_entry) in identities.iter().flatten() {
@@ -102,13 +301,49 @@ pub(crate) fn get_all_addresses(database_name: &str) -> Result<Vec<(MultiSigner,
     Ok(out)
 }
 
+#[cfg(any(feature = "active", feature = "signer"))]
+pub fn get_multisigner_by_address<P: AsRef<Path>>(
+    db_path: P,
+    address: &AddressKey,
+) -> Result<Option<MultiSigner>> {
+    use definitions::helpers::ecdsa_public_to_eth_address;
+
+    Ok(get_all_addresses(db_path)?.into_iter().find_map(|(m, a)| {
+        // TODO: Keys in the system should have disambiguous addressing
+        // the current state of events has to do with the fact
+        // that some parts of UI may be addressing eth keys by
+        // Ethereum addresses and other parts by public keys
+
+        // First check if an etherum address is being requested
+        if a.encryption == Encryption::Ethereum {
+            if let MultiSigner::Ecdsa(ref public) = m {
+                if let Ok(addr) = ecdsa_public_to_eth_address(public) {
+                    if addr.as_ref() == address.key() {
+                        return Some(m);
+                    }
+                }
+            }
+        }
+
+        // TODO: for ecdsa address is not simply a public key
+        // Do a general check after Ethereum-specific one
+        if address.key() == m.encode() {
+            return Some(m);
+        }
+        None
+    }))
+}
+
 /// Get all existing addresses for a given seed name from the database.
-#[cfg(feature = "signer")]
-pub fn get_addresses_by_seed_name(
-    database_name: &str,
+#[cfg(any(feature = "active", feature = "signer"))]
+pub fn get_addresses_by_seed_name<P>(
+    db_path: P,
     seed_name: &str,
-) -> Result<Vec<(MultiSigner, AddressDetails)>> {
-    Ok(get_all_addresses(database_name)?
+) -> Result<Vec<(MultiSigner, AddressDetails)>>
+where
+    P: AsRef<Path>,
+{
+    Ok(get_all_addresses(&db_path)?
         .into_iter()
         .filter(|(_, address_details)| address_details.seed_name == seed_name)
         .collect())
@@ -124,6 +359,89 @@ pub fn generate_random_phrase(words_number: u32) -> Result<String> {
     let mnemonic_type = MnemonicType::for_word_count(words_number as usize)?;
     let mnemonic = Mnemonic::new(mnemonic_type, Language::English);
     Ok(mnemonic.into_phrase())
+}
+
+/// Check that key with a given path should be marked as a progeny of a key with
+/// exposed secret.
+///
+/// There could be false positives here, as the passwords are not stored
+/// anywhere in Signer, therefore if there are two passwords, there is no way to
+/// check if they are different.
+///
+/// <table>
+///     <tr><th>current</th><th>mark current?</th><th>exposed in set</th></tr>
+///     <tr><td><code>//Alice</code></td><td>-</td><td><code>//Ali</code></td></tr>
+///     <tr><td><code>//Alice//1</code></td><td>+</td><td><code>//Alice</code></td></tr>
+///     <tr><td><code>//Alice///&ltpassword&gt</code></td><td>+</td><td><code>//Alice</code></td></tr>
+///     <tr><td><code>//Alice//1///&ltpassword&gt</code></td><td>+</td><td><code>//Alice</code></td></tr>
+///     <tr><td><code>//Alice</code></td><td>-</td><td><code>//Alice///&ltpassword&gt</code></td></tr>
+///     <tr><td><code>//Alice//1</code></td><td>-</td><td><code>//Alice///&ltpassword&gt</code></td></tr>
+///     <tr><td><code>//Alice///&ltpassword1&gt</code></td><td>+</td><td><code>//Alice///&ltpassword0&gt</code></td></tr>
+///     <tr><td><code>//Alice//1///&ltpassword1&gt</code></td><td>+</td><td><code>//Alice///&ltpassword0&gt</code></td></tr>
+///
+/// </table>
+#[cfg(any(feature = "active", feature = "signer"))]
+pub(crate) fn is_potentially_exposed(
+    path: &str,
+    path_is_passworded: bool,
+    exposed_path: &str,
+    exposed_is_passworded: bool,
+) -> bool {
+    if (path == exposed_path) || path.starts_with(&format!("{}/", exposed_path)) {
+        path_is_passworded || !exposed_is_passworded
+    } else {
+        false
+    }
+}
+
+/// Check if given key should be marked as exposed because its parent was
+/// exposed.
+///
+/// Input set is already filtered by seed name elsewhere.
+#[cfg(any(feature = "active", feature = "signer"))]
+fn has_parent_with_exposed_secret<P>(
+    new_cropped_path: &str,
+    new_is_passworded: bool,
+    seed_name: &str,
+    db_path: P,
+) -> Result<bool>
+where
+    P: AsRef<Path>,
+{
+    Ok(get_addresses_by_seed_name(db_path, seed_name)?
+        .iter()
+        .any(|(_, address_details)| {
+            address_details.secret_exposed
+                && is_potentially_exposed(
+                    new_cropped_path,
+                    new_is_passworded,
+                    &address_details.path,
+                    address_details.has_pwd,
+                )
+        }))
+}
+
+/// Find all `(AddressKey, AddressDetails)` that must be marked as exposed
+/// because current key gets exposed.
+///
+/// Input set is already filtered by the seed name elsewhere.
+#[cfg(feature = "signer")]
+fn exposed_set(
+    exposed_cropped_path: &str,
+    exposed_is_passworded: bool,
+    filtered_set: Vec<(MultiSigner, AddressDetails)>,
+) -> Vec<(MultiSigner, AddressDetails)> {
+    filtered_set
+        .into_iter()
+        .filter(|(_, address_details)| {
+            is_potentially_exposed(
+                &address_details.path,
+                address_details.has_pwd,
+                exposed_cropped_path,
+                exposed_is_passworded,
+            )
+        })
+        .collect()
 }
 
 /// Data associated with address generation
@@ -176,14 +494,17 @@ pub(crate) struct PrepData {
 /// [`sp_core::crypto`]. Combined secret string is then zeroized here regardless
 /// of the address generation success.
 #[cfg(any(feature = "active", feature = "signer"))]
-pub(crate) fn create_address(
-    database_name: &str,
+pub(crate) fn create_address<P>(
+    db_path: P,
     input_batch_prep: &[(AddressKey, AddressDetails)],
     path: &str,
     network_specs: &NetworkSpecs,
     seed_name: &str,
     seed_phrase: &str,
-) -> Result<PrepData> {
+) -> Result<PrepData>
+where
+    P: AsRef<Path>,
+{
     // Check that the seed phrase is not empty.
     // In upstream, empty seed phrase means default Alice seed phrase.
     if seed_phrase.is_empty() {
@@ -224,16 +545,18 @@ pub(crate) fn create_address(
                 return Err(Error::SecretStringError(e));
             }
         },
-        Encryption::Ecdsa => match ecdsa::Pair::from_string(&full_address, None) {
-            Ok(a) => {
-                full_address.zeroize();
-                MultiSigner::Ecdsa(a.public())
+        Encryption::Ecdsa | Encryption::Ethereum => {
+            match ecdsa::Pair::from_string(&full_address, None) {
+                Ok(a) => {
+                    full_address.zeroize();
+                    MultiSigner::Ecdsa(a.public())
+                }
+                Err(e) => {
+                    full_address.zeroize();
+                    return Err(Error::SecretStringError(e));
+                }
             }
-            Err(e) => {
-                full_address.zeroize();
-                return Err(Error::SecretStringError(e));
-            }
-        },
+        }
     };
 
     let public_key = multisigner_to_public(&multisigner);
@@ -316,8 +639,17 @@ pub(crate) fn create_address(
 
         // `AddressKey` is not yet in the transaction
         None => {
+            // The only way to create address with `secret_exposed` marker is if
+            // the parent with exposed secret is in the database.
+            //
+            // If the address key already exists in the database, the
+            // `secret_exposed` flag will not be changed by extending key to
+            // another network.
+            let secret_exposed =
+                has_parent_with_exposed_secret(cropped_path, has_pwd, seed_name, &db_path)?;
+
             // check if the `AddressKey` is already in the database
-            let database = open_db(database_name)?;
+            let database = open_db(&db_path)?;
             let identities = open_tree(&database, ADDRTREE)?;
             match identities.get(address_key.key()) {
                 // `AddressKey` is in the database
@@ -341,6 +673,15 @@ pub(crate) fn create_address(
                     if address_details.path != cropped_path {
                         return Err(Error::KeyCollision {
                             seed_name: address_details.seed_name,
+                        });
+                    }
+
+                    // Expected `secret_exposed` flag activated. Could indicate
+                    // the database corruption.
+                    if secret_exposed && !address_details.secret_exposed {
+                        return Err(Error::SecretExposedMismatch {
+                            multisigner,
+                            address_details,
                         });
                     }
 
@@ -374,6 +715,7 @@ pub(crate) fn create_address(
                         has_pwd,
                         network_id: vec![network_specs_key],
                         encryption: network_specs.encryption.to_owned(),
+                        secret_exposed,
                     };
                     address_prep.push((address_key, address_details));
                     Ok(PrepData {
@@ -415,12 +757,15 @@ pub(crate) fn create_address(
 /// This function inputs secret seed phrase as `&str`. It is passed as `&str`
 /// into `create_address` and used there.
 #[cfg(any(feature = "active", feature = "signer"))]
-fn populate_addresses(
-    database_name: &str,
+fn populate_addresses<P>(
+    db_path: P,
     seed_name: &str,
     seed_phrase: &str,
     make_seed_keys: bool,
-) -> Result<PrepData> {
+) -> Result<PrepData>
+where
+    P: AsRef<Path>,
+{
     // Set of `(AddressKey, AddressDetails)` to be added into the database.
     // Set is updated and is used on each iteration of `create_address` to check
     // for collisions.
@@ -433,7 +778,7 @@ fn populate_addresses(
     // Collect all networks known to Signer.
     // Note: networks with all `Encryption` variants are used here if they are
     // in the Signer database.
-    let specs_set = get_all_networks(database_name)?;
+    let specs_set = get_all_networks(&db_path)?;
 
     for network_specs in specs_set.iter() {
         // Make seed keys if requested.
@@ -441,10 +786,10 @@ fn populate_addresses(
         // if a seed key has a collision with some other key, it is an error
         if make_seed_keys {
             let prep_data = create_address(
-                database_name,
+                &db_path,
                 &address_prep,
                 "",
-                network_specs,
+                &network_specs.specs,
                 seed_name,
                 seed_phrase,
             )?;
@@ -456,10 +801,10 @@ fn populate_addresses(
         // key with default derivation may collide with some other key,
         // this should not prevent generating a seed;
         if let Ok(prep_data) = create_address(
-            database_name,
+            &db_path,
             &address_prep,
-            &network_specs.path_id,
-            network_specs,
+            &network_specs.specs.path_id,
+            &network_specs.specs,
             seed_name,
             seed_phrase,
         ) {
@@ -486,22 +831,25 @@ fn populate_addresses(
 /// This function inputs secret seed phrase as `&str`. It is passed as `&str`
 /// into `populate_addresses` and used there.
 #[cfg(feature = "signer")]
-pub fn try_create_seed(
+pub fn try_create_seed<P>(
     seed_name: &str,
     seed_phrase: &str,
     make_seed_keys: bool,
-    database_name: &str,
-) -> Result<()> {
+    db_path: P,
+) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let mut events: Vec<Event> = vec![Event::SeedCreated {
         seed_created: seed_name.to_string(),
     }];
 
-    let prep_data = populate_addresses(database_name, seed_name, seed_phrase, make_seed_keys)?;
+    let prep_data = populate_addresses(&db_path, seed_name, seed_phrase, make_seed_keys)?;
     events.extend_from_slice(&prep_data.history_prep);
     TrDbCold::new()
         .set_addresses(upd_id_batch(Batch::default(), prep_data.address_prep)) // add addresses just made in populate_addresses
-        .set_history(events_to_batch(database_name, events)?) // add corresponding history
-        .apply(database_name)
+        .set_history(events_to_batch(&db_path, events)?) // add corresponding history
+        .apply(&db_path)
 }
 
 /// Remove address from the Signer database.
@@ -514,12 +862,15 @@ pub fn try_create_seed(
 /// associated with [`AddressKey`] remain, i.e. `network_id` set becomes empty,
 /// whole entry is removed.
 #[cfg(feature = "signer")]
-pub fn remove_key(
-    database_name: &str,
+pub fn remove_key<P>(
+    db_path: P,
     multisigner: &MultiSigner,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<()> {
-    remove_keys_set(database_name, &[multisigner.to_owned()], network_specs_key)
+) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    remove_keys_set(&db_path, &[multisigner.to_owned()], network_specs_key)
 }
 
 /// Remove a set of addresses within a single network from the Signer database.
@@ -533,31 +884,32 @@ pub fn remove_key(
 /// values. If no networks associated with [`AddressKey`] remain, i.e.
 /// `network_id` set becomes empty, whole associated entry is removed.
 #[cfg(feature = "signer")]
-pub fn remove_keys_set(
-    database_name: &str,
+pub fn remove_keys_set<P>(
+    db_path: P,
     multiselect: &[MultiSigner],
     network_specs_key: &NetworkSpecsKey,
-) -> Result<()> {
+) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let mut id_batch = Batch::default();
     let mut events: Vec<Event> = Vec::new();
-    let network_specs = get_network_specs(database_name, network_specs_key)?;
+    let network_specs = get_network_specs(&db_path, network_specs_key)?;
     for multisigner in multiselect.iter() {
         let public_key = multisigner_to_public(multisigner);
         let address_key = AddressKey::from_multisigner(multisigner);
-        let mut address_details = get_address_details(database_name, &address_key)?;
+        let mut address_details = get_address_details(&db_path, &address_key)?;
         let identity_history = IdentityHistory::get(
             &address_details.seed_name,
-            &network_specs.encryption,
+            &network_specs.specs.encryption,
             &public_key,
             &address_details.path,
-            network_specs.genesis_hash,
+            network_specs.specs.genesis_hash,
         );
         events.push(Event::IdentityRemoved { identity_history });
-        address_details.network_id = address_details
+        address_details
             .network_id
-            .into_iter()
-            .filter(|id| id != network_specs_key)
-            .collect();
+            .retain(|id| id != network_specs_key);
         if address_details.network_id.is_empty() {
             id_batch.remove(address_key.key())
         } else {
@@ -566,8 +918,8 @@ pub fn remove_keys_set(
     }
     TrDbCold::new()
         .set_addresses(id_batch) // modify existing address entries
-        .set_history(events_to_batch(database_name, events)?) // add corresponding history
-        .apply(database_name)
+        .set_history(events_to_batch(&db_path, events)?) // add corresponding history
+        .apply(&db_path)
 }
 
 /// Add a set of new derived addresses: N+1, N+2, etc into Signer database.
@@ -626,20 +978,20 @@ pub fn remove_keys_set(
 /// - `//user//3`
 /// - `//user//4`
 #[cfg(feature = "signer")]
-pub fn create_increment_set(
+pub fn create_increment_set<P>(
     increment: u32,
     multisigner: &MultiSigner,
     network_specs_key: &NetworkSpecsKey,
     seed_phrase: &str,
-    database_name: &str,
-) -> Result<()> {
+    db_path: P,
+) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let address_details =
-        get_address_details(database_name, &AddressKey::from_multisigner(multisigner))?;
-    let existing_identities = addresses_set_seed_name_network(
-        database_name,
-        &address_details.seed_name,
-        network_specs_key,
-    )?;
+        get_address_details(&db_path, &AddressKey::from_multisigner(multisigner))?;
+    let existing_identities =
+        addresses_set_seed_name_network(&db_path, &address_details.seed_name, network_specs_key)?;
     let mut last_index = 0;
     for (_, details) in existing_identities.iter() {
         if let Some(("", suffix)) = details.path.split_once(&address_details.path) {
@@ -650,16 +1002,16 @@ pub fn create_increment_set(
             }
         }
     }
-    let network_specs = get_network_specs(database_name, network_specs_key)?;
+    let network_specs = get_network_specs(&db_path, network_specs_key)?;
     let mut identity_adds: Vec<(AddressKey, AddressDetails)> = Vec::new();
     let mut current_events: Vec<Event> = Vec::new();
     for i in 0..increment {
         let path = address_details.path.to_string() + "//" + &(last_index + i).to_string();
         let prep_data = create_address(
-            database_name,
+            &db_path,
             &identity_adds,
             &path,
-            &network_specs,
+            &network_specs.specs,
             &address_details.seed_name,
             seed_phrase,
         )?;
@@ -669,8 +1021,8 @@ pub fn create_increment_set(
     let id_batch = upd_id_batch(Batch::default(), identity_adds);
     TrDbCold::new()
         .set_addresses(id_batch) // add created addresses
-        .set_history(events_to_batch(database_name, current_events)?) // add corresponding history
-        .apply(database_name)
+        .set_history(events_to_batch(&db_path, current_events)?) // add corresponding history
+        .apply(&db_path)
 }
 
 /// Check derivation format and determine if it has a password.
@@ -733,12 +1085,15 @@ pub enum DerivationCheck {
 /// of password-free valid derivation. Bad format of the derivation is **not**
 /// an error, UI just does not allow to proceed.
 #[cfg(feature = "signer")]
-pub fn derivation_check(
+pub fn derivation_check<P>(
     seed_name: &str,
     path: &str,
     network_specs_key: &NetworkSpecsKey,
-    database_name: &str,
-) -> Result<DerivationCheck> {
+    db_path: P,
+) -> Result<DerivationCheck>
+where
+    P: AsRef<Path>,
+{
     match is_passworded(path) {
         // Proposed derivation has password, no checks could be made, proceed.
         Ok(true) => Ok(DerivationCheck::Password),
@@ -747,7 +1102,7 @@ pub fn derivation_check(
         // coincidence.
         Ok(false) => {
             let mut found_exact = None;
-            for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
+            for (multisigner, address_details) in get_all_addresses(db_path)?.into_iter() {
                 if (address_details.seed_name == seed_name) // seed name
                     && (address_details.path == path) // derivation path, cropped part without password
                     && (address_details.network_id.contains(network_specs_key)) // in this network
@@ -809,14 +1164,17 @@ pub fn cut_path(path: &str) -> Result<(String, String)> {
 /// Both are input as `&str` and go directly in `create_address` (both) and
 /// `derivation_check` (path only).
 #[cfg(feature = "signer")]
-pub fn try_create_address(
+pub fn try_create_address<P>(
     seed_name: &str,
     seed_phrase: &str,
     path: &str,
     network_specs_key: &NetworkSpecsKey,
-    database_name: &str,
-) -> Result<()> {
-    match derivation_check(seed_name, path, network_specs_key, database_name)? {
+    db_path: P,
+) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    match derivation_check(seed_name, path, network_specs_key, &db_path)? {
         // UI should prevent user from getting into `try_create_address` if
         // derivation has a bad format
         DerivationCheck::BadFormat => Err(Error::InvalidDerivation(path.to_string())),
@@ -838,20 +1196,20 @@ pub fn try_create_address(
         // coincidence (for passworded derivation) could not have been checked
         // preliminarily and would result in `create_address` errors here.
         _ => {
-            let network_specs = get_network_specs(database_name, network_specs_key)?;
+            let network_specs = get_network_specs(&db_path, network_specs_key)?;
             let prep_data = create_address(
-                database_name,
+                &db_path,
                 &Vec::new(), // a single address is created, no data to check against here
                 path,
-                &network_specs,
+                &network_specs.specs,
                 seed_name,
                 seed_phrase,
             )?;
             let id_batch = upd_id_batch(Batch::default(), prep_data.address_prep);
             TrDbCold::new()
                 .set_addresses(id_batch) // add created address
-                .set_history(events_to_batch(database_name, prep_data.history_prep)?) // add corresponding history
-                .apply(database_name)
+                .set_history(events_to_batch(&db_path, prep_data.history_prep)?) // add corresponding history
+                .apply(&db_path)
         }
     }
 }
@@ -865,15 +1223,18 @@ pub fn try_create_address(
 /// - addresses with default derivation path in each default network
 /// - address with `//Alice` derivation path in Westend network
 #[cfg(feature = "active")]
-pub fn generate_test_identities(database_name: &str) -> Result<()> {
+pub fn generate_test_identities<P>(db_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     // clear the tree
-    let entry_batch = make_batch_clear_tree(database_name, ADDRTREE)?;
+    let entry_batch = make_batch_clear_tree(&db_path, ADDRTREE)?;
 
     // make a record that the tree was wiped
     let mut events = vec![Event::IdentitiesWiped];
 
     // data for adding seed addresses and addresses with default derivation path
-    let prep_data = populate_addresses(database_name, "Alice", ALICE_SEED_PHRASE, true)?;
+    let prep_data = populate_addresses(&db_path, "Alice", ALICE_SEED_PHRASE, true)?;
 
     // Address preparation set, to be used as following `create_address` input.
     // Alice addresses are known and good, so checking them for collisions is
@@ -883,15 +1244,17 @@ pub fn generate_test_identities(database_name: &str) -> Result<()> {
     // update events
     events.extend_from_slice(&prep_data.history_prep);
 
-    for network_specs in get_all_networks(database_name)?.iter() {
-        if (network_specs.name == "westend") && (network_specs.encryption == Encryption::Sr25519) {
+    for network_specs in get_all_networks(&db_path)?.iter() {
+        if (network_specs.specs.name == "westend")
+            && (network_specs.specs.encryption == Encryption::Sr25519)
+        {
             // data for adding address with `//Alice` derivation path in Westend
             // network
             let prep_data = create_address(
-                database_name,
+                &db_path,
                 &address_prep, // address
                 "//Alice",
-                network_specs,
+                &network_specs.specs,
                 "Alice",
                 ALICE_SEED_PHRASE,
             )?;
@@ -902,8 +1265,8 @@ pub fn generate_test_identities(database_name: &str) -> Result<()> {
 
     TrDbCold::new()
         .set_addresses(upd_id_batch(entry_batch, address_prep)) // add created addresses
-        .set_history(events_to_batch(database_name, events)?) // add corresponding history
-        .apply(database_name)
+        .set_history(events_to_batch(&db_path, events)?) // add corresponding history
+        .apply(&db_path)
 }
 
 /// Remove all addresses associated with given seed name from the Signer
@@ -912,12 +1275,15 @@ pub fn generate_test_identities(database_name: &str) -> Result<()> {
 /// Complementary action in frontend is removal of the seed data from the device
 /// key management system.
 #[cfg(feature = "signer")]
-pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<()> {
+pub fn remove_seed<P>(db_path: P, seed_name: &str) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     // `Batch` to use
     let mut identity_batch = Batch::default();
 
     // All addresses with given seed name from the database
-    let id_set = get_addresses_by_seed_name(database_name, seed_name)?;
+    let id_set = get_addresses_by_seed_name(&db_path, seed_name)?;
     if id_set.is_empty() {
         return Err(Error::NoKnownSeeds);
     }
@@ -949,8 +1315,8 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<()> {
     }
     TrDbCold::new()
         .set_addresses(identity_batch) // modify addresses
-        .set_history(events_to_batch(database_name, events)?) // add corresponding history
-        .apply(database_name)
+        .set_history(events_to_batch(&db_path, events)?) // add corresponding history
+        .apply(&db_path)
 }
 
 /// Create a set of addresses using imported derivations set for user-selected
@@ -975,16 +1341,19 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<()> {
 // TODO this is likely to be considerably changed as soon as UI/UX design
 // appears
 #[cfg(feature = "signer")]
-pub fn import_derivations(
+pub fn import_derivations<P>(
     checksum: u32,
     seed_name: &str,
     seed_phrase: &str,
-    database_name: &str,
-) -> Result<()> {
+    db_path: P,
+) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     // derivations data retrieved from the database
-    let content_derivations = TrDbColdDerivations::from_storage(database_name, checksum)?;
+    let content_derivations = TrDbColdDerivations::from_storage(&db_path, checksum)?;
 
-    // [`NetworkSpecs`] for the network in which the addresses are generated
+    // [`OrderedNetworkSpecs`] for the network in which the addresses are generated
     let network_specs = content_derivations.network_specs();
 
     // Address preparation set, to be modified and used as `create_address`
@@ -997,10 +1366,10 @@ pub fn import_derivations(
     for path in content_derivations.checked_derivations().iter() {
         // try creating address for each of the derivations
         match create_address(
-            database_name,
+            &db_path,
             &adds,
             path,
-            network_specs,
+            &network_specs.specs,
             seed_name,
             seed_phrase,
         ) {
@@ -1019,9 +1388,9 @@ pub fn import_derivations(
     }
     TrDbCold::new()
         .set_addresses(upd_id_batch(Batch::default(), adds)) // modify addresses data
-        .set_history(events_to_batch(database_name, events)?) // add corresponding history
-        .set_transaction(make_batch_clear_tree(database_name, TRANSACTION)?) // clear transaction tree
-        .apply(database_name)
+        .set_history(events_to_batch(&db_path, events)?) // add corresponding history
+        .set_transaction(make_batch_clear_tree(&db_path, TRANSACTION)?) // clear transaction tree
+        .apply(&db_path)
 }
 
 /// Check derivations before offering user to import them.
@@ -1103,4 +1472,219 @@ pub fn prepare_derivations_import(
         genesis_hash,
         &derivations,
     ))
+}
+
+#[cfg(feature = "signer")]
+fn prepare_secret_key_for_export(
+    multisigner: &MultiSigner,
+    full_address: &str,
+    pwd: Option<&str>,
+) -> Result<[u8; 32]> {
+    match multisigner {
+        MultiSigner::Ed25519(public) => {
+            let ed25519_pair =
+                ed25519::Pair::from_string(full_address, pwd).map_err(Error::SecretStringError)?;
+            if public != &ed25519_pair.public() {
+                return Err(Error::WrongPassword);
+            }
+            Ok(ed25519_pair.seed().to_owned())
+        }
+        MultiSigner::Sr25519(public) => {
+            let (sr25519_pair, seed) = sr25519::Pair::from_string_with_seed(full_address, pwd)
+                .map_err(Error::SecretStringError)?;
+            if public != &sr25519_pair.public() {
+                return Err(Error::WrongPassword);
+            }
+            Ok(seed.ok_or_else(|| Error::NoSeedForKeyPair {
+                multisigner: multisigner.clone(),
+            })?)
+        }
+        MultiSigner::Ecdsa(public) => {
+            let ecdsa_pair =
+                ecdsa::Pair::from_string(full_address, pwd).map_err(Error::SecretStringError)?;
+            if public != &ecdsa_pair.public() {
+                return Err(Error::WrongPassword);
+            }
+            Ok(ecdsa_pair.seed())
+        }
+    }
+}
+
+/// Prepare **secret** key export screen struct [`MKeyDetails`].
+///
+/// For QR code the secret key information is put in format
+/// `secret:0x{}:{network genesis hash}` transformed into bytes, to be
+/// compatible with `polkadot-js` interface.
+///
+/// There is no direct mentioning of [`Encryption`] in the QR code. It is
+/// that user knows the key in which network and with what encryption they are
+/// exporting.
+///
+/// The QR code here contains sensitive information, and is made with special
+/// coloration, so that the difference with safe QR codes is immediately visible
+/// on screen.
+#[cfg(feature = "signer")]
+pub fn export_secret_key<P>(
+    db_path: P,
+    public_key: &str,
+    expected_seed_name: &str,
+    network_specs_key_hex: &str,
+    seed_phrase: &str,
+    mut key_password: Option<String>,
+) -> Result<MKeyDetails>
+where
+    P: AsRef<Path>,
+{
+    let public_key = &unhex(public_key)?;
+    let network_specs_key = &NetworkSpecsKey::from_hex(network_specs_key_hex)?;
+    let network_specs = get_network_specs(&db_path, network_specs_key)?;
+    let multisigner = &get_multisigner(public_key, &network_specs.specs.encryption)?;
+    let address_key = AddressKey::from_multisigner(multisigner);
+    let address_details = get_address_details(&db_path, &address_key)?;
+    if address_details.seed_name != expected_seed_name {
+        return Err(Error::SeedNameNotMatching {
+            address_key,
+            expected_seed_name: expected_seed_name.to_string(),
+            real_seed_name: address_details.seed_name,
+        });
+    }
+    if !address_details.network_id.contains(network_specs_key) {
+        return Err(Error::NetworkSpecsKeyForAddressNotFound {
+            network_specs_key: network_specs_key.to_owned(),
+            address_key,
+        });
+    }
+    let public_key = multisigner_to_public(multisigner);
+
+    let style = address_details.encryption.identicon_style();
+    let address = Address {
+        path: address_details.path.to_string(),
+        has_pwd: address_details.has_pwd,
+        identicon: make_identicon_from_multisigner(multisigner, style),
+        seed_name: address_details.seed_name.to_string(),
+        secret_exposed: true,
+    };
+
+    let network_info = MSCNetworkInfo {
+        network_title: network_specs.specs.title,
+        network_logo: network_specs.specs.logo,
+        network_specs_key: network_specs_key_hex.to_owned(),
+    };
+
+    let database_addresses = get_addresses_by_seed_name(&db_path, expected_seed_name)?;
+
+    let exposed_addresses = exposed_set(
+        &address_details.path,
+        address_details.has_pwd,
+        database_addresses,
+    );
+
+    let mut identity_batch = Batch::default();
+
+    for (x_multisigner, x_address_details) in exposed_addresses.into_iter() {
+        let mut new_address_details = x_address_details;
+        new_address_details.secret_exposed = true;
+        identity_batch.insert(
+            AddressKey::from_multisigner(&x_multisigner).key(),
+            new_address_details.encode(),
+        )
+    }
+
+    let history_batch = events_to_batch(
+        &db_path,
+        vec![Event::SecretWasExported {
+            identity_history: IdentityHistory::get(
+                &address_details.seed_name,
+                &address_details.encryption,
+                &public_key,
+                &address_details.path,
+                network_specs.specs.genesis_hash,
+            ),
+        }],
+    )?;
+
+    let mut qr = generate_secret_qr(
+        multisigner,
+        &address_details,
+        &network_specs.specs.genesis_hash,
+        seed_phrase,
+        key_password.as_deref(),
+    )?;
+    key_password.zeroize();
+
+    if let Err(e) = TrDbCold::new()
+        .set_addresses(identity_batch) // modify addresses
+        .set_history(history_batch) // add corresponding history
+        .apply(&db_path)
+    {
+        qr.zeroize();
+        return Err(e);
+    };
+
+    Ok(MKeyDetails {
+        qr,
+        pubkey: hex::encode(public_key),
+        network_info,
+        base58: print_multisigner_as_base58_or_eth(
+            multisigner,
+            Some(network_specs.specs.base58prefix),
+            address_details.encryption,
+        ),
+        multiselect: None,
+        address,
+    })
+}
+
+#[cfg(feature = "signer")]
+fn generate_secret_qr(
+    multisigner: &MultiSigner,
+    address_details: &AddressDetails,
+    genesis_hash: &H256,
+    seed_phrase: &str,
+    pwd: Option<&str>,
+) -> Result<Vec<u8>> {
+    // create fixed-length string to avoid reallocations
+    let mut full_address = String::with_capacity(seed_phrase.len() + address_details.path.len());
+    full_address.push_str(seed_phrase);
+    full_address.push_str(&address_details.path);
+
+    let mut secret = match prepare_secret_key_for_export(multisigner, &full_address, pwd) {
+        Ok(a) => {
+            full_address.zeroize();
+            a
+        }
+        Err(e) => {
+            full_address.zeroize();
+            return Err(e);
+        }
+    };
+
+    let qr = png_qr_from_string(
+        &format!(
+            "secret:0x{}:{}",
+            hex::encode(secret),
+            hex::encode(genesis_hash)
+        ),
+        DataType::Sensitive,
+    )
+    .map_err(|e| Error::Qr(e.to_string()));
+    secret.zeroize();
+    qr
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn potentially_exposed() {
+        assert!(is_potentially_exposed("//A//0", false, "//A", false));
+        assert!(!is_potentially_exposed("//A//0", false, "//A", true));
+        assert!(is_potentially_exposed("//A//0", true, "//A", false));
+        assert!(!is_potentially_exposed("//A", false, "//A//0", false));
+        assert!(is_potentially_exposed("//A//0", false, "//A//0", false));
+        assert!(is_potentially_exposed("//A/0", false, "//A", false));
+        assert!(is_potentially_exposed("//A//0//0", true, "//A", true));
+        assert!(!is_potentially_exposed("//A//0", false, "//B", false));
+    }
 }

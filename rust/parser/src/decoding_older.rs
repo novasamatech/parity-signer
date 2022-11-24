@@ -365,7 +365,7 @@ fn deal_with_option(
         };
         let remaining_vector = {
             if data.len() > 1 {
-                (&data[1..]).to_vec()
+                data[1..].to_vec()
             } else {
                 Vec::new()
             }
@@ -379,7 +379,7 @@ fn deal_with_option(
             0 => {
                 let remaining_vector = {
                     if data.len() > 1 {
-                        (&data[1..]).to_vec()
+                        data[1..].to_vec()
                     } else {
                         Vec::new()
                     }
@@ -597,7 +597,7 @@ fn special_case_bitvec(data: Vec<u8>, indent: u32) -> Result<DecodedOut> {
     // the data is preluded by compact indicating the number of `BitVec` elements - info from js documentation, decode not implemented for `BitVec` as is
     let pre_bitvec = get_compact::<u32>(&data)?;
     let actual_length = match pre_bitvec.compact_found % 8 {
-        0 => (pre_bitvec.compact_found / 8),
+        0 => pre_bitvec.compact_found / 8,
         _ => (pre_bitvec.compact_found / 8) + 1,
     };
     match pre_bitvec.start_next_unit {
@@ -793,7 +793,7 @@ fn deal_with_enum(
         EnumVariantType::None => {
             let remaining_vector = {
                 if data.len() > 1 {
-                    (&data[1..]).to_vec()
+                    data[1..].to_vec()
                 } else {
                     Vec::new()
                 }

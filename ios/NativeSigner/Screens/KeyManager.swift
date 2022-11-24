@@ -55,9 +55,9 @@ struct KeyManager: View {
                     .padding(2)
                     if content.root.swiped {
                         AddressCardControls(
-                            seedName: content.root.seedName,
+                            seedName: content.root.address.seedName,
                             increment: { details in
-                                increment(content.root.seedName, details)
+                                increment(content.root.address.seedName, details)
                             },
                             navigationRequest: navigationRequest
                         )
@@ -74,7 +74,9 @@ struct KeyManager: View {
                     }
                 )
                 HStack {
-                    Text("DERIVED KEYS").foregroundColor(Asset.text300.swiftUIColor).font(Fontstyle.overline.base)
+                    Localizable.derivedKeys.text
+                        .foregroundColor(Asset.text300.swiftUIColor)
+                        .font(Fontstyle.overline.base)
                     Spacer()
                     Button(
                         action: {
@@ -85,15 +87,16 @@ struct KeyManager: View {
                             }
                         },
                         label: {
-                            Image(.plus, variant: .circle).imageScale(.large)
+                            Image(.plus, variant: .circle)
+                                .imageScale(.large)
                                 .foregroundColor(Asset.action400.swiftUIColor)
                         }
                     )
                 }.padding(.horizontal, 8)
                 ScrollView {
                     LazyVStack {
-                        ForEach(content.set.sorted(by: { $0.path < $1.path }).filter { card in
-                            card.path.contains(searchString) || searchString.isEmpty
+                        ForEach(content.set.sorted(by: { $0.address.path < $1.address.path }).filter { card in
+                            card.address.path.contains(searchString) || searchString.isEmpty
                         }, id: \.addressKey) { address in
                             ZStack {
                                 Button(
@@ -102,12 +105,15 @@ struct KeyManager: View {
                                     },
                                     label: {
                                         AddressCard(
-                                            address: Address(
+                                            card: MAddressCard(
                                                 base58: address.base58,
-                                                path: address.path,
-                                                hasPwd: address.hasPwd,
-                                                identicon: address.identicon,
-                                                seedName: "",
+                                                address: Address(
+                                                    path: address.address.path,
+                                                    hasPwd: address.address.hasPwd,
+                                                    identicon: address.address.identicon,
+                                                    seedName: "",
+                                                    secretExposed: address.address.secretExposed
+                                                ),
                                                 multiselect: address.multiselect
                                             ),
                                             multiselectMode: content.multiselectMode
@@ -131,9 +137,9 @@ struct KeyManager: View {
                                 ).padding(2)
                                 if address.swiped {
                                     AddressCardControls(
-                                        seedName: content.root.seedName,
+                                        seedName: content.root.address.seedName,
                                         increment: { details in
-                                            increment(content.root.seedName, details)
+                                            increment(content.root.address.seedName, details)
                                         },
                                         navigationRequest: navigationRequest
                                     )

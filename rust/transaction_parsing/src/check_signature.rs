@@ -32,7 +32,7 @@ pub fn pass_crypto(data_hex: &str, content: TransferContent) -> Result<InfoPasse
                 tail[64..].to_vec(),
             );
             ed25519::Pair::verify(&signature, &message, &pubkey)
-                .then(|| ())
+                .then_some(())
                 .ok_or(Error::BadSignature)?;
             let verifier = Verifier {
                 v: Some(VerifierValue::Standard {
@@ -58,7 +58,7 @@ pub fn pass_crypto(data_hex: &str, content: TransferContent) -> Result<InfoPasse
                 tail[64..].to_vec(),
             );
             sr25519::Pair::verify(&signature, &message, &pubkey)
-                .then(|| ())
+                .then_some(())
                 .ok_or(Error::BadSignature)?;
             let verifier = Verifier {
                 v: Some(VerifierValue::Standard {
@@ -71,7 +71,7 @@ pub fn pass_crypto(data_hex: &str, content: TransferContent) -> Result<InfoPasse
                 tail,
             })
         }
-        "02" => {
+        "02" | "03" => {
             // Ecdsa crypto was used by the verifier
             let a = data.get(3..36).ok_or(Error::TooShort)?;
             let into_pubkey: [u8; 33] = a.try_into().expect("fixed size should fit in array");
@@ -84,7 +84,7 @@ pub fn pass_crypto(data_hex: &str, content: TransferContent) -> Result<InfoPasse
                 tail[65..].to_vec(),
             );
             ecdsa::Pair::verify(&signature, &message, &pubkey)
-                .then(|| ())
+                .then_some(())
                 .ok_or(Error::BadSignature)?;
             let verifier = Verifier {
                 v: Some(VerifierValue::Standard {

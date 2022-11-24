@@ -42,9 +42,3 @@ final class ConnectivityMonitoringAssemblerTests: XCTestCase {
         XCTAssertTrue(result is ConnectivityMonitoringAdapter)
     }
 }
-
-// MARK: - Mocks
-
-final class RuntimePropertiesProvidingMock: RuntimePropertiesProviding {
-    var isInDevelopmentMode: Bool = false
-}

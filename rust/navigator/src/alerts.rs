@@ -1,6 +1,6 @@
 //! List of all alerts
 
-#[derive(PartialEq, Debug, Copy, Clone)]
+#[derive(PartialEq, Eq, Debug, Copy, Clone)]
 pub enum Alert {
     Empty,
     Error,

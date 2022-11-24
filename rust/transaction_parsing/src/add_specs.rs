@@ -13,6 +13,7 @@ use definitions::{
     network_specs::{ValidCurrentVerifier, Verifier},
     qr_transfers::ContentAddSpecs,
 };
+use std::path::Path;
 
 use crate::cards::{Card, Warning};
 use crate::check_signature::pass_crypto;
@@ -22,16 +23,17 @@ use crate::{StubNav, TransactionAction};
 
 use crate::holds::{GeneralHold, Hold, HoldRelease};
 
-pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionAction> {
+pub fn add_specs<P>(data_hex: &str, db_path: P) -> Result<TransactionAction>
+where
+    P: AsRef<Path>,
+{
     let checked_info = pass_crypto(data_hex, TransferContent::AddSpecs)?;
     let specs = ContentAddSpecs::from_slice(&checked_info.message).specs()?;
     let network_specs_key = NetworkSpecsKey::from_parts(&specs.genesis_hash, &specs.encryption);
     let verifier_key = VerifierKey::from_parts(specs.genesis_hash);
-    let possible_valid_current_verifier =
-        try_get_valid_current_verifier(&verifier_key, database_name)?;
-    let general_verifier = get_general_verifier(database_name)?;
-    if let Some(specs_invariants) =
-        genesis_hash_in_specs(specs.genesis_hash, &open_db(database_name)?)?
+    let possible_valid_current_verifier = try_get_valid_current_verifier(&verifier_key, &db_path)?;
+    let general_verifier = get_general_verifier(&db_path)?;
+    if let Some(specs_invariants) = genesis_hash_in_specs(specs.genesis_hash, &open_db(&db_path)?)?
     {
         if specs.name != specs_invariants.name {
             return Err(Error::AddSpecsDifferentName {
@@ -64,7 +66,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                         v: Verifier { v: None },
                     },
                     &general_verifier,
-                    database_name,
+                    &db_path,
                 )?;
                 stub = stub.new_network_verifier(
                     &verifier_key,
@@ -73,7 +75,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                     },
                     &general_verifier,
                 );
-                let checksum = stub.store_and_get_checksum(database_name)?;
+                let checksum = stub.store_and_get_checksum(&db_path)?;
                 let warning_card = Card::Warning(Warning::NotVerified).card(&mut index, 0);
                 let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                 Ok(TransactionAction::Stub {
@@ -95,13 +97,13 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                 match general_verifier {
                     Verifier { v: None } => {
                         let new_general_verifier = checked_info.verifier;
-                        let general_hold = GeneralHold::get(database_name)?;
-                        stub = general_hold.upd_stub(stub, &new_general_verifier, database_name)?;
+                        let general_hold = GeneralHold::get(&db_path)?;
+                        stub = general_hold.upd_stub(stub, &new_general_verifier, &db_path)?;
                         stub = stub.add_network_specs(
                             &specs,
                             &ValidCurrentVerifier::General,
                             &new_general_verifier,
-                            database_name,
+                            &db_path,
                         )?;
                         stub = stub.new_network_verifier(
                             &verifier_key,
@@ -112,7 +114,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                             Card::Warning(Warning::GeneralVerifierAppeared(&general_hold))
                                 .card(&mut index, 0);
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                        let checksum = stub.store_and_get_checksum(database_name)?;
+                        let checksum = stub.store_and_get_checksum(db_path)?;
                         Ok(TransactionAction::Stub {
                             s: TransactionCardSet {
                                 verifier: Some(vec![verifier_card]),
@@ -132,7 +134,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                                 &specs,
                                 &ValidCurrentVerifier::General,
                                 &general_verifier,
-                                database_name,
+                                &db_path,
                             )?;
                             stub = stub.new_network_verifier(
                                 &verifier_key,
@@ -140,7 +142,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                                 &general_verifier,
                             );
                             let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                            let checksum = stub.store_and_get_checksum(database_name)?;
+                            let checksum = stub.store_and_get_checksum(&db_path)?;
                             Ok(TransactionAction::Stub {
                                 s: TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
@@ -159,7 +161,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                                     v: checked_info.verifier.to_owned(),
                                 },
                                 &general_verifier,
-                                database_name,
+                                &db_path,
                             )?;
                             stub = stub.new_network_verifier(
                                 &verifier_key,
@@ -169,7 +171,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                                 &general_verifier,
                             );
                             let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                            let checksum = stub.store_and_get_checksum(database_name)?;
+                            let checksum = stub.store_and_get_checksum(&db_path)?;
                             Ok(TransactionAction::Stub {
                                 s: TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
@@ -193,16 +195,16 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                         warning: Warning::NotVerified.show(),
                     });
                     let warning_card = Card::Warning(Warning::NotVerified).card(&mut index, 0);
-                    if specs_are_new(&specs, database_name)? {
+                    if specs_are_new(&specs, &db_path)? {
                         stub = stub.add_network_specs(
                             &specs,
                             &ValidCurrentVerifier::Custom {
                                 v: Verifier { v: None },
                             },
                             &general_verifier,
-                            database_name,
+                            &db_path,
                         )?;
-                        let checksum = stub.store_and_get_checksum(database_name)?;
+                        let checksum = stub.store_and_get_checksum(&db_path)?;
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                         Ok(TransactionAction::Stub {
                             s: TransactionCardSet {
@@ -226,7 +228,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                     v: Some(ref new_verifier_value),
                 } => {
                     let verifier_card = Card::Verifier(new_verifier_value).card(&mut index, 0);
-                    let hold = Hold::get(&verifier_key, database_name)?;
+                    let hold = Hold::get(&verifier_key, &db_path)?;
                     if checked_info.verifier == general_verifier {
                         stub = hold.upd_stub(
                             stub,
@@ -234,7 +236,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                             &custom_verifier,
                             &ValidCurrentVerifier::General,
                             HoldRelease::General,
-                            database_name,
+                            &db_path,
                         )?;
                         let warning_card_1 = Card::Warning(Warning::VerifierChangingToGeneral {
                             verifier_key: &verifier_key,
@@ -242,7 +244,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                         })
                         .card(&mut index, 0);
                         let mut possible_warning = None;
-                        if !specs_are_new(&specs, database_name)? {
+                        if !specs_are_new(&specs, &db_path)? {
                             possible_warning = Some(
                                 Card::Warning(Warning::NetworkSpecsAlreadyThere(&specs.title))
                                     .card(&mut index, 0),
@@ -255,10 +257,10 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                             &specs,
                             &ValidCurrentVerifier::General,
                             &general_verifier,
-                            database_name,
+                            &db_path,
                         )?;
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                        let checksum = stub.store_and_get_checksum(database_name)?;
+                        let checksum = stub.store_and_get_checksum(&db_path)?;
                         match possible_warning {
                             None => Ok(TransactionAction::Stub {
                                 s: TransactionCardSet {
@@ -293,20 +295,20 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                             &custom_verifier,
                             &ValidCurrentVerifier::General,
                             HoldRelease::GeneralSuper,
-                            database_name,
+                            &db_path,
                         )?;
                         let warning_card_1 = Card::Warning(Warning::VerifierGeneralSuper {
                             verifier_key: &verifier_key,
                             hold: &hold,
                         })
                         .card(&mut index, 0);
-                        let general_hold = GeneralHold::get(database_name)?;
-                        stub = general_hold.upd_stub(stub, &new_general_verifier, database_name)?;
+                        let general_hold = GeneralHold::get(&db_path)?;
+                        stub = general_hold.upd_stub(stub, &new_general_verifier, &db_path)?;
                         let warning_card_2 =
                             Card::Warning(Warning::GeneralVerifierAppeared(&general_hold))
                                 .card(&mut index, 0);
                         let mut possible_warning = None;
-                        if !specs_are_new(&specs, database_name)? {
+                        if !specs_are_new(&specs, &db_path)? {
                             possible_warning = Some(
                                 Card::Warning(Warning::NetworkSpecsAlreadyThere(&specs.title))
                                     .card(&mut index, 0),
@@ -319,10 +321,10 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                             &specs,
                             &ValidCurrentVerifier::General,
                             &general_verifier,
-                            database_name,
+                            &db_path,
                         )?;
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                        let checksum = stub.store_and_get_checksum(database_name)?;
+                        let checksum = stub.store_and_get_checksum(&db_path)?;
                         match possible_warning {
                             None => Ok(TransactionAction::Stub {
                                 s: TransactionCardSet {
@@ -362,7 +364,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                                 v: checked_info.verifier.to_owned(),
                             },
                             HoldRelease::Custom,
-                            database_name,
+                            &db_path,
                         )?;
                         let warning_card_1 = Card::Warning(Warning::VerifierChangingToCustom {
                             verifier_key: &verifier_key,
@@ -370,7 +372,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                         })
                         .card(&mut index, 0);
                         let mut possible_warning = None;
-                        if !specs_are_new(&specs, database_name)? {
+                        if !specs_are_new(&specs, &db_path)? {
                             possible_warning = Some(
                                 Card::Warning(Warning::NetworkSpecsAlreadyThere(&specs.title))
                                     .card(&mut index, 0),
@@ -385,10 +387,10 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                                 v: checked_info.verifier.to_owned(),
                             },
                             &general_verifier,
-                            database_name,
+                            &db_path,
                         )?;
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                        let checksum = stub.store_and_get_checksum(database_name)?;
+                        let checksum = stub.store_and_get_checksum(&db_path)?;
                         match possible_warning {
                             None => Ok(TransactionAction::Stub {
                                 s: TransactionCardSet {
@@ -430,14 +432,14 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                 } => {
                     let verifier_card = Card::Verifier(new_verifier_value).card(&mut index, 0);
                     if checked_info.verifier == general_verifier {
-                        let hold = Hold::get(&verifier_key, database_name)?;
+                        let hold = Hold::get(&verifier_key, &db_path)?;
                         stub = hold.upd_stub(
                             stub,
                             &verifier_key,
                             &custom_verifier,
                             &ValidCurrentVerifier::General,
                             HoldRelease::General,
-                            database_name,
+                            &db_path,
                         )?;
                         let warning_card_1 = Card::Warning(Warning::VerifierChangingToGeneral {
                             verifier_key: &verifier_key,
@@ -445,7 +447,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                         })
                         .card(&mut index, 0);
                         let mut possible_warning = None;
-                        if !specs_are_new(&specs, database_name)? {
+                        if !specs_are_new(&specs, &db_path)? {
                             possible_warning = Some(
                                 Card::Warning(Warning::NetworkSpecsAlreadyThere(&specs.title))
                                     .card(&mut index, 0),
@@ -458,10 +460,10 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                             &specs,
                             &ValidCurrentVerifier::General,
                             &general_verifier,
-                            database_name,
+                            &db_path,
                         )?;
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                        let checksum = stub.store_and_get_checksum(database_name)?;
+                        let checksum = stub.store_and_get_checksum(&db_path)?;
                         match possible_warning {
                             None => Ok(TransactionAction::Stub {
                                 s: TransactionCardSet {
@@ -489,15 +491,15 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                             }),
                         }
                     } else if new_verifier_value == old_verifier_value {
-                        if specs_are_new(&specs, database_name)? {
+                        if specs_are_new(&specs, &db_path)? {
                             stub = stub.add_network_specs(
                                 &specs,
                                 &ValidCurrentVerifier::Custom { v: custom_verifier },
                                 &general_verifier,
-                                database_name,
+                                &db_path,
                             )?;
                             let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                            let checksum = stub.store_and_get_checksum(database_name)?;
+                            let checksum = stub.store_and_get_checksum(&db_path)?;
                             Ok(TransactionAction::Stub {
                                 s: TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
@@ -532,15 +534,15 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                     stub = stub.new_history_entry(Event::Warning {
                         warning: Warning::NotVerified.show(),
                     });
-                    if specs_are_new(&specs, database_name)? {
+                    if specs_are_new(&specs, &db_path)? {
                         stub = stub.add_network_specs(
                             &specs,
                             &ValidCurrentVerifier::General,
                             &general_verifier,
-                            database_name,
+                            &db_path,
                         )?;
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                        let checksum = stub.store_and_get_checksum(database_name)?;
+                        let checksum = stub.store_and_get_checksum(&db_path)?;
                         Ok(TransactionAction::Stub {
                             s: TransactionCardSet {
                                 warning: Some(vec![warning_card]),
@@ -564,13 +566,13 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                 } => {
                     let verifier_card = Card::Verifier(new_verifier_value).card(&mut index, 0);
                     let new_general_verifier = checked_info.verifier;
-                    let general_hold = GeneralHold::get(database_name)?;
-                    stub = general_hold.upd_stub(stub, &new_general_verifier, database_name)?;
+                    let general_hold = GeneralHold::get(&db_path)?;
+                    stub = general_hold.upd_stub(stub, &new_general_verifier, &db_path)?;
                     let warning_card_1 =
                         Card::Warning(Warning::GeneralVerifierAppeared(&general_hold))
                             .card(&mut index, 0);
                     let mut possible_warning = None;
-                    if !specs_are_new(&specs, database_name)? {
+                    if !specs_are_new(&specs, &db_path)? {
                         possible_warning = Some(
                             Card::Warning(Warning::NetworkSpecsAlreadyThere(&specs.title))
                                 .card(&mut index, 0),
@@ -583,10 +585,10 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                         &specs,
                         &ValidCurrentVerifier::General,
                         &new_general_verifier,
-                        database_name,
+                        &db_path,
                     )?;
                     let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                    let checksum = stub.store_and_get_checksum(database_name)?;
+                    let checksum = stub.store_and_get_checksum(&db_path)?;
                     match possible_warning {
                         None => Ok(TransactionAction::Stub {
                             s: TransactionCardSet {
@@ -619,17 +621,17 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
                 v: Some(ref old_general_verifier_value),
             } => {
                 if checked_info.verifier == general_verifier {
-                    if specs_are_new(&specs, database_name)? {
+                    if specs_are_new(&specs, &db_path)? {
                         let verifier_card =
                             Card::Verifier(old_general_verifier_value).card(&mut index, 0);
                         stub = stub.add_network_specs(
                             &specs,
                             &ValidCurrentVerifier::General,
                             &general_verifier,
-                            database_name,
+                            &db_path,
                         )?;
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                        let checksum = stub.store_and_get_checksum(database_name)?;
+                        let checksum = stub.store_and_get_checksum(&db_path)?;
                         Ok(TransactionAction::Stub {
                             s: TransactionCardSet {
                                 verifier: Some(vec![verifier_card]),

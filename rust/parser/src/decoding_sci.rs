@@ -17,7 +17,7 @@ use definitions::network_specs::ShortSpecs;
 
 use crate::decoding_commons::{
     decode_known_length, decode_primitive_with_flags, get_compact, special_case_account_id,
-    DecodedOut, OutputCard,
+    special_case_account_id_20, DecodedOut, OutputCard,
 };
 use crate::decoding_sci_ext::{special_case_era, special_case_hash, Ext, Hash, SpecialExt};
 use crate::error::{ParserDecodingError, ParserMetadataError, Result};
@@ -293,6 +293,7 @@ fn decode_big256(data: &[u8], signed: bool, indent: u32) -> Result<DecodedOut> {
 #[derive(Debug)]
 enum SpecialType {
     AccountId,
+    AccountId20,
     Call,
     None,
 }
@@ -301,6 +302,7 @@ fn check_special(current_type: &Type<PortableForm>) -> SpecialType {
     match current_type.path().ident() {
         Some(a) => match a.as_str() {
             "AccountId32" => SpecialType::AccountId,
+            "AccountId20" => SpecialType::AccountId20,
             "Call" => SpecialType::Call,
             _ => SpecialType::None,
         },
@@ -347,6 +349,7 @@ pub(crate) fn decoding_sci_complete(
     };
     match special_type {
         SpecialType::AccountId => special_case_account_id(data, indent, short_specs),
+        SpecialType::AccountId20 => special_case_account_id_20(data, indent, short_specs),
         _ => {
             if let Some(ext) = possible_ext {
                 if let SpecialExt::Era = ext.specialty {
@@ -510,7 +513,7 @@ pub(crate) fn decoding_sci_entry_point(
     mut indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut> {
-    let pallet_index: u8 = *data.get(0).ok_or(ParserDecodingError::DataTooShort)?;
+    let pallet_index: u8 = *data.first().ok_or(ParserDecodingError::DataTooShort)?;
 
     let mut found_call_type: Option<u32> = None;
     let mut found_pallet_name: Option<String> = None;
@@ -741,7 +744,7 @@ fn decode_type_def_variant(
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut> {
-    let enum_index = *data.get(0).ok_or(ParserDecodingError::DataTooShort)?;
+    let enum_index = *data.first().ok_or(ParserDecodingError::DataTooShort)?;
 
     let check = is_option_bool(found_ty, meta_v14);
     if check.is_option {
@@ -1001,7 +1004,7 @@ fn decode_type_def_bit_sequence(
 ) -> Result<DecodedOut> {
     let pre_bitvec = get_compact::<u32>(&data)?;
     let actual_length = match pre_bitvec.compact_found % 8 {
-        0 => (pre_bitvec.compact_found / 8),
+        0 => pre_bitvec.compact_found / 8,
         _ => (pre_bitvec.compact_found / 8) + 1,
     };
     match pre_bitvec.start_next_unit {

@@ -2,13 +2,14 @@
 
 use bitvec::prelude::{BitVec, Msb0};
 use constants::{qr_palette, BORDER, CHUNK_SIZE, FPS_DEN, FPS_NOM, SCALING};
-use qrcode_static::png_qr;
+use qrcode_static::{png_qr, DataType};
 use qrcodegen::{QrCode, QrCodeEcc};
 use std::fs;
+use std::path::Path;
 
 /// function to take data as `Vec<u8>`, apply `raptorq` to get `Vec<EncodingPacket>`
 /// and serialize it to get `Vec<u8>` output
-fn make_data_packs(input: &[u8]) -> Result<Vec<Vec<u8>>, &'static str> {
+pub fn make_data_packs(input: &[u8], chunk_size: u16) -> Result<Vec<Vec<u8>>, &'static str> {
     // checking that data is not too long, set limit for now at 2^31 bit
     if input.len() >= 0x80000000 {
         return Err("Input data is too long, processing not possible");
@@ -18,14 +19,14 @@ fn make_data_packs(input: &[u8]) -> Result<Vec<Vec<u8>>, &'static str> {
 
     // number of additional packets; currently roughly equal to number of core packets
     let repair_packets_per_block: u32 = {
-        if input.len() as u32 <= CHUNK_SIZE as u32 {
+        if input.len() as u32 <= chunk_size as u32 {
             0
         } else {
-            input.len() as u32 / CHUNK_SIZE as u32
+            input.len() as u32 / chunk_size as u32
         }
     };
     // making `raptorq` Encoder, with defaults
-    let raptor_encoder = raptorq::Encoder::with_defaults(input, CHUNK_SIZE);
+    let raptor_encoder = raptorq::Encoder::with_defaults(input, chunk_size);
     // making EncodingPacket and deserializing each into `Vec<u8>`
     let out: Vec<Vec<u8>> = raptor_encoder
         .get_encoded_packets(repair_packets_per_block)
@@ -55,7 +56,14 @@ fn make_qr_codes(data: Vec<Vec<u8>>) -> Result<Vec<QrCode>, Box<dyn std::error::
     Ok(out)
 }
 
-fn make_apng(data: Vec<QrCode>, output_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+fn make_apng<P>(
+    data: Vec<QrCode>,
+    output_name: P,
+    fps: u16,
+) -> Result<(), Box<dyn std::error::Error>>
+where
+    P: AsRef<Path>,
+{
     let mut output_file = fs::File::create(output_name)?;
     let frames_count: u32 = data.len() as u32;
     let border_size = BORDER * SCALING;
@@ -67,7 +75,7 @@ fn make_apng(data: Vec<QrCode>, output_name: &str) -> Result<(), Box<dyn std::er
     encoder.set_color(png::ColorType::Indexed);
     encoder.set_palette(qr_palette());
     encoder.set_animated(frames_count, 0)?;
-    encoder.set_frame_delay(FPS_NOM, FPS_DEN)?;
+    encoder.set_frame_delay(FPS_NOM, fps)?;
     encoder.set_depth(png::BitDepth::One);
 
     let mut writer = encoder.write_header()?;
@@ -92,24 +100,32 @@ fn make_apng(data: Vec<QrCode>, output_name: &str) -> Result<(), Box<dyn std::er
 }
 
 /// Function to transform input `Vec<u8>` into fountain qr-code
-fn transform_into_qr_apng(
+pub fn transform_into_qr_apng<P>(
     input: &[u8],
-    output_name: &str,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let data_packs = make_data_packs(input)?;
-    make_apng(make_qr_codes(data_packs)?, output_name)?;
+    chunk_size: u16,
+    fps: u16,
+    output_name: P,
+) -> Result<(), Box<dyn std::error::Error>>
+where
+    P: AsRef<Path>,
+{
+    let data_packs = make_data_packs(input, chunk_size)?;
+    make_apng(make_qr_codes(data_packs)?, output_name, fps)?;
     Ok(())
 }
 
 /// Function to make appropriately sized qr code, apng or static
-pub fn make_pretty_qr(input: &[u8], output_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub fn make_pretty_qr<P>(input: &[u8], output_name: P) -> Result<(), Box<dyn std::error::Error>>
+where
+    P: AsRef<Path>,
+{
     if input.len() <= 2953 {
-        let qr = png_qr(input)?;
+        let qr = png_qr(input, DataType::Regular)?;
         match std::fs::write(output_name, &qr) {
             Ok(_) => Ok(()),
-            Err(e) => return Err(Box::from(format!("Output error {}", e))),
+            Err(e) => Err(Box::from(format!("Output error {}", e))),
         }
     } else {
-        transform_into_qr_apng(input, output_name)
+        transform_into_qr_apng(input, CHUNK_SIZE, FPS_DEN, output_name)
     }
 }

@@ -1,11 +1,11 @@
 //! Utils to display the database content and to verify default metadata files
-use constants::HOT_DB_NAME;
 use db_handling::helpers::try_get_meta_values_by_name_version;
 use definitions::{
     metadata::{AddressBookEntry, MetaValues},
-    network_specs::NetworkSpecsToSend,
+    network_specs::NetworkSpecs,
 };
 use sp_core::blake2_256;
+use std::path::Path;
 
 use crate::error::Result;
 use crate::helpers::{
@@ -38,8 +38,8 @@ use crate::helpers::{
 ///
 /// Block hash could be used to retrieve later the metadata from exactly same
 /// block if there is a need to compare metadata from different blocks.
-pub fn show_metadata() -> Result<()> {
-    let meta_values_stamped_set = read_metadata_database()?;
+pub fn show_metadata<P: AsRef<Path>>(db_path: P) -> Result<()> {
+    let meta_values_stamped_set = read_metadata_database(db_path)?;
     if meta_values_stamped_set.is_empty() {
         println!("Database has no metadata entries.");
         return Ok(());
@@ -71,7 +71,7 @@ pub fn show_metadata() -> Result<()> {
 /// - network encryption
 /// - additional marker that the network is a default one
 /// - network title as it will be displayed in Signer, from
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) in
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) in
 /// [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
 ///
 /// It could be called by:
@@ -86,8 +86,11 @@ pub fn show_metadata() -> Result<()> {
 ///
 /// Address book title is used to address networks when making `add_specs`
 /// update payloads or inspecting existing network specs.
-pub fn show_networks() -> Result<()> {
-    let address_book_set = address_book_content()?;
+pub fn show_networks<P>(db_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let address_book_set = address_book_content(&db_path)?;
     if address_book_set.is_empty() {
         println!("Address book is empty.");
         return Ok(());
@@ -95,11 +98,11 @@ pub fn show_networks() -> Result<()> {
     struct SetPart {
         title: String,
         address_book_entry: AddressBookEntry,
-        network_specs: NetworkSpecsToSend,
+        network_specs: NetworkSpecs,
     }
     let mut set: Vec<SetPart> = Vec::new();
     for (title, address_book_entry) in address_book_set.into_iter() {
-        let network_specs = network_specs_from_entry(&address_book_entry)?;
+        let network_specs = network_specs_from_entry(&address_book_entry, &db_path)?;
         set.push(SetPart {
             title,
             address_book_entry,
@@ -139,13 +142,16 @@ pub fn show_networks() -> Result<()> {
 /// it completely matches the one from the file
 ///
 /// Function could be used to check release metadata files in `defaults` crate.
-pub fn check_file(path: String) -> Result<()> {
+pub fn check_file<P>(path: String, db_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let meta_str = std::fs::read_to_string(&path)?;
 
     // `MetaValues` from metadata in file
     let from_file = MetaValues::from_str_metadata(meta_str.trim())?;
 
-    match try_get_meta_values_by_name_version(HOT_DB_NAME, &from_file.name, from_file.version)? {
+    match try_get_meta_values_by_name_version(db_path, &from_file.name, from_file.version)? {
         // network metadata for same network name and version is in the database
         Some(from_database) => {
             if from_database.meta == from_file.meta {
@@ -187,8 +193,11 @@ fn hash_string(meta: &[u8]) -> String {
 }
 
 /// Show network specs for user-entered address book title.
-pub fn show_specs(title: String) -> Result<()> {
-    let specs = network_specs_from_title(&title)?;
+pub fn show_specs<P>(title: String, db_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let specs = network_specs_from_title(&title, db_path)?;
     println!(
         "address book title: {}\nbase58 prefix: {}\ncolor: {}\ndecimals: {}\nencryption: {}\ngenesis_hash: {}\nlogo: {}\nname: {}\npath_id: {}\nsecondary_color: {}\ntitle: {}\nunit: {}",
         title,
@@ -209,8 +218,11 @@ pub fn show_specs(title: String) -> Result<()> {
 
 /// Show metadata block hash history from
 /// [`META_HISTORY`](constants::META_HISTORY) tree.
-pub fn show_block_history() -> Result<()> {
-    let meta_history_set = meta_history_content()?;
+pub fn show_block_history<P>(db_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let meta_history_set = meta_history_content(db_path)?;
     if meta_history_set.is_empty() {
         println!("Database has no metadata fetch history entries on record.");
         return Ok(());

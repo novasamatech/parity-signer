@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct TCAuthorPlain: View {
-    var value: MscAuthorPlain
+    var value: MscId
     var body: some View {
         HStack {
             Identicon(identicon: value.identicon)
-            TCNameValueTemplate(name: "From", value: value.base58)
+            TCNameValueTemplate(name: Localizable.TCName.from.string, value: value.base58)
         }
     }
 }

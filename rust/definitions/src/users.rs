@@ -23,7 +23,7 @@ use crate::{
 ///
 /// Info that should be available for any address key.  
 /// No secrets are stored there.  
-#[derive(Decode, PartialEq, Encode, Debug, Clone)]
+#[derive(Decode, PartialEq, Eq, Encode, Debug, Clone)]
 pub struct AddressDetails {
     /// seed name (as it is known to the Signer device)  
     pub seed_name: String,
@@ -40,6 +40,9 @@ pub struct AddressDetails {
 
     /// encryption algorithm associated with the address key and all its associated networks  
     pub encryption: Encryption,
+
+    /// address, or its parent address, had or could have secret exposed
+    pub secret_exposed: bool,
 }
 
 impl AddressDetails {
@@ -54,7 +57,10 @@ impl AddressDetails {
     ) -> Result<(MultiSigner, Self)> {
         let multisigner = address_key.multi_signer()?;
         let address_details = AddressDetails::decode(&mut &address_details_encoded[..])?;
-        if multisigner_to_encryption(&multisigner) != address_details.encryption {
+        if multisigner_to_encryption(&multisigner) != address_details.encryption
+            && multisigner_to_encryption(&multisigner) != Encryption::Ecdsa
+            && address_details.encryption != Encryption::Ethereum
+        {
             return Err(Error::EncryptionMismatch {
                 address_key: address_key.to_owned(),
                 encryption: address_details.encryption,

@@ -25,7 +25,7 @@
 mod ffi_types;
 
 use crate::ffi_types::*;
-use std::{fmt::Display, str::FromStr};
+use std::{collections::HashMap, fmt::Display, str::FromStr};
 
 /// Container for severe error message
 ///
@@ -37,6 +37,18 @@ pub enum ErrorDisplayed {
         /// Error description
         s: String,
     },
+    MutexPoisoned,
+}
+
+impl From<navigator::Error> for ErrorDisplayed {
+    fn from(e: navigator::Error) -> Self {
+        match e {
+            navigator::Error::MutexPoisoned => Self::MutexPoisoned,
+            _ => Self::Str {
+                s: format!("{}", e),
+            },
+        }
+    }
 }
 
 impl From<anyhow::Error> for ErrorDisplayed {
@@ -95,27 +107,27 @@ fn backend_action(
     action: Action,
     details: &str,
     seed_phrase: &str,
-) -> Result<Option<ActionResult>, ErrorDisplayed> {
-    navigator::do_action(action, details, seed_phrase).map_err(|s| ErrorDisplayed::Str { s })
+) -> Result<ActionResult, ErrorDisplayed> {
+    Ok(navigator::do_action(action, details, seed_phrase)?)
 }
 
 /// Should be called once at start of the app and could be called on app reset
 ///
 /// Accepts list of seed names to avoid calling [`update_seed_names`] every time
-fn init_navigation(dbname: &str, seed_names: Vec<String>) {
-    navigator::init_navigation(dbname, seed_names)
+fn init_navigation(dbname: &str, seed_names: Vec<String>) -> Result<(), ErrorDisplayed> {
+    Ok(navigator::init_navigation(dbname, seed_names)?)
 }
 
 /// Should be called every time any change could have been done to seeds. Accepts updated list of
 /// seeds, completely disregards previously known list
-fn update_seed_names(seed_names: Vec<String>) {
-    navigator::update_seed_names(seed_names)
+fn update_seed_names(seed_names: Vec<String>) -> Result<(), ErrorDisplayed> {
+    Ok(navigator::update_seed_names(seed_names)?)
 }
 
 /// Determines estimated required number of multiframe QR that should be gathered before decoding
 /// is attempted
 fn qrparser_get_packets_total(data: &str, cleaned: bool) -> anyhow::Result<u32, ErrorDisplayed> {
-    qr_reader_phone::get_length(data, cleaned).map_err(Into::into)
+    qr_reader_phone::get_length(data, cleaned).map_err(|e| e.to_string().into())
 }
 
 /// Attempts to convert QR data (transfered as json-like string) into decoded but not parsed UOS
@@ -124,10 +136,33 @@ fn qrparser_get_packets_total(data: &str, cleaned: bool) -> anyhow::Result<u32, 
 /// `cleaned` is platform-specific flag indicating whether QR payloads have QR prefix stripped by
 /// QR parsing code
 fn qrparser_try_decode_qr_sequence(
-    data: &str,
+    data: &[String],
     cleaned: bool,
-) -> anyhow::Result<String, anyhow::Error> {
-    qr_reader_phone::decode_sequence(data, cleaned)
+) -> anyhow::Result<String, ErrorDisplayed> {
+    qr_reader_phone::decode_sequence(data, cleaned).map_err(|e| e.to_string().into())
+}
+
+/// Exports secret (private) key as QR code
+///
+/// `public_key` is hex-encoded public key of the key to export. Can be taken from [`MKeyDetails`]
+/// `network_specs_key` is hex-encoded [`NetworkSpecsKey`]. Can be taken from [`MSCNetworkInfo`]
+fn generate_secret_key_qr(
+    dbname: &str,
+    public_key: &str,
+    expected_seed_name: &str,
+    network_specs_key: &str,
+    seed_phrase: &str,
+    key_password: Option<String>,
+) -> Result<MKeyDetails, anyhow::Error> {
+    db_handling::identities::export_secret_key(
+        dbname,
+        public_key,
+        expected_seed_name,
+        network_specs_key,
+        seed_phrase,
+        key_password,
+    )
+    .map_err(Into::into)
 }
 
 /// Checks derivation path for validity and collisions
@@ -186,6 +221,23 @@ fn history_entry_system(event: Event, dbname: &str) -> anyhow::Result<(), String
 fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<(), String> {
     db_handling::manage_history::seed_name_was_shown(dbname, seed_name.to_string())
         .map_err(|e| format!("{}", e))
+}
+
+fn export_key_info(
+    dbname: &str,
+    selected_names: HashMap<String, ExportedSet>,
+) -> anyhow::Result<MKeysInfoExport, String> {
+    navigator::export_key_info(dbname, selected_names).map_err(|e| format!("{}", e))
+}
+
+fn keys_by_seed_name(dbname: &str, seed_name: &str) -> anyhow::Result<MKeysNew, String> {
+    navigator::keys_by_seed_name(dbname, seed_name).map_err(|e| format!("{}", e))
+}
+/// Encode binary info into qr code
+fn encode_to_qr(payload: &[u8]) -> anyhow::Result<Vec<u8>, String> {
+    use qrcode_static::DataType;
+
+    qrcode_static::png_qr(payload, DataType::Regular).map_err(|e| format!("{}", e))
 }
 
 /// Must be called once to initialize logging from Rust in development mode.

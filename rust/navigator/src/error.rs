@@ -13,4 +13,13 @@ pub enum Error {
 
     #[error("DB not initialized.")]
     DbNotInitialized,
+
+    #[error("Key not found {0}")]
+    KeyNotFound(String),
+
+    #[error("Mutex poisoned")]
+    MutexPoisoned,
+
+    #[error("Data packing error: {0}")]
+    DataPacking(String),
 }

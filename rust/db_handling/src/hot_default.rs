@@ -14,7 +14,7 @@
 //! fetched through RPC calls, empty by default
 //! - [`SETTREE`](constants::SETTREE) with types information
 //! - [`SPECSTREEPREP`](constants::SPECSTREEPREP) with network specs entries
-//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 use parity_scale_codec::Encode;
 use sled::Batch;
 
@@ -41,10 +41,10 @@ fn default_hot_address_book() -> Result<Batch> {
 }
 
 /// Make [`Batch`] with default
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 /// values, for [`SPECSTREEPREP`] tree, in purged database.
 ///
-/// - Add default `NetworkSpecsToSend` values
+/// - Add default `NetworkSpecs` values
 fn default_hot_network_specs_prep() -> Result<Batch> {
     let mut batch = Batch::default();
     for x in default_chainspecs_to_send().iter() {
@@ -77,11 +77,14 @@ fn default_hot_settings() -> Result<Batch> {
 ///
 /// Note that no metadata entries are loaded. It is intended that all metadata
 /// entries appear during the database use.
-pub fn reset_hot_database(database_name: &str) -> Result<()> {
-    if std::fs::remove_dir_all(database_name).is_ok() {}
+pub fn reset_hot_database<P>(db_path: P) -> Result<()>
+where
+    P: AsRef<std::path::Path>,
+{
+    if std::fs::remove_dir_all(&db_path).is_ok() {}
     TrDbHot::new()
         .set_address_book(default_hot_address_book()?) // set default address book
         .set_network_specs_prep(default_hot_network_specs_prep()?) // set default network specs
         .set_settings(default_hot_settings()?) // load default types
-        .apply(database_name)
+        .apply(&db_path)
 }

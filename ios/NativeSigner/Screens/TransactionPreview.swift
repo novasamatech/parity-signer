@@ -19,31 +19,37 @@ struct TransactionPreview: View {
         VStack {
             TransactionBlock(cards: content.content.assemble())
             VStack {
-                if let address = content.authorInfo {
-                    AddressCard(address: address)
+                if let authorInfo = content.authorInfo {
+                    AddressCard(card: authorInfo)
                 }
                 if let network = content.networkInfo {
                     NetworkCard(title: network.networkTitle, logo: network.networkLogo)
                 }
                 if content.ttype == .sign {
                     HStack {
-                        Text("LOG NOTE").font(Fontstyle.overline.base).foregroundColor(Asset.text400.swiftUIColor)
+                        Localizable.logNote.text.font(Fontstyle.overline.base)
+                            .foregroundColor(Asset.text400.swiftUIColor)
                         Spacer()
                     }
                     ZStack {
                         RoundedRectangle(cornerRadius: 8).stroke(Asset.border400.swiftUIColor).frame(height: 39)
-                        TextField("comment", text: $comment, prompt: Text("Comment (not published)"))
-                            .foregroundColor(Asset.text400.swiftUIColor)
-                            .background(Asset.bg100.swiftUIColor)
-                            .font(Fontstyle.body2.base)
-                            .focused($focus)
-                            .onDisappear {
-                                focus = false
-                            }
-                            .padding(.horizontal, 8)
+                        TextField(
+                            Localizable.comment.string,
+                            text: $comment,
+                            prompt: Localizable.commentNotPublished.text
+                        )
+                        .foregroundColor(Asset.text400.swiftUIColor)
+                        .background(Asset.bg100.swiftUIColor)
+                        .font(Fontstyle.body2.base)
+                        .focused($focus)
+                        .onDisappear {
+                            focus = false
+                        }
+                        .padding(.horizontal, 8)
                     }
                     HStack {
-                        Text("visible only on this device").font(Fontstyle.subtitle1.base)
+                        Localizable.visibleOnlyOnThisDevice.text
+                            .font(Fontstyle.subtitle1.base)
                             .padding(.bottom)
                         Spacer()
                     }
@@ -53,19 +59,19 @@ struct TransactionPreview: View {
                     switch content.ttype {
                     case .sign:
                         BigButton(
-                            text: "Unlock key and sign",
+                            text: Localizable.TransactionPreview.unlockSign.key,
                             isShaded: false,
                             isCrypto: true,
                             action: {
                                 focus = false
-                                if let seedName = content.authorInfo?.seedName {
+                                if let seedName = content.authorInfo?.address.seedName {
                                     sign(seedName, comment)
                                 }
                             }
                         )
                     case .stub:
                         BigButton(
-                            text: "Approve",
+                            text: Localizable.TransactionPreview.approve.key,
                             action: {
                                 navigationRequest(.init(action: .goForward))
                             }
@@ -74,7 +80,7 @@ struct TransactionPreview: View {
                         EmptyView()
                     case .importDerivations:
                         BigButton(
-                            text: "Select seed",
+                            text: Localizable.TransactionPreview.selectSeed.key,
                             isCrypto: true,
                             action: {
                                 navigationRequest(.init(action: .goForward))
@@ -85,7 +91,7 @@ struct TransactionPreview: View {
                     }
                     if content.ttype != .done {
                         BigButton(
-                            text: "Decline",
+                            text: Localizable.TransactionPreview.decline.key,
                             isShaded: true,
                             isDangerous: true,
                             action: {

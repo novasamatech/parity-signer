@@ -1,13 +1,27 @@
 input_dir: ./
 output_dir: NativeSigner/Generated/
 
-xcassets:
-  - inputs: ./NativeSigner/Resources/Assets.xcassets
-    outputs:
-      templateName: swift5
-      output: Assets.swift
 fonts:
   - inputs: ./NativeSigner/Resources/Fonts
     outputs:
       templateName: swift5
       output: Fonts.swift
+plist:
+  - inputs: ./NativeSigner/Info.plist
+    outputs:
+      templateName: runtime-swift5
+      output: ApplicationInformation.swift
+      params:
+          enumName: ApplicationInformation
+strings:
+    - inputs: ./NativeSigner/Resources/en.lproj/Localizable.strings
+      outputs:
+        - templatePath: ./NativeSigner/Resources/Templates/swiftui-strings-template.stencil
+          output: Localizable.swift
+          params:
+            enumName: Localizable
+xcassets:
+  - inputs: ./NativeSigner/Resources/Assets.xcassets
+    outputs:
+      templateName: swift5
+      output: Assets.swift

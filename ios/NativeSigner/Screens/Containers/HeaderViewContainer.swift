@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct HeaderViewContainer: View {
-    @ObservedObject var data: SignerDataModel
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         Header(
@@ -18,11 +18,7 @@ struct HeaderViewContainer: View {
             screenNameType: navigation.actionResult.screenNameType,
             rightButton: navigation.actionResult.rightButton,
             alert: data.alert,
-            canaryDead: data.canaryDead,
-            alertShow: { data.alertShow = true },
-            navigationRequest: { navigationRequest in
-                navigation.perform(navigation: navigationRequest)
-            }
+            alertShow: { data.alertShow = true }
         )
     }
 }

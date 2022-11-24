@@ -1,6 +1,7 @@
 [Error]
 interface ErrorDisplayed {
     Str(string s);
+    MutexPoisoned();
 };
 
 dictionary MetaValuesDisplay {
@@ -37,6 +38,7 @@ enum Encryption {
     "Ed25519",
     "Sr25519",
     "Ecdsa",
+    "Ethereum",
 };
 
 [Enum]
@@ -45,22 +47,12 @@ interface ValidCurrentVerifier {
     Custom(Verifier v);
 };
 
-dictionary NetworkSpecs {
-    u16 base58prefix;
-    string color;
-    u8 decimals;
-    Encryption encryption;
-    H256 genesis_hash;
-    string logo;
-    string name;
+dictionary OrderedNetworkSpecs {
+    NetworkSpecs specs;
     u8 order;
-    string path_id;
-    string secondary_color;
-    string title;
-    string unit;
 };
 
-dictionary NetworkSpecsToSend {
+dictionary NetworkSpecs {
     u16 base58prefix;
     string color;
     u8 decimals;
@@ -75,14 +67,14 @@ dictionary NetworkSpecsToSend {
 };
 
 dictionary NetworkSpecsDisplay {
-    NetworkSpecs specs;
+    OrderedNetworkSpecs network;
     ValidCurrentVerifier valid_current_verifier;
     Verifier general_verifier;
 };
 
 
 dictionary NetworkSpecsExport {
-    NetworkSpecsToSend specs_to_send;
+    NetworkSpecs specs_to_send;
     VerifierValue signed_by;
 };
 
@@ -219,6 +211,7 @@ interface Event {
     HistoryCleared();
     DatabaseInitiated();
     SeedRemoved(string seed_name);
+    SecretWasExported(IdentityHistory identity_history);
 };
 
 enum Action {
@@ -268,26 +261,6 @@ enum Action {
     "Nothing",
 };
 
-dictionary Identity {
-    string seed_name;
-    string address_key;
-    string public_key;
-    sequence<u8> identicon;
-    boolean has_pwd;
-    string path;
-    boolean is_multiselect;
-    string base58;
-};
-
-dictionary MSeedKeyCard {
-    string seed_name;
-    sequence<u8> identicon;
-    string address_key;
-    string base58;
-    boolean swiped;
-    boolean multiselect;
-};
-
 dictionary MNetworkCard {
     string title;
     string logo;
@@ -295,18 +268,16 @@ dictionary MNetworkCard {
 
 dictionary MKeys {
     sequence<MKeysCard> set;
-    MSeedKeyCard root;
+    MKeysCard root;
     MNetworkCard network;
     boolean multiselect_mode;
     string multiselect_count;
 };
 
 dictionary MKeysCard {
+    Address address;
     string address_key;
     string base58;
-    sequence<u8> identicon;
-    boolean has_pwd;
-    string path;
     boolean swiped;
     boolean multiselect;
 };
@@ -330,7 +301,7 @@ dictionary History {
 
 dictionary MEventMaybeDecoded {
     Event event;
-    Address? signed_by;
+    MAddressCard? signed_by;
     TransactionCardSet? decoded;
     MVerifierDetails? verifier_details;
 };
@@ -343,7 +314,7 @@ dictionary MLogDetails {
 dictionary MTransaction {
     TransactionCardSet content;
     TransactionType ttype;
-    Address? author_info;
+    MAddressCard? author_info;
     MSCNetworkInfo? network_info;
 };
 
@@ -378,6 +349,7 @@ dictionary TransactionCardSet {
 dictionary SeedNameCard {
     string seed_name;
     sequence<u8> identicon;
+    u32 derived_keys_count;
 };
 
 dictionary MSeeds {
@@ -389,6 +361,8 @@ dictionary MKeyDetails {
     string pubkey;
     MSCNetworkInfo network_info;
     Address address;
+    string base58;
+    boolean? multiselect;
 };
 
 dictionary MNewSeed {
@@ -422,16 +396,21 @@ dictionary MDeriveKey {
 dictionary DerivationCheck {
     boolean button_good;
     DerivationDestination? where_to;
-    Address? collision;
+    MAddressCard? collision;
     string? error;
 };
 
 dictionary Address {
-    string base58;
     string path;
     boolean has_pwd;
     sequence<u8> identicon;
     string seed_name;
+    boolean secret_exposed;
+};
+
+dictionary MAddressCard {
+    string base58;
+    Address address;
     boolean? multiselect;
 };
 
@@ -476,12 +455,9 @@ dictionary MMetadataRecord {
 };
 
 dictionary MRawKey {
-    string seed_name;
+    Address address;
     string address_key;
     string public_key;
-    sequence<u8> identicon;
-    boolean has_pwd;
-    string path;
 };
 
 dictionary MSignSufficientCrypto {
@@ -503,6 +479,10 @@ dictionary MMNetwork {
 
 dictionary MManageNetworks {
     sequence<MMNetwork> networks;
+};
+
+dictionary MKeysInfoExport {
+    sequence<sequence<u8>> frames;
 };
 
 [Enum]
@@ -531,18 +511,23 @@ interface ScreenData {
 namespace signer {
     FooterButton? action_get_name([ByRef] Action action);
 
+    [Throws=ErrorDisplayed]
     void init_navigation([ByRef] string dbname, sequence<string> seed_names);
 
     [Throws=ErrorDisplayed]
-    ActionResult? backend_action(Action action, [ByRef] string details, [ByRef] string seed_phrase);
+    ActionResult backend_action(Action action, [ByRef] string details, [ByRef] string seed_phrase);
 
+    [Throws=ErrorDisplayed]
     void update_seed_names(sequence<string> seed_names);
 
     [Throws=ErrorDisplayed]
     u32 qrparser_get_packets_total([ByRef] string data, boolean cleaned);
 
     [Throws=ErrorDisplayed]
-    string qrparser_try_decode_qr_sequence([ByRef] string data, boolean cleaned);
+    string qrparser_try_decode_qr_sequence([ByRef] sequence<string> data, boolean cleaned);
+
+    [Throws=ErrorDisplayed]
+    MKeyDetails generate_secret_key_qr([ByRef] string dbname, [ByRef] string public_key, [ByRef] string expected_seed_name, [ByRef] string network_specs_key, [ByRef] string seed_phrase, string? key_password);
 
     DerivationCheck substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
 
@@ -567,9 +552,38 @@ namespace signer {
     [Throws=ErrorDisplayed]
     void history_seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
 
+    [Throws=ErrorDisplayed]
+    MKeysInfoExport export_key_info([ByRef] string dbname, record<DOMString, ExportedSet> selected_names);
+
+    [Throws=ErrorDisplayed]
+    MKeysNew keys_by_seed_name([ByRef] string dbname, [ByRef] string seed_name);
+
+    [Throws=ErrorDisplayed]
+    sequence<u8> encode_to_qr([ByRef] sequence<u8> payload);
+
     void init_logging(string tag);
 };
 
+dictionary MKeysNew {
+    MAddressCard? root;
+    sequence<MKeyAndNetworkCard> set;
+};
+
+dictionary MKeyAndNetworkCard {
+    MKeysCard key;
+    MSCNetworkInfo network;
+};
+
+dictionary PathAndNetwork {
+    string derivation;
+    string network_specs_key;
+};
+
+[Enum]
+interface ExportedSet {
+    All();
+    Selected(sequence<PathAndNetwork> s);
+};
 
 [Enum]
 interface MSCContent {
@@ -579,7 +593,7 @@ interface MSCContent {
 };
 
 dictionary MSufficientCryptoReady {
-    Address author_info;
+    MAddressCard author_info;
     sequence<u8> sufficient;
     MSCContent content;
 };
@@ -634,7 +648,7 @@ dictionary MSignatureReady {
 };
 
 dictionary MEnterPassword {
-    Address author_info;
+    MAddressCard author_info;
     u32 counter;
 };
 
@@ -681,11 +695,6 @@ interface ModalData {
     KeyDetailsAction();
     LogComment();
     SelectSeed(MSeeds f);
-};
-
-dictionary MSCAuthorPlain {
-    string base58;
-    sequence<u8> identicon;
 };
 
 dictionary MSCCall {
@@ -736,6 +745,7 @@ dictionary MSCNameVersion {
 dictionary MSCNetworkInfo {
     string network_title;
     string network_logo;
+    string network_specs_key;
 };
 
 dictionary MSCTip {
@@ -751,8 +761,8 @@ dictionary MSCTxSpecPlain {
 
 [Enum]
 interface Card {
-    AuthorCard(Address f);
-    AuthorPlainCard(MSCAuthorPlain f);
+    AuthorCard(MAddressCard f);
+    AuthorPlainCard(MSCId f);
     AuthorPublicKeyCard(MVerifierDetails f);
     BalanceCard(MSCCurrency f);
     BitVecCard(string f);
@@ -773,7 +783,7 @@ interface Card {
     NetworkGenesisHashCard(string f);
     NetworkNameCard(string f);
     NetworkInfoCard(MSCNetworkInfo f);
-    NewSpecsCard(NetworkSpecsToSend f);
+    NewSpecsCard(NetworkSpecs f);
     NonceCard(string f);
     NoneCard();
     PalletCard(string f);

@@ -1,14 +1,14 @@
 //! Helpers
+use db_handling::identities::{AddrInfo, ExportAddrs, ExportAddrsV1, SeedInfo};
 use parity_scale_codec::Encode;
+use qrcode_rtx::transform_into_qr_apng;
 use serde_json::{map::Map, value::Value};
 use sled::Batch;
 use sp_core::H256;
+use std::path::Path;
 use std::{cmp::Ordering, convert::TryInto};
 
-use constants::{
-    add_specs, load_metadata, ADDRESS_BOOK, COLOR, EXPORT_FOLDER, HOT_DB_NAME, METATREE,
-    META_HISTORY, SECONDARY_COLOR, SPECSTREEPREP,
-};
+use constants::{ADDRESS_BOOK, COLOR, METATREE, META_HISTORY, SECONDARY_COLOR, SPECSTREEPREP};
 use db_handling::{
     db_transactions::TrDbHot,
     helpers::{make_batch_clear_tree, open_db, open_tree},
@@ -18,7 +18,7 @@ use definitions::{
     helpers::unhex,
     keyring::{AddressBookKey, MetaKey, NetworkSpecsKey},
     metadata::{AddressBookEntry, MetaHistoryEntry, MetaValues},
-    network_specs::NetworkSpecsToSend,
+    network_specs::NetworkSpecs,
     qr_transfers::{ContentAddSpecs, ContentLoadMeta},
 };
 
@@ -28,8 +28,11 @@ use crate::interpret_specs::{check_specs, interpret_properties, TokenFetch};
 use crate::parser::Token;
 
 /// Get [`AddressBookEntry`] from the database for given address book title.
-pub fn get_address_book_entry(title: &str) -> Result<AddressBookEntry> {
-    let database = open_db(HOT_DB_NAME)?;
+pub fn get_address_book_entry<P>(title: &str, db_path: P) -> Result<AddressBookEntry>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
     let address_book = open_tree(&database, ADDRESS_BOOK)?;
     match address_book.get(AddressBookKey::from_title(title).key())? {
         Some(a) => Ok(AddressBookEntry::from_entry_with_title(title, &a)?),
@@ -37,25 +40,32 @@ pub fn get_address_book_entry(title: &str) -> Result<AddressBookEntry> {
     }
 }
 
-/// Get [`NetworkSpecsToSend`] from the database for given address book title.
-pub fn network_specs_from_title(title: &str) -> Result<NetworkSpecsToSend> {
-    network_specs_from_entry(&get_address_book_entry(title)?)
+/// Get [`NetworkSpecs`] from the database for given address book title.
+pub fn network_specs_from_title<P>(title: &str, db_path: P) -> Result<NetworkSpecs>
+where
+    P: AsRef<Path>,
+{
+    network_specs_from_entry(&get_address_book_entry(title, &db_path)?, &db_path)
 }
 
-/// Get [`NetworkSpecsToSend`] corresponding to the given [`AddressBookEntry`].
+/// Get [`NetworkSpecs`] corresponding to the given [`AddressBookEntry`].
 ///
 /// Entries in [`ADDRESS_BOOK`] and [`SPECSTREEPREP`] trees for any network can
 /// be added and removed only simultaneously.
 // TODO consider combining those, key would be address book title, network specs
 // key will stay only in cold database then?
-pub fn network_specs_from_entry(
+pub fn network_specs_from_entry<P>(
     address_book_entry: &AddressBookEntry,
-) -> Result<NetworkSpecsToSend> {
+    db_path: P,
+) -> Result<NetworkSpecs>
+where
+    P: AsRef<Path>,
+{
     let network_specs_key = NetworkSpecsKey::from_parts(
         &address_book_entry.genesis_hash,
         &address_book_entry.encryption,
     );
-    let network_specs = get_network_specs_to_send(&network_specs_key)?;
+    let network_specs = get_network_specs_to_send(&network_specs_key, db_path)?;
     if network_specs.name != address_book_entry.name {
         return Err(Error::AddressBookSpecsName {
             address_book_name: address_book_entry.name.to_string(),
@@ -65,17 +75,21 @@ pub fn network_specs_from_entry(
     Ok(network_specs)
 }
 
-/// Try to get network specs [`NetworkSpecsToSend`] from the hot database.
+/// Try to get network specs [`NetworkSpecs`] from the hot database.
 ///
-/// If the [`NetworkSpecsKey`] and associated [`NetworkSpecsToSend`] are not
+/// If the [`NetworkSpecsKey`] and associated [`NetworkSpecs`] are not
 /// found in the [`SPECSTREEPREP`], the result is `Ok(None)`.
-pub fn try_get_network_specs_to_send(
+pub fn try_get_network_specs_to_send<P>(
     network_specs_key: &NetworkSpecsKey,
-) -> Result<Option<NetworkSpecsToSend>> {
-    let database = open_db(HOT_DB_NAME)?;
+    db_path: P,
+) -> Result<Option<NetworkSpecs>>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
     let chainspecs = open_tree(&database, SPECSTREEPREP)?;
     match chainspecs.get(network_specs_key.key())? {
-        Some(specs_encoded) => Ok(Some(NetworkSpecsToSend::from_entry_with_key_checked(
+        Some(specs_encoded) => Ok(Some(NetworkSpecs::from_entry_with_key_checked(
             network_specs_key,
             specs_encoded,
         )?)),
@@ -83,30 +97,37 @@ pub fn try_get_network_specs_to_send(
     }
 }
 
-/// Get network specs [`NetworkSpecsToSend`] from the hot database.
+/// Get network specs [`NetworkSpecs`] from the hot database.
 ///
 /// Network specs here are expected to be found, not finding them results in an
 /// error.
-pub fn get_network_specs_to_send(
+pub fn get_network_specs_to_send<P>(
     network_specs_key: &NetworkSpecsKey,
-) -> Result<NetworkSpecsToSend> {
-    match try_get_network_specs_to_send(network_specs_key)? {
+    db_path: P,
+) -> Result<NetworkSpecs>
+where
+    P: AsRef<Path>,
+{
+    match try_get_network_specs_to_send(network_specs_key, db_path)? {
         Some(a) => Ok(a),
-        None => Err(Error::NetworkSpecsToSend(network_specs_key.to_owned())),
+        None => Err(Error::NetworkSpecs(network_specs_key.to_owned())),
     }
 }
 
-/// Update the database after `add_specs` run.
+/// Update the database after `add-specs` run.
 ///
 /// Inputs `&str` URL address that was used for RPC calls and already completed
-/// [`NetworkSpecsToSend`].
+/// [`NetworkSpecs`].
 ///
 /// Adds simultaneously [`AddressBookEntry`] to [`ADDRESS_BOOK`] and
-/// [`NetworkSpecsToSend`] to [`SPECSTREEPREP`].
+/// [`NetworkSpecs`] to [`SPECSTREEPREP`].
 ///
 /// Key for [`AddressBookEntry`] is the network address book title. It always
 /// has format `<network_name>-<network_encryption>`.
-pub fn db_upd_network(address: &str, network_specs: &NetworkSpecsToSend) -> Result<()> {
+pub fn db_upd_network<P>(address: &str, network_specs: &NetworkSpecs, db_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let mut network_specs_prep_batch = Batch::default();
     network_specs_prep_batch.insert(
         NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption).key(),
@@ -121,7 +142,7 @@ pub fn db_upd_network(address: &str, network_specs: &NetworkSpecsToSend) -> Resu
         name: network_specs.name.to_string(),
         genesis_hash: network_specs.genesis_hash,
         address: address.to_string(),
-        encryption: network_specs.encryption.clone(),
+        encryption: network_specs.encryption,
         def: false,
     }
     .encode();
@@ -130,7 +151,7 @@ pub fn db_upd_network(address: &str, network_specs: &NetworkSpecsToSend) -> Resu
     TrDbHot::new()
         .set_address_book(address_book_batch)
         .set_network_specs_prep(network_specs_prep_batch)
-        .apply(HOT_DB_NAME)?;
+        .apply(db_path)?;
     Ok(())
 }
 
@@ -144,7 +165,7 @@ pub fn error_occured(e: Error, pass_errors: bool) -> Result<()> {
     }
 }
 
-/// Content to print during `load_metadata <-k/-p/-t>` processing.
+/// Content to print during `load-metadata<-k/-p/-t>` processing.
 pub enum Write {
     /// all payloads, `-t` key or no setting key was used
     All,
@@ -152,13 +173,16 @@ pub enum Write {
     /// only new payloads, `-k` setting key was used
     OnlyNew,
 
-    /// no payloads, `-p` setting key was used    
+    /// no payloads, `-p` setting key was used
     None,
 }
 
 /// Get all [`ADDRESS_BOOK`] entries with address book titles.
-pub fn address_book_content() -> Result<Vec<(String, AddressBookEntry)>> {
-    let database = open_db(HOT_DB_NAME)?;
+pub fn address_book_content<P>(db_path: P) -> Result<Vec<(String, AddressBookEntry)>>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
     let address_book = open_tree(&database, ADDRESS_BOOK)?;
     let mut out: Vec<(String, AddressBookEntry)> = Vec::new();
     for x in address_book.iter().flatten() {
@@ -169,10 +193,16 @@ pub fn address_book_content() -> Result<Vec<(String, AddressBookEntry)>> {
 
 /// Get all [`ADDRESS_BOOK`] entries with address book titles, for given URL
 /// address.
-pub fn filter_address_book_by_url(address: &str) -> Result<Vec<(String, AddressBookEntry)>> {
+pub fn filter_address_book_by_url<P>(
+    address: &str,
+    db_path: P,
+) -> Result<Vec<(String, AddressBookEntry)>>
+where
+    P: AsRef<Path>,
+{
     let mut out: Vec<(String, AddressBookEntry)> = Vec::new();
     let mut found_name = None;
-    for (title, address_book_entry) in address_book_content()?.into_iter() {
+    for (title, address_book_entry) in address_book_content(db_path)?.into_iter() {
         if address_book_entry.address == address {
             found_name = match found_name {
                 Some(name) => {
@@ -193,9 +223,12 @@ pub fn filter_address_book_by_url(address: &str) -> Result<Vec<(String, AddressB
 }
 
 /// Search for any [`ADDRESS_BOOK`] entry with given genesis hash.
-pub fn genesis_hash_in_hot_db(genesis_hash: H256) -> Result<Option<AddressBookEntry>> {
+pub fn genesis_hash_in_hot_db<P>(genesis_hash: H256, db_path: P) -> Result<Option<AddressBookEntry>>
+where
+    P: AsRef<Path>,
+{
     let mut out = None;
-    for (_, address_book_entry) in address_book_content()?.into_iter() {
+    for (_, address_book_entry) in address_book_content(db_path)?.into_iter() {
         if address_book_entry.genesis_hash == genesis_hash {
             out = Some(address_book_entry);
             break;
@@ -206,8 +239,11 @@ pub fn genesis_hash_in_hot_db(genesis_hash: H256) -> Result<Option<AddressBookEn
 
 /// Check if [`ADDRESS_BOOK`] has entries with given `name` and title other than
 /// `except_title`.
-pub fn is_specname_in_db(name: &str, except_title: &str) -> Result<bool> {
-    let database = open_db(HOT_DB_NAME)?;
+pub fn is_specname_in_db<P>(name: &str, except_title: &str, db_path: P) -> Result<bool>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
     let address_book = open_tree(&database, ADDRESS_BOOK)?;
     let mut out = false;
     for x in address_book.iter().flatten() {
@@ -221,8 +257,11 @@ pub fn is_specname_in_db(name: &str, except_title: &str) -> Result<bool> {
 }
 
 /// Get all entries from `META_HISTORY`.
-pub fn meta_history_content() -> Result<Vec<MetaHistoryEntry>> {
-    let database = open_db(HOT_DB_NAME)?;
+pub fn meta_history_content<P>(db_path: P) -> Result<Vec<MetaHistoryEntry>>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
     let meta_history = open_tree(&database, META_HISTORY)?;
     let mut out: Vec<MetaHistoryEntry> = Vec::new();
     for x in meta_history.iter().flatten() {
@@ -242,8 +281,11 @@ pub struct MetaValuesStamped {
 }
 
 /// Collect all [`MetaValuesStamped`] from the hot database.
-pub fn read_metadata_database() -> Result<Vec<MetaValuesStamped>> {
-    let database = open_db(HOT_DB_NAME)?;
+pub fn read_metadata_database<P>(db_path: P) -> Result<Vec<MetaValuesStamped>>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
     let metadata = open_tree(&database, METATREE)?;
     let meta_history = open_tree(&database, META_HISTORY)?;
     let mut out: Vec<MetaValuesStamped> = Vec::new();
@@ -484,19 +526,25 @@ pub fn add_new_metadata(new: &MetaValuesStamped, sorted: &mut SortedMetaValues) 
 }
 
 /// Collect and sort [`MetaValuesStamped`] from the hot database
-pub fn prepare_metadata() -> Result<SortedMetaValues> {
-    let known_metavalues = read_metadata_database()?;
+pub fn prepare_metadata<P>(db_path: P) -> Result<SortedMetaValues>
+where
+    P: AsRef<Path>,
+{
+    let known_metavalues = read_metadata_database(db_path)?;
     sort_metavalues(known_metavalues)
 }
 
-/// Update the database after `load_metadata` run.
+/// Update the database after `load-metadata` run.
 ///
 /// Clear [`METATREE`] tree of the hot database and write new metadata set in
 /// it.
 ///
 /// Update [`META_HISTORY`] tree.
-pub fn db_upd_metadata(sorted_meta_values: SortedMetaValues) -> Result<()> {
-    let mut metadata_batch = make_batch_clear_tree(HOT_DB_NAME, METATREE)?;
+pub fn db_upd_metadata<P>(sorted_meta_values: SortedMetaValues, db_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let mut metadata_batch = make_batch_clear_tree(&db_path, METATREE)?;
     let mut meta_history_batch = Batch::default();
     let mut all_meta = sorted_meta_values.newer;
     all_meta.extend_from_slice(&sorted_meta_values.older);
@@ -510,7 +558,7 @@ pub fn db_upd_metadata(sorted_meta_values: SortedMetaValues) -> Result<()> {
     TrDbHot::new()
         .set_metadata(metadata_batch)
         .set_meta_history(meta_history_batch)
-        .apply(HOT_DB_NAME)?;
+        .apply(&db_path)?;
 
     Ok(())
 }
@@ -577,28 +625,78 @@ pub fn meta_fetch(address: &str) -> Result<MetaFetched> {
 ///
 /// Fetched network metadata, processes it, and outputs file
 /// `<network_name><metadata_version>_<block_hash>` with hexadecimal
-/// metadata in [`EXPORT_FOLDER`].
+/// metadata in [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
 ///
 /// Command line to get metadata at block:
 ///
 /// `meta_at_block -u <network_url_address> -block <block_hash>`
-pub fn debug_meta_at_block(address: &str, hex_block_hash: &str) -> Result<()> {
+pub fn debug_meta_at_block<P>(address: &str, hex_block_hash: &str, export_dir: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let block_hash = get_hash(hex_block_hash, Hash::BlockEntered)?;
     let meta_fetched = fetch_meta_at_block(address, block_hash)?;
     let meta_values = MetaValues::from_str_metadata(&meta_fetched)?;
     let filename = format!(
-        "{}/{}{}_{}",
-        EXPORT_FOLDER,
+        "{}{}_{}",
         meta_values.name,
         meta_values.version,
         hex::encode(block_hash)
     );
-    std::fs::write(&filename, hex::encode(meta_values.meta))?;
+    let f_path = export_dir.as_ref().join(filename);
+    std::fs::write(f_path, hex::encode(meta_values.meta))?;
 
     Ok(())
 }
 
-/// Fetch data and assemble [`NetworkSpecsToSend`] with only URL address and
+pub fn generate_key_info_export_to_qr<P: AsRef<Path>>(
+    output_name: P,
+    chunk_size: u16,
+    fps: u16,
+    keys_num: usize,
+) -> Result<()> {
+    use sp_keyring::sr25519::Keyring;
+    use sp_runtime::MultiSigner;
+
+    let multisigner = Some(MultiSigner::from(Keyring::Alice.public()));
+    let name = "a very long key name a very long key name".to_owned();
+
+    let derived_keys: Vec<AddrInfo> = (0..keys_num)
+        .into_iter()
+        .map(|num| AddrInfo {
+            address: "0xdeadbeefdeadbeefdeadbeef".to_string(),
+            derivation_path: Some(format!("//this//is//a//path//{}", num)),
+            encryption: Encryption::Sr25519,
+            genesis_hash: H256::default(),
+        })
+        .collect();
+
+    let seed_info = SeedInfo {
+        name,
+        multisigner,
+        derived_keys,
+    };
+    let export_addrs_v1 = ExportAddrsV1 {
+        addrs: vec![seed_info],
+    };
+    let export_addrs = ExportAddrs::V1(export_addrs_v1);
+
+    let export_addrs_encoded = [&[0x53, 0xff, 0xde], export_addrs.encode().as_slice()].concat();
+
+    generate_qr_code(&export_addrs_encoded, chunk_size, fps, output_name)
+}
+
+/// Generate with data into a specified file.
+pub fn generate_qr_code<P: AsRef<Path>>(
+    input: &[u8],
+    chunk_size: u16,
+    fps: u16,
+    output_name: P,
+) -> Result<()> {
+    transform_into_qr_apng(input, chunk_size, fps, output_name).map_err(Error::Qr)
+}
+
+/// Fetch data and assemble [`NetworkSpecs`] with only URL address and
 /// user-entered data.
 ///
 /// Database is not addressed. For `-d` content key.
@@ -607,7 +705,7 @@ pub fn specs_agnostic(
     encryption: Encryption,
     optional_token_override: Option<Token>,
     optional_signer_title_override: Option<String>,
-) -> Result<NetworkSpecsToSend> {
+) -> Result<NetworkSpecs> {
     let fetch = common_specs_fetch(address)?;
 
     // `NetworkProperties` checked and processed
@@ -623,9 +721,9 @@ pub fn specs_agnostic(
         encryption.show()
     ));
 
-    // `NetworkSpecsToSend` is constructed with fetched and user-entered values
+    // `NetworkSpecs` is constructed with fetched and user-entered values
     // and with default colors.
-    Ok(NetworkSpecsToSend {
+    Ok(NetworkSpecs {
         base58prefix: new_properties.base58prefix,
         color: COLOR.to_string(),
         decimals: new_properties.decimals,
@@ -640,7 +738,7 @@ pub fn specs_agnostic(
     })
 }
 
-/// Update [`NetworkSpecsToSend`] already existing in the database with
+/// Update [`NetworkSpecs`] already existing in the database with
 /// **exactly same** encryption.
 ///
 /// Could be used to overwrite token (if possible for the network) or the Signer
@@ -650,7 +748,7 @@ pub fn specs_agnostic(
 /// should be updated.
 pub fn update_known_specs(
     address: &str,
-    specs: &mut NetworkSpecsToSend,
+    specs: &mut NetworkSpecs,
     optional_signer_title_override: Option<String>,
     optional_token_override: Option<Token>,
 ) -> Result<bool> {
@@ -665,7 +763,7 @@ pub fn update_known_specs(
     Ok(update_done)
 }
 
-/// Modify [`NetworkSpecsToSend`] existing in the database **only** with
+/// Modify [`NetworkSpecs`] existing in the database **only** with
 /// different encryption.
 ///
 /// New data always will be added to the database unless errors occur.
@@ -673,15 +771,15 @@ pub fn update_known_specs(
 /// Function inputs:
 ///
 /// - `&str` address to make RPC calls
-/// - `NetworkSpecsToSend` as they were found in the database, to be modified
+/// - `NetworkSpecs` as they were found in the database, to be modified
 /// here
 /// - new `Encryption` to apply to `encryption` and `title` (if no title
-/// override was entered) fields of the `NetworkSpecsToSend`
+/// override was entered) fields of the `NetworkSpecs`
 /// - optional title override
 /// - optional token override
 pub fn update_modify_encryption_specs(
     address: &str,
-    specs: &mut NetworkSpecsToSend,
+    specs: &mut NetworkSpecs,
     encryption: &Encryption,
     optional_signer_title_override: Option<String>,
     optional_token_override: Option<Token>,
@@ -733,17 +831,17 @@ fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch> {
     })
 }
 
-/// Check known [`NetworkSpecsToSend`] with network data fetched and apply token
+/// Check known [`NetworkSpecs`] with network data fetched and apply token
 /// override.
 ///
-/// This is a helper function for `add_specs` runs with `-n` reference key, i.e.
+/// This is a helper function for `add-specs` runs with `-n` reference key, i.e.
 /// for cases when *some* network specs entry already exists in the database.
 ///
-/// Input [`NetworkSpecsToSend`] is the entry from the database to which the
+/// Input [`NetworkSpecs`] is the entry from the database to which the
 /// encryption and title overrides could be applied.
 ///
 /// Function inputs `address` at which RPC calls are made, network specs
-/// `NetworkSpecsToSend` from the database, and user-entered optional override
+/// `NetworkSpecs` from the database, and user-entered optional override
 /// for `Token`.
 ///
 /// Output is flag indicating if the network specs have been changed. This flag
@@ -751,7 +849,7 @@ fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch> {
 /// function.
 fn known_specs_processing(
     address: &str,
-    specs: &mut NetworkSpecsToSend,
+    specs: &mut NetworkSpecs,
     optional_token_override: Option<Token>,
 ) -> Result<bool> {
     let mut update_done = false;
@@ -901,19 +999,17 @@ fn get_hash(input_hash: &str, what: Hash) -> Result<H256> {
     let hash_vec = unhex(input_hash)?;
     let out: [u8; 32] = match hash_vec.try_into() {
         Ok(a) => a,
-        Err(_) => match what {
-            Hash::BlockEntered => return Err(Error::BlockHashLength),
-            Hash::BlockFetched { url: _ } => {
-                return Err(Error::UnexpectedFetchedBlockHashFormat {
+        Err(_) => {
+            return match what {
+                Hash::BlockEntered => Err(Error::BlockHashLength),
+                Hash::BlockFetched { url: _ } => Err(Error::UnexpectedFetchedBlockHashFormat {
                     value: input_hash.to_string(),
-                });
-            }
-            Hash::Genesis { url: _ } => {
-                return Err(Error::UnexpectedFetchedGenesisHashFormat {
+                }),
+                Hash::Genesis { url: _ } => Err(Error::UnexpectedFetchedGenesisHashFormat {
                     value: input_hash.to_string(),
-                })
+                }),
             }
-        },
+        }
     };
     Ok(out.into())
 }
@@ -922,30 +1018,35 @@ fn get_hash(input_hash: &str, what: Hash) -> Result<H256> {
 ///
 /// Resulting file, located in dedicated [`FOLDER`](constants::FOLDER), could be
 /// used to generate data signature and to produce updates.
-pub fn load_metadata_print(shortcut: &MetaShortCut) -> Result<()> {
-    let filename = format!(
-        "{}_{}V{}",
-        load_metadata(),
-        shortcut.meta_values.name,
-        shortcut.meta_values.version
+pub fn load_metadata_print<P>(shortcut: &MetaShortCut, files_dir: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let file_name = format!(
+        "sign_me_load_metadata_{}V{}",
+        shortcut.meta_values.name, shortcut.meta_values.version
     );
+    let file_path = files_dir.as_ref().join(file_name);
     let content = ContentLoadMeta::generate(&shortcut.meta_values.meta, &shortcut.genesis_hash);
-    content.write(&filename)?;
+    content.write(file_path)?;
     Ok(())
 }
 
 /// Write to file `add_specs` update payload as raw bytes.
 ///
-/// Resulting file, located in dedicated [`FOLDER`](constants::FOLDER), could be
+/// Resulting file, located in dedicated directory (by default, [`FOLDER`](constants::FOLDER)), could be
 /// used to generate data signature and to produce updates.
-pub fn add_specs_print(network_specs: &NetworkSpecsToSend) -> Result<()> {
-    let filename = format!(
-        "{}_{}_{}",
-        add_specs(),
+pub fn add_specs_print<P>(network_specs: &NetworkSpecs, files_dir: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let file_name = format!(
+        "sign_me_add_specs_{}_{}",
         network_specs.name,
         network_specs.encryption.show()
     );
+    let file_path = files_dir.as_ref().join(file_name);
     let content = ContentAddSpecs::generate(network_specs);
-    content.write(&filename)?;
+    content.write(file_path)?;
     Ok(())
 }

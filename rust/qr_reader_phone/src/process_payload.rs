@@ -1,77 +1,76 @@
-use anyhow::anyhow;
-use constants::CHUNK_SIZE;
-use raptorq;
-use std::convert::TryInto;
+use crate::{Error, LegacyFrame, RaptorqFrame, Result};
+use raptorq::{self, EncodingPacket};
+use std::{collections::HashSet, convert::TryFrom};
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub struct Fountain {
     decoder: raptorq::Decoder,
-    collected_ser_packets: Vec<Vec<u8>>,
     length: u32,
-    pub total: usize,
+    pub total: u32,
+    collected: HashSet<usize>,
 }
 
 impl Fountain {
+    /// Return the number of packets collected.
     pub fn collected(&self) -> usize {
-        self.collected_ser_packets.len()
+        self.collected.len()
+    }
+
+    /// Called to inform that the packet with the id has been collected.
+    pub fn collect(&mut self, frame_index: usize) {
+        self.collected.insert(frame_index);
     }
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub struct LegacyMulti {
     length: u16,
     elements: Vec<Element>,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub struct Element {
     number: u16,
     contents: Vec<u8>,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum InProgress {
     None,
     Fountain(Fountain),
     LegacyMulti(LegacyMulti),
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum Ready {
     NotYet(InProgress),
     Yes(Vec<u8>),
 }
 
-pub fn process_decoded_payload(
-    payload: Vec<u8>,
-    mut decoding: InProgress,
-) -> anyhow::Result<Ready> {
-    if payload[0] & 0b10000000 > 0 {
-        //        println!("dealing with part of dynamic fountain qr code");
-        let length_piece: [u8; 4] = payload[..4]
-            .to_vec()
-            .try_into()
-            .expect("constant vector slice size, always fits");
-        let length = u32::from_be_bytes(length_piece) - 0x80000000;
-        let new_packet = payload[4..].to_vec();
+pub fn process_decoded_payload(payload: Vec<u8>, mut decoding: InProgress) -> Result<Ready> {
+    if let Ok(frame) = RaptorqFrame::try_from(payload.as_ref()) {
+        let length = frame.size;
+        let total = frame.total();
+        let new_packet = frame.payload;
+        let decoded_packet = EncodingPacket::deserialize(&new_packet);
+        let block_number = decoded_packet.payload_id().encoding_symbol_id() as usize;
         match decoding {
             InProgress::None => {
-                let total = (length as usize) / new_packet.len() + 2;
-                let collected_ser_packets = vec![new_packet];
                 let config = raptorq::ObjectTransmissionInformation::with_defaults(
                     length as u64,
-                    CHUNK_SIZE,
+                    decoded_packet.data().len() as u16,
                 );
                 let mut decoder = raptorq::Decoder::new(config);
-                match try_fountain(&collected_ser_packets, &mut decoder) {
+                match try_fountain(decoded_packet, &mut decoder) {
                     Some(v) => Ok(Ready::Yes(v)),
                     None => {
-                        let in_progress = Fountain {
+                        let mut in_progress = Fountain {
                             decoder,
-                            collected_ser_packets,
                             length,
                             total,
+                            collected: HashSet::new(),
                         };
+                        in_progress.collect(block_number);
                         decoding = InProgress::Fountain(in_progress);
                         Ok(Ready::NotYet(decoding))
                     }
@@ -79,41 +78,24 @@ pub fn process_decoded_payload(
             }
             InProgress::Fountain(mut in_progress) => {
                 if in_progress.length != length {
-                    return Err(anyhow!("Was decoding fountain qr code with message length {}, got interrupted by fountain qr code with message length {}", in_progress.length, length));
+                    return Err(Error::ConflictingPayloads(in_progress.length, length));
                 }
-                if !in_progress.collected_ser_packets.contains(&new_packet) {
-                    in_progress.collected_ser_packets.push(new_packet);
-                    match try_fountain(&in_progress.collected_ser_packets, &mut in_progress.decoder)
-                    {
-                        Some(v) => Ok(Ready::Yes(v)),
-                        None => Ok(Ready::NotYet(InProgress::Fountain(in_progress))),
-                    }
-                } else {
-                    Ok(Ready::NotYet(InProgress::Fountain(in_progress)))
+
+                in_progress.collect(block_number);
+                match try_fountain(decoded_packet, &mut in_progress.decoder) {
+                    Some(v) => Ok(Ready::Yes(v)),
+                    None => Ok(Ready::NotYet(InProgress::Fountain(in_progress))),
                 }
             }
-            InProgress::LegacyMulti(_) => {
-                return Err(anyhow!(
-                    "Was decoding legacy multi-element qr, and got interrupted by a fountain one."
-                ))
-            }
+            InProgress::LegacyMulti(_) => Err(Error::LegacyInterruptedByFountain),
         }
-    } else if payload.starts_with(&[0]) {
-        //            println!("dealing with part of legacy dynamic multi-element qr code");
-        let length_piece: [u8; 2] = payload[1..3]
-            .to_vec()
-            .try_into()
-            .expect("constant vector slice size, always fits");
-        let length = u16::from_be_bytes(length_piece);
-        let element_number_piece: [u8; 2] = payload[3..5]
-            .to_vec()
-            .try_into()
-            .expect("constant vector slice size, always fits");
-        let number = u16::from_be_bytes(element_number_piece);
+    } else if let Ok(frame) = LegacyFrame::try_from(payload.as_ref()) {
+        let length = frame.total;
+        let number = frame.index;
         if number >= length {
-            return Err(anyhow!("Number of element in legacy multi-element qr sequence exceeds expected sequence length."));
+            return Err(Error::LengthExceeded);
         }
-        let contents = payload[5..].to_vec();
+        let contents = frame.data;
         let new_element = Element { number, contents };
         match decoding {
             InProgress::None => {
@@ -126,19 +108,15 @@ pub fn process_decoded_payload(
                     None => Ok(Ready::NotYet(InProgress::LegacyMulti(collected))),
                 }
             }
-            InProgress::Fountain(_) => {
-                return Err(anyhow!(
-                "Was decoding fountain qr code, and got interrupted by a legacy multi-element one."
-            ))
-            }
+            InProgress::Fountain(_) => Err(Error::FountainInterruptedByLegacy),
             InProgress::LegacyMulti(mut collected) => {
                 if collected.length != length {
-                    return Err(anyhow!("Was decoding legacy multi-element qr code with {} elements, got interrupted by legacy multi-element qr code with {} elements", collected.length, length));
+                    return Err(Error::ConflictingLegacyLengths(collected.length, length));
                 }
                 if !collected.elements.contains(&new_element) {
                     for x in collected.elements.iter() {
                         if x.number == number {
-                            return Err(anyhow!("Encountered two legacy multi-element qr code fragments with same number."));
+                            return Err(Error::SameNumber);
                         }
                     }
                     collected.elements.push(new_element);
@@ -154,21 +132,13 @@ pub fn process_decoded_payload(
     } else if let InProgress::None = decoding {
         Ok(Ready::Yes(payload))
     } else {
-        return Err(anyhow!(
-            "Was reading dynamic qr, and got interrupted by a static one."
-        ));
+        Err(Error::DynamicInterruptedByStatic)
     }
 }
 
-fn try_fountain(
-    collected_ser_packets: &[Vec<u8>],
-    current_decoder: &mut raptorq::Decoder,
-) -> Option<Vec<u8>> {
-    let mut result = None;
-    for x in collected_ser_packets.iter() {
-        result = current_decoder.decode(raptorq::EncodingPacket::deserialize(x));
-    }
-    result
+fn try_fountain(packet: EncodingPacket, decoder: &mut raptorq::Decoder) -> Option<Vec<u8>> {
+    decoder.add_new_packet(packet);
+    decoder.get_result()
 }
 
 fn try_legacy(collected: &mut LegacyMulti) -> Option<Vec<u8>> {

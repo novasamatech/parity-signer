@@ -1,22 +1,25 @@
 use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 use sp_runtime::{generic::Era, MultiSigner};
 
+use definitions::helpers::{make_identicon_from_account, make_identicon_from_id20, IdenticonStyle};
+use definitions::keyring::NetworkSpecsKey;
+
+use definitions::navigation::MAddressCard;
 use definitions::{
     crypto::Encryption,
-    helpers::{make_identicon_from_multisigner, pic_meta, print_multisigner_as_base58},
+    helpers::{make_identicon_from_multisigner, pic_meta, print_multisigner_as_base58_or_eth},
     history::MetaValuesDisplay,
     keyring::VerifierKey,
     navigation::{
-        Address, Card as NavCard, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency,
-        MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCFieldNumber, MSCId, MSCNameVersion,
-        MSCNetworkInfo, MTypesInfo, MVerifierDetails, TransactionCard,
+        Address, Card as NavCard, MMetadataRecord, MSCCall, MSCCurrency, MSCEnumVariantName,
+        MSCEraMortal, MSCFieldName, MSCFieldNumber, MSCId, MSCNameVersion, MSCNetworkInfo,
+        MTypesInfo, MVerifierDetails, TransactionCard,
     },
-    network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue},
+    network_specs::{NetworkSpecs, OrderedNetworkSpecs, VerifierValue},
     qr_transfers::ContentLoadTypes,
     users::AddressDetails,
 };
 use parser::cards::ParserCard;
-use plot_icon::generate_png_scaled_default;
 
 use crate::error::Error;
 use crate::holds::{GeneralHold, Hold};
@@ -37,8 +40,8 @@ pub(crate) enum Card<'a> {
     Verifier(&'a VerifierValue),
     Meta(MetaValuesDisplay),
     TypesInfo(ContentLoadTypes),
-    NewSpecs(&'a NetworkSpecsToSend),
-    NetworkInfo(&'a NetworkSpecs),
+    NewSpecs(&'a NetworkSpecs),
+    NetworkInfo(&'a OrderedNetworkSpecs),
     NetworkGenesisHash(&'a [u8]),
     Derivations(&'a [String]),
     Warning(Warning<'a>),
@@ -115,7 +118,16 @@ impl<'a> Card<'a> {
                     f: MSCId {
                         base58: id
                             .to_ss58check_with_version(Ss58AddressFormat::custom(*base58prefix)),
-                        identicon: generate_png_scaled_default(&<[u8; 32]>::from(id.to_owned())),
+                        identicon: make_identicon_from_account(id.to_owned()),
+                    },
+                },
+                ParserCard::Id20 {
+                    id,
+                    base58prefix: _,
+                } => NavCard::IdCard {
+                    f: MSCId {
+                        base58: format!("0x{}", hex::encode(id)),
+                        identicon: make_identicon_from_id20(id),
                     },
                 },
                 ParserCard::None => NavCard::NoneCard,
@@ -203,17 +215,21 @@ impl<'a> Card<'a> {
                 author,
                 base58prefix,
             } => NavCard::AuthorPlainCard {
-                f: MSCAuthorPlain {
-                    base58: print_multisigner_as_base58(author, Some(*base58prefix)),
-                    identicon: make_identicon_from_multisigner(author),
+                f: MSCId {
+                    base58: print_multisigner_as_base58_or_eth(
+                        author,
+                        Some(*base58prefix),
+                        Encryption::Sr25519,
+                    ),
+                    identicon: make_identicon_from_multisigner(author, IdenticonStyle::Dots),
                 },
             },
             Card::AuthorPublicKey(author) => {
-                let identicon = make_identicon_from_multisigner(author);
+                let identicon = make_identicon_from_multisigner(author, IdenticonStyle::Dots);
                 let (public_key, encryption) = match author {
-                    MultiSigner::Ed25519(p) => (hex::encode(&p), Encryption::Ed25519.show()),
-                    MultiSigner::Sr25519(p) => (hex::encode(&p), Encryption::Sr25519.show()),
-                    MultiSigner::Ecdsa(p) => (hex::encode(&p), Encryption::Ecdsa.show()),
+                    MultiSigner::Ed25519(p) => (hex::encode(p), Encryption::Ed25519.show()),
+                    MultiSigner::Sr25519(p) => (hex::encode(p), Encryption::Sr25519.show()),
+                    MultiSigner::Ecdsa(p) => (hex::encode(p), Encryption::Ecdsa.show()),
                 };
                 NavCard::AuthorPublicKeyCard {
                     f: MVerifierDetails {
@@ -226,14 +242,14 @@ impl<'a> Card<'a> {
             Card::Verifier(x) => match x {
                 VerifierValue::Standard { m } => {
                     let (public_key, encryption) = match m {
-                        MultiSigner::Ed25519(p) => (hex::encode(&p), Encryption::Ed25519.show()),
-                        MultiSigner::Sr25519(p) => (hex::encode(&p), Encryption::Sr25519.show()),
-                        MultiSigner::Ecdsa(p) => (hex::encode(&p), Encryption::Ecdsa.show()),
+                        MultiSigner::Ed25519(p) => (hex::encode(p), Encryption::Ed25519.show()),
+                        MultiSigner::Sr25519(p) => (hex::encode(p), Encryption::Sr25519.show()),
+                        MultiSigner::Ecdsa(p) => (hex::encode(p), Encryption::Ecdsa.show()),
                     };
                     NavCard::VerifierCard {
                         f: MVerifierDetails {
                             public_key,
-                            identicon: make_identicon_from_multisigner(m),
+                            identicon: make_identicon_from_multisigner(m, IdenticonStyle::Dots),
                             encryption,
                         },
                     }
@@ -243,7 +259,7 @@ impl<'a> Card<'a> {
                 f: MMetadataRecord {
                     specname: x.name.clone(),
                     specs_version: x.version.to_string(),
-                    meta_hash: hex::encode(&x.meta_hash),
+                    meta_hash: hex::encode(x.meta_hash),
                     meta_id_pic: pic_meta(x.meta_hash.as_bytes()),
                 },
             },
@@ -260,8 +276,12 @@ impl<'a> Card<'a> {
             Card::NewSpecs(x) => NavCard::NewSpecsCard { f: (*x).clone() },
             Card::NetworkInfo(x) => NavCard::NetworkInfoCard {
                 f: MSCNetworkInfo {
-                    network_title: x.title.clone(),
-                    network_logo: x.logo.clone(),
+                    network_title: x.specs.title.clone(),
+                    network_logo: x.specs.logo.clone(),
+                    network_specs_key: hex::encode(
+                        NetworkSpecsKey::from_parts(&x.specs.genesis_hash, &x.specs.encryption)
+                            .key(),
+                    ),
                 },
             },
             Card::NetworkGenesisHash(x) => NavCard::NetworkGenesisHashCard { f: hex::encode(x) },
@@ -286,13 +306,21 @@ pub(crate) fn make_author_info(
     author: &MultiSigner,
     base58prefix: u16,
     address_details: &AddressDetails,
-) -> Address {
-    Address {
-        base58: print_multisigner_as_base58(author, Some(base58prefix)),
-        identicon: make_identicon_from_multisigner(author),
-        seed_name: address_details.seed_name.clone(),
-        path: address_details.path.clone(),
-        has_pwd: address_details.has_pwd,
+) -> MAddressCard {
+    let base58 =
+        print_multisigner_as_base58_or_eth(author, Some(base58prefix), address_details.encryption);
+    MAddressCard {
+        base58,
+        address: Address {
+            identicon: make_identicon_from_multisigner(
+                author,
+                address_details.encryption.identicon_style(),
+            ),
+            seed_name: address_details.seed_name.clone(),
+            path: address_details.path.clone(),
+            has_pwd: address_details.has_pwd,
+            secret_exposed: address_details.secret_exposed,
+        },
         multiselect: None,
     }
 }

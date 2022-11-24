@@ -2,16 +2,19 @@
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
-use crate::error::Result;
+use crate::error::{Error, Result};
 use db_handling::{
     helpers::get_address_details,
+    identities::get_multisigner_by_address,
     interface_signer::{first_network, SeedDraft},
 };
+use definitions::navigation::MAddressCard;
 use definitions::{
-    helpers::{make_identicon_from_multisigner, multisigner_to_public},
+    crypto::Encryption,
+    helpers::{make_identicon_from_multisigner, multisigner_to_public, IdenticonStyle},
     keyring::{AddressKey, NetworkSpecsKey},
     navigation::{Address, TransactionCardSet},
-    network_specs::NetworkSpecs,
+    network_specs::OrderedNetworkSpecs,
     users::AddressDetails,
 };
 use transaction_parsing;
@@ -97,7 +100,7 @@ pub struct TransactionState {
 ///State of screen generating sufficient crypto
 #[derive(Debug, Clone)]
 pub struct SufficientCryptoState {
-    key_selected: Option<(MultiSigner, AddressDetails, Address)>,
+    key_selected: Option<(MultiSigner, AddressDetails, MAddressCard)>,
     entered_info: EnteredInfo,
     content: transaction_signing::SufficientContent,
     counter: u8,
@@ -117,7 +120,7 @@ pub struct EnteredInfo(pub String);
 
 impl KeysState {
     pub fn new(seed_name: &str, database_name: &str) -> Result<Self> {
-        let network_specs = first_network(database_name)?;
+        let network_specs = first_network(database_name)?.specs;
         Ok(Self {
             seed_name: seed_name.to_string(),
             network_specs_key: NetworkSpecsKey::from_parts(
@@ -177,10 +180,7 @@ impl KeysState {
             SpecialtyKeysState::MultiSelect(multiselect) => {
                 let mut new_multiselect = multiselect.to_owned();
                 if multiselect.contains(multisigner) {
-                    new_multiselect = new_multiselect
-                        .into_iter()
-                        .filter(|a| a != multisigner)
-                        .collect();
+                    new_multiselect.retain(|a| a != multisigner);
                 } else {
                     new_multiselect.push(multisigner.to_owned());
                 }
@@ -229,7 +229,13 @@ impl KeysState {
 impl AddressState {
     pub fn new(hex_address_key: &str, keys_state: &KeysState, database_name: &str) -> Result<Self> {
         let address_key = AddressKey::from_hex(hex_address_key)?;
-        let multisigner = address_key.multi_signer()?;
+        let multisigner = if let Ok(m) = address_key.multi_signer() {
+            m
+        } else if let Some(key) = get_multisigner_by_address(database_name, &address_key)? {
+            key
+        } else {
+            return Err(Error::KeyNotFound(format!("{:?}", address_key)));
+        };
         let is_root =
             get_address_details(database_name, &AddressKey::from_multisigner(&multisigner))?
                 .is_root();
@@ -422,8 +428,8 @@ impl TransactionState {
         new_checksum: u32,
         content: TransactionCardSet,
         has_pwd: bool,
-        author_info: Address,
-        network_info: NetworkSpecs,
+        author_info: MAddressCard,
+        network_info: OrderedNetworkSpecs,
     ) -> Self {
         let action = transaction_parsing::TransactionAction::Sign {
             content,
@@ -468,7 +474,7 @@ impl SufficientCryptoState {
     pub fn content(&self) -> transaction_signing::SufficientContent {
         self.content.to_owned()
     }
-    pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, Address)> {
+    pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, MAddressCard)> {
         self.key_selected.to_owned()
     }
     pub fn update(
@@ -477,13 +483,22 @@ impl SufficientCryptoState {
         address_details: &AddressDetails,
         new_secret_string: &str,
     ) -> Self {
-        let identicon = make_identicon_from_multisigner(multisigner);
-        let author_info = Address {
+        let style = if address_details.encryption == Encryption::Ethereum {
+            IdenticonStyle::Blockies
+        } else {
+            IdenticonStyle::Dots
+        };
+
+        let identicon = make_identicon_from_multisigner(multisigner, style);
+        let author_info = MAddressCard {
+            address: Address {
+                identicon,
+                seed_name: address_details.seed_name.clone(),
+                path: address_details.path.clone(),
+                has_pwd: address_details.has_pwd,
+                secret_exposed: address_details.secret_exposed,
+            },
             base58: hex::encode(multisigner_to_public(multisigner)),
-            identicon,
-            seed_name: address_details.seed_name.clone(),
-            path: address_details.path.clone(),
-            has_pwd: address_details.has_pwd,
             multiselect: None,
         };
         Self {
@@ -636,6 +651,7 @@ mod tests {
             has_pwd: false,
             network_id: Vec::new(),
             encryption: Encryption::Sr25519,
+            secret_exposed: false,
         }
     }
 

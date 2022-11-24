@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct ScreenSelector: View {
+    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject var navigation: NavigationCoordinator
+    @EnvironmentObject var appState: AppState
+
     let screenData: ScreenData
-    let alert: Bool
     let navigationRequest: NavigationRequest
     let getSeed: (String) -> String
     let doJailbreak: () -> Void
@@ -29,12 +32,14 @@ struct ScreenSelector: View {
                 navigationRequest: navigationRequest
             )
         case let .keys(value):
-            KeyManager(
-                content: value,
-                alert: alert,
-                alertShow: alertShow,
-                increment: increment,
-                navigationRequest: navigationRequest
+            KeyDetailsView(
+                dataModel: KeyDetailsDataModel(value),
+                viewModel: .init(
+                    keysData: appState.userData.keysData,
+                    exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value)
+                ),
+                forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
+                resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
             )
         case let .settings(value):
             SettingsScreen(
@@ -56,12 +61,17 @@ struct ScreenSelector: View {
                 navigationRequest: navigationRequest
             )
         case let .seedSelector(value):
-            SeedManager(
-                content: value,
-                navigationRequest: navigationRequest
+            KeySetList(
+                viewModel: .init(listViewModel: KeySetListViewModelBuilder().build(for: value))
             )
         case let .keyDetails(value):
-            ExportAddress(content: value)
+            KeyDetailsPublicKeyView(
+                forgetKeyActionHandler: ForgetSingleKeyAction(navigation: navigation),
+                viewModel: KeyDetailsPublicKeyViewModel(value),
+                actionModel: KeyDetailsPublicKeyActionModel(value),
+                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value),
+                resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
+            )
         case let .newSeed(value):
             NewSeedScreen(
                 content: value,

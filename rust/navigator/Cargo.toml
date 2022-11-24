@@ -11,17 +11,19 @@ definitions = {path = "../definitions", default-features = false, features = ["s
 hex = "0.4.3"
 lazy_static = "1.4.0"
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
-thiserror = "1.0.32"
+thiserror = "1.0.37"
 transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
 zeroize = "1.5.7"
+qrcode_rtx = { path = "../qrcode_rtx" }
+parity-scale-codec = "3.2.1"
 
 [dev-dependencies]
 constants = { path = "../constants", features = ["test"] }
-image = { version = "0.24.3", default-features = false, features = ["ico"] }
+image = { version = "0.24.4", default-features = false, features = ["ico"] }
 parser = { path = "../parser", default-features = false }
 quircs = { version = "0.10.0" }
-regex = { version = "1.6.0" }
+regex = { version = "1.7.0" }
 db_handling = {path = "../db_handling"}
 
 pretty_assertions = "1"

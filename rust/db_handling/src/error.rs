@@ -76,7 +76,7 @@ pub enum Error {
     /// [`CurrentVerifier`](definitions::network_specs::CurrentVerifier) under
     /// `verifier_key` in `VERIFIERS` tree of the database, however, the
     /// corresponding genesis hash is encountered in a
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry under
+    /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry under
     /// `network_specs_key` in `SPECSTREE` tree of the database.
     /// No network specs record can get into database without the verifier
     /// entry, and the verifier could not be removed while network specs still
@@ -323,7 +323,7 @@ pub enum Error {
     #[error("Types not found.")]
     TypesNotFound,
 
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) for a network
+    /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) for a network
     /// in `SPECSTREE` tree of the Signer database, searched by
     /// [`NetworkSpecsKey`].
     ///
@@ -364,6 +364,30 @@ pub enum Error {
 
     #[error("There are no seeds. Please create a seed first.")]
     NoKnownSeeds,
+
+    /// Found `secret_exposed` flag mismatch in the database: address is not
+    /// marked as potentially exposed when it must have been.
+    #[error(
+    "Address details entry with public key {} (seed {}, path {}{}) is not marked as potentially exposed, \
+        when it should be.",
+    hex::encode(multisigner_to_public(.multisigner)),
+    .address_details.seed_name,
+    .address_details.path,
+    if .address_details.has_pwd { "///<password>" } else { "" },
+    )]
+    SecretExposedMismatch {
+        multisigner: MultiSigner,
+        address_details: AddressDetails,
+    },
+
+    /// User has entered a wrong password for a passworded address.
+    #[error("Wrong password.")]
+    WrongPassword,
+
+    #[error("Key pair with public key {} can't be expressed as a direct derivation from a seed",
+    hex::encode(multisigner_to_public(.multisigner)),
+    )]
+    NoSeedForKeyPair { multisigner: MultiSigner },
 }
 
 /// DB handling result.

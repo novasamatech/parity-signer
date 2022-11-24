@@ -14,8 +14,6 @@ struct SettingsScreen: View {
     let doWipe: () -> Void
     let navigationRequest: NavigationRequest
 
-    private let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-
     var body: some View {
         VStack(spacing: 2) {
             Button(
@@ -23,7 +21,7 @@ struct SettingsScreen: View {
                     navigationRequest(.init(action: .manageNetworks))
                 },
                 label: {
-                    SettingsCardTemplate(text: "Networks")
+                    SettingsCardTemplate(text: Localizable.networks.key)
                 }
             )
             Button(
@@ -31,7 +29,7 @@ struct SettingsScreen: View {
                     navigationRequest(.init(action: .backupSeed))
                 },
                 label: {
-                    SettingsCardTemplate(text: "Backup keys")
+                    SettingsCardTemplate(text: Localizable.backupKeys.key)
                 }
             )
             Button(
@@ -39,33 +37,42 @@ struct SettingsScreen: View {
                 label: {
                     VStack {
                         HStack {
-                            Text("Verifier certificate").font(Fontstyle.header1.base)
+                            Localizable.verifierCertificate.text
+                                .font(Fontstyle.header1.base)
                                 .foregroundColor(Asset.text600.swiftUIColor)
                             Spacer()
                         }
                         VStack {
                             if content.publicKey != nil {
-                                AddressCard(address: Address(
+                                AddressCard(card: MAddressCard(
                                     base58: "encryption: " + (content.encryption ?? "unknown"),
-                                    path: content.publicKey?.truncateMiddle(length: 8) ?? "",
-                                    hasPwd: false,
-                                    identicon: content.identicon ?? [],
-                                    seedName: "",
+                                    address: Address(
+                                        path: content.publicKey?.truncateMiddle(length: 8) ?? "",
+                                        hasPwd: false,
+                                        identicon: content.identicon ?? [],
+                                        seedName: "",
+                                        secretExposed: false
+                                    ),
                                     multiselect: false
                                 ))
                             } else {
                                 if let errorMessage = content.error {
-                                    Text("Error!").foregroundColor(Asset.signalDanger.swiftUIColor)
+                                    Localizable.errorCapitalised.text
+                                        .foregroundColor(Asset.signalDanger.swiftUIColor)
                                         .font(Fontstyle.header4.base)
-                                    Text(errorMessage).foregroundColor(Asset.signalDanger.swiftUIColor)
+                                    Text(errorMessage)
+                                        .foregroundColor(Asset.signalDanger.swiftUIColor)
                                         .font(Fontstyle.body2.base)
                                 } else {
-                                    AddressCard(address: Address(
+                                    AddressCard(card: MAddressCard(
                                         base58: "",
-                                        path: "None",
-                                        hasPwd: false,
-                                        identicon: [],
-                                        seedName: "",
+                                        address: Address(
+                                            path: "None",
+                                            hasPwd: false,
+                                            identicon: [],
+                                            seedName: "",
+                                            secretExposed: false
+                                        ),
                                         multiselect: false
                                     ))
                                 }
@@ -81,18 +88,18 @@ struct SettingsScreen: View {
                 },
                 label: {
                     SettingsCardTemplate(
-                        text: "Wipe all data",
+                        text: Localizable.wipeAllDataAlt.key,
                         danger: true
                     )
                 }
             )
             .alert(isPresented: $wipe, content: {
                 Alert(
-                    title: Text("Wipe ALL data?"),
-                    message: Text("Factory reset the Signer app. This operation can not be reverted!"),
+                    title: Localizable.wipeALLData.text,
+                    message: Localizable.FactoryResetTheSignerApp.thisOperationCanNotBeReverted.text,
                     primaryButton: .cancel(),
                     secondaryButton: .destructive(
-                        Text("Wipe"),
+                        Localizable.wipe.text,
                         action: {
                             doWipe()
                         }
@@ -104,14 +111,15 @@ struct SettingsScreen: View {
                     navigationRequest(.init(action: .showDocuments))
                 },
                 label: {
-                    SettingsCardTemplate(text: "About")
+                    SettingsCardTemplate(text: Localizable.about.key)
                 }
             )
             SettingsCardTemplate(
-                text: "App version: " + (appVersion ?? "Unknown!"),
+                text: LocalizedStringKey(Localizable.appVersion(ApplicationInformation.cfBundleShortVersionString)),
                 withIcon: false,
                 withBackground: false
             )
+            Spacer().frame(idealHeight: .infinity)
         }
     }
 }

@@ -8,16 +8,17 @@
 import SwiftUI
 
 struct UnauthenticatedScreenContainer: View {
-    @ObservedObject var data: SignerDataModel
+    @EnvironmentObject private var data: SignerDataModel
+    private let seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
 
     var body: some View {
         Button(
-            action: { data.refreshSeeds() },
+            action: { seedsMediator.refreshSeeds() },
             label: {
                 BigButton(
-                    text: "Unlock app",
+                    text: Localizable.unlockApp.key,
                     action: {
-                        data.refreshSeeds()
+                        seedsMediator.refreshSeeds()
                         data.totalRefresh()
                     }
                 )

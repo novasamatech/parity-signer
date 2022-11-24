@@ -31,6 +31,10 @@ pub enum Error {
     #[error("Input is too short.")]
     TooShort,
 
+    /// Key corresponding to the address was not found in the db
+    #[error("Address {0} was not found in DB")]
+    AddrNotFound(String),
+
     /// All transactions are expected to be the Substrate ones, starting with
     /// hexadecimal `53`.
     ///
@@ -88,11 +92,11 @@ pub enum Error {
         encryption: Encryption,
     },
 
-    /// [`NetworkSpecs`] needed to parse
+    /// [`OrderedNetworkSpecs`] needed to parse
     /// historical transactions saved into history log, searched by network
     /// name and encryption.
     ///
-    /// [`NetworkSpecs`]: definitions::network_specs::NetworkSpecs
+    /// [`OrderedNetworkSpecs`]: definitions::network_specs::OrderedNetworkSpecs
     #[error(
         "Could not find network specs for {name} with encryption {} \
         needed to decode historical transaction.",
@@ -103,9 +107,9 @@ pub enum Error {
         encryption: Encryption,
     },
 
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
     /// received in `add_specs` payload are for a network that already has
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
+    /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry in
     /// the `SPECSTREE` tree of the Signer database with **same**
     /// [`NetworkSpecsKey`], and the permanent components of the network
     /// specs stores and received are different.
@@ -199,7 +203,7 @@ pub enum Error {
 
     /// Received signable transaction (with prelude `53xx00`, `53xx02` or
     /// `53xx03`) is generated in the network that has no corresponding
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in the
+    /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry in the
     /// `SPECSTREE` tree of the database.
     #[error(
         "Input generated within unknown network and could not be processed. \
@@ -216,9 +220,9 @@ pub enum Error {
     #[error("Received message could not be read. {0}")]
     Codec(#[from] parity_scale_codec::Error),
 
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
     /// received in `add_specs` payload are for a network that already has
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
+    /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry in
     /// the `SPECSTREE` tree of the Signer database with not necessarily
     /// same encryption, i.e. **possibly different** [`NetworkSpecsKey`],
     /// and base58 prefix in stored network specs is different from the base58
@@ -236,9 +240,9 @@ pub enum Error {
         base58_input: u16,
     },
 
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
     /// received in `add_specs` payload are for a network that already has
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
+    /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry in
     /// the `SPECSTREE` tree of the Signer database with not necessarily
     /// same encryption, i.e. **possibly different** [`NetworkSpecsKey`],
     /// and network name in stored network specs is different from the network
@@ -254,7 +258,7 @@ pub enum Error {
         name_input: String,
     },
 
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecs) from the
+    /// [`NetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) from the
     /// received `add_specs` payload already have an entry in `SPECSTREE` tree
     /// of the database.
     ///
@@ -386,7 +390,7 @@ pub enum Error {
     },
 
     /// User attempted to load into Signer the metadata for the network that
-    /// has no associated [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
+    /// has no associated [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs)
     /// entries in the `SPECSTREE` tree of the Signer database, although it has
     /// an associated
     /// [`ValidCurrentVerifier`](definitions::network_specs::ValidCurrentVerifier),
@@ -410,7 +414,7 @@ pub enum Error {
     },
 
     /// User attempted to load into Signer the metadata for the network that
-    /// has a [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in the
+    /// has a [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry in the
     /// `SPECSTREE` tree of the Signer database, but specs have a different
     /// network name.
     ///
@@ -561,7 +565,7 @@ pub enum Error {
         version: u32,
     },
 
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) for network in
+    /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) for network in
     /// which the imported derivations are user to create addresses.
     #[error(
         "Unable to import derivations for network with genesis hash {} \
@@ -577,6 +581,12 @@ pub enum Error {
         /// network supported encryption
         encryption: Encryption,
     },
+
+    #[error(transparent)]
+    NotUtf8(#[from] std::str::Utf8Error),
+
+    #[error("Parser error: {0}")]
+    ParserError(String),
 }
 
 fn display_parsing_errors(network_name: &str, errors: &[(u32, parser::Error)]) -> String {

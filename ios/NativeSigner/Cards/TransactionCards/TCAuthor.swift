@@ -8,15 +8,18 @@
 import SwiftUI
 
 struct TCAuthor: View {
-    var author: Address
+    var author: MAddressCard
     var body: some View {
         HStack {
-            Identicon(identicon: author.identicon)
+            Identicon(identicon: author.address.identicon)
             VStack(alignment: .leading) {
-                Text("From:")
+                Localizable.from.text
                     .foregroundColor(Asset.text400.swiftUIColor)
-                Text(author.seedName + author.path + (author.hasPwd == true ? "///" : ""))
-                    .foregroundColor(Asset.crypto400.swiftUIColor)
+                Text(
+                    author.address.seedName + author.address
+                        .path + (author.address.hasPwd == true ? Localizable.Path.delimeter.string : "")
+                )
+                .foregroundColor(Asset.crypto400.swiftUIColor)
                 Text(author.base58)
                     .font(.caption2)
                     .foregroundColor(Asset.text600.swiftUIColor)

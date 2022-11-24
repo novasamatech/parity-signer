@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct ModalSelectorView: View {
-    @ObservedObject var data: SignerDataModel
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var navigation: NavigationCoordinator
+    private let seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
 
     var body: some View {
         ModalSelector(
@@ -19,12 +20,11 @@ struct ModalSelectorView: View {
             navigationRequest: { navigationRequest in
                 navigation.perform(navigation: navigationRequest)
             },
-            removeSeed: { seedName in data.removeSeed(seedName: seedName) },
-            restoreSeed: { seedName, seedPhrase, createSeedKeys in data.restoreSeed(
+            removeSeed: { seedName in seedsMediator.removeSeed(seedName: seedName) },
+            restoreSeed: { seedName, seedPhrase, createSeedKeys in seedsMediator.restoreSeed(
                 seedName: seedName, seedPhrase: seedPhrase, createRoots: createSeedKeys
             ) },
             createAddress: { path, seedName in data.createAddress(path: path, seedName: seedName) },
-            getSeedForBackup: { seedName in data.getSeed(seedName: seedName, backup: true) },
             sign: { seedName, comment in data.sign(seedName: seedName, comment: comment) }
         )
     }

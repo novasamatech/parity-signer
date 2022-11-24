@@ -54,7 +54,7 @@ gen/
 # BUCK
 buck-out/
 \.buckd/
-android/app/libs
+android/libs
 *.keystore
 
 # fastlane
@@ -67,19 +67,20 @@ android/app/libs
 fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots
+fastlane/test_output
 
 # vim
 *.swp
 .vscode
 
 # Android
+.project
 android/.project
-android/app/.project
-android/app/bin
-android/app/src/main/jniLibs
-android/app/src/main/assets/Database/*
-android/app/release
-android/app/debug
+android/bin
+android/src/main/jniLibs
+android/src/main/assets/Database/*
+android/release
+android/debug
 
 # iOS
 ios/NativeSigner/Database/Database/*

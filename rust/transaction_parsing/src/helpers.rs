@@ -1,29 +1,36 @@
 use constants::{METATREE, SPECSTREE};
-use db_handling::helpers::{get_types, open_db, open_tree};
+use db_handling::{
+    helpers::{get_types, open_db, open_tree},
+    identities::get_all_addresses,
+};
 use definitions::{
     crypto::Encryption,
     error::MetadataError,
     helpers::unhex,
     keyring::{MetaKey, MetaKeyPrefix, NetworkSpecsKey},
     metadata::{MetaSetElement, MetaValues},
-    network_specs::{NetworkSpecs, NetworkSpecsToSend, ShortSpecs},
+    network_specs::{NetworkSpecs, OrderedNetworkSpecs, ShortSpecs},
 };
 use frame_metadata::RuntimeMetadata;
 use parser::{method::OlderMeta, MetadataBundle};
 use sp_core::{ecdsa, ed25519, sr25519, H256};
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
+use std::path::Path;
 
 use crate::error::{Error, Result};
 
 /// Function to get the network specs from the database
 /// by network name and encryption
-pub(crate) fn specs_by_name(
+pub(crate) fn specs_by_name<P>(
     network_name: &str,
     encryption: &Encryption,
-    database_name: &str,
-) -> Result<NetworkSpecs> {
-    let database = open_db(database_name)?;
+    db_path: P,
+) -> Result<NetworkSpecs>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
     let chainspecs = open_tree(&database, SPECSTREE)?;
     let mut found_network_specs = None;
     for x in chainspecs.iter().flatten() {
@@ -51,8 +58,11 @@ pub(crate) fn specs_by_name(
     }
 }
 
-pub fn find_meta_set(short_specs: &ShortSpecs, database_name: &str) -> Result<Vec<MetaSetElement>> {
-    let database = open_db(database_name)?;
+pub fn find_meta_set<P>(short_specs: &ShortSpecs, db_path: P) -> Result<Vec<MetaSetElement>>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
     let metadata = open_tree(&database, METATREE)?;
     let mut out: Vec<MetaSetElement> = Vec::new();
     let meta_key_prefix = MetaKeyPrefix::from_name(&short_specs.name);
@@ -73,19 +83,22 @@ pub fn find_meta_set(short_specs: &ShortSpecs, database_name: &str) -> Result<Ve
     Ok(out)
 }
 
-pub fn bundle_from_meta_set_element<'a>(
-    meta_set_element: &'a MetaSetElement,
-    database_name: &'a str,
-) -> Result<MetadataBundle<'a>> {
+pub fn bundle_from_meta_set_element<P>(
+    meta_set_element: &MetaSetElement,
+    db_path: P,
+) -> Result<MetadataBundle>
+where
+    P: AsRef<Path>,
+{
     match meta_set_element.runtime_metadata() {
         RuntimeMetadata::V12(ref meta_v12) => Ok(MetadataBundle::Older {
             older_meta: OlderMeta::V12(meta_v12),
-            types: get_types(database_name)?,
+            types: get_types(db_path)?,
             network_version: meta_set_element.version(),
         }),
         RuntimeMetadata::V13(ref meta_v13) => Ok(MetadataBundle::Older {
             older_meta: OlderMeta::V13(meta_v13),
-            types: get_types(database_name)?,
+            types: get_types(db_path)?,
             network_version: meta_set_element.version(),
         }),
         RuntimeMetadata::V14(ref meta_v14) => Ok(MetadataBundle::Sci {
@@ -96,9 +109,12 @@ pub fn bundle_from_meta_set_element<'a>(
     }
 }
 
-pub fn accept_meta_values(meta_values: &MetaValues, database_name: &str) -> Result<bool> {
+pub fn accept_meta_values<P>(meta_values: &MetaValues, db_path: P) -> Result<bool>
+where
+    P: AsRef<Path>,
+{
     let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
-    let database = open_db(database_name)?;
+    let database = open_db(db_path)?;
     let metadata = open_tree(&database, METATREE)?;
     match metadata.get(meta_key.key())? {
         Some(a) => {
@@ -116,16 +132,20 @@ pub fn accept_meta_values(meta_values: &MetaValues, database_name: &str) -> Resu
 }
 
 /// Function to check if the chain specs are already in the database
-pub fn specs_are_new(new: &NetworkSpecsToSend, database_name: &str) -> Result<bool> {
+pub fn specs_are_new<P>(new: &NetworkSpecs, db_path: P) -> Result<bool>
+where
+    P: AsRef<Path>,
+{
     let network_specs_key = NetworkSpecsKey::from_parts(&new.genesis_hash, &new.encryption);
-    let database = open_db(database_name)?;
+    let database = open_db(db_path)?;
     let chainspecs = open_tree(&database, SPECSTREE)?;
     match chainspecs.get(network_specs_key.key())? {
         Some(encoded_known_network_specs) => {
-            let old = NetworkSpecs::from_entry_with_key_checked(
+            let old = OrderedNetworkSpecs::from_entry_with_key_checked(
                 &network_specs_key,
                 encoded_known_network_specs,
-            )?;
+            )?
+            .specs;
             if (old.base58prefix != new.base58prefix)
                 | (old.decimals != new.decimals)
                 | (old.encryption != new.encryption)
@@ -148,7 +168,8 @@ pub fn specs_are_new(new: &NetworkSpecsToSend, database_name: &str) -> Result<bo
 /// function to process hex data and get from it author_public_key, encryption,
 /// data to process (either transaction to parse or message to decode),
 /// and network specs key
-pub fn multisigner_msg_genesis_encryption(
+pub fn multisigner_msg_genesis_encryption<P: AsRef<Path>>(
+    db_path: P,
     data_hex: &str,
 ) -> Result<(MultiSigner, Vec<u8>, H256, Encryption)> {
     let data = unhex(data_hex)?;
@@ -181,6 +202,37 @@ pub fn multisigner_msg_genesis_encryption(
                 &data[36..],
                 Encryption::Ecdsa,
             ),
+            None => return Err(Error::TooShort),
+        },
+        "03" => match data.get(3..23) {
+            Some(a) => {
+                if let Some(addr) =
+                    get_all_addresses(db_path)?
+                        .into_iter()
+                        .find_map(|(multisigner, _)| {
+                            if let MultiSigner::Ecdsa(ref e) = multisigner {
+                                let eth_addr = if let Ok(addr) =
+                                    definitions::helpers::ecdsa_public_to_eth_address(e)
+                                {
+                                    addr
+                                } else {
+                                    return None;
+                                };
+                                if eth_addr.as_ref() == a {
+                                    Some(multisigner.clone())
+                                } else {
+                                    None
+                                }
+                            } else {
+                                None
+                            }
+                        })
+                {
+                    (addr, &data[23..], Encryption::Ethereum)
+                } else {
+                    return Err(Error::AddrNotFound(format!("0x{}", hex::encode(a))));
+                }
+            }
             None => return Err(Error::TooShort),
         },
         _ => return Err(Error::EncryptionNotSupported(data_hex[2..4].to_string())),

@@ -2,8 +2,9 @@
 //!
 //! This module deals with processing command
 //!
-//! `$ cargo run add_specs <keys> <argument(s)>`
+//! `$ cargo run add-specs <keys> <argument(s)>`
 use definitions::{crypto::Encryption, keyring::NetworkSpecsKey, metadata::AddressBookEntry};
+use std::path::Path;
 
 use crate::error::{Error, Result};
 use crate::helpers::{
@@ -14,14 +15,14 @@ use crate::helpers::{
 };
 use crate::parser::{Content, InstructionSpecs, Override, Set, Token};
 
-/// Process `add_specs` command according to the [`InstructionSpecs`] received
+/// Process `add-specs` command according to the [`InstructionSpecs`] received
 /// from the command line.
 pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
     match instruction.set.into() {
         // `-f` setting key: produce `add_specs` payload files from existing
         // database entries.
         Set::F => match instruction.content.clone().into() {
-            // `$ cargo run add_specs -f -a`
+            // `$ cargo run add-specs -f -a`
             //
             // Make `add_specs` payloads for all specs entries in the database.
             Content::All { pass_errors: _ } => {
@@ -32,19 +33,19 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
                 }
 
                 // collect `ADDRESS_BOOK` entries
-                let address_book_set = address_book_content()?;
+                let address_book_set = address_book_content(&instruction.db)?;
                 if address_book_set.is_empty() {
                     return Err(Error::AddressBookEmpty);
                 }
 
                 // process each entry
                 for (_, address_book_entry) in address_book_set.iter() {
-                    specs_f_a_element(address_book_entry)?;
+                    specs_f_a_element(address_book_entry, &instruction.db, &instruction.files_dir)?;
                 }
                 Ok(())
             }
 
-            // `$ cargo run add_specs -f -n <address_book_title>
+            // `$ cargo run add-specs -f -n <address_book_title>
             // <optional encryption override> <optional signer title override>`
             //
             // Make `add_specs` payload for single specs entry from the
@@ -58,7 +59,13 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
                 if instruction.over.token().is_some() {
                     return Err(Error::NotSupported);
                 }
-                specs_f_n(&name, instruction.over.encryption, instruction.over.title)
+                specs_f_n(
+                    &name,
+                    instruction.over.encryption,
+                    instruction.over.title,
+                    instruction.db,
+                    instruction.files_dir,
+                )
             }
 
             // `-u` content key is to provide the URL address for RPC calls;
@@ -79,7 +86,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // Same as `-d -a` combination, of no use.
             Content::Name { .. } => Err(Error::NotSupported),
 
-            // `$ cargo run add_specs -d -u network_url_address
+            // `$ cargo run add-specs -d -u network_url_address
             // <encryption override> <optional token override> <optional signer
             // title override>`
             //
@@ -96,12 +103,13 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // In some cases the command may contain token override as well.
             Content::Address { s: address } => {
                 // not allowed to proceed without encryption override defined
-                if let Some(ref encryption) = instruction.over.encryption {
+                if let Some(encryption) = instruction.over.encryption {
                     specs_d_u(
                         &address,
-                        encryption.clone(),
+                        encryption,
                         instruction.over.token(),
                         instruction.over.title.clone(),
+                        &instruction.files_dir,
                     )
                 } else {
                     Err(Error::NotSupported)
@@ -123,7 +131,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // use.
             Content::All { pass_errors: _ } => Err(Error::NotSupported),
 
-            // `$ cargo run add_specs -p -n network_address_book_title
+            // `$ cargo run add-specs -p -n network_address_book_title
             // <encryption override> <optional title override>
             // <optional token override>`
             //
@@ -137,10 +145,16 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // Payload files are not created.
             Content::Name { s: name } => {
                 // using this command makes sense only if there is some override
-                specs_pt_n(&name, instruction.over, false)
+                specs_pt_n(
+                    &name,
+                    instruction.over,
+                    false,
+                    &instruction.db,
+                    &instruction.files_dir,
+                )
             }
 
-            // `$ cargo run add_specs -p -u network_url_address
+            // `$ cargo run add-specs -p -u network_url_address
             // <encryption override> <optional token override>`
             //
             // Update the database by making RPC calls at `network_url_address`.
@@ -154,13 +168,15 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // In some cases the command may contain token override as well.
             Content::Address { s: address } => {
                 // not allowed to proceed without encryption override defined
-                if let Some(ref encryption) = instruction.over.encryption {
+                if let Some(encryption) = instruction.over.encryption {
                     specs_pt_u(
                         &address,
-                        encryption.clone(),
+                        encryption,
                         instruction.over.token(),
                         instruction.over.title,
                         false,
+                        instruction.db,
+                        instruction.files_dir,
                     )
                 } else {
                     Err(Error::NotSupported)
@@ -175,7 +191,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // this command seems to be of no use.
             Content::All { pass_errors: _ } => Err(Error::NotSupported),
 
-            // `$ cargo run add_specs -n network_address_book_title
+            // `$ cargo run add-specs -n network_address_book_title
             // <encryption override>`
             //
             // Network already has an entry in the database and could be
@@ -186,9 +202,15 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // displayed network title
             //
             // Payload files are created.
-            Content::Name { s: name } => specs_pt_n(&name, instruction.over, true),
+            Content::Name { s: name } => specs_pt_n(
+                &name,
+                instruction.over,
+                true,
+                instruction.db,
+                instruction.files_dir,
+            ),
 
-            // `$ cargo run add_specs -u network_url_address
+            // `$ cargo run add-specs -u network_url_address
             // <encryption override> <optional token override>`
             //
             // Update the database by making RPC calls at `network_url_address`
@@ -203,13 +225,15 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // In some cases the command may contain token override as well.
             Content::Address { s: address } => {
                 // not allowed to proceed without encryption override defined
-                if let Some(ref encryption) = instruction.over.encryption {
+                if let Some(encryption) = instruction.over.encryption {
                     specs_pt_u(
                         &address,
-                        encryption.clone(),
+                        encryption,
                         instruction.over.token(),
                         instruction.over.title,
                         true,
+                        instruction.db,
+                        instruction.files_dir,
                     )
                 } else {
                     Err(Error::NotSupported)
@@ -219,40 +243,48 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
     }
 }
 
-/// `add_specs -f -a` for individual address book entry.
+/// `add-specs -f -a` for individual address book entry.
 ///
 /// - Get network specs
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) from
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from
 /// the database using information in address book entry
 /// - Output raw bytes payload file
-fn specs_f_a_element(entry: &AddressBookEntry) -> Result<()> {
-    let network_specs = network_specs_from_entry(entry)?;
-    add_specs_print(&network_specs)
+fn specs_f_a_element<P>(entry: &AddressBookEntry, db_path: P, files_dir: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let network_specs = network_specs_from_entry(entry, db_path)?;
+    add_specs_print(&network_specs, files_dir)
 }
 
-/// `add_specs -f -n <address_book_title> <override(s)>`
+/// `add-specs -f -n <address_book_title> <override(s)>`
 ///
 /// Token override is not allowed. Encryption and title override are optional.
 /// Overrides are used to modify the entry for specified address book title.
 ///
 /// - Get address book entry for the network using network address book `title`
 /// - Get network specs
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) from
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from
 /// the database using information in address book entry
 /// - Output raw bytes payload file
-fn specs_f_n(
+fn specs_f_n<P>(
     title: &str,
     optional_encryption_override: Option<Encryption>,
     optional_signer_title_override: Option<String>,
-) -> Result<()> {
-    let mut network_specs = network_specs_from_title(title)?;
+    db_path: P,
+    files_dir: P,
+) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let mut network_specs = network_specs_from_title(title, db_path)?;
     match optional_encryption_override {
         Some(encryption) => {
             if network_specs.encryption == encryption {
                 if let Some(new_title) = optional_signer_title_override {
                     network_specs.title = new_title
                 }
-                add_specs_print(&network_specs)
+                add_specs_print(&network_specs, &files_dir)
             } else {
                 network_specs.title = optional_signer_title_override.unwrap_or(format!(
                     "{}-{}",
@@ -260,39 +292,43 @@ fn specs_f_n(
                     encryption.show()
                 ));
                 network_specs.encryption = encryption;
-                add_specs_print(&network_specs)
+                add_specs_print(&network_specs, &files_dir)
             }
         }
-        None => add_specs_print(&network_specs),
+        None => add_specs_print(&network_specs, &files_dir),
     }
 }
 
-/// `add_specs -d -u <url_address> <override(s)>`
+/// `add-specs -d -u <url_address> <override(s)>`
 ///
 /// Encryption override is mandatory. Title override is optional. Token override
 /// is possible if token set is fetched.
 ///
 /// - Fetch network information using RPC calls and interpret it
 /// - Construct
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) with
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) with
 /// fetched values, user overrides and defaults
 /// - Output raw bytes payload file
-fn specs_d_u(
+fn specs_d_u<P>(
     address: &str,
     encryption: Encryption,
     optional_token_override: Option<Token>,
     optional_signer_title_override: Option<String>,
-) -> Result<()> {
+    files_dir: P,
+) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let specs = specs_agnostic(
         address,
         encryption,
         optional_token_override,
         optional_signer_title_override,
     )?;
-    add_specs_print(&specs)
+    add_specs_print(&specs, &files_dir)
 }
 
-/// `add_specs <-p/-t> -n <address_book_title> <override(s)>`
+/// `add-specs <-p/-t> -n <address_book_title> <override(s)>`
 ///
 /// Encryption and title overrides are possible. Token override is possible if
 /// network has token set.
@@ -302,7 +338,7 @@ fn specs_d_u(
 ///
 /// - Search for an address book entry by address book title and get
 /// corresponding
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 /// - Fetch network specs through RPC calls and check that the network specs
 /// from the database are still valid
 /// - Modify network specs according to the overrides requested
@@ -315,14 +351,23 @@ fn specs_d_u(
 ///
 /// Network address book title for new address book entries is constructed as
 /// `<network_name>-<encryption>`. Field `title` in network specs
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend), i.e.
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs), i.e.
 /// the title under which Signer displays the network, is also constructed as
 /// `<network_name>-<encryption>` for non-default networks, unless overridden by
 /// the user.
-fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<()> {
+fn specs_pt_n<P>(
+    title: &str,
+    over: Override,
+    printing: bool,
+    db_path: P,
+    files_dir: P,
+) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     // address book entry for `title`
-    let address_book_entry = get_address_book_entry(title)?;
-    let mut network_specs_to_change = network_specs_from_entry(&address_book_entry)?;
+    let address_book_entry = get_address_book_entry(title, &db_path)?;
+    let mut network_specs_to_change = network_specs_from_entry(&address_book_entry, &db_path)?;
     let make_update = match over.encryption {
         // requested encryption override
         Some(ref encryption) => {
@@ -344,7 +389,7 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<()> {
 
                 // check if this new network specs key has an entry in the
                 // database
-                match try_get_network_specs_to_send(&network_specs_key_possible)? {
+                match try_get_network_specs_to_send(&network_specs_key_possible, &db_path)? {
                     // user entered encryption override that already has an
                     // entry in the database, only with wrong address book title
                     //
@@ -383,14 +428,18 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<()> {
     };
 
     if make_update {
-        db_upd_network(&address_book_entry.address, &network_specs_to_change)?;
+        db_upd_network(
+            &address_book_entry.address,
+            &network_specs_to_change,
+            db_path,
+        )?;
         if printing {
-            add_specs_print(&network_specs_to_change)
+            add_specs_print(&network_specs_to_change, &files_dir)
         } else {
             Ok(())
         }
     } else if printing {
-        add_specs_print(&network_specs_to_change)
+        add_specs_print(&network_specs_to_change, &files_dir)
     } else {
         Err(Error::SpecsInDb {
             name: address_book_entry.name,
@@ -399,7 +448,7 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<()> {
     }
 }
 
-/// `add_specs <-p/-t> -u <url_address> <override(s)>`
+/// `add-specs <-p/-t> -u <url_address> <override(s)>`
 ///
 /// Encryption override is mandatory. Title override is optional. Token override
 /// is possible if token set is fetched.
@@ -414,19 +463,24 @@ fn specs_pt_n(title: &str, over: Override, printing: bool) -> Result<()> {
 /// - Check that there is no entries with same genesis hash as was just fetched
 /// in the database
 /// - Construct
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) with
+/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) with
 /// fetched values, user overrides and defaults
 /// - Construct `AddressBookEntry`
 /// - Update the database (network specs and address book)
 /// - Output raw bytes payload files if requested
-fn specs_pt_u(
+fn specs_pt_u<P>(
     address: &str,
     encryption: Encryption,
     optional_token_override: Option<Token>,
     optional_signer_title_override: Option<String>,
     printing: bool,
-) -> Result<()> {
-    let known_address_set = filter_address_book_by_url(address)?;
+    db_path: P,
+    files_dir: P,
+) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let known_address_set = filter_address_book_by_url(address, &db_path)?;
 
     if !known_address_set.is_empty() {
         return Err(Error::UKeyUrlInDb {
@@ -442,15 +496,15 @@ fn specs_pt_u(
         optional_signer_title_override,
     )?;
 
-    match genesis_hash_in_hot_db(specs.genesis_hash)? {
+    match genesis_hash_in_hot_db(specs.genesis_hash, &db_path)? {
         Some(address_book_entry) => Err(Error::UKeyHashInDb {
             address_book_entry,
             url: address.to_string(),
         }),
         None => {
-            db_upd_network(address, &specs)?;
+            db_upd_network(address, &specs, &db_path)?;
             if printing {
-                add_specs_print(&specs)?
+                add_specs_print(&specs, &files_dir)?
             }
             Ok(())
         }
@@ -461,13 +515,14 @@ fn specs_pt_u(
 mod tests {
     use super::*;
     use crate::parser::{ContentArgs, Override, SetFlags};
-    use constants::FOLDER;
+    use constants::{FOLDER, HOT_DB_NAME};
 
     // The aim is to check that RPC calls are going through for "officially
     // approved" networks. Although the blanket fetch test was nice, not all
     // networks could be reached at all the times, therefore this is currently
     // limited to three default networks that must be working always.
     #[test]
+    #[ignore]
     fn mass_fetch() {
         let address_set = [
             "wss://rpc.polkadot.io",
@@ -491,6 +546,8 @@ mod tests {
                     token_unit: None,
                     token_decimals: None,
                 },
+                db: HOT_DB_NAME.into(),
+                files_dir: FOLDER.into(),
             };
             match gen_add_specs(instruction) {
                 Ok(()) => (),

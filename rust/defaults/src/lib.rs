@@ -13,7 +13,7 @@
 //!
 //! - general verifier `Verifier` set to `Some(VerifierValue)` with Parity
 //! public key as a verifier value
-//! - network specs `NetworkSpecs` for default networks
+//! - network specs `OrderedNetworkSpecs` for default networks
 //! - verifiers for default networks, set to
 //! `CurrentVerifier::Valid(ValidCurrentVerifier::General)`
 //! - two latest metadata versions for each of the default networks
@@ -27,7 +27,7 @@
 //!
 //! Default hot database contains:
 //!
-//! - network specs `NetworkSpecsToSend` for default networks
+//! - network specs `NetworkSpecs` for default networks
 //! - address book containing the data for default networks
 //! - default types information
 //!
@@ -73,7 +73,7 @@ use definitions::{
     crypto::Encryption,
     keyring::VerifierKey,
     metadata::{AddressBookEntry, MetaValues},
-    network_specs::{CurrentVerifier, NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier},
+    network_specs::{CurrentVerifier, NetworkSpecs, OrderedNetworkSpecs, ValidCurrentVerifier},
     qr_transfers::ContentLoadTypes,
     types::{Description, EnumVariant, EnumVariantType, StructField, TypeEntry},
 };
@@ -185,25 +185,27 @@ fn default_network_info() -> [DefaultNetworkInfo; 3] {
     ]
 }
 
-/// Generate network specs [`NetworkSpecs`] set for the default networks, for
+/// Generate network specs [`OrderedNetworkSpecs`] set for the default networks, for
 /// cold database
 #[cfg(feature = "active")]
-pub fn default_chainspecs() -> Vec<NetworkSpecs> {
-    let mut out: Vec<NetworkSpecs> = Vec::new();
+pub fn default_chainspecs() -> Vec<OrderedNetworkSpecs> {
+    let mut out: Vec<OrderedNetworkSpecs> = Vec::new();
     for x in default_network_info() {
-        let new = NetworkSpecs {
-            base58prefix: x.base58prefix,
-            color: x.color.to_string(),
-            decimals: x.decimals,
-            encryption: x.encryption.clone(),
-            genesis_hash: x.genesis_hash,
-            logo: x.logo.to_string(),
-            name: x.name.to_string(),
+        let new = OrderedNetworkSpecs {
+            specs: NetworkSpecs {
+                base58prefix: x.base58prefix,
+                color: x.color.to_string(),
+                decimals: x.decimals,
+                encryption: x.encryption,
+                genesis_hash: x.genesis_hash,
+                logo: x.logo.to_string(),
+                name: x.name.to_string(),
+                path_id: x.path_id.to_string(),
+                secondary_color: x.secondary_color.to_string(),
+                title: x.title.to_string(),
+                unit: x.unit.to_string(),
+            },
             order: x.order,
-            path_id: x.path_id.to_string(),
-            secondary_color: x.secondary_color.to_string(),
-            title: x.title.to_string(),
-            unit: x.unit.to_string(),
         };
         out.push(new);
     }
@@ -223,17 +225,17 @@ pub fn default_verifiers() -> Vec<(VerifierKey, CurrentVerifier)> {
     out
 }
 
-/// Generate network specs [`NetworkSpecsToSend`] set for the default networks,
+/// Generate network specs [`NetworkSpecs`] set for the default networks,
 /// for hot database
 #[cfg(feature = "active")]
-pub fn default_chainspecs_to_send() -> Vec<NetworkSpecsToSend> {
-    let mut out: Vec<NetworkSpecsToSend> = Vec::new();
+pub fn default_chainspecs_to_send() -> Vec<NetworkSpecs> {
+    let mut out: Vec<NetworkSpecs> = Vec::new();
     for x in default_network_info() {
-        let new = NetworkSpecsToSend {
+        let new = NetworkSpecs {
             base58prefix: x.base58prefix,
             color: x.color.to_string(),
             decimals: x.decimals,
-            encryption: x.encryption.clone(),
+            encryption: x.encryption,
             genesis_hash: x.genesis_hash,
             logo: x.logo.to_string(),
             name: x.name.to_string(),
@@ -256,7 +258,7 @@ pub fn default_address_book() -> Vec<AddressBookEntry> {
             name: x.name.to_string(),
             genesis_hash: x.genesis_hash,
             address: x.address.to_string(),
-            encryption: x.encryption.clone(),
+            encryption: x.encryption,
             def: true,
         };
         out.push(new);
@@ -362,13 +364,13 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
     let mut types_prep: Vec<TypeEntry> = Vec::new();
 
     for caps1 in REG_STRUCTS_WITH_NAMES.captures_iter(&type_info) {
-        let struct_name = (&caps1["name"]).to_string();
-        let struct_description = (&caps1["description"]).to_string();
+        let struct_name = (caps1["name"]).to_string();
+        let struct_description = (caps1["description"]).to_string();
         let mut struct_fields: Vec<StructField> = Vec::new();
         for caps2 in REG_STRUCT_FIELDS.captures_iter(&struct_description) {
             let new = StructField {
-                field_name: Some((&caps2["field_name"]).to_string()),
-                field_type: (&caps2["field_type"]).to_string(),
+                field_name: Some((caps2["field_name"]).to_string()),
+                field_type: (caps2["field_type"]).to_string(),
             };
             struct_fields.push(new);
         }
@@ -381,17 +383,17 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
     for caps in REG_STRUCTS_NO_NAMES.captures_iter(&type_info) {
         let only_field = StructField {
             field_name: None,
-            field_type: (&caps["description"]).to_string(),
+            field_type: (caps["description"]).to_string(),
         };
         let new_entry = TypeEntry {
-            name: (&caps["name"]).to_string(),
+            name: (caps["name"]).to_string(),
             description: Description::Struct(vec![only_field]),
         };
         types_prep.push(new_entry);
     }
     for caps1 in REG_ENUM.captures_iter(&type_info) {
-        let enum_name = (&caps1["name"]).to_string();
-        let enum_description = (&caps1["description"]).to_string();
+        let enum_name = (caps1["name"]).to_string();
+        let enum_description = (caps1["description"]).to_string();
         let enum_variants = enum_description
             .lines()
             .filter(|line| REG_ENUM_VARIANTS.is_match(line))
@@ -399,7 +401,7 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
                 let caps2 = REG_ENUM_VARIANTS
                     .captures(line)
                     .expect("just checked it is match");
-                let variant_name = (&caps2["variant_name"]).to_string();
+                let variant_name = (caps2["variant_name"]).to_string();
                 let variant_type = match caps2.name("variant_type") {
                     None => EnumVariantType::None,
                     Some(a) => {
@@ -408,7 +410,7 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
                             // either a single type or a tuple
                             match REG_ENUM_SIMPLE.captures(&x[1..x.len() - 1]) {
                                 // single type
-                                Some(b) => EnumVariantType::Type((&b["simple_type"]).to_string()),
+                                Some(b) => EnumVariantType::Type((b["simple_type"]).to_string()),
                                 // tuple
                                 None => EnumVariantType::Type(x),
                             }
@@ -417,8 +419,8 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
                             let mut type_is_struct: Vec<StructField> = Vec::new();
                             for caps3 in REG_ENUM_STRUCT.captures_iter(&x) {
                                 let new = StructField {
-                                    field_name: Some((&caps3["field_name"]).to_string()),
-                                    field_type: (&caps3["field_type"]).to_string(),
+                                    field_name: Some((caps3["field_name"]).to_string()),
+                                    field_type: (caps3["field_type"]).to_string(),
                                 };
                                 type_is_struct.push(new);
                             }
@@ -440,8 +442,8 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
     }
     for caps in REG_TYPES.captures_iter(&type_info) {
         let new_entry = TypeEntry {
-            name: (&caps["name"]).to_string(),
-            description: Description::Type((&caps["description"]).to_string()),
+            name: (caps["name"]).to_string(),
+            description: Description::Type((caps["description"]).to_string()),
         };
         types_prep.push(new_entry);
     }

@@ -11,7 +11,7 @@ struct LandingView: View {
     @State private var tacAccept = false
     @State private var ppAccept = false
     @State private var accept = false
-    @ObservedObject var data: SignerDataModel
+    @EnvironmentObject private var data: SignerDataModel
     var body: some View {
         VStack {
             DocumentModal()
@@ -23,7 +23,7 @@ struct LandingView: View {
                     label: {
                         HStack {
                             (tacAccept ? Image(.checkmark, variant: .square) : Image(.square)).imageScale(.large)
-                            Text("I agree to the terms and conditions")
+                            Localizable.iAgreeToTheTermsAndConditions.text
                                 .multilineTextAlignment(.leading)
                             Spacer()
                         }
@@ -36,14 +36,14 @@ struct LandingView: View {
                     label: {
                         HStack {
                             (ppAccept ? Image(.checkmark, variant: .square) : Image(.square)).imageScale(.large)
-                            Text("I agree to the privacy policy")
+                            Localizable.iAgreeToThePrivacyPolicy.text
                                 .multilineTextAlignment(.leading)
                             Spacer()
                         }
                     }
                 )
                 BigButton(
-                    text: "Next",
+                    text: Localizable.next.key,
                     action: {
                         accept = true
                     },
@@ -52,9 +52,12 @@ struct LandingView: View {
                 .padding(.top, 16.0)
                 .alert(isPresented: $accept, content: {
                     Alert(
-                        title: Text("Accept privacy policy?"),
-                        primaryButton: .default(Text("Decline")),
-                        secondaryButton: .default(Text("Accept"), action: { data.onboard() })
+                        title: Localizable.acceptPrivacyPolicy.text,
+                        primaryButton: .default(Localizable.decline.text),
+                        secondaryButton: .default(
+                            Localizable.accept.text,
+                            action: { data.onboard() }
+                        )
                     )
                 })
             }

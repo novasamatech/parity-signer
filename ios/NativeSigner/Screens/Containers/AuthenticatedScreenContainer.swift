@@ -8,20 +8,23 @@
 import SwiftUI
 
 struct AuthenticatedScreenContainer: View {
-    @ObservedObject var data: SignerDataModel
-    @ObservedObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+    @EnvironmentObject private var navigation: NavigationCoordinator
+
+    @StateObject var snackBarPresentation = ServiceLocator.bottomSnackbarPresentation
     @GestureState private var dragOffset = CGSize.zero
 
     var body: some View {
         VStack(spacing: 0) {
-            HeaderViewContainer(data: data, navigation: navigation)
+            if !navigation.shouldSkipInjectedViews {
+                HeaderViewContainer()
+            }
             ZStack {
                 VStack(spacing: 0) {
-                    ScreenSelectorView(data: data, navigation: navigation)
-                    Spacer()
+                    ScreenSelectorView()
                 }
-                ModalSelectorView(data: data, navigation: navigation)
-                AlertSelectorView(data: data, navigation: navigation)
+                ModalSelectorView()
             }
             .gesture(
                 DragGesture().updating($dragOffset, body: { value, _, _ in
@@ -30,17 +33,10 @@ struct AuthenticatedScreenContainer: View {
                     }
                 })
             )
-            // Certain places are better off without footer
-            if navigation.actionResult.footer {
-                Footer(
-                    footerButton: navigation.actionResult.footerButton,
-                    navigationRequest: { navigationRequest in
-                        navigation.perform(navigation: navigationRequest)
-                    }
+            if navigation.actionResult.footer, navigation.selectedTab != .keys {
+                TabBarView(
+                    selectedTab: $navigation.selectedTab
                 )
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-                .background(Asset.bg000.swiftUIColor)
             }
         }
         .gesture(
@@ -50,6 +46,17 @@ struct AuthenticatedScreenContainer: View {
                 }
             }
         )
-        .alert("Navigation error", isPresented: $data.parsingAlert, actions: {})
+        .environmentObject(snackBarPresentation)
+        .bottomSnackbar(snackBarPresentation.viewModel, isPresented: $snackBarPresentation.isSnackbarPresented)
+        .fullScreenCover(
+            isPresented: $navigation.genericError.isPresented
+        ) {
+            ErrorBottomModal(
+                viewModel: .alertError(message: navigation.genericError.errorMessage),
+                dismissAction: navigation.perform(navigation: .init(action: .goBack)),
+                isShowingBottomAlert: $navigation.genericError.isPresented
+            )
+            .clearModalBackground()
+        }
     }
 }

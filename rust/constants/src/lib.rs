@@ -156,27 +156,6 @@ pub const COLOR: &str = "#660D35";
 #[cfg(feature = "active")]
 pub const SECONDARY_COLOR: &str = "#262626";
 
-/// Common part of the file names for `load_metadata` payloads ready for signing,
-/// for `generate_message` crate
-#[cfg(feature = "active")]
-pub fn load_metadata() -> String {
-    format!("{}/sign_me_load_metadata", FOLDER)
-}
-
-/// File name for `load_types` payload ready for signing, for `generate_message`
-/// crate
-#[cfg(feature = "active")]
-pub fn load_types() -> String {
-    format!("{}/sign_me_load_types", FOLDER)
-}
-
-/// Common part of the file names for `add_specs` payloads ready for signing,
-/// for `generate_message` crate
-#[cfg(feature = "active")]
-pub fn add_specs() -> String {
-    format!("{}/sign_me_add_specs", FOLDER)
-}
-
 /// Folder to save payloads ready for signing, for `generate_message` crate
 #[cfg(feature = "active")]
 pub const FOLDER: &str = "../files/in_progress";
@@ -196,12 +175,22 @@ pub const CHUNK_SIZE: u16 = 1072;
 /// Main color for QR codes (both static and animated ones)
 pub const MAIN_COLOR: [u8; 3] = [0x00, 0x00, 0x00];
 
+/// Main color for **dangerous** QR codes (static only, in Signer)
+#[cfg(feature = "signer")]
+pub const MAIN_COLOR_DANGER: [u8; 3] = [0xfd, 0x49, 0x35];
+
 /// Background color for QR codes (both static and animated ones)
 pub const BACK_COLOR: [u8; 3] = [0xff, 0xff, 0xff];
 
 /// Color palette for QR codes (both static and animated ones)
 pub fn qr_palette() -> Vec<u8> {
     [MAIN_COLOR.to_vec(), BACK_COLOR.to_vec()].concat()
+}
+
+/// Color palette for **dangerous** QR codes (static only, in Signer)
+#[cfg(feature = "signer")]
+pub fn qr_palette_danger() -> Vec<u8> {
+    [MAIN_COLOR_DANGER.to_vec(), BACK_COLOR.to_vec()].concat()
 }
 
 /// Scaling factor for QR codes (size of QR code dot, in pixels)
@@ -217,3 +206,6 @@ pub const FPS_DEN: u16 = 30;
 
 /// Width of the QR code border, in QR code dots
 pub const BORDER: i32 = 4;
+
+/// Size of square identicon images.
+pub const IDENTICON_IMG_SIZE: usize = 72;

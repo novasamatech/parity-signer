@@ -1,5 +1,5 @@
 use parity_scale_codec::Encode;
-use sp_core::{ecdsa, ed25519, sr25519, Pair};
+use sp_core::{ecdsa, ed25519, keccak_256, sr25519, Pair};
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
@@ -10,20 +10,21 @@ use db_handling::{
     manage_history::events_to_batch,
 };
 use definitions::{
-    crypto::SufficientCrypto,
+    crypto::{Encryption, SufficientCrypto},
     history::{Event, MetaValuesExport, NetworkSpecsExport, TypesExport},
     keyring::NetworkSpecsKey,
     navigation::{MSCContent, MSCNetworkInfo},
     qr_transfers::{ContentAddSpecs, ContentLoadMeta},
     users::AddressDetails,
 };
-use qrcode_static::png_qr;
+use qrcode_static::{png_qr, DataType};
 
 pub(crate) fn sign_as_address_key(
     to_sign: &[u8],
     multisigner: &MultiSigner,
     full_address: &str,
     pwd: Option<&str>,
+    encryption: Encryption,
 ) -> Result<SufficientCrypto> {
     match multisigner {
         MultiSigner::Ed25519(public) => {
@@ -58,7 +59,11 @@ pub(crate) fn sign_as_address_key(
             if public != &ecdsa_pair.public() {
                 return Err(Error::WrongPassword);
             }
-            let signature = ecdsa_pair.sign(to_sign);
+            let signature = if encryption == Encryption::Ethereum {
+                ecdsa_pair.sign_prehashed(&keccak_256(to_sign))
+            } else {
+                ecdsa_pair.sign(to_sign)
+            };
             Ok(SufficientCrypto::Ecdsa {
                 public: public.to_owned(),
                 signature,
@@ -75,6 +80,7 @@ fn sufficient_crypto(
     seed_phrase: &str,
     pwd_entry: &str,
 ) -> Result<SufficientCrypto> {
+    let encryption = address_details.encryption;
     let pwd = {
         if address_details.has_pwd {
             Some(pwd_entry)
@@ -83,7 +89,7 @@ fn sufficient_crypto(
         }
     };
     let mut full_address = seed_phrase.to_owned() + &address_details.path;
-    match sign_as_address_key(to_sign, multisigner, &full_address, pwd) {
+    match sign_as_address_key(to_sign, multisigner, &full_address, pwd, encryption) {
         Ok(a) => {
             full_address.zeroize();
             Ok(a)
@@ -145,7 +151,7 @@ pub(crate) fn sufficient_crypto_load_metadata(
     seed_phrase: &str,
     pwd_entry: &str,
 ) -> Result<(Vec<u8>, MSCContent)> {
-    let network_specs = get_network_specs(database_name, network_specs_key)?;
+    let network_specs = get_network_specs(database_name, network_specs_key)?.specs;
     let meta_values =
         get_meta_values_by_name_version(database_name, &network_specs.name, network_version)?;
     let load_meta_content =
@@ -198,7 +204,7 @@ pub(crate) fn sufficient_crypto_add_specs(
     seed_phrase: &str,
     pwd_entry: &str,
 ) -> Result<(Vec<u8>, MSCContent)> {
-    let network_specs_to_send = get_network_specs(database_name, network_specs_key)?.to_send();
+    let network_specs_to_send = get_network_specs(database_name, network_specs_key)?.specs;
     let add_specs_content = ContentAddSpecs::generate(&network_specs_to_send);
     let sufficient = match sufficient_crypto(
         multisigner,
@@ -236,11 +242,12 @@ pub(crate) fn sufficient_crypto_add_specs(
             f: MSCNetworkInfo {
                 network_title: network_specs_to_send.title,
                 network_logo: network_specs_to_send.logo,
+                network_specs_key: hex::encode(network_specs_key.key()),
             },
         },
     ))
 }
 
 fn qr_from_sufficient(sufficient: SufficientCrypto) -> Result<Vec<u8>> {
-    Ok(png_qr(&sufficient.encode())?)
+    Ok(png_qr(&sufficient.encode(), DataType::Regular)?)
 }

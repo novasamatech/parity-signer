@@ -1,8 +1,8 @@
 <div align="center">
-	
-![Logo Black](docs/src/res/logo-black.svg#gh-light-mode-only)	
+
+![Logo Black](docs/src/res/logo-black.svg#gh-light-mode-only)
 ![Logo White](docs/src/res/logo-white.svg#gh-dark-mode-only)
-	
+
 </div>
 
 <div align="center">
@@ -12,7 +12,7 @@
 </div>
 
 <div align="center">
-    <a href="https://github.com/paritytech/parity-signer/releases"><img src="docs/src/res/github-badge.png" width="150"></a> <a href="https://play.google.com/store/apps/details?id=io.parity.signer"><img src="docs/src/res/google-play-badge.png" width="150"></a> <a href="https://itunes.apple.com/us/app/parity-signer/id1218174838"><img src="docs/src/res/app-store-badge.png" width="150"></a><br<br>
+    <a href="https://github.com/paritytech/parity-signer/releases"><img src="docs/src/res/github-badge.png" width="150"></a> <a href="https://play.google.com/store/apps/details?id=io.parity.signer"><img src="docs/src/res/google-play-badge.png" width="150"></a> <a href="https://itunes.apple.com/us/app/parity-signer/id1218174838"><img src="docs/src/res/app-store-badge.png" width="150"></a><br><br>
 </div>
 
 # Introduction
@@ -102,23 +102,37 @@ Sub-folders of the `rust` folder:
 If you get errors like `cargo: feature X is required`, it most likely means you have an old version of Rust. Update it by running `rustup update stable`.
 
 **2.** Install `uniffi-bindgen`. Version has to match the version of `uniffi` crates specified
-   in the project (currently it is `0.19.3`):
+   in the project (currently it is `0.21.0`):
 
    ```bash
-   cargo install uniffi_bindgen --version 0.19.3 
+   cargo install uniffi_bindgen --version 0.21.0
    ```
+
+**3.**  Ensure [opencv crate dependencies](https://crates.io/crates/opencv).
 
 ## iOS
 
-**3.** You probably already have [Xcode](https://developer.apple.com/xcode/) installed if you are reading this. If not, go get it. 
+**4.** You probably already have [Xcode](https://developer.apple.com/xcode/) installed if you are reading this. If not, go get it.
 
-**4.** Compile the core Rust library first:
+**5.** Install dependencies
+Currently most of iOS tooling is integrated via [Homebrew](https://brew.sh) to avoid use of [CocoaPods](https://cocoapods.org).
 
+Before running project for the first time, run the following in the console
+
+```bash
+brew install swiftgen
+brew install swiftformat
+brew install swiftlint
 ```
-cd scripts && ./build.sh ios
+
+If you are using M1 machine, it might be necessary to run following commands for XCode's Build Phases to run tooling correctly:
+```
+sudo ln -s /opt/homebrew/bin/swiftgen /usr/local/bin/swiftgen
+sudo ln -s /opt/homebrew/bin/swiftformat /usr/local/bin/swiftformat
+sudo ln -s /opt/homebrew/bin/swiftlint /usr/local/bin/swiftlint
 ```
 
-**5.** Open the `NativeSigner.xcodeproj` project from the `ios` folder in your Xcode. Project features two schemes:
+**6.** Open the `NativeSigner.xcodeproj` project from the `ios` folder in your Xcode. Project features two schemes:
 - `NativeSigner` - used for deployments and running production-ready app on your devices
 - `NativeSigner-Dev` - development scheme that can be used to simulate offline mode without turning off WiFi on your Mac if you are using simulator.
 To run project, select one of the schemes and click `Run` (Cmd+R)
@@ -129,31 +143,30 @@ However, we strongly recommend that you use a real device for development, as so
 
 ## Android
 
-**3.** Install necessary rust targets (this set may vary depending on the target architecture
-   you are building for be it android studio emulators or hardware devices):
+**4.** Install necessary rust targets (this set may vary depending on the target device architecture
+   you are building for):
 
    ```bash
     rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
    ```
+Note - old x86 is not supported. Just use x86_64 emulator image.
 
-**4.** Download [Android Studio](https://developer.android.com/studio).
+**5.** Download [Android Studio](https://developer.android.com/studio).
 
-**5.** Open the project from the `android` directory.
+**6.** Open the project from the root directory.
 
-**6.** Install NDK. Go to `File -> Project Structure -> SDK Location`. Next to the "Android NDK location" section, click "Download Android NDK" button.
+**7.** Install NDK. Currently specific version 24.0.8215888 is required.
 
-⚠️  We highly recommend you to update all existing plugins and SDK's for Kotlin, Gradle,
-etc even if you just downloaded a fresh Android Studio. It's always a good idea to restart
-Android Studio after that. This can save you many hours on Stackoverflow trying to fix
-random errors like "NDK not found".
+Android Studio -> SDK Manager -> SDK Tools tab. Find NDK there.
+Enable "Show package details" checkmark to select specific version.
 
-**7.** Connect your device or create a virtual one. Open `Tools -> Device Manager` and create a new phone simulator with the latest Android.
+**8.** Connect your device or create a virtual one. Open `Tools -> Device Manager` and create a new phone simulator with the latest Android.
 
-**8. (macOS)** Specify path to `python` in `local.properties`.
+**9. (macOS)** : Specify path to `python` in `local.properties`.
 
 `rust.pythonCommand=python3`
 
-**9.** Run the project (`Ctrl+R`). It should build the Rust core library automatically.
+**10.** Run the project (`Ctrl+R`). It should build the Rust core library automatically.
 
 # Tests
 

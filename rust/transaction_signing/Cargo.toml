@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 hex = "0.4.3"
-parity-scale-codec = "3.1.5"
+parity-scale-codec = "3.2.1"
 zeroize = "1.5.7"
 
 definitions = { path = "../definitions", default-features = false, features = ["signer"] }
@@ -15,8 +15,8 @@ db_handling = { path = "../db_handling", default-features = false, features = ["
 qrcode_static = { path = "../qrcode_static" }
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
-thiserror = "1.0.32"
-anyhow = "1.0.60"
+thiserror = "1.0.37"
+anyhow = "1.0.66"
 
 [dev-dependencies]
 pretty_assertions = "1"

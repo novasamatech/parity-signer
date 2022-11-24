@@ -8,23 +8,25 @@
 import SwiftUI
 
 struct MainScreenContainer: View {
+    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+    @EnvironmentObject private var navigation: NavigationCoordinator
     @StateObject var data: SignerDataModel
-    @StateObject var navigation: NavigationCoordinator
 
     var body: some View {
         if data.onboardingDone, data.authenticated {
-            AuthenticatedScreenContainer(data: data, navigation: navigation)
+            AuthenticatedScreenContainer()
+                .environmentObject(data)
         } else if data.onboardingDone {
-            UnauthenticatedScreenContainer(data: data)
+            UnauthenticatedScreenContainer()
+                .environmentObject(data)
         } else if data.protected {
-            LandingView(data: data)
-        } else if data.protected, data.canaryDead {
-            Text(
-                "Please enable airplane mode, turn off bluetooth and wifi connection" +
-                    " and disconnect all cables!"
-            ).background(Asset.bg000.swiftUIColor)
+            LandingView()
+                .environmentObject(data)
+        } else if data.protected, connectivityMediator.isConnectivityOn {
+            Localizable.Connectivity.detected.text
+                .background(Asset.bg000.swiftUIColor)
         } else {
-            Text("Please protect device with pin or password!")
+            Localizable.pleaseProtectDeviceWithPinOrPassword.text
                 .background(Asset.bg000.swiftUIColor)
         }
     }
