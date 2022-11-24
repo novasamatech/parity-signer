@@ -39,7 +39,8 @@ fun ScanProgressBar(
 		modifier = Modifier
 			.fillMaxWidth(1f)
 			.padding(start = 8.dp, end = 8.dp, bottom = 16.dp, top = 8.dp)
-			.background(MaterialTheme.colors.forcedFill30, innerShape)
+			.background(MaterialTheme.colors.fill12, innerShape)
+			.background(MaterialTheme.colors.backgroundTertiary, innerShape)
 			.padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 20.dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically) {

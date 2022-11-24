@@ -119,7 +119,7 @@ private fun CameraBottomText(isMultimode: Boolean) {
 		//square clip height
 			LocalConfiguration.current.screenWidthDp.dp - ScanConstants.CLIP_SIDE_PADDING.times(2)
 		Spacer(modifier = Modifier.padding(top = paddingTop))
-		Spacer(modifier = Modifier.weight(0.6f))
+		Spacer(modifier = Modifier.weight(0.5f))
 		Text(
 			text = stringResource(
 				if (isMultimode) {
@@ -147,7 +147,7 @@ private fun CameraBottomText(isMultimode: Boolean) {
 			textAlign = TextAlign.Center,
 			modifier = Modifier.fillMaxWidth(1f),
 		)
-		Spacer(modifier = Modifier.weight(0.3f))
+		Spacer(modifier = Modifier.weight(0.5f))
 	}
 }
 
