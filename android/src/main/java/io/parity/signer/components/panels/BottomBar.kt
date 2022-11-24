@@ -12,7 +12,7 @@ import androidx.compose.material.icons.filled.CropFree
 import androidx.compose.material.icons.filled.Pattern
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -78,7 +78,7 @@ fun BottomBarButton(
 	action: Action,
 ) {
 	val selected =
-		signerDataModel.actionResult.observeAsState().value?.footerButton == actionGetName(action)
+		signerDataModel.actionResult.collectAsState().value.footerButton == actionGetName(action)
 	val tint = if (selected) {
 		MaterialTheme.colors.Text600
 	} else {

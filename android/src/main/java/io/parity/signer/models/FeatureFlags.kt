@@ -1,9 +1,16 @@
 package io.parity.signer.models
 
+import io.parity.signer.BuildConfig
+
 object FeatureFlags {
 	fun isEnabled(feature: FeatureOption): Boolean {
+		//skip all for release in case it wasn't
+		if (!BuildConfig.DEBUG) return false
+
 		return when (feature) {
-			FeatureOption.EXPORT_SECRET_KEY -> true
+			FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT -> false
+			FeatureOption.MULTI_TRANSACTION_CAMERA -> false
+			FeatureOption.EXPORT_SECRET_KEY -> false //unused
 		}
 	}
 
@@ -12,5 +19,9 @@ object FeatureFlags {
 
 
 enum class FeatureOption {
-	EXPORT_SECRET_KEY,
+	SKIP_UNLOCK_FOR_DEVELOPMENT,
+	MULTI_TRANSACTION_CAMERA,
+	EXPORT_SECRET_KEY; //unused as sample
+
+	fun isEnabled() = FeatureFlags.isEnabled(this)
 }

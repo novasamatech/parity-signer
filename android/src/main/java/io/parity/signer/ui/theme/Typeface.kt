@@ -28,7 +28,7 @@ private val RobotoFontFamily = FontFamily(
 )
 
 // Set of Material typography styles to start with
-@Deprecated("new SignerTypeface")
+@Deprecated("use new SignerTypeface")
 val Typography = Typography(
 	h1 = TextStyle(
 		fontFamily = InterFontFamily,
@@ -98,10 +98,10 @@ val CryptoTypography = Typography(
 )
 
 // Special font for network labels
-// TODO: labels could be stored in db instead!
 private val Web3Font = Font(R.font.web3_regular)
 private val Web3FontFamily = FontFamily(Web3Font)
 
+@Deprecated("use new SignerTypeface")
 val Web3Typography = Typography(
 	defaultFontFamily = Web3FontFamily,
 	h4 = TextStyle(

@@ -1,6 +1,7 @@
 package io.parity.signer.components.sharedcomponents
 
 import android.content.res.Configuration
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -141,6 +142,7 @@ private fun ShowBase58Collapsible(base58: String) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier.clickable { expanded.value = !expanded.value }
+			.animateContentSize()
 	) {
 		if (expanded.value) {
 			Text(
