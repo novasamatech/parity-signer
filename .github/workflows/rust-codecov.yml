@@ -42,7 +42,7 @@ jobs:
       - name:                 Execute tests
         run:                  |
           cd rust
-          cargo test --no-fail-fast --locked --all-targets --verbose --features signer active
+          cargo test --no-fail-fast --locked --all-targets --verbose --features signer
         env:
           CARGO_INCREMENTAL:  '0'
           RUSTC_WRAPPER:      ''
