@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.base.BottomSheetSubtitle
-import io.parity.signer.components.base.SignerBottomSheetDivider
+import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.items.SlimKeyItem
 import io.parity.signer.components.sharedcomponents.SnackBarCircularCountDownTimer
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
@@ -62,7 +62,7 @@ private fun SeedBackupBottomSheet(
 			subtitile = model.seedBase58.abbreviateString(BASE58_STYLE_ABBREVIATE),
 			onCloseClicked = onClose,
 		)
-		SignerBottomSheetDivider(padding = 24.dp)
+		SignerDivider(padding = 24.dp)
 		Column(
 			modifier = Modifier
 				.verticalScroll(rememberScrollState()),
@@ -79,7 +79,7 @@ private fun SeedBackupBottomSheet(
 			for (index in 0..model.derivations.lastIndex) {
 				SlimKeyItem(model = model.derivations[index])
 				if (index != model.derivations.lastIndex) {
-					SignerBottomSheetDivider(padding = 24.dp)
+					SignerDivider(padding = 24.dp)
 				}
 			}
 			Spacer(modifier = Modifier.size(height = 80.dp, width = 1.dp))

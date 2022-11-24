@@ -3,9 +3,8 @@ package io.parity.signer.screens.keysetdetails.export
 import io.parity.signer.backend.UniffiInteractor
 import io.parity.signer.backend.mapError
 import io.parity.signer.components.qrcode.AnimatedQrKeysProvider
-import io.parity.signer.dependencyGraph.ServiceLocator
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.KeyModel
-import io.parity.signer.models.NetworkModel
 
 
 class KeySetDetailsExportService :

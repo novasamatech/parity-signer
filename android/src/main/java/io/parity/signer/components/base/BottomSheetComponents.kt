@@ -158,7 +158,7 @@ fun RowButtonsBottomSheet(
 }
 
 @Composable
-fun SignerBottomSheetDivider(
+fun SignerDivider(
 	modifier: Modifier = Modifier,
 	padding: Dp = 16.dp,
 ) {
@@ -197,7 +197,7 @@ private fun PreviewCtaButtons() {
 				withBackground = true
 			) {}
 			PrimaryButtonNotWide(label = "primary slim") {}
-			SignerBottomSheetDivider()
+			SignerDivider()
 		}
 	}
 }
