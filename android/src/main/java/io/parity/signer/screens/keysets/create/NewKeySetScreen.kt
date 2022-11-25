@@ -46,30 +46,11 @@ fun NewKeySetScreen(
 	val canProceed = keySetName.isNotEmpty() && !seedNames.contains(keySetName)
 
 	Column(
-		Modifier
-			.fillMaxSize(1f)
-			.background(MaterialTheme.colors.background),
+        Modifier
+            .fillMaxSize(1f)
+            .background(MaterialTheme.colors.background),
 	) {
-		Row(
-			modifier = Modifier
-				.padding(start = 24.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
-			verticalAlignment = Alignment.CenterVertically,
-		) {
-			CloseIcon(
-				modifier = Modifier.padding(vertical = 20.dp),
-			) {
-				rootNavigator.backAction()
-			}
-			Spacer(modifier = Modifier.weight(1f))
-			DotsIndicator(totalDots = 2, selectedIndex = 1)
-			Spacer(modifier = Modifier.weight(1f))
-			PrimaryButtonNotWide(
-				label = stringResource(R.string.button_next),
-				isEnabled = canProceed,
-			) {
-				if (canProceed) rootNavigator.navigate(Action.GO_FORWARD, keySetName)
-			}
-		}
+		NewSeedHeader(rootNavigator, canProceed, keySetName)
 		Text(
 			text = stringResource(R.string.new_key_set_title),
 			color = MaterialTheme.colors.primary,
@@ -81,27 +62,28 @@ fun NewKeySetScreen(
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.LabelM,
 			modifier = Modifier
-				.padding(horizontal = 24.dp)
-				.padding(top = 8.dp, bottom = 20.dp),
+                .padding(horizontal = 24.dp)
+                .padding(top = 8.dp, bottom = 20.dp),
 		)
 
 		TextField(
 			value = keySetName,
 			onValueChange = { newStr -> keySetName = newStr },
 			keyboardOptions = KeyboardOptions(
-				imeAction = ImeAction.Done
+				imeAction = if (canProceed) ImeAction.Done else ImeAction.None
 			),
 			keyboardActions = KeyboardActions(
 				onDone = {
 					if (canProceed) rootNavigator.navigate(Action.GO_FORWARD, keySetName)
 				}
 			),
+			singleLine = true,
 			textStyle = SignerTypeface.LabelM,
 			colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
 			modifier = Modifier
-				.focusRequester(focusRequester)
-				.fillMaxWidth(1f)
-				.padding(horizontal = 24.dp),
+                .focusRequester(focusRequester)
+                .fillMaxWidth(1f)
+                .padding(horizontal = 24.dp),
 		)
 
 		Text(
@@ -109,14 +91,55 @@ fun NewKeySetScreen(
 			color = MaterialTheme.colors.textSecondary,
 			style = SignerTypeface.CaptionM,
 			modifier = Modifier
-				.padding(horizontal = 24.dp)
-				.padding(top = 16.dp, bottom = 16.dp),
+                .padding(horizontal = 24.dp)
+                .padding(top = 16.dp, bottom = 16.dp),
 		)
 	}
 
 	DisposableEffect(Unit) {
 		focusRequester.requestFocus()
 		onDispose { focusManager.clearFocus() }
+	}
+}
+
+@Composable
+private fun NewSeedHeader(
+	rootNavigator: Navigator,
+	canProceed: Boolean,
+	keySetName: String
+) {
+	Box(
+		modifier = Modifier
+			.padding(start = 24.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+		contentAlignment = Alignment.Center,
+	) {
+		Box(
+			modifier = Modifier.fillMaxWidth(1f),
+			contentAlignment = Alignment.CenterStart,
+		) {
+			CloseIcon(
+				modifier = Modifier.padding(vertical = 20.dp),
+			) {
+				rootNavigator.backAction()
+			}
+		}
+		Box(
+			modifier = Modifier.fillMaxWidth(1f),
+			contentAlignment = Alignment.Center,
+		) {
+			DotsIndicator(totalDots = 2, selectedIndex = 1)
+		}
+		Box(
+			modifier = Modifier.fillMaxWidth(1f),
+			contentAlignment = Alignment.CenterEnd,
+		) {
+			PrimaryButtonNotWide(
+				label = stringResource(R.string.button_next),
+				isEnabled = canProceed,
+			) {
+				if (canProceed) rootNavigator.navigate(Action.GO_FORWARD, keySetName)
+			}
+		}
 	}
 }
 

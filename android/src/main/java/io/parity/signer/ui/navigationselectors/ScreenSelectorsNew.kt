@@ -1,6 +1,7 @@
 package io.parity.signer.ui.navigationselectors
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -70,7 +71,11 @@ fun CombinedScreensSelector(
 					)
 				}
 			is ScreenData.NewSeed ->
-				Box(modifier = Modifier.statusBarsPadding()) {
+				Box(
+					modifier = Modifier
+						.statusBarsPadding()
+						.imePadding()
+				) {
 					NewKeySetScreen(
 						rootNavigator = rootNavigator,
 						seedNames = seedNames.value,
