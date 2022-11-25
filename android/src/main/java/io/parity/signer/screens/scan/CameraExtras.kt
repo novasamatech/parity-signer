@@ -29,19 +29,23 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.forcedFill40
 import io.parity.signer.ui.theme.pink500
 
+
+object ScanConstants{
+	val CLIP_TOP_PADDING = 140.dp
+	val CLIP_SIDE_PADDING = 8.dp
+}
+
 @Composable
 internal fun TransparentClipLayout(
 	modifier: Modifier = Modifier,
 ) {
-	val offsetY = remember { 140.dp }
-	val sidePadding = remember { 48.dp }
 
 	val offsetInPx: Float
 	val sidePaddingInPX: Float
 
 	with(LocalDensity.current) {
-		offsetInPx = offsetY.toPx()
-		sidePaddingInPX = sidePadding.toPx()
+		offsetInPx = ScanConstants.CLIP_TOP_PADDING.toPx()
+		sidePaddingInPX = ScanConstants.CLIP_SIDE_PADDING.toPx()
 	}
 
 	val background = MaterialTheme.colors.forcedFill40
