@@ -43,9 +43,8 @@ fun TransactionSignScreen(
 				.weight(1f)
 				.verticalScroll(rememberScrollState())
 		) {
-			val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
 			val plateShape =
-				RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
+				RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 
 			//verifier
 			Text(

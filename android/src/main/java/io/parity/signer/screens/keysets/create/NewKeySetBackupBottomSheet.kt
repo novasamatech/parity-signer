@@ -32,26 +32,16 @@ import io.parity.signer.models.KeySetDetailsModel
 import io.parity.signer.models.KeySetModel
 import io.parity.signer.ui.theme.*
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun NewKeySetBackupBottomSheet(
-	model: KeySetDetailsModel,
-	selectedKeys: Set<String>,
+	model: NewSeedBackupModel,
 	onClose: Callback,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.backgroundTertiary))
 	{
-		BottomSheetHeader(
-			title = pluralStringResource(
-				id = R.plurals.key_export_title,
-				count = selectedKeys.size,
-				selectedKeys.size,
-			),
-			onCloseClicked = onClose
-		)
-		val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
+
 		val plateShape =
-			RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
+			RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 		//scrollable part
 		Column(
 			modifier = Modifier
@@ -60,24 +50,9 @@ internal fun NewKeySetBackupBottomSheet(
 				.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
 				.background(MaterialTheme.colors.fill6, plateShape)
 		) {
-			if (LocalInspectionMode.current) {
-				AnimatedQrKeysInfo(
-					input = Unit,
-					provider = EmptyAnimatedQrKeysProvider(),
-					modifier = Modifier.padding(8.dp)
-				)
-			} else {
-				AnimatedQrKeysInfo(
-					input = KeySetDetailsExportService.GetQrCodesListRequest(model.root.seedName,
-						model.keys.filter { selectedKeys.contains(it.addressKey) }),
-					provider = KeySetDetailsExportService(),
-					modifier = Modifier.padding(8.dp)
-				)
-			}
 
-			val innerRoun = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 			val innerShape =
-				RoundedCornerShape(innerRoun, innerRoun, innerRoun, innerRoun)
+				RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 			Row(
 				modifier = Modifier
 					.padding(8.dp)
@@ -105,51 +80,11 @@ internal fun NewKeySetBackupBottomSheet(
 						.padding(start = 18.dp, end = 18.dp)
 				)
 			}
-			KeySeedCard(
-				seedTitle = model.root.seedName,
-				base58 = model.root.base58,
-			)
-			SignerDivider()
-			val seedList = selectedKeys.toList()
-			for (i in 0..seedList.lastIndex) {
-				val seed = seedList[i]
-				val keyModel = model.keys.first { it.addressKey == seed }
-				KeyCard(
-					KeyCardModel.fromKeyModel(keyModel, model.network.title),
-				)
-				if (i != seedList.lastIndex) {
-					SignerDivider()
-				}
-			}
+
 		}
 	}
 }
 
-@Composable
-@OptIn(ExperimentalComposeUiApi::class)
-private fun KeySetItemInExport(seed: KeySetModel) {
-	Row(Modifier.padding(16.dp, top = 12.dp, bottom = 12.dp)) {
-		Text(
-			text = seed.seedName,
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.BodyM,
-		)
-		Text(
-			text = " · ",
-			color = MaterialTheme.colors.textTertiary,
-			style = SignerTypeface.BodyM,
-		)
-		Text(
-			text = pluralStringResource(
-				id = R.plurals.key_sets_item_derived_subtitle,
-				count = seed.derivedKeysCount.toInt(),
-				seed.derivedKeysCount.toInt(),
-			),
-			color = MaterialTheme.colors.textTertiary,
-			style = SignerTypeface.BodyM,
-		)
-	}
-}
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -162,14 +97,8 @@ private fun KeySetItemInExport(seed: KeySetModel) {
 )
 @Composable
 private fun PreviewNewKeySetBackupBottomSheet() {
-	val model = KeySetDetailsModel.createStub()
-	val selected = setOf(
-		model.keys[0].addressKey,
-		model.keys[1].addressKey,
-	)
+	val model = NewSeedBackupModel.createStub()
 	SignerNewTheme {
-		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			NewKeySetBackupBottomSheet(model, selected, {})
-		}
+			NewKeySetBackupBottomSheet(model, {})
 	}
 }

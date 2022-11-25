@@ -75,35 +75,8 @@ fun KeySetDetailsExportResultBottomSheet(
 			}
 
 			val innerRoun = dimensionResource(id = R.dimen.innerFramesCornerRadius)
-			val innerShape =
-				RoundedCornerShape(innerRoun, innerRoun, innerRoun, innerRoun)
-			Row(
-				modifier = Modifier
-					.padding(8.dp)
-					.border(
-						BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-						innerShape
-					)
-					.background(MaterialTheme.colors.fill6, innerShape)
-
-			) {
-				Text(
-					text = stringResource(R.string.key_set_export_description_content),
-					color = MaterialTheme.colors.textTertiary,
-					style = SignerTypeface.CaptionM,
-					modifier = Modifier
-						.weight(1f)
-						.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
-				)
-				Icon(
-					imageVector = Icons.Outlined.Info,
-					contentDescription = null,
-					tint = MaterialTheme.colors.pink300,
-					modifier = Modifier
-						.align(Alignment.CenterVertically)
-						.padding(start = 18.dp, end = 18.dp)
-				)
-			}
+			val innerShape = RoundedCornerShape(innerRoun)
+			NotificationFrameText(innerShape)
 			KeySeedCard(
 				seedTitle = model.root.seedName,
 				base58 = model.root.base58,
@@ -121,6 +94,37 @@ fun KeySetDetailsExportResultBottomSheet(
 				}
 			}
 		}
+	}
+}
+
+@Composable
+fun NotificationFrameText(innerShape: RoundedCornerShape) {
+	Row(
+		modifier = Modifier
+			.padding(8.dp)
+			.border(
+				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+				innerShape
+			)
+			.background(MaterialTheme.colors.fill6, innerShape)
+
+	) {
+		Text(
+			text = stringResource(R.string.key_set_export_description_content),
+			color = MaterialTheme.colors.textTertiary,
+			style = SignerTypeface.CaptionM,
+			modifier = Modifier
+				.weight(1f)
+				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+		)
+		Icon(
+			imageVector = Icons.Outlined.Info,
+			contentDescription = null,
+			tint = MaterialTheme.colors.pink300,
+			modifier = Modifier
+				.align(Alignment.CenterVertically)
+				.padding(start = 18.dp, end = 18.dp)
+		)
 	}
 }
 

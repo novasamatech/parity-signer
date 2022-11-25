@@ -14,7 +14,6 @@ import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.models.Callback
 import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.Navigator
 import io.parity.signer.screens.keysetdetails.backup.BackupPhraseBox
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -57,7 +56,12 @@ internal fun NewKeySetBackupScreen(
 data class NewSeedBackupModel(
 	var seed: String,
 	var seedPhrase: String,
-)
+){
+	companion object {
+		fun createStub(): NewSeedBackupModel =
+			NewSeedBackupModel("seed name", " some long words some some words that consists key phrase")
+	}
+}
 
 fun MNewSeedBackup.toNewSeedBackupModel(): NewSeedBackupModel =
 	NewSeedBackupModel(seed = seed, seedPhrase = seedPhrase)
@@ -79,6 +83,6 @@ private fun PreviewNewKeySetBackupScreen() {
 		"some words many many words secr fphr phrase"
 	)
 	SignerNewTheme {
-		NewKeySetBackupScreen(model, EmptyNavigator(), { _, _ -> })
+		NewKeySetBackupScreen(model, {})
 	}
 }

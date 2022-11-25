@@ -31,38 +31,36 @@ fun NewKeySetBackupScreenFull(
 		)
 	val scope = rememberCoroutineScope()
 
-	val selected = remember { mutableStateOf(setOf<String>()) }
 
 	BottomSheetWrapperContent(
 		bottomSheetState = modalBottomSheetState,
 		bottomSheetContent = {
 			NewKeySetBackupBottomSheet(
-				selectedKeys = selected.value,
 				model = model,
 				onClose = { scope.launch { modalBottomSheetState.hide() }},
 			)
 		},
 		mainContent = {
-			NewKeySetBackupScreen(
-				model = model,
-				selected = selected,
-				onClose = onClose,
-				onExportSelected = {
-					scope.launch {
-						modalBottomSheetState.animateTo(
-							ModalBottomSheetValue.Expanded
-						)
-					}
-				},
-				onExportAll = {
-					scope.launch {
-						selected.value = model.keys.map { it.addressKey }.toSet()
-						modalBottomSheetState.animateTo(
-							ModalBottomSheetValue.Expanded
-						)
-					}
-				},
-			)
+//			NewKeySetBackupScreen(
+//				model = model,
+//				selected = selected,
+//				onClose = onClose,
+//				onExportSelected = {
+//					scope.launch {
+//						modalBottomSheetState.animateTo(
+//							ModalBottomSheetValue.Expanded
+//						)
+//					}
+//				},
+//				onExportAll = {
+//					scope.launch {
+//						selected.value = model.keys.map { it.addressKey }.toSet()
+//						modalBottomSheetState.animateTo(
+//							ModalBottomSheetValue.Expanded
+//						)
+//					}
+//				},
+//			)
 		},
 	)
 }
