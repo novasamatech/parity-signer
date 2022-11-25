@@ -403,3 +403,5 @@
 "Transaction.EnterPassword.Label.Placeholder" = "Enter password";
 "Transaction.EnterPassword.Label.Explanation" = "Enter password you used for derivation path\nfor example //path_name///password";
 "Transaction.EnterPassword.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
+"Transaction.EnterPassword.Error.Title" = "Did you forget your\npassword?";
+"Transaction.EnterPassword.Error.Message" = "Your password was entered incorrectly three times.\nFor your safety, you will need to retrieve it before continuing.";

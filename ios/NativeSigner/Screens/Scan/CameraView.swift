@@ -117,6 +117,7 @@ struct CameraView: View {
         .fullScreenCover(
             isPresented: $viewModel.isPresentingTransactionPreview,
             onDismiss: {
+                viewModel.isInTransactionProgress = false
                 model.multipleTransactions = []
                 model.start()
             }
@@ -132,6 +133,11 @@ struct CameraView: View {
         .fullScreenCover(
             isPresented: $viewModel.isPresentingEnterPassword,
             onDismiss: {
+                if viewModel.shouldPresentError {
+                    viewModel.isPresentingError = true
+                    return
+                }
+                viewModel.isInTransactionProgress = false
                 viewModel.enterPassword = nil
                 model.start()
             }
@@ -139,10 +145,26 @@ struct CameraView: View {
             EnterPasswordModal(
                 viewModel: .init(
                     isPresented: $viewModel.isPresentingEnterPassword,
+                    isErrorPresented: $viewModel.shouldPresentError,
                     dataModel: $viewModel.enterPassword,
                     signature: $viewModel.signature
                 )
             )
+            .clearModalBackground()
+        }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingError,
+            onDismiss: {
+                viewModel.isInTransactionProgress = false
+                viewModel.enterPassword = nil
+                model.start()
+            }
+        ) {
+            ErrorBottomModal(
+                viewModel: .signingForgotPassword(),
+                isShowingBottomAlert: $viewModel.isPresentingError
+            )
+            .clearModalBackground()
         }
     }
 
@@ -180,15 +202,22 @@ struct CameraView: View {
 
 extension CameraView {
     final class ViewModel: ObservableObject {
-        @Published var isPresentingTransactionPreview: Bool = false
+        // Overlay presentation
         @Published var isPresentingProgressSnackbar: Bool = false
-        @Published var isPresentingEnterPassword: Bool = false
         @Published var isScanningMultiple: Bool = false
+        @Published var header: String = Localizable.Scanner.Label.Scan.Main.header.string
+        @Published var message: String = Localizable.Scanner.Label.Scan.Main.message.string
+        // Modal presentation
+        @Published var isPresentingTransactionPreview: Bool = false
+        @Published var isPresentingEnterPassword: Bool = false
+        @Published var shouldPresentError: Bool = false
+        @Published var isPresentingError: Bool = false
+        @Published var isInTransactionProgress: Bool = false
+
+        // Data models for modals
         @Published var transactions: [MTransaction] = []
         @Published var signature: MSignatureReady?
         @Published var enterPassword: MEnterPassword!
-        @Published var header: String = Localizable.Scanner.Label.Scan.Main.header.string
-        @Published var message: String = Localizable.Scanner.Label.Scan.Main.message.string
 
         @Binding var isPresented: Bool
         private weak var navigation: NavigationCoordinator!
@@ -207,7 +236,8 @@ extension CameraView {
         }
 
         func checkForTransactionNavigation(_ payload: String?, model _: CameraService) {
-            guard payload != nil, !isPresentingTransactionPreview else { return }
+            guard payload != nil, !isInTransactionProgress else { return }
+            isInTransactionProgress = true
             let actionResult = navigation.performFake(
                 navigation: .init(
                     action: .transactionFetched,

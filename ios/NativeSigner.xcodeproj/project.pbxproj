@@ -172,7 +172,6 @@
 		6D84442128D3267A0072FBAC /* ForgetSingleKeyAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D84442028D3267A0072FBAC /* ForgetSingleKeyAction.swift */; };
 		6D84442428D3424F0072FBAC /* HiddenScrollContainerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D84442328D3424F0072FBAC /* HiddenScrollContainerModifier.swift */; };
 		6D850BDE292F7B4D00BA9017 /* EnterPasswordModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D850BDD292F7B4D00BA9017 /* EnterPasswordModal.swift */; };
-		6D850BE0292F7BC900BA9017 /* KeyboardOffsetAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D850BDF292F7BC900BA9017 /* KeyboardOffsetAdapter.swift */; };
 		6D850BE2292F85F200BA9017 /* SecuredTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D850BE1292F85F200BA9017 /* SecuredTextField.swift */; };
 		6D850BE4292FAA6700BA9017 /* RoundedContainerBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D850BE3292FAA6700BA9017 /* RoundedContainerBackground.swift */; };
 		6D850BE629308B2A00BA9017 /* KeyboardAvoidance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D850BE529308B2A00BA9017 /* KeyboardAvoidance.swift */; };
@@ -450,7 +449,6 @@
 		6D84442028D3267A0072FBAC /* ForgetSingleKeyAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForgetSingleKeyAction.swift; sourceTree = "<group>"; };
 		6D84442328D3424F0072FBAC /* HiddenScrollContainerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenScrollContainerModifier.swift; sourceTree = "<group>"; };
 		6D850BDD292F7B4D00BA9017 /* EnterPasswordModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterPasswordModal.swift; sourceTree = "<group>"; };
-		6D850BDF292F7BC900BA9017 /* KeyboardOffsetAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardOffsetAdapter.swift; sourceTree = "<group>"; };
 		6D850BE1292F85F200BA9017 /* SecuredTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuredTextField.swift; sourceTree = "<group>"; };
 		6D850BE3292FAA6700BA9017 /* RoundedContainerBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedContainerBackground.swift; sourceTree = "<group>"; };
 		6D850BE529308B2A00BA9017 /* KeyboardAvoidance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardAvoidance.swift; sourceTree = "<group>"; };
@@ -1039,7 +1037,6 @@
 			isa = PBXGroup;
 			children = (
 				6D6430EE28CB30A000342E37 /* BottoEdgeOverlay.swift */,
-				6D850BDF292F7BC900BA9017 /* KeyboardOffsetAdapter.swift */,
 			);
 			path = Overlays;
 			sourceTree = "<group>";
@@ -1785,7 +1782,6 @@
 				2D48F3DC277E3CAA004B27BE /* MultiselectBottomControl.swift in Sources */,
 				6D95E97828B6250B00E28A11 /* ClearBackgroundView.swift in Sources */,
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,
-				6D850BE0292F7BC900BA9017 /* KeyboardOffsetAdapter.swift in Sources */,
 				2D59B9FD278F1D930088057A /* InstructionsSquare.swift in Sources */,
 				6DC5644028B929EA003D540B /* KeyDetailsView.swift in Sources */,
 				6D850BE629308B2A00BA9017 /* KeyboardAvoidance.swift in Sources */,

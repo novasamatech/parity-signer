@@ -34,6 +34,14 @@ struct ErrorBottomModalViewModel {
         self.tertiaryAction = tertiaryAction
     }
 
+    static func signingForgotPassword(_ action: @escaping @autoclosure () -> Void = {}()) -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.Transaction.EnterPassword.Error.title.string,
+            content: Localizable.Transaction.EnterPassword.Error.message.string,
+            secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
+        )
+    }
+
     static func connectivityOn(_ action: @escaping @autoclosure () -> Void = {}()) -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
             icon: Asset.wifiOn.swiftUIImage,

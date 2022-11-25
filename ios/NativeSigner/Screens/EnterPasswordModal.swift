@@ -9,7 +9,6 @@ import SwiftUI
 
 struct EnterPasswordModal: View {
     @EnvironmentObject private var navigation: NavigationCoordinator
-//    @StateObject var keyboardOffsetAdapter = KeyboardOffsetAdapter()
     @StateObject var viewModel: ViewModel
     @FocusState var focusedField: SecurePrimaryTextField.Field?
     @State var animateBackground: Bool = false
@@ -56,7 +55,8 @@ struct EnterPasswordModal: View {
                         placeholder: "",
                         text: $viewModel.password,
                         isValid: $viewModel.isValid,
-                        focusedField: _focusedField
+                        focusedField: _focusedField,
+                        onCommit: { viewModel.onDoneTap() }
                     )
                     .padding(.top, Spacing.medium)
                     Group {
@@ -85,7 +85,7 @@ struct EnterPasswordModal: View {
     func keyComponent() -> some View {
         HStack {
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                Text(viewModel.dataModel.authorInfo.address.path)
+                Text(renderablePath)
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                     .font(Fontstyle.captionM.base)
                 Text(viewModel.dataModel.authorInfo.address.seedName)
@@ -106,24 +106,32 @@ struct EnterPasswordModal: View {
         .padding(Spacing.small)
         .containerBackground(isTinted: true)
     }
+
+    /// Manual string interpolation for `lock` `SFSymbol`
+    private var renderablePath: String {
+        "\(viewModel.dataModel.authorInfo.address.path)\(Localizable.Path.delimeter.string)\(Image(.lock))"
+    }
 }
 
 extension EnterPasswordModal {
     final class ViewModel: ObservableObject {
         private weak var navigation: NavigationCoordinator!
-
         @Binding var isPresented: Bool
+        @Binding var isErrorPresented: Bool
         @Binding var dataModel: MEnterPassword
         @Binding var signature: MSignatureReady?
+
         @Published var password: String = ""
-        @State var isValid: Bool = true
+        @Published var isValid: Bool = true
 
         init(
             isPresented: Binding<Bool>,
+            isErrorPresented: Binding<Bool>,
             dataModel: Binding<MEnterPassword>,
             signature: Binding<MSignatureReady?>
         ) {
             _isPresented = isPresented
+            _isErrorPresented = isErrorPresented
             _dataModel = dataModel
             _signature = signature
         }
@@ -133,7 +141,14 @@ extension EnterPasswordModal {
         }
 
         func onCancelTap() {
-            navigation.performFake(navigation: .init(action: .goBack)) // going back to MTransaction
+            // Dismissing password modal goes to `Log` screen
+            navigation.performFake(navigation: .init(action: .goBack))
+            // Pretending to navigate back to `Scan` so navigation states for new QR code scan will work
+            navigation.performFake(navigation: .init(action: .navbarScan))
+            isPresented.toggle()
+        }
+
+        func onErrorDismiss() {
             isPresented.toggle()
         }
 
@@ -142,13 +157,22 @@ extension EnterPasswordModal {
             // If navigation returned `enterPassword`, it means password is invalid
             if case let .enterPassword(value) = actionResult.modalData {
                 dataModel = value
-                isValid = value.counter == 0
+                isValid = false
             }
             // If we got signature from navigation, we should return to camera view and there check for further
             // navigation to Transaction Details
             if case let .signatureReady(value) = actionResult.modalData {
-                signature = value
                 isPresented = false
+                // This needs to trigger navigation to Transaction Details in parent camera view via Binding
+                signature = value
+            }
+            // If we got `Log`, we need to hide password modal, "navigate" to camera view and present
+            if case .log = actionResult.screenData {
+                // Inform parent camera view to present error for too many failed attempts at password
+                isPresented = false
+                isErrorPresented = true
+                // Fake navigation to camera, as were brought back to `Log` screen on navstate error handling
+                navigation.performFake(navigation: .init(action: .navbarScan))
             }
         }
     }
@@ -159,12 +183,13 @@ struct EnterPasswordModal_Previews: PreviewProvider {
         EnterPasswordModal(
             viewModel: .init(
                 isPresented: Binding<Bool>.constant(true),
+                isErrorPresented: Binding<Bool>.constant(false),
                 dataModel: Binding<MEnterPassword>.constant(
                     .init(
                         authorInfo: .init(
                             base58: PreviewData.base58,
                             address: .init(
-                                path: "//polkadot///",
+                                path: "//polkadot",
                                 hasPwd: true,
                                 identicon: PreviewData.exampleIdenticon,
                                 seedName: "Parity Keys",

@@ -19,7 +19,7 @@ struct PrimaryTextFieldStyle: ViewModifier {
             .font(Fontstyle.bodyL.base)
             .autocapitalization(.none)
             .keyboardType(.asciiCapable)
-            .submitLabel(.done)
+            .submitLabel(.return)
             .frame(height: Heights.textFieldHeight)
             .padding(.horizontal, Spacing.medium)
             .background(Asset.fill6.swiftUIColor)
