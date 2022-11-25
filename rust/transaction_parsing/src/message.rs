@@ -114,27 +114,10 @@ where
                 }
             }
         }
-        None => {
-            let author_card = Card::AuthorPublicKey(&author_multi_signer).card(&mut index, indent);
-            let error_card = Card::Error(Error::UnknownNetwork {
-                genesis_hash,
-                encryption,
-            })
-            .card(&mut index, indent);
-            let message_card =
-                Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
-            let network_card =
-                Card::NetworkGenesisHash(genesis_hash.as_ref()).card(&mut index, indent);
-            Ok(TransactionAction::Read {
-                r: TransactionCardSet {
-                    author: Some(vec![author_card]),
-                    error: Some(vec![error_card]),
-                    message: Some(vec![message_card]),
-                    new_specs: Some(vec![network_card]),
-                    ..Default::default()
-                },
-            })
-        }
+        None => Err(Error::UnknownNetwork {
+            genesis_hash,
+            encryption,
+        }),
     }
 }
 

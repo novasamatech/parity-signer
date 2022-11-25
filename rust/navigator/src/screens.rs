@@ -399,13 +399,13 @@ impl DeriveState {
 }
 
 impl TransactionState {
-    pub fn new(details_str: &str, dbname: &str) -> Self {
-        Self {
+    pub fn new(details_str: &str, dbname: &str) -> Result<Self> {
+        Ok(Self {
             entered_info: EnteredInfo("".to_string()),
-            action: transaction_parsing::produce_output(details_str, dbname),
+            action: transaction_parsing::produce_output(details_str, dbname)?,
             comment: "".to_string(),
             counter: 1,
-        }
+        })
     }
     pub fn update_seed(&self, new_secret_string: &str) -> Self {
         Self {

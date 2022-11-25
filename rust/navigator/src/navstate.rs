@@ -896,14 +896,18 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_transaction_fetched(&self, dbname: &str, details_str: &str) -> (Navstate, String) {
+    fn handle_transaction_fetched(
+        &self,
+        dbname: &str,
+        details_str: &str,
+    ) -> Result<(Navstate, String)> {
         let errorline = String::new();
 
         let new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
-            TransactionState::new(details_str, dbname),
+            TransactionState::new(details_str, dbname)?,
         )));
 
-        (new_navstate, errorline)
+        Ok((new_navstate, errorline))
     }
 
     fn handle_remove_network(&self, dbname: &str) -> (Navstate, String) {
@@ -1890,7 +1894,9 @@ impl State {
                 Action::PreviousUnit => self.handle_previous_unit(),
                 Action::ChangeNetwork => self.handle_change_network(details_str),
                 Action::CheckPassword => self.handle_change_password(details_str),
-                Action::TransactionFetched => self.handle_transaction_fetched(dbname, details_str),
+                Action::TransactionFetched => {
+                    self.handle_transaction_fetched(dbname, details_str)?
+                }
                 Action::RemoveNetwork => self.handle_remove_network(dbname),
                 Action::RemoveMetadata => self.handle_remove_metadata(dbname),
                 Action::RemoveTypes => self.handle_remove_types(dbname),

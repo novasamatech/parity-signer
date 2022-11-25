@@ -21,7 +21,6 @@ use definitions::{
 };
 use parser::cards::ParserCard;
 
-use crate::error::Error;
 use crate::holds::{GeneralHold, Hold};
 
 #[allow(clippy::enum_variant_names)]
@@ -45,7 +44,6 @@ pub(crate) enum Card<'a> {
     NetworkGenesisHash(&'a [u8]),
     Derivations(&'a [String]),
     Warning(Warning<'a>),
-    Error(Error),
 }
 
 pub(crate) enum Warning<'a> {
@@ -287,9 +285,6 @@ impl<'a> Card<'a> {
             Card::NetworkGenesisHash(x) => NavCard::NetworkGenesisHashCard { f: hex::encode(x) },
             Card::Derivations(x) => NavCard::DerivationsCard { f: x.to_vec() },
             Card::Warning(warn) => NavCard::WarningCard { f: warn.show() },
-            Card::Error(err) => NavCard::ErrorCard {
-                f: format!("Bad input data. {}", err),
-            },
         };
 
         let i = *index;

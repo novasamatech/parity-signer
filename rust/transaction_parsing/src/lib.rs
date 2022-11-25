@@ -1,14 +1,12 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use definitions::navigation::TransactionCardSet;
 use std::path::Path;
 
 pub use definitions::navigation::{StubNav, TransactionAction};
 mod add_specs;
 use add_specs::add_specs;
 pub mod cards;
-use cards::Card;
 pub mod check_signature;
 mod derivations;
 use derivations::process_derivations;
@@ -66,17 +64,9 @@ where
     }
 }
 
-pub fn produce_output<P>(payload: &str, dbname: P) -> TransactionAction
+pub fn produce_output<P>(payload: &str, dbname: P) -> Result<TransactionAction>
 where
     P: AsRef<Path>,
 {
-    match handle_scanner_input(payload, dbname) {
-        Ok(out) => out,
-        Err(e) => TransactionAction::Read {
-            r: TransactionCardSet {
-                error: Some(vec![Card::Error(e).card(&mut 0, 0)]),
-                ..Default::default()
-            },
-        },
-    }
+    Ok(handle_scanner_input(payload, dbname)?)
 }
