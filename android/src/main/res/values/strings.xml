@@ -132,4 +132,7 @@
 	<string name="exposed_before_cancel_button">Go Back</string>
 	<string name="exposed_before_proceed_button">Acknowledge and Proceed</string>
     <string name="button_next">Next</string>
+	<string name="new_key_set_backup_title">Recovery Phrase</string>
+	<string name="new_key_set_backup_subtitle">Write down your Secret Recovery Phrase</string>
+
 </resources>

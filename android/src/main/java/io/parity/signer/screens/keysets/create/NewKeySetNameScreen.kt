@@ -35,7 +35,7 @@ import io.parity.signer.uniffi.Action
  * second it NewKeySetBackup
  */
 @Composable
-fun NewKeySetScreen(
+fun NewKeySetNameScreen(
 	rootNavigator: Navigator,
 	seedNames: Array<String>
 ) {
@@ -156,6 +156,6 @@ private fun NewSeedHeader(
 @Composable
 private fun PreviewNewKeySetScreen() {
 	SignerNewTheme {
-		NewKeySetScreen(EmptyNavigator(), arrayOf())
+		NewKeySetNameScreen(EmptyNavigator(), arrayOf())
 	}
 }
