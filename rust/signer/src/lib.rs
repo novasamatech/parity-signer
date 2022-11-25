@@ -38,12 +38,37 @@ pub enum ErrorDisplayed {
         s: String,
     },
     MutexPoisoned,
+    UnknownNetwork {
+        genesis_hash: H256,
+        encryption: Encryption,
+    },
+    WrongNetworkVersion {
+        as_decoded: String,
+        in_metadata: u32,
+    },
 }
 
 impl From<navigator::Error> for ErrorDisplayed {
     fn from(e: navigator::Error) -> Self {
         match e {
             navigator::Error::MutexPoisoned => Self::MutexPoisoned,
+            navigator::Error::TransactionParsing(transaction_parsing::Error::UnknownNetwork {
+                genesis_hash,
+                encryption,
+            }) => Self::UnknownNetwork {
+                genesis_hash,
+                encryption,
+            },
+
+            navigator::Error::TransactionParsing(transaction_parsing::Error::Parser(
+                parser::Error::WrongNetworkVersion {
+                    as_decoded,
+                    in_metadata,
+                },
+            )) => Self::WrongNetworkVersion {
+                as_decoded,
+                in_metadata,
+            },
             _ => Self::Str {
                 s: format!("{}", e),
             },

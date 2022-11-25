@@ -2,6 +2,8 @@
 interface ErrorDisplayed {
     Str(string s);
     MutexPoisoned();
+    UnknownNetwork(H256 genesis_hash, Encryption encryption);
+    WrongNetworkVersion(string as_decoded, u32 in_metadata);
 };
 
 dictionary MetaValuesDisplay {

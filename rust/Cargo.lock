@@ -3213,10 +3213,12 @@ dependencies = [
  "hex",
  "log",
  "navigator",
+ "parser",
  "qr_reader_phone",
  "qrcode_static",
  "sp-core",
  "sp-runtime",
+ "transaction_parsing",
  "uniffi",
  "uniffi_build",
 ]
