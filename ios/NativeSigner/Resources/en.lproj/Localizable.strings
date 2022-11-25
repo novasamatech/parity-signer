@@ -398,4 +398,8 @@
 "TransactionSign.Label.Details.Destination" = "Dest";
 "TransactionSign.Label.Details.Value" = "Value";
 
-
+"Transaction.EnterPassword.Action.Done" = "Done";
+"Transaction.EnterPassword.Label.Title" = "Enter the password for";
+"Transaction.EnterPassword.Label.Placeholder" = "Enter password";
+"Transaction.EnterPassword.Label.Explanation" = "Enter password you used for derivation path\nfor example //path_name///password";
+"Transaction.EnterPassword.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";

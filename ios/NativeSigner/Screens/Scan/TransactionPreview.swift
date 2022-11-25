@@ -123,39 +123,6 @@ struct TransactionPreview: View {
     }
 
     @ViewBuilder
-    /// To be deleted
-    func signContent() -> some View {
-        HStack {
-            Localizable.logNote.text
-                .font(Fontstyle.overline.base)
-                .foregroundColor(Asset.text400.swiftUIColor)
-            Spacer()
-        }
-        ZStack {
-            RoundedRectangle(cornerRadius: 8).stroke(Asset.border400.swiftUIColor).frame(height: 39)
-            TextField(
-                Localizable.comment.string,
-                text: $comment,
-                prompt: Localizable.commentNotPublished.text
-            )
-            .foregroundColor(Asset.text400.swiftUIColor)
-            .background(Asset.bg100.swiftUIColor)
-            .font(Fontstyle.body2.base)
-            .focused($focus)
-            .onDisappear {
-                focus = false
-            }
-            .padding(.horizontal, Spacing.extraSmall)
-        }
-        HStack {
-            Localizable.visibleOnlyOnThisDevice.text
-                .font(Fontstyle.subtitle1.base)
-                .padding(.bottom)
-            Spacer()
-        }
-    }
-
-    @ViewBuilder
     func actions(transactionType: TransactionType?) -> some View {
         VStack {
             switch transactionType {

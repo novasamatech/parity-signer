@@ -129,6 +129,21 @@ struct CameraView: View {
                 )
             )
         }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingEnterPassword,
+            onDismiss: {
+                viewModel.enterPassword = nil
+                model.start()
+            }
+        ) {
+            EnterPasswordModal(
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingEnterPassword,
+                    dataModel: $viewModel.enterPassword,
+                    signature: $viewModel.signature
+                )
+            )
+        }
     }
 
     var multipleTransactionOverlay: some View {
@@ -167,9 +182,11 @@ extension CameraView {
     final class ViewModel: ObservableObject {
         @Published var isPresentingTransactionPreview: Bool = false
         @Published var isPresentingProgressSnackbar: Bool = false
+        @Published var isPresentingEnterPassword: Bool = false
         @Published var isScanningMultiple: Bool = false
         @Published var transactions: [MTransaction] = []
         @Published var signature: MSignatureReady?
+        @Published var enterPassword: MEnterPassword!
         @Published var header: String = Localizable.Scanner.Label.Scan.Main.header.string
         @Published var message: String = Localizable.Scanner.Label.Scan.Main.message.string
 
@@ -210,13 +227,14 @@ extension CameraView {
                             seedPhrase: seedPhrase
                         )
                     )
+                    transactions = [transaction]
                     if case let .signatureReady(value) = actionResult.modalData {
                         signature = value
-                        transactions = [transaction]
                         isPresentingTransactionPreview = true
                     }
-                    if case .enterPassword = actionResult.modalData {
-                        // To be implemented
+                    if case let .enterPassword(value) = actionResult.modalData {
+                        enterPassword = value
+                        isPresentingEnterPassword = true
                     }
                 default:
                     transactions = [transaction]

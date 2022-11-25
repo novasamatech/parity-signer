@@ -35,11 +35,6 @@ struct ModalSelector: View {
                 content: value,
                 navigationRequest: navigationRequest
             )
-        case let .enterPassword(value):
-            EnterPassword(
-                content: value,
-                navigationRequest: navigationRequest
-            )
         case let .logRight(value):
             LogMenu(
                 content: value,
@@ -78,15 +73,13 @@ struct ModalSelector: View {
                 navigationRequest: navigationRequest
             )
         // Handled in native navigation
-        case .backup:
-            EmptyView()
-        case .keyDetailsAction:
-            EmptyView()
-        case .newSeedMenu:
-            EmptyView()
-        case .seedMenu:
-            EmptyView()
-        case nil:
+        case
+            .enterPassword,
+            .backup,
+            .keyDetailsAction,
+            .newSeedMenu,
+            .seedMenu,
+            nil:
             EmptyView()
         }
     }
