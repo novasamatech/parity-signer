@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,7 +23,10 @@ import io.parity.signer.R
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.*
 
-
+/**
+ * This component shown on top of Scan screen with forced colors
+ * and so it have forced colors as well
+ */
 @Composable
 fun ScanProgressBar(
 	captured: Int,
@@ -31,6 +35,9 @@ fun ScanProgressBar(
 ) {
 	val progress =
 		captured.toFloat() / (total ?: 1).toFloat()
+
+	val background = Color(0x7AFFFFFF)//todo implement
+	val progressTextColor = Color(0x7AFFFFFF)
 
 	val innerRound = dimensionResource(id = R.dimen.qrShapeCornerRadius)
 	val innerShape =
