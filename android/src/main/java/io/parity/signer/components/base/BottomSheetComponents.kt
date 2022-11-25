@@ -69,6 +69,7 @@ fun PrimaryButtonNotWide(
 			},
 			style = SignerTypeface.TitleS,
 			maxLines = 1,
+			modifier = Modifier.padding(horizontal = 16.dp)
 		)
 	}
 }

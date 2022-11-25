@@ -50,7 +50,11 @@ fun NewKeySetScreen(
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background),
 	) {
-		Row(verticalAlignment = Alignment.CenterVertically) {
+		Row(
+			modifier = Modifier
+				.padding(start = 24.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+			verticalAlignment = Alignment.CenterVertically,
+		) {
 			CloseIcon(
 				modifier = Modifier.padding(vertical = 20.dp),
 			) {
@@ -70,15 +74,19 @@ fun NewKeySetScreen(
 			text = stringResource(R.string.new_key_set_title),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleL,
+			modifier = Modifier.padding(horizontal = 24.dp),
 		)
 		Text(
 			text = stringResource(R.string.new_key_set_subtitle),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.LabelM,
+			modifier = Modifier
+				.padding(horizontal = 24.dp)
+				.padding(top = 8.dp, bottom = 20.dp),
 		)
 
 		TextField(
-			value = "",
+			value = keySetName,
 			onValueChange = { newStr -> keySetName = newStr },
 			keyboardOptions = KeyboardOptions(
 				imeAction = ImeAction.Done
@@ -92,13 +100,17 @@ fun NewKeySetScreen(
 			colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
 			modifier = Modifier
 				.focusRequester(focusRequester)
-				.fillMaxWidth(1f),
+				.fillMaxWidth(1f)
+				.padding(horizontal = 24.dp),
 		)
 
 		Text(
 			text = stringResource(R.string.new_key_set_description),
 			color = MaterialTheme.colors.textSecondary,
 			style = SignerTypeface.CaptionM,
+			modifier = Modifier
+				.padding(horizontal = 24.dp)
+				.padding(top = 16.dp, bottom = 16.dp),
 		)
 	}
 

@@ -19,6 +19,7 @@ import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNewSeed
 
+//todo dmitry delete
 @Composable
 fun NewSeedScreen(
 	newSeed: MNewSeed,

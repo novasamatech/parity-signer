@@ -104,7 +104,7 @@
 	<string name="add_key_set_menu_recover">Recover Key Set</string>
     <string name="new_key_set_title">Key Set Name</string>
 	<string name="new_key_set_subtitle">Enter a name that will help you identify this key set</string>
-	<string name="new_key_set_description">Enter a name that will help you identify this key set</string>
+	<string name="new_key_set_description">Name examples: Main account, My validator, Dotsama crowdloans, etc</string>
 	<string name="description_multisign_mode">multi sign mode</string>
 	<string name="description_camera_tourch_enable">camera tourch button</string>
 	<string name="screen_title_update_metadata">Update metadata</string>
