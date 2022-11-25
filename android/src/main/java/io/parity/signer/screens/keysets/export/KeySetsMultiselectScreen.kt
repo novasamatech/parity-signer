@@ -110,7 +110,7 @@ fun ClickableLabel(
 		} else {
 			MaterialTheme.colors.textDisabled
 		},
-		style = TypefaceNew.TitleS,
+		style = SignerTypeface.TitleS,
 		modifier = modifier,
 	)
 }

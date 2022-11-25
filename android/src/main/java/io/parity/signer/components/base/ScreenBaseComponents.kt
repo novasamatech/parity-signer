@@ -21,13 +21,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun ScreenHeader(
 	@StringRes stringId: Int?,
-	onback: (() -> Unit)? = null,
+	onBack: (() -> Unit)? = null,
 	onMenu: (() -> Unit)? = null,
 ) {
 	Row(
@@ -35,14 +35,14 @@ fun ScreenHeader(
 			.fillMaxWidth(1f)
 			.defaultMinSize(minHeight = 56.dp)
 	) {
-		if (onback != null) {
+		if (onBack != null) {
 			Image(
 				imageVector = Icons.Filled.ChevronLeft,
 				contentDescription = stringResource(R.string.description_back_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
 					.padding(horizontal = 8.dp)
-					.clickable(onClick = onback)
+					.clickable(onClick = onBack)
 					.padding(8.dp)
 					.size(24.dp)
 					.align(Alignment.CenterVertically)
@@ -55,7 +55,7 @@ fun ScreenHeader(
 			Text(
 				text = stringResource(stringId),
 				color = MaterialTheme.colors.primary,
-				style = TypefaceNew.TitleS,
+				style = SignerTypeface.TitleS,
 				textAlign = TextAlign.Center,
 				modifier = Modifier
 					.align(Alignment.CenterVertically)
@@ -115,7 +115,7 @@ fun ScreenHeaderClose(
 			Text(
 				text = title,
 				color = MaterialTheme.colors.primary,
-				style = TypefaceNew.TitleS,
+				style = SignerTypeface.TitleS,
 				textAlign = TextAlign.Center,
 				modifier = Modifier.fillMaxWidth(1f),
 			)
@@ -123,7 +123,7 @@ fun ScreenHeaderClose(
 				Text(
 					text = subtitle,
 					color = MaterialTheme.colors.textTertiary,
-					style = TypefaceNew.CaptionM,
+					style = SignerTypeface.CaptionM,
 					textAlign = TextAlign.Center,
 					modifier = Modifier.fillMaxWidth(1f),
 				)
@@ -171,17 +171,17 @@ private fun PreviewScreenBaseComponent() {
 		) {
 			ScreenHeader(
 				null,
-				onback = {},
+				onBack = {},
 				onMenu = {},
 			)
 			ScreenHeader(
 				R.string.key_sets_screem_title,
-				onback = null,
+				onBack = null,
 				onMenu = {},
 			)
 			ScreenHeader(
 				R.string.key_sets_screem_title,
-				onback = null,
+				onBack = null,
 				onMenu = null,
 			)
 			ScreenHeaderClose(

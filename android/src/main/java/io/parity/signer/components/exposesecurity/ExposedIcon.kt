@@ -55,7 +55,7 @@ private fun ExposedIconActive(
 		contentAlignment = Alignment.Center
 	) {
 		Image(
-			painter = painterResource(id = R.drawable.ic_gpp_maybe_32),
+			painter = painterResource(id = R.drawable.ic_shield_exposed_32),
 			contentDescription = stringResource(R.string.description_shield_exposed_icon),
 			colorFilter = ColorFilter.tint(Color.White),
 			modifier = Modifier.size(32.dp),

@@ -20,7 +20,7 @@ qr_reader_phone = { path = "../qr_reader_phone" }
 qrcode_static = { path = "../qrcode_static" }
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
-env_logger = "0.9"
+env_logger = "0.10"
 
 [target.'cfg(target_os = "android")'.dependencies]
 android_logger = "0.11"

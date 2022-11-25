@@ -16,13 +16,20 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 	lateinit var context: Context
 
 	fun authenticate(activity: FragmentActivity, onSuccess: () -> Unit) {
+		if (FeatureFlags.isEnabled(FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT)) {
+			setAuth(true)
+			onSuccess()
+			return
+		}
+
 		val biometricManager = BiometricManager.from(context)
 
 		val promptInfo =
 			BiometricPrompt.PromptInfo.Builder()
 				.setTitle(context.getString(R.string.unlock_device_title))
 				.setSubtitle(context.getString(R.string.unlock_device_subtitle))
-				.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK)
+				.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL
+					or BiometricManager.Authenticators.BIOMETRIC_WEAK)
 				.build()
 
 		when (biometricManager.canAuthenticate(

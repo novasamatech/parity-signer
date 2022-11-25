@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
-import io.parity.signer.components.base.SignerBottomSheetDivider
+import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
 import io.parity.signer.models.Callback
@@ -91,7 +91,7 @@ fun KeySetExportResultBottomSheet(
 				Text(
 					text = stringResource(R.string.key_set_export_description_content),
 					color = MaterialTheme.colors.textTertiary,
-					style = TypefaceNew.CaptionM,
+					style = SignerTypeface.CaptionM,
 					modifier = Modifier
 						.weight(1f)
 						.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
@@ -110,7 +110,7 @@ fun KeySetExportResultBottomSheet(
 				val seed = seedList[i]
 				KeySetItemInExport(seed)
 				if (i != seedList.lastIndex) {
-					SignerBottomSheetDivider()
+					SignerDivider()
 				}
 			}
 		}
@@ -124,12 +124,12 @@ private fun KeySetItemInExport(seed: KeySetModel) {
 		Text(
 			text = seed.seedName,
 			color = MaterialTheme.colors.primary,
-			style = TypefaceNew.BodyM,
+			style = SignerTypeface.BodyM,
 		)
 		Text(
 			text = " · ",
 			color = MaterialTheme.colors.textTertiary,
-			style = TypefaceNew.BodyM,
+			style = SignerTypeface.BodyM,
 		)
 		Text(
 			text = pluralStringResource(
@@ -138,7 +138,7 @@ private fun KeySetItemInExport(seed: KeySetModel) {
 				seed.derivedKeysCount.toInt(),
 			),
 			color = MaterialTheme.colors.textTertiary,
-			style = TypefaceNew.BodyM,
+			style = SignerTypeface.BodyM,
 		)
 	}
 }

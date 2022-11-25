@@ -109,7 +109,7 @@ fun BottomBarButton2(
 		Text(
 			text = stringResource(id = labelResId),
 			color = color,
-			style = TypefaceNew.CaptionS,
+			style = SignerTypeface.CaptionS,
 		)
 	}
 }

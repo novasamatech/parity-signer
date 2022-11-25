@@ -51,7 +51,7 @@ fun KeySetItem(
 				Text(
 					text = model.seedName,
 					color = MaterialTheme.colors.primary,
-					style = TypefaceNew.LabelM,
+					style = SignerTypeface.LabelM,
 				)
 				if (model.derivedKeysCount > 0.toUInt()) {
 					Spacer(modifier = Modifier.padding(top = 4.dp))
@@ -62,7 +62,7 @@ fun KeySetItem(
 							model.derivedKeysCount.toInt(),
 						),
 						color = MaterialTheme.colors.textDisabled,
-						style = TypefaceNew.BodyM,
+						style = SignerTypeface.BodyM,
 					)
 				}
 			}

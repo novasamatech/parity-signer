@@ -33,7 +33,7 @@ import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.models.*
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textDisabled
 import io.parity.signer.ui.theme.textTertiary
 import io.parity.signer.uniffi.Action
@@ -53,7 +53,7 @@ fun KeySetDetailsScreenView(
 	Column {
 		ScreenHeader(
 			stringId = null,
-			onback = { navigator.backAction() },
+			onBack = { navigator.backAction() },
 			onMenu = onMenu, //navigator.navigate(Action.RIGHT_BUTTON_ACTION) was in rust navigation
 		)
 		Box(modifier = Modifier.weight(1f)) {
@@ -72,7 +72,7 @@ fun KeySetDetailsScreenView(
 					Text(
 						text = stringResource(R.string.key_sets_details_screem_derived_subtitle),
 						color = MaterialTheme.colors.textTertiary,
-						style = TypefaceNew.BodyM,
+						style = SignerTypeface.BodyM,
 						modifier = Modifier.weight(1f),
 					)
 					Icon(
@@ -141,12 +141,12 @@ fun SeedKeyViewItem(
 				Text(
 					text = seedKeyModel.seedName,
 					color = if (onClick != null) MaterialTheme.colors.primary else MaterialTheme.colors.textDisabled,
-					style = TypefaceNew.TitleL,
+					style = SignerTypeface.TitleL,
 				)
 				Text(
 					text = seedKeyModel.base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
 					color = if (onClick != null) MaterialTheme.colors.textTertiary else MaterialTheme.colors.textDisabled,
-					style = TypefaceNew.BodyM,
+					style = SignerTypeface.BodyM,
 				)
 			}
 			if (onClick != null) {
