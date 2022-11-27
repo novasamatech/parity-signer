@@ -36,8 +36,8 @@ fun ScanProgressBar(
 	val progress =
 		captured.toFloat() / (total ?: 1).toFloat()
 
-	val background = Color(0x7AFFFFFF)//todo implement
-	val progressTextColor = Color(0x7AFFFFFF)
+	val SNACKBAR_BACKGROUND = Color(0xFF454549)
+	val PROGRESS_TEXT_COLOR = Color(0x7AFFFFFF)
 
 	val innerRound = dimensionResource(id = R.dimen.qrShapeCornerRadius)
 	val innerShape =
@@ -46,20 +46,19 @@ fun ScanProgressBar(
 		modifier = Modifier
 			.fillMaxWidth(1f)
 			.padding(start = 8.dp, end = 8.dp, bottom = 16.dp, top = 8.dp)
-			.background(MaterialTheme.colors.fill12, innerShape)
-			.background(MaterialTheme.colors.backgroundTertiary, innerShape)
+			.background(SNACKBAR_BACKGROUND, innerShape)
 			.padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 20.dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			Column(Modifier.weight(1f)) {
 				Text(
 					text = stringResource(R.string.scan_progress_bar_title),
-					color = MaterialTheme.colors.primary,
+					color = Color.White,
 					style = SignerTypeface.BodyL,
 				)
 				Text(
 					text = stringResource(R.string.scan_progress_bar_progress, captured, total ?: -1),
-					color = MaterialTheme.colors.textTertiary,
+					color = PROGRESS_TEXT_COLOR,
 					style = SignerTypeface.CaptionM,
 				)
 			}
