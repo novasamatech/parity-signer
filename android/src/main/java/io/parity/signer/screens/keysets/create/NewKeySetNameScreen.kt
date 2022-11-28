@@ -124,6 +124,7 @@ private fun NewSeedHeader(
 		) {
 			CloseIcon(
 				modifier = Modifier.padding(vertical = 20.dp),
+				noBackground = true,
 			) {
 				rootNavigator.backAction()
 			}
