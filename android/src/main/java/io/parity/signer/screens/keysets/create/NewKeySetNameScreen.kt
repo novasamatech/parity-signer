@@ -12,6 +12,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
@@ -50,7 +51,7 @@ fun NewKeySetNameScreen(
             .fillMaxSize(1f)
             .background(MaterialTheme.colors.background),
 	) {
-		NewSeedHeader(rootNavigator, canProceed, keySetName)
+		NewSeedHeader(rootNavigator, canProceed, keySetName, focusManager)
 		Text(
 			text = stringResource(R.string.new_key_set_title),
 			color = MaterialTheme.colors.primary,
@@ -74,7 +75,10 @@ fun NewKeySetNameScreen(
 			),
 			keyboardActions = KeyboardActions(
 				onDone = {
-					if (canProceed) rootNavigator.navigate(Action.GO_FORWARD, keySetName)
+					if (canProceed) {
+						rootNavigator.navigate(Action.GO_FORWARD, keySetName)
+						focusManager.clearFocus(true)
+					}
 				}
 			),
 			singleLine = true,
@@ -106,7 +110,8 @@ fun NewKeySetNameScreen(
 private fun NewSeedHeader(
 	rootNavigator: Navigator,
 	canProceed: Boolean,
-	keySetName: String
+	keySetName: String,
+	focusManager: FocusManager,
 ) {
 	Box(
 		modifier = Modifier
@@ -137,7 +142,10 @@ private fun NewSeedHeader(
 				label = stringResource(R.string.button_next),
 				isEnabled = canProceed,
 			) {
-				if (canProceed) rootNavigator.navigate(Action.GO_FORWARD, keySetName)
+				if (canProceed) {
+					rootNavigator.navigate(Action.GO_FORWARD, keySetName)
+					focusManager.clearFocus(true)
+				}
 			}
 		}
 	}
