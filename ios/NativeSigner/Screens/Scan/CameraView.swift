@@ -27,6 +27,9 @@ struct CameraView: View {
                     if total > 1, viewModel.isPresentingProgressSnackbar == false, !viewModel.isScanningMultiple {
                         viewModel.isPresentingProgressSnackbar = true
                     }
+                    if total <= 1 {
+                        viewModel.isPresentingProgressSnackbar = false
+                    }
                 }
                 .onChange(of: model.captured) { newValue in
                     progressViewModel.current = newValue

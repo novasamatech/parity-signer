@@ -12,13 +12,13 @@ struct TCError: View {
     var body: some View {
         HStack {
             Localizable.errorCapitalised.text
-                .foregroundColor(Asset.signalDanger.swiftUIColor)
-                .font(Fontstyle.body2.base)
             Text(text)
-                .foregroundColor(Asset.signalDanger.swiftUIColor)
-                .font(Fontstyle.body2.base)
             Spacer()
-        }.background(Asset.bgDanger.swiftUIColor)
+        }
+        .foregroundColor(Asset.accentRed400.swiftUIColor)
+        .font(Fontstyle.bodyM.base)
+        .padding(Spacing.small)
+        .containerBackground(isTinted: true)
     }
 }
 
