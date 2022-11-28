@@ -26,10 +26,9 @@ import io.parity.signer.uniffi.MSettings
  */
 @Composable
 fun SettingsScreen(
-	settings: MSettings,
 	button1: (Action) -> Unit,
-	isStrongBoxProtected: () -> Boolean,
-	getAppVersion: () -> String,
+	isStrongBoxProtected: Boolean,
+	appVersion: String,
 	wipeToFactory: () -> Unit,
 	alertState: State<AlertState?>
 ) {
@@ -64,40 +63,6 @@ fun SettingsScreen(
 				)
 				Spacer(Modifier.weight(1f))
 			}
-			Surface(
-				shape = MaterialTheme.shapes.small,
-				color = MaterialTheme.colors.Bg200,
-				modifier = Modifier.padding(8.dp)
-			) {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					modifier = Modifier
-						.padding(8.dp)
-						.fillMaxWidth(1f)
-				) {
-					IdentIcon(identicon = settings.identicon ?: listOf())
-					Spacer(Modifier.width(4.dp))
-					Column {
-						Text(
-							settings.publicKey ?: "".abbreviateString(BASE58_STYLE_ABBREVIATE),
-							style = CryptoTypography.body2,
-							color = MaterialTheme.colors.Crypto400
-						)
-						Text(
-							"encryption: " + settings.encryption,
-							style = CryptoTypography.body1,
-							color = MaterialTheme.colors.Text400
-						)
-						settings.error?.let {
-							Text(
-								it,
-								style = Typography.body2,
-								color = MaterialTheme.colors.error
-							)
-						}
-					}
-				}
-			}
 		}
 		Row(
 			Modifier.clickable {
@@ -114,19 +79,9 @@ fun SettingsScreen(
 			withBackground = false
 		)
 		SettingsCardTemplate(
-			"Version: " + getAppVersion(),
+			"Version: $appVersion",
 			withIcon = false,
 			withBackground = false
 		)
 	}
-
-	AndroidCalledConfirm(
-		show = confirm,
-		header = "Wipe ALL data?",
-		text = "Factory reset the Signer app. This operation can not be reverted!",
-		back = { confirm = false },
-		forward = { wipeToFactory() },
-		backText = "Cancel",
-		forwardText = "Wipe"
-	)
 }

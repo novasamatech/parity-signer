@@ -79,7 +79,7 @@ fun ScreenSelector(
 			screenData.f,
 			button2
 		)
-		is ScreenData.Settings -> SettingsScreen(
+		is ScreenData.Settings -> SettingsScreenOld(
 			screenData.f,
 			button1 = button1,
 			isStrongBoxProtected = signerDataModel::isStrongBoxProtected,
