@@ -42,22 +42,22 @@ fun PrimaryButton(
 ) {
 	Column(
 		modifier = modifier
-            .run {
-                if (isEnabled) {
-                    clickable(onClick = onClicked)
-                } else {
-                    this
-                }
-            }
-            .background(
-                if (isEnabled) {
-                    MaterialTheme.colors.pink500
-                } else {
-                    MaterialTheme.colors.fill6
-                },
-                RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
-            )
-            .padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)),
+			.run {
+				if (isEnabled) {
+					clickable(onClick = onClicked)
+				} else {
+					this
+				}
+			}
+			.background(
+				if (isEnabled) {
+					MaterialTheme.colors.pink500
+				} else {
+					MaterialTheme.colors.fill6
+				},
+				RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
+			)
+			.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)),
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		Text(
@@ -95,18 +95,18 @@ private fun SecondaryButton(
 ) {
 	Column(
 		modifier = modifier
-            .clickable(onClick = onClicked)
-            .run {
-                if (withBackground) {
-                    background(
-                        MaterialTheme.colors.fill18,
-                        RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius)),
-                    )
-                } else {
-                    this
-                }
-            }
-            .padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)),
+			.clickable(onClick = onClicked)
+			.run {
+				if (withBackground) {
+					background(
+						MaterialTheme.colors.fill18,
+						RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius)),
+					)
+				} else {
+					this
+				}
+			}
+			.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)),
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
 		Text(
@@ -122,11 +122,12 @@ private fun SecondaryButton(
 fun RowButtonsBottomSheet(
 	labelCancel: String,
 	labelCta: String,
+	modifier: Modifier = Modifier,
 	onClickedCancel: Callback,
 	onClickedCta: Callback,
 	isCtaEnabled: Boolean = true,
 ) {
-	Row {
+	Row(modifier = modifier) {
 		SecondaryButton(
 			label = labelCancel,
 			modifier = Modifier.weight(1f),

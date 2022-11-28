@@ -39,16 +39,22 @@ internal fun NewKeySetBackupBottomSheet(
 		CheckboxWithText(
 			checked = confirmBackup,
 			text = stringResource(R.string.new_key_set_backup_bottomsheet_checkbox_written),
+			modifier = Modifier
+				.padding(horizontal = 24.dp)
 		) { newValue ->
 			confirmBackup = newValue
 		}
 		CheckboxWithText(
 			checked = confirmNotLoose,
 			text = stringResource(R.string.new_key_set_backup_bottomsheet_checkbox_keep_careful),
+			modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 8.dp)
 		) { newValue ->
 			confirmNotLoose = newValue
 		}
 		RowButtonsBottomSheet(
+			modifier = Modifier.padding(24.dp),
 			labelCancel = stringResource(id = R.string.generic_cancel),
 			labelCta = stringResource(id = R.string.generic_done),
 			onClickedCancel = onCancel,
