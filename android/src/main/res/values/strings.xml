@@ -7,6 +7,7 @@
 	<string name="remove_key_set_confirm_text">This Key Set will be removed for all networks. This cannot be reversed.  Are you sure you wish to proceed?</string>
 	<string name="remove_key_set_confirm_cta">Remove</string>
 	<string name="generic_cancel">Cancel</string>
+	<string name="generic_done">Done</string>
 	<string name="export_private_key_confirm_title">Export Private Key</string>
 	<string name="export_private_key_confirm_text">A private key can be used to sign transactions. This key will be marked as a hot key after export.</string>
 	<string name="export_private_key_confirm_cta">Export Private Key</string>
@@ -137,5 +138,7 @@
 	<string name="new_key_set_backup_warning_message">Write it down on a paper and keep  it in a safe place. </string>
 	<string name="new_key_set_backup_cta">Create Key Set</string>
 	<string name="new_key_set_backup_bottomsheet_title">Please confirm that you have you written down your secret recovery phrase</string>
+	<string name="new_key_set_backup_bottomsheet_checkbox_written">I’ve written down my secret recovery phrase</string>
+	<string name="new_key_set_backup_bottomsheet_checkbox_keep_careful">I understand that if I lose my secret phrase, my funds will be lost forever</string>
 
 </resources>

@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -28,14 +27,14 @@ fun PrimaryButtonBottomSheet(
 	isEnabled: Boolean = true,
 	onClicked: Callback,
 ) {
-	PrimaryButtonNotWide(
+	PrimaryButton(
 		label, modifier.fillMaxWidth(1f),
 		isEnabled, onClicked
 	)
 }
 
 @Composable
-fun PrimaryButtonNotWide(
+fun PrimaryButton(
 	label: String,
 	modifier: Modifier = Modifier,
 	isEnabled: Boolean = true,
@@ -43,22 +42,22 @@ fun PrimaryButtonNotWide(
 ) {
 	Column(
 		modifier = modifier
-			.run {
-				if (isEnabled) {
-					clickable(onClick = onClicked)
-				} else {
-					this
-				}
-			}
-			.background(
-				if (isEnabled) {
-					MaterialTheme.colors.pink500
-				} else {
-					MaterialTheme.colors.fill6
-				},
-				RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
-			)
-			.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)),
+            .run {
+                if (isEnabled) {
+                    clickable(onClick = onClicked)
+                } else {
+                    this
+                }
+            }
+            .background(
+                if (isEnabled) {
+                    MaterialTheme.colors.pink500
+                } else {
+                    MaterialTheme.colors.fill6
+                },
+                RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
+            )
+            .padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)),
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		Text(
@@ -82,21 +81,32 @@ fun SecondaryButtonBottomSheet(
 	withBackground: Boolean = false,
 	onClicked: Callback,
 ) {
+	SecondaryButton(
+		label, modifier.fillMaxWidth(), withBackground, onClicked,
+	)
+}
+
+@Composable
+private fun SecondaryButton(
+	label: String,
+	modifier: Modifier = Modifier,
+	withBackground: Boolean = false,
+	onClicked: Callback,
+) {
 	Column(
 		modifier = modifier
-			.clickable(onClick = onClicked)
-			.run {
-				if (withBackground) {
-					background(
-						MaterialTheme.colors.fill18,
-						RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius)),
-					)
-				} else {
-					this
-				}
-			}
-			.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
-			.fillMaxWidth(),
+            .clickable(onClick = onClicked)
+            .run {
+                if (withBackground) {
+                    background(
+                        MaterialTheme.colors.fill18,
+                        RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius)),
+                    )
+                } else {
+                    this
+                }
+            }
+            .padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)),
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
 		Text(
@@ -117,51 +127,17 @@ fun RowButtonsBottomSheet(
 	isCtaEnabled: Boolean = true,
 ) {
 	Row {
-		Box(
-			modifier = Modifier
-				.clickable(onClick = onClickedCancel)
-				.background(
-					MaterialTheme.colors.fill18, RoundedCornerShape(
-						dimensionResource(id = R.dimen.buttonCornerRadius)
-					)
-				)
-				.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
-				.weight(1f),
-			contentAlignment = Alignment.Center
-		) {
-			Text(
-				text = labelCancel,
-				color = MaterialTheme.colors.primary,
-				style = SignerTypeface.TitleS,
-				maxLines = 1,
-			)
-		}
-
+		SecondaryButton(
+			label = labelCancel,
+			modifier = Modifier.weight(1f),
+			withBackground = true,
+			onClicked = onClickedCancel,
+		)
 		Spacer(modifier = Modifier.padding(end = 8.dp))
-		Box(
-			modifier = Modifier
-				.clickable(onClick = onClickedCta)
-				.background(
-					if (isCtaEnabled) {
-						MaterialTheme.colors.pink500
-					} else {
-						MaterialTheme.colors.pink300
-					}, RoundedCornerShape(
-						dimensionResource(id = R.dimen.buttonCornerRadius)
-					)
-				)
-				.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
-				.weight(1f),
-		) {
-			Text(
-				text = labelCta,
-				color = Color.White,
-				style = SignerTypeface.TitleS,
-				maxLines = 1,
-				textAlign = TextAlign.Center,
-				modifier = Modifier.fillMaxWidth(1f)
-			)
-		}
+		PrimaryButton(
+			label = labelCta, modifier = Modifier.weight(1f),
+			onClicked = onClickedCta, isEnabled = isCtaEnabled
+		)
 	}
 }
 
@@ -210,8 +186,8 @@ private fun PreviewCtaButtons() {
 				"Secondary with background",
 				withBackground = true
 			) {}
-			PrimaryButtonNotWide(label = "primary slim") {}
-			PrimaryButtonNotWide(
+			PrimaryButton(label = "primary slim") {}
+			PrimaryButton(
 				label = "primary disabled",
 				isEnabled = false,
 			) {}
