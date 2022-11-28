@@ -7,8 +7,22 @@
 
 import Foundation
 
-struct NavigationError: Error, CustomStringConvertible {
-    let message: String
+enum NavigationError: Error, CustomStringConvertible {
+    case general(String)
+    case unknownNetwork(genesisHash: H256, encryption: Encryption)
+    case invalidNetworkVersion(asDecoded: String, inMetadata: UInt32)
+
+    /// This is temporary debug error message, until `Scan` redesigned is finished
+    var message: String {
+        switch self {
+        case let .general(message):
+            return message
+        case let .unknownNetwork(genesisHash, encryption):
+            return "Unknown network.\nGenesis hash:\(genesisHash.formattedAsString)\nEncryption:\(encryption.rawValue)"
+        case let .invalidNetworkVersion(asDecoded, inMetadata):
+            return "Invalid network version.\nDecoded as:\(asDecoded)\nIn Metadata:\(String(inMetadata))"
+        }
+    }
 
     var description: String {
         [Localizable.Error.Navigation.Label.prefix.string, message, Localizable.Error.Navigation.Label.suffix.string]
@@ -39,8 +53,14 @@ final class BackendNavigationAdapter: BackendNavigationPerforming {
                 seedPhrase: seedPhrase
             )
             return .success(actionResult)
+        } catch let ErrorDisplayed.Str(details) {
+            return .failure(.general(details))
+        } catch let ErrorDisplayed.UnknownNetwork(genesisHash, encryption) {
+            return .failure(.unknownNetwork(genesisHash: genesisHash, encryption: encryption))
+        } catch let ErrorDisplayed.WrongNetworkVersion(asDecoded, inMetadata) {
+            return .failure(.invalidNetworkVersion(asDecoded: asDecoded, inMetadata: inMetadata))
         } catch {
-            return .failure(.init(message: Localizable.Error.Navigation.Label.message(error.localizedDescription)))
+            return .failure(.general(Localizable.Error.Navigation.Label.message(error.localizedDescription)))
         }
     }
 }
