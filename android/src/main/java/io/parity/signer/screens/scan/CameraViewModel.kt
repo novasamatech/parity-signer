@@ -121,7 +121,7 @@ class CameraViewModel() : ViewModel() {
 			Log.e("Camera scan", "transaction parsing failed, ${error.error.message}")
 		}
 		return allResults.filterIsInstance<UniffiResult.Success<ActionResult>>()
-			.mapNotNull { (it.result.screenData as? ScreenData.Transaction)?.f }
+			.mapNotNull { (it.result.screenData as? ScreenData.Transaction)?.f }.flatten()
 	}
 
 	/**

@@ -4,7 +4,7 @@ use parity_scale_codec::Encode;
 use regex::Regex;
 use sp_core::{blake2_256, sr25519, Pair, H256};
 use sp_runtime::MultiSigner;
-use std::{collections::HashMap, convert::TryInto, str::FromStr};
+use std::{collections::HashMap, convert::TryInto, fs, str::FromStr};
 
 use constants::{
     test_values::{
@@ -21,16 +21,16 @@ use db_handling::{
     cold_default::{init_db, populate_cold_nav_test},
     identities::{
         export_all_addrs, import_all_addrs, try_create_address, try_create_seed, AddrInfo,
-        ExportAddrs, ExportAddrsV1, SeedInfo,
+        ExportAddrs, ExportAddrsV1, SeedInfo, TransactionBulk, TransactionBulkV1,
     },
 };
 use definitions::{
     crypto::Encryption,
     history::{
-        Event, IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
+        Entry, Event, IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
         NetworkSpecsExport, SignDisplay, SignMessageDisplay, TypesDisplay, TypesExport,
     },
-    keyring::NetworkSpecsKey,
+    keyring::{NetworkSpecsKey, Order},
     navigation::{
         ActionResult, Address, AlertData, Card, DerivationCheck, DerivationDestination,
         DerivationEntry, DerivationPack, ExportedSet, FooterButton, History, MBackup, MDeriveKey,
@@ -50,7 +50,11 @@ use definitions::{
 use definitions::navigation::MAddressCard;
 use pretty_assertions::assert_eq;
 
-use crate::{navstate::State, Action};
+use crate::{
+    navstate::State,
+    states::{SignResult, TransactionState},
+    Action,
+};
 
 const ALICE: [u8; 32] = [
     212, 53, 147, 199, 21, 253, 211, 28, 97, 20, 26, 189, 4, 169, 159, 214, 130, 44, 133, 88, 133,
@@ -300,6 +304,282 @@ fn erase_public_keys(m: &mut ScreenData) {
             }
         }
     }
+}
+
+#[test]
+fn bulk_signing_test_unpassworded() {
+    let dbname = "for_tests/bulk_signing_test_unpassworded";
+    let alice_westend_public =
+        "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34".to_string();
+    let tx = "a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33";
+
+    let tx = "0102".to_string() + &alice_westend_public + tx + WESTEND_GENESIS;
+
+    let encoded_transactions = vec![hex::decode(&tx).unwrap(), hex::decode(&tx).unwrap()];
+
+    // Another bulk in format that is digestible by verification
+    // utilities function.
+    let encoded_transactions_prefixed: Vec<_> = encoded_transactions
+        .iter()
+        .map(|tx| "53".to_string() + &hex::encode(tx))
+        .collect();
+
+    let bulk = TransactionBulk::V1(TransactionBulkV1 {
+        encoded_transactions,
+    });
+
+    let payload = [&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat();
+    let seeds = format!("{}\n{}", ALICE_SEED_PHRASE, ALICE_SEED_PHRASE);
+
+    populate_cold_nav_test(dbname).unwrap();
+
+    try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
+
+    let mut tx_state = TransactionState::new(&hex::encode(payload), dbname);
+
+    tx_state.update_seeds(&seeds);
+
+    // Two passwordless transactions are signed with no further
+    // interactions.
+    let result = tx_state.handle_sign(dbname).unwrap();
+
+    if let SignResult::Ready { signatures } = result {
+        assert_eq!(signatures.len(), 2);
+
+        for (tx, signature) in encoded_transactions_prefixed.iter().zip(signatures.iter()) {
+            assert!(signature_is_good(tx, &hex::encode(signature.0.encode())));
+        }
+    } else {
+        panic!("Unexpected sign result {:?}", result);
+    }
+
+    fs::remove_dir_all(dbname).unwrap();
+}
+
+const WESTEND_GENESIS: &str = "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+
+// Test that bulk signing works when the bulk contains several
+// transactions for passworded keys:
+//   1) Passwords are requested
+//   2) Incorrectly entered passwords are re-requested
+//   3) Passwords are not requested multiple times for the same key
+//   4) Produced signatures are valid.
+#[test]
+fn bulk_signing_test_passworded() {
+    let dbname = "for_tests/bulk_signing_test_passworded";
+
+    let tx =
+"a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33";
+
+    // TODO: move this to proper usage of `sp_keyring`.
+    // subkey inspect "bottom drive obey lake curtain smoke basket hold race lonely fit walk//westend///password123"
+    let alice_westend_password123_public =
+        "b6df7b569953a39eb872e913c0eecd48a5ac16a5ad9751c652eeb0729df1e114";
+
+    let password123_multisigner = MultiSigner::Sr25519(sr25519::Public(
+        TryInto::<[u8; 32]>::try_into(hex::decode(alice_westend_password123_public).unwrap())
+            .unwrap(),
+    ));
+
+    // TODO: move this to proper usage of `sp_keyring`.
+    // subkey inspect "bottom drive obey lake curtain smoke basket hold race lonely fit walk//westend///password345"
+    let alice_westend_password345_public =
+        "268a6ac46f141d80ca3208128f5682abf700931547221a9a5c39750a19912150";
+
+    let password345_multisigner = MultiSigner::Sr25519(sr25519::Public(
+        TryInto::<[u8; 32]>::try_into(hex::decode(alice_westend_password345_public).unwrap())
+            .unwrap(),
+    ));
+
+    populate_cold_nav_test(dbname).unwrap();
+
+    // Create alice seeds.
+    try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
+
+    // Add passworded derivations.
+    try_create_address(
+        "Alice",
+        ALICE_SEED_PHRASE,
+        "//westend///password123",
+        &NetworkSpecsKey::from_parts(
+            &H256::from_str(WESTEND_GENESIS).unwrap(),
+            &Encryption::Sr25519,
+        ),
+        dbname,
+    )
+    .unwrap();
+
+    try_create_address(
+        "Alice",
+        ALICE_SEED_PHRASE,
+        "//westend///password345",
+        &NetworkSpecsKey::from_parts(
+            &H256::from_str(WESTEND_GENESIS).unwrap(),
+            &Encryption::Sr25519,
+        ),
+        dbname,
+    )
+    .unwrap();
+
+    db_handling::manage_history::clear_history(dbname).unwrap();
+
+    // Prepare transactions and put them in the bulk.
+    let tx_passworded_123_1 =
+        "0102".to_string() + alice_westend_password123_public + tx + WESTEND_GENESIS;
+
+    let tx_passworded_123_2 = tx_passworded_123_1.clone();
+
+    let tx_passworded_345_1 =
+        "0102".to_string() + alice_westend_password345_public + tx + WESTEND_GENESIS;
+
+    let encoded_transactions = vec![
+        hex::decode(&tx_passworded_123_1).unwrap(),
+        hex::decode(&tx_passworded_123_2).unwrap(),
+        hex::decode(&tx_passworded_345_1).unwrap(),
+    ];
+
+    // Another bulk in format that is digestible by verification
+    // utilities function.
+    let encoded_transactions_prefixed: Vec<_> = encoded_transactions
+        .iter()
+        .map(|tx| "53".to_string() + &hex::encode(tx))
+        .collect();
+
+    let bulk = TransactionBulk::V1(TransactionBulkV1 {
+        encoded_transactions,
+    });
+
+    let payload = [&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat();
+
+    let mut tx_state = TransactionState::new(&hex::encode(payload), dbname);
+    tx_state.update_seeds(&format!(
+        "{}\n{}\n{}",
+        ALICE_SEED_PHRASE, ALICE_SEED_PHRASE, ALICE_SEED_PHRASE
+    ));
+
+    // Begin signing process.
+    let result = tx_state.handle_sign(dbname).unwrap();
+
+    // The password is requested.
+    assert_eq!(result, SignResult::RequestPassword { idx: 0, counter: 1 });
+
+    // A wrong password is provided.
+    tx_state.password_entered("password_wrong");
+
+    let result = tx_state.handle_sign(dbname).unwrap();
+
+    // A password is requested another time.
+    assert_eq!(result, SignResult::RequestPassword { idx: 0, counter: 2 });
+
+    // A correct password is provided.
+    tx_state.password_entered("password123");
+    let result = tx_state.handle_sign(dbname).unwrap();
+
+    // Two first transactions for the first key are signed,
+    // password is requested for the second transaction.
+    // A password is requested for the third transaction for the password `password345`.
+    assert_eq!(result, SignResult::RequestPassword { idx: 2, counter: 1 });
+
+    // Password is provided.
+    tx_state.password_entered("password345");
+    let result = tx_state.handle_sign(dbname).unwrap();
+
+    // All signatures are ready, check them.
+    if let SignResult::Ready { signatures } = result {
+        assert_eq!(signatures.len(), 3);
+
+        for (tx, signature) in encoded_transactions_prefixed.iter().zip(signatures.iter()) {
+            assert!(signature_is_good(tx, &hex::encode(signature.0.encode())));
+        }
+    } else {
+        panic!("Unexpected sign result: {:?}", result);
+    }
+
+    let mut log = db_handling::manage_history::get_history(dbname).unwrap();
+
+    for l in log.iter_mut() {
+        l.1.timestamp = String::new();
+    }
+
+    // Check that all logs have been added correctly.
+    assert_eq!(
+        log,
+        vec![
+            (
+                Order::from_number(4),
+                Entry {
+                    timestamp: String::new(),
+                    events: vec![Event::TransactionSigned {
+                        sign_display: SignDisplay {
+                            transaction: hex::decode(tx).unwrap(),
+                            network_name: "westend".to_string(),
+                            signed_by: VerifierValue::Standard {
+                                m: password345_multisigner,
+                            },
+                            user_comment: "".to_string(),
+                        }
+                    }]
+                }
+            ),
+            (
+                Order::from_number(3),
+                Entry {
+                    timestamp: String::new(),
+                    events: vec![Event::TransactionSigned {
+                        sign_display: SignDisplay {
+                            transaction: hex::decode(tx).unwrap(),
+                            network_name: "westend".to_string(),
+                            signed_by: VerifierValue::Standard {
+                                m: password123_multisigner.clone(),
+                            },
+                            user_comment: "".to_string(),
+                        }
+                    }]
+                }
+            ),
+            (
+                Order::from_number(2),
+                Entry {
+                    timestamp: String::new(),
+                    events: vec![Event::TransactionSigned {
+                        sign_display: SignDisplay {
+                            transaction: hex::decode(tx).unwrap(),
+                            network_name: "westend".to_string(),
+                            signed_by: VerifierValue::Standard {
+                                m: password123_multisigner.clone(),
+                            },
+                            user_comment: "".to_string(),
+                        }
+                    }]
+                }
+            ),
+            (
+                Order::from_number(1),
+                Entry {
+                    timestamp: String::new(),
+                    events: vec![Event::TransactionSignError {
+                        sign_display: SignDisplay {
+                            transaction: hex::decode(tx).unwrap(),
+                            network_name: "westend".to_string(),
+                            signed_by: VerifierValue::Standard {
+                                m: password123_multisigner,
+                            },
+                            user_comment: "".to_string(),
+                        }
+                    }]
+                }
+            ),
+            (
+                Order::from_number(0),
+                Entry {
+                    timestamp: String::new(),
+                    events: vec![Event::HistoryCleared],
+                }
+            )
+        ]
+    );
+
+    fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
@@ -1309,7 +1589,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     verifier: Some(vec![TransactionCard {
                         index: 0,
@@ -1346,7 +1626,7 @@ fn flow_test_1() {
                 ttype: TransactionType::Stub,
                 author_info: None,
                 network_info: None,
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -1533,7 +1813,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     verifier: Some(vec![TransactionCard {
                         index: 0,
@@ -1563,7 +1843,7 @@ fn flow_test_1() {
                 ttype: TransactionType::Stub,
                 author_info: None,
                 network_info: None,
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -1711,7 +1991,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     verifier: Some(vec![TransactionCard {
                         index: 0,
@@ -1747,7 +2027,7 @@ fn flow_test_1() {
                 ttype: TransactionType::Stub,
                 author_info: None,
                 network_info: None,
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -3650,7 +3930,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     importing_derivations: Some(vec![TransactionCard {
                         index: 0,
@@ -3676,7 +3956,7 @@ fn flow_test_1() {
                         "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                 }),
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -5536,7 +5816,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     error: Some(vec![TransactionCard {
                         index: 0,
@@ -5557,7 +5837,7 @@ fn flow_test_1() {
                 ttype: TransactionType::Read,
                 author_info: None,
                 network_info: None,
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -5597,7 +5877,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     method: Some(vec![
                         TransactionCard {
@@ -5745,7 +6025,7 @@ fn flow_test_1() {
                         "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                 }),
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -5767,10 +6047,10 @@ fn flow_test_1() {
         )
         .unwrap();
     let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { signature },
+        f: MSignatureReady { signatures },
     }) = action.modal_data
     {
-        String::from_utf8(qr_payload(&signature)).unwrap()
+        String::from_utf8(signatures[0].clone()).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -5815,7 +6095,7 @@ fn flow_test_1() {
                                         .unwrap(),
                                     ),
                                 },
-                                user_comment: "Alice sends some cash".to_string(),
+                                user_comment: "".to_string(),
                             },
                         }],
                     },
@@ -5870,7 +6150,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     message: Some(vec![TransactionCard {
                         index: 0,
@@ -5900,7 +6180,7 @@ fn flow_test_1() {
                         "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                 }),
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -5918,10 +6198,10 @@ fn flow_test_1() {
         .perform(Action::GoForward, "text test", ALICE_SEED_PHRASE)
         .unwrap();
     let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { ref signature },
+        f: MSignatureReady { ref signatures },
     }) = action.modal_data
     {
-        String::from_utf8(qr_payload(signature)).unwrap()
+        String::from_utf8(signatures[0].clone()).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -5971,7 +6251,7 @@ fn flow_test_1() {
                                         .unwrap(),
                                     ),
                                 },
-                                user_comment: "text test".to_string(),
+                                user_comment: "".to_string(),
                             },
                         }],
                     },
@@ -6016,7 +6296,7 @@ fn flow_test_1() {
                                     .unwrap(),
                                 ),
                             },
-                            user_comment: "text test".to_string(),
+                            user_comment: "".to_string(),
                         },
                     },
                     decoded: None,
@@ -6220,7 +6500,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     method: Some(vec![
                         TransactionCard {
@@ -6368,7 +6648,7 @@ fn flow_test_1() {
                         "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                 }),
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -6390,16 +6670,16 @@ fn flow_test_1() {
         )
         .unwrap();
     let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { ref signature },
+        f: MSignatureReady { ref signatures },
     }) = action.modal_data
     {
         expected_action.modal_data = Some(ModalData::SignatureReady {
             f: MSignatureReady {
-                signature: signature.clone(),
+                signatures: signatures.clone(),
             },
         });
 
-        String::from_utf8(qr_payload(signature)).unwrap()
+        String::from_utf8(signatures[0].clone()).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -6574,7 +6854,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
-            f: MTransaction {
+            f: vec![MTransaction {
                 content: TransactionCardSet {
                     message: Some(vec![TransactionCard {
                         index: 0,
@@ -6602,7 +6882,7 @@ fn flow_test_1() {
                         "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                 }),
-            },
+            }],
         },
         modal_data: None,
         alert_data: None,
@@ -6664,9 +6944,7 @@ fn flow_test_1() {
             counter: 2,
         },
     });
-    expected_action.alert_data = Some(AlertData::ErrorData {
-        f: "Wrong password.".to_string(),
-    });
+    expected_action.alert_data = None;
 
     assert_eq!(
         action, expected_action,
@@ -6676,7 +6954,6 @@ fn flow_test_1() {
         )
     );
 
-    state.perform(Action::GoBack, "", "").unwrap();
     let action = state.perform(Action::GoForward, "wrong_two", "").unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
@@ -6702,7 +6979,6 @@ fn flow_test_1() {
         )
     );
 
-    state.perform(Action::GoBack, "", "").unwrap();
     let mut action = state.perform(Action::GoForward, "wrong_three", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
@@ -6733,8 +7009,7 @@ fn flow_test_1() {
                                 message: message.clone(),
                                 network_name: "westend".to_string(),
                                 signed_by: verifier_value.clone(),
-                                user_comment: "Pepper tries sending text from passworded account"
-                                    .to_string(),
+                                user_comment: "".to_string(),
                             },
                         }],
                     },
@@ -6746,8 +7021,7 @@ fn flow_test_1() {
                                 message: message.clone(),
                                 network_name: "westend".to_string(),
                                 signed_by: verifier_value.clone(),
-                                user_comment: "Pepper tries sending text from passworded account"
-                                    .to_string(),
+                                user_comment: "".to_string(),
                             },
                         }],
                     },
@@ -6759,8 +7033,7 @@ fn flow_test_1() {
                                 message,
                                 network_name: "westend".to_string(),
                                 signed_by: verifier_value.clone(),
-                                user_comment: "Pepper tries sending text from passworded account"
-                                    .to_string(),
+                                user_comment: "".to_string(),
                             },
                         }],
                     },
@@ -6799,9 +7072,7 @@ fn flow_test_1() {
             },
         },
         modal_data: None,
-        alert_data: Some(AlertData::ErrorData {
-            f: "Wrong password.".to_string(),
-        }),
+        alert_data: None,
     };
 
     assert_eq!(
@@ -6828,16 +7099,16 @@ fn flow_test_1() {
         .unwrap();
     let action = state.perform(Action::GoForward, "secret", "").unwrap();
     let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { ref signature },
+        f: MSignatureReady { ref signatures },
     }) = action.modal_data
     {
         text_sign_action.modal_data = Some(ModalData::SignatureReady {
             f: MSignatureReady {
-                signature: signature.clone(),
+                signatures: signatures.clone(),
             },
         });
 
-        String::from_utf8(qr_payload(signature)).unwrap()
+        String::from_utf8(signatures[0].clone()).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -6960,7 +7231,7 @@ fn flow_test_1() {
                                     .to_string(),
                                 network_name: "westend".to_string(),
                                 signed_by: verifier_value,
-                                user_comment: "Pepper tries better".to_string(),
+                                user_comment: "".to_string(),
                             },
                         }],
                     },

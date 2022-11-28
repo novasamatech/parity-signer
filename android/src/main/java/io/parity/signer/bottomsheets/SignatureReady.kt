@@ -15,8 +15,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.BigButton
+import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
+import io.parity.signer.components.qrcode.EmptyQrCodeProvider
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
@@ -54,11 +55,10 @@ fun SignatureReady(
 		) {
 			Text("Your signature")
 			Text("Scan this into your application")
-			Image(
-				bitmap = signatureReady.signature.intoImageBitmap(),
-				contentDescription = "Signed transaction",
-				contentScale = ContentScale.FillWidth,
-				modifier = Modifier.fillMaxWidth()
+			AnimatedQrKeysInfo(
+				input = signatureReady.signatures,
+				provider = EmptyQrCodeProvider(),
+				modifier = Modifier.fillMaxWidth(1f)
 			)
 			Spacer(Modifier.weight(1f))
 			BigButton(

@@ -1,11 +1,11 @@
 use db_handling::{
-    db_transactions::{SignContent, TrDbColdSign},
+    db_transactions::{SignContent, TrDbColdSign, TrDbColdSignOne},
     helpers::{try_get_address_details, try_get_network_specs},
 };
 use definitions::{
     history::{Entry, Event, SignDisplay},
     keyring::{AddressKey, NetworkSpecsKey},
-    navigation::{MEventMaybeDecoded, TransactionCard, TransactionCardSet},
+    navigation::{MEventMaybeDecoded, TransactionCard, TransactionCardSet, TransactionSignAction},
     network_specs::VerifierValue,
     users::AddressDetails,
 };
@@ -40,7 +40,11 @@ enum CardsPrep<'a> {
 /// i.e. it starts with 53****, followed by author address, followed by actual transaction piece,
 /// followed by extrinsics, concluded with chain genesis hash
 
-pub(crate) fn parse_transaction<P>(data_hex: &str, db_path: P) -> Result<TransactionAction>
+pub(crate) fn parse_transaction<P>(
+    data_hex: &str,
+    db_path: P,
+    _in_bulk: bool,
+) -> Result<TransactionAction>
 where
     P: AsRef<Path>,
 {
@@ -150,7 +154,7 @@ where
                             Ok(a) => {
                                 found_solution = match cards_prep {
                                     CardsPrep::SignProceed(address_details, possible_warning) => {
-                                        let sign = TrDbColdSign::generate(
+                                        let sign_one = TrDbColdSignOne::generate(
                                             SignContent::Transaction {
                                                 method: method_data,
                                                 extensions: extensions_data,
@@ -161,6 +165,9 @@ where
                                             &author_multi_signer,
                                             history,
                                         );
+                                        let mut sign = TrDbColdSign::from_storage(&db_path, None)?
+                                            .unwrap_or_default();
+                                        sign.signing_bulk.push(sign_one);
                                         let checksum = sign.store_and_get_checksum(&db_path)?;
                                         let author_info = make_author_info(
                                             &author_multi_signer,
@@ -179,11 +186,13 @@ where
                                             ..Default::default()
                                         };
                                         Some(TransactionAction::Sign {
-                                            content,
+                                            actions: vec![TransactionSignAction {
+                                                content,
+                                                has_pwd: address_details.has_pwd,
+                                                author_info,
+                                                network_info: network_specs.clone(),
+                                            }],
                                             checksum,
-                                            has_pwd: address_details.has_pwd,
-                                            author_info,
-                                            network_info: network_specs.clone(),
                                         })
                                     }
                                     CardsPrep::ShowOnly(author_card, warning_card) => {
@@ -192,13 +201,13 @@ where
                                         let method = Some(into_cards(&a, &mut index));
                                         let extensions =
                                             Some(into_cards(&extensions_cards, &mut index));
-                                        let r = TransactionCardSet {
+                                        let r = Box::new(TransactionCardSet {
                                             author,
                                             warning,
                                             method,
                                             extensions,
                                             ..Default::default()
-                                        };
+                                        });
                                         Some(TransactionAction::Read { r })
                                     }
                                 };
@@ -217,13 +226,13 @@ where
                                         .card(&mut index, indent);
                                         let error = Card::Error(e.into()).card(&mut index, indent);
                                         let extensions = into_cards(&extensions_cards, &mut index);
-                                        let r = TransactionCardSet {
+                                        let r = Box::new(TransactionCardSet {
                                             author: Some(vec![author]),
                                             error: Some(vec![error]),
                                             warning,
                                             extensions: Some(extensions),
                                             ..Default::default()
-                                        };
+                                        });
                                         Some(TransactionAction::Read { r })
                                     }
                                     CardsPrep::ShowOnly(author_card, warning_card) => {
@@ -234,13 +243,13 @@ where
                                         ]);
                                         let extensions =
                                             Some(into_cards(&extensions_cards, &mut index));
-                                        let r = TransactionCardSet {
+                                        let r = Box::new(TransactionCardSet {
                                             author,
                                             warning,
                                             error,
                                             extensions,
                                             ..Default::default()
-                                        };
+                                        });
                                         Some(TransactionAction::Read { r })
                                     }
                                 };
@@ -270,11 +279,11 @@ where
             let author = Some(vec![author_card]);
             let error = Some(vec![error_card]);
 
-            let r = TransactionCardSet {
+            let r = Box::new(TransactionCardSet {
                 author,
                 error,
                 ..Default::default()
-            };
+            });
 
             Ok(TransactionAction::Read { r })
         }

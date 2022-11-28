@@ -173,22 +173,22 @@ where
         match first_card {
             FirstCard::WarningCard(warning_card) => match optional_ext_warning {
                 Some(ext_warning) => Ok(TransactionAction::Stub {
-                    s: TransactionCardSet {
+                    s: Box::new(TransactionCardSet {
                         warning: Some(vec![ext_warning, warning_card]),
                         meta: Some(vec![meta_card]),
                         ..Default::default()
-                    },
+                    }),
                     u: checksum,
                     stub: StubNav::LoadMeta {
                         l: specs_invariants.first_network_specs_key,
                     },
                 }),
                 None => Ok(TransactionAction::Stub {
-                    s: TransactionCardSet {
+                    s: Box::new(TransactionCardSet {
                         warning: Some(vec![warning_card]),
                         meta: Some(vec![meta_card]),
                         ..Default::default()
-                    },
+                    }),
                     u: checksum,
                     stub: StubNav::LoadMeta {
                         l: specs_invariants.first_network_specs_key,
@@ -197,23 +197,23 @@ where
             },
             FirstCard::VerifierCard(verifier_card) => match optional_ext_warning {
                 Some(ext_warning) => Ok(TransactionAction::Stub {
-                    s: TransactionCardSet {
+                    s: Box::new(TransactionCardSet {
                         warning: Some(vec![ext_warning]),
                         verifier: Some(vec![verifier_card]),
                         meta: Some(vec![meta_card]),
                         ..Default::default()
-                    },
+                    }),
                     u: checksum,
                     stub: StubNav::LoadMeta {
                         l: specs_invariants.first_network_specs_key,
                     },
                 }),
                 None => Ok(TransactionAction::Stub {
-                    s: TransactionCardSet {
+                    s: Box::new(TransactionCardSet {
                         verifier: Some(vec![verifier_card]),
                         meta: Some(vec![meta_card]),
                         ..Default::default()
-                    },
+                    }),
                     u: checksum,
                     stub: StubNav::LoadMeta {
                         l: specs_invariants.first_network_specs_key,

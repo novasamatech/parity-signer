@@ -45,7 +45,7 @@ fun ScanNavSubgraph(
 		composable(ScanNavSubgraph.transaction) {
 			Box(modifier = Modifier.statusBarsPadding()) {
 				TransactionPreviewEdited(
-					transaction = scanViewModel.pendingTransactions.first(), //todo multisign support missing yet
+					transactions = scanViewModel.pendingTransactions, //todo multisign support missing yet
 					onBack = {
 						//was navigate(Action.GO_BACK, "", "")
 						navController.navigate(ScanNavSubgraph.camera)

@@ -13,31 +13,44 @@ pub struct SeedNameWithIdenticon {
     pub identicon: Vec<u8>,
 }
 
+/// A single transaction signing action.
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub struct TransactionSignAction {
+    /// Parsed contents of the transaction.
+    pub content: TransactionCardSet,
+
+    /// If this transaction should be signed with a passworded key.
+    pub has_pwd: bool,
+
+    /// Information about the signing key of this transaction.
+    pub author_info: MAddressCard,
+
+    /// Info about the network this tx happens on.
+    pub network_info: OrderedNetworkSpecs,
+}
+
 /// Enum containing card sets for four different outcomes:
 /// importing derivations (Derivations), signing (Sign),
 /// accepting (Stub) and reading, for example, in case of an error (Read)
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum TransactionAction {
     Derivations {
-        content: TransactionCardSet,
-        network_info: OrderedNetworkSpecs,
+        content: Box<TransactionCardSet>,
+        network_info: Box<OrderedNetworkSpecs>,
         checksum: u32,
         network_specs_key: NetworkSpecsKey,
     },
     Sign {
-        content: TransactionCardSet,
+        actions: Vec<TransactionSignAction>,
         checksum: u32,
-        has_pwd: bool,
-        author_info: MAddressCard,
-        network_info: OrderedNetworkSpecs,
     },
     Stub {
-        s: TransactionCardSet,
+        s: Box<TransactionCardSet>,
         u: u32,
         stub: StubNav,
     },
     Read {
-        r: TransactionCardSet,
+        r: Box<TransactionCardSet>,
     },
 }
 
@@ -117,7 +130,7 @@ pub enum ScreenData {
     Settings { f: MSettings },
     Log { f: MLog },
     LogDetails { f: MLogDetails },
-    Transaction { f: MTransaction },
+    Transaction { f: Vec<MTransaction> },
     SeedSelector { f: MSeeds },
     KeyDetails { f: MKeyDetails },
     NewSeed { f: MNewSeed },
@@ -491,9 +504,11 @@ pub struct MPasswordConfirm {
     pub cropped_path: String,
 }
 
+/// Data about signatures that are ready.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MSignatureReady {
-    pub signature: Vec<u8>,
+    /// Frames of the animated QR code that should be displayed by the UI.
+    pub signatures: Vec<Vec<u8>>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -609,6 +624,18 @@ pub struct MSCNetworkInfo {
     pub network_title: String,
     pub network_logo: String,
     pub network_specs_key: String,
+}
+
+impl From<OrderedNetworkSpecs> for MSCNetworkInfo {
+    fn from(o: OrderedNetworkSpecs) -> Self {
+        MSCNetworkInfo {
+            network_title: o.specs.title,
+            network_logo: o.specs.logo,
+            network_specs_key: hex::encode(
+                NetworkSpecsKey::from_parts(&o.specs.genesis_hash, &o.specs.encryption).key(),
+            ),
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
