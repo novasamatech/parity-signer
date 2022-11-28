@@ -14,7 +14,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import io.parity.signer.components.*
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.Text400
-import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.TransactionType
 
@@ -72,8 +71,9 @@ fun TransactionPreviewEdited(
 					text = "Unlock key and sign",
 					action = {
 						signTransaction(
-							comment.value, transactions.firstOrNull()
-								?.authorInfo?.address?.seedName ?: ""
+							comment.value,
+							transactions.mapNotNull { it.authorInfo?.address?.seedName }
+								.joinToString(separator = "/n")
 						)
 					}
 				)
