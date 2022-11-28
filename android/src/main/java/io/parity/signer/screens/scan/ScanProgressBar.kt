@@ -64,7 +64,7 @@ fun ScanProgressBar(
 			}
 			Text(
 				text = stringResource(id = R.string.generic_cancel),
-				color = MaterialTheme.colors.pink500,
+				color = MaterialTheme.colors.pink300,
 				style = SignerTypeface.LabelM,
 				modifier = Modifier
 					.padding(8.dp)
