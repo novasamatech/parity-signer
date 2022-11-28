@@ -33,11 +33,16 @@ struct AnimatedQRCodeView: View {
 
     init(
         viewModel: Binding<AnimatedQRCodeViewModel>,
-        qrCodesGenerator: QRCodeImageGenerator = QRCodeImageGenerator()
+        qrCodesGenerator: QRCodeImageGenerator = QRCodeImageGenerator(),
+        shouldDecode: Bool = true
     ) {
         _viewModel = viewModel
         self.qrCodesGenerator = qrCodesGenerator
-        let images = viewModel.qrCodes.wrappedValue.map { qrCodesGenerator.generateQRCode(from: $0) }
+        let images = viewModel.qrCodes.wrappedValue.compactMap {
+            shouldDecode ?
+                qrCodesGenerator.generateQRCode(from: $0) :
+                UIImage(data: Data($0))
+        }
         _imagesIterator = State(wrappedValue: images.makeIterator())
         _images = State(wrappedValue: images)
     }
@@ -75,7 +80,7 @@ struct AnimatedQRCodeView: View {
                     start()
                 }
         }
-        .frame(maxWidth: .infinity, alignment: .center)
+//        .frame(maxWidth: .infinity, alignment: .center)
         .padding(
             UIScreen.main.bounds.width == Constants.compactDeviceWidth ? Spacing.large : Spacing.x3Large
         )

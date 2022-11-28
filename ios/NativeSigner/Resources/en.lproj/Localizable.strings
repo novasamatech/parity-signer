@@ -385,9 +385,10 @@
 "Transaction.AddNetwork.Label.Header" = "New Network";
 "Transaction.AddNetwork.Label.GenesisHash" = "Genesis hash";
 
+"TransactionSign.Label.Details" = "Transaction Details";
 "TransactionSign.Label.Header.Single" = "Sign Transaction";
 "TransactionSign.Label.Header.Multiple" = "Sign %@ Transactions";
-"TransactionSign.Label.Details" = "Transaction Details";
+"TransactionSign.Label.MultipleTransactionsInfo" = "Please note that by scanning this QR code into your application you’ll sign transactions using all keys shown in the transactions list above";
 "TransactionSign.Label.Sign" = "Sign With";
 "TransactionSign.Label.SignCode" = "Sign Transaction";
 "TransactionSign.Action.Done" = "Done";

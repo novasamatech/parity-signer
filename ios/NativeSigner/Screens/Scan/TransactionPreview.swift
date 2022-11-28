@@ -23,7 +23,7 @@ struct TransactionPreview: View {
     var body: some View {
         VStack {
             NavigationBarView(
-                viewModel: .init(title: title(), leftButton: .xmark),
+                viewModel: .init(title: title(viewModel.dataModel.count), leftButton: .xmark),
                 actionModel: .init(
                     leftBarMenuAction: { viewModel.onBackButtonTap() },
                     rightBarMenuAction: {}
@@ -31,22 +31,9 @@ struct TransactionPreview: View {
             )
             ScrollView {
                 ForEach(viewModel.dataModel, id: \.id) { singleTransaction(content: $0.content) }
-                // QR Code
-                if let signature = viewModel.signature {
-                    VStack(alignment: .leading, spacing: Spacing.small) {
-                        Localizable.TransactionSign.Label.signCode.text
-                            .font(Fontstyle.bodyL.base)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        AnimatedQRCodeView(
-                            viewModel: Binding<AnimatedQRCodeViewModel>
-                                .constant(.init(qrCodes: [signature.signature]))
-                        )
-                    }
-                    .padding(.horizontal, Spacing.large)
-                    .padding(.top, Spacing.large)
-                }
-                logNote()
-                actions(transactionType: viewModel.dataModel.first?.content.ttype)
+                qrCodeComponent(viewModel.dataModel.count)
+                logNote(viewModel.dataModel.first?.content.ttype)
+                actions(viewModel.dataModel.first?.content.ttype)
             }
         }
         .onAppear {
@@ -78,6 +65,17 @@ struct TransactionPreview: View {
                     }
                 )
                 .padding(.horizontal, Spacing.medium)
+            // Used when new network is being added
+            // User when network metadata is being added
+            // Cards are redesigned to present new design
+            case .stub:
+                VStack {
+                    ForEach(content.content.asSortedCards(), id: \.index) { card in
+                        TransactionCardView(card: card)
+                    }
+                }
+                .padding(.horizontal, Spacing.medium)
+                EmptyView()
             default:
                 VStack {
                     ForEach(content.content.asSortedCards(), id: \.index) { card in
@@ -90,48 +88,53 @@ struct TransactionPreview: View {
     }
 
     @ViewBuilder
-    func logNote() -> some View {
-        // Log Note
-        VStack(alignment: .leading) {
-            if isLogNoteVisible {
-                VStack(alignment: .leading) {
-                    Localizable.TransactionSign.Action.note.text
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(Fontstyle.bodyL.base)
-                    TextField("", text: $comment)
-                        .primaryTextFieldStyle(
-                            Localizable.TransactionSign.Action.note.string,
-                            text: $comment
-                        )
-                        .focused($focus)
+    func logNote(_ transactionType: TransactionType?) -> some View {
+        switch transactionType {
+        case .sign:
+            VStack(alignment: .leading) {
+                if isLogNoteVisible {
+                    VStack(alignment: .leading) {
+                        Localizable.TransactionSign.Action.note.text
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .font(Fontstyle.bodyL.base)
+                        TextField("", text: $comment)
+                            .primaryTextFieldStyle(
+                                Localizable.TransactionSign.Action.note.string,
+                                text: $comment
+                            )
+                            .focused($focus)
+                    }
+                } else {
+                    InlineButton(
+                        action: {
+                            withAnimation {
+                                isLogNoteVisible = true
+                            }
+                        },
+                        icon: Asset.add.swiftUIImage,
+                        text: Localizable.TransactionSign.Action.note.string
+                    )
                 }
-            } else {
-                InlineButton(
-                    action: {
-                        withAnimation {
-                            isLogNoteVisible = true
-                        }
-                    },
-                    icon: Asset.add.swiftUIImage,
-                    text: Localizable.TransactionSign.Action.note.string
-                )
             }
+            .animation(.easeInOut, value: isLogNoteVisible)
+            .padding(.horizontal, Spacing.large)
+            .padding(.vertical, Spacing.medium)
+        case .stub,
+             .importDerivations,
+             .read,
+             .done,
+             .none:
+            EmptyView()
         }
-        .animation(.easeInOut, value: isLogNoteVisible)
-        .padding(.horizontal, Spacing.large)
-        .padding(.vertical, Spacing.medium)
     }
 
     @ViewBuilder
-    func actions(transactionType: TransactionType?) -> some View {
+    func actions(_ transactionType: TransactionType?) -> some View {
         VStack {
             switch transactionType {
-            case .sign:
+            case .sign, .read:
                 PrimaryButton(
-                    action: {
-                        focus = false
-                        viewModel.onBackButtonTap()
-                    },
+                    action:  viewModel.onDoneTap,
                     text: Localizable.TransactionPreview.Action.done.key,
                     style: .secondary()
                 )
@@ -143,12 +146,11 @@ struct TransactionPreview: View {
                         .TransactionPreview.Action.selectSeed.key,
                     style: .primary()
                 )
-            case .read,
-                 .done,
+            case .done,
                  .none:
                 EmptyView()
             }
-            if ![.done, .sign].contains(transactionType) {
+            if ![.done, .sign, .read].contains(transactionType) {
                 EmptyButton(
                     action: viewModel.onCancelTap,
                     text: Localizable.TransactionPreview.Action.cancel.key
@@ -157,11 +159,44 @@ struct TransactionPreview: View {
         }
         .padding(.horizontal, Spacing.large)
         .padding(.bottom, Spacing.medium)
-        .padding(.top, Spacing.extraSmall)
+        .padding(.top, Spacing.large)
     }
 
-    func title() -> String {
-        viewModel.dataModel.count == 1 ?
+    @ViewBuilder
+    func qrCodeComponent(_ transactionsCount: Int) -> some View {
+        if let signature = viewModel.signature {
+            VStack(alignment: .leading, spacing: Spacing.small) {
+                // Header
+                Localizable.TransactionSign.Label.signCode.text
+                    .font(Fontstyle.bodyL.base)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .padding(.leading, Spacing.extraSmall)
+                // QR Code container
+                VStack(alignment: .leading, spacing: Spacing.medium) {
+                    AnimatedQRCodeView(
+                        viewModel: Binding<AnimatedQRCodeViewModel>.constant(
+                            .init(
+                                qrCodes: [signature.signature]
+                            )
+                        ),
+                        shouldDecode: transactionsCount > 1
+                    )
+                    if transactionsCount > 1 {
+                        InfoBoxView(text: Localizable.TransactionSign.Label.multipleTransactionsInfo.string)
+                    }
+                }
+                .padding(transactionsCount > 1 ? Spacing.medium : 0)
+                .strokeContainerBackground()
+            }
+            .padding(.horizontal, Spacing.medium)
+            .padding(.top, Spacing.large)
+        } else {
+            EmptyView()
+        }
+    }
+
+    func title(_ transactionsCount: Int) -> String {
+        transactionsCount == 1 ?
             Localizable.TransactionSign.Label.Header.single.string :
             Localizable.TransactionSign.Label.Header.multiple(viewModel.dataModel.count)
     }
@@ -204,6 +239,11 @@ extension TransactionPreview {
             isPresented.toggle()
         }
 
+        func onDoneTap() {
+            navigation.performFake(navigation: .init(action: .goBack))
+            isPresented.toggle()
+        }
+
         func onCancelTap() {
             navigation.performFake(navigation: .init(action: .goBack))
             isPresented.toggle()
@@ -211,19 +251,21 @@ extension TransactionPreview {
 
         func onApproveTap() {
             navigation.perform(navigation: .init(action: .goForward))
+            isPresented.toggle()
         }
 
-        func sign(with comment: String) {
+        func signTransaction() {
             let seedName = dataModel.compactMap { $0.content.authorInfo?.address.seedName }.first
             let seedPhrase = seedsMediator.getSeed(seedName: seedName ?? "")
-            navigation.perform(
+            let actionResult = navigation.performFake(
                 navigation:
                 .init(
                     action: .goForward,
-                    details: comment,
+                    details: "",
                     seedPhrase: seedPhrase
                 )
             )
+            print(actionResult)
         }
 
         func presentDetails(for content: MTransaction) {
@@ -235,9 +277,19 @@ extension TransactionPreview {
 
 struct TransactionPreview_Previews: PreviewProvider {
     static var previews: some View {
+        // Single transaction
         TransactionPreview(viewModel: .init(
             isPresented: Binding<Bool>.constant(true),
             content: [PreviewData.signTransaction],
+            signature: MSignatureReady(signature: PreviewData.exampleQRCode)
+        ))
+        .environmentObject(NavigationCoordinator())
+        .environmentObject(SignerDataModel())
+        .preferredColorScheme(.dark)
+        // Multi transaction (i.e. different QR code design)
+        TransactionPreview(viewModel: .init(
+            isPresented: Binding<Bool>.constant(true),
+            content: [PreviewData.signTransaction, PreviewData.signTransaction],
             signature: MSignatureReady(signature: PreviewData.exampleQRCode)
         ))
         .environmentObject(NavigationCoordinator())
