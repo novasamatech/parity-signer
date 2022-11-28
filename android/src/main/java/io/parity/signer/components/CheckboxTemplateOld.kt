@@ -19,8 +19,9 @@ import io.parity.signer.ui.theme.Action600
 /**
  * Active checkbox field that responds to click anywhere within it
  */
+@Deprecated("Use redesigned [CheckboxWithText()]")
 @Composable
-fun CheckboxTemplate(
+fun CheckboxTemplateOld(
 	checked: Boolean,
 	onValueChange: (Boolean) -> Unit,
 	text: String
@@ -49,7 +50,7 @@ fun CheckboxTemplate(
  * Just a checkbox with proper colors
  */
 @Composable
-fun CheckboxIcon(
+private fun CheckboxIcon(
 	checked: Boolean
 ) {
 	Checkbox(

@@ -9,7 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.BigButton
-import io.parity.signer.components.CheckboxTemplate
+import io.parity.signer.components.CheckboxTemplateOld
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.SeedBox
 import io.parity.signer.models.SignerDataModel
@@ -41,12 +41,12 @@ fun NewSeedBackup(
 			SeedBox(
 				seedPhrase = newSeedBackup.seedPhrase
 			)
-			CheckboxTemplate(
+			CheckboxTemplateOld(
 				checked = confirmBackup.value,
 				onValueChange = { confirmBackup.value = it },
 				text = "I have written down my seed phrase"
 			)
-			CheckboxTemplate(
+			CheckboxTemplateOld(
 				checked = createRoots.value,
 				onValueChange = { createRoots.value = it },
 				text = "Create seed keys"

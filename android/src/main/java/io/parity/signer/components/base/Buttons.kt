@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -113,9 +114,10 @@ fun RowButtonsBottomSheet(
 	labelCta: String,
 	onClickedCancel: Callback,
 	onClickedCta: Callback,
+	isCtaEnabled: Boolean = true,
 ) {
 	Row {
-		Column(
+		Box(
 			modifier = Modifier
 				.clickable(onClick = onClickedCancel)
 				.background(
@@ -125,7 +127,7 @@ fun RowButtonsBottomSheet(
 				)
 				.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
 				.weight(1f),
-			horizontalAlignment = Alignment.CenterHorizontally
+			contentAlignment = Alignment.Center
 		) {
 			Text(
 				text = labelCancel,
@@ -136,23 +138,28 @@ fun RowButtonsBottomSheet(
 		}
 
 		Spacer(modifier = Modifier.padding(end = 8.dp))
-		Column(
+		Box(
 			modifier = Modifier
 				.clickable(onClick = onClickedCta)
 				.background(
-					MaterialTheme.colors.pink500, RoundedCornerShape(
+					if (isCtaEnabled) {
+						MaterialTheme.colors.pink500
+					} else {
+						MaterialTheme.colors.pink300
+					}, RoundedCornerShape(
 						dimensionResource(id = R.dimen.buttonCornerRadius)
 					)
 				)
 				.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
 				.weight(1f),
-			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			Text(
 				text = labelCta,
 				color = Color.White,
 				style = SignerTypeface.TitleS,
 				maxLines = 1,
+				textAlign = TextAlign.Center,
+				modifier = Modifier.fillMaxWidth(1f)
 			)
 		}
 	}
@@ -183,7 +190,6 @@ fun SignerDivider(
 private fun PreviewCtaButtons() {
 	SignerNewTheme {
 		Column(
-			modifier = Modifier.size(300.dp),
 		) {
 			PrimaryButtonBottomSheet("button") {}
 			RowButtonsBottomSheet(
@@ -192,12 +198,23 @@ private fun PreviewCtaButtons() {
 				onClickedCancel = {},
 				onClickedCta = {},
 			)
+			RowButtonsBottomSheet(
+				labelCancel = "Cancel",
+				labelCta = "Apply",
+				onClickedCancel = {},
+				onClickedCta = {},
+				isCtaEnabled = false,
+			)
 			SecondaryButtonBottomSheet("Secondary Bottom Sheet") {}
 			SecondaryButtonBottomSheet(
 				"Secondary with background",
 				withBackground = true
 			) {}
 			PrimaryButtonNotWide(label = "primary slim") {}
+			PrimaryButtonNotWide(
+				label = "primary disabled",
+				isEnabled = false,
+			) {}
 			SignerDivider()
 		}
 	}
