@@ -9,7 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.NavbarShield
@@ -29,10 +29,10 @@ fun TopBar(
 	signerDataModel: SignerDataModel,
 	alertState: State<AlertState?>
 ) {
-	val actionResult = signerDataModel.actionResult.observeAsState()
-	// val screenName = signerDataModel.screenLabel.observeAsState()
-	// val screenNameType = signerDataModel.screenNameType.observeAsState()
-	// val rightButton = signerDataModel.rightButton.observeAsState()
+	val actionResult = signerDataModel.actionResult.collectAsState()
+	// val screenName = signerDataModel.screenLabel.collectAsState()
+	// val screenNameType = signerDataModel.screenNameType.collectAsState()
+	// val rightButton = signerDataModel.rightButton.collectAsState()
 
 	TopAppBar(
 		backgroundColor = MaterialTheme.colors.Bg100

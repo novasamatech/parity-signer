@@ -1,4 +1,4 @@
-package io.parity.signer.dependencyGraph
+package io.parity.signer.dependencygraph
 
 import android.content.Context
 import io.parity.signer.backend.UniffiInteractor

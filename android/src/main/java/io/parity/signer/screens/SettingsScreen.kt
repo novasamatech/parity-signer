@@ -13,6 +13,7 @@ import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.SettingsCardTemplate
 import io.parity.signer.models.AlertState
+import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
@@ -78,7 +79,7 @@ fun SettingsScreen(
 					Spacer(Modifier.width(4.dp))
 					Column {
 						Text(
-							settings.publicKey ?: "".abbreviateString(8),
+							settings.publicKey ?: "".abbreviateString(BASE58_STYLE_ABBREVIATE),
 							style = CryptoTypography.body2,
 							color = MaterialTheme.colors.Crypto400
 						)

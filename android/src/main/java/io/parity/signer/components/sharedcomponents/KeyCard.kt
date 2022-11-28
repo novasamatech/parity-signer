@@ -1,6 +1,7 @@
 package io.parity.signer.components.sharedcomponents
 
 import android.content.res.Configuration
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.KeyCardModel
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.*
@@ -31,26 +33,26 @@ import io.parity.signer.ui.theme.*
 @Composable
 fun KeyCard(model: KeyCardModel) {
 	Row(
-		Modifier
-			.fillMaxWidth()
-			.padding(16.dp)
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
 	) {
 
 		//left
-		Column() {
+		Column(Modifier.weight(1f)) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Text(
 					model.path,
 					color = MaterialTheme.colors.textSecondary,
-					style = TypefaceNew.CaptionM,
+					style = SignerTypeface.CaptionM,
 				)
 				if (model.hasPwd) {
 					Text(
 						" •••• ",
 						color = MaterialTheme.colors.textSecondary,
-						style = TypefaceNew.CaptionM,
+						style = SignerTypeface.CaptionM,
 					)
 					Icon(
 						Icons.Default.Lock,
@@ -65,15 +67,16 @@ fun KeyCard(model: KeyCardModel) {
 			Text(
 				model.seedName,
 				color = MaterialTheme.colors.primary,
-				style = TypefaceNew.LabelS,
+				style = SignerTypeface.LabelS,
 			)
 
 			Spacer(Modifier.padding(top = 10.dp))
 
-			showBase58Collapsible(model.base58)
+			Box(modifier = Modifier.padding(end = 24.dp)) {
+				ShowBase58Collapsible(model.base58)
+			}
 		}
 
-		Spacer(Modifier.weight(1f))
 
 		//right()
 		Column(horizontalAlignment = Alignment.End) {
@@ -100,17 +103,17 @@ fun KeyCard(model: KeyCardModel) {
 
 			Box(
 				modifier = Modifier
-					.background(
-						MaterialTheme.colors.fill12,
-						RoundedCornerShape(12.dp)
-					)
-					.padding(horizontal = 8.dp, vertical = 2.dp),
+                    .background(
+                        MaterialTheme.colors.fill12,
+                        RoundedCornerShape(12.dp)
+                    )
+                    .padding(horizontal = 8.dp, vertical = 2.dp),
 				contentAlignment = Alignment.Center,
 			) {
 				Text(
 					model.network,
 					color = MaterialTheme.colors.textTertiary,
-					style = TypefaceNew.CaptionM,
+					style = SignerTypeface.CaptionM,
 				)
 			}
 		}
@@ -120,38 +123,38 @@ fun KeyCard(model: KeyCardModel) {
 @Composable
 fun KeySeedCard(seedTitle: String, base58: String) {
 	Column(
-		Modifier
-			.fillMaxWidth()
-			.padding(16.dp)
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
 	) {
 		Text(
 			seedTitle,
 			color = MaterialTheme.colors.primary,
-			style = TypefaceNew.LabelS,
+			style = SignerTypeface.LabelS,
 		)
-		showBase58Collapsible(base58)
+		ShowBase58Collapsible(base58)
 	}
 }
 
 @Composable
-private fun showBase58Collapsible(base58: String) {
+private fun ShowBase58Collapsible(base58: String) {
 	val expanded = remember { mutableStateOf(false) }
-	//todo dmitry fix if true we get extra space below
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier.clickable { expanded.value = !expanded.value }
+			.animateContentSize()
 	) {
 		if (expanded.value) {
 			Text(
 				base58,
 				color = MaterialTheme.colors.textTertiary,
-				style = TypefaceNew.BodyM
+				style = SignerTypeface.BodyM
 			)
 		} else {
 			Text(
-				base58.abbreviateString(8),
+				base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
 				color = MaterialTheme.colors.textTertiary,
-				style = TypefaceNew.BodyM,
+				style = SignerTypeface.BodyM,
 				maxLines = 1,
 			)
 			Spacer(modifier = Modifier.padding(horizontal = 4.dp))
@@ -196,7 +199,8 @@ private fun PreviewKeyCard() {
 @Composable
 private fun PreviewKeySeedCard() {
 	SignerNewTheme {
-		KeySeedCard(seedTitle = "Seed title",
+		KeySeedCard(
+			seedTitle = "Seed title",
 			base58 = KeyCardModel.createStub().base58,
 		)
 	}

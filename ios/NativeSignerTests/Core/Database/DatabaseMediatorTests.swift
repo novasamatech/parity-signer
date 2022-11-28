@@ -19,7 +19,12 @@ final class DatabaseMediatorTests: XCTestCase {
         bundle.urlForResourceWithExtensionReturnValue = .generate()
         fileManager = FileManagingProtocolMock()
         fileManager.fileExistsAtPathReturnValue = false
-        fileManager.urlForInAppropriateForCreateReturnValue = .generate()
+        fileManager.urlForInAppropriateForCreateReturnValue = try? FileManager.default.url(
+            for: .documentDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: false
+        )
 
         subject = DatabaseMediator(
             bundle: bundle,
@@ -29,7 +34,13 @@ final class DatabaseMediatorTests: XCTestCase {
 
     func test_databseName_returnsExpectedValue() {
         // Given
-        let expectedValue = NSHomeDirectory() + "/Documents/Database"
+        let documentsURL = try? FileManager.default.url(
+            for: .documentDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: false
+        )
+        let expectedValue = documentsURL?.appendingPathComponent("Database").path ?? ""
 
         // When
         let result = subject.databaseName
@@ -40,14 +51,20 @@ final class DatabaseMediatorTests: XCTestCase {
 
     func test_isDatabaseAvailable_checksForExistingFileAtExpectedPath() {
         // Given
-        let expectedPath = NSHomeDirectory() + "/Documents/Database"
+        let documentsURL = try? FileManager.default.url(
+            for: .documentDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: false
+        )
+        let expectedValue = documentsURL?.appendingPathComponent("Database").path ?? ""
 
         // When
         _ = subject.isDatabaseAvailable()
 
         // Then
         XCTAssertEqual(fileManager.fileExistsAtPathCallsCount, 1)
-        XCTAssertEqual(fileManager.fileExistsAtPathReceivedPath, [expectedPath])
+        XCTAssertEqual(fileManager.fileExistsAtPathReceivedPath, [expectedValue])
     }
 
     func test_isDatabaseAvailable_returnsInformationOnFileExistenceFromFileManager() {
@@ -62,6 +79,9 @@ final class DatabaseMediatorTests: XCTestCase {
     }
 
     func test_wipeDatabase_accessesExpectedFile() {
+        // Given
+        fileManager.fileExistsAtPathReturnValue = true
+
         // When
         subject.wipeDatabase()
 
@@ -81,19 +101,7 @@ final class DatabaseMediatorTests: XCTestCase {
 
         // Then
         XCTAssertEqual(fileManager.removeItemAtCallsCount, 1)
-        XCTAssertEqual(fileManager.removeItemAtReceivedURL, [expectedPathUrl])
-    }
-
-    func test_wipeDatabase_whenDestinationAccessThrowsError_returnsFalse() {
-        // Given
-        fileManager.urlForInAppropriateForCreateThrowableError = ErrorMock.unknown
-        fileManager.removeItemAtThrowableError = nil
-
-        // When
-        let result = subject.wipeDatabase()
-
-        // Then
-        XCTAssertFalse(result)
+        XCTAssertEqual(fileManager.removeItemAtReceivedPath, [expectedPathUrl.path])
     }
 
     func test_wipeDatabase_whenRemoveItemThrowsError_returnsFalse() {
@@ -150,10 +158,13 @@ final class DatabaseMediatorTests: XCTestCase {
         _ = subject.recreateDatabaseFile()
 
         // Then
-        XCTAssertEqual(fileManager.urlForInAppropriateForCreateCallsCount, 1)
-        XCTAssertEqual(fileManager.urlForInAppropriateForCreateReceivedDirectory, [.documentDirectory])
-        XCTAssertEqual(fileManager.urlForInAppropriateForCreateReceivedDomain, [.userDomainMask])
-        XCTAssertEqual(fileManager.urlForInAppropriateForCreateReceivedShouldCreate, [false])
+        XCTAssertEqual(fileManager.urlForInAppropriateForCreateCallsCount, 2)
+        XCTAssertEqual(
+            fileManager.urlForInAppropriateForCreateReceivedDirectory,
+            [.documentDirectory, .documentDirectory]
+        )
+        XCTAssertEqual(fileManager.urlForInAppropriateForCreateReceivedDomain, [.userDomainMask, .userDomainMask])
+        XCTAssertEqual(fileManager.urlForInAppropriateForCreateReceivedShouldCreate, [true, false])
     }
 
     func test_recreateDatabaseFile_whenFileExists_removesFileAtExpectedDestination() {
@@ -240,6 +251,7 @@ final class FileManagingProtocolMock: FileManagingProtocol {
     var removeItemAtCallsCount = 0
     var removeItemAtThrowableError: Error?
     var removeItemAtReceivedURL: [URL] = []
+    var removeItemAtReceivedPath: [String] = []
     var copyItemAtToCallsCount = 0
     var copyItemAtToThrowableError: Error?
     var copyItemAtToReceivedSrcURL: [URL] = []
@@ -261,6 +273,14 @@ final class FileManagingProtocolMock: FileManagingProtocol {
     func removeItem(at URL: URL) throws {
         removeItemAtCallsCount += 1
         removeItemAtReceivedURL.append(URL)
+        if let error = removeItemAtThrowableError {
+            throw error
+        }
+    }
+
+    func removeItem(atPath path: String) throws {
+        removeItemAtCallsCount += 1
+        removeItemAtReceivedPath.append(path)
         if let error = removeItemAtThrowableError {
             throw error
         }

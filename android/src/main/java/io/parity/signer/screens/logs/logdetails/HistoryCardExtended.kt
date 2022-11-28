@@ -1,4 +1,4 @@
-package io.parity.signer.components
+package io.parity.signer.screens.logs.logdetails
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,6 +7,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.Composable
+import io.parity.signer.components.IdentIcon
+import io.parity.signer.components.TransactionPreviewField
+import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.Event
@@ -27,7 +30,7 @@ fun HistoryCardExtended(
 	val verifierDetails = event.verifierDetails
 	when (val eventVal = event.event) {
 		is Event.DatabaseInitiated -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Smartphone,
 				line1 = timestamp,
 				line2 = "Database initiated",
@@ -35,7 +38,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.DeviceWasOnline -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Dangerous,
 				line1 = timestamp,
 				line2 = "Device was connected to network",
@@ -52,16 +55,16 @@ fun HistoryCardExtended(
 					else -> listOf()
 				}
 			}
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Shield,
 				line1 = timestamp,
 				line2 = "General verifier set",
 				line3 = hex.getOrElse(0) { "" }
-					.abbreviateString(8) + hex.getOrElse(1) { "" }
+					.abbreviateString(BASE58_STYLE_ABBREVIATE) + hex.getOrElse(1) { "" }
 			)
 		}
 		is Event.HistoryCleared -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.DeleteForever,
 				line1 = timestamp,
 				line2 = "History cleared",
@@ -69,7 +72,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.IdentitiesWiped -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Delete,
 				line1 = timestamp,
 				line2 = "All keys were wiped",
@@ -78,7 +81,7 @@ fun HistoryCardExtended(
 		}
 		is Event.IdentityAdded -> {
 			eventVal.identityHistory.let {
-				HistoryCardTemplate(
+				HistoryCardTemplateOld(
 					image = Icons.Default.Pattern,
 					line1 = timestamp,
 					line2 = "Key created",
@@ -88,7 +91,7 @@ fun HistoryCardExtended(
 		}
 		is Event.IdentityRemoved -> {
 			eventVal.identityHistory.let {
-				HistoryCardTemplate(
+				HistoryCardTemplateOld(
 					image = Icons.Default.Delete,
 					line1 = timestamp,
 					line2 = "Key removed",
@@ -98,7 +101,7 @@ fun HistoryCardExtended(
 		}
 		is Event.SecretWasExported -> {
 			eventVal.identityHistory.let {
-				HistoryCardTemplate(
+				HistoryCardTemplateOld(
 					image = Icons.Default.WbSunny,
 					line1 = timestamp,
 					line2 = "Secret was exported",
@@ -107,7 +110,7 @@ fun HistoryCardExtended(
 			}
 		}
 		is Event.MessageSignError -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Message signing error!",
@@ -116,7 +119,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.MessageSigned -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Done,
 				line1 = timestamp,
 				line2 = "Generated signature for message",
@@ -125,7 +128,7 @@ fun HistoryCardExtended(
 		}
 		is Event.MetadataAdded -> {
 			eventVal.metaValuesDisplay.let {
-				HistoryCardTemplate(
+				HistoryCardTemplateOld(
 					image = Icons.Default.QrCodeScanner,
 					line1 = timestamp,
 					line2 = "Metadata added",
@@ -135,7 +138,7 @@ fun HistoryCardExtended(
 		}
 		is Event.MetadataRemoved -> {
 			eventVal.metaValuesDisplay.let {
-				HistoryCardTemplate(
+				HistoryCardTemplateOld(
 					image = Icons.Default.Delete,
 					line1 = timestamp,
 					line2 = "Metadata removed",
@@ -144,7 +147,7 @@ fun HistoryCardExtended(
 			}
 		}
 		is Event.NetworkSpecsAdded -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.QrCodeScanner,
 				line1 = timestamp,
 				line2 = "Network added",
@@ -152,7 +155,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.NetworkSpecsRemoved -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Delete,
 				line1 = timestamp,
 				line2 = "Network removed",
@@ -178,7 +181,7 @@ fun HistoryCardExtended(
 
 			line3 += " for network with genesis hash " + eventVal.networkVerifierDisplay.genesisHash.toUByteArray()
 				.toByteArray().encodeHex()
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Shield,
 				line1 = timestamp,
 				line2 = "Network verifier set",
@@ -186,7 +189,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.ResetDangerRecord -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.DeleteForever,
 				line1 = timestamp,
 				line2 = "History cleared",
@@ -195,7 +198,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.SeedCreated -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Pattern,
 				line1 = timestamp,
 				line2 = "Seed created",
@@ -203,7 +206,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.SeedRemoved -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Outlined.Delete,
 				line1 = timestamp,
 				line2 = "Seed removed",
@@ -211,7 +214,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.SeedNameWasShown -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Seed was shown",
@@ -219,7 +222,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.NetworkSpecsSigned -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Verified,
 				line1 = timestamp,
 				line2 = "Network specs signed",
@@ -228,7 +231,7 @@ fun HistoryCardExtended(
 		}
 		is Event.MetadataSigned -> {
 			eventVal.metaValuesExport.let {
-				HistoryCardTemplate(
+				HistoryCardTemplateOld(
 					image = Icons.Default.Verified,
 					line1 = timestamp,
 					line2 = "Meta signed",
@@ -237,7 +240,7 @@ fun HistoryCardExtended(
 			}
 		}
 		is Event.TypesSigned -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Verified,
 				line1 = timestamp,
 				line2 = "Types signed",
@@ -245,7 +248,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.SystemEntry -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "System entry",
@@ -253,7 +256,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.TransactionSignError -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Dangerous,
 				line1 = timestamp,
 				line2 = "Signing failure",
@@ -291,7 +294,7 @@ fun HistoryCardExtended(
 			}
 		}
 		is Event.TypesAdded -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.QrCodeScanner,
 				line1 = timestamp,
 				line2 = "New types info loaded",
@@ -299,7 +302,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.TypesRemoved -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Remove,
 				line1 = timestamp,
 				line2 = "Types info removed",
@@ -308,7 +311,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.UserEntry -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Note,
 				line1 = timestamp,
 				line2 = "User entry",
@@ -316,7 +319,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.Warning -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Warning!",
@@ -325,7 +328,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.WrongPassword -> {
-			HistoryCardTemplate(
+			HistoryCardTemplateOld(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Wrong password entered",

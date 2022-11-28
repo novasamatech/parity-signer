@@ -23,10 +23,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.KeyModel
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.TypefaceNew
+import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textDisabled
 import io.parity.signer.ui.theme.textTertiary
 
@@ -56,7 +57,7 @@ fun KeyDerivedItem(
 					Text(
 						text = model.path,
 						color = MaterialTheme.colors.primary,
-						style = TypefaceNew.LabelM,
+						style = SignerTypeface.LabelM,
 					)
 					if (model.hasPwd) {
 						Icon(
@@ -69,9 +70,9 @@ fun KeyDerivedItem(
 				}
 				Spacer(modifier = Modifier.padding(top = 4.dp))
 				Text(
-					text = model.base58.abbreviateString(8),
+					text = model.base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
 					color = MaterialTheme.colors.textTertiary,
-					style = TypefaceNew.BodyM,
+					style = SignerTypeface.BodyM,
 				)
 			}
 			Image(
@@ -86,6 +87,35 @@ fun KeyDerivedItem(
 	}
 }
 
+@Composable
+fun SlimKeyItem(model: KeyModel) {
+	Row(
+		modifier = Modifier.fillMaxWidth(1f),
+		verticalAlignment = Alignment.CenterVertically,
+	) {
+		IdentIcon(
+			identicon = model.identicon, size = 36.dp, modifier = Modifier.padding(
+				top = 16.dp,
+				bottom = 16.dp,
+				start = 24.dp,
+				end = 12.dp
+			)
+		)
+		Text(
+			text = model.path,
+			color = MaterialTheme.colors.primary,
+			style = SignerTypeface.LabelM,
+		)
+		if (model.hasPwd) {
+			Icon(
+				painterResource(id = R.drawable.ic_lock_16),
+				contentDescription = stringResource(R.string.key_lock_item),
+				tint = MaterialTheme.colors.textTertiary,
+				modifier = Modifier.padding(start = 8.dp)
+			)
+		}
+	}
+}
 
 @Preview(
 	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -99,6 +129,24 @@ fun KeyDerivedItem(
 private fun PreviewKeyDerivedItem() {
 	SignerNewTheme {
 		KeyDerivedItem(
+			KeyModel.createStub()
+		)
+	}
+}
+
+
+@Preview(
+	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewSlimKeyItem() {
+	SignerNewTheme {
+		SlimKeyItem(
 			KeyModel.createStub()
 		)
 	}

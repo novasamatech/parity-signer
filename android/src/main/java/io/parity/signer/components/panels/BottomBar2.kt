@@ -36,7 +36,7 @@ fun BottomBar2(
 ) {
 	BottomAppBar(
 		backgroundColor = MaterialTheme.colors.backgroundSecondary,
-		elevation = 0.dp,
+		elevation = 8.dp,
 		modifier = Modifier.height(50.dp)
 	) {
 		Row(
@@ -109,7 +109,7 @@ fun BottomBarButton2(
 		Text(
 			text = stringResource(id = labelResId),
 			color = color,
-			style = TypefaceNew.CaptionS,
+			style = SignerTypeface.CaptionS,
 		)
 	}
 }

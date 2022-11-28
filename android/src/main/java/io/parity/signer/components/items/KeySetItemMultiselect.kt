@@ -1,11 +1,10 @@
 package io.parity.signer.components.items
 
-import SignerCheckboxColors
+import SignerCheckbox
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -53,7 +52,7 @@ fun KeySetItemMultiselect(
 				Text(
 					text = model.seedName,
 					color = MaterialTheme.colors.primary,
-					style = TypefaceNew.LabelM,
+					style = SignerTypeface.LabelM,
 				)
 				if (model.derivedKeysCount > 0.toUInt()) {
 					Spacer(modifier = Modifier.padding(top = 4.dp))
@@ -64,15 +63,17 @@ fun KeySetItemMultiselect(
 							model.derivedKeysCount.toInt(),
 						),
 						color = MaterialTheme.colors.textDisabled,
-						style = TypefaceNew.BodyM,
+						style = SignerTypeface.BodyM,
 					)
 				}
 			}
-			Checkbox(
-				checked = isSelected,
-				onCheckedChange = { c -> onClick(c, model) },
-				colors = SignerCheckboxColors(),
-			)
+			SignerCheckbox(
+				isChecked = isSelected,
+				modifier = Modifier
+					.padding(end = 8.dp)
+			) {
+				onClick(!isSelected, model)
+			}
 		}
 	}
 }

@@ -854,14 +854,11 @@ impl State {
     }
 
     fn handle_transaction_fetched(&self, dbname: &str, details_str: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
         let errorline = String::new();
 
-        if let Screen::Scan = self.navstate.screen {
-            new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
-                TransactionState::new(details_str, dbname),
-            )));
-        }
+        let new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
+            TransactionState::new(details_str, dbname),
+        )));
 
         (new_navstate, errorline)
     }
