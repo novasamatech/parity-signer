@@ -9,11 +9,9 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -74,7 +72,8 @@ fun ScanProgressBar(
 		Spacer(modifier = Modifier.padding(top = 12.dp))
 		LinearProgressIndicator(
 			progress = progress,
-			modifier = Modifier.fillMaxWidth(1f),
+			modifier = Modifier.fillMaxWidth(1f)
+				.clip(RoundedCornerShape(2.dp)),
 			color = MaterialTheme.colors.pink300,
 			backgroundColor = MaterialTheme.colors.fill18,
 		)
