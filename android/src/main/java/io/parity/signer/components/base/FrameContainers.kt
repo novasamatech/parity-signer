@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,16 +30,17 @@ import io.parity.signer.ui.theme.*
 @Composable
 fun NotificationFrameText(
 	@StringRes messageRes: Int
-	) {
-	val innerShape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+) {
+	val innerShape =
+		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 	Row(
 		modifier = Modifier
-			.padding(8.dp)
-			.border(
-				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-				innerShape
-			)
-			.background(MaterialTheme.colors.fill6, innerShape)
+            .padding(8.dp)
+            .border(
+                BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+                innerShape
+            )
+            .background(MaterialTheme.colors.fill6, innerShape)
 
 	) {
 		Text(
@@ -46,51 +48,52 @@ fun NotificationFrameText(
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.CaptionM,
 			modifier = Modifier
-				.weight(1f)
-				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+                .weight(1f)
+                .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
 		)
 		Icon(
 			imageVector = Icons.Outlined.Info,
 			contentDescription = null,
 			tint = MaterialTheme.colors.pink300,
 			modifier = Modifier
-				.align(Alignment.CenterVertically)
-				.padding(start = 18.dp, end = 18.dp)
+                .align(Alignment.CenterVertically)
+                .padding(start = 18.dp, end = 18.dp)
 		)
 	}
 }
 
 @Composable
 fun NotificationFrameTextImportant(
-	@StringRes messageRes: Int
+	message: String,
+	modifier: Modifier = Modifier,
 ) {
-	val innerShape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+	val BACKGROUND = Color(0x14F272B6)
+	val innerShape =
+		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 	Row(
-		modifier = Modifier
-			.padding(8.dp)
-			.border(
-				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-				innerShape
-			)
-			//todo dmitry make as per design?
-			.background(MaterialTheme.colors.fill6, innerShape)
+		modifier = modifier
+            .border(
+                BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+                innerShape
+            )
+            .background(BACKGROUND, innerShape)
 
 	) {
 		Text(
-			text = stringResource(messageRes),
+			text = message,
 			color = MaterialTheme.colors.pink300,
 			style = SignerTypeface.CaptionM,
 			modifier = Modifier
-				.weight(1f)
-				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+                .weight(1f)
+                .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
 		)
 		Icon(
 			imageVector = Icons.Outlined.Info,
 			contentDescription = null,
 			tint = MaterialTheme.colors.pink300,
 			modifier = Modifier
-				.align(Alignment.CenterVertically)
-				.padding(start = 18.dp, end = 18.dp)
+                .align(Alignment.CenterVertically)
+                .padding(start = 18.dp, end = 18.dp)
 		)
 	}
 }
@@ -112,7 +115,10 @@ private fun PreviewFrameContainers() {
 		) {
 			NotificationFrameText(messageRes = R.string.key_set_export_description_content)
 			SignerDivider()
-			NotificationFrameTextImportant(messageRes = R.string.key_set_export_description_content)
+			NotificationFrameTextImportant(
+				message = stringResource(id = R.string.key_set_export_description_content),
+				modifier = Modifier.padding(horizontal = 8.dp),
+			)
 		}
 	}
 }

@@ -18,6 +18,7 @@ import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.MNewSeedBackup
 
+//todo dmitry remote this file
 @Composable
 fun NewSeedBackup(
 	newSeedBackup: MNewSeedBackup,
