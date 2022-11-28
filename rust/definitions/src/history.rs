@@ -516,7 +516,7 @@ pub enum Event {
 ///
 /// `Entry` is stored SCALE-encoded in the `HISTORY` tree of the cold database,
 /// under key `Order`.
-#[derive(Debug, Decode, Encode, Clone)]
+#[derive(Debug, Decode, Encode, Clone, Eq, PartialEq)]
 pub struct Entry {
     pub timestamp: String,
     pub events: Vec<Event>, // events already in showable form

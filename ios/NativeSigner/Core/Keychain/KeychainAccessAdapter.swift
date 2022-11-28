@@ -31,6 +31,7 @@ protocol KeychainAccessAdapting: AnyObject {
     /// - Returns: closure with `.success` if successfully saved to Keychain
     ///            otherwise `.failure` with `KeychainError`
     func retrieveSeed(with seedName: String) -> Result<String, KeychainError>
+    func retrieveSeeds(with seedNames: Set<String>) -> Result<[String: String], KeychainError>
     /// Removes seed with `seedName` from Keychain
     /// - Parameter seedName: seed name
     /// - Returns: closure with `.success` if successfully removed from Keychain
@@ -120,6 +121,38 @@ final class KeychainAccessAdapter: KeychainAccessAdapting {
            let result = String(data: itemAsData, encoding: .utf8) {
             return .success(result)
         }
+        return .failure(.fetchError)
+    }
+
+    func retrieveSeeds(with seedNames: Set<String>) -> Result<[String: String], KeychainError> {
+        let query = queryProvider.query(for: .fetchWithData)
+        var fetchResult: CFTypeRef?
+        let osStatus = SecItemCopyMatching(query, &fetchResult)
+        // Keychain returned success and non-nil payload
+        if case errSecSuccess = osStatus, let resultAsItems = fetchResult as? [[String: Any]] {
+            let seedNames: [(String, String)] = resultAsItems
+                .compactMap { seed in
+                    guard
+                        let seedPhraseAsData = seed[kSecValueData as String] as? Data,
+                        let seedPhrase = String(data: seedPhraseAsData, encoding: .utf8),
+                        let seedName = seed[kSecAttrAccount as String] as? String,
+                        seedNames.contains(seedName)
+                    else { return nil }
+                    return (seedName, seedPhrase)
+                }
+
+            let result: [String: String] = Dictionary(uniqueKeysWithValues: seedNames)
+            return .success(result)
+        }
+        // Keychain returned success but no data
+        if case errSecSuccess = osStatus {
+            return .success([:])
+        }
+        // Kechain stores no data for given query
+        if case errSecItemNotFound = osStatus {
+            return .success([:])
+        }
+        // Different result status, return generic error
         return .failure(.fetchError)
     }
 

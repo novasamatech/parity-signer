@@ -55,11 +55,7 @@ struct ScreenSelector: View {
         case let .logDetails(value):
             EventDetails(content: value)
         case let .transaction(value):
-            TransactionPreview(
-                content: value,
-                sign: sign,
-                navigationRequest: navigationRequest
-            )
+            TransactionPreview(viewModel: .init(content: value))
         case let .seedSelector(value):
             KeySetList(
                 viewModel: .init(listViewModel: KeySetListViewModelBuilder().build(for: value))

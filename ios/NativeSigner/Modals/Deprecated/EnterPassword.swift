@@ -10,12 +10,19 @@ import SwiftUI
 struct EnterPassword: View {
     var content: MEnterPassword
     let navigationRequest: NavigationRequest
+    @StateObject var keyboardOffsetAdapter = KeyboardOffsetAdapter()
     @State private var password: String = ""
     @FocusState private var focused: Bool
+    @State var animateBackground: Bool = false
+
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg000.swiftUIColor)
-            VStack {
+        FullScreenRoundedModal(
+            backgroundTapAction: {
+                dismiss()
+            },
+            animateBackground: $animateBackground
+        ) {
+            VStack(spacing: Spacing.medium) {
                 HeaderBar(line1: Localizable.secretPath.key, line2: Localizable.Path.password.key)
                 AddressCard(card: content.authorInfo)
                 if content.counter > 0 {
@@ -37,9 +44,6 @@ struct EnterPassword: View {
                             .submitLabel(.done)
                             .focused($focused)
                             .padding(8)
-                            .onAppear {
-                                focused = true
-                            }
                     }
                 }
                 BigButton(
@@ -50,13 +54,46 @@ struct EnterPassword: View {
                     },
                     isDisabled: password.isEmpty
                 )
+                BigButton(
+                    text: "Cancel",
+                    isShaded: true,
+                    isDangerous: true,
+                    action: {
+                        focused = false
+                        navigationRequest(.init(action: .goBack))
+                    }
+                )
             }
+            .onAppear {
+                focused = true
+            }
+            .padding(Spacing.medium)
+            .cornerRadius(CornerRadius.extraSmall)
+            .background(Asset.bg000.swiftUIColor)
+            .padding(.bottom, keyboardOffsetAdapter.keyboardHeight)
         }
+    }
+
+    func dismiss() {
+        navigationRequest(.init(action: .goBack))
     }
 }
 
-// struct EnterPassword_Previews: PreviewProvider {
-// static var previews: some View {
-// EnterPassword()
-// }
-// }
+struct EnterPassword_Previews: PreviewProvider {
+    static var previews: some View {
+        EnterPassword(
+            content: MEnterPassword(authorInfo: .init(
+                base58: "fdsfsf",
+                address: .init(
+                    path: "path",
+                    hasPwd: true,
+                    identicon: PreviewData.exampleIdenticon,
+                    seedName: "password",
+                    secretExposed: true
+                ),
+                multiselect: nil
+            ), counter: 2),
+            navigationRequest: { _ in }
+        )
+    }
+}

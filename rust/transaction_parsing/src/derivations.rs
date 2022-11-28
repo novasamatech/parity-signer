@@ -33,11 +33,11 @@ where
     let derivations_card = Card::Derivations(&derivations).card(&mut 0, 0);
     let network_info = network_specs;
     Ok(TransactionAction::Derivations {
-        content: TransactionCardSet {
+        content: Box::new(TransactionCardSet {
             importing_derivations: Some(vec![derivations_card]),
             ..Default::default()
-        },
-        network_info,
+        }),
+        network_info: Box::new(network_info),
         checksum,
         network_specs_key,
     })
