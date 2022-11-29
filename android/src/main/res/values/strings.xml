@@ -132,6 +132,14 @@
 	<string name="exposed_past_message">Your Signer device has connected to a WIFI, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use.</string>
 	<string name="exposed_before_cancel_button">Go Back</string>
 	<string name="exposed_before_proceed_button">Acknowledge and Proceed</string>
+	<string name="settings_title">Settings</string>
+	<string name="settings_networks">Networks</string>
+	<string name="settings_verifier_certificate">Verifier certificate</string>
+	<string name="settings_backup_keys">Backup keys</string>
+	<string name="settings_docs"><![CDATA[Privacy & Terms docs]]></string>
+	<string name="settings_wipe_data">Wipe all Data</string>
+	<string name="settings_hardware_key">Hardware seed protection: %1$s</string>
+	<string name="settings_version">Signer version: %1$s</string>
     <string name="button_next">Next</string>
 	<string name="new_key_set_backup_title">Recovery Phrase</string>
 	<string name="new_key_set_backup_subtitle">Write down your Secret Recovery Phrase</string>
