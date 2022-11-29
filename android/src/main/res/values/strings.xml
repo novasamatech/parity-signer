@@ -127,5 +127,10 @@
 	<string name="exposed_before_proceed_button">Acknowledge and Proceed</string>
 	<string name="settings_title">Settings</string>
 	<string name="settings_networks">Networks</string>
-
+	<string name="settings_verifier_certificate">Verifier certificate</string>
+	<string name="settings_backup_keys">Backup keys</string>
+	<string name="settings_docs"><![CDATA[Privacy & Terms docs]]></string>
+	<string name="settings_wipe_data">Wipe all Data</string>
+	<string name="settings_hardware_key">Hardware seed protection: %1$s</string>
+	<string name="settings_version">Signer version: %1$s</string>
 </resources>

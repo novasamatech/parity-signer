@@ -1,18 +1,29 @@
-package io.parity.signer.screens
+package io.parity.signer.screens.settings
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.SettingsCardTemplate
+import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.base.ScreenHeader
+import io.parity.signer.components.panels.BottomBar2
+import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.Callback
 import io.parity.signer.models.EmptyNavigator
@@ -30,73 +41,97 @@ fun SettingsScreen(
 	rootNavigator: Navigator,
 	isStrongBoxProtected: Boolean,
 	appVersion: String,
-	wipeToFactory: () -> Unit,
+	wipeToFactory: Callback,
 	alertState: State<AlertState?>
 ) {
 	var confirm by remember { mutableStateOf(false) }
 
-	Column(
-		verticalArrangement = Arrangement.spacedBy(4.dp)
-	) {
-		ScreenHeader(
-			stringId = R.string.settings_title,
-			onBack = { rootNavigator.backAction() },
-		)
-		SettingsElement(name = stringResource(R.string.settings_networks)) {
-			rootNavigator.navigate(Action.MANAGE_NETWORKS)
-		}
+	Column() {
+		ScreenHeader(stringId = R.string.settings_title)
 
-		Row(Modifier.clickable { rootNavigator.navigate(Action.MANAGE_NETWORKS) }) {
-			SettingsCardTemplate(text = stringResource(R.string.settings_networks))
-		}
-		Row(
-			Modifier.clickable {
+		Column(Modifier.verticalScroll(rememberScrollState())) {
+			SettingsElement(name = stringResource(R.string.settings_networks)) {
+				rootNavigator.navigate(Action.MANAGE_NETWORKS)
+			}
+			SettingsElement(name = stringResource(R.string.settings_verifier_certificate)) {
+				rootNavigator.navigate(Action.VIEW_GENERAL_VERIFIER)
+			}
+			SettingsElement(name = stringResource(R.string.settings_backup_keys)) {
 				if (alertState.value == AlertState.None)
 					rootNavigator.navigate(Action.BACKUP_SEED)
 				else
 					rootNavigator.navigate(Action.SHIELD)
 			}
-		) {
-			SettingsCardTemplate(text = "Backup keys")
-		}
-		Column(
-			Modifier
-				.padding(12.dp)
-				.clickable { rootNavigator.navigate(Action.VIEW_GENERAL_VERIFIER) }
-		) {
-			Row {
-				Text(
-					"Verifier certificate",
-					style = MaterialTheme.typography.h1,
-					color = MaterialTheme.colors.Text600
-				)
-				Spacer(Modifier.weight(1f))
+			SettingsElement(name = stringResource(R.string.settings_docs)) {
+				rootNavigator.navigate(Action.SHOW_DOCUMENTS)
 			}
-		}
-		Row(
-			Modifier.clickable {
+			SettingsElement(
+				name = stringResource(R.string.settings_wipe_data),
+				isDanger = true,
+			) {
 				confirm = true
 			}
-		) { SettingsCardTemplate(text = "Wipe signer", danger = true) }
-		Row(Modifier.clickable { rootNavigator.navigate(Action.SHOW_DOCUMENTS) }) {
-			SettingsCardTemplate(text = "About")
+
+			Text(
+				text = stringResource(
+					R.string.settings_hardware_key,
+					isStrongBoxProtected.toString()
+				),
+				style = SignerTypeface.BodyM,
+				color = MaterialTheme.colors.textSecondary,
+				modifier = Modifier
+					.padding(horizontal = 24.dp, vertical = 16.dp)
+			)
+			Text(
+				text = stringResource(R.string.settings_version, appVersion),
+				style = SignerTypeface.BodyM,
+				color = MaterialTheme.colors.textSecondary,
+				modifier = Modifier
+					.padding(horizontal = 24.dp)
+			)
 		}
-		SettingsCardTemplate(
-			"Hardware seed protection: $isStrongBoxProtected",
-			withIcon = false,
-			withBackground = false
-		)
-		SettingsCardTemplate(
-			"Version: $appVersion",
-			withIcon = false,
-			withBackground = false
-		)
+
+		Spacer(modifier = Modifier.weight(1f))
+		BottomBar2(rootNavigator, BottomBar2State.SETTINGS)
 	}
+
+	AndroidCalledConfirm(
+		show = confirm,
+		header = "Wipe ALL data?",
+		text = "Factory reset the Signer app. This operation can not be reverted!",
+		back = { confirm = false },
+		forward = { wipeToFactory() },
+		backText = "Cancel",
+		forwardText = "Wipe"
+	)
 }
 
 @Composable
-internal fun SettingsElement(name: String, onClick: Callback) {
-
+internal fun SettingsElement(
+	name: String,
+	isDanger: Boolean = false,
+	onClick: Callback,
+) {
+	Row(
+		modifier = Modifier
+			.clickable(onClick = onClick)
+			.padding(vertical = 14.dp),
+	) {
+		Text(
+			text = name,
+			style = SignerTypeface.TitleS,
+			color = if (isDanger) MaterialTheme.colors.red400 else MaterialTheme.colors.primary,
+			modifier = Modifier
+				.padding(start = 24.dp)
+				.weight(1f)
+		)
+		Image(
+			imageVector = Icons.Filled.ChevronRight,
+			contentDescription = null,
+			colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
+			modifier = Modifier.padding(horizontal = 16.dp)
+		)
+	}
 }
 
 @Preview(
