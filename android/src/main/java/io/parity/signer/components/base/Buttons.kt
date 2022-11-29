@@ -247,11 +247,6 @@ private fun PreviewButtons() {
 				"Secondary with background",
 				withBackground = true
 			) {}
-			PrimaryButton(label = "primary slim") {}
-			PrimaryButton(
-				label = "primary disabled",
-				isEnabled = false,
-			) {}
 			SignerDivider()
 		}
 	}
