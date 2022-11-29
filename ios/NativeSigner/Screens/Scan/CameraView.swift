@@ -136,12 +136,20 @@ struct CameraView: View {
         .fullScreenCover(
             isPresented: $viewModel.isPresentingEnterPassword,
             onDismiss: {
+                // Clear password modal state no matter what
+                defer { viewModel.enterPassword = nil }
+
+                // User forgot password
                 if viewModel.shouldPresentError {
                     viewModel.isPresentingError = true
                     return
                 }
-                viewModel.isInTransactionProgress = false
-                viewModel.enterPassword = nil
+                // User entered valid password, signature is ready
+                if viewModel.signature != nil {
+                    viewModel.continueWithSignature()
+                    return
+                }
+                // Dismissed by user
                 model.start()
             }
         ) {
@@ -247,24 +255,27 @@ extension CameraView {
                     details: payload
                 )
             )
-            if case let .transaction(transactions) = actionResult.screenData {
-                let firstTransaction = transactions.first
-                switch firstTransaction?.ttype {
-                case .sign:
-                    let actionResult = sign(transactions: transactions)
-                    self.transactions = transactions
-                    if case let .signatureReady(value) = actionResult.modalData {
-                        signature = value
-                        isPresentingTransactionPreview = true
-                    }
-                    if case let .enterPassword(value) = actionResult.modalData {
-                        enterPassword = value
-                        isPresentingEnterPassword = true
-                    }
-                default:
-                    self.transactions = transactions
-                    isPresentingTransactionPreview = true
+            guard case let .transaction(transactions) = actionResult.screenData else { return }
+            let firstTransaction = transactions.first
+            switch firstTransaction?.ttype {
+            case .sign:
+                let actionResult = sign(transactions: transactions)
+                self.transactions = transactions
+                // Password protected key, continue to modal
+                if case let .enterPassword(value) = actionResult.modalData {
+                    enterPassword = value
+                    isPresentingEnterPassword = true
                 }
+                // Transaction ready to sign
+                if case let .signatureReady(value) = actionResult.modalData {
+                    signature = value
+                    continueWithSignature()
+                }
+            default:
+                // Transaction with error
+                // Transaction that does not require signing (i.e. adding network or metadata)
+                self.transactions = transactions
+                isPresentingTransactionPreview = true
             }
         }
 
@@ -292,29 +303,35 @@ extension CameraView {
             updateTexts()
         }
 
-        private func updateTexts() {
-            let key = Localizable.Scanner.Label.Scan.self
-            withAnimation {
-                header = (isScanningMultiple ? key.Multiple.header : key.Main.header).string
-                message = (isScanningMultiple ? key.Multiple.message : key.Main.message).string
-            }
+        func continueWithSignature() {
+            isPresentingTransactionPreview = true
         }
+    }
+}
 
-        private func sign(transactions: [MTransaction]) -> ActionResult {
-            let seedNames = transactions.compactMap { $0.authorInfo?.address.seedName }
-            let seedPhrasesDictionary = seedsMediator.getSeeds(seedNames: Set(seedNames))
-            return navigation.performFake(
-                navigation:
-                .init(
-                    action: .goForward,
-                    details: "",
-                    seedPhrase: formattedPhrase(seedNames: seedNames, with: seedPhrasesDictionary)
-                )
+private extension CameraView.ViewModel {
+    func updateTexts() {
+        let key = Localizable.Scanner.Label.Scan.self
+        withAnimation {
+            header = (isScanningMultiple ? key.Multiple.header : key.Main.header).string
+            message = (isScanningMultiple ? key.Multiple.message : key.Main.message).string
+        }
+    }
+
+    func sign(transactions: [MTransaction]) -> ActionResult {
+        let seedNames = transactions.compactMap { $0.authorInfo?.address.seedName }
+        let seedPhrasesDictionary = seedsMediator.getSeeds(seedNames: Set(seedNames))
+        return navigation.performFake(
+            navigation:
+            .init(
+                action: .goForward,
+                details: "",
+                seedPhrase: formattedPhrase(seedNames: seedNames, with: seedPhrasesDictionary)
             )
-        }
+        )
+    }
 
-        private func formattedPhrase(seedNames: [String], with dictionary: [String: String]) -> String {
-            seedNames.reduce(into: "") { $0 += "\(dictionary[$1] ?? "")\n" }
-        }
+    func formattedPhrase(seedNames: [String], with dictionary: [String: String]) -> String {
+        seedNames.reduce(into: "") { $0 += "\(dictionary[$1] ?? "")\n" }
     }
 }

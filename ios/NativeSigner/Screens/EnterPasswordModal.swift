@@ -85,7 +85,7 @@ struct EnterPasswordModal: View {
     func keyComponent() -> some View {
         HStack {
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                Text(renderablePath)
+                renderablePath
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                     .font(Fontstyle.captionM.base)
                 Text(viewModel.dataModel.authorInfo.address.seedName)
@@ -108,8 +108,11 @@ struct EnterPasswordModal: View {
     }
 
     /// Manual string interpolation for `lock` `SFSymbol`
-    private var renderablePath: String {
-        "\(viewModel.dataModel.authorInfo.address.path)\(Localizable.Path.delimeter.string)\(Image(.lock))"
+    private var renderablePath: Text {
+        Text(
+            // swiftlint:disable:next line_length
+            "\(viewModel.dataModel.authorInfo.address.path)\(Localizable.Transaction.EnterPassword.Label.pathDelimeter.string)\(Image(.lock))"
+        )
     }
 }
 

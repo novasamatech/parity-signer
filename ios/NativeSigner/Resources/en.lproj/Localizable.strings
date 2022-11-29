@@ -422,4 +422,4 @@
 "Transaction.EnterPassword.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
 "Transaction.EnterPassword.Error.Title" = "Did you forget your\npassword?";
 "Transaction.EnterPassword.Error.Message" = "Your password was entered incorrectly three times.\nFor your safety, you will need to retrieve it before continuing.";
-
+"Transaction.EnterPassword.Label.PathDelimeter" = "///••••";
