@@ -70,10 +70,11 @@ struct CameraView: View {
                                 .overlay(
                                     Asset.cameraOverlay.swiftUIImage
                                         .resizable(resizingMode: .stretch)
+                                        .padding(-Spacing.extraExtraSmall)
                                 )
                         }
-                        .padding([.leading, .trailing], Spacing.extraExtraLarge)
-                        .padding([.top, .bottom], Spacing.componentSpacer)
+                        .padding([.leading, .trailing], Spacing.medium)
+                        .padding([.top, .bottom], Spacing.x3Large)
                         // Text description
                         VStack(spacing: Spacing.small) {
                             Text(viewModel.header)

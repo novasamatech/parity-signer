@@ -23,5 +23,5 @@ enum CornerRadius {
     /// Extra Extra Large: 40 pts
     static let extraExtraLarge: CGFloat = 40
     /// QR Code scanner: 56 pts
-    static let qrCodeScanner: CGFloat = 64
+    static let qrCodeScanner: CGFloat = 74
 }
