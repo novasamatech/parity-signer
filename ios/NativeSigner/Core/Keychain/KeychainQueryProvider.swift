@@ -10,6 +10,7 @@ import Foundation
 /// Available queries for accessing Keychain
 enum KeychainQuery {
     case fetch
+    case fetchWithData
     case check
     case deleteAll
     case search(seedName: String)
@@ -35,6 +36,10 @@ final class KeychainQueryProvider: KeychainQueryProviding {
             dictionary[kSecMatchLimit] = kSecMatchLimitAll // return all items
             dictionary[kSecReturnAttributes] = true // return item attributes
             dictionary[kSecReturnData] = false // don't return item data
+        case .fetchWithData:
+            dictionary[kSecMatchLimit] = kSecMatchLimitAll // return all items
+            dictionary[kSecReturnAttributes] = true // return item attributes
+            dictionary[kSecReturnData] = true // return item data
         case .check:
             dictionary[kSecMatchLimit] = kSecMatchLimitAll
             dictionary[kSecReturnData] = true

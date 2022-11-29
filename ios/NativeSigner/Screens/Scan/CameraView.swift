@@ -247,10 +247,11 @@ extension CameraView {
                     details: payload
                 )
             )
-            if case let .transaction(transaction) = actionResult.screenData {
-                switch transaction.ttype {
+            if case let .transaction(transactions) = actionResult.screenData {
+                let firstTransaction = transactions.first
+                switch firstTransaction?.ttype {
                 case .sign:
-                    let seedName = transaction.authorInfo?.address.seedName ?? ""
+                    let seedName = firstTransaction?.authorInfo?.address.seedName ?? ""
                     let seedPhrase = seedsMediator.getSeed(seedName: seedName)
                     let actionResult = navigation.performFake(
                         navigation:
@@ -260,7 +261,7 @@ extension CameraView {
                             seedPhrase: seedPhrase
                         )
                     )
-                    transactions = [transaction]
+                    self.transactions = transactions
                     if case let .signatureReady(value) = actionResult.modalData {
                         signature = value
                         isPresentingTransactionPreview = true
@@ -270,7 +271,7 @@ extension CameraView {
                         isPresentingEnterPassword = true
                     }
                 default:
-                    transactions = [transaction]
+                    self.transactions = transactions
                     isPresentingTransactionPreview = true
                 }
             }
@@ -286,7 +287,7 @@ extension CameraView {
                     )
                 )
                 if case let .transaction(value) = actionResult.screenData {
-                    transactions.append(value)
+                    transactions += value
                 }
             }
             self.transactions = transactions

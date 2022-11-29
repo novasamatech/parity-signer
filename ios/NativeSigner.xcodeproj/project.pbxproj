@@ -1048,6 +1048,7 @@
 			isa = PBXGroup;
 			children = (
 				6D6430EE28CB30A000342E37 /* BottoEdgeOverlay.swift */,
+				6D199C8F292799D200E79113 /* KeyboardOffsetAdapter.swift */,
 			);
 			path = Overlays;
 			sourceTree = "<group>";

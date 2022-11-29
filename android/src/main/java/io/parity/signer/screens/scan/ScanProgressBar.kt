@@ -9,11 +9,10 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,7 +21,10 @@ import io.parity.signer.R
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.*
 
-
+/**
+ * This component shown on top of Scan screen with forced colors
+ * and so it have forced colors as well
+ */
 @Composable
 fun ScanProgressBar(
 	captured: Int,
@@ -32,6 +34,9 @@ fun ScanProgressBar(
 	val progress =
 		captured.toFloat() / (total ?: 1).toFloat()
 
+	val SNACKBAR_BACKGROUND = Color(0xFF454549)
+	val PROGRESS_TEXT_COLOR = Color(0x7AFFFFFF)
+
 	val innerRound = dimensionResource(id = R.dimen.qrShapeCornerRadius)
 	val innerShape =
 		RoundedCornerShape(innerRound, innerRound, innerRound, innerRound)
@@ -39,26 +44,25 @@ fun ScanProgressBar(
 		modifier = Modifier
 			.fillMaxWidth(1f)
 			.padding(start = 8.dp, end = 8.dp, bottom = 16.dp, top = 8.dp)
-			.background(MaterialTheme.colors.fill12, innerShape)
-			.background(MaterialTheme.colors.backgroundTertiary, innerShape)
+			.background(SNACKBAR_BACKGROUND, innerShape)
 			.padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 20.dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			Column(Modifier.weight(1f)) {
 				Text(
 					text = stringResource(R.string.scan_progress_bar_title),
-					color = MaterialTheme.colors.primary,
+					color = Color.White,
 					style = SignerTypeface.BodyL,
 				)
 				Text(
 					text = stringResource(R.string.scan_progress_bar_progress, captured, total ?: -1),
-					color = MaterialTheme.colors.textTertiary,
+					color = PROGRESS_TEXT_COLOR,
 					style = SignerTypeface.CaptionM,
 				)
 			}
 			Text(
 				text = stringResource(id = R.string.generic_cancel),
-				color = MaterialTheme.colors.pink500,
+				color = MaterialTheme.colors.pink300,
 				style = SignerTypeface.LabelM,
 				modifier = Modifier
 					.padding(8.dp)
@@ -68,7 +72,8 @@ fun ScanProgressBar(
 		Spacer(modifier = Modifier.padding(top = 12.dp))
 		LinearProgressIndicator(
 			progress = progress,
-			modifier = Modifier.fillMaxWidth(1f),
+			modifier = Modifier.fillMaxWidth(1f)
+				.clip(RoundedCornerShape(2.dp)),
 			color = MaterialTheme.colors.pink300,
 			backgroundColor = MaterialTheme.colors.fill18,
 		)

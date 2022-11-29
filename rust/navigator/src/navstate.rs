@@ -6,9 +6,9 @@ use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
     ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
     MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
-    MRecoverSeedPhrase, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
-    MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData,
-    ScreenNameType, ShieldAlert, TransactionType,
+    MRecoverSeedPhrase, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
+    MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData, ScreenNameType,
+    ShieldAlert, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use std::fmt::Write;
@@ -17,11 +17,13 @@ use zeroize::Zeroize;
 
 use crate::actions::Action;
 use crate::alerts::Alert;
+use crate::export_signatures_bulk;
 use crate::modals::Modal;
 use crate::screens::{
     AddressState, AddressStateMulti, DeriveState, KeysState, RecoverSeedPhraseState, Screen,
-    SpecialtyKeysState, SufficientCryptoState, TransactionState,
+    SpecialtyKeysState, SufficientCryptoState,
 };
+use crate::states::{SignResult, TransactionState};
 use db_handling::interface_signer::{get_all_seed_names_with_identicons, guess};
 use definitions::{
     keyring::{AddressKey, NetworkSpecsKey},
@@ -395,75 +397,32 @@ impl State {
             }
             Screen::Transaction(ref t) => {
                 match t.action() {
-                    transaction_parsing::TransactionAction::Sign {
-                        content,
-                        checksum,
-                        has_pwd,
-                        author_info,
-                        network_info,
-                    } => {
-                        if has_pwd {
-                            match self.navstate.modal {
-                                Modal::EnterPassword => {
-                                    let mut seed = t.seed();
-                                    match transaction_signing::handle_sign(
-                                        checksum,
-                                        &seed,
-                                        details_str,
-                                        &t.get_comment(),
-                                        dbname,
-                                        network_info.specs.encryption,
-                                    ) {
-                                        Ok(a) => {
-                                            seed.zeroize();
-                                            new_navstate.modal = Modal::SignatureReady(a);
-                                        }
-                                        Err(e) => {
-                                            seed.zeroize();
-                                            if let transaction_signing::Error::WrongPasswordNewChecksum(c) = e {
-                                                if t.ok() {
-                                                    new_navstate.screen = Screen::Transaction(
-                                                        Box::new(t.update_checksum_sign(
-                                                            c,
-                                                            content,
-                                                            has_pwd,
-                                                            author_info,
-                                                            network_info,
-                                                        )),
-                                                    );
-                                                } else {
-                                                    new_navstate =
-                                                        Navstate::clean_screen(Screen::Log);
-                                                }
-                                            }
-                                            new_navstate.alert = Alert::Error;
-                                            let _ = write!(&mut errorline, "{}", e);
-                                        }
+                    transaction_parsing::TransactionAction::Sign { .. } => {
+                        let mut new = t.clone();
+                        new.update_seeds(secret_seed_phrase);
+                        if let Modal::EnterPassword = self.navstate.modal {
+                            new.password_entered(details_str);
+                            new_navstate.modal = Modal::Empty;
+                        }
+                        match new.handle_sign(dbname) {
+                            Ok(result) => {
+                                match result {
+                                    SignResult::RequestPassword { .. } => {
+                                        new_navstate.modal = Modal::EnterPassword;
                                     }
-                                }
-                                _ => {
-                                    new_navstate.screen = Screen::Transaction(Box::new(
-                                        t.add_comment(details_str).update_seed(secret_seed_phrase),
-                                    ));
-                                    new_navstate.modal = Modal::EnterPassword;
+                                    SignResult::Ready { signatures } => {
+                                        new_navstate.modal = Modal::SignatureReady(signatures);
+                                    }
+                                };
+                                if t.ok() {
+                                    new_navstate.screen = Screen::Transaction(new);
+                                } else {
+                                    new_navstate = Navstate::clean_screen(Screen::Log);
                                 }
                             }
-                        } else {
-                            match transaction_signing::handle_sign(
-                                checksum,
-                                secret_seed_phrase,
-                                "",
-                                details_str,
-                                dbname,
-                                network_info.specs.encryption,
-                            ) {
-                                Ok(a) => {
-                                    new_navstate.modal = Modal::SignatureReady(a);
-                                }
-                                Err(e) => {
-                                    new_navstate.alert = Alert::Error;
-                                    let _ = write!(&mut errorline, "{}", e);
-                                }
+                            Err(e) => {
+                                new_navstate.alert = Alert::Error;
+                                let _ = write!(&mut errorline, "{}", e);
                             }
                         }
                     }
@@ -471,20 +430,20 @@ impl State {
                         s: _,
                         u: checksum,
                         stub: stub_nav,
-                    } => match transaction_signing::handle_stub(checksum, dbname) {
+                    } => match transaction_signing::handle_stub(*checksum, dbname) {
                         Ok(()) => match stub_nav {
                             transaction_parsing::StubNav::AddSpecs {
                                 n: network_specs_key,
                             } => {
                                 new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
-                                    network_specs_key,
+                                    network_specs_key.clone(),
                                 ));
                             }
                             transaction_parsing::StubNav::LoadMeta {
                                 l: network_specs_key,
                             } => {
                                 new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
-                                    network_specs_key,
+                                    network_specs_key.clone(),
                                 ));
                             }
                             transaction_parsing::StubNav::LoadTypes => {
@@ -510,7 +469,7 @@ impl State {
                                 // details_str is seed_name
                                 // `secret_seed_phrase` is `seed_phrase`
                                 match db_handling::identities::import_derivations(
-                                    checksum,
+                                    *checksum,
                                     details_str,
                                     secret_seed_phrase,
                                     dbname,
@@ -519,7 +478,7 @@ impl State {
                                         new_navstate = Navstate::clean_screen(Screen::Keys(
                                             KeysState::new_in_network(
                                                 details_str,
-                                                &network_specs_key,
+                                                network_specs_key,
                                             ),
                                         ));
                                     }
@@ -1490,49 +1449,40 @@ impl State {
             }
             Screen::Scan => ScreenData::Scan,
             Screen::Transaction(ref t) => {
-                let (content, ttype, author_info, network_info) = match t.action() {
+                let f = match t.action() {
                     TransactionAction::Derivations {
                         content,
                         network_info,
                         ..
-                    } => (
-                        content,
-                        TransactionType::ImportDerivations,
-                        None,
-                        Some(network_info),
-                    ),
-                    TransactionAction::Sign {
-                        content,
-                        author_info,
-                        network_info,
-                        ..
-                    } => (
-                        content,
-                        TransactionType::Sign,
-                        Some(author_info),
-                        Some(network_info),
-                    ),
-                    TransactionAction::Stub { s, .. } => (s, TransactionType::Stub, None, None),
-                    TransactionAction::Read { r } => (r, TransactionType::Read, None, None),
+                    } => vec![MTransaction {
+                        content: *content.clone(),
+                        ttype: TransactionType::ImportDerivations,
+                        author_info: None,
+                        network_info: Some(network_info.as_ref().clone().into()),
+                    }],
+                    TransactionAction::Sign { actions, .. } => actions
+                        .iter()
+                        .map(|a| MTransaction {
+                            content: a.content.clone(),
+                            ttype: TransactionType::Sign,
+                            author_info: Some(a.author_info.clone()),
+                            network_info: Some(a.network_info.clone().into()),
+                        })
+                        .collect(),
+                    TransactionAction::Stub { s, .. } => vec![MTransaction {
+                        content: *s.clone(),
+                        ttype: TransactionType::Stub,
+                        author_info: None,
+                        network_info: None,
+                    }],
+                    TransactionAction::Read { r } => vec![MTransaction {
+                        content: *r.clone(),
+                        ttype: TransactionType::Read,
+                        author_info: None,
+                        network_info: None,
+                    }],
                 };
-                ScreenData::Transaction {
-                    f: MTransaction {
-                        content,
-                        ttype,
-                        author_info,
-                        network_info: network_info.map(|i| MSCNetworkInfo {
-                            network_title: i.specs.title,
-                            network_logo: i.specs.logo,
-                            network_specs_key: hex::encode(
-                                NetworkSpecsKey::from_parts(
-                                    &i.specs.genesis_hash,
-                                    &i.specs.encryption,
-                                )
-                                .key(),
-                            ),
-                        }),
-                    },
-                }
+                ScreenData::Transaction { f }
             }
             Screen::SeedSelector => {
                 let seed_name_cards =
@@ -1754,29 +1704,17 @@ impl State {
                 _ => None,
             },
             Modal::SignatureReady(ref a) => Some(ModalData::SignatureReady {
-                f: MSignatureReady {
-                    signature: a.to_vec(),
-                },
+                f: export_signatures_bulk(a)?,
             }),
             Modal::EnterPassword => match new_navstate.screen {
                 Screen::Transaction(ref t) => {
-                    if let transaction_parsing::TransactionAction::Sign {
-                        content: _,
-                        checksum: _,
-                        has_pwd: _,
-                        author_info,
-                        network_info: _,
-                    } = t.action()
-                    {
-                        Some(ModalData::EnterPassword {
+                    t.current_password_author_info()
+                        .map(|author_info| ModalData::EnterPassword {
                             f: MEnterPassword {
                                 author_info,
                                 counter: t.counter() as u32,
                             },
                         })
-                    } else {
-                        None
-                    }
                 }
                 Screen::SignSufficientCrypto(ref s) => {
                     if let Some((_, _, author_info)) = s.key_selected() {

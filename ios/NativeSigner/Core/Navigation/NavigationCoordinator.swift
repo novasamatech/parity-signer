@@ -119,7 +119,8 @@ private extension NavigationCoordinator {
         switch actionResult.screenData {
         case .seedSelector, // Main `Keys` screen
              .keys, // `Key Details` screen
-             .keyDetails: // `Public Key` screen
+             .keyDetails, // `Public Key` screen
+             .transaction:
             updatedShouldSkipInjectedViews = true
         default:
             updatedShouldSkipInjectedViews = false

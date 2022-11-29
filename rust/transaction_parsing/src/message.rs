@@ -1,10 +1,10 @@
 use db_handling::{
-    db_transactions::{SignContent, TrDbColdSign},
+    db_transactions::{SignContent, TrDbColdSign, TrDbColdSignOne},
     helpers::{try_get_address_details, try_get_network_specs},
 };
 use definitions::{
     keyring::{AddressKey, NetworkSpecsKey},
-    navigation::TransactionCardSet,
+    navigation::{TransactionCardSet, TransactionSignAction},
 };
 use nom::bytes::complete::{tag, take_until};
 use parser::cards::ParserCard;
@@ -42,7 +42,7 @@ where
                     if address_details.network_id.contains(&network_specs_key) {
                         let message_card = Card::ParserCard(&ParserCard::Text(display_msg))
                             .card(&mut index, indent);
-                        let sign = TrDbColdSign::generate(
+                        let sign = TrDbColdSignOne::generate(
                             SignContent::Message(message),
                             &network_specs.specs.name,
                             &address_details.path,
@@ -50,6 +50,7 @@ where
                             &author_multi_signer,
                             Vec::new(),
                         );
+                        let sign: TrDbColdSign = sign.into();
                         let checksum = sign.store_and_get_checksum(&db_path)?;
                         let author_info = make_author_info(
                             &author_multi_signer,
@@ -58,14 +59,16 @@ where
                         );
                         let network_info = network_specs;
                         Ok(TransactionAction::Sign {
-                            content: TransactionCardSet {
-                                message: Some(vec![message_card]),
-                                ..Default::default()
-                            },
+                            actions: vec![TransactionSignAction {
+                                content: TransactionCardSet {
+                                    message: Some(vec![message_card]),
+                                    ..Default::default()
+                                },
+                                has_pwd: address_details.has_pwd,
+                                author_info,
+                                network_info,
+                            }],
                             checksum,
-                            has_pwd: address_details.has_pwd,
-                            author_info,
-                            network_info,
                         })
                     } else {
                         let author_card = Card::Author {
@@ -81,13 +84,13 @@ where
                         let network_card =
                             Card::NetworkInfo(&network_specs).card(&mut index, indent);
                         Ok(TransactionAction::Read {
-                            r: TransactionCardSet {
+                            r: Box::new(TransactionCardSet {
                                 author: Some(vec![author_card]),
                                 warning: Some(vec![warning_card]),
                                 message: Some(vec![message_card]),
                                 new_specs: Some(vec![network_card]),
                                 ..Default::default()
-                            },
+                            }),
                         })
                     }
                 }
@@ -103,13 +106,13 @@ where
                         Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
                     let network_card = Card::NetworkInfo(&network_specs).card(&mut index, indent);
                     Ok(TransactionAction::Read {
-                        r: TransactionCardSet {
+                        r: Box::new(TransactionCardSet {
                             author: Some(vec![author_card]),
                             warning: Some(vec![warning_card]),
                             message: Some(vec![message_card]),
                             new_specs: Some(vec![network_card]),
                             ..Default::default()
-                        },
+                        }),
                     })
                 }
             }
@@ -126,13 +129,13 @@ where
             let network_card =
                 Card::NetworkGenesisHash(genesis_hash.as_ref()).card(&mut index, indent);
             Ok(TransactionAction::Read {
-                r: TransactionCardSet {
+                r: Box::new(TransactionCardSet {
                     author: Some(vec![author_card]),
                     error: Some(vec![error_card]),
                     message: Some(vec![message_card]),
                     new_specs: Some(vec![network_card]),
                     ..Default::default()
-                },
+                }),
             })
         }
     }

@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use definitions::crypto::Encryption;
 use parity_scale_codec::Encode;
 use sp_core::blake2_256;
@@ -10,26 +12,66 @@ use qrcode_static::{png_qr_from_string, DataType};
 use crate::sign_message::sign_as_address_key;
 use crate::{Error, Result};
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SignatureType {
+    Transaction,
+    Message,
+}
+
+pub struct SignatureAndChecksum {
+    signature_type: SignatureType,
+    signature: MultiSignature,
+    new_checksum: u32,
+}
+
+impl SignatureAndChecksum {
+    pub fn new_checksum(&self) -> u32 {
+        self.new_checksum
+    }
+
+    pub fn signature(&self) -> &MultiSignature {
+        &self.signature
+    }
+
+    pub fn signature_type(&self) -> SignatureType {
+        self.signature_type
+    }
+}
+
+impl ToString for SignatureAndChecksum {
+    fn to_string(&self) -> String {
+        match self.signature_type {
+            SignatureType::Transaction => hex::encode(self.signature.encode()),
+            SignatureType::Message => match &self.signature {
+                MultiSignature::Ed25519(a) => hex::encode(a),
+                MultiSignature::Sr25519(a) => hex::encode(a),
+                MultiSignature::Ecdsa(a) => hex::encode(a),
+            },
+        }
+    }
+}
+
 /// Function to create signatures using RN output action line, and user entered pin and password.
 /// Also needs database name to fetch saved transaction and key.
-
-pub(crate) fn create_signature(
+pub fn create_signature<P: AsRef<Path>>(
     seed_phrase: &str,
     pwd_entry: &str,
     user_comment: &str,
-    database_name: &str,
+    database_name: P,
     checksum: u32,
+    idx: usize,
     encryption: Encryption,
-) -> Result<String> {
-    let sign = TrDbColdSign::from_storage(database_name, checksum)?;
+) -> Result<SignatureAndChecksum> {
+    let sign = TrDbColdSign::from_storage(&database_name, Some(checksum))?
+        .ok_or(db_handling::Error::Sign)?;
     let pwd = {
-        if sign.has_pwd() {
+        if sign.signing_bulk[idx].has_pwd() {
             Some(pwd_entry)
         } else {
             None
         }
     };
-    let content = sign.content().to_owned();
+    let content = sign.signing_bulk[idx].content().to_owned();
     let content_vec = match &content {
         SignContent::Transaction { method, extensions } => {
             [method.to_vec(), extensions.to_vec()].concat()
@@ -46,23 +88,23 @@ pub(crate) fn create_signature(
             content_vec
         }
     };
-    let mut full_address = seed_phrase.to_owned() + &sign.path();
+    let mut full_address = seed_phrase.to_owned() + &sign.signing_bulk[idx].path();
     let signature = match sign_as_address_key(
         &content_vec,
-        &sign.multisigner(),
+        &sign.signing_bulk[idx].multisigner(),
         &full_address,
         pwd,
         encryption,
     ) {
         Ok(s) => {
             full_address.zeroize();
-            sign.apply(false, user_comment, database_name)?;
-            Ok(s.multi_signature())
+            let c = sign.apply(false, user_comment, idx, database_name)?;
+            Ok((s.multi_signature(), c))
         }
         Err(e) => {
             full_address.zeroize();
             if let Error::WrongPassword = e {
-                let checksum = sign.apply(true, user_comment, database_name)?;
+                let checksum = sign.apply(true, user_comment, idx, database_name)?;
                 Err(Error::WrongPasswordNewChecksum(checksum))
             } else {
                 Err(e)
@@ -70,18 +112,18 @@ pub(crate) fn create_signature(
         }
     }?;
 
-    let encoded = match &content {
+    let signature_type = match &content {
         SignContent::Transaction {
             method: _,
             extensions: _,
-        } => hex::encode(signature.encode()),
-        SignContent::Message(_) => match signature {
-            MultiSignature::Sr25519(a) => hex::encode(a),
-            MultiSignature::Ed25519(a) => hex::encode(a),
-            MultiSignature::Ecdsa(a) => hex::encode(a),
-        },
+        } => SignatureType::Transaction,
+        SignContent::Message(_) => SignatureType::Message,
     };
-    Ok(encoded)
+    Ok(SignatureAndChecksum {
+        signature_type,
+        signature: signature.0,
+        new_checksum: signature.1,
+    })
 }
 
 pub fn create_signature_png(
@@ -90,16 +132,18 @@ pub fn create_signature_png(
     user_comment: &str,
     database_name: &str,
     checksum: u32,
+    idx: usize,
     encryption: Encryption,
 ) -> Result<Vec<u8>> {
-    let hex_result = create_signature(
+    let signature = create_signature(
         seed_phrase,
         pwd_entry,
         user_comment,
         database_name,
         checksum,
+        idx,
         encryption,
     )?;
-    let qr_data = png_qr_from_string(&hex_result, DataType::Regular)?;
+    let qr_data = png_qr_from_string(&signature.to_string(), DataType::Regular)?;
     Ok(qr_data)
 }

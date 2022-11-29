@@ -23,27 +23,29 @@ import io.parity.signer.uniffi.TransactionType
  */
 @Composable
 fun TransactionPreviewEdited(
-	transaction: MTransaction,
+	transactions: List<MTransaction>,
 	onBack: Callback,
 	onFinish: Callback,
 	signTransaction: (comment: String, seedName: String) -> Unit
 ) {
-	val action = transaction.ttype
-	val comment = remember { mutableStateOf("") }
-	val focusManager = LocalFocusManager.current
-	val focusRequester = remember { FocusRequester() }
 	Column(
 		Modifier.verticalScroll(rememberScrollState())
 	) {
-		TransactionPreviewField(
-			cardSet = transaction.content,
-		)
-		transaction.authorInfo?.let {
-			KeyCardOld(identity = it)
+		for (transaction in transactions) {
+			TransactionPreviewField(
+				cardSet = transaction.content,
+			)
+			transaction.authorInfo?.let {
+				KeyCardOld(identity = it)
+			}
+			transaction.networkInfo?.let {
+				NetworkCard(NetworkCardModel(it.networkTitle, it.networkLogo))
+			}
 		}
-		transaction.networkInfo?.let {
-			NetworkCard(NetworkCardModel(it.networkTitle, it.networkLogo))
-		}
+		val action = transactions.first().ttype
+		val comment = remember { mutableStateOf("") }
+		val focusManager = LocalFocusManager.current
+		val focusRequester = remember { FocusRequester() }
 		when (action) {
 			TransactionType.SIGN -> {
 				Text(
@@ -70,7 +72,8 @@ fun TransactionPreviewEdited(
 					text = "Unlock key and sign",
 					action = {
 						signTransaction(
-							comment.value, transaction.authorInfo?.address?.seedName ?: ""
+							comment.value, transactions.firstOrNull()
+								?.authorInfo?.address?.seedName ?: ""
 						)
 					}
 				)

@@ -132,9 +132,10 @@ struct TransactionPreview: View {
     func actions(_ transactionType: TransactionType?) -> some View {
         VStack {
             switch transactionType {
-            case .sign, .read:
+            case .sign,
+                 .read:
                 PrimaryButton(
-                    action:  viewModel.onDoneTap,
+                    action: viewModel.onDoneTap,
                     text: Localizable.TransactionPreview.Action.done.key,
                     style: .secondary()
                 )
@@ -176,7 +177,7 @@ struct TransactionPreview: View {
                     AnimatedQRCodeView(
                         viewModel: Binding<AnimatedQRCodeViewModel>.constant(
                             .init(
-                                qrCodes: [signature.signature]
+                                qrCodes: signature.signatures
                             )
                         ),
                         shouldDecode: transactionsCount > 1
@@ -281,7 +282,7 @@ struct TransactionPreview_Previews: PreviewProvider {
         TransactionPreview(viewModel: .init(
             isPresented: Binding<Bool>.constant(true),
             content: [PreviewData.signTransaction],
-            signature: MSignatureReady(signature: PreviewData.exampleQRCode)
+            signature: MSignatureReady(signatures: [PreviewData.exampleQRCode])
         ))
         .environmentObject(NavigationCoordinator())
         .environmentObject(SignerDataModel())
@@ -290,7 +291,7 @@ struct TransactionPreview_Previews: PreviewProvider {
         TransactionPreview(viewModel: .init(
             isPresented: Binding<Bool>.constant(true),
             content: [PreviewData.signTransaction, PreviewData.signTransaction],
-            signature: MSignatureReady(signature: PreviewData.exampleQRCode)
+            signature: MSignatureReady(signatures: [PreviewData.exampleQRCode])
         ))
         .environmentObject(NavigationCoordinator())
         .environmentObject(SignerDataModel())
