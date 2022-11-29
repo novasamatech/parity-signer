@@ -2,15 +2,13 @@ package io.parity.signer.screens.settings
 
 import android.content.res.Configuration
 import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
@@ -19,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.base.ScreenHeader
+import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.models.AlertState
@@ -45,50 +44,55 @@ fun SettingsScreen(
 
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeader(stringId = R.string.settings_title)
+		Box(modifier = Modifier.weight(1f)) {
+			Column(Modifier.verticalScroll(rememberScrollState())) {
+				SettingsElement(name = stringResource(R.string.settings_networks)) {
+					rootNavigator.navigate(Action.MANAGE_NETWORKS)
+				}
+				SettingsElement(name = stringResource(R.string.settings_verifier_certificate)) {
+					rootNavigator.navigate(Action.VIEW_GENERAL_VERIFIER)
+				}
+				SettingsElement(name = stringResource(R.string.settings_backup_keys)) {
+					if (alertState.value == AlertState.None)
+						rootNavigator.navigate(Action.BACKUP_SEED)
+					else
+						rootNavigator.navigate(Action.SHIELD)
+				}
+				SettingsElement(name = stringResource(R.string.settings_docs)) {
+					rootNavigator.navigate(Action.SHOW_DOCUMENTS)
+				}
+				SettingsElement(
+					name = stringResource(R.string.settings_wipe_data),
+					isDanger = true,
+				) {
+					confirm = true
+				}
 
-		Column(Modifier.verticalScroll(rememberScrollState())) {
-			SettingsElement(name = stringResource(R.string.settings_networks)) {
-				rootNavigator.navigate(Action.MANAGE_NETWORKS)
+				Text(
+					text = stringResource(
+						R.string.settings_hardware_key,
+						isStrongBoxProtected.toString()
+					),
+					style = SignerTypeface.BodyM,
+					color = MaterialTheme.colors.textSecondary,
+					modifier = Modifier
+						.padding(horizontal = 24.dp, vertical = 16.dp)
+				)
+				Text(
+					text = stringResource(R.string.settings_version, appVersion),
+					style = SignerTypeface.BodyM,
+					color = MaterialTheme.colors.textSecondary,
+					modifier = Modifier
+						.padding(horizontal = 24.dp)
+				)
 			}
-			SettingsElement(name = stringResource(R.string.settings_verifier_certificate)) {
-				rootNavigator.navigate(Action.VIEW_GENERAL_VERIFIER)
-			}
-			SettingsElement(name = stringResource(R.string.settings_backup_keys)) {
-				if (alertState.value == AlertState.None)
-					rootNavigator.navigate(Action.BACKUP_SEED)
-				else
-					rootNavigator.navigate(Action.SHIELD)
-			}
-			SettingsElement(name = stringResource(R.string.settings_docs)) {
-				rootNavigator.navigate(Action.SHOW_DOCUMENTS)
-			}
-			SettingsElement(
-				name = stringResource(R.string.settings_wipe_data),
-				isDanger = true,
-			) {
-				confirm = true
-			}
-
-			Text(
-				text = stringResource(
-					R.string.settings_hardware_key,
-					isStrongBoxProtected.toString()
-				),
-				style = SignerTypeface.BodyM,
-				color = MaterialTheme.colors.textSecondary,
+			ExposedIcon(
+				alertState = alertState, navigator = rootNavigator,
 				modifier = Modifier
-					.padding(horizontal = 24.dp, vertical = 16.dp)
-			)
-			Text(
-				text = stringResource(R.string.settings_version, appVersion),
-				style = SignerTypeface.BodyM,
-				color = MaterialTheme.colors.textSecondary,
-				modifier = Modifier
-					.padding(horizontal = 24.dp)
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = 16.dp)
 			)
 		}
-
-		Spacer(modifier = Modifier.weight(1f))
 		BottomBar2(rootNavigator, BottomBar2State.SETTINGS)
 	}
 
@@ -111,16 +115,16 @@ internal fun SettingsElement(
 ) {
 	Row(
 		modifier = Modifier
-			.clickable(onClick = onClick)
-			.padding(vertical = 14.dp),
+            .clickable(onClick = onClick)
+            .padding(vertical = 14.dp),
 	) {
 		Text(
 			text = name,
 			style = SignerTypeface.TitleS,
 			color = if (isDanger) MaterialTheme.colors.red400 else MaterialTheme.colors.primary,
 			modifier = Modifier
-				.padding(start = 24.dp)
-				.weight(1f)
+                .padding(start = 24.dp)
+                .weight(1f)
 		)
 		Image(
 			imageVector = Icons.Filled.ChevronRight,
@@ -143,7 +147,7 @@ internal fun SettingsElement(
 @Composable
 private fun PreviewSettingsScreen() {
 	SignerNewTheme {
-		val state = remember { mutableStateOf(AlertState.None) }
+		val state = remember { mutableStateOf(AlertState.Past) }
 		SettingsScreen(
 			rootNavigator = EmptyNavigator(),
 			isStrongBoxProtected = false,
