@@ -60,6 +60,7 @@ fun BottomBar2(
 			BottomBarButton2(
 				navigator = navigator,
 				iconId = R.drawable.ic_view_agenda_outlined_24,
+				enabledIconId = R.drawable.ic_view_agenda_filled_24,
 				action = Action.NAVBAR_LOG,
 				labelResId = R.string.bottom_bar_label_logs,
 				isEnabled = state == BottomBar2State.LOGS,
@@ -67,6 +68,7 @@ fun BottomBar2(
 			BottomBarButton2(
 				navigator = navigator,
 				iconId = R.drawable.ic_settings_outlined_24,
+				enabledIconId = R.drawable.ic_settings_filled_24,
 				action = Action.NAVBAR_SETTINGS,
 				labelResId = R.string.bottom_bar_label_settings,
 				isEnabled = state == BottomBar2State.SETTINGS,
@@ -84,6 +86,7 @@ enum class BottomBar2State { KEYS, SCANNER, LOGS, SETTINGS }
 fun BottomBarButton2(
 	navigator: Navigator,
 	@DrawableRes iconId: Int,
+	@DrawableRes enabledIconId: Int? = null,
 	action: Action,
 	@StringRes labelResId: Int,
 	isEnabled: Boolean,
@@ -96,14 +99,17 @@ fun BottomBarButton2(
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier
-            .clickable { navigator.navigate(action) }
-            .width(66.dp)
+			.clickable { navigator.navigate(action) }
+			.width(66.dp)
 	) {
 		Icon(
-			painter = painterResource(id = iconId),
+			painter = painterResource(
+				id = if (isEnabled) enabledIconId ?: iconId else iconId
+			),
 			contentDescription = stringResource(id = labelResId),
 			tint = color,
-			modifier = Modifier.size(28.dp)
+			modifier = Modifier
+				.size(28.dp)
 				.padding(bottom = 2.dp)
 		)
 		Text(
