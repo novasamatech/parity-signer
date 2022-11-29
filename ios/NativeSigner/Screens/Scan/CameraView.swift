@@ -251,16 +251,7 @@ extension CameraView {
                 let firstTransaction = transactions.first
                 switch firstTransaction?.ttype {
                 case .sign:
-                    let seedName = firstTransaction?.authorInfo?.address.seedName ?? ""
-                    let seedPhrase = seedsMediator.getSeed(seedName: seedName)
-                    let actionResult = navigation.performFake(
-                        navigation:
-                        .init(
-                            action: .goForward,
-                            details: "",
-                            seedPhrase: seedPhrase
-                        )
-                    )
+                    let actionResult = sign(transactions: transactions)
                     self.transactions = transactions
                     if case let .signatureReady(value) = actionResult.modalData {
                         signature = value
@@ -308,11 +299,22 @@ extension CameraView {
                 message = (isScanningMultiple ? key.Multiple.message : key.Main.message).string
             }
         }
+
+        private func sign(transactions: [MTransaction]) -> ActionResult {
+            let seedNames = transactions.compactMap { $0.authorInfo?.address.seedName }
+            let seedPhrasesDictionary = seedsMediator.getSeeds(seedNames: Set(seedNames))
+            return navigation.performFake(
+                navigation:
+                .init(
+                    action: .goForward,
+                    details: "",
+                    seedPhrase: formattedPhrase(seedNames: seedNames, with: seedPhrasesDictionary)
+                )
+            )
+        }
+
+        private func formattedPhrase(seedNames: [String], with dictionary: [String: String]) -> String {
+            seedNames.reduce(into: "") { $0 += "\(dictionary[$1] ?? "")\n" }
+        }
     }
 }
-
-// struct CameraView_Previews: PreviewProvider {
-// static var previews: some View {
-// CameraView()
-// }
-// }
