@@ -64,6 +64,7 @@ fun SettingsScreen(
 				SettingsElement(
 					name = stringResource(R.string.settings_wipe_data),
 					isDanger = true,
+					skipChevron = true,
 				) {
 					confirm = true
 				}
@@ -111,6 +112,7 @@ fun SettingsScreen(
 internal fun SettingsElement(
 	name: String,
 	isDanger: Boolean = false,
+	skipChevron: Boolean = false,
 	onClick: Callback,
 ) {
 	Row(
@@ -126,12 +128,14 @@ internal fun SettingsElement(
                 .padding(start = 24.dp)
                 .weight(1f)
 		)
-		Image(
-			imageVector = Icons.Filled.ChevronRight,
-			contentDescription = null,
-			colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
-			modifier = Modifier.padding(horizontal = 16.dp)
-		)
+		if (!skipChevron) {
+			Image(
+				imageVector = Icons.Filled.ChevronRight,
+				contentDescription = null,
+				colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
+				modifier = Modifier.padding(horizontal = 16.dp)
+			)
+		}
 	}
 }
 
