@@ -24,6 +24,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.components.base.DotsIndicator
 import io.parity.signer.components.base.PrimaryButton
+import io.parity.signer.components.base.PrimaryButtonGreyDisabled
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -139,7 +140,7 @@ private fun NewSeedHeader(
 			modifier = Modifier.fillMaxWidth(1f),
 			contentAlignment = Alignment.CenterEnd,
 		) {
-			PrimaryButton(
+			PrimaryButtonGreyDisabled(
 				label = stringResource(R.string.button_next),
 				isEnabled = canProceed,
 			) {

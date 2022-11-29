@@ -25,6 +25,9 @@ val Colors.textSecondary: Color
 val Colors.textTertiary: Color
 	get() = if (isLight) Color(0x73000000) else Color(0x7AFFFFFF)
 
+val Colors.textTertiaryDarkForced: Color
+	get() = Color(0x7AFFFFFF)
+
 val Colors.textDisabled: Color
 	get() = if (isLight) Color(0x40000000) else Color(0x45FFFFFF)
 
@@ -32,6 +35,12 @@ val Colors.textDisabled: Color
 
 val Colors.fill30: Color
 	get() = if (isLight) Color(0x4D000000) else Color(0x4DFFFFFF)
+
+/**
+ * light fill for light theme and dark for dark. Used to made button disabled
+ */
+val Colors.fill30Inverted: Color
+	get() = if (!isLight) Color(0x4D000000) else Color(0x4DFFFFFF)
 
 val Colors.fill24: Color
 	get() = if (isLight) Color(0x3D000000) else Color(0x3DFFFFFF)

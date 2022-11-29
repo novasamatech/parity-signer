@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,52 @@ fun PrimaryButtonBottomSheet(
 
 @Composable
 fun PrimaryButton(
+	label: String,
+	modifier: Modifier = Modifier,
+	isEnabled: Boolean = true,
+	onClicked: Callback
+) {
+	Box(
+		modifier = modifier
+			.run {
+				if (isEnabled) {
+					clickable(onClick = onClicked)
+				} else {
+					this
+				}
+			}
+			.background(
+				MaterialTheme.colors.pink500,
+				RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
+			),
+		contentAlignment = Alignment.Center,
+	) {
+		Text(
+			text = label,
+			color = if (isEnabled) Color.White else MaterialTheme.colors.textTertiaryDarkForced,
+			style = SignerTypeface.TitleS,
+			textAlign = TextAlign.Center,
+			maxLines = 1,
+			modifier = Modifier
+				.padding(horizontal = dimensionResource(id = R.dimen.buttonHorizontalTextPadding),
+					vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
+		)
+		if (!isEnabled) {
+			Box(
+				modifier = Modifier
+					.background(
+						MaterialTheme.colors.fill30Inverted,
+						RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
+					)
+					.matchParentSize(),
+				content = {}
+			)
+		}
+	}
+}
+
+@Composable
+fun PrimaryButtonGreyDisabled(
 	label: String,
 	modifier: Modifier = Modifier,
 	isEnabled: Boolean = true,
@@ -69,7 +116,7 @@ fun PrimaryButton(
 			},
 			style = SignerTypeface.TitleS,
 			maxLines = 1,
-			modifier = Modifier.padding(horizontal = 16.dp)
+			modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.buttonHorizontalTextPadding))
 		)
 	}
 }
@@ -164,10 +211,9 @@ fun SignerDivider(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewCtaButtons() {
+private fun PreviewButtons() {
 	SignerNewTheme {
-		Column(
-		) {
+		Column() {
 			PrimaryButtonBottomSheet("button") {}
 			RowButtonsBottomSheet(
 				labelCancel = "Cancel",
@@ -182,6 +228,20 @@ private fun PreviewCtaButtons() {
 				onClickedCta = {},
 				isCtaEnabled = false,
 			)
+			PrimaryButtonGreyDisabled(label = "grey enabled") {
+			}
+			PrimaryButtonGreyDisabled(
+				label = "grey disabled",
+				isEnabled = false,
+			) {
+			}
+			PrimaryButton(label = "Primary enabled") {
+			}
+			PrimaryButton(
+				label = "Primary disabled",
+				isEnabled = false,
+			) {
+			}
 			SecondaryButtonBottomSheet("Secondary Bottom Sheet") {}
 			SecondaryButtonBottomSheet(
 				"Secondary with background",
