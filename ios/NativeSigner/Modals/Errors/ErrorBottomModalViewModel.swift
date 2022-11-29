@@ -8,10 +8,16 @@
 import SwiftUI
 
 struct ErrorBottomModalViewModel {
+    struct Step {
+        let step: String
+        let content: AttributedString
+    }
+
     let icon: Image?
     let title: String
     let content: String
     let details: String?
+    let steps: [Step]
     let primaryAction: ActionModel?
     let secondaryAction: ActionModel?
     let tertiaryAction: ActionModel?
@@ -21,6 +27,7 @@ struct ErrorBottomModalViewModel {
         title: String,
         content: String,
         details: String? = nil,
+        steps: [Step] = [],
         primaryAction: ActionModel? = nil,
         secondaryAction: ActionModel? = nil,
         tertiaryAction: ActionModel? = nil
@@ -29,6 +36,7 @@ struct ErrorBottomModalViewModel {
         self.title = title
         self.content = content
         self.details = details
+        self.steps = steps
         self.primaryAction = primaryAction
         self.secondaryAction = secondaryAction
         self.tertiaryAction = tertiaryAction
@@ -39,6 +47,82 @@ struct ErrorBottomModalViewModel {
             title: Localizable.Transaction.EnterPassword.Error.title.string,
             content: Localizable.Transaction.EnterPassword.Error.message.string,
             secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
+        )
+    }
+
+    static func signingUnknownNetwork(
+        _ networkName: String,
+        _ action: @escaping @autoclosure () -> Void = {}()
+    ) -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.TransactionSign.Error.InvalidNetworkVersion.title(networkName),
+            content: Localizable.TransactionSign.Error.InvalidNetworkVersion.message.string,
+            steps: [
+                .init(
+                    step: "1",
+                    content: {
+                        var stepOnePrefix = AttributedString(
+                            Localizable.TransactionSign.Error.InvalidNetworkVersion.step1
+                                .string
+                        )
+                        stepOnePrefix.foregroundColor = Asset.textAndIconsPrimary.swiftUIColor
+                        var stepOneSuffix = AttributedString(
+                            Localizable.TransactionSign.Error.InvalidNetworkVersion.Step1.suffix
+                                .string
+                        )
+                        stepOneSuffix.foregroundColor = Asset.accentPink300.swiftUIColor
+                        return stepOnePrefix + stepOneSuffix
+                    }()
+                ),
+                .init(
+                    step: "2",
+                    content: AttributedString(Localizable.TransactionSign.Error.InvalidNetworkVersion.step2.string)
+                ),
+                .init(
+                    step: "3",
+                    content: AttributedString(Localizable.TransactionSign.Error.InvalidNetworkVersion.step3.string)
+                )
+            ],
+            secondaryAction: .init(label: Localizable.TransactionSign.Action.error.key, action: action)
+        )
+    }
+
+    static func signingInvalidNetworkVersion(_ action: @escaping @autoclosure () -> Void = {}())
+        -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.TransactionSign.Error.UnknownNetwork.title.string,
+            content: Localizable.TransactionSign.Error.UnknownNetwork.message.string,
+            steps: [
+                .init(
+                    step: "1",
+                    content: {
+                        var stepOnePrefix = AttributedString(
+                            Localizable.TransactionSign.Error.UnknownNetwork.step1
+                                .string
+                        )
+                        stepOnePrefix.foregroundColor = Asset.textAndIconsPrimary.swiftUIColor
+                        var stepOneSuffix = AttributedString(
+                            Localizable.TransactionSign.Error.UnknownNetwork.Step1.suffix
+                                .string
+                        )
+                        stepOneSuffix.foregroundColor = Asset.accentPink300.swiftUIColor
+                        return stepOnePrefix + stepOneSuffix
+                    }()
+                ),
+                .init(
+                    step: "2",
+                    content: AttributedString(Localizable.TransactionSign.Error.UnknownNetwork.step2.string)
+                ),
+                .init(
+                    step: "3",
+                    content: AttributedString(Localizable.TransactionSign.Error.UnknownNetwork.step3.string)
+                ),
+                .init(
+                    step: "4",
+                    content: AttributedString(Localizable.TransactionSign.Error.UnknownNetwork.step4.string)
+                )
+            ],
+            secondaryAction: .init(label: Localizable.TransactionSign.Action.error.key, action: action)
         )
     }
 

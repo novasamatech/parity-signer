@@ -393,11 +393,27 @@
 "TransactionSign.Label.SignCode" = "Sign Transaction";
 "TransactionSign.Action.Done" = "Done";
 "TransactionSign.Action.Note" = "Add Log Note";
+"TransactionSign.Action.Error" = "Got It";
 
 "TransactionSign.Label.Details.Pallet" = "Pallet";
 "TransactionSign.Label.Details.Method" = "Method";
 "TransactionSign.Label.Details.Destination" = "Dest";
 "TransactionSign.Label.Details.Value" = "Value";
+
+"TransactionSign.Error.UnknownNetwork.Title" = "Please add the Network\nyou want to Transact in";
+"TransactionSign.Error.UnknownNetwork.Message" = "You're trying to sign a transaction in a network which has not been added to your Parity Signer.";
+"TransactionSign.Error.UnknownNetwork.Step1" = "Go to ";
+"TransactionSign.Error.UnknownNetwork.Step1.suffix" = "metadata.parity.io";
+"TransactionSign.Error.UnknownNetwork.Step2" = "Choose the network you need ";
+"TransactionSign.Error.UnknownNetwork.Step3" = "Scan \"Chain spec\" QR to add the missing network";
+"TransactionSign.Error.UnknownNetwork.Step4" = "Select \"Metadata\" tab on top, scan QR code with Parity Signer and wait until the update is finished";
+
+"TransactionSign.Error.InvalidNetworkVersion.Title" = "Please update %@ Network Metadata";
+"TransactionSign.Error.InvalidNetworkVersion.Message" = "The Westend network's current metadata is different to the data you're using in the app. Please update it to sign the transaction.";
+"TransactionSign.Error.InvalidNetworkVersion.Step1" = "Go to ";
+"TransactionSign.Error.InvalidNetworkVersion.Step1.suffix" = "metadata.parity.io";
+"TransactionSign.Error.InvalidNetworkVersion.Step2" = "Choose the network you need ";
+"TransactionSign.Error.InvalidNetworkVersion.Step3" = "Scan the metadata’s QR code with the scanner";
 
 "Transaction.EnterPassword.Action.Done" = "Done";
 "Transaction.EnterPassword.Label.Title" = "Enter the password for";
@@ -406,3 +422,4 @@
 "Transaction.EnterPassword.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
 "Transaction.EnterPassword.Error.Title" = "Did you forget your\npassword?";
 "Transaction.EnterPassword.Error.Message" = "Your password was entered incorrectly three times.\nFor your safety, you will need to retrieve it before continuing.";
+
