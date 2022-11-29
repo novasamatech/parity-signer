@@ -70,7 +70,7 @@ struct TransactionPreview: View {
             // Cards are redesigned to present new design
             case .stub:
                 VStack {
-                    ForEach(content.content.asSortedCards(), id: \.index) { card in
+                    ForEach(content.sortedValueCards(), id: \.index) { card in
                         TransactionCardView(card: card)
                     }
                 }
@@ -78,7 +78,7 @@ struct TransactionPreview: View {
                 EmptyView()
             default:
                 VStack {
-                    ForEach(content.content.asSortedCards(), id: \.index) { card in
+                    ForEach(content.sortedValueCards(), id: \.index) { card in
                         TransactionCardView(card: card)
                     }
                 }
@@ -179,8 +179,7 @@ struct TransactionPreview: View {
                             .init(
                                 qrCodes: signature.signatures
                             )
-                        ),
-                        shouldDecode: transactionsCount > 1
+                        )
                     )
                     if transactionsCount > 1 {
                         InfoBoxView(text: Localizable.TransactionSign.Label.multipleTransactionsInfo.string)

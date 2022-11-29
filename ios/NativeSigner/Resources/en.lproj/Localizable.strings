@@ -364,7 +364,7 @@
 "Scanner.Label.SignMultiple.Suffix.single" = "Transaction";
 "Scanner.Label.SignMultiple.Suffix.plural" = "Transactions";
 
-"TransactionPreview.Label.Title" = "Transaction";
+"TransactionPreview.Label.Title" = "Transaction Details";
 "TransactionPreview.Action.UnlockSign" = "Unlock key and sign";
 "TransactionPreview.Action.Approve" = "Approve";
 "TransactionPreview.Action.SelectSeed" = "Select seed";

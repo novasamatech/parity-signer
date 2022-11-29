@@ -23,7 +23,7 @@ struct TransactionDetailsView: View {
             )
             ScrollView {
                 VStack {
-                    ForEach(viewModel.transaction.content.asSortedCards(), id: \.index) { card in
+                    ForEach(viewModel.transaction.sortedValueCards(), id: \.index) { card in
                         TransactionCardView(card: card)
                     }
                 }

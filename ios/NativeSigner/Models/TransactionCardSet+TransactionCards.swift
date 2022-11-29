@@ -7,20 +7,28 @@
 
 import Foundation
 
-extension TransactionCardSet {
-    func asSortedCards() -> [TransactionCard] {
+extension MTransaction {
+    func sortedValueCards() -> [TransactionCard] {
         [
-            author,
-            error,
-            extensions,
-            importingDerivations,
-            message,
-            meta,
-            method,
-            newSpecs,
-            verifier,
-            warning,
-            typesInfo
+            content.author,
+            content.extensions,
+            content.importingDerivations,
+            content.message,
+            content.meta,
+            content.method,
+            content.newSpecs,
+            content.verifier,
+            content.typesInfo
+        ]
+        .compactMap { $0 }
+        .flatMap { $0 }
+        .sorted { $0.index < $1.index }
+    }
+
+    func transactionIssuesCards() -> [TransactionCard] {
+        [
+            content.error,
+            content.warning
         ]
         .compactMap { $0 }
         .flatMap { $0 }
