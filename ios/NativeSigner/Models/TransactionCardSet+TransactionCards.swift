@@ -11,6 +11,7 @@ extension MTransaction {
     func sortedValueCards() -> [TransactionCard] {
         [
             content.author,
+            content.error
             content.extensions,
             content.importingDerivations,
             content.message,
@@ -18,6 +19,7 @@ extension MTransaction {
             content.method,
             content.newSpecs,
             content.verifier,
+            content.warning,
             content.typesInfo
         ]
         .compactMap { $0 }
