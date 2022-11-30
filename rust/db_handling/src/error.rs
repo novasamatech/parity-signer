@@ -259,10 +259,6 @@ pub enum Error {
     #[error("Derivation had password, then lost it.")]
     LostPwd,
 
-    /// Provided file contains no valid derivations that could be exported
-    #[error("No valid derivations found to generate ContentDerivations.")]
-    NoValidDerivationToExport,
-
     /// Temporary database entry in `TRANSACTION` tree of the Signer database
     /// under the key `DRV`, used to store the derivation import data.
     ///

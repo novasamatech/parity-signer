@@ -23,7 +23,7 @@ pub enum TransactionAction {
         content: TransactionCardSet,
     },
     Sign {
-        content: TransactionCardSet,
+        content: Box<TransactionCardSet>,
         checksum: u32,
         has_pwd: bool,
         author_info: MAddressCard,

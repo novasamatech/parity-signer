@@ -62,8 +62,6 @@ use definitions::helpers::{get_multisigner, unhex};
 #[cfg(feature = "signer")]
 use definitions::navigation::ExportedSet;
 use definitions::network_specs::NetworkSpecs;
-#[cfg(feature = "active")]
-use definitions::qr_transfers::ContentDerivations;
 #[cfg(any(feature = "active", feature = "signer"))]
 use definitions::{
     crypto::Encryption,
@@ -1406,62 +1404,6 @@ pub fn check_derivation_set(derivations: &[String]) -> Result<()> {
         }
     }
     Ok(())
-}
-
-/// Prepare derivations import content [`ContentDerivations`].
-///
-/// Function is used on the active side. It inputs information about network in
-/// which the derivations would be created (genesis hash and `Encryption`), and
-/// the plain text user derivations set.
-///
-/// Derivations allowed in the import set must be valid, with or without
-/// password. The derivations source file must have derivations as a list with
-/// each new derivation on the new line.
-///
-/// The source plain text is cut in lines and each line is processes using regex,
-/// all invalid derivations are ignored. Function prints found valid
-/// password-free derivations as is and passworded with only public part
-/// visible (e.g. `//alice///<password>`).
-#[cfg(feature = "active")]
-pub fn prepare_derivations_import(
-    encryption: &Encryption,
-    genesis_hash: H256,
-    content: &str,
-) -> Result<ContentDerivations> {
-    let mut derivations: Vec<String> = Vec::new();
-    let mut display_derivations: Vec<String> = Vec::new();
-    let content_set: Vec<&str> = content.trim().split('\n').collect();
-    for path in content_set.iter() {
-        if let Some(caps) = REG_PATH.captures(path) {
-            if let Some(p) = caps.name("path") {
-                derivations.push(path.to_string());
-                let display = {
-                    if caps.name("password").is_none() {
-                        p.as_str().to_string()
-                    } else {
-                        format!("{}///<password>", p.as_str())
-                    }
-                };
-                display_derivations.push(display);
-            }
-        }
-    }
-    if display_derivations.is_empty() {
-        return Err(Error::NoValidDerivationToExport);
-    } else {
-        println!(
-            "Found and used {} valid derivations:",
-            display_derivations.len()
-        );
-        for x in display_derivations.iter() {
-            println!("\"{}\"", x);
-        }
-    }
-    Ok(ContentDerivations::generate(
-        encryption,
-        genesis_hash,
-        &derivations,
-    ))
 }
 
 #[cfg(feature = "signer")]

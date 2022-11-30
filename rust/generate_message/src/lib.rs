@@ -126,56 +126,6 @@
 //! signature is produced, an unsigned or easily signed update must be loaded
 //! into Signer.
 //!
-//! # Derivations import
-//!
-//! Crate `generate_message` can generate derivations import for bulk import of
-//! derivations, either password-free or passworded.
-//!
-//! Derivations import has following structure:
-//!
-//! <table>
-//!     <tr>
-//!         <td>prelude</td>
-//!         <td>derivations import payload</td>
-//!     </tr>
-//! </table>
-//!
-//! Derivations imports are unsigned, and always have the same prelude,
-//! `53ffde`. The payload content is
-//! [`ContentDerivations`](definitions::qr_transfers::ContentDerivations) in
-//! `to_transfer` form.
-//!
-//! Derivations import data is assembled as `Vec<u8>` and could be transformed
-//! into:
-//!
-//! - `PNG` QR code, static or dynamic multiframe depending on the data size
-//! - hex-encoded string (for tests)
-//!
-//! Derivations imports are generated from user-provided derivations list and
-//! network information. User provides network address book title when
-//! generating the update, the update itself contains network genesis hash and
-//! [`Encryption`](definitions::crypto::Encryption).
-//!
-//! Only valid derivation are getting in the update. On generation the
-//! user-provided derivation list is searched for valid derivations: each line
-//! is a separate derivation, soft (`/`) and hard (`//`) derivations are
-//! allowed, with or without `///<password>` part, any incorrectly formatted
-//! derivations are skipped. `generate_message` prints the suitable derivations
-//! found: password-free as is, and passworded with `///<password>` instead of
-//! the real password.
-//!
-//! When the update is scanned into the Signer, only valid derivations are
-//! expected to be found in the derivations set, otherwise the Signer will
-//! produce an error. If derivations set gets accepted for a certain seed,
-//! Signer tries to create derived keys for all derivations.
-//!
-//! If a derivation produces exactly same public key with exactly same
-//! derivation path as already in the database or in the import, it get ignored
-//! causing no error. If a derivation produces same public key as already in the
-//! database or in the import, but with **different** derivation path, it causes
-//! an error and all derivations set gets rejected. Note that currently the
-//! checking happens only after the seed is already fed into the Signer.
-//!
 //! # Available commands
 //!
 //! ## Display content of the metadata `METATREE` tree of the hot database
@@ -1070,8 +1020,6 @@ use db_handling::{
     helpers::{prep_types, transfer_metadata_to_cold},
 };
 
-mod derivations;
-use derivations::process_derivations;
 pub mod fetch_metadata;
 pub mod helpers;
 use helpers::{debug_meta_at_block, generate_key_info_export_to_qr, generate_qr_code};
@@ -1114,7 +1062,6 @@ pub fn full_run(command: Command) -> Result<()> {
         Command::TransferMetaToColdRelease { cold_db, hot_db } => {
             Ok(transfer_metadata_to_cold(hot_db, cold_db)?)
         }
-        Command::Derivations(x) => process_derivations(x),
         Command::Unwasm {
             filename,
             update_db,

@@ -164,12 +164,6 @@ pub enum Command {
         hot_db: PathBuf,
     },
 
-    /// Make derivations import QR and/or hexadecimal string file
-    ///
-    /// Output file is in `/generate_message/` folder, file name would be
-    /// `derivations-<address_book_title>`.
-    Derivations(Derivations),
-
     /// Prepare payload for `load_metadata` update from `.wasm` file
     ///
     /// This command extracts metadata from `.wasm` file and uses this metadata to
