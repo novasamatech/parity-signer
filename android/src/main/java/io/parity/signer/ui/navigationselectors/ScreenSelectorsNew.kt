@@ -17,6 +17,7 @@ import io.parity.signer.screens.logs.LogsMenu
 import io.parity.signer.screens.logs.LogsScreen
 import io.parity.signer.screens.logs.toLogsScreenModel
 import io.parity.signer.screens.scan.ScanScreen
+import io.parity.signer.screens.settings.SettingsScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.ModalData
@@ -65,6 +66,16 @@ fun CombinedScreensSelector(
 					LogsScreen(
 						model = screenData.f.toLogsScreenModel(),
 						navigator = rootNavigator,
+					)
+				}
+			is ScreenData.Settings ->
+				Box(modifier = Modifier.statusBarsPadding()) {
+					SettingsScreen(
+						rootNavigator = rootNavigator,
+						isStrongBoxProtected = signerDataModel.isStrongBoxProtected(),
+						appVersion = signerDataModel.getAppVersion(),
+						wipeToFactory = signerDataModel::wipeToFactory,
+						alertState = alertState
 					)
 				}
 			is ScreenData.Scan, is ScreenData.Transaction ->
