@@ -79,7 +79,7 @@ fun CombinedScreensSelector(
 					)
 				}
 			is ScreenData.Scan, is ScreenData.Transaction ->
-				submitErrorState("Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph")
+				submitErrorState("Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData")
 
 			else -> {} //old Selector showing them
 		}

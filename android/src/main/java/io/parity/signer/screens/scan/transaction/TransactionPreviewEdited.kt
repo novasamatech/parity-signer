@@ -25,7 +25,7 @@ fun TransactionPreviewEdited(
 	transactions: List<MTransaction>,
 	onBack: Callback,
 	onFinish: Callback,
-	signTransaction: (comment: String, seedName: String) -> Unit
+	signTransaction: (comment: String, seedNames: List<String>) -> Unit
 ) {
 	Column(
 		Modifier.verticalScroll(rememberScrollState())
@@ -73,7 +73,6 @@ fun TransactionPreviewEdited(
 						signTransaction(
 							comment.value,
 							transactions.mapNotNull { it.authorInfo?.address?.seedName }
-								.joinToString(separator = "/n")
 						)
 					}
 				)
