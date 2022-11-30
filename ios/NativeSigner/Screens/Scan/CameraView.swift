@@ -152,6 +152,7 @@ struct CameraView: View {
                     return
                 }
                 // Dismissed by user
+                viewModel.clearTransactionState()
                 model.start()
             }
         ) {
