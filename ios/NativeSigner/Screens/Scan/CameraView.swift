@@ -260,8 +260,11 @@ extension CameraView {
             )
             // Handle transactions with just error payload
             guard case let .transaction(transactions) = actionResult.screenData else { return }
-            if let transaction = transactions.first, transactions.count == 1, transaction.isDisplayingErrorOnly {
-                presentableError = .transactionSigningError(message: transaction.transactionIssues())
+            if transactions.allSatisfy(\.isDisplayingErrorOnly) {
+                presentableError = .transactionSigningError(
+                    message: transactions
+                        .reduce("") { $0 + $1.transactionIssues() + ($1 == transactions.last ? "\n" : "") }
+                )
                 navigation.performFake(navigation: .init(action: .goBack))
                 isPresentingError = true
                 return
