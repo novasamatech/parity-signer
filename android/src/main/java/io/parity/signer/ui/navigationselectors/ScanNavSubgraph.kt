@@ -26,7 +26,7 @@ fun ScanNavSubgraph(
 	signerDataModel: SignerDataModel,
 	rootNavigator: Navigator,
 ) {
-	val scanViewModel : ScanViewModel = viewModel()
+	val scanViewModel: ScanViewModel = viewModel()
 	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
@@ -56,11 +56,11 @@ fun ScanNavSubgraph(
 						// todo multisign handle subsequent modals
 //						rust/navigator/src/navstate.rs:396
 //						val navResult = uniffiinteractor.ProcessBatchTransactions(some_all) and handle
-							//Modal::EnterPassword
+						//Modal::EnterPassword
 						//Modal::SignatureReady(a);
 						//Screen::Transaction( can come with updated checksum
 						//success will clear to log
-										 // alert error
+						// alert error
 					},
 					signTransaction = signerDataModel::signTransaction,
 				)

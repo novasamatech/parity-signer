@@ -48,6 +48,7 @@ fun ScanScreen(
 					val transactions = viewModel.getTransactionsFromPendingPayload()
 					if (transactions.isNotEmpty()) {
 						//scanned qr codes is signer transaction qr code
+						viewModel.resetPendingTransactions()
 						onNavigateToTransaction(transactions)
 					} else {
 						viewModel.resetPendingTransactions()

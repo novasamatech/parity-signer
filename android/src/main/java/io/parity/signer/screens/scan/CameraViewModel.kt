@@ -135,6 +135,7 @@ class CameraViewModel() : ViewModel() {
 
 	fun resetPendingTransactions() {
 		_pendingPayloads.value = emptySet()
+		resetScanValues()
 	}
 
 	sealed class CameraNavModel {
