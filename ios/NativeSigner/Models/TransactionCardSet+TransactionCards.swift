@@ -11,7 +11,6 @@ extension MTransaction {
     func sortedValueCards() -> [TransactionCard] {
         [
             content.author,
-            content.error,
             content.extensions,
             content.importingDerivations,
             content.message,
@@ -19,7 +18,6 @@ extension MTransaction {
             content.method,
             content.newSpecs,
             content.verifier,
-            content.warning,
             content.typesInfo
         ]
         .compactMap { $0 }
@@ -34,7 +32,42 @@ extension MTransaction {
         ]
         .compactMap { $0 }
         .flatMap { $0 }
+    }
+
+    func transactionIssues() -> String {
+        [
+            content.error,
+            content.warning
+        ]
+        .compactMap { $0 }
+        .flatMap { $0 }
         .sorted { $0.index < $1.index }
+        .compactMap {
+            if case let .errorCard(text) = $0.card {
+                return text
+            }
+            if case let .warningCard(text) = $0.card {
+                return text
+            }
+            return nil
+        }
+        .joined(separator: "\n")
+    }
+
+    var isDisplayingErrorOnly: Bool {
+        [
+            content.extensions,
+            content.importingDerivations,
+            content.message,
+            content.meta,
+            content.method,
+            content.newSpecs,
+            content.verifier,
+            content.typesInfo
+        ]
+        .compactMap { $0 }
+        .flatMap { $0 }
+        .isEmpty && !transactionIssuesCards().isEmpty
     }
 }
 

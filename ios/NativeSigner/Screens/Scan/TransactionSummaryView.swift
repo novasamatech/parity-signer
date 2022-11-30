@@ -38,6 +38,18 @@ struct TransactionSummaryView: View {
             }
             .contentShape(Rectangle())
             .onTapGesture { onTransactionDetailsTap() }
+            signature()
+        }
+        .padding(Spacing.medium)
+        .background(
+            RoundedRectangle(cornerRadius: CornerRadius.small)
+                .fill(Asset.fill6.swiftUIColor)
+        )
+    }
+
+    @ViewBuilder
+    func signature() -> some View {
+        if let signature = renderable.signature {
             Divider()
             VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                 Localizable.TransactionSign.Label.sign.text
@@ -45,15 +57,15 @@ struct TransactionSummaryView: View {
                     .font(Fontstyle.captionM.base)
                 HStack {
                     VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                        Text(renderable.signature.path)
+                        Text(signature.path)
                             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                             .font(Fontstyle.captionM.base)
-                        Text(renderable.signature.name)
+                        Text(signature.name)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             .font(Fontstyle.bodyM.base)
                         HStack {
                             Text(
-                                isShowingFullAddress ? renderable.signature.base58 : renderable.signature.base58
+                                isShowingFullAddress ? signature.base58 : signature.base58
                                     .truncateMiddle()
                             )
                             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
@@ -73,15 +85,12 @@ struct TransactionSummaryView: View {
                         }
                     }
                     Spacer()
-                    Identicon(identicon: renderable.signature.identicon, rowHeight: Heights.identiconInCell)
+                    Identicon(identicon: signature.identicon, rowHeight: Heights.identiconInCell)
                 }
             }
+        } else {
+            EmptyView()
         }
-        .padding(Spacing.medium)
-        .background(
-            RoundedRectangle(cornerRadius: CornerRadius.small)
-                .fill(Asset.fill6.swiftUIColor)
-        )
     }
 }
 

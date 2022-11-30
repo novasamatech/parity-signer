@@ -121,7 +121,7 @@ struct CameraView: View {
         .fullScreenCover(
             isPresented: $viewModel.isPresentingTransactionPreview,
             onDismiss: {
-                viewModel.isInTransactionProgress = false
+                viewModel.clearTransactionState()
                 model.multipleTransactions = []
                 model.start()
             }
@@ -142,6 +142,7 @@ struct CameraView: View {
 
                 // User forgot password
                 if viewModel.shouldPresentError {
+                    viewModel.presentableError = .signingForgotPassword()
                     viewModel.isPresentingError = true
                     return
                 }
@@ -167,13 +168,12 @@ struct CameraView: View {
         .fullScreenCover(
             isPresented: $viewModel.isPresentingError,
             onDismiss: {
-                viewModel.isInTransactionProgress = false
-                viewModel.enterPassword = nil
+                viewModel.clearTransactionState()
                 model.start()
             }
         ) {
             ErrorBottomModal(
-                viewModel: .signingForgotPassword(),
+                viewModel: viewModel.presentableError,
                 isShowingBottomAlert: $viewModel.isPresentingError
             )
             .clearModalBackground()
@@ -219,6 +219,7 @@ extension CameraView {
         @Published var isScanningMultiple: Bool = false
         @Published var header: String = Localizable.Scanner.Label.Scan.Main.header.string
         @Published var message: String = Localizable.Scanner.Label.Scan.Main.message.string
+
         // Modal presentation
         @Published var isPresentingTransactionPreview: Bool = false
         @Published var isPresentingEnterPassword: Bool = false
@@ -230,6 +231,7 @@ extension CameraView {
         @Published var transactions: [MTransaction] = []
         @Published var signature: MSignatureReady?
         @Published var enterPassword: MEnterPassword!
+        @Published var presentableError: ErrorBottomModalViewModel = .signingForgotPassword()
 
         @Binding var isPresented: Bool
         private weak var navigation: NavigationCoordinator!
@@ -256,7 +258,15 @@ extension CameraView {
                     details: payload
                 )
             )
+            // Handle transactions with just error payload
             guard case let .transaction(transactions) = actionResult.screenData else { return }
+            if let transaction = transactions.first, transactions.count == 1, transaction.isDisplayingErrorOnly {
+                presentableError = .transactionSigningError(message: transaction.transactionIssues())
+                navigation.performFake(navigation: .init(action: .goBack))
+                isPresentingError = true
+                return
+            }
+            // Handle rest of transactions with optional error payload, type is assumed based on first error
             let firstTransaction = transactions.first
             switch firstTransaction?.ttype {
             case .sign:
@@ -306,6 +316,12 @@ extension CameraView {
 
         func continueWithSignature() {
             isPresentingTransactionPreview = true
+        }
+
+        func clearTransactionState() {
+            signature = nil
+            enterPassword = nil
+            isInTransactionProgress = false
         }
     }
 }

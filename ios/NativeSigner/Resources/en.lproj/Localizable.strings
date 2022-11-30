@@ -400,6 +400,7 @@
 "TransactionSign.Label.Details.Destination" = "Dest";
 "TransactionSign.Label.Details.Value" = "Value";
 
+"TransactionSign.Error.Generic.Title" = "Error signing Transaction";
 "TransactionSign.Error.UnknownNetwork.Title" = "Please add the Network\nyou want to Transact in";
 "TransactionSign.Error.UnknownNetwork.Message" = "You're trying to sign a transaction in a network which has not been added to your Parity Signer.";
 "TransactionSign.Error.UnknownNetwork.Step1" = "Go to ";

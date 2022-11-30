@@ -159,4 +159,16 @@ struct ErrorBottomModalViewModel {
             secondaryAction: .init(label: Localizable.GenericErrorModal.Action.ok.key, action: action)
         )
     }
+
+    static func transactionSigningError(
+        message: String,
+        _ action: @escaping @autoclosure () -> Void = {}()
+    ) -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.TransactionSign.Error.Generic.title.string,
+            content: Localizable.GenericErrorModal.Label.messagePrefix.string,
+            details: message,
+            secondaryAction: .init(label: Localizable.GenericErrorModal.Action.ok.key, action: action)
+        )
+    }
 }

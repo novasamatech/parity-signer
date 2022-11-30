@@ -9,14 +9,14 @@ import SwiftUI
 
 struct RoundedContainerBackground: ViewModifier {
     var cornerRadius: CGFloat
-    var isTinted: Bool
+    var isError: Bool
 
     func body(content: Content) -> some View {
         content
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .foregroundColor(
-                        isTinted ? Asset.accentRed300.swiftUIColor.opacity(0.12) : Asset.fill6
+                        isError ? Asset.accentRed300.swiftUIColor.opacity(0.12) : Asset.fill6
                             .swiftUIColor
                     )
             )
@@ -24,7 +24,7 @@ struct RoundedContainerBackground: ViewModifier {
 }
 
 extension View {
-    func containerBackground(_ cornerRadius: CGFloat = CornerRadius.medium, isTinted: Bool = false) -> some View {
-        modifier(RoundedContainerBackground(cornerRadius: cornerRadius, isTinted: isTinted))
+    func containerBackground(_ cornerRadius: CGFloat = CornerRadius.medium, isError: Bool = false) -> some View {
+        modifier(RoundedContainerBackground(cornerRadius: cornerRadius, isError: isError))
     }
 }

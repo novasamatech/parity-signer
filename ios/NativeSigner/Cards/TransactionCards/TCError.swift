@@ -15,10 +15,10 @@ struct TCError: View {
             Text(text)
             Spacer()
         }
-        .foregroundColor(Asset.accentRed400.swiftUIColor)
+        .foregroundColor(Asset.accentRed300.swiftUIColor)
         .font(Fontstyle.bodyM.base)
         .padding(Spacing.small)
-        .containerBackground(isTinted: true)
+        .containerBackground(isError: true)
     }
 }
 

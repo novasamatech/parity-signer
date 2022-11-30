@@ -54,9 +54,12 @@ struct TransactionPreview: View {
 
     @ViewBuilder
     func singleTransaction(content: MTransaction) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: Spacing.medium) {
+            TransactionErrorsView(content: content)
+                .padding(.horizontal, Spacing.medium)
             switch content.ttype {
-            case .sign:
+            case .sign,
+                 .read:
                 // Rounded corner summary card
                 TransactionSummaryView(
                     renderable: .init(content),
@@ -65,7 +68,7 @@ struct TransactionPreview: View {
                     }
                 )
                 .padding(.horizontal, Spacing.medium)
-            // Used when new network is being added
+            // Used when new netwoxrk is being added
             // User when network metadata is being added
             // Cards are redesigned to present new design
             case .stub:
@@ -74,15 +77,15 @@ struct TransactionPreview: View {
                         TransactionCardView(card: card)
                     }
                 }
-                .padding(.horizontal, Spacing.medium)
-                EmptyView()
-            default:
+                .padding(Spacing.medium)
+            case .done,
+                 .importDerivations:
                 VStack {
                     ForEach(content.sortedValueCards(), id: \.index) { card in
                         TransactionCardView(card: card)
                     }
                 }
-                .padding(.horizontal, Spacing.medium)
+                .padding(Spacing.medium)
             }
         }
     }

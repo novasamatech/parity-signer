@@ -13,7 +13,7 @@ struct TransactionDetailsView: View {
     @EnvironmentObject private var data: SignerDataModel
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             NavigationBarView(
                 viewModel: .init(title: Localizable.TransactionPreview.Label.title.string, leftButton: .xmark),
                 actionModel: .init(
@@ -23,13 +23,14 @@ struct TransactionDetailsView: View {
             )
             ScrollView {
                 VStack {
+                    TransactionErrorsView(content: viewModel.transaction)
+                        .padding(.bottom, Spacing.small)
                     ForEach(viewModel.transaction.sortedValueCards(), id: \.index) { card in
                         TransactionCardView(card: card)
                     }
                 }
                 .padding(.horizontal, Spacing.large)
             }
-            .padding(.top, Spacing.medium)
         }
         .onAppear {
             viewModel.use(navigation: navigation)

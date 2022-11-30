@@ -36,12 +36,16 @@ extension TransactionPreviewRenderable {
             destination: destination,
             value: value
         )
-        signature = .init(
-            path: transaction.authorInfo?.address.path ?? "",
-            name: transaction.authorInfo?.address.seedName ?? "",
-            base58: transaction.authorInfo?.base58 ?? "",
-            identicon: transaction.authorInfo?.address.identicon ?? []
-        )
+        if let author = transaction.authorInfo {
+            signature = .init(
+                path: author.address.path,
+                name: author.address.seedName,
+                base58: author.base58,
+                identicon: author.address.identicon
+            )
+        } else {
+            signature = nil
+        }
     }
 }
 
@@ -53,7 +57,7 @@ struct TransactionDetailsRow: Equatable, Identifiable {
 
 struct TransactionPreviewRenderable: Equatable {
     let summary: TransactionSummaryModel
-    let signature: TransactionSignatureRenderable
+    let signature: TransactionSignatureRenderable?
 }
 
 struct TransactionSummaryModel: Equatable {
