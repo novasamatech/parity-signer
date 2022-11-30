@@ -30,11 +30,6 @@ struct ModalSelector: View {
                 content: value,
                 createAddress: createAddress
             )
-        case let .signatureReady(value):
-            SignatureReady(
-                content: value,
-                navigationRequest: navigationRequest
-            )
         case let .logRight(value):
             LogMenu(
                 content: value,
@@ -79,6 +74,7 @@ struct ModalSelector: View {
             .keyDetailsAction,
             .newSeedMenu,
             .seedMenu,
+            .signatureReady,
             nil:
             EmptyView()
         }
