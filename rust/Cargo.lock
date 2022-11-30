@@ -4125,6 +4125,7 @@ dependencies = [
  "sled",
  "sp-core",
  "sp-runtime",
+ "tempfile",
  "thiserror",
  "transaction_parsing",
  "zeroize",
