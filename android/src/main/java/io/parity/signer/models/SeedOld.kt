@@ -34,7 +34,7 @@ fun SignerDataModel.addSeed(
 ) {
 
 	// Check if seed name already exists
-	if (seedNames.value?.contains(seedName) as Boolean) {
+	if (seedNames.value.contains(seedName)) {
 		return
 	}
 

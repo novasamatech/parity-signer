@@ -44,9 +44,7 @@ fun KeySetExportResultBottomSheet(
 			),
 			onCloseClicked = onClose
 		)
-		val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
-		val plateShape =
-			RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
+		val plateShape = RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 		//scrollable part
 		Column(
 			modifier = Modifier
