@@ -95,9 +95,7 @@ fun SnackBarCircularCountDownTimer(
 		submitErrorState("timer started with wrong value $timeoutSeconds")
 	}
 
-	val innerRoun = dimensionResource(id = R.dimen.innerFramesCornerRadius)
-	val innerShape =
-		RoundedCornerShape(innerRoun, innerRoun, innerRoun, innerRoun)
+	val innerShape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 
 	var timeLeft by remember { mutableStateOf<Int>(timeoutSeconds) }
 	Row(

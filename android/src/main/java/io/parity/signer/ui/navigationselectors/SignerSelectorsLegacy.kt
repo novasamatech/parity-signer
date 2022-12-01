@@ -53,11 +53,7 @@ fun ScreenSelector(
 			screenData.f,
 			button2
 		)
-		is ScreenData.NewSeed -> NewSeedScreen(
-			screenData.f,
-			signerDataModel::navigate,
-			seedNames.value
-		)
+		is ScreenData.NewSeed -> {} // new selector
 		is ScreenData.RecoverSeedName -> RecoverSeedName(
 			screenData.f,
 			signerDataModel::navigate,
@@ -137,10 +133,7 @@ fun ModalSelector(
 				modalData.f,
 				signerDataModel = signerDataModel
 			)
-			is ModalData.NewSeedBackup -> NewSeedBackup(
-				modalData.f,
-				signerDataModel = signerDataModel
-			)
+			is ModalData.NewSeedBackup -> {}//moved to new selector
 			is ModalData.LogComment -> {} //moved to new sheet
 			is ModalData.SelectSeed -> {
 				SelectSeed(modalData.f, signerDataModel = signerDataModel)

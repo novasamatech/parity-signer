@@ -52,12 +52,11 @@ fun KeyDetailsPublicKeyScreen(
 			Column(
 				modifier = Modifier.verticalScroll(rememberScrollState())
 			) {
-				val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
 				val plateShape =
-					RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
+					RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 				Column(
 					modifier = Modifier
-						.padding(start = 24.dp, end = 24.dp, top = 50.dp, bottom = 8.dp )
+						.padding(start = 24.dp, end = 24.dp, top = 50.dp, bottom = 8.dp)
 						.clip(plateShape)
 						.border(
 							BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
@@ -71,7 +70,7 @@ fun KeyDetailsPublicKeyScreen(
 							.aspectRatio(1.1f)
 							.background(
 								Color.White,
-								RoundedCornerShape(qrRounding)
+								plateShape
 							),
 						contentAlignment = Alignment.Center,
 					) {

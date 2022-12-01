@@ -7,6 +7,7 @@
 	<string name="remove_key_set_confirm_text">This Key Set will be removed for all networks. This cannot be reversed.  Are you sure you wish to proceed?</string>
 	<string name="remove_key_set_confirm_cta">Remove</string>
 	<string name="generic_cancel">Cancel</string>
+	<string name="generic_done">Done</string>
 	<string name="export_private_key_confirm_title">Export Private Key</string>
 	<string name="export_private_key_confirm_text">A private key can be used to sign transactions. This key will be marked as a hot key after export.</string>
 	<string name="export_private_key_confirm_cta">Export Private Key</string>
@@ -99,6 +100,12 @@
 	<string name="subtitle_derived_keys">Derived Keys</string>
 	<string name="seed_backup_autohide_title">Backup info will be hidden in</string>
 	<string name="unlock_app_button">Unlock app</string>
+	<string name="add_key_set_menu_title">Add Key Set</string>
+	<string name="add_key_set_menu_add">Add new Key Set</string>
+	<string name="add_key_set_menu_recover">Recover Key Set</string>
+    <string name="new_key_set_title">Key Set Name</string>
+	<string name="new_key_set_subtitle">Enter a name that will help you identify this key set</string>
+	<string name="new_key_set_description">Name examples: Main account, My validator, Dotsama crowdloans, etc</string>
 	<string name="description_multisign_mode">multi sign mode</string>
 	<string name="description_camera_tourch_enable">camera tourch button</string>
 	<string name="screen_title_update_metadata">Update metadata</string>
@@ -133,4 +140,13 @@
 	<string name="settings_wipe_data">Wipe all Data</string>
 	<string name="settings_hardware_key">Hardware seed protection: %1$s</string>
 	<string name="settings_version">Signer version: %1$s</string>
+    <string name="button_next">Next</string>
+	<string name="new_key_set_backup_title">Recovery Phrase</string>
+	<string name="new_key_set_backup_subtitle">Write down your Secret Recovery Phrase</string>
+	<string name="new_key_set_backup_warning_message">Write it down on a paper and keep  it in a safe place. </string>
+	<string name="new_key_set_backup_cta">Create Key Set</string>
+	<string name="new_key_set_backup_bottomsheet_title">Please confirm that you have you written down your secret recovery phrase</string>
+	<string name="new_key_set_backup_bottomsheet_checkbox_written">I’ve written down my secret recovery phrase</string>
+	<string name="new_key_set_backup_bottomsheet_checkbox_keep_careful">I understand that if I lose my secret phrase, my funds will be lost forever</string>
+
 </resources>
