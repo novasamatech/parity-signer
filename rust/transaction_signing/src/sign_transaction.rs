@@ -81,12 +81,12 @@ pub fn create_signature<P: AsRef<Path>>(
 
     // For larger transactions, their hash should be signed instead; this is not implemented
     // upstream so we put it here
-    let content_vec = {
-        if content_vec.len() > 257 {
-            blake2_256(&content_vec).to_vec()
-        } else {
-            content_vec
-        }
+    let content_vec = match &content {
+        SignContent::Transaction {
+            method: _,
+            extensions: _,
+        } if content_vec.len() > 257 => blake2_256(&content_vec).to_vec(),
+        _ => content_vec,
     };
     let mut full_address = seed_phrase.to_owned() + &sign.signing_bulk[idx].path();
     let signature = match sign_as_address_key(
@@ -146,4 +146,54 @@ pub fn create_signature_png(
     )?;
     let qr_data = png_qr_from_string(&signature.to_string(), DataType::Regular)?;
     Ok(qr_data)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use constants::ALICE_SEED_PHRASE;
+    use db_handling::cold_default::populate_cold;
+    use definitions::navigation::TransactionAction;
+    use definitions::network_specs::Verifier;
+    use sp_core::crypto::AccountId32;
+
+    use sp_runtime::traits::Verify;
+    use tempfile::tempdir;
+    use transaction_parsing::produce_output;
+
+    #[test]
+    fn sign_long_msg() {
+        let tmp_dir = tempdir().unwrap();
+        populate_cold(tmp_dir.path(), Verifier { v: None }).unwrap();
+        let message = format!("<Bytes>{}bbb</Bytes>", "a".repeat(256));
+        let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", hex::encode(&message));
+        let output = produce_output(&line, tmp_dir.path());
+        let public = sp_core::sr25519::Public::try_from(
+            hex::decode("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")
+                .unwrap()
+                .as_ref(),
+        )
+        .unwrap();
+        if let TransactionAction::Sign {
+            actions: _,
+            checksum,
+        } = output
+        {
+            let signature = create_signature(
+                ALICE_SEED_PHRASE,
+                "",
+                "",
+                tmp_dir.path(),
+                checksum,
+                0,
+                Encryption::Sr25519,
+            )
+            .unwrap();
+            assert!(signature
+                .signature
+                .verify(message.as_bytes(), &AccountId32::new(public.0)));
+        } else {
+            panic!("Wrong action: {:?}", output)
+        }
+    }
 }
