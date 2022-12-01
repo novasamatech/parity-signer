@@ -165,8 +165,8 @@ mod tests {
     fn sign_long_msg() {
         let tmp_dir = tempdir().unwrap();
         populate_cold(tmp_dir.path(), Verifier { v: None }).unwrap();
-        let message = b"<Bytes>baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbb</Bytes>";
-        let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", hex::encode(message));
+        let message = format!("<Bytes>{}bbb</Bytes>", "a".repeat(256));
+        let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", hex::encode(&message));
         let output = produce_output(&line, tmp_dir.path());
         let public = sp_core::sr25519::Public::try_from(
             hex::decode("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")
@@ -191,7 +191,7 @@ mod tests {
             .unwrap();
             assert!(signature
                 .signature
-                .verify(&message[..], &AccountId32::new(public.0)));
+                .verify(message.as_bytes(), &AccountId32::new(public.0)));
         } else {
             panic!("Wrong action: {:?}", output)
         }
