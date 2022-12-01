@@ -22,16 +22,23 @@ import io.parity.signer.ui.theme.fill18
 @Composable
 fun CloseIcon(
 	modifier: Modifier = Modifier,
+	noBackground: Boolean = false,
 	onCloseClicked: Callback
 ) {
 	Box(
 		modifier = modifier
 			.size(32.dp)
 			.clickable(onClick = onCloseClicked)
-			.background(
-				MaterialTheme.colors.fill18,
-				CircleShape
-			),
+			.run {
+				if (noBackground) {
+					this
+				} else {
+					background(
+						MaterialTheme.colors.fill18,
+						CircleShape
+					)
+				}
+			},
 		contentAlignment = Alignment.Center,
 	) {
 		Image(
