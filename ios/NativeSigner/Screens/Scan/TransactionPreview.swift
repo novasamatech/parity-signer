@@ -68,7 +68,7 @@ struct TransactionPreview: View {
                     }
                 )
                 .padding(.horizontal, Spacing.medium)
-            // Used when new netwoxrk is being added
+            // Used when new network is being added
             // User when network metadata is being added
             // Cards are redesigned to present new design
             case .stub:
@@ -189,7 +189,7 @@ struct TransactionPreview: View {
                     }
                 }
                 .padding(transactionsCount > 1 ? Spacing.medium : 0)
-                .strokeContainerBackground()
+                .containerBackground()
             }
             .padding(.horizontal, Spacing.medium)
             .padding(.top, Spacing.large)
@@ -297,6 +297,6 @@ struct TransactionPreview_Previews: PreviewProvider {
         ))
         .environmentObject(NavigationCoordinator())
         .environmentObject(SignerDataModel())
-        .preferredColorScheme(.dark)
+//        .preferredColorScheme(.dark)
     }
 }

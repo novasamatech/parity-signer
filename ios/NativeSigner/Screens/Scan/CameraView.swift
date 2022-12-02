@@ -47,13 +47,14 @@ struct CameraView: View {
                                 icon: Asset.xmarkButton.swiftUIImage
                             )
                             Spacer()
-                            CameraButton(
-                                action: {
-                                    viewModel.onScanMultipleTap(model: model)
-                                },
-                                icon: Asset.scanMultiple.swiftUIImage,
-                                isPressed: $viewModel.isScanningMultiple
-                            )
+                            // Disabled multi-batch mode
+//                            CameraButton(
+//                                action: {
+//                                    viewModel.onScanMultipleTap(model: model)
+//                                },
+//                                icon: Asset.scanMultiple.swiftUIImage,
+//                                isPressed: $viewModel.isScanningMultiple
+//                            )
                             CameraButton(
                                 action: { model.toggleTorch() },
                                 icon: Asset.torchOff.swiftUIImage,
@@ -261,6 +262,7 @@ extension CameraView {
             )
             // Handle transactions with just error payload
             guard case let .transaction(transactions) = actionResult.screenData else { return }
+            print(transactions.first)
             if transactions.allSatisfy(\.isDisplayingErrorOnly) {
                 presentableError = .transactionSigningError(
                     message: transactions

@@ -39,7 +39,8 @@ struct EnterPasswordModal: View {
                     Spacer()
                     CapsuleButton(
                         action: viewModel.onDoneTap,
-                        title: Localizable.Transaction.EnterPassword.Action.done.string
+                        title: Localizable.Transaction.EnterPassword.Action.done.string,
+                        isDisabled: $viewModel.isActionDisabled
                     )
                 }
                 .padding(.top, -Spacing.extraSmall)
@@ -125,7 +126,9 @@ extension EnterPasswordModal {
         @Binding var signature: MSignatureReady?
 
         @Published var password: String = ""
+        @Published var isActionDisabled: Bool = true
         @Published var isValid: Bool = true
+        private var cancelBag = CancelBag()
 
         init(
             isPresented: Binding<Bool>,
@@ -137,6 +140,7 @@ extension EnterPasswordModal {
             _isErrorPresented = isErrorPresented
             _dataModel = dataModel
             _signature = signature
+            subscribeToUpdates()
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -177,6 +181,13 @@ extension EnterPasswordModal {
                 // Fake navigation to camera, as were brought back to `Log` screen on navstate error handling
                 navigation.performFake(navigation: .init(action: .navbarScan))
             }
+        }
+
+        private func subscribeToUpdates() {
+            $password.sink { newValue in
+                self.isActionDisabled = newValue.isEmpty
+            }
+            .store(in: cancelBag)
         }
     }
 }

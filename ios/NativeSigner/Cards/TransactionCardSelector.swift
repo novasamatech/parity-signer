@@ -13,8 +13,6 @@ struct TransactionCardSelector: View {
         HStack {
             switch card.card {
             // Author cards with identicon and variable description
-            case let .authorCard(author): // Not present on new designs
-                TCAuthor(author: author)
             case let .authorPlainCard(value): // Not present on new designs
                 TCAuthorPlain(value: value)
             case let .authorPublicKeyCard(value): // Not present on new designs
@@ -62,12 +60,14 @@ struct TransactionCardSelector: View {
                 TCText(text: text)
 
             // Simple values - redesigned
+            case let .authorCard(author):
+                TCNamedValueCard(name: Localizable.TCName.from.string, value: author.base58, valueInSameLine: false)
             case let .balanceCard(value):
                 TCNamedValueCard(value: [value.amount, value.units].joined(separator: " "))
             case let .bitVecCard(text):
                 TCNamedValueCard(name: Localizable.TCName.bitVec.string, value: text)
             case let .blockHashCard(text):
-                TCNamedValueCard(name: Localizable.TCName.blockHash.string, value: text)
+                TCNamedValueCard(name: Localizable.TCName.blockHash.string, value: text, valueInSameLine: false)
             case let .defaultCard(text):
                 TCNamedValueCard(value: text)
             case .eraImmortalCard:

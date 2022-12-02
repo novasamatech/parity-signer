@@ -33,6 +33,7 @@ enum Heights {
     static let progressSnackbarHeight: CGFloat = 96
     static let bottomBarHeight: CGFloat = 56
     static let capsuleButton: CGFloat = 40
+    static let minTransactionCardHeight: CGFloat = 24
 }
 
 enum Sizes {

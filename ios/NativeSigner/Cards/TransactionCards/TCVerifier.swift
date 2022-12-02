@@ -40,6 +40,7 @@ struct TCVerifier: View {
             }
             .background(Asset.fill6.swiftUIColor)
             .cornerRadius(CornerRadius.medium)
+            .padding(.bottom, Spacing.extraSmall)
         }
     }
 }

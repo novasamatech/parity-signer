@@ -202,7 +202,7 @@
 "TCName.Tip" = "Tip";
 "TCName.GenesisHash" = "Genesis hash";
 "TCName.Version" = "Version";
-"TCName.TxVersion" = "Tx version";
+"TCName.TxVersion" = "TX version";
 "TCName.TxVersion.uppercased" = "TX version";
 
 "TCName.NetworkName" = "Network name";
@@ -210,8 +210,8 @@
 "TCName.From" = "From";
 "TCName.IdentityField" = "IdentityField";
 "TCName.BlockHash" = "Block hash";
-"TCName.Phase" = "phase";
-"TCName.Period" = "period";
+"TCName.Phase" = "Phase";
+"TCName.Period" = "Period";
 "TCField.Path" = "Path: %@";
 "TCAuthor.SignedWith" = "Signed with %@";
 
@@ -384,6 +384,14 @@
 
 "Transaction.AddNetwork.Label.Header" = "New Network";
 "Transaction.AddNetwork.Label.GenesisHash" = "Genesis hash";
+"Transaction.AddNetwork.Label.Name" = "Network name";
+"Transaction.AddNetwork.Label.basePrefix" = "base58 prefix";
+"Transaction.AddNetwork.Label.Decimals" = "Decimals";
+"Transaction.AddNetwork.Label.Unit" = "Unit";
+"Transaction.AddNetwork.Label.Crypto" = "Crypto";
+"Transaction.AddNetwork.Label.Spec" = "Spec name";
+"Transaction.AddNetwork.Label.Logo" = "Logo";
+"Transaction.AddNetwork.Label.Path" = "Default path";
 
 "TransactionSign.Label.Details" = "Transaction Details";
 "TransactionSign.Label.Header.Single" = "Sign Transaction";

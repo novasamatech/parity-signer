@@ -27,7 +27,7 @@ struct TransactionSummaryView: View {
                                 Text(row.value)
                                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             }
-                            .font(Fontstyle.captionM.base)
+                            .font(Fontstyle.bodyM.base)
                         }
                     }
                     Spacer()
@@ -55,6 +55,7 @@ struct TransactionSummaryView: View {
                 Localizable.TransactionSign.Label.sign.text
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                     .font(Fontstyle.captionM.base)
+                    .padding(.top, Spacing.extraSmall)
                 HStack {
                     VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                         Text(signature.path)

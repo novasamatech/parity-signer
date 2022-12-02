@@ -10,33 +10,61 @@ import SwiftUI
 struct TCNamedValueCard: View {
     let name: String?
     let value: String?
+    let valueInSameLine: Bool
 
     init(
         name: String? = nil,
-        value: String? = nil
+        value: String? = nil,
+        valueInSameLine: Bool = true
     ) {
         self.name = name
         self.value = value
+        self.valueInSameLine = valueInSameLine
     }
 
     var body: some View {
-        HStack {
-            if let name = name {
-                Text(name)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+        if valueInSameLine {
+            HStack(alignment: .top, spacing: Spacing.extraSmall) {
+                if let name = name {
+                    Text(name)
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                }
+                if let value = value {
+                    Text(value)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                }
+                Spacer()
             }
-            if let value = value {
-                Text(value)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+            .font(Fontstyle.bodyL.base)
+            .frame(minHeight: Heights.minTransactionCardHeight)
+        } else {
+            VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
+                if let name = name {
+                    Text(name)
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                }
+                if let value = value {
+                    Text(value)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                }
+                HStack {
+                    Spacer()
+                }
             }
-            Spacer()
+            .font(Fontstyle.bodyL.base)
+            .frame(minHeight: Heights.minTransactionCardHeight)
         }
-        .font(Fontstyle.bodyL.base)
     }
 }
 
 struct TCNamedValueCard_Previews: PreviewProvider {
     static var previews: some View {
+        TCNamedValueCard(name: "Name", value: "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq")
         TCNamedValueCard(name: "Name", value: "value")
+        TCNamedValueCard(
+            name: "Name",
+            value: "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
+            valueInSameLine: false
+        )
     }
 }

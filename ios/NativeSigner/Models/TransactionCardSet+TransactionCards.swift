@@ -91,3 +91,13 @@ extension TransactionCardSet {
         .sorted { $0.index < $1.index }
     }
 }
+
+extension MTransaction {
+    enum TransactionPreviewType {
+        case addNetwork
+        case metadata
+        case transfer
+        case utility
+        case multisig
+    }
+}

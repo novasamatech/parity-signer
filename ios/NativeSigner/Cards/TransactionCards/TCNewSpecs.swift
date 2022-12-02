@@ -15,13 +15,13 @@ struct TCAddNewNetwork: View {
                 .font(Fontstyle.bodyL.base)
                 .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                 .padding(.leading, Spacing.medium)
-                .padding(.bottom, Spacing.extraExtraSmall)
+                .padding(.bottom, Spacing.extraSmall)
             VStack {
                 VStack(alignment: .leading, spacing: Spacing.small) {
-                    rowWrapper(value.title)
-                    rowWrapper(String(value.base58prefix))
-                    rowWrapper(String(value.decimals))
-                    rowWrapper(value.unit)
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.name.string, value.title)
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.basePrefix.string, String(value.base58prefix))
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.decimals.string, String(value.decimals))
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.unit.string, value.unit)
                     VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                         Localizable.Transaction.AddNetwork.Label.genesisHash.text
                             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
@@ -29,15 +29,18 @@ struct TCAddNewNetwork: View {
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         Divider()
                     }
-                    rowWrapper(value.encryption.rawValue)
-                    rowWrapper(value.name)
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.crypto.string, value.encryption.rawValue)
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.spec.string, value.name)
                     HStack {
+                        Text(Localizable.Transaction.AddNetwork.Label.logo.string)
+                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        Spacer()
                         Text(value.logo)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             .font(Fontstyle.header4.web3)
                     }
                     Divider()
-                    rowWrapper(value.pathId, isLast: true)
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.path.string, value.pathId, isLast: true)
                 }
                 .padding(Spacing.medium)
             }
@@ -47,11 +50,17 @@ struct TCAddNewNetwork: View {
     }
 
     @ViewBuilder
-    private func rowWrapper(_ value: String, isLast: Bool = false) -> some View {
+    private func rowWrapper(
+        _ key: String,
+        _ value: String,
+        isLast: Bool = false
+    ) -> some View {
         HStack {
+            Text(key)
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            Spacer()
             Text(value)
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-            Spacer()
         }
         if !isLast {
             Divider()
@@ -69,7 +78,7 @@ struct TCAddNewNetwork_Previews: PreviewProvider {
                 encryption: .sr25519,
                 genesisHash: H256(repeating: 3, count: 4),
                 logo: "polkadot",
-                name: "Polkadot",
+                name: "polkadot",
                 pathId: "1",
                 secondaryColor: "pink",
                 title: "Polka",

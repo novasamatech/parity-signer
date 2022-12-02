@@ -12,6 +12,7 @@ struct TransactionCardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
             TransactionCardSelector(card: card)
+                .frame(minHeight: Heights.minTransactionCardHeight)
         }
         .padding(.leading, CGFloat(card.indent) * Spacing.extraSmall)
         .onAppear {

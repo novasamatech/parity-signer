@@ -80,12 +80,15 @@ struct AnimatedQRCodeView: View {
                     start()
                 }
         }
-//        .frame(maxWidth: .infinity, alignment: .center)
         .padding(
             UIScreen.main.bounds.width == Constants.compactDeviceWidth ? Spacing.large : Spacing.x3Large
         )
-        .background(Asset.backgroundSystemLightOnly.swiftUIColor)
-        .cornerRadius(CornerRadius.medium)
+        .background(
+            RoundedRectangle(cornerRadius: CornerRadius.medium)
+                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
+                .background(Asset.backgroundSystemLightOnly.swiftUIColor)
+                .cornerRadius(CornerRadius.medium)
+        )
     }
 
     private func stop() {
