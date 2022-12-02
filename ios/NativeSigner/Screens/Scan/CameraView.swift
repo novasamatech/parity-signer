@@ -122,9 +122,9 @@ struct CameraView: View {
         .fullScreenCover(
             isPresented: $viewModel.isPresentingTransactionPreview,
             onDismiss: {
-                viewModel.clearTransactionState()
                 model.multipleTransactions = []
                 model.start()
+                viewModel.clearTransactionState()
             }
         ) {
             TransactionPreview(
@@ -153,8 +153,9 @@ struct CameraView: View {
                     return
                 }
                 // Dismissed by user
-                viewModel.clearTransactionState()
+                model.payload = nil
                 model.start()
+                viewModel.clearTransactionState()
             }
         ) {
             EnterPasswordModal(
@@ -170,8 +171,9 @@ struct CameraView: View {
         .fullScreenCover(
             isPresented: $viewModel.isPresentingError,
             onDismiss: {
-                viewModel.clearTransactionState()
+                model.payload = nil
                 model.start()
+                viewModel.clearTransactionState()
             }
         ) {
             ErrorBottomModal(
@@ -324,6 +326,7 @@ extension CameraView {
         }
 
         func clearTransactionState() {
+            transactions = []
             signature = nil
             enterPassword = nil
             isPresentingError = false

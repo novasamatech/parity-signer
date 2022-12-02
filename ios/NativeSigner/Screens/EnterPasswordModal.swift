@@ -163,6 +163,11 @@ extension EnterPasswordModal {
             let actionResult = navigation.performFake(navigation: .init(action: .goForward, details: password))
             // If navigation returned `enterPassword`, it means password is invalid
             if case let .enterPassword(value) = actionResult.modalData {
+                if value.counter > 3 {
+                    navigation.performFake(navigation: .init(action: .goBack))
+                    proceedtoErrorState()
+                    return
+                }
                 dataModel = value
                 isValid = false
             }
@@ -175,12 +180,16 @@ extension EnterPasswordModal {
             }
             // If we got `Log`, we need to hide password modal, "navigate" to camera view and present
             if case .log = actionResult.screenData {
-                // Inform parent camera view to present error for too many failed attempts at password
-                isPresented = false
-                isErrorPresented = true
-                // Fake navigation to camera, as were brought back to `Log` screen on navstate error handling
-                navigation.performFake(navigation: .init(action: .navbarScan))
+                proceedtoErrorState()
             }
+        }
+
+        private func proceedtoErrorState() {
+            // Inform parent camera view to present error for too many failed attempts at password
+            isPresented = false
+            isErrorPresented = true
+            // Fake navigation to camera, as were brought back to `Log` screen on navstate error handling
+            navigation.performFake(navigation: .init(action: .navbarScan))
         }
 
         private func subscribeToUpdates() {

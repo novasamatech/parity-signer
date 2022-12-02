@@ -38,7 +38,7 @@ extension TransactionPreviewRenderable {
         )
         if let author = transaction.authorInfo {
             signature = .init(
-                path: author.address.path,
+                path: author.address.displayablePath,
                 name: author.address.seedName,
                 base58: author.base58,
                 identicon: author.address.identicon
