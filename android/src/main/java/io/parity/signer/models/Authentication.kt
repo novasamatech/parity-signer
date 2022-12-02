@@ -229,14 +229,13 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 				}
 			}
 		}
-
-	sealed class AuthResult {
-		object AuthSuccess : AuthResult()
-		object AuthError : AuthResult()
-		object AuthFailed : AuthResult()
-		object AuthUnavailable : AuthResult()
-	}
 }
 
+sealed class AuthResult {
+	object AuthSuccess : AuthResult()
+	object AuthError : AuthResult()
+	object AuthFailed : AuthResult()
+	object AuthUnavailable : AuthResult()
+}
 
 

@@ -8,14 +8,18 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import io.parity.signer.components.*
 import io.parity.signer.models.Callback
+import io.parity.signer.models.SignResult
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.uniffi.MTransaction
+import io.parity.signer.uniffi.ScreenData
 import io.parity.signer.uniffi.TransactionType
+import kotlinx.coroutines.launch
 
 /**
  * Old UI screen edited to work on new screens
@@ -26,7 +30,7 @@ fun TransactionPreviewEdited(
 	onBack: Callback,
 	onFinish: Callback,
 	onSuccess: (List<MTransaction>) -> Unit,
-	signTransaction: (comment: String, seedNames: List<String>) -> Unit
+	signTransaction: suspend (comment: String, seedNames: List<String>) -> SignResult
 ) {
 	Column(
 		Modifier.verticalScroll(rememberScrollState())
@@ -54,8 +58,7 @@ fun TransactionPreviewEdited(
 					color = MaterialTheme.colors.Text400
 				)
 
-				SingleTextInput(
-					content = comment,
+				SingleTextInput(content = comment,
 					update = { comment.value = it },
 					onDone = { },
 					focusManager = focusManager,
@@ -67,49 +70,44 @@ fun TransactionPreviewEdited(
 					style = MaterialTheme.typography.subtitle1,
 					color = MaterialTheme.colors.Text400
 				)
-
-				BigButton(
-					text = "Unlock key and sign",
-					action = {
-						signTransaction(
-							comment.value,
-							transactions.mapNotNull { it.authorInfo?.address?.seedName }
-						)
+				val scope = rememberCoroutineScope()
+				BigButton(text = "Unlock key and sign", action = {
+					scope.launch {
+						val result = signTransaction(comment.value,
+							transactions.mapNotNull { it.authorInfo?.address?.seedName })
+						//todo dmitry handle non happy cases as well and probably in viewmodel not here
+						if (result is SignResult.Success) {
+							(result.navResult.screenData as? ScreenData.Transaction)?.f?.let {
+									transactions ->
+								onSuccess(transactions)
+							}
+						}
 					}
-				)
+				})
 				BigButton(
-					text = "Decline",
-					action = onBack
+					text = "Decline", action = onBack
 				)
 			}
-			TransactionType.DONE ->
-				BigButton(
-					text = "Done",
-					action = onBack
-				)
+			TransactionType.DONE -> BigButton(
+				text = "Done", action = onBack
+			)
 			TransactionType.STUB -> {
 				BigButton(
-					text = "Approve",
-					action = onFinish
+					text = "Approve", action = onFinish
 				)
 				BigButton(
-					text = "Decline",
-					action = onBack
+					text = "Decline", action = onBack
 				)
 			}
-			TransactionType.READ ->
-				BigButton(
-					text = "Back",
-					action = onBack
-				)
+			TransactionType.READ -> BigButton(
+				text = "Back", action = onBack
+			)
 			TransactionType.IMPORT_DERIVATIONS -> {
 				BigButton(
-					text = "Select seed",
-					action = onFinish
+					text = "Select seed", action = onFinish
 				)
 				BigButton(
-					text = "Decline",
-					action = onBack
+					text = "Decline", action = onBack
 				)
 			}
 		}
