@@ -25,6 +25,7 @@ fun TransactionPreviewEdited(
 	transactions: List<MTransaction>,
 	onBack: Callback,
 	onFinish: Callback,
+	onSuccess: (List<MTransaction>) -> Unit,
 	signTransaction: (comment: String, seedNames: List<String>) -> Unit
 ) {
 	Column(

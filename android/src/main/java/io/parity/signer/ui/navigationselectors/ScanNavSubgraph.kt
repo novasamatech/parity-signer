@@ -3,6 +3,7 @@ package io.parity.signer.ui.navigationselectors
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -36,23 +37,29 @@ fun ScanNavSubgraph(
 		composable(ScanNavSubgraph.camera) {
 			ScanScreen(
 				onClose = { rootNavigator.backAction() },
-				onNavigateToTransaction = { transaction ->
-					scanViewModel.pendingTransactions = transaction
+				onNavigateToTransaction = { transactions ->
+					scanViewModel.pendingTransactions.value = transactions
 					navController.navigate(ScanNavSubgraph.transaction)
 				}
 			)
 		}
 		composable(ScanNavSubgraph.transaction) {
+			val transactions = scanViewModel.pendingTransactions.collectAsState()
+
 			Box(modifier = Modifier.statusBarsPadding()) {
 				TransactionPreviewEdited(
-					transactions = scanViewModel.pendingTransactions, //todo multisign support missing yet
+					transactions = transactions.value,
 					onBack = {
 						//was navigate(Action.GO_BACK, "", "")
 						navController.navigate(ScanNavSubgraph.camera)
 					},
+					onSuccess = { transaction ->
+						//todo dmitry check it is shown in itself?
+						scanViewModel.pendingTransactions.value = transaction
+					},
 					onFinish = {
 						rootNavigator.navigate(Action.GO_FORWARD)
-						scanViewModel.pendingTransactions = emptyList()
+						scanViewModel.pendingTransactions.value = emptyList()
 						// todo multisign handle subsequent modals
 //						rust/navigator/src/navstate.rs:396
 //						val navResult = uniffiinteractor.ProcessBatchTransactions(some_all) and handle
