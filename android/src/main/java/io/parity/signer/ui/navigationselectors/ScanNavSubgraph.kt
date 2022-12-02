@@ -14,9 +14,8 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.signTransaction
 import io.parity.signer.screens.scan.ScanScreen
 import io.parity.signer.screens.scan.transaction.TransactionPreviewEdited
-import io.parity.signer.ui.ScanViewModel
+import io.parity.signer.screens.scan.ScanViewModel
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.MTransaction
 
 /**
  * Navigation Subgraph with compose nav controller for those Key Set screens which are not part of general
