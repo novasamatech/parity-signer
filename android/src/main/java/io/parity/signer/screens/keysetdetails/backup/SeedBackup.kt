@@ -62,7 +62,7 @@ private fun SeedBackupBottomSheet(
 			subtitile = model.seedBase58.abbreviateString(BASE58_STYLE_ABBREVIATE),
 			onCloseClicked = onClose,
 		)
-		SignerDivider()
+		SignerDivider(padding = 24.dp)
 		Column(
 			modifier = Modifier
 				.verticalScroll(rememberScrollState()),
@@ -79,7 +79,7 @@ private fun SeedBackupBottomSheet(
 			for (index in 0..model.derivations.lastIndex) {
 				SlimKeyItem(model = model.derivations[index])
 				if (index != model.derivations.lastIndex) {
-					SignerDivider()
+					SignerDivider(padding = 24.dp)
 				}
 			}
 			Spacer(modifier = Modifier.size(height = 80.dp, width = 1.dp))
