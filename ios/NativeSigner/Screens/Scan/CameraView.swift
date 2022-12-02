@@ -262,7 +262,6 @@ extension CameraView {
             )
             // Handle transactions with just error payload
             guard case let .transaction(transactions) = actionResult.screenData else { return }
-            print(transactions.first)
             if transactions.allSatisfy(\.isDisplayingErrorOnly) {
                 presentableError = .transactionSigningError(
                     message: transactions
@@ -327,6 +326,8 @@ extension CameraView {
         func clearTransactionState() {
             signature = nil
             enterPassword = nil
+            isPresentingError = false
+            shouldPresentError = false
             isInTransactionProgress = false
         }
     }
