@@ -204,7 +204,7 @@ impl TransactionState {
     }
 
     pub fn ok(&self) -> bool {
-        self.counter <= MAX_COUNT_SET
+        self.counter < MAX_COUNT_SET
     }
 
     pub fn counter(&self) -> u8 {
