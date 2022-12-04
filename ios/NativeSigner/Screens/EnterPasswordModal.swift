@@ -164,7 +164,6 @@ extension EnterPasswordModal {
             // If navigation returned `enterPassword`, it means password is invalid
             if case let .enterPassword(value) = actionResult.modalData {
                 if value.counter > 3 {
-                    navigation.performFake(navigation: .init(action: .goBack))
                     proceedtoErrorState()
                     return
                 }
@@ -174,9 +173,12 @@ extension EnterPasswordModal {
             // If we got signature from navigation, we should return to camera view and there check for further
             // navigation to Transaction Details
             if case let .signatureReady(value) = actionResult.modalData {
+                navigation.performFake(navigation: .init(action: .goBack))
                 isPresented = false
+                isErrorPresented = false
                 // This needs to trigger navigation to Transaction Details in parent camera view via Binding
                 signature = value
+                return
             }
             // If we got `Log`, we need to hide password modal, "navigate" to camera view and present
             if case .log = actionResult.screenData {
@@ -185,6 +187,7 @@ extension EnterPasswordModal {
         }
 
         private func proceedtoErrorState() {
+            navigation.performFake(navigation: .init(action: .goBack))
             // Inform parent camera view to present error for too many failed attempts at password
             isPresented = false
             isErrorPresented = true
