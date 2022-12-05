@@ -47,6 +47,7 @@ fun ScanNavSubgraph(
 			Box(modifier = Modifier.statusBarsPadding()) {
 				TransactionPreviewEdited(
 					transactions = transactions.value,
+					signerDataModel = signerDataModel,
 					onBack = {
 						//was navigate(Action.GO_BACK, "", "")
 						navController.navigate(ScanNavSubgraph.camera)

@@ -1,5 +1,6 @@
 package io.parity.signer.screens.scan.transaction
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,6 +22,8 @@ import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.ScreenData
 import io.parity.signer.uniffi.TransactionType
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.*
+
 
 /**
  * Old UI screen edited to work on new screens
@@ -28,15 +31,19 @@ import kotlinx.coroutines.launch
 @Composable
 fun TransactionPreviewEdited(
 	transactions: List<MTransaction>,
+	signerDataModel: SignerDataModel,
 	onBack: Callback,
 	onFinish: Callback,
 	onSuccess: (List<MTransaction>) -> Unit,
 ) {
+	var screenTransactions by remember {
+		mutableStateOf(transactions)
+	}
 	Column(
 		Modifier.verticalScroll(rememberScrollState())
 	) {
 		val transactionVm: TransactionViewModel = viewModel()
-		for (transaction in transactions) {
+		for (transaction in screenTransactions) {
 			TransactionPreviewField(
 				cardSet = transaction.content,
 			)
@@ -47,7 +54,7 @@ fun TransactionPreviewEdited(
 				NetworkCard(NetworkCardModel(it.networkTitle, it.networkLogo))
 			}
 		}
-		val action = transactions.first().ttype
+		val action = screenTransactions.first().ttype
 		val comment = remember { mutableStateOf("") }
 		val focusManager = LocalFocusManager.current
 		val focusRequester = remember { FocusRequester() }
@@ -72,19 +79,22 @@ fun TransactionPreviewEdited(
 					color = MaterialTheme.colors.Text400
 				)
 				val scope = rememberCoroutineScope()
-				val signerDataModel : SignerDataModel = viewModel() //todo get rid of it
 				BigButton(text = "Unlock key and sign", action = {
 					scope.launch {
 						val result = transactionVm.signTransaction(
 							comment = comment.value,
-							seedNames = transactions.mapNotNull { it.authorInfo?.address?.seedName },
-							signerVM = signerDataModel
+							seedNames = screenTransactions.mapNotNull { it.authorInfo?.address?.seedName },
+							signerVM = signerDataModel,
 						)
 						//todo dmitry handle non happy cases as well and probably in viewmodel not here
 						if (result is SignResult.Success) {
-							(result.navResult.screenData as? ScreenData.Transaction)?.f?.let {
-									transactions ->
-								onSuccess(transactions)
+							if (result.navResult.alertData != null) {
+								Log.e("sign error", result.navResult.alertData.toString()) //todo dmitry show error
+							} else {
+								(result.navResult.screenData as? ScreenData.Transaction)?.f?.let { transactions ->
+//								onSuccess(transactions)
+									screenTransactions = transactions
+								}
 							}
 						}
 					}

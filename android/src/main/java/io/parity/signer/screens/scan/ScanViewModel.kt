@@ -11,5 +11,4 @@ class ScanViewModel : ViewModel() {
 	var pendingTransactions: MutableStateFlow<List<MTransaction>> =
 		MutableStateFlow(emptyList())
 
-	
 }

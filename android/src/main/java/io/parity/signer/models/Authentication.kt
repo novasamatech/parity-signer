@@ -1,6 +1,5 @@
 package io.parity.signer.models
 
-import android.content.Context
 import android.widget.Toast
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt

@@ -20,12 +20,14 @@ class TransactionViewModel : ViewModel() {
 		signerVM: SignerDataModel, //todo dmitry inbound get seed from it!
 	): SignResult {
 		return when (val authResult =
-			ServiceLocator.authentication.authenticate(signerVM.activity)) {
+			authentication.authenticate(signerVM.activity)) {
 			AuthResult.AuthSuccess -> {
 				val seedPhrases = seedNames
 					.map { signerVM.getSeed(it) }
+					.also { 				println("transaction seed in map is $it")
+					}
 					.filter { it.isNotEmpty() }
-					.joinToString(separator = "/n")
+					.joinToString(separator = "\n")
 
 				if (seedPhrases.isNotBlank()) {
 					SignResult.Success(
