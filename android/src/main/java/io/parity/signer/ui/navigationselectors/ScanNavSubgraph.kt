@@ -58,7 +58,7 @@ fun ScanNavSubgraph(
 					onFinish = {
 						rootNavigator.navigate(Action.GO_FORWARD)
 						scanViewModel.pendingTransactions.value = emptyList()
-						// todo multisign handle subsequent modals
+						// todo dmitry handle subsequent modals
 //						rust/navigator/src/navstate.rs:396
 //						val navResult = uniffiinteractor.ProcessBatchTransactions(some_all) and handle
 						//Modal::EnterPassword
