@@ -12,9 +12,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.components.*
 import io.parity.signer.models.Callback
-import io.parity.signer.models.SignResult
+import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.ScreenData
@@ -30,11 +31,11 @@ fun TransactionPreviewEdited(
 	onBack: Callback,
 	onFinish: Callback,
 	onSuccess: (List<MTransaction>) -> Unit,
-	signTransaction: suspend (comment: String, seedNames: List<String>) -> SignResult
 ) {
 	Column(
 		Modifier.verticalScroll(rememberScrollState())
 	) {
+		val transactionVm: TransactionViewModel = viewModel()
 		for (transaction in transactions) {
 			TransactionPreviewField(
 				cardSet = transaction.content,
@@ -71,10 +72,14 @@ fun TransactionPreviewEdited(
 					color = MaterialTheme.colors.Text400
 				)
 				val scope = rememberCoroutineScope()
+				val signerDataModel : SignerDataModel = viewModel() //todo get rid of it
 				BigButton(text = "Unlock key and sign", action = {
 					scope.launch {
-						val result = signTransaction(comment.value,
-							transactions.mapNotNull { it.authorInfo?.address?.seedName })
+						val result = transactionVm.signTransaction(
+							comment = comment.value,
+							seedNames = transactions.mapNotNull { it.authorInfo?.address?.seedName },
+							signerVM = signerDataModel
+						)
 						//todo dmitry handle non happy cases as well and probably in viewmodel not here
 						if (result is SignResult.Success) {
 							(result.navResult.screenData as? ScreenData.Transaction)?.f?.let {

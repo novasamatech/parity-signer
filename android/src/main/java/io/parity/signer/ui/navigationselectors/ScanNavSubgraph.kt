@@ -11,7 +11,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.signTransaction
 import io.parity.signer.screens.scan.ScanScreen
 import io.parity.signer.screens.scan.transaction.TransactionPreviewEdited
 import io.parity.signer.screens.scan.ScanViewModel
@@ -68,7 +67,6 @@ fun ScanNavSubgraph(
 						//success will clear to log
 						// alert error
 					},
-					signTransaction = signerDataModel::signTransaction,
 				)
 			}
 		}

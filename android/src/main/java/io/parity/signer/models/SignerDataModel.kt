@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.dependencygraph.getDbNameFromContext
 import io.parity.signer.ui.navigationselectors.OnboardingWasShown
 import io.parity.signer.uniffi.*
@@ -43,13 +44,6 @@ class SignerDataModel : ViewModel() {
 
 	// Current key details, after rust API will migrate to REST-like should not store this value here.
 	internal var lastOpenedKeyDetails: MKeyDetails? = null
-
-	// State of the app being unlocked
-	private val _authenticated = MutableStateFlow(false)
-
-	// Authenticator to call!
-	internal var authentication: Authentication =
-		Authentication(setAuth = { _authenticated.value = it })
 
 	// Transaction
 	internal var action = JSONObject()
@@ -88,7 +82,7 @@ class SignerDataModel : ViewModel() {
 	// Observables for screens state
 
 	val onBoardingDone: StateFlow<OnboardingWasShown> = _onBoardingDone
-	val authenticated: StateFlow<Boolean> = _authenticated
+	val authenticated: StateFlow<Boolean> = ServiceLocator.authentication.auth
 
 	val alertState: StateFlow<AlertState> = _alertState
 
@@ -112,7 +106,6 @@ class SignerDataModel : ViewModel() {
 	fun lateInit() {
 		// Define local database name
 		dbName = context.getDbNameFromContext()
-		authentication.context = context
 		hasStrongbox = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 			context
 				.packageManager
@@ -153,6 +146,7 @@ class SignerDataModel : ViewModel() {
 
 		// Imitate ios behavior
 		Log.e("ENCRY", "$context $keyStore $masterKey")
+		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
 			sharedPreferences =
 				if (FeatureFlags.isEnabled(FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT)) {
@@ -292,6 +286,7 @@ class SignerDataModel : ViewModel() {
 	 * Auth user and wipe the Signer to initial state
 	 */
 	fun wipeToFactory() {
+		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
 			wipe()
 			totalRefresh()
@@ -302,6 +297,7 @@ class SignerDataModel : ViewModel() {
 	 * Auth user and wipe Signer to state without general verifier certificate
 	 */
 	fun wipeToJailbreak() {
+		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
 			jailbreak()
 		}

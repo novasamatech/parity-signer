@@ -1,9 +1,11 @@
 package io.parity.signer.models
 
+import io.parity.signer.dependencygraph.ServiceLocator
+
 
 suspend fun SignerDataModel.getSeedPhraseForBackup(seedName: String,
 ): String? {
-	return when (authentication.authenticate(activity)) {
+	return when (ServiceLocator.authentication.authenticate(activity)) {
 		AuthResult.AuthSuccess -> {
 			val seedPhrase = getSeed(seedName, backup = true)
 			seedPhrase
