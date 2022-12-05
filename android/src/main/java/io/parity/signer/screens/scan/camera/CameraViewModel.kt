@@ -69,14 +69,14 @@ class CameraViewModel() : ViewModel() {
 										resetScanValues()
 										addPendingTransaction(payload)
 									} catch (e: java.lang.Exception) {
-										Log.e("Single frame decode failed", e.toString())
+										Log.e("scanVM", "Single frame decode failed $e")
 									}
 								} else {
 									currentMultiQrTransaction += payloadString
 									_total.value = proposeTotal
 								}
 							} catch (e: java.lang.Exception) {
-								Log.e("QR sequence length estimation", e.toString())
+								Log.e("scanVM", "QR sequence length estimation $e")
 							}
 						} else {
 							currentMultiQrTransaction += payloadString
@@ -91,17 +91,17 @@ class CameraViewModel() : ViewModel() {
 										addPendingTransaction(payload)
 									}
 								} catch (e: java.lang.Exception) {
-									Log.e("failed to parse sequence", e.toString())
+									Log.e("scanVM", "failed to parse sequence $e")
 								}
 							}
 							_captured.value = currentMultiQrTransaction.size
-							Log.d("captured", captured.value.toString())
+							Log.d("scanVM", "captured " + captured.value.toString())
 						}
 					}
 				}
 			}
 			.addOnFailureListener {
-				Log.e("Scan failed", it.message.toString())
+				Log.e("scanVM","Scan failed " + it.message.toString())
 			}
 			.addOnCompleteListener {
 				imageProxy.close()
@@ -118,7 +118,7 @@ class CameraViewModel() : ViewModel() {
 		}
 		//todo handle error cases and show ot user?
 		allResults.filterIsInstance<UniffiResult.Error<Any>>().forEach { error ->
-			Log.e("Camera scan", "transaction parsing failed, ${error.error.message}")
+			Log.e("scanVM","Camera scan: " + "transaction parsing failed, ${error.error.message}")
 		}
 		return allResults.filterIsInstance<UniffiResult.Success<ActionResult>>()
 			.mapNotNull { (it.result.screenData as? ScreenData.Transaction)?.f }.flatten()
