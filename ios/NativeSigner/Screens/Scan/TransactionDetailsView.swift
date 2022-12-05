@@ -22,9 +22,9 @@ struct TransactionDetailsView: View {
                 )
             )
             ScrollView {
-                VStack {
+                VStack(spacing: 0) {
                     TransactionErrorsView(content: viewModel.transaction)
-                        .padding(.bottom, Spacing.small)
+                        .padding(.bottom, Spacing.medium)
                     ForEach(viewModel.transaction.sortedValueCards(), id: \.index) { card in
                         TransactionCardView(card: card)
                     }

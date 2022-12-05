@@ -36,14 +36,13 @@ struct TCNamedValueCard: View {
                 Spacer()
             }
             .font(Fontstyle.bodyL.base)
-            .frame(minHeight: Heights.minTransactionCardHeight)
         } else {
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                if let name = name {
+                if let name = name, name.isEmpty == false {
                     Text(name)
                         .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                 }
-                if let value = value {
+                if let value = value, value.isEmpty == false {
                     Text(value)
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                 }
@@ -52,7 +51,6 @@ struct TCNamedValueCard: View {
                 }
             }
             .font(Fontstyle.bodyL.base)
-            .frame(minHeight: Heights.minTransactionCardHeight)
         }
     }
 }

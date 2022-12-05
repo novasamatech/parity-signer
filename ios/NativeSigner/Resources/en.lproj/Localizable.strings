@@ -398,7 +398,7 @@
 "TransactionSign.Label.Header.Multiple" = "Sign %@ Transactions";
 "TransactionSign.Label.MultipleTransactionsInfo" = "Please note that by scanning this QR code into your application you’ll sign transactions using all keys shown in the transactions list above";
 "TransactionSign.Label.Sign" = "Sign With";
-"TransactionSign.Label.SignCode" = "Sign Transaction";
+"TransactionSign.Label.SignCode" = "Scan QR code to Sign Transaction";
 "TransactionSign.Action.Done" = "Done";
 "TransactionSign.Action.Note" = "Add Log Note";
 "TransactionSign.Action.Error" = "Got It";
@@ -427,10 +427,10 @@
 "Transaction.EnterPassword.Action.Done" = "Done";
 "Transaction.EnterPassword.Label.Title" = "Enter the password for";
 "Transaction.EnterPassword.Label.Placeholder" = "Enter password";
-"Transaction.EnterPassword.Label.Explanation" = "Enter password you used for derivation path\nfor example //path_name///password";
+"Transaction.EnterPassword.Label.Explanation" = "Enter the password you used for your derivation path";
 "Transaction.EnterPassword.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
 "Transaction.EnterPassword.Error.Title" = "Did you forget your\npassword?";
-"Transaction.EnterPassword.Error.Message" = "Your password was entered incorrectly three times.\nFor your safety, you will need to retrieve it before continuing.";
+"Transaction.EnterPassword.Error.Message" = "Your password was entered incorrectly more than once. Retrieve it and scan the QR code again.";
 "Transaction.EnterPassword.Label.PathDelimeter" = "///••••";
 
 "Address.Label.PasswordProtectedPath.PathDelimeter" = "///••••";

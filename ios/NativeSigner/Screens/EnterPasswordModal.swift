@@ -53,7 +53,7 @@ struct EnterPasswordModal: View {
                     keyComponent()
                         .padding(.top, Spacing.medium)
                     SecurePrimaryTextField(
-                        placeholder: "",
+                        placeholder: Localizable.Transaction.EnterPassword.Label.placeholder.string,
                         text: $viewModel.password,
                         isValid: $viewModel.isValid,
                         focusedField: _focusedField,

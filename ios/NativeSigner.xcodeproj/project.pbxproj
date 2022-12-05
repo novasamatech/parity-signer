@@ -68,7 +68,6 @@
 		2DA5F86D27566C3600D8DD29 /* TCAuthorPlain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85627566C3600D8DD29 /* TCAuthorPlain.swift */; };
 		2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85727566C3600D8DD29 /* TCWarning.swift */; };
 		2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85B27566C3600D8DD29 /* TCFieldNumber.swift */; };
-		2DA5F87427566C3600D8DD29 /* TCEraMortal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85D27566C3600D8DD29 /* TCEraMortal.swift */; };
 		2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */; };
 		2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */; };
 		2DA5F87E2756A28B00D8DD29 /* NetworkCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F87D2756A28A00D8DD29 /* NetworkCard.swift */; };
@@ -343,7 +342,6 @@
 		2DA5F85627566C3600D8DD29 /* TCAuthorPlain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCAuthorPlain.swift; sourceTree = "<group>"; };
 		2DA5F85727566C3600D8DD29 /* TCWarning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCWarning.swift; sourceTree = "<group>"; };
 		2DA5F85B27566C3600D8DD29 /* TCFieldNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCFieldNumber.swift; sourceTree = "<group>"; };
-		2DA5F85D27566C3600D8DD29 /* TCEraMortal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraMortal.swift; sourceTree = "<group>"; };
 		2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPreview.swift; sourceTree = "<group>"; };
 		2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeedCardForManager.swift; sourceTree = "<group>"; };
 		2DA5F87D2756A28A00D8DD29 /* NetworkCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkCard.swift; sourceTree = "<group>"; };
@@ -683,7 +681,6 @@
 				2DA5F85727566C3600D8DD29 /* TCWarning.swift */,
 				2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */,
 				2DA5F85B27566C3600D8DD29 /* TCFieldNumber.swift */,
-				2DA5F85D27566C3600D8DD29 /* TCEraMortal.swift */,
 			);
 			path = TransactionCards;
 			sourceTree = "<group>";
@@ -1706,7 +1703,6 @@
 				6D57DC4D289D652400005C63 /* Dispatching.swift in Sources */,
 				6DA501DB290F16280096DA4E /* KeyDetails+SelectionOverlay.swift in Sources */,
 				6D01996C289C974C00F4C317 /* HeaderViewContainer.swift in Sources */,
-				2DA5F87427566C3600D8DD29 /* TCEraMortal.swift in Sources */,
 				2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */,
 				6D199CA2292A8EB300E79113 /* TransactionSummaryModels.swift in Sources */,
 				2D48F3B42770C164004B27BE /* VerifierScreen.swift in Sources */,

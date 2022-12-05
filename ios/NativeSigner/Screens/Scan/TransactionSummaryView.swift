@@ -14,12 +14,12 @@ struct TransactionSummaryView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.extraSmall) {
-            VStack(alignment: .leading, spacing: Spacing.extraSmall) {
+            VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                 Localizable.TransactionSign.Label.details.text
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                     .font(Fontstyle.captionM.base)
                 HStack {
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 0) {
                         ForEach(renderable.summary.asRenderable, id: \.id) { row in
                             HStack(spacing: Spacing.extraSmall) {
                                 Text(row.key)
@@ -28,6 +28,7 @@ struct TransactionSummaryView: View {
                                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             }
                             .font(Fontstyle.bodyM.base)
+                            .frame(minHeight: Heights.minTransactionSummaryItemHeight)
                         }
                     }
                     Spacer()
@@ -57,13 +58,15 @@ struct TransactionSummaryView: View {
                     .font(Fontstyle.captionM.base)
                     .padding(.top, Spacing.extraSmall)
                 HStack {
-                    VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                        Text(signature.path)
+                    VStack(alignment: .leading, spacing: 0) {
+                        renderablePath(for: signature)
                             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                             .font(Fontstyle.captionM.base)
+                            .frame(minHeight: Heights.minTransactionSummaryItemHeight)
                         Text(signature.name)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             .font(Fontstyle.bodyM.base)
+                            .frame(minHeight: Heights.minTransactionSummaryItemHeight)
                         HStack {
                             Text(
                                 isShowingFullAddress ? signature.base58 : signature.base58
@@ -74,7 +77,7 @@ struct TransactionSummaryView: View {
 
                             if !isShowingFullAddress {
                                 Asset.chevronDown.swiftUIImage
-                                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                                     .padding(.leading, Spacing.extraExtraSmall)
                             }
                         }
@@ -92,6 +95,13 @@ struct TransactionSummaryView: View {
         } else {
             EmptyView()
         }
+    }
+
+    /// Manual string interpolation for `lock` `SFSymbol`
+    private func renderablePath(for signature: TransactionSignatureRenderable) -> Text {
+        signature.hasPassword ?
+            Text("\(signature.path)\(Image(.lock))") :
+            Text(signature.path)
     }
 }
 

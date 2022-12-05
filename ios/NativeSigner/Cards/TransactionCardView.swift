@@ -10,7 +10,7 @@ import SwiftUI
 struct TransactionCardView: View {
     var card: TransactionCard
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
+        VStack(alignment: .leading, spacing: 0) {
             TransactionCardSelector(card: card)
                 .frame(minHeight: Heights.minTransactionCardHeight)
         }

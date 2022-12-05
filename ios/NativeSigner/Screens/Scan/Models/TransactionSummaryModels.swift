@@ -41,7 +41,8 @@ extension TransactionPreviewRenderable {
                 path: author.address.displayablePath,
                 name: author.address.seedName,
                 base58: author.base58,
-                identicon: author.address.identicon
+                identicon: author.address.identicon,
+                hasPassword: author.address.hasPwd
             )
         } else {
             signature = nil
@@ -99,23 +100,27 @@ struct TransactionSignatureRenderable: Equatable {
     let name: String
     let base58: String
     let identicon: [UInt8]
+    let hasPassword: Bool
 
     init(_: MTransaction) {
         path = ""
         name = ""
         base58 = ""
         identicon = PreviewData.exampleIdenticon
+        hasPassword = false
     }
 
     init(
         path: String = "",
         name: String = "",
         base58: String = "",
-        identicon: [UInt8] = []
+        identicon: [UInt8] = [],
+        hasPassword: Bool = false
     ) {
         self.path = path
         self.name = name
         self.base58 = base58
         self.identicon = identicon
+        self.hasPassword = hasPassword
     }
 }
