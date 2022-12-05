@@ -556,7 +556,7 @@ pub enum Error {
     /// Signer database, with exactly same metadata.
     ///
     /// Not exactly an error, but Signer can't do anything and complains.
-    #[error(" Metadata for {name}{version} is already in the database.")]
+    #[error("Metadata for {name}{version} is already in the database.")]
     MetadataKnown {
         /// network name (identical for received and for stored metadata)
         name: String,
