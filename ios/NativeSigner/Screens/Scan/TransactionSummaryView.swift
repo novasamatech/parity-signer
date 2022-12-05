@@ -14,10 +14,11 @@ struct TransactionSummaryView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.extraSmall) {
-            VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
+            VStack(alignment: .leading, spacing: 0) {
                 Localizable.TransactionSign.Label.details.text
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                     .font(Fontstyle.captionM.base)
+                    .padding(.bottom, Spacing.extraSmall)
                 HStack {
                     VStack(alignment: .leading, spacing: 0) {
                         ForEach(renderable.summary.asRenderable, id: \.id) { row in
@@ -52,21 +53,19 @@ struct TransactionSummaryView: View {
     func signature() -> some View {
         if let signature = renderable.signature {
             Divider()
-            VStack(alignment: .leading, spacing: Spacing.extraSmall) {
+            VStack(alignment: .leading, spacing: 0) {
                 Localizable.TransactionSign.Label.sign.text
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                     .font(Fontstyle.captionM.base)
-                    .padding(.top, Spacing.extraSmall)
+                    .padding(.bottom, Spacing.extraSmall)
                 HStack {
-                    VStack(alignment: .leading, spacing: 0) {
+                    VStack(alignment: .leading, spacing: 2) {
                         renderablePath(for: signature)
                             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                             .font(Fontstyle.captionM.base)
-                            .frame(minHeight: Heights.minTransactionSummaryItemHeight)
                         Text(signature.name)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             .font(Fontstyle.bodyM.base)
-                            .frame(minHeight: Heights.minTransactionSummaryItemHeight)
                         HStack {
                             Text(
                                 isShowingFullAddress ? signature.base58 : signature.base58

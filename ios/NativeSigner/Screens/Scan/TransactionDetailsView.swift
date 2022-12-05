@@ -28,6 +28,8 @@ struct TransactionDetailsView: View {
                     ForEach(viewModel.transaction.sortedValueCards(), id: \.index) { card in
                         TransactionCardView(card: card)
                     }
+                    Spacer()
+                        .frame(height: Spacing.extraExtraLarge)
                 }
                 .padding(.horizontal, Spacing.large)
             }
