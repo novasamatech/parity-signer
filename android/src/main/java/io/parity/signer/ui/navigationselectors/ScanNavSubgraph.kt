@@ -1,5 +1,6 @@
 package io.parity.signer.ui.navigationselectors
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
@@ -12,8 +13,10 @@ import androidx.navigation.compose.rememberNavController
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.screens.scan.ScanScreen
-import io.parity.signer.screens.scan.transaction.TransactionPreviewEdited
 import io.parity.signer.screens.scan.ScanViewModel
+import io.parity.signer.screens.scan.old.SignatureReady
+import io.parity.signer.screens.scan.transaction.TransactionPreviewEdited
+import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
 
 /**
@@ -33,6 +36,9 @@ fun ScanNavSubgraph(
 	) {
 
 		composable(ScanNavSubgraph.camera) {
+			BackHandler() {
+				rootNavigator.backAction()
+			}
 			ScanScreen(
 				onClose = { rootNavigator.backAction() },
 				onNavigateToTransaction = { transactions ->
@@ -52,9 +58,9 @@ fun ScanNavSubgraph(
 						//was navigate(Action.GO_BACK, "", "")
 						navController.navigate(ScanNavSubgraph.camera)
 					},
-					onSuccess = { transaction ->
-						//todo dmitry check it is shown in itself?
-						scanViewModel.pendingTransactions.value = transaction
+					onSigReady = { signature ->
+						scanViewModel.signature.value = signature
+						navController.navigate(ScanNavSubgraph.signatureReady)
 					},
 					onFinish = {
 						rootNavigator.navigate(Action.GO_FORWARD)
@@ -71,10 +77,24 @@ fun ScanNavSubgraph(
 				)
 			}
 		}
+		composable(ScanNavSubgraph.signatureReady) {
+			BackHandler() {
+				navController.navigate(ScanNavSubgraph.camera)
+			}
+			BottomSheetWrapperRoot(onClosedAction = {
+				navController.navigate(ScanNavSubgraph.camera)
+			}) {
+				SignatureReady(
+					scanViewModel.signature.collectAsState().value!!,
+					signerDataModel = signerDataModel
+				)
+			}
+		}
 	}
 }
 
 private object ScanNavSubgraph {
 	const val camera = "scan_camera"
 	const val transaction = "scan_transaction"
+	const val signatureReady = "signature ready"
 }

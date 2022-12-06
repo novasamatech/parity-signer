@@ -18,11 +18,9 @@ import io.parity.signer.components.*
 import io.parity.signer.models.Callback
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Text400
-import io.parity.signer.uniffi.MTransaction
-import io.parity.signer.uniffi.ScreenData
-import io.parity.signer.uniffi.TransactionType
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
+import io.parity.signer.uniffi.*
 
 
 /**
@@ -34,7 +32,7 @@ fun TransactionPreviewEdited(
 	signerDataModel: SignerDataModel,
 	onBack: Callback,
 	onFinish: Callback,
-	onSuccess: (List<MTransaction>) -> Unit,
+	onSigReady: (MSignatureReady) -> Unit,
 ) {
 	var screenTransactions by remember {
 		mutableStateOf(transactions)
@@ -90,7 +88,17 @@ fun TransactionPreviewEdited(
 						if (result is SignResult.Success) {
 							if (result.navResult.alertData != null) {
 								Log.e("sign error", result.navResult.alertData.toString()) //todo dmitry show error
-							} else {
+							} else if (result.navResult.modalData != null){
+								if (result.navResult.modalData is ModalData.SignatureReady) {
+									onSigReady((result.navResult.modalData as ModalData.SignatureReady).f)
+								} else {
+									//todo dmitry show password
+									Log.e(
+										"sign modal is not handled",
+										result.navResult.modalData.toString()
+									)
+								}
+							} else{
 								(result.navResult.screenData as? ScreenData.Transaction)?.f?.let { transactions ->
 //								onSuccess(transactions)
 									screenTransactions = transactions

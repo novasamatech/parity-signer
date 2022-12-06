@@ -9,7 +9,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import io.parity.signer.bottomsheets.EnterPassword
 import io.parity.signer.bottomsheets.LogComment
-import io.parity.signer.bottomsheets.SignatureReady
 import io.parity.signer.models.*
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
@@ -161,11 +160,7 @@ fun BottomSheetSelector(
 							navigator = signerDataModel.navigator,
 						)
 					}
-				//old design
-				is ModalData.SignatureReady -> SignatureReady(
-					modalData.f,
-					signerDataModel = signerDataModel
-				)
+				is ModalData.SignatureReady -> {}//part of camera flow now
 				//old design
 				is ModalData.EnterPassword -> EnterPassword(
 					modalData.f,
