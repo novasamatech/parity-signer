@@ -62,33 +62,13 @@ struct ExportMultipleKeysModal: View {
                         AnimatedQRCodeView(viewModel: $viewModel.qrCode)
                             .padding(0.5)
                             .fixedSize(horizontal: false, vertical: true)
-                        HStack {
-                            Localizable.KeysExport.KeySets.Label.info.text
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            Spacer().frame(maxWidth: Spacing.medium)
-                            Asset.infoIconBold.swiftUIImage
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
-                        }
-                        .padding()
-                        .font(Fontstyle.bodyM.base)
-                        .background(
-                            RoundedRectangle(cornerRadius: CornerRadius.small)
-                                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                                .background(Asset.fill6.swiftUIColor)
-                                .cornerRadius(CornerRadius.small)
-                        )
-                        .padding(.top, Spacing.extraSmall)
+                        InfoBoxView(text: Localizable.KeysExport.KeySets.Label.info.string)
+                            .padding(.top, Spacing.extraSmall)
                         // Keys list
                         keyList
                     }
                     .padding(Spacing.extraSmall)
-                    .background(
-                        RoundedRectangle(cornerRadius: CornerRadius.medium)
-                            .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                            .background(Asset.fill6.swiftUIColor)
-                            .cornerRadius(CornerRadius.medium)
-                    )
+                    .strokeContainerBackground()
                     .padding([.leading, .trailing], Spacing.medium)
                 }
                 .padding(.bottom, Spacing.medium)

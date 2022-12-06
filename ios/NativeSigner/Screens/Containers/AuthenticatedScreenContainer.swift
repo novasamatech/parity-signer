@@ -14,6 +14,7 @@ struct AuthenticatedScreenContainer: View {
 
     @StateObject var snackBarPresentation = ServiceLocator.bottomSnackbarPresentation
     @GestureState private var dragOffset = CGSize.zero
+    @State private var isShowingQRScanner: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -37,6 +38,33 @@ struct AuthenticatedScreenContainer: View {
                 TabBarView(
                     selectedTab: $navigation.selectedTab
                 )
+            }
+        }
+        .bottomEdgeOverlay(
+            overlayView: CameraView(
+                viewModel: .init(
+                    isPresented: $navigation.shouldPresentQRScanner
+                )
+            ),
+            isPresented: $isShowingQRScanner
+        )
+        .onReceive(navigation.$shouldPresentQRScanner) { shouldPresent in
+            withAnimation {
+                if shouldPresent {
+                    // Pretend to go to QR Scanner tab, to be able to display transaction later
+                    navigation.performFake(navigation: .init(action: .navbarScan))
+                    isShowingQRScanner = true
+                } else {
+                    // "Pretend" to go back to previous tab (as we don't change `selectedTab` when showing QR screen
+                    // now), but do
+                    // it for real before dismissing QR code scanner to have dataset to display as we might have
+                    // ventured
+                    // into transaction details
+                    if let action = navigation.selectedTab.action {
+                        navigation.perform(navigation: .init(action: action))
+                    }
+                    isShowingQRScanner = false
+                }
             }
         }
         .gesture(

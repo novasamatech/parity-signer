@@ -107,31 +107,31 @@ struct CircularProgressView: View {
     }
 }
 
-// struct CircularProgressView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        VStack {
-//            CircularProgressView(
-//                CircularCountdownModel(
-//                    counter: 15,
-//                    onCompletion: {}
-//                ),
-//                viewModel: .privateKeyCountdown
-//            )
-//        }
-//        .padding()
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//        VStack {
-//            CircularProgressView(
-//                CircularCountdownModel(
-//                    counter: 15,
-//                    onCompletion: {}
-//                ),
-//                viewModel: .privateKeyCountdown
-//            )
-//        }
-//        .padding()
-//        .preferredColorScheme(.light)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }
+struct CircularProgressView_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack {
+            CircularProgressView(
+                CircularCountdownModel(
+                    counter: 15,
+                    viewModel: .privateKeyCountdown,
+                    onCompletion: {}
+                )
+            )
+        }
+        .padding()
+        .preferredColorScheme(.dark)
+        .previewLayout(.sizeThatFits)
+        VStack {
+            CircularProgressView(
+                CircularCountdownModel(
+                    counter: 15,
+                    viewModel: .snackbarCountdown,
+                    onCompletion: {}
+                )
+            )
+        }
+        .padding()
+        .preferredColorScheme(.light)
+        .previewLayout(.sizeThatFits)
+    }
+}

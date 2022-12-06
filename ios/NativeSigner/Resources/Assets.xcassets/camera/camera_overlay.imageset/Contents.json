@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "camera_overlay.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

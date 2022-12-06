@@ -24,7 +24,8 @@ final class TabViewModelBuilderTests: XCTestCase {
             action: .navbarKeys,
             isActive: isSelected,
             icon: Asset.tabbarKeys.swiftUIImage,
-            label: Localizable.TabBar.keys.text
+            label: Localizable.TabBar.keys.text,
+            tab: tab
         )
 
         // When
@@ -39,10 +40,11 @@ final class TabViewModelBuilderTests: XCTestCase {
         let tab: Tab = .scanner
         let isSelected = false
         let expectedResult = TabViewModel(
-            action: .navbarScan,
+            action: nil,
             isActive: isSelected,
             icon: Asset.tabbarScanner.swiftUIImage,
-            label: Localizable.TabBar.scanner.text
+            label: Localizable.TabBar.scanner.text,
+            tab: tab
         )
 
         // When
@@ -60,7 +62,8 @@ final class TabViewModelBuilderTests: XCTestCase {
             action: .navbarLog,
             isActive: isSelected,
             icon: Asset.tabbarLogs.swiftUIImage,
-            label: Localizable.TabBar.logs.text
+            label: Localizable.TabBar.logs.text,
+            tab: tab
         )
 
         // When
@@ -78,7 +81,8 @@ final class TabViewModelBuilderTests: XCTestCase {
             action: .navbarLog,
             isActive: isSelected,
             icon: Asset.tabbarLogsSelected.swiftUIImage,
-            label: Localizable.TabBar.logs.text
+            label: Localizable.TabBar.logs.text,
+            tab: tab
         )
 
         // When
@@ -96,7 +100,8 @@ final class TabViewModelBuilderTests: XCTestCase {
             action: .navbarSettings,
             isActive: isSelected,
             icon: Asset.tabbarSettings.swiftUIImage,
-            label: Localizable.TabBar.settings.text
+            label: Localizable.TabBar.settings.text,
+            tab: tab
         )
 
         // When
@@ -114,7 +119,8 @@ final class TabViewModelBuilderTests: XCTestCase {
             action: .navbarSettings,
             isActive: isSelected,
             icon: Asset.tabbarSettingsSelected.swiftUIImage,
-            label: Localizable.TabBar.settings.text
+            label: Localizable.TabBar.settings.text,
+            tab: tab
         )
 
         // When

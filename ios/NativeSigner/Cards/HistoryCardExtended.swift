@@ -94,7 +94,7 @@ struct HistoryCardExtended: View {
         case let .transactionSignError(value):
             VStack {
                 Localizable.transactionFailed.text
-                TransactionBlock(cards: event.decoded?.assemble() ?? [])
+                OldTransactionBlock(cards: event.decoded?.asSortedCards() ?? [])
                 Localizable.signedBy.text
                 HStack {
                     Identicon(identicon: event.signedBy?.address.identicon ?? [])
@@ -110,7 +110,7 @@ struct HistoryCardExtended: View {
             }
         case let .transactionSigned(value):
             VStack {
-                TransactionBlock(cards: event.decoded?.assemble() ?? [])
+                OldTransactionBlock(cards: event.decoded?.asSortedCards() ?? [])
                 Localizable.signedBy.text
                 HStack {
                     Identicon(identicon: event.signedBy?.address.identicon ?? [])
@@ -125,6 +125,24 @@ struct HistoryCardExtended: View {
                 Text(value.userComment)
             }
         }
+    }
+}
+
+struct OldTransactionBlock: View {
+    var cards: [TransactionCard]
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: CornerRadius.extraSmall)
+                .stroke(Asset.crypto400.swiftUIColor)
+            VStack {
+                ForEach(cards, id: \.index) { card in
+                    TransactionCardView(card: card)
+                }
+            }
+            .padding(Spacing.medium)
+        }
+        .padding(Spacing.small)
+        .frame(width: UIScreen.main.bounds.size.width)
     }
 }
 

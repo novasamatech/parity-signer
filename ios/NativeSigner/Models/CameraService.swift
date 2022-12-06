@@ -6,6 +6,7 @@
 //
 
 import AVKit
+import SwiftUI
 import UIKit
 
 final class CameraService: ObservableObject {
@@ -15,12 +16,20 @@ final class CameraService: ObservableObject {
         case configurationFailed
     }
 
+    /// QR codes payloads for multiple transactions
+    @Published var multipleTransactions: [String] = []
+    /// Informs whether camera service should handle individual QR code batch scanning
+    @Published var isMultipleTransactionMode: Bool = false
+
     /// QR code payload decoded by Rust
     @Published var payload: String?
     /// Number of expected frames for given payload
     @Published var total: Int = 0
     /// Number of already captured frames for given payload
     @Published var captured: Int = 0
+
+    @Published var isTorchOn: Bool = false
+
     /// Partial payload to decode, collection of payloads from individual QR codes
     private var bucket: [String] = []
 
@@ -32,16 +41,18 @@ final class CameraService: ObservableObject {
     private let stitcherQueue = DispatchQueue.global(qos: .userInitiated)
     private let videoDataOutputQueue = DispatchQueue.global(qos: .userInteractive)
     private let callbackQueue = DispatchQueue.main
-    private let captureDeviceConfigurator: CaptureDeviceConfiguring = CaptureDeviceConfigurator()
+    private let captureDeviceConfigurator: CaptureDeviceConfiguring
     private let cameraPermissionHandler: CameraPermissionHandler
     private let videoOutputDelegate: CameraVideoOutputDelegate
 
     init(
         session: AVCaptureSession = AVCaptureSession(),
+        captureDeviceConfigurator: CaptureDeviceConfiguring = CaptureDeviceConfigurator(),
         cameraPermissionHandler: CameraPermissionHandler = CameraPermissionHandler(),
         videoOutputDelegate: CameraVideoOutputDelegate = CameraVideoOutputDelegate()
     ) {
         self.session = session
+        self.captureDeviceConfigurator = captureDeviceConfigurator
         self.cameraPermissionHandler = cameraPermissionHandler
         self.videoOutputDelegate = videoOutputDelegate
         videoOutputDelegate.set(updateReceiver: self)
@@ -69,6 +80,10 @@ final class CameraService: ObservableObject {
         payload = nil
         clearLocalState()
     }
+
+    func toggleTorch() {
+        isTorchOn = captureDeviceConfigurator.toggleTorch()
+    }
 }
 
 extension CameraService: QRPayloadUpdateReceiving {
@@ -80,10 +95,23 @@ extension CameraService: QRPayloadUpdateReceiving {
 
 private extension CameraService {
     func handleNew(qrCodePayload: String) {
+        if isMultipleTransactionMode {
+            multiTransactionOperation(with: qrCodePayload)
+            return
+        }
         if bucket.isEmpty {
             handleNewOperation(with: qrCodePayload)
         } else {
             appendToCurrentBucket(qrCodePayload: qrCodePayload)
+        }
+    }
+
+    func multiTransactionOperation(with qrCodePayload: String) {
+        guard let parsedPayload = try? qrparserTryDecodeQrSequence(data: [qrCodePayload], cleaned: false)
+        else { return }
+        callbackQueue.async {
+            guard !self.multipleTransactions.contains(parsedPayload) else { return }
+            self.multipleTransactions.append(parsedPayload)
         }
     }
 
