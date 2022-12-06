@@ -20,6 +20,8 @@ protocol CaptureDeviceConfiguring: AnyObject {
         with delegate: AVCaptureVideoDataOutputSampleBufferDelegate,
         videoOutputQueue: DispatchQueue
     ) -> Bool
+
+    func toggleTorch() -> Bool
 }
 
 final class CaptureDeviceConfigurator: CaptureDeviceConfiguring {
@@ -30,9 +32,7 @@ final class CaptureDeviceConfigurator: CaptureDeviceConfiguring {
     ) -> Bool {
         defer { session.commitConfiguration() }
         guard let videoDevice = AVCaptureDevice.default(
-            .builtInWideAngleCamera,
-            for: .video,
-            position: .back
+            for: .video
         ) else {
             print("Default camera is unavailable")
             return false
@@ -55,6 +55,14 @@ final class CaptureDeviceConfigurator: CaptureDeviceConfiguring {
         }
 
         return true
+    }
+
+    func toggleTorch() -> Bool {
+        guard let camera = AVCaptureDevice.default(for: .video), camera.hasTorch else { return false }
+        try? camera.lockForConfiguration()
+        camera.torchMode = camera.torchMode == .off ? .on : .off
+        camera.unlockForConfiguration()
+        return camera.torchMode == .on
     }
 }
 

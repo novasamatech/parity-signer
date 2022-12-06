@@ -44,12 +44,7 @@ struct ExportPrivateKeyModal: View {
                         QRCodeAddressFooterView(viewModel: viewModel.addressFooter)
                     }
                     .fixedSize(horizontal: false, vertical: true)
-                    .background(
-                        RoundedRectangle(cornerRadius: CornerRadius.medium)
-                            .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                            .background(Asset.fill6.swiftUIColor)
-                            .cornerRadius(CornerRadius.medium)
-                    )
+                    .strokeContainerBackground()
                     .padding([.leading, .trailing], Spacing.large)
                     // Bottom "Hide" container
                     ExportPrivateKeyAddressFooter(hideAction: animateDismissal)

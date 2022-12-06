@@ -18,28 +18,36 @@ struct TCCall: View {
             label: {
                 VStack {
                     HStack {
-                        TCNameValueTemplate(name: Localizable.TCName.method.string, value: value.methodName)
+                        TCNamedValueCard(name: Localizable.TCName.method.string, value: value.methodName)
                         if !value.docs.isEmpty {
-                            Localizable.questionMark.text
-                                .foregroundColor(Asset.action400.swiftUIColor)
+                            Asset.questionCircle.swiftUIImage
+                                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
                         }
                     }
                     if showDoc {
-                        Text(
-                            AttributedString(fromHexDocs: value.docs) ??
-                                AttributedString(Localizable.Error.docsParsing.string)
-                        )
-                        .foregroundColor(Asset.text600.swiftUIColor)
-                        .multilineTextAlignment(.leading)
+                        withAnimation {
+                            VStack(alignment: .leading) {
+                                Text.markdownWithFallback(value.docs)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                HStack {
+                                    Spacer()
+                                }
+                            }
+                            .padding(.horizontal, Spacing.medium)
+                            .padding(.vertical, Spacing.small)
+                            .strokeContainerBackground()
+                        }
                     }
                 }
+                .font(Fontstyle.bodyL.base)
             }
-        ).disabled(value.docs.isEmpty)
+        )
+        .disabled(value.docs.isEmpty)
     }
 }
 
-// struct TCCall_Previews: PreviewProvider {
-// static var previews: some View {
-// TCCall()
-// }
-// }
+struct TCCall_Previews: PreviewProvider {
+    static var previews: some View {
+        TCCall(value: MscCall(methodName: "method name", docs: PreviewData.exampleMarkdownDocs))
+    }
+}

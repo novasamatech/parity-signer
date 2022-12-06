@@ -102,3 +102,19 @@ extension PreviewData {
         seedNames: mseeds.seedNameCards.map(\.seedName)
     )
 }
+
+extension PreviewData {
+    static let transactionSummary: TransactionSummaryModel = .init(
+        pallet: "Balances",
+        method: "transfer_keep_alive",
+        destination: "1219xC79CXV31543DDXoQMjuA",
+        value: "0.2 WND"
+    )
+
+    static let transactionSignature: TransactionSignatureRenderable = .init(
+        path: "//polkadot//1",
+        name: "Parity Keys",
+        base58: "1219xC79CXV31543DDXoQMjuA",
+        identicon: PreviewData.exampleIdenticon
+    )
+}
