@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
-import io.parity.signer.components.transactionCards.*
 import io.parity.signer.models.decodeHex
+import io.parity.signer.screens.scan.transaction.transactionCards.*
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.Card
 import io.parity.signer.uniffi.TransactionCard
