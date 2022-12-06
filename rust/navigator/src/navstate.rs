@@ -408,17 +408,17 @@ impl State {
                             Ok(result) => {
                                 match result {
                                     SignResult::RequestPassword { .. } => {
-                                        new_navstate.modal = Modal::EnterPassword;
+                                        if t.ok() {
+                                            new_navstate.screen = Screen::Transaction(new);
+                                            new_navstate.modal = Modal::EnterPassword;
+                                        } else {
+                                            new_navstate = Navstate::clean_screen(Screen::Log);
+                                        }
                                     }
                                     SignResult::Ready { signatures } => {
                                         new_navstate.modal = Modal::SignatureReady(signatures);
                                     }
                                 };
-                                if t.ok() {
-                                    new_navstate.screen = Screen::Transaction(new);
-                                } else {
-                                    new_navstate = Navstate::clean_screen(Screen::Log);
-                                }
                             }
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;

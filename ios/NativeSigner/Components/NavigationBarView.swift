@@ -43,11 +43,11 @@ struct NavigationBarViewModel: Equatable {
 
 struct NavigationBarActionModel {
     let leftBarMenuAction: (() -> Void)?
-    let rightBarMenuAction: () -> Void
+    let rightBarMenuAction: (() -> Void)?
 
     init(
         leftBarMenuAction: (() -> Void)? = nil,
-        rightBarMenuAction: @escaping () -> Void
+        rightBarMenuAction: (() -> Void)? = nil
     ) {
         self.leftBarMenuAction = leftBarMenuAction
         self.rightBarMenuAction = rightBarMenuAction
@@ -106,11 +106,11 @@ struct NavigationBarView: View {
                 Spacer().frame(width: Heights.navigationButton)
             case .more:
                 NavbarButton(
-                    action: actionModel.rightBarMenuAction,
+                    action: actionModel.rightBarMenuAction ?? {},
                     icon: Asset.moreDots.swiftUIImage
                 )
             case let .action(title):
-                NavbarActionButton(action: actionModel.rightBarMenuAction, title: title)
+                NavbarActionButton(action: actionModel.rightBarMenuAction ?? {}, title: title)
             }
         }
         .padding([.leading, .trailing], Spacing.extraExtraSmall)

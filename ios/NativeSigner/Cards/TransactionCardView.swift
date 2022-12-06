@@ -10,11 +10,14 @@ import SwiftUI
 struct TransactionCardView: View {
     var card: TransactionCard
     var body: some View {
-        VStack(alignment: .leading) {
-            TransactionCardSelector(card: card).padding(4)
+        VStack(alignment: .leading, spacing: 0) {
+            TransactionCardSelector(card: card)
+                .frame(minHeight: Heights.minTransactionCardHeight)
         }
-        .border(Asset.border400.swiftUIColor)
-        .padding(.leading, CGFloat(card.indent) * 10.0)
+        .padding(.leading, CGFloat(card.indent) * Spacing.extraSmall)
+        .onAppear {
+            print("Card info: \(card.index)  \(card.indent)  \(card.card)")
+        }
     }
 }
 
