@@ -396,6 +396,9 @@
 "TransactionSign.Label.Details" = "Transaction Details";
 "TransactionSign.Label.Header.Single" = "Sign Transaction";
 "TransactionSign.Label.Header.Multiple" = "Sign %@ Transactions";
+"TransactionSign.Label.Header.Metadata" = "Add Metadata";
+"TransactionSign.Label.Header.Network" = "Add Network";
+
 "TransactionSign.Label.MultipleTransactionsInfo" = "Please note that by scanning this QR code into your application you’ll sign transactions using all keys shown in the transactions list above";
 "TransactionSign.Label.Sign" = "Sign With";
 "TransactionSign.Label.SignCode" = "Scan QR code to Sign Transaction";
@@ -423,6 +426,8 @@
 "TransactionSign.Error.InvalidNetworkVersion.Step1.suffix" = "metadata.parity.io";
 "TransactionSign.Error.InvalidNetworkVersion.Step2" = "Choose the network you need ";
 "TransactionSign.Error.InvalidNetworkVersion.Step3" = "Scan the metadata’s QR code with the scanner";
+"TransactionSign.Snackbar.Metadata" = "Metadata %@ %@ was added";
+"TransactionSign.Snackbar.NetworkAdded" = "Network %@ was added";
 
 "Transaction.EnterPassword.Action.Done" = "Done";
 "Transaction.EnterPassword.Label.Title" = "Enter the password for";

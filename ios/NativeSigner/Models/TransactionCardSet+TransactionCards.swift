@@ -94,10 +94,29 @@ extension TransactionCardSet {
 
 extension MTransaction {
     enum TransactionPreviewType {
-        case addNetwork
-        case metadata
+        case addNetwork(network: String)
+        case metadata(network: String, version: String)
         case transfer
-        case utility
-        case multisig
+        case unknown
+    }
+
+    var previewType: TransactionPreviewType {
+        switch ttype {
+        case .stub:
+            return sortedValueCards().compactMap {
+                switch $0.card {
+                case let .metaCard(record):
+                    return TransactionPreviewType.metadata(network: record.specname, version: record.specsVersion)
+                case let .newSpecsCard(spec):
+                    return TransactionPreviewType.addNetwork(network: spec.name)
+                default:
+                    return nil
+                }
+            }.first ?? .unknown
+        case .sign:
+            return .transfer
+        default:
+            return .unknown
+        }
     }
 }

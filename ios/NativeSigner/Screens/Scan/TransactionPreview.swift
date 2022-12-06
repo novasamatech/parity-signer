@@ -23,7 +23,13 @@ struct TransactionPreview: View {
     var body: some View {
         VStack {
             NavigationBarView(
-                viewModel: .init(title: title(viewModel.dataModel.count), leftButton: .xmark),
+                viewModel: .init(
+                    title: title(
+                        viewModel.dataModel.count,
+                        previewType: viewModel.dataModel.first?.content.previewType
+                    ),
+                    leftButton: .xmark
+                ),
                 actionModel: .init(
                     leftBarMenuAction: { viewModel.onBackButtonTap() },
                     rightBarMenuAction: {}
@@ -198,10 +204,17 @@ struct TransactionPreview: View {
         }
     }
 
-    func title(_ transactionsCount: Int) -> String {
-        transactionsCount == 1 ?
-            Localizable.TransactionSign.Label.Header.single.string :
-            Localizable.TransactionSign.Label.Header.multiple(viewModel.dataModel.count)
+    func title(_ transactionsCount: Int, previewType: MTransaction.TransactionPreviewType?) -> String {
+        switch previewType {
+        case .addNetwork:
+            return Localizable.TransactionSign.Label.Header.network.string
+        case .metadata:
+            return Localizable.TransactionSign.Label.Header.metadata.string
+        default:
+            return transactionsCount == 1 ?
+                Localizable.TransactionSign.Label.Header.single.string :
+                Localizable.TransactionSign.Label.Header.multiple(viewModel.dataModel.count)
+        }
     }
 }
 
@@ -213,6 +226,7 @@ extension TransactionPreview {
         private weak var navigation: NavigationCoordinator!
         private weak var data: SignerDataModel!
         private let seedsMediator: SeedsMediating
+        private let snackbarPresentation: BottomSnackbarPresentation
 
         let dataModel: [TransactionWrapper]
         let signature: MSignatureReady?
@@ -221,12 +235,14 @@ extension TransactionPreview {
             isPresented: Binding<Bool>,
             content: [MTransaction],
             signature: MSignatureReady?,
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation
         ) {
             _isPresented = isPresented
             dataModel = content.map { TransactionWrapper(content: $0) }
             self.signature = signature
             self.seedsMediator = seedsMediator
+            self.snackbarPresentation = snackbarPresentation
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -255,6 +271,22 @@ extension TransactionPreview {
         func onApproveTap() {
             navigation.perform(navigation: .init(action: .goForward))
             isPresented.toggle()
+            switch dataModel.first?.content.previewType {
+            case let .addNetwork(network):
+                snackbarPresentation.viewModel = .init(
+                    title: Localizable.TransactionSign.Snackbar.networkAdded(network),
+                    style: .info
+                )
+                snackbarPresentation.isSnackbarPresented = true
+            case let .metadata(network, version):
+                snackbarPresentation.viewModel = .init(
+                    title: Localizable.TransactionSign.Snackbar.metadata(network, version),
+                    style: .info
+                )
+                snackbarPresentation.isSnackbarPresented = true
+            default:
+                ()
+            }
         }
 
         func signTransaction() {
