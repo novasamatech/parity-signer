@@ -11,15 +11,15 @@ struct TCDerivations: View {
     let value: [String]
     var body: some View {
         HStack {
-            VStack {
+            VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                 Localizable.importingDerivations.text
-                    .font(Fontstyle.header1.base)
-                    .foregroundColor(Asset.text600.swiftUIColor)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(Fontstyle.bodyL.base)
                 ForEach(value, id: \.self) { derivation in
                     HStack {
                         Text(derivation)
-                            .font(Fontstyle.body2.crypto)
-                            .foregroundColor(Asset.crypto400.swiftUIColor)
+                            .font(Fontstyle.bodyM.base)
+                            .foregroundColor(Asset.accentPink300.swiftUIColor)
                         Spacer()
                     }
                 }
@@ -28,8 +28,8 @@ struct TCDerivations: View {
     }
 }
 
-// struct TCDerivations_Previews: PreviewProvider {
-// static var previews: some View {
-// TCDerivations()
-// }
-// }
+struct TCDerivations_Previews: PreviewProvider {
+    static var previews: some View {
+        TCDerivations(value: ["Derivation 1", "Derivation 2"])
+    }
+}

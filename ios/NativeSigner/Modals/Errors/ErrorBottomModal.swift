@@ -54,13 +54,26 @@ struct ErrorBottomModal: View {
                             .font(Fontstyle.bodyL.base)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(Spacing.medium)
-                            .background(
-                                RoundedRectangle(cornerRadius: CornerRadius.medium)
-                                    .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                                    .background(Asset.fill6.swiftUIColor)
-                                    .cornerRadius(CornerRadius.medium)
-                            )
+                            .strokeContainerBackground()
                             .padding(.top, Spacing.extraSmall)
+                    }
+                    if viewModel.steps.count > 1 {
+                        VStack(alignment: .leading, spacing: Spacing.small) {
+                            ForEach(viewModel.steps, id: \.step) { step in
+                                HStack(alignment: .top, spacing: 0) {
+                                    Text(step.step)
+                                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                        .frame(width: Spacing.large, alignment: .leading)
+                                    Text(step.content)
+                                        .lineSpacing(Spacing.extraExtraSmall)
+                                }
+                            }
+                        }
+                        .font(Fontstyle.bodyL.base)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(Spacing.medium)
+                        .strokeContainerBackground()
+                        .padding(.top, Spacing.extraSmall)
                     }
                     VStack {
                         if let primaryAction = viewModel.primaryAction {
@@ -105,6 +118,14 @@ struct ErrorBottomModal: View {
 struct ErrorBottomModal_Previews: PreviewProvider {
     static var previews: some View {
         Group {
+            ErrorBottomModal(
+                viewModel: .signingUnknownNetwork("Westend"),
+                isShowingBottomAlert: Binding<Bool>.constant(true)
+            )
+            ErrorBottomModal(
+                viewModel: .signingInvalidNetworkVersion(),
+                isShowingBottomAlert: Binding<Bool>.constant(true)
+            )
             ErrorBottomModal(
                 viewModel: .connectivityOn(),
                 isShowingBottomAlert: Binding<Bool>.constant(true)

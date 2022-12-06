@@ -20,17 +20,12 @@ struct ScreenSelector: View {
     let createAddress: (String, String) -> Void
     let checkSeedCollision: (String) -> Bool
     let restoreSeed: (String, String, Bool) -> Void
-    let sign: (String, String) -> Void
     let doWipe: () -> Void
     let alertShow: () -> Void
     let increment: (String, String) -> Void
 
     var body: some View {
         switch screenData {
-        case .scan:
-            TransactionScreen(
-                navigationRequest: navigationRequest
-            )
         case let .keys(value):
             KeyDetailsView(
                 dataModel: KeyDetailsDataModel(value),
@@ -54,8 +49,6 @@ struct ScreenSelector: View {
             )
         case let .logDetails(value):
             EventDetails(content: value)
-        case let .transaction(value):
-            TransactionPreview(viewModel: .init(content: value))
         case let .seedSelector(value):
             KeySetList(
                 viewModel: .init(listViewModel: KeySetListViewModelBuilder().build(for: value))
@@ -126,6 +119,11 @@ struct ScreenSelector: View {
                 content: value,
                 navigationRequest: navigationRequest
             )
+        // Screens handled outside of Rust navigation
+        case .scan:
+            EmptyView()
+        case .transaction:
+            EmptyView()
         }
     }
 }

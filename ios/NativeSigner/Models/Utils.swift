@@ -39,28 +39,6 @@ extension Data {
     }
 }
 
-/// Decode markdown object from hex-encoded string passed in JSON
-extension AttributedString {
-    init?(fromHexDocs string: String) {
-        try? self.init(
-            markdown: Data(fromHexEncodedString: string) ?? Data(),
-            options: AttributedString.MarkdownParsingOptions(
-                interpretedSyntax: .inlineOnlyPreservingWhitespace,
-                failurePolicy: .returnPartiallyParsedIfPossible
-            )
-        )
-    }
-}
-
-extension TransactionCardSet {
-    func assemble() -> [TransactionCard] {
-        [author, error, extensions, importingDerivations, message, meta, method, newSpecs, verifier, warning, typesInfo]
-            .compactMap { $0 }
-            .flatMap { $0 }
-            .sorted { $0.index < $1.index }
-    }
-}
-
 extension MRecoverSeedPhrase {
     func draftPhrase() -> String {
         draft.joined(separator: " ")
