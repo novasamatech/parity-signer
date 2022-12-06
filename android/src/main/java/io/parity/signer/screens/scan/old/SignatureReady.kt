@@ -53,7 +53,7 @@ fun SignatureReady(
 		) {
 			Text("Your signature")
 			Text("Scan this into your application")
-			AnimatedQrKeysInfo(
+			AnimatedQrKeysInfo<List<List<UByte>>>(
 				input = signatureReady.signatures,
 				provider = EmptyQrCodeProvider(),
 				modifier = Modifier.fillMaxWidth(1f)
