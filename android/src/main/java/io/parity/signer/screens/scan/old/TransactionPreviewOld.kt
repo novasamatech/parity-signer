@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import io.parity.signer.components.*
+import io.parity.signer.screens.scan.transaction.components.TransactionPreviewField
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MTransaction

@@ -1,4 +1,4 @@
-package io.parity.signer.components
+package io.parity.signer.screens.scan.transaction.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border

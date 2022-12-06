@@ -20,6 +20,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Text400
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
+import io.parity.signer.screens.scan.transaction.components.TransactionPreviewField
 import io.parity.signer.uniffi.*
 
 

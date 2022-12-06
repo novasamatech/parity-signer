@@ -8,7 +8,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.Composable
 import io.parity.signer.components.IdentIcon
-import io.parity.signer.components.TransactionPreviewField
+import io.parity.signer.screens.scan.transaction.components.TransactionPreviewField
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.encodeHex
