@@ -1,0 +1,30 @@
+package io.parity.signer.screens.scan.transaction.transactionElements
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import io.parity.signer.components.IdentIcon
+import io.parity.signer.ui.theme.Crypto400
+import io.parity.signer.uniffi.MVerifierDetails
+
+@Composable
+fun TCVerifier(verifier: MVerifierDetails) {
+	Column {
+		Text("VERIFIER CERTIFICATE")
+		Row {
+			IdentIcon(identicon = verifier.identicon)
+			Column {
+				Row {
+					Text("key:")
+					Text(verifier.publicKey, color = MaterialTheme.colors.Crypto400)
+				}
+				Row {
+					Text("crypto:")
+					Text(verifier.encryption, color = MaterialTheme.colors.Crypto400)
+				}
+			}
+		}
+	}
+}

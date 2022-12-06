@@ -16,54 +16,43 @@ import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.uniffi.TransactionCard
 import io.parity.signer.uniffi.TransactionCardSet
 
-fun transactionCards(
-	scope: LazyListScope,
-	transactions: List<TransactionCard>?,
-) {
-	transactions?.let {
-		scope.items(it.size) { item ->
-			TransactionCard(
-				card = it[item]
-			)
-		}
-	}
-}
-
 @Composable
 fun TransactionPreviewField(
 	cardSet: TransactionCardSet,
 ) {
-
 	LazyColumn(
 		modifier = Modifier
-			.aspectRatio(1f)
-			.padding(8.dp)
-			.border(
-				BorderStroke(1.dp, MaterialTheme.colors.Crypto400),
-				RoundedCornerShape(8.dp)
-			)
-			.clip(RoundedCornerShape(8.dp))
-			.padding(8.dp)
+            .aspectRatio(1f)
+            .padding(8.dp)
+            .border(
+                BorderStroke(1.dp, MaterialTheme.colors.Crypto400),
+                RoundedCornerShape(8.dp)
+            )
+            .clip(RoundedCornerShape(8.dp))
+            .padding(8.dp)
 	) {
-		transactionCards(this, cardSet.author)
-		transactionCards(this, cardSet.error)
-		transactionCards(
-			this,
-			cardSet.extensions
-		)
-		transactionCards(
-			this,
-			cardSet.importingDerivations
-		)
-		transactionCards(this, cardSet.message)
-		transactionCards(this, cardSet.meta)
-		transactionCards(this, cardSet.method)
-		transactionCards(this, cardSet.newSpecs)
-		transactionCards(this, cardSet.verifier)
-		transactionCards(this, cardSet.warning)
-		transactionCards(
-			this,
-			cardSet.typesInfo
-		)
+		transactionCards(cardSet.author)
+		transactionCards(cardSet.error)
+		transactionCards(cardSet.extensions)
+		transactionCards(cardSet.importingDerivations)
+		transactionCards(cardSet.message)
+		transactionCards(cardSet.meta)
+		transactionCards(cardSet.method)
+		transactionCards(cardSet.newSpecs)
+		transactionCards(cardSet.verifier)
+		transactionCards(cardSet.warning)
+		transactionCards(cardSet.typesInfo)
+	}
+}
+
+private fun LazyListScope.transactionCards(
+	transactions: List<TransactionCard>?,
+) {
+	transactions?.let {
+		items(it.size) { item ->
+			TransactionElement(
+				card = it[item]
+			)
+		}
 	}
 }
