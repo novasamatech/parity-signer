@@ -59,23 +59,27 @@ struct Snackbar: View {
     }
 
     var body: some View {
-        VStack {
+        HStack {
+            Text(viewModel.title)
+                .font(Fontstyle.bodyL.base)
+                .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                .padding(Spacing.large)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
             Spacer()
-            HStack {
-                Text(viewModel.title)
-                    .font(Fontstyle.bodyL.base)
-                    .foregroundColor(Asset.accentForegroundText.swiftUIColor)
-                    .padding(Spacing.large)
-                Spacer()
-                if let countdown = viewModel.countdown {
-                    CircularProgressView(countdown)
-                        .padding(.trailing, Spacing.medium)
-                }
+            if let countdown = viewModel.countdown {
+                CircularProgressView(countdown)
+                    .padding(.trailing, Spacing.medium)
             }
-            .frame(height: Heights.snackbarHeight, alignment: .center)
-            .background(viewModel.style.tintColor)
-            .cornerRadius(CornerRadius.small)
         }
+        .frame(
+            minHeight: Heights.snackbarHeight,
+            idealHeight: Heights.snackbarHeight,
+            maxHeight: Heights.snackbarMaxHeight,
+            alignment: .center
+        )
+        .background(viewModel.style.tintColor)
+        .cornerRadius(CornerRadius.small)
         .padding([.top, .bottom])
         .padding([.leading, .trailing], Spacing.extraSmall)
     }
