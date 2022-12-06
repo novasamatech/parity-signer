@@ -13,10 +13,8 @@ class KeySetsExportService : AnimatedQrKeysProvider<List<KeySetModel>> {
 		ServiceLocator.backendLocator.uniffiInteractor
 
 	override suspend fun getQrCodesList(input: List<KeySetModel>): AnimatedQrImages? {
-		val keyInfo =
-			uniffiInteractor.exportSeedKeyInfos(input.map { it.seedName })
-				.mapError()
-		return keyInfo
+		return uniffiInteractor.exportSeedKeyInfos(input.map { it.seedName })
+			.mapError()
 			?.let { keyInfo -> uniffiInteractor.encodeToQrImages(keyInfo.frames) }
 			?.mapError()
 			?.let { AnimatedQrImages(it) }
