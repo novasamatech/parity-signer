@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.SeedCard
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.getSeed
 import io.parity.signer.models.navigate
@@ -40,7 +41,7 @@ fun SelectSeed(seeds: MSeeds, signerDataModel: SignerDataModel) {
 					Row(
 						Modifier
 							.clickable {
-								signerDataModel.authentication.authenticate(signerDataModel.activity) {
+								ServiceLocator.authentication.authenticate(signerDataModel.activity) {
 									val seedName = cards[item].seedName
 									val seedPhrase = signerDataModel.getSeed(seedName)
 									if (seedPhrase.isNotBlank()) {

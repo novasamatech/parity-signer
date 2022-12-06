@@ -1,4 +1,4 @@
-package io.parity.signer.screens.scan
+package io.parity.signer.screens.scan.camera
 
 import android.util.Log
 import android.view.ViewGroup

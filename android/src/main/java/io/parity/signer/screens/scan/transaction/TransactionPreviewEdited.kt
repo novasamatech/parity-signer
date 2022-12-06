@@ -1,5 +1,6 @@
 package io.parity.signer.screens.scan.transaction
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -8,15 +9,19 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.components.*
 import io.parity.signer.models.Callback
+import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Text400
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.MTransaction
-import io.parity.signer.uniffi.TransactionType
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.*
+import io.parity.signer.uniffi.*
+
 
 /**
  * Old UI screen edited to work on new screens
@@ -24,14 +29,19 @@ import io.parity.signer.uniffi.TransactionType
 @Composable
 fun TransactionPreviewEdited(
 	transactions: List<MTransaction>,
+	signerDataModel: SignerDataModel,
 	onBack: Callback,
 	onFinish: Callback,
-	signTransaction: (comment: String, seedName: String) -> Unit
+	onSigReady: (MSignatureReady) -> Unit,
 ) {
+	var screenTransactions by remember {
+		mutableStateOf(transactions)
+	}
 	Column(
 		Modifier.verticalScroll(rememberScrollState())
 	) {
-		for (transaction in transactions) {
+		val transactionVm: TransactionViewModel = viewModel()
+		for (transaction in screenTransactions) {
 			TransactionPreviewField(
 				cardSet = transaction.content,
 			)
@@ -42,7 +52,7 @@ fun TransactionPreviewEdited(
 				NetworkCard(NetworkCardModel(it.networkTitle, it.networkLogo))
 			}
 		}
-		val action = transactions.first().ttype
+		val action = screenTransactions.first().ttype
 		val comment = remember { mutableStateOf("") }
 		val focusManager = LocalFocusManager.current
 		val focusRequester = remember { FocusRequester() }
@@ -54,8 +64,7 @@ fun TransactionPreviewEdited(
 					color = MaterialTheme.colors.Text400
 				)
 
-				SingleTextInput(
-					content = comment,
+				SingleTextInput(content = comment,
 					update = { comment.value = it },
 					onDone = { },
 					focusManager = focusManager,
@@ -67,49 +76,61 @@ fun TransactionPreviewEdited(
 					style = MaterialTheme.typography.subtitle1,
 					color = MaterialTheme.colors.Text400
 				)
-
-				BigButton(
-					text = "Unlock key and sign",
-					action = {
-						signTransaction(
-							comment.value, transactions.firstOrNull()
-								?.authorInfo?.address?.seedName ?: ""
+				val scope = rememberCoroutineScope()
+				BigButton(text = "Unlock key and sign", action = {
+					scope.launch {
+						val result = transactionVm.signTransaction(
+							comment = comment.value,
+							seedNames = screenTransactions.mapNotNull { it.authorInfo?.address?.seedName },
+							signerVM = signerDataModel,
 						)
+						//todo dmitry handle non happy cases as well and probably in viewmodel not here
+						if (result is SignResult.Success) {
+							if (result.navResult.alertData != null) {
+								Log.e("sign error", result.navResult.alertData.toString()) //todo dmitry show error
+							} else if (result.navResult.modalData != null){
+								if (result.navResult.modalData is ModalData.SignatureReady) {
+									onSigReady((result.navResult.modalData as ModalData.SignatureReady).f)
+								} else {
+									//todo dmitry show password
+									Log.e(
+										"sign modal is not handled",
+										result.navResult.modalData.toString()
+									)
+								}
+							} else{
+								(result.navResult.screenData as? ScreenData.Transaction)?.f?.let { transactions ->
+//								onSuccess(transactions)
+									screenTransactions = transactions
+								}
+							}
+						}
 					}
-				)
+				})
 				BigButton(
-					text = "Decline",
-					action = onBack
+					text = "Decline", action = onBack
 				)
 			}
-			TransactionType.DONE ->
-				BigButton(
-					text = "Done",
-					action = onBack
-				)
+			TransactionType.DONE -> BigButton(
+				text = "Done", action = onBack
+			)
 			TransactionType.STUB -> {
 				BigButton(
-					text = "Approve",
-					action = onFinish
+					text = "Approve", action = onFinish
 				)
 				BigButton(
-					text = "Decline",
-					action = onBack
+					text = "Decline", action = onBack
 				)
 			}
-			TransactionType.READ ->
-				BigButton(
-					text = "Back",
-					action = onBack
-				)
+			TransactionType.READ -> BigButton(
+				text = "Back", action = onBack
+			)
 			TransactionType.IMPORT_DERIVATIONS -> {
 				BigButton(
-					text = "Select seed",
-					action = onFinish
+					text = "Select seed", action = onFinish
 				)
 				BigButton(
-					text = "Decline",
-					action = onBack
+					text = "Decline", action = onBack
 				)
 			}
 		}
