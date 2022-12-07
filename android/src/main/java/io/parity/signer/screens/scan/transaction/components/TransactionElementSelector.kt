@@ -23,8 +23,11 @@ import io.parity.signer.uniffi.TransactionCard
 fun TransactionElementSelector(card: TransactionCard) {
 	Box(
 		modifier = Modifier
-            .padding(start = (card.indent.toInt() * 10).dp)
-            .fillMaxWidth()
+			.padding(
+				start = (card.indent.toInt() * 10).dp,
+				end = (card.indent.toInt() * 10).dp
+			)
+			.fillMaxWidth()
 	) {
 		when (val txCard = card.card) {
 			// Author cards with identicon and variable description
@@ -32,7 +35,7 @@ fun TransactionElementSelector(card: TransactionCard) {
 			is Card.AuthorPublicKeyCard -> TCAuthorPublicKey(key = txCard.f)  // Not present on new designs
 
 			// Foldable Markdown values on tap
-			is Card.CallCard -> TCMethod(payload = txCard.f)  // This is used to present `Method` and provides details on tap
+			is Card.CallCard -> TCCall(payload = txCard.f.toTransactionCallModel())  // This is used to present `Method` and provides details on tap
 			is Card.EnumVariantNameCard -> TCEnumVariantName(name = txCard.f)
 			is Card.FieldNameCard -> TCFieldName(fieldName = txCard.f) // Presents `dest` or `value` indentent values
 			is Card.FieldNumberCard -> TCFieldNumber(fieldNumber = txCard.f)
