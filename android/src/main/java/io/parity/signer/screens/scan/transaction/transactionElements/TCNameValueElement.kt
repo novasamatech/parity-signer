@@ -1,10 +1,7 @@
 package io.parity.signer.screens.scan.transaction.transactionElements
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +20,7 @@ fun TCNameValueElement(
 	valueInSameLine: Boolean = true,
 ) {
 	if (valueInSameLine) {
-		Row() {
+		Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
 			if (name?.isNotEmpty() == true) {
 				Text(
 					text = name,
@@ -31,7 +28,6 @@ fun TCNameValueElement(
 					color = MaterialTheme.colors.textTertiary
 				)
 			}
-			Spacer(Modifier.width(4.dp))
 			if (value?.isNotEmpty() == true) {
 				Text(
 					text = value,
@@ -41,7 +37,7 @@ fun TCNameValueElement(
 			}
 		}
 	} else {
-		Column() {
+		Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
 			if (name?.isNotEmpty() == true) {
 				Text(
 					text = name,
@@ -49,7 +45,6 @@ fun TCNameValueElement(
 					color = MaterialTheme.colors.textTertiary
 				)
 			}
-			Spacer(Modifier.width(8.dp))
 			if (value?.isNotEmpty() == true) {
 				Text(
 					text = value,
