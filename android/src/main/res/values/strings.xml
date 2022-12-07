@@ -152,5 +152,15 @@
 	<string name="transaction_field_bitvec">BitVec</string>
 	<string name="transaction_field_backhash">Block hash</string>
 	<string name="transaction_field_transaction_immortal">Immortal transaction</string>
+	<string name="transaction_field_phrase">Phase</string>
+	<string name="transaction_field_period">Period</string>
+	<string name="transaction_field_identityfield">IdentityField</string>
+	<string name="transaction_field_genesis_hash">Genesis hash</string>
+	<string name="transaction_field_network_name">Network name</string>
+	<string name="transaction_field_nonce">Nonce</string>
+	<string name="transaction_field_none">None</string>
+	<string name="transaction_field_pallet">Pallet</string>
+	<string name="transaction_field_tip">Tip</string>
+	<string name="transaction_field_tx_version">TX version</string>
 
 </resources>

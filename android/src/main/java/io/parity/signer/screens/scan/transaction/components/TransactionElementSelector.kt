@@ -83,21 +83,50 @@ fun TransactionElementSelector(card: TransactionCard) {
 			Card.EraImmortalCard -> TCNameValueElement(
 				name = stringResource(R.string.transaction_field_transaction_immortal),
 			)
-			//todo redesign
 			is Card.EraMortalCard -> TCEra(era = txCard.f)
-			is Card.IdCard -> TCID(txCard.f) // ID card, new designs present it without identicon
-			is Card.IdentityFieldCard -> TCIdentityField(text = txCard.f)
-			is Card.NameVersionCard -> TCNameVersion(nameVersion = txCard.f)
-			is Card.NetworkGenesisHashCard -> TCGenesisHash(payload = txCard.f)
-
-			is Card.NetworkNameCard -> TCNetworkName(text = txCard.f)
-			is Card.NonceCard -> TCNonce(text = txCard.f)
-			Card.NoneCard -> Text("None")
-			is Card.PalletCard -> TCPallet(text = txCard.f)
-			is Card.TipCard -> TCTip(txCard.f)
-			is Card.TipPlainCard -> TCTipPlain(txCard.f)
-			is Card.TxSpecCard -> TCTXSpec(txCard.f)
-			is Card.VarNameCard -> TCVarName(txCard.f)
+			is Card.IdCard -> TCID(txCard.f.base58) // ID card, new designs present it without identicon
+			is Card.IdentityFieldCard -> TCNameValueElement(
+				name = stringResource(R.string.transaction_field_identityfield),
+				value = txCard.f,
+			)
+			is Card.NameVersionCard -> TCNameValueElement(
+				name = txCard.f.name,
+				value = txCard.f.version,
+			)
+			is Card.NetworkGenesisHashCard -> TCNameValueElement(
+				name = stringResource(R.string.transaction_field_genesis_hash),
+				value = txCard.f,
+			)
+			is Card.NetworkNameCard -> TCNameValueElement(
+				name = stringResource(R.string.transaction_field_network_name),
+				value = txCard.f,
+			)
+			is Card.NonceCard -> TCNameValueElement(
+				name = stringResource(R.string.transaction_field_nonce),
+				value = txCard.f,
+			)
+			Card.NoneCard -> TCNameValueElement(
+				name = stringResource(R.string.transaction_field_none),
+			)
+			is Card.PalletCard -> TCNameValueElement(
+				name = stringResource(R.string.transaction_field_pallet),
+				value = txCard.f,
+			)
+			is Card.TipCard -> TCNameValueElement(
+				name = stringResource(R.string.transaction_field_tip),
+				value = "${txCard.f.amount} ${txCard.f.units}",
+			)
+			is Card.TipPlainCard -> TCNameValueElement(
+				name = stringResource(R.string.transaction_field_tip),
+				value = txCard.f,
+			)
+			is Card.TxSpecCard -> TCNameValueElement(
+				name = stringResource(R.string.transaction_field_tx_version),
+				value = txCard.f,
+			)
+			is Card.VarNameCard -> TCNameValueElement(
+				value = txCard.f,
+			)
 		}
 	}
 }
