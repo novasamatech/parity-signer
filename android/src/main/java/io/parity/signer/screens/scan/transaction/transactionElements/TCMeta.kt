@@ -14,6 +14,7 @@ import io.parity.signer.uniffi.MMetadataRecord
 
 @Composable
 fun TCMeta(meta: MMetadataRecord) {
+	//todo dmitry redesign and below
 	Row {
 		IdentIcon(identicon = meta.metaIdPic)
 		Column {

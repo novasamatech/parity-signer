@@ -61,9 +61,9 @@ fun TCValueWithMarkdownTrio(
 					contentDescription = null,
 					colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
 					modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .size(16.dp)
-                        .align(Alignment.CenterVertically)
+						.padding(horizontal = 8.dp)
+						.size(16.dp)
+						.align(Alignment.CenterVertically)
 				)
 			}
 		}
@@ -147,9 +147,13 @@ fun MscFieldNumber.toTCFieldNameModel() = TCWithTrioMarkdownModel(
 private fun PreviewTCFieldName() {
 	SignerNewTheme {
 		Column {
-			TCValueWithMarkdownTrio(TCWithTrioMarkdownModel.createStub())
+			TCValueWithMarkdownTrio(
+				TCWithTrioMarkdownModel.createStub().copy(isNumber = false)
+			)
 			SignerDivider()
-			TCValueWithMarkdownTrio(TCWithTrioMarkdownModel.createStub().copy(isNumber = true))
+			TCValueWithMarkdownTrio(
+				TCWithTrioMarkdownModel.createStub().copy(isNumber = true)
+			)
 		}
 	}
 }

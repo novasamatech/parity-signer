@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -44,7 +45,7 @@ fun TCValueWithToogleDocs(
 	) {
 		Row(Modifier.fillMaxWidth(1f)) {
 			TCNameValueElement(
-				name = stringResource(R.string.transaction_field_method_call),
+				name = if (payload.isMethod) stringResource(R.string.transaction_field_method_call) else null,
 				value = payload.methodName
 			)
 			if (payload.docs.isNotEmpty()) {
@@ -76,22 +77,30 @@ fun TCValueWithToogleDocs(
  */
 data class TCWithMarkdownDocsModel(
 	val methodName: String,
-	val docs: String
+	val docs: String,
+	val isMethod: Boolean,
 ) {
 	companion object {
 		fun createStub(): TCWithMarkdownDocsModel =
 			//todo dmitry how do you do  Text.markdownWithFallback(value.docs) and whether preview sample with umbers is the current one?
-			TCWithMarkdownDocsModel("method name", PreviewData.exampleMarkdownDocs)
+			TCWithMarkdownDocsModel(
+				"method name",
+				PreviewData.exampleMarkdownDocs,
+				true
+			)
 	}
 }
 
 fun MscCall.toTransactionCallModel() = TCWithMarkdownDocsModel(
 	methodName = methodName,
 	docs = docs,
+	isMethod = true,
 )
+
 fun MscEnumVariantName.toTransactionCallModel() = TCWithMarkdownDocsModel(
 	methodName = name,
 	docs = docsEnumVariant,
+	isMethod = true,
 )
 
 
@@ -107,8 +116,14 @@ fun MscEnumVariantName.toTransactionCallModel() = TCWithMarkdownDocsModel(
 private fun PreviewTCCall() {
 	SignerNewTheme {
 		Column {
-			TCValueWithToogleDocs(TCWithMarkdownDocsModel.createStub())
-//			SignerDivider()
+			TCValueWithToogleDocs(
+				TCWithMarkdownDocsModel.createStub().copy(isMethod = true)
+			)
+			SignerDivider()
+			TCValueWithToogleDocs(
+				TCWithMarkdownDocsModel.createStub().copy(isMethod = false)
+			)
+
 		}
 	}
 }
