@@ -33,26 +33,28 @@ struct HistoryCardExtended: View {
              .wrongPassword,
              .messageSignError,
              .messageSigned:
-            HistoryCard(event: event.event)
+            HistoryCard(
+                timestamp: nil,
+                danger: event.event.isWarning,
+                line1: event.event.eventTitle,
+                line2: event.event.displayValue
+            )
         case let .identityAdded(value):
-            HistoryCardTemplate(
-                image: .init(.aqi, variant: .medium),
+            HistoryCard(
                 danger: false,
                 line1: Localizable.keyCreated.string,
                 line2: value.seedName + value.path + " in network with hash " +
                     value.networkGenesisHash.formattedAsString
             )
         case let .identityRemoved(value):
-            HistoryCardTemplate(
-                image: .init(.xmark, variants: [.rectangle, .portrait]),
+            HistoryCard(
                 danger: false,
                 line1: Localizable.keyRemoved.string,
                 line2: value.seedName + value.path + " in network with hash " +
                     value.networkGenesisHash.formattedAsString
             )
         case let .secretWasExported(value):
-            HistoryCardTemplate(
-                image: .init(.eye, variants: [.trianglebadge, .exclamationmark, .fill]),
+            HistoryCard(
                 danger: true,
                 line1: Localizable.secretWasExported.string,
                 line2: value.seedName + value.path + " in network with hash " +
@@ -61,16 +63,14 @@ struct HistoryCardExtended: View {
         case let .networkVerifierSet(value):
             switch value.validCurrentVerifier {
             case .general:
-                HistoryCardTemplate(
-                    image: .init(.checkmark, variant: .shield),
+                HistoryCard(
                     danger: false,
                     line1: Localizable.networkVerifierSet.string,
                     line2: value.generalVerifier.show() + " for network with genesis hash " +
                         value.genesisHash.formattedAsString
                 )
             case let .custom(verifier):
-                HistoryCardTemplate(
-                    image: .init(.checkmark, variant: .shield),
+                HistoryCard(
                     danger: false,
                     line1: Localizable.networkVerifierSet.string,
                     line2: verifier.show() + " for network with genesis hash " +
@@ -78,15 +78,13 @@ struct HistoryCardExtended: View {
                 )
             }
         case let .metadataSigned(value):
-            HistoryCardTemplate(
-                image: .init(.signature),
+            HistoryCard(
                 danger: false,
                 line1: Localizable.metadataSigned.string,
                 line2: value.name + String(value.version)
             )
         case let .typesSigned(value):
-            HistoryCardTemplate(
-                image: .init(.signature),
+            HistoryCard(
                 danger: false,
                 line1: Localizable.typesSigned.string,
                 line2: value.typesHash.formattedAsString

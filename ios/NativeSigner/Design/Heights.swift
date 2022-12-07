@@ -37,6 +37,7 @@ enum Heights {
     static let capsuleButton: CGFloat = 40
     static let minTransactionCardHeight: CGFloat = 24
     static let minTransactionSummaryItemHeight: CGFloat = 18
+    static let dateHeaderHeight: CGFloat = 32
 }
 
 enum Sizes {
@@ -46,4 +47,6 @@ enum Sizes {
     static let actionSheetIcon: CGFloat = 30
     /// Size for seed word position label
     static let seedWordPositionWidth: CGFloat = 28
+    /// Diameter for ">" button in circle, 28pt
+    static let chevronCircleButton: CGFloat = 28
 }
