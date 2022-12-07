@@ -17,15 +17,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textDisabled
 import io.parity.signer.uniffi.MscCall
+import io.parity.signer.uniffi.MscEnumVariantName
 
 @Composable
-fun TCCall(
+fun TCValueWithToogleDocs(
 	payload: TCCallModel,
 ) {
 	var showDoc by remember {
@@ -88,6 +88,10 @@ fun MscCall.toTransactionCallModel() = TCCallModel(
 	methodName = methodName,
 	docs = docs,
 )
+fun MscEnumVariantName.toTransactionCallModel() = TCCallModel(
+	methodName = name,
+	docs = docsEnumVariant,
+)
 
 
 @Preview(
@@ -102,7 +106,7 @@ fun MscCall.toTransactionCallModel() = TCCallModel(
 private fun PreviewTCCall() {
 	SignerNewTheme {
 		Column {
-			TCCall(TCCallModel.createStub())
+			TCValueWithToogleDocs(TCCallModel.createStub())
 //			SignerDivider()
 		}
 	}

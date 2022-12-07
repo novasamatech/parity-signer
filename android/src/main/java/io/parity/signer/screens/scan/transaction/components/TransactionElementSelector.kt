@@ -35,8 +35,8 @@ fun TransactionElementSelector(card: TransactionCard) {
 			is Card.AuthorPublicKeyCard -> TCAuthorPublicKey(key = txCard.f)  // Not present on new designs
 
 			// Foldable Markdown values on tap
-			is Card.CallCard -> TCCall(payload = txCard.f.toTransactionCallModel())  // This is used to present `Method` and provides details on tap
-			is Card.EnumVariantNameCard -> TCEnumVariantName(name = txCard.f)
+			is Card.CallCard -> TCValueWithToogleDocs(payload = txCard.f.toTransactionCallModel())  // This is used to present `Method` and provides details on tap
+			is Card.EnumVariantNameCard -> TCValueWithToogleDocs(payload = txCard.f.toTransactionCallModel())
 			is Card.FieldNameCard -> TCFieldName(fieldName = txCard.f) // Presents `dest` or `value` indentent values
 			is Card.FieldNumberCard -> TCFieldNumber(fieldNumber = txCard.f)
 
@@ -86,7 +86,7 @@ fun TransactionElementSelector(card: TransactionCard) {
 			Card.EraImmortalCard -> TCNameValueElement(
 				name = stringResource(R.string.transaction_field_transaction_immortal),
 			)
-			is Card.EraMortalCard -> TCEra(era = txCard.f)
+			is Card.EraMortalCard -> TCEraMortal(era = txCard.f)
 			is Card.IdCard -> TCID(txCard.f.base58) // ID card, new designs present it without identicon
 			is Card.IdentityFieldCard -> TCNameValueElement(
 				name = stringResource(R.string.transaction_field_identityfield),

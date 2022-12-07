@@ -9,6 +9,7 @@ import io.parity.signer.uniffi.MscFieldName
 @Composable
 fun TCFieldName(fieldName: MscFieldName) {
 	//TODO: documentation button
+	//todo dmitry redesign this and below
 	Text(
 		fieldName.name,
 		style = MaterialTheme.typography.body2,

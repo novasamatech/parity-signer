@@ -19,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,9 +34,9 @@ import io.parity.signer.ui.theme.*
 @Composable
 fun KeyCard(model: KeyCardModel) {
 	Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+		Modifier
+			.fillMaxWidth()
+			.padding(16.dp)
 	) {
 
 		//left
@@ -103,11 +104,11 @@ fun KeyCard(model: KeyCardModel) {
 
 			Box(
 				modifier = Modifier
-                    .background(
-                        MaterialTheme.colors.fill12,
-                        RoundedCornerShape(12.dp)
-                    )
-                    .padding(horizontal = 8.dp, vertical = 2.dp),
+					.background(
+						MaterialTheme.colors.fill12,
+						RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+					)
+					.padding(horizontal = 8.dp, vertical = 2.dp),
 				contentAlignment = Alignment.Center,
 			) {
 				Text(
@@ -123,9 +124,9 @@ fun KeyCard(model: KeyCardModel) {
 @Composable
 fun KeySeedCard(seedTitle: String, base58: String) {
 	Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+		Modifier
+			.fillMaxWidth()
+			.padding(16.dp)
 	) {
 		Text(
 			seedTitle,
@@ -141,7 +142,8 @@ private fun ShowBase58Collapsible(base58: String) {
 	val expanded = remember { mutableStateOf(false) }
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		modifier = Modifier.clickable { expanded.value = !expanded.value }
+		modifier = Modifier
+			.clickable { expanded.value = !expanded.value }
 			.animateContentSize()
 	) {
 		if (expanded.value) {
