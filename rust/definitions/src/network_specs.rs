@@ -281,6 +281,7 @@ use sp_runtime::MultiSigner;
 use crate::{
     error::{Error, Result},
     helpers::IdenticonStyle,
+    navigation::Image,
 };
 
 #[cfg(feature = "signer")]
@@ -515,7 +516,9 @@ impl Verifier {
             Some(a) => a.show_card(),
             None => MVerifierDetails {
                 public_key: String::new(),
-                identicon: EMPTY_PNG.to_vec(),
+                identicon: Image::Png {
+                    image: EMPTY_PNG.to_vec(),
+                },
                 encryption: String::new(),
             },
         }

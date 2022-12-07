@@ -33,6 +33,9 @@ use crate::network_specs::NetworkSpecs;
 use crate::types::TypeEntry;
 use sp_core::H256;
 
+#[cfg(feature = "signer")]
+use crate::navigation::Image;
+
 /// `load_metadata` QR code content  
 ///
 /// Messages `load_metadata` are used to update through air-gap the network
@@ -232,7 +235,7 @@ impl ContentLoadTypes {
     /// Types information hash is calculated for `Vec<u8>` of encoded types information,
     /// as it would be stored in the database  
     #[cfg(feature = "signer")]
-    pub fn show(&self) -> (String, Vec<u8>) {
+    pub fn show(&self) -> (String, Image) {
         use sp_core::blake2_256;
 
         let types_hash = blake2_256(&self.store()).as_ref().to_vec();

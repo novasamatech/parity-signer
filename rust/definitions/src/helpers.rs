@@ -17,6 +17,9 @@ use std::convert::TryInto;
 #[cfg(feature = "signer")]
 use plot_icon::{generate_png, EMPTY_PNG};
 
+#[cfg(all(feature = "signer", target_os = "ios"))]
+use plot_icon::generate_svg;
+
 use crate::crypto::Encryption;
 #[cfg(feature = "signer")]
 use crate::error::Error;
@@ -68,13 +71,13 @@ pub enum IdenticonStyle {
     Blockies,
 }
 
+#[cfg(feature = "signer")]
+use crate::navigation::Image;
+
 /// Print identicon from
 /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)  
 #[cfg(feature = "signer")]
-pub fn make_identicon_from_multisigner(
-    multisigner: &MultiSigner,
-    style: IdenticonStyle,
-) -> Vec<u8> {
+pub fn make_identicon_from_multisigner(multisigner: &MultiSigner, style: IdenticonStyle) -> Image {
     match style {
         IdenticonStyle::Dots => make_identicon(&multisigner_to_public(multisigner)),
         IdenticonStyle::Blockies => {
@@ -84,35 +87,50 @@ pub fn make_identicon_from_multisigner(
                 let account = account.canonicalize_ethaddr();
                 let dimension = (IDENTICON_IMG_SIZE, IDENTICON_IMG_SIZE);
                 let compressed_output = false;
-                eth_blockies_png_data(account, dimension, compressed_output)
+                Image::Png {
+                    image: eth_blockies_png_data(account, dimension, compressed_output),
+                }
             } else {
-                EMPTY_PNG.to_vec()
+                Image::Png {
+                    image: EMPTY_PNG.to_vec(),
+                }
             }
         }
     }
 }
 
 #[cfg(feature = "signer")]
-pub fn make_identicon_from_id20(id: &[u8; 20]) -> Vec<u8> {
+pub fn make_identicon_from_id20(id: &[u8; 20]) -> Image {
     use eth_blockies::eth_blockies_png_data;
 
     let account = format!("0x{}", hex::encode(id));
     let dimension = (IDENTICON_IMG_SIZE, IDENTICON_IMG_SIZE);
     let compressed_output = false;
-    eth_blockies_png_data(account, dimension, compressed_output)
+    let image = eth_blockies_png_data(account, dimension, compressed_output);
+
+    Image::Png { image }
 }
 
 #[cfg(feature = "signer")]
-pub fn make_identicon_from_account(account: AccountId32) -> Vec<u8> {
+pub fn make_identicon_from_account(account: AccountId32) -> Image {
     make_identicon(&<[u8; 32]>::from(account))
 }
 
-#[cfg(feature = "signer")]
-fn make_identicon(into_id: &[u8]) -> Vec<u8> {
-    match generate_png(into_id, IDENTICON_IMG_SIZE as u16) {
+#[cfg(all(feature = "signer", target_os = "ios"))]
+fn make_identicon(into_id: &[u8]) -> Image {
+    let image = generate_svg(into_id).to_string().into_bytes();
+
+    Image::Svg { image }
+}
+
+#[cfg(all(feature = "signer", not(target_os = "ios")))]
+fn make_identicon(into_id: &[u8]) -> Image {
+    let image = match generate_png(into_id, IDENTICON_IMG_SIZE as u16) {
         Ok(a) => a,
         Err(_) => EMPTY_PNG.to_vec(),
-    }
+    };
+
+    Image::Png { image }
 }
 
 /// Get [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
@@ -213,7 +231,7 @@ fn print_ethereum_address(public: &ecdsa::Public) -> String {
 ///
 /// Currently uses PNG identicon generator, could be changed later.
 #[cfg(feature = "signer")]
-pub fn pic_meta(meta_hash: &[u8]) -> Vec<u8> {
+pub fn pic_meta(meta_hash: &[u8]) -> Image {
     make_identicon(meta_hash)
 }
 
@@ -221,7 +239,7 @@ pub fn pic_meta(meta_hash: &[u8]) -> Vec<u8> {
 ///
 /// Currently uses PNG identicon generator, could be changed later.
 #[cfg(feature = "signer")]
-pub fn pic_types(types_hash: &[u8]) -> Vec<u8> {
+pub fn pic_types(types_hash: &[u8]) -> Image {
     make_identicon(types_hash)
 }
 
