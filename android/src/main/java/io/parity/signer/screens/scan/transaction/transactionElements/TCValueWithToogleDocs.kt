@@ -63,7 +63,8 @@ fun TCValueWithToogleDocs(
 			Text(
 				text = payload.docs,
 				style = SignerTypeface.BodyL,
-				color = MaterialTheme.colors.primary
+				color = MaterialTheme.colors.primary,
+				modifier = Modifier.padding(16.dp),
 			)
 		}
 	}
@@ -71,7 +72,7 @@ fun TCValueWithToogleDocs(
 
 
 /**
- * Local copy of shared [MscCall] class
+ * Local copy of shared [MscCall] amd [MscEnumVariantName] class
  */
 data class TCCallModel(
 	val methodName: String,

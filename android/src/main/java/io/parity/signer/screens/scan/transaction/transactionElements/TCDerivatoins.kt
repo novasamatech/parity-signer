@@ -14,7 +14,7 @@ import io.parity.signer.ui.theme.*
 fun TCDerivations(payload: List<String>) {
 	Column {
 		Text(
-			stringResource(R.string.transactions_field_import_derivations),
+			stringResource(R.string.transaction_field_import_derivations),
 			style = SignerTypeface.BodyL,
 			color = MaterialTheme.colors.textTertiary
 		)

@@ -9,6 +9,8 @@ import io.parity.signer.uniffi.MscFieldNumber
 @Composable
 fun TCFieldNumber(fieldNumber: MscFieldNumber) {
 	//TODO: documentation button
+	//todo dmitry redesign this and below
+
 	Text(
 		fieldNumber.number,
 		style = MaterialTheme.typography.body2,

@@ -164,7 +164,9 @@
 	<string name="transaction_field_tx_version">TX version</string>
 	<string name="transaction_field_signed_with">Signed with %1$s</string>
 	<string name="transaction_field_method_call">Method</string>
-	<string name="transactions_field_import_derivations">Importing derivations</string>
+	<string name="transaction_field_import_derivations">Importing derivations</string>
 	<string name="transaction_field_error">Error!</string>
+	<string name="transaction_field_path">Path %1$s</string>
+
 
 </resources>
