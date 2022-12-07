@@ -9,20 +9,20 @@ import io.parity.signer.uniffi.NetworkSpecs
 fun TCNewSpecs(specs: NetworkSpecs) {
 	Column {
 		Text("NEW NETWORK")
-		TCNameValueTemplate(name = "Network name:", value = specs.title)
-		TCNameValueTemplate(
+		TCNameValueElement(name = "Network name:", value = specs.title)
+		TCNameValueElement(
 			name = "base58 prefix:",
 			value = specs.base58prefix.toString()
 		)
-		TCNameValueTemplate(name = "decimals:", value = specs.decimals.toString())
-		TCNameValueTemplate(name = "unit:", value = specs.unit)
-		TCNameValueTemplate(
+		TCNameValueElement(name = "decimals:", value = specs.decimals.toString())
+		TCNameValueElement(name = "unit:", value = specs.unit)
+		TCNameValueElement(
 			name = "genesis hash:",
 			value = specs.genesisHash.toString()
 		)
-		TCNameValueTemplate(name = "crypto:", value = specs.encryption.toString())
-		TCNameValueTemplate(name = "spec name:", value = specs.name)
-		TCNameValueTemplate(name = "logo:", value = specs.logo)
-		TCNameValueTemplate(name = "default path", value = specs.pathId)
+		TCNameValueElement(name = "crypto:", value = specs.encryption.toString())
+		TCNameValueElement(name = "spec name:", value = specs.name)
+		TCNameValueElement(name = "logo:", value = specs.logo)
+		TCNameValueElement(name = "default path", value = specs.pathId)
 	}
 }

@@ -9,6 +9,6 @@ import io.parity.signer.uniffi.MTypesInfo
 fun TCTypesInfo(types: MTypesInfo) {
 	Row {
 		types.typesIdPic?.let { IdentIcon (identicon = it) }
-		TCNameValueTemplate(name = "Types hash:", value = types.typesHash ?: "")
+		TCNameValueElement(name = "Types hash:", value = types.typesHash ?: "")
 	}
 }

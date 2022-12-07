@@ -96,6 +96,7 @@ fun TransactionElementSelector(card: TransactionCard) {
 			is Card.NetworkGenesisHashCard -> TCNameValueElement(
 				name = stringResource(R.string.transaction_field_genesis_hash),
 				value = txCard.f,
+				valueInSameLine = false,
 			)
 			is Card.NetworkNameCard -> TCNameValueElement(
 				name = stringResource(R.string.transaction_field_network_name),

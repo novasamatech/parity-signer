@@ -10,12 +10,12 @@ import io.parity.signer.uniffi.MscTxSpecPlain
 fun TCTXSpecPlain(specsPlain: MscTxSpecPlain) {
 	Column {
 		Text("Unknown network")
-		TCNameValueTemplate(
+		TCNameValueElement(
 			name = "Genesis hash",
 			value = specsPlain.networkGenesisHash.toUByteArray()
 				.toByteArray().encodeHex()
 		)
-		TCNameValueTemplate(name = "Version", value = specsPlain.version)
-		TCNameValueTemplate(name = "Tx version", value = specsPlain.txVersion)
+		TCNameValueElement(name = "Version", value = specsPlain.version)
+		TCNameValueElement(name = "Tx version", value = specsPlain.txVersion)
 	}
 }

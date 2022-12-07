@@ -31,12 +31,12 @@ fun TCNameValueElement(
 					color = MaterialTheme.colors.textTertiary
 				)
 			}
-			Spacer(Modifier.width(16.dp)) // todo dmitry space?
+			Spacer(Modifier.width(4.dp))
 			if (value?.isNotEmpty() == true) {
 				Text(
 					text = value,
 					style = SignerTypeface.BodyL,
-					color = MaterialTheme.colors.textTertiary
+					color = MaterialTheme.colors.primary
 				)
 			}
 		}
@@ -49,12 +49,12 @@ fun TCNameValueElement(
 					color = MaterialTheme.colors.textTertiary
 				)
 			}
-			Spacer(Modifier.width(16.dp))// todo dmitry space?
+			Spacer(Modifier.width(8.dp))
 			if (value?.isNotEmpty() == true) {
 				Text(
 					text = value,
 					style = SignerTypeface.BodyL,
-					color = MaterialTheme.colors.textTertiary
+					color = MaterialTheme.colors.primary
 				)
 			}
 		}
