@@ -15,6 +15,9 @@ import io.parity.signer.ui.theme.Text600
 import io.parity.signer.ui.theme.Typography
 import io.parity.signer.uniffi.MAddressCard
 
+/**
+ * todo dmitry remove
+ */
 @Composable
 fun TCAuthor(author: MAddressCard) {
 	Row {
