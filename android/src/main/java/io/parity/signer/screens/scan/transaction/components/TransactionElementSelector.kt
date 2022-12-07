@@ -3,16 +3,16 @@ package io.parity.signer.screens.scan.transaction.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.parity.signer.R
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.decodeHex
 import io.parity.signer.screens.scan.transaction.transactionElements.*
-import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.Card
 import io.parity.signer.uniffi.TransactionCard
 
@@ -20,11 +20,11 @@ import io.parity.signer.uniffi.TransactionCard
  * Selector for transaction card appearance
  */
 @Composable
-fun TransactionElement(card: TransactionCard) {
+fun TransactionElementSelector(card: TransactionCard) {
 	Box(
 		modifier = Modifier
-			.padding(start = (card.indent.toInt() * 10).dp)
-			.fillMaxWidth()
+            .padding(start = (card.indent.toInt() * 10).dp)
+            .fillMaxWidth()
 	) {
 		when (val txCard = card.card) {
 			// Author cards with identicon and variable description
@@ -60,17 +60,30 @@ fun TransactionElement(card: TransactionCard) {
 
 
 			// Simple values - redesigned
-			//todo redesign
-			is Card.AuthorCard -> TCAuthor(author = txCard.f)
-			is Card.BalanceCard -> TCBalance(currency = txCard.f)
-			is Card.BitVecCard -> TCBitVec(bitVec = txCard.f)
-			is Card.BlockHashCard -> TCBlockHash(text = txCard.f)
-			is Card.DefaultCard -> Text(
-				txCard.f,
-				style = MaterialTheme.typography.body2,
-				color = MaterialTheme.colors.Text600
+			is Card.AuthorCard -> TCNameValueElement(
+				name = stringResource(R.string.transaction_field_from),
+				value = txCard.f.base58,
+				valueInSameLine = false
 			)
-			Card.EraImmortalCard -> TCEraImmortal()
+			is Card.BalanceCard -> TCNameValueElement(
+				value = "${txCard.f.amount} ${txCard.f.units}",
+			)
+			is Card.BitVecCard -> TCNameValueElement(
+				name = stringResource(R.string.transaction_field_bitvec),
+				value = txCard.f,
+			)
+			is Card.BlockHashCard -> TCNameValueElement(
+				name = stringResource(R.string.transaction_field_backhash),
+				value = txCard.f,
+				valueInSameLine = false
+			)
+			is Card.DefaultCard -> TCNameValueElement(
+				name = txCard.f,
+			)
+			Card.EraImmortalCard -> TCNameValueElement(
+				name = stringResource(R.string.transaction_field_transaction_immortal),
+			)
+			//todo redesign
 			is Card.EraMortalCard -> TCEra(era = txCard.f)
 			is Card.IdCard -> TCID(txCard.f) // ID card, new designs present it without identicon
 			is Card.IdentityFieldCard -> TCIdentityField(text = txCard.f)

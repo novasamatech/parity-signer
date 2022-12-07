@@ -148,5 +148,9 @@
 	<string name="new_key_set_backup_bottomsheet_title">Please confirm that you have you written down your secret recovery phrase</string>
 	<string name="new_key_set_backup_bottomsheet_checkbox_written">I’ve written down my secret recovery phrase</string>
 	<string name="new_key_set_backup_bottomsheet_checkbox_keep_careful">I understand that if I lose my secret phrase, my funds will be lost forever</string>
+    <string name="transaction_field_from">From</string>
+	<string name="transaction_field_bitvec">BitVec</string>
+	<string name="transaction_field_backhash">Block hash</string>
+	<string name="transaction_field_transaction_immortal">Immortal transaction</string>
 
 </resources>

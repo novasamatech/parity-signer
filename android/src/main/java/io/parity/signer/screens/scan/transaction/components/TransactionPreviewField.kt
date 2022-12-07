@@ -50,7 +50,7 @@ private fun LazyListScope.transactionCards(
 ) {
 	transactions?.let {
 		items(it.size) { item ->
-			TransactionElement(
+			TransactionElementSelector(
 				card = it[item]
 			)
 		}

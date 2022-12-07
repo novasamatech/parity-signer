@@ -12,45 +12,51 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.base.SignerDivider
-import io.parity.signer.components.items.KeySetItem
-import io.parity.signer.models.KeySetModel
-import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun TCNameValueElement(
-	name: String,
-	value: String,
+	name: String? = null,
+	value: String? = null,
 	valueInSameLine: Boolean = true,
 ) {
 	if (valueInSameLine) {
-		//todo dmitry HStack(alignment: .top, spacing: Spacing.extraSmall) { - top bottom spacing?
 		Row() {
-			Text(
-				text = name,
-				style = SignerTypeface.BodyL,
-				color = MaterialTheme.colors.textTertiary
-			)
-			Spacer(Modifier.width(16.dp))
-			Text(
-				text = value,
-				style = SignerTypeface.BodyL,
-				color = MaterialTheme.colors.textTertiary
-			)
+			if (name?.isNotEmpty() == true) {
+				Text(
+					text = name,
+					style = SignerTypeface.BodyL,
+					color = MaterialTheme.colors.textTertiary
+				)
+			}
+			Spacer(Modifier.width(16.dp)) // todo dmitry space?
+			if (value?.isNotEmpty() == true) {
+				Text(
+					text = value,
+					style = SignerTypeface.BodyL,
+					color = MaterialTheme.colors.textTertiary
+				)
+			}
 		}
 	} else {
 		Column() {
-			Text(
-				text = name,
-				style = SignerTypeface.BodyL,
-				color = MaterialTheme.colors.textTertiary
-			)
-			Spacer(Modifier.width(16.dp))
-			Text(
-				text = value,
-				style = SignerTypeface.BodyL,
-				color = MaterialTheme.colors.textTertiary
-			)
+			if (name?.isNotEmpty() == true) {
+				Text(
+					text = name,
+					style = SignerTypeface.BodyL,
+					color = MaterialTheme.colors.textTertiary
+				)
+			}
+			Spacer(Modifier.width(16.dp))// todo dmitry space?
+			if (value?.isNotEmpty() == true) {
+				Text(
+					text = value,
+					style = SignerTypeface.BodyL,
+					color = MaterialTheme.colors.textTertiary
+				)
+			}
 		}
 	}
 }
