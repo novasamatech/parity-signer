@@ -21,22 +21,21 @@ import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textDisabled
-import io.parity.signer.uniffi.MscFieldName
+import io.parity.signer.uniffi.MscCall
+import io.parity.signer.uniffi.MscEnumVariantName
 
 @Composable
-fun TCFieldName(value: TCFieldNameModel) {
+fun TCValueWithToogleDocs(
+	payload: TCWithMarkdownDocsModel,
+) {
 	var showDoc by remember {
 		mutableStateOf(false)
 	}
-
-	val hasDetails: Boolean =
-		(value.docsFieldName + value.pathType + value.docsType).isNotEmpty()
-
 	Column(
 		modifier = Modifier
 			.animateContentSize()
 			.run {
-				if (hasDetails) {
+				if (payload.docs.isNotEmpty()) {
 					clickable { showDoc = !showDoc }
 				} else {
 					this
@@ -44,12 +43,11 @@ fun TCFieldName(value: TCFieldNameModel) {
 			},
 	) {
 		Row(Modifier.fillMaxWidth(1f)) {
-			Text(
-				value.name,
-				style = SignerTypeface.BodyL,
-				color = MaterialTheme.colors.primary
+			TCNameValueElement(
+				name = stringResource(R.string.transaction_field_method_call),
+				value = payload.methodName
 			)
-			if (hasDetails) {
+			if (payload.docs.isNotEmpty()) {
 				Image(
 					imageVector = Icons.Default.QuestionMark,
 					contentDescription = null,
@@ -62,57 +60,39 @@ fun TCFieldName(value: TCFieldNameModel) {
 			}
 		}
 		if (showDoc) {
-			Column(	modifier = Modifier.padding(16.dp),) {
-				Text(
-					text = stringResource(id = R.string.transaction_field_path, value.pathType),
-					style = SignerTypeface.BodyL,
-					color = MaterialTheme.colors.primary,
-					)
-				//todo markdowns below
-				Text(
-					text = value.docsFieldName,
-					style = SignerTypeface.BodyL,
-					color = MaterialTheme.colors.primary,
-				)
-				Text(
-					text = value.docsType,
-					style = SignerTypeface.BodyL,
-					color = MaterialTheme.colors.primary,
-				)
-			}
+			Text(
+				text = payload.docs,
+				style = SignerTypeface.BodyL,
+				color = MaterialTheme.colors.primary,
+				modifier = Modifier.padding(16.dp),
+			)
 		}
 	}
 }
 
 
-
 /**
- * Local copy of shared [MscFieldName] class
+ * Local copy of shared [MscCall] amd [MscEnumVariantName] class
  */
-data class TCFieldNameModel(
-	val name: String,
-	val docsFieldName: String,
-	val pathType: String,
-	val docsType: String
+data class TCWithMarkdownDocsModel(
+	val methodName: String,
+	val docs: String
 ) {
 	companion object {
-		fun createStub(): TCFieldNameModel =
-			TCFieldNameModel(
-				name = "method name",
-				docsFieldName = "docs Field Numbar",
-				pathType = "pathTYpe",
-				docsType = PreviewData.exampleMarkdownDocs,
-			)
+		fun createStub(): TCWithMarkdownDocsModel =
+			//todo dmitry how do you do  Text.markdownWithFallback(value.docs) and whether preview sample with umbers is the current one?
+			TCWithMarkdownDocsModel("method name", PreviewData.exampleMarkdownDocs)
 	}
 }
 
-fun MscFieldName.toTCFieldNameModel() = TCFieldNameModel(
-	name = name,
-	docsFieldName = docsFieldName,
-	pathType = pathType,
-	docsType = docsType,
+fun MscCall.toTransactionCallModel() = TCWithMarkdownDocsModel(
+	methodName = methodName,
+	docs = docs,
 )
-
+fun MscEnumVariantName.toTransactionCallModel() = TCWithMarkdownDocsModel(
+	methodName = name,
+	docs = docsEnumVariant,
+)
 
 
 @Preview(
@@ -124,10 +104,10 @@ fun MscFieldName.toTCFieldNameModel() = TCFieldNameModel(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewTCFieldName() {
+private fun PreviewTCCall() {
 	SignerNewTheme {
 		Column {
-			TCFieldName(TCFieldNameModel.createStub())
+			TCValueWithToogleDocs(TCWithMarkdownDocsModel.createStub())
 //			SignerDivider()
 		}
 	}

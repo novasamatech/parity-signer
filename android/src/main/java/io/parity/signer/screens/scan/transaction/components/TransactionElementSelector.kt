@@ -37,8 +37,8 @@ fun TransactionElementSelector(card: TransactionCard) {
 			// Foldable Markdown values on tap
 			is Card.CallCard -> TCValueWithToogleDocs(payload = txCard.f.toTransactionCallModel())  // This is used to present `Method` and provides details on tap
 			is Card.EnumVariantNameCard -> TCValueWithToogleDocs(payload = txCard.f.toTransactionCallModel())
-			is Card.FieldNameCard -> TCFieldName(value = txCard.f.toTCFieldNameModel()) // Presents `dest` or `value` indentent values
-			is Card.FieldNumberCard -> TCFieldNumber(fieldNumber = txCard.f)
+			is Card.FieldNameCard -> TCValueWithMarkdownTrio(value = txCard.f.toTCFieldNameModel()) // Presents `dest` or `value` indentent values
+			is Card.FieldNumberCard -> TCValueWithMarkdownTrio(value = txCard.f.toTCFieldNameModel())
 
 			// Sections
 			is Card.NewSpecsCard -> TCNewSpecs(specs = txCard.f) // User when adding new network, redesigned
