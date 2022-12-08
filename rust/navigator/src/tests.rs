@@ -42,7 +42,7 @@ use definitions::{
         MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
         MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData,
         Network, NetworkSpecs, PathAndNetwork, RightButton, ScreenData, ScreenNameType,
-        SeedNameCard, TransactionCard, TransactionCardSet, TransactionType,
+        SeedNameCard, SignerImage, TransactionCard, TransactionCardSet, TransactionType,
     },
     network_specs::{OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -94,7 +94,7 @@ fn cut_seed_remove_identicon(data: &mut Option<ModalData>) -> String {
     if let Some(ModalData::NewSeedBackup { f }) = data {
         let res = f.seed_phrase.clone();
         f.seed_phrase = String::new();
-        f.identicon = vec![];
+        f.identicon = SignerImage::default();
         res
     } else {
         panic!("Expected ModalData::NewSeedBackup, got {:?}", data);
@@ -261,7 +261,7 @@ fn erase_log_timestamps(log: &mut ScreenData) {
 fn erase_identicon(m: &mut ScreenData) {
     if let ScreenData::SeedSelector { f } = m {
         for seed_name_card in f.seed_name_cards.iter_mut() {
-            seed_name_card.identicon = vec![];
+            seed_name_card.identicon = SignerImage::default();
         }
     } else {
         panic!("expected ScreenData::SeedSelector, got {:?}", m);
@@ -272,7 +272,7 @@ fn erase_modal_seed_phrase_and_identicon(m: &mut ModalData) -> String {
     if let ModalData::NewSeedBackup { f } = m {
         let res = f.seed_phrase.clone();
         f.seed_phrase = String::new();
-        f.identicon = vec![];
+        f.identicon = SignerImage::default();
         res
     } else {
         panic!("expected ModalData::NewSeedBackup got {:?}", m);
@@ -282,11 +282,11 @@ fn erase_modal_seed_phrase_and_identicon(m: &mut ModalData) -> String {
 fn erase_base58_address_identicon(m: &mut ScreenData) {
     if let ScreenData::Keys { f } = m {
         for key in f.set.iter_mut() {
-            key.address.identicon = vec![];
+            key.address.identicon = SignerImage::default();
             key.base58 = String::new();
             key.address_key = String::new();
         }
-        f.root.address.identicon = vec![];
+        f.root.address.identicon = SignerImage::default();
         f.root.base58 = String::new();
         f.root.address_key = String::new();
     } else {
@@ -982,7 +982,9 @@ fn flow_test_1() {
                 public_key: Some(
                     "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d".to_string(),
                 ),
-                identicon: Some(alice_sr_alice().to_vec()),
+                identicon: Some(SignerImage::Png {
+                    image: alice_sr_alice().to_vec(),
+                }),
                 encryption: Some("sr25519".to_string()),
                 error: None,
             },
@@ -1038,7 +1040,9 @@ fn flow_test_1() {
             f: MVerifierDetails {
                 public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                     .to_string(),
-                identicon: alice_sr_alice().to_vec(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_alice().to_vec(),
+                },
                 encryption: "sr25519".to_string(),
             },
         },
@@ -1170,7 +1174,9 @@ fn flow_test_1() {
                         public_key:
                             "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                                 .to_string(),
-                        identicon: alice_sr_alice().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
                         encryption: "sr25519".to_string(),
                     },
                 },
@@ -1179,7 +1185,9 @@ fn flow_test_1() {
                     specs_version: "9130".to_string(),
                     meta_hash: "3e6bf025743e5cc550883170d91c8275fb238762b214922b41d64f9feba23987"
                         .to_string(),
-                    meta_id_pic: kusama_9130().to_vec(),
+                    meta_id_pic: SignerImage::Png {
+                        image: kusama_9130().to_vec(),
+                    },
                 }],
             },
         },
@@ -1215,7 +1223,9 @@ fn flow_test_1() {
             version: "9130".to_string(),
             meta_hash: "3e6bf025743e5cc550883170d91c8275fb238762b214922b41d64f9feba23987"
                 .to_string(),
-            meta_id_pic: kusama_9130().to_vec(),
+            meta_id_pic: SignerImage::Png {
+                image: kusama_9130().to_vec(),
+            },
             networks: vec![MMMNetwork {
                 title: "Kusama".to_string(),
                 logo: "kusama".to_string(),
@@ -1281,7 +1291,9 @@ fn flow_test_1() {
                         public_key:
                             "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                                 .to_string(),
-                        identicon: alice_sr_alice().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
                         encryption: "sr25519".to_string(),
                     },
                 },
@@ -1369,7 +1381,9 @@ fn flow_test_1() {
             types_hash: Some(
                 "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string(),
             ),
-            types_id_pic: Some(types_known().to_vec()),
+            types_id_pic: Some(SignerImage::Png {
+                image: types_known().to_vec(),
+            }),
         },
     });
 
@@ -1597,7 +1611,9 @@ fn flow_test_1() {
                         card: Card::VerifierCard {
                             f: MVerifierDetails {
                                 public_key: aaa,
-                                identicon: alice_sr_alice().to_vec(),
+                                identicon: SignerImage::Png {
+                                    image: alice_sr_alice().to_vec(),
+                                },
                                 encryption: "sr25519".to_string(),
                             },
                         },
@@ -1679,7 +1695,9 @@ fn flow_test_1() {
                         public_key:
                             "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                                 .to_string(),
-                        identicon: alice_sr_alice().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
                         encryption: "sr25519".to_string(),
                     },
                 },
@@ -1821,7 +1839,9 @@ fn flow_test_1() {
                         card: Card::VerifierCard {
                             f: MVerifierDetails {
                                 public_key: aaa_2,
-                                identicon: alice_sr_alice().to_vec(),
+                                identicon: SignerImage::Png {
+                                    image: alice_sr_alice().to_vec(),
+                                },
                                 encryption: "sr25519".to_string(),
                             },
                         },
@@ -1834,7 +1854,9 @@ fn flow_test_1() {
                                 specname: "kusama".to_string(),
                                 specs_version: "9151".to_string(),
                                 meta_hash,
-                                meta_id_pic: kusama_9151().to_vec(),
+                                meta_id_pic: SignerImage::Png {
+                                    image: kusama_9151().to_vec(),
+                                },
                             },
                         },
                     }]),
@@ -1884,7 +1906,9 @@ fn flow_test_1() {
                         public_key:
                             "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                                 .to_string(),
-                        identicon: alice_sr_alice().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
                         encryption: "sr25519".to_string(),
                     },
                 },
@@ -1893,7 +1917,9 @@ fn flow_test_1() {
                     specs_version: "9151".to_string(),
                     meta_hash: "9a179da92949dd3ab3829177149ec83dc46fb009af10a45f955949b2a6693b46"
                         .to_string(),
-                    meta_id_pic: kusama_9151().to_vec(),
+                    meta_id_pic: SignerImage::Png {
+                        image: kusama_9151().to_vec(),
+                    },
                 }],
             },
         },
@@ -1999,7 +2025,9 @@ fn flow_test_1() {
                         card: Card::VerifierCard {
                             f: MVerifierDetails {
                                 public_key,
-                                identicon: alice_sr_alice().to_vec(),
+                                identicon: SignerImage::Png {
+                                    image: alice_sr_alice().to_vec(),
+                                },
                                 encryption: "sr25519".to_string(),
                             },
                         },
@@ -2018,7 +2046,9 @@ fn flow_test_1() {
                             f: MTypesInfo {
                                 types_on_file: false,
                                 types_hash,
-                                types_id_pic: Some(types_known().to_vec()),
+                                types_id_pic: Some(SignerImage::Png {
+                                    image: types_known().to_vec(),
+                                }),
                             },
                         },
                     }]),
@@ -2204,7 +2234,7 @@ fn flow_test_1() {
             f: MNewSeedBackup {
                 seed: "Portia".to_string(),
                 seed_phrase: String::new(),
-                identicon: vec![],
+                identicon: SignerImage::default(),
             },
         }),
         alert_data: None,
@@ -2255,7 +2285,7 @@ fn flow_test_1() {
             f: MNewSeedBackup {
                 seed: "Portia".to_string(),
                 seed_phrase: String::new(),
-                identicon: vec![],
+                identicon: SignerImage::default(),
             },
         }),
         alert_data: None,
@@ -2283,7 +2313,7 @@ fn flow_test_1() {
                     address_key: String::new(),
                     base58: String::new(),
                     address: Address {
-                        identicon: vec![],
+                        identicon: SignerImage::default(),
                         has_pwd: false,
                         path: "//polkadot".to_string(),
                         secret_exposed: false,
@@ -2296,7 +2326,7 @@ fn flow_test_1() {
                     address: Address {
                         path: "".to_string(),
                         seed_name: "Portia".to_string(),
-                        identicon: vec![],
+                        identicon: SignerImage::default(),
                         secret_exposed: false,
                         has_pwd: false,
                     },
@@ -2338,7 +2368,7 @@ fn flow_test_1() {
             f: MSeeds {
                 seed_name_cards: vec![SeedNameCard {
                     seed_name: "Portia".to_string(),
-                    identicon: vec![],
+                    identicon: SignerImage::default(),
                     derived_keys_count: 3,
                 }],
             },
@@ -3067,7 +3097,9 @@ fn flow_test_1() {
                     base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
                     address: Address {
                         seed_name: "Alice".to_string(),
-                        identicon: alice_sr_polkadot().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_polkadot().to_vec(),
+                        },
                         has_pwd: false,
                         path: "//polkadot".to_string(),
                         secret_exposed: false,
@@ -3080,7 +3112,9 @@ fn flow_test_1() {
                 root: MKeysCard {
                     address: Address {
                         seed_name: "Alice".to_string(),
-                        identicon: empty_png().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: empty_png().to_vec(),
+                        },
                         ..Default::default()
                     },
                     ..Default::default()
@@ -3126,12 +3160,12 @@ fn flow_test_1() {
                 seed_name_cards: vec![
                     SeedNameCard {
                         seed_name: "Alice".to_string(),
-                        identicon: vec![],
+                        identicon: SignerImage::default(),
                         derived_keys_count: 3,
                     },
                     SeedNameCard {
                         seed_name: "Portia".to_string(),
-                        identicon: vec![],
+                        identicon: SignerImage::default(),
                         derived_keys_count: 3,
                     },
                 ],
@@ -3176,7 +3210,9 @@ fn flow_test_1() {
                 pubkey: "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                     .to_string(),
                 address: Address {
-                    identicon: alice_sr_polkadot().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_polkadot().to_vec(),
+                    },
                     seed_name: "Alice".to_string(),
                     path: "//polkadot".to_string(),
                     has_pwd: false,
@@ -3316,7 +3352,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb".to_string(),
                         address: Address {
-                            identicon: alice_sr_secret_path_multipass().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_secret_path_multipass().to_vec(),
+                            },
                             has_pwd: true,
                             path: "//secret//path".to_string(),
                             secret_exposed: false,
@@ -3331,7 +3369,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
                         address: Address {
-                            identicon: alice_sr_polkadot().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_polkadot().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//polkadot".to_string(),
                             secret_exposed: false,
@@ -3346,7 +3386,9 @@ fn flow_test_1() {
                 root: MKeysCard {
                     address: Address {
                         seed_name: "Alice".to_string(),
-                        identicon: empty_png().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: empty_png().to_vec(),
+                        },
                         ..Default::default()
                     },
                     ..Default::default()
@@ -3393,7 +3435,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb".to_string(),
                         address: Address {
-                            identicon: alice_sr_secret_path_multipass().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_secret_path_multipass().to_vec(),
+                            },
                             has_pwd: true,
                             path: "//secret//path".to_string(),
                             secret_exposed: false,
@@ -3410,7 +3454,9 @@ fn flow_test_1() {
                         multiselect: false,
                         swiped: false,
                         address: Address {
-                            identicon: alice_sr_polkadot().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_polkadot().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//polkadot".to_string(),
                             secret_exposed: false,
@@ -3426,7 +3472,9 @@ fn flow_test_1() {
                     address: Address {
                         path: "".to_string(),
                         seed_name: "Alice".to_string(),
-                        identicon: alice_sr_root().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_root().to_vec(),
+                        },
                         secret_exposed: false,
                         has_pwd: false,
                     },
@@ -3466,12 +3514,12 @@ fn flow_test_1() {
                 seed_name_cards: vec![
                     SeedNameCard {
                         seed_name: "Alice".to_string(),
-                        identicon: vec![],
+                        identicon: SignerImage::default(),
                         derived_keys_count: 4,
                     },
                     SeedNameCard {
                         seed_name: "Portia".to_string(),
-                        identicon: vec![],
+                        identicon: SignerImage::default(),
                         derived_keys_count: 3,
                     },
                 ],
@@ -3508,7 +3556,9 @@ fn flow_test_1() {
                         base58: "16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb".to_string(),
                         swiped: false,
                         address: Address {
-                            identicon: alice_sr_secret_path_multipass().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_secret_path_multipass().to_vec(),
+                            },
                             has_pwd: true,
                             path: "//secret//path".to_string(),
                             secret_exposed: false,
@@ -3524,7 +3574,9 @@ fn flow_test_1() {
                         swiped: false,
                         multiselect: false,
                         address: Address {
-                            identicon: alice_sr_polkadot().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_polkadot().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//polkadot".to_string(),
                             secret_exposed: false,
@@ -3536,7 +3588,9 @@ fn flow_test_1() {
                     address: Address {
                         path: "".to_string(),
                         seed_name: "Alice".to_string(),
-                        identicon: alice_sr_root().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_root().to_vec(),
+                        },
                         secret_exposed: false,
                         has_pwd: false,
                     },
@@ -3799,7 +3853,9 @@ fn flow_test_1() {
             f: MSeeds {
                 seed_name_cards: vec![SeedNameCard {
                     seed_name: "Alice".to_string(),
-                    identicon: alice_sr_root().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_root().to_vec(),
+                    },
                     derived_keys_count: 4,
                 }],
             },
@@ -3886,7 +3942,9 @@ fn flow_test_1() {
                             .to_string(),
                     base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
                     address: Address {
-                        identicon: alice_sr_westend().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_westend().to_vec(),
+                        },
                         has_pwd: false,
                         path: "//westend".to_string(),
                         secret_exposed: false,
@@ -3898,7 +3956,9 @@ fn flow_test_1() {
                 root: MKeysCard {
                     address: Address {
                         seed_name: "Alice".to_string(),
-                        identicon: empty_png().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: empty_png().to_vec(),
+                        },
                         ..Default::default()
                     },
                     ..Default::default()
@@ -3974,7 +4034,9 @@ fn flow_test_1() {
         f: MSeeds {
             seed_name_cards: vec![SeedNameCard {
                 seed_name: "Alice".to_string(),
-                identicon: alice_sr_root().to_vec(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_root().to_vec(),
+                },
                 derived_keys_count: 4,
             }],
         },
@@ -4007,7 +4069,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5D34dL5prEUaGNQtPPZ3yN5Y6BnkfXunKXXz6fo7ZJbLwRRH".to_string(),
                         address: Address {
-                            identicon: alice_sr_0().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_0().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//0".to_string(),
                             secret_exposed: false,
@@ -4022,7 +4086,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
                         address: Address {
-                            identicon: alice_sr_westend().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_westend().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//westend".to_string(),
                             secret_exposed: false,
@@ -4037,7 +4103,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
                         address: Address {
-                            identicon: alice_sr_alice_secret_secret().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_alice_secret_secret().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//Alice/secret//secret".to_string(),
                             secret_exposed: false,
@@ -4052,7 +4120,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5FcKjDXS89U79cXvhksZ2pF5XBeafmSM8rqkDVoTHQcXd5Gq".to_string(),
                         address: Address {
-                            identicon: alice_sr_alice_westend().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_alice_westend().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//Alice/westend".to_string(),
                             secret_exposed: false,
@@ -4067,7 +4137,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5GBNeWRhZc2jXu7D55rBimKYDk8PGk8itRYFTPfC8RJLKG5o".to_string(),
                         address: Address {
-                            identicon: alice_sr_1().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_1().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//1".to_string(),
                             secret_exposed: false,
@@ -4082,7 +4154,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                         address: Address {
-                            identicon: alice_sr_alice().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_alice().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//Alice".to_string(),
                             secret_exposed: false,
@@ -4096,7 +4170,9 @@ fn flow_test_1() {
                     address: Address {
                         path: "".to_string(),
                         seed_name: "Alice".to_string(),
-                        identicon: empty_png().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: empty_png().to_vec(),
+                        },
                         secret_exposed: false,
                         has_pwd: false,
                     },
@@ -4254,7 +4330,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5CofVLAGjwvdGXvBiP6ddtZYMVbhT5Xke8ZrshUpj2ZXAnND".to_string(),
                         address: Address {
-                            identicon: alice_sr_westend_1().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_westend_1().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//westend//1".to_string(),
                             secret_exposed: false,
@@ -4269,7 +4347,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5D34dL5prEUaGNQtPPZ3yN5Y6BnkfXunKXXz6fo7ZJbLwRRH".to_string(),
                         address: Address {
-                            identicon: alice_sr_0().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_0().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//0".to_string(),
                             secret_exposed: false,
@@ -4284,7 +4364,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
                         address: Address {
-                            identicon: alice_sr_westend().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_westend().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//westend".to_string(),
                             secret_exposed: false,
@@ -4299,7 +4381,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
                         address: Address {
-                            identicon: alice_sr_alice_secret_secret().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_alice_secret_secret().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//Alice/secret//secret".to_string(),
                             secret_exposed: false,
@@ -4314,7 +4398,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5GBNeWRhZc2jXu7D55rBimKYDk8PGk8itRYFTPfC8RJLKG5o".to_string(),
                         address: Address {
-                            identicon: alice_sr_1().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_1().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//1".to_string(),
                             secret_exposed: false,
@@ -4329,7 +4415,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                         address: Address {
-                            identicon: alice_sr_alice().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_alice().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//Alice".to_string(),
                             secret_exposed: false,
@@ -4344,7 +4432,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5HGiBcFgEBMgT6GEuo9SA98sBnGgwHtPKDXiUukT6aqCrKEx".to_string(),
                         address: Address {
-                            identicon: alice_sr_westend_0().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_westend_0().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//westend//0".to_string(),
                             secret_exposed: false,
@@ -4357,7 +4447,9 @@ fn flow_test_1() {
                 root: MKeysCard {
                     address: Address {
                         seed_name: "Alice".to_string(),
-                        identicon: empty_png().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: empty_png().to_vec(),
+                        },
                         ..Default::default()
                     },
                     ..Default::default()
@@ -4397,7 +4489,9 @@ fn flow_test_1() {
                     .to_string(),
                 base58: "5DqGKX9v7uR92EvmNNmiETZ9PcDBrg2YRYukGhzXHEkKmpfx".to_string(),
                 address: Address {
-                    identicon: alice_sr_westend_2().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_westend_2().to_vec(),
+                    },
                     has_pwd: false,
                     path: "//westend//2".to_string(),
                     secret_exposed: false,
@@ -4624,7 +4718,9 @@ fn flow_test_1() {
                         .to_string(),
                     base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
                     address: Address {
-                        identicon: alice_sr_westend().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_westend().to_vec(),
+                        },
                         seed_name: "Alice".to_string(),
                         path: "//westend".to_string(),
                         has_pwd: false,
@@ -4671,7 +4767,9 @@ fn flow_test_1() {
                     pubkey: "8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
                         .to_string(),
                     address: Address {
-                        identicon: alice_sr_alice_secret_secret().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice_secret_secret().to_vec(),
+                        },
                         seed_name: "Alice".to_string(),
                         path: "//Alice/secret//secret".to_string(),
                         has_pwd: false,
@@ -4722,7 +4820,9 @@ fn flow_test_1() {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                     multiselect: None,
                     address: Address {
-                        identicon: alice_sr_alice().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
                         seed_name: "Alice".to_string(),
                         path: "//Alice".to_string(),
                         has_pwd: false,
@@ -4842,7 +4942,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
                         address: Address {
-                            identicon: alice_sr_westend().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_westend().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//westend".to_string(),
                             secret_exposed: false,
@@ -4857,7 +4959,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
                         address: Address {
-                            identicon: alice_sr_alice_secret_secret().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_alice_secret_secret().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//Alice/secret//secret".to_string(),
                             secret_exposed: false,
@@ -4872,7 +4976,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                         address: Address {
-                            identicon: alice_sr_alice().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_alice().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//Alice".to_string(),
                             secret_exposed: false,
@@ -4886,7 +4992,9 @@ fn flow_test_1() {
                     address: Address {
                         path: "".to_string(),
                         seed_name: "Alice".to_string(),
-                        identicon: alice_sr_root().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_root().to_vec(),
+                        },
                         secret_exposed: false,
                         has_pwd: false,
                     },
@@ -4965,7 +5073,9 @@ fn flow_test_1() {
                     .to_string(),
                 base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
                 address: Address {
-                    identicon: alice_sr_root().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_root().to_vec(),
+                    },
                     seed_name: "Alice".to_string(),
                     path: String::new(),
                     has_pwd: false,
@@ -5007,7 +5117,9 @@ fn flow_test_1() {
             f: MSeeds {
                 seed_name_cards: vec![SeedNameCard {
                     seed_name: "Alice".to_string(),
-                    identicon: alice_sr_root().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_root().to_vec(),
+                    },
                     derived_keys_count: 6,
                 }],
             },
@@ -5040,7 +5152,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb".to_string(),
                         address: Address {
-                            identicon: alice_sr_secret_path_multipass().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_secret_path_multipass().to_vec(),
+                            },
                             has_pwd: true,
                             path: "//secret//path".to_string(),
                             secret_exposed: false,
@@ -5055,7 +5169,9 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
                         address: Address {
-                            identicon: alice_sr_polkadot().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_polkadot().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//polkadot".to_string(),
                             secret_exposed: false,
@@ -5069,7 +5185,9 @@ fn flow_test_1() {
                     address: Address {
                         path: "".to_string(),
                         seed_name: "Alice".to_string(),
-                        identicon: alice_sr_root().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_root().to_vec(),
+                        },
                         secret_exposed: false,
                         has_pwd: false,
                     },
@@ -5189,7 +5307,9 @@ fn flow_test_1() {
                                 .to_string(),
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_westend().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_westend().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//westend".to_string(),
                             secret_exposed: false,
@@ -5204,7 +5324,9 @@ fn flow_test_1() {
                                 .to_string(),
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_root().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_root().to_vec(),
+                            },
                             has_pwd: false,
                             path: "".to_string(),
                             secret_exposed: false,
@@ -5213,7 +5335,9 @@ fn flow_test_1() {
                     MRawKey {
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_kusama().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_kusama().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//kusama".to_string(),
                             secret_exposed: false,
@@ -5234,7 +5358,9 @@ fn flow_test_1() {
                                 .to_string(),
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_alice_secret_secret().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_alice_secret_secret().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//Alice/secret//secret".to_string(),
                             secret_exposed: false,
@@ -5249,7 +5375,9 @@ fn flow_test_1() {
                                 .to_string(),
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_alice().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_alice().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//Alice".to_string(),
                             secret_exposed: false,
@@ -5258,7 +5386,9 @@ fn flow_test_1() {
                     MRawKey {
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_secret_path_multipass().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_secret_path_multipass().to_vec(),
+                            },
                             has_pwd: true,
                             path: "//secret//path".to_string(),
                             secret_exposed: false,
@@ -5273,7 +5403,9 @@ fn flow_test_1() {
                     MRawKey {
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_polkadot().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_polkadot().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//polkadot".to_string(),
                             secret_exposed: false,
@@ -5314,7 +5446,9 @@ fn flow_test_1() {
                     .to_string(),
                 multiselect: None,
                 address: Address {
-                    identicon: alice_sr_root().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_root().to_vec(),
+                    },
                     seed_name: "Alice".to_string(),
                     path: String::new(),
                     has_pwd: false,
@@ -5487,7 +5621,9 @@ fn flow_test_1() {
                     MRawKey {
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_westend().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_westend().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//westend".to_string(),
                             secret_exposed: false,
@@ -5502,7 +5638,9 @@ fn flow_test_1() {
                     MRawKey {
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_root().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_root().to_vec(),
+                            },
                             has_pwd: false,
                             path: "".to_string(),
                             secret_exposed: false,
@@ -5517,7 +5655,9 @@ fn flow_test_1() {
                     MRawKey {
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_kusama().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_kusama().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//kusama".to_string(),
                             secret_exposed: false,
@@ -5532,7 +5672,9 @@ fn flow_test_1() {
                     MRawKey {
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_alice_secret_secret().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_alice_secret_secret().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//Alice/secret//secret".to_string(),
                             secret_exposed: false,
@@ -5547,7 +5689,9 @@ fn flow_test_1() {
                     MRawKey {
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_alice().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_alice().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//Alice".to_string(),
                             secret_exposed: false,
@@ -5562,7 +5706,9 @@ fn flow_test_1() {
                     MRawKey {
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_secret_path_multipass().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_secret_path_multipass().to_vec(),
+                            },
                             has_pwd: true,
                             path: "//secret//path".to_string(),
                             secret_exposed: false,
@@ -5577,7 +5723,9 @@ fn flow_test_1() {
                     MRawKey {
                         address: Address {
                             seed_name: "Alice".to_string(),
-                            identicon: alice_sr_polkadot().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: alice_sr_polkadot().to_vec(),
+                            },
                             has_pwd: false,
                             path: "//polkadot".to_string(),
                             secret_exposed: false,
@@ -5599,7 +5747,9 @@ fn flow_test_1() {
                         .to_string(),
                     multiselect: None,
                     address: Address {
-                        identicon: alice_sr_root().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_root().to_vec(),
+                        },
                         seed_name: "Alice".to_string(),
                         path: String::new(),
                         has_pwd: false,
@@ -5723,7 +5873,9 @@ fn flow_test_1() {
                     .to_string(),
                 multiselect: None,
                 address: Address {
-                    identicon: alice_sr_root().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_root().to_vec(),
+                    },
                     seed_name: "Alice".to_string(),
                     path: String::new(),
                     has_pwd: false,
@@ -5735,7 +5887,9 @@ fn flow_test_1() {
             content: MSCContent::LoadTypes {
                 types: "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"
                     .to_string(),
-                pic: types_known().to_vec(),
+                pic: SignerImage::Png {
+                    image: types_known().to_vec(),
+                },
             },
         },
     });
@@ -5927,7 +6081,9 @@ fn flow_test_1() {
                                 f: MSCId {
                                     base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"
                                         .to_string(),
-                                    identicon: bob().to_vec(),
+                                    identicon: SignerImage::Png {
+                                        image: bob().to_vec(),
+                                    },
                                 },
                             },
                         },
@@ -6011,7 +6167,9 @@ fn flow_test_1() {
                     base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
                     multiselect: None,
                     address: Address {
-                        identicon: alice_sr_alice_secret_secret().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice_secret_secret().to_vec(),
+                        },
                         seed_name: "Alice".to_string(),
                         path: "//Alice/secret//secret".to_string(),
                         has_pwd: false,
@@ -6165,7 +6323,9 @@ fn flow_test_1() {
                 author_info: Some(MAddressCard {
                     base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
                     address: Address {
-                        identicon: alice_sr_westend().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_westend().to_vec(),
+                        },
                         seed_name: "Alice".to_string(),
                         path: "//westend".to_string(),
                         has_pwd: false,
@@ -6340,7 +6500,7 @@ fn flow_test_1() {
             f: MNewSeedBackup {
                 seed: "Pepper".to_string(),
                 seed_phrase: String::new(),
-                identicon: vec![],
+                identicon: SignerImage::default(),
             },
         }),
         alert_data: None,
@@ -6373,7 +6533,7 @@ fn flow_test_1() {
                     swiped: false,
                     multiselect: false,
                     address: Address {
-                        identicon: vec![],
+                        identicon: SignerImage::default(),
                         has_pwd: false,
                         path: "//polkadot".to_string(),
                         secret_exposed: false,
@@ -6384,7 +6544,7 @@ fn flow_test_1() {
                     address: Address {
                         path: "".to_string(),
                         seed_name: "Pepper".to_string(),
-                        identicon: vec![],
+                        identicon: SignerImage::default(),
                         secret_exposed: false,
                         has_pwd: false,
                     },
@@ -6439,7 +6599,7 @@ fn flow_test_1() {
                     swiped: false,
                     multiselect: false,
                     address: Address {
-                        identicon: vec![],
+                        identicon: SignerImage::default(),
                         has_pwd: false,
                         path: "//westend".to_string(),
                         secret_exposed: false,
@@ -6550,7 +6710,9 @@ fn flow_test_1() {
                                 f: MSCId {
                                     base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"
                                         .to_string(),
-                                    identicon: bob().to_vec(),
+                                    identicon: SignerImage::Png {
+                                        image: bob().to_vec(),
+                                    },
                                 },
                             },
                         },
@@ -6805,7 +6967,7 @@ fn flow_test_1() {
                     swiped: false,
                     multiselect: false,
                     address: Address {
-                        identicon: vec![],
+                        identicon: SignerImage::default(),
                         has_pwd: true,
                         path: "//0".to_string(),
                         secret_exposed: false,

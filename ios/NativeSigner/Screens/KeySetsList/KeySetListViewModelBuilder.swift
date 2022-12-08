@@ -41,7 +41,7 @@ final class KeySetListViewModelBuilder {
                     seed: $0,
                     keyName: $0.seedName,
                     derivedKeys: derivedKeys(for: $0),
-                    identicon: $0.identicon
+                    identicon: $0.identicon.svgPayload
                 )
             }
         )

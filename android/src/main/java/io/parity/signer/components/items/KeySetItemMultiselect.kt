@@ -21,6 +21,7 @@ import io.parity.signer.components.IdentIcon
 import io.parity.signer.models.KeySetModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
+import io.parity.signer.uniffi.SignerImage
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

@@ -62,7 +62,7 @@ fun MKeys.toKeySetDetailsModel() = KeySetDetailsModel(
  * Local copy of shared [MKeysCard] class
  */
 data class KeyModel(
-	val identicon: List<UByte>,
+	val identicon: SignerImage,
 	val addressKey: String,
 	val seedName: String,
 	val base58: String,
@@ -123,7 +123,7 @@ fun MSeeds.toKeySetsSelectModel() = KeySetsSelectModel(
  */
 data class KeySetModel(
 	val seedName: String,
-	val identicon: List<UByte>,
+	val identicon: SignerImage,
 	val derivedKeysCount: UInt
 )
 
@@ -135,7 +135,7 @@ data class KeyCardModel(
 	val network: String,
 	val base58: String,
 	val path: String,
-	val identIcon: List<UByte>,
+	val identIcon: SignerImage,
 	val seedName: String,
 	val hasPwd: Boolean = false,
 	val multiselect: Boolean? = null,

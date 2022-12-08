@@ -284,7 +284,7 @@ dictionary MKeysCard {
 
 dictionary MSettings {
     string? public_key;
-    sequence<u8>? identicon;
+    SignerImage? identicon;
     string? encryption;
     string? error;
 };
@@ -348,7 +348,7 @@ dictionary TransactionCardSet {
 
 dictionary SeedNameCard {
     string seed_name;
-    sequence<u8> identicon;
+    SignerImage identicon;
     u32 derived_keys_count;
 };
 
@@ -403,7 +403,7 @@ dictionary DerivationCheck {
 dictionary Address {
     string path;
     boolean has_pwd;
-    sequence<u8> identicon;
+    SignerImage identicon;
     string seed_name;
     boolean secret_exposed;
 };
@@ -421,7 +421,7 @@ enum DerivationDestination {
 
 dictionary MVerifierDetails {
     string public_key;
-    sequence<u8> identicon;
+    SignerImage identicon;
     string encryption;
 };
 
@@ -451,7 +451,7 @@ dictionary MMetadataRecord {
     string specname;
     string specs_version;
     string meta_hash;
-    sequence<u8> meta_id_pic;
+    SignerImage meta_id_pic;
 };
 
 dictionary MRawKey {
@@ -587,7 +587,7 @@ interface ExportedSet {
 
 [Enum]
 interface MSCContent {
-    LoadTypes(string types, sequence<u8> pic);
+    LoadTypes(string types, SignerImage pic);
     LoadMetadata(string name, u32 version);
     AddSpecs(MSCNetworkInfo f);
 };
@@ -622,7 +622,7 @@ dictionary MSeedMenu {
 dictionary MNewSeedBackup {
     string seed;
     string seed_phrase;
-    sequence<u8> identicon;
+    SignerImage identicon;
 };
 
 dictionary Network {
@@ -667,14 +667,14 @@ dictionary MManageMetadata {
     string name;
     string version;
     string meta_hash;
-    sequence<u8> meta_id_pic;
+    SignerImage meta_id_pic;
     sequence<MMMNetwork> networks;
 };
 
 dictionary MTypesInfo {
     boolean types_on_file;
     string? types_hash;
-    sequence<u8>? types_id_pic;
+    SignerImage? types_id_pic;
 };
 
 [Enum]
@@ -732,9 +732,15 @@ dictionary MSCFieldNumber {
     string docs_type;
 };
 
+[Enum]
+interface SignerImage {
+    Svg(sequence<u8> image);
+    Png(sequence<u8> image);
+};
+
 dictionary MSCId {
     string base58;
-    sequence<u8> identicon;
+    SignerImage identicon;
 };
 
 dictionary MSCNameVersion {
