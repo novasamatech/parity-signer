@@ -6,16 +6,17 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-blake2-rfc = "0.2.18"
 hex = "0.4.3"
-parity-scale-codec = "3.1.5"
-zeroize = "1.5.5"
+parity-scale-codec = "3.2.1"
+zeroize = "1.5.7"
 
 definitions = { path = "../definitions", default-features = false, features = ["signer"] }
 db_handling = { path = "../db_handling", default-features = false, features = ["signer"] }
 qrcode_static = { path = "../qrcode_static" }
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
+thiserror = "1.0.37"
+anyhow = "1.0.66"
 
 [dev-dependencies]
 pretty_assertions = "1"
@@ -23,6 +24,7 @@ sled = "0.34.6"
 constants = { path = "../constants" }
 db_handling = {path = "../db_handling"}
 transaction_parsing = { path = "../transaction_parsing", default-features = false }
+tempfile = "3.3"
 
 [lib]
 name = "transaction_signing"

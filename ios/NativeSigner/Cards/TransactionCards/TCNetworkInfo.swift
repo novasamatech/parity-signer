@@ -16,10 +16,10 @@ struct TCNetworkInfo: View {
     }
 }
 
-/*
 struct TCNetworkInfo_Previews: PreviewProvider {
     static var previews: some View {
-        TCNetworkInfo()
+        TCNetworkInfo(
+            content: MscNetworkInfo(networkTitle: "Polkadot", networkLogo: "polkadot", networkSpecsKey: "spec keys")
+        )
     }
 }
-*/

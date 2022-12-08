@@ -8,7 +8,7 @@ edition = "2018"
 anyhow = "1.0"
 ffi-support = "0.4"
 hex = "0.4.3"
-uniffi = { version = "0.18.0", features=["builtin-bindgen"] }
+uniffi = { version = "0.21.0" }
 
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
@@ -16,11 +16,11 @@ sp-core = { git = "https://github.com/paritytech/substrate", default-features = 
 db_handling = { path = "../db_handling", default-features = false, features = ["signer"] }
 definitions = { path = "../definitions", default-features = false, features = ["signer"] }
 navigator = { path = "../navigator", default-features = false }
-qr_reader_phone = { path = "..//qr_reader_phone" }
-transaction_parsing = { path = "../transaction_parsing", default-features = false }
+qr_reader_phone = { path = "../qr_reader_phone" }
+qrcode_static = { path = "../qrcode_static" }
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
-env_logger = "0.9"
+env_logger = "0.10"
 
 [target.'cfg(target_os = "android")'.dependencies]
 android_logger = "0.11"
@@ -29,7 +29,7 @@ log = "0.4.17"
 [build-dependencies]
 definitions = {path = "../definitions"}
 generate_message = {path = "../generate_message"}
-uniffi_build = { version = "0.18.0", features = ["builtin-bindgen"] }
+uniffi_build = { version = "0.21.0", features = ["builtin-bindgen"] }
 
 [lib]
 crate-type = ["staticlib", "cdylib"]

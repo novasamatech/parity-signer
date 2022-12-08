@@ -11,17 +11,15 @@ struct TCText: View {
     let text: String
     var body: some View {
         HStack {
-            Text(AttributedString(fromHexDocs: text) ?? AttributedString(text))
-                .foregroundColor(Color("Text600")).font(FBase(style: .body2))
+            Text(AttributedString.build(fromHexDocs: text) ?? AttributedString(text))
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).font(Fontstyle.bodyL.base)
             Spacer()
         }
     }
 }
 
-/*
 struct TCText_Previews: PreviewProvider {
     static var previews: some View {
-        TCText()
+        TCText(text: "body text possible markdown support")
     }
 }
-*/

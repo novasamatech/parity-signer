@@ -1,5 +1,5 @@
 //
-//  TCNewSpecs.swift
+//  TCAddNewNetwork.swift
 //  NativeSigner
 //
 //  Created by Alexander Slesarev on 21.10.2021.
@@ -7,75 +7,83 @@
 
 import SwiftUI
 
-struct TCNewSpecs: View {
-    var value: NetworkSpecsToSend
+struct TCAddNewNetwork: View {
+    var value: NetworkSpecs
     var body: some View {
-        VStack {
-            Text("NEW NETWORK").foregroundColor(Color("Text600"))
-            VStack(alignment: .leading) {
-                HStack {
-                    Text("Network name:")
-                        .foregroundColor(Color("Text400"))
-                    Text(value.title)
-                        .foregroundColor(Color("Text600"))
+        VStack(alignment: .leading, spacing: 0) {
+            Localizable.Transaction.AddNetwork.Label.header.text
+                .font(Fontstyle.bodyL.base)
+                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                .padding(.leading, Spacing.medium)
+                .padding(.bottom, Spacing.extraSmall)
+            VStack {
+                VStack(alignment: .leading, spacing: Spacing.small) {
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.name.string, value.title)
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.basePrefix.string, String(value.base58prefix))
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.decimals.string, String(value.decimals))
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.unit.string, value.unit)
+                    VStack(alignment: .leading, spacing: Spacing.extraSmall) {
+                        Localizable.Transaction.AddNetwork.Label.genesisHash.text
+                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        Text(value.genesisHash.formattedAsString)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        Divider()
+                    }
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.crypto.string, value.encryption.rawValue)
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.spec.string, value.name)
+                    HStack {
+                        Text(Localizable.Transaction.AddNetwork.Label.logo.string)
+                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        Spacer()
+                        Text(value.logo)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .font(Fontstyle.header4.web3)
+                    }
+                    Divider()
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.path.string, value.pathId, isLast: true)
                 }
-                HStack {
-                    Text("base58 prefix:")
-                        .foregroundColor(Color("Text400"))
-                    Text(String(value.base58prefix))
-                        .foregroundColor(Color("Text600"))
-                }
-                HStack {
-                    Text("decimals:")
-                        .foregroundColor(Color("Text400"))
-                    Text(String(value.decimals))
-                        .foregroundColor(Color("Text600"))
-                }
-                HStack {
-                    Text("unit:")
-                        .foregroundColor(Color("Text400"))
-                    Text(value.unit)
-                        .foregroundColor(Color("Text600"))
-                }
-                HStack {
-                    Text("genesis hash:")
-                        .foregroundColor(Color("Text400"))
-                    Text(value.genesisHash.map{String(format: "%02X", $0)}.joined())
-                        .foregroundColor(Color("Text600"))
-                }
-                HStack {
-                    Text("crypto:")
-                        .foregroundColor(Color("Text400"))
-                    Text(
-                        value.encryption == .ed25519 ? "ed25519" : value.encryption == .sr25519 ? "sr25519" : value.encryption == .ecdsa ? "ecdsa" : "error"
-                    )
-                        .foregroundColor(Color("Text600"))
-                }
-                HStack {
-                    Text("spec name:")
-                        .foregroundColor(Color("Text400"))
-                    Text(value.name)
-                        .foregroundColor(Color("Text600"))
-                }
-                HStack {
-                    Text("logo:")
-                        .foregroundColor(Color("Text400"))
-                    NetworkLogo(logo: value.logo)
-                }
-                HStack {
-                    Text("default path:")
-                        .foregroundColor(Color("Text400"))
-                    Text(value.pathId)
-                        .foregroundColor(Color("Text600"))
-                }
+                .padding(Spacing.medium)
             }
+            .background(Asset.fill6Solid.swiftUIColor)
+            .cornerRadius(CornerRadius.medium)
+        }
+    }
+
+    @ViewBuilder
+    private func rowWrapper(
+        _ key: String,
+        _ value: String,
+        isLast: Bool = false
+    ) -> some View {
+        HStack {
+            Text(key)
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            Spacer()
+            Text(value)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+        }
+        if !isLast {
+            Divider()
         }
     }
 }
-    
-    /*
-     struct TCNewSpecs_Previews: PreviewProvider {
-     static var previews: some View {
-     TCNewSpecs()
-     }
-     }*/
+
+struct TCAddNewNetwork_Previews: PreviewProvider {
+    static var previews: some View {
+        TCAddNewNetwork(
+            value: NetworkSpecs(
+                base58prefix: 231,
+                color: "black",
+                decimals: 4,
+                encryption: .sr25519,
+                genesisHash: H256(repeating: 3, count: 4),
+                logo: "polkadot",
+                name: "polkadot",
+                pathId: "1",
+                secondaryColor: "pink",
+                title: "Polka",
+                unit: "DOT"
+            )
+        )
+    }
+}

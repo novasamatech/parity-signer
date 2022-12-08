@@ -8,50 +8,52 @@
 import SwiftUI
 
 struct VerifierScreen: View {
-    @State var jailbreak = false
+    @State private var jailbreak = false
     let content: MVerifierDetails
     let doJailbreak: () -> Void
     var body: some View {
         VStack {
             HStack {
                 Identicon(identicon: content.identicon, rowHeight: 42)
-                VStack{
-                    Text("General verifier certificate")
+                VStack {
+                    Localizable.generalVerifierCertificate.text
                     Text(content.publicKey)
-                    Text("encryption: " + content.encryption)
+                    Text(Localizable.encryption(content.encryption))
                 }
             }
-            Button(action: {
-                //TODO: add some alerts to make sure the operation was successful
-                jailbreak = true
-            }) {
-                SettingsCardTemplate(
-                    text: "Remove general certificate",
-                    danger: true
-                )
-            }
-            .alert(isPresented: $jailbreak, content: {
-                Alert(
-                    title: Text("Wipe ALL data?"),
-                    message: Text("Remove all data and set general verifier blank so that it could be set later. This operation can not be reverted. Do not proceed unless you absolutely know what you are doing, there is no need to use this procedure in most cases. Misusing this feature may lead to loss of funds!"),
-                    primaryButton: .cancel(),
-                    secondaryButton: .destructive(
-                        Text("I understand"),
-                        action: {
-                            doJailbreak()
-                        }
+            Button(
+                action: {
+                    jailbreak = true
+                },
+                label: {
+                    SettingsCardTemplate(
+                        text: Localizable.removeGeneralCertificate.key,
+                        danger: true
                     )
-                )
-            })
+                }
+            )
+            .alert(
+                isPresented: $jailbreak,
+                content: {
+                    Alert(
+                        title: Localizable.wipeALLData.text,
+                        message: Localizable.RemoveAllData.message.text,
+                        primaryButton: .cancel(),
+                        secondaryButton: .destructive(
+                            Localizable.iUnderstand.text,
+                            action: {
+                                doJailbreak()
+                            }
+                        )
+                    )
+                }
+            )
         }
     }
 }
-    
-    
-    /*
-     struct VerifierScreen_Previews: PreviewProvider {
-     static var previews: some View {
-     VerifierScreen()
-     }
-     }
-     */
+
+// struct VerifierScreen_Previews: PreviewProvider {
+// static var previews: some View {
+// VerifierScreen()
+// }
+// }

@@ -4,7 +4,7 @@
 //!
 //! This crate is mainly used to:
 //!
-//! - fetch network data through rpc calls
+//! - fetch network data through RPC calls
 //! - prepare Signer update and derivation import payloads
 //! - generate Signer update QR codes, either signed or unsigned, and
 //! derivations import QR codes, to be scanned into Signer
@@ -18,20 +18,20 @@
 //! Crate `generate_message` can generate and the Signer can accept following
 //! updates:
 //!
-//! - `add_specs`, to add a new network (i.e. the network specs) into the Signer
-//! - `load_metadata`, to load into the Signer the network metadata, for
+//! - `add-specs`, to add a new network (i.e. the network specs) into the Signer
+//! - `load-metadata`, to load into the Signer the network metadata, for
 //! networks that already have corresponding network specs entry in the Signer
 //! database
-//! - `load_types`, to load types information (it is used to support the
+//! - `load-types`, to load types information (it is used to support the
 //! transactions parsing in networks with legacy metadata, `RuntimeMetadata`
-//! version below V14)
+//! version below `V14`)
 //!
 //! Updates are assembled as `Vec<u8>` and could be transformed into:
 //!
-//! - `png` QR codes, static or dynamic multiframe depending on the data size
+//! - `PNG` QR codes, static or dynamic multiframe depending on the data size
 //! - hex-encoded string (for tests)
 //!
-//! Information in `add_specs`, `load_metadata` and `load_types` could be either
+//! Information in `add-specs`, `load-metadata` and `load-types` could be either
 //! signed or unsigned. Using signed updates is strongly encouraged.
 //!
 //! Update has following general structure:
@@ -80,8 +80,8 @@
 //!     <tr>
 //!         <td><code>add_specs</code></td>
 //!         <td><code>ContentAddSpecs</code></td>
-//!         <td>SCALE encoded <code>NetworkSpecsToSend</code></td>
-//!         <td>double SCALE encoded <code>NetworkSpecsToSend</code></td>
+//!         <td>SCALE encoded <code>NetworkSpecs</code></td>
+//!         <td>double SCALE encoded <code>NetworkSpecs</code></td>
 //!     </tr>
 //!     <tr>
 //!         <td><code>load_metadata</code></td>
@@ -129,7 +129,7 @@
 //! # Derivations import
 //!
 //! Crate `generate_message` can generate derivations import for bulk import of
-//! password-free derivations.
+//! derivations, either password-free or passworded.
 //!
 //! Derivations import has following structure:
 //!
@@ -148,7 +148,7 @@
 //! Derivations import data is assembled as `Vec<u8>` and could be transformed
 //! into:
 //!
-//! - `png` QR code, static or dynamic multiframe depending on the data size
+//! - `PNG` QR code, static or dynamic multiframe depending on the data size
 //! - hex-encoded string (for tests)
 //!
 //! Derivations imports are generated from user-provided derivations list and
@@ -156,17 +156,18 @@
 //! generating the update, the update itself contains network genesis hash and
 //! [`Encryption`](definitions::crypto::Encryption).
 //!
-//! Only password-free derivation are getting in the update. On generation the
+//! Only valid derivation are getting in the update. On generation the
 //! user-provided derivation list is searched for valid derivations: each line
-//! is a separate derivation, only soft (`/`) and hard (`//`) derivations are
-//! allowed, any incorrectly formatted or passworded (with `///<password>` part)
+//! is a separate derivation, soft (`/`) and hard (`//`) derivations are
+//! allowed, with or without `///<password>` part, any incorrectly formatted
 //! derivations are skipped. `generate_message` prints the suitable derivations
-//! found.
+//! found: password-free as is, and passworded with `///<password>` instead of
+//! the real password.
 //!
-//! When the update is scanned into the Signer, only password-free valid
-//! derivations are expected to be found in the derivations set, otherwise the
-//! Signer will produce an error. If derivations set gets accepted for a certain
-//! seed, Signer tries to create derived keys for all derivations.
+//! When the update is scanned into the Signer, only valid derivations are
+//! expected to be found in the derivations set, otherwise the Signer will
+//! produce an error. If derivations set gets accepted for a certain seed,
+//! Signer tries to create derived keys for all derivations.
 //!
 //! If a derivation produces exactly same public key with exactly same
 //! derivation path as already in the database or in the import, it get ignored
@@ -179,7 +180,7 @@
 //!
 //! ## Display content of the metadata `METATREE` tree of the hot database
 //!
-//! `$ cargo run show -metadata`
+//! `$ cargo run show metadata`
 //!
 //! Prints for each entry in hot database [`METATREE`](constants::METATREE)
 //! tree:
@@ -194,36 +195,36 @@
 //!
 //! ## Display content of the address book `ADDRESS_BOOK` tree of the hot database
 //!
-//! `$ cargo run show -networks`
+//! `$ cargo run show networks`
 //!
 //! Prints for each entry in hot database
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree:
 //!
 //! - address book title for the network `<network_name>-<network_encryption>`,
 //! used only to distinguish between address book entries
-//! - url address at which rpc calls are made for the network
+//! - URL address at which RPC calls are made for the network
 //! - network encryption
 //! - additional marker that the network is a default one, i.e. entry has not
 //! changed since the database generation
 //! - network title as it will be displayed in Signer, from
-//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 //!
 //! ## Show network specs for a network, as recorded in the hot database
 //!
-//! `$ cargo run show -specs <address_book_title>`
+//! `$ cargo run show specs <ADDRESS BOOK TITLE>`
 //!
 //! Prints network address book title and corresponding
-//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 //! from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree of the hot
 //! database.
 //!
 //! ### Example
 //!
-//! `$ cargo run show -specs westend-sr25519`
+//! `$ cargo run show specs westend-sr25519`
 //!
 //! ## Check external file with hex-encoded metadata
 //!
-//! `$ cargo run check_file <path>`
+//! `$ cargo run show check-file <METADATA FILE>`
 //!
 //! Asserts that:
 //!
@@ -234,11 +235,11 @@
 //!
 //! ### Example
 //!
-//! `$ cargo run check_file "../defaults/release_metadata/kusama9230"`
+//! `$ cargo run show check-file "../defaults/release_metadata/kusama9230"`
 //!
 //! ## Show metadata fetch block history from `META_HISTORY` tree of the hot database
 //!
-//! `$ cargo run show -block_history`
+//! `$ cargo run show block-history`
 //!
 //! Prints block hashes at which the network metadata was fetched as it first
 //! got in the database. If the metadata is from `.wasm` file, there is no entry
@@ -254,7 +255,7 @@
 //!
 //! ## Prepare `add_specs` update payload
 //!
-//! `$ cargo run add_specs <keys> <argument(s)> <overrides>`
+//! `$ cargo run add-specs [OPTIONS] <-d|-f|-k|-p|-t> <--all|--name <NAME>|--url <ADDRESS>>`
 //!
 //! A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
 //! (optionally) be signed and later be transformed into `add_specs` update
@@ -262,20 +263,20 @@
 //!
 //! Setting keys that could be used in command line (maximum one):
 //!
-//! - `-d`: do **not** update the database, make rpc calls, and produce
+//! - `-d`: do **not** update the database, make RPC calls, and produce
 //! output files
-//! - `-f`: do **not** run rpc calls, produce output files using data already in
+//! - `-f`: do **not** run RPC calls, produce output files using data already in
 //! the database
-//! - `-p`: update or check database through rpc calls, do **not** produce any
+//! - `-p`: update or check database through RPC calls, do **not** produce any
 //! output files
-//! - `-t` (no setting key defaults here): update or check database through rpc
+//! - `-t` (no setting key defaults here): update or check database through RPC
 //! calls, produce output files
 //!
 //! <table>
 //!     <tr>
 //!         <th>setting key</th>
 //!         <th>hot database update</th>
-//!         <th>rpc calls</th>
+//!         <th>RPC calls</th>
 //!         <th>output update payload</th>
 //!     </tr>
 //!     <tr>
@@ -306,35 +307,35 @@
 //!
 //! Reference keys (exactly only one has to be used):
 //!
-//! - `-a`: all networks with entries in the
+//! - `--all`: all networks with entries in the
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
-//! - `-n` followed by single network address book title: for a network with
+//! - `--name` followed by single network address book title: for a network with
 //! existing record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-//! - `-u` followed by single url address: reserved for networks with no
+//! - `--url` followed by single URL address: reserved for networks with no
 //! record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //!
-//! `-a` key could be used with `-s` key, to stop processing after first
+//! `--all` key could be used with `--pass-errors` key, to stop processing after first
 //! error.
 //!
-//! Override key specifying encryption algorithm supported by the network is
-//! optional for `-n` reference key (since there is already an entry in the
-//! database with specified encryption) and mandatory for `-u` reference key.
+//! `--encryption` key to override specifying encryption algorithm supported by the
+//! network is optional for `--name` reference key (since there is already an entry in
+//! the database with specified encryption) and mandatory for `--url` reference key.
 //! Supported variants are:
 //!
-//! - `-ed25519`
-//! - `-sr25519`
-//! - `-ecdsa`
+//! - `ed25519`
+//! - `sr25519`
+//! - `ecdsa`
 //!
 //! Sequence invoking token override could be used when processing an
 //! individual network that has multiple allowed decimals and unit values
-//! retrieved as arrays of equal size. To override token, key `-token` followed
-//! by `u8` decimals value and `String` unit value is used. By default, if no
-//! token override in provided, such networks have `0u8` decimals and `UNIT`
-//! unit set up.
+//! retrieved as arrays of equal size. To override token, key `--token-decimals`
+//! followed by `u8` decimals value and key `--token-unit` `String` unit value is used.
+//! By default, if no token override in provided, such networks have `0u8` decimals
+//! and `UNIT` unit set up.
 //!
 //! Title override could be used when processing an individual network, to set
 //! the title under which the network will be displayed in Signer, should the
-//! `add_specs` payload be accepted. Non-default networks, if the title override
+//! `add-specs` payload be accepted. Non-default networks, if the title override
 //! is not specified, have title `<network_name>-<network_encryption>`.
 //!
 //! Not all setting and reference key combinations are compatible, and not all
@@ -358,7 +359,7 @@
 //!         <td>mandatory</td>
 //!         <td>possible, if token array fetched</td>
 //!         <td>possible</td>
-//!         <td>- make rpc calls<br>
+//!         <td>- make RPC calls<br>
 //!             - apply overrides<br>
 //!             - make payload file<br>
 //!             Note: database is <b>not</b> used
@@ -397,7 +398,7 @@
 //!         <td>possible</td>
 //!         <td>- get address book entry for <code>address_book_title</code><br>
 //!             - get corresponding network specs entry<br>
-//!             - make rpc calls, check that the entry remains correct<br>
+//!             - make RPC calls, check that the entry remains correct<br>
 //!             - apply overrides<br>
 //!             - update database
 //!         </td>
@@ -409,7 +410,7 @@
 //!         <td>mandatory</td>
 //!         <td>possible, if token array fetched</td>
 //!         <td>possible</td>
-//!         <td>- make rpc calls<br>
+//!         <td>- make RPC calls<br>
 //!             - apply overrides<br>
 //!             - update database<br>
 //!             Note: reserved for networks with no entries in the database
@@ -424,7 +425,7 @@
 //!         <td>possible</td>
 //!         <td>- get address book entry for <code>address_book_title</code><br>
 //!             - get corresponding network specs entry<br>
-//!             - make rpc calls, check that the entry remains correct<br>
+//!             - make RPC calls, check that the entry remains correct<br>
 //!             - apply overrides<br>
 //!             - update database if needed<br>
 //!             - make payload file
@@ -437,7 +438,7 @@
 //!         <td>mandatory</td>
 //!         <td>possible, if token array fetched</td>
 //!         <td>possible</td>
-//!         <td>- make rpc calls<br>
+//!         <td>- make RPC calls<br>
 //!             - apply overrides<br>
 //!             - update database if needed<br>
 //!             - make payload file<br>
@@ -450,19 +451,19 @@
 //!
 //! Make `add_specs` update payload for a known network from the hot database:
 //!
-//! `$ cargo run add_specs -n westend-sr25519`
+//! `$ cargo run add-specs --name westend-sr25519`
 //!
-//! Make `add_specs` update payload for a new network:
+//! Make `add-specs` update payload for a new network:
 //!
-//! `$ cargo run add_specs -d -u wss://rococo-rpc.polkadot.io -sr25519 -title Rococo`
+//! `$ cargo run add-specs -d -u wss://rococo-rpc.polkadot.io --encryption sr25519 --title Rococo`
 //!
-//! Make `add_specs` update payload for a new network with token set:
+//! Make `add-specs` update payload for a new network with token set:
 //!
-//! `$ cargo run add_specs -d -u wss://acala.polkawallet.io -sr25519 -token 12 ACA -title Acala`
+//! `$ cargo run add-specs -d -u wss://acala.polkawallet.io --encryption sr25519 --token-decimals 12 --token-unit ACA --title Acala`
 //!
 //! ## Prepare `load_metadata` update payload
 //!
-//! `$ cargo run load_metadata <key(s)> <(argument)>`
+//! `$ cargo run load-metadata [OPTIONS] <-d|-f|-k|-p|-t>`
 //!
 //! A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
 //! (optionally) be signed and later be transformed into `load_metadata`
@@ -471,22 +472,22 @@
 //!
 //! Setting keys that could be used in command line (maximum one):
 //!
-//! - `-d`: do **not** update the database, make rpc calls, and produce
+//! - `-d`: do **not** update the database, make RPC calls, and produce
 //! output files
-//! - `-f`: do **not** run rpc calls, produce output files from database as
+//! - `-f`: do **not** run RPC calls, produce output files from database as
 //! it is
-//! - `-k`: update database through rpc calls, produce output files only for
+//! - `-k`: update database through RPC calls, produce output files only for
 //! **new** database entries
-//! - `-p`: update database through rpc calls, do **not** produce any output
+//! - `-p`: update database through RPC calls, do **not** produce any output
 //! files
-//! - `-t` (no setting key defaults here): update database through rpc
+//! - `-t` (no setting key defaults here): update database through RPC
 //! calls, produce output files
 //!
 //! <table>
 //!     <tr>
 //!         <th>setting key</th>
 //!         <th>hot database update</th>
-//!         <th>rpc calls</th>
+//!         <th>RPC calls</th>
 //!         <th>output update payload</th>
 //!     </tr>
 //!     <tr>
@@ -521,23 +522,23 @@
 //!     </tr>
 //! </table>
 //!
-//! Network metadata updates quite often, compared to `add_specs` command there
+//! Network metadata updates quite often, compared to `add-specs` command there
 //! is also setting key `-k` to print only the data that was not in the hot
 //! database before the fetch.
 //!
 //! Reference keys (exactly only one has to be used):
 //!
-//! - `-a`: all networks with entries in the
+//! - `-a,--all`: all networks with entries in the
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
-//! - `-n` followed by single network name: for a network with existing
+//! - `-n,--name` followed by single network name: for a network with existing
 //! record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
-//! - `-u` followed by single url address: reserved for networks with no
+//! - `-u,--url` followed by single URL address: reserved for networks with no
 //! record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //!
-//! `-a` key could be used with `-s` key, to stop processing after first
+//! `-a` key could be used with `--pass-errors` key, to stop processing after first
 //! error.
 //!
-//! `load_metadata` has no overrides available. Not all setting and reference
+//! `load-metadata` has no overrides available. Not all setting and reference
 //! key combinations are compatible, and not all overrides are supported. Users
 //! are encouraged to comment if they need some other than current key
 //! combinations available.
@@ -553,29 +554,29 @@
 //!         <td><code>-d</code></td>
 //!         <td><code>-a</code></td>
 //!         <td></td>
-//!         <td>- get all url addresses <b>from the database</b><br>
-//!             - make rpc calls<br>
+//!         <td>- get all URL addresses <b>from the database</b><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - make payload file(s)<br>
-//!             Note: database is needed to get url addresses
+//!             Note: database is needed to get URL addresses
 //!         </td>
 //!     </tr>
 //!     <tr>
 //!         <td><code>-d</code></td>
 //!         <td><code>-n</code></td>
 //!         <td><code>network_name</code></td>
-//!         <td>- get url address <b>from the database</b> for the <code>network_name</code><br>
-//!             - make rpc calls<br>
+//!         <td>- get URL address <b>from the database</b> for the <code>network_name</code><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - make payload file<br>
-//!             Note: database is needed to get url address
+//!             Note: database is needed to get URL address
 //!         </td>
 //!     </tr>
 //!     <tr>
 //!         <td><code>-d</code></td>
 //!         <td><code>-u</code></td>
 //!         <td><code>url_address</code></td>
-//!         <td>- make rpc calls<br>
+//!         <td>- make RPC calls<br>
 //!             - make payload file<br>
 //!             Note: database is <b>not</b> used
 //!         </td>
@@ -600,8 +601,8 @@
 //!         <td><code>-k</code></td>
 //!         <td><code>-a</code></td>
 //!         <td></td>
-//!         <td>- get all url addresses from the database<br>
-//!             - make rpc calls<br>
+//!         <td>- get all URL addresses from the database<br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed<br>
 //!             - make payload file for each new entry
@@ -611,8 +612,8 @@
 //!         <td><code>-k</code></td>
 //!         <td><code>-n</code></td>
 //!         <td><code>network_name</code></td>
-//!         <td>- get url address from the database for the <code>network_name</code><br>
-//!             - make rpc calls<br>
+//!         <td>- get URL address from the database for the <code>network_name</code><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed<br>
 //!             - make payload file if the entry is new
@@ -622,8 +623,8 @@
 //!         <td><code>-p</code></td>
 //!         <td><code>-a</code></td>
 //!         <td></td>
-//!         <td>- get all url addresses from the database<br>
-//!             - make rpc calls<br>
+//!         <td>- get all URL addresses from the database<br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed
 //!         </td>
@@ -632,8 +633,8 @@
 //!         <td><code>-p</code></td>
 //!         <td><code>-n</code></td>
 //!         <td><code>network_name</code></td>
-//!         <td>- get url address from the database for the <code>network_name</code><br>
-//!             - make rpc calls<br>
+//!         <td>- get URL address from the database for the <code>network_name</code><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed
 //!         </td>
@@ -642,8 +643,8 @@
 //!         <td><code>-t</code> or none declared</td>
 //!         <td><code>-a</code></td>
 //!         <td></td>
-//!         <td>- get all url addresses from the database<br>
-//!             - make rpc calls<br>
+//!         <td>- get all URL addresses from the database<br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed<br>
 //!             - make payload file(s)
@@ -653,8 +654,8 @@
 //!         <td><code>-t</code> or none declared</td>
 //!         <td><code>-n</code></td>
 //!         <td><code>network_name</code></td>
-//!         <td>- get url address from the database for the <code>network_name</code><br>
-//!             - make rpc calls<br>
+//!         <td>- get URL address from the database for the <code>network_name</code><br>
+//!             - make RPC calls<br>
 //!             - verify name, genesis hash, base58 prefix<br>
 //!             - update the database if needed<br>
 //!             - make payload file
@@ -667,15 +668,15 @@
 //! Check metadata updates and make `load_metadata` update payloads for latest
 //! metadata for all known networks:
 //!
-//! `$ cargo run load_metadata -a`
+//! `$ cargo run load-metadata -a`
 //!
 //! Make `load_metadata` update payload for a network not in the database:
 //!
-//! `$ cargo run load_metadata -d -u wss://rococo-rpc.polkadot.io`
+//! `$ cargo run load-metadata -d -u wss://rococo-rpc.polkadot.io`
 //!
 //! ## Prepare `load_types` update payload
 //!
-//! `$ cargo run load_types`
+//! `$ cargo run load-types`
 //!
 //! A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
 //! (optionally) be signed and later be transformed into `load_types` update QR.
@@ -719,19 +720,19 @@
 //!
 //! <table>
 //!     <tr>
-//!         <th><code>msgtype</code></th>
+//!         <th><code>msg</code></th>
 //!         <th>default update file name</th>
 //!     </tr>
 //!     <tr>
-//!         <td><code>add_specs</code></td>
+//!         <td><code>add-specs</code></td>
 //!         <td><code>add_specs_&ltnetwork_name&gt-&ltnetwork_encryption&gt</code></td>
 //!     </tr>
 //!     <tr>
-//!         <td><code>load_metadata</code></td>
+//!         <td><code>load-metadata</code></td>
 //!         <td><code>load_metadata_&ltnetwork_name&gtV&ltmetadata_version&gt</code></td>
 //!     </tr>
 //!     <tr>
-//!         <td><code>load_types</code></td>
+//!         <td><code>load-types</code></td>
 //!         <td><code>load_types</code></td>
 //!     </tr>
 //! </table>
@@ -743,29 +744,27 @@
 //!
 //! ### `make` command
 //!
-//! `$ cargo run make <optional_target_key> <keys> <arguments>`
+//! `$ cargo run make <keys> <arguments>`
 //!
 //! Keys to be used in command line:
 //!
-//! - `<optional_target_key>`: `-qr` will generate only apng QR code, `-text`
-//! will generate only text file with hex-encoded update. By default, i.e. if
-//! content key is not provided, both QR code and text file are generated.
-//! `<optional_target_key>` is expected immediately after `make` command, if at
-//! all; keys to follow could go in any order, but with argument immediately
-//! following the key.
+//! - Key `--goal` followed by the type to to generate
+//!    - `qr` will generate only a png QR code
+//!    - `text` will generate only text file with hex-encoded update.
+//!    - default, i.e. if goal is not provided, both QR code and text file are generated.
 //!
-//! - Key `-crypto` followed by encryption used to make update signature:
+//! - Key `--crypto` followed by encryption used to make update signature:
 //!    - `ed25519`
 //!    - `sr25519`
 //!    - `ecdsa`
 //!    - `none` if the message is not verified
 //!
-//! - Key `-msgtype` followed by update type:
-//!    - `load_types`
-//!    - `load_metadata`
-//!    - `add_specs`
+//! - Key `--msg` followed by update type:
+//!    - `load-types`
+//!    - `load-metadata`
+//!    - `add-specs`
 //!
-//! - Key `-verifier` (can be entered only if the `-crypto` argument was
+//! - Key `--verifier` (can be entered only if the `--crypto` argument was
 //! `ed25519`, `sr25519`, or `ecdsa`), followed by:
 //!    - `Alice` to generate messages "verified" by
 //! [Alice seed phrase](constants::ALICE_SEED_PHRASE) with derivation `//Alice`
@@ -773,12 +772,12 @@
 //!    - `-file` followed by the path in dedicated [`FOLDER`](constants::FOLDER)
 //! for file with public key as raw bytes
 //!
-//! - Key `-payload` followed by file path in dedicated
+//! - Key `--payload` followed by file path in dedicated
 //! [`FOLDER`](constants::FOLDER) containing already generated payload as
 //! raw bytes
 //!
-//! - Key `-signature` (can be entered only if the `-crypto` argument was
-//! `ed25519`, `sr25519`, or `ecdsa` **and** `-verifier` is not `Alice`),
+//! - Key `--signature` (can be entered only if the `--crypto` argument was
+//! `ed25519`, `sr25519`, or `ecdsa` **and** `--verifier` is not `Alice`),
 //! followed by:
 //!    - `-hex` followed by hex signature
 //!    - `-file` followed by the path in dedicated [`FOLDER`](constants::FOLDER)
@@ -789,16 +788,14 @@
 //!
 //! ### `sign` command
 //!
-//! `$ cargo run make <optional_target_key> <keys> <arguments>`
+//! `$ cargo run make <keys> <arguments>`
 //!
 //! Keys to be used in command line:
 //!
-//! - `<optional_target_key>`: `-qr` will generate only apng QR code, `-text`
-//! will generate only text file with hex-encoded update. By default, i.e. if
-//! content key is not provided, both QR code and text file are generated.
-//! `<optional_target_key>` is expected immediately after `sign` command, if at
-//! all; keys to follow could go in any order, but with argument immediately
-//! following the key.
+//! - Key `--goal` followed by the type to to generate
+//!    - `qr` will generate only a png QR code
+//!    - `text` will generate only text file with hex-encoded update.
+//!    - default, i.e. if goal is not provided, both QR code and text file are generated.
 //!
 //! - Key `-sufficient` followed by:
 //!    - `-hex` followed by hexadecimal string with contents of Signer-produced
@@ -807,12 +804,12 @@
 //! [`FOLDER`](constants::FOLDER) for raw bytes file with contents of
 //! Signer-produced `SufficientCrypto` QR code
 //!
-//! - Key `-msgtype` followed by message type:
-//!    - `load_types`
-//!    - `load_metadata`
-//!    - `add_specs`
+//! - Key `-msg` followed by message type:
+//!    - `load-types`
+//!    - `load-metadata`
+//!    - `add-specs`
 //!
-//! - Key `-payload` followed by file path in dedicated
+//! - Key `--payload` followed by file path in dedicated
 //! [`FOLDER`](constants::FOLDER) containing already generated payload as
 //! raw bytes
 //!
@@ -836,9 +833,9 @@
 //!
 //! #### `make` for external signature
 //!
-//! `$ cargo run make -qr -crypto <encryption> -msgtype load_metadata
-//! -verifier -hex <public key> -payload sign_me_load_metadata_westendV9200
-//! -signature -hex <signature>`
+//! `$ cargo run make --goal qr --crypto <encryption> --msg load-metadata
+//! --verifier-hex <public key> --payload sign_me_load_metadata_westendV9200
+//! --signature-hex <signature>`
 //!
 //! Here `<signature>` is hexadecimal signature generated for the contents of
 //! the payload file for `<public_key>` using `<encryption>` algorithm.
@@ -848,9 +845,9 @@
 //!
 //! Example:
 //!
-//! `$ cargo run make -qr -crypto sr25519 -msgtype load_metadata -verifier -hex
-//! 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a -payload
-//! sign_me_load_metadata_westendV9200 -signature -hex
+//! `$ cargo run make --goal qr --crypto sr25519 --msg load-metadata --verifier-hex
+//! 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a --payload
+//! sign_me_load_metadata_westendV9200 --signature-hex
 //! 125717599cd057bfe6db7b111274cbda796d2543467400110552fa1c62dc087a7acefb53b68716f1e34f8af6bf13ab45d70d50655fd39483c64f3f057418748a`
 //!
 //! #### `make` for test verifier Alice
@@ -859,20 +856,20 @@
 //! in this case is generated automatically and is not supplied in command
 //! line.
 //!
-//! `$ cargo run make -qr -crypto <encryption> -msgtype load_metadata
-//! -verifier Alice -payload sign_me_load_metadata_westendV9200`.
+//! `$ cargo run make --goal qr --crypto <encryption> --msg load-metadata
+//! --verifier Alice --payload sign_me_load_metadata_westendV9200`.
 //!
 //! Output file is `load_metadata_westendV9200_Alice-<encryption>` in
 //! [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
 //!
 //! Example:
 //!
-//! `$ cargo run make -qr -crypto sr25519 -msgtype load_metadata -verifier Alice
-//! -payload sign_me_load_metadata_westendV9200`
+//! `$ cargo run make --goal qr --crypto sr25519 --msg load-metadata --verifier Alice
+//! --payload sign_me_load_metadata_westendV9200`
 //!
 //! #### `make` with no signature
 //!
-//! `$ cargo run make -qr -crypto none -msgtype load_metadata -payload
+//! `$ cargo run make --goal qr --crypto none --msg load-metadata --payload
 //! sign_me_load_metadata_westendV9200`
 //!
 //! Output file is `load_metadata_westendV9200_unverified` in
@@ -880,7 +877,7 @@
 //!
 //! Example:
 //!
-//! `$ cargo run make -qr -crypto none -msgtype load_metadata -payload
+//! `$ cargo run make --goal qr --crypto none --msg load-metadata --payload
 //! sign_me_load_metadata_westendV9200`
 //!
 //! #### `sign`
@@ -889,21 +886,21 @@
 //! [`SufficientCrypto`](definitions::crypto::SufficientCrypto) QR code produced
 //! by the Signer.
 //!
-//! `$ cargo run sign -qr -sufficient -hex <hex_sufficient> -msgtype
-//! load_metadata -payload sign_me_load_metadata_westendV9200`
+//! `$ cargo run sign --goal qr --sufficient-hex <hex_sufficient> --msg
+//! load-metadata --payload sign_me_load_metadata_westendV9200`
 //!
 //! Output file is `load_metadata_westendV9200` in
 //! [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
 //!
 //! Example:
 //!
-//! `$ cargo run sign -qr -sufficient -hex
+//! `$ cargo run sign --goal qr --sufficient-hex
 //! 0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47aceef7c58b5f952b6233b8aba5beb6f0000c8ca7f7cc16b7ada7cd45026fc3f3ec2289dd90dab0dfac38dfe3be843231443ddd30a3f3bbabb5cefcd2bbcef908c
-//! -msgtype load_metadata -payload sign_me_load_metadata_westendV9200`
+//! --msg load-metadata --payload sign_me_load_metadata_westendV9200`
 //!
 //! ## Remove a single metadata entry from the `METATREE`
 //!
-//! `$ cargo run remove -name <network_name> -version <metadata_version>`
+//! `$ cargo run remove --name <network_name> --version <metadata_version>`
 //!
 //! Removes only the specified entry from the [`METATREE`](constants::METATREE).
 //!
@@ -915,14 +912,14 @@
 //!
 //! ## Remove all data associated with a network
 //!
-//! `$ cargo run remove -title <address_book_title>`
+//! `$ cargo run remove --title <address_book_title>`
 //!
 //! This will remove:
 //! - address book entry
 //! [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
 //! - network specs
-//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 //! from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
 //! - all associated metadata entries from [`METATREE`](constants::METATREE)
 //! if there are no other address book entries this metadata is associated
@@ -933,7 +930,7 @@
 //!
 //! ## Restore hot database to default state
 //!
-//! `$ cargo run restore_defaults`
+//! `$ cargo run restore-defaults`
 //!
 //! Removes old hot database and generates new one with default values at
 //! default path [`HOT_DB_NAME`](constants::HOT_DB_NAME).
@@ -951,7 +948,7 @@
 //!
 //! ## Generate default cold release database
 //!
-//! `$ cargo run make_cold_release <optional path>`
+//! `$ cargo run make-cold-release <optional path>`
 //!
 //! Removes old cold release database and generates new one with default values
 //! (unitiniated) at user-provided path or, if no valid path is given, at
@@ -979,30 +976,30 @@
 //! user-provided path or, if no valid path is given, at default path
 //! [`COLD_DB_NAME_RELEASE`](constants::COLD_DB_NAME_RELEASE).
 //!
-//! Metadata is transfered only for the networks that are known to the cold
+//! Metadata is transferred only for the networks that are known to the cold
 //! database, i.e. the ones having
-//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) entry in
+//! [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry in
 //! [`SPECSTREE`](constants::SPECSTREE).
 
 //! ## Make derivations import QR and/or hexadecimal string file
 //!
-//! `$ cargo run derivations <optional_target_key> <keys> <arguments>`
+//! `$ cargo run derivations --goal <GOAL> --title <TITLE> --derivations <DERIVATIONS>`
 //!
 //! Keys to be used in command line:
 //!
-//! - `<optional_target_key>`: `-qr` will generate only apng QR code, `-text`
+//! - `<GOAL>`: `qr` will generate only apng QR code, `text`
 //! will generate only text file with hex-encoded update. By default, i.e. if
 //! content key is not provided, both QR code and text file are generated.
 //! `<optional_target_key>` is expected immediately after `derivations` command,
 //! if at all; keys to follow could go in any order, but with argument
 //! immediately following the key.
 //!
-//! - Key `-payload` followed by file path in `/generate_message/` folder.
-//! File with derivations contains password-free derivations, each on its own
-//! line. Only suitable derivations will be processed. Processed derivations are
-//! also printed for user to check.
+//! - Key `--derivations` followed by file path in `/generate_message/` folder.
+//! File with derivations contains valid derivations, each on its own line. Only
+//! suitable derivations will be processed. Processed derivations are also
+//! printed for user to check.
 //!
-//! - Key `-title` followed by network address book title, to indicate to
+//! - Key `--title` followed by network address book title, to indicate to
 //! which network the derivations belong.
 //!
 //! Output file is in `/generate_message/` folder, file name would be
@@ -1010,7 +1007,7 @@
 //!
 //! ## Prepare payload for `load_metadata` update from `.wasm` file
 //!
-//! `$ cargo run unwasm -payload <wasm_file_path> <optional -d key>`
+//! `$ cargo run unwasm [OPTIONS] --filename <FILENAME>`
 //!
 //! This command extracts metadata from `.wasm` file and uses this metadata to
 //! produce `load_metadata` update payload. Only networks with network specs
@@ -1020,8 +1017,8 @@
 //! codes before the metadata becomes accessible from the node.
 //!
 //! Network name found in the metadata is used to find
-//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) for
-//! the network. `NetworkSpecsToSend` are used to get genesis hash and to check
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) for
+//! the network. `NetworkSpecs` are used to get genesis hash and to check
 //! base58 prefix, it the network metadata has base58 prefix inside.
 //!
 //! A raw bytes update payload file is generated in dedicated
@@ -1037,8 +1034,7 @@
 //!
 //! ## Make metadata file for `defaults` release metadata set
 //!
-//! `$ cargo run meta_default_file -name <network_name> -version
-//! <network_version>`
+//! `$ cargo run  meta-default-file --name <NETWORK NAME> --version <NETWORK VERSION>`
 //!
 //! Produces file with hex-encoded network metadata from the hot database
 //! [`METATREE`](constants::METATREE) entry.
@@ -1049,11 +1045,11 @@
 //!
 //! ### Example
 //!
-//! `$ cargo run meta_default_file -name westend -version 9230`
+//! `$ cargo run meta-default-file --name westend --version 9230`
 //!
 //! ## Make file with hexadecimal network metadata fetched for specific block hash from provided address
 //!
-//! `$ cargo run meta_at_block -u <url_address> -block <block_hash>`
+//! `$ cargo run meta-at-block --url <RPC URL> --block-hash <BLOCK HASH>`
 //!
 //! Output file named `<network_name><metadata_version>_<block_hash>` is
 //! generated in dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
@@ -1063,23 +1059,25 @@
 //!
 //! ### Example
 //!
-//! `$ cargo run meta_at_block -u wss://westend-rpc.polkadot.io -block
+//! `$ cargo run meta-at-block --url wss://westend-rpc.polkadot.io --block
 //! 780812df50c4006d1865742269fe4ca339c097e61d6279cce91ebc58f5aebada`
-#![deny(unused_crate_dependencies)]
+#![deny(unused)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use constants::{load_types, COLD_DB_NAME_RELEASE, HOT_DB_NAME};
+use constants::FPS_DEN;
 use db_handling::{
     default_cold_release, default_hot,
     helpers::{prep_types, transfer_metadata_to_cold},
 };
-use definitions::error_active::{Active, ErrorActive};
 
 mod derivations;
 use derivations::process_derivations;
 pub mod fetch_metadata;
 pub mod helpers;
-use helpers::debug_meta_at_block;
+use helpers::{
+    debug_meta_at_block, generate_bulk_transaction_qr, generate_key_info_export_to_qr,
+    generate_qr_code,
+};
 pub mod interpret_specs;
 mod load;
 use load::{gen_load_meta, meta_default_file, unwasm};
@@ -1094,36 +1092,77 @@ use show::{check_file, show_block_history, show_metadata, show_networks, show_sp
 mod specs;
 use specs::gen_add_specs;
 
+mod error;
+pub use error::{Error, Result};
+
 /// Process incoming command as interpreted by parser.
-pub fn full_run(command: Command) -> Result<(), ErrorActive> {
+pub fn full_run(command: Command) -> Result<()> {
     match command {
-        Command::Show(x) => match x {
-            Show::Metadata => show_metadata(),
-            Show::Networks => show_networks(),
-            Show::Specs(title) => show_specs(title),
-            Show::CheckFile(path) => check_file(path),
-            Show::BlockHistory => show_block_history(),
+        Command::Show { s: show, db_path } => match show {
+            Show::Metadata => show_metadata(db_path),
+            Show::Networks => show_networks(db_path),
+            Show::Specs { s: title } => show_specs(title, db_path),
+            Show::CheckFile { s: path } => check_file(path, db_path),
+            Show::BlockHistory => show_block_history(db_path),
         },
-        Command::Specs(instruction) => gen_add_specs(instruction),
+        Command::Specs { s: instruction } => gen_add_specs(instruction),
         Command::Load(instruction) => gen_load_meta(instruction),
-        Command::Types => prep_types::<Active>(HOT_DB_NAME)?.write(&load_types()),
-        Command::Make(make) => make_message(make),
-        Command::Remove(info) => remove_info(info),
-        Command::RestoreDefaults => default_hot(None),
-        Command::MakeColdRelease(opt_path) => default_cold_release(opt_path),
-        Command::TransferMetaRelease(opt_path) => {
-            let cold_database_path = match opt_path {
-                Some(ref path) => path.to_str().unwrap_or(COLD_DB_NAME_RELEASE),
-                None => COLD_DB_NAME_RELEASE,
-            };
-            transfer_metadata_to_cold(HOT_DB_NAME, cold_database_path)
+        Command::Types { db_path, files_dir } => {
+            Ok(prep_types(db_path)?.write(files_dir.join("sign_me_load_types"))?)
+        }
+        Command::Sign(make) | Command::Make(make) => make_message(make),
+        Command::Remove { r: info, db_path } => remove_info(info, db_path),
+        Command::RestoreDefaults { db_path } => Ok(default_hot(Some(db_path))?),
+        Command::MakeColdRelease { path } => Ok(default_cold_release(path)?),
+        Command::TransferMetaToColdRelease { cold_db, hot_db } => {
+            Ok(transfer_metadata_to_cold(hot_db, cold_db)?)
         }
         Command::Derivations(x) => process_derivations(x),
         Command::Unwasm {
             filename,
             update_db,
-        } => unwasm(&filename, update_db),
-        Command::MetaDefaultFile { name, version } => meta_default_file(&name, version),
-        Command::MetaAtBlock { url, block_hash } => debug_meta_at_block(&url, &block_hash),
+            db_path,
+            files_dir,
+        } => unwasm(&filename, update_db, db_path, files_dir),
+        Command::MetaDefaultFile {
+            name,
+            version,
+            db_path,
+            export_dir,
+        } => meta_default_file(&name, version, db_path, export_dir),
+        Command::MetaAtBlock {
+            url,
+            block_hash,
+            export_dir,
+        } => debug_meta_at_block(&url, &block_hash, export_dir),
+        Command::EncodeToQr {
+            path,
+            hex,
+            chunk_size,
+            dst_file,
+        } => {
+            let data = if let Some(hex) = hex {
+                hex::decode(hex).unwrap()
+            } else if let Some(path) = path {
+                std::fs::read(path).unwrap()
+            } else {
+                panic!("path or hex data required");
+            };
+
+            generate_qr_code(&data, chunk_size, FPS_DEN, dst_file)
+        }
+        Command::KeyInfoExportToQr {
+            dst_file,
+            chunk_size,
+            fps,
+            keys_num,
+        } => generate_key_info_export_to_qr(dst_file, chunk_size, fps, keys_num),
+        Command::BulkTransactionTestPayload {
+            dst_file,
+            tx_count,
+            chunk_size,
+            from,
+            output_format,
+        } => generate_bulk_transaction_qr(dst_file, tx_count, chunk_size, from, output_format),
     }
 }

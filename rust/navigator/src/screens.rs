@@ -1,21 +1,25 @@
 //!List of all screens
+
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
+use crate::{
+    error::{Error, Result},
+    states::TransactionState,
+};
 use db_handling::{
     helpers::get_address_details,
+    identities::get_multisigner_by_address,
     interface_signer::{first_network, SeedDraft},
 };
+use definitions::navigation::MAddressCard;
 use definitions::{
-    error::AddressKeySource,
-    error_signer::{ErrorSigner, ExtraAddressKeySourceSigner, Signer},
-    helpers::{make_identicon_from_multisigner, multisigner_to_public},
+    crypto::Encryption,
+    helpers::{make_identicon_from_multisigner, multisigner_to_public, IdenticonStyle},
     keyring::{AddressKey, NetworkSpecsKey},
-    navigation::{Address, TransactionCardSet},
-    network_specs::NetworkSpecs,
+    navigation::Address,
     users::AddressDetails,
 };
-use transaction_parsing;
 use transaction_signing;
 
 const MAX_COUNT_SET: u8 = 3;
@@ -86,19 +90,10 @@ pub struct DeriveState {
     collision: Option<(MultiSigner, AddressDetails)>,
 }
 
-///State of transaction screen
-#[derive(Clone, Debug)]
-pub struct TransactionState {
-    entered_info: EnteredInfo,
-    action: transaction_parsing::TransactionAction,
-    comment: String,
-    counter: u8,
-}
-
 ///State of screen generating sufficient crypto
 #[derive(Debug, Clone)]
 pub struct SufficientCryptoState {
-    key_selected: Option<(MultiSigner, AddressDetails, Address)>,
+    key_selected: Option<(MultiSigner, AddressDetails, MAddressCard)>,
     entered_info: EnteredInfo,
     content: transaction_signing::SufficientContent,
     counter: u8,
@@ -111,14 +106,14 @@ pub struct RecoverSeedPhraseState {
     seed_draft: SeedDraft,
 }
 
-///EnteredInfo, path+pwd entered by the user, zeroizeable
+///`EnteredInfo`, `path+pwd` entered by the user, zeroizeable
 #[derive(Debug, Clone, Zeroize)]
 #[zeroize(drop)]
 pub struct EnteredInfo(pub String);
 
 impl KeysState {
-    pub fn new(seed_name: &str, database_name: &str) -> Result<Self, ErrorSigner> {
-        let network_specs = first_network(database_name)?;
+    pub fn new(seed_name: &str, database_name: &str) -> Result<Self> {
+        let network_specs = first_network(database_name)?.specs;
         Ok(Self {
             seed_name: seed_name.to_string(),
             network_specs_key: NetworkSpecsKey::from_parts(
@@ -178,10 +173,7 @@ impl KeysState {
             SpecialtyKeysState::MultiSelect(multiselect) => {
                 let mut new_multiselect = multiselect.to_owned();
                 if multiselect.contains(multisigner) {
-                    new_multiselect = new_multiselect
-                        .into_iter()
-                        .filter(|a| a != multisigner)
-                        .collect();
+                    new_multiselect.retain(|a| a != multisigner);
                 } else {
                     new_multiselect.push(multisigner.to_owned());
                 }
@@ -228,15 +220,15 @@ impl KeysState {
 }
 
 impl AddressState {
-    pub fn new(
-        hex_address_key: &str,
-        keys_state: &KeysState,
-        database_name: &str,
-    ) -> Result<Self, ErrorSigner> {
+    pub fn new(hex_address_key: &str, keys_state: &KeysState, database_name: &str) -> Result<Self> {
         let address_key = AddressKey::from_hex(hex_address_key)?;
-        let multisigner = address_key.multi_signer::<Signer>(AddressKeySource::Extra(
-            ExtraAddressKeySourceSigner::Interface,
-        ))?;
+        let multisigner = if let Ok(m) = address_key.multi_signer() {
+            m
+        } else if let Some(key) = get_multisigner_by_address(database_name, &address_key)? {
+            key
+        } else {
+            return Err(Error::KeyNotFound(format!("{:?}", address_key)));
+        };
         let is_root =
             get_address_details(database_name, &AddressKey::from_multisigner(&multisigner))?
                 .is_root();
@@ -274,7 +266,7 @@ impl AddressStateMulti {
         network_specs_key: NetworkSpecsKey,
         multiselect: &[MultiSigner],
         database_name: &str,
-    ) -> Result<Self, ErrorSigner> {
+    ) -> Result<Self> {
         let mut set: Vec<(MultiSigner, bool)> = Vec::new();
         for multisigner in multiselect.iter() {
             let address_details =
@@ -399,70 +391,6 @@ impl DeriveState {
     }
 }
 
-impl TransactionState {
-    pub fn new(details_str: &str, dbname: &str) -> Self {
-        Self {
-            entered_info: EnteredInfo("".to_string()),
-            action: transaction_parsing::produce_output(details_str, dbname),
-            comment: "".to_string(),
-            counter: 1,
-        }
-    }
-    pub fn update_seed(&self, new_secret_string: &str) -> Self {
-        Self {
-            entered_info: EnteredInfo(new_secret_string.to_string()),
-            action: self.action(),
-            comment: self.comment.to_string(),
-            counter: self.counter,
-        }
-    }
-    pub fn add_comment(&self, comment: &str) -> Self {
-        Self {
-            entered_info: self.entered_info.to_owned(),
-            action: self.action(),
-            comment: comment.to_string(),
-            counter: self.counter,
-        }
-    }
-    pub fn update_checksum_sign(
-        &self,
-        new_checksum: u32,
-        content: TransactionCardSet,
-        has_pwd: bool,
-        author_info: Address,
-        network_info: NetworkSpecs,
-    ) -> Self {
-        let action = transaction_parsing::TransactionAction::Sign {
-            content,
-            checksum: new_checksum,
-            has_pwd,
-            author_info,
-            network_info,
-        };
-        Self {
-            entered_info: self.entered_info.to_owned(),
-            action,
-            comment: self.comment.to_string(),
-            counter: self.counter + 1,
-        }
-    }
-    pub fn action(&self) -> transaction_parsing::TransactionAction {
-        self.action.to_owned()
-    }
-    pub fn seed(&self) -> String {
-        self.entered_info.0.to_string()
-    }
-    pub fn get_comment(&self) -> String {
-        self.comment.to_owned()
-    }
-    pub fn ok(&self) -> bool {
-        self.counter < MAX_COUNT_SET
-    }
-    pub fn counter(&self) -> u8 {
-        self.counter
-    }
-}
-
 impl SufficientCryptoState {
     pub fn init(content: transaction_signing::SufficientContent) -> Self {
         Self {
@@ -475,7 +403,7 @@ impl SufficientCryptoState {
     pub fn content(&self) -> transaction_signing::SufficientContent {
         self.content.to_owned()
     }
-    pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, Address)> {
+    pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, MAddressCard)> {
         self.key_selected.to_owned()
     }
     pub fn update(
@@ -484,13 +412,22 @@ impl SufficientCryptoState {
         address_details: &AddressDetails,
         new_secret_string: &str,
     ) -> Self {
-        let identicon = make_identicon_from_multisigner(multisigner);
-        let author_info = Address {
+        let style = if address_details.encryption == Encryption::Ethereum {
+            IdenticonStyle::Blockies
+        } else {
+            IdenticonStyle::Dots
+        };
+
+        let identicon = make_identicon_from_multisigner(multisigner, style);
+        let author_info = MAddressCard {
+            address: Address {
+                identicon,
+                seed_name: address_details.seed_name.clone(),
+                path: address_details.path.clone(),
+                has_pwd: address_details.has_pwd,
+                secret_exposed: address_details.secret_exposed,
+            },
             base58: hex::encode(multisigner_to_public(multisigner)),
-            identicon,
-            seed_name: address_details.seed_name.clone(),
-            path: address_details.path.clone(),
-            has_pwd: address_details.has_pwd,
             multiselect: None,
         };
         Self {
@@ -643,11 +580,12 @@ mod tests {
             has_pwd: false,
             network_id: Vec::new(),
             encryption: Encryption::Sr25519,
+            secret_exposed: false,
         }
     }
 
-    /// EnteredInfo holds String with sensitive information arriving either from Signer phone memory or from the user.
-    /// EnteredInto is used in several structs, and should always be zeroized properly.
+    /// `EnteredInfo` holds String with sensitive information arriving either from Signer phone memory or from the user.
+    /// `EnteredInto` is used in several structs, and should always be zeroized properly.
     #[test]
     fn zeroize_entered_info_in_sufficient_crypto_state() {
         let secret_ptr: *const u8;

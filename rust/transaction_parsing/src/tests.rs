@@ -6,16 +6,17 @@ use db_handling::{
     cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
     manage_history::get_history,
 };
+use definitions::navigation::{MAddressCard, SignerImage, TransactionSignAction};
 use definitions::{
     crypto::Encryption,
     history::{Entry, Event},
     keyring::NetworkSpecsKey,
     navigation::{
-        Address, Card, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName,
-        MSCEraMortal, MSCId, MSCNameVersion, MTypesInfo, MVerifierDetails, NetworkSpecsToSend,
-        TransactionAction, TransactionCard, TransactionCardSet,
+        Address, Card, MMetadataRecord, MSCCall, MSCCurrency, MSCEnumVariantName, MSCEraMortal,
+        MSCId, MSCNameVersion, MTypesInfo, MVerifierDetails, NetworkSpecs, TransactionAction,
+        TransactionCard, TransactionCardSet,
     },
-    network_specs::{NetworkSpecs, Verifier, VerifierValue},
+    network_specs::{OrderedNetworkSpecs, Verifier, VerifierValue},
 };
 use pretty_assertions::assert_eq;
 use sp_core::H256;
@@ -47,23 +48,25 @@ fn entries_contain_event(entries: &[Entry], event: &Event) -> bool {
     entries.iter().flat_map(|e| &e.events).any(|e| e == event)
 }
 
-fn westend_spec() -> NetworkSpecs {
-    NetworkSpecs {
-        base58prefix: 42,
-        color: "#660D35".to_string(),
-        decimals: 12,
-        encryption: Encryption::Sr25519,
-        genesis_hash: H256::from_str(
-            "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        )
-        .unwrap(),
-        logo: "westend".to_string(),
-        name: "westend".to_string(),
+fn westend_spec() -> OrderedNetworkSpecs {
+    OrderedNetworkSpecs {
+        specs: NetworkSpecs {
+            base58prefix: 42,
+            color: "#660D35".to_string(),
+            decimals: 12,
+            encryption: Encryption::Sr25519,
+            genesis_hash: H256::from_str(
+                "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            )
+            .unwrap(),
+            logo: "westend".to_string(),
+            name: "westend".to_string(),
+            path_id: "//westend".to_string(),
+            secondary_color: "#262626".to_string(),
+            title: "Westend".to_string(),
+            unit: "WND".to_string(),
+        },
         order: 2,
-        path_id: "//westend".to_string(),
-        secondary_color: "#262626".to_string(),
-        title: "Westend".to_string(),
-        unit: "WND".to_string(),
     }
 }
 
@@ -99,7 +102,7 @@ fn add_specs_westend_no_network_info_not_signed() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 42,
                     color: "#660D35".to_string(),
                     decimals: 12,
@@ -130,7 +133,7 @@ fn add_specs_westend_no_network_info_not_signed() {
     let output = produce_output(line.trim(), dbname);
 
     if let TransactionAction::Stub { s, u: _, stub } = output {
-        assert_eq!(s, card_set_known);
+        assert_eq!(*s, card_set_known);
         assert_eq!(stub, stub_nav_known)
     } else {
         panic!("expected TansactionAction::Stub, got {:?}", output);
@@ -146,14 +149,14 @@ fn add_specs_westend_not_signed() {
     let line = fs::read_to_string("for_tests/add_specs_westend_unverified.txt").unwrap();
     let action = produce_output(line.trim(), dbname);
     let expected_action = TransactionAction::Read {
-        r: TransactionCardSet {
+        r: Box::new(TransactionCardSet {
             error: Some(vec![TransactionCard {
                 index: 0,
                 indent: 0,
                 card: Card::ErrorCard { f:  "Bad input data. Exactly same network specs for network westend with encryption sr25519 are already in the database.".to_string()},
             }]),
             ..Default::default()
-        }
+        })
     };
     assert_eq!(action, expected_action);
     fs::remove_dir_all(dbname).unwrap();
@@ -166,14 +169,14 @@ fn add_specs_westend_not_signed_general_verifier_disappear() {
     let line = fs::read_to_string("for_tests/add_specs_westend_unverified.txt").unwrap();
     let action = produce_output(line.trim(), dbname);
     let expected_action = TransactionAction::Read {
-        r: TransactionCardSet {
+        r: Box::new(TransactionCardSet {
             error: Some(vec![TransactionCard {
                 index: 0,
                 indent: 0,
                 card: Card::ErrorCard { f: "Bad input data. General verifier in the database is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Received unsigned westend network information could be accepted only if signed by the general verifier.".to_string()},
             }]),
             ..Default::default()
-        }
+        })
     };
     assert_eq!(action, expected_action);
 
@@ -187,7 +190,7 @@ fn load_types_known_not_signed() {
     let line = fs::read_to_string("for_tests/types_info_None.txt").unwrap();
     let action = produce_output(line.trim(), dbname);
     let expected_action = TransactionAction::Read {
-        r: TransactionCardSet {
+        r: Box::new(TransactionCardSet {
             error: Some(vec![TransactionCard {
                 index: 0,
                 indent: 0,
@@ -197,7 +200,7 @@ fn load_types_known_not_signed() {
                 },
             }]),
             ..Default::default()
-        },
+        }),
     };
     assert_eq!(action, expected_action);
 
@@ -211,7 +214,7 @@ fn load_types_known_not_signed_general_verifier_disappear() {
     let line = fs::read_to_string("for_tests/types_info_None.txt").unwrap();
     let action = produce_output(line.trim(), dbname);
     let expected_action = TransactionAction::Read {
-        r: TransactionCardSet {
+        r: Box::new(TransactionCardSet {
             error: Some(vec![TransactionCard {
                 index: 0,
                 indent: 0,
@@ -220,7 +223,7 @@ fn load_types_known_not_signed_general_verifier_disappear() {
                 },
             }]),
             ..Default::default()
-        },
+        }),
     };
     assert_eq!(action, expected_action);
 
@@ -261,7 +264,9 @@ fn load_types_known_alice_signed() {
                 types_hash: Some(
                     "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string(),
                 ),
-                types_id_pic: Some(types_known().to_vec()),
+                types_id_pic: Some(SignerImage::Png {
+                    image: types_known().to_vec(),
+                }),
             },
         },
     }]);
@@ -274,7 +279,9 @@ fn load_types_known_alice_signed() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -291,7 +298,7 @@ fn load_types_known_alice_signed() {
         stub,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub, StubNav::LoadTypes);
     } else {
         panic!("Wrong action {:?}", output)
@@ -318,7 +325,7 @@ fn load_types_known_alice_signed_known_general_verifier() {
 
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Read { r: reply } = output {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
     } else {
         panic!("Wrong action {:?}", output)
     }
@@ -341,7 +348,7 @@ fn load_types_known_alice_signed_bad_general_verifier() {
 
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Read { r: reply } = action {
-        assert_eq!(reply, action_expected);
+        assert_eq!(*reply, action_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -361,7 +368,7 @@ fn load_types_known_alice_signed_metadata_hold() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png{ image: alice_sr_alice().to_vec() },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -383,7 +390,7 @@ fn load_types_known_alice_signed_metadata_hold() {
             card: Card::TypesInfoCard { f: MTypesInfo {
                 types_on_file: false,
                 types_hash: Some("d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string()),
-                types_id_pic: Some(types_known().to_vec()),
+                types_id_pic: Some(SignerImage::Png{ image: types_known().to_vec() }),
             }
             }
         }]),
@@ -392,7 +399,7 @@ fn load_types_known_alice_signed_metadata_hold() {
 
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub { s: set, u: _, stub } = output {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
         assert_eq!(stub, StubNav::LoadTypes);
     } else {
         panic!("Wrong action {:?}", output)
@@ -432,7 +439,9 @@ fn load_types_unknown_not_signed() {
                         "d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"
                             .to_string(),
                     ),
-                    types_id_pic: Some(types_unknown().to_vec()),
+                    types_id_pic: Some(SignerImage::Png {
+                        image: types_unknown().to_vec(),
+                    }),
                 },
             },
         }]),
@@ -442,7 +451,7 @@ fn load_types_unknown_not_signed() {
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(stub, StubNav::LoadTypes);
-        assert_eq!(set, expected_set);
+        assert_eq!(*set, expected_set);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -462,7 +471,7 @@ fn load_types_unknown_alice_signed() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png{ image: alice_sr_alice().to_vec() },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -483,7 +492,7 @@ fn load_types_unknown_alice_signed() {
                 f: MTypesInfo {
                     types_on_file: false,
                     types_hash: Some("d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574".to_string()),
-                    types_id_pic: Some(types_unknown().to_vec()),
+                    types_id_pic: Some(SignerImage::Png{ image: types_unknown().to_vec() }),
                 }
             }
         }]),
@@ -492,7 +501,7 @@ fn load_types_unknown_alice_signed() {
 
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
-        assert_eq!(set, expected_set);
+        assert_eq!(*set, expected_set);
         assert_eq!(stub, StubNav::LoadTypes);
     } else {
         panic!("Wrong action {:?}", action)
@@ -509,14 +518,14 @@ fn parse_transaction_westend_50_not_in_db() {
         error: Some(vec![TransactionCard {
             index: 0,
             indent: 0,
-            card: Card::ErrorCard { f: "Failed to decode extensions. Please try updating metadata for westend network. Parsing with westend9010 metadata: Network spec version decoded from extensions (50) differs from the version in metadata (9010). Parsing with westend9000 metadata: Network spec version decoded from extensions (50) differs from the version in metadata (9000).".to_string() },
+            card: Card::ErrorCard { f: "Bad input data. Failed to decode extensions. Please try updating metadata for westend network. Parsing with westend9010 metadata: Network spec version decoded from extensions (50) differs from the version in metadata (9010). Parsing with westend9000 metadata: Network spec version decoded from extensions (50) differs from the version in metadata (9000).".to_string() },
         }]),
         ..Default::default()
     };
 
     let action = produce_output(line, dbname);
     if let TransactionAction::Read { r: set } = action {
-        assert_eq!(set, expected_set);
+        assert_eq!(*set, expected_set);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -571,7 +580,7 @@ fn parse_transaction_1() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: bob().to_vec(),
+                        identicon: SignerImage::Png { image: bob().to_vec() },
                     },
                 },
             },
@@ -649,44 +658,52 @@ fn parse_transaction_1() {
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
+        address: Address {
+            identicon: SignerImage::Png {
+                image: alice_sr_alice().to_vec(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
-    let network_info_known = NetworkSpecs {
-        base58prefix: 42,
-        color: "#660D35".to_string(),
-        decimals: 12,
-        encryption: Encryption::Sr25519,
-        genesis_hash: H256::from_str(
-            "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        )
-        .unwrap(),
-        logo: "westend".to_string(),
-        name: "westend".to_string(),
+    let network_info_known = OrderedNetworkSpecs {
+        specs: NetworkSpecs {
+            base58prefix: 42,
+            color: "#660D35".to_string(),
+            decimals: 12,
+            encryption: Encryption::Sr25519,
+            genesis_hash: H256::from_str(
+                "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            )
+            .unwrap(),
+            logo: "westend".to_string(),
+            name: "westend".to_string(),
+            path_id: "//westend".to_string(),
+            secondary_color: "#262626".to_string(),
+            title: "Westend".to_string(),
+            unit: "WND".to_string(),
+        },
         order: 2,
-        path_id: "//westend".to_string(),
-        secondary_color: "#262626".to_string(),
-        title: "Westend".to_string(),
-        unit: "WND".to_string(),
     };
     let output = produce_output(line, dbname);
-    if let TransactionAction::Sign {
-        content,
-        checksum: _,
-        has_pwd,
-        author_info,
-        network_info,
-    } = output
-    {
-        assert_eq!(content, content_known);
-        assert_eq!(author_info, author_info_known);
-        assert_eq!(network_info, network_info_known);
-        assert_eq!(has_pwd, false)
+    if let TransactionAction::Sign { actions, .. } = output {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
+        assert_eq!(network_info, &network_info_known);
+        assert_eq!(*has_pwd, false)
     } else {
         panic!("Wrong action {:?}", output)
     }
@@ -772,7 +789,9 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        identicon: alice_sr_alice().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
                     },
                 },
             },
@@ -850,7 +869,9 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5G1ojzh47Yt8KoYhuAjXpHcazvsoCXe3G8LZchKDvumozJJJ".to_string(),
-                        identicon: id_01().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: id_01().to_vec(),
+                        },
                     },
                 },
             },
@@ -870,7 +891,9 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f".to_string(),
-                        identicon: id_02().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: id_02().to_vec(),
+                        },
                     },
                 },
             },
@@ -914,7 +937,9 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: bob().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: bob().to_vec(),
+                        },
                     },
                 },
             },
@@ -975,28 +1000,34 @@ fn parse_transaction_2() {
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
+        address: Address {
+            identicon: SignerImage::Png {
+                image: alice_sr_alice().to_vec(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
     let network_info_known = westend_spec();
 
     let action = produce_output(line, dbname);
-    if let TransactionAction::Sign {
-        content,
-        checksum: _,
-        has_pwd,
-        author_info,
-        network_info,
-    } = action
-    {
-        assert_eq!(content, content_known);
-        assert_eq!(author_info, author_info_known);
-        assert_eq!(network_info, network_info_known);
+    if let TransactionAction::Sign { actions, .. } = action {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
+        assert_eq!(network_info, &network_info_known);
         assert!(!has_pwd, "Expected no password");
     } else {
         panic!("Wrong action {:?}", action)
@@ -1054,7 +1085,9 @@ fn parse_transaction_3() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: bob().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: bob().to_vec(),
+                        },
                     },
                 },
             },
@@ -1132,28 +1165,34 @@ fn parse_transaction_3() {
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
+        address: Address {
+            identicon: SignerImage::Png {
+                image: alice_sr_alice().to_vec(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
     let network_info_known = westend_spec();
     let output = produce_output(line, dbname);
-    if let TransactionAction::Sign {
-        content,
-        checksum: _,
-        has_pwd,
-        author_info,
-        network_info,
-    } = output
-    {
-        assert_eq!(content, content_known);
-        assert_eq!(author_info, author_info_known);
+    if let TransactionAction::Sign { actions, .. } = output {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
         assert!(!has_pwd, "Expected no password");
-        assert_eq!(network_info, network_info_known);
+        assert_eq!(network_info, &network_info_known);
     } else {
         panic!("Wrong action {:?}", output)
     }
@@ -1182,7 +1221,9 @@ fn load_westend9070_not_signed() {
                     specs_version: "9070".to_string(),
                     meta_hash: "e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"
                         .to_string(),
-                    meta_id_pic: westend_9070().to_vec(),
+                    meta_id_pic: SignerImage::Png {
+                        image: westend_9070().to_vec(),
+                    },
                 },
             },
         }]),
@@ -1198,7 +1239,7 @@ fn load_westend9070_not_signed() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
     } else {
         panic!("Wrong action {:?}", action)
@@ -1221,7 +1262,7 @@ fn load_westend9070_alice_signed() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Read { r: reply } = action {
-        assert_eq!(reply, set_expected);
+        assert_eq!(*reply, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -1246,7 +1287,7 @@ fn load_westend9000_already_in_db_not_signed() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Read { r: set } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -1271,7 +1312,7 @@ fn load_westend9000_already_in_db_alice_signed() {
 
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Read { r: set } = output {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", output)
     }
@@ -1297,7 +1338,7 @@ fn load_westend9000_already_in_db_alice_signed_known_general_verifier() {
 
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Read { r: set } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -1319,7 +1360,7 @@ fn load_westend9000_already_in_db_alice_signed_bad_general_verifier() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Read { r: set } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -1344,7 +1385,7 @@ fn load_dock31_unknown_network() {
 
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Read { r: set } = output {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", output)
     }
@@ -1370,7 +1411,7 @@ fn add_specs_dock_not_verified_db_not_verified() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1400,7 +1441,7 @@ fn add_specs_dock_not_verified_db_not_verified() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
     } else {
         panic!("Wrong action {:?}", action)
@@ -1424,7 +1465,7 @@ fn add_specs_dock_alice_verified_db_not_verified() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png{ image: alice_sr_alice().to_vec() },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1438,7 +1479,7 @@ fn add_specs_dock_alice_verified_db_not_verified() {
             index: 2,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1465,7 +1506,7 @@ fn add_specs_dock_alice_verified_db_not_verified() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
     } else {
         panic!("Wrong action {:?}", action)
@@ -1492,7 +1533,7 @@ fn add_specs_dock_not_verified_db_alice_verified() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1522,7 +1563,7 @@ fn add_specs_dock_not_verified_db_alice_verified() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
     } else {
         panic!("Wrong action {:?}", action)
@@ -1545,7 +1586,9 @@ fn add_specs_dock_both_verified_same() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1554,7 +1597,7 @@ fn add_specs_dock_both_verified_same() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1584,7 +1627,7 @@ fn add_specs_dock_both_verified_same() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
     } else {
         panic!("Wrong action {:?}", action)
@@ -1607,7 +1650,9 @@ fn add_specs_dock_both_verified_different() {
                 f: MVerifierDetails {
                     public_key: "88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee"
                         .to_string(),
-                    identicon: ed().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: ed().to_vec(),
+                    },
                     encryption: "ed25519".to_string(),
                 },
             },
@@ -1616,7 +1661,7 @@ fn add_specs_dock_both_verified_different() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1646,7 +1691,7 @@ fn add_specs_dock_both_verified_different() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
     } else {
         panic!("Wrong action {:?}", action)
@@ -1671,7 +1716,7 @@ fn add_specs_westend_ed25519_not_signed() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 42,
                     color: "#660D35".to_string(),
                     decimals: 12,
@@ -1700,7 +1745,7 @@ fn add_specs_westend_ed25519_not_signed() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
     } else {
         panic!("Wrong action {:?}", action)
@@ -1725,7 +1770,7 @@ fn add_specs_bad_westend_ed25519_not_signed() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Read { r: set } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -1747,7 +1792,9 @@ fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1761,7 +1808,7 @@ fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
             index: 2,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 42,
                     color: "#660D35".to_string(),
                     decimals: 12,
@@ -1790,7 +1837,7 @@ fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
     } else {
         panic!("Wrong action {:?}", action)
@@ -1814,7 +1861,7 @@ fn add_specs_westend_ed25519_not_verified_db_alice_verified() {
 
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Read { r: set } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -1834,7 +1881,9 @@ fn add_specs_westend_ed25519_both_verified_same() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1843,7 +1892,7 @@ fn add_specs_westend_ed25519_both_verified_same() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 42,
                     color: "#660D35".to_string(),
                     decimals: 12,
@@ -1873,7 +1922,7 @@ fn add_specs_westend_ed25519_both_verified_same() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
     } else {
         panic!("Wrong action {:?}", action)
@@ -1886,7 +1935,7 @@ fn add_specs_westend_ed25519_both_verified_different() {
     let dbname = "for_tests/add_specs_westend_ed25519_both_verified_different";
     populate_cold(dbname, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_Alice-ed25519.txt").unwrap();
-    let error = "Bad input data. General verifier in the database is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Received network westend specs could be accepted only if verified by the same general verifier. Current message is verified by public key: 88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee, encryption: ed25519.".to_string();
+    let error = "Bad input data. General verifier in the database is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Received westend network information could be accepted only if verified by the same general verifier. Current message is verified by public key: 88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee, encryption: ed25519.".to_string();
     let set_expected = TransactionCardSet {
         error: Some(vec![TransactionCard {
             index: 0,
@@ -1897,7 +1946,7 @@ fn add_specs_westend_ed25519_both_verified_different() {
     };
     let action = produce_output(line.trim(), dbname);
     if let TransactionAction::Read { r: set } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -1917,9 +1966,11 @@ fn parse_transaction_4_unknown_author() {
             index: 0,
             indent: 0,
             card: Card::AuthorPlainCard {
-                f: MSCAuthorPlain {
+                f: MSCId {
                     base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                    identicon: bob().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: bob().to_vec(),
+                    },
                 },
             },
         }]),
@@ -1971,7 +2022,9 @@ fn parse_transaction_4_unknown_author() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        identicon: alice_sr_alice().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
                     },
                 },
             },
@@ -2051,7 +2104,7 @@ fn parse_transaction_4_unknown_author() {
 
     let action = produce_output(line, dbname);
     if let TransactionAction::Read { r: set } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -2071,7 +2124,7 @@ fn parse_transaction_5_unknown_network() {
                 f: MVerifierDetails {
                     public_key: "761291ee5faf5b5b67b028aa7e28fb1271bf40af17a486b368e8c7de86ad3c62"
                         .to_string(),
-                    identicon: id_03().to_vec(),
+                    identicon: SignerImage::Png{ image: id_03().to_vec() } ,
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -2085,7 +2138,7 @@ fn parse_transaction_5_unknown_network() {
     };
     let action = produce_output(line, dbname);
     if let TransactionAction::Read { r: set } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -2098,19 +2151,24 @@ fn parse_transaction_6_error_on_parsing() {
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403018eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
-    let error = "Error parsing incoming transaction content. After decoding the method some data remained unused.".to_string();
+    let error = "Bad input data. Error parsing incoming transaction content. After decoding the method some data remained unused.".to_string();
     let set_expected = TransactionCardSet {
         author: Some(vec![TransactionCard {
             index: 0,
             indent: 0,
             card: Card::AuthorCard {
-                f: Address {
+                f: MAddressCard {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    identicon: alice_sr_alice().to_vec(),
-                    seed_name: "Alice".to_string(),
-                    path: "//Alice".to_string(),
-                    has_pwd: false,
                     multiselect: None,
+                    address: Address {
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
+                        seed_name: "Alice".to_string(),
+                        path: "//Alice".to_string(),
+                        has_pwd: false,
+                        secret_exposed: false,
+                    },
                 },
             },
         }]),
@@ -2177,7 +2235,7 @@ fn parse_transaction_6_error_on_parsing() {
 
     let action = produce_output(line, dbname);
     if let TransactionAction::Read { r: set } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -2190,20 +2248,25 @@ fn parse_transaction_7_error_on_parsing() {
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403068eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
-    let error = "Error parsing incoming transaction content. Encountered unexpected enum variant."
+    let error = "Bad input data. Error parsing incoming transaction content. Encountered unexpected enum variant."
         .to_string();
     let set_expected = TransactionCardSet {
         author: Some(vec![TransactionCard {
             index: 0,
             indent: 0,
             card: Card::AuthorCard {
-                f: Address {
+                f: MAddressCard {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    identicon: alice_sr_alice().to_vec(),
-                    seed_name: "Alice".to_string(),
-                    path: "//Alice".to_string(),
-                    has_pwd: false,
                     multiselect: None,
+                    address: Address {
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
+                        seed_name: "Alice".to_string(),
+                        path: "//Alice".to_string(),
+                        has_pwd: false,
+                        secret_exposed: false,
+                    },
                 },
             },
         }]),
@@ -2270,7 +2333,7 @@ fn parse_transaction_7_error_on_parsing() {
 
     let action = produce_output(line, dbname);
     if let TransactionAction::Read { r: set } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -2283,7 +2346,7 @@ fn parse_transaction_8_error_on_parsing() {
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403028eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
-    let data = "Error parsing incoming transaction content. Data too short for expected content."
+    let data = "Bad input data. Error parsing incoming transaction content. Data too short for expected content."
         .to_string();
 
     let set_expected = TransactionCardSet {
@@ -2291,13 +2354,18 @@ fn parse_transaction_8_error_on_parsing() {
             index: 0,
             indent: 0,
             card: Card::AuthorCard {
-                f: Address {
+                f: MAddressCard {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    identicon: alice_sr_alice().to_vec(),
-                    seed_name: "Alice".to_string(),
-                    path: "//Alice".to_string(),
-                    has_pwd: false,
                     multiselect: None,
+                    address: Address {
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
+                        seed_name: "Alice".to_string(),
+                        path: "//Alice".to_string(),
+                        has_pwd: false,
+                        secret_exposed: false,
+                    },
                 },
             },
         }]),
@@ -2364,7 +2432,7 @@ fn parse_transaction_8_error_on_parsing() {
 
     let action = produce_output(line, dbname);
     if let TransactionAction::Read { r: set } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -2375,9 +2443,9 @@ fn parse_transaction_8_error_on_parsing() {
 fn parse_msg_1() {
     let dbname = "for_tests/parse_msg_1";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let line = "530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27df5064c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2ee143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-
-    let text = "4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e".to_string();
+    let sign_msg = hex::encode(b"<Bytes>uuid-abcd</Bytes>");
+    let text = hex::encode(b"uuid-abcd");
+    let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", sign_msg);
 
     let set_expected = TransactionCardSet {
         message: Some(vec![TransactionCard {
@@ -2388,29 +2456,34 @@ fn parse_msg_1() {
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
+        address: Address {
+            identicon: SignerImage::Png {
+                image: alice_sr_alice().to_vec(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
 
     let network_info_known = westend_spec();
-    let action = produce_output(line, dbname);
+    let action = produce_output(&line, dbname);
 
-    if let TransactionAction::Sign {
-        content: set,
-        checksum: _,
-        has_pwd,
-        author_info,
-        network_info,
-    } = action
-    {
-        assert_eq!(set, set_expected);
-        assert_eq!(author_info, author_info_known);
-        assert_eq!(network_info, network_info_known);
+    if let TransactionAction::Sign { actions, .. } = action {
+        let TransactionSignAction {
+            content: set,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+        assert_eq!(actions.len(), 1);
+        assert_eq!(set, &set_expected);
+        assert_eq!(author_info, &author_info_known);
+        assert_eq!(network_info, &network_info_known);
         assert!(!has_pwd, "Expected no password");
     } else {
         panic!("Wrong action {:?}", action)
@@ -2423,20 +2496,21 @@ fn parse_msg_2() {
     let dbname = "for_tests/parse_msg_2";
     populate_cold(dbname, Verifier { v: None }).unwrap();
     // sneaking one extra byte in the text body
-    let line = "530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27df5064c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c6c61626f72756d2ee143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+    let sign_msg = hex::encode(b"<Bytes>uuid-abcd");
+    let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", sign_msg);
     let set_expected = TransactionCardSet {
         error: Some(vec![TransactionCard {
             index: 0,
             indent: 0,
             card: Card::ErrorCard {
-                f: "Bad input data. Received message could not be read.".to_string(),
+                f: "Bad input data. Parser error: Error(Error { input: \"uuid-abcd\", code: TakeUntil })".to_string(),
             },
         }]),
         ..Default::default()
     };
-    let action = produce_output(line, dbname);
+    let action = produce_output(&line, dbname);
     if let TransactionAction::Read { r: set } = action {
-        assert_eq!(set, set_expected);
+        assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
@@ -2474,8 +2548,49 @@ fn import_derivations() {
         network_specs_key: _,
     } = action
     {
-        assert_eq!(set, set_expected);
-        assert_eq!(network_info, network_info_known);
+        assert_eq!(*set, set_expected);
+        assert_eq!(*network_info, network_info_known);
+    } else {
+        panic!("Wrong action {:?}", action)
+    }
+    fs::remove_dir_all(dbname).unwrap();
+}
+
+#[test]
+fn import_derivations_some_passworded() {
+    let dbname = "for_tests/import_derivations_some_passworded";
+    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let line = "53ffde01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e1c1c2f2f416c6963653c2f2f416c6963652f77657374656e64582f2f416c6963652f7365637265742f2f7365637265740c2f2f300c2f2f31702f2f416c6963652f2f2f6d795f7365637265745f70617373776f7264182f2f2f303030";
+    let set_expected = TransactionCardSet {
+        importing_derivations: Some(vec![TransactionCard {
+            index: 0,
+            indent: 0,
+            card: Card::DerivationsCard {
+                f: vec![
+                    "//Alice".to_string(),
+                    "//Alice/westend".to_string(),
+                    "//Alice/secret//secret".to_string(),
+                    "//0".to_string(),
+                    "//1".to_string(),
+                    "//Alice///my_secret_password".to_string(),
+                    "///000".to_string(),
+                ],
+            },
+        }]),
+        ..Default::default()
+    };
+
+    let network_info_known = westend_spec();
+    let action = produce_output(line, dbname);
+    if let TransactionAction::Derivations {
+        content: set,
+        network_info,
+        checksum: _,
+        network_specs_key: _,
+    } = action
+    {
+        assert_eq!(*set, set_expected);
+        assert_eq!(*network_info, network_info_known);
     } else {
         panic!("Wrong action {:?}", action)
     }

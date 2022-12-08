@@ -11,23 +11,21 @@ struct MetadataCard: View {
     var meta: MMetadataRecord
     var body: some View {
         HStack {
-            Identicon(identicon: meta.metaIdPic) //TODO: this is potentially different from identicon
+            Identicon(identicon: meta.metaIdPic) // this is potentially different from identicon
             VStack {
-                Text("version")
+                Localizable.version.text
                 Text(meta.specsVersion)
             }
             VStack {
-                Text("hash")
+                Localizable.hash.text
                 Text(meta.metaHash.truncateMiddle(length: 8))
             }
         }.padding(.horizontal, 8)
     }
 }
 
-/*
-struct MetadataCard_Previews: PreviewProvider {
-    static var previews: some View {
-        MetadataCard()
-    }
-}
-*/
+// struct MetadataCard_Previews: PreviewProvider {
+//    static var previews: some View {
+//        MetadataCard()
+//    }
+// }

@@ -9,63 +9,65 @@ import SwiftUI
 
 struct NetworkDetails: View {
     let content: MNetworkDetails
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         ZStack {
             VStack {
                 VStack(alignment: .leading) {
                     NetworkCard(title: content.title, logo: content.logo)
                     HStack {
-                        Text("Network name:")
+                        Localizable.networkName.text
                         Text(content.name)
                     }
                     HStack {
-                        Text("base58 prefix:")
+                        Localizable.base58Prefix.text
                         Text(String(content.base58prefix))
                     }
                     HStack {
-                        Text("decimals:")
+                        Localizable.decimals.text
                         Text(String(content.decimals))
                     }
                     HStack {
-                        Text("unit:")
+                        Localizable.unit.text
                         Text(content.unit)
                     }
                     HStack {
-                        Text("genesis hash:")
-                        Text(content.genesisHash.map{String(format: "%02X", $0)}.joined()).fixedSize(horizontal: false, vertical: true)
+                        Localizable.genesisHash.text
+                        Text(content.genesisHash.formattedAsString)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     HStack {
-                        Text("Verifier certificate: ").fixedSize(horizontal: false, vertical: true)
+                        Localizable.verifierCertificateAlt.text.fixedSize(horizontal: false, vertical: true)
                         switch content.currentVerifier.ttype {
                         case "general":
-                            Text("general")
+                            Localizable.general.text
                         case "custom":
                             Identicon(identicon: content.currentVerifier.details.identicon)
                             VStack {
-                                Text("custom")
-                                Text(content.currentVerifier.details.publicKey).fixedSize(horizontal: false, vertical: true)
-                                Text("encryption: " + content.currentVerifier.details.encryption)
+                                Localizable.custom.text
+                                Text(content.currentVerifier.details.publicKey)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                Text(Localizable.encryption(content.currentVerifier.details.encryption))
                             }
                         case "none":
-                            Text("none")
+                            Localizable.none.text
                         default:
-                            Text("unknown")
+                            Localizable.unknown.text
                         }
                     }
                 }
-                Text("Metadata available:")
+                Localizable.metadataAvailable.text
                 ScrollView {
                     LazyVStack {
-                        ForEach(content.meta, id: \.metaHash) {
-                            metaEntry in
+                        ForEach(content.meta, id: \.metaHash) { metaEntry in
                             Button(
                                 action: {
-                                    pushButton(.manageMetadata, metaEntry.specsVersion, "")
+                                    navigationRequest(.init(action: .manageMetadata, details: metaEntry.specsVersion))
+                                },
+                                label: {
+                                    MetadataCard(meta: metaEntry)
                                 }
-                            ){
-                            MetadataCard(meta: metaEntry)
-                            }
+                            )
                         }
                     }
                 }
@@ -75,10 +77,8 @@ struct NetworkDetails: View {
     }
 }
 
-/*
-struct NetworkDetails_Previews: PreviewProvider {
-    static var previews: some View {
-        NetworkDetails()
-    }
-}
-*/
+// struct NetworkDetails_Previews: PreviewProvider {
+// static var previews: some View {
+// NetworkDetails()
+// }
+// }

@@ -14,7 +14,7 @@ use sp_runtime::MultiSigner;
 
 use crate::{
     crypto::Encryption,
-    error::{AddressKeySource, ErrorSource, SpecsKeySource},
+    error::{Error, Result},
     helpers::multisigner_to_encryption,
     keyring::{AddressKey, NetworkSpecsKey},
 };
@@ -23,7 +23,7 @@ use crate::{
 ///
 /// Info that should be available for any address key.  
 /// No secrets are stored there.  
-#[derive(Decode, PartialEq, Encode, Debug, Clone)]
+#[derive(Decode, PartialEq, Eq, Encode, Debug, Clone)]
 pub struct AddressDetails {
     /// seed name (as it is known to the Signer device)  
     pub seed_name: String,
@@ -40,6 +40,9 @@ pub struct AddressDetails {
 
     /// encryption algorithm associated with the address key and all its associated networks  
     pub encryption: Encryption,
+
+    /// address, or its parent address, had or could have secret exposed
+    pub secret_exposed: bool,
 }
 
 impl AddressDetails {
@@ -48,29 +51,28 @@ impl AddressDetails {
     /// database tree `ADDRTREE`.  
     ///
     /// Checks that there is no encryption mismatch.
-    pub fn process_entry_with_key_checked<T: ErrorSource>(
+    pub fn process_entry_with_key_checked(
         address_key: &AddressKey,
         address_details_encoded: IVec,
-    ) -> Result<(MultiSigner, Self), T::Error> {
-        let multisigner = address_key.multi_signer::<T>(AddressKeySource::AddrTree)?;
-        let address_details = match AddressDetails::decode(&mut &address_details_encoded[..]) {
-            Ok(a) => a,
-            Err(_) => return Err(<T>::address_details_decoding(address_key.to_owned())),
-        };
-        if multisigner_to_encryption(&multisigner) != address_details.encryption {
-            return Err(<T>::address_details_encryption_mismatch(
-                address_key.to_owned(),
-                address_details.encryption,
-            ));
+    ) -> Result<(MultiSigner, Self)> {
+        let multisigner = address_key.multi_signer()?;
+        let address_details = AddressDetails::decode(&mut &address_details_encoded[..])?;
+        if multisigner_to_encryption(&multisigner) != address_details.encryption
+            && multisigner_to_encryption(&multisigner) != Encryption::Ecdsa
+            && address_details.encryption != Encryption::Ethereum
+        {
+            return Err(Error::EncryptionMismatch {
+                address_key: address_key.to_owned(),
+                encryption: address_details.encryption,
+            });
         }
         for network_specs_key in address_details.network_id.iter() {
-            let (_, network_specs_key_encryption) = network_specs_key
-                .genesis_hash_encryption::<T>(SpecsKeySource::AddrTree(address_key.to_owned()))?;
+            let (_, network_specs_key_encryption) = network_specs_key.genesis_hash_encryption()?;
             if network_specs_key_encryption != address_details.encryption {
-                return Err(<T>::address_details_specs_encryption_mismatch(
-                    address_key.to_owned(),
-                    network_specs_key.to_owned(),
-                ));
+                return Err(Error::EncryptionMismatch {
+                    address_key: address_key.to_owned(),
+                    encryption: address_details.encryption,
+                });
             }
         }
         Ok((multisigner, address_details))
@@ -80,25 +82,23 @@ impl AddressDetails {
     /// [`AddressDetails`]) tuple from database tree `ADDRTREE` (key, value) entry.  
     ///
     /// Checks that there is no encryption mismatch.
-    pub fn process_entry_checked<T: ErrorSource>(
+    pub fn process_entry_checked(
         (address_key_vec, address_details_encoded): (IVec, IVec),
-    ) -> Result<(MultiSigner, Self), T::Error> {
+    ) -> Result<(MultiSigner, Self)> {
         let address_key = AddressKey::from_ivec(&address_key_vec);
-        AddressDetails::process_entry_with_key_checked::<T>(&address_key, address_details_encoded)
+        AddressDetails::process_entry_with_key_checked(&address_key, address_details_encoded)
     }
 
     /// Gets [`AddressDetails`] from [`AddressKey`] and associated value from
     /// database tree `ADDRTREE`.  
     ///
     /// Checks that there is no encryption mismatch.
-    pub fn from_entry_with_key_checked<T: ErrorSource>(
+    pub fn from_entry_with_key_checked(
         address_key: &AddressKey,
         address_details_encoded: IVec,
-    ) -> Result<Self, T::Error> {
-        let (_, address_details) = AddressDetails::process_entry_with_key_checked::<T>(
-            address_key,
-            address_details_encoded,
-        )?;
+    ) -> Result<Self> {
+        let (_, address_details) =
+            AddressDetails::process_entry_with_key_checked(address_key, address_details_encoded)?;
         Ok(address_details)
     }
 

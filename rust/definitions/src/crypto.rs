@@ -10,8 +10,8 @@
 //! and data signature combined.  
 //!
 //! Networks are expected to use certain encryption algorithm [`Encryption`].
-//! This is reflected in [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
-//! and in [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+//! This is reflected in [`OrderedNetworkSpecs`](crate::network_specs::OrderedNetworkSpecs)
+//! and in [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
 //! field `encryption`, and also in corresponding database keys
 //! [`NetworkSpecsKey`](crate::keyring::NetworkSpecsKey).
 //! In principle, network could support more than one encryption algorithm,
@@ -38,7 +38,7 @@
 //! Signer receives Substrate transactions starting in hexadecimal recording
 //! with `53xxyy` where `xx` corresponds to the encryption type.
 //!
-//! For signable transactions, possible encryptions are:
+//! Possible signature schemes are:
 //!
 //! - `00` for `Ed25519`
 //! - `01` for `Sr25519`
@@ -72,16 +72,17 @@ use parity_scale_codec::{Decode, Encode};
 use sp_core;
 use sp_runtime::{MultiSignature, MultiSigner};
 
-use crate::network_specs::VerifierValue;
+use crate::{helpers::IdenticonStyle, network_specs::VerifierValue};
 
 /// Encryption algorithm
 ///
 /// Lists all encryption algorithms supported by Substrate
-#[derive(Clone, PartialEq, Debug, Decode, Encode)]
+#[derive(Copy, Clone, Debug, Decode, Encode, PartialEq, Eq)]
 pub enum Encryption {
     Ed25519,
     Sr25519,
     Ecdsa,
+    Ethereum,
 }
 
 impl Encryption {
@@ -93,6 +94,18 @@ impl Encryption {
             Encryption::Ed25519 => String::from("ed25519"),
             Encryption::Sr25519 => String::from("sr25519"),
             Encryption::Ecdsa => String::from("ecdsa"),
+            Encryption::Ethereum => String::from("ethereum"),
+        }
+    }
+
+    /// The style to use for identicons.
+    ///
+    /// Dots ss58
+    /// Blockies for ethereum h160 addrs.
+    pub fn identicon_style(&self) -> IdenticonStyle {
+        match self {
+            Encryption::Ethereum => IdenticonStyle::Blockies,
+            _ => IdenticonStyle::Dots,
         }
     }
 }
@@ -104,7 +117,7 @@ impl Encryption {
 ///
 /// Stores no information on what data exactly is signed, supposedly user
 /// keeps track of what they are signing.  
-#[derive(Decode, Encode, PartialEq, Debug)]
+#[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub enum SufficientCrypto {
     /// `Ed25519` encryption algorithm
     Ed25519 {

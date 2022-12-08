@@ -5,6 +5,11 @@ updates:
     labels: ["dependabot"]
     schedule:
       interval: "daily"
+  - package-ecosystem: "gradle"
+    directory: "/android"
+    labels: ["dependabot"]
+    schedule:
+      interval: "daily"
   - package-ecosystem: "github-actions"
     directory: "/"
     labels: ["dependabot"]

@@ -2,7 +2,7 @@
 //!
 //! Cold database has following trees:  
 //!
-//! - `SPECSTREE`, for network specs `NetworkSpecs` entries, with keys
+//! - `SPECSTREE`, for network specs `OrderedNetworkSpecs` entries, with keys
 //! [`NetworkSpecsKey`]  
 //! - `VERIFIERS`, for network verifier [`CurrentVerifier`](crate::network_specs::CurrentVerifier)
 //! entries, with keys [`VerifierKey`]  
@@ -20,7 +20,7 @@
 //!
 //! Hot database has following trees:  
 //!
-//! - `SPECSTREEPREP`, for network specs [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+//! - `SPECSTREEPREP`, for network specs [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
 //! entries, with keys [`NetworkSpecsKey`]  
 //! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and
 //! prefix search with [`MetaKeyPrefix`]  
@@ -28,30 +28,25 @@
 //! prefix search with [`MetaKeyPrefix`]
 //! - `SETTREE`, for types information  
 //! - `ADDRESS_BOOK` for `AddressBookEntry` data needed to maintain hot database
-//! and send rpc calls to fetch network information, with keys `AddressBookKey`
+//! and send RPC calls to fetch network information, with keys `AddressBookKey`
 //!
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
 use sp_core::H256;
 use sp_runtime::MultiSigner;
 
-#[cfg(feature = "active")]
-use crate::error_active::{DatabaseActive, ErrorActive, KeyDecodingActive};
+#[cfg(feature = "signer")]
+use crate::helpers::{get_multisigner, unhex};
 use crate::{
     crypto::Encryption,
-    error::{AddressKeySource, ErrorSource, SpecsKeySource},
-};
-#[cfg(feature = "signer")]
-use crate::{
-    error_signer::{DatabaseSigner, ErrorSigner, KeyDecodingSignerDb, NotHexSigner, Signer},
-    helpers::{get_multisigner, unhex},
+    error::{Error, Result},
 };
 
 /// Key in `SPECSTREE` tree (cold database) and in `SPECSPREPTREE` (hot database)  
 ///
 /// [`NetworkSpecsKey`] is used to retrieve the
-/// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) in cold database and
-/// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) in hot
+/// [`OrderedNetworkSpecs`](crate::network_specs::OrderedNetworkSpecs) in cold database and
+/// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) in hot
 /// database.  
 ///
 /// Key is derived from network genesis hash and encryption algorithm.  
@@ -59,7 +54,7 @@ use crate::{
 /// Network could support more than one encryption algorithm. In this case
 /// there would be more than one database entry with different
 /// [`NetworkSpecsKey`] values. Such entries do not conflict.  
-#[derive(Decode, Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub struct NetworkSpecsKey(Vec<u8>);
 
 /// Decoded `NetworkSpecsKey` content, encryption-based variants with vector
@@ -69,6 +64,7 @@ enum NetworkSpecsKeyContent {
     Ed25519(H256),
     Sr25519(H256),
     Ecdsa(H256),
+    Ethereum(H256),
 }
 
 impl NetworkSpecsKey {
@@ -79,13 +75,14 @@ impl NetworkSpecsKey {
             Encryption::Ed25519 => NetworkSpecsKeyContent::Ed25519(*genesis_hash),
             Encryption::Sr25519 => NetworkSpecsKeyContent::Sr25519(*genesis_hash),
             Encryption::Ecdsa => NetworkSpecsKeyContent::Ecdsa(*genesis_hash),
+            Encryption::Ethereum => NetworkSpecsKeyContent::Ethereum(*genesis_hash),
         };
         Self(network_key_content.encode())
     }
 
     /// Transform database `IVec` key into [`NetworkSpecsKey`] prior to processing  
     ///
-    /// Unfallible, no check of encryption validity is done here.  
+    /// Infallible, no check of encryption validity is done here.
     pub fn from_ivec(ivec: &IVec) -> Self {
         Self(ivec.to_vec())
     }
@@ -97,27 +94,17 @@ impl NetworkSpecsKey {
     /// This function checks only that hexadecimal format is valid, no check
     /// of encryption validity is done here.  
     #[cfg(feature = "signer")]
-    pub fn from_hex(hex_line: &str) -> Result<Self, ErrorSigner> {
-        Ok(Self(unhex::<Signer>(
-            hex_line,
-            NotHexSigner::NetworkSpecsKey {
-                input: hex_line.to_string(),
-            },
-        )?))
+    pub fn from_hex(hex_line: &str) -> Result<Self> {
+        Ok(Self(unhex(hex_line)?))
     }
 
     /// Get genesis hash as `H256` and [`Encryption`] from [`NetworkSpecsKey`]
-    pub fn genesis_hash_encryption<T: ErrorSource>(
-        &self,
-        source: SpecsKeySource<T>,
-    ) -> Result<(H256, Encryption), T::Error> {
-        match <NetworkSpecsKeyContent>::decode(&mut &self.0[..]) {
-            Ok(a) => match a {
-                NetworkSpecsKeyContent::Ed25519(b) => Ok((b, Encryption::Ed25519)),
-                NetworkSpecsKeyContent::Sr25519(b) => Ok((b, Encryption::Sr25519)),
-                NetworkSpecsKeyContent::Ecdsa(b) => Ok((b, Encryption::Ecdsa)),
-            },
-            Err(_) => Err(<T>::specs_key_to_error(self, source)),
+    pub fn genesis_hash_encryption(&self) -> Result<(H256, Encryption)> {
+        match <NetworkSpecsKeyContent>::decode(&mut &self.0[..])? {
+            NetworkSpecsKeyContent::Ed25519(b) => Ok((b, Encryption::Ed25519)),
+            NetworkSpecsKeyContent::Sr25519(b) => Ok((b, Encryption::Sr25519)),
+            NetworkSpecsKeyContent::Ecdsa(b) => Ok((b, Encryption::Ecdsa)),
+            NetworkSpecsKeyContent::Ethereum(b) => Ok((b, Encryption::Ethereum)),
         }
     }
 
@@ -138,7 +125,7 @@ impl NetworkSpecsKey {
 ///
 /// - network specs, for any encryption algorithm  
 /// - network metadata
-#[derive(Decode, Encode, Debug, Clone, PartialEq)]
+#[derive(Decode, Encode, Debug, Clone, PartialEq, Eq)]
 pub struct VerifierKey(H256);
 
 impl VerifierKey {
@@ -148,11 +135,11 @@ impl VerifierKey {
     }
 
     /// Transform database `IVec` key into [`VerifierKey`]  
-    pub fn from_ivec<T: ErrorSource>(ivec: &IVec) -> Result<Self, T::Error> {
+    pub fn from_ivec(ivec: &IVec) -> Result<Self> {
         let bytes: [u8; 32] = ivec
             .to_vec()
             .try_into()
-            .map_err(|_| <T>::faulty_database_types())?;
+            .map_err(|_| Error::WrongPublicKeyLength)?;
         Ok(Self(bytes.into()))
     }
 
@@ -195,7 +182,7 @@ impl VerifierKey {
 /// For the user interface these addresses would appear as separate entities,
 /// however, the database stores them under same [`AddressKey`], with a set of
 /// allowed networks.  
-#[derive(Decode, Encode, Debug, PartialEq, Clone)]
+#[derive(Decode, Encode, Debug, PartialEq, Eq, Clone)]
 pub struct AddressKey(Vec<u8>);
 
 /// Decoded `AddressKey` content, struct with `MultiSigner` inside  
@@ -214,14 +201,14 @@ impl AddressKey {
     /// Could result in error if public key length does not match the
     /// expected length for chosen encryption algorithm.  
     #[cfg(feature = "signer")]
-    pub fn from_parts(public: &[u8], encryption: &Encryption) -> Result<Self, ErrorSigner> {
+    pub fn from_parts(public: &[u8], encryption: &Encryption) -> Result<Self> {
         let multisigner = get_multisigner(public, encryption)?;
         Ok(Self::from_multisigner(&multisigner))
     }
 
     /// Transform database `IVec` key into [`AddressKey`] prior to processing  
     ///
-    /// Unfallible, the validity of resulting `AddressKey` is not checked.
+    /// Infallible, the validity of resulting `AddressKey` is not checked.
     pub fn from_ivec(ivec: &IVec) -> Self {
         Self(ivec.to_vec())
     }
@@ -233,21 +220,13 @@ impl AddressKey {
     /// This function checks only that hexadecimal format is valid, no length
     /// check happens here.  
     #[cfg(feature = "signer")]
-    pub fn from_hex(hex_address_key: &str) -> Result<Self, ErrorSigner> {
-        Ok(Self(unhex::<Signer>(
-            hex_address_key,
-            NotHexSigner::AddressKey {
-                input: hex_address_key.to_string(),
-            },
-        )?))
+    pub fn from_hex(hex_address_key: &str) -> Result<Self> {
+        Ok(Self(unhex(hex_address_key)?))
     }
 
     /// Get public key and [`Encryption`] from the [`AddressKey`]  
-    pub fn public_key_encryption<T: ErrorSource>(
-        &self,
-        source: AddressKeySource<T>,
-    ) -> Result<(Vec<u8>, Encryption), T::Error> {
-        match &self.multi_signer(source)? {
+    pub fn public_key_encryption(&self) -> Result<(Vec<u8>, Encryption)> {
+        match &self.multi_signer()? {
             MultiSigner::Ed25519(b) => Ok((b.to_vec(), Encryption::Ed25519)),
             MultiSigner::Sr25519(b) => Ok((b.to_vec(), Encryption::Sr25519)),
             MultiSigner::Ecdsa(b) => Ok((b.0.to_vec(), Encryption::Ecdsa)),
@@ -256,14 +235,8 @@ impl AddressKey {
 
     /// Get [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
     /// from the [`AddressKey`]  
-    pub fn multi_signer<T: ErrorSource>(
-        &self,
-        source: AddressKeySource<T>,
-    ) -> Result<MultiSigner, T::Error> {
-        match <AddressKeyContent>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok(a.0),
-            Err(_) => Err(<T>::address_key_to_error(self, source)),
-        }
+    pub fn multi_signer(&self) -> Result<MultiSigner> {
+        Ok(<AddressKeyContent>::decode(&mut &self.0[..])?.0)
     }
 
     /// Transform [`AddressKey`] into `Vec<u8>` database key  
@@ -314,7 +287,7 @@ impl MetaKey {
 
     /// Transform database `IVec` key into [`MetaKey`] prior to processing  
     ///
-    /// Unfallible, the validity of resulting `MetaKey` is not checked.
+    /// Infallible, the validity of resulting `MetaKey` is not checked.
     pub fn from_ivec(ivec: &IVec) -> Self {
         Self(ivec.to_vec())
     }
@@ -322,11 +295,9 @@ impl MetaKey {
     /// Get network name and network version from the [`MetaKey`]
     ///
     /// Could result in error if key is corrupted.  
-    pub fn name_version<T: ErrorSource>(&self) -> Result<(String, u32), T::Error> {
-        match <MetaKeyContent>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok((a.name, a.version)),
-            Err(_) => Err(<T>::meta_key_to_error(self)),
-        }
+    pub fn name_version(&self) -> Result<(String, u32)> {
+        let res = <MetaKeyContent>::decode(&mut &self.0[..])?;
+        Ok((res.name, res.version))
     }
 
     /// Transform [`MetaKey`] into `Vec<u8>` database key  
@@ -374,11 +345,11 @@ impl MetaKeyPrefix {
 /// [`Order`] is used to retrieve history log entry.  
 ///
 /// History log [`Entry`](crate::history::Entry) contains timestamp and a set
-/// of simultaneously occured events.  
+/// of simultaneously occurred events.
 ///
 /// Order is generated from the number of the history entry in the database
 /// `HISTORY` tree.  
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Order(u32);
 
 impl Order {
@@ -387,13 +358,8 @@ impl Order {
     /// If `Order` could not be decoded, i.e. entry is corrupted, produces an
     /// error.  
     #[cfg(feature = "signer")]
-    pub fn from_ivec(ivec: &IVec) -> Result<Self, ErrorSigner> {
-        match <u32>::decode(&mut &ivec[..]) {
-            Ok(a) => Ok(Self(a)),
-            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::KeyDecoding(
-                KeyDecodingSignerDb::EntryOrder(ivec.to_vec()),
-            ))),
-        }
+    pub fn from_ivec(ivec: &IVec) -> Result<Self> {
+        Ok(Self(<u32>::decode(&mut &ivec[..])?))
     }
 
     /// Generate [`Order`] from `u32` number
@@ -424,7 +390,7 @@ impl Order {
 ///
 /// Database could have a few entries for related networks, for example,
 /// entry "westend" for default Westend, and entry "westend-ed25519" for
-/// Westend with Ed25519 encryption. Such entries would not conflict.  
+/// Westend with `Ed25519` encryption. Such entries would not conflict.
 #[derive(Debug, Clone)]
 #[cfg(feature = "active")]
 pub struct AddressBookKey(Vec<u8>);
@@ -444,7 +410,7 @@ impl AddressBookKey {
 
     /// Transform database `IVec` key into [`AddressBookKey`] prior to processing  
     ///
-    /// Unfallible, the validity of resulting `AddressBookKey` is not checked.
+    /// Infallible, the validity of resulting `AddressBookKey` is not checked.
     pub fn from_ivec(ivec: &IVec) -> Self {
         Self(ivec.to_vec())
     }
@@ -452,13 +418,8 @@ impl AddressBookKey {
     /// Get the network address book title from the [`AddressBookKey`]
     ///
     /// Could result in error if key is corrupted.
-    pub fn title(&self) -> Result<String, ErrorActive> {
-        match <AddressBookKeyContent>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok(a.0),
-            Err(_) => Err(ErrorActive::Database(DatabaseActive::KeyDecoding(
-                KeyDecodingActive::AddressBookKey(self.to_owned()),
-            ))),
-        }
+    pub fn title(&self) -> Result<String> {
+        Ok(<AddressBookKeyContent>::decode(&mut &self.0[..])?.0)
     }
 
     /// Transform [`AddressBookKey`] into `Vec<u8>` database key  
@@ -471,54 +432,29 @@ impl AddressBookKey {
 #[cfg(feature = "test")]
 mod tests {
     use super::*;
-    use crate::error::SpecsKeySource;
-    use crate::error_active::Active;
-    use crate::error_signer::ExtraSpecsKeySourceSigner;
 
     #[test]
     fn error_in_network_specs_key_signer() {
         let network_specs_key_hex =
-            "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+            "0450e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
         let network_specs_key = NetworkSpecsKey::from_hex(network_specs_key_hex).unwrap();
-        let error = network_specs_key
-            .genesis_hash_encryption::<Signer>(SpecsKeySource::Extra(
-                ExtraSpecsKeySourceSigner::Interface,
-            ))
-            .unwrap_err();
-        let error_print = <Signer>::show(&error);
-        let expected_error_print = "Error on the interface. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e passed through the interface.";
-        assert!(
-            error_print == expected_error_print,
-            "Received: \n{}",
-            error_print
-        );
-        let error = network_specs_key
-            .genesis_hash_encryption::<Signer>(SpecsKeySource::SpecsTree)
-            .unwrap_err();
-        let error_print = <Signer>::show(&error);
-        let expected_error_print = "Database error. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e from the database.";
-        assert!(
-            error_print == expected_error_print,
-            "Received: \n{}",
-            error_print
-        );
+        let error = network_specs_key.genesis_hash_encryption().unwrap_err();
+        if let Error::CodecError(_) = error {
+        } else {
+            panic!("Expected codec error, received {:?}", error);
+        }
     }
 
     #[test]
     fn error_in_network_specs_key_active() {
         let network_specs_key_hex =
-            "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+            "0450e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
         let network_specs_key =
             NetworkSpecsKey::from_ivec(&IVec::from(hex::decode(network_specs_key_hex).unwrap()));
-        let error = network_specs_key
-            .genesis_hash_encryption::<Active>(SpecsKeySource::SpecsTree)
-            .unwrap_err();
-        let error_print = <Active>::show(&error);
-        let expected_error_print = "Database error. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e from the database.";
-        assert!(
-            error_print == expected_error_print,
-            "Received: \n{}",
-            error_print
-        );
+        let error = network_specs_key.genesis_hash_encryption().unwrap_err();
+        if let Error::CodecError(_) = error {
+        } else {
+            panic!("Expected codec error, received {:?}", error);
+        }
     }
 }

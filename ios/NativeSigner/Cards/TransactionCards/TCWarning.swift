@@ -11,19 +11,19 @@ struct TCWarning: View {
     let text: String
     var body: some View {
         HStack {
-            Text("Warning!")
-                .foregroundColor(Color("SignalDanger")).font(FBase(style: .body2))
+            Localizable.warning.text
             Text(text)
-                .foregroundColor(Color("SignalDanger")).font(FBase(style: .body2))
             Spacer()
-        }.background(Color("BgDanger"))
+        }
+        .foregroundColor(Asset.accentRed400.swiftUIColor)
+        .font(Fontstyle.bodyM.base)
+        .padding(Spacing.small)
+        .containerBackground(isError: true)
     }
 }
 
-/*
 struct TCWarning_Previews: PreviewProvider {
     static var previews: some View {
-        TCWarning()
+        TCWarning(text: "Content of the warning")
     }
 }
-*/

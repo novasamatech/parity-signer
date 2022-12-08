@@ -1,0 +1,40 @@
+opt_out_usage
+default_platform(:ios)
+
+ENV["FASTLANE_XCODEBUILD_SETTINGS_RETRIES"] = "5"
+
+platform :ios do
+  # imports
+  import ("lanes/lane_tests.rb")
+  import ("lanes/lane_build.rb")
+  import ("lanes/lane_testflight.rb")
+
+  # shared variables
+  main_target = "NativeSigner"
+  main_scheme = "NativeSigner"
+  configuration = "Release"
+  desc "Runs unit tests for main scheme"
+  desc "Example usage: fastlane run_unit_tests"
+  lane :run_unit_tests do
+    test_build(
+      scheme:main_scheme
+    )
+  end
+
+  desc "Distribute new iOS build through TestFlight"
+  desc "Example usage: fastlane distribute_testflight"
+  lane :distribute_testflight do
+    load_asc_api_key
+    prepare_code_signing
+    build_release(
+      scheme:main_scheme,
+      target:main_target,
+      configuration:configuration
+    )
+    upload_testflight(
+      scheme:main_scheme,
+      target:main_target,
+      configuration:configuration
+    )
+  end
+end

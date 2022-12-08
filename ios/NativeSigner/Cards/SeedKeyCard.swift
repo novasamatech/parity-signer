@@ -8,33 +8,35 @@
 import SwiftUI
 
 struct SeedKeyCard: View {
-    @EnvironmentObject var data: SignerDataModel
-    var seedCard: MSeedKeyCard
+    @EnvironmentObject private var data: SignerDataModel
+    var seedCard: MKeysCard
     var multiselectMode: Bool = false
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4).foregroundColor(Color("Bg200")).frame(height: 47)
+            RoundedRectangle(cornerRadius: 4)
+                .foregroundColor(Asset.bg200.swiftUIColor)
+                .frame(height: 47)
             HStack {
                 ZStack {
-                    Identicon(identicon: seedCard.identicon)
-                    if (multiselectMode && seedCard.base58 != "") {
-                        VStack{
+                    Identicon(identicon: seedCard.address.identicon)
+                    if multiselectMode, !seedCard.base58.isEmpty {
+                        VStack {
                             Spacer()
-                            HStack{
-                        Spacer()
-                        Image(systemName: seedCard.multiselect ? "checkmark.circle.fill" : "circle").imageScale(.large)
+                            HStack {
+                                Spacer()
+                                (seedCard.multiselect ? Image(.checkmark, variants: [.circle, .fill]) : Image(.circle))
+                                    .imageScale(.large)
                             }
-                            
                         }
                     }
                 }.frame(width: 30, height: 30)
-                VStack (alignment: .leading) {
-                    Text(seedCard.seedName)
-                        .foregroundColor(Color("Text600"))
-                        .font(FBase(style: .subtitle1))
+                VStack(alignment: .leading) {
+                    Text(seedCard.address.seedName)
+                        .foregroundColor(Asset.text600.swiftUIColor)
+                        .font(Fontstyle.subtitle1.base)
                     Text(seedCard.base58.truncateMiddle(length: 8))
-                        .foregroundColor(Color("Text400"))
-                        .font(FCrypto(style: .body1))
+                        .foregroundColor(Asset.text400.swiftUIColor)
+                        .font(Fontstyle.body1.crypto)
                 }
                 Spacer()
             }
@@ -43,10 +45,8 @@ struct SeedKeyCard: View {
     }
 }
 
-/*
-struct SeedKeyCard_Previews: PreviewProvider {
-    static var previews: some View {
-        SeedKeyCard()
-    }
-}
-*/
+// struct SeedKeyCard_Previews: PreviewProvider {
+// static var previews: some View {
+// SeedKeyCard()
+// }
+// }

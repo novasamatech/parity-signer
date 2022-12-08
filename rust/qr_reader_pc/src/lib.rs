@@ -39,7 +39,7 @@ pub struct CameraSettings {
 ///
 /// # Arguments
 ///
-/// * `camera_settings` - CameraSettings struct that holds the camera parameters
+/// * `camera_settings` - `CameraSettings` struct that holds the camera parameters
 pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String> {
     let camera_index = match camera_settings.index {
         Some(index) => index,
@@ -147,7 +147,8 @@ pub fn process_qr_image(image: &GrayImage, decoding: InProgress) -> anyhow::Resu
 
     match codes.last() {
         Some(Ok(code)) => match code.decode() {
-            Ok(decoded) => process_decoded_payload(decoded.payload, decoding),
+            Ok(decoded) => process_decoded_payload(decoded.payload, decoding)
+                .map_err(|e| anyhow!(e.to_string())),
             Err(_) => Ok(Ready::NotYet(decoding)),
         },
         Some(_) => Ok(Ready::NotYet(decoding)),
@@ -177,8 +178,8 @@ fn skip_frames(camera: &mut videoio::VideoCapture) {
 }
 
 /// The program's argument parser.
-/// The parser initializes the CameraSettings structure with program`s arguments
-/// (described in the readme.md file).
+/// The parser initializes the `CameraSettings` structure with program's arguments
+/// (described in the `readme.md` file).
 pub fn arg_parser(arguments: Vec<String>) -> anyhow::Result<CameraSettings> {
     let mut args = arguments.into_iter();
     args.next(); // skip program name

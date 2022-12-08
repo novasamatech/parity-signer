@@ -1,35 +1,40 @@
+use std::fmt::Write;
+use std::path::Path;
+
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES, VERIFIERS};
 use db_handling::{
     db_transactions::TrDbColdStub,
     helpers::{get_general_verifier, open_db, open_tree, prep_types},
 };
 use definitions::{
-    error::ErrorSource,
-    error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, Signer},
     history::Event,
     keyring::{MetaKeyPrefix, VerifierKey},
     metadata::MetaValues,
-    network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier},
+    network_specs::{CurrentVerifier, OrderedNetworkSpecs, ValidCurrentVerifier, Verifier},
 };
 use parity_scale_codec::Decode;
 use sled::Tree;
 
 use crate::cards::Warning;
+use crate::error::Result;
 
-fn print_affected(metadata_set: &[MetaValues], network_specs_set: &[NetworkSpecs]) -> String {
+fn print_affected(
+    metadata_set: &[MetaValues],
+    network_specs_set: &[OrderedNetworkSpecs],
+) -> String {
     let mut out_metadata = String::new();
     let mut out_network_specs = String::new();
     for (i, x) in metadata_set.iter().enumerate() {
         if i > 0 {
             out_metadata.push_str(", ");
         }
-        out_metadata.push_str(&format!("{}{}", x.name, x.version));
+        let _ = write!(&mut out_metadata, "{}{}", x.name, x.version);
     }
     for (i, x) in network_specs_set.iter().enumerate() {
         if i > 0 {
             out_network_specs.push_str(", ");
         }
-        out_network_specs.push_str(&x.title);
+        out_network_specs.push_str(&x.specs.title);
     }
     if out_network_specs.is_empty() {
         out_network_specs = String::from("none");
@@ -47,28 +52,27 @@ fn collect_set(
     verifier_key: &VerifierKey,
     chainspecs: &Tree,
     metadata: &Tree,
-) -> Result<(Vec<MetaValues>, Vec<NetworkSpecs>), ErrorSigner> {
-    let mut metadata_set: Vec<MetaValues> = Vec::new();
-    let mut network_specs_set: Vec<NetworkSpecs> = Vec::new();
+) -> Result<(Vec<MetaValues>, Vec<OrderedNetworkSpecs>)> {
+    let mut metadata_set = Vec::new();
+    let mut network_specs_set = Vec::new();
     let genesis_hash = verifier_key.genesis_hash();
     let mut name_found: Option<String> = None;
     for x in chainspecs.iter().flatten() {
-        let network_specs = NetworkSpecs::from_entry_checked::<Signer>(x)?;
-        if network_specs.genesis_hash.as_bytes() == &genesis_hash[..] {
+        let network_specs = OrderedNetworkSpecs::from_entry_checked(x)?;
+        if network_specs.specs.genesis_hash.as_bytes() == &genesis_hash[..] {
             name_found = match name_found {
                 Some(n) => {
-                    if n != network_specs.name {
-                        return Err(ErrorSigner::Database(
-                            DatabaseSigner::DifferentNamesSameGenesisHash {
-                                name1: n,
-                                name2: network_specs.name,
-                                genesis_hash: network_specs.genesis_hash,
-                            },
-                        ));
+                    if n != network_specs.specs.name {
+                        return Err(db_handling::Error::DifferentNamesSameGenesisHash {
+                            name1: n,
+                            name2: network_specs.specs.name,
+                            genesis_hash: network_specs.specs.genesis_hash,
+                        }
+                        .into());
                     }
                     Some(n)
                 }
-                None => Some(network_specs.name.to_string()),
+                None => Some(network_specs.specs.name.to_string()),
             };
             network_specs_set.push(network_specs);
         }
@@ -76,17 +80,17 @@ fn collect_set(
     if let Some(name) = name_found {
         let meta_key_prefix = MetaKeyPrefix::from_name(&name);
         for y in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
-            metadata_set.push(MetaValues::from_entry_checked::<Signer>(y)?)
+            metadata_set.push(MetaValues::from_entry_checked(y)?)
         }
     }
     metadata_set.sort_by(|a, b| a.version.cmp(&b.version));
-    network_specs_set.sort_by(|a, b| a.title.cmp(&b.title));
+    network_specs_set.sort_by(|a, b| a.specs.title.cmp(&b.specs.title));
     Ok((metadata_set, network_specs_set))
 }
 
 pub(crate) struct GeneralHold {
     pub(crate) metadata_set: Vec<MetaValues>,
-    pub(crate) network_specs_set: Vec<NetworkSpecs>,
+    pub(crate) network_specs_set: Vec<OrderedNetworkSpecs>,
     pub(crate) types: bool,
 }
 
@@ -101,27 +105,22 @@ impl GeneralHold {
         }
     }
     /// function to find all entries in the database that were verified by general verifier
-    pub(crate) fn get(database_name: &str) -> Result<Self, ErrorSigner> {
-        let mut metadata_set: Vec<MetaValues> = Vec::new();
-        let mut network_specs_set: Vec<NetworkSpecs> = Vec::new(); // all are verified by general_verifier
-        let mut verifier_set: Vec<VerifierKey> = Vec::new();
+    pub(crate) fn get<P>(db_path: P) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
+        let mut metadata_set = Vec::new();
+        let mut network_specs_set = Vec::new(); // all are verified by general_verifier
+        let mut verifier_set = Vec::new();
 
-        let database = open_db::<Signer>(database_name)?;
-        let metadata = open_tree::<Signer>(&database, METATREE)?;
-        let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
-        let settings = open_tree::<Signer>(&database, SETTREE)?;
-        let verifiers = open_tree::<Signer>(&database, VERIFIERS)?;
+        let database = open_db(&db_path)?;
+        let metadata = open_tree(&database, METATREE)?;
+        let chainspecs = open_tree(&database, SPECSTREE)?;
+        let settings = open_tree(&database, SETTREE)?;
+        let verifiers = open_tree(&database, VERIFIERS)?;
         for (verifier_key_vec, current_verifier_encoded) in verifiers.iter().flatten() {
-            let verifier_key = VerifierKey::from_ivec::<Signer>(&verifier_key_vec)?;
-            let current_verifier =
-                match <CurrentVerifier>::decode(&mut &current_verifier_encoded[..]) {
-                    Ok(a) => a,
-                    Err(_) => {
-                        return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-                            EntryDecodingSigner::CurrentVerifier(verifier_key),
-                        )))
-                    }
-                };
+            let verifier_key = VerifierKey::from_ivec(&verifier_key_vec)?;
+            let current_verifier = <CurrentVerifier>::decode(&mut &current_verifier_encoded[..])?;
             if let CurrentVerifier::Valid(ValidCurrentVerifier::General) = current_verifier {
                 verifier_set.push(verifier_key)
             }
@@ -132,25 +131,25 @@ impl GeneralHold {
             metadata_set.extend_from_slice(&new_metadata_set);
             network_specs_set.extend_from_slice(&new_network_specs_set);
         }
-        let types = match settings.contains_key(TYPES) {
-            Ok(a) => a,
-            Err(e) => return Err(<Signer>::db_internal(e)),
-        };
+        let types = settings.contains_key(TYPES)?;
         metadata_set.sort_by(|a, b| a.name.cmp(&b.name));
-        network_specs_set.sort_by(|a, b| a.title.cmp(&b.title));
+        network_specs_set.sort_by(|a, b| a.specs.title.cmp(&b.specs.title));
         Ok(Self {
             metadata_set,
             network_specs_set,
             types,
         })
     }
-    pub(crate) fn upd_stub(
+    pub(crate) fn upd_stub<P>(
         &self,
         stub: TrDbColdStub,
         new_general_verifier: &Verifier,
-        database_name: &str,
-    ) -> Result<TrDbColdStub, ErrorSigner> {
-        let former_general_verifier = get_general_verifier(database_name)?;
+        db_path: P,
+    ) -> Result<TrDbColdStub>
+    where
+        P: AsRef<Path>,
+    {
+        let former_general_verifier = get_general_verifier(&db_path)?;
         let mut out = stub;
         out = out.new_history_entry(Event::Warning {
             warning: Warning::GeneralVerifierAppeared(self).show(),
@@ -166,10 +165,7 @@ impl GeneralHold {
             )
         }
         if self.types {
-            out = out.remove_types(
-                &prep_types::<Signer>(database_name)?,
-                &former_general_verifier,
-            )
+            out = out.remove_types(&prep_types(&db_path)?, &former_general_verifier)
         }
         out = out.new_general_verifier(new_general_verifier);
         Ok(out)
@@ -178,7 +174,7 @@ impl GeneralHold {
 
 pub(crate) struct Hold {
     pub(crate) metadata_set: Vec<MetaValues>,
-    pub(crate) network_specs_set: Vec<NetworkSpecs>,
+    pub(crate) network_specs_set: Vec<OrderedNetworkSpecs>,
 }
 
 impl Hold {
@@ -186,30 +182,33 @@ impl Hold {
     pub(crate) fn show(&self) -> String {
         print_affected(&self.metadata_set, &self.network_specs_set)
     }
-    /// function to find all entries in the database corresponding to given verifier_key, that was used to store the former verifier
-    pub(crate) fn get(
-        verifier_key: &VerifierKey,
-        database_name: &str,
-    ) -> Result<Self, ErrorSigner> {
-        let database = open_db::<Signer>(database_name)?;
-        let metadata = open_tree::<Signer>(&database, METATREE)?;
-        let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
+    /// function to find all entries in the database corresponding to given `verifier_key`, that was used to store the former verifier
+    pub(crate) fn get<P>(verifier_key: &VerifierKey, db_path: P) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
+        let database = open_db(&db_path)?;
+        let metadata = open_tree(&database, METATREE)?;
+        let chainspecs = open_tree(&database, SPECSTREE)?;
         let (metadata_set, network_specs_set) = collect_set(verifier_key, &chainspecs, &metadata)?;
         Ok(Self {
             metadata_set,
             network_specs_set,
         })
     }
-    pub(crate) fn upd_stub(
+    pub(crate) fn upd_stub<P>(
         &self,
         stub: TrDbColdStub,
         verifier_key: &VerifierKey,
         former_verifier: &Verifier,
         new_verifier: &ValidCurrentVerifier,
         hold_release: HoldRelease,
-        database_name: &str,
-    ) -> Result<TrDbColdStub, ErrorSigner> {
-        let general_verifier = get_general_verifier(database_name)?;
+        db_path: P,
+    ) -> Result<TrDbColdStub>
+    where
+        P: AsRef<Path>,
+    {
+        let general_verifier = get_general_verifier(&db_path)?;
         let mut out = stub;
         let warning = match hold_release {
             HoldRelease::General => Warning::VerifierChangingToGeneral {

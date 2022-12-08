@@ -203,7 +203,7 @@ fn checking_derivation_set() {
         "//secret//westend".to_string()
     ])
     .is_ok());
-    assert!(check_derivation_set(&["//remarkably///ugly".to_string()]).is_err());
+    assert!(check_derivation_set(&["//remarkably///ugly".to_string()]).is_ok());
     assert!(check_derivation_set(&["no_path_at_all".to_string()]).is_err());
     assert!(check_derivation_set(&["///".to_string()]).is_err());
 }

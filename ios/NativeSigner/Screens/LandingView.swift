@@ -8,36 +8,42 @@
 import SwiftUI
 
 struct LandingView: View {
-    @State var tacAccept = false
-    @State var ppAccept = false
-    @State var accept = false
-    let onboard: () -> Void
+    @State private var tacAccept = false
+    @State private var ppAccept = false
+    @State private var accept = false
+    @EnvironmentObject private var data: SignerDataModel
     var body: some View {
         VStack {
             DocumentModal()
             VStack(spacing: 16) {
-                Button(action: {
-                    tacAccept.toggle()
-                }) {
-                    HStack {
-                        Image(systemName: tacAccept ? "checkmark.square" : "square").imageScale(.large)
-                        Text("I agree to the terms and conditions")
-                            .multilineTextAlignment(.leading)
-                        Spacer()
+                Button(
+                    action: {
+                        tacAccept.toggle()
+                    },
+                    label: {
+                        HStack {
+                            (tacAccept ? Image(.checkmark, variant: .square) : Image(.square)).imageScale(.large)
+                            Localizable.iAgreeToTheTermsAndConditions.text
+                                .multilineTextAlignment(.leading)
+                            Spacer()
+                        }
                     }
-                }
-                Button(action: {
-                    ppAccept.toggle()
-                }) {
-                    HStack {
-                        Image(systemName: ppAccept ? "checkmark.square" : "square").imageScale(.large)
-                        Text("I agree to the privacy policy")
-                            .multilineTextAlignment(.leading)
-                        Spacer()
+                )
+                Button(
+                    action: {
+                        ppAccept.toggle()
+                    },
+                    label: {
+                        HStack {
+                            (ppAccept ? Image(.checkmark, variant: .square) : Image(.square)).imageScale(.large)
+                            Localizable.iAgreeToThePrivacyPolicy.text
+                                .multilineTextAlignment(.leading)
+                            Spacer()
+                        }
                     }
-                }
+                )
                 BigButton(
-                    text: "Next",
+                    text: Localizable.next.key,
                     action: {
                         accept = true
                     },
@@ -46,9 +52,12 @@ struct LandingView: View {
                 .padding(.top, 16.0)
                 .alert(isPresented: $accept, content: {
                     Alert(
-                        title: Text("Accept privacy policy?"),
-                        primaryButton: .default(Text("Decline")),
-                        secondaryButton: .default(Text("Accept"), action: {onboard()})
+                        title: Localizable.acceptPrivacyPolicy.text,
+                        primaryButton: .default(Localizable.decline.text),
+                        secondaryButton: .default(
+                            Localizable.accept.text,
+                            action: { data.onboard() }
+                        )
                     )
                 })
             }
@@ -57,9 +66,8 @@ struct LandingView: View {
     }
 }
 
-/*
- struct LandingView_Previews: PreviewProvider {
- static var previews: some View {
- LandingView()
- }
- }*/
+// struct LandingView_Previews: PreviewProvider {
+// static var previews: some View {
+// LandingView()
+// }
+// }

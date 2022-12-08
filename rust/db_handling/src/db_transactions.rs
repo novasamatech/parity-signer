@@ -7,11 +7,12 @@
 //!
 //! For transactions scanned into Signer, currently a temporary database entry
 //! is made to store transaction details while they are displayed to user.
+use std::path::Path;
 // TODO this is a temporary solution, the data eventually could be stored in
 // `navigator` state.
 #[cfg(feature = "signer")]
 use parity_scale_codec::{Decode, Encode};
-use sled::{Batch, Transactional};
+use sled::{transaction::TransactionResult, Batch, Transactional};
 #[cfg(feature = "signer")]
 use sp_runtime::MultiSigner;
 
@@ -21,12 +22,8 @@ use constants::{ADDRTREE, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, VE
 #[cfg(feature = "signer")]
 use constants::{DRV, GENERALVERIFIER, SIGN, STUB, TYPES};
 
-use definitions::error::ErrorSource;
-#[cfg(feature = "active")]
-use definitions::error_active::{Active, ErrorActive};
 #[cfg(feature = "signer")]
 use definitions::{
-    error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, NotFoundSigner, Signer},
     helpers::multisigner_to_public,
     history::{
         Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay,
@@ -35,7 +32,7 @@ use definitions::{
     keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey},
     metadata::MetaValues,
     network_specs::{
-        CurrentVerifier, NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier,
+        CurrentVerifier, NetworkSpecs, OrderedNetworkSpecs, ValidCurrentVerifier, Verifier,
         VerifierValue,
     },
     qr_transfers::ContentLoadTypes,
@@ -43,6 +40,9 @@ use definitions::{
 };
 
 use crate::helpers::{open_db, open_tree};
+#[cfg(feature = "signer")]
+use crate::Error;
+use crate::Result;
 #[cfg(feature = "signer")]
 use crate::{
     helpers::{make_batch_clear_tree, verify_checksum},
@@ -152,17 +152,20 @@ impl TrDbCold {
     /// Apply constructed set of batches within [`TrDbCold`] to the database
     /// with a given name, in a single transaction.
     ///
-    /// Note that both ErrorSource variants are available.
-    pub fn apply<T: ErrorSource>(&self, database_name: &str) -> Result<(), T::Error> {
-        let database = open_db::<T>(database_name)?;
-        let addresses = open_tree::<T>(&database, ADDRTREE)?;
-        let history = open_tree::<T>(&database, HISTORY)?;
-        let metadata = open_tree::<T>(&database, METATREE)?;
-        let network_specs = open_tree::<T>(&database, SPECSTREE)?;
-        let settings = open_tree::<T>(&database, SETTREE)?;
-        let transaction = open_tree::<T>(&database, TRANSACTION)?;
-        let verifiers = open_tree::<T>(&database, VERIFIERS)?;
-        match (
+    /// Note that both `ErrorSource` variants are available.
+    pub fn apply<P>(&self, db_path: P) -> Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        let database = open_db(&db_path)?;
+        let addresses = open_tree(&database, ADDRTREE)?;
+        let history = open_tree(&database, HISTORY)?;
+        let metadata = open_tree(&database, METATREE)?;
+        let network_specs = open_tree(&database, SPECSTREE)?;
+        let settings = open_tree(&database, SETTREE)?;
+        let transaction = open_tree(&database, TRANSACTION)?;
+        let verifiers = open_tree(&database, VERIFIERS)?;
+        let s = (
             &addresses,
             &history,
             &metadata,
@@ -170,37 +173,36 @@ impl TrDbCold {
             &settings,
             &transaction,
             &verifiers,
-        )
-            .transaction(
-                |(
-                    tx_addresses,
-                    tx_history,
-                    tx_metadata,
-                    tx_network_specs,
-                    tx_settings,
-                    tx_transaction,
-                    tx_verifiers,
-                )| {
-                    tx_addresses.apply_batch(&self.for_addresses)?;
-                    tx_addresses.flush();
-                    tx_history.apply_batch(&self.for_history)?;
-                    tx_history.flush();
-                    tx_metadata.apply_batch(&self.for_metadata)?;
-                    tx_metadata.flush();
-                    tx_network_specs.apply_batch(&self.for_network_specs)?;
-                    tx_network_specs.flush();
-                    tx_settings.apply_batch(&self.for_settings)?;
-                    tx_settings.flush();
-                    tx_transaction.apply_batch(&self.for_transaction)?;
-                    tx_transaction.flush();
-                    tx_verifiers.apply_batch(&self.for_verifiers)?;
-                    tx_verifiers.flush();
-                    Ok(())
-                },
-            ) {
-            Ok(()) => Ok(()),
-            Err(e) => Err(<T>::db_transaction(e)),
-        }
+        );
+        let res: TransactionResult<(), sled::Error> = s.transaction(
+            |(
+                tx_addresses,
+                tx_history,
+                tx_metadata,
+                tx_network_specs,
+                tx_settings,
+                tx_transaction,
+                tx_verifiers,
+            )| {
+                tx_addresses.apply_batch(&self.for_addresses)?;
+                tx_addresses.flush();
+                tx_history.apply_batch(&self.for_history)?;
+                tx_history.flush();
+                tx_metadata.apply_batch(&self.for_metadata)?;
+                tx_metadata.flush();
+                tx_network_specs.apply_batch(&self.for_network_specs)?;
+                tx_network_specs.flush();
+                tx_settings.apply_batch(&self.for_settings)?;
+                tx_settings.flush();
+                tx_transaction.apply_batch(&self.for_transaction)?;
+                tx_transaction.flush();
+                tx_verifiers.apply_batch(&self.for_verifiers)?;
+                tx_verifiers.flush();
+                Ok(())
+            },
+        );
+
+        Ok(res?)
     }
 }
 
@@ -295,44 +297,47 @@ impl TrDbHot {
 
     /// Apply constructed set of batches within [`TrDbHot`] to the database
     /// with a given name, in a single transaction.
-    pub fn apply(&self, database_name: &str) -> Result<(), ErrorActive> {
-        let database = open_db::<Active>(database_name)?;
-        let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
-        let metadata = open_tree::<Active>(&database, METATREE)?;
-        let meta_history = open_tree::<Active>(&database, META_HISTORY)?;
-        let network_specs_prep = open_tree::<Active>(&database, SPECSTREEPREP)?;
-        let settings = open_tree::<Active>(&database, SETTREE)?;
-        match (
+    pub fn apply<P>(&self, db_path: P) -> Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        let database = open_db(&db_path)?;
+        let address_book = open_tree(&database, ADDRESS_BOOK)?;
+        let metadata = open_tree(&database, METATREE)?;
+        let meta_history = open_tree(&database, META_HISTORY)?;
+        let network_specs_prep = open_tree(&database, SPECSTREEPREP)?;
+        let settings = open_tree(&database, SETTREE)?;
+        let s = (
             &address_book,
             &metadata,
             &meta_history,
             &network_specs_prep,
             &settings,
-        )
-            .transaction(
-                |(
-                    tx_address_book,
-                    tx_metadata,
-                    tx_meta_history,
-                    tx_network_specs_prep,
-                    tx_settings,
-                )| {
-                    tx_address_book.apply_batch(&self.for_address_book)?;
-                    tx_address_book.flush();
-                    tx_metadata.apply_batch(&self.for_metadata)?;
-                    tx_metadata.flush();
-                    tx_meta_history.apply_batch(&self.for_meta_history)?;
-                    tx_meta_history.flush();
-                    tx_network_specs_prep.apply_batch(&self.for_network_specs_prep)?;
-                    tx_network_specs_prep.flush();
-                    tx_settings.apply_batch(&self.for_settings)?;
-                    tx_settings.flush();
-                    Ok(())
-                },
-            ) {
-            Ok(()) => Ok(()),
-            Err(e) => Err(<Active>::db_transaction(e)),
-        }
+        );
+
+        let res: TransactionResult<(), sled::Error> = s.transaction(
+            |(
+                tx_address_book,
+                tx_metadata,
+                tx_meta_history,
+                tx_network_specs_prep,
+                tx_settings,
+            )| {
+                tx_address_book.apply_batch(&self.for_address_book)?;
+                tx_address_book.flush();
+                tx_metadata.apply_batch(&self.for_metadata)?;
+                tx_metadata.flush();
+                tx_meta_history.apply_batch(&self.for_meta_history)?;
+                tx_meta_history.flush();
+                tx_network_specs_prep.apply_batch(&self.for_network_specs_prep)?;
+                tx_network_specs_prep.flush();
+                tx_settings.apply_batch(&self.for_settings)?;
+                tx_settings.flush();
+                Ok(())
+            },
+        );
+
+        Ok(res?)
     }
 }
 
@@ -475,26 +480,20 @@ impl TrDbColdStub {
     /// into storage.
     ///
     /// [`TRANSACTION`] tree is cleared in the process.
-    pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self, ErrorSigner> {
+    pub fn from_storage<P>(db_path: P, checksum: u32) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
         let stub_encoded = {
-            let database = open_db::<Signer>(database_name)?;
+            let database = open_db(&db_path)?;
             verify_checksum(&database, checksum)?;
-            let transaction = open_tree::<Signer>(&database, TRANSACTION)?;
-            match transaction.get(STUB) {
-                Ok(Some(a)) => a,
-                Ok(None) => return Err(ErrorSigner::NotFound(NotFoundSigner::Stub)),
-                Err(e) => return Err(<Signer>::db_internal(e)),
-            }
+            let transaction = open_tree(&database, TRANSACTION)?;
+            transaction.get(STUB)?.ok_or(Error::Stub)?
         };
         TrDbCold::new()
-            .set_transaction(make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?) // clear transaction tree
-            .apply::<Signer>(database_name)?;
-        match Self::decode(&mut &stub_encoded[..]) {
-            Ok(a) => Ok(a),
-            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-                EntryDecodingSigner::Stub,
-            ))),
-        }
+            .set_transaction(make_batch_clear_tree(&db_path, TRANSACTION)?) // clear transaction tree
+            .apply(&db_path)?;
+        Ok(Self::decode(&mut &stub_encoded[..])?)
     }
 
     /// Put SCALE-encoded [`TrDbColdStub`] into storage in the [`TRANSACTION`]
@@ -504,17 +503,17 @@ impl TrDbColdStub {
     /// stored [`TrDbColdStub`] using `from_storage` method.
     ///
     /// The [`TRANSACTION`] tree is cleared prior to adding data to storage.
-    pub fn store_and_get_checksum(&self, database_name: &str) -> Result<u32, ErrorSigner> {
-        let mut transaction_batch = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
+    pub fn store_and_get_checksum<P>(&self, db_path: P) -> Result<u32>
+    where
+        P: AsRef<Path>,
+    {
+        let mut transaction_batch = make_batch_clear_tree(&db_path, TRANSACTION)?;
         transaction_batch.insert(STUB, self.encode());
         TrDbCold::new()
             .set_transaction(transaction_batch) // clear transaction tree
-            .apply::<Signer>(database_name)?;
-        let database = open_db::<Signer>(database_name)?;
-        match database.checksum() {
-            Ok(x) => Ok(x),
-            Err(e) => Err(<Signer>::db_internal(e)),
-        }
+            .apply(&db_path)?;
+        let database = open_db(&db_path)?;
+        Ok(database.checksum()?)
     }
 
     /// Add new [`Event`] in `history_stub` field of the [`TrDbColdStub`]
@@ -558,17 +557,17 @@ impl TrDbColdStub {
         self
     }
 
-    /// Prepare adding [`NetworkSpecs`] into the cold database:
+    /// Prepare adding [`OrderedNetworkSpecs`] into the cold database:
     ///
-    /// - Transform received in `add_specs` payload [`NetworkSpecsToSend`]
-    /// into [`NetworkSpecs`] by adding `order` field. Networks are always added
+    /// - Transform received in `add_specs` payload [`NetworkSpecs`]
+    /// into [`OrderedNetworkSpecs`] by adding `order` field. Networks are always added
     /// in the end of the network list, with order set to the total number of
     /// network specs entries currently in Signer. When a network is removed,
     /// the order of the remaining networks gets rearranged, see details in
     /// function [`remove_network`](crate::helpers::remove_network).
     /// - Add a (key, value) pair to the network specs additions queue in
     /// `network_specs_stub`. Key is [`NetworkSpecsKey`] in key form, value is
-    /// SCALE-encoded [`NetworkSpecs`].
+    /// SCALE-encoded [`OrderedNetworkSpecs`].
     /// - Add corresponding `Event::NetworkSpecsAdded(_)` into `history_stub`.
     /// - Add root address for the network if the [`AddressDetails`] entry with
     /// matching [`Encryption`](definitions::crypto::Encryption) already exists,
@@ -581,20 +580,23 @@ impl TrDbColdStub {
     /// Note that `add_network_specs` does not deal with network verifiers:
     /// verifier data is not necessarily updated each time the network
     /// specs are added.
-    pub fn add_network_specs(
+    pub fn add_network_specs<P>(
         mut self,
-        network_specs_to_send: &NetworkSpecsToSend,
+        network_specs_to_send: &NetworkSpecs,
         valid_current_verifier: &ValidCurrentVerifier,
         general_verifier: &Verifier,
-        database_name: &str,
-    ) -> Result<Self, ErrorSigner> {
+        db_path: P,
+    ) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
         let network_specs_key = NetworkSpecsKey::from_parts(
             &network_specs_to_send.genesis_hash,
             &network_specs_to_send.encryption,
         );
         let order = {
-            let database = open_db::<Signer>(database_name)?;
-            let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
+            let database = open_db(&db_path)?;
+            let chainspecs = open_tree(&database, SPECSTREE)?;
             chainspecs.len()
         } as u8;
         let network_specs = network_specs_to_send.to_store(order);
@@ -609,17 +611,14 @@ impl TrDbColdStub {
             ),
         });
         {
-            let database = open_db::<Signer>(database_name)?;
-            let identities = open_tree::<Signer>(&database, ADDRTREE)?;
+            let database = open_db(&db_path)?;
+            let identities = open_tree(&database, ADDRTREE)?;
             for (address_key_vec, address_entry) in identities.iter().flatten() {
                 let address_key = AddressKey::from_ivec(&address_key_vec);
                 let (multisigner, mut address_details) =
-                    AddressDetails::process_entry_with_key_checked::<Signer>(
-                        &address_key,
-                        address_entry,
-                    )?;
+                    AddressDetails::process_entry_with_key_checked(&address_key, address_entry)?;
                 if address_details.is_root()
-                    && (address_details.encryption == network_specs.encryption)
+                    && (address_details.encryption == network_specs.specs.encryption)
                     && !address_details.network_id.contains(&network_specs_key)
                 {
                     address_details
@@ -634,7 +633,7 @@ impl TrDbColdStub {
                             &address_details.encryption,
                             &multisigner_to_public(&multisigner),
                             &address_details.path,
-                            network_specs.genesis_hash.as_bytes(),
+                            network_specs.specs.genesis_hash,
                         ),
                     });
                 }
@@ -643,7 +642,7 @@ impl TrDbColdStub {
         Ok(self)
     }
 
-    /// Prepare removing [`NetworkSpecs`] from the cold database:
+    /// Prepare removing [`OrderedNetworkSpecs`] from the cold database:
     ///
     /// - Add [`NetworkSpecsKey`] in key form to the network specs removal queue
     /// in `network_specs_stub`.
@@ -661,12 +660,14 @@ impl TrDbColdStub {
     /// interface when the properly verified network specs are loaded in Signer.
     pub fn remove_network_specs(
         mut self,
-        network_specs: &NetworkSpecs,
+        network_specs: &OrderedNetworkSpecs,
         valid_current_verifier: &ValidCurrentVerifier,
         general_verifier: &Verifier,
     ) -> Self {
-        let network_specs_key =
-            NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
+        let network_specs_key = NetworkSpecsKey::from_parts(
+            &network_specs.specs.genesis_hash,
+            &network_specs.specs.encryption,
+        );
         self.network_specs_stub = self.network_specs_stub.new_removal(network_specs_key.key());
         self.history_stub.push(Event::NetworkSpecsRemoved {
             network_specs_display: NetworkSpecsDisplay::get(
@@ -763,18 +764,21 @@ impl TrDbColdStub {
     /// It is unlikely that this clearing is ever doing anything, as the
     /// intended use of the [`TrDbColdStub`] is to recover it from the database
     /// (with clearing the [`TRANSACTION`] tree) and then immediately apply.
-    pub fn apply(self, database_name: &str) -> Result<(), ErrorSigner> {
-        let for_transaction = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
+    pub fn apply<P>(self, db_path: P) -> Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        let for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
         TrDbCold {
             for_addresses: self.addresses_stub.make_batch(),
-            for_history: events_to_batch::<Signer>(database_name, self.history_stub)?,
+            for_history: events_to_batch(&db_path, self.history_stub)?,
             for_metadata: self.metadata_stub.make_batch(),
             for_network_specs: self.network_specs_stub.make_batch(),
             for_settings: self.settings_stub.make_batch(),
             for_transaction,
             for_verifiers: self.verifiers_stub.make_batch(),
         }
-        .apply::<Signer>(database_name)
+        .apply(db_path)
     }
 }
 
@@ -808,8 +812,146 @@ impl Default for TrDbColdStub {
 /// - relevant history [`Event`] set: warnings that were shown during the
 /// parsing
 #[cfg(feature = "signer")]
-#[derive(Debug, Decode, Encode)]
+#[derive(Debug, Decode, Default, Encode)]
 pub struct TrDbColdSign {
+    /// Bulk of transactions to sign.
+    pub signing_bulk: Vec<TrDbColdSignOne>,
+}
+
+#[cfg(feature = "signer")]
+impl TrDbColdSign {
+    /// Recover [`TrDbColdSign`] from storage in the cold database.
+    ///
+    /// Function requires an optional correct checksum to make sure
+    /// the signable transaction is still the one that was shown to
+    /// the user previously, and no changes to the database have occured.
+    /// While parsing a bulk no checksum is provided and no checks are done.
+    ///
+    /// [`TRANSACTION`] tree is **not** cleared in the process. User is allowed
+    /// to try entering password several times, for all this time the
+    /// transaction remains in the database.
+    pub fn from_storage<P: AsRef<Path>>(db_path: P, checksum: Option<u32>) -> Result<Option<Self>> {
+        let sign_encoded = {
+            let database = open_db(&db_path)?;
+            if let Some(checksum) = checksum {
+                verify_checksum(&database, checksum)?;
+            }
+            let transaction = open_tree(&database, TRANSACTION)?;
+            match transaction.get(SIGN)? {
+                Some(a) => a,
+                None => return Ok(None),
+            }
+        };
+        Ok(Some(Self::decode(&mut &sign_encoded[..])?))
+    }
+
+    /// Put SCALE-encoded [`TrDbColdSign`] into storage in the [`TRANSACTION`]
+    /// tree of the cold database under the key [`SIGN`].
+    ///
+    /// Function returns `u32` checksum. This checksum is needed to recover
+    /// stored [`TrDbColdSign`] using `from_storage` method.
+    ///
+    /// The [`TRANSACTION`] tree is cleared prior to adding data to storage.
+    pub fn store_and_get_checksum<P: AsRef<Path>>(&self, db_path: P) -> Result<u32> {
+        let mut transaction_batch = make_batch_clear_tree(&db_path, TRANSACTION)?;
+        transaction_batch.insert(SIGN, self.encode());
+        TrDbCold::new()
+            .set_transaction(transaction_batch) // clear transaction tree
+            .apply(&db_path)?;
+        let database = open_db(&db_path)?;
+        Ok(database.checksum()?)
+    }
+
+    /// Use [`TrDbColdSign`] to add history log data into the cold database.
+    ///
+    /// Possible history log entries are:
+    ///
+    /// - `Event::TransactionSigned(_)` and `Event::MessageSigned(_)` for the
+    /// cases when the signature was generated and displayed through the user
+    /// interface
+    /// - `Event::TransactionSignError(_)` and `Event::MessageSignError(_)` for
+    /// the cases when the user has entered the wrong password and no signature
+    /// was generated. Signer current policy is to log all wrong password entry
+    /// attempts.
+    ///
+    /// Required input:
+    ///
+    /// - `wrong_password` flag; for entries with `true` value the signature
+    /// was not generated, because user has entered the wrong password;
+    /// - user-added text comment for the transaction
+    /// - index of the transaction in the bulk
+    /// - database name, into which the data is added
+    ///
+    /// Function returns database checksum, to be collected and re-used in case
+    /// of wrong password entry.
+    pub fn apply<P: AsRef<Path>>(
+        self,
+        wrong_password: bool,
+        user_comment: &str,
+        idx: usize,
+        db_path: P,
+    ) -> Result<u32> {
+        let mut history = vec![];
+        let mut for_transaction = Batch::default();
+        let s = &self.signing_bulk[idx];
+        let signed_by = VerifierValue::Standard { m: s.multisigner() };
+        history.append(&mut s.history.clone());
+        match &s.content {
+            SignContent::Transaction { method, extensions } => {
+                let transaction = [method.encode(), extensions.clone()].concat();
+                let sign_display =
+                    SignDisplay::get(&transaction, &s.network_name, &signed_by, user_comment);
+                if wrong_password {
+                    history.push(Event::TransactionSignError { sign_display })
+                } else {
+                    history.push(Event::TransactionSigned { sign_display });
+                    // if this is the last transaction in the bulk and the password was right,
+                    // all is done and the DB can be cleared.
+                    if idx == self.signing_bulk.len() - 1 {
+                        for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
+                    }
+                }
+            }
+            SignContent::Message(message) => {
+                let sign_message_display =
+                    SignMessageDisplay::get(message, &s.network_name, &signed_by, user_comment);
+                if wrong_password {
+                    history.push(Event::MessageSignError {
+                        sign_message_display,
+                    })
+                } else {
+                    history.push(Event::MessageSigned {
+                        sign_message_display,
+                    });
+                    // if this is the last transaction in the bulk and the password was right,
+                    // all is done and the DB can be cleared.
+                    if idx == self.signing_bulk.len() - 1 {
+                        for_transaction = make_batch_clear_tree(&db_path, TRANSACTION)?;
+                    }
+                }
+            }
+        }
+        TrDbCold::new()
+            .set_history(events_to_batch(&db_path, history)?)
+            .set_transaction(for_transaction)
+            .apply(&db_path)?;
+        let database = open_db(&db_path)?;
+        Ok(database.checksum()?)
+    }
+}
+
+#[cfg(feature = "signer")]
+impl From<TrDbColdSignOne> for TrDbColdSign {
+    fn from(t: TrDbColdSignOne) -> Self {
+        Self {
+            signing_bulk: vec![t],
+        }
+    }
+}
+
+#[cfg(feature = "signer")]
+#[derive(Debug, Decode, Encode)]
+pub struct TrDbColdSignOne {
     /// data to sign
     content: SignContent,
 
@@ -842,7 +984,7 @@ pub struct TrDbColdSign {
 ///
 /// Messages contain SCALE-encoded text messages.
 #[cfg(feature = "signer")]
-#[derive(Debug, Decode, Encode)]
+#[derive(Debug, Decode, Encode, Clone)]
 pub enum SignContent {
     /// `53xx00` or `53xx02` transaction
     Transaction {
@@ -858,7 +1000,7 @@ pub enum SignContent {
 }
 
 #[cfg(feature = "signer")]
-impl TrDbColdSign {
+impl TrDbColdSignOne {
     /// Construct [`TrDbColdSign`] from components.
     ///
     /// Required input:
@@ -886,34 +1028,6 @@ impl TrDbColdSign {
         }
     }
 
-    /// Recover [`TrDbColdSign`] from storage in the cold database.
-    ///
-    /// Function requires correct checksum to make sure the signable transaction
-    /// is still the one that was shown to the user previously, and no
-    /// changes to the database have occured.
-    ///
-    /// [`TRANSACTION`] tree is **not** cleared in the process. User is allowed
-    /// to try entering password several times, for all this time the
-    /// transaction remains in the database.
-    pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self, ErrorSigner> {
-        let sign_encoded = {
-            let database = open_db::<Signer>(database_name)?;
-            verify_checksum(&database, checksum)?;
-            let transaction = open_tree::<Signer>(&database, TRANSACTION)?;
-            match transaction.get(SIGN) {
-                Ok(Some(a)) => a,
-                Ok(None) => return Err(ErrorSigner::NotFound(NotFoundSigner::Sign)),
-                Err(e) => return Err(<Signer>::db_internal(e)),
-            }
-        };
-        match Self::decode(&mut &sign_encoded[..]) {
-            Ok(a) => Ok(a),
-            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-                EntryDecodingSigner::Sign,
-            ))),
-        }
-    }
-
     /// Get transaction content.
     pub fn content(&self) -> &SignContent {
         &self.content
@@ -933,104 +1047,11 @@ impl TrDbColdSign {
     pub fn multisigner(&self) -> MultiSigner {
         self.multisigner.to_owned()
     }
-
-    /// Put SCALE-encoded [`TrDbColdSign`] into storage in the [`TRANSACTION`]
-    /// tree of the cold database under the key [`SIGN`].
-    ///
-    /// Function returns `u32` checksum. This checksum is needed to recover
-    /// stored [`TrDbColdSign`] using `from_storage` method.
-    ///
-    /// The [`TRANSACTION`] tree is cleared prior to adding data to storage.
-    pub fn store_and_get_checksum(&self, database_name: &str) -> Result<u32, ErrorSigner> {
-        let mut transaction_batch = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
-        transaction_batch.insert(SIGN, self.encode());
-        TrDbCold::new()
-            .set_transaction(transaction_batch) // clear transaction tree
-            .apply::<Signer>(database_name)?;
-        let database = open_db::<Signer>(database_name)?;
-        match database.checksum() {
-            Ok(x) => Ok(x),
-            Err(e) => Err(<Signer>::db_internal(e)),
-        }
-    }
-
-    /// Use [`TrDbColdSign`] to add history log data into the cold database.
-    ///
-    /// Possible history log entries are:
-    ///
-    /// - `Event::TransactionSigned(_)` and `Event::MessageSigned(_)` for the
-    /// cases when the signature was generated and diaplayed through the user
-    /// interface
-    /// - `Event::TransactionSignError(_)` and `Event::MessageSignError(_)` for
-    /// the cases when the user has entered the wrong password and no signature
-    /// was generated. Signer current policy is to log all wrong password entry
-    /// attempts.
-    ///
-    /// Required input:
-    ///
-    /// - `wrong_password` flag; for entries with `true` value the signature
-    /// was not generated, because user has entered the wrong password;
-    /// - user-added text comment for the transaction
-    /// - database name, into which the data is added
-    ///
-    /// Function returns database checksum, to be collected and re-used in case
-    /// of wrong password entry.
-    ///
-    /// If the password entered is correct, the [`TRANSACTION`] tree gets
-    /// cleared.
-    pub fn apply(
-        self,
-        wrong_password: bool,
-        user_comment: &str,
-        database_name: &str,
-    ) -> Result<u32, ErrorSigner> {
-        let signed_by = VerifierValue::Standard {
-            m: self.multisigner(),
-        };
-        let mut history = self.history;
-        let mut for_transaction = Batch::default();
-        match self.content {
-            SignContent::Transaction { method, extensions } => {
-                let transaction = [method.encode(), extensions].concat();
-                let sign_display =
-                    SignDisplay::get(&transaction, &self.network_name, &signed_by, user_comment);
-                if wrong_password {
-                    history.push(Event::TransactionSignError { sign_display })
-                } else {
-                    history.push(Event::TransactionSigned { sign_display });
-                    for_transaction = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
-                }
-            }
-            SignContent::Message(message) => {
-                let sign_message_display =
-                    SignMessageDisplay::get(&message, &self.network_name, &signed_by, user_comment);
-                if wrong_password {
-                    history.push(Event::MessageSignError {
-                        sign_message_display,
-                    })
-                } else {
-                    history.push(Event::MessageSigned {
-                        sign_message_display,
-                    });
-                    for_transaction = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
-                }
-            }
-        }
-        TrDbCold::new()
-            .set_history(events_to_batch::<Signer>(database_name, history)?)
-            .set_transaction(for_transaction)
-            .apply::<Signer>(database_name)?;
-        let database = open_db::<Signer>(database_name)?;
-        match database.checksum() {
-            Ok(x) => Ok(x),
-            Err(e) => Err(<Signer>::db_internal(e)),
-        }
-    }
 }
 
 /// Temporary storage for derivations import data.
 ///
-/// Signer can import **password-free** derivations in bulk using
+/// Signer can import derivations in bulk using
 /// [`ContentDerivations`](definitions::qr_transfers::ContentDerivations)
 /// payloads.
 ///
@@ -1046,24 +1067,23 @@ impl TrDbColdSign {
 ///
 /// - a set of derivations, that was checked when the derivation import was
 /// received by Signer
-/// - [`NetworkSpecs`] for the network in which the derivations will be used to
+/// - [`OrderedNetworkSpecs`] for the network in which the derivations will be used to
 /// generate addresses
 #[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 pub struct TrDbColdDerivations {
-    /// set of password-free derivation path strings, from received
-    /// `derivations` payload
+    /// set of derivation path strings, from received `derivations` payload
     checked_derivations: Vec<String>,
 
     /// network specs for the network in which to generate the derivations,
     /// from received `derivations` payload
-    network_specs: NetworkSpecs,
+    network_specs: OrderedNetworkSpecs,
 }
 
 #[cfg(feature = "signer")]
 impl TrDbColdDerivations {
     /// Construct [`TrDbColdDerivations`] from payload components.
-    pub fn generate(checked_derivations: &[String], network_specs: &NetworkSpecs) -> Self {
+    pub fn generate(checked_derivations: &[String], network_specs: &OrderedNetworkSpecs) -> Self {
         Self {
             checked_derivations: checked_derivations.to_owned(),
             network_specs: network_specs.to_owned(),
@@ -1077,26 +1097,23 @@ impl TrDbColdDerivations {
     /// occured.
     ///
     /// [`TRANSACTION`] tree is cleared in the process.
-    pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self, ErrorSigner> {
+    pub fn from_storage<P>(db_path: P, checksum: u32) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
         let drv_encoded = {
-            let database = open_db::<Signer>(database_name)?;
+            let database = open_db(&db_path)?;
             verify_checksum(&database, checksum)?;
-            let transaction = open_tree::<Signer>(&database, TRANSACTION)?;
-            match transaction.get(DRV) {
-                Ok(Some(a)) => a,
-                Ok(None) => return Err(ErrorSigner::NotFound(NotFoundSigner::Derivations)),
-                Err(e) => return Err(<Signer>::db_internal(e)),
+            let transaction = open_tree(&database, TRANSACTION)?;
+            match transaction.get(DRV)? {
+                Some(a) => a,
+                None => return Err(Error::DerivationsNotFound),
             }
         };
         TrDbCold::new()
-            .set_transaction(make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?) // clear transaction tree
-            .apply::<Signer>(database_name)?;
-        match Self::decode(&mut &drv_encoded[..]) {
-            Ok(a) => Ok(a),
-            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-                EntryDecodingSigner::Derivations,
-            ))),
-        }
+            .set_transaction(make_batch_clear_tree(&db_path, TRANSACTION)?) // clear transaction tree
+            .apply(&db_path)?;
+        Ok(Self::decode(&mut &drv_encoded[..])?)
     }
 
     /// Get checked derivations
@@ -1105,7 +1122,7 @@ impl TrDbColdDerivations {
     }
 
     /// Get network specs
-    pub fn network_specs(&self) -> &NetworkSpecs {
+    pub fn network_specs(&self) -> &OrderedNetworkSpecs {
         &self.network_specs
     }
 
@@ -1116,16 +1133,17 @@ impl TrDbColdDerivations {
     /// stored [`TrDbColdDerivations`] using `from_storage` method.
     ///
     /// The [`TRANSACTION`] tree is cleared prior to adding data to storage.
-    pub fn store_and_get_checksum(&self, database_name: &str) -> Result<u32, ErrorSigner> {
-        let mut transaction_batch = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
+    pub fn store_and_get_checksum<P>(&self, db_path: P) -> Result<u32>
+    where
+        P: AsRef<Path>,
+    {
+        let mut transaction_batch = make_batch_clear_tree(&db_path, TRANSACTION)?;
         transaction_batch.insert(DRV, self.encode());
         TrDbCold::new()
             .set_transaction(transaction_batch) // clear transaction tree
-            .apply::<Signer>(database_name)?;
-        let database = open_db::<Signer>(database_name)?;
-        match database.checksum() {
-            Ok(x) => Ok(x),
-            Err(e) => Err(<Signer>::db_internal(e)),
-        }
+            .apply(&db_path)?;
+        let database = open_db(&db_path)?;
+
+        Ok(database.checksum()?)
     }
 }

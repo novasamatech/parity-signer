@@ -1,0 +1,112 @@
+// Generated using SwiftGen — https://github.com/SwiftGen/SwiftGen
+
+{% if tables.count > 0 %}
+import SwiftUI
+
+// MARK: - Strings
+
+{% macro parametersBlock types %}{% filter removeNewlines:"leading" %}
+  {% for type in types %}
+    {% if type == "String" %}
+    _ p{{forloop.counter}}: Any
+    {% else %}
+    _ p{{forloop.counter}}: {{type}}
+    {% endif %}
+    {{ ", " if not forloop.last }}
+  {% endfor %}
+{% endfilter %}{% endmacro %}
+{% macro argumentsBlock types %}{% filter removeNewlines:"leading" %}
+  {% for type in types %}
+    {% if type == "String" %}
+    String(describing: p{{forloop.counter}})
+    {% elif type == "UnsafeRawPointer" %}
+    Int(bitPattern: p{{forloop.counter}})
+    {% else %}
+    p{{forloop.counter}}
+    {% endif %}
+    {{ ", " if not forloop.last }}
+  {% endfor %}
+{% endfilter %}{% endmacro %}
+{% macro recursiveBlock table item %}
+  {% for string in item.strings %}
+  {% if not param.noComments %}
+  /// {{string.translation}}
+  {% endif %}
+  {% if string.types %}
+  public static func {{string.name|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}({% call parametersBlock string.types %}) -> String {
+    return tr("{{table}}", "{{string.key}}", {% call argumentsBlock string.types %})
+  }
+  {% else %}
+  public static let {{string.name|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}} = LocalizedString(table: "{{table}}", lookupKey: "{{string.key}}")
+  {% endif %}
+  {% endfor %}
+  {% for child in item.children %}
+  public enum {{child.name|swiftIdentifier:"pretty"|escapeReservedKeywords}} {
+    {% filter indent:2 %}{% call recursiveBlock table child %}{% endfilter %}
+  }
+  {% endfor %}
+{% endmacro %}
+{% set enumName %}{{param.enumName|default:"L10n"}}{% endset %}
+public enum {{enumName}} {
+  {% if tables.count > 1 or param.forceFileNameEnum %}
+  {% for table in tables %}
+  public enum {{table.name|swiftIdentifier:"pretty"|escapeReservedKeywords}} {
+    {% filter indent:2 %}{% call recursiveBlock table.name table.levels %}{% endfilter %}
+  }
+  {% endfor %}
+  {% else %}
+  {% call recursiveBlock tables.first.name tables.first.levels %}
+  {% endif %}
+}
+
+// MARK: - Implementation Details
+{% if not param.withoutSupporter %}
+fileprivate func tr(_ table: String, _ key: String, _ args: CVarArg...) -> String {
+  let locale = Locale.current
+  let path = Bundle.main.path(forResource: locale.identifier, ofType: "lproj") ?? ""
+  let format: String
+  if let bundle = Bundle(path: path) {
+    format = NSLocalizedString(key, tableName: table, bundle: bundle, comment: "")
+  } else {
+    format = BundleToken.bundle.localizedString(forKey: key, value: nil, table: table)
+  }
+  return String(format: format, locale: locale, arguments: args)
+}
+
+public struct LocalizedString: Hashable {
+  let table: String
+  fileprivate let lookupKey: String
+
+  init(table: String, lookupKey: String) {
+    self.table = table
+    self.lookupKey = lookupKey
+  }
+
+  var key: LocalizedStringKey {
+    LocalizedStringKey(lookupKey)
+  }
+
+  var string: String {
+    tr(table, lookupKey)
+  }
+
+  var text: Text {
+    Text(key, tableName: table, bundle: {{param.bundle|default:"BundleToken.bundle"}})
+  }
+}
+{% endif %}
+{% if not param.bundle %}
+
+private final class BundleToken {
+  static let bundle: Bundle = {
+    #if SWIFT_PACKAGE
+      return Bundle.module
+    #else
+      return Bundle(for: BundleToken.self)
+    #endif
+  }()
+}
+{% endif %}
+{% else %}
+// No string found
+{% endif %}

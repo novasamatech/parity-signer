@@ -1,6 +1,6 @@
 # Troubleshooting
 
-## Rust side builds but app crashes on start (Android) or complains about symbols not found (ioS)
+## Rust side builds but app crashes on start (Android) or complains about symbols not found (iOS)
 
 One common reason for this is inconsistency in `uniffi` version - make sure that installed version matches one stated in Cargo.toml
 

@@ -1,11 +1,12 @@
-use crate::parse_and_display_set;
+use crate::{parse_and_display_set, Error};
 use definitions::network_specs::ShortSpecs;
 use frame_metadata::RuntimeMetadata;
 use parity_scale_codec::Decode;
+use pretty_assertions::assert_eq;
 
 fn metadata(filename: &str) -> RuntimeMetadata {
-    let metadata_hex = std::fs::read_to_string(&filename).unwrap();
-    let metadata_vec = hex::decode(&metadata_hex.trim()).unwrap()[4..].to_vec();
+    let metadata_hex = std::fs::read_to_string(filename).unwrap();
+    let metadata_vec = hex::decode(metadata_hex.trim()).unwrap()[4..].to_vec();
     RuntimeMetadata::decode(&mut &metadata_vec[..]).unwrap()
 }
 
@@ -74,13 +75,16 @@ fn tr_2() {
     let data = hex::decode("4d0210020806000046ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a07001b2c3ef70006050c0008264834504a64ace1373f0c8ed5d57381ddf54a2f67a318fa42b1352681606d00aebb0211dbb07b4d335a657257b8ac5e53794c901e4f616d4a254f2490c43934009ae581fef1fc06828723715731adcf810e42ce4dadad629b1b7fa5c3c144a81d550008009723000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff").unwrap();
     let reply =
         parse_and_display_set(&data, &metadata("for_tests/westend9120"), &specs()).unwrap_err();
-    let reply_known = "Network spec version decoded from extensions (9111) differs from the version in metadata (9120).";
-    assert!(
-        reply == reply_known,
-        "Expected: {}\nReceived: {}",
-        reply_known,
-        reply
-    );
+    if let Error::WrongNetworkVersion {
+        as_decoded,
+        in_metadata,
+    } = reply
+    {
+        assert_eq!(as_decoded, "9111".to_string());
+        assert_eq!(in_metadata, 9120);
+    } else {
+        panic!("Expected Error::WrongNetworkVersion, got {:?}", reply);
+    }
 }
 
 #[test]
@@ -218,4 +222,47 @@ block_hash: 5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620"#;
         reply_known,
         reply
     );
+}
+
+#[test]
+fn tr_7() {
+    let data = hex::decode(concat!(
+           "780300e855f5e79ca68ecae0fe99a3fa46806461740e1a0f0000c16ff28623e40000000a0700000200000091bc6e169807aaa54802737e1c504b2577d4fafedd5a02c10293b1cd60e395272470dff6295dd9bb3e5a89c9eb7647d7c5ae525618d77757171718dc034be8f5")
+        ).unwrap();
+    let specs_moonbase = ShortSpecs {
+        base58prefix: 1287,
+        decimals: 18,
+        genesis_hash: [
+            145, 188, 110, 22, 152, 7, 170, 165, 72, 2, 115, 126, 28, 80, 75, 37, 119, 212, 250,
+            254, 221, 90, 2, 193, 2, 147, 177, 205, 96, 227, 149, 39,
+        ]
+        .into(),
+        name: "moonbase".to_string(),
+        unit: "DEV".to_string(),
+    };
+
+    let reply =
+        parse_and_display_set(&data, &metadata("for_tests/moonbase1802"), &specs_moonbase).unwrap();
+
+    let reply_known = r#"
+Method:
+
+pallet: Balances,
+  method: transfer,
+    field_name: dest,
+      Id: 0xe855f5e79ca68ecae0fe99a3fa46806461740e1a,
+    field_name: value,
+      balance: 10.000000000000000 mDEV
+
+
+Extensions:
+
+era: Mortal, phase: 14, period: 32,
+nonce: 0,
+tip: 0 aDEV,
+network: moonbase1802,
+tx_version: 2,
+block_hash: 2470dff6295dd9bb3e5a89c9eb7647d7c5ae525618d77757171718dc034be8f5"#;
+
+    assert_eq!(reply, reply_known)
 }

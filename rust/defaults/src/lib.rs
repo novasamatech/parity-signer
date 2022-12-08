@@ -13,21 +13,21 @@
 //!
 //! - general verifier `Verifier` set to `Some(VerifierValue)` with Parity
 //! public key as a verifier value
-//! - network specs `NetworkSpecs` for default networks
+//! - network specs `OrderedNetworkSpecs` for default networks
 //! - verifiers for default networks, set to
 //! `CurrentVerifier::Valid(ValidCurrentVerifier::General)`
 //! - two latest metadata versions for each of the default networks
 //! - default types information
 //!
 //! Latest metadata entries get updated as soon as they are published and could
-//! be fetched via rpc calls. For this, new metadata entry is added into
+//! be fetched via RPC calls. For this, new metadata entry is added into
 //! `release_metadata` folder, and older one is removed.
 //!
 //! # Defaults in the hot database
 //!
 //! Default hot database contains:
 //!
-//! - network specs `NetworkSpecsToSend` for default networks
+//! - network specs `NetworkSpecs` for default networks
 //! - address book containing the data for default networks
 //! - default types information
 //!
@@ -71,14 +71,9 @@ use std::str::FromStr;
 #[cfg(feature = "active")]
 use definitions::{
     crypto::Encryption,
-    error::{ErrorSource, MetadataError, MetadataSource},
-    error_active::{
-        Active, DefaultLoading, ErrorActive, IncomingMetadataSourceActive,
-        IncomingMetadataSourceActiveStr,
-    },
     keyring::VerifierKey,
     metadata::{AddressBookEntry, MetaValues},
-    network_specs::{CurrentVerifier, NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier},
+    network_specs::{CurrentVerifier, NetworkSpecs, OrderedNetworkSpecs, ValidCurrentVerifier},
     qr_transfers::ContentLoadTypes,
     types::{Description, EnumVariant, EnumVariantType, StructField, TypeEntry},
 };
@@ -86,7 +81,10 @@ use definitions::{
 #[cfg(feature = "signer")]
 use definitions::network_specs::{Verifier, VerifierValue};
 
-/// Real Parity public key, with Sr25519 encryption
+mod error;
+pub use error::{Error, Result};
+
+/// Real Parity public key, with `Sr25519` encryption
 ///
 /// To be used in [`VerifierValue`] for general verifier in default cold
 /// database
@@ -187,25 +185,27 @@ fn default_network_info() -> [DefaultNetworkInfo; 3] {
     ]
 }
 
-/// Generate network specs [`NetworkSpecs`] set for the default networks, for
+/// Generate network specs [`OrderedNetworkSpecs`] set for the default networks, for
 /// cold database
 #[cfg(feature = "active")]
-pub fn default_chainspecs() -> Vec<NetworkSpecs> {
-    let mut out: Vec<NetworkSpecs> = Vec::new();
+pub fn default_chainspecs() -> Vec<OrderedNetworkSpecs> {
+    let mut out: Vec<OrderedNetworkSpecs> = Vec::new();
     for x in default_network_info() {
-        let new = NetworkSpecs {
-            base58prefix: x.base58prefix,
-            color: x.color.to_string(),
-            decimals: x.decimals,
-            encryption: x.encryption.clone(),
-            genesis_hash: x.genesis_hash,
-            logo: x.logo.to_string(),
-            name: x.name.to_string(),
+        let new = OrderedNetworkSpecs {
+            specs: NetworkSpecs {
+                base58prefix: x.base58prefix,
+                color: x.color.to_string(),
+                decimals: x.decimals,
+                encryption: x.encryption,
+                genesis_hash: x.genesis_hash,
+                logo: x.logo.to_string(),
+                name: x.name.to_string(),
+                path_id: x.path_id.to_string(),
+                secondary_color: x.secondary_color.to_string(),
+                title: x.title.to_string(),
+                unit: x.unit.to_string(),
+            },
             order: x.order,
-            path_id: x.path_id.to_string(),
-            secondary_color: x.secondary_color.to_string(),
-            title: x.title.to_string(),
-            unit: x.unit.to_string(),
         };
         out.push(new);
     }
@@ -225,17 +225,17 @@ pub fn default_verifiers() -> Vec<(VerifierKey, CurrentVerifier)> {
     out
 }
 
-/// Generate network specs [`NetworkSpecsToSend`] set for the default networks,
+/// Generate network specs [`NetworkSpecs`] set for the default networks,
 /// for hot database
 #[cfg(feature = "active")]
-pub fn default_chainspecs_to_send() -> Vec<NetworkSpecsToSend> {
-    let mut out: Vec<NetworkSpecsToSend> = Vec::new();
+pub fn default_chainspecs_to_send() -> Vec<NetworkSpecs> {
+    let mut out: Vec<NetworkSpecs> = Vec::new();
     for x in default_network_info() {
-        let new = NetworkSpecsToSend {
+        let new = NetworkSpecs {
             base58prefix: x.base58prefix,
             color: x.color.to_string(),
             decimals: x.decimals,
-            encryption: x.encryption.clone(),
+            encryption: x.encryption,
             genesis_hash: x.genesis_hash,
             logo: x.logo.to_string(),
             name: x.name.to_string(),
@@ -258,7 +258,7 @@ pub fn default_address_book() -> Vec<AddressBookEntry> {
             name: x.name.to_string(),
             genesis_hash: x.genesis_hash,
             address: x.address.to_string(),
-            encryption: x.encryption.clone(),
+            encryption: x.encryption,
             def: true,
         };
         out.push(new);
@@ -269,57 +269,33 @@ pub fn default_address_book() -> Vec<AddressBookEntry> {
 /// Read metadata files from given directory. Is used to populate different
 /// variants of cold database (release and tests)
 #[cfg(feature = "active")]
-fn metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
+fn metadata(dir: &str) -> Result<Vec<MetaValues>> {
     let mut out: Vec<MetaValues> = Vec::new();
-    let path_set = match std::fs::read_dir(dir) {
-        Ok(a) => a,
-        Err(e) => {
-            return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFolder(
-                e,
-            )))
-        }
-    };
+    let path_set = std::fs::read_dir(dir)?;
     for x in path_set.flatten() {
         if let Some(filename) = x.path().to_str() {
-            let meta_str = match std::fs::read_to_string(x.path()) {
-                Ok(a) => a,
-                Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFile(e))),
-            };
-            let new = MetaValues::from_str_metadata(
-                meta_str.trim(),
-                IncomingMetadataSourceActiveStr::Default {
-                    filename: filename.to_string(),
-                },
-            )?;
+            let meta_str = std::fs::read_to_string(x.path())?;
+            let new = MetaValues::from_str_metadata(meta_str.trim())?;
             let mut found = false;
             for a in default_network_info() {
                 if new.name == a.name {
                     found = true;
                     if let Some(prefix_from_meta) = new.optional_base58prefix {
                         if prefix_from_meta != a.base58prefix {
-                            return Err(<Active>::faulty_metadata(
-                                MetadataError::Base58PrefixSpecsMismatch {
-                                    specs: a.base58prefix,
-                                    meta: prefix_from_meta,
-                                },
-                                MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
-                                    IncomingMetadataSourceActiveStr::Default {
-                                        filename: filename.to_string(),
-                                    },
-                                )),
-                            ));
+                            return Err(Error::Base58PrefixSpecsMismatch {
+                                specs: a.base58prefix,
+                                meta: prefix_from_meta,
+                            });
                         }
                     }
                     break;
                 }
             }
             if !found {
-                return Err(ErrorActive::DefaultLoading(
-                    DefaultLoading::OrphanMetadata {
-                        name: new.name,
-                        filename: filename.to_string(),
-                    },
-                ));
+                return Err(Error::OrphanMetadata {
+                    name: new.name,
+                    filename: filename.to_string(),
+                });
             }
             out.push(new)
         }
@@ -329,20 +305,20 @@ fn metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
 
 /// Read metadata set for test cold database from `test_metadata` folder
 #[cfg(feature = "active")]
-pub fn test_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
+pub fn test_metadata() -> Result<Vec<MetaValues>> {
     metadata("../defaults/test_metadata")
 }
 
 /// Read metadata set for navigation test cold database from `nav_test_metadata`
 /// folder
 #[cfg(feature = "active")]
-pub fn nav_test_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
+pub fn nav_test_metadata() -> Result<Vec<MetaValues>> {
     metadata("../defaults/nav_test_metadata")
 }
 
 /// Read metadata set for release cold database from `release_metadata` folder
 #[cfg(feature = "active")]
-pub fn release_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
+pub fn release_metadata() -> Result<Vec<MetaValues>> {
     metadata("../defaults/release_metadata")
 }
 
@@ -366,12 +342,12 @@ lazy_static! {
 /// to categorize, and collected as `TypeEntry` set.
 ///
 /// Types information is necessary only to parse transactions produced with
-/// `RuntimeVersion` of the network metadata below V14. Therefore, it is
+/// `RuntimeVersion` of the network metadata below `V14`. Therefore, it is
 /// obsolete for default networks.
 ///
 /// Types information currently on file was collected for older metadata
 /// versions of Westend, Polkadot, Kusama, and Rococo, when they were still
-/// using metadata runtime version V12 and V13. Type definitions were gathered
+/// using metadata runtime version `V12` and `V13`. Type definitions were gathered
 /// (mostly) from substrate crates and in some cases from js client code, when
 /// it was not possible to find explicit descriptions in substrate crates.
 ///
@@ -381,23 +357,20 @@ lazy_static! {
 /// description could be added into types file by user, and types update could
 /// be generated by user.
 #[cfg(feature = "active")]
-pub fn default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
+pub fn default_types_vec() -> Result<Vec<TypeEntry>> {
     let filename = "../defaults/default_types/full_types_information";
-    let type_info = match fs::read_to_string(filename) {
-        Ok(x) => x,
-        Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::TypesFile(e))),
-    };
+    let type_info = fs::read_to_string(filename)?;
 
     let mut types_prep: Vec<TypeEntry> = Vec::new();
 
     for caps1 in REG_STRUCTS_WITH_NAMES.captures_iter(&type_info) {
-        let struct_name = (&caps1["name"]).to_string();
-        let struct_description = (&caps1["description"]).to_string();
+        let struct_name = (caps1["name"]).to_string();
+        let struct_description = (caps1["description"]).to_string();
         let mut struct_fields: Vec<StructField> = Vec::new();
         for caps2 in REG_STRUCT_FIELDS.captures_iter(&struct_description) {
             let new = StructField {
-                field_name: Some((&caps2["field_name"]).to_string()),
-                field_type: (&caps2["field_type"]).to_string(),
+                field_name: Some((caps2["field_name"]).to_string()),
+                field_type: (caps2["field_type"]).to_string(),
             };
             struct_fields.push(new);
         }
@@ -410,17 +383,17 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
     for caps in REG_STRUCTS_NO_NAMES.captures_iter(&type_info) {
         let only_field = StructField {
             field_name: None,
-            field_type: (&caps["description"]).to_string(),
+            field_type: (caps["description"]).to_string(),
         };
         let new_entry = TypeEntry {
-            name: (&caps["name"]).to_string(),
+            name: (caps["name"]).to_string(),
             description: Description::Struct(vec![only_field]),
         };
         types_prep.push(new_entry);
     }
     for caps1 in REG_ENUM.captures_iter(&type_info) {
-        let enum_name = (&caps1["name"]).to_string();
-        let enum_description = (&caps1["description"]).to_string();
+        let enum_name = (caps1["name"]).to_string();
+        let enum_description = (caps1["description"]).to_string();
         let enum_variants = enum_description
             .lines()
             .filter(|line| REG_ENUM_VARIANTS.is_match(line))
@@ -428,7 +401,7 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
                 let caps2 = REG_ENUM_VARIANTS
                     .captures(line)
                     .expect("just checked it is match");
-                let variant_name = (&caps2["variant_name"]).to_string();
+                let variant_name = (caps2["variant_name"]).to_string();
                 let variant_type = match caps2.name("variant_type") {
                     None => EnumVariantType::None,
                     Some(a) => {
@@ -437,7 +410,7 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
                             // either a single type or a tuple
                             match REG_ENUM_SIMPLE.captures(&x[1..x.len() - 1]) {
                                 // single type
-                                Some(b) => EnumVariantType::Type((&b["simple_type"]).to_string()),
+                                Some(b) => EnumVariantType::Type((b["simple_type"]).to_string()),
                                 // tuple
                                 None => EnumVariantType::Type(x),
                             }
@@ -446,8 +419,8 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
                             let mut type_is_struct: Vec<StructField> = Vec::new();
                             for caps3 in REG_ENUM_STRUCT.captures_iter(&x) {
                                 let new = StructField {
-                                    field_name: Some((&caps3["field_name"]).to_string()),
-                                    field_type: (&caps3["field_type"]).to_string(),
+                                    field_name: Some((caps3["field_name"]).to_string()),
+                                    field_type: (caps3["field_type"]).to_string(),
                                 };
                                 type_is_struct.push(new);
                             }
@@ -469,8 +442,8 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
     }
     for caps in REG_TYPES.captures_iter(&type_info) {
         let new_entry = TypeEntry {
-            name: (&caps["name"]).to_string(),
-            description: Description::Type((&caps["description"]).to_string()),
+            name: (caps["name"]).to_string(),
+            description: Description::Type((caps["description"]).to_string()),
         };
         types_prep.push(new_entry);
     }
@@ -480,7 +453,7 @@ pub fn default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
 
 /// Generate default types as [`ContentLoadTypes`]
 #[cfg(feature = "active")]
-pub fn default_types_content() -> Result<ContentLoadTypes, ErrorActive> {
+pub fn default_types_content() -> Result<ContentLoadTypes> {
     Ok(ContentLoadTypes::generate(&default_types_vec()?))
 }
 

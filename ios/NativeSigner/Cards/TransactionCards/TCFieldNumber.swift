@@ -11,34 +11,56 @@ struct TCFieldNumber: View {
     var value: MscFieldNumber
     @State private var showDoc = false
     var body: some View {
-        Button (action: {
-            self.showDoc.toggle()
-        }) {
-            HStack {
-                Text(value.number)
-                    .foregroundColor(Color("Text600"))
-                Spacer()
-                if value.docsFieldNumber + value.pathType + value.docsType != "" {
-                    Text("?")
-                        .foregroundColor(Color("Text400"))
-                }
-            }
-            if showDoc {
+        Button(
+            action: {
+                self.showDoc.toggle()
+            },
+            label: {
                 VStack {
-                    Text("Path: " + value.pathType)
-                    Text(AttributedString(fromHexDocs: value.docsFieldNumber) ?? "docs parsing error in iOS, please refer to other sources")
-                        .foregroundColor(Color("Text600"))
-                    Text(AttributedString(fromHexDocs: value.docsType) ?? "docs parsing error in iOS, please refer to other sources")
-                        .foregroundColor(Color("Text600"))
+                    HStack {
+                        Text(value.number)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        Spacer()
+                        if value.displayableValue.isEmpty {
+                            Asset.questionCircle.swiftUIImage
+                                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                        }
+                    }
+                    if showDoc {
+                        withAnimation {
+                            VStack(alignment: .leading) {
+                                Text(Localizable.TCField.path(value.pathType))
+                                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                Text.markdownWithFallback(value.docsFieldNumber)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                Text.markdownWithFallback(value.docsType)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            }
+                            .padding(.horizontal, Spacing.medium)
+                            .padding(.vertical, Spacing.small)
+                            .strokeContainerBackground()
+                        }
+                    }
                 }
+                .font(Fontstyle.bodyL.base)
             }
-        }.disabled(value.docsFieldNumber + value.pathType + value.docsType == "")
+        ).disabled(value.displayableValue.isEmpty)
     }
 }
 
-/*
- struct TCFieldNumber_Previews: PreviewProvider {
- static var previews: some View {
- TCFieldNumber()
- }
- }*/
+private extension MscFieldNumber {
+    var displayableValue: String {
+        [docsFieldNumber, pathType, docsType].joined()
+    }
+}
+
+struct TCFieldNumber_Previews: PreviewProvider {
+    static var previews: some View {
+        TCFieldNumber(value: MscFieldNumber(
+            number: "number",
+            docsFieldNumber: "docsFieldNumber",
+            pathType: "pathType",
+            docsType: PreviewData.exampleMarkdownDocs
+        ))
+    }
+}

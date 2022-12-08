@@ -1,4 +1,4 @@
-//! Fetch network information from a node using rpc calls
+//! Fetch network information from a node using RPC calls
 //!
 //! Preparing `add_specs` and `load_metadata` update payload may require
 //! gathering network information from a node.
@@ -55,12 +55,12 @@
 //! </table>
 //!
 //! Block hash is fetched first to always have network metadata matching the
-//! block hash, even if the two rpc calls were done during block switching.
+//! block hash, even if the two RPC calls were done during block switching.
 //!
-//! Addresses for rpc calls in different networks could be found
+//! Addresses for RPC calls in different networks could be found
 //! [here](https://github.com/polkadot-js/apps/tree/master/packages/apps-config/src/endpoints)
 //!
-//! This module deals only with the rpc calls part and does **no processing**
+//! This module deals only with the RPC calls part and does **no processing**
 //! of the fetched data.
 use jsonrpsee::core::client::ClientT;
 use jsonrpsee::rpc_params;
@@ -72,8 +72,11 @@ use serde_json::{
     value::{Number, Value},
 };
 use sp_core::H256;
+use std::time::Duration;
 
-/// Data from rpc calls for `load_metadata` update payload.
+use crate::error::{Error, Result};
+
+/// Data from RPC calls for `load_metadata` update payload.
 ///
 /// This data is **sufficient** for `load_metadata` update payload generation,
 /// i.e. nothing else has to be known about the network beforehand to produce an
@@ -89,7 +92,7 @@ pub struct FetchedInfo {
     pub genesis_hash: String,
 }
 
-/// Data from rpc calls for `add_specs` update payload.
+/// Data from RPC calls for `add_specs` update payload.
 ///
 /// Note that this data is **not sufficient** for `add_specs` update payload
 /// generation. At least network encryption is needed additionally.
@@ -113,6 +116,9 @@ lazy_static! {
     /// See tests for behavior examples.
     static ref PORT: Regex = Regex::new(r"^(?P<body>wss://[^/]*?)(?P<port>:[0-9]+)?(?P<tail>/.*)?$").expect("known value");
 }
+
+const CONNECTION_TIMEOUT: Duration = Duration::from_secs(60);
+const REQUEST_TIMEOUT: Duration = Duration::from_secs(120);
 
 /// Supply address with port if needed.
 ///
@@ -142,9 +148,9 @@ fn address_with_port(str_address: &str) -> String {
     }
 }
 
-/// Fetch data for `load_metadata` update payload through rpc calls.
+/// Fetch data for `load_metadata` update payload through RPC calls.
 ///
-/// Function inputs address at which rpc calls are made.
+/// Function inputs address at which RPC calls are made.
 ///
 /// Data fetched:
 ///
@@ -152,21 +158,23 @@ fn address_with_port(str_address: &str) -> String {
 /// 2. metadata at this block hash
 /// 3. network genesis hash
 #[tokio::main]
-pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::error::Error>> {
+pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo> {
     let client = WsClientBuilder::default()
+        .connection_timeout(CONNECTION_TIMEOUT)
+        .request_timeout(REQUEST_TIMEOUT)
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client.request("chain_getBlockHash", rpc_params![]).await?;
     let block_hash = match response {
         Value::String(x) => x,
-        _ => return Err(Box::from("Unexpected block hash format")),
+        _ => return Err(Error::UnexpectedBlockHashFormat),
     };
     let response: Value = client
         .request("state_getMetadata", rpc_params![&block_hash])
         .await?;
     let meta = match response {
         Value::String(x) => x,
-        _ => return Err(Box::from("Unexpected metadata format")),
+        _ => return Err(Error::UnexpectedMetadataFormat),
     };
     let response: Value = client
         .request(
@@ -176,7 +184,7 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
         .await?;
     let genesis_hash = match response {
         Value::String(x) => x,
-        _ => return Err(Box::from("Unexpected genesis hash format")),
+        _ => return Err(Error::UnexpectedGenesisHashFormat),
     };
     Ok(FetchedInfo {
         meta,
@@ -185,17 +193,16 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
     })
 }
 
-/// Fetch network metadata from given url address at given block through rpc
+/// Fetch network metadata from given URL address at given block through RPC
 /// call.
 ///
-/// Function inputs address at which rpc call is made and block hash in [`H256`]
+/// Function inputs address at which RPC call is made and block hash in [`H256`]
 /// format. Outputs hexadecimal metadata.
 #[tokio::main]
-pub async fn fetch_meta_at_block(
-    str_address: &str,
-    block_hash: H256,
-) -> Result<String, Box<dyn std::error::Error>> {
+pub async fn fetch_meta_at_block(str_address: &str, block_hash: H256) -> Result<String> {
     let client = WsClientBuilder::default()
+        .connection_timeout(CONNECTION_TIMEOUT)
+        .request_timeout(REQUEST_TIMEOUT)
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client
@@ -206,13 +213,13 @@ pub async fn fetch_meta_at_block(
         .await?;
     match response {
         Value::String(x) => Ok(x),
-        _ => Err(Box::from("Unexpected metadata format")),
+        _ => Err(Error::UnexpectedMetadataFormat),
     }
 }
 
-/// Fetch data for `add_specs` update payload through rpc calls.
+/// Fetch data for `add_specs` update payload through RPC calls.
 ///
-/// Function inputs address at which rpc calls are made.
+/// Function inputs address at which RPC calls are made.
 ///
 /// Data fetched:
 ///
@@ -222,14 +229,16 @@ pub async fn fetch_meta_at_block(
 #[tokio::main]
 pub async fn fetch_info_with_network_specs(
     str_address: &str,
-) -> Result<FetchedInfoWithNetworkSpecs, Box<dyn std::error::Error>> {
+) -> Result<FetchedInfoWithNetworkSpecs> {
     let client = WsClientBuilder::default()
+        .connection_timeout(CONNECTION_TIMEOUT)
+        .request_timeout(REQUEST_TIMEOUT)
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
     let meta = match response {
         Value::String(x) => x,
-        _ => return Err(Box::from("Unexpected metadata format")),
+        _ => return Err(Error::UnexpectedMetadataFormat),
     };
     let response: Value = client
         .request(
@@ -239,12 +248,12 @@ pub async fn fetch_info_with_network_specs(
         .await?;
     let genesis_hash = match response {
         Value::String(x) => x,
-        _ => return Err(Box::from("Unexpected genesis hash format")),
+        _ => return Err(Error::UnexpectedGenesisHashFormat),
     };
     let response: Value = client.request("system_properties", rpc_params![]).await?;
     let properties = match response {
         Value::Object(x) => x,
-        _ => return Err(Box::from("Unexpected system properties format")),
+        _ => return Err(Error::UnexpectedSystemPropertiesFormat),
     };
     Ok(FetchedInfoWithNetworkSpecs {
         meta,

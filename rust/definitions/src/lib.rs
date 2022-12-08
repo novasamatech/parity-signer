@@ -20,7 +20,6 @@ pub mod danger;
 
 pub mod error;
 
-#[cfg(feature = "active")]
 pub mod error_active;
 
 #[cfg(feature = "signer")]
@@ -37,9 +36,6 @@ pub mod metadata;
 pub mod network_specs;
 
 pub mod qr_transfers;
-
-#[cfg(feature = "signer")]
-pub mod test_all_errors_signer;
 
 pub mod types;
 

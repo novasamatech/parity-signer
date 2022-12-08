@@ -12,27 +12,28 @@ struct NewSeedScreen: View {
     @FocusState private var nameFocused: Bool
     let content: MNewSeed
     let checkSeedCollision: (String) -> Bool
-    let pushButton: (Action, String, String) -> Void
-    
+    let navigationRequest: NavigationRequest
+
     var body: some View {
         VStack(alignment: .leading) {
-            Text("DISPLAY NAME").font(FBase(style: .overline)).foregroundColor(Color("Text500"))
+            Localizable.displayName.text
+                .font(Fontstyle.overline.base)
+                .foregroundColor(Asset.text500.swiftUIColor)
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color("Border400"))
-                //.foregroundColor(Color("Border400"))
+                    .stroke(Asset.border400.swiftUIColor)
                     .frame(height: 39)
-                TextField("Seed", text: $seedName, prompt: Text("Seed name"))
+                TextField(Localizable.seed.string, text: $seedName, prompt: Localizable.seedName.text)
                     .focused($nameFocused)
-                    .foregroundColor(Color("Text600"))
-                    .font(FBase(style: .body2))
+                    .foregroundColor(Asset.text600.swiftUIColor)
+                    .font(Fontstyle.body2.base)
                     .disableAutocorrection(true)
                     .keyboardType(.asciiCapable)
                     .submitLabel(.done)
                     .onSubmit {
                         nameFocused = false
-                        if (seedName != "") && !checkSeedCollision(seedName) {
-                            pushButton(.goForward, seedName, "")
+                        if !seedName.isEmpty, !checkSeedCollision(seedName) {
+                            navigationRequest(.init(action: .goForward, details: seedName))
                         }
                     }
                     .onAppear(perform: {
@@ -40,25 +41,23 @@ struct NewSeedScreen: View {
                     })
                     .padding(.horizontal, 8)
             }
-            Text("Display name is visible only on this device").font(.callout)
+            Localizable.displayNameIsVisibleOnlyOnThisDevice.text.font(.callout)
             Spacer()
             BigButton(
-                text: "Generate seed phrase",
+                text: Localizable.NewSeed.generate.key,
                 action: {
                     nameFocused = false
-                    pushButton(.goForward, seedName, "")
+                    navigationRequest(.init(action: .goForward, details: seedName))
                 },
-                isDisabled: (seedName == "") || checkSeedCollision(seedName)
+                isDisabled: (seedName.isEmpty) || checkSeedCollision(seedName)
             )
             Spacer()
         }.padding()
     }
 }
 
-/*
- struct NewSeedScreen_Previews: PreviewProvider {
- static var previews: some View {
- NewSeedScreen().previewLayout(.sizeThatFits)
- }
- }
- */
+// struct NewSeedScreen_Previews: PreviewProvider {
+// static var previews: some View {
+// NewSeedScreen().previewLayout(.sizeThatFits)
+// }
+// }

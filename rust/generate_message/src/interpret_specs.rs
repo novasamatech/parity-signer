@@ -1,7 +1,7 @@
-//! Fit network properties fetched via rpc call into data in expected format
+//! Fit network properties fetched via RPC call into data in expected format
 //!
 //! Fetched network properties contain data needed to make
-//! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend), used
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs), used
 //! in [`ContentAddSpecs`](definitions::qr_transfers::ContentAddSpecs) payload.
 //!
 //! Network properties may contain:
@@ -13,12 +13,12 @@
 //! `String`)
 //!
 //! There could be base58 prefix information in network metadata. If base58
-//! prefix is fetched via `system_properties` rpc call and the metadata contains
+//! prefix is fetched via `system_properties` RPC call and the metadata contains
 //! `SS58Prefix` constant, they must be matching for the network to be
 //! suitable for use in the Signer. If no base58 prefix is encountered at all,
 //! network is not suitable for use in Signer either.
 //!
-//! Some networks support more than one token, in this case rpc returns an array
+//! Some networks support more than one token, in this case RPC returns an array
 //! of decimals and an array of units, that must have equal length. No mechanism
 //! to automatically choose a token from the fetched set is currently present.
 //!
@@ -32,35 +32,36 @@
 //!
 //! Command line with token override:
 //!
-//! `$ cargo run add_specs -d -u <url_address> -sr25519 -token <decimals> <unit>`
-use definitions::{error_active::SpecsError, network_specs::NetworkProperties};
+//! `$ cargo run add-specs -d -u <url_address> --encryption sr25519 --token-decimals <decimals> --token-unit <unit>`
+use definitions::network_specs::NetworkProperties;
 use serde_json::{map::Map, value::Value};
 use std::convert::TryInto;
 
+use crate::error::{Result, SpecsError};
 use crate::parser::Token;
 
-/// Transform `system_properties` rpc call results into [`NetworkProperties`].
+/// Transform `system_properties` RPC call results into [`NetworkProperties`].
 ///
 /// This function is only used if the network properties are used as is, i.e.
 /// without checking with existing database entries.
 ///
 /// Function inputs:
 ///
-/// - `&Map<String, Value>` received via `system_properties` rpc call,
+/// - `&Map<String, Value>` received via `system_properties` RPC call,
 /// - optional base58 prefix from the network metadata
 /// - optional token override to be applied if allowed
 pub fn interpret_properties(
     x: &Map<String, Value>,
     optional_prefix_from_meta: Option<u16>,
     optional_token_override: Option<Token>,
-) -> Result<NetworkProperties, SpecsError> {
+) -> Result<NetworkProperties> {
     let base58prefix = base58prefix(x, optional_prefix_from_meta)?;
 
     let (decimals, unit) = match token(x)? {
         TokenFetch::Single(token) => {
             // single unit value and single decimals value, override impossible
             if optional_token_override.is_some() {
-                return Err(SpecsError::OverrideIgnoredSingle);
+                return Err(SpecsError::OverrideIgnoredSingle)?;
             }
             (token.decimals, token.unit)
         }
@@ -71,14 +72,14 @@ pub fn interpret_properties(
                 (token_override.decimals, token_override.unit)
             } else {
                 // token override is possible, but not called for by the user
-                println!("Network supports several tokens. An array of tokenDecimals {} and an array of tokenSymbol {} were fetched. By default, decimals value will be set to 0, and unit value will be set to UNIT. To override, use -token <value_decimals> <value_unit>. To improve this behavior, please file a ticket.", decimals, unit);
+                println!("Network supports several tokens. An array of tokenDecimals {} and an array of tokenSymbol {} were fetched. By default, decimals value will be set to 0, and unit value will be set to UNIT. To override, use --token-decimals <value_decimals> --token-unit <value_unit>. To improve this behavior, please file a ticket.", decimals, unit);
                 (0, String::from("UNIT"))
             }
         }
         TokenFetch::None => {
             // override impossible
             if optional_token_override.is_some() {
-                return Err(SpecsError::OverrideIgnoredNone);
+                return Err(SpecsError::OverrideIgnoredNone)?;
             }
             println!("Network has no token. By default, decimals value will be set to 0, and unit value will be set to UNIT. To improve this behavior, please file a ticket.");
             (0, String::from("UNIT"))
@@ -95,14 +96,11 @@ pub fn interpret_properties(
 ///
 /// Function inputs:
 ///
-/// - `&Map<String, Value>` received via `system_properties` rpc call,
+/// - `&Map<String, Value>` received via `system_properties` RPC call,
 /// - optional base58 prefix from the network metadata
-fn base58prefix(
-    x: &Map<String, Value>,
-    optional_prefix_from_meta: Option<u16>,
-) -> Result<u16, SpecsError> {
+fn base58prefix(x: &Map<String, Value>, optional_prefix_from_meta: Option<u16>) -> Result<u16> {
     let base58prefix: u16 = match x.get("ss58Format") {
-        // base58 prefix is fetched in `system_properties` rpc call
+        // base58 prefix is fetched in `system_properties` RPC call
         Some(a) => match a {
             // base58 prefix value is a number
             Value::Number(b) => match b.as_u64() {
@@ -123,7 +121,7 @@ fn base58prefix(
                                 return Err(SpecsError::Base58PrefixMismatch {
                                     specs: d,
                                     meta: prefix_from_meta,
-                                });
+                                })?;
                             }
                         }
 
@@ -136,7 +134,7 @@ fn base58prefix(
                     Err(_) => {
                         return Err(SpecsError::Base58PrefixFormatNotSupported {
                             value: a.to_string(),
-                        })
+                        })?;
                     }
                 },
 
@@ -145,7 +143,7 @@ fn base58prefix(
                 None => {
                     return Err(SpecsError::Base58PrefixFormatNotSupported {
                         value: a.to_string(),
-                    })
+                    })?;
                 }
             },
 
@@ -153,24 +151,24 @@ fn base58prefix(
             _ => {
                 return Err(SpecsError::Base58PrefixFormatNotSupported {
                     value: a.to_string(),
-                })
+                })?;
             }
         },
 
-        // no base58 prefix fetched in `system_properties` rpc call
+        // no base58 prefix fetched in `system_properties` RPC call
         None => match optional_prefix_from_meta {
             // base58 prefix was found in `SS58Prefix` constant of the network
             // metadata
             Some(prefix_from_meta) => prefix_from_meta,
 
             // no base58 prefix at all, this is an error
-            None => return Err(SpecsError::NoBase58Prefix),
+            None => return Err(SpecsError::NoBase58Prefix)?,
         },
     };
     Ok(base58prefix)
 }
 
-/// Accepted token from `system_properties` rpc call
+/// Accepted token from `system_properties` RPC call
 pub enum TokenFetch {
     /// Single decimals parameter and single unit.
     Single(Token),
@@ -215,10 +213,10 @@ enum UnitFetch {
 /// Process decimals
 ///
 /// Function inputs only `&Map<String, Value>` received via `system_properties`
-/// rpc call.
-fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch, SpecsError> {
+/// RPC call.
+fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch> {
     match x.get("tokenDecimals") {
-        // decimals info is fetched in `system_properties` rpc call
+        // decimals info is fetched in `system_properties` RPC call
         Some(a) => match a {
             // fetched decimals value is a number
             Value::Number(b) => match b.as_u64() {
@@ -231,13 +229,13 @@ fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch, SpecsError> {
                     // this `u64` does not fit into `u8`, this is an error
                     Err(_) => Err(SpecsError::DecimalsFormatNotSupported {
                         value: a.to_string(),
-                    }),
+                    })?,
                 },
 
                 // number could not be represented as `u64`, this is an error
                 None => Err(SpecsError::DecimalsFormatNotSupported {
                     value: a.to_string(),
-                }),
+                })?,
             },
 
             // fetched decimals is an array
@@ -260,20 +258,20 @@ fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch, SpecsError> {
                                 // error
                                 Err(_) => Err(SpecsError::DecimalsFormatNotSupported {
                                     value: a.to_string(),
-                                }),
+                                })?,
                             },
 
                             // number could not be represented as `u64`, this is
                             // an error
                             None => Err(SpecsError::DecimalsFormatNotSupported {
                                 value: a.to_string(),
-                            }),
+                            })?,
                         }
                     } else {
                         // element is not a number, this is an error
                         Err(SpecsError::DecimalsFormatNotSupported {
                             value: a.to_string(),
-                        })
+                        })?
                     }
                 } else {
                     // decimals are an array with more than one element
@@ -287,7 +285,7 @@ fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch, SpecsError> {
             // unexpected decimals format
             _ => Err(SpecsError::DecimalsFormatNotSupported {
                 value: a.to_string(),
-            }),
+            })?,
         },
 
         // decimals are missing
@@ -298,10 +296,10 @@ fn decimals(x: &Map<String, Value>) -> Result<DecimalsFetch, SpecsError> {
 /// Process unit
 ///
 /// Function inputs only `&Map<String, Value>` received via `system_properties`
-/// rpc call.
-fn unit(x: &Map<String, Value>) -> Result<UnitFetch, SpecsError> {
+/// RPC call.
+fn unit(x: &Map<String, Value>) -> Result<UnitFetch> {
     match x.get("tokenSymbol") {
-        // unit info is fetched in `system_properties` rpc call
+        // unit info is fetched in `system_properties` RPC call
         Some(a) => match a {
             // fetched unit value is a `String`
             Value::String(b) => {
@@ -321,7 +319,7 @@ fn unit(x: &Map<String, Value>) -> Result<UnitFetch, SpecsError> {
                         // element is not a `String`, this is an error
                         Err(SpecsError::DecimalsFormatNotSupported {
                             value: a.to_string(),
-                        })
+                        })?
                     }
                 } else {
                     // units are an array with more than one element
@@ -335,7 +333,7 @@ fn unit(x: &Map<String, Value>) -> Result<UnitFetch, SpecsError> {
             // unexpected unit format
             _ => Err(SpecsError::UnitFormatNotSupported {
                 value: a.to_string(),
-            }),
+            })?,
         },
 
         // unit missing
@@ -344,36 +342,36 @@ fn unit(x: &Map<String, Value>) -> Result<UnitFetch, SpecsError> {
 }
 
 /// Combine decimals and unit information
-fn token(x: &Map<String, Value>) -> Result<TokenFetch, SpecsError> {
+fn token(x: &Map<String, Value>) -> Result<TokenFetch> {
     let decimals_fetch = decimals(x)?;
     let unit_fetch = unit(x)?;
 
     match decimals_fetch {
         DecimalsFetch::Single(decimals) => match unit_fetch {
             UnitFetch::Single(unit) => Ok(TokenFetch::Single(Token { decimals, unit })),
-            UnitFetch::Array(..) => Err(SpecsError::UnitsArrayDecimalsNot),
-            UnitFetch::None => Err(SpecsError::DecimalsNoUnit(decimals.to_string())),
+            UnitFetch::Array(..) => Err(SpecsError::UnitsArrayDecimalsNot)?,
+            UnitFetch::None => Err(SpecsError::DecimalsNoUnit(decimals.to_string()))?,
         },
         DecimalsFetch::Array(decimals, decimals_array_size) => match unit_fetch {
-            UnitFetch::Single(_) => Err(SpecsError::DecimalsArrayUnitsNot),
+            UnitFetch::Single(_) => Err(SpecsError::DecimalsArrayUnitsNot)?,
             UnitFetch::Array(unit, unit_array_size) => {
                 if decimals_array_size != unit_array_size {
-                    Err(SpecsError::DecimalsUnitsArrayLength { decimals, unit })
+                    Err(SpecsError::DecimalsUnitsArrayLength { decimals, unit })?
                 } else {
                     Ok(TokenFetch::Array { decimals, unit })
                 }
             }
-            UnitFetch::None => Err(SpecsError::DecimalsNoUnit(decimals)),
+            UnitFetch::None => Err(SpecsError::DecimalsNoUnit(decimals))?,
         },
         DecimalsFetch::None => match unit_fetch {
-            UnitFetch::Single(unit) => Err(SpecsError::UnitNoDecimals(unit)),
-            UnitFetch::Array(unit, _) => Err(SpecsError::UnitNoDecimals(unit)),
+            UnitFetch::Single(unit) => Err(SpecsError::UnitNoDecimals(unit))?,
+            UnitFetch::Array(unit, _) => Err(SpecsError::UnitNoDecimals(unit))?,
             UnitFetch::None => Ok(TokenFetch::None),
         },
     }
 }
 
-/// Get from `system_properties` rpc call results the network data to be
+/// Get from `system_properties` RPC call results the network data to be
 /// compared with already known data.
 ///
 /// This function is used if the fetch results are used to check already
@@ -381,7 +379,7 @@ fn token(x: &Map<String, Value>) -> Result<TokenFetch, SpecsError> {
 ///
 /// Function inputs:
 ///
-/// - `&Map<String, Value>` received via `system_properties` rpc call,
+/// - `&Map<String, Value>` received via `system_properties` RPC call,
 /// - optional base58 prefix from the network metadata
 ///
 /// Function outputs:
@@ -391,7 +389,7 @@ fn token(x: &Map<String, Value>) -> Result<TokenFetch, SpecsError> {
 pub fn check_specs(
     x: &Map<String, Value>,
     optional_prefix_from_meta: Option<u16>,
-) -> Result<(u16, TokenFetch), SpecsError> {
+) -> Result<(u16, TokenFetch)> {
     let base58prefix = base58prefix(x, optional_prefix_from_meta)?;
     let token_fetch = token(x)?;
     Ok((base58prefix, token_fetch))
@@ -399,6 +397,8 @@ pub fn check_specs(
 
 #[cfg(test)]
 mod tests {
+    use crate::Error;
+
     use super::*;
     use serde_json::json;
     #[test]
@@ -424,15 +424,14 @@ mod tests {
         mock_map.insert("tokenDecimals".to_string(), json!(12u8));
         mock_map.insert("tokenSymbol".to_string(), Value::String("WND".to_string()));
         let properties_error = interpret_properties(&mock_map, Some(24u16), None).unwrap_err();
-        assert!(
-            properties_error
-                == SpecsError::Base58PrefixMismatch {
-                    specs: 42,
-                    meta: 24
-                },
-            "Wrong error in mock specs:\n{:?}",
-            properties_error
-        );
+        if let Error::Specs(SpecsError::Base58PrefixMismatch {
+            specs: 42,
+            meta: 24,
+        }) = properties_error
+        {
+        } else {
+            panic!("Wrong error in mock specs:\n{:?}", properties_error);
+        }
     }
 
     #[test]
@@ -451,11 +450,10 @@ mod tests {
             }),
         )
         .unwrap_err();
-        assert!(
-            properties_error == SpecsError::OverrideIgnoredSingle,
-            "Wrong error in mock specs:\n{:?}",
-            properties_error
-        );
+        if let Error::Specs(SpecsError::OverrideIgnoredSingle) = properties_error {
+        } else {
+            panic!("Wrong error in mock specs:\n{:?}", properties_error);
+        }
     }
 
     #[test]
@@ -566,15 +564,14 @@ mod tests {
             json!(["Unknown".to_string(), "WND".to_string(), "NWND".to_string()]),
         );
         let properties_error = interpret_properties(&mock_map, None, None).unwrap_err();
-        assert!(
+        if let Error::Specs(SpecsError::DecimalsUnitsArrayLength { decimals, unit }) =
             properties_error
-                == SpecsError::DecimalsUnitsArrayLength {
-                    decimals: "[8,8]".to_string(),
-                    unit: "[\"Unknown\",\"WND\",\"NWND\"]".to_string()
-                },
-            "Wrong error in mock specs:\n{:?}",
-            properties_error
-        );
+        {
+            assert_eq!(decimals, "[8,8]");
+            assert_eq!(unit, "[\"Unknown\",\"WND\",\"NWND\"]");
+        } else {
+            panic!("Wrong error in mock specs:\n{:?}", properties_error);
+        }
     }
 
     #[test]
@@ -615,10 +612,9 @@ mod tests {
             }),
         )
         .unwrap_err();
-        assert!(
-            properties_error == SpecsError::OverrideIgnoredNone,
-            "Wrong error in mock specs:\n{:?}",
-            properties_error
-        );
+        if let Error::Specs(SpecsError::OverrideIgnoredNone) = properties_error {
+        } else {
+            panic!("Wrong error in mock specs:\n{:?}", properties_error);
+        }
     }
 }

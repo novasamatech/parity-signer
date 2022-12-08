@@ -9,19 +9,25 @@ import SwiftUI
 
 struct SelectSeedForBackup: View {
     let content: MSeeds
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     var body: some View {
         VStack {
             ScrollView {
                 LazyVStack {
-                    ForEach(content.seedNameCards.sorted(by: {$0.seedName < $1.seedName}), id: \.seedName) {seedNameCard in
+                    ForEach(
+                        content.seedNameCards.sorted(by: { $0.seedName < $1.seedName }),
+                        id: \.seedName
+                    ) { seedNameCard in
                         HStack {
-                            Button(action: {
-                                pushButton(.backupSeed, seedNameCard.seedName, "")
-                            }) {
-                                SeedCardForManager(seedNameCard: seedNameCard)
-                                Spacer()
-                            }
+                            Button(
+                                action: {
+                                    navigationRequest(.init(action: .backupSeed, details: seedNameCard.seedName))
+                                },
+                                label: {
+                                    SeedCardForManager(seedNameCard: seedNameCard)
+                                    Spacer()
+                                }
+                            )
                         }
                     }
                 }
@@ -31,10 +37,8 @@ struct SelectSeedForBackup: View {
     }
 }
 
-/*
-struct SelectSeedForBackup_Previews: PreviewProvider {
-    static var previews: some View {
-        SelectSeedForBackup()
-    }
-}
-*/
+// struct SelectSeedForBackup_Previews: PreviewProvider {
+// static var previews: some View {
+// SelectSeedForBackup()
+// }
+// }

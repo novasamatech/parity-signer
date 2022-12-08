@@ -1,6 +1,6 @@
 # Upgrading Signer
 
-First of all, you need to be certain you want to upgrade Signer. Starting from v5, all network information could be downloaded through QR codes and upgrades are needed only to add new software features.
+First of all, you need to be certain you want to upgrade Signer. Starting from `v5`, all network information could be downloaded through QR codes and upgrades are needed only to add new software features.
 
 ## Preparation to upgrade
 
@@ -20,7 +20,7 @@ When the Signer is removed, wipe the phone to factory state. This is good time t
 
 ### Set up phone
 
-Before installing the Signer, you need to set up the phone. It is essential that you enable sufficient authentication method; your secret seeds in Signer are as safe as the phone is. Seed secrets are protected with hardware encryption based on vendor authentification protocol. Other than that, you might want to select dark mode (Signer remains dark for historic reasons)
+Before installing the Signer, you need to set up the phone. It is essential that you enable sufficient authentication method; your secret seeds in Signer are as safe as the phone is. Seed secrets are protected with hardware encryption based on vendor authentication protocol. Other than that, you might want to select dark mode (Signer remains dark for historic reasons)
 
 ### Install Signer
 

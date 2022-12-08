@@ -1,127 +1,135 @@
 //! Helpers
+use db_handling::identities::{
+    AddrInfo, ExportAddrs, ExportAddrsV1, SeedInfo, TransactionBulk, TransactionBulkV1,
+};
 use parity_scale_codec::Encode;
+use qrcode_rtx::transform_into_qr_apng;
 use serde_json::{map::Map, value::Value};
 use sled::Batch;
 use sp_core::H256;
+use std::path::Path;
 use std::{cmp::Ordering, convert::TryInto};
 
-use constants::{
-    add_specs, load_metadata, ADDRESS_BOOK, COLOR, EXPORT_FOLDER, HOT_DB_NAME, METATREE,
-    META_HISTORY, SECONDARY_COLOR, SPECSTREEPREP,
-};
+use constants::{ADDRESS_BOOK, COLOR, METATREE, META_HISTORY, SECONDARY_COLOR, SPECSTREEPREP};
 use db_handling::{
     db_transactions::TrDbHot,
     helpers::{make_batch_clear_tree, open_db, open_tree},
 };
 use definitions::{
     crypto::Encryption,
-    error::ErrorSource,
-    error_active::{
-        Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActiveStr,
-        InputActive, MismatchActive, NotFoundActive, NotHexActive, SpecsError,
-    },
     helpers::unhex,
     keyring::{AddressBookKey, MetaKey, NetworkSpecsKey},
     metadata::{AddressBookEntry, MetaHistoryEntry, MetaValues},
-    network_specs::NetworkSpecsToSend,
+    network_specs::NetworkSpecs,
     qr_transfers::{ContentAddSpecs, ContentLoadMeta},
 };
 
+use crate::error::{Changed, Error, NotHexActive, Result, SpecsError};
 use crate::fetch_metadata::{fetch_info, fetch_info_with_network_specs, fetch_meta_at_block};
 use crate::interpret_specs::{check_specs, interpret_properties, TokenFetch};
-use crate::parser::Token;
+use crate::parser::{Goal, Token};
 
 /// Get [`AddressBookEntry`] from the database for given address book title.
-pub fn get_address_book_entry(title: &str) -> Result<AddressBookEntry, ErrorActive> {
-    let database = open_db::<Active>(HOT_DB_NAME)?;
-    let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
-    match address_book.get(AddressBookKey::from_title(title).key()) {
-        Ok(Some(a)) => AddressBookEntry::from_entry_with_title(title, &a),
-        Ok(None) => Err(ErrorActive::NotFound(NotFoundActive::AddressBookEntry {
-            title: title.to_string(),
-        })),
-        Err(e) => Err(<Active>::db_internal(e)),
+pub fn get_address_book_entry<P>(title: &str, db_path: P) -> Result<AddressBookEntry>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
+    let address_book = open_tree(&database, ADDRESS_BOOK)?;
+    match address_book.get(AddressBookKey::from_title(title).key())? {
+        Some(a) => Ok(AddressBookEntry::from_entry_with_title(title, &a)?),
+        None => Err(Error::NotFound(title.to_string())),
     }
 }
 
-/// Get [`NetworkSpecsToSend`] from the database for given address book title.
-pub fn network_specs_from_title(title: &str) -> Result<NetworkSpecsToSend, ErrorActive> {
-    network_specs_from_entry(&get_address_book_entry(title)?)
+/// Get [`NetworkSpecs`] from the database for given address book title.
+pub fn network_specs_from_title<P>(title: &str, db_path: P) -> Result<NetworkSpecs>
+where
+    P: AsRef<Path>,
+{
+    network_specs_from_entry(&get_address_book_entry(title, &db_path)?, &db_path)
 }
 
-/// Get [`NetworkSpecsToSend`] corresponding to the given [`AddressBookEntry`].
+/// Get [`NetworkSpecs`] corresponding to the given [`AddressBookEntry`].
 ///
 /// Entries in [`ADDRESS_BOOK`] and [`SPECSTREEPREP`] trees for any network can
 /// be added and removed only simultaneously.
 // TODO consider combining those, key would be address book title, network specs
 // key will stay only in cold database then?
-pub fn network_specs_from_entry(
+pub fn network_specs_from_entry<P>(
     address_book_entry: &AddressBookEntry,
-) -> Result<NetworkSpecsToSend, ErrorActive> {
+    db_path: P,
+) -> Result<NetworkSpecs>
+where
+    P: AsRef<Path>,
+{
     let network_specs_key = NetworkSpecsKey::from_parts(
         &address_book_entry.genesis_hash,
         &address_book_entry.encryption,
     );
-    let network_specs = get_network_specs_to_send(&network_specs_key)?;
+    let network_specs = get_network_specs_to_send(&network_specs_key, db_path)?;
     if network_specs.name != address_book_entry.name {
-        return Err(ErrorActive::Database(DatabaseActive::Mismatch(
-            MismatchActive::AddressBookSpecsName {
-                address_book_name: address_book_entry.name.to_string(),
-                specs_name: network_specs.name,
-            },
-        )));
+        return Err(Error::AddressBookSpecsName {
+            address_book_name: address_book_entry.name.to_string(),
+            specs_name: network_specs.name,
+        });
     }
     Ok(network_specs)
 }
 
-/// Try to get network specs [`NetworkSpecsToSend`] from the hot database.
+/// Try to get network specs [`NetworkSpecs`] from the hot database.
 ///
-/// If the [`NetworkSpecsKey`] and associated [`NetworkSpecsToSend`] are not
+/// If the [`NetworkSpecsKey`] and associated [`NetworkSpecs`] are not
 /// found in the [`SPECSTREEPREP`], the result is `Ok(None)`.
-pub fn try_get_network_specs_to_send(
+pub fn try_get_network_specs_to_send<P>(
     network_specs_key: &NetworkSpecsKey,
-) -> Result<Option<NetworkSpecsToSend>, ErrorActive> {
-    let database = open_db::<Active>(HOT_DB_NAME)?;
-    let chainspecs = open_tree::<Active>(&database, SPECSTREEPREP)?;
-    match chainspecs.get(network_specs_key.key()) {
-        Ok(Some(specs_encoded)) => Ok(Some(NetworkSpecsToSend::from_entry_with_key_checked(
+    db_path: P,
+) -> Result<Option<NetworkSpecs>>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
+    let chainspecs = open_tree(&database, SPECSTREEPREP)?;
+    match chainspecs.get(network_specs_key.key())? {
+        Some(specs_encoded) => Ok(Some(NetworkSpecs::from_entry_with_key_checked(
             network_specs_key,
             specs_encoded,
         )?)),
-        Ok(None) => Ok(None),
-        Err(e) => Err(<Active>::db_internal(e)),
+        None => Ok(None),
     }
 }
 
-/// Get network specs [`NetworkSpecsToSend`] from the hot database.
+/// Get network specs [`NetworkSpecs`] from the hot database.
 ///
 /// Network specs here are expected to be found, not finding them results in an
 /// error.
-pub fn get_network_specs_to_send(
+pub fn get_network_specs_to_send<P>(
     network_specs_key: &NetworkSpecsKey,
-) -> Result<NetworkSpecsToSend, ErrorActive> {
-    match try_get_network_specs_to_send(network_specs_key)? {
+    db_path: P,
+) -> Result<NetworkSpecs>
+where
+    P: AsRef<Path>,
+{
+    match try_get_network_specs_to_send(network_specs_key, db_path)? {
         Some(a) => Ok(a),
-        None => Err(ErrorActive::NotFound(NotFoundActive::NetworkSpecsToSend(
-            network_specs_key.to_owned(),
-        ))),
+        None => Err(Error::NetworkSpecs(network_specs_key.to_owned())),
     }
 }
 
-/// Update the database after `add_specs` run.
+/// Update the database after `add-specs` run.
 ///
-/// Inputs `&str` url address that was used for rpc calls and already completed
-/// [`NetworkSpecsToSend`].
+/// Inputs `&str` URL address that was used for RPC calls and already completed
+/// [`NetworkSpecs`].
 ///
 /// Adds simultaneously [`AddressBookEntry`] to [`ADDRESS_BOOK`] and
-/// [`NetworkSpecsToSend`] to [`SPECSTREEPREP`].
+/// [`NetworkSpecs`] to [`SPECSTREEPREP`].
 ///
 /// Key for [`AddressBookEntry`] is the network address book title. It always
-/// has format <network_name>-<network_encryption>.
-pub fn db_upd_network(
-    address: &str,
-    network_specs: &NetworkSpecsToSend,
-) -> Result<(), ErrorActive> {
+/// has format `<network_name>-<network_encryption>`.
+pub fn db_upd_network<P>(address: &str, network_specs: &NetworkSpecs, db_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let mut network_specs_prep_batch = Batch::default();
     network_specs_prep_batch.insert(
         NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption).key(),
@@ -136,7 +144,7 @@ pub fn db_upd_network(
         name: network_specs.name.to_string(),
         genesis_hash: network_specs.genesis_hash,
         address: address.to_string(),
-        encryption: network_specs.encryption.clone(),
+        encryption: network_specs.encryption,
         def: false,
     }
     .encode();
@@ -145,11 +153,12 @@ pub fn db_upd_network(
     TrDbHot::new()
         .set_address_book(address_book_batch)
         .set_network_specs_prep(network_specs_prep_batch)
-        .apply(HOT_DB_NAME)
+        .apply(db_path)?;
+    Ok(())
 }
 
 /// Process error depending on pass errors flag `-s`.
-pub fn error_occured(e: ErrorActive, pass_errors: bool) -> Result<(), ErrorActive> {
+pub fn error_occured(e: Error, pass_errors: bool) -> Result<()> {
     if pass_errors {
         println!("Error encountered. {} Skipping it.", e);
         Ok(())
@@ -158,7 +167,7 @@ pub fn error_occured(e: ErrorActive, pass_errors: bool) -> Result<(), ErrorActiv
     }
 }
 
-/// Content to print during `load_metadata <-k/-p/-t>` processing.
+/// Content to print during `load-metadata<-k/-p/-t>` processing.
 pub enum Write {
     /// all payloads, `-t` key or no setting key was used
     All,
@@ -166,14 +175,17 @@ pub enum Write {
     /// only new payloads, `-k` setting key was used
     OnlyNew,
 
-    /// no payloads, `-p` setting key was used    
+    /// no payloads, `-p` setting key was used
     None,
 }
 
 /// Get all [`ADDRESS_BOOK`] entries with address book titles.
-pub fn address_book_content() -> Result<Vec<(String, AddressBookEntry)>, ErrorActive> {
-    let database = open_db::<Active>(HOT_DB_NAME)?;
-    let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
+pub fn address_book_content<P>(db_path: P) -> Result<Vec<(String, AddressBookEntry)>>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
+    let address_book = open_tree(&database, ADDRESS_BOOK)?;
     let mut out: Vec<(String, AddressBookEntry)> = Vec::new();
     for x in address_book.iter().flatten() {
         out.push(AddressBookEntry::process_entry(x)?)
@@ -181,23 +193,27 @@ pub fn address_book_content() -> Result<Vec<(String, AddressBookEntry)>, ErrorAc
     Ok(out)
 }
 
-/// Get all [`ADDRESS_BOOK`] entries with address book titles, for given url
+/// Get all [`ADDRESS_BOOK`] entries with address book titles, for given URL
 /// address.
-pub fn filter_address_book_by_url(
+pub fn filter_address_book_by_url<P>(
     address: &str,
-) -> Result<Vec<(String, AddressBookEntry)>, ErrorActive> {
+    db_path: P,
+) -> Result<Vec<(String, AddressBookEntry)>>
+where
+    P: AsRef<Path>,
+{
     let mut out: Vec<(String, AddressBookEntry)> = Vec::new();
     let mut found_name = None;
-    for (title, address_book_entry) in address_book_content()?.into_iter() {
+    for (title, address_book_entry) in address_book_content(db_path)?.into_iter() {
         if address_book_entry.address == address {
             found_name = match found_name {
                 Some(name) => {
                     if name == address_book_entry.name {
                         Some(name)
                     } else {
-                        return Err(ErrorActive::Database(DatabaseActive::TwoNamesForUrl {
+                        return Err(Error::TwoNamesForUrl {
                             url: address.to_string(),
-                        }));
+                        });
                     }
                 }
                 None => Some(address_book_entry.name.to_string()),
@@ -209,9 +225,12 @@ pub fn filter_address_book_by_url(
 }
 
 /// Search for any [`ADDRESS_BOOK`] entry with given genesis hash.
-pub fn genesis_hash_in_hot_db(genesis_hash: H256) -> Result<Option<AddressBookEntry>, ErrorActive> {
+pub fn genesis_hash_in_hot_db<P>(genesis_hash: H256, db_path: P) -> Result<Option<AddressBookEntry>>
+where
+    P: AsRef<Path>,
+{
     let mut out = None;
-    for (_, address_book_entry) in address_book_content()?.into_iter() {
+    for (_, address_book_entry) in address_book_content(db_path)?.into_iter() {
         if address_book_entry.genesis_hash == genesis_hash {
             out = Some(address_book_entry);
             break;
@@ -222,9 +241,12 @@ pub fn genesis_hash_in_hot_db(genesis_hash: H256) -> Result<Option<AddressBookEn
 
 /// Check if [`ADDRESS_BOOK`] has entries with given `name` and title other than
 /// `except_title`.
-pub fn is_specname_in_db(name: &str, except_title: &str) -> Result<bool, ErrorActive> {
-    let database = open_db::<Active>(HOT_DB_NAME)?;
-    let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
+pub fn is_specname_in_db<P>(name: &str, except_title: &str, db_path: P) -> Result<bool>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
+    let address_book = open_tree(&database, ADDRESS_BOOK)?;
     let mut out = false;
     for x in address_book.iter().flatten() {
         let (title, address_book_entry) = <AddressBookEntry>::process_entry(x)?;
@@ -237,9 +259,12 @@ pub fn is_specname_in_db(name: &str, except_title: &str) -> Result<bool, ErrorAc
 }
 
 /// Get all entries from `META_HISTORY`.
-pub fn meta_history_content() -> Result<Vec<MetaHistoryEntry>, ErrorActive> {
-    let database = open_db::<Active>(HOT_DB_NAME)?;
-    let meta_history = open_tree::<Active>(&database, META_HISTORY)?;
+pub fn meta_history_content<P>(db_path: P) -> Result<Vec<MetaHistoryEntry>>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
+    let meta_history = open_tree(&database, META_HISTORY)?;
     let mut out: Vec<MetaHistoryEntry> = Vec::new();
     for x in meta_history.iter().flatten() {
         out.push(MetaHistoryEntry::from_entry(x)?)
@@ -258,18 +283,18 @@ pub struct MetaValuesStamped {
 }
 
 /// Collect all [`MetaValuesStamped`] from the hot database.
-pub fn read_metadata_database() -> Result<Vec<MetaValuesStamped>, ErrorActive> {
-    let database = open_db::<Active>(HOT_DB_NAME)?;
-    let metadata = open_tree::<Active>(&database, METATREE)?;
-    let meta_history = open_tree::<Active>(&database, META_HISTORY)?;
+pub fn read_metadata_database<P>(db_path: P) -> Result<Vec<MetaValuesStamped>>
+where
+    P: AsRef<Path>,
+{
+    let database = open_db(db_path)?;
+    let metadata = open_tree(&database, METATREE)?;
+    let meta_history = open_tree(&database, META_HISTORY)?;
     let mut out: Vec<MetaValuesStamped> = Vec::new();
     for x in metadata.iter().flatten() {
-        let meta_values = MetaValues::from_entry_checked::<Active>(x)?;
+        let meta_values = MetaValues::from_entry_checked(x)?;
         let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
-        let at_block_hash = match meta_history
-            .get(meta_key.key())
-            .map_err(<Active>::db_internal)?
-        {
+        let at_block_hash = match meta_history.get(meta_key.key())? {
             Some(meta_history_entry_encoded) => Some(
                 MetaHistoryEntry::from_entry_with_key_parts(
                     &meta_values.name,
@@ -304,7 +329,7 @@ pub struct SortedMetaValues {
 ///
 /// Database contains maximum two metadata entries for each network name, both
 /// newer and older sets can contain at most one metadata [`MetaValuesStamped`].
-fn sort_metavalues(meta_values: Vec<MetaValuesStamped>) -> Result<SortedMetaValues, ErrorActive> {
+fn sort_metavalues(meta_values: Vec<MetaValuesStamped>) -> Result<SortedMetaValues> {
     // newer metadata set, i.e. with higher version for given network
     let mut newer: Vec<MetaValuesStamped> = Vec::new();
 
@@ -329,11 +354,9 @@ fn sort_metavalues(meta_values: Vec<MetaValuesStamped>) -> Result<SortedMetaValu
                 // `older` set; should not find any;
                 for z in older.iter() {
                     if x.meta_values.name == z.meta_values.name {
-                        return Err(ErrorActive::Database(
-                            DatabaseActive::HotDatabaseMetadataOverTwoEntries {
-                                name: x.meta_values.name.to_string(),
-                            },
-                        ));
+                        return Err(Error::HotDatabaseMetadataOverTwoEntries {
+                            name: x.meta_values.name.to_string(),
+                        });
                     }
                 }
 
@@ -346,12 +369,10 @@ fn sort_metavalues(meta_values: Vec<MetaValuesStamped>) -> Result<SortedMetaValu
 
                     // same version?!
                     Ordering::Equal => {
-                        return Err(ErrorActive::Database(
-                            DatabaseActive::HotDatabaseMetadataSameVersionTwice {
-                                name: x.meta_values.name.to_string(),
-                                version: x.meta_values.version,
-                            },
-                        ))
+                        return Err(Error::HotDatabaseMetadataSameVersionTwice {
+                            name: x.meta_values.name.to_string(),
+                            version: x.meta_values.version,
+                        })
                     }
 
                     // `x` entry goes to `newer` and replaces `y` entry, `y`
@@ -391,10 +412,7 @@ fn sort_metavalues(meta_values: Vec<MetaValuesStamped>) -> Result<SortedMetaValu
 ///
 /// If there was no block hash in hot database and the metadata did not change,
 /// a new block hash could be added if it is known.
-pub fn add_new_metadata(
-    new: &MetaValuesStamped,
-    sorted: &mut SortedMetaValues,
-) -> Result<bool, ErrorActive> {
+pub fn add_new_metadata(new: &MetaValuesStamped, sorted: &mut SortedMetaValues) -> Result<bool> {
     // action to perform after sorting on found entry
     enum Found {
         DoNothing,
@@ -413,7 +431,7 @@ pub fn add_new_metadata(
     for (i, x) in sorted.newer.iter().enumerate() {
         if new.meta_values.name == x.meta_values.name {
             similar_entries = match new.meta_values.version.cmp(&x.meta_values.version) {
-                // earlier metadata should not be fetched through rpc call;
+                // earlier metadata should not be fetched through RPC call;
                 //
                 // version downgrades happened, but these should always be
                 // double checked before being accepted;
@@ -421,11 +439,11 @@ pub fn add_new_metadata(
                 // earlier metadata could be retrieved from an outdated `.wasm`
                 // file - no reason to accept it either;
                 Ordering::Less => {
-                    return Err(ErrorActive::Fetch(Fetch::EarlierVersion {
+                    return Err(Error::EarlierVersion {
                         name: x.meta_values.name.to_string(),
                         old_version: x.meta_values.version,
                         new_version: new.meta_values.version,
-                    }))
+                    })
                 }
 
                 // same version, no updates;
@@ -449,12 +467,12 @@ pub fn add_new_metadata(
                         }
                         println!("new: {:?}, in db: {:?}", sus1, sus2);
 
-                        return Err(ErrorActive::Fetch(Fetch::SameVersionDifferentMetadata {
+                        return Err(Error::SameVersionDifferentMetadata {
                             name: new.meta_values.name.to_string(),
                             version: new.meta_values.version,
                             block_hash_in_db: x.at_block_hash,
                             block_hash_in_fetch: new.at_block_hash,
-                        }));
+                        });
                     }
                     match x.at_block_hash {
                         Some(_) => Some(Found::DoNothing),
@@ -510,19 +528,25 @@ pub fn add_new_metadata(
 }
 
 /// Collect and sort [`MetaValuesStamped`] from the hot database
-pub fn prepare_metadata() -> Result<SortedMetaValues, ErrorActive> {
-    let known_metavalues = read_metadata_database()?;
+pub fn prepare_metadata<P>(db_path: P) -> Result<SortedMetaValues>
+where
+    P: AsRef<Path>,
+{
+    let known_metavalues = read_metadata_database(db_path)?;
     sort_metavalues(known_metavalues)
 }
 
-/// Update the database after `load_metadata` run.
+/// Update the database after `load-metadata` run.
 ///
 /// Clear [`METATREE`] tree of the hot database and write new metadata set in
 /// it.
 ///
 /// Update [`META_HISTORY`] tree.
-pub fn db_upd_metadata(sorted_meta_values: SortedMetaValues) -> Result<(), ErrorActive> {
-    let mut metadata_batch = make_batch_clear_tree::<Active>(HOT_DB_NAME, METATREE)?;
+pub fn db_upd_metadata<P>(sorted_meta_values: SortedMetaValues, db_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let mut metadata_batch = make_batch_clear_tree(&db_path, METATREE)?;
     let mut meta_history_batch = Batch::default();
     let mut all_meta = sorted_meta_values.newer;
     all_meta.extend_from_slice(&sorted_meta_values.older);
@@ -536,7 +560,9 @@ pub fn db_upd_metadata(sorted_meta_values: SortedMetaValues) -> Result<(), Error
     TrDbHot::new()
         .set_metadata(metadata_batch)
         .set_meta_history(meta_history_batch)
-        .apply(HOT_DB_NAME)
+        .apply(&db_path)?;
+
+    Ok(())
 }
 
 /// Data needed to output `load_metadata` update payload file.
@@ -568,15 +594,10 @@ impl MetaFetched {
     }
 }
 
-/// Get network information through rpc calls at `address` and interpret it into
+/// Get network information through RPC calls at `address` and interpret it into
 /// [`MetaFetched`].
-pub fn meta_fetch(address: &str) -> Result<MetaFetched, ErrorActive> {
-    let new_info = fetch_info(address).map_err(|e| {
-        ErrorActive::Fetch(Fetch::Failed {
-            url: address.to_string(),
-            error: e.to_string(),
-        })
-    })?;
+pub fn meta_fetch(address: &str) -> Result<MetaFetched> {
+    let new_info = fetch_info(address)?;
 
     let genesis_hash = get_hash(
         &new_info.genesis_hash,
@@ -590,13 +611,7 @@ pub fn meta_fetch(address: &str) -> Result<MetaFetched, ErrorActive> {
             url: address.to_string(),
         },
     )?;
-    let meta_values = MetaValues::from_str_metadata(
-        &new_info.meta,
-        IncomingMetadataSourceActiveStr::Fetch {
-            url: address.to_string(),
-            optional_block: None,
-        },
-    )?;
+    let meta_values = MetaValues::from_str_metadata(&new_info.meta)?;
     Ok(MetaFetched {
         meta_values,
         block_hash,
@@ -604,7 +619,7 @@ pub fn meta_fetch(address: &str) -> Result<MetaFetched, ErrorActive> {
     })
 }
 
-/// Get network metadata file from given url address at specified block.
+/// Get network metadata file from given URL address at specified block.
 ///
 /// For investigating silent metadata update cases.
 ///
@@ -612,40 +627,110 @@ pub fn meta_fetch(address: &str) -> Result<MetaFetched, ErrorActive> {
 ///
 /// Fetched network metadata, processes it, and outputs file
 /// `<network_name><metadata_version>_<block_hash>` with hexadecimal
-/// metadata in [`EXPORT_FOLDER`].
+/// metadata in [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
 ///
 /// Command line to get metadata at block:
 ///
 /// `meta_at_block -u <network_url_address> -block <block_hash>`
-pub fn debug_meta_at_block(address: &str, hex_block_hash: &str) -> Result<(), ErrorActive> {
+pub fn debug_meta_at_block<P>(address: &str, hex_block_hash: &str, export_dir: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let block_hash = get_hash(hex_block_hash, Hash::BlockEntered)?;
-    let meta_fetched = fetch_meta_at_block(address, block_hash).map_err(|e| {
-        ErrorActive::Fetch(Fetch::Failed {
-            url: address.to_string(),
-            error: e.to_string(),
-        })
-    })?;
-    let meta_values = MetaValues::from_str_metadata(
-        &meta_fetched,
-        IncomingMetadataSourceActiveStr::Fetch {
-            url: address.to_string(),
-            optional_block: Some(block_hash),
-        },
-    )?;
+    let meta_fetched = fetch_meta_at_block(address, block_hash)?;
+    let meta_values = MetaValues::from_str_metadata(&meta_fetched)?;
     let filename = format!(
-        "{}/{}{}_{}",
-        EXPORT_FOLDER,
+        "{}{}_{}",
         meta_values.name,
         meta_values.version,
         hex::encode(block_hash)
     );
-    match std::fs::write(&filename, hex::encode(meta_values.meta)) {
-        Ok(_) => Ok(()),
-        Err(e) => Err(ErrorActive::Output(e)),
-    }
+    let f_path = export_dir.as_ref().join(filename);
+    std::fs::write(f_path, hex::encode(meta_values.meta))?;
+
+    Ok(())
 }
 
-/// Fetch data and assemble [`NetworkSpecsToSend`] with only url address and
+pub fn generate_key_info_export_to_qr<P: AsRef<Path>>(
+    output_name: P,
+    chunk_size: u16,
+    fps: u16,
+    keys_num: usize,
+) -> Result<()> {
+    use sp_keyring::sr25519::Keyring;
+    use sp_runtime::MultiSigner;
+
+    let multisigner = Some(MultiSigner::from(Keyring::Alice.public()));
+    let name = "a very long key name a very long key name".to_owned();
+
+    let derived_keys: Vec<AddrInfo> = (0..keys_num)
+        .into_iter()
+        .map(|num| AddrInfo {
+            address: "0xdeadbeefdeadbeefdeadbeef".to_string(),
+            derivation_path: Some(format!("//this//is//a//path//{}", num)),
+            encryption: Encryption::Sr25519,
+            genesis_hash: H256::default(),
+        })
+        .collect();
+
+    let seed_info = SeedInfo {
+        name,
+        multisigner,
+        derived_keys,
+    };
+    let export_addrs_v1 = ExportAddrsV1 {
+        addrs: vec![seed_info],
+    };
+    let export_addrs = ExportAddrs::V1(export_addrs_v1);
+
+    let export_addrs_encoded = [&[0x53, 0xff, 0xde], export_addrs.encode().as_slice()].concat();
+
+    generate_qr_code(&export_addrs_encoded, chunk_size, fps, output_name)
+}
+
+/// Generate Bulk Transaction Signing payload for testing
+pub fn generate_bulk_transaction_qr<P: AsRef<Path>>(
+    dst_file: P,
+    tx_count: usize,
+    chunk_size: u16,
+    from: String,
+    output_format: Goal,
+) -> Result<()> {
+    let encoded_transactions = (0..tx_count).map(|_| {
+
+let line = "0102".to_string() + 
+    &from +
+"a80403004adb5312dbd3a1bc28610deb1fb631110bbcccb6e7fb97e18501509d5565ea760b00a014e3322615010000682400000e000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e2faa9938ec10c2627d0fd5d20214aba3bf281e94a6a8f50d19b4e0ce3b253d65e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+        hex::decode(line).unwrap()
+    })
+    .collect();
+    let v1_bulk = TransactionBulkV1 {
+        encoded_transactions,
+    };
+    let bulk = TransactionBulk::V1(v1_bulk);
+
+    let payload = [&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat();
+
+    match output_format {
+        Goal::Qr => generate_qr_code(&payload, chunk_size, 8, dst_file)?,
+        Goal::Text => std::fs::write(dst_file, hex::encode(payload))?,
+        Goal::Both => todo!(),
+    };
+
+    Ok(())
+}
+
+/// Generate with data into a specified file.
+pub fn generate_qr_code<P: AsRef<Path>>(
+    input: &[u8],
+    chunk_size: u16,
+    fps: u16,
+    output_name: P,
+) -> Result<()> {
+    transform_into_qr_apng(input, chunk_size, fps, output_name).map_err(Error::Qr)
+}
+
+/// Fetch data and assemble [`NetworkSpecs`] with only URL address and
 /// user-entered data.
 ///
 /// Database is not addressed. For `-d` content key.
@@ -654,7 +739,7 @@ pub fn specs_agnostic(
     encryption: Encryption,
     optional_token_override: Option<Token>,
     optional_signer_title_override: Option<String>,
-) -> Result<NetworkSpecsToSend, ErrorActive> {
+) -> Result<NetworkSpecs> {
     let fetch = common_specs_fetch(address)?;
 
     // `NetworkProperties` checked and processed
@@ -662,13 +747,7 @@ pub fn specs_agnostic(
         &fetch.properties,
         fetch.meta_values.optional_base58prefix,
         optional_token_override,
-    )
-    .map_err(|error| {
-        ErrorActive::Fetch(Fetch::FaultySpecs {
-            url: address.to_string(),
-            error,
-        })
-    })?;
+    )?;
 
     let title = optional_signer_title_override.unwrap_or(format!(
         "{}-{}",
@@ -676,9 +755,9 @@ pub fn specs_agnostic(
         encryption.show()
     ));
 
-    // `NetworkSpecsToSend` is constructed with fetched and user-entered values
+    // `NetworkSpecs` is constructed with fetched and user-entered values
     // and with default colors.
-    Ok(NetworkSpecsToSend {
+    Ok(NetworkSpecs {
         base58prefix: new_properties.base58prefix,
         color: COLOR.to_string(),
         decimals: new_properties.decimals,
@@ -693,7 +772,7 @@ pub fn specs_agnostic(
     })
 }
 
-/// Update [`NetworkSpecsToSend`] already existing in the database with
+/// Update [`NetworkSpecs`] already existing in the database with
 /// **exactly same** encryption.
 ///
 /// Could be used to overwrite token (if possible for the network) or the Signer
@@ -703,10 +782,10 @@ pub fn specs_agnostic(
 /// should be updated.
 pub fn update_known_specs(
     address: &str,
-    specs: &mut NetworkSpecsToSend,
+    specs: &mut NetworkSpecs,
     optional_signer_title_override: Option<String>,
     optional_token_override: Option<Token>,
-) -> Result<bool, ErrorActive> {
+) -> Result<bool> {
     let mut update_done = known_specs_processing(address, specs, optional_token_override)?;
 
     if let Some(title) = optional_signer_title_override {
@@ -718,27 +797,27 @@ pub fn update_known_specs(
     Ok(update_done)
 }
 
-/// Modify [`NetworkSpecsToSend`] existing in the database **only** with
+/// Modify [`NetworkSpecs`] existing in the database **only** with
 /// different encryption.
 ///
 /// New data always will be added to the database unless errors occur.
 ///
 /// Function inputs:
 ///
-/// - `&str` address to make rpc calls
-/// - `NetworkSpecsToSend` as they were found in the database, to be modified
+/// - `&str` address to make RPC calls
+/// - `NetworkSpecs` as they were found in the database, to be modified
 /// here
 /// - new `Encryption` to apply to `encryption` and `title` (if no title
-/// override was entered) fields of the `NetworkSpecsToSend`
+/// override was entered) fields of the `NetworkSpecs`
 /// - optional title override
 /// - optional token override
 pub fn update_modify_encryption_specs(
     address: &str,
-    specs: &mut NetworkSpecsToSend,
+    specs: &mut NetworkSpecs,
     encryption: &Encryption,
     optional_signer_title_override: Option<String>,
     optional_token_override: Option<Token>,
-) -> Result<(), ErrorActive> {
+) -> Result<()> {
     known_specs_processing(address, specs, optional_token_override)?;
 
     specs.title =
@@ -763,14 +842,9 @@ struct CommonSpecsFetch {
 ///
 /// Processing of propertoes depends on what is done to the fetch results and
 /// the contents of the database.
-fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch, ErrorActive> {
+fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch> {
     // actual fetch
-    let new_info = fetch_info_with_network_specs(address).map_err(|e| {
-        ErrorActive::Fetch(Fetch::Failed {
-            url: address.to_string(),
-            error: e.to_string(),
-        })
-    })?;
+    let new_info = fetch_info_with_network_specs(address)?;
 
     // genesis hash in proper format
     let genesis_hash = get_hash(
@@ -782,13 +856,7 @@ fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch, ErrorActive> {
 
     // `MetaValues` are needed to get network name and (optionally) base58
     // prefix
-    let meta_values = MetaValues::from_str_metadata(
-        &new_info.meta,
-        IncomingMetadataSourceActiveStr::Fetch {
-            url: address.to_string(),
-            optional_block: None,
-        },
-    )?;
+    let meta_values = MetaValues::from_str_metadata(&new_info.meta)?;
 
     Ok(CommonSpecsFetch {
         genesis_hash,
@@ -797,17 +865,17 @@ fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch, ErrorActive> {
     })
 }
 
-/// Check known [`NetworkSpecsToSend`] with network data fetched and apply token
+/// Check known [`NetworkSpecs`] with network data fetched and apply token
 /// override.
 ///
-/// This is a helper function for `add_specs` runs with `-n` reference key, i.e.
+/// This is a helper function for `add-specs` runs with `-n` reference key, i.e.
 /// for cases when *some* network specs entry already exists in the database.
 ///
-/// Input [`NetworkSpecsToSend`] is the entry from the database to which the
+/// Input [`NetworkSpecs`] is the entry from the database to which the
 /// encryption and title overrides could be applied.
 ///
-/// Function inputs `address` at which rpc calls are made, network specs
-/// `NetworkSpecsToSend` from the database, and user-entered optional override
+/// Function inputs `address` at which RPC calls are made, network specs
+/// `NetworkSpecs` from the database, and user-entered optional override
 /// for `Token`.
 ///
 /// Output is flag indicating if the network specs have been changed. This flag
@@ -815,55 +883,48 @@ fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch, ErrorActive> {
 /// function.
 fn known_specs_processing(
     address: &str,
-    specs: &mut NetworkSpecsToSend,
+    specs: &mut NetworkSpecs,
     optional_token_override: Option<Token>,
-) -> Result<bool, ErrorActive> {
+) -> Result<bool> {
     let mut update_done = false;
     let url = address.to_string();
 
     let fetch = common_specs_fetch(address)?;
 
     let (base58prefix, token_fetch) =
-        check_specs(&fetch.properties, fetch.meta_values.optional_base58prefix).map_err(
-            |error| {
-                ErrorActive::Fetch(Fetch::FaultySpecs {
-                    url: address.to_string(),
-                    error,
-                })
-            },
-        )?;
+        check_specs(&fetch.properties, fetch.meta_values.optional_base58prefix)?;
 
     // check that base58 prefix did not change
     if specs.base58prefix != base58prefix {
-        return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+        return Err(Error::ValuesChanged {
             url,
             what: Changed::Base58Prefix {
                 old: specs.base58prefix,
                 new: base58prefix,
             },
-        }));
+        });
     }
 
     // check that genesis hash did not change
     if specs.genesis_hash != fetch.genesis_hash {
-        return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+        return Err(Error::ValuesChanged {
             url,
             what: Changed::GenesisHash {
                 old: specs.genesis_hash,
                 new: fetch.genesis_hash,
             },
-        }));
+        });
     }
 
     // check that name did not change
     if specs.name != fetch.meta_values.name {
-        return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+        return Err(Error::ValuesChanged {
             url,
             what: Changed::Name {
                 old: specs.name.to_string(),
                 new: fetch.meta_values.name,
             },
-        }));
+        });
     }
 
     // check that token did not change or could be overridden
@@ -872,32 +933,32 @@ fn known_specs_processing(
         TokenFetch::Single(token) => {
             // check that decimals value did not change
             if specs.decimals != token.decimals {
-                return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+                return Err(Error::ValuesChanged {
                     url,
                     what: Changed::Decimals {
                         old: specs.decimals,
                         new: token.decimals,
                     },
-                }));
+                });
             }
 
             // check that unit did not change
             if specs.unit != token.unit {
-                return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+                return Err(Error::ValuesChanged {
                     url,
                     what: Changed::Unit {
                         old: specs.unit.to_string(),
                         new: token.unit,
                     },
-                }));
+                });
             }
 
             // override is not allowed
             if optional_token_override.is_some() {
-                return Err(ErrorActive::Fetch(Fetch::FaultySpecs {
+                return Err(Error::FaultySpecs {
                     url,
                     error: SpecsError::OverrideIgnoredSingle,
-                }));
+                });
             }
         }
         TokenFetch::Array { .. } => {
@@ -917,30 +978,30 @@ fn known_specs_processing(
             // only decimals `0` possible, check that decimals value did not
             // change
             if specs.decimals != 0 {
-                return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+                return Err(Error::ValuesChanged {
                     url,
                     what: Changed::DecimalsBecameNone {
                         old: specs.decimals,
                     },
-                }));
+                });
             }
 
             // only unit `UNIT` possible, check that unit did not change
             if specs.unit != "UNIT" {
-                return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+                return Err(Error::ValuesChanged {
                     url,
                     what: Changed::UnitBecameNone {
                         old: specs.unit.to_string(),
                     },
-                }));
+                });
             }
 
             // override is not allowed
             if optional_token_override.is_some() {
-                return Err(ErrorActive::Fetch(Fetch::FaultySpecs {
+                return Err(Error::FaultySpecs {
                     url,
                     error: SpecsError::OverrideIgnoredNone,
-                }));
+                });
             }
         }
     }
@@ -959,36 +1020,30 @@ enum Hash {
 ///
 /// Inputs hexadecimal `input_hash` and hash type/source `Hash` (used to
 /// produce error in case the `input_hash` format is incorrect).
-fn get_hash(input_hash: &str, what: Hash) -> Result<H256, ErrorActive> {
-    let not_hex = match what {
-        Hash::BlockEntered => NotHexActive::EnteredBlockHash,
-        Hash::BlockFetched { ref url } => NotHexActive::FetchedBlockHash {
+fn get_hash(input_hash: &str, what: Hash) -> Result<H256> {
+    let _not_hex = match what {
+        Hash::BlockEntered => NotHexActive::EnteredBlock,
+        Hash::BlockFetched { ref url } => NotHexActive::FetchedBlock {
             url: url.to_string(),
         },
-        Hash::Genesis { ref url } => NotHexActive::FetchedGenesisHash {
+        Hash::Genesis { ref url } => NotHexActive::FetchedGenesis {
             url: url.to_string(),
         },
     };
-    let hash_vec = unhex::<Active>(input_hash, not_hex)?;
+    let hash_vec = unhex(input_hash)?;
     let out: [u8; 32] = match hash_vec.try_into() {
         Ok(a) => a,
-        Err(_) => match what {
-            Hash::BlockEntered => return Err(ErrorActive::Input(InputActive::BlockHashLength)),
-            Hash::BlockFetched { url: _ } => {
-                return Err(ErrorActive::Fetch(
-                    Fetch::UnexpectedFetchedBlockHashFormat {
-                        value: input_hash.to_string(),
-                    },
-                ))
+        Err(_) => {
+            return match what {
+                Hash::BlockEntered => Err(Error::BlockHashLength),
+                Hash::BlockFetched { url: _ } => Err(Error::UnexpectedFetchedBlockHashFormat {
+                    value: input_hash.to_string(),
+                }),
+                Hash::Genesis { url: _ } => Err(Error::UnexpectedFetchedGenesisHashFormat {
+                    value: input_hash.to_string(),
+                }),
             }
-            Hash::Genesis { url: _ } => {
-                return Err(ErrorActive::Fetch(
-                    Fetch::UnexpectedFetchedGenesisHashFormat {
-                        value: input_hash.to_string(),
-                    },
-                ))
-            }
-        },
+        }
     };
     Ok(out.into())
 }
@@ -997,28 +1052,35 @@ fn get_hash(input_hash: &str, what: Hash) -> Result<H256, ErrorActive> {
 ///
 /// Resulting file, located in dedicated [`FOLDER`](constants::FOLDER), could be
 /// used to generate data signature and to produce updates.
-pub fn load_metadata_print(shortcut: &MetaShortCut) -> Result<(), ErrorActive> {
-    let filename = format!(
-        "{}_{}V{}",
-        load_metadata(),
-        shortcut.meta_values.name,
-        shortcut.meta_values.version
+pub fn load_metadata_print<P>(shortcut: &MetaShortCut, files_dir: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let file_name = format!(
+        "sign_me_load_metadata_{}V{}",
+        shortcut.meta_values.name, shortcut.meta_values.version
     );
+    let file_path = files_dir.as_ref().join(file_name);
     let content = ContentLoadMeta::generate(&shortcut.meta_values.meta, &shortcut.genesis_hash);
-    content.write(&filename)
+    content.write(file_path)?;
+    Ok(())
 }
 
 /// Write to file `add_specs` update payload as raw bytes.
 ///
-/// Resulting file, located in dedicated [`FOLDER`](constants::FOLDER), could be
+/// Resulting file, located in dedicated directory (by default, [`FOLDER`](constants::FOLDER)), could be
 /// used to generate data signature and to produce updates.
-pub fn add_specs_print(network_specs: &NetworkSpecsToSend) -> Result<(), ErrorActive> {
-    let filename = format!(
-        "{}_{}_{}",
-        add_specs(),
+pub fn add_specs_print<P>(network_specs: &NetworkSpecs, files_dir: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    let file_name = format!(
+        "sign_me_add_specs_{}_{}",
         network_specs.name,
         network_specs.encryption.show()
     );
+    let file_path = files_dir.as_ref().join(file_name);
     let content = ContentAddSpecs::generate(network_specs);
-    content.write(&filename)
+    content.write(file_path)?;
+    Ok(())
 }

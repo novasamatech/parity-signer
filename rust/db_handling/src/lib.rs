@@ -34,8 +34,6 @@
 #[cfg(feature = "active")]
 use constants::{COLD_DB_NAME_RELEASE, HOT_DB_NAME};
 #[cfg(feature = "active")]
-use definitions::error_active::ErrorActive;
-#[cfg(feature = "active")]
 use std::path::PathBuf;
 
 pub mod cold_default;
@@ -53,6 +51,10 @@ pub mod identities;
 pub mod interface_signer;
 
 pub mod manage_history;
+
+mod error;
+
+pub use error::{Error, Result};
 
 #[cfg(feature = "test")]
 #[cfg(test)]
@@ -88,12 +90,8 @@ use hot_default::reset_hot_database;
 /// This operation is performed **not** on Signer device, and is governed by
 /// the active side.
 #[cfg(feature = "active")]
-pub fn default_cold_release(path: Option<PathBuf>) -> Result<(), ErrorActive> {
-    let database_name = match path {
-        Some(ref path) => path.to_str().unwrap_or(COLD_DB_NAME_RELEASE),
-        None => COLD_DB_NAME_RELEASE,
-    };
-    populate_cold_release(database_name)
+pub fn default_cold_release(path: Option<PathBuf>) -> Result<()> {
+    populate_cold_release(path.unwrap_or_else(|| COLD_DB_NAME_RELEASE.into()))
 }
 
 /// Generate or restore "hot" database with default values.
@@ -108,12 +106,8 @@ pub fn default_cold_release(path: Option<PathBuf>) -> Result<(), ErrorActive> {
 /// - **no** metadata entries
 /// - **no** metadata block history entries
 ///
-/// All metadata-related entries get in the hot database only through rpc calls.
+/// All metadata-related entries get in the hot database only through RPC calls.
 #[cfg(feature = "active")]
-pub fn default_hot(path: Option<PathBuf>) -> Result<(), ErrorActive> {
-    let database_name = match path {
-        Some(ref path) => path.to_str().unwrap_or(HOT_DB_NAME),
-        None => HOT_DB_NAME,
-    };
-    reset_hot_database(database_name)
+pub fn default_hot(path: Option<PathBuf>) -> Result<()> {
+    reset_hot_database(path.unwrap_or_else(|| HOT_DB_NAME.into()))
 }

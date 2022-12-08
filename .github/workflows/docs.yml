@@ -13,12 +13,12 @@ jobs:
     steps:
 
       - name:                 Cancel Previous Runs
-        uses:                 styfle/cancel-workflow-action@0.9.1
+        uses:                 styfle/cancel-workflow-action@b173b6ec0100793626c2d9e6b90435061f4fc3e5 # 0.11.0
         with:
           access_token:       ${{ github.token }}
 
       - name:                 Checkout sources
-        uses:                 actions/checkout@v3
+        uses:                 actions/checkout@v3.1.0
         with:
           fetch-depth:        1
           submodules:         recursive
@@ -30,9 +30,25 @@ jobs:
           sudo apt install -y clang libclang-dev libopencv-dev
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@v1.3.0
+        uses:                 Swatinem/rust-cache@359a70e43a0bb8a13953b04a90f76428b4959bb6 # v2.2.0
         with:
-          working-directory:  rust
+          workspaces:         rust -> rust/target
+
+      - name:                 Install cargo-spellcheck
+        uses:                 baptiste0928/cargo-install@bf6758885262d0e6f61089a9d8c8790d3ac3368f # v1.3.0
+        with:
+          crate:              cargo-spellcheck
+
+      - name:                 Install uniffi_bindgen
+        uses:                 actions-rs/install@v0.1
+        with:
+          crate:              uniffi_bindgen
+          version:            0.21.0 # Must be in sync with version in Cargo.toml
+          use-tool-cache:     true
+
+      - name:                 Run spellcheck
+        run:                  |
+          cargo spellcheck check --cfg=.spellcheck/config.toml -m 99
 
       - name:                 Generate cargo doc
         run:                  |
@@ -45,17 +61,17 @@ jobs:
       # user-docs
       # they are generated after rustdocs to check the relative links
       - name:                 Setup mdBook
-        uses:                 peaceiris/actions-mdbook@v1.1.14
+        uses:                 peaceiris/actions-mdbook@adeb05db28a0c0004681db83893d56c0388ea9ea # v1.2.0
         with:
           mdbook-version:     latest
 
       - name:                 Install mdbook-linkcheck
-        uses:                 baptiste0928/cargo-install@v1
+        uses:                 baptiste0928/cargo-install@bf6758885262d0e6f61089a9d8c8790d3ac3368f # v1.3.0
         with:
           crate:              mdbook-linkcheck
 
       - name:                 Install mdbook-mermaid
-        uses:                 baptiste0928/cargo-install@v1
+        uses:                 baptiste0928/cargo-install@bf6758885262d0e6f61089a9d8c8790d3ac3368f # v1.3.0
         with:
           crate:              mdbook-mermaid
 
@@ -70,9 +86,10 @@ jobs:
 
       # deploy
       - name:                 Deploy rustdocs and user-docs
-        uses:                 peaceiris/actions-gh-pages@v3
-        # published only from master
-        if:                   ${{ github.ref == 'refs/heads/master' }}
+        uses:                 peaceiris/actions-gh-pages@de7ea6f8efb354206b205ef54722213d99067935 # v3.9.0
+        # published only from master AND if the triggerer is not dependabot
+        # https://github.com/dependabot/dependabot-core/issues/3253#issuecomment-797125425
+        if:                   ${{ github.ref == 'refs/heads/master' && github.actor != 'dependabot[bot]' }}
         with:
           github_token:       ${{ github.token }}
           force_orphan:       true

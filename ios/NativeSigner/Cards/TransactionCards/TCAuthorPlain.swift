@@ -8,19 +8,17 @@
 import SwiftUI
 
 struct TCAuthorPlain: View {
-    var value: MscAuthorPlain
+    var value: MscId
     var body: some View {
         HStack {
             Identicon(identicon: value.identicon)
-            TCNameValueTemplate(name: "From", value: value.base58)
+            TCNamedValueCard(name: Localizable.TCName.from.string, value: value.base58)
         }
     }
 }
 
-/*
- struct TCAuthorPlain_Previews: PreviewProvider {
- static var previews: some View {
- TCAuthorPlain(author: AuthorPlain(base58: "111"))
- }
- }
- */
+struct TCAuthorPlain_Previews: PreviewProvider {
+    static var previews: some View {
+        TCAuthorPlain(value: MscId(base58: PreviewData.base58, identicon: .svg(image: PreviewData.exampleIdenticon)))
+    }
+}

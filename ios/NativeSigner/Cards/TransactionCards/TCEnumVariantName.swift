@@ -11,32 +11,44 @@ struct TCEnumVariantName: View {
     var value: MscEnumVariantName
     @State private var showDoc = false
     var body: some View {
-        Button (action: {
-            self.showDoc.toggle()
-        }) {
-            VStack {
-                HStack {
-                    Text(value.name)
-                        .foregroundColor(Color("Text600"))
-                    Spacer()
-                    if value.docsEnumVariant != "" {
-                        Text("?")
-                            .foregroundColor(Color("Action400"))
+        Button(
+            action: {
+                self.showDoc.toggle()
+            },
+            label: {
+                VStack {
+                    HStack {
+                        Text(value.name)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        Spacer()
+                        if !value.docsEnumVariant.isEmpty {
+                            Asset.questionCircle.swiftUIImage
+                                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                        }
+                    }
+                    if showDoc {
+                        withAnimation {
+                            VStack(alignment: .leading) {
+                                Text.markdownWithFallback(value.docsEnumVariant)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                HStack {
+                                    Spacer()
+                                }
+                            }
+                            .padding(.horizontal, Spacing.medium)
+                            .padding(.vertical, Spacing.small)
+                            .strokeContainerBackground()
+                        }
                     }
                 }
-                if showDoc {
-                    Text(AttributedString(fromHexDocs: value.docsEnumVariant) ?? "docs parsing error in iOS, please refer to other sources")
-                        .foregroundColor(Color("Text600"))
-                }
+                .font(Fontstyle.bodyL.base)
             }
-        }.disabled(value.docsEnumVariant == "")
+        ).disabled(value.docsEnumVariant.isEmpty)
     }
 }
 
-/*
- struct TCEnumVariantName_Previews: PreviewProvider {
- static var previews: some View {
- TCEnumVariantName()
- }
- }
- */
+struct TCEnumVariantName_Previews: PreviewProvider {
+    static var previews: some View {
+        TCEnumVariantName(value: MscEnumVariantName(name: "Name", docsEnumVariant: PreviewData.exampleMarkdownDocs))
+    }
+}

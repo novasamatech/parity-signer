@@ -1,43 +1,45 @@
 //! Navigation state of the app
 
 use db_handling::helpers::get_danger_status;
+use db_handling::identities::get_multisigner_by_address;
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
-    ActionResult, Address, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti,
-    MKeys, MLog, MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm,
-    MRecoverSeedName, MRecoverSeedPhrase, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings,
-    MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData,
-    RightButton, ScreenData, ScreenNameType, ShieldAlert, TransactionType,
+    ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
+    MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
+    MRecoverSeedPhrase, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
+    MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData, ScreenNameType,
+    ShieldAlert, TransactionType,
 };
 use sp_runtime::MultiSigner;
+use std::fmt::Write;
 use transaction_parsing::{entry_to_transactions_with_decoding, TransactionAction};
 use zeroize::Zeroize;
 
 use crate::actions::Action;
 use crate::alerts::Alert;
+use crate::export_signatures_bulk;
 use crate::modals::Modal;
 use crate::screens::{
     AddressState, AddressStateMulti, DeriveState, KeysState, RecoverSeedPhraseState, Screen,
-    SpecialtyKeysState, SufficientCryptoState, TransactionState,
+    SpecialtyKeysState, SufficientCryptoState,
 };
+use crate::states::{SignResult, TransactionState};
 use db_handling::interface_signer::{get_all_seed_names_with_identicons, guess};
 use definitions::{
-    error::{AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSource},
-    error_signer::{
-        ErrorSigner, ExtraAddressKeySourceSigner, InputSigner, InterfaceSigner, Signer,
-    },
     keyring::{AddressKey, NetworkSpecsKey},
     network_specs::Verifier,
     users::AddressDetails,
 };
 
+use crate::error::{Error, Result};
+
 ///State of the app as remembered by backend
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub struct State {
-    pub navstate: Navstate,
-    pub dbname: Option<String>,
-    pub seed_names: Vec<String>,
-    pub networks: Vec<NetworkSpecsKey>,
+    navstate: Navstate,
+    dbname: Option<String>,
+    seed_names: Vec<String>,
+    networks: Vec<NetworkSpecsKey>,
 }
 
 ///Navigation state is completely defined here
@@ -65,6 +67,25 @@ impl Default for Navstate {
 }
 
 impl State {
+    pub fn init_navigation(&mut self, dbname: &str, seed_names: Vec<String>) -> Result<()> {
+        self.seed_names = seed_names;
+        self.dbname = Some(dbname.to_string());
+
+        let networks = db_handling::helpers::get_all_networks(dbname)?;
+        for x in &networks {
+            self.networks.push(NetworkSpecsKey::from_parts(
+                &x.specs.genesis_hash,
+                &x.specs.encryption,
+            ));
+        }
+
+        Ok(())
+    }
+
+    pub fn update_seed_names(&mut self, seed_names: Vec<String>) {
+        self.seed_names = seed_names;
+    }
+
     fn handle_navbar_log(&self) -> (Navstate, String) {
         let mut new_navstate = self.navstate.to_owned();
         let errorline = String::new();
@@ -115,7 +136,7 @@ impl State {
             }
             Err(e) => {
                 new_navstate.alert = Alert::Error;
-                errorline.push_str(&<Signer>::show(&e));
+                let _ = write!(&mut errorline, "{}", e);
             }
         }
 
@@ -138,7 +159,7 @@ impl State {
                                 Ok(()) => new_navstate.screen = Screen::Scan,
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
+                                    let _ = write!(&mut errorline, "{}", e);
                                 }
                             }
                         }
@@ -208,7 +229,7 @@ impl State {
                                 Ok(()) => new_navstate = Navstate::clean_screen(Screen::Log),
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
+                                    let _ = write!(&mut errorline, "{}", e);
                                 }
                             }
                         }
@@ -247,7 +268,7 @@ impl State {
                             Ok(()) => new_navstate = Navstate::clean_screen(Screen::Log),
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
-                                errorline.push_str(&<Signer>::show(&e));
+                                let _ = write!(&mut errorline, "{}", e);
                             }
                         }
                     }
@@ -272,20 +293,18 @@ impl State {
                                     Ok(a) => new_navstate = Navstate::clean_screen(Screen::Keys(a)),
                                     Err(e) => {
                                         new_navstate.alert = Alert::Error;
-                                        errorline.push_str(&<Signer>::show(&e));
+                                        let _ = write!(&mut errorline, "{}", e);
                                     }
                                 },
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
+                                    let _ = write!(&mut errorline, "{}", e);
                                 }
                             }
                         }
-                        Err(_) => {
+                        Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(
-                                InterfaceSigner::FlagNotBool(details_str.to_string()),
-                            )));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     },
                     _ => println!("GoForward does nothing here"),
@@ -300,14 +319,16 @@ impl State {
                             ))
                         } else {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&ErrorSigner::Input(
-                                InputSigner::SeedNameExists(details_str.to_string()),
-                            )));
+                            let _ = write!(
+                                &mut errorline,
+                                "Bad input data. Seed name {} already exists.",
+                                details_str
+                            );
                         }
                     }
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        errorline.push_str(&<Signer>::show(&e));
+                        let _ = write!(&mut errorline, "{}", e);
                     }
                 }
             }
@@ -324,19 +345,17 @@ impl State {
                             Ok(a) => new_navstate = Navstate::clean_screen(Screen::Keys(a)),
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
-                                errorline.push_str(&<Signer>::show(&e));
+                                let _ = write!(&mut errorline, "{}", e);
                             }
                         },
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     },
-                    Err(_) => {
+                    Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(
-                            InterfaceSigner::FlagNotBool(details_str.to_string()),
-                        )));
+                        let _ = write!(&mut errorline, "{}", e);
                     }
                 }
             }
@@ -357,96 +376,53 @@ impl State {
                             )))
                     }
                     Err(e) => {
-                        if let ErrorSigner::AddressGeneration(AddressGeneration::Common(
-                            AddressGenerationCommon::DerivationExists(
-                                ref multisigner,
-                                ref address_details,
-                                _,
-                            ),
-                        )) = e
+                        if let db_handling::Error::DerivationExists {
+                            ref multisigner,
+                            ref address_details,
+                            ..
+                        } = e
                         {
                             new_navstate.screen = Screen::DeriveKey(
                                 derive_state.collided_with(multisigner, address_details),
                             );
                             new_navstate.modal = Modal::Empty;
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         } else {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
             }
             Screen::Transaction(ref t) => {
                 match t.action() {
-                    transaction_parsing::TransactionAction::Sign {
-                        content,
-                        checksum,
-                        has_pwd,
-                        author_info,
-                        network_info,
-                    } => {
-                        if has_pwd {
-                            match self.navstate.modal {
-                                Modal::EnterPassword => {
-                                    let mut seed = t.seed();
-                                    match transaction_signing::handle_sign(
-                                        checksum,
-                                        &seed,
-                                        details_str,
-                                        &t.get_comment(),
-                                        dbname,
-                                    ) {
-                                        Ok(a) => {
-                                            seed.zeroize();
-                                            new_navstate.modal = Modal::SignatureReady(a);
-                                        }
-                                        Err(e) => {
-                                            seed.zeroize();
-                                            if let ErrorSigner::WrongPasswordNewChecksum(c) = e {
-                                                if t.ok() {
-                                                    new_navstate.screen = Screen::Transaction(
-                                                        Box::new(t.update_checksum_sign(
-                                                            c,
-                                                            content,
-                                                            has_pwd,
-                                                            author_info,
-                                                            network_info,
-                                                        )),
-                                                    );
-                                                } else {
-                                                    new_navstate =
-                                                        Navstate::clean_screen(Screen::Log);
-                                                }
-                                            }
-                                            new_navstate.alert = Alert::Error;
-                                            errorline.push_str(&<Signer>::show(&e));
+                    transaction_parsing::TransactionAction::Sign { .. } => {
+                        let mut new = t.clone();
+                        new.update_seeds(secret_seed_phrase);
+                        if let Modal::EnterPassword = self.navstate.modal {
+                            new.password_entered(details_str);
+                            new_navstate.modal = Modal::Empty;
+                        }
+                        match new.handle_sign(dbname) {
+                            Ok(result) => {
+                                match result {
+                                    SignResult::RequestPassword { .. } => {
+                                        if t.ok() {
+                                            new_navstate.screen = Screen::Transaction(new);
+                                            new_navstate.modal = Modal::EnterPassword;
+                                        } else {
+                                            new_navstate = Navstate::clean_screen(Screen::Log);
                                         }
                                     }
-                                }
-                                _ => {
-                                    new_navstate.screen = Screen::Transaction(Box::new(
-                                        t.add_comment(details_str).update_seed(secret_seed_phrase),
-                                    ));
-                                    new_navstate.modal = Modal::EnterPassword;
-                                }
+                                    SignResult::Ready { signatures } => {
+                                        new_navstate.modal = Modal::SignatureReady(signatures);
+                                    }
+                                };
                             }
-                        } else {
-                            match transaction_signing::handle_sign(
-                                checksum,
-                                secret_seed_phrase,
-                                "",
-                                details_str,
-                                dbname,
-                            ) {
-                                Ok(a) => {
-                                    new_navstate.modal = Modal::SignatureReady(a);
-                                }
-                                Err(e) => {
-                                    new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
-                                }
+                            Err(e) => {
+                                new_navstate.alert = Alert::Error;
+                                let _ = write!(&mut errorline, "{}", e);
                             }
                         }
                     }
@@ -454,20 +430,20 @@ impl State {
                         s: _,
                         u: checksum,
                         stub: stub_nav,
-                    } => match transaction_signing::handle_stub(checksum, dbname) {
+                    } => match transaction_signing::handle_stub(*checksum, dbname) {
                         Ok(()) => match stub_nav {
                             transaction_parsing::StubNav::AddSpecs {
                                 n: network_specs_key,
                             } => {
                                 new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
-                                    network_specs_key,
+                                    network_specs_key.clone(),
                                 ));
                             }
                             transaction_parsing::StubNav::LoadMeta {
                                 l: network_specs_key,
                             } => {
                                 new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
-                                    network_specs_key,
+                                    network_specs_key.clone(),
                                 ));
                             }
                             transaction_parsing::StubNav::LoadTypes => {
@@ -476,7 +452,7 @@ impl State {
                         },
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     },
                     transaction_parsing::TransactionAction::Read { .. } => {
@@ -491,9 +467,9 @@ impl State {
                         match self.navstate.modal {
                             Modal::SelectSeed => {
                                 // details_str is seed_name
-                                // secret_seed_phrase is seed_phrase
+                                // `secret_seed_phrase` is `seed_phrase`
                                 match db_handling::identities::import_derivations(
-                                    checksum,
+                                    *checksum,
                                     details_str,
                                     secret_seed_phrase,
                                     dbname,
@@ -502,20 +478,21 @@ impl State {
                                         new_navstate = Navstate::clean_screen(Screen::Keys(
                                             KeysState::new_in_network(
                                                 details_str,
-                                                &network_specs_key,
+                                                network_specs_key,
                                             ),
                                         ));
                                     }
                                     Err(e) => {
                                         new_navstate.alert = Alert::Error;
-                                        errorline.push_str(&<Signer>::show(&e));
+                                        let _ = write!(&mut errorline, "{}", e);
                                     }
                                 }
                             }
                             Modal::Empty => {
                                 if self.seed_names.is_empty() {
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&ErrorSigner::NoKnownSeeds));
+
+                                    let _ = write!(&mut errorline, "No known seeds");
                                 } else {
                                     new_navstate.modal = Modal::SelectSeed;
                                 }
@@ -531,7 +508,7 @@ impl State {
                 }
                 Err(e) => {
                     new_navstate.alert = Alert::Error;
-                    errorline.push_str(&<Signer>::show(&e));
+                    let _ = write!(&mut errorline, "{}", e);
                 }
             },
             Screen::SignSufficientCrypto(ref s) => {
@@ -555,7 +532,7 @@ impl State {
                                 }
                                 Err(e) => {
                                     seed.zeroize();
-                                    if let ErrorSigner::WrongPassword = e {
+                                    if let transaction_signing::Error::WrongPassword = e {
                                         if s.ok() {
                                             new_navstate.screen =
                                                 Screen::SignSufficientCrypto(s.plus_one());
@@ -564,14 +541,14 @@ impl State {
                                         }
                                     }
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
+                                    let _ = write!(&mut errorline, "{}", e);
                                 }
                             }
                         }
                     }
                     None => {
-                        // details_str is hex_address_key
-                        // secret_seed_phrase is seed phrase
+                        // `details_str` is `hex_address_key`
+                        // `secret_seed_phrase` is seed phrase
                         match process_hex_address_key_address_details(details_str, dbname) {
                             Ok((multisigner, address_details)) => {
                                 if address_details.has_pwd {
@@ -598,14 +575,14 @@ impl State {
                                         }
                                         Err(e) => {
                                             new_navstate.alert = Alert::Error;
-                                            errorline.push_str(&<Signer>::show(&e));
+                                            let _ = write!(&mut errorline, "{}", e);
                                         }
                                     }
                                 }
                             }
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
-                                errorline.push_str(&<Signer>::show(&e));
+                                let _ = write!(&mut errorline, "{}", e);
                             }
                         }
                     }
@@ -629,7 +606,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {
@@ -648,15 +625,22 @@ impl State {
         match self.navstate.screen {
             Screen::Keys(ref keys_state) => {
                 if keys_state.is_multiselect() {
-                    match process_hex_address_key(details_str) {
-                        Ok(multisigner) => {
+                    match get_multisigner_by_address(
+                        dbname,
+                        &AddressKey::from_hex(details_str).unwrap(),
+                    ) {
+                        Ok(Some(multisigner)) => {
                             new_navstate = Navstate::clean_screen(Screen::Keys(
                                 keys_state.select_single(&multisigner),
                             ));
                         }
+                        Ok(None) => {
+                            new_navstate.alert = Alert::Error;
+                            let _ = write!(&mut errorline, "key not found {}", details_str);
+                        }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {
@@ -666,7 +650,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
@@ -776,7 +760,7 @@ impl State {
                     alert: Alert::Empty,
                 },
                 Err(e) => {
-                    errorline.push_str(&<Signer>::show(&e));
+                    let _ = write!(&mut errorline, "{}", e);
                     Navstate {
                         screen: Screen::Log,
                         modal: Modal::Empty,
@@ -848,7 +832,7 @@ impl State {
                     }
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        errorline.push_str(&<Signer>::show(&e));
+                        let _ = write!(&mut errorline, "{}", e);
                     }
                 }
             }
@@ -872,14 +856,11 @@ impl State {
     }
 
     fn handle_transaction_fetched(&self, dbname: &str, details_str: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
         let errorline = String::new();
 
-        if let Screen::Scan = self.navstate.screen {
-            new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
-                TransactionState::new(details_str, dbname),
-            )));
-        }
+        let new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
+            TransactionState::new(details_str, dbname),
+        )));
 
         (new_navstate, errorline)
     }
@@ -896,7 +877,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
@@ -925,7 +906,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
@@ -948,7 +929,7 @@ impl State {
                     }
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        errorline.push_str(&<Signer>::show(&e));
+                        let _ = write!(&mut errorline, "{}", e);
                     }
                 },
                 _ => println!("RemoveTypes does nothing here"),
@@ -1056,11 +1037,9 @@ impl State {
                 Ok(version) => {
                     new_navstate.modal = Modal::ManageMetadata(version);
                 }
-                Err(_) => {
+                Err(e) => {
                     new_navstate.alert = Alert::Error;
-                    errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(
-                        InterfaceSigner::VersionNotU32(details_str.to_string()),
-                    )));
+                    let _ = write!(&mut errorline, "{}", e);
                 }
             },
             _ => println!("ManageMetadata does nothing here"),
@@ -1089,7 +1068,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
@@ -1108,7 +1087,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
@@ -1126,7 +1105,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {
@@ -1168,7 +1147,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {
@@ -1193,7 +1172,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {
@@ -1214,11 +1193,9 @@ impl State {
                 // details_str is u32 order which will be shown
                 match details_str.parse::<u32>() {
                     Ok(order) => new_navstate = Navstate::clean_screen(Screen::LogDetails(order)),
-                    Err(_) => {
+                    Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(
-                            InterfaceSigner::OrderNotU32(details_str.to_string()),
-                        )));
+                        let _ = write!(&mut errorline, "{}", e);
                     }
                 }
             }
@@ -1239,7 +1216,7 @@ impl State {
                 }
                 Err(e) => {
                     new_navstate.alert = Alert::Error;
-                    errorline.push_str(&<Signer>::show(&e));
+                    let _ = write!(&mut errorline, "{}", e);
                 }
             },
             _ => println!("Swipe does nothing here"),
@@ -1260,7 +1237,7 @@ impl State {
                 }
                 Err(e) => {
                     new_navstate.alert = Alert::Error;
-                    errorline.push_str(&<Signer>::show(&e));
+                    let _ = write!(&mut errorline, "{}", e);
                 }
             },
             _ => println!("LongTap does nothing here"),
@@ -1305,7 +1282,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 }
@@ -1334,7 +1311,7 @@ impl State {
                         Ok(a) => new_navstate = Navstate::clean_screen(Screen::KeyDetailsMulti(a)),
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {
@@ -1378,15 +1355,14 @@ impl State {
                                 }
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
+                                    let _ = write!(&mut errorline, "{}", e);
                                 }
                             }
                         }
-                        Err(_) => {
+                        Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(
-                                InterfaceSigner::IncNotU32(details_str.to_string()),
-                            )));
+
+                            let _ = write!(&mut errorline, "{}", e);
                         }
                     }
                 } else {
@@ -1448,7 +1424,7 @@ impl State {
         new_navstate: &Navstate,
         details_str: &str,
         dbname: &str,
-    ) -> Result<ScreenData, ErrorSigner> {
+    ) -> Result<ScreenData> {
         let sd = match new_navstate.screen {
             Screen::Log => {
                 let history = db_handling::manage_history::get_history(dbname)?;
@@ -1473,42 +1449,40 @@ impl State {
             }
             Screen::Scan => ScreenData::Scan,
             Screen::Transaction(ref t) => {
-                let (content, ttype, author_info, network_info) = match t.action() {
+                let f = match t.action() {
                     TransactionAction::Derivations {
                         content,
                         network_info,
                         ..
-                    } => (
-                        content,
-                        TransactionType::ImportDerivations,
-                        None,
-                        Some(network_info),
-                    ),
-                    TransactionAction::Sign {
-                        content,
-                        author_info,
-                        network_info,
-                        ..
-                    } => (
-                        content,
-                        TransactionType::Sign,
-                        Some(author_info),
-                        Some(network_info),
-                    ),
-                    TransactionAction::Stub { s, .. } => (s, TransactionType::Stub, None, None),
-                    TransactionAction::Read { r } => (r, TransactionType::Read, None, None),
+                    } => vec![MTransaction {
+                        content: *content.clone(),
+                        ttype: TransactionType::ImportDerivations,
+                        author_info: None,
+                        network_info: Some(network_info.as_ref().clone().into()),
+                    }],
+                    TransactionAction::Sign { actions, .. } => actions
+                        .iter()
+                        .map(|a| MTransaction {
+                            content: a.content.clone(),
+                            ttype: TransactionType::Sign,
+                            author_info: Some(a.author_info.clone()),
+                            network_info: Some(a.network_info.clone().into()),
+                        })
+                        .collect(),
+                    TransactionAction::Stub { s, .. } => vec![MTransaction {
+                        content: *s.clone(),
+                        ttype: TransactionType::Stub,
+                        author_info: None,
+                        network_info: None,
+                    }],
+                    TransactionAction::Read { r } => vec![MTransaction {
+                        content: *r.clone(),
+                        ttype: TransactionType::Read,
+                        author_info: None,
+                        network_info: None,
+                    }],
                 };
-                ScreenData::Transaction {
-                    f: MTransaction {
-                        content,
-                        ttype,
-                        author_info,
-                        network_info: network_info.map(|i| MSCNetworkInfo {
-                            network_title: i.title,
-                            network_logo: i.logo,
-                        }),
-                    },
-                }
+                ScreenData::Transaction { f }
             }
             Screen::SeedSelector => {
                 let seed_name_cards =
@@ -1647,7 +1621,7 @@ impl State {
                         public_key: None,
                         identicon: None,
                         encryption: None,
-                        error: Some(<Signer>::show(&e)),
+                        error: Some(format!("{}", e)),
                     },
                 };
                 ScreenData::Settings { f }
@@ -1683,7 +1657,7 @@ impl State {
         &mut self,
         new_navstate: &mut Navstate,
         dbname: &str,
-    ) -> Result<Option<ModalData>, ErrorSigner> {
+    ) -> Result<Option<ModalData>> {
         let modal = match new_navstate.modal {
             Modal::Backup(ref seed_name) => Some(ModalData::Backup {
                 f: db_handling::interface_signer::backup_prep(dbname, seed_name)?,
@@ -1723,36 +1697,24 @@ impl State {
                         }
                         Err(e) => {
                             path.zeroize();
-                            return Err(e);
+                            return Err(e.into());
                         }
                     }
                 }
                 _ => None,
             },
             Modal::SignatureReady(ref a) => Some(ModalData::SignatureReady {
-                f: MSignatureReady {
-                    signature: a.to_vec(),
-                },
+                f: export_signatures_bulk(a)?,
             }),
             Modal::EnterPassword => match new_navstate.screen {
                 Screen::Transaction(ref t) => {
-                    if let transaction_parsing::TransactionAction::Sign {
-                        content: _,
-                        checksum: _,
-                        has_pwd: _,
-                        author_info,
-                        network_info: _,
-                    } = t.action()
-                    {
-                        Some(ModalData::EnterPassword {
+                    t.current_password_author_info()
+                        .map(|author_info| ModalData::EnterPassword {
                             f: MEnterPassword {
                                 author_info,
                                 counter: t.counter() as u32,
                             },
                         })
-                    } else {
-                        None
-                    }
                 }
                 Screen::SignSufficientCrypto(ref s) => {
                     if let Some((_, _, author_info)) = s.key_selected() {
@@ -1788,14 +1750,6 @@ impl State {
                     Screen::SignSufficientCrypto(ref s) => {
                         if let Some((_, _, author_info)) = s.key_selected() {
                             let content = content.clone();
-                            let author_info = Address {
-                                base58: author_info.base58,
-                                identicon: author_info.identicon,
-                                seed_name: author_info.seed_name,
-                                path: author_info.path,
-                                has_pwd: author_info.has_pwd,
-                                multiselect: None,
-                            };
                             let f = MSufficientCryptoReady {
                                 author_info,
                                 sufficient: sufficient.clone(),
@@ -1842,7 +1796,7 @@ impl State {
         action: Action,
         details_str: &str,
         secret_seed_phrase: &str,
-    ) -> Result<ActionResult, String> {
+    ) -> Result<ActionResult> {
         let mut new_navstate = self.navstate.to_owned();
 
         if let Some(ref dbname) = self.dbname.clone() {
@@ -1904,7 +1858,7 @@ impl State {
             let screen_data = match self.get_screen_data(&new_navstate, details_str, dbname) {
                 Ok(sd) => sd,
                 Err(e) => {
-                    errorline.push_str(&<Signer>::show(&e));
+                    let _ = write!(&mut errorline, "{}", e);
                     //This is special error used only
                     //here; please do not change it to
                     //`Alert::Error` or app may get stuck
@@ -1919,7 +1873,7 @@ impl State {
             let modal_data = match self.get_modal_details(&mut new_navstate, dbname) {
                 Ok(md) => md,
                 Err(e) => {
-                    errorline.push_str(&<Signer>::show(&e));
+                    let _ = write!(&mut errorline, "{}", e);
                     new_navstate.alert = Alert::Error;
                     None
                 }
@@ -1936,7 +1890,7 @@ impl State {
                     }),
                     Ok(false) => Some(AlertData::Shield { f: None }),
                     Err(e) => Some(AlertData::ErrorData {
-                        f: e.anyhow().to_string(),
+                        f: format!("{}", e),
                     }),
                 },
             };
@@ -1957,7 +1911,7 @@ impl State {
 
             Ok(action_result)
         } else {
-            Err("db not initialized".to_string())
+            Err(Error::DbNotInitialized)
         }
     }
 
@@ -2065,7 +2019,7 @@ impl State {
         }
     }
 
-    ///Determine whether screen name should be h1 or h4
+    ///Determine whether screen name should be `h1` or `h4`
     fn get_screen_name_type(&self) -> ScreenNameType {
         match self.navstate.screen {
             Screen::Log
@@ -2126,20 +2080,17 @@ impl Navstate {
 fn process_hex_address_key_address_details(
     hex_address_key: &str,
     dbname: &str,
-) -> Result<(MultiSigner, AddressDetails), ErrorSigner> {
+) -> Result<(MultiSigner, AddressDetails)> {
     let address_key = AddressKey::from_hex(hex_address_key)?;
-    let multisigner = address_key.multi_signer::<Signer>(AddressKeySource::Extra(
-        ExtraAddressKeySourceSigner::Interface,
-    ))?;
+    let multisigner = get_multisigner_by_address(dbname, &address_key)?
+        .ok_or_else(|| Error::KeyNotFound(format!("0x{}", hex_address_key)))?;
     let address_details = db_handling::helpers::get_address_details(dbname, &address_key)?;
     Ok((multisigner, address_details))
 }
 
-fn process_hex_address_key(hex_address_key: &str) -> Result<MultiSigner, ErrorSigner> {
+fn process_hex_address_key(hex_address_key: &str) -> Result<MultiSigner> {
     let address_key = AddressKey::from_hex(hex_address_key)?;
-    address_key.multi_signer::<Signer>(AddressKeySource::Extra(
-        ExtraAddressKeySourceSigner::Interface,
-    ))
+    Ok(address_key.multi_signer()?)
 }
 
 //TODO: tests should probably be performed here, as static object in lib.rs

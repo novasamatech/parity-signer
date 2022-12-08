@@ -1,9 +1,9 @@
-use parity_scale_codec::{Decode, Encode};
+use parity_scale_codec::Decode;
 use pretty_assertions::assert_eq;
 use sled::{open, Db, Tree};
 use sp_core::H256;
 use sp_runtime::MultiSigner;
-use std::{fs, io::Write, str::FromStr};
+use std::{fmt::Write as _, fs, io::Write, str::FromStr};
 
 use constants::{
     test_values::{
@@ -18,25 +18,26 @@ use db_handling::{
     identities::{remove_seed, try_create_address, try_create_seed},
     manage_history::{get_history, get_history_entry_by_order},
 };
+use definitions::navigation::{MAddressCard, SignerImage, TransactionSignAction};
 use definitions::{
     crypto::Encryption,
-    error::{AddressKeySource, ErrorSource},
-    error_signer::{DatabaseSigner, ErrorSigner, Signer},
     history::{Entry, Event, SignDisplay, SignMessageDisplay},
     keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey},
     navigation::{
-        Address, Card, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName,
-        MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion, MTypesInfo, MVerifierDetails,
-        NetworkSpecsToSend, TransactionCard, TransactionCardSet,
+        Address, Card, MMetadataRecord, MSCCall, MSCCurrency, MSCEnumVariantName, MSCEraMortal,
+        MSCFieldName, MSCId, MSCNameVersion, MTypesInfo, MVerifierDetails, NetworkSpecs,
+        TransactionCard, TransactionCardSet,
     },
-    network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
+    network_specs::{
+        CurrentVerifier, OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue,
+    },
     users::AddressDetails,
 };
 use transaction_parsing::{
     entry_to_transactions_with_decoding, produce_output, StubNav, TransactionAction,
 };
 
-use crate::{handle_stub, sign_transaction::create_signature};
+use crate::{handle_stub, sign_transaction::create_signature, Error, Result};
 
 const PWD: &str = "";
 const USER_COMMENT: &str = "";
@@ -59,19 +60,31 @@ fn sign_action_test(
     pwd_entry: &str,
     user_comment: &str,
     dbname: &str,
-) -> Result<String, ErrorSigner> {
-    Ok(hex::encode(
-        create_signature(seed_phrase, pwd_entry, user_comment, dbname, checksum)?.encode(),
-    ))
+    encryption: Encryption,
+) -> Result<String> {
+    create_signature(
+        seed_phrase,
+        pwd_entry,
+        user_comment,
+        dbname,
+        checksum,
+        0,
+        encryption,
+    )
+    .map(|r| r.to_string())
 }
 
-fn identicon_to_str(identicon: &[u8]) -> &str {
-    if identicon == ed() {
-        "<ed>"
-    } else if identicon == alice_sr_alice() {
-        "<alice_sr25519_//Alice>"
-    } else if identicon == empty_png() {
-        "<empty>"
+fn identicon_to_str(identicon: &SignerImage) -> &str {
+    if let SignerImage::Png { image: identicon } = identicon {
+        if identicon == ed() {
+            "<ed>"
+        } else if identicon == alice_sr_alice() {
+            "<alice_sr25519_//Alice>"
+        } else if identicon == empty_png() {
+            "<empty>"
+        } else {
+            "<unknown>"
+        }
     } else {
         "<unknown>"
     }
@@ -84,46 +97,47 @@ fn print_db_content(dbname: &str) -> String {
     let metadata: Tree = database.open_tree(METATREE).unwrap();
     for (meta_key_vec, _) in metadata.iter().flatten() {
         let meta_key = MetaKey::from_ivec(&meta_key_vec);
-        let (name, version) = meta_key.name_version::<Signer>().unwrap();
+        let (name, version) = meta_key.name_version().unwrap();
         metadata_set.push(format!("{}{}", name, version));
     }
     metadata_set.sort();
     let mut metadata_str = String::new();
     for x in metadata_set.iter() {
-        metadata_str.push_str(&format!("\n    {}", x))
+        let _ = write!(&mut metadata_str, "\n    {}", x);
     }
 
-    let mut network_specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
+    let mut network_specs_set: Vec<(NetworkSpecsKey, OrderedNetworkSpecs)> = Vec::new();
     let chainspecs: Tree = database.open_tree(SPECSTREE).unwrap();
     for (network_specs_key_vec, network_specs_encoded) in chainspecs.iter().flatten() {
         let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
-        let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(
+        let network_specs = OrderedNetworkSpecs::from_entry_with_key_checked(
             &network_specs_key,
             network_specs_encoded,
         )
         .unwrap();
         network_specs_set.push((network_specs_key, network_specs));
     }
-    network_specs_set.sort_by(|(_, a), (_, b)| a.title.cmp(&b.title));
+    network_specs_set.sort_by(|(_, a), (_, b)| a.specs.title.cmp(&b.specs.title));
     let mut network_specs_str = String::new();
     for (network_specs_key, network_specs) in network_specs_set.iter() {
-        network_specs_str.push_str(&format!(
+        let _ = write!(
+            &mut network_specs_str,
             "\n    {}: {} ({} with {})",
             hex::encode(network_specs_key.key()),
-            network_specs.title,
-            network_specs.name,
-            network_specs.encryption.show()
-        ))
+            network_specs.specs.title,
+            network_specs.specs.name,
+            network_specs.specs.encryption.show()
+        );
     }
 
     let settings: Tree = database.open_tree(SETTREE).unwrap();
-    let general_verifier_encoded = settings.get(&GENERALVERIFIER).unwrap().unwrap();
+    let general_verifier_encoded = settings.get(GENERALVERIFIER).unwrap().unwrap();
     let general_verifier = Verifier::decode(&mut &general_verifier_encoded[..]).unwrap();
 
     let mut verifiers_set: Vec<String> = Vec::new();
     let verifiers: Tree = database.open_tree(VERIFIERS).unwrap();
     for (verifier_key_vec, current_verifier_encoded) in verifiers.iter().flatten() {
-        let verifier_key = VerifierKey::from_ivec::<Signer>(&verifier_key_vec).unwrap();
+        let verifier_key = VerifierKey::from_ivec(&verifier_key_vec).unwrap();
         let current_verifier = CurrentVerifier::decode(&mut &current_verifier_encoded[..]).unwrap();
         match current_verifier {
             CurrentVerifier::Valid(a) => {
@@ -172,7 +186,7 @@ fn print_db_content(dbname: &str) -> String {
     verifiers_set.sort();
     let mut verifiers_str = String::new();
     for x in verifiers_set.iter() {
-        verifiers_str.push_str(&format!("\n    {}", x))
+        let _ = write!(&mut verifiers_str, "\n    {}", x);
     }
 
     let mut identities_set: Vec<String> = Vec::new();
@@ -180,9 +194,7 @@ fn print_db_content(dbname: &str) -> String {
     for (address_key_vec, address_details_encoded) in identities.iter().flatten() {
         let address_key = AddressKey::from_ivec(&address_key_vec);
         let address_details = AddressDetails::decode(&mut &address_details_encoded[..]).unwrap();
-        let (public_key, encryption) = address_key
-            .public_key_encryption::<Signer>(AddressKeySource::AddrTree)
-            .unwrap();
+        let (public_key, encryption) = address_key.public_key_encryption().unwrap();
 
         let mut networks_set: Vec<String> = Vec::new();
         for y in address_details.network_id.iter() {
@@ -191,7 +203,7 @@ fn print_db_content(dbname: &str) -> String {
         networks_set.sort();
         let mut networks_str = String::new();
         for y in networks_set.iter() {
-            networks_str.push_str(&format!("\n        {}", y))
+            let _ = write!(&mut networks_str, "\n        {}", y);
         }
 
         identities_set.push(format!(
@@ -205,7 +217,7 @@ fn print_db_content(dbname: &str) -> String {
     identities_set.sort();
     let mut identities_str = String::new();
     for x in identities_set.iter() {
-        identities_str.push_str(&format!("\n    {}", x))
+        let _ = write!(&mut identities_str, "\n    {}", x);
     }
 
     format!("Database contents:\nMetadata:{}\nNetwork Specs:{}\nVerifiers:{}\nGeneral Verifier: {}\nIdentities:{}", metadata_str, network_specs_str, verifiers_str, general_verifier.show_error(), identities_str)
@@ -266,7 +278,9 @@ fn can_sign_transaction_1() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: bob().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: bob().to_vec(),
+                        },
                     },
                 },
             },
@@ -343,48 +357,63 @@ fn can_sign_transaction_1() {
         ]),
         ..Default::default()
     };
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
+        address: Address {
+            identicon: SignerImage::Png {
+                image: alice_sr_alice().to_vec(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
 
-    let network_info_known = NetworkSpecs {
-        base58prefix: 42,
-        color: "#660D35".to_string(),
-        decimals: 12,
-        encryption: Encryption::Sr25519,
-        genesis_hash: H256::from_str(
-            "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        )
-        .unwrap(),
-        logo: "westend".to_string(),
-        name: "westend".to_string(),
+    let network_info_known = OrderedNetworkSpecs {
+        specs: NetworkSpecs {
+            base58prefix: 42,
+            color: "#660D35".to_string(),
+            decimals: 12,
+            encryption: Encryption::Sr25519,
+            genesis_hash: H256::from_str(
+                "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            )
+            .unwrap(),
+            logo: "westend".to_string(),
+            name: "westend".to_string(),
+            path_id: "//westend".to_string(),
+            secondary_color: "#262626".to_string(),
+            title: "Westend".to_string(),
+            unit: "WND".to_string(),
+        },
         order: 2,
-        path_id: "//westend".to_string(),
-        secondary_color: "#262626".to_string(),
-        title: "Westend".to_string(),
-        unit: "WND".to_string(),
     };
 
     let output = produce_output(line, dbname);
-    if let TransactionAction::Sign {
-        content: set,
-        checksum,
-        has_pwd,
-        author_info,
-        network_info,
-    } = output
-    {
-        assert_eq!(set, set_expected);
-        assert_eq!(author_info, author_info_known);
-        assert_eq!(network_info, network_info_known);
+    if let TransactionAction::Sign { actions, checksum } = output {
+        let TransactionSignAction {
+            content: set,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+
+        assert_eq!(actions.len(), 1);
+        assert_eq!(set, &set_expected);
+        assert_eq!(author_info, &author_info_known);
+        assert_eq!(network_info, &network_info_known);
         assert!(!has_pwd, "Expected no password");
 
-        match sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname) {
+        match sign_action_test(
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            dbname,
+            network_info.specs.encryption,
+        ) {
             Ok(signature) => assert!(
                 (signature.len() == 130) && (signature.starts_with("01")),
                 "Wrong signature format,\nReceived: \n{}",
@@ -422,10 +451,17 @@ fn can_sign_transaction_1() {
 
         assert!(entries_contain_event(&history_recorded, &my_event));
 
-        let result = sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname);
+        let result = sign_action_test(
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            dbname,
+            network_info.specs.encryption,
+        );
         if let Err(e) = result {
-            let expected_err = ErrorSigner::Database(DatabaseSigner::ChecksumMismatch);
-            if <Signer>::show(&e) != <Signer>::show(&expected_err) {
+            if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
+            } else {
                 panic!("Expected wrong checksum. Got error: {:?}.", e)
             }
         } else {
@@ -478,7 +514,9 @@ fn can_sign_transaction_1() {
                     card: Card::IdCard {
                         f: MSCId {
                             base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                            identicon: bob().to_vec(),
+                            identicon: SignerImage::Png {
+                                image: bob().to_vec(),
+                            },
                         },
                     },
                 },
@@ -570,62 +608,79 @@ fn can_sign_transaction_1() {
 fn can_sign_message_1() {
     let dbname = "for_tests/can_sign_message_1";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let line = "530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27df5064c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2ee143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-    let output = produce_output(line, dbname);
-    let message = "4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e".to_string();
+
+    let card_text = hex::encode(b"uuid-abcd");
+    let message = hex::encode(b"<Bytes>uuid-abcd</Bytes>");
+    let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", message);
+    let output = produce_output(&line, dbname);
 
     let content_known = TransactionCardSet {
         message: Some(vec![TransactionCard {
             index: 0,
             indent: 0,
-            card: Card::TextCard { f: message.clone() },
+            card: Card::TextCard { f: card_text },
         }]),
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
+        address: Address {
+            identicon: SignerImage::Png {
+                image: alice_sr_alice().to_vec(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
 
-    let network_info_known = NetworkSpecs {
-        base58prefix: 42,
-        color: "#660D35".to_string(),
-        decimals: 12,
-        encryption: Encryption::Sr25519,
-        genesis_hash: H256::from_str(
-            "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        )
-        .unwrap(),
-        logo: "westend".to_string(),
-        name: "westend".to_string(),
+    let network_info_known = OrderedNetworkSpecs {
+        specs: NetworkSpecs {
+            base58prefix: 42,
+            color: "#660D35".to_string(),
+            decimals: 12,
+            encryption: Encryption::Sr25519,
+            genesis_hash: H256::from_str(
+                "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            )
+            .unwrap(),
+            logo: "westend".to_string(),
+            name: "westend".to_string(),
+            path_id: "//westend".to_string(),
+            secondary_color: "#262626".to_string(),
+            title: "Westend".to_string(),
+            unit: "WND".to_string(),
+        },
         order: 2,
-        path_id: "//westend".to_string(),
-        secondary_color: "#262626".to_string(),
-        title: "Westend".to_string(),
-        unit: "WND".to_string(),
     };
 
-    if let TransactionAction::Sign {
-        content,
-        checksum,
-        has_pwd,
-        author_info,
-        network_info,
-    } = output
-    {
-        assert_eq!(content, content_known);
-        assert_eq!(author_info, author_info_known);
-        assert_eq!(network_info, network_info_known);
+    if let TransactionAction::Sign { actions, checksum } = output {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
+        assert_eq!(network_info, &network_info_known);
         assert!(!has_pwd, "Expected no password");
 
-        match sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname) {
-            Ok(signature) => assert!(
-                (signature.len() == 130) && (signature.starts_with("01")),
+        match sign_action_test(
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            dbname,
+            network_info.specs.encryption,
+        ) {
+            Ok(signature) => assert_eq!(
+                signature.len(),
+                128,
                 "Wrong signature format,\nReceived: \n{}",
                 signature
             ),
@@ -666,10 +721,17 @@ fn can_sign_message_1() {
             history_recorded
         );
 
-        let result = sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname);
+        let result = sign_action_test(
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            dbname,
+            network_info.specs.encryption,
+        );
         if let Err(e) = result {
-            let expected_err = ErrorSigner::Database(DatabaseSigner::ChecksumMismatch);
-            if <Signer>::show(&e) != <Signer>::show(&expected_err) {
+            if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
+            } else {
                 panic!("Expected wrong checksum. Got error: {:?}.", e)
             }
         } else {
@@ -699,7 +761,7 @@ fn add_specs_westend_no_network_info_not_signed() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 42,
                     color: "#660D35".to_string(),
                     decimals: 12,
@@ -733,7 +795,7 @@ fn add_specs_westend_no_network_info_not_signed() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before = print_db_content(dbname);
@@ -781,7 +843,7 @@ fn add_specs_westend_ed25519_not_signed() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 42,
                     color: "#660D35".to_string(),
                     decimals: 12,
@@ -815,7 +877,7 @@ fn add_specs_westend_ed25519_not_signed() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before =
@@ -1031,7 +1093,9 @@ fn load_westend9070() {
                     specs_version: "9070".to_string(),
                     meta_hash: "e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"
                         .to_string(),
-                    meta_id_pic: westend_9070().to_vec(),
+                    meta_id_pic: SignerImage::Png {
+                        image: westend_9070().to_vec(),
+                    },
                 },
             },
         }]),
@@ -1051,7 +1115,7 @@ fn load_westend9070() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before =
@@ -1144,7 +1208,9 @@ fn load_known_types_upd_general_verifier() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1171,7 +1237,9 @@ fn load_known_types_upd_general_verifier() {
                         "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"
                             .to_string(),
                     ),
-                    types_id_pic: Some(types_known().to_vec()),
+                    types_id_pic: Some(SignerImage::Png {
+                        image: types_known().to_vec(),
+                    }),
                 },
             },
         }]),
@@ -1186,7 +1254,7 @@ fn load_known_types_upd_general_verifier() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before =
@@ -1267,7 +1335,9 @@ fn load_new_types_verified() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1289,7 +1359,9 @@ fn load_new_types_verified() {
                         "d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"
                             .to_string(),
                     ),
-                    types_id_pic: Some(types_unknown().to_vec()),
+                    types_id_pic: Some(SignerImage::Png {
+                        image: types_unknown().to_vec(),
+                    }),
                 },
             },
         }]),
@@ -1304,7 +1376,7 @@ fn load_new_types_verified() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before = print_db_content(dbname)
@@ -1406,7 +1478,7 @@ fn dock_adventures_1() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1441,7 +1513,7 @@ fn dock_adventures_1() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before =
@@ -1544,7 +1616,9 @@ Identities:
                     specs_version: "31".to_string(),
                     meta_hash: "28c25067d5c0c739f64f7779c5f3095ecf57d9075b0c5258f3be2df6d7f323d0"
                         .to_string(),
-                    meta_id_pic: dock_31().to_vec(),
+                    meta_id_pic: SignerImage::Png {
+                        image: dock_31().to_vec(),
+                    },
                 },
             },
         }]),
@@ -1564,7 +1638,7 @@ Identities:
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         handle_stub(checksum, dbname).unwrap();
@@ -1627,7 +1701,9 @@ Identities:
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1653,7 +1729,7 @@ Identities:
             index: 4,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1688,7 +1764,7 @@ Identities:
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         handle_stub(checksum, dbname).unwrap();
@@ -1751,7 +1827,7 @@ fn dock_adventures_2() {
             index: 1,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -1786,7 +1862,7 @@ fn dock_adventures_2() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before = print_db_content(dbname)
@@ -1891,7 +1967,9 @@ Identities:
                     specs_version: "31".to_string(),
                     meta_hash: "28c25067d5c0c739f64f7779c5f3095ecf57d9075b0c5258f3be2df6d7f323d0"
                         .to_string(),
-                    meta_id_pic: dock_31().to_vec(),
+                    meta_id_pic: SignerImage::Png {
+                        image: dock_31().to_vec(),
+                    },
                 },
             },
         }]),
@@ -1911,7 +1989,7 @@ Identities:
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         handle_stub(checksum, dbname).unwrap();
@@ -1976,7 +2054,9 @@ Identities:
                 f: MVerifierDetails {
                     public_key: "88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee"
                         .to_string(),
-                    identicon: ed().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: ed().to_vec(),
+                    },
                     encryption: "ed25519".to_string(),
                 },
             },
@@ -1997,7 +2077,7 @@ Identities:
             index: 3,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -2033,7 +2113,7 @@ Identities:
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         handle_stub(checksum, dbname).unwrap();
@@ -2095,7 +2175,9 @@ Identities:
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -2116,7 +2198,7 @@ Identities:
             index: 3,
             indent: 0,
             card: Card::NewSpecsCard {
-                f: NetworkSpecsToSend {
+                f: NetworkSpecs {
                     base58prefix: 22,
                     color: "#660D35".to_string(),
                     decimals: 6,
@@ -2151,7 +2233,7 @@ Identities:
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         handle_stub(checksum, dbname).unwrap();
@@ -2224,7 +2306,9 @@ fn can_parse_westend_with_v14() {
                     specs_version: "9111".to_string(),
                     meta_hash: "207956815bc7b3234fa8827ef40df5fd2879e93f18a680e22bc6801bca27312d"
                         .to_string(),
-                    meta_id_pic: westend_9111().to_vec(),
+                    meta_id_pic: SignerImage::Png {
+                        image: westend_9111().to_vec(),
+                    },
                 },
             },
         }]),
@@ -2245,7 +2329,7 @@ fn can_parse_westend_with_v14() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before =
@@ -2376,7 +2460,9 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: bob().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: bob().to_vec(),
+                        },
                     },
                 },
             },
@@ -2459,29 +2545,42 @@ Identities:
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "//Alice".to_string(),
-        has_pwd: false,
         multiselect: None,
+        address: Address {
+            identicon: SignerImage::Png {
+                image: alice_sr_alice().to_vec(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
     // TODO: let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
-    if let TransactionAction::Sign {
-        content,
-        checksum,
-        has_pwd,
-        author_info,
-        network_info: _,
-    } = output
-    {
-        assert_eq!(content, content_known);
-        assert_eq!(author_info, author_info_known);
+    if let TransactionAction::Sign { actions, checksum } = output {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
         // TODO: assert_eq!(network_info, network_info_known);
         assert!(!has_pwd, "Expected no password");
-        sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname).unwrap();
+        sign_action_test(
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            dbname,
+            network_info.specs.encryption,
+        )
+        .unwrap();
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -2569,7 +2668,9 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
-                        identicon: alice_sr_root().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_root().to_vec(),
+                        },
                     },
                 },
             },
@@ -2662,7 +2763,9 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5CFPcUJgYgWryPaV1aYjSbTpbTLu42V32Ytw1L9rfoMAsfGh".to_string(),
-                        identicon: id_04().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: id_04().to_vec(),
+                        },
                     },
                 },
             },
@@ -2682,7 +2785,9 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5G1ojzh47Yt8KoYhuAjXpHcazvsoCXe3G8LZchKDvumozJJJ".to_string(),
-                        identicon: id_01().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: id_01().to_vec(),
+                        },
                     },
                 },
             },
@@ -2702,7 +2807,9 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f".to_string(),
-                        identicon: id_02().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: id_02().to_vec(),
+                        },
                     },
                 },
             },
@@ -2761,29 +2868,43 @@ Identities:
         ..Default::default()
     };
 
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
-        identicon: alice_sr_root().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: String::new(),
-        has_pwd: false,
         multiselect: None,
+        address: Address {
+            identicon: SignerImage::Png {
+                image: alice_sr_root().to_vec(),
+            },
+            seed_name: "Alice".to_string(),
+            path: String::new(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
     // TODO let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
-    if let TransactionAction::Sign {
-        content,
-        checksum,
-        has_pwd,
-        author_info,
-        network_info: _,
-    } = output
-    {
-        assert_eq!(content, content_known);
-        assert_eq!(author_info, author_info_known);
+    if let TransactionAction::Sign { actions, checksum } = output {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
         // TODO assert_eq!(network_info, network_info_known);
         assert!(!has_pwd, "Expected no password");
-        sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname).unwrap();
+        sign_action_test(
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            dbname,
+            network_info.specs.encryption,
+        )
+        .unwrap();
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -2840,7 +2961,9 @@ fn parse_transaction_alice_remarks_westend9122() {
                     specs_version: "9122".to_string(),
                     meta_hash: "d656951f4c58c9fdbe029be33b02a7095abc3007586656be7ff68fd0550d6ced"
                         .to_string(),
-                    meta_id_pic: westend_9122().to_vec(),
+                    meta_id_pic: SignerImage::Png {
+                        image: westend_9122().to_vec(),
+                    },
                 },
             },
         }]),
@@ -2860,7 +2983,7 @@ fn parse_transaction_alice_remarks_westend9122() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
         handle_stub(checksum, dbname).unwrap();
     } else {
@@ -2966,26 +3089,31 @@ fn parse_transaction_alice_remarks_westend9122() {
         ]),
         ..Default::default()
     };
-    let author_info_known = Address {
+    let author_info_known = MAddressCard {
         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
-        identicon: alice_sr_root().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: String::new(),
-        has_pwd: false,
         multiselect: None,
+        address: Address {
+            identicon: SignerImage::Png {
+                image: alice_sr_root().to_vec(),
+            },
+            seed_name: "Alice".to_string(),
+            path: String::new(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
     };
     // TODO let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
-    if let TransactionAction::Sign {
-        content,
-        checksum: _,
-        has_pwd,
-        author_info,
-        network_info: _,
-    } = output
-    {
-        assert_eq!(content, content_known);
-        assert_eq!(author_info, author_info_known);
+    if let TransactionAction::Sign { actions, .. } = output {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            ..
+        } = &actions[0];
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
         // TODO: assert_eq!(network_info == network_info_known);
         assert!(!has_pwd, "Expected no password");
     } else {
@@ -3027,7 +3155,9 @@ fn proper_hold_display() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -3054,7 +3184,9 @@ fn proper_hold_display() {
                         "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"
                             .to_string(),
                     ),
-                    types_id_pic: Some(types_known().to_vec()),
+                    types_id_pic: Some(SignerImage::Png {
+                        image: types_known().to_vec(),
+                    }),
                 },
             },
         }]),
@@ -3069,7 +3201,7 @@ fn proper_hold_display() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
     } else {
         panic!("Wrong action: {:?}", output)
@@ -3130,7 +3262,7 @@ Identities:
     };
 
     if let TransactionAction::Read { r: reply } = output {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -3258,7 +3390,7 @@ Identities:
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt")
             .unwrap();
-    let error = "Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
+    let error = "Bad input data. Database error. Internal error. Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
 
     let output = produce_output(line.trim(), dbname);
     let reply_known = TransactionCardSet {
@@ -3271,7 +3403,7 @@ Identities:
     };
 
     if let TransactionAction::Read { r: reply } = output {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -3281,7 +3413,7 @@ Identities:
             .unwrap();
     let output = produce_output(line.trim(), dbname);
 
-    let error = "Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
+    let error = "Bad input data. Database error. Internal error. Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
     let reply_known = TransactionCardSet {
         error: Some(vec![TransactionCard {
             index: 0,
@@ -3292,7 +3424,7 @@ Identities:
     };
 
     if let TransactionAction::Read { r: reply } = output {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -3358,9 +3490,11 @@ Identities:"#;
             index: 0,
             indent: 0,
             card: Card::AuthorPlainCard {
-                f: MSCAuthorPlain {
+                f: MSCId {
                     base58: "25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C".to_string(),
-                    identicon: id_05().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: id_05().to_vec(),
+                    },
                 },
             },
         }]),
@@ -3417,7 +3551,9 @@ Identities:"#;
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C".to_string(),
-                        identicon: id_05().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: id_05().to_vec(),
+                        },
                     },
                 },
             },
@@ -3499,7 +3635,7 @@ Identities:"#;
     };
 
     if let TransactionAction::Read { r: content } = output {
-        assert_eq!(content, content_known);
+        assert_eq!(*content, content_known);
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -3553,7 +3689,9 @@ fn shell_no_token_warning_on_metadata() {
                     specs_version: "200".to_string(),
                     meta_hash: "65f0d394de10396c6c1800092f9a95c48ec1365d9302dbf5df736c5e0c54fde3"
                         .to_string(),
-                    meta_id_pic: shell_200().to_vec(),
+                    meta_id_pic: SignerImage::Png {
+                        image: shell_200().to_vec(),
+                    },
                 },
             },
         }]),
@@ -3574,7 +3712,7 @@ fn shell_no_token_warning_on_metadata() {
         stub: stub_nav,
     } = output
     {
-        assert_eq!(reply, reply_known);
+        assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
     } else {
         panic!("Wrong action: {:?}", output)
@@ -3588,7 +3726,7 @@ fn rococo_and_verifiers_1() {
     let dbname = "for_tests/rococo_and_verifiers_1";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with ed25519, custom verifier
+    // added rococo specs with `ed25519`, custom verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-ed25519_Alice-ed25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3602,7 +3740,7 @@ fn rococo_and_verifiers_1() {
         panic!("Wrong action: {:?}", output)
     }
 
-    // added rococo specs with sr25519, custom verifier
+    // added rococo specs with `sr25519`, custom verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-ed25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3657,7 +3795,7 @@ fn rococo_and_verifiers_2() {
     let dbname = "for_tests/rococo_and_verifiers_2";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with sr25519, general verifier, specified one
+    // added rococo specs with `sr25519`, general verifier, specified one
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3713,7 +3851,7 @@ fn rococo_and_verifiers_3() {
     let dbname = "for_tests/rococo_and_verifiers_3";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with sr25519, custom verifier None
+    // added rococo specs with `sr25519`, custom verifier None
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_unverified.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3767,7 +3905,7 @@ fn rococo_and_verifiers_4() {
     let dbname = "for_tests/rococo_and_verifiers_4";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with sr25519, custom verifier None
+    // added rococo specs with `sr25519`, custom verifier None
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_unverified.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3792,7 +3930,7 @@ General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a
 Identities:"#;
     assert_eq!(print, expected_print);
 
-    // added rococo specs with sr25519, general verifier
+    // added rococo specs with `sr25519`, general verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3826,7 +3964,7 @@ fn rococo_and_verifiers_5() {
     let dbname = "for_tests/rococo_and_verifiers_5";
     populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
 
-    // added rococo specs with sr25519, custom verifier
+    // added rococo specs with `sr25519`, custom verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-ed25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {
@@ -3851,7 +3989,7 @@ General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a
 Identities:"#;
     assert_eq!(print, expected_print);
 
-    // added rococo specs with sr25519, general verifier
+    // added rococo specs with `sr25519`, general verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     if let TransactionAction::Stub {

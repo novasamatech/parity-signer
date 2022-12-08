@@ -9,23 +9,35 @@ import SwiftUI
 
 struct SignSufficientCrypto: View {
     let content: MSignSufficientCrypto
-    let pushButton: (Action, String, String) -> Void
+    let navigationRequest: NavigationRequest
     let getSeed: (String) -> String
     var body: some View {
         VStack {
-            Text("Select key for signing")
+            Localizable.selectKeyForSigning.text
             ScrollView {
-                
                 LazyVStack {
-                    ForEach(content.identities, id: \.addressKey) {keyrecord in
-                        Button(action: {
-                            let seedPhrase = getSeed(keyrecord.seedName)
-                            if seedPhrase != "" {
-                                pushButton(.goForward, keyrecord.addressKey, seedPhrase)
+                    ForEach(content.identities, id: \.addressKey) { keyrecord in
+                        Button(
+                            action: {
+                                let seedPhrase = getSeed(keyrecord.address.seedName)
+                                if !seedPhrase.isEmpty {
+                                    navigationRequest(.init(
+                                        action: .goForward,
+                                        details: keyrecord.addressKey,
+                                        seedPhrase: seedPhrase
+                                    ))
+                                }
+                            },
+                            label: {
+                                AddressCard(
+                                    card: MAddressCard(
+                                        base58: keyrecord.publicKey,
+                                        address: keyrecord.address,
+                                        multiselect: nil
+                                    )
+                                )
                             }
-                        }) {
-                            AddressCard(address: Address(base58: keyrecord.publicKey, path: keyrecord.path, hasPwd: keyrecord.hasPwd, identicon: keyrecord.identicon, seedName: keyrecord.seedName, multiselect: nil))
-                        }
+                        )
                     }
                 }
             }
@@ -33,10 +45,8 @@ struct SignSufficientCrypto: View {
     }
 }
 
-/*
- struct SignSufficientCrypto_Previews: PreviewProvider {
- static var previews: some View {
- SignSufficientCrypto()
- }
- }
- */
+// struct SignSufficientCrypto_Previews: PreviewProvider {
+// static var previews: some View {
+// SignSufficientCrypto()
+// }
+// }
