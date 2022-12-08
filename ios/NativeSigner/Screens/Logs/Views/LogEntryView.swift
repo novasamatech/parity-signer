@@ -71,11 +71,8 @@ struct LogEntryView: View {
             .onTapGesture {
                 viewModel.onEventTap()
             }
-            HStack {
-                Spacer()
-            }
+            .padding(.vertical, Spacing.small)
         }
-        .padding(.vertical, Spacing.small)
         .padding(.horizontal, Spacing.large)
         .onAppear {
             viewModel.use(navigation: navigation)

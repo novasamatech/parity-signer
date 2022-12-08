@@ -12,7 +12,7 @@ struct LogsListView: View {
     @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
                     title: Localizable.LogsList.Label.title.string,
@@ -29,9 +29,6 @@ struct LogsListView: View {
                     ForEach(viewModel.renderables, id: \.id) { renderable in
                         LogEntryView(viewModel: .init(renderable: renderable))
                     }
-                }
-                HStack {
-                    Spacer()
                 }
             }
         }
