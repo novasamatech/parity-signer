@@ -11,7 +11,7 @@ use std::path::Path;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
-use definitions::navigation::{Image, MAddressCard, MKeyAndNetworkCard, MKeysNew};
+use definitions::navigation::{MAddressCard, MKeyAndNetworkCard, MKeysNew, SignerImage};
 use definitions::network_specs::NetworkSpecs;
 use definitions::{
     crypto::Encryption,
@@ -122,9 +122,9 @@ where
 /// - the available seed key if there is only one
 /// - preferred seed key, if there are more than one; order of preference:
 /// `Sr25519`, `Ed25519`, `Ecdsa`
-fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> Image {
+fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> SignerImage {
     if multisigner_set.is_empty() {
-        Image::Png {
+        SignerImage::Png {
             image: EMPTY_PNG.to_vec(),
         }
     } else {
@@ -145,7 +145,7 @@ fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> Image {
         } else if let Some(a) = got_ecdsa {
             make_identicon_from_multisigner(&a, IdenticonStyle::Dots)
         } else {
-            Image::Png {
+            SignerImage::Png {
                 image: EMPTY_PNG.to_vec(),
             }
         }
@@ -274,7 +274,7 @@ where
     let network_specs = get_network_specs(&db_path, network_specs_key)?;
     let identities = addresses_set_seed_name_network(&db_path, seed_name, network_specs_key)?;
     let mut root_id = None;
-    let mut other_id: Vec<(MultiSigner, AddressDetails, Image, bool, bool)> = Vec::new();
+    let mut other_id: Vec<(MultiSigner, AddressDetails, SignerImage, bool, bool)> = Vec::new();
     for (multisigner, address_details) in identities.into_iter() {
         let style = address_details.encryption.identicon_style();
         let identicon = make_identicon_from_multisigner(&multisigner, style);

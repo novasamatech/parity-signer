@@ -11,7 +11,7 @@ pub use crate::network_specs::NetworkSpecs;
 #[derive(PartialEq, Eq, Clone)]
 pub struct SeedNameWithIdenticon {
     pub seed_name: String,
-    pub identicon: Image,
+    pub identicon: SignerImage,
 }
 
 /// A single transaction signing action.
@@ -186,7 +186,7 @@ pub struct MKeys {
 #[derive(Clone, Default, Debug, PartialEq, Eq)]
 pub struct MSettings {
     pub public_key: Option<String>,
-    pub identicon: Option<Image>,
+    pub identicon: Option<SignerImage>,
     pub encryption: Option<String>,
     pub error: Option<String>,
 }
@@ -259,7 +259,7 @@ pub struct MTransaction {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SeedNameCard {
     pub seed_name: String,
-    pub identicon: Image,
+    pub identicon: SignerImage,
     pub derived_keys_count: u32,
 }
 
@@ -311,7 +311,7 @@ pub struct DerivationCheck {
 pub struct Address {
     pub path: String,
     pub has_pwd: bool,
-    pub identicon: Image,
+    pub identicon: SignerImage,
     pub seed_name: String,
     pub secret_exposed: bool,
 }
@@ -343,7 +343,7 @@ pub struct MDeriveKey {
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MVerifierDetails {
     pub public_key: String,
-    pub identicon: Image,
+    pub identicon: SignerImage,
     pub encryption: String,
 }
 
@@ -358,7 +358,7 @@ pub struct MMetadataRecord {
     pub specname: String,
     pub specs_version: String,
     pub meta_hash: String,
-    pub meta_id_pic: Image,
+    pub meta_id_pic: SignerImage,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -425,7 +425,7 @@ pub struct PathAndNetwork {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MSCContent {
-    LoadTypes { types: String, pic: Image },
+    LoadTypes { types: String, pic: SignerImage },
     LoadMetadata { name: String, version: u32 },
     AddSpecs { f: MSCNetworkInfo },
 }
@@ -466,7 +466,7 @@ pub struct MSeedMenu {
 pub struct MNewSeedBackup {
     pub seed: String,
     pub seed_phrase: String,
-    pub identicon: Image,
+    pub identicon: SignerImage,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -536,7 +536,7 @@ pub struct MManageMetadata {
     pub name: String,
     pub version: String,
     pub meta_hash: String,
-    pub meta_id_pic: Image,
+    pub meta_id_pic: SignerImage,
     pub networks: Vec<MMMNetwork>,
 }
 
@@ -544,7 +544,7 @@ pub struct MManageMetadata {
 pub struct MTypesInfo {
     pub types_on_file: bool,
     pub types_hash: Option<String>,
-    pub types_id_pic: Option<Image>,
+    pub types_id_pic: Option<SignerImage>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -609,12 +609,12 @@ pub struct MSCFieldNumber {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum Image {
+pub enum SignerImage {
     Svg { image: Vec<u8> },
     Png { image: Vec<u8> },
 }
 
-impl Default for Image {
+impl Default for SignerImage {
     fn default() -> Self {
         Self::Png {
             image: EMPTY_PNG.to_vec(),
@@ -625,7 +625,7 @@ impl Default for Image {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MSCId {
     pub base58: String,
-    pub identicon: Image,
+    pub identicon: SignerImage,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
