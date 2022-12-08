@@ -14,10 +14,12 @@ import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.IdentIcon
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.navigate
+import io.parity.signer.models.toBytes
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MTypesInfo
+import io.parity.signer.uniffi.SignerImage
 
 @Composable
 fun TypesInfo(typesInfo: MTypesInfo, signerDataModel: SignerDataModel) {
@@ -35,7 +37,7 @@ fun TypesInfo(typesInfo: MTypesInfo, signerDataModel: SignerDataModel) {
 				HeaderBar(line1 = "MANAGE TYPES", line2 = "Select action")
 				if (typesInfo.typesOnFile) {
 					Row {
-						IdentIcon(identicon = typesInfo.typesIdPic?:listOf())
+						IdentIcon(identicon = typesInfo.typesIdPic?:SignerImage.Png(listOf()))
 						Text(typesInfo.typesHash ?: "")
 					}
 				} else {

@@ -217,7 +217,7 @@ struct EnterPasswordModal_Previews: PreviewProvider {
                             address: .init(
                                 path: "//polkadot",
                                 hasPwd: true,
-                                identicon: PreviewData.exampleIdenticon,
+                                identicon: .svg(image: PreviewData.exampleIdenticon),
                                 seedName: "Parity Keys",
                                 secretExposed: true
                             ),

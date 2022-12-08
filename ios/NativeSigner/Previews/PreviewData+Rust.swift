@@ -11,7 +11,7 @@ extension PreviewData {
     static let address: Address = .init(
         path: "// polkadot",
         hasPwd: true,
-        identicon: PreviewData.exampleIdenticon,
+        identicon: .svg(image: PreviewData.exampleIdenticon),
         seedName: "main account",
         secretExposed: false
     )
@@ -23,7 +23,7 @@ extension PreviewData {
             address: .init(
                 path: "",
                 hasPwd: false,
-                identicon: [],
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 seedName: "",
                 secretExposed: false
             ),
@@ -41,7 +41,7 @@ extension PreviewData {
         address: .init(
             path: "",
             hasPwd: false,
-            identicon: [],
+            identicon: .svg(image: PreviewData.exampleIdenticon),
             seedName: "",
             secretExposed: false
         ),
@@ -57,7 +57,7 @@ extension PreviewData {
             address: .init(
                 path: "",
                 hasPwd: false,
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 seedName: "",
                 secretExposed: false
             ),
@@ -73,7 +73,7 @@ extension PreviewData {
         address: .init(
             path: "",
             hasPwd: false,
-            identicon: [],
+            identicon: .svg(image: PreviewData.exampleIdenticon),
             seedName: "",
             secretExposed: false
         ),
@@ -87,7 +87,7 @@ extension PreviewData {
 
     static let seedNameCard = SeedNameCard(
         seedName: "aaaa",
-        identicon: PreviewData.exampleIdenticon,
+        identicon: .svg(image: PreviewData.exampleIdenticon),
         derivedKeysCount: 3
     )
 
@@ -95,37 +95,37 @@ extension PreviewData {
         seedNameCards: [
             SeedNameCard(
                 seedName: "aaaa",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 3
             ),
             SeedNameCard(
                 seedName: "bbbb",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 0
             ),
             SeedNameCard(
                 seedName: "cccc",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 1
             ),
             SeedNameCard(
                 seedName: "dddd",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 4
             ),
             SeedNameCard(
                 seedName: "eeee",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 15
             ),
             SeedNameCard(
                 seedName: "ffff",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 1
             ),
             SeedNameCard(
                 seedName: "gggg",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 0
             )
         ]
@@ -182,7 +182,7 @@ extension PreviewData {
                     indent: 4,
                     card: .idCard(f: .init(
                         base58: "5FeSzkpTHV9N86kj61QLVaYU7pndHuCD7Cjj3zyzUhxxKZ5i",
-                        identicon: PreviewData.exampleIdenticon
+                        identicon: .svg(image: PreviewData.exampleIdenticon)
                     ))
                 ),
                 .init(
@@ -204,7 +204,7 @@ extension PreviewData {
             address: .init(
                 path: "",
                 hasPwd: true,
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 seedName: "Seed name",
                 secretExposed: false
             ), multiselect: nil

@@ -30,7 +30,7 @@ struct KeyDetailsPublicKeyViewModel: Equatable {
         } else {
             footer = .address(
                 .init(
-                    identicon: keyDetails.address.identicon,
+                    identicon: keyDetails.address.identicon.svgPayload,
                     rootKeyName: keyDetails.address.seedName,
                     path: keyDetails.address.path,
                     network: keyDetails.networkInfo.networkTitle,

@@ -2412,9 +2412,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4dd2138c08c8a11f671b7ff011672d796e64adebf4f1d8c22d7930a35a6a8418"
 dependencies = [
  "blake2-rfc",
+ "hex",
  "image",
  "palette",
  "png",
+ "svg",
 ]
 
 [[package]]
@@ -3746,6 +3748,12 @@ name = "subtle"
 version = "2.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
+
+[[package]]
+name = "svg"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e72d8b19ab05827afefcca66bf47040c1e66a0901eb814784c77d4ec118bd309"
 
 [[package]]
 name = "syn"

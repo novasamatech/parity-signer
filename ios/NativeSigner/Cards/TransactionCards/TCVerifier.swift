@@ -50,7 +50,7 @@ struct TCVerifier_Previews: PreviewProvider {
         TCVerifier(
             value: MVerifierDetails(
                 publicKey: "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
-                identicon: [],
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 encryption: "sr25519"
             )
         )

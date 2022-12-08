@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.models.toBytes
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.MscId
