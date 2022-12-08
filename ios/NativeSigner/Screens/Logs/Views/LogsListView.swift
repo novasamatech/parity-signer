@@ -26,7 +26,7 @@ struct LogsListView: View {
             )
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0) {
-                    ForEach(viewModel.renderables, id: \.self) { renderable in
+                    ForEach(viewModel.renderables, id: \.id) { renderable in
                         LogEntryView(viewModel: .init(renderable: renderable))
                     }
                 }

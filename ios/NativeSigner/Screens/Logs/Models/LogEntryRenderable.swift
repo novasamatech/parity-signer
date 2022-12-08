@@ -7,13 +7,14 @@
 
 import Foundation
 
-struct LogEntryRenderable: Equatable, Hashable {
+struct LogEntryRenderable: Equatable, Hashable, Identifiable {
     enum EntryType: Equatable {
         case basic
         case bottomDetails
         case fullDetails
     }
 
+    let id = UUID()
     let title: String
     let displayValue: String?
     let additionalValue: String?
