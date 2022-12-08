@@ -20,7 +20,7 @@ struct AddressCard: View {
             RoundedRectangle(cornerRadius: 4).foregroundColor(Asset.bg200.swiftUIColor).frame(height: 44)
             HStack {
                 ZStack {
-                    Identicon(identicon: card.address.identicon.svgPayload)
+                    Identicon(identicon: card.address.identicon)
                     if multiselectMode {
                         VStack {
                             Spacer()

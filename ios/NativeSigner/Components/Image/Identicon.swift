@@ -14,17 +14,17 @@ struct Identicon: View {
     let identicon: Data
     var rowHeight: CGFloat?
 
-    init(identicon: [UInt8], rowHeight: CGFloat? = 28) {
+    init(identicon: [UInt8], rowHeight: CGFloat? = Heights.identiconInCell) {
         self.identicon = Data(identicon)
         self.rowHeight = rowHeight
     }
 
-    init(identicon: SignerImage, rowHeight: CGFloat? = 28) {
+    init(identicon: SignerImage, rowHeight: CGFloat? = Heights.identiconInCell) {
         self.identicon = Data(identicon.svgPayload)
         self.rowHeight = rowHeight
     }
 
-    init(identicon: Data, rowHeight: CGFloat? = 28) {
+    init(identicon: Data, rowHeight: CGFloat? = Heights.identiconInCell) {
         self.identicon = identicon
         self.rowHeight = rowHeight
     }
