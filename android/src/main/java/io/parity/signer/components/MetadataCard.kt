@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
+import io.parity.signer.models.toBytes
 import io.parity.signer.uniffi.MMetadataRecord
 
 @Composable

@@ -24,6 +24,7 @@ import io.parity.signer.models.Navigator
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.SignerImage
 
 /**
  * Bar to be shown on the bottom of screen;

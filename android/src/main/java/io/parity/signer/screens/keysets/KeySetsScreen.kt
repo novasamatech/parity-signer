@@ -29,6 +29,7 @@ import io.parity.signer.ui.navigationselectors.KeySetsNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.backgroundSystem
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.SignerImage
 
 /**
  * Default main screen with list Seeds/root keys

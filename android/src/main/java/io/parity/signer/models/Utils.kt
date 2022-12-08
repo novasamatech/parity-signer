@@ -4,8 +4,18 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import io.parity.signer.uniffi.SignerImage
 
 typealias Callback = () -> Unit
+
+fun SignerImage.toBytes(): List<UByte> {
+	val image = when (this) {
+		is SignerImage.Png -> this.image
+		is SignerImage.Svg -> listOf()
+	}
+	return image
+}
+
 
 /**
  * Decodes from hex string into number array

@@ -29,6 +29,7 @@ import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textTertiary
+import io.parity.signer.uniffi.SignerImage
 
 @Composable
 fun KeyDerivedItemMultiselect(
