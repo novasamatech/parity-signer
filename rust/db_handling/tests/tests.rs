@@ -38,7 +38,7 @@ use definitions::{
         Address, DerivationCheck as NavDerivationCheck, DerivationDestination, DerivationEntry,
         DerivationPack, MBackup, MDeriveKey, MKeyDetails, MKeysCard, MMMNetwork, MMNetwork,
         MManageMetadata, MMetadataRecord, MNetworkDetails, MNetworkMenu, MRawKey, MSCNetworkInfo,
-        MTypesInfo, MVerifier, Network, NetworkSpecs, SeedNameCard,
+        MTypesInfo, MVerifier, Network, NetworkSpecs, SeedNameCard, SignerImage,
     },
     network_specs::{OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
     users::AddressDetails,
@@ -82,7 +82,9 @@ fn print_seed_names() {
     let cards = get_all_seed_names_with_identicons(dbname, &[String::from("Alice")]).unwrap();
     let expected_cards = vec![SeedNameCard {
         seed_name: "Alice".to_string(),
-        identicon: alice_sr_root().to_vec(),
+        identicon: SignerImage::Png {
+            image: alice_sr_root().to_vec(),
+        },
         derived_keys_count: 4, // "//westend", "//kusama", "//polkadot", "//Alice"
     }];
     assert!(cards == expected_cards, "\nReceived: \n{:?}", cards);
@@ -103,12 +105,16 @@ fn print_seed_names_with_orphan() {
     let expected_cards = vec![
         SeedNameCard {
             seed_name: "Alice".to_string(),
-            identicon: alice_sr_root().to_vec(),
+            identicon: SignerImage::Png {
+                image: alice_sr_root().to_vec(),
+            },
             derived_keys_count: 4,
         },
         SeedNameCard {
             seed_name: "BobGhost".to_string(),
-            identicon: empty_png().to_vec(),
+            identicon: SignerImage::Png {
+                image: empty_png().to_vec(),
+            },
             derived_keys_count: 0,
         },
     ];
@@ -119,6 +125,8 @@ fn print_seed_names_with_orphan() {
 #[cfg(feature = "test")]
 #[test]
 fn print_all_ids() {
+    use definitions::navigation::SignerImage;
+
     let dbname = "for_tests/print_all_ids";
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let keys = print_all_identities(dbname).unwrap();
@@ -131,7 +139,9 @@ fn print_all_ids() {
                 .to_string(),
             address: Address {
                 seed_name: "Alice".to_string(),
-                identicon: alice_sr_westend().to_vec(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_westend().to_vec(),
+                },
                 has_pwd: false,
                 path: "//westend".to_string(),
                 secret_exposed: false,
@@ -144,7 +154,9 @@ fn print_all_ids() {
                 .to_string(),
             address: Address {
                 seed_name: "Alice".to_string(),
-                identicon: alice_sr_root().to_vec(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_root().to_vec(),
+                },
                 has_pwd: false,
                 path: "".to_string(),
                 secret_exposed: false,
@@ -157,7 +169,9 @@ fn print_all_ids() {
                 .to_string(),
             address: Address {
                 seed_name: "Alice".to_string(),
-                identicon: alice_sr_kusama().to_vec(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_kusama().to_vec(),
+                },
                 has_pwd: false,
                 path: "//kusama".to_string(),
                 secret_exposed: false,
@@ -170,7 +184,9 @@ fn print_all_ids() {
                 .to_string(),
             address: Address {
                 seed_name: "Alice".to_string(),
-                identicon: alice_sr_alice().to_vec(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_alice().to_vec(),
+                },
                 has_pwd: false,
                 path: "//Alice".to_string(),
                 secret_exposed: false,
@@ -183,7 +199,9 @@ fn print_all_ids() {
                 .to_string(),
             address: Address {
                 seed_name: "Alice".to_string(),
-                identicon: alice_sr_polkadot().to_vec(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_polkadot().to_vec(),
+                },
                 has_pwd: false,
                 path: "//polkadot".to_string(),
                 secret_exposed: false,
@@ -217,7 +235,9 @@ fn print_ids_seed_name_network() {
             address: Address {
                 path: "".to_string(),
                 seed_name: "Alice".to_string(),
-                identicon: alice_sr_root().to_vec(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_root().to_vec(),
+                },
                 secret_exposed: false,
                 has_pwd: false,
             },
@@ -233,7 +253,9 @@ fn print_ids_seed_name_network() {
                     .to_string(),
                 base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
                 address: Address {
-                    identicon: alice_sr_westend().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_westend().to_vec(),
+                    },
                     has_pwd: false,
                     path: "//westend".to_string(),
                     secret_exposed: false,
@@ -249,7 +271,9 @@ fn print_ids_seed_name_network() {
                 swiped: false,
                 multiselect: false,
                 address: Address {
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     has_pwd: false,
                     path: "//Alice".to_string(),
                     secret_exposed: false,
@@ -352,6 +376,8 @@ fn first_standard_network() {
 #[cfg(feature = "test")]
 #[test]
 fn export_alice_westend() {
+    use definitions::navigation::SignerImage;
+
     let dbname = "for_tests/export_alice_westend";
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let public: [u8; 32] =
@@ -375,7 +401,9 @@ fn export_alice_westend() {
         pubkey: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a".to_string(),
         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
         address: Address {
-            identicon: alice_sr_root().to_vec(),
+            identicon: SignerImage::Png {
+                image: alice_sr_root().to_vec(),
+            },
             seed_name: "Alice".to_string(),
             path: "".to_string(),
             has_pwd: false,
@@ -544,7 +572,9 @@ fn derive_prep_alice_collided() {
                 address: Address {
                     path: "//Alice".to_string(),
                     has_pwd: false,
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     seed_name: "Alice".to_string(),
                     secret_exposed: false,
                 },
@@ -615,7 +645,9 @@ fn derive_prep_alice_collided_with_password() {
                 address: Address {
                     path: "//secret".to_string(),
                     has_pwd: true,
-                    identicon: alice_sr_secret_abracadabra().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_secret_abracadabra().to_vec(),
+                    },
                     seed_name: "Alice".to_string(),
                     secret_exposed: false,
                 },
@@ -661,7 +693,9 @@ fn westend_network_details() {
             ttype: "general".to_string(),
             details: definitions::navigation::MVerifierDetails {
                 public_key: "".to_string(),
-                identicon: empty_png().to_vec(),
+                identicon: SignerImage::Png {
+                    image: empty_png().to_vec(),
+                },
                 encryption: "".to_string(),
             },
         },
@@ -671,14 +705,18 @@ fn westend_network_details() {
                 specs_version: "9000".to_string(),
                 meta_hash: "e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce"
                     .to_string(),
-                meta_id_pic: westend_9000().to_vec(),
+                meta_id_pic: SignerImage::Png {
+                    image: westend_9000().to_vec(),
+                },
             },
             MMetadataRecord {
                 specname: "westend".to_string(),
                 specs_version: "9010".to_string(),
                 meta_hash: "70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf"
                     .to_string(),
-                meta_id_pic: westend_9010().to_vec(),
+                meta_id_pic: SignerImage::Png {
+                    image: westend_9010().to_vec(),
+                },
             },
         ],
     };
@@ -705,7 +743,9 @@ fn westend_9010_metadata_details() {
         name: "westend".to_string(),
         version: "9010".to_string(),
         meta_hash: "70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf".to_string(),
-        meta_id_pic: westend_9010().to_vec(),
+        meta_id_pic: SignerImage::Png {
+            image: westend_9010().to_vec(),
+        },
         networks: vec![MMMNetwork {
             title: "Westend".to_string(),
             logo: "westend".to_string(),
@@ -729,7 +769,9 @@ fn types_status_and_history() {
         types_hash: Some(
             "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string(),
         ),
-        types_id_pic: Some(types_known().to_vec()),
+        types_id_pic: Some(SignerImage::Png {
+            image: types_known().to_vec(),
+        }),
     };
     assert_eq!(types, expected_types);
 
@@ -778,7 +820,9 @@ fn path_is_known() {
             address: Address {
                 path: "//Alice".to_string(),
                 has_pwd: false,
-                identicon: alice_sr_alice().to_vec(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_alice().to_vec(),
+                },
                 seed_name: "Alice".to_string(),
                 secret_exposed: false,
             },
