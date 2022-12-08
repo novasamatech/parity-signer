@@ -112,6 +112,7 @@ data class TCWithTrioMarkdownModel(
 				name = "method name",
 				docsFieldName = "docs Field Numbar",
 				pathType = "pathTYpe",
+	//todo dmitry			//ios/NativeSigner/Models/Utils.swift:38
 				docsType = PreviewData.exampleMarkdownDocs,
 				isNumber = false
 			)
