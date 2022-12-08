@@ -12,7 +12,7 @@ struct TCTypesInfo: View {
     var body: some View {
         HStack {
             if let identicon = content.typesIdPic {
-                Identicon(identicon: identicon)
+                Identicon(identicon: identicon.svgPayload)
             }
             TCNamedValueCard(
                 name: Localizable.TCName.typesHash.string,
@@ -29,7 +29,7 @@ struct TCTypesInfo_Previews: PreviewProvider {
                 content: MTypesInfo(
                     typesOnFile: false,
                     typesHash: "typesHas",
-                    typesIdPic: PreviewData.exampleIdenticon
+                    typesIdPic: .svg(image: PreviewData.exampleIdenticon)
                 )
             )
         }

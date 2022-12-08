@@ -35,7 +35,7 @@ final class ExportPrivateKeyService {
         return ExportPrivateKeyViewModel(
             qrCode: .init(qrCode: qrCode),
             addressFooter: .init(
-                identicon: keyDetails.address.identicon,
+                identicon: keyDetails.address.identicon.svgPayload,
                 rootKeyName: keyDetails.address.seedName,
                 path: keyDetails.address.path,
                 network: keyDetails.networkInfo.networkTitle,

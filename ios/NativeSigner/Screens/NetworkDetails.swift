@@ -42,7 +42,7 @@ struct NetworkDetails: View {
                         case "general":
                             Localizable.general.text
                         case "custom":
-                            Identicon(identicon: content.currentVerifier.details.identicon)
+                            Identicon(identicon: content.currentVerifier.details.identicon.svgPayload)
                             VStack {
                                 Localizable.custom.text
                                 Text(content.currentVerifier.details.publicKey)

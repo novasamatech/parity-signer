@@ -11,7 +11,7 @@ struct TCAuthorPlain: View {
     var value: MscId
     var body: some View {
         HStack {
-            Identicon(identicon: value.identicon)
+            Identicon(identicon: value.identicon.svgPayload)
             TCNamedValueCard(name: Localizable.TCName.from.string, value: value.base58)
         }
     }
@@ -19,6 +19,6 @@ struct TCAuthorPlain: View {
 
 struct TCAuthorPlain_Previews: PreviewProvider {
     static var previews: some View {
-        TCAuthorPlain(value: MscId(base58: PreviewData.base58, identicon: PreviewData.exampleIdenticon))
+        TCAuthorPlain(value: MscId(base58: PreviewData.base58, identicon: .svg(image: PreviewData.exampleIdenticon)))
     }
 }
