@@ -270,7 +270,7 @@ pub struct MSeeds {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MKeyDetails {
-    pub qr: Vec<u8>,
+    pub qr: QrData,
     pub pubkey: String,
     pub network_info: MSCNetworkInfo,
     pub base58: String,
@@ -428,6 +428,12 @@ pub enum MSCContent {
     LoadTypes { types: String, pic: SignerImage },
     LoadMetadata { name: String, version: u32 },
     AddSpecs { f: MSCNetworkInfo },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum QrData {
+    Regular { data: Vec<u8> },
+    Sensitive { data: Vec<u8> },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

@@ -75,10 +75,8 @@ use definitions::{
 #[cfg(feature = "signer")]
 use definitions::{
     helpers::make_identicon_from_multisigner,
-    navigation::{Address, MKeyDetails, MSCNetworkInfo},
+    navigation::{Address, MKeyDetails, MSCNetworkInfo, QrData},
 };
-#[cfg(feature = "signer")]
-use qrcode_static::{png_qr_from_string, DataType};
 
 #[cfg(any(feature = "active", feature = "signer"))]
 use crate::{
@@ -1640,7 +1638,7 @@ where
         }],
     )?;
 
-    let mut qr = generate_secret_qr(
+    let qr = generate_secret_qr(
         multisigner,
         &address_details,
         &network_specs.specs.genesis_hash,
@@ -1654,7 +1652,6 @@ where
         .set_history(history_batch) // add corresponding history
         .apply(&db_path)
     {
-        qr.zeroize();
         return Err(e);
     };
 
@@ -1679,8 +1676,9 @@ fn generate_secret_qr(
     genesis_hash: &H256,
     seed_phrase: &str,
     pwd: Option<&str>,
-) -> Result<Vec<u8>> {
+) -> Result<QrData> {
     // create fixed-length string to avoid reallocations
+
     let mut full_address = String::with_capacity(seed_phrase.len() + address_details.path.len());
     full_address.push_str(seed_phrase);
     full_address.push_str(&address_details.path);
@@ -1696,17 +1694,17 @@ fn generate_secret_qr(
         }
     };
 
-    let qr = png_qr_from_string(
-        &format!(
+    let qr = QrData::Sensitive {
+        data: format!(
             "secret:0x{}:{}",
             hex::encode(secret),
             hex::encode(genesis_hash)
-        ),
-        DataType::Sensitive,
-    )
-    .map_err(|e| Error::Qr(e.to_string()));
+        )
+        .as_bytes()
+        .to_vec(),
+    };
     secret.zeroize();
-    qr
+    Ok(qr)
 }
 
 #[cfg(test)]

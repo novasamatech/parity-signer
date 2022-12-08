@@ -13,7 +13,6 @@ use sign_message::{
     sufficient_crypto_add_specs, sufficient_crypto_load_metadata, sufficient_crypto_load_types,
 };
 mod sign_transaction;
-use sign_transaction::create_signature_png;
 #[cfg(test)]
 mod tests;
 
@@ -35,7 +34,7 @@ pub fn handle_sign(
     idx: usize,
     encryption: Encryption,
 ) -> Result<Vec<u8>> {
-    create_signature_png(
+    create_signature(
         seed_phrase,
         pwd_entry,
         user_comment,
@@ -44,6 +43,7 @@ pub fn handle_sign(
         idx,
         encryption,
     )
+    .and_then(|s| Ok(s.to_string().as_bytes().to_vec()))
 }
 
 ///Possible content to generate sufficient crypto for
