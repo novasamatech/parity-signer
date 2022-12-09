@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
-import io.parity.signer.models.toBytes
+import io.parity.signer.components.toImageContent
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.MscId
@@ -16,7 +16,7 @@ import io.parity.signer.uniffi.MscId
 @Composable
 fun TCAuthorPlain(author: MscId) {
 	Row {
-		IdentIcon(author.identicon)
+		IdentIcon(author.identicon.toImageContent())
 		TCNameValueElement(
 			name = stringResource(R.string.transaction_field_from),
 			value = author.base58,
