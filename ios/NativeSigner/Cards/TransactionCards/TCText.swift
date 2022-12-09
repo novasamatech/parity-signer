@@ -11,7 +11,7 @@ struct TCText: View {
     let text: String
     var body: some View {
         HStack {
-            Text(AttributedString.build(fromHexDocs: text) ?? AttributedString(text))
+            Text(AttributedString.build(fromDocs: text) ?? AttributedString(text))
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).font(Fontstyle.bodyL.base)
             Spacer()
         }
@@ -20,6 +20,6 @@ struct TCText: View {
 
 struct TCText_Previews: PreviewProvider {
     static var previews: some View {
-        TCText(text: "body text possible markdown support")
+        TCText(text: PreviewData.exampleMarkdownDocs)
     }
 }

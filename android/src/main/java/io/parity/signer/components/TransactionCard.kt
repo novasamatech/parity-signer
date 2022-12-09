@@ -61,7 +61,7 @@ fun TransactionCard(card: TransactionCard) {
 			is Card.NonceCard -> TCNonce(text = txCard.f)
 			Card.NoneCard -> Text("None")
 			is Card.PalletCard -> TCPallet(text = txCard.f)
-			is Card.TextCard -> Text(String(txCard.f.decodeHex()))
+			is Card.TextCard -> Text(txCard.f)
 			is Card.TipCard -> TCTip(txCard.f)
 			is Card.TipPlainCard -> TCTipPlain(txCard.f)
 			is Card.TxSpecCard -> TCTXSpec(txCard.f)
