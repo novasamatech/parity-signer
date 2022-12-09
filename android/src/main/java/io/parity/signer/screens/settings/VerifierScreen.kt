@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.components.toImageContent
 import io.parity.signer.uniffi.MVerifierDetails
 
 @Composable
@@ -18,7 +19,7 @@ fun VerifierScreen(
 
 	Column {
 		Row {
-			IdentIcon(identicon = verifierDetails.identicon)
+			IdentIcon(identicon = verifierDetails.identicon.toImageContent())
 			Column {
 				Text("General verifier certificate")
 				Text(verifierDetails.publicKey)

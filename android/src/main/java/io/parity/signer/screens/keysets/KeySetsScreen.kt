@@ -29,7 +29,6 @@ import io.parity.signer.ui.navigationselectors.KeySetsNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.backgroundSystem
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.SignerImage
 
 /**
  * Default main screen with list Seeds/root keys
@@ -97,12 +96,12 @@ private fun PreviewKeySetsSelectScreen() {
 	val keys = mutableListOf(
 		KeySetModel(
 			"first seed name",
-			PreviewData.exampleIdenticon,
+			PreviewData.exampleIdenticonPng,
 			1.toUInt()
 		),
 		KeySetModel(
 			"second seed name",
-			PreviewData.exampleIdenticon,
+			PreviewData.exampleIdenticonPng,
 			3.toUInt()
 		),
 	)
@@ -110,7 +109,7 @@ private fun PreviewKeySetsSelectScreen() {
 		keys.add(
 			KeySetModel(
 				"second seed name",
-				PreviewData.exampleIdenticon,
+				PreviewData.exampleIdenticonPng,
 				3.toUInt()
 			)
 		)

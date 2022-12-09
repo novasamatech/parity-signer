@@ -10,13 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.models.toBytes
 import io.parity.signer.uniffi.MMetadataRecord
 
 @Composable
 fun MetadataCard(metadataRecord: MMetadataRecord) {
 	Row {
-		IdentIcon(identicon = metadataRecord.metaIdPic)
+		IdentIcon(identicon = metadataRecord.metaIdPic.toImageContent())
 		Column {
 			Text("version")
 			Text(metadataRecord.specsVersion)
