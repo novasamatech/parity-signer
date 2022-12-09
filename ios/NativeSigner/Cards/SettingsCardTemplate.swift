@@ -17,15 +17,15 @@ struct SettingsCardTemplate: View {
         HStack {
             Text(text)
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(danger ? Asset.signalDanger.swiftUIColor : Asset.text400.swiftUIColor)
+                .foregroundColor(danger ? Asset.accentRed400.swiftUIColor : Asset.textAndIconsTertiary.swiftUIColor)
             Spacer()
             if withIcon {
                 Image(.chevron, variant: .forward)
                     .imageScale(.medium)
-                    .foregroundColor(Asset.border400.swiftUIColor)
+                    .foregroundColor(Asset.fill12.swiftUIColor)
             }
         }
         .padding()
-        .background(withBackground ? Asset.bg200.swiftUIColor : Color.clear)
+        .background(withBackground ? Asset.backgroundSecondary.swiftUIColor : Color.clear)
     }
 }

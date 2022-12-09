@@ -29,15 +29,15 @@ struct BigButton: View {
     var isDisabled: Bool = false
 
     var body: some View {
-        let accentColor = isCrypto ? Asset.crypto400.swiftUIColor : Asset.action400.swiftUIColor
+        let accentColor = isCrypto ? Asset.textAndIconsPrimary.swiftUIColor : Asset.textAndIconsPrimary.swiftUIColor
         let bgColor = isDisabled
-            ? Asset.bg200.swiftUIColor
-            : isShaded ? Asset.bg300.swiftUIColor : accentColor
+            ? Asset.backgroundSecondary.swiftUIColor
+            : isShaded ? Asset.backgroundTertiary.swiftUIColor : accentColor
         let fgColor = isDisabled
-            ? Asset.text300.swiftUIColor
+            ? Asset.textAndIconsTertiary.swiftUIColor
             : isShaded
-            ? isDangerous ? Asset.signalDanger.swiftUIColor : accentColor
-            : Asset.action600.swiftUIColor
+            ? isDangerous ? Asset.accentRed400.swiftUIColor : Asset.textAndIconsPrimary.swiftUIColor
+            : Asset.accentForegroundText.swiftUIColor
 
         Button(action: action) {
             HStack {
