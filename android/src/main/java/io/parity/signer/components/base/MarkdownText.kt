@@ -21,7 +21,7 @@ fun MarkdownText(
 ) {
 	MaterialRichText(modifier = modifier) {
 		RichText {
-			Markdown(content.string, onLinkClicked)
+			Markdown(content.string, onLinkClicked = onLinkClicked)
 		}
 	}
 }
