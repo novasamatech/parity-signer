@@ -74,9 +74,9 @@ fun PrivateKeyExportBottomSheet(
 						),
 					contentAlignment = Alignment.Center,
 				) {
-					val qr = remember { runBlocking { encodeToQr(model.qrData, true) } }
+					val qrImage = remember { runBlocking { encodeToQr(model.qrData, true) } }
 					Image(
-						bitmap = qr.intoImageBitmap(),
+						bitmap = qrImage.intoImageBitmap(),
 						contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
 						contentScale = ContentScale.Fit,
 						modifier = Modifier.size(264.dp)
@@ -103,7 +103,7 @@ class PrivateKeyExportModel(
 		const val SHOW_PRIVATE_KEY_TIMEOUT = 60 //seconds
 
 		fun createMock(): PrivateKeyExportModel = PrivateKeyExportModel(
-			qrData = PreviewData.exampleQRCode,//todo qr fix preview
+			qrData = PreviewData.exampleQRData,
 			keyCard = KeyCardModel.createStub(),
 			network = NetworkCardModel("Polkadot", "NetworkLogo")
 		)

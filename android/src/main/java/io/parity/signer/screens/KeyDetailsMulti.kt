@@ -11,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
@@ -19,6 +20,7 @@ import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.getData
 import io.parity.signer.models.intoImageBitmap
+import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.runBlocking
@@ -62,9 +64,18 @@ fun KeyDetailsMulti(
 				)
 			)
 		}
-		val qr = remember { runBlocking { encodeToQr(keyDetailsMulti.keyDetails.qr.getData(), false) } }
+
+		val isPreview = LocalInspectionMode.current
+		val qrImage = remember {
+			if (isPreview) {
+				PreviewData.exampleQRImage
+			} else {
+				runBlocking { encodeToQr(keyDetailsMulti.keyDetails.qr.getData(), false) }
+			}
+		}
+
 		Image(
-			qr.intoImageBitmap(),
+			qrImage.intoImageBitmap(),
 			contentDescription = stringResource(id = R.string.qr_with_address_to_scan_description),
 			contentScale = ContentScale.FillWidth,
 			modifier = Modifier
