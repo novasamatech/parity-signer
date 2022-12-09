@@ -15,7 +15,7 @@ struct NetworkCard: View {
         ZStack {
             if fancy {
                 RoundedRectangle(cornerRadius: 4)
-                    .foregroundColor(Asset.bg200.swiftUIColor)
+                    .foregroundColor(Asset.backgroundSecondary.swiftUIColor)
                     .frame(height: 47)
             }
             HStack {
@@ -23,7 +23,7 @@ struct NetworkCard: View {
                 Text(title).font(PrimaryFont.labelM.font)
                 if fancy { Spacer() }
             }
-            .foregroundColor(Asset.text600.swiftUIColor)
+            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
             .frame(height: 36)
             .padding(.horizontal)
         }

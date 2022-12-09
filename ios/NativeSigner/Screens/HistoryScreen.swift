@@ -30,7 +30,7 @@ struct HistoryScreen: View {
                                     event: event,
                                     timestamp: history.timestamp.padding(toLength: 16, withPad: " ", startingAt: 0)
                                 )
-                                .foregroundColor(Asset.text400.swiftUIColor)
+                                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                             }
                         )
                     }

@@ -11,7 +11,7 @@ struct HeadingOverline: View {
     var text: LocalizedStringKey
     var body: some View {
         Text(text)
-            .foregroundColor(Asset.text600.swiftUIColor)
+            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
             .font(PrimaryFont.labelS.font)
             .tracking(0.5)
             .textCase(.uppercase)
@@ -25,7 +25,7 @@ struct HeaderBar: View {
         VStack(alignment: .leading, spacing: 2) {
             HeadingOverline(text: line1)
             Text(line2)
-                .foregroundColor(Asset.text400.swiftUIColor)
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                 .font(PrimaryFont.bodyM.font)
             Divider()
                 .padding(.top, 6)
