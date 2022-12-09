@@ -37,7 +37,6 @@ enum Heights {
     static let capsuleButton: CGFloat = 40
     static let minTransactionCardHeight: CGFloat = 24
     static let minTransactionSummaryItemHeight: CGFloat = 18
-    static let dateHeaderHeight: CGFloat = 32
     static let chevronLogElementWidth: CGFloat = 32
 }
 

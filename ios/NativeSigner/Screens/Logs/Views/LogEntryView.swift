@@ -18,8 +18,8 @@ struct LogEntryView: View {
                     Text(date)
                         .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                         .font(Fontstyle.bodyM.base)
+                        .padding(.vertical, Spacing.small)
                 }
-                .frame(height: Heights.dateHeaderHeight)
             }
             HStack {
                 VStack(alignment: .leading, spacing: 0) {
@@ -34,6 +34,7 @@ struct LogEntryView: View {
                         Spacer()
                         HStack(spacing: 0) {
                             Text(DateFormatter.hourMinutes(viewModel.renderable.timestamp))
+                                .padding(.leading, Spacing.extraSmall)
                             if viewModel.renderable.type != .basic {
                                 Asset.chevronRight.swiftUIImage
                                     .frame(width: Heights.chevronLogElementWidth)
@@ -43,20 +44,23 @@ struct LogEntryView: View {
                             }
                         }
                     }
-                    if let displayValue = viewModel.renderable.displayValue {
+                    if let displayValue = viewModel.renderable.displayValue, !displayValue.isEmpty {
                         Text(displayValue)
                             .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                             .font(Fontstyle.bodyM.base)
                             .padding(.top, Spacing.small)
+                            .padding(.trailing, Spacing.large)
                     }
-                    if let additionalValue = viewModel.renderable.additionalValue {
+                    if let additionalValue = viewModel.renderable.additionalValue, !additionalValue.isEmpty {
                         Text(additionalValue)
                             .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                             .font(Fontstyle.captionM.base)
                             .padding(.top, Spacing.extraExtraSmall)
+                            .padding(.trailing, Spacing.large)
                     }
                 }
                 .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .padding(.vertical, Spacing.small)
             }
         }
         .contentShape(Rectangle())
@@ -64,7 +68,6 @@ struct LogEntryView: View {
             viewModel.onEventTap()
         }
         .padding(.leading, Spacing.large)
-        .padding(.vertical, Spacing.small)
         .onAppear {
             viewModel.use(navigation: navigation)
         }
@@ -132,12 +135,12 @@ extension LogEntryView {
                 LogEntryView(
                     viewModel: .init(
                         renderable: .init(
-                            title: "Generated signature with extremely long message that won't fit into single line",
+                            title: "Generated signature",
                             displayValue: "Very bad message",
                             additionalValue: nil,
                             isWarning: true,
-                            type: .basic,
-                            dateHeader: "Dec 09",
+                            type: .fullDetails,
+                            dateHeader: nil,
                             timestamp: "13:42",
                             navigationDetails: "0"
                         )
@@ -146,12 +149,12 @@ extension LogEntryView {
                 LogEntryView(
                     viewModel: .init(
                         renderable: .init(
-                            title: "Generated signature",
+                            title: "Generated signature with extremely long message that won't fit into single line",
                             displayValue: "Very bad message",
                             additionalValue: nil,
                             isWarning: true,
-                            type: .fullDetails,
-                            dateHeader: nil,
+                            type: .basic,
+                            dateHeader: "Dec 09",
                             timestamp: "13:42",
                             navigationDetails: "0"
                         )
