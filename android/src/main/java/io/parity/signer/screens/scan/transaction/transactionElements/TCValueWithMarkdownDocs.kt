@@ -63,14 +63,10 @@ fun TCValueWithToogleDocs(
 		}
 		if (showDoc) {
 			MarkdownText(content = payload.docs,
+//				style = SignerTypeface.BodyL, //todo dmitry
+				color = MaterialTheme.colors.primary,
 				modifier = Modifier.padding(16.dp),
 			)
-//			Text(
-//				text = payload.docs,
-//				style = SignerTypeface.BodyL,
-//				color = MaterialTheme.colors.primary,
-//				modifier = Modifier.padding(16.dp),
-//			)
 		}
 	}
 }
@@ -86,7 +82,6 @@ data class TCWithMarkdownDocsModel(
 ) {
 	companion object {
 		fun createStub(): TCWithMarkdownDocsModel =
-			//todo dmitry how do you do  Text.markdownWithFallback(value.docs) and whether preview sample with umbers is the current one?
 			TCWithMarkdownDocsModel(
 				"method name",
 				PreviewData.exampleMarkdownDocs,
@@ -133,7 +128,6 @@ private fun PreviewTCCall() {
 			TCValueWithToogleDocs(
 				TCWithMarkdownDocsModel.createStub().copy(isMethod = false)
 			)
-
 		}
 	}
 }
