@@ -42,7 +42,7 @@ struct TCFieldNumber: View {
                         }
                     }
                 }
-                .font(Fontstyle.bodyL.base)
+                .font(PrimaryFont.bodyL.font)
             }
         ).disabled(value.displayableValue.isEmpty)
     }

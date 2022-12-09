@@ -20,7 +20,7 @@ struct InfoBoxView: View {
                 .foregroundColor(Asset.accentPink300.swiftUIColor)
         }
         .padding()
-        .font(Fontstyle.bodyM.base)
+        .font(PrimaryFont.bodyM.font)
         .strokeContainerBackground(CornerRadius.small)
     }
 }

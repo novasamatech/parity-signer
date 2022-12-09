@@ -76,7 +76,7 @@ struct KeyManager: View {
                 HStack {
                     Localizable.derivedKeys.text
                         .foregroundColor(Asset.text300.swiftUIColor)
-                        .font(Fontstyle.overline.base)
+                        .font(PrimaryFont.labelS.font)
                     Spacer()
                     Button(
                         action: {

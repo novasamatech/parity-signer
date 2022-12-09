@@ -110,7 +110,7 @@ private extension ExportMultipleKeysModal {
         HStack {
             Text(headerName)
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                .font(Fontstyle.titleS.base)
+                .font(PrimaryFont.titleS.font)
             Spacer()
             CloseModalButton(action: animateDismissal)
         }
@@ -128,7 +128,7 @@ private extension ExportMultipleKeysModal {
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                 Spacer()
             }
-            .font(Fontstyle.bodyM.base)
+            .font(PrimaryFont.bodyM.font)
             Spacer()
             if !isLast {
                 Divider()
@@ -156,7 +156,7 @@ private struct ExportPrivateKeyAddressFooter: View {
         HStack {
             Localizable.KeyExport.Label.hide.text
                 .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                .font(Fontstyle.bodyL.base)
+                .font(PrimaryFont.bodyL.font)
             CircularProgressView(
                 CircularCountdownModel(
                     counter: Constants.keyVisibilityTime,

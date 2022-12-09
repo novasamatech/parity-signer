@@ -22,24 +22,24 @@ struct RecoverSeedPhrase: View {
                 VStack {
                     Text(content.seedName)
                     VStack(alignment: .leading) {
-                        Localizable.seedPhrase.text.font(Fontstyle.overline.base)
+                        Localizable.seedPhrase.text.font(PrimaryFont.labelS.font)
                         VStack {
                             Text(
                                 content.draftPhrase()
                             )
                             .lineLimit(nil)
                             .fixedSize(horizontal: false, vertical: true)
-                            .font(.system(size: 16, weight: .semibold, design: .monospaced))
+                            .font(PrimaryFont.labelM.font)
                             .foregroundColor(Asset.crypto400.swiftUIColor)
                             .padding(12)
                             Divider().foregroundColor(Asset.border400.swiftUIColor)
                             HStack {
                                 Text(">").foregroundColor(Asset.text400.swiftUIColor)
-                                    .font(Fontstyle.body2.base)
+                                    .font(PrimaryFont.bodyL.font)
                                 TextField(Localizable.seed.string, text: $userInput, prompt: Localizable.seedName.text)
                                     .focused($focus)
                                     .foregroundColor(Asset.text600.swiftUIColor)
-                                    .font(Fontstyle.body2.base)
+                                    .font(PrimaryFont.bodyL.font)
                                     .disableAutocorrection(true)
                                     .textInputAutocapitalization(.never)
                                     .keyboardType(.asciiCapable)
@@ -76,7 +76,7 @@ struct RecoverSeedPhrase: View {
                                             label: {
                                                 Text(guess)
                                                     .foregroundColor(Asset.crypto400.swiftUIColor)
-                                                    .font(Fontstyle.body2.crypto)
+                                                    .font(PrimaryFont.captionM.font)
                                                     .padding(.horizontal, 12)
                                                     .padding(.vertical, 4)
                                                     .background(

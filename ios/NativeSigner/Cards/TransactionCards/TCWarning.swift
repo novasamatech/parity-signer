@@ -16,7 +16,7 @@ struct TCWarning: View {
             Spacer()
         }
         .foregroundColor(Asset.accentRed400.swiftUIColor)
-        .font(Fontstyle.bodyM.base)
+        .font(PrimaryFont.bodyM.font)
         .padding(Spacing.small)
         .containerBackground(isError: true)
     }

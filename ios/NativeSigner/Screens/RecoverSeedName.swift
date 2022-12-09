@@ -16,7 +16,7 @@ struct RecoverSeedName: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Localizable.displayName.text.font(Fontstyle.overline.base)
+            Localizable.displayName.text.font(PrimaryFont.labelS.font)
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(Asset.border400.swiftUIColor)
@@ -24,7 +24,7 @@ struct RecoverSeedName: View {
                 TextField(Localizable.seed.string, text: $seedName, prompt: Localizable.seedName.text)
                     .focused($nameFocused)
                     .foregroundColor(Asset.text600.swiftUIColor)
-                    .font(Fontstyle.body2.base)
+                    .font(PrimaryFont.bodyL.font)
                     .disableAutocorrection(true)
                     .keyboardType(.asciiCapable)
                     .submitLabel(.done)

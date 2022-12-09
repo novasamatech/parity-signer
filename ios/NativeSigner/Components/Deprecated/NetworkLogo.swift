@@ -13,7 +13,7 @@ struct NetworkLogo: View {
     var body: some View {
         Text(logo)
             .foregroundColor(Asset.text600.swiftUIColor)
-            .font(Fontstyle.header4.web3)
+            .font(.web3)
             .frame(width: 36, height: 36)
     }
 }

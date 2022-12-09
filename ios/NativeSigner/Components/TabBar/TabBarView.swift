@@ -67,7 +67,7 @@ private struct TabBarButton: View {
                         .frame(height: Heights.tabbarAssetHeight, alignment: .center)
                         .padding(.bottom, -Spacing.extraExtraSmall)
                     viewModel.label
-                        .font(Fontstyle.captionS.base)
+                        .font(PrimaryFont.captionS.font)
                 }
                 .foregroundColor(
                     viewModel.isActive ?
