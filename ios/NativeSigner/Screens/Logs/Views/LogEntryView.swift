@@ -22,8 +22,8 @@ struct LogEntryView: View {
                 .frame(height: Heights.dateHeaderHeight)
             }
             HStack {
-                HStack(alignment: .bottom, spacing: Spacing.extraSmall) {
-                    VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .top, spacing: Spacing.extraSmall) {
                         Text(viewModel.renderable.title)
                             .foregroundColor(
                                 viewModel.renderable.isWarning ?
@@ -31,49 +31,40 @@ struct LogEntryView: View {
                                     Asset.textAndIconsPrimary.swiftUIColor
                             )
                             .font(Fontstyle.titleS.base)
-                        if let displayValue = viewModel.renderable.displayValue {
-                            Text(displayValue)
-                                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                                .font(Fontstyle.bodyM.base)
-                                .padding(.top, Spacing.small)
-                        }
-                        if let additionalValue = viewModel.renderable.additionalValue {
-                            Text(additionalValue)
-                                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                                .font(Fontstyle.captionM.base)
-                                .padding(.top, Spacing.extraExtraSmall)
+                        Spacer()
+                        HStack(spacing: 0) {
+                            Text(DateFormatter.hourMinutes(viewModel.renderable.timestamp))
+                            if viewModel.renderable.type != .basic {
+                                Asset.chevronRight.swiftUIImage
+                                    .frame(width: Heights.chevronLogElementWidth)
+                            } else {
+                                Spacer()
+                                    .frame(width: Heights.chevronLogElementWidth)
+                            }
                         }
                     }
-                    Spacer()
-                    VStack(alignment: .trailing) {
-                        if viewModel.renderable.type != .basic {
-                            ZStack {
-                                Circle()
-                                    .frame(
-                                        width: Sizes.chevronCircleButton,
-                                        height: Sizes.chevronCircleButton,
-                                        alignment: .center
-                                    )
-                                    .foregroundColor(Asset.fill6.swiftUIColor)
-                                Asset.chevronRight.swiftUIImage
-                                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                            }
-                            Spacer()
-                        }
-                        HStack(spacing: Spacing.extraSmall) {
-                            Text(DateFormatter.hourMinutes(viewModel.renderable.timestamp))
-                        }
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    if let displayValue = viewModel.renderable.displayValue {
+                        Text(displayValue)
+                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .font(Fontstyle.bodyM.base)
+                            .padding(.top, Spacing.small)
+                    }
+                    if let additionalValue = viewModel.renderable.additionalValue {
+                        Text(additionalValue)
+                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .font(Fontstyle.captionM.base)
+                            .padding(.top, Spacing.extraExtraSmall)
                     }
                 }
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
             }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                viewModel.onEventTap()
-            }
-            .padding(.vertical, Spacing.small)
         }
-        .padding(.horizontal, Spacing.large)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            viewModel.onEventTap()
+        }
+        .padding(.leading, Spacing.large)
+        .padding(.vertical, Spacing.small)
         .onAppear {
             viewModel.use(navigation: navigation)
         }
@@ -106,16 +97,68 @@ extension LogEntryView {
     }
 }
 
-//
-// #if DEBUG
-//    struct LogEntryView_Previews: PreviewProvider {
-//        static var previews: some View {
-//            LogsListView(viewModel: .init(logs: MLog(log: [History(
-//                order: 0,
-//                timestamp: "43254353453",
-//                events: [.databaseInitiated, .deviceWasOnline, .historyCleared, .identitiesWiped]
-//            )])))
-//            .environmentObject(NavigationCoordinator())
-//        }
-//    }
-// #endif
+#if DEBUG
+    struct LogEntryView_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack(spacing: 0) {
+                LogEntryView(
+                    viewModel: .init(
+                        renderable: .init(
+                            title: "Generated signature",
+                            displayValue: "some value",
+                            additionalValue: nil,
+                            isWarning: false,
+                            type: .fullDetails,
+                            dateHeader: "Dec 09",
+                            timestamp: "13:42",
+                            navigationDetails: "0"
+                        )
+                    )
+                )
+                LogEntryView(
+                    viewModel: .init(
+                        renderable: .init(
+                            title: "Generated signature",
+                            displayValue: nil,
+                            additionalValue: nil,
+                            isWarning: false,
+                            type: .basic,
+                            dateHeader: nil,
+                            timestamp: "13:42",
+                            navigationDetails: "0"
+                        )
+                    )
+                )
+                LogEntryView(
+                    viewModel: .init(
+                        renderable: .init(
+                            title: "Generated signature with extremely long message that won't fit into single line",
+                            displayValue: "Very bad message",
+                            additionalValue: nil,
+                            isWarning: true,
+                            type: .basic,
+                            dateHeader: "Dec 09",
+                            timestamp: "13:42",
+                            navigationDetails: "0"
+                        )
+                    )
+                )
+                LogEntryView(
+                    viewModel: .init(
+                        renderable: .init(
+                            title: "Generated signature",
+                            displayValue: "Very bad message",
+                            additionalValue: nil,
+                            isWarning: true,
+                            type: .fullDetails,
+                            dateHeader: nil,
+                            timestamp: "13:42",
+                            navigationDetails: "0"
+                        )
+                    )
+                )
+            }
+            .environmentObject(NavigationCoordinator())
+        }
+    }
+#endif
