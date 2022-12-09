@@ -3214,6 +3214,7 @@ dependencies = [
  "log",
  "navigator",
  "qr_reader_phone",
+ "qrcode_static",
  "sp-core",
  "sp-runtime",
  "uniffi",

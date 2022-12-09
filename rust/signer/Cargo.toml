@@ -17,6 +17,7 @@ db_handling = { path = "../db_handling", default-features = false, features = ["
 definitions = { path = "../definitions", default-features = false, features = ["signer"] }
 navigator = { path = "../navigator", default-features = false }
 qr_reader_phone = { path = "../qr_reader_phone" }
+qrcode_static = { path = "../qrcode_static" }
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
 env_logger = "0.10"

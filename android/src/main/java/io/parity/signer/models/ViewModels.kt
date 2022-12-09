@@ -250,7 +250,7 @@ data class KeyDetailsModel(
 
 fun MKeyDetails.toKeyDetailsModel() =
 	KeyDetailsModel(
-		qr = qr, pubkey = pubkey, networkInfo = networkInfo.toNetworkInfoModel(),
+		qr = qr.getData(), pubkey = pubkey, networkInfo = networkInfo.toNetworkInfoModel(),
 		address = KeyCardModel.fromAddress(
 			address = address,
 			base58 = base58,
@@ -273,4 +273,9 @@ data class NetworkInfoModel(
 fun MscNetworkInfo.toNetworkInfoModel() =
 	NetworkInfoModel(networkTitle, networkLogo, networkSpecsKey)
 
+fun QrData.getData(): List<UByte> =
+	when (this) {
+		is QrData.Regular -> this.data
+		is QrData.Sensitive -> this.data
+	}
 

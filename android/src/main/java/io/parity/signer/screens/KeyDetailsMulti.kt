@@ -17,11 +17,11 @@ import io.parity.signer.R
 import io.parity.signer.components.KeyCardOld
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
+import io.parity.signer.models.getData
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg200
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.MAddressCard
-import io.parity.signer.uniffi.MKeyDetailsMulti
+import io.parity.signer.uniffi.*
+import kotlinx.coroutines.runBlocking
 
 /**
  * This screen is replaced by animated qr bottom sheet
@@ -62,8 +62,9 @@ fun KeyDetailsMulti(
 				)
 			)
 		}
+		val qr = remember { runBlocking { encodeToQr(keyDetailsMulti.keyDetails.qr.getData(), false) } }
 		Image(
-			(keyDetailsMulti.keyDetails.qr).intoImageBitmap(),
+			qr.intoImageBitmap(),
 			contentDescription = stringResource(id = R.string.qr_with_address_to_scan_description),
 			contentScale = ContentScale.FillWidth,
 			modifier = Modifier

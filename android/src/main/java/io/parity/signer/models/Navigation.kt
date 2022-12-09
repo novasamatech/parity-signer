@@ -88,7 +88,7 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 					keyPassword = null
 				)
 				val model = PrivateKeyExportModel(
-					qrImage = secretKeyDetailsQR.qr,
+					qrData = secretKeyDetailsQR.qr.getData(), //todo qr
 					keyCard = KeyCardModel.fromAddress(
 						address_card = MAddressCard(
 							address = secretKeyDetailsQR.address,

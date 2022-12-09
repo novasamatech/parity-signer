@@ -6,6 +6,7 @@ import io.parity.signer.components.qrcode.AnimatedQrImages
 import io.parity.signer.components.qrcode.AnimatedQrKeysProvider
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.KeyModel
+import io.parity.signer.models.getData
 
 
 class KeySetDetailsExportService :
@@ -18,7 +19,7 @@ class KeySetDetailsExportService :
 			seed = input.seedName,
 			derivedKeyAddr = input.keys.map { key -> key.addressKey })
 			.mapError()
-			?.let { keyInfo -> uniffiInteractor.encodeToQrImages(keyInfo.frames) }
+			?.let { keyInfo -> uniffiInteractor.encodeToQrImages(keyInfo.frames.map { it.getData() }) }
 			?.mapError()
 			?.let { AnimatedQrImages(it) }
 	}
