@@ -29,7 +29,7 @@ struct CapsuleButton: View {
         Button(action: action) {
             HStack(spacing: Spacing.extraSmall) {
                 Text(title)
-                    .font(Fontstyle.labelM.base)
+                    .font(PrimaryFont.labelM.font)
                 if let icon = icon {
                     icon
                 }

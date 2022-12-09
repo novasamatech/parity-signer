@@ -35,7 +35,7 @@ struct TCNamedValueCard: View {
                 }
                 Spacer()
             }
-            .font(Fontstyle.bodyL.base)
+            .font(PrimaryFont.bodyL.font)
         } else {
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                 if let name = name, name.isEmpty == false {
@@ -50,7 +50,7 @@ struct TCNamedValueCard: View {
                     Spacer()
                 }
             }
-            .font(Fontstyle.bodyL.base)
+            .font(PrimaryFont.bodyL.font)
         }
     }
 }

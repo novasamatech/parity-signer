@@ -13,7 +13,7 @@ struct TCID: View {
         HStack {
             Text(value.base58)
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                .font(Fontstyle.bodyL.base)
+                .font(PrimaryFont.bodyL.font)
             Spacer()
         }
     }

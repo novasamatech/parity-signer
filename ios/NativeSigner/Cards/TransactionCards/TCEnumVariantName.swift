@@ -41,7 +41,7 @@ struct TCEnumVariantName: View {
                         }
                     }
                 }
-                .font(Fontstyle.bodyL.base)
+                .font(PrimaryFont.bodyL.font)
             }
         ).disabled(value.docsEnumVariant.isEmpty)
     }

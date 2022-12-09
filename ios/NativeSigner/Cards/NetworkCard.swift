@@ -20,7 +20,7 @@ struct NetworkCard: View {
             }
             HStack {
                 NetworkLogo(logo: logo)
-                Text(title).font(Fontstyle.header3.base)
+                Text(title).font(PrimaryFont.labelM.font)
                 if fancy { Spacer() }
             }
             .foregroundColor(Asset.text600.swiftUIColor)

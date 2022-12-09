@@ -45,7 +45,7 @@ struct Header: View {
                 Spacer()
                 Text(screenLabel)
                     .foregroundColor(Asset.text600.swiftUIColor)
-                    .font(screenNameType == .h1 ? Fontstyle.header2.base : Fontstyle.header4.base)
+                    .font(screenNameType == .h1 ? PrimaryFont.titleM.font : PrimaryFont.labelM.font)
                     .tracking(0.1)
                 if rightButton == .multiSelect {
                     Button(

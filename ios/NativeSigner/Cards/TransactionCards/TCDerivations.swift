@@ -14,11 +14,11 @@ struct TCDerivations: View {
             VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                 Localizable.importingDerivations.text
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(Fontstyle.bodyL.base)
+                    .font(PrimaryFont.bodyL.font)
                 ForEach(value, id: \.self) { derivation in
                     HStack {
                         Text(derivation)
-                            .font(Fontstyle.bodyM.base)
+                            .font(PrimaryFont.bodyM.font)
                             .foregroundColor(Asset.accentPink300.swiftUIColor)
                         Spacer()
                     }

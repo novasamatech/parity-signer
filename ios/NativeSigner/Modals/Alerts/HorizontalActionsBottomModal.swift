@@ -54,9 +54,9 @@ struct HorizontalActionsBottomModal: View {
             content: {
                 VStack(alignment: .center, spacing: Spacing.medium) {
                     Text(viewModel.title)
-                        .font(Fontstyle.titleL.base)
+                        .font(PrimaryFont.titleL.font)
                     Text(viewModel.content)
-                        .font(Fontstyle.bodyL.base)
+                        .font(PrimaryFont.bodyL.font)
                         .lineSpacing(Spacing.extraExtraSmall)
                         .multilineTextAlignment(.center)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)

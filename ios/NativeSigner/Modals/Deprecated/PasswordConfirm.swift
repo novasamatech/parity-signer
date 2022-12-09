@@ -21,7 +21,7 @@ struct PasswordConfirm: View {
                 HStack {
                     Text(content.croppedPath + Localizable.Path.delimeter.string)
                     Image(.lock).foregroundColor(Asset.crypto400.swiftUIColor)
-                        .font(Fontstyle.body2.crypto)
+                        .font(PrimaryFont.captionM.font)
                 }
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
@@ -32,7 +32,7 @@ struct PasswordConfirm: View {
                             .foregroundColor(Asset.crypto400.swiftUIColor)
                         TextField(Localizable.secretPath.string, text: $passwordCheck, prompt: Text(""))
                             .foregroundColor(Asset.crypto400.swiftUIColor)
-                            .font(Fontstyle.body2.crypto)
+                            .font(PrimaryFont.captionM.font)
                             .disableAutocorrection(true)
                             .autocapitalization(.none)
                             .keyboardType(.asciiCapable)
