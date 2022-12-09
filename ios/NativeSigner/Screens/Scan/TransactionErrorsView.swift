@@ -19,7 +19,7 @@ struct TransactionErrorsView: View {
                 }
             }
             .padding(Spacing.medium)
-            .font(Fontstyle.bodyM.base)
+            .font(PrimaryFont.bodyM.font)
             .foregroundColor(Asset.accentRed300.swiftUIColor)
             .strokeContainerBackground(CornerRadius.small, isError: true)
         } else {

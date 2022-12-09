@@ -14,7 +14,7 @@ struct MenuButtonStyle: ButtonStyle {
         configuration.label
             .padding(Spacing.none)
             .foregroundColor(foregroundColor)
-            .font(Fontstyle.labelL.base)
+            .font(PrimaryFont.labelL.font)
             .frame(height: Heights.menuButton, alignment: .leading)
     }
 }

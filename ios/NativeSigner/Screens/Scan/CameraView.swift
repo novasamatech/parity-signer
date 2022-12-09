@@ -79,9 +79,9 @@ struct CameraView: View {
                         // Text description
                         VStack(spacing: Spacing.small) {
                             Text(viewModel.header)
-                                .font(Fontstyle.titleL.base)
+                                .font(PrimaryFont.titleL.font)
                             Text(viewModel.message)
-                                .font(Fontstyle.bodyL.base)
+                                .font(PrimaryFont.bodyL.font)
                                 .multilineTextAlignment(.center)
                         }
                         .foregroundColor(Asset.accentForegroundText.swiftUIColor)
@@ -187,7 +187,7 @@ struct CameraView: View {
     var multipleTransactionOverlay: some View {
         HStack(alignment: .center) {
             Text(signText())
-                .font(Fontstyle.titleS.base)
+                .font(PrimaryFont.titleS.font)
                 .foregroundColor(Asset.accentForegroundText.swiftUIColor)
                 .padding(.top, Spacing.medium)
             Spacer()

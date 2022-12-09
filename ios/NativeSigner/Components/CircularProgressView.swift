@@ -89,7 +89,7 @@ struct CircularProgressView: View {
                 .animation(.linear, value: normalisedProgress())
             Text(String(Int(counter)))
                 .foregroundColor(model.viewModel.foregroundFontColor)
-                .font(Fontstyle.labelS.base)
+                .font(PrimaryFont.labelS.font)
         }
         .frame(width: model.viewModel.size, height: model.viewModel.size, alignment: .center)
         .onReceive(timer) { _ in

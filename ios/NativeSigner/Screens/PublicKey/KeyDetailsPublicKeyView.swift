@@ -87,7 +87,7 @@ struct KeyDetailsPublicKeyView: View {
                         }
                         .padding()
                         .foregroundColor(Asset.accentRed300.swiftUIColor)
-                        .font(Fontstyle.bodyM.base)
+                        .font(PrimaryFont.bodyM.font)
                         .strokeContainerBackground(CornerRadius.small, isError: true)
                     }
                 }

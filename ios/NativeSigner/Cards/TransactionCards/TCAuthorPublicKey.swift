@@ -15,9 +15,9 @@ struct TCAuthorPublicKey: View {
             VStack(alignment: .leading) {
                 Text(Localizable.TCAuthor.signedWith(value.encryption))
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(Fontstyle.bodyL.base)
+                    .font(PrimaryFont.bodyL.font)
                 Text(value.publicKey)
-                    .font(Fontstyle.captionM.base)
+                    .font(PrimaryFont.captionM.font)
                     .foregroundColor(Asset.accentPink300.swiftUIColor)
             }
             Spacer()

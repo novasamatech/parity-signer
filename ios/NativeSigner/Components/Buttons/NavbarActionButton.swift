@@ -13,7 +13,7 @@ struct NavbarActionButtonStyle: ButtonStyle {
             .padding(Spacing.medium)
             .background(Asset.accentPink500.swiftUIColor)
             .foregroundColor(Asset.accentForegroundText.swiftUIColor)
-            .font(Fontstyle.labelM.base)
+            .font(PrimaryFont.labelM.font)
             .frame(
                 height: Heights.navigationButton,
                 alignment: .center

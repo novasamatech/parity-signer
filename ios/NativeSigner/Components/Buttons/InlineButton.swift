@@ -14,7 +14,7 @@ struct InlineButtonStyle: ButtonStyle {
         configuration.label
             .padding(Spacing.none)
             .foregroundColor(foregroundColor)
-            .font(Fontstyle.bodyL.base)
+            .font(PrimaryFont.bodyL.font)
             .frame(height: Heights.menuButton, alignment: .leading)
     }
 }

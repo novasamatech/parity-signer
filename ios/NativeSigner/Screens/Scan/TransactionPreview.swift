@@ -105,7 +105,7 @@ struct TransactionPreview: View {
                     VStack(alignment: .leading) {
                         Localizable.TransactionSign.Action.note.text
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            .font(Fontstyle.bodyL.base)
+                            .font(PrimaryFont.bodyL.font)
                         TextField("", text: $comment)
                             .primaryTextFieldStyle(
                                 Localizable.TransactionSign.Action.note.string,
@@ -178,7 +178,7 @@ struct TransactionPreview: View {
             VStack(alignment: .leading, spacing: Spacing.small) {
                 // Header
                 Localizable.TransactionSign.Label.signCode.text
-                    .font(Fontstyle.bodyL.base)
+                    .font(PrimaryFont.bodyL.font)
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .padding(.leading, Spacing.extraSmall)
                 // QR Code container

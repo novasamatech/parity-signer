@@ -47,10 +47,10 @@ struct BackupModal: View {
                         VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                             Text(viewModel.header.keyName)
                                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                                .font(Fontstyle.titleS.base)
+                                .font(PrimaryFont.titleS.font)
                             Text(viewModel.header.base58.truncateMiddle())
                                 .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                                .font(Fontstyle.bodyM.base)
+                                .font(PrimaryFont.bodyM.font)
                         }
                         Spacer()
                         CloseModalButton(action: animateDismissal)
@@ -65,7 +65,7 @@ struct BackupModal: View {
                             HStack {
                                 Localizable.BackupModal.Label.secret.text
                                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                                    .font(Fontstyle.bodyL.base)
+                                    .font(PrimaryFont.bodyL.font)
                                 Spacer()
                             }
                             SeedPhraseView(viewModel: viewModel.seedPhrase)
@@ -73,7 +73,7 @@ struct BackupModal: View {
                             HStack {
                                 Localizable.BackupModal.Label.derived.text
                                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                                    .font(Fontstyle.bodyL.base)
+                                    .font(PrimaryFont.bodyL.font)
                                 Spacer()
                             }
                             VStack(alignment: .leading, spacing: 0) {
@@ -91,7 +91,7 @@ struct BackupModal: View {
                             HStack {
                                 Localizable.BackupModal.Label.qrCode.text
                                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                                    .font(Fontstyle.bodyL.base)
+                                    .font(PrimaryFont.bodyL.font)
                                 Spacer()
                             }
                             AnimatedQRCodeView(
