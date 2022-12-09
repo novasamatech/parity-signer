@@ -26,7 +26,7 @@ struct NewAddressScreen: View {
                 NetworkCard(title: content.networkTitle, logo: content.networkLogo)
                 VStack(alignment: .leading) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 8).stroke(Asset.crypto400.swiftUIColor).frame(height: 39)
+                        RoundedRectangle(cornerRadius: 8).stroke(Asset.fill6.swiftUIColor).frame(height: 39)
                         HStack {
                             Text(content.seedName)
                             TextField(
@@ -34,7 +34,7 @@ struct NewAddressScreen: View {
                                 text: $path,
                                 prompt: Localizable.NetworkInput.prompt.text
                             )
-                            .foregroundColor(Asset.crypto400.swiftUIColor)
+                            .foregroundColor(Asset.accentPink300.swiftUIColor)
                             .font(PrimaryFont.captionM.font)
                             .disableAutocorrection(true)
                             .autocapitalization(.none)
@@ -63,7 +63,7 @@ struct NewAddressScreen: View {
                     VStack {
                         HStack {
                             Localizable.thisKeyAlreadyExists.text
-                                .foregroundColor(Asset.text300.swiftUIColor)
+                                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                             Spacer()
                         }
                         AddressCard(card: collision)

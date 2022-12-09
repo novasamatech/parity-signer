@@ -14,7 +14,7 @@ struct SufficientCryptoReady: View {
     var content: MSufficientCryptoReady
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg000.swiftUIColor)
+            RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.backgroundPrimary.swiftUIColor)
             VStack {
                 HeaderBar(
                     line1: Localizable.yourSignature.key,

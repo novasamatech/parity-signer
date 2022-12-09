@@ -20,11 +20,11 @@ struct NetworkManager: View {
                 })
             ZStack {
                 RoundedRectangle(cornerRadius: 20.0)
-                    .foregroundColor(Asset.bg000.swiftUIColor)
+                    .foregroundColor(Asset.backgroundPrimary.swiftUIColor)
                 VStack {
                     Spacer()
                     Rectangle()
-                        .foregroundColor(Asset.bg000.swiftUIColor)
+                        .foregroundColor(Asset.backgroundPrimary.swiftUIColor)
                         .frame(height: 25)
                 }
                 VStack {

@@ -38,7 +38,7 @@ struct LogMenu: View {
             }
             .padding([.leading, .trailing, .top])
             .padding(.bottom, 24)
-            .background(Asset.bg000.swiftUIColor)
+            .background(Asset.backgroundPrimary.swiftUIColor)
             .alert(isPresented: $clearConfirm, content: {
                 Alert(
                     title: Localizable.clearLogQuestion.text,
