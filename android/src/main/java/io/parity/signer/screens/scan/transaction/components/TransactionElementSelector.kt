@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
+import io.parity.signer.components.base.MarkdownText
 import io.parity.signer.models.decodeHex
 import io.parity.signer.screens.scan.transaction.transactionElements.*
 import io.parity.signer.uniffi.Card
@@ -59,8 +60,7 @@ fun TransactionElementSelector(card: TransactionCard) {
 				)
 			)
 			is Card.TypesInfoCard -> TCTypesInfo(txCard.f) // Not present in new designs
-			is Card.TextCard -> Text(String(txCard.f.decodeHex())) // Markdown text field, not present on new designs
-
+			is Card.TextCard -> MarkdownText(RichTextString(txCard.f)) // Markdown text field, not present on new designs
 
 			// Simple values - redesigned
 			is Card.AuthorCard -> TCNameValueElement(

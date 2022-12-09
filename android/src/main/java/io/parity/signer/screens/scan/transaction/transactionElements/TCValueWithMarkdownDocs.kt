@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.MarkdownText
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -36,7 +37,7 @@ fun TCValueWithToogleDocs(
 		modifier = Modifier
 			.animateContentSize()
 			.run {
-				if (payload.docs.isNotEmpty()) {
+				if (payload.docs.string.isNotEmpty()) {
 					clickable { showDoc = !showDoc }
 				} else {
 					this
@@ -48,7 +49,7 @@ fun TCValueWithToogleDocs(
 				name = if (payload.isMethod) stringResource(R.string.transaction_field_method_call) else null,
 				value = payload.methodName
 			)
-			if (payload.docs.isNotEmpty()) {
+			if (payload.docs.string.isNotEmpty()) {
 				Image(
 					imageVector = Icons.Default.QuestionMark,
 					contentDescription = null,
@@ -61,12 +62,15 @@ fun TCValueWithToogleDocs(
 			}
 		}
 		if (showDoc) {
-			Text(
-				text = payload.docs,
-				style = SignerTypeface.BodyL,
-				color = MaterialTheme.colors.primary,
+			MarkdownText(content = payload.docs,
 				modifier = Modifier.padding(16.dp),
 			)
+//			Text(
+//				text = payload.docs,
+//				style = SignerTypeface.BodyL,
+//				color = MaterialTheme.colors.primary,
+//				modifier = Modifier.padding(16.dp),
+//			)
 		}
 	}
 }
@@ -77,7 +81,7 @@ fun TCValueWithToogleDocs(
  */
 data class TCWithMarkdownDocsModel(
 	val methodName: String,
-	val docs: String,
+	val docs: RichTextString,
 	val isMethod: Boolean,
 ) {
 	companion object {
@@ -91,15 +95,21 @@ data class TCWithMarkdownDocsModel(
 	}
 }
 
+/**
+ * String with markdown lablels, show as rich text
+ */
+data class RichTextString(val string: String)
+fun String.toRichTextStr() = RichTextString(this)
+
 fun MscCall.toTransactionCallModel() = TCWithMarkdownDocsModel(
 	methodName = methodName,
-	docs = docs,
+	docs = docs.toRichTextStr(),
 	isMethod = true,
 )
 
 fun MscEnumVariantName.toTransactionCallModel() = TCWithMarkdownDocsModel(
 	methodName = name,
-	docs = docsEnumVariant,
+	docs = docsEnumVariant.toRichTextStr(),
 	isMethod = true,
 )
 

@@ -11,6 +11,7 @@ import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
 import io.parity.signer.screens.logs.logdetails.LogDetails
+import io.parity.signer.screens.networks.NetworkDetails
 import io.parity.signer.screens.settings.VerifierScreen
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData

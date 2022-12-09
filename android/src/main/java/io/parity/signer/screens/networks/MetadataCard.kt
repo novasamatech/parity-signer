@@ -1,4 +1,4 @@
-package io.parity.signer.components
+package io.parity.signer.screens.networks
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,9 +8,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.parity.signer.components.IdentIcon
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.models.toBytes
 import io.parity.signer.uniffi.MMetadataRecord
 
 @Composable

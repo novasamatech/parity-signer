@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.MarkdownText
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -36,7 +37,8 @@ fun TCValueWithMarkdownTrio(
 	}
 
 	val hasDetails: Boolean =
-		(value.docsFieldName + value.pathType + value.docsType).isNotEmpty()
+		value.docsFieldName.string.isNotEmpty() || value.pathType.isNotEmpty()
+			|| value.docsType.string.isNotEmpty()
 
 	Column(
 		modifier = Modifier
@@ -78,16 +80,18 @@ fun TCValueWithMarkdownTrio(
 					color = if (value.isNumber) MaterialTheme.colors.pink300 else MaterialTheme.colors.primary,
 				)
 				//todo markdowns below
-				Text(
-					text = value.docsFieldName,
-					style = SignerTypeface.BodyL,
-					color = MaterialTheme.colors.primary,
-				)
-				Text(
-					text = value.docsType,
-					style = SignerTypeface.BodyL,
-					color = MaterialTheme.colors.primary,
-				)
+				MarkdownText(content = value.docsFieldName, )
+				MarkdownText(content = value.docsType, )
+//				Text(
+//					text = value.docsFieldName,
+//					style = SignerTypeface.BodyL,
+//					color = MaterialTheme.colors.primary,
+//				)
+//				Text(
+//					text = value.docsType,
+//					style = SignerTypeface.BodyL,
+//					color = MaterialTheme.colors.primary,
+//				)
 			}
 		}
 	}
@@ -101,18 +105,17 @@ fun TCValueWithMarkdownTrio(
  */
 data class TCWithTrioMarkdownModel(
 	val name: String,
-	val docsFieldName: String,
+	val docsFieldName: RichTextString,
 	val pathType: String,
-	val docsType: String,
+	val docsType: RichTextString,
 	val isNumber: Boolean,
 ) {
 	companion object {
 		fun createStub(): TCWithTrioMarkdownModel =
 			TCWithTrioMarkdownModel(
 				name = "method name",
-				docsFieldName = "docs Field Numbar",
+				docsFieldName = RichTextString("docs Field Numbar"),
 				pathType = "pathTYpe",
-	//todo dmitry			//ios/NativeSigner/Models/Utils.swift:38
 				docsType = PreviewData.exampleMarkdownDocs,
 				isNumber = false
 			)
@@ -121,17 +124,17 @@ data class TCWithTrioMarkdownModel(
 
 fun MscFieldName.toTCFieldNameModel() = TCWithTrioMarkdownModel(
 	name = name,
-	docsFieldName = docsFieldName,
+	docsFieldName = docsFieldName.toRichTextStr(),
 	pathType = pathType,
-	docsType = docsType,
+	docsType = docsType.toRichTextStr(),
 	isNumber = false,
 )
 
 fun MscFieldNumber.toTCFieldNameModel() = TCWithTrioMarkdownModel(
 	name = number,
-	docsFieldName = docsFieldNumber,
+	docsFieldName = docsFieldNumber.toRichTextStr(),
 	pathType = pathType,
-	docsType = docsType,
+	docsType = docsType.toRichTextStr(),
 	isNumber = true,
 )
 

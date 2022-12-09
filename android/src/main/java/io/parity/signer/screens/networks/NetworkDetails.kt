@@ -1,4 +1,4 @@
-package io.parity.signer.screens
+package io.parity.signer.screens.networks
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -8,7 +8,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.parity.signer.components.IdentIcon
-import io.parity.signer.components.MetadataCard
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.models.encodeHex
