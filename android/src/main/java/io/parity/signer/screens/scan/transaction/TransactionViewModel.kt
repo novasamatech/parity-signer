@@ -24,8 +24,6 @@ class TransactionViewModel : ViewModel() {
 			AuthResult.AuthSuccess -> {
 				val seedPhrases = seedNames
 					.map { signerVM.getSeed(it) }
-					.also { 				println("transaction seed in map is $it")
-					}
 					.filter { it.isNotEmpty() }
 					.joinToString(separator = "\n")
 
