@@ -15,23 +15,23 @@ struct PasswordConfirm: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg000.swiftUIColor)
+            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.backgroundPrimary.swiftUIColor)
             VStack {
                 HeaderBar(line1: Localizable.confirmSecretPath.key, line2: Localizable.details.key)
                 HStack {
                     Text(content.croppedPath + Localizable.Path.delimeter.string)
-                    Image(.lock).foregroundColor(Asset.crypto400.swiftUIColor)
+                    Image(.lock).foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         .font(PrimaryFont.captionM.font)
                 }
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Asset.crypto400.swiftUIColor)
+                        .stroke(Asset.fill6.swiftUIColor)
                         .frame(height: 39)
                     HStack {
                         Localizable.Path.delimeter.text
-                            .foregroundColor(Asset.crypto400.swiftUIColor)
+                            .foregroundColor(Asset.accentPink300.swiftUIColor)
                         TextField(Localizable.secretPath.string, text: $passwordCheck, prompt: Text(""))
-                            .foregroundColor(Asset.crypto400.swiftUIColor)
+                            .foregroundColor(Asset.accentPink300.swiftUIColor)
                             .font(PrimaryFont.captionM.font)
                             .disableAutocorrection(true)
                             .autocapitalization(.none)

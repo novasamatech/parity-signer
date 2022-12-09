@@ -19,25 +19,25 @@ struct HistoryCardTemplate: View {
             VStack(alignment: .leading, spacing: 2) {
                 if let timestamp = timestamp, !timestamp.isEmpty {
                     Text(timestamp)
-                        .foregroundColor(Asset.text400.swiftUIColor)
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                         .font(PrimaryFont.bodyM.font)
                 }
                 Text(line1)
-                    .foregroundColor(Asset.text600.swiftUIColor)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .font(PrimaryFont.captionM.font)
                     .tracking(0.1)
                 Text(line2)
-                    .foregroundColor(Asset.crypto400.swiftUIColor)
+                    .foregroundColor(Asset.accentPink300.swiftUIColor)
                     .font(PrimaryFont.captionM.font)
             }
             Spacer()
             image
                 .imageScale(.medium)
-                .foregroundColor(danger ? Asset.signalDanger.swiftUIColor : Asset.text400.swiftUIColor)
+                .foregroundColor(danger ? Asset.accentRed400.swiftUIColor : Asset.textAndIconsTertiary.swiftUIColor)
         }
         .padding(8)
         .cornerRadius(8)
-        .background(danger ? Asset.bgDanger.swiftUIColor : Asset.bg200.swiftUIColor)
+        .background(danger ? Asset.accentRed300.swiftUIColor.opacity(0.3) : Asset.backgroundSecondary.swiftUIColor)
     }
 }
 

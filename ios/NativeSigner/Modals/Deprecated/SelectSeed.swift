@@ -13,7 +13,7 @@ struct SelectSeed: View {
     let navigationRequest: NavigationRequest
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg100.swiftUIColor)
+            RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.backgroundPrimary.swiftUIColor)
             VStack {
                 ScrollView {
                     LazyVStack {

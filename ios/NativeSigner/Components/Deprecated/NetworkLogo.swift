@@ -12,7 +12,7 @@ struct NetworkLogo: View {
     let logo: String
     var body: some View {
         Text(logo)
-            .foregroundColor(Asset.text600.swiftUIColor)
+            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
             .font(.web3)
             .frame(width: 36, height: 36)
     }
