@@ -8,9 +8,7 @@
 import Foundation
 
 extension PreviewData {
-    static let qrCodeContainerViewModel = QRCodeContainerViewModel(
-        qrCode: PreviewData.exampleQRCode
-    )
+    static let qrCodeContainerViewModel = QrData.regular(data: PreviewData.exampleQRCode)
 
     static let animatedQrCodeViewModel = AnimatedQRCodeViewModel(
         qrCodes: [PreviewData.exampleQRCode, PreviewData.exampleQRCode]

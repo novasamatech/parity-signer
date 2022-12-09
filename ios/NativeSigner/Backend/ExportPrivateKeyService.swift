@@ -33,7 +33,7 @@ final class ExportPrivateKeyService {
         ).qr else { return nil }
 
         return ExportPrivateKeyViewModel(
-            qrCode: .init(qrCode: qrCode),
+            qrCode: qrCode,
             addressFooter: .init(
                 identicon: keyDetails.address.identicon.svgPayload,
                 rootKeyName: keyDetails.address.seedName,

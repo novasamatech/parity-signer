@@ -61,8 +61,14 @@ struct KeyDetailsPublicKeyView: View {
             ScrollView {
                 VStack {
                     VStack(spacing: 0) {
-                        QRCodeContainerView(viewModel: viewModel.qrCode)
-                            .padding(0.5)
+                        AnimatedQRCodeView(
+                            viewModel: Binding<AnimatedQRCodeViewModel>.constant(
+                                .init(
+                                    qrCodes: [viewModel.qrCode.payload]
+                                )
+                            )
+                        )
+                        .padding(0.5)
                         switch viewModel.footer {
                         case let .address(viewModel):
                             QRCodeAddressFooterView(viewModel: viewModel)

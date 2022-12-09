@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ExportPrivateKeyViewModel: Equatable {
-    let qrCode: QRCodeContainerViewModel
+    let qrCode: QrData
     let addressFooter: QRCodeAddressFooterViewModel
 }
 
@@ -39,8 +39,14 @@ struct ExportPrivateKeyModal: View {
                     .padding([.trailing], Spacing.medium)
                     // QR Code container
                     VStack(spacing: 0) {
-                        QRCodeContainerView(viewModel: viewModel.qrCode)
-                            .padding(0.5)
+                        AnimatedQRCodeView(
+                            viewModel: Binding<AnimatedQRCodeViewModel>.constant(
+                                .init(
+                                    qrCodes: [viewModel.qrCode.payload]
+                                )
+                            )
+                        )
+                        .padding(0.5)
                         QRCodeAddressFooterView(viewModel: viewModel.addressFooter)
                     }
                     .fixedSize(horizontal: false, vertical: true)
