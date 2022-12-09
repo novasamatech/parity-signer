@@ -436,6 +436,29 @@ pub enum QrData {
     Sensitive { data: Vec<u8> },
 }
 
+impl QrData {
+    /// Get the length of the underlying data
+    pub fn len(&self) -> usize {
+        match self {
+            QrData::Regular { data } | QrData::Sensitive { data } => data.len(),
+        }
+    }
+
+    /// Get a reference to the underlying data.
+    pub fn data(&self) -> &[u8] {
+        match self {
+            QrData::Regular { data } | QrData::Sensitive { data } => data,
+        }
+    }
+
+    /// If the underlying data is empty.
+    pub fn is_empty(&self) -> bool {
+        match self {
+            QrData::Regular { data } | QrData::Sensitive { data } => data.is_empty(),
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MSufficientCryptoReady {
     pub author_info: MAddressCard,
@@ -515,7 +538,7 @@ pub struct MPasswordConfirm {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MSignatureReady {
     /// Frames of the animated QR code that should be displayed by the UI.
-    pub signatures: Vec<Vec<u8>>,
+    pub signatures: Vec<QrData>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -674,7 +697,7 @@ pub struct MSCTxSpecPlain {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MKeysInfoExport {
-    pub frames: Vec<Vec<u8>>,
+    pub frames: Vec<QrData>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

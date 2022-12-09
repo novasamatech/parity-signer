@@ -488,7 +488,7 @@ dictionary MManageNetworks {
 };
 
 dictionary MKeysInfoExport {
-    sequence<sequence<u8>> frames;
+    sequence<QrData> frames;
 };
 
 [Enum]
@@ -647,7 +647,7 @@ dictionary MPasswordConfirm {
 };
 
 dictionary MSignatureReady {
-    sequence<sequence<u8>> signatures;
+    sequence<QrData> signatures;
 };
 
 dictionary MEnterPassword {

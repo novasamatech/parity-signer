@@ -1647,13 +1647,10 @@ where
     )?;
     key_password.zeroize();
 
-    if let Err(e) = TrDbCold::new()
+    TrDbCold::new()
         .set_addresses(identity_batch) // modify addresses
         .set_history(history_batch) // add corresponding history
-        .apply(&db_path)
-    {
-        return Err(e);
-    };
+        .apply(&db_path)?;
 
     Ok(MKeyDetails {
         qr,
