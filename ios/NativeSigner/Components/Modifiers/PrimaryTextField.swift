@@ -16,7 +16,7 @@ struct PrimaryTextFieldStyle: ViewModifier {
         content
             .foregroundColor(isValid ? Asset.textAndIconsPrimary.swiftUIColor : Asset.accentRed300.swiftUIColor)
             .placeholder(placeholder, when: text.isEmpty)
-            .font(Fontstyle.bodyL.base)
+            .font(PrimaryFont.bodyL.font)
             .autocapitalization(.none)
             .keyboardType(.asciiCapable)
             .submitLabel(.return)

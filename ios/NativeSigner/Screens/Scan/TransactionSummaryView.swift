@@ -17,7 +17,7 @@ struct TransactionSummaryView: View {
             VStack(alignment: .leading, spacing: 0) {
                 Localizable.TransactionSign.Label.details.text
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(Fontstyle.captionM.base)
+                    .font(PrimaryFont.captionM.font)
                     .padding(.bottom, Spacing.extraSmall)
                 HStack {
                     VStack(alignment: .leading, spacing: 0) {
@@ -28,7 +28,7 @@ struct TransactionSummaryView: View {
                                 Text(row.value)
                                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             }
-                            .font(Fontstyle.bodyM.base)
+                            .font(PrimaryFont.bodyM.font)
                             .frame(minHeight: Heights.minTransactionSummaryItemHeight)
                         }
                     }
@@ -56,23 +56,23 @@ struct TransactionSummaryView: View {
             VStack(alignment: .leading, spacing: 0) {
                 Localizable.TransactionSign.Label.sign.text
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(Fontstyle.captionM.base)
+                    .font(PrimaryFont.captionM.font)
                     .padding(.bottom, Spacing.extraSmall)
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         renderablePath(for: signature)
                             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                            .font(Fontstyle.captionM.base)
+                            .font(PrimaryFont.captionM.font)
                         Text(signature.name)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            .font(Fontstyle.bodyM.base)
+                            .font(PrimaryFont.bodyM.font)
                         HStack {
                             Text(
                                 isShowingFullAddress ? signature.base58 : signature.base58
                                     .truncateMiddle()
                             )
                             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                            .font(Fontstyle.bodyM.base)
+                            .font(PrimaryFont.bodyM.font)
 
                             if !isShowingFullAddress {
                                 Asset.chevronDown.swiftUIImage

@@ -61,7 +61,7 @@ struct Snackbar: View {
     var body: some View {
         HStack {
             Text(viewModel.title)
-                .font(Fontstyle.bodyL.base)
+                .font(PrimaryFont.bodyL.font)
                 .foregroundColor(Asset.accentForegroundText.swiftUIColor)
                 .padding(Spacing.large)
                 .multilineTextAlignment(.leading)

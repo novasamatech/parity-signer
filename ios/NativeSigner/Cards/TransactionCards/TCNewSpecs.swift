@@ -12,7 +12,7 @@ struct TCAddNewNetwork: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Localizable.Transaction.AddNetwork.Label.header.text
-                .font(Fontstyle.bodyL.base)
+                .font(PrimaryFont.bodyL.font)
                 .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                 .padding(.leading, Spacing.medium)
                 .padding(.bottom, Spacing.extraSmall)
@@ -37,7 +37,7 @@ struct TCAddNewNetwork: View {
                         Spacer()
                         Text(value.logo)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            .font(Fontstyle.header4.web3)
+                            .font(.web3)
                     }
                     Divider()
                     rowWrapper(Localizable.Transaction.AddNetwork.Label.path.string, value.pathId, isLast: true)

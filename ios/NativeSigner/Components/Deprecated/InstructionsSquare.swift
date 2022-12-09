@@ -12,17 +12,17 @@ struct InstructionsSquare: View {
         VStack(alignment: .leading) {
             Image(.airplane)
             Localizable.useSignerInAirplaneMode.text
-                .font(Fontstyle.body2.base)
+                .font(PrimaryFont.bodyL.font)
                 .foregroundColor(Asset.text600.swiftUIColor)
             Localizable.AirplaneMode.explanation.text
-                .font(Fontstyle.subtitle2.base)
+                .font(PrimaryFont.bodyM.font)
                 .foregroundColor(Asset.text300.swiftUIColor)
             Image(.wifi, variant: .slash)
             Localizable.airgapYourPhone.text
-                .font(Fontstyle.body2.base)
+                .font(PrimaryFont.bodyL.font)
                 .foregroundColor(Asset.text600.swiftUIColor)
             Localizable.Connectivity.explanation.text
-                .font(Fontstyle.subtitle2.base).foregroundColor(Asset.text300.swiftUIColor)
+                .font(PrimaryFont.bodyM.font).foregroundColor(Asset.text300.swiftUIColor)
         }
         .padding(16)
         .background(

@@ -20,15 +20,15 @@ struct HistoryCardTemplate: View {
                 if let timestamp = timestamp, !timestamp.isEmpty {
                     Text(timestamp)
                         .foregroundColor(Asset.text400.swiftUIColor)
-                        .font(Fontstyle.subtitle2.base)
+                        .font(PrimaryFont.bodyM.font)
                 }
                 Text(line1)
                     .foregroundColor(Asset.text600.swiftUIColor)
-                    .font(Fontstyle.subtitle1.base)
+                    .font(PrimaryFont.captionM.font)
                     .tracking(0.1)
                 Text(line2)
                     .foregroundColor(Asset.crypto400.swiftUIColor)
-                    .font(Fontstyle.body1.crypto)
+                    .font(PrimaryFont.captionM.font)
             }
             Spacer()
             image

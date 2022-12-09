@@ -19,7 +19,7 @@ struct NativeSignerApp: App {
                 navigation: navigation,
                 connectivityMediator: connectivityMediator
             ))
-            .font(Fontstyle.body1.base)
+            .font(PrimaryFont.bodyL.font)
             .background(Asset.bg100.swiftUIColor)
             .environmentObject(navigation)
             .environmentObject(connectivityMediator)
