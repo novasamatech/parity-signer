@@ -192,6 +192,7 @@
 		6D971AC02941B45A00121A36 /* SignerImage+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D971ABF2941B45A00121A36 /* SignerImage+Helpers.swift */; };
 		6D971AC32941CDF600121A36 /* Identicon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D971AC22941CDF600121A36 /* Identicon.swift */; };
 		6D971AC72942465C00121A36 /* QrData+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D971AC62942465C00121A36 /* QrData+Helpers.swift */; };
+		6D971ACA2942E79100121A36 /* QRCode in Frameworks */ = {isa = PBXBuildFile; productRef = 6D971AC92942E79100121A36 /* QRCode */; };
 		6DA2ACA22939CB3900AAEADC /* CancelBag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA2ACA12939CB3900AAEADC /* CancelBag.swift */; };
 		6DA2ACB0293A17DF00AAEADC /* Address+DisplayablePath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA2ACAF293A17DF00AAEADC /* Address+DisplayablePath.swift */; };
 		6DA501CC290A48190096DA4E /* KeyDetails+ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501CB290A48190096DA4E /* KeyDetails+ViewModel.swift */; };
@@ -544,6 +545,7 @@
 			files = (
 				6D971ABC2941B1C600121A36 /* SVGView in Frameworks */,
 				6DEEA87E28AFBF5D00371ECA /* libsigner.a in Frameworks */,
+				6D971ACA2942E79100121A36 /* QRCode in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1503,6 +1505,7 @@
 			name = NativeSigner;
 			packageProductDependencies = (
 				6D971ABB2941B1C600121A36 /* SVGView */,
+				6D971AC92942E79100121A36 /* QRCode */,
 			);
 			productName = NativeSigner;
 			productReference = 2DE72BBE26A588C7002BB752 /* NativeSigner.app */;
@@ -1556,6 +1559,7 @@
 			mainGroup = 2DE72BB526A588C7002BB752;
 			packageReferences = (
 				6D971ABA2941B1C600121A36 /* XCRemoteSwiftPackageReference "SVGView" */,
+				6D971AC82942E79100121A36 /* XCRemoteSwiftPackageReference "QRCode" */,
 			);
 			productRefGroup = 2DE72BBF26A588C7002BB752 /* Products */;
 			projectDirPath = "";
@@ -2243,6 +2247,14 @@
 				kind = branch;
 			};
 		};
+		6D971AC82942E79100121A36 /* XCRemoteSwiftPackageReference "QRCode" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/dagronf/QRCode";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2250,6 +2262,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6D971ABA2941B1C600121A36 /* XCRemoteSwiftPackageReference "SVGView" */;
 			productName = SVGView;
+		};
+		6D971AC92942E79100121A36 /* QRCode */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6D971AC82942E79100121A36 /* XCRemoteSwiftPackageReference "QRCode" */;
+			productName = QRCode;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
