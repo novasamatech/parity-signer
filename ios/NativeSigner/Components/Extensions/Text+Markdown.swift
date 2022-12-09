@@ -11,7 +11,7 @@ extension Text {
     @ViewBuilder
     static func markdownWithFallback(_ value: String, allowsEmptyValue: Bool = true) -> some View {
         Text(
-            AttributedString.build(fromHexDocs: value, allowsEmptyValue: allowsEmptyValue) ??
+            AttributedString.build(fromDocs: value, allowsEmptyValue: allowsEmptyValue) ??
                 AttributedString(Localizable.Error.docsParsing.string)
         )
         .multilineTextAlignment(.leading)
