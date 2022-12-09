@@ -1,4 +1,3 @@
-use image::{GenericImageView, GrayImage, ImageBuffer, Pixel};
 use lazy_static::lazy_static;
 use parity_scale_codec::Encode;
 use regex::Regex;
@@ -8,12 +7,10 @@ use std::{collections::HashMap, convert::TryInto, fs, str::FromStr};
 
 use constants::{
     test_values::{
-        alice_polkadot_qr, alice_sr_0, alice_sr_1, alice_sr_alice, alice_sr_alice_secret_secret,
+        alice_sr_0, alice_sr_1, alice_sr_alice, alice_sr_alice_secret_secret,
         alice_sr_alice_westend, alice_sr_kusama, alice_sr_polkadot, alice_sr_root,
         alice_sr_secret_path_multipass, alice_sr_westend, alice_sr_westend_0, alice_sr_westend_1,
-        alice_sr_westend_2, alice_westend_alice_qr, alice_westend_alice_secret_secret_qr,
-        alice_westend_root_qr, alice_westend_westend_qr, bob, empty_png, kusama_9130, kusama_9151,
-        types_known,
+        alice_sr_westend_2, bob, empty_png, kusama_9130, kusama_9151, types_known,
     },
     ALICE_SEED_PHRASE,
 };
@@ -41,7 +38,7 @@ use definitions::{
         MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion,
         MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
         MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData,
-        Network, NetworkSpecs, PathAndNetwork, RightButton, ScreenData, ScreenNameType,
+        Network, NetworkSpecs, PathAndNetwork, QrData, RightButton, ScreenData, ScreenNameType,
         SeedNameCard, SignerImage, TransactionCard, TransactionCardSet, TransactionType,
     },
     network_specs::{OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
@@ -99,19 +96,6 @@ fn cut_seed_remove_identicon(data: &mut Option<ModalData>) -> String {
     } else {
         panic!("Expected ModalData::NewSeedBackup, got {:?}", data);
     }
-}
-fn qr_payload(qr_content: &[u8]) -> Vec<u8> {
-    let image = image::load_from_memory(qr_content).unwrap();
-    let mut gray_img: GrayImage = ImageBuffer::new(image.width(), image.height());
-    for y in 0..image.height() {
-        for x in 0..image.width() {
-            let new_pixel = image.get_pixel(x, y).to_luma();
-            gray_img.put_pixel(x, y, new_pixel);
-        }
-    }
-    let mut qr_decoder = quircs::Quirc::new();
-    let codes = qr_decoder.identify(image.width() as usize, image.height() as usize, &gray_img);
-    codes.last().unwrap().unwrap().decode().unwrap().payload
 }
 
 fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
@@ -3206,7 +3190,15 @@ fn flow_test_1() {
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::KeyDetails {
             f: MKeyDetails {
-                qr: alice_polkadot_qr().to_vec(),
+                qr: QrData::Regular {
+                    data: format!(
+                        "substrate:{}:0x{}",
+                        "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW",
+                        network_genesis_hash_polkadot
+                    )
+                    .as_bytes()
+                    .to_vec(),
+                },
                 pubkey: "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                     .to_string(),
                 address: Address {
@@ -4713,7 +4705,14 @@ fn flow_test_1() {
         screen_data: ScreenData::KeyDetailsMulti {
             f: MKeyDetailsMulti {
                 key_details: MKeyDetails {
-                    qr: alice_westend_westend_qr().to_vec(),
+                    qr: QrData::Regular {
+                        data: format!(
+                            "substrate:{}:0x{}",
+                            "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N", WESTEND_GENESIS,
+                        )
+                        .as_bytes()
+                        .to_vec(),
+                    },
                     pubkey: "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                         .to_string(),
                     base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
@@ -4763,7 +4762,14 @@ fn flow_test_1() {
         screen_data: ScreenData::KeyDetailsMulti {
             f: MKeyDetailsMulti {
                 key_details: MKeyDetails {
-                    qr: alice_westend_alice_secret_secret_qr().to_vec(),
+                    qr: QrData::Regular {
+                        data: format!(
+                            "substrate:{}:0x{}",
+                            "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK", WESTEND_GENESIS,
+                        )
+                        .as_bytes()
+                        .to_vec(),
+                    },
                     pubkey: "8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
                         .to_string(),
                     address: Address {
@@ -4814,7 +4820,14 @@ fn flow_test_1() {
         screen_data: ScreenData::KeyDetailsMulti {
             f: MKeyDetailsMulti {
                 key_details: MKeyDetails {
-                    qr: alice_westend_alice_qr().to_vec(),
+                    qr: QrData::Regular {
+                        data: format!(
+                            "substrate:{}:0x{}",
+                            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", WESTEND_GENESIS,
+                        )
+                        .as_bytes()
+                        .to_vec(),
+                    },
                     pubkey: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
@@ -5068,7 +5081,14 @@ fn flow_test_1() {
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::KeyDetails {
             f: MKeyDetails {
-                qr: alice_westend_root_qr().to_vec(),
+                qr: QrData::Regular {
+                    data: format!(
+                        "substrate:{}:0x{}",
+                        "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV", WESTEND_GENESIS
+                    )
+                    .as_bytes()
+                    .to_vec(),
+                },
                 pubkey: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                     .to_string(),
                 base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
@@ -5477,7 +5497,7 @@ fn flow_test_1() {
             action.modal_data
         );
     };
-    let sufficient_hex = hex::encode(qr_payload(&sufficient));
+    let sufficient_hex = hex::encode(&sufficient);
 
     let mut new_log_with_modal = expected_action.clone();
     assert_eq!(
@@ -5774,7 +5794,7 @@ fn flow_test_1() {
             action.modal_data
         );
     };
-    let sufficient_hex = hex::encode(qr_payload(&sufficient));
+    let sufficient_hex = hex::encode(&sufficient);
 
     assert_eq!(
         action, expected_action,
@@ -5864,7 +5884,7 @@ fn flow_test_1() {
         );
     };
 
-    let sufficient_hex = hex::encode(qr_payload(&sufficient));
+    let sufficient_hex = hex::encode(&sufficient);
 
     new_log_with_modal.modal_data = Some(ModalData::SufficientCryptoReady {
         f: MSufficientCryptoReady {
@@ -6208,7 +6228,7 @@ fn flow_test_1() {
         f: MSignatureReady { signatures },
     }) = action.modal_data
     {
-        String::from_utf8(signatures[0].clone()).unwrap()
+        String::from_utf8(signatures[0].data().to_vec()).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -6361,7 +6381,7 @@ fn flow_test_1() {
         f: MSignatureReady { ref signatures },
     }) = action.modal_data
     {
-        String::from_utf8(signatures[0].clone()).unwrap()
+        String::from_utf8(signatures[0].data().to_vec()).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -6841,7 +6861,7 @@ fn flow_test_1() {
             },
         });
 
-        String::from_utf8(signatures[0].clone()).unwrap()
+        String::from_utf8(signatures[0].data().to_vec()).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -7270,7 +7290,7 @@ fn flow_test_1() {
             },
         });
 
-        String::from_utf8(signatures[0].clone()).unwrap()
+        String::from_utf8(signatures[0].data().to_vec()).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",

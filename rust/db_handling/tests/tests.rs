@@ -15,8 +15,8 @@ use std::{convert::TryInto, fs, path::PathBuf, str::FromStr};
 use constants::{
     test_values::{
         alice_sr_alice, alice_sr_kusama, alice_sr_polkadot, alice_sr_root,
-        alice_sr_secret_abracadabra, alice_sr_westend, alice_westend_root_qr,
-        alice_westend_secret_qr, empty_png, types_known, westend_9000, westend_9010,
+        alice_sr_secret_abracadabra, alice_sr_westend, empty_png, types_known, westend_9000,
+        westend_9010,
     },
     ADDRTREE, ALICE_SEED_PHRASE, METATREE, SPECSTREE,
 };
@@ -396,8 +396,10 @@ fn export_alice_westend() {
         ),
     )
     .unwrap();
+
+    // `subkey inspect "ALICE_SEED_PHRASE"`
     let expected_key = MKeyDetails {
-        qr: alice_westend_root_qr().to_vec(),
+        qr: definitions::navigation::QrData::Regular { data: "substrate:5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV:0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string().as_bytes().to_vec() },
         pubkey: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a".to_string(),
         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
         address: Address {
@@ -2503,7 +2505,11 @@ fn test_export_secret_key() {
     )
     .unwrap();
 
-    assert_eq!(secret_key.qr, alice_westend_secret_qr().to_vec());
+    // `subkey inspect "ALICE_SEED_PHRASE//Alice"`
+    assert_eq!(
+        String::from_utf8(secret_key.qr.data().to_vec()).unwrap(),
+        "secret:0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a:e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string()
+    );
     assert!(secret_key.address.secret_exposed);
 
     let identities: Vec<(MultiSigner, AddressDetails)> =

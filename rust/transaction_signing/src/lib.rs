@@ -43,7 +43,7 @@ pub fn handle_sign(
         idx,
         encryption,
     )
-    .and_then(|s| Ok(s.to_string().as_bytes().to_vec()))
+    .map(|s| s.to_string().as_bytes().to_vec())
 }
 
 ///Possible content to generate sufficient crypto for
