@@ -6020,7 +6020,7 @@ fn flow_test_1() {
     let action = state
         .perform(Action::TransactionFetched, transaction_hex, "")
         .unwrap();
-    let docs = "53616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a6f726967696e206163636f756e742e0a0a393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a5b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e73666572".to_string();
+    let docs = "Same as the [`transfer`] call, but with a check that the transfer will not kill the\norigin account.\n\n99% of the time you want [`transfer`] instead.\n\n[`transfer`]: struct.Pallet.html#method.transfer".to_string();
 
     let block_hash = "538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33".to_string();
     let expected_action = ActionResult {
@@ -6294,7 +6294,7 @@ fn flow_test_1() {
 
     // let's scan a text message
     state.perform(Action::NavbarScan, "", "").unwrap();
-    let card_text = hex::encode(b"uuid-abcd");
+    let card_text = String::from("uuid-abcd");
     let sign_msg = hex::encode(b"<Bytes>uuid-abcd</Bytes>");
     let message_hex = format!("5301033efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", sign_msg);
     let action = state

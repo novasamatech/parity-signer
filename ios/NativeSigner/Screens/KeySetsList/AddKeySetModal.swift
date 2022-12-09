@@ -24,7 +24,7 @@ struct AddKeySetModal: View {
                 VStack(alignment: .leading) {
                     Localizable.AddKeySet.title.text
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                        .font(Fontstyle.titleS.base)
+                        .font(PrimaryFont.titleS.font)
                         .padding([.bottom, .top], Spacing.medium)
                     Divider()
                     MenuButton(

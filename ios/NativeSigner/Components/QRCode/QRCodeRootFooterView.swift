@@ -27,11 +27,11 @@ struct QRCodeRootFooterView: View {
             VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                 Text(Localizable.PublicKeyDetails.Label.keys(viewModel.keyName))
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    .font(Fontstyle.bodyM.base)
+                    .font(PrimaryFont.bodyM.font)
                 HStack(spacing: Spacing.extraExtraSmall) {
                     Text(showFullAddress ? viewModel.base58 : viewModel.base58.truncateMiddle())
                         .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                        .font(Fontstyle.bodyM.base)
+                        .font(PrimaryFont.bodyM.font)
                         .frame(idealWidth: .infinity, alignment: .leading)
                     if !showFullAddress {
                         Asset.chevronDown.swiftUIImage

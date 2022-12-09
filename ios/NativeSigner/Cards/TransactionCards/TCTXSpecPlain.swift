@@ -14,7 +14,7 @@ struct TCTXSpecPlain: View {
             VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                 Localizable.unknownNetwork.text
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(Fontstyle.bodyL.base)
+                    .font(PrimaryFont.bodyL.font)
                 TCNamedValueCard(
                     name: Localizable.TCName.genesisHash.string,
                     value: content.networkGenesisHash.formattedAsString

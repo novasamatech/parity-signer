@@ -90,12 +90,12 @@ struct NavigationBarView: View {
             VStack {
                 if let title = viewModel.title {
                     Text(title)
-                        .font(Fontstyle.titleS.base)
+                        .font(PrimaryFont.titleS.font)
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).lineLimit(1)
                 }
                 if let subtitle = viewModel.subtitle {
                     Text(subtitle)
-                        .font(Fontstyle.captionM.base)
+                        .font(PrimaryFont.captionM.font)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                 }
             }
@@ -116,7 +116,6 @@ struct NavigationBarView: View {
         .padding([.leading, .trailing], Spacing.extraExtraSmall)
         .frame(maxWidth: .infinity)
         .frame(height: Heights.navigationBarHeight)
-        .background(viewModel.backgroundColor)
     }
 
     private func leftButtonAction() -> () -> Void {

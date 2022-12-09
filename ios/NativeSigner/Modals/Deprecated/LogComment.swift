@@ -27,7 +27,7 @@ struct LogComment: View {
                             .frame(height: 39)
                         TextField(Localizable.commentUppercase.string, text: $comment, prompt: Text(""))
                             .foregroundColor(Asset.crypto400.swiftUIColor)
-                            .font(Fontstyle.body2.crypto)
+                            .font(PrimaryFont.captionM.font)
                             .disableAutocorrection(true)
                             .autocapitalization(.none)
                             .keyboardType(.asciiCapable)

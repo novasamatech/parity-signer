@@ -15,7 +15,7 @@ struct ActionSheetButtonStyle: ButtonStyle {
             .frame(height: Heights.actionSheetButton, alignment: .leading)
             .padding(Spacing.none)
             .foregroundColor(foregroundColor)
-            .font(Fontstyle.labelL.base)
+            .font(PrimaryFont.labelL.font)
     }
 
     static let destructive = ActionSheetButtonStyle(foregroundColor: Asset.accentRed400.swiftUIColor)

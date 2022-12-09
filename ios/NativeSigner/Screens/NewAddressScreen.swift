@@ -35,7 +35,7 @@ struct NewAddressScreen: View {
                                 prompt: Localizable.NetworkInput.prompt.text
                             )
                             .foregroundColor(Asset.crypto400.swiftUIColor)
-                            .font(Fontstyle.body2.crypto)
+                            .font(PrimaryFont.captionM.font)
                             .disableAutocorrection(true)
                             .autocapitalization(.none)
                             .keyboardType(.asciiCapable)

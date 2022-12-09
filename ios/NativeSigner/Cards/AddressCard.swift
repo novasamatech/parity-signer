@@ -38,21 +38,21 @@ struct AddressCard: View {
                 VStack(alignment: .leading) {
                     HStack {
                         Text(card.address.seedName).foregroundColor(Asset.text600.swiftUIColor)
-                            .font(Fontstyle.subtitle1.base)
+                            .font(PrimaryFont.labelM.font)
                         Text(card.address.path)
                         if card.address.hasPwd {
                             Localizable.Path.delimeter.text
                                 .foregroundColor(Asset.crypto400.swiftUIColor)
-                                .font(Fontstyle.body2.crypto)
+                                .font(PrimaryFont.captionM.font)
                             Image(.lock)
                                 .foregroundColor(Asset.crypto400.swiftUIColor)
-                                .font(Fontstyle.body2.crypto)
+                                .font(PrimaryFont.captionM.font)
                         }
                     }.foregroundColor(Asset.crypto400.swiftUIColor)
-                        .font(Fontstyle.body2.crypto)
+                        .font(PrimaryFont.captionM.font)
                     // Here we could have shortened base58 address when buttons are shown, but we don't need to
                     Text(card.base58.truncateMiddle(length: 8)).foregroundColor(Asset.text400.swiftUIColor)
-                        .font(Fontstyle.body1.crypto)
+                        .font(PrimaryFont.captionM.font)
                 }
                 Spacer()
             }.padding(.horizontal, 8)

@@ -20,7 +20,7 @@ struct SeedCardForManager: View {
                 VStack(alignment: .leading) {
                     Text(seedNameCard.seedName)
                         .foregroundColor(Asset.text600.swiftUIColor)
-                        .font(Fontstyle.subtitle1.base)
+                        .font(PrimaryFont.labelM.font)
                 }
                 Spacer()
             }

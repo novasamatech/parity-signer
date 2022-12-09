@@ -104,7 +104,7 @@ impl<'a> Card<'a> {
                 ParserCard::Method { method_name, docs } => NavCard::CallCard {
                     f: MSCCall {
                         method_name: method_name.clone(),
-                        docs: hex::encode(docs.as_bytes()),
+                        docs: docs.clone(),
                     },
                 },
                 ParserCard::Varname(varname) => NavCard::VarNameCard { f: varname.clone() },
@@ -112,7 +112,7 @@ impl<'a> Card<'a> {
                     f: decoded_string.clone(),
                 },
                 ParserCard::Text(decoded_text) => NavCard::TextCard {
-                    f: hex::encode(decoded_text.as_bytes()),
+                    f: decoded_text.clone(),
                 },
                 ParserCard::Id { id, base58prefix } => NavCard::IdCard {
                     f: MSCId {
@@ -149,9 +149,9 @@ impl<'a> Card<'a> {
                 } => NavCard::FieldNameCard {
                     f: MSCFieldName {
                         name: name.clone(),
-                        docs_field_name: hex::encode(docs_field_name.as_bytes()),
+                        docs_field_name: docs_field_name.clone(),
                         path_type: path_type.clone(),
-                        docs_type: hex::encode(docs_type.as_bytes()),
+                        docs_type: docs_type.clone(),
                     },
                 },
                 ParserCard::FieldNumber {
@@ -162,9 +162,9 @@ impl<'a> Card<'a> {
                 } => NavCard::FieldNumberCard {
                     f: MSCFieldNumber {
                         number: number.to_string(),
-                        docs_field_number: hex::encode(docs_field_number.as_bytes()),
+                        docs_field_number: docs_field_number.clone(),
                         path_type: path_type.clone(),
-                        docs_type: hex::encode(docs_type.as_bytes()),
+                        docs_type: docs_type.clone(),
                     },
                 },
                 ParserCard::EnumVariantName {
@@ -173,7 +173,7 @@ impl<'a> Card<'a> {
                 } => NavCard::EnumVariantNameCard {
                     f: MSCEnumVariantName {
                         name: name.clone(),
-                        docs_enum_variant: hex::encode(docs_enum_variant.as_bytes()),
+                        docs_enum_variant: docs_enum_variant.clone(),
                     },
                 },
                 ParserCard::Era(era) => match era {
