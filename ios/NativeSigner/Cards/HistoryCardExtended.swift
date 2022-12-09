@@ -95,7 +95,7 @@ struct HistoryCardExtended: View {
                 OldTransactionBlock(cards: event.decoded?.asSortedCards() ?? [])
                 Localizable.signedBy.text
                 HStack {
-                    Identicon(identicon: event.signedBy?.address.identicon ?? [])
+                    Identicon(identicon: event.signedBy?.address.identicon.svgPayload ?? [])
                     VStack {
                         Text(value.signedBy.show())
                         Text((event.signedBy?.address.seedName ?? "") + (event.signedBy?.address.path ?? ""))
@@ -111,7 +111,7 @@ struct HistoryCardExtended: View {
                 OldTransactionBlock(cards: event.decoded?.asSortedCards() ?? [])
                 Localizable.signedBy.text
                 HStack {
-                    Identicon(identicon: event.signedBy?.address.identicon ?? [])
+                    Identicon(identicon: event.signedBy?.address.identicon.svgPayload ?? [])
                     VStack {
                         Text(value.signedBy.show())
                         Text((event.signedBy?.address.seedName ?? "") + (event.signedBy?.address.path ?? ""))

@@ -12,10 +12,7 @@ import io.parity.signer.components.TransactionPreviewField
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.encodeHex
-import io.parity.signer.uniffi.Event
-import io.parity.signer.uniffi.MEventMaybeDecoded
-import io.parity.signer.uniffi.ValidCurrentVerifier
-import io.parity.signer.uniffi.VerifierValue
+import io.parity.signer.uniffi.*
 
 /**
  * Detailed history event description representation selector
@@ -276,7 +273,7 @@ fun HistoryCardExtended(
 				Text("Signed by:")
 				Row {
 					IdentIcon(
-						identicon = signedBy?.address?.identicon ?: listOf()
+						identicon = signedBy?.address?.identicon ?: SignerImage.Png(listOf())
 					)
 					Column {
 						Text(verifierDetails?.publicKey ?: "")

@@ -49,7 +49,7 @@ struct SettingsScreen: View {
                                     address: Address(
                                         path: content.publicKey?.truncateMiddle(length: 8) ?? "",
                                         hasPwd: false,
-                                        identicon: content.identicon ?? [],
+                                        identicon: .svg(image: content.identicon?.svgPayload ?? []),
                                         seedName: "",
                                         secretExposed: false
                                     ),
@@ -69,7 +69,7 @@ struct SettingsScreen: View {
                                         address: Address(
                                             path: "None",
                                             hasPwd: false,
-                                            identicon: [],
+                                            identicon: .svg(image: []),
                                             seedName: "",
                                             secretExposed: false
                                         ),

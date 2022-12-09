@@ -22,6 +22,7 @@ import androidx.core.view.WindowCompat
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.panels.TopBar
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.NavigationMigrations
 import io.parity.signer.models.SignerDataModel
@@ -158,7 +159,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						BigButton(
 							text = stringResource(R.string.unlock_app_button),
 							action = {
-								signerDataModel.authentication.authenticate(signerDataModel.activity) {
+								ServiceLocator.authentication.authenticate(signerDataModel.activity) {
 									signerDataModel.totalRefresh()
 								}
 							}

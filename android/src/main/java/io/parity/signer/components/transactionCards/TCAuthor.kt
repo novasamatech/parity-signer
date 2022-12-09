@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.Composable
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.models.toBytes
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600

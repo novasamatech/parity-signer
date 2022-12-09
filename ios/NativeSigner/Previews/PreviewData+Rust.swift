@@ -11,7 +11,7 @@ extension PreviewData {
     static let address: Address = .init(
         path: "// polkadot",
         hasPwd: true,
-        identicon: PreviewData.exampleIdenticon,
+        identicon: .svg(image: PreviewData.exampleIdenticon),
         seedName: "main account",
         secretExposed: false
     )
@@ -23,7 +23,7 @@ extension PreviewData {
             address: .init(
                 path: "",
                 hasPwd: false,
-                identicon: [],
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 seedName: "",
                 secretExposed: false
             ),
@@ -41,7 +41,7 @@ extension PreviewData {
         address: .init(
             path: "",
             hasPwd: false,
-            identicon: [],
+            identicon: .svg(image: PreviewData.exampleIdenticon),
             seedName: "",
             secretExposed: false
         ),
@@ -57,7 +57,7 @@ extension PreviewData {
             address: .init(
                 path: "",
                 hasPwd: false,
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 seedName: "",
                 secretExposed: false
             ),
@@ -73,7 +73,7 @@ extension PreviewData {
         address: .init(
             path: "",
             hasPwd: false,
-            identicon: [],
+            identicon: .svg(image: PreviewData.exampleIdenticon),
             seedName: "",
             secretExposed: false
         ),
@@ -87,7 +87,7 @@ extension PreviewData {
 
     static let seedNameCard = SeedNameCard(
         seedName: "aaaa",
-        identicon: PreviewData.exampleIdenticon,
+        identicon: .svg(image: PreviewData.exampleIdenticon),
         derivedKeysCount: 3
     )
 
@@ -95,37 +95,37 @@ extension PreviewData {
         seedNameCards: [
             SeedNameCard(
                 seedName: "aaaa",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 3
             ),
             SeedNameCard(
                 seedName: "bbbb",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 0
             ),
             SeedNameCard(
                 seedName: "cccc",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 1
             ),
             SeedNameCard(
                 seedName: "dddd",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 4
             ),
             SeedNameCard(
                 seedName: "eeee",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 15
             ),
             SeedNameCard(
                 seedName: "ffff",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 1
             ),
             SeedNameCard(
                 seedName: "gggg",
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 derivedKeysCount: 0
             )
         ]
@@ -135,7 +135,7 @@ extension PreviewData {
 extension PreviewData {
     static let exampleMarkdownDocs: String =
         // swiftlint:disable:next line_length
-        "53616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a6f726967696e206163636f756e742e0a0a393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a5b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e73666572"
+        "Same as the [`transfer`] call, but with a check that the transfer will not kill the\n origin account.\n\n 99% of the time you want [`transfer`] instead.\n\n [`transfer`]: struct.Pallet.html#method.transfer\n # <weight>\n - Cheaper than transfer because account cannot be killed.\n - Base Weight: 51.4 µs\n - DB Weight: 1 Read and 1 Write to dest (sender is in overlay already)\n #</weight>"
 
     static let signTransaction = MTransaction(
         content: .init(
@@ -182,7 +182,7 @@ extension PreviewData {
                     indent: 4,
                     card: .idCard(f: .init(
                         base58: "5FeSzkpTHV9N86kj61QLVaYU7pndHuCD7Cjj3zyzUhxxKZ5i",
-                        identicon: PreviewData.exampleIdenticon
+                        identicon: .svg(image: PreviewData.exampleIdenticon)
                     ))
                 ),
                 .init(
@@ -204,7 +204,7 @@ extension PreviewData {
             address: .init(
                 path: "",
                 hasPwd: true,
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 seedName: "Seed name",
                 secretExposed: false
             ), multiselect: nil

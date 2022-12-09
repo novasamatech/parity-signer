@@ -41,7 +41,7 @@ extension TransactionPreviewRenderable {
                 path: author.address.displayablePath,
                 name: author.address.seedName,
                 base58: author.base58,
-                identicon: author.address.identicon,
+                identicon: author.address.identicon.svgPayload,
                 hasPassword: author.address.hasPwd
             )
         } else {

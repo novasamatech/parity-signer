@@ -22,6 +22,10 @@ import com.google.accompanist.permissions.shouldShowRationale
 import io.parity.signer.R
 import io.parity.signer.components.KeepScreenOn
 import io.parity.signer.models.Callback
+import io.parity.signer.screens.scan.camera.*
+import io.parity.signer.screens.scan.camera.CameraViewInternal
+import io.parity.signer.screens.scan.camera.ScanHeader
+import io.parity.signer.screens.scan.camera.TransparentClipLayout
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.uniffi.MTransaction
@@ -48,6 +52,7 @@ fun ScanScreen(
 					val transactions = viewModel.getTransactionsFromPendingPayload()
 					if (transactions.isNotEmpty()) {
 						//scanned qr codes is signer transaction qr code
+						viewModel.resetPendingTransactions()
 						onNavigateToTransaction(transactions)
 					} else {
 						viewModel.resetPendingTransactions()

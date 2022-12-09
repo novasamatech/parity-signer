@@ -2,6 +2,7 @@ package io.parity.signer.dependencygraph
 
 import android.content.Context
 import io.parity.signer.backend.UniffiInteractor
+import io.parity.signer.models.Authentication
 
 object ServiceLocator {
 
@@ -14,6 +15,8 @@ object ServiceLocator {
 	fun initBackendDeps(context: Context) {
 		_backendLocator = BackendLocator(context.getDbNameFromContext())
 	}
+
+	val authentication by lazy { Authentication() }
 }
 
 fun Context.getDbNameFromContext() =

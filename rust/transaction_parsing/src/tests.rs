@@ -6,7 +6,7 @@ use db_handling::{
     cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
     manage_history::get_history,
 };
-use definitions::navigation::{MAddressCard, TransactionSignAction};
+use definitions::navigation::{MAddressCard, SignerImage, TransactionSignAction};
 use definitions::{
     crypto::Encryption,
     history::{Entry, Event},
@@ -264,7 +264,9 @@ fn load_types_known_alice_signed() {
                 types_hash: Some(
                     "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string(),
                 ),
-                types_id_pic: Some(types_known().to_vec()),
+                types_id_pic: Some(SignerImage::Png {
+                    image: types_known().to_vec(),
+                }),
             },
         },
     }]);
@@ -277,7 +279,9 @@ fn load_types_known_alice_signed() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -364,7 +368,7 @@ fn load_types_known_alice_signed_metadata_hold() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png{ image: alice_sr_alice().to_vec() },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -386,7 +390,7 @@ fn load_types_known_alice_signed_metadata_hold() {
             card: Card::TypesInfoCard { f: MTypesInfo {
                 types_on_file: false,
                 types_hash: Some("d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string()),
-                types_id_pic: Some(types_known().to_vec()),
+                types_id_pic: Some(SignerImage::Png{ image: types_known().to_vec() }),
             }
             }
         }]),
@@ -435,7 +439,9 @@ fn load_types_unknown_not_signed() {
                         "d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"
                             .to_string(),
                     ),
-                    types_id_pic: Some(types_unknown().to_vec()),
+                    types_id_pic: Some(SignerImage::Png {
+                        image: types_unknown().to_vec(),
+                    }),
                 },
             },
         }]),
@@ -465,7 +471,7 @@ fn load_types_unknown_alice_signed() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png{ image: alice_sr_alice().to_vec() },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -486,7 +492,7 @@ fn load_types_unknown_alice_signed() {
                 f: MTypesInfo {
                     types_on_file: false,
                     types_hash: Some("d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574".to_string()),
-                    types_id_pic: Some(types_unknown().to_vec()),
+                    types_id_pic: Some(SignerImage::Png{ image: types_unknown().to_vec() }),
                 }
             }
         }]),
@@ -547,7 +553,7 @@ fn parse_transaction_1() {
                 card: Card::CallCard {
                     f: MSCCall {
                         method_name: "transfer_keep_alive".to_string(),
-                        docs: "2053616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a206f726967696e206163636f756e742e0a0a20393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a205b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e736665720a2023203c7765696768743e0a202d2043686561706572207468616e207472616e736665722062656361757365206163636f756e742063616e6e6f74206265206b696c6c65642e0a202d2042617365205765696768743a2035312e3420c2b5730a202d204442205765696768743a2031205265616420616e64203120577269746520746f2064657374202873656e64657220697320696e206f7665726c617920616c7265616479290a20233c2f7765696768743e".to_string(), 
+                        docs: " Same as the [`transfer`] call, but with a check that the transfer will not kill the\n origin account.\n\n 99% of the time you want [`transfer`] instead.\n\n [`transfer`]: struct.Pallet.html#method.transfer\n # <weight>\n - Cheaper than transfer because account cannot be killed.\n - Base Weight: 51.4 µs\n - DB Weight: 1 Read and 1 Write to dest (sender is in overlay already)\n #</weight>".to_string(),
                     },
                 },
             },
@@ -574,7 +580,7 @@ fn parse_transaction_1() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: bob().to_vec(),
+                        identicon: SignerImage::Png { image: bob().to_vec() },
                     },
                 },
             },
@@ -656,7 +662,9 @@ fn parse_transaction_1() {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
         multiselect: None,
         address: Address {
-            identicon: alice_sr_alice().to_vec(),
+            identicon: SignerImage::Png {
+                image: alice_sr_alice().to_vec(),
+            },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
             has_pwd: false,
@@ -707,13 +715,13 @@ fn parse_transaction_2() {
     let dbname = "for_tests/parse_transaction_2";
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d550210020c060000d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0700b864d9450006050800aebb0211dbb07b4d335a657257b8ac5e53794c901e4f616d4a254f2490c43934009ae581fef1fc06828723715731adcf810e42ce4dadad629b1b7fa5c3c144a81d0608008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48f501b4003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e314e9f9aef4e836a54bdd109aba380106e05e2ea83fbc490206b476840cd68e3e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-    let docs1 = "2053656e642061206261746368206f662064697370617463682063616c6c7320616e642061746f6d6963616c6c792065786563757465207468656d2e0a205468652077686f6c65207472616e73616374696f6e2077696c6c20726f6c6c6261636b20616e64206661696c20696620616e79206f66207468652063616c6c73206661696c65642e0a0a204d61792062652063616c6c65642066726f6d20616e79206f726967696e2e0a0a202d206063616c6c73603a205468652063616c6c7320746f20626520646973706174636865642066726f6d207468652073616d65206f726967696e2e0a0a204966206f726967696e20697320726f6f74207468656e2063616c6c2061726520646973706174636820776974686f757420636865636b696e67206f726967696e2066696c7465722e20285468697320696e636c756465730a20627970617373696e6720606672616d655f73797374656d3a3a436f6e6669673a3a4261736543616c6c46696c74657260292e0a0a2023203c7765696768743e0a202d20436f6d706c65786974793a204f284329207768657265204320697320746865206e756d626572206f662063616c6c7320746f20626520626174636865642e0a2023203c2f7765696768743e".to_string();
+    let docs1 = " Send a batch of dispatch calls and atomically execute them.\n The whole transaction will rollback and fail if any of the calls failed.\n\n May be called from any origin.\n\n - `calls`: The calls to be dispatched from the same origin.\n\n If origin is root then call are dispatch without checking origin filter. (This includes\n bypassing `frame_system::Config::BaseCallFilter`).\n\n # <weight>\n - Complexity: O(C) where C is the number of calls to be batched.\n # </weight>".to_string();
 
-    let docs2 = "2054616b6520746865206f726967696e206163636f756e74206173206120737461736820616e64206c6f636b207570206076616c756560206f66206974732062616c616e63652e2060636f6e74726f6c6c6572602077696c6c0a20626520746865206163636f756e74207468617420636f6e74726f6c732069742e0a0a206076616c756560206d757374206265206d6f7265207468616e2074686520606d696e696d756d5f62616c616e636560207370656369666965642062792060543a3a43757272656e6379602e0a0a20546865206469737061746368206f726967696e20666f7220746869732063616c6c206d757374206265205f5369676e65645f20627920746865207374617368206163636f756e742e0a0a20456d6974732060426f6e646564602e0a0a2023203c7765696768743e0a202d20496e646570656e64656e74206f662074686520617267756d656e74732e204d6f64657261746520636f6d706c65786974792e0a202d204f2831292e0a202d20546872656520657874726120444220656e74726965732e0a0a204e4f54453a2054776f206f66207468652073746f726167652077726974657320286053656c663a3a626f6e646564602c206053656c663a3a7061796565602920617265205f6e657665725f20636c65616e65640a20756e6c6573732074686520606f726967696e602066616c6c732062656c6f77205f6578697374656e7469616c206465706f7369745f20616e6420676574732072656d6f76656420617320647573742e0a202d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d0a205765696768743a204f2831290a204442205765696768743a0a202d20526561643a20426f6e6465642c204c65646765722c205b4f726967696e204163636f756e745d2c2043757272656e74204572612c20486973746f72792044657074682c204c6f636b730a202d2057726974653a20426f6e6465642c2050617965652c205b4f726967696e204163636f756e745d2c204c6f636b732c204c65646765720a2023203c2f7765696768743e".to_string();
+    let docs2 = " Take the origin account as a stash and lock up `value` of its balance. `controller` will\n be the account that controls it.\n\n `value` must be more than the `minimum_balance` specified by `T::Currency`.\n\n The dispatch origin for this call must be _Signed_ by the stash account.\n\n Emits `Bonded`.\n\n # <weight>\n - Independent of the arguments. Moderate complexity.\n - O(1).\n - Three extra DB entries.\n\n NOTE: Two of the storage writes (`Self::bonded`, `Self::payee`) are _never_ cleaned\n unless the `origin` falls below _existential deposit_ and gets removed as dust.\n ------------------\n Weight: O(1)\n DB Weight:\n - Read: Bonded, Ledger, [Origin Account], Current Era, History Depth, Locks\n - Write: Bonded, Payee, [Origin Account], Locks, Ledger\n # </weight>".to_string();
 
-    let docs3 = "204465636c617265207468652064657369726520746f206e6f6d696e6174652060746172676574736020666f7220746865206f726967696e20636f6e74726f6c6c65722e0a0a20456666656374732077696c6c2062652066656c742061742074686520626567696e6e696e67206f6620746865206e657874206572612e20546869732063616e206f6e6c792062652063616c6c6564207768656e0a205b60457261456c656374696f6e537461747573605d2069732060436c6f736564602e0a0a20546865206469737061746368206f726967696e20666f7220746869732063616c6c206d757374206265205f5369676e65645f2062792074686520636f6e74726f6c6c65722c206e6f74207468652073746173682e0a20416e642c2069742063616e206265206f6e6c792063616c6c6564207768656e205b60457261456c656374696f6e537461747573605d2069732060436c6f736564602e0a0a2023203c7765696768743e0a202d20546865207472616e73616374696f6e277320636f6d706c65786974792069732070726f706f7274696f6e616c20746f207468652073697a65206f662060746172676574736020284e290a2077686963682069732063617070656420617420436f6d7061637441737369676e6d656e74733a3a4c494d495420284d41585f4e4f4d494e4154494f4e53292e0a202d20426f74682074686520726561647320616e642077726974657320666f6c6c6f7720612073696d696c6172207061747465726e2e0a202d2d2d2d2d2d2d2d2d0a205765696768743a204f284e290a207768657265204e20697320746865206e756d626572206f6620746172676574730a204442205765696768743a0a202d2052656164733a2045726120456c656374696f6e205374617475732c204c65646765722c2043757272656e74204572610a202d205772697465733a2056616c696461746f72732c204e6f6d696e61746f72730a2023203c2f7765696768743e".to_string();
+    let docs3 = " Declare the desire to nominate `targets` for the origin controller.\n\n Effects will be felt at the beginning of the next era. This can only be called when\n [`EraElectionStatus`] is `Closed`.\n\n The dispatch origin for this call must be _Signed_ by the controller, not the stash.\n And, it can be only called when [`EraElectionStatus`] is `Closed`.\n\n # <weight>\n - The transaction's complexity is proportional to the size of `targets` (N)\n which is capped at CompactAssignments::LIMIT (MAX_NOMINATIONS).\n - Both the reads and writes follow a similar pattern.\n ---------\n Weight: O(N)\n where N is the number of targets\n DB Weight:\n - Reads: Era Election Status, Ledger, Current Era\n - Writes: Validators, Nominators\n # </weight>".to_string();
 
-    let docs4 = "202852652d297365742074686520636f6e74726f6c6c6572206f6620612073746173682e0a0a20456666656374732077696c6c2062652066656c742061742074686520626567696e6e696e67206f6620746865206e657874206572612e0a0a20546865206469737061746368206f726967696e20666f7220746869732063616c6c206d757374206265205f5369676e65645f206279207468652073746173682c206e6f742074686520636f6e74726f6c6c65722e0a0a2023203c7765696768743e0a202d20496e646570656e64656e74206f662074686520617267756d656e74732e20496e7369676e69666963616e7420636f6d706c65786974792e0a202d20436f6e7461696e732061206c696d69746564206e756d626572206f662072656164732e0a202d2057726974657320617265206c696d6974656420746f2074686520606f726967696e60206163636f756e74206b65792e0a202d2d2d2d2d2d2d2d2d2d0a205765696768743a204f2831290a204442205765696768743a0a202d20526561643a20426f6e6465642c204c6564676572204e657720436f6e74726f6c6c65722c204c6564676572204f6c6420436f6e74726f6c6c65720a202d2057726974653a20426f6e6465642c204c6564676572204e657720436f6e74726f6c6c65722c204c6564676572204f6c6420436f6e74726f6c6c65720a2023203c2f7765696768743e".to_string();
+    let docs4 = " (Re-)set the controller of a stash.\n\n Effects will be felt at the beginning of the next era.\n\n The dispatch origin for this call must be _Signed_ by the stash, not the controller.\n\n # <weight>\n - Independent of the arguments. Insignificant complexity.\n - Contains a limited number of reads.\n - Writes are limited to the `origin` account key.\n ----------\n Weight: O(1)\n DB Weight:\n - Read: Bonded, Ledger New Controller, Ledger Old Controller\n - Write: Bonded, Ledger New Controller, Ledger Old Controller\n # </weight>".to_string();
 
     let content_known = TransactionCardSet {
         method: Some(vec![
@@ -781,7 +789,9 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        identicon: alice_sr_alice().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
                     },
                 },
             },
@@ -859,7 +869,9 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5G1ojzh47Yt8KoYhuAjXpHcazvsoCXe3G8LZchKDvumozJJJ".to_string(),
-                        identicon: id_01().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: id_01().to_vec(),
+                        },
                     },
                 },
             },
@@ -879,7 +891,9 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f".to_string(),
-                        identicon: id_02().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: id_02().to_vec(),
+                        },
                     },
                 },
             },
@@ -923,7 +937,9 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: bob().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: bob().to_vec(),
+                        },
                     },
                 },
             },
@@ -988,7 +1004,9 @@ fn parse_transaction_2() {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
         multiselect: None,
         address: Address {
-            identicon: alice_sr_alice().to_vec(),
+            identicon: SignerImage::Png {
+                image: alice_sr_alice().to_vec(),
+            },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
             has_pwd: false,
@@ -1023,7 +1041,7 @@ fn parse_transaction_3() {
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27dac0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480f00c06e31d91001750365010f00c06e31d910013223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423ea8dfb73a4b44e6bf84affe258954c12db1fe8e8cf00b965df2af2f49c1ec11cde143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
-    let docs1 = "2053616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a206f726967696e206163636f756e742e0a0a20393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a205b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e736665720a2023203c7765696768743e0a202d2043686561706572207468616e207472616e736665722062656361757365206163636f756e742063616e6e6f74206265206b696c6c65642e0a202d2042617365205765696768743a2035312e3420c2b5730a202d204442205765696768743a2031205265616420616e64203120577269746520746f2064657374202873656e64657220697320696e206f7665726c617920616c7265616479290a20233c2f7765696768743e".to_string();
+    let docs1 = " Same as the [`transfer`] call, but with a check that the transfer will not kill the\n origin account.\n\n 99% of the time you want [`transfer`] instead.\n\n [`transfer`]: struct.Pallet.html#method.transfer\n # <weight>\n - Cheaper than transfer because account cannot be killed.\n - Base Weight: 51.4 µs\n - DB Weight: 1 Read and 1 Write to dest (sender is in overlay already)\n #</weight>".to_string();
 
     let content_known = TransactionCardSet {
         method: Some(vec![
@@ -1067,7 +1085,9 @@ fn parse_transaction_3() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: bob().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: bob().to_vec(),
+                        },
                     },
                 },
             },
@@ -1149,7 +1169,9 @@ fn parse_transaction_3() {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
         multiselect: None,
         address: Address {
-            identicon: alice_sr_alice().to_vec(),
+            identicon: SignerImage::Png {
+                image: alice_sr_alice().to_vec(),
+            },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
             has_pwd: false,
@@ -1199,7 +1221,9 @@ fn load_westend9070_not_signed() {
                     specs_version: "9070".to_string(),
                     meta_hash: "e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"
                         .to_string(),
-                    meta_id_pic: westend_9070().to_vec(),
+                    meta_id_pic: SignerImage::Png {
+                        image: westend_9070().to_vec(),
+                    },
                 },
             },
         }]),
@@ -1330,7 +1354,7 @@ fn load_westend9000_already_in_db_alice_signed_bad_general_verifier() {
         error: Some(vec![TransactionCard {
             index: 0,
             indent: 0,
-            card: Card::ErrorCard { f:  "Bad input data. Network westend is verified by the general verifier which currently is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: ed25519. Received load_metadata message is verified by public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Changing the general verifier or changing the network verifier to custom would require wipe and reset of Signer.".to_string() } 
+            card: Card::ErrorCard { f:  "Bad input data. Network westend is verified by the general verifier which currently is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: ed25519. Received load_metadata message is verified by public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Changing the general verifier or changing the network verifier to custom would require wipe and reset of Signer.".to_string() }
         }]),
         ..Default::default()
     };
@@ -1441,7 +1465,7 @@ fn add_specs_dock_alice_verified_db_not_verified() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png{ image: alice_sr_alice().to_vec() },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1562,7 +1586,9 @@ fn add_specs_dock_both_verified_same() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1624,7 +1650,9 @@ fn add_specs_dock_both_verified_different() {
                 f: MVerifierDetails {
                     public_key: "88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee"
                         .to_string(),
-                    identicon: ed().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: ed().to_vec(),
+                    },
                     encryption: "ed25519".to_string(),
                 },
             },
@@ -1764,7 +1792,9 @@ fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1851,7 +1881,9 @@ fn add_specs_westend_ed25519_both_verified_same() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: alice_sr_alice().to_vec(),
+                    },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1927,7 +1959,7 @@ fn parse_transaction_4_unknown_author() {
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = "5301008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48a4040300d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
-    let docs = "2053616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a206f726967696e206163636f756e742e0a0a20393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a205b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e736665720a2023203c7765696768743e0a202d2043686561706572207468616e207472616e736665722062656361757365206163636f756e742063616e6e6f74206265206b696c6c65642e0a202d2042617365205765696768743a2035312e3420c2b5730a202d204442205765696768743a2031205265616420616e64203120577269746520746f2064657374202873656e64657220697320696e206f7665726c617920616c7265616479290a20233c2f7765696768743e".to_string();
+    let docs = " Same as the [`transfer`] call, but with a check that the transfer will not kill the\n origin account.\n\n 99% of the time you want [`transfer`] instead.\n\n [`transfer`]: struct.Pallet.html#method.transfer\n # <weight>\n - Cheaper than transfer because account cannot be killed.\n - Base Weight: 51.4 µs\n - DB Weight: 1 Read and 1 Write to dest (sender is in overlay already)\n #</weight>".to_string();
 
     let set_expected = TransactionCardSet {
         author: Some(vec![TransactionCard {
@@ -1936,7 +1968,9 @@ fn parse_transaction_4_unknown_author() {
             card: Card::AuthorPlainCard {
                 f: MSCId {
                     base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                    identicon: bob().to_vec(),
+                    identicon: SignerImage::Png {
+                        image: bob().to_vec(),
+                    },
                 },
             },
         }]),
@@ -1988,7 +2022,9 @@ fn parse_transaction_4_unknown_author() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        identicon: alice_sr_alice().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
                     },
                 },
             },
@@ -2088,7 +2124,7 @@ fn parse_transaction_5_unknown_network() {
                 f: MVerifierDetails {
                     public_key: "761291ee5faf5b5b67b028aa7e28fb1271bf40af17a486b368e8c7de86ad3c62"
                         .to_string(),
-                    identicon: id_03().to_vec(),
+                    identicon: SignerImage::Png{ image: id_03().to_vec() } ,
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -2125,7 +2161,9 @@ fn parse_transaction_6_error_on_parsing() {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                     multiselect: None,
                     address: Address {
-                        identicon: alice_sr_alice().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
                         seed_name: "Alice".to_string(),
                         path: "//Alice".to_string(),
                         has_pwd: false,
@@ -2221,7 +2259,9 @@ fn parse_transaction_7_error_on_parsing() {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                     multiselect: None,
                     address: Address {
-                        identicon: alice_sr_alice().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
                         seed_name: "Alice".to_string(),
                         path: "//Alice".to_string(),
                         has_pwd: false,
@@ -2318,7 +2358,9 @@ fn parse_transaction_8_error_on_parsing() {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                     multiselect: None,
                     address: Address {
-                        identicon: alice_sr_alice().to_vec(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_alice().to_vec(),
+                        },
                         seed_name: "Alice".to_string(),
                         path: "//Alice".to_string(),
                         has_pwd: false,
@@ -2402,7 +2444,7 @@ fn parse_msg_1() {
     let dbname = "for_tests/parse_msg_1";
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let sign_msg = hex::encode(b"<Bytes>uuid-abcd</Bytes>");
-    let text = hex::encode(b"uuid-abcd");
+    let text = String::from("uuid-abcd");
     let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", sign_msg);
 
     let set_expected = TransactionCardSet {
@@ -2418,7 +2460,9 @@ fn parse_msg_1() {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
         multiselect: None,
         address: Address {
-            identicon: alice_sr_alice().to_vec(),
+            identicon: SignerImage::Png {
+                image: alice_sr_alice().to_vec(),
+            },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
             has_pwd: false,

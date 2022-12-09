@@ -40,12 +40,12 @@ fun <T> AnimatedQrKeysInfo(
 
 	Box(
 		modifier = modifier
-			.fillMaxWidth(1f)
-			.aspectRatio(1.1f)
-			.background(
-				Color.White,
-				RoundedCornerShape(qrRounding)
-			),
+            .fillMaxWidth(1f)
+            .aspectRatio(1.1f)
+            .background(
+                Color.White,
+                RoundedCornerShape(qrRounding)
+            ),
 		contentAlignment = Alignment.Center,
 	) {
 		currentCode.value?.let { currentImage ->
@@ -60,8 +60,11 @@ fun <T> AnimatedQrKeysInfo(
 
 	LaunchedEffect(key1 = input) {
 		provider.getQrCodesList(input)
+			?.images
 			?.map { it.intoImageBitmap() }
-			?.let { qrCodes.value = it }
+			?.let {
+				qrCodes.value = it
+			}
 	}
 
 	LaunchedEffect(key1 = qrCodes.value) {
@@ -79,13 +82,14 @@ fun <T> AnimatedQrKeysInfo(
 	}
 }
 
+data class AnimatedQrImages(val images: List<List<UByte>>)
 
 interface AnimatedQrKeysProvider<T> {
-	suspend fun getQrCodesList(input: T): List<List<UByte>>?
+	suspend fun getQrCodesList(input: T): AnimatedQrImages?
 }
 
 class EmptyAnimatedQrKeysProvider : AnimatedQrKeysProvider<Any> {
-	override suspend fun getQrCodesList(input: Any): List<List<UByte>> {
-		return listOf(PreviewData.exampleQRCode)
+	override suspend fun getQrCodesList(input: Any): AnimatedQrImages {
+		return AnimatedQrImages(listOf(PreviewData.exampleQRCode))
 	}
 }

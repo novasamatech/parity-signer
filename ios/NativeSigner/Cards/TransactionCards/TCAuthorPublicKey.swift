@@ -31,7 +31,7 @@ struct TCAuthorPublicKey_Previews: PreviewProvider {
             value:
             MVerifierDetails(
                 publicKey: PreviewData.publicKey,
-                identicon: PreviewData.exampleIdenticon,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
                 encryption: "sh29919"
             )
         )

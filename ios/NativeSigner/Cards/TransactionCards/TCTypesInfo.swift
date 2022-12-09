@@ -29,7 +29,7 @@ struct TCTypesInfo_Previews: PreviewProvider {
                 content: MTypesInfo(
                     typesOnFile: false,
                     typesHash: "typesHas",
-                    typesIdPic: PreviewData.exampleIdenticon
+                    typesIdPic: .svg(image: PreviewData.exampleIdenticon)
                 )
             )
         }

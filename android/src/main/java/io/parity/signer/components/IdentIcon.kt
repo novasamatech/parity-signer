@@ -11,15 +11,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.models.intoImageBitmap
+import io.parity.signer.models.toBytes
+import io.parity.signer.uniffi.SignerImage
 
 /**
  * Just draw a standard identicon used everywhere, with standard size
  */
 @Composable
-fun IdentIcon(identicon: List<UByte>, size: Dp = 28.dp,
+fun IdentIcon(identicon: SignerImage, size: Dp = 28.dp,
 							modifier: Modifier = Modifier) {
 	Image(
-		identicon.intoImageBitmap(),
+		identicon.toBytes().intoImageBitmap(),
 		stringResource(R.string.description_identicon),
 		modifier = modifier
 			.size(size)
