@@ -26,13 +26,13 @@ struct ProgressSnackbar: View {
                 HStack {
                     VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                         Text(viewModel.title)
-                            .font(Fontstyle.bodyL.base)
+                            .font(PrimaryFont.bodyL.font)
                             .foregroundColor(Asset.accentForegroundText.swiftUIColor)
                         Text(
                             Localizable.Scanner.Label
                                 .progress(min(viewModel.current, viewModel.total), viewModel.total)
                         )
-                        .font(Fontstyle.captionM.base)
+                        .font(PrimaryFont.captionM.font)
                         .foregroundColor(Asset.textAndIconsTertiarySolid.swiftUIColor)
                     }
                     Spacer()
@@ -41,7 +41,7 @@ struct ProgressSnackbar: View {
                     ) {
                         Text(viewModel.cancelActionTitle)
                             .foregroundColor(Asset.accentPink300.swiftUIColor)
-                            .font(Fontstyle.labelM.base)
+                            .font(PrimaryFont.labelM.font)
                     }
                     .padding(.trailing, Spacing.extraSmall)
                 }

@@ -43,7 +43,7 @@ struct TCFieldName: View {
                         .strokeContainerBackground()
                     }
                 }
-                .font(Fontstyle.bodyL.base)
+                .font(PrimaryFont.bodyL.font)
             }
         )
         .disabled(!hasDetails)

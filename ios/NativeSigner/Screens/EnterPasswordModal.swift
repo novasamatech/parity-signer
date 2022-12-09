@@ -47,7 +47,7 @@ struct EnterPasswordModal: View {
                 .padding(.horizontal, Spacing.extraSmall)
                 VStack(alignment: .leading, spacing: 0) {
                     Localizable.Transaction.EnterPassword.Label.title.text
-                        .font(Fontstyle.titleL.base)
+                        .font(PrimaryFont.titleL.font)
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         .padding(.bottom, Spacing.extraSmall)
                     keyComponent()
@@ -68,7 +68,7 @@ struct EnterPasswordModal: View {
                         Localizable.Transaction.EnterPassword.Label.explanation.text
                             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                     }
-                    .font(Fontstyle.captionM.base)
+                    .font(PrimaryFont.captionM.font)
                     .padding(.top, Spacing.extraSmall)
                     .padding(.bottom, Spacing.small)
                 }
@@ -88,17 +88,17 @@ struct EnterPasswordModal: View {
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                 renderablePath
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(Fontstyle.captionM.base)
+                    .font(PrimaryFont.captionM.font)
                 Text(viewModel.dataModel.authorInfo.address.seedName)
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    .font(Fontstyle.bodyM.base)
+                    .font(PrimaryFont.bodyM.font)
                 HStack {
                     Text(
                         viewModel.dataModel.authorInfo.base58
                             .truncateMiddle()
                     )
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(Fontstyle.bodyM.base)
+                    .font(PrimaryFont.bodyM.font)
                 }
             }
             Spacer()

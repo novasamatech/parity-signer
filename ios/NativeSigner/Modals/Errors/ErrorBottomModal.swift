@@ -43,15 +43,15 @@ struct ErrorBottomModal: View {
                         .frame(height: Heights.errorModalIconContainer)
                     }
                     Text(viewModel.title)
-                        .font(Fontstyle.titleM.base)
+                        .font(PrimaryFont.titleM.font)
                     Text(viewModel.content)
-                        .font(Fontstyle.bodyM.base)
+                        .font(PrimaryFont.bodyM.font)
                         .lineSpacing(Spacing.extraExtraSmall)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                     if let detailsMessage = viewModel.details {
                         Text(detailsMessage)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            .font(Fontstyle.bodyL.base)
+                            .font(PrimaryFont.bodyL.font)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(Spacing.medium)
                             .strokeContainerBackground()
@@ -69,7 +69,7 @@ struct ErrorBottomModal: View {
                                 }
                             }
                         }
-                        .font(Fontstyle.bodyL.base)
+                        .font(PrimaryFont.bodyL.font)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(Spacing.medium)
                         .strokeContainerBackground()

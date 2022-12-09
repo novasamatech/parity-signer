@@ -24,10 +24,10 @@ struct MainScreenContainer: View {
                 .environmentObject(data)
         } else if data.protected, connectivityMediator.isConnectivityOn {
             Localizable.Connectivity.detected.text
-                .background(Asset.bg000.swiftUIColor)
+                .background(Asset.backgroundPrimary.swiftUIColor)
         } else {
             Localizable.pleaseProtectDeviceWithPinOrPassword.text
-                .background(Asset.bg000.swiftUIColor)
+                .background(Asset.backgroundPrimary.swiftUIColor)
         }
     }
 }

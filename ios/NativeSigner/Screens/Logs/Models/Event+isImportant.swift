@@ -24,9 +24,3 @@ extension Event {
         }
     }
 }
-
-// struct HistoryCard_Previews: PreviewProvider {
-// static var previews: some View {
-// HistoryCard()
-// }
-// }

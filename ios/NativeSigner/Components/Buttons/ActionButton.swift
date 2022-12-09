@@ -19,7 +19,7 @@ struct ActionButtonStyle: ButtonStyle {
             .foregroundColor(foregroundColor)
             .frame(height: Heights.actionButton, alignment: .center)
             .cornerRadius(CornerRadius.extraExtraLarge)
-            .font(Fontstyle.labelL.base)
+            .font(PrimaryFont.labelL.font)
             .disabled(isDisabled)
     }
 

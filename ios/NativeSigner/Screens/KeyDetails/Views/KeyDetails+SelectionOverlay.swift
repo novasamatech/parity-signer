@@ -16,7 +16,7 @@ extension KeyDetailsView {
                     .padding(.leading, Spacing.extraSmall)
                 Spacer()
                 Text(selectionTitle)
-                    .font(Fontstyle.titleS.base)
+                    .font(PrimaryFont.titleS.font)
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).lineLimit(1)
                 Spacer()
                 Spacer().frame(width: Heights.navigationButton)
@@ -30,7 +30,7 @@ extension KeyDetailsView {
                 Button(action: { selectAll() }) {
                     Localizable.KeyDetails.Overlay.Action.selectAll.text
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(Fontstyle.labelL.base)
+                        .font(PrimaryFont.labelL.font)
                 }
                 .padding(.leading, Spacing.medium)
                 Spacer()
@@ -41,7 +41,7 @@ extension KeyDetailsView {
                             viewModel.selectedSeeds.isEmpty ? Asset.textAndIconsDisabled.swiftUIColor : Asset
                                 .textAndIconsPrimary.swiftUIColor
                         )
-                        .font(Fontstyle.labelL.base)
+                        .font(PrimaryFont.labelL.font)
                 }
                 .padding(.trailing, Spacing.medium)
                 .disabled(viewModel.selectedSeeds.isEmpty)

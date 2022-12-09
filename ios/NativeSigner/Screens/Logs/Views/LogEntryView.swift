@@ -17,7 +17,7 @@ struct LogEntryView: View {
                 HStack(alignment: .center) {
                     Text(date)
                         .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                        .font(Fontstyle.bodyM.base)
+                        .font(PrimaryFont.bodyM.font)
                         .padding(.vertical, Spacing.small)
                 }
             }
@@ -30,7 +30,7 @@ struct LogEntryView: View {
                                     Asset.accentRed300.swiftUIColor :
                                     Asset.textAndIconsPrimary.swiftUIColor
                             )
-                            .font(Fontstyle.titleS.base)
+                            .font(PrimaryFont.titleS.font)
                         Spacer()
                         HStack(spacing: 0) {
                             Text(DateFormatter.hourMinutes(viewModel.renderable.timestamp))
@@ -47,14 +47,14 @@ struct LogEntryView: View {
                     if let displayValue = viewModel.renderable.displayValue, !displayValue.isEmpty {
                         Text(displayValue)
                             .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                            .font(Fontstyle.bodyM.base)
+                            .font(PrimaryFont.bodyM.font)
                             .padding(.top, Spacing.small)
                             .padding(.trailing, Spacing.large)
                     }
                     if let additionalValue = viewModel.renderable.additionalValue, !additionalValue.isEmpty {
                         Text(additionalValue)
                             .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                            .font(Fontstyle.captionM.base)
+                            .font(PrimaryFont.captionM.font)
                             .padding(.top, Spacing.extraExtraSmall)
                             .padding(.trailing, Spacing.large)
                     }

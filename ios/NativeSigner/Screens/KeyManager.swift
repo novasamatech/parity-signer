@@ -75,8 +75,8 @@ struct KeyManager: View {
                 )
                 HStack {
                     Localizable.derivedKeys.text
-                        .foregroundColor(Asset.text300.swiftUIColor)
-                        .font(Fontstyle.overline.base)
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .font(PrimaryFont.labelS.font)
                     Spacer()
                     Button(
                         action: {
@@ -89,7 +89,7 @@ struct KeyManager: View {
                         label: {
                             Image(.plus, variant: .circle)
                                 .imageScale(.large)
-                                .foregroundColor(Asset.action400.swiftUIColor)
+                                .foregroundColor(Asset.accentPink300.swiftUIColor)
                         }
                     )
                 }.padding(.horizontal, 8)

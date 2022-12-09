@@ -18,24 +18,24 @@ struct HistoryCard: View {
             VStack(alignment: .leading, spacing: 2) {
                 if let timestamp = timestamp, !timestamp.isEmpty {
                     Text(timestamp)
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                        .font(Fontstyle.subtitle2.base)
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .font(PrimaryFont.captionM.font)
                 }
                 Text(line1)
-                    .foregroundColor(Asset.text600.swiftUIColor)
-                    .font(Fontstyle.subtitle1.base)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .font(PrimaryFont.bodyM.font)
                     .tracking(0.1)
                 if let line2 = line2 {
                     Text(line2)
-                        .foregroundColor(Asset.crypto400.swiftUIColor)
-                        .font(Fontstyle.body1.crypto)
+                        .foregroundColor(Asset.accentPink300.swiftUIColor)
+                        .font(PrimaryFont.captionM.font)
                 }
             }
             Spacer()
         }
         .padding(8)
         .cornerRadius(8)
-        .background(danger ? Asset.bgDanger.swiftUIColor : Asset.bg200.swiftUIColor)
+        .background(danger ? Asset.accentRed300.swiftUIColor.opacity(0.3) : Asset.backgroundSecondary.swiftUIColor)
     }
 }
 

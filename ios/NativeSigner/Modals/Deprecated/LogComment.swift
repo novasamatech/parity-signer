@@ -15,7 +15,7 @@ struct LogComment: View {
         VStack {
             Spacer()
             ZStack {
-                RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.bg000.swiftUIColor)
+                RoundedRectangle(cornerRadius: 20.0).foregroundColor(Asset.backgroundPrimary.swiftUIColor)
                 VStack {
                     HeaderBar(
                         line1: Localizable.commentUppercase.key,
@@ -23,11 +23,11 @@ struct LogComment: View {
                     )
                     ZStack {
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(Asset.crypto400.swiftUIColor)
+                            .stroke(Asset.fill6.swiftUIColor)
                             .frame(height: 39)
                         TextField(Localizable.commentUppercase.string, text: $comment, prompt: Text(""))
-                            .foregroundColor(Asset.crypto400.swiftUIColor)
-                            .font(Fontstyle.body2.crypto)
+                            .foregroundColor(Asset.accentPink300.swiftUIColor)
+                            .font(PrimaryFont.captionM.font)
                             .disableAutocorrection(true)
                             .autocapitalization(.none)
                             .keyboardType(.asciiCapable)

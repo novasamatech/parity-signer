@@ -26,11 +26,11 @@ struct ExportPrivateKeyWarningModal: View {
                         .padding([.bottom, .top], Spacing.small)
                     Localizable.KeyExportWarning.Label.header.text
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(Fontstyle.titleL.base)
+                        .font(PrimaryFont.titleL.font)
                         .padding(.bottom, Spacing.extraSmall)
                     Localizable.KeyExportWarning.Label.content.text
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                        .font(Fontstyle.bodyL.base)
+                        .font(PrimaryFont.bodyL.font)
                         .multilineTextAlignment(.center)
                         .padding(.bottom, Spacing.small)
                     PrimaryButton(

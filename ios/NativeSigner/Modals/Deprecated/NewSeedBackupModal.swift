@@ -15,16 +15,16 @@ struct NewSeedBackupModal: View {
     @State private var createRoots = true
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.bg200.swiftUIColor)
+            RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.backgroundSecondary.swiftUIColor)
             VStack {
                 HeaderBar(line1: Localizable.backupSeedPhrase.key, line2: LocalizedStringKey(content.seed))
                 ZStack {
                     Text(content.seedPhrase)
                         .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                        .foregroundColor(Asset.crypto400.swiftUIColor)
+                        .foregroundColor(Asset.accentPink300.swiftUIColor)
                         .padding(8)
                 }
-                .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.crypto100.swiftUIColor))
+                .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.accentPink300.swiftUIColor))
                 VStack(spacing: 16) {
                     Button(
                         action: {
@@ -36,7 +36,7 @@ struct NewSeedBackupModal: View {
                                     .imageScale(.large)
                                 Localizable.iHaveWrittenDownMySeedPhrase.text
                                     .multilineTextAlignment(.leading)
-                                    .foregroundColor(Asset.text500.swiftUIColor)
+                                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                                 Spacer()
                             }
                         }
@@ -50,7 +50,7 @@ struct NewSeedBackupModal: View {
                                 (createRoots ? Image(.checkmark, variant: .square) : Image(.square)).imageScale(.large)
                                 Localizable.createRootKeys.text
                                     .multilineTextAlignment(.leading)
-                                    .foregroundColor(Asset.text500.swiftUIColor)
+                                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                                 Spacer()
                             }
                         }
