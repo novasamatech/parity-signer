@@ -1,5 +1,7 @@
 package io.parity.signer.models
 
+import io.parity.signer.components.ImageContent
+import io.parity.signer.components.toImageContent
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.uniffi.*
 
@@ -25,7 +27,7 @@ data class KeySetDetailsModel(
 				KeyModel(
 					addressKey = "address key2",
 					base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9sdfsdfsdfS1repo5EYjGG",
-					identicon = PreviewData.exampleIdenticon,
+					identicon = PreviewData.exampleIdenticonPng,
 					hasPwd = true,
 					path = "//polkadot//path3",
 					multiselect = false,
@@ -34,7 +36,7 @@ data class KeySetDetailsModel(
 				),
 			),
 			root = KeyModel(
-				identicon = PreviewData.exampleIdenticon,
+				identicon = PreviewData.exampleIdenticonPng,
 				addressKey = "address key",
 				base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
 				hasPwd = true,
@@ -62,7 +64,7 @@ fun MKeys.toKeySetDetailsModel() = KeySetDetailsModel(
  * Local copy of shared [MKeysCard] class
  */
 data class KeyModel(
-	val identicon: SignerImage,
+	val identicon: ImageContent,
 	val addressKey: String,
 	val seedName: String,
 	val base58: String,
@@ -75,7 +77,7 @@ data class KeyModel(
 		fun createStub() = KeyModel(
 			addressKey = "address key",
 			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
-			identicon = PreviewData.exampleIdenticon,
+			identicon = PreviewData.exampleIdenticonPng,
 			hasPwd = true,
 			path = "//polkadot//path2",
 			multiselect = false,
@@ -88,7 +90,7 @@ data class KeyModel(
 fun MKeysCard.toKeysModel() = KeyModel(
 	addressKey = addressKey,
 	base58 = base58,
-	identicon = address.identicon,
+	identicon = address.identicon.toImageContent(),
 	hasPwd = address.hasPwd,
 	path = address.path,
 	multiselect = multiselect,
@@ -123,19 +125,19 @@ fun MSeeds.toKeySetsSelectModel() = KeySetsSelectModel(
  */
 data class KeySetModel(
 	val seedName: String,
-	val identicon: SignerImage,
+	val identicon: ImageContent,
 	val derivedKeysCount: UInt
 )
 
 fun SeedNameCard.toSeedModel() =
-	KeySetModel(seedName, identicon, derivedKeysCount)
+	KeySetModel(seedName, identicon.toImageContent(), derivedKeysCount)
 
 
 data class KeyCardModel(
 	val network: String,
 	val base58: String,
 	val path: String,
-	val identIcon: SignerImage,
+	val identIcon: ImageContent,
 	val seedName: String,
 	val hasPwd: Boolean = false,
 	val multiselect: Boolean? = null,
@@ -165,7 +167,7 @@ data class KeyCardModel(
 				base58 = address_card.base58,
 				path = address_card.address.path,
 				hasPwd = address_card.address.hasPwd,
-				identIcon = address_card.address.identicon,
+				identIcon = address_card.address.identicon.toImageContent(),
 				seedName = address_card.address.seedName,
 				multiselect = address_card.multiselect,
 			)
@@ -180,7 +182,7 @@ data class KeyCardModel(
 				base58 = base58,
 				path = address.path,
 				hasPwd = address.hasPwd,
-				identIcon = address.identicon,
+				identIcon = address.identicon.toImageContent(),
 				seedName = address.seedName,
 				multiselect = false,
 			)
@@ -189,7 +191,7 @@ data class KeyCardModel(
 			network = "Polkadot",
 			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
 			path = "//polkadot//path",
-			identIcon = PreviewData.exampleIdenticon,
+			identIcon = PreviewData.exampleIdenticonPng,
 			seedName = "Seed Name",
 			hasPwd = false,
 			multiselect = null,
@@ -270,4 +272,5 @@ data class NetworkInfoModel(
 
 fun MscNetworkInfo.toNetworkInfoModel() =
 	NetworkInfoModel(networkTitle, networkLogo, networkSpecsKey)
+
 

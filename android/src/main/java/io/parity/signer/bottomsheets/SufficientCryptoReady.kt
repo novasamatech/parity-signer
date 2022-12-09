@@ -11,7 +11,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.*
 import io.parity.signer.models.intoImageBitmap
-import io.parity.signer.models.toBytes
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.MSufficientCryptoReady
@@ -48,7 +47,7 @@ fun SufficientCryptoReady(
 				is MscContent.LoadMetadata -> Text("Metadata for " + c.name + " with version " + c.version)
 				is MscContent.LoadTypes -> Column {
 					Text("types " + c.types)
-					IdentIcon(identicon = c.pic)
+					IdentIcon(identicon = c.pic.toImageContent())
 				}
 			}
 		}
