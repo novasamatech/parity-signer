@@ -9,7 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.Composable
 import io.parity.signer.components.IdentIcon
-import io.parity.signer.models.toBytes
+import io.parity.signer.components.toImageContent
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
@@ -19,7 +19,7 @@ import io.parity.signer.uniffi.MAddressCard
 @Composable
 fun TCAuthor(author: MAddressCard) {
 	Row {
-		IdentIcon(author.address.identicon)
+		IdentIcon(author.address.identicon.toImageContent())
 		Column {
 			Text(
 				"From: ",

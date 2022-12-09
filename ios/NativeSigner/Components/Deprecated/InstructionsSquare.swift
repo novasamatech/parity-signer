@@ -13,21 +13,21 @@ struct InstructionsSquare: View {
             Image(.airplane)
             Localizable.useSignerInAirplaneMode.text
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.text600.swiftUIColor)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
             Localizable.AirplaneMode.explanation.text
                 .font(PrimaryFont.bodyM.font)
-                .foregroundColor(Asset.text300.swiftUIColor)
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
             Image(.wifi, variant: .slash)
             Localizable.airgapYourPhone.text
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.text600.swiftUIColor)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
             Localizable.Connectivity.explanation.text
-                .font(PrimaryFont.bodyM.font).foregroundColor(Asset.text300.swiftUIColor)
+                .font(PrimaryFont.bodyM.font).foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
         }
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .foregroundColor(Asset.bg200.swiftUIColor)
+                .foregroundColor(Asset.backgroundSecondary.swiftUIColor)
         )
     }
 }

@@ -24,7 +24,6 @@ import io.parity.signer.components.IdentIcon
 import io.parity.signer.models.KeySetModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
-import io.parity.signer.uniffi.SignerImage
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -94,7 +93,7 @@ private fun PreviewKeySetItem() {
 		KeySetItem(
 			KeySetModel(
 				"My special key set",
-				PreviewData.exampleIdenticon,
+				PreviewData.exampleIdenticonPng,
 				2.toUInt()
 			)
 		)

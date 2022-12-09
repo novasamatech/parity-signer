@@ -6,6 +6,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.components.toImageContent
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.uniffi.MVerifierDetails
 
@@ -14,7 +15,7 @@ fun TCVerifier(verifier: MVerifierDetails) {
 	Column {
 		Text("VERIFIER CERTIFICATE")
 		Row {
-			IdentIcon(identicon = verifier.identicon)
+			IdentIcon(identicon = verifier.identicon.toImageContent())
 			Column {
 				Row {
 					Text("key:")

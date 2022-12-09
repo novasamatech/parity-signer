@@ -30,15 +30,15 @@ struct RecoverSeedPhrase: View {
                             .lineLimit(nil)
                             .fixedSize(horizontal: false, vertical: true)
                             .font(PrimaryFont.labelM.font)
-                            .foregroundColor(Asset.crypto400.swiftUIColor)
+                            .foregroundColor(Asset.accentPink300.swiftUIColor)
                             .padding(12)
-                            Divider().foregroundColor(Asset.border400.swiftUIColor)
+                            Divider().foregroundColor(Asset.fill12.swiftUIColor)
                             HStack {
-                                Text(">").foregroundColor(Asset.text400.swiftUIColor)
+                                Text(">").foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                                     .font(PrimaryFont.bodyL.font)
                                 TextField(Localizable.seed.string, text: $userInput, prompt: Localizable.seedName.text)
                                     .focused($focus)
-                                    .foregroundColor(Asset.text600.swiftUIColor)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                                     .font(PrimaryFont.bodyL.font)
                                     .disableAutocorrection(true)
                                     .textInputAutocapitalization(.never)
@@ -64,7 +64,7 @@ struct RecoverSeedPhrase: View {
                                     .padding(.bottom, 10)
                             }
                         }
-                        .background(RoundedRectangle(cornerRadius: 8).stroke(Asset.border400.swiftUIColor))
+                        .background(RoundedRectangle(cornerRadius: 8).stroke(Asset.fill12.swiftUIColor))
                         ScrollView(.horizontal) {
                             LazyHStack {
                                 ForEach(content.guessSet, id: \.self) { guess in
@@ -75,13 +75,13 @@ struct RecoverSeedPhrase: View {
                                             },
                                             label: {
                                                 Text(guess)
-                                                    .foregroundColor(Asset.crypto400.swiftUIColor)
+                                                    .foregroundColor(Asset.accentPink300.swiftUIColor)
                                                     .font(PrimaryFont.captionM.font)
                                                     .padding(.horizontal, 12)
                                                     .padding(.vertical, 4)
                                                     .background(
                                                         RoundedRectangle(cornerRadius: 4)
-                                                            .foregroundColor(Asset.crypto100.swiftUIColor)
+                                                            .foregroundColor(Asset.accentPink300.swiftUIColor)
                                                     )
                                             }
                                         )

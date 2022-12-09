@@ -17,7 +17,7 @@ struct AddressCard: View {
     let rowHeight: CGFloat = 28
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4).foregroundColor(Asset.bg200.swiftUIColor).frame(height: 44)
+            RoundedRectangle(cornerRadius: 4).foregroundColor(Asset.backgroundSecondary.swiftUIColor).frame(height: 44)
             HStack {
                 ZStack {
                     Identicon(identicon: card.address.identicon)
@@ -37,21 +37,21 @@ struct AddressCard: View {
                 }.frame(width: 30, height: 30)
                 VStack(alignment: .leading) {
                     HStack {
-                        Text(card.address.seedName).foregroundColor(Asset.text600.swiftUIColor)
+                        Text(card.address.seedName).foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             .font(PrimaryFont.labelM.font)
                         Text(card.address.path)
                         if card.address.hasPwd {
                             Localizable.Path.delimeter.text
-                                .foregroundColor(Asset.crypto400.swiftUIColor)
+                                .foregroundColor(Asset.accentPink300.swiftUIColor)
                                 .font(PrimaryFont.captionM.font)
                             Image(.lock)
-                                .foregroundColor(Asset.crypto400.swiftUIColor)
+                                .foregroundColor(Asset.accentPink300.swiftUIColor)
                                 .font(PrimaryFont.captionM.font)
                         }
-                    }.foregroundColor(Asset.crypto400.swiftUIColor)
+                    }.foregroundColor(Asset.accentPink300.swiftUIColor)
                         .font(PrimaryFont.captionM.font)
                     // Here we could have shortened base58 address when buttons are shown, but we don't need to
-                    Text(card.base58.truncateMiddle(length: 8)).foregroundColor(Asset.text400.swiftUIColor)
+                    Text(card.base58.truncateMiddle(length: 8)).foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                         .font(PrimaryFont.captionM.font)
                 }
                 Spacer()

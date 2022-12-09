@@ -8,13 +8,6 @@ import io.parity.signer.uniffi.SignerImage
 
 typealias Callback = () -> Unit
 
-fun SignerImage.toBytes(): List<UByte> {
-	val image = when (this) {
-		is SignerImage.Png -> this.image
-		is SignerImage.Svg -> listOf()
-	}
-	return image
-}
 
 
 /**
