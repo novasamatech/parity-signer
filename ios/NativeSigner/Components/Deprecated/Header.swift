@@ -35,7 +35,7 @@ struct Header: View {
                                     variant: rightButton == .multiSelect ? nil : .left
                                 )
                                 .imageScale(.large)
-                                .foregroundColor(Asset.text500.swiftUIColor)
+                                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                             }
                         )
                     }
@@ -44,7 +44,7 @@ struct Header: View {
                 .frame(width: 72.0)
                 Spacer()
                 Text(screenLabel)
-                    .foregroundColor(Asset.text600.swiftUIColor)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .font(screenNameType == .h1 ? PrimaryFont.titleM.font : PrimaryFont.labelM.font)
                     .tracking(0.1)
                 if rightButton == .multiSelect {
@@ -69,11 +69,11 @@ struct Header: View {
                             case .backup:
                                 Image(.ellipsis)
                                     .imageScale(.large)
-                                    .foregroundColor(Asset.action400.swiftUIColor)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             case .logRight:
                                 Image(.ellipsis)
                                     .imageScale(.large)
-                                    .foregroundColor(Asset.action400.swiftUIColor)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             case .multiSelect:
                                 EmptyView()
                             case .none:
@@ -81,7 +81,7 @@ struct Header: View {
                             default:
                                 Image(.ellipsis)
                                     .imageScale(.large)
-                                    .foregroundColor(Asset.action400.swiftUIColor)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             }
                         }
                     )

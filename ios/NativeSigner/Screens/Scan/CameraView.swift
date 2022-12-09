@@ -118,7 +118,7 @@ struct CameraView: View {
             UIApplication.shared.isIdleTimerDisabled = false
             model.shutdown()
         }
-        .background(Asset.bg100.swiftUIColor)
+        .background(Asset.backgroundPrimary.swiftUIColor)
         .fullScreenCover(
             isPresented: $viewModel.isPresentingTransactionPreview,
             onDismiss: {

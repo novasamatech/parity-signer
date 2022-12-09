@@ -39,7 +39,7 @@ struct SettingsScreen: View {
                         HStack {
                             Localizable.verifierCertificate.text
                                 .font(PrimaryFont.titleM.font)
-                                .foregroundColor(Asset.text600.swiftUIColor)
+                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             Spacer()
                         }
                         VStack {
@@ -58,10 +58,10 @@ struct SettingsScreen: View {
                             } else {
                                 if let errorMessage = content.error {
                                     Localizable.errorCapitalised.text
-                                        .foregroundColor(Asset.signalDanger.swiftUIColor)
+                                        .foregroundColor(Asset.accentRed400.swiftUIColor)
                                         .font(PrimaryFont.labelM.font)
                                     Text(errorMessage)
-                                        .foregroundColor(Asset.signalDanger.swiftUIColor)
+                                        .foregroundColor(Asset.accentRed400.swiftUIColor)
                                         .font(PrimaryFont.bodyL.font)
                                 } else {
                                     AddressCard(card: MAddressCard(
