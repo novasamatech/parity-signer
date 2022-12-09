@@ -90,12 +90,6 @@ data class TCWithMarkdownDocsModel(
 	}
 }
 
-/**
- * String with markdown lablels, show as rich text
- */
-data class RichTextString(val string: String)
-fun String.toRichTextStr() = RichTextString(this)
-
 fun MscCall.toTransactionCallModel() = TCWithMarkdownDocsModel(
 	methodName = methodName,
 	docs = docs.toRichTextStr(),
@@ -107,6 +101,13 @@ fun MscEnumVariantName.toTransactionCallModel() = TCWithMarkdownDocsModel(
 	docs = docsEnumVariant.toRichTextStr(),
 	isMethod = true,
 )
+
+/**
+ * String with markdown lablels, show as rich text
+ */
+data class RichTextString(val string: String)
+fun String.toRichTextStr() = RichTextString(this)
+
 
 
 @Preview(
