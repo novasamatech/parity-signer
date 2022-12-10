@@ -23,7 +23,7 @@ struct KeyListMoreMenuModal: View {
             animateBackground: $animateBackground,
             content: {
                 VStack(alignment: .leading) {
-                    MenuButton(
+                    ActionSheetButton(
                         action: {
                             animateDismissal {
                                 isExportKeysSelected.toggle()

@@ -437,5 +437,12 @@
 "Transaction.EnterPassword.Error.Title" = "Did you forget your\npassword?";
 "Transaction.EnterPassword.Error.Message" = "Your password was entered incorrectly more than once. Retrieve it and scan the QR code again.";
 "Transaction.EnterPassword.Label.PathDelimeter" = "///••••";
-
 "Address.Label.PasswordProtectedPath.PathDelimeter" = "///••••";
+"LogsList.Label.Title" = "All Logs";
+"LogsList.More.Action.Add" = "Add Note";
+"LogsList.More.Action.Clear" = "Clear Log";
+"LogsList.More.Action.Cancel" = "Cancel";
+
+"LogsList.ClearConfirmation.Label.Title" = "Are You Sure?";
+"LogsList.ClearConfirmation.Action.Cancel" = "Cancel";
+"LogsList.ClearConfirmation.Action.Clear" = "Clear Log";

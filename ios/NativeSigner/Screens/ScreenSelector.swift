@@ -43,10 +43,7 @@ struct ScreenSelector: View {
                 navigationRequest: navigationRequest
             )
         case let .log(value):
-            HistoryScreen(
-                content: value,
-                navigationRequest: navigationRequest
-            )
+            LogsListView(viewModel: .init(logs: value))
         case let .logDetails(value):
             EventDetails(content: value)
         case let .seedSelector(value):
