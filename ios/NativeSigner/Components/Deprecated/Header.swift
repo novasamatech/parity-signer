@@ -66,14 +66,6 @@ struct Header: View {
                         },
                         label: {
                             switch rightButton {
-                            case .backup:
-                                Image(.ellipsis)
-                                    .imageScale(.large)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            case .logRight:
-                                Image(.ellipsis)
-                                    .imageScale(.large)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             case .multiSelect:
                                 EmptyView()
                             case .none:
