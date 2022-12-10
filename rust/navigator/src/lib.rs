@@ -12,7 +12,7 @@ use std::{collections::HashMap, sync::Mutex};
 use transaction_signing::SignatureType;
 
 use definitions::navigation::{
-    ActionResult, ExportedSet, MKeysInfoExport, MKeysNew, MSignatureReady,
+    ActionResult, ExportedSet, MKeysInfoExport, MKeysNew, MSignatureReady, QrData,
 };
 use parity_scale_codec::Encode;
 use qrcode_rtx::make_data_packs;
@@ -107,7 +107,9 @@ pub fn export_signatures_bulk(
                 MultiSignature::Ecdsa(a) => hex::encode(a),
             },
         };
-        vec![encoded.as_bytes().into()]
+        vec![QrData::Regular {
+            data: encoded.as_bytes().into(),
+        }]
     };
 
     Ok(MSignatureReady { signatures })

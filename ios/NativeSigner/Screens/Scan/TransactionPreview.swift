@@ -186,7 +186,7 @@ struct TransactionPreview: View {
                     AnimatedQRCodeView(
                         viewModel: Binding<AnimatedQRCodeViewModel>.constant(
                             .init(
-                                qrCodes: signature.signatures
+                                qrCodes: signature.signatures.map(\.payload)
                             )
                         )
                     )
@@ -316,7 +316,7 @@ struct TransactionPreview_Previews: PreviewProvider {
         TransactionPreview(viewModel: .init(
             isPresented: Binding<Bool>.constant(true),
             content: [PreviewData.signTransaction],
-            signature: MSignatureReady(signatures: [PreviewData.exampleQRCode])
+            signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
         ))
         .environmentObject(NavigationCoordinator())
         .environmentObject(SignerDataModel())
@@ -325,7 +325,7 @@ struct TransactionPreview_Previews: PreviewProvider {
         TransactionPreview(viewModel: .init(
             isPresented: Binding<Bool>.constant(true),
             content: [PreviewData.signTransaction, PreviewData.signTransaction],
-            signature: MSignatureReady(signatures: [PreviewData.exampleQRCode])
+            signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
         ))
         .environmentObject(NavigationCoordinator())
         .environmentObject(SignerDataModel())

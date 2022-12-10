@@ -25,7 +25,7 @@ struct KeyDetailsMulti: View {
                     title: content.keyDetails.networkInfo.networkTitle,
                     logo: content.keyDetails.networkInfo.networkLogo
                 )
-                Image(uiImage: UIImage(data: Data(content.keyDetails.qr)) ?? UIImage())
+                Image(uiImage: UIImage(data: Data(content.keyDetails.qr.payload)) ?? UIImage())
                     .resizable()
                     .aspectRatio(contentMode: .fit).padding(12)
                     .offset(x: offset, y: 0)

@@ -27,7 +27,7 @@ struct AddKeySetModal: View {
                         .font(PrimaryFont.titleS.font)
                         .padding([.bottom, .top], Spacing.medium)
                     Divider()
-                    MenuButton(
+                    ActionSheetButton(
                         action: {
                             animateDismissal {
                                 navigation.perform(navigation: .init(action: .newSeed))
@@ -36,7 +36,7 @@ struct AddKeySetModal: View {
                         icon: Asset.add.swiftUIImage,
                         text: Localizable.AddKeySet.Button.add.key
                     )
-                    MenuButton(
+                    ActionSheetButton(
                         action: {
                             animateDismissal {
                                 navigation.perform(navigation: .init(action: .recoverSeed))
