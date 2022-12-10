@@ -16,6 +16,7 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyQrCodeProvider
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.getData
 import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
@@ -54,7 +55,7 @@ fun SignatureReady(
 			Text("Your signature")
 			Text("Scan this into your application")
 			AnimatedQrKeysInfo<List<List<UByte>>>(
-				input = signatureReady.signatures,
+				input = signatureReady.signatures.map { it.getData() },
 				provider = EmptyQrCodeProvider(),
 				modifier = Modifier.fillMaxWidth(1f)
 			)

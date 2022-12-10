@@ -6,6 +6,7 @@ import io.parity.signer.components.qrcode.AnimatedQrImages
 import io.parity.signer.components.qrcode.AnimatedQrKeysProvider
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.KeySetModel
+import io.parity.signer.models.getData
 
 
 class KeySetsExportService : AnimatedQrKeysProvider<List<KeySetModel>> {
@@ -16,7 +17,7 @@ class KeySetsExportService : AnimatedQrKeysProvider<List<KeySetModel>> {
 		val keyInfo =
 			uniffiInteractor.exportSeedKeyInfos(input.map { it.seedName }).mapError()
 		val images = keyInfo
-			?.let { keyInfo -> uniffiInteractor.encodeToQrImages(keyInfo.frames) }
+			?.let { keyInfo -> uniffiInteractor.encodeToQrImages(keyInfo.frames.map { it.getData() }) }
 			?.mapError()
 			?.let { AnimatedQrImages(it) }
 		return images

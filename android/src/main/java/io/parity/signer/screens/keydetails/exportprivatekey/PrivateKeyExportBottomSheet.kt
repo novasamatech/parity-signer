@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,14 +23,13 @@ import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components.sharedcomponents.CircularCountDownTimer
 import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.base.BottomSheetHeader
-import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.KeyCardModel
-import io.parity.signer.models.Navigator
-import io.parity.signer.models.intoImageBitmap
+import io.parity.signer.models.*
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.appliedStroke
 import io.parity.signer.ui.theme.fill6
+import io.parity.signer.uniffi.encodeToQr
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun PrivateKeyExportBottomSheet(
@@ -74,8 +74,9 @@ fun PrivateKeyExportBottomSheet(
 						),
 					contentAlignment = Alignment.Center,
 				) {
+					val qrImage = remember { runBlocking { encodeToQr(model.qrData, true) } }
 					Image(
-						bitmap = model.qrImage.intoImageBitmap(),
+						bitmap = qrImage.intoImageBitmap(),
 						contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
 						contentScale = ContentScale.Fit,
 						modifier = Modifier.size(264.dp)
@@ -94,7 +95,7 @@ fun PrivateKeyExportBottomSheet(
 }
 
 class PrivateKeyExportModel(
-	val qrImage: List<UByte>,
+	val qrData: List<UByte>,
 	val keyCard: KeyCardModel,
 	val network: NetworkCardModel,
 ) {
@@ -102,7 +103,7 @@ class PrivateKeyExportModel(
 		const val SHOW_PRIVATE_KEY_TIMEOUT = 60 //seconds
 
 		fun createMock(): PrivateKeyExportModel = PrivateKeyExportModel(
-			qrImage = PreviewData.exampleQRCode,
+			qrData = PreviewData.exampleQRData,
 			keyCard = KeyCardModel.createStub(),
 			network = NetworkCardModel("Polkadot", "NetworkLogo")
 		)

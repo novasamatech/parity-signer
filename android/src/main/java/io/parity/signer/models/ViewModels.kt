@@ -203,7 +203,7 @@ data class KeyCardModel(
  * Local copy of shared [MKeyDetails] class
  */
 data class KeyDetailsModel(
-	val qr: List<UByte>,
+	val qrData: List<UByte>,
 	val pubkey: String,
 	val networkInfo: NetworkInfoModel,
 	val address: KeyCardModel,
@@ -216,7 +216,7 @@ data class KeyDetailsModel(
 		fun createStubDerived(): KeyDetailsModel {
 			val keyCard = KeyCardModel.createStub()
 			return KeyDetailsModel(
-				qr = PreviewData.exampleQRCode,
+				qrData = PreviewData.exampleQRData,
 				pubkey = "public key",
 				networkInfo = NetworkInfoModel(
 					"network title",
@@ -231,7 +231,7 @@ data class KeyDetailsModel(
 		fun createStubRoot(): KeyDetailsModel {
 			val keyCard = KeyCardModel.createStub()
 			return KeyDetailsModel(
-				qr = PreviewData.exampleQRCode,
+				qrData = PreviewData.exampleQRData,
 				pubkey = "public key",
 				networkInfo = NetworkInfoModel(
 					"network title",
@@ -250,7 +250,7 @@ data class KeyDetailsModel(
 
 fun MKeyDetails.toKeyDetailsModel() =
 	KeyDetailsModel(
-		qr = qr, pubkey = pubkey, networkInfo = networkInfo.toNetworkInfoModel(),
+		qrData = qr.getData(), pubkey = pubkey, networkInfo = networkInfo.toNetworkInfoModel(),
 		address = KeyCardModel.fromAddress(
 			address = address,
 			base58 = base58,
@@ -273,4 +273,9 @@ data class NetworkInfoModel(
 fun MscNetworkInfo.toNetworkInfoModel() =
 	NetworkInfoModel(networkTitle, networkLogo, networkSpecsKey)
 
+fun QrData.getData(): List<UByte> =
+	when (this) {
+		is QrData.Regular -> this.data
+		is QrData.Sensitive -> this.data
+	}
 

@@ -11,7 +11,7 @@ use std::path::Path;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
-use definitions::navigation::{MAddressCard, MKeyAndNetworkCard, MKeysNew, SignerImage};
+use definitions::navigation::{MAddressCard, MKeyAndNetworkCard, MKeysNew, QrData, SignerImage};
 use definitions::network_specs::NetworkSpecs;
 use definitions::{
     crypto::Encryption,
@@ -30,7 +30,6 @@ use definitions::{
     qr_transfers::ContentLoadTypes,
     users::AddressDetails,
 };
-use qrcode_static::{png_qr_from_string, DataType};
 
 use crate::helpers::{
     get_address_details, get_all_networks, get_general_verifier, get_meta_values_by_name,
@@ -481,16 +480,16 @@ where
             } else {
                 "substrate"
             };
-            png_qr_from_string(
-                &format!(
+            QrData::Regular {
+                data: format!(
                     "{}:{}:0x{}",
                     prefix,
                     base58,
                     hex::encode(network_specs.genesis_hash)
-                ),
-                DataType::Regular,
-            )
-            .map_err(|e| Error::Qr(e.to_string()))?
+                )
+                .as_bytes()
+                .to_vec(),
+            }
         } else {
             return Err(Error::NetworkSpecsKeyForAddressNotFound {
                 network_specs_key: network_specs_key.to_owned(),

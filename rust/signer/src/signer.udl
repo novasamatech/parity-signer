@@ -356,8 +356,14 @@ dictionary MSeeds {
     sequence<SeedNameCard> seed_name_cards;
 };
 
+[Enum]
+interface QrData {
+    Regular(sequence<u8> data);
+    Sensitive(sequence<u8> data);
+};
+
 dictionary MKeyDetails {
-    sequence<u8> qr;
+    QrData qr;
     string pubkey;
     MSCNetworkInfo network_info;
     Address address;
@@ -482,7 +488,7 @@ dictionary MManageNetworks {
 };
 
 dictionary MKeysInfoExport {
-    sequence<sequence<u8>> frames;
+    sequence<QrData> frames;
 };
 
 [Enum]
@@ -559,7 +565,7 @@ namespace signer {
     MKeysNew keys_by_seed_name([ByRef] string dbname, [ByRef] string seed_name);
 
     [Throws=ErrorDisplayed]
-    sequence<u8> encode_to_qr([ByRef] sequence<u8> payload);
+    sequence<u8> encode_to_qr([ByRef] sequence<u8> payload, boolean is_danger);
 
     void init_logging(string tag);
 };
@@ -644,7 +650,7 @@ dictionary MPasswordConfirm {
 };
 
 dictionary MSignatureReady {
-    sequence<sequence<u8>> signatures;
+    sequence<QrData> signatures;
 };
 
 dictionary MEnterPassword {
