@@ -5,8 +5,8 @@
 //  Created by Krzysztof Rodak on 18/10/2022.
 //
 
+import QRCode
 import SwiftUI
-
 struct AnimatedQRCodeViewModel: Equatable {
     var qrCodes: [[UInt8]]
 }
@@ -34,14 +34,12 @@ struct AnimatedQRCodeView: View {
     init(
         viewModel: Binding<AnimatedQRCodeViewModel>,
         qrCodesGenerator: QRCodeImageGenerator = QRCodeImageGenerator(),
-        shouldDecode: Bool = true
+        shouldDecode _: Bool = true
     ) {
         _viewModel = viewModel
         self.qrCodesGenerator = qrCodesGenerator
         let images = viewModel.qrCodes.wrappedValue.compactMap {
-            shouldDecode ?
-                qrCodesGenerator.generateQRCode(from: $0) :
-                UIImage(data: Data($0))
+            qrCodesGenerator.generateQRCode(from: $0)
         }
         _imagesIterator = State(wrappedValue: images.makeIterator())
         _images = State(wrappedValue: images)

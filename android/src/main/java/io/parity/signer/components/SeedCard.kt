@@ -21,7 +21,7 @@ import io.parity.signer.uniffi.SignerImage
 @Composable
 fun SeedCard(
 	seedName: String,
-	identicon: SignerImage,
+	identicon: ImageContent,
 	base58: String = "",
 	showAddress: Boolean = false,
 	multiselectMode: Boolean = false,

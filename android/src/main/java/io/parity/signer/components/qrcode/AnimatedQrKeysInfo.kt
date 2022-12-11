@@ -90,6 +90,6 @@ interface AnimatedQrKeysProvider<T> {
 
 class EmptyAnimatedQrKeysProvider : AnimatedQrKeysProvider<Any> {
 	override suspend fun getQrCodesList(input: Any): AnimatedQrImages {
-		return AnimatedQrImages(listOf(PreviewData.exampleQRCode))
+		return AnimatedQrImages(listOf(PreviewData.exampleQRData))
 	}
 }

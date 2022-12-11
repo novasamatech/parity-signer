@@ -155,12 +155,12 @@ private fun PreviewKeySetExportResultBottomSheet() {
 	val keys = mutableSetOf(
 		KeySetModel(
 			"first seed name",
-			PreviewData.exampleIdenticon,
+			PreviewData.exampleIdenticonPng,
 			1.toUInt()
 		),
 		KeySetModel(
 			"second seed name",
-			PreviewData.exampleIdenticon,
+			PreviewData.exampleIdenticonPng,
 			3.toUInt()
 		),
 	)

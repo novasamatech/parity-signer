@@ -59,7 +59,7 @@ final class ExportMultipleKeysService {
                     dbname: self.databaseMediator.databaseName,
                     selectedNames: selectedItems
                 ).frames
-                result = .success(AnimatedQRCodeViewModel(qrCodes: qrCodes))
+                result = .success(AnimatedQRCodeViewModel(qrCodes: qrCodes.map(\.payload)))
             } catch {
                 result = .failure(.unknown)
             }

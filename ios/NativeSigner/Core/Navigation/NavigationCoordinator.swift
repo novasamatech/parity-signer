@@ -120,7 +120,8 @@ private extension NavigationCoordinator {
         case .seedSelector, // Main `Keys` screen
              .keys, // `Key Details` screen
              .keyDetails, // `Public Key` screen
-             .transaction:
+             .transaction,
+             .log:
             updatedShouldSkipInjectedViews = true
         default:
             updatedShouldSkipInjectedViews = false

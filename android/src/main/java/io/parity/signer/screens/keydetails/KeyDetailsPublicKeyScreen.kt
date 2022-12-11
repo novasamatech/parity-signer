@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,8 +28,11 @@ import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.sharedcomponents.KeySeedCard
 import io.parity.signer.models.*
+import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.encodeToQr
+import kotlinx.coroutines.runBlocking
 
 /**
  * Default main screen with list Seeds/root keys
@@ -74,8 +79,18 @@ fun KeyDetailsPublicKeyScreen(
 							),
 						contentAlignment = Alignment.Center,
 					) {
+
+						val isPreview = LocalInspectionMode.current
+						val qrImage = remember {
+							if (isPreview) {
+								PreviewData.exampleQRImage
+							} else {
+								runBlocking { encodeToQr(model.qrData, false) }
+							}
+						}
+
 						Image(
-							bitmap = model.qr.intoImageBitmap(),
+							bitmap = qrImage.intoImageBitmap(),
 							contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
 							contentScale = ContentScale.Fit,
 							modifier = Modifier.size(264.dp)

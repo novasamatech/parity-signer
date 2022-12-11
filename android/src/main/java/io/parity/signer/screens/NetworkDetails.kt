@@ -7,10 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import io.parity.signer.components.IdentIcon
-import io.parity.signer.components.MetadataCard
-import io.parity.signer.components.NetworkCard
-import io.parity.signer.components.NetworkCardModel
+import io.parity.signer.components.*
 import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNetworkDetails
@@ -59,7 +56,7 @@ fun NetworkDetails(
 				}
 				"custom" -> {
 					Row {
-						IdentIcon(identicon = networkDetails.currentVerifier.details.identicon)
+						IdentIcon(identicon = networkDetails.currentVerifier.details.identicon.toImageContent())
 						Column {
 							Text("custom")
 							Text(

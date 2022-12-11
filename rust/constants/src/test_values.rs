@@ -167,34 +167,7 @@ pub const fn ed() -> &'static [u8] {
     include_bytes!("ed")
 }
 
-/// Export qr code for root Alice address in westend network
-pub const fn alice_westend_root_qr() -> &'static [u8] {
-    include_bytes!("alice_westend_root_qr")
-}
-
 /// Export qr code for root Alice secret in westend network
 pub const fn alice_westend_secret_qr() -> &'static [u8] {
     include_bytes!("alice_westend_derivation_secret")
-}
-
-/// Export qr code for Alice key with `//westend` derivation in westend network
-pub const fn alice_westend_westend_qr() -> &'static [u8] {
-    include_bytes!("alice_westend_westend_qr")
-}
-
-/// Export qr code for Alice key with `//Alice` derivation in westend network
-pub const fn alice_westend_alice_qr() -> &'static [u8] {
-    include_bytes!("alice_westend_alice_qr")
-}
-
-/// Export qr code for Alice key with `//Alice/secret//secret` derivation in
-/// westend network
-pub const fn alice_westend_alice_secret_secret_qr() -> &'static [u8] {
-    include_bytes!("alice_westend_alice_secret_secret_qr")
-}
-
-/// Export qr code for Alice key with `//polkadot` derivation in polkadot
-/// network
-pub const fn alice_polkadot_qr() -> &'static [u8] {
-    include_bytes!("alice_polkadot_qr")
 }

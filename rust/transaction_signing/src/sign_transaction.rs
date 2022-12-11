@@ -7,7 +7,6 @@ use sp_runtime::MultiSignature;
 use zeroize::Zeroize;
 
 use db_handling::db_transactions::{SignContent, TrDbColdSign};
-use qrcode_static::{png_qr_from_string, DataType};
 
 use crate::sign_message::sign_as_address_key;
 use crate::{Error, Result};
@@ -124,28 +123,6 @@ pub fn create_signature<P: AsRef<Path>>(
         signature: signature.0,
         new_checksum: signature.1,
     })
-}
-
-pub fn create_signature_png(
-    seed_phrase: &str,
-    pwd_entry: &str,
-    user_comment: &str,
-    database_name: &str,
-    checksum: u32,
-    idx: usize,
-    encryption: Encryption,
-) -> Result<Vec<u8>> {
-    let signature = create_signature(
-        seed_phrase,
-        pwd_entry,
-        user_comment,
-        database_name,
-        checksum,
-        idx,
-        encryption,
-    )?;
-    let qr_data = png_qr_from_string(&signature.to_string(), DataType::Regular)?;
-    Ok(qr_data)
 }
 
 #[cfg(test)]

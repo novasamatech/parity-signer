@@ -67,7 +67,7 @@ extension PreviewData {
     )
 
     static let mkeyDetails = MKeyDetails(
-        qr: [],
+        qr: .regular(data: []),
         pubkey: "",
         networkInfo: .init(networkTitle: "", networkLogo: "", networkSpecsKey: ""),
         address: .init(
