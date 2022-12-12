@@ -15,12 +15,10 @@ struct ScreenSelector: View {
     let screenData: ScreenData
     let navigationRequest: NavigationRequest
     let getSeed: (String) -> String
-    let doJailbreak: () -> Void
     let pathCheck: (String, String, String) -> DerivationCheck
     let createAddress: (String, String) -> Void
     let checkSeedCollision: (String) -> Bool
     let restoreSeed: (String, String, Bool) -> Void
-    let doWipe: () -> Void
     let alertShow: () -> Void
     let increment: (String, String) -> Void
 
@@ -36,12 +34,8 @@ struct ScreenSelector: View {
                 forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
                 resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
             )
-        case let .settings(value):
-            SettingsScreen(
-                content: value,
-                doWipe: doWipe,
-                navigationRequest: navigationRequest
-            )
+        case .settings:
+            SettingsView(viewModel: .init())
         case let .log(value):
             LogsListView(viewModel: .init(logs: value))
         case let .logDetails(value):
@@ -84,10 +78,7 @@ struct ScreenSelector: View {
                 navigationRequest: navigationRequest
             )
         case let .vVerifier(value):
-            VerifierScreen(
-                content: value,
-                doJailbreak: doJailbreak
-            )
+            VerfierCertificateView(viewModel: .init(content: value))
         case let .manageNetworks(value):
             ManageNetworks(
                 content: value,

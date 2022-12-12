@@ -123,7 +123,7 @@
 "Unknown network" = "Unknown network";
 "Use Signer in Airplane mode" = "Use Signer in Airplane mode";
 "Used for:" = "Used for:";
-"verifier_certificate" = "Verifier certificate";
+"verifier_certificate" = "Verifier Certificate";
 "verifier_certificate_uppercase" = "VERIFIER CERTIFICATE";
 "verifier_certificate_alt" = "Verifier certificate: ";
 "version" = "version";
@@ -446,3 +446,18 @@
 "LogsList.ClearConfirmation.Label.Title" = "Are You Sure?";
 "LogsList.ClearConfirmation.Action.Cancel" = "Cancel";
 "LogsList.ClearConfirmation.Action.Clear" = "Clear Log";
+
+"Settings.Label.Title" = "Settings";
+"Settings.Label.Networks" = "Networks";
+"Settings.Label.Verifier" = "Verifier Certificate";
+"Settings.Label.Backup" = "Backup Keys";
+"Settings.Label.Policy" = "Privacy Policy";
+"Settings.Label.Terms" = "Terms and Conditions";
+"Settings.Label.Feedback" = "Leave Feedback";
+"Settings.Label.Version" = "App version %@";
+"Settings.Label.Wipe" = "Wipe all Data";
+"Settings.Action.Cancel" = "Cancel";
+
+"VerifierCertificate.Label.Title" = "Verifier Certificate";
+"VerifierCertificate.Action.Remove" = "Remove certificate";
+

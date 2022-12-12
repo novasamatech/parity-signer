@@ -38,6 +38,8 @@ enum Heights {
     static let minTransactionCardHeight: CGFloat = 24
     static let minTransactionSummaryItemHeight: CGFloat = 18
     static let chevronLogElementWidth: CGFloat = 32
+    static let settingsEntryHeight: CGFloat = 56
+    static let verifierCertificateActionHeight: CGFloat = 48
 }
 
 enum Sizes {
