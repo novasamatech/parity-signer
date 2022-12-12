@@ -64,7 +64,7 @@ struct NavigationBarView: View {
 
     init(
         viewModel: NavigationBarViewModel,
-        actionModel: NavigationBarActionModel
+        actionModel: NavigationBarActionModel = .init()
     ) {
         self.viewModel = viewModel
         self.actionModel = actionModel
