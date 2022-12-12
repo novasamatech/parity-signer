@@ -446,3 +446,14 @@
 "LogsList.ClearConfirmation.Label.Title" = "Are You Sure?";
 "LogsList.ClearConfirmation.Action.Cancel" = "Cancel";
 "LogsList.ClearConfirmation.Action.Clear" = "Clear Log";
+
+"Settings.Label.Title" = "Settings";
+"Settings.Label.Networks" = "Networks";
+"Settings.Label.Verifier" = "Verifier Certificate";
+"Settings.Label.Backup" = "Backup Keys";
+"Settings.Label.Policy" = "Privacy Policy";
+"Settings.Label.Terms" = "Terms and Conditions";
+"Settings.Label.Feedback" = "Leave Feedback";
+"Settings.Label.Version" = "App Version";
+"Settings.Label.Wipe" = "Wipe all Data";
+"Settings.Action.Cancel" = "Cancel";

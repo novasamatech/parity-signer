@@ -32,7 +32,7 @@ struct LogsListView: View {
                 }
             }
         }
-        .background(Asset.backgroundSystem.swiftUIColor)
+        .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
             viewModel.loadData()

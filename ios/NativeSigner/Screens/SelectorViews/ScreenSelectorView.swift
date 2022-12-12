@@ -31,7 +31,6 @@ struct ScreenSelectorView: View {
             restoreSeed: { seedName, seedPhrase, createRoots in seedsMediator.restoreSeed(
                 seedName: seedName, seedPhrase: seedPhrase, createRoots: createRoots
             ) },
-            doWipe: data.wipe,
             alertShow: { data.alertShow = true },
             increment: { seedName, _ in
                 let seedPhrase = seedsMediator.getSeed(seedName: seedName)

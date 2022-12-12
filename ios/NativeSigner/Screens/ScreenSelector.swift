@@ -20,7 +20,6 @@ struct ScreenSelector: View {
     let createAddress: (String, String) -> Void
     let checkSeedCollision: (String) -> Bool
     let restoreSeed: (String, String, Bool) -> Void
-    let doWipe: () -> Void
     let alertShow: () -> Void
     let increment: (String, String) -> Void
 
@@ -36,12 +35,8 @@ struct ScreenSelector: View {
                 forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
                 resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
             )
-        case let .settings(value):
-            SettingsScreen(
-                content: value,
-                doWipe: doWipe,
-                navigationRequest: navigationRequest
-            )
+        case .settings:
+            SettingsView(viewModel: .init())
         case let .log(value):
             LogsListView(viewModel: .init(logs: value))
         case let .logDetails(value):

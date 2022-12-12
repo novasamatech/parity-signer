@@ -33,6 +33,13 @@ struct HorizontalActionsBottomModalViewModel {
         dismissActionLabel: Localizable.LogsList.ClearConfirmation.Action.cancel.key,
         mainActionLabel: Localizable.LogsList.ClearConfirmation.Action.clear.key
     )
+
+    static let wipeAll = HorizontalActionsBottomModalViewModel(
+        title: Localizable.wipeALLData.string,
+        content: Localizable.FactoryResetTheSignerApp.thisOperationCanNotBeReverted.string,
+        dismissActionLabel: Localizable.Settings.Action.cancel.key,
+        mainActionLabel: Localizable.wipe.key
+    )
 }
 
 struct HorizontalActionsBottomModal: View {

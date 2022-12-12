@@ -32,23 +32,24 @@ struct VerifierScreen: View {
                     )
                 }
             )
-            .alert(
-                isPresented: $jailbreak,
-                content: {
-                    Alert(
-                        title: Localizable.wipeALLData.text,
-                        message: Localizable.RemoveAllData.message.text,
-                        primaryButton: .cancel(),
-                        secondaryButton: .destructive(
-                            Localizable.iUnderstand.text,
-                            action: {
-                                doJailbreak()
-                            }
-                        )
-                    )
-                }
-            )
+            Spacer()
         }
+        .alert(
+            isPresented: $jailbreak,
+            content: {
+                Alert(
+                    title: Localizable.wipeALLData.text,
+                    message: Localizable.RemoveAllData.message.text,
+                    primaryButton: .cancel(),
+                    secondaryButton: .destructive(
+                        Localizable.iUnderstand.text,
+                        action: {
+                            doJailbreak()
+                        }
+                    )
+                )
+            }
+        )
     }
 }
 
