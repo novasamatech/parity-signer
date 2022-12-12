@@ -184,7 +184,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				} else {
 					Box(
 						contentAlignment = Alignment.Center,
-						modifier = Modifier.padding(12.dp),
+						modifier = Modifier.padding(12.dp).fillMaxSize(1f),
 					) {
 						Text(
 							"Please enable airplane mode",
