@@ -61,8 +61,14 @@ struct KeyDetailsPublicKeyView: View {
             ScrollView {
                 VStack {
                     VStack(spacing: 0) {
-                        QRCodeContainerView(viewModel: viewModel.qrCode)
-                            .padding(0.5)
+                        AnimatedQRCodeView(
+                            viewModel: Binding<AnimatedQRCodeViewModel>.constant(
+                                .init(
+                                    qrCodes: [viewModel.qrCode.payload]
+                                )
+                            )
+                        )
+                        .padding(0.5)
                         switch viewModel.footer {
                         case let .address(viewModel):
                             QRCodeAddressFooterView(viewModel: viewModel)
@@ -70,12 +76,7 @@ struct KeyDetailsPublicKeyView: View {
                             QRCodeRootFooterView(viewModel: viewModel)
                         }
                     }
-                    .background(
-                        RoundedRectangle(cornerRadius: CornerRadius.medium)
-                            .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                            .background(Asset.fill6.swiftUIColor)
-                            .cornerRadius(CornerRadius.medium)
-                    )
+                    .strokeContainerBackground()
                     // Exposed key alert
                     if viewModel.isKeyExposed {
                         HStack {
@@ -86,13 +87,8 @@ struct KeyDetailsPublicKeyView: View {
                         }
                         .padding()
                         .foregroundColor(Asset.accentRed300.swiftUIColor)
-                        .font(Fontstyle.bodyM.base)
-                        .background(
-                            RoundedRectangle(cornerRadius: CornerRadius.small)
-                                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                                .background(Asset.accentRed300.swiftUIColor.opacity(0.12))
-                                .cornerRadius(CornerRadius.small)
-                        )
+                        .font(PrimaryFont.bodyM.font)
+                        .strokeContainerBackground(CornerRadius.small, isError: true)
                     }
                 }
                 .padding([.leading, .trailing], Spacing.large)

@@ -1,22 +1,26 @@
 package io.parity.signer.ui.navigationselectors
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import io.parity.signer.bottomsheets.EnterPassword
 import io.parity.signer.bottomsheets.LogComment
-import io.parity.signer.bottomsheets.SignatureReady
 import io.parity.signer.models.*
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
-import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
 import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
-import io.parity.signer.screens.keysets.NewSeedMenu
+import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
+import io.parity.signer.screens.keysets.create.NewKeySetBackupScreenFull
+import io.parity.signer.screens.keysets.create.NewKeySetNameScreen
+import io.parity.signer.screens.keysets.create.NewSeedMenu
+import io.parity.signer.screens.keysets.create.toNewSeedBackupModel
 import io.parity.signer.screens.logs.LogsMenu
 import io.parity.signer.screens.logs.LogsScreen
 import io.parity.signer.screens.logs.toLogsScreenModel
-import io.parity.signer.screens.scan.ScanScreen
+import io.parity.signer.screens.settings.SettingsScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.ModalData
@@ -30,6 +34,7 @@ fun CombinedScreensSelector(
 	signerDataModel: SignerDataModel
 ) {
 	val rootNavigator = signerDataModel.navigator
+	val seedNames = signerDataModel.seedNames.collectAsState()
 
 	when (localNavAction) {
 		LocalNavAction.ShowScan -> {
@@ -67,8 +72,29 @@ fun CombinedScreensSelector(
 						navigator = rootNavigator,
 					)
 				}
+			is ScreenData.Settings ->
+				Box(modifier = Modifier.statusBarsPadding()) {
+					SettingsScreen(
+						rootNavigator = rootNavigator,
+						isStrongBoxProtected = signerDataModel.isStrongBoxProtected(),
+						appVersion = signerDataModel.getAppVersion(),
+						wipeToFactory = signerDataModel::wipeToFactory,
+						alertState = alertState
+					)
+				}
+			is ScreenData.NewSeed ->
+				Box(
+					modifier = Modifier
+						.statusBarsPadding()
+						.imePadding()
+				) {
+					NewKeySetNameScreen(
+						rootNavigator = rootNavigator,
+						seedNames = seedNames.value,
+					)
+				}
 			is ScreenData.Scan, is ScreenData.Transaction ->
-				submitErrorState("Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph")
+				submitErrorState("Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData")
 
 			else -> {} //old Selector showing them
 		}
@@ -119,6 +145,13 @@ fun BottomSheetSelector(
 							navigator = signerDataModel.navigator,
 						)
 					}
+				is ModalData.NewSeedBackup -> {
+					NewKeySetBackupScreenFull(
+						model = modalData.f.toNewSeedBackupModel(),
+						onBack = { navigator.backAction() },
+						onCreateKeySet = signerDataModel::addSeed
+					)
+				}
 				is ModalData.LogRight ->
 					BottomSheetWrapperRoot(onClosedAction = {
 						navigator.backAction()
@@ -127,11 +160,7 @@ fun BottomSheetSelector(
 							navigator = signerDataModel.navigator,
 						)
 					}
-				//old design
-				is ModalData.SignatureReady -> SignatureReady(
-					modalData.f,
-					signerDataModel = signerDataModel
-				)
+				is ModalData.SignatureReady -> {}//part of camera flow now
 				//old design
 				is ModalData.EnterPassword -> EnterPassword(
 					modalData.f,

@@ -93,7 +93,7 @@ private fun PreviewKeySetItem() {
 		KeySetItem(
 			KeySetModel(
 				"My special key set",
-				PreviewData.exampleIdenticon,
+				PreviewData.exampleIdenticonPng,
 				2.toUInt()
 			)
 		)

@@ -37,3 +37,18 @@ extension Tab {
         }
     }
 }
+
+extension Tab {
+    var action: Action? {
+        switch self {
+        case .keys:
+            return .navbarKeys
+        case .scanner:
+            return nil
+        case .logs:
+            return .navbarLog
+        case .settings:
+            return .navbarSettings
+        }
+    }
+}

@@ -38,16 +38,16 @@ struct NavbarShield: View {
                 if connectivityMediator.isConnectivityOn {
                     Image(.shield, variant: .slash)
                         .imageScale(.large)
-                        .foregroundColor(Asset.signalDanger.swiftUIColor)
+                        .foregroundColor(Asset.accentRed400.swiftUIColor)
                 } else {
                     if alert {
                         Image(.exclamationmark, variant: .shield)
                             .imageScale(.large)
-                            .foregroundColor(Asset.signalWarning.swiftUIColor)
+                            .foregroundColor(Asset.accentRed300.swiftUIColor)
                     } else {
                         Image(.lock, variants: [.shield, .fill])
                             .imageScale(.large)
-                            .foregroundColor(Asset.crypto400.swiftUIColor)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     }
                 }
             }

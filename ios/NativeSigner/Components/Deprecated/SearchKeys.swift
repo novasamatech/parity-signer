@@ -15,13 +15,13 @@ struct SearchKeys: View {
         HStack {
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(searchString.isEmpty ? Asset.action100.swiftUIColor : Asset.action400.swiftUIColor)
+                    .stroke(searchString.isEmpty ? Asset.accentPink300.swiftUIColor : Asset.accentPink500.swiftUIColor)
                     .frame(height: 39)
                 TextField(Localizable.findKeys.string, text: $searchString)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
                     .font(.system(size: 12, design: .monospaced))
-                    .foregroundColor(Asset.text400.swiftUIColor)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                     .padding(8)
             }
             if !searchString.isEmpty {
@@ -33,13 +33,13 @@ struct SearchKeys: View {
                 )
             } else {
                 Image(.doc, variants: [.text, .magnifyingglass]).imageScale(.large)
-                    .foregroundColor(Asset.action400.swiftUIColor)
+                    .foregroundColor(Asset.accentPink300.swiftUIColor)
             }
         }
         .onDisappear {
             searchString = ""
         }
-        .background(Asset.bg000.swiftUIColor)
+        .background(Asset.backgroundPrimary.swiftUIColor)
     }
 }
 

@@ -4,12 +4,16 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use db_handling::identities::export_all_addrs;
+use db_handling::identities::{export_all_addrs, SignaturesBulk, SignaturesBulkV1};
 //do we support mutex?
 use lazy_static::lazy_static;
+use sp_runtime::MultiSignature;
 use std::{collections::HashMap, sync::Mutex};
+use transaction_signing::SignatureType;
 
-use definitions::navigation::{ActionResult, ExportedSet, MKeysInfoExport, MKeysNew};
+use definitions::navigation::{
+    ActionResult, ExportedSet, MKeysInfoExport, MKeysNew, MSignatureReady, QrData,
+};
 use parity_scale_codec::Encode;
 use qrcode_rtx::make_data_packs;
 
@@ -20,6 +24,7 @@ pub use actions::Action;
 pub mod alerts;
 pub mod modals;
 mod navstate;
+mod states;
 use navstate::State;
 pub mod screens;
 #[cfg(test)]
@@ -76,6 +81,38 @@ pub fn export_key_info(
     let frames = make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?;
 
     Ok(MKeysInfoExport { frames })
+}
+
+/// Export signatures bulk.
+pub fn export_signatures_bulk(
+    signatures: &[(MultiSignature, SignatureType)],
+) -> Result<MSignatureReady> {
+    let signatures = if signatures.len() > 1 {
+        let v1: SignaturesBulkV1 = signatures
+            .iter()
+            .map(|s| s.0.clone())
+            .collect::<Vec<_>>()
+            .as_slice()
+            .into();
+        let v1: SignaturesBulk = v1.into();
+        let data = v1.encode();
+
+        make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?
+    } else {
+        let encoded = match signatures[0].1 {
+            SignatureType::Transaction => hex::encode(&signatures[0].0.encode()),
+            SignatureType::Message => match &signatures[0].0 {
+                MultiSignature::Ed25519(a) => hex::encode(a),
+                MultiSignature::Sr25519(a) => hex::encode(a),
+                MultiSignature::Ecdsa(a) => hex::encode(a),
+            },
+        };
+        vec![QrData::Regular {
+            data: encoded.as_bytes().into(),
+        }]
+    };
+
+    Ok(MSignatureReady { signatures })
 }
 
 /// Get keys by seed name

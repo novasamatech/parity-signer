@@ -1,5 +1,5 @@
 //
-//  TCNewSpecs.swift
+//  TCAddNewNetwork.swift
 //  NativeSigner
 //
 //  Created by Alexander Slesarev on 21.10.2021.
@@ -7,73 +7,83 @@
 
 import SwiftUI
 
-struct TCNewSpecs: View {
+struct TCAddNewNetwork: View {
     var value: NetworkSpecs
     var body: some View {
-        VStack {
-            Localizable.newNetwork.text
-                .foregroundColor(Asset.text600.swiftUIColor)
-            VStack(alignment: .leading) {
-                HStack {
-                    Localizable.networkName.text
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                    Text(value.title)
-                        .foregroundColor(Asset.text600.swiftUIColor)
+        VStack(alignment: .leading, spacing: 0) {
+            Localizable.Transaction.AddNetwork.Label.header.text
+                .font(PrimaryFont.bodyL.font)
+                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                .padding(.leading, Spacing.medium)
+                .padding(.bottom, Spacing.extraSmall)
+            VStack {
+                VStack(alignment: .leading, spacing: Spacing.small) {
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.name.string, value.title)
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.basePrefix.string, String(value.base58prefix))
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.decimals.string, String(value.decimals))
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.unit.string, value.unit)
+                    VStack(alignment: .leading, spacing: Spacing.extraSmall) {
+                        Localizable.Transaction.AddNetwork.Label.genesisHash.text
+                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        Text(value.genesisHash.formattedAsString)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        Divider()
+                    }
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.crypto.string, value.encryption.rawValue)
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.spec.string, value.name)
+                    HStack {
+                        Text(Localizable.Transaction.AddNetwork.Label.logo.string)
+                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        Spacer()
+                        Text(value.logo)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .font(.web3)
+                    }
+                    Divider()
+                    rowWrapper(Localizable.Transaction.AddNetwork.Label.path.string, value.pathId, isLast: true)
                 }
-                HStack {
-                    Localizable.base58Prefix.text
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                    Text(String(value.base58prefix))
-                        .foregroundColor(Asset.text600.swiftUIColor)
-                }
-                HStack {
-                    Localizable.decimals.text
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                    Text(String(value.decimals))
-                        .foregroundColor(Asset.text600.swiftUIColor)
-                }
-                HStack {
-                    Localizable.unit.text
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                    Text(value.unit)
-                        .foregroundColor(Asset.text600.swiftUIColor)
-                }
-                HStack {
-                    Localizable.genesisHash.text
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                    Text(value.genesisHash.formattedAsString)
-                        .foregroundColor(Asset.text600.swiftUIColor)
-                }
-                HStack {
-                    Localizable.crypto.text
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                    Text(value.encryption.rawValue)
-                        .foregroundColor(Asset.text600.swiftUIColor)
-                }
-                HStack {
-                    Localizable.specName.text
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                    Text(value.name)
-                        .foregroundColor(Asset.text600.swiftUIColor)
-                }
-                HStack {
-                    Localizable.logo.text
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                    NetworkLogo(logo: value.logo)
-                }
-                HStack {
-                    Localizable.defaultPath.text
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                    Text(value.pathId)
-                        .foregroundColor(Asset.text600.swiftUIColor)
-                }
+                .padding(Spacing.medium)
             }
+            .background(Asset.fill6Solid.swiftUIColor)
+            .cornerRadius(CornerRadius.medium)
+        }
+    }
+
+    @ViewBuilder
+    private func rowWrapper(
+        _ key: String,
+        _ value: String,
+        isLast: Bool = false
+    ) -> some View {
+        HStack {
+            Text(key)
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            Spacer()
+            Text(value)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+        }
+        if !isLast {
+            Divider()
         }
     }
 }
 
-// struct TCNewSpecs_Previews: PreviewProvider {
-// static var previews: some View {
-// TCNewSpecs()
-// }
-// }
+struct TCAddNewNetwork_Previews: PreviewProvider {
+    static var previews: some View {
+        TCAddNewNetwork(
+            value: NetworkSpecs(
+                base58prefix: 231,
+                color: "black",
+                decimals: 4,
+                encryption: .sr25519,
+                genesisHash: H256(repeating: 3, count: 4),
+                logo: "polkadot",
+                name: "polkadot",
+                pathId: "1",
+                secondaryColor: "pink",
+                title: "Polka",
+                unit: "DOT"
+            )
+        )
+    }
+}

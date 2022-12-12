@@ -13,12 +13,13 @@ use sign_message::{
     sufficient_crypto_add_specs, sufficient_crypto_load_metadata, sufficient_crypto_load_types,
 };
 mod sign_transaction;
-use sign_transaction::create_signature_png;
 #[cfg(test)]
 mod tests;
 
 mod error;
 pub use error::{Error, Result};
+
+pub use sign_transaction::{create_signature, SignatureAndChecksum, SignatureType};
 
 pub fn handle_stub(checksum: u32, database_name: &str) -> Result<()> {
     Ok(TrDbColdStub::from_storage(database_name, checksum)?.apply(database_name)?)
@@ -30,16 +31,19 @@ pub fn handle_sign(
     pwd_entry: &str,
     user_comment: &str,
     database_name: &str,
+    idx: usize,
     encryption: Encryption,
 ) -> Result<Vec<u8>> {
-    create_signature_png(
+    create_signature(
         seed_phrase,
         pwd_entry,
         user_comment,
         database_name,
         checksum,
+        idx,
         encryption,
     )
+    .map(|s| s.to_string().as_bytes().to_vec())
 }
 
 ///Possible content to generate sufficient crypto for

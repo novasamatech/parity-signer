@@ -96,12 +96,12 @@ private fun PreviewKeySetsSelectScreen() {
 	val keys = mutableListOf(
 		KeySetModel(
 			"first seed name",
-			PreviewData.exampleIdenticon,
+			PreviewData.exampleIdenticonPng,
 			1.toUInt()
 		),
 		KeySetModel(
 			"second seed name",
-			PreviewData.exampleIdenticon,
+			PreviewData.exampleIdenticonPng,
 			3.toUInt()
 		),
 	)
@@ -109,7 +109,7 @@ private fun PreviewKeySetsSelectScreen() {
 		keys.add(
 			KeySetModel(
 				"second seed name",
-				PreviewData.exampleIdenticon,
+				PreviewData.exampleIdenticonPng,
 				3.toUInt()
 			)
 		)

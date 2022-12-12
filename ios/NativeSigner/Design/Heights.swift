@@ -13,6 +13,8 @@ enum Heights {
     static let actionButton: CGFloat = 56
     /// All variants of `Snackbar`, 56 pt
     static let snackbarHeight: CGFloat = 56
+    /// Max height variant of `Snackbar`, 72 pt
+    static let snackbarMaxHeight: CGFloat = 72
     /// All variants of `NavigationBarView`, 64 pt
     static let navigationBarHeight: CGFloat = 64
     /// All variants of `NavbarButton`, 40 pt
@@ -26,7 +28,18 @@ enum Heights {
     /// Height for `Identicon` when used in list collections
     static let identiconInCell: CGFloat = 36
     static let tabbarHeight: CGFloat = 49
+    static let textFieldHeight: CGFloat = 48
+    static let tabbarAssetHeight: CGFloat = 28
     static let errorModalIconContainer: CGFloat = 80
+    /// All variants of `ProgressSnackbar`, 96 pt
+    static let progressSnackbarHeight: CGFloat = 96
+    static let bottomBarHeight: CGFloat = 56
+    static let capsuleButton: CGFloat = 40
+    static let minTransactionCardHeight: CGFloat = 24
+    static let minTransactionSummaryItemHeight: CGFloat = 18
+    static let chevronLogElementWidth: CGFloat = 32
+    static let settingsEntryHeight: CGFloat = 56
+    static let verifierCertificateActionHeight: CGFloat = 48
 }
 
 enum Sizes {
@@ -36,4 +49,6 @@ enum Sizes {
     static let actionSheetIcon: CGFloat = 30
     /// Size for seed word position label
     static let seedWordPositionWidth: CGFloat = 28
+    /// Diameter for ">" button in circle, 28pt
+    static let chevronCircleButton: CGFloat = 28
 }

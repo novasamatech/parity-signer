@@ -55,15 +55,19 @@ private struct TabBarButton: View {
     var body: some View {
         Button(
             action: {
-                navigation.perform(navigation: .init(action: viewModel.action))
+                if let action = viewModel.action {
+                    navigation.perform(navigation: .init(action: action))
+                } else {
+                    navigation.shouldPresentQRScanner.toggle()
+                }
             },
             label: {
                 VStack {
                     viewModel.icon
-                        .frame(height: 28, alignment: .center)
-                        .padding(.bottom, -4)
+                        .frame(height: Heights.tabbarAssetHeight, alignment: .center)
+                        .padding(.bottom, -Spacing.extraExtraSmall)
                     viewModel.label
-                        .font(Fontstyle.captionS.base)
+                        .font(PrimaryFont.captionS.font)
                 }
                 .foregroundColor(
                     viewModel.isActive ?

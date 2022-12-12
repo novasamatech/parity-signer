@@ -48,7 +48,7 @@ final class PrivateKeyQRCodeService {
             ),
             derivedKeys: keys.set.map { DerivedKeyOverviewViewModel($0) },
             seedPhrase: SeedPhraseViewModel(seedPhrase: seedPhrase),
-            qrCode: QRCodeContainerViewModel(qrCode: exportQRCode.qr)
+            qrCode: exportQRCode.qr
         )
     }
 }

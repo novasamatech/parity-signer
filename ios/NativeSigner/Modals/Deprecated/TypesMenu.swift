@@ -17,7 +17,7 @@ struct TypesMenu: View {
             HeaderBar(line1: Localizable.manageTypes.key, line2: Localizable.selectAction.key).padding(.top, 10)
             if content.typesOnFile {
                 HStack {
-                    Identicon(identicon: content.typesIdPic ?? []) // this is potentially different image
+                    Identicon(identicon: content.typesIdPic?.svgPayload ?? []) // this is potentially different image
                 }
                 Text(content.typesHash ?? Localizable.none.string)
             } else {

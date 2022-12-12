@@ -43,11 +43,11 @@ struct NavigationBarViewModel: Equatable {
 
 struct NavigationBarActionModel {
     let leftBarMenuAction: (() -> Void)?
-    let rightBarMenuAction: () -> Void
+    let rightBarMenuAction: (() -> Void)?
 
     init(
         leftBarMenuAction: (() -> Void)? = nil,
-        rightBarMenuAction: @escaping () -> Void
+        rightBarMenuAction: (() -> Void)? = nil
     ) {
         self.leftBarMenuAction = leftBarMenuAction
         self.rightBarMenuAction = rightBarMenuAction
@@ -64,7 +64,7 @@ struct NavigationBarView: View {
 
     init(
         viewModel: NavigationBarViewModel,
-        actionModel: NavigationBarActionModel
+        actionModel: NavigationBarActionModel = .init()
     ) {
         self.viewModel = viewModel
         self.actionModel = actionModel
@@ -90,12 +90,12 @@ struct NavigationBarView: View {
             VStack {
                 if let title = viewModel.title {
                     Text(title)
-                        .font(Fontstyle.titleS.base)
+                        .font(PrimaryFont.titleS.font)
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).lineLimit(1)
                 }
                 if let subtitle = viewModel.subtitle {
                     Text(subtitle)
-                        .font(Fontstyle.captionM.base)
+                        .font(PrimaryFont.captionM.font)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                 }
             }
@@ -106,17 +106,16 @@ struct NavigationBarView: View {
                 Spacer().frame(width: Heights.navigationButton)
             case .more:
                 NavbarButton(
-                    action: actionModel.rightBarMenuAction,
+                    action: actionModel.rightBarMenuAction ?? {},
                     icon: Asset.moreDots.swiftUIImage
                 )
             case let .action(title):
-                NavbarActionButton(action: actionModel.rightBarMenuAction, title: title)
+                NavbarActionButton(action: actionModel.rightBarMenuAction ?? {}, title: title)
             }
         }
         .padding([.leading, .trailing], Spacing.extraExtraSmall)
         .frame(maxWidth: .infinity)
         .frame(height: Heights.navigationBarHeight)
-        .background(viewModel.backgroundColor)
     }
 
     private func leftButtonAction() -> () -> Void {

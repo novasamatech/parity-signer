@@ -23,9 +23,9 @@ struct AddressCardControls: View {
                 },
                 label: {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 6).foregroundColor(Asset.crypto100.swiftUIColor)
-                        Text("N+" + String(Int(count))).font(Fontstyle.body2.crypto)
-                            .foregroundColor(Asset.crypto400.swiftUIColor)
+                        RoundedRectangle(cornerRadius: 6).foregroundColor(Asset.accentPink300.swiftUIColor)
+                        Text("N+" + String(Int(count))).font(PrimaryFont.captionM.font)
+                            .foregroundColor(Asset.accentPink300.swiftUIColor)
                     }
                     .frame(width: rowHeight, height: rowHeight)
                     .gesture(
@@ -48,8 +48,8 @@ struct AddressCardControls: View {
                 },
                 label: {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 6).foregroundColor(Asset.signalDanger.swiftUIColor)
-                        Image(.trash, variant: .slash).foregroundColor(Asset.bgDanger.swiftUIColor)
+                        RoundedRectangle(cornerRadius: 6).foregroundColor(Asset.accentRed400.swiftUIColor)
+                        Image(.trash, variant: .slash).foregroundColor(Asset.accentRed300.swiftUIColor.opacity(0.3))
                     }
                     .frame(width: rowHeight, height: rowHeight)
                     .alert(isPresented: $delete, content: {

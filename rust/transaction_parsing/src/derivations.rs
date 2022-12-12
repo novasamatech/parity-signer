@@ -19,10 +19,10 @@ where
     let import_info = prepare_derivations_preview(export_info);
     let derivations_card = Card::Derivations(&import_info).card(&mut 0, 0);
     Ok(TransactionAction::Derivations {
-        content: TransactionCardSet {
+        content: Box::new(TransactionCardSet {
             importing_derivations: Some(vec![derivations_card]),
             ..Default::default()
-        },
+        }),
     })
 }
 

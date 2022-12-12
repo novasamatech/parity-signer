@@ -1,6 +1,8 @@
 //! List of all modals
 
 use definitions::{keyring::NetworkSpecsKey, navigation::MSCContent};
+use sp_runtime::MultiSignature;
+use transaction_signing::SignatureType;
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum Modal {
@@ -10,7 +12,7 @@ pub enum Modal {
     SeedMenu,
     NetworkSelector(NetworkSpecsKey),
     PasswordConfirm,
-    SignatureReady(Vec<u8>),
+    SignatureReady(Vec<(MultiSignature, SignatureType)>),
     EnterPassword,
     LogComment,
     LogRight,

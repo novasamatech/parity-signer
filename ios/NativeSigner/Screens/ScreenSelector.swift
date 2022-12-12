@@ -15,22 +15,15 @@ struct ScreenSelector: View {
     let screenData: ScreenData
     let navigationRequest: NavigationRequest
     let getSeed: (String) -> String
-    let doJailbreak: () -> Void
     let pathCheck: (String, String, String) -> DerivationCheck
     let createAddress: (String, String) -> Void
     let checkSeedCollision: (String) -> Bool
     let restoreSeed: (String, String, Bool) -> Void
-    let sign: (String, String) -> Void
-    let doWipe: () -> Void
     let alertShow: () -> Void
     let increment: (String, String) -> Void
 
     var body: some View {
         switch screenData {
-        case .scan:
-            TransactionScreen(
-                navigationRequest: navigationRequest
-            )
         case let .keys(value):
             KeyDetailsView(
                 dataModel: KeyDetailsDataModel(value),
@@ -41,25 +34,12 @@ struct ScreenSelector: View {
                 forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
                 resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
             )
-        case let .settings(value):
-            SettingsScreen(
-                content: value,
-                doWipe: doWipe,
-                navigationRequest: navigationRequest
-            )
+        case .settings:
+            SettingsView(viewModel: .init())
         case let .log(value):
-            HistoryScreen(
-                content: value,
-                navigationRequest: navigationRequest
-            )
+            LogsListView(viewModel: .init(logs: value))
         case let .logDetails(value):
             EventDetails(content: value)
-        case let .transaction(value):
-            TransactionPreview(
-                content: value,
-                sign: sign,
-                navigationRequest: navigationRequest
-            )
         case let .seedSelector(value):
             KeySetList(
                 viewModel: .init(listViewModel: KeySetListViewModelBuilder().build(for: value))
@@ -98,10 +78,7 @@ struct ScreenSelector: View {
                 navigationRequest: navigationRequest
             )
         case let .vVerifier(value):
-            VerifierScreen(
-                content: value,
-                doJailbreak: doJailbreak
-            )
+            VerfierCertificateView(viewModel: .init(content: value))
         case let .manageNetworks(value):
             ManageNetworks(
                 content: value,
@@ -130,6 +107,11 @@ struct ScreenSelector: View {
                 content: value,
                 navigationRequest: navigationRequest
             )
+        // Screens handled outside of Rust navigation
+        case .scan:
+            EmptyView()
+        case .transaction:
+            EmptyView()
         }
     }
 }

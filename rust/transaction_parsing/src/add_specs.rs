@@ -79,11 +79,11 @@ where
                 let warning_card = Card::Warning(Warning::NotVerified).card(&mut index, 0);
                 let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                 Ok(TransactionAction::Stub {
-                    s: TransactionCardSet {
+                    s: Box::new(TransactionCardSet {
                         warning: Some(vec![warning_card]),
                         new_specs: Some(vec![specs_card]),
                         ..Default::default()
-                    },
+                    }),
                     u: checksum,
                     stub: StubNav::AddSpecs {
                         n: network_specs_key,
@@ -116,12 +116,12 @@ where
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                         let checksum = stub.store_and_get_checksum(db_path)?;
                         Ok(TransactionAction::Stub {
-                            s: TransactionCardSet {
+                            s: Box::new(TransactionCardSet {
                                 verifier: Some(vec![verifier_card]),
                                 warning: Some(vec![warning_card]),
                                 new_specs: Some(vec![specs_card]),
                                 ..Default::default()
-                            },
+                            }),
                             u: checksum,
                             stub: StubNav::AddSpecs {
                                 n: network_specs_key,
@@ -144,11 +144,11 @@ where
                             let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                             let checksum = stub.store_and_get_checksum(&db_path)?;
                             Ok(TransactionAction::Stub {
-                                s: TransactionCardSet {
+                                s: Box::new(TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
                                     new_specs: Some(vec![specs_card]),
                                     ..Default::default()
-                                },
+                                }),
                                 u: checksum,
                                 stub: StubNav::AddSpecs {
                                     n: network_specs_key,
@@ -173,11 +173,11 @@ where
                             let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                             let checksum = stub.store_and_get_checksum(&db_path)?;
                             Ok(TransactionAction::Stub {
-                                s: TransactionCardSet {
+                                s: Box::new(TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
                                     new_specs: Some(vec![specs_card]),
                                     ..Default::default()
-                                },
+                                }),
                                 u: checksum,
                                 stub: StubNav::AddSpecs {
                                     n: network_specs_key,
@@ -207,11 +207,11 @@ where
                         let checksum = stub.store_and_get_checksum(&db_path)?;
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                         Ok(TransactionAction::Stub {
-                            s: TransactionCardSet {
+                            s: Box::new(TransactionCardSet {
                                 warning: Some(vec![warning_card]),
                                 new_specs: Some(vec![specs_card]),
                                 ..Default::default()
-                            },
+                            }),
                             u: checksum,
                             stub: StubNav::AddSpecs {
                                 n: network_specs_key,
@@ -263,24 +263,24 @@ where
                         let checksum = stub.store_and_get_checksum(&db_path)?;
                         match possible_warning {
                             None => Ok(TransactionAction::Stub {
-                                s: TransactionCardSet {
+                                s: Box::new(TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
                                     warning: Some(vec![warning_card_1]),
                                     new_specs: Some(vec![specs_card]),
                                     ..Default::default()
-                                },
+                                }),
                                 u: checksum,
                                 stub: StubNav::AddSpecs {
                                     n: network_specs_key,
                                 },
                             }),
                             Some(warning_card_2) => Ok(TransactionAction::Stub {
-                                s: TransactionCardSet {
+                                s: Box::new(TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
                                     warning: Some(vec![warning_card_1, warning_card_2]),
                                     new_specs: Some(vec![specs_card]),
                                     ..Default::default()
-                                },
+                                }),
                                 u: checksum,
                                 stub: StubNav::AddSpecs {
                                     n: network_specs_key,
@@ -327,19 +327,19 @@ where
                         let checksum = stub.store_and_get_checksum(&db_path)?;
                         match possible_warning {
                             None => Ok(TransactionAction::Stub {
-                                s: TransactionCardSet {
+                                s: Box::new(TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
                                     warning: Some(vec![warning_card_1, warning_card_2]),
                                     new_specs: Some(vec![specs_card]),
                                     ..Default::default()
-                                },
+                                }),
                                 u: checksum,
                                 stub: StubNav::AddSpecs {
                                     n: network_specs_key,
                                 },
                             }),
                             Some(warning_card_3) => Ok(TransactionAction::Stub {
-                                s: TransactionCardSet {
+                                s: Box::new(TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
                                     warning: Some(vec![
                                         warning_card_1,
@@ -348,7 +348,7 @@ where
                                     ]),
                                     new_specs: Some(vec![specs_card]),
                                     ..Default::default()
-                                },
+                                }),
                                 u: checksum,
                                 stub: StubNav::AddSpecs {
                                     n: network_specs_key,
@@ -393,24 +393,24 @@ where
                         let checksum = stub.store_and_get_checksum(&db_path)?;
                         match possible_warning {
                             None => Ok(TransactionAction::Stub {
-                                s: TransactionCardSet {
+                                s: Box::new(TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
                                     warning: Some(vec![warning_card_1]),
                                     new_specs: Some(vec![specs_card]),
                                     ..Default::default()
-                                },
+                                }),
                                 u: checksum,
                                 stub: StubNav::AddSpecs {
                                     n: network_specs_key,
                                 },
                             }),
                             Some(warning_card_2) => Ok(TransactionAction::Stub {
-                                s: TransactionCardSet {
+                                s: Box::new(TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
                                     warning: Some(vec![warning_card_1, warning_card_2]),
                                     new_specs: Some(vec![specs_card]),
                                     ..Default::default()
-                                },
+                                }),
                                 u: checksum,
                                 stub: StubNav::AddSpecs {
                                     n: network_specs_key,
@@ -466,24 +466,24 @@ where
                         let checksum = stub.store_and_get_checksum(&db_path)?;
                         match possible_warning {
                             None => Ok(TransactionAction::Stub {
-                                s: TransactionCardSet {
+                                s: Box::new(TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
                                     warning: Some(vec![warning_card_1]),
                                     new_specs: Some(vec![specs_card]),
                                     ..Default::default()
-                                },
+                                }),
                                 u: checksum,
                                 stub: StubNav::AddSpecs {
                                     n: network_specs_key,
                                 },
                             }),
                             Some(warning_card_2) => Ok(TransactionAction::Stub {
-                                s: TransactionCardSet {
+                                s: Box::new(TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
                                     warning: Some(vec![warning_card_1, warning_card_2]),
                                     new_specs: Some(vec![specs_card]),
                                     ..Default::default()
-                                },
+                                }),
                                 u: checksum,
                                 stub: StubNav::AddSpecs {
                                     n: network_specs_key,
@@ -501,11 +501,11 @@ where
                             let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                             let checksum = stub.store_and_get_checksum(&db_path)?;
                             Ok(TransactionAction::Stub {
-                                s: TransactionCardSet {
+                                s: Box::new(TransactionCardSet {
                                     verifier: Some(vec![verifier_card]),
                                     new_specs: Some(vec![specs_card]),
                                     ..Default::default()
-                                },
+                                }),
                                 u: checksum,
                                 stub: StubNav::AddSpecs {
                                     n: network_specs_key,
@@ -544,11 +544,11 @@ where
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                         let checksum = stub.store_and_get_checksum(&db_path)?;
                         Ok(TransactionAction::Stub {
-                            s: TransactionCardSet {
+                            s: Box::new(TransactionCardSet {
                                 warning: Some(vec![warning_card]),
                                 new_specs: Some(vec![specs_card]),
                                 ..Default::default()
-                            },
+                            }),
                             u: checksum,
                             stub: StubNav::AddSpecs {
                                 n: network_specs_key,
@@ -591,24 +591,24 @@ where
                     let checksum = stub.store_and_get_checksum(&db_path)?;
                     match possible_warning {
                         None => Ok(TransactionAction::Stub {
-                            s: TransactionCardSet {
+                            s: Box::new(TransactionCardSet {
                                 verifier: Some(vec![verifier_card]),
                                 warning: Some(vec![warning_card_1]),
                                 new_specs: Some(vec![specs_card]),
                                 ..Default::default()
-                            },
+                            }),
                             u: checksum,
                             stub: StubNav::AddSpecs {
                                 n: network_specs_key,
                             },
                         }),
                         Some(warning_card_2) => Ok(TransactionAction::Stub {
-                            s: TransactionCardSet {
+                            s: Box::new(TransactionCardSet {
                                 verifier: Some(vec![verifier_card]),
                                 warning: Some(vec![warning_card_1, warning_card_2]),
                                 new_specs: Some(vec![specs_card]),
                                 ..Default::default()
-                            },
+                            }),
                             u: checksum,
                             stub: StubNav::AddSpecs {
                                 n: network_specs_key,
@@ -633,11 +633,11 @@ where
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                         let checksum = stub.store_and_get_checksum(&db_path)?;
                         Ok(TransactionAction::Stub {
-                            s: TransactionCardSet {
+                            s: Box::new(TransactionCardSet {
                                 verifier: Some(vec![verifier_card]),
                                 new_specs: Some(vec![specs_card]),
                                 ..Default::default()
-                            },
+                            }),
                             u: checksum,
                             stub: StubNav::AddSpecs {
                                 n: network_specs_key,

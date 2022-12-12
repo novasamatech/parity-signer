@@ -1,7 +1,9 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use definitions::navigation::TransactionCardSet;
+use db_handling::identities::TransactionBulk;
+use definitions::{helpers::unhex, navigation::TransactionCardSet};
+use parity_scale_codec::Decode;
 use std::path::Path;
 
 pub use definitions::navigation::{StubNav, TransactionAction};
@@ -57,13 +59,42 @@ where
     }
 
     match &data_hex[4..6] {
-        "00" | "02" => parse_transaction(data_hex, db_path),
+        "00" | "02" => parse_transaction(data_hex, db_path, false),
         "03" => process_message(data_hex, db_path),
+        "04" => parse_transaction_bulk(data_hex, db_path),
         "80" => load_metadata(data_hex, db_path),
         "81" => load_types(data_hex, db_path),
         "c1" => add_specs(data_hex, db_path),
         "de" => process_derivations(data_hex, db_path),
         _ => Err(Error::PayloadNotSupported(data_hex[4..6].to_string())),
+    }
+}
+fn parse_transaction_bulk<P: AsRef<Path>>(payload: &str, dbname: P) -> Result<TransactionAction> {
+    let decoded_data = unhex(payload)?;
+
+    let bulk = TransactionBulk::decode(&mut &decoded_data[3..])?;
+
+    match bulk {
+        TransactionBulk::V1(b) => {
+            let mut actions = vec![];
+
+            let mut checksum = 0;
+            for t in &b.encoded_transactions {
+                let encoded = hex::encode(t);
+                let encoded = "53".to_string() + &encoded;
+                let action = parse_transaction(&encoded, &dbname, true)?;
+                if let TransactionAction::Sign {
+                    actions: a,
+                    checksum: c,
+                } = action
+                {
+                    checksum = c;
+                    actions.push(a[0].clone());
+                }
+            }
+
+            Ok(TransactionAction::Sign { actions, checksum })
+        }
     }
 }
 
@@ -74,10 +105,10 @@ where
     match handle_scanner_input(payload, dbname) {
         Ok(out) => out,
         Err(e) => TransactionAction::Read {
-            r: TransactionCardSet {
+            r: Box::new(TransactionCardSet {
                 error: Some(vec![Card::Error(e).card(&mut 0, 0)]),
                 ..Default::default()
-            },
+            }),
         },
     }
 }

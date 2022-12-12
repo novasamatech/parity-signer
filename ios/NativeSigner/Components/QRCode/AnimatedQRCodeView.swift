@@ -5,8 +5,8 @@
 //  Created by Krzysztof Rodak on 18/10/2022.
 //
 
+import QRCode
 import SwiftUI
-
 struct AnimatedQRCodeViewModel: Equatable {
     var qrCodes: [[UInt8]]
 }
@@ -19,6 +19,7 @@ struct AnimatedQRCodeView: View {
         static let compactDeviceWidth: CGFloat = 320
         static let qrCodeWidthForSmallDevices: CGFloat = 216
         static let qrCodeWidthForStandardDevices: CGFloat = 232
+        static let qrCodeWidthForLargerDevices: CGFloat = 320
     }
 
     @Binding var viewModel: AnimatedQRCodeViewModel
@@ -32,13 +33,16 @@ struct AnimatedQRCodeView: View {
 
     init(
         viewModel: Binding<AnimatedQRCodeViewModel>,
-        qrCodesGenerator: QRCodeImageGenerator = QRCodeImageGenerator()
+        qrCodesGenerator: QRCodeImageGenerator = QRCodeImageGenerator(),
+        shouldDecode _: Bool = true
     ) {
         _viewModel = viewModel
         self.qrCodesGenerator = qrCodesGenerator
-        let images = viewModel.qrCodes.wrappedValue.map { qrCodesGenerator.generateQRCode(from: $0) }
-        imagesIterator = images.makeIterator()
-        self.images = images
+        let images = viewModel.qrCodes.wrappedValue.compactMap {
+            qrCodesGenerator.generateQRCode(from: $0)
+        }
+        _imagesIterator = State(wrappedValue: images.makeIterator())
+        _images = State(wrappedValue: images)
     }
 
     var body: some View {
@@ -50,7 +54,7 @@ struct AnimatedQRCodeView: View {
                 .frame(
                     minWidth: Constants.qrCodeWidthForSmallDevices,
                     idealWidth: Constants.qrCodeWidthForStandardDevices,
-                    maxWidth: Constants.qrCodeWidthForStandardDevices,
+                    maxWidth: Constants.qrCodeWidthForLargerDevices,
                     alignment: .center
                 )
                 .onAppear {
@@ -74,13 +78,15 @@ struct AnimatedQRCodeView: View {
                     start()
                 }
         }
-        .frame(maxWidth: .infinity, alignment: .center)
         .padding(
-            UIScreen.main.bounds.width == Constants.compactDeviceWidth ? Spacing.large : Spacing
-                .extraExtraLarge
+            UIScreen.main.bounds.width == Constants.compactDeviceWidth ? Spacing.large : Spacing.x3Large
         )
-        .background(.white)
-        .cornerRadius(CornerRadius.medium)
+        .background(
+            RoundedRectangle(cornerRadius: CornerRadius.medium)
+                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
+                .background(Asset.backgroundSystemLightOnly.swiftUIColor)
+                .cornerRadius(CornerRadius.medium)
+        )
     }
 
     private func stop() {

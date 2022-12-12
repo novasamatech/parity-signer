@@ -30,21 +30,6 @@ struct ModalSelector: View {
                 content: value,
                 createAddress: createAddress
             )
-        case let .signatureReady(value):
-            SignatureReady(
-                content: value,
-                navigationRequest: navigationRequest
-            )
-        case let .enterPassword(value):
-            EnterPassword(
-                content: value,
-                navigationRequest: navigationRequest
-            )
-        case let .logRight(value):
-            LogMenu(
-                content: value,
-                navigationRequest: navigationRequest
-            )
         case .networkDetailsMenu:
             NetworkDetailsMenu(
                 navigationRequest: navigationRequest
@@ -78,15 +63,15 @@ struct ModalSelector: View {
                 navigationRequest: navigationRequest
             )
         // Handled in native navigation
-        case .backup:
-            EmptyView()
-        case .keyDetailsAction:
-            EmptyView()
-        case .newSeedMenu:
-            EmptyView()
-        case .seedMenu:
-            EmptyView()
-        case nil:
+        case
+            .enterPassword,
+            .backup,
+            .keyDetailsAction,
+            .newSeedMenu,
+            .seedMenu,
+            .signatureReady,
+            .logRight,
+            nil:
             EmptyView()
         }
     }

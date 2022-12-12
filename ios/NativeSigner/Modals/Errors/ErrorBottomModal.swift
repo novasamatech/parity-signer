@@ -43,24 +43,37 @@ struct ErrorBottomModal: View {
                         .frame(height: Heights.errorModalIconContainer)
                     }
                     Text(viewModel.title)
-                        .font(Fontstyle.titleM.base)
+                        .font(PrimaryFont.titleM.font)
                     Text(viewModel.content)
-                        .font(Fontstyle.bodyM.base)
+                        .font(PrimaryFont.bodyM.font)
                         .lineSpacing(Spacing.extraExtraSmall)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                     if let detailsMessage = viewModel.details {
                         Text(detailsMessage)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            .font(Fontstyle.bodyL.base)
+                            .font(PrimaryFont.bodyL.font)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(Spacing.medium)
-                            .background(
-                                RoundedRectangle(cornerRadius: CornerRadius.medium)
-                                    .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                                    .background(Asset.fill6.swiftUIColor)
-                                    .cornerRadius(CornerRadius.medium)
-                            )
+                            .strokeContainerBackground()
                             .padding(.top, Spacing.extraSmall)
+                    }
+                    if viewModel.steps.count > 1 {
+                        VStack(alignment: .leading, spacing: Spacing.small) {
+                            ForEach(viewModel.steps, id: \.step) { step in
+                                HStack(alignment: .top, spacing: 0) {
+                                    Text(step.step)
+                                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                        .frame(width: Spacing.large, alignment: .leading)
+                                    Text(step.content)
+                                        .lineSpacing(Spacing.extraExtraSmall)
+                                }
+                            }
+                        }
+                        .font(PrimaryFont.bodyL.font)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(Spacing.medium)
+                        .strokeContainerBackground()
+                        .padding(.top, Spacing.extraSmall)
                     }
                     VStack {
                         if let primaryAction = viewModel.primaryAction {
@@ -105,6 +118,14 @@ struct ErrorBottomModal: View {
 struct ErrorBottomModal_Previews: PreviewProvider {
     static var previews: some View {
         Group {
+            ErrorBottomModal(
+                viewModel: .signingUnknownNetwork("Westend"),
+                isShowingBottomAlert: Binding<Bool>.constant(true)
+            )
+            ErrorBottomModal(
+                viewModel: .signingInvalidNetworkVersion(),
+                isShowingBottomAlert: Binding<Bool>.constant(true)
+            )
             ErrorBottomModal(
                 viewModel: .connectivityOn(),
                 isShowingBottomAlert: Binding<Bool>.constant(true)

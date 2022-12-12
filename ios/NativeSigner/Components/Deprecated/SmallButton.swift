@@ -13,7 +13,10 @@ struct SmallButton: View {
         Text(text)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .overlay(RoundedRectangle(cornerRadius: 8.0).strokeBorder().foregroundColor(Asset.action400.swiftUIColor))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8.0).strokeBorder()
+                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+            )
     }
 }
 

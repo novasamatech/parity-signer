@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct NetworkCard: View {
-    @EnvironmentObject private var data: SignerDataModel
     let title: String
     let logo: String
     var fancy: Bool = false
@@ -16,24 +15,28 @@ struct NetworkCard: View {
         ZStack {
             if fancy {
                 RoundedRectangle(cornerRadius: 4)
-                    .foregroundColor(Asset.bg200.swiftUIColor)
+                    .foregroundColor(Asset.backgroundSecondary.swiftUIColor)
                     .frame(height: 47)
             }
             HStack {
                 NetworkLogo(logo: logo)
-                Text(title).font(Fontstyle.header3.base)
+                Text(title).font(PrimaryFont.labelM.font)
                 if fancy { Spacer() }
             }
-            .foregroundColor(Asset.text600.swiftUIColor)
+            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
             .frame(height: 36)
             .padding(.horizontal)
         }
     }
 }
 
-// struct NetworkCard_Previews: PreviewProvider {
-// static var network = Network.networkData[0]
-// static var previews: some View {
-// NetworkCard(network: network).previewLayout(.sizeThatFits)
-// }
-// }
+struct NetworkCard_Previews: PreviewProvider {
+    static var previews: some View {
+        NetworkCard(
+            title: "Polkadot",
+            logo: "polkadot",
+            fancy: true
+        )
+        .previewLayout(.sizeThatFits)
+    }
+}

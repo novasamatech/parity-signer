@@ -1,27 +1,31 @@
 package io.parity.signer.models
 
-import android.content.Context
 import android.widget.Toast
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import io.parity.signer.R
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlin.coroutines.suspendCoroutine
 
 
-class Authentication(val setAuth: (Boolean) -> Unit) {
+class Authentication {
 
 	private lateinit var biometricPrompt: BiometricPrompt
-	lateinit var context: Context
+
+	private val _auth = MutableStateFlow<Boolean>(false)
+	val auth: StateFlow<Boolean> = _auth
 
 	fun authenticate(activity: FragmentActivity, onSuccess: () -> Unit) {
 		if (FeatureFlags.isEnabled(FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT)) {
-			setAuth(true)
+			_auth.value = true
 			onSuccess()
 			return
 		}
 
+		val context = activity.baseContext
 		val biometricManager = BiometricManager.from(context)
 
 		val promptInfo =
@@ -54,14 +58,14 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 								Toast.LENGTH_SHORT
 							)
 								.show()
-							setAuth(false)
+							_auth.value = false
 						}
 
 						override fun onAuthenticationSucceeded(
 							result: BiometricPrompt.AuthenticationResult
 						) {
 							super.onAuthenticationSucceeded(result)
-							setAuth(true)
+							_auth.value = true
 							onSuccess()
 						}
 
@@ -72,7 +76,7 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 								Toast.LENGTH_SHORT
 							)
 								.show()
-							setAuth(false)
+							_auth.value = false
 						}
 					})
 
@@ -127,6 +131,7 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 
 	suspend fun authenticate(activity: FragmentActivity): AuthResult =
 		suspendCoroutine { continuation ->
+			val context = activity.baseContext
 			val biometricManager = BiometricManager.from(context)
 
 			val promptInfo =
@@ -158,7 +163,7 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 									Toast.LENGTH_SHORT
 								).show()
 
-								setAuth(false)
+								_auth.value = false
 								continuation.resumeWith(Result.success(AuthResult.AuthError))
 							}
 
@@ -166,7 +171,7 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 								result: BiometricPrompt.AuthenticationResult
 							) {
 								super.onAuthenticationSucceeded(result)
-								setAuth(true)
+								_auth.value = true
 								continuation.resumeWith(Result.success(AuthResult.AuthSuccess))
 							}
 
@@ -177,7 +182,7 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 									Toast.LENGTH_SHORT
 								)
 									.show()
-								setAuth(false)
+								_auth.value = false
 								continuation.resumeWith(Result.success(AuthResult.AuthFailed))
 							}
 						})
@@ -229,14 +234,13 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 				}
 			}
 		}
-
-	sealed class AuthResult {
-		object AuthSuccess : AuthResult()
-		object AuthError : AuthResult()
-		object AuthFailed : AuthResult()
-		object AuthUnavailable : AuthResult()
-	}
 }
 
+sealed class AuthResult {
+	object AuthSuccess : AuthResult()
+	object AuthError : AuthResult()
+	object AuthFailed : AuthResult()
+	object AuthUnavailable : AuthResult()
+}
 
 

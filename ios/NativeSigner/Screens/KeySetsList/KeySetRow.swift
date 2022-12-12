@@ -26,12 +26,12 @@ struct KeySetRow: View {
                 VStack(alignment: .leading) {
                     Text(viewModel.keyName)
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(Fontstyle.titleS.base)
+                        .font(PrimaryFont.titleS.font)
                     if let derivedKeys = viewModel.derivedKeys {
                         Spacer().frame(height: 2)
                         Text(derivedKeys)
                             .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                            .font(Fontstyle.bodyM.base)
+                            .font(PrimaryFont.bodyM.font)
                     }
                 }
                 Spacer()

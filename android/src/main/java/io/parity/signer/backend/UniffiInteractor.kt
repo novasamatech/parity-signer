@@ -66,7 +66,7 @@ class UniffiInteractor(private val dbName: String) {
 			try {
 				val images = binaryData.map {
 					async(Dispatchers.IO) {
-						encodeToQr(it)
+						encodeToQr(it, false)
 					}
 				}.map { it.await() }
 				UniffiResult.Success(images)

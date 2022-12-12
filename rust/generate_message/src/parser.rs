@@ -292,6 +292,28 @@ pub enum Command {
         #[arg(long, value_name = "NUMBER OF TEST KEYS")]
         keys_num: usize,
     },
+
+    /// Produce a bulk tx signing QR
+    BulkTransactionTestPayload {
+        #[arg(long, value_name = "FILE PATH")]
+        dst_file: PathBuf,
+
+        /// Number of transactions in a bulk.
+        #[arg(long, value_name = "TX COUNT")]
+        tx_count: usize,
+
+        /// Size of a chunk in a multiframe RaptorQ encoding.
+        #[arg(long, value_name = "CHUNK SIZE")]
+        chunk_size: u16,
+
+        /// AccountId of transaction in hex form.
+        #[arg(long, value_name = "ADDRESS")]
+        from: String,
+
+        /// Qr or File
+        #[arg(long, value_name = "OUTPUT FORMAT")]
+        output_format: Goal,
+    },
 }
 
 /// Display data commands.
