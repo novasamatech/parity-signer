@@ -22,7 +22,6 @@ import io.parity.signer.uniffi.MMetadataRecord
 
 @Composable
 fun TCMeta(meta: TransactionMetadataModel) {
-	//todo dmitry redesign and below
 	Column {
 		Text(
 			stringResource(R.string.transaction_metadata_header),
@@ -34,33 +33,40 @@ fun TCMeta(meta: TransactionMetadataModel) {
 		)
 		Column(
 			verticalArrangement = Arrangement.spacedBy(8.dp),
-			modifier = Modifier.background(MaterialTheme.colors.fill6,
-				RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius)))
+			modifier = Modifier
+				.background(
+					MaterialTheme.colors.fill6,
+					RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
+				)
 				.padding(16.dp)
 		) {
 			Row() {
 				Text(
 					text = stringResource(R.string.transaction_metadata_label),
-					style = SignerTypeface.BodyM,
+					style = SignerTypeface.BodyL,
 					color = MaterialTheme.colors.textSecondary,
 				)
 				Spacer(modifier = Modifier.weight(1f))
 				Text(
 					meta.specname,
-					style = SignerTypeface.BodyM,
+					style = SignerTypeface.BodyL,
 					color = MaterialTheme.colors.primary,
 				)
 				Spacer(modifier = Modifier.padding(end = 8.dp))
 				Text(
 					meta.specsVersion,
-					style = SignerTypeface.BodyM,
+					style = SignerTypeface.BodyL,
 					color = MaterialTheme.colors.primary,
 				)
 			}
+//			TCNameValueElement( //todo dmitry as in other screens
+//				name = stringResource(R.string.transaction_metadata_label),
+//				value = "${meta.specname} ${meta.specsVersion}"
+//			)
 			SignerDivider()
 			Text(
 				meta.metaHash,
-				style = SignerTypeface.BodyM,
+				style = SignerTypeface.BodyL,
 				color = MaterialTheme.colors.primary,
 			)
 		}
