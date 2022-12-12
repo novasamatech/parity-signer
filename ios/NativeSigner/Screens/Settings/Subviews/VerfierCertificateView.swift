@@ -21,11 +21,6 @@ struct VerfierCertificateView: View {
                     rightButton: .empty
                 )
             )
-            Localizable.Transaction.Verifier.Label.header.text
-                .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                .padding(.leading, Spacing.large)
-                .padding(.bottom, Spacing.extraExtraSmall)
             VStack {
                 VStack(spacing: Spacing.small) {
                     VStack(alignment: .leading, spacing: Spacing.extraSmall) {

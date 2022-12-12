@@ -23,7 +23,7 @@ struct SettingsView: View {
                 )
             )
             ScrollView {
-                VStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 0) {
                     ForEach(viewModel.renderable.items, id: \.id) { renderable in
                         SettingsRowView(renderable: renderable)
                             .contentShape(Rectangle())
@@ -31,6 +31,12 @@ struct SettingsView: View {
                                 viewModel.onTapAction(renderable.item)
                             }
                     }
+                    Text(Localizable.Settings.Label.version(ApplicationInformation.cfBundleShortVersionString))
+                        .font(PrimaryFont.captionM.font)
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .padding(.top, Spacing.medium)
+                        .padding(.horizontal, Spacing.large)
+                        .padding(.bottom, Spacing.extraSmall)
                 }
             }
         }
@@ -78,10 +84,6 @@ extension SettingsView {
                 navigation.perform(navigation: .init(action: action))
             } else {
                 switch item {
-                case .leaveFeedback:
-                    ()
-                case .appVersion:
-                    ()
                 case .wipe:
                     onTapWipe()
                 default:
