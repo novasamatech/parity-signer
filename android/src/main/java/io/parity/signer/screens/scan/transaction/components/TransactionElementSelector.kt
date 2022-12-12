@@ -43,7 +43,7 @@ fun TransactionElementSelector(card: TransactionCard) {
 
 			// Sections
 			is Card.NewSpecsCard -> TCNewSpecs(specs = txCard.f) // User when adding new network, redesigned
-			is Card.MetaCard -> TCMeta(meta = txCard.f) // Used when scanning metadata update, redesigned
+			is Card.MetaCard -> TCMeta(meta = txCard.f.toTransactionMetadataModel()) // Used when scanning metadata update, redesigned
 			is Card.VerifierCard -> TCVerifier(txCard.f) // Used in metadata update, adding new network, redesigned
 			is Card.DerivationsCard -> TCDerivations(payload = txCard.f)  // Not present on new designs
 			is Card.TxSpecPlainCard -> TCTXSpecPlain(txCard.f) // Unknown network information for given transaction, not present on new designs

@@ -167,6 +167,8 @@
 	<string name="transaction_field_import_derivations">Importing derivations</string>
 	<string name="transaction_field_error">Error!</string>
 	<string name="transaction_field_path">Path %1$s</string>
+    <string name="transaction_metadata_header">Add metadata</string>
+	<string name="transaction_metadata_label">Metadata</string>
 
 
 </resources>
