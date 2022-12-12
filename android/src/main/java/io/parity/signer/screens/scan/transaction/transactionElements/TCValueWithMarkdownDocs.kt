@@ -122,6 +122,7 @@ fun String.toRichTextStr() = RichTextString(this)
 private fun PreviewTCCall() {
 	SignerNewTheme {
 		Column {
+			//todo dmitry test below - our current markdown lib doesn't support rust markdown labels
 			TCValueWithToogleDocs(
 				TCWithMarkdownDocsModel.createStub().copy(isMethod = true)
 			)
