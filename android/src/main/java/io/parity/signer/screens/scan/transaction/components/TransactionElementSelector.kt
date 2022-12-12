@@ -3,7 +3,6 @@ package io.parity.signer.screens.scan.transaction.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -12,7 +11,6 @@ import io.parity.signer.R
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components.base.MarkdownText
-import io.parity.signer.models.decodeHex
 import io.parity.signer.screens.scan.transaction.transactionElements.*
 import io.parity.signer.uniffi.Card
 import io.parity.signer.uniffi.TransactionCard
@@ -42,7 +40,7 @@ fun TransactionElementSelector(card: TransactionCard) {
 			is Card.FieldNumberCard -> TCValueWithMarkdownTrio(value = txCard.f.toTCFieldNameModel())
 
 			// Sections
-			is Card.NewSpecsCard -> TCNewSpecs(specs = txCard.f) // User when adding new network, redesigned
+			is Card.NewSpecsCard -> TCAddNetwork(specs = txCard.f) // User when adding new network, redesigned
 			is Card.MetaCard -> TCMeta(meta = txCard.f.toTransactionMetadataModel()) // Used when scanning metadata update, redesigned
 			is Card.VerifierCard -> TCVerifier(txCard.f) // Used in metadata update, adding new network, redesigned
 			is Card.DerivationsCard -> TCDerivations(payload = txCard.f)  // Not present on new designs

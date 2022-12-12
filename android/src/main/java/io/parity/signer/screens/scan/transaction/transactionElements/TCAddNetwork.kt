@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import io.parity.signer.uniffi.NetworkSpecs
 
 @Composable
-fun TCNewSpecs(specs: NetworkSpecs) {
+fun TCAddNetwork(specs: NetworkSpecs) {
 	Column {
 		Text("NEW NETWORK")
 		TCNameValueElement(name = "Network name:", value = specs.title)

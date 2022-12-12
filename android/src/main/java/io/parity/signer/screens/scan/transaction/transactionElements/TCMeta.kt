@@ -50,6 +50,7 @@ fun TCMeta(meta: TransactionMetadataModel) {
 					style = SignerTypeface.BodyM,
 					color = MaterialTheme.colors.primary,
 				)
+				Spacer(modifier = Modifier.padding(end = 8.dp))
 				Text(
 					meta.specsVersion,
 					style = SignerTypeface.BodyM,
