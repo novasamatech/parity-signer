@@ -40,34 +40,13 @@ fun TCMeta(meta: TransactionMetadataModel) {
 				)
 				.padding(16.dp)
 		) {
-			Row() {
-				Text(
-					text = stringResource(R.string.transaction_metadata_label),
-					style = SignerTypeface.BodyL,
-					color = MaterialTheme.colors.textSecondary,
-				)
-				Spacer(modifier = Modifier.weight(1f))
-				Text(
-					meta.specname,
-					style = SignerTypeface.BodyL,
-					color = MaterialTheme.colors.primary,
-				)
-				Spacer(modifier = Modifier.padding(end = 8.dp))
-				Text(
-					meta.specsVersion,
-					style = SignerTypeface.BodyL,
-					color = MaterialTheme.colors.primary,
-				)
-			}
-//			TCNameValueElement( //todo dmitry as in other screens
-//				name = stringResource(R.string.transaction_metadata_label),
-//				value = "${meta.specname} ${meta.specsVersion}"
-//			)
+			TCNameValueOppositeElement(
+				name = stringResource(R.string.transaction_metadata_label),
+				value = "${meta.specname} ${meta.specsVersion}"
+			)
 			SignerDivider()
-			Text(
-				meta.metaHash,
-				style = SignerTypeface.BodyL,
-				color = MaterialTheme.colors.primary,
+			TCNameValueOppositeElement(
+				value = meta.metaHash
 			)
 		}
 	}

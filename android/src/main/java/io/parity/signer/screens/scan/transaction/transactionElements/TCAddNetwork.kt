@@ -39,48 +39,48 @@ fun TCAddNetwork(specs: NetworkSpecs) {
 				)
 				.padding(16.dp)
 		) {
-			TCNameValueElement(
+			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_new_network_network_name),
 				value = specs.title
 			)
 			SignerDivider()
-			TCNameValueElement(
+			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_new_network_base58),
 				value = specs.base58prefix.toString()
 			)
 			SignerDivider()
-			TCNameValueElement(
+			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_new_network_decimals),
 				value = specs.decimals.toString()
 			)
 			SignerDivider()
-			TCNameValueElement(
+			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_new_network_unit),
 				value = specs.unit
 			)
 			SignerDivider()
-			TCNameValueElement(
+			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_new_network_genesis),
 				value = specs.genesisHash.toString(),
 				valueInSameLine = false,
 			)
 			SignerDivider()
-			TCNameValueElement(
+			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_new_network_crypto),
 				value = specs.encryption.toString()
 			)
 			SignerDivider()
-			TCNameValueElement(
+			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_new_network_spec_name),
 				value = specs.name
 			)
 			SignerDivider()
-			TCNameValueElement(
+			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_new_network_logo),
 				value = specs.logo
 			)
 			SignerDivider()
-			TCNameValueElement(
+			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_new_default_network_path),
 				value = specs.pathId
 			)

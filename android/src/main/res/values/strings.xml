@@ -182,6 +182,12 @@
 	<string name="transaction_verifier_header">Verifier Certificate</string>
 	<string name="transaction_verifier_key">Key</string>
 	<string name="transaction_verifier_crypto">Crypto</string>
+	<string name="transaction_unknown_network_header">Unknown network</string>
+	<string name="transaction_unknown_network_genesis_hash">Genesis hash</string>
+	<string name="transaction_unknown_network_version">Version</string>
+	<string name="transaction_unknown_network_tx_version">Tx version</string>
+	<string name="transaction_types_info_hash">Types hash</string>
+	<string name="warning_exl">Warning!</string>
 
 
 </resources>

@@ -39,13 +39,13 @@ fun TCVerifier(verifier: MVerifierDetails) {
 				)
 				.padding(16.dp)
 		) {
-			TCNameValueElement(
+			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_verifier_key),
 				value = verifier.publicKey,
 				valueInSameLine = false,
 			)
 			SignerDivider()
-			TCNameValueElement(
+			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_verifier_crypto),
 				value = verifier.encryption
 			)
