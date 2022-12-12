@@ -17,7 +17,8 @@ use constants::{
 use db_handling::{
     cold_default::{init_db, populate_cold_nav_test},
     identities::{
-        export_all_addrs, import_all_addrs, try_create_address, try_create_seed, TransactionBulk, TransactionBulkV1,
+        export_all_addrs, import_all_addrs, try_create_address, try_create_seed, TransactionBulk,
+        TransactionBulkV1,
     },
 };
 use definitions::{
@@ -4065,13 +4066,13 @@ fn flow_test_1() {
         modal_data: None,
         alert_data: None,
     };
-	// assert_eq!(
-	//     action, expected_action,
-	//     concat!(
-	//         "import, with SelectSeed modal. ",
-	//         "Expected updated Keys screen for Alice westend keys"
-	//     )
-	// );
+    // assert_eq!(
+    //     action, expected_action,
+    //     concat!(
+    //         "import, with SelectSeed modal. ",
+    //         "Expected updated Keys screen for Alice westend keys"
+    //     )
+    // );
 
     // frontend is calling an api
     import_all_addrs(
@@ -4233,7 +4234,6 @@ fn flow_test_1() {
         modal_data: None,
         alert_data: None,
     };
-
 
     let mut keys_westend = expected_action.clone();
 
