@@ -52,12 +52,6 @@ fun SettingsScreen(
 				SettingsElement(name = stringResource(R.string.settings_verifier_certificate)) {
 					rootNavigator.navigate(Action.VIEW_GENERAL_VERIFIER)
 				}
-				SettingsElement(name = stringResource(R.string.settings_backup_keys)) {
-					if (alertState.value == AlertState.None)
-						rootNavigator.navigate(Action.BACKUP_SEED)
-					else
-						rootNavigator.navigate(Action.SHIELD)
-				}
 				SettingsElement(name = stringResource(R.string.settings_docs)) {
 					rootNavigator.navigate(Action.SHOW_DOCUMENTS)
 				}
