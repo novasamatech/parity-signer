@@ -123,7 +123,7 @@
 "Unknown network" = "Unknown network";
 "Use Signer in Airplane mode" = "Use Signer in Airplane mode";
 "Used for:" = "Used for:";
-"verifier_certificate" = "Verifier certificate";
+"verifier_certificate" = "Verifier Certificate";
 "verifier_certificate_uppercase" = "VERIFIER CERTIFICATE";
 "verifier_certificate_alt" = "Verifier certificate: ";
 "version" = "version";
@@ -457,3 +457,7 @@
 "Settings.Label.Version" = "App Version";
 "Settings.Label.Wipe" = "Wipe all Data";
 "Settings.Action.Cancel" = "Cancel";
+
+"VerifierCertificate.Label.Title" = "Verifier Certificate";
+"VerifierCertificate.Action.Remove" = "Remove certificate";
+

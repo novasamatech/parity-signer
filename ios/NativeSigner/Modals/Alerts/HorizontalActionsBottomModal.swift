@@ -40,6 +40,13 @@ struct HorizontalActionsBottomModalViewModel {
         dismissActionLabel: Localizable.Settings.Action.cancel.key,
         mainActionLabel: Localizable.wipe.key
     )
+
+    static let removeGeneralVerifier = HorizontalActionsBottomModalViewModel(
+        title: Localizable.wipeALLData.string,
+        content: Localizable.RemoveAllData.message.string,
+        dismissActionLabel: Localizable.Settings.Action.cancel.key,
+        mainActionLabel: Localizable.iUnderstand.key
+    )
 }
 
 struct HorizontalActionsBottomModal: View {

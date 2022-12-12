@@ -12,7 +12,7 @@ struct TCVerifier: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Localizable.verifierCertificate.text
+            Localizable.Transaction.Verifier.Label.header.text
                 .font(PrimaryFont.bodyL.font)
                 .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                 .padding(.leading, Spacing.medium)

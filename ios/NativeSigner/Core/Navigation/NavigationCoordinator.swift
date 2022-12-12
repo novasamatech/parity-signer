@@ -122,7 +122,8 @@ private extension NavigationCoordinator {
              .keyDetails, // `Public Key` screen
              .transaction,
              .log,
-             .settings:
+             .settings,
+             .vVerifier:
             updatedShouldSkipInjectedViews = true
         default:
             updatedShouldSkipInjectedViews = false

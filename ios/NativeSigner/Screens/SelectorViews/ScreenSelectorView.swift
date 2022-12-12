@@ -20,7 +20,6 @@ struct ScreenSelectorView: View {
                 navigation.perform(navigation: navigationRequest)
             },
             getSeed: { seedName in seedsMediator.getSeed(seedName: seedName) },
-            doJailbreak: data.jailbreak,
             pathCheck: { seed, path, network in
                 substratePathCheck(
                     seedName: seed, path: path, network: network, dbname: databaseMediator.databaseName
