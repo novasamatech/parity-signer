@@ -1,19 +1,17 @@
 package io.parity.signer.components
 
 import androidx.compose.runtime.Composable
-import com.halilibo.richtext.markdown.Markdown
-import com.halilibo.richtext.ui.RichText
-import com.halilibo.richtext.ui.material.MaterialRichText
+import io.parity.signer.components.base.MarkdownText
+import io.parity.signer.screens.scan.transaction.transactionElements.RichTextString
 
 /**
  * Privacy policy content
  */
 @Composable
 fun PP() {
-	MaterialRichText {
-		RichText {
-			Markdown(
-				"""
+	MarkdownText(
+		content = RichTextString(
+			"""
 # Privacy Policy
 
 Parity Technologies Limited (“**We**”; “**us**”; or “**our**”) are committed to protecting and respecting your privacy.
@@ -240,7 +238,6 @@ Statutory information
 - Registered Number: 09760015
 - Registered Office: Ignition Law, Moray House Floor 1, 23-31 Great Titchfield Street, London, United Kingdom, WC1W 7PA.
 						"""
-			)
-		}
-	}
+		)
+	)
 }
