@@ -2,9 +2,9 @@ package io.parity.signer.screens.scan.transaction.transactionElements
 
 import android.content.res.Configuration
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,10 +21,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.MarkdownText
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.pink300
-import io.parity.signer.ui.theme.textDisabled
+import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.MscFieldName
 import io.parity.signer.uniffi.MscFieldNumber
 
@@ -70,7 +68,17 @@ fun TCValueWithMarkdownTrio(
 			}
 		}
 		if (showDoc) {
-			Column(modifier = Modifier.padding(16.dp)) {
+			val innerShape =
+				RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+			Column(
+				modifier = Modifier
+					.border(
+						BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+						innerShape
+					)
+					.background(MaterialTheme.colors.fill6, innerShape)
+					.padding(16.dp),
+			) {
 				Text(
 					text = stringResource(
 						id = R.string.transaction_field_path,
@@ -80,8 +88,8 @@ fun TCValueWithMarkdownTrio(
 					color = if (value.isNumber) MaterialTheme.colors.pink300 else MaterialTheme.colors.primary,
 				)
 				//todo markdowns below
-				MarkdownText(content = value.docsFieldName, )
-				MarkdownText(content = value.docsType, )
+				MarkdownText(content = value.docsFieldName)
+				MarkdownText(content = value.docsType)
 //				Text(
 //					text = value.docsFieldName,
 //					style = SignerTypeface.BodyL,

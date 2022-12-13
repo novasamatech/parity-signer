@@ -2,17 +2,17 @@ package io.parity.signer.screens.scan.transaction.transactionElements
 
 import android.content.res.Configuration
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,9 +20,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.MarkdownText
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.textDisabled
+import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.MscCall
 import io.parity.signer.uniffi.MscEnumVariantName
 
@@ -62,10 +60,20 @@ fun TCValueWithToogleDocs(
 			}
 		}
 		if (showDoc) {
-			MarkdownText(content = payload.docs,
+			val innerShape =
+				RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+
+			MarkdownText(
+				content = payload.docs,
 //				style = SignerTypeface.BodyL, //todo dmitry
 				color = MaterialTheme.colors.primary,
-				modifier = Modifier.padding(16.dp),
+				modifier = Modifier
+					.border(
+						BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+						innerShape
+					)
+					.background(MaterialTheme.colors.fill6, innerShape)
+					.padding(16.dp),
 			)
 		}
 	}
@@ -106,8 +114,8 @@ fun MscEnumVariantName.toTransactionCallModel() = TCWithMarkdownDocsModel(
  * String with markdown lablels, show as rich text
  */
 data class RichTextString(val string: String)
-fun String.toRichTextStr() = RichTextString(this)
 
+fun String.toRichTextStr() = RichTextString(this)
 
 
 @Preview(
