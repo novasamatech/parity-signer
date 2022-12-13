@@ -1,7 +1,7 @@
 package io.parity.signer.ui.helpers
 
-import io.parity.signer.screens.scan.transaction.transactionElements.RichTextString
 import io.parity.signer.components.ImageContent
+import io.parity.signer.components.base.RichTextString
 
 
 object PreviewData {

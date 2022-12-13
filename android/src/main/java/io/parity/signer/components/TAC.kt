@@ -2,7 +2,7 @@ package io.parity.signer.components
 
 import androidx.compose.runtime.Composable
 import io.parity.signer.components.base.MarkdownText
-import io.parity.signer.screens.scan.transaction.transactionElements.RichTextString
+import io.parity.signer.components.base.toRichTextStr
 
 /**
  * Terms and conditions content.
@@ -10,8 +10,8 @@ import io.parity.signer.screens.scan.transaction.transactionElements.RichTextStr
 @Composable
 fun TAC() {
 	MarkdownText(
-		content = RichTextString(
-			"""
+		content =
+		"""
 **PARITY SIGNER MOBILE APPLICATION - END USER LICENCE AGREEMENT**
 
 **Parity Technologies Limited** is a company registered in England and Wales under company number 09760015, with its registered office at c/o Ignition Law, 1 Sans Walk, London, England, EC1R 0LT ("**Parity**"). Parity operates this Parity Signer mobile application (the "**App**").
@@ -206,7 +206,6 @@ For the purpose of this appendix 1, "**Appstore Provider**" means the provider o
 
 If the Appstore Provider is Apple, you acknowledge and agree that Apple and its subsidiaries are third party beneficiaries to this EULA. Upon your acceptance of this EULA, Apple will have the right to enforce the EULA against you as a third party beneficiary.
 
-						"""
-		)
+						""".toRichTextStr()
 	)
 }

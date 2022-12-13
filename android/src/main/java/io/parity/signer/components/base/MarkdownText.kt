@@ -7,7 +7,6 @@ import androidx.compose.ui.text.font.FontStyle
 import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.RichText
 import com.halilibo.richtext.ui.material.MaterialRichText
-import io.parity.signer.screens.scan.transaction.transactionElements.RichTextString
 
 
 @Composable
@@ -25,3 +24,11 @@ fun MarkdownText(
 		}
 	}
 }
+
+
+/**
+ * String with markdown labels, show as rich text
+ */
+data class RichTextString(val string: String)
+
+fun String.toRichTextStr() = RichTextString(this)
