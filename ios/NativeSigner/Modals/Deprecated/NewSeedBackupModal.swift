@@ -24,7 +24,7 @@ struct NewSeedBackupModal: View {
                         .foregroundColor(Asset.accentPink300.swiftUIColor)
                         .padding(8)
                 }
-                .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.accentPink300.swiftUIColor))
+                .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.backgroundSecondary.swiftUIColor))
                 VStack(spacing: 16) {
                     Button(
                         action: {
