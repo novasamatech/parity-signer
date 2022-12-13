@@ -67,8 +67,6 @@ fun TCValueWithToogleDocs(
 
 			MarkdownText(
 				content = payload.docs,
-//				style = SignerTypeface.BodyL, //todo dmitry
-				color = MaterialTheme.colors.primary,
 				modifier = Modifier
 					.border(
 						BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
@@ -125,11 +123,11 @@ fun MscEnumVariantName.toTransactionCallModel() = TCWithMarkdownDocsModel(
 private fun PreviewTCCall() {
 	SignerNewTheme {
 		Column {
-			//todo dmitry test below - our current markdown lib doesn't support rust markdown labels
 			TCValueWithToogleDocs(
 				TCWithMarkdownDocsModel.createStub().copy(isMethod = true)
 			)
 			SignerDivider()
+			//doesn't work in dark mode? Check runtime, it's preview broken for this library
 			TCValueWithToogleDocs(
 				TCWithMarkdownDocsModel.createStub().copy(isMethod = false)
 			)

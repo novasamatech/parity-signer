@@ -1,8 +1,11 @@
 package io.parity.signer.components
 
+import android.content.res.Configuration
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import io.parity.signer.components.base.MarkdownText
 import io.parity.signer.components.base.toRichTextStr
+import io.parity.signer.ui.theme.SignerNewTheme
 
 /**
  * Terms and conditions content.
@@ -208,4 +211,22 @@ If the Appstore Provider is Apple, you acknowledge and agree that Apple and its 
 
 						""".toRichTextStr()
 	)
+}
+
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewTAC() {
+	SignerNewTheme {
+		//doesn't work in dark mode? Check runtime, it's preview broken for this library
+		TAC()
+	}
 }
