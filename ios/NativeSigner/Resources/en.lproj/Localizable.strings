@@ -461,3 +461,7 @@
 "VerifierCertificate.Label.Title" = "Verifier Certificate";
 "VerifierCertificate.Action.Remove" = "Remove certificate";
 
+"ImportKeys.Label.Title.Single" = "Import Key";
+"ImportKeys.Label.Title.Multiple" = "Import %@ Keys";
+"ImportKeys.Label.Key.DerivedKey" = "Derived Keys";
+"ImportKeys.Action.Import" = "Import Keys";

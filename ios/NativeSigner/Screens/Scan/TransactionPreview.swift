@@ -148,12 +148,16 @@ struct TransactionPreview: View {
                     text: Localizable.TransactionPreview.Action.done.key,
                     style: .secondary()
                 )
-            case .stub,
-                 .importDerivations:
+            case .stub:
                 PrimaryButton(
                     action: viewModel.onApproveTap,
-                    text: transactionType == .stub ? Localizable.TransactionPreview.Action.approve.key : Localizable
-                        .TransactionPreview.Action.selectSeed.key,
+                    text: Localizable.TransactionPreview.Action.approve.key,
+                    style: .primary()
+                )
+            case .importDerivations:
+                PrimaryButton(
+                    action: viewModel.onImportKeysTap,
+                    text: Localizable.ImportKeys.Action.import.key,
                     style: .primary()
                 )
             case .done,
@@ -210,10 +214,14 @@ struct TransactionPreview: View {
             return Localizable.TransactionSign.Label.Header.network.string
         case .metadata:
             return Localizable.TransactionSign.Label.Header.metadata.string
+        case let .importKeys(keysCount):
+            return keysCount == 1 ?
+                Localizable.ImportKeys.Label.Title.single.string :
+                Localizable.ImportKeys.Label.Title.multiple(keysCount)
         default:
             return transactionsCount == 1 ?
                 Localizable.TransactionSign.Label.Header.single.string :
-                Localizable.TransactionSign.Label.Header.multiple(viewModel.dataModel.count)
+                Localizable.TransactionSign.Label.Header.multiple(transactionsCount)
         }
     }
 }
@@ -287,6 +295,10 @@ extension TransactionPreview {
             default:
                 ()
             }
+        }
+
+        func onImportKeysTap() {
+            import
         }
 
         func signTransaction() {

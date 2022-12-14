@@ -97,11 +97,20 @@ extension MTransaction {
         case addNetwork(network: String)
         case metadata(network: String, version: String)
         case transfer
+        case importKeys(keysCount: Int)
         case unknown
     }
 
     var previewType: TransactionPreviewType {
         switch ttype {
+        case .importDerivations:
+            var keysCount: Int = 0
+            sortedValueCards().forEach {
+                if case let .derivationsCard(keys) = $0.card {
+                    keysCount += keys.reduce(into: 0) { $0 += ($1.derivedKeys.count + 1) }
+                }
+            }
+            return .importKeys(keysCount: keysCount)
         case .stub:
             return sortedValueCards().compactMap {
                 switch $0.card {
