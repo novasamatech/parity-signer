@@ -163,10 +163,11 @@ private extension KeyDetailsView.ViewModel {
             .sorted(by: { $0.key.address.path < $1.key.address.path })
         derivedKeys = sortedDerivedKeys
             .map {
-                DerivedKeyRowModel(
+                let details = "\($0.key.addressKey)\n\($0.network.networkSpecsKey)"
+                return DerivedKeyRowModel(
                     viewModel: DerivedKeyRowViewModel($0.key),
                     actionModel: DerivedKeyActionModel(
-                        tapAction: .init(action: .selectKey, details: $0.key.addressKey)
+                        tapAction: .init(action: .selectKey, details: details)
                     )
                 )
             }
