@@ -20,11 +20,6 @@ struct ModalSelector: View {
 
     var body: some View {
         switch modalData {
-        case let .networkSelector(value):
-            NetworkManager(
-                content: value,
-                navigationRequest: navigationRequest
-            )
         case let .passwordConfirm(value):
             PasswordConfirm(
                 content: value,
@@ -71,6 +66,7 @@ struct ModalSelector: View {
             .seedMenu,
             .signatureReady,
             .logRight,
+            .networkSelector,
             nil:
             EmptyView()
         }
