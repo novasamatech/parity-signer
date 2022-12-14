@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct KeyDetailsView: View {
-    let dataModel: KeyDetailsDataModel
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
@@ -53,7 +52,7 @@ struct KeyDetailsView: View {
         .onAppear {
             viewModel.use(navigation: navigation)
             viewModel.use(appState: appState)
-            viewModel.refreshData(dataModel: dataModel)
+            viewModel.refreshData()
         }
         .fullScreenCover(
             isPresented: $viewModel.isShowingActionSheet,
@@ -233,113 +232,113 @@ private struct KeySummaryView: View {
     }
 }
 
-#if DEBUG
-    struct KeyDetailsView_Previews: PreviewProvider {
-        static var previews: some View {
-            VStack {
-                KeyDetailsView(
-                    dataModel: .init(
-                        keySummary: KeySummaryViewModel(
-                            keyName: "Main Polkadot",
-                            base58: "15Gsc678...0HA04H0A"
-                        ),
-                        derivedKeys: [
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "// polkadot",
-                                    hasPassword: false,
-                                    base58: "15Gsc678654FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            ),
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "// polkadot",
-                                    hasPassword: false,
-                                    base58: "15Gsc678654FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            ),
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "//astar//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
-                                    hasPassword: true,
-                                    base58: "15Gsc678654FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            ),
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
-                                    hasPassword: false,
-                                    base58: "15Gsc678654FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            ),
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "// acala",
-                                    hasPassword: true,
-                                    base58: "15Gsc678654FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            ),
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "// moonbeam",
-                                    hasPassword: true,
-                                    base58: "15Gsc678654FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            ),
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "// kilt",
-                                    hasPassword: true,
-                                    base58: "15Gsc6786546423FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            )
-                        ]
-                    ),
-                    viewModel: .init(
-                        keysData: PreviewData.mKeyNew,
-                        exportPrivateKeyService: PrivateKeyQRCodeService(
-                            navigation: NavigationCoordinator(),
-                            keys: PreviewData.mkeys
-                        )
-                    ),
-                    forgetKeyActionHandler: .init(navigation: NavigationCoordinator()),
-                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(true))
-                )
-            }
-            .preferredColorScheme(.dark)
-            .previewLayout(.sizeThatFits)
-            .environmentObject(NavigationCoordinator())
-            .environmentObject(ConnectivityMediator())
-            .environmentObject(SignerDataModel())
-            .environmentObject(AppState())
-        }
-    }
-#endif
+//#if DEBUG
+//    struct KeyDetailsView_Previews: PreviewProvider {
+//        static var previews: some View {
+//            VStack {
+//                KeyDetailsView(
+//                    dataModel: .init(
+//                        keySummary: KeySummaryViewModel(
+//                            keyName: "Main Polkadot",
+//                            base58: "15Gsc678...0HA04H0A"
+//                        ),
+//                        derivedKeys: [
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "// polkadot",
+//                                    hasPassword: false,
+//                                    base58: "15Gsc678654FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            ),
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "// polkadot",
+//                                    hasPassword: false,
+//                                    base58: "15Gsc678654FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            ),
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "//astar//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
+//                                    hasPassword: true,
+//                                    base58: "15Gsc678654FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            ),
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
+//                                    hasPassword: false,
+//                                    base58: "15Gsc678654FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            ),
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "// acala",
+//                                    hasPassword: true,
+//                                    base58: "15Gsc678654FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            ),
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "// moonbeam",
+//                                    hasPassword: true,
+//                                    base58: "15Gsc678654FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            ),
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "// kilt",
+//                                    hasPassword: true,
+//                                    base58: "15Gsc6786546423FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            )
+//                        ]
+//                    ),
+//                    viewModel: .init(
+//                        keysData: PreviewData.mKeyNew,
+//                        exportPrivateKeyService: PrivateKeyQRCodeService(
+//                            navigation: NavigationCoordinator(),
+//                            keys: PreviewData.mkeys
+//                        )
+//                    ),
+//                    forgetKeyActionHandler: .init(navigation: NavigationCoordinator()),
+//                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(true))
+//                )
+//            }
+//            .preferredColorScheme(.dark)
+//            .previewLayout(.sizeThatFits)
+//            .environmentObject(NavigationCoordinator())
+//            .environmentObject(ConnectivityMediator())
+//            .environmentObject(SignerDataModel())
+//            .environmentObject(AppState())
+//        }
+//    }
+//#endif

@@ -26,10 +26,12 @@ struct ScreenSelector: View {
         switch screenData {
         case let .keys(value):
             KeyDetailsView(
-                dataModel: KeyDetailsDataModel(value),
                 viewModel: .init(
-                    keysData: appState.userData.keysData,
-                    exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value)
+                    keyName: value.root.address.seedName,
+                    exportPrivateKeyService: PrivateKeyQRCodeService(
+                        navigation: navigation,
+                        keys: value
+                    )
                 ),
                 forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
                 resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
