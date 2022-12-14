@@ -55,7 +55,8 @@ struct KeyDetailsDataModel: Equatable {
     }
 }
 
-struct DerivedKeyExportModel: Equatable {
+struct DerivedKeyExportModel: Equatable, Identifiable {
+    let id = UUID()
     let viewModel: DerivedKeyRowViewModel
     let keyData: MKeyAndNetworkCard
 }
