@@ -6,7 +6,9 @@ on:
     branches:
       - master
       - stable
-
+    paths-ignore:
+      - 'ios/**'
+      - 'android/**'
 jobs:
   linter:
     name:                     Cargo clippy

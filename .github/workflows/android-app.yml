@@ -6,7 +6,10 @@ on:
     branches:
       - master
       - stable
-
+    paths:
+      - 'android/**'
+      - 'rust/**'
+      - '.github/workflows/android-app.yml'
 jobs:
   build:
     name: Build
