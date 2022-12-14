@@ -107,6 +107,7 @@ struct KeyManager: View {
                                         AddressCard(
                                             card: MAddressCard(
                                                 base58: address.base58,
+                                                addressKey: address.addressKey,
                                                 address: Address(
                                                     path: address.address.path,
                                                     hasPwd: address.address.hasPwd,

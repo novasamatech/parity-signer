@@ -54,6 +54,7 @@ extension PreviewData {
     static let mKeyNew = MKeysNew(
         root: MAddressCard(
             base58: "",
+            addressKey: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
             address: .init(
                 path: "",
                 hasPwd: false,
@@ -201,6 +202,7 @@ extension PreviewData {
         ttype: .sign,
         authorInfo: .init(
             base58: "5ELtQSR8igkgpwCNGKkoGiepCWS6m558T9mchaMax7zwVWUz",
+            addressKey: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
             address: .init(
                 path: "",
                 hasPwd: true,

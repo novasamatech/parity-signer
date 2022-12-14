@@ -180,7 +180,7 @@ private extension KeyDetailsView.ViewModel {
             keyName: keysData.root?.address.seedName ?? "",
             base58: keysData.root?.base58 ?? ""
         )
-        addressKeyNavigation = .init(action: .selectKey, details: keysData.root?.address.seedName ?? "")
+        addressKeyNavigation = .init(action: .selectKey, details: keysData.root?.addressKey ?? "")
         removeSeed = keysData.root?.address.seedName ?? ""
     }
 }
