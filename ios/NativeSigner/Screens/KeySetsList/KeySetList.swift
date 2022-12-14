@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct KeySetList: View {
-    @ObservedObject var viewModel: ViewModel
+    @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject var appState: AppState
     @State private var isShowingNewSeedMenu = false

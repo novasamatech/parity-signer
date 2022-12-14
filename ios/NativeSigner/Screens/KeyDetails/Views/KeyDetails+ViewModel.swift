@@ -16,6 +16,7 @@ extension KeyDetailsView {
         /// `.newSeed` -> `.keys`, data will be filled on `onAppear`, so this can remain optional
         var keysData: MKeysNew?
         private weak var appState: AppState!
+        private weak var navigation: NavigationCoordinator!
         @Published var shouldPresentRemoveConfirmationModal = false
         @Published var shouldPresentBackupModal = false
         @Published var shouldPresentSelectionOverlay = false
@@ -26,6 +27,8 @@ extension KeyDetailsView {
         @Published var isPresentingSelectionOverlay = false
         @Published var isShowingKeysExportModal = false
         @Published var selectedSeeds: [String] = []
+        // Network selection
+        @Published var isPresentingNetworkSelection = false
 
         init(
             keysData: MKeysNew?,
@@ -37,8 +40,12 @@ extension KeyDetailsView {
             self.keyDetailsService = keyDetailsService
         }
 
-        func set(appState: AppState) {
+        func use(appState: AppState) {
             self.appState = appState
+        }
+
+        func use(navigation: NavigationCoordinator) {
+            self.navigation = navigation
         }
 
         func keyExportModel(dataModel: KeyDetailsDataModel) -> ExportMultipleKeysModalViewModel {
@@ -86,6 +93,15 @@ extension KeyDetailsView {
                 shouldPresentSelectionOverlay.toggle()
                 isPresentingSelectionOverlay.toggle()
             }
+        }
+
+        func onNetworkSelectionTap() {
+            guard case let .networkSelector(networksContainer) = navigation
+                .performFake(navigation: .init(action: .networkSelector)).modalData else { return }
+
+            appState.userData.allNetworks = networksContainer.networks
+            appState.userData.selectedNetworks = networksContainer.networks.filter(\.selected)
+            isPresentingNetworkSelection = true
         }
     }
 }
