@@ -42,7 +42,7 @@ struct KeyDetailsView: View {
             } else {
                 PrimaryButton(
                     action: {
-                        navigation.perform(navigation: dataModel.createDerivedKey)
+                        navigation.perform(navigation: viewModel.createDerivedKey)
                     },
                     text: Localizable.KeyDetails.Action.create.key
                 )
@@ -69,7 +69,7 @@ struct KeyDetailsView: View {
         .fullScreenCover(isPresented: $viewModel.isShowingRemoveConfirmation) {
             HorizontalActionsBottomModal(
                 viewModel: .forgetKeySet,
-                mainAction: forgetKeyActionHandler.forgetKeySet(dataModel.removeSeed),
+                mainAction: forgetKeyActionHandler.forgetKeySet(viewModel.removeSeed),
                 // We need to fake right button action here or Rust machine will break
                 // In old UI, if you dismiss equivalent of this modal, underlying modal would still be there,
                 // so we need to inform Rust we actually hid it
@@ -103,16 +103,20 @@ struct KeyDetailsView: View {
         .fullScreenCover(
             isPresented: $viewModel.isShowingKeysExportModal
         ) {
-            ExportMultipleKeysModal(
-                viewModel: .init(
-                    viewModel: viewModel.keyExportModel(dataModel: dataModel),
-                    isPresented: $viewModel.isShowingKeysExportModal
+            if let keyExportModel = viewModel.keyExportModel() {
+                ExportMultipleKeysModal(
+                    viewModel: .init(
+                        viewModel: keyExportModel,
+                        isPresented: $viewModel.isShowingKeysExportModal
+                    )
                 )
-            )
-            .clearModalBackground()
-            .onAppear {
-                viewModel.selectedSeeds.removeAll()
-                viewModel.isPresentingSelectionOverlay.toggle()
+                .clearModalBackground()
+                .onAppear {
+                    viewModel.selectedSeeds.removeAll()
+                    viewModel.isPresentingSelectionOverlay.toggle()
+                }
+            } else {
+                EmptyView()
             }
         }
         .fullScreenCover(
@@ -128,16 +132,14 @@ struct KeyDetailsView: View {
     var mainList: some View {
         List {
             // Main key cell
-            KeySummaryView(
-                viewModel: dataModel.keySummary,
-                isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
-            )
-            .padding(Padding.detailsCell)
-            .keyDetailsListElement()
-            .onTapGesture {
-                if !viewModel.isPresentingSelectionOverlay {
-                    navigation.perform(navigation: dataModel.addressKeyNavigation)
-                }
+            if let keySummary = viewModel.keySummary {
+                KeySummaryView(
+                    viewModel: keySummary,
+                    isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
+                )
+                .padding(Padding.detailsCell)
+                .keyDetailsListElement()
+                .onTapGesture { viewModel.onRootKeyTap() }
             }
             // Header
             HStack {
@@ -155,7 +157,7 @@ struct KeyDetailsView: View {
             .keyDetailsListElement()
             // List of derived keys
             ForEach(
-                dataModel.derivedKeys,
+                viewModel.derivedKeys,
                 id: \.viewModel.addressKey
             ) { deriveKey in
                 DerivedKeyRow(
@@ -232,7 +234,7 @@ private struct KeySummaryView: View {
     }
 }
 
-//#if DEBUG
+// #if DEBUG
 //    struct KeyDetailsView_Previews: PreviewProvider {
 //        static var previews: some View {
 //            VStack {
@@ -341,4 +343,4 @@ private struct KeySummaryView: View {
 //            .environmentObject(AppState())
 //        }
 //    }
-//#endif
+// #endif

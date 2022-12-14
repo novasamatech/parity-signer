@@ -26,11 +26,13 @@ extension KeyDetailsView {
         @Published var isPresentingConnectivityAlert = false
         @Published var isPresentingSelectionOverlay = false
         @Published var isShowingKeysExportModal = false
-        @Published var isShowingNetworkSelection = false
+        // Network selection
+        @Published var isPresentingNetworkSelection = false
 
         @Published var keySummary: KeySummaryViewModel?
         @Published var derivedKeys: [DerivedKeyRowModel] = []
         @Published var selectedSeeds: [String] = []
+        private var cancelBag = CancelBag()
 
         /// Navigation action for selecting main `Address Key`
         var addressKeyNavigation: Navigation?
@@ -52,11 +54,11 @@ extension KeyDetailsView {
             updateRenderables()
         }
 
-        func set(appState: AppState) {
+        func use(appState: AppState) {
             self.appState = appState
         }
 
-        func set(navigation: NavigationCoordinator) {
+        func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
         }
 
@@ -86,10 +88,11 @@ extension KeyDetailsView.ViewModel {
     }
 
     func onNetworkSelectionTap() {
-        let modalData = navigation.performFake(navigation: .init(action: .networkSelector)).modalData
-        guard case let .networkSelector(networksMenu) = modalData else { return }
-        appState.userData.allNetworks = networksMenu.networks
-        isShowingNetworkSelection = true
+        guard case let .networkSelector(networksContainer) = navigation
+            .performFake(navigation: .init(action: .networkSelector)).modalData else { return }
+
+        appState.userData.allNetworks = networksContainer.networks
+        isPresentingNetworkSelection = true
     }
 
     func onDerivedKeyTap(_ deriveKey: DerivedKeyRowModel) {
