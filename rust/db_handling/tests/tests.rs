@@ -569,6 +569,8 @@ fn derive_prep_alice_collided() {
             button_good: false,
             where_to: None,
             collision: Some(MAddressCard {
+                address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
+                    .to_string(),
                 base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                 multiselect: None,
                 address: Address {
@@ -642,6 +644,8 @@ fn derive_prep_alice_collided_with_password() {
             button_good: false,
             where_to: None,
             collision: Some(MAddressCard {
+                address_key: "0176b68c7ad0e084b37d6a0c8c92d792f6041da5e7ff0c6c3d4a2d6b97772ad46e"
+                    .to_string(),
                 base58: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_string(),
                 multiselect: None,
                 address: Address {
@@ -817,8 +821,9 @@ fn path_is_known() {
         button_good: false,
         where_to: None,
         collision: Some(MAddressCard {
+            address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
+                .to_string(),
             base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-            multiselect: None,
             address: Address {
                 path: "//Alice".to_string(),
                 has_pwd: false,
@@ -828,6 +833,7 @@ fn path_is_known() {
                 seed_name: "Alice".to_string(),
                 secret_exposed: false,
             },
+            multiselect: None,
         }),
         error: None,
     };

@@ -360,6 +360,7 @@ fn can_sign_transaction_1() {
     let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
         multiselect: None,
+        address_key: String::new(),
         address: Address {
             identicon: SignerImage::Png {
                 image: alice_sr_alice().to_vec(),
@@ -625,6 +626,7 @@ fn can_sign_message_1() {
 
     let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+        address_key: String::new(),
         multiselect: None,
         address: Address {
             identicon: SignerImage::Png {
@@ -2548,6 +2550,7 @@ Identities:
     let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
         multiselect: None,
+        address_key: String::new(),
         address: Address {
             identicon: SignerImage::Png {
                 image: alice_sr_alice().to_vec(),
@@ -2870,6 +2873,7 @@ Identities:
 
     let author_info_known = MAddressCard {
         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
+        address_key: String::new(),
         multiselect: None,
         address: Address {
             identicon: SignerImage::Png {
@@ -3092,6 +3096,8 @@ fn parse_transaction_alice_remarks_westend9122() {
     let author_info_known = MAddressCard {
         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
         multiselect: None,
+        address_key: "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+            .to_string(),
         address: Address {
             identicon: SignerImage::Png {
                 image: alice_sr_root().to_vec(),

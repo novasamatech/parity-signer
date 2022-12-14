@@ -419,7 +419,10 @@ impl SufficientCryptoState {
         };
 
         let identicon = make_identicon_from_multisigner(multisigner, style);
+        let address_key = hex::encode(AddressKey::from_multisigner(multisigner).key());
         let author_info = MAddressCard {
+            base58: hex::encode(multisigner_to_public(multisigner)),
+            address_key,
             address: Address {
                 identicon,
                 seed_name: address_details.seed_name.clone(),
@@ -427,7 +430,6 @@ impl SufficientCryptoState {
                 has_pwd: address_details.has_pwd,
                 secret_exposed: address_details.secret_exposed,
             },
-            base58: hex::encode(multisigner_to_public(multisigner)),
             multiselect: None,
         };
         Self {

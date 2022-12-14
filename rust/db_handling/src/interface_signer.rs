@@ -200,8 +200,10 @@ pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<
             ),
             secret_exposed: root.1.secret_exposed,
         };
+        let address_key = hex::encode(AddressKey::from_multisigner(&root.0).key());
         MAddressCard {
             base58: print_multisigner_as_base58_or_eth(&root.0, None, root.1.encryption),
+            address_key,
             address,
             multiselect: None,
         }
@@ -605,7 +607,10 @@ where
                 address_details.encryption.identicon_style(),
             );
             let seed_name = seed_name.to_string();
+            let address_key = hex::encode(AddressKey::from_multisigner(&multisigner).key());
             let collision = MAddressCard {
+                base58,
+                address_key,
                 address: Address {
                     path,
                     has_pwd,
@@ -614,7 +619,6 @@ where
                     secret_exposed: address_details.secret_exposed,
                 },
                 multiselect: None,
-                base58,
             };
 
             NavDerivationCheck {
@@ -703,8 +707,10 @@ where
                         &multisigner,
                         address_details.encryption.identicon_style(),
                     );
+                    let address_key = hex::encode(AddressKey::from_multisigner(&multisigner).key());
                     let collision_display = MAddressCard {
                         base58: address_base58,
+                        address_key,
                         address: Address {
                             path: address_details.path,
                             has_pwd: address_details.has_pwd,

@@ -416,6 +416,7 @@ dictionary Address {
 
 dictionary MAddressCard {
     string base58;
+    string address_key;
     Address address;
     boolean? multiselect;
 };

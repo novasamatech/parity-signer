@@ -319,6 +319,7 @@ pub struct Address {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MAddressCard {
     pub base58: String,
+    pub address_key: String,
     pub address: Address,
     pub multiselect: Option<bool>,
 }

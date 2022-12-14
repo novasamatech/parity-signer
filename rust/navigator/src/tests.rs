@@ -5464,7 +5464,8 @@ fn flow_test_1() {
             author_info: MAddressCard {
                 base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                     .to_string(),
-                multiselect: None,
+                address_key: "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                    .to_string(),
                 address: Address {
                     identicon: SignerImage::Png {
                         image: alice_sr_root().to_vec(),
@@ -5475,6 +5476,7 @@ fn flow_test_1() {
 
                     secret_exposed: false,
                 },
+                multiselect: None,
             },
             sufficient: vec![],
             content: MSCContent::AddSpecs {
@@ -5765,7 +5767,10 @@ fn flow_test_1() {
                 author_info: MAddressCard {
                     base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                         .to_string(),
-                    multiselect: None,
+
+                    address_key:
+                        "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                            .to_string(),
                     address: Address {
                         identicon: SignerImage::Png {
                             image: alice_sr_root().to_vec(),
@@ -5775,6 +5780,7 @@ fn flow_test_1() {
                         has_pwd: false,
                         secret_exposed: false,
                     },
+                    multiselect: None,
                 },
                 sufficient: vec![],
                 content: MSCContent::LoadMetadata {
@@ -5889,6 +5895,8 @@ fn flow_test_1() {
     new_log_with_modal.modal_data = Some(ModalData::SufficientCryptoReady {
         f: MSufficientCryptoReady {
             author_info: MAddressCard {
+                address_key: "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                    .to_string(),
                 base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                     .to_string(),
                 multiselect: None,
@@ -6185,6 +6193,9 @@ fn flow_test_1() {
                 ttype: TransactionType::Sign,
                 author_info: Some(MAddressCard {
                     base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
+                    address_key:
+                        "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
+                            .to_string(),
                     multiselect: None,
                     address: Address {
                         identicon: SignerImage::Png {
@@ -6341,6 +6352,9 @@ fn flow_test_1() {
                 },
                 ttype: TransactionType::Sign,
                 author_info: Some(MAddressCard {
+                    address_key:
+                        "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
+                            .to_string(),
                     base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
                     address: Address {
                         identicon: SignerImage::Png {
@@ -6813,6 +6827,7 @@ fn flow_test_1() {
                 },
                 ttype: TransactionType::Sign,
                 author_info: Some(MAddressCard {
+                    address_key: "01".to_string() + &pepper_westend_public,
                     base58: pepper_westend_base58,
                     multiselect: None,
                     address: Address {
@@ -7047,6 +7062,7 @@ fn flow_test_1() {
                 },
                 ttype: TransactionType::Sign,
                 author_info: Some(MAddressCard {
+                    address_key: "01".to_string() + &pepper_key0_public,
                     base58: pepper_key0_base58.clone(),
                     multiselect: None,
                     address: Address {
@@ -7089,6 +7105,7 @@ fn flow_test_1() {
         f: MEnterPassword {
             author_info: MAddressCard {
                 base58: pepper_key0_base58.clone(),
+                address_key: "01".to_string() + &pepper_key0_public,
                 multiselect: None,
                 address: Address {
                     identicon: pepper_key0_identicon.clone(),
@@ -7113,6 +7130,7 @@ fn flow_test_1() {
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
             author_info: MAddressCard {
+                address_key: "01".to_string() + &pepper_key0_public,
                 base58: pepper_key0_base58.clone(),
                 multiselect: None,
                 address: Address {
@@ -7140,6 +7158,7 @@ fn flow_test_1() {
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
             author_info: MAddressCard {
+                address_key: "01".to_string() + &pepper_key0_public,
                 base58: pepper_key0_base58,
                 multiselect: None,
                 address: Address {
