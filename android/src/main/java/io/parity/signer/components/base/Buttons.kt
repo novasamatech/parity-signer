@@ -104,7 +104,7 @@ fun PrimaryButtonGreyDisabled(
 				},
 				RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
 			)
-			.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)),
+			.padding(vertical = 12.dp), // in other places 16, but this is exception to show in header
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		Text(

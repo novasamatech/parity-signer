@@ -3,21 +3,26 @@ package io.parity.signer.bottomsheets.password
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.SingleTextInput
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.components.base.PrimaryButtonGreyDisabled
 import io.parity.signer.components.sharedcomponents.KeyCardModelBase
@@ -41,51 +46,71 @@ fun EnterPassword(
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
+	val canProceed = password.value.isNotBlank()
+
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier.imePadding()
 	) {
 		EnterPasswordHeader(
 			onClose = onClose,
-			onProceed = { proceed(password.value) },
-			isEnabled = password.value.isNotBlank()
+			onProceed = {
+				proceed(password.value)
+				focusManager.clearFocus(true)
+			},
+			isEnabled = canProceed
 		)
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
 			modifier = Modifier
-				.padding(horizontal = 24.dp)
-				.verticalScroll(
-					rememberScrollState()
-				)
+                .padding(horizontal = 24.dp)
+                .verticalScroll(
+                    rememberScrollState()
+                )
 		) {
 			Text(
 				text = stringResource(R.string.enter_password_title),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleL,
-				modifier = Modifier.padding(horizontal = 24.dp),
 			)
+			Spacer(modifier = Modifier.padding(top = 16.dp))
 			KeyCardPassword(model = data.keyCard)
 //		if (enterPassword.counter > 0u) {
 //			Text("Attempt " + enterPassword.counter.toString() + " of 3")
 //		}
 
-			SingleTextInput(
-				content = password,
-				update = { password.value = it },
-				onDone = {
-					if (password.value.isNotBlank()) {
-						proceed(password.value)
+			//todo https://stackoverflow.com/questions/65304229/toggle-password-field-jetpack-compose
+			//todo placeholder for mark
+			Spacer(modifier = Modifier.padding(top = 16.dp))
+
+			TextField(
+				value = password.value,
+				onValueChange = { password.value = it },
+				keyboardOptions = KeyboardOptions(
+					imeAction = if (canProceed) ImeAction.Done else ImeAction.None
+				),
+				keyboardActions = KeyboardActions(
+					onDone = {
+						if (canProceed) {
+							proceed(password.value)
+							focusManager.clearFocus(true)
+						}
 					}
-				},
-				prefix = { Text("///") },
-				focusManager = focusManager,
-				focusRequester = focusRequester
+				),
+				label = { Text(text = "Enter password") },
+				singleLine = true,
+				textStyle = SignerTypeface.LabelM,
+				colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
+				modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .fillMaxWidth(1f),
 			)
+
 			Text(
 				text = stringResource(R.string.enter_password_description),
 				color = MaterialTheme.colors.textTertiary,
 				style = SignerTypeface.CaptionM,
-				modifier = Modifier.padding(bottom = 30.dp),
+				modifier = Modifier.padding(top = 8.dp, bottom = 30.dp),
 			)
 		}
 	}
@@ -108,7 +133,6 @@ private fun EnterPasswordHeader(
 			contentAlignment = Alignment.CenterStart,
 		) {
 			CloseIcon(
-				modifier = Modifier.padding(vertical = 20.dp),
 				noBackground = true,
 			) {
 				onClose()
