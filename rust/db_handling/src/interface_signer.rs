@@ -244,7 +244,7 @@ pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<
             let network = MSCNetworkInfo {
                 network_title: network_specs.specs.title,
                 network_logo: network_specs.specs.logo,
-                network_specs_key: hex::encode(network_specs_key.encode()),
+                network_specs_key: hex::encode(network_specs_key.key()),
             };
 
             Ok(MKeyAndNetworkCard { key, network })
