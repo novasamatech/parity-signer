@@ -8,9 +8,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,9 +26,12 @@ import io.parity.signer.ui.theme.*
  * Key card plate used in enter password screen, without network name
  */
 @Composable
-fun KeyCardPassword(model: KeyCardModelBase) {
+fun KeyCardPassword(
+	model: KeyCardModelBase,
+	modifier: Modifier = Modifier,
+) {
 	Row(
-		Modifier
+		modifier
 			.fillMaxWidth()
 			.background(
 				MaterialTheme.colors.red500fill12,

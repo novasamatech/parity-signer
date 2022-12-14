@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.*
 
+@Deprecated("This is old design component. Use TextField() directly like in new screens")
 @Composable
 fun SingleTextInput(
 	content: MutableState<String>,
