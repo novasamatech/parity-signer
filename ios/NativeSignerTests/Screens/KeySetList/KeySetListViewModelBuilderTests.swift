@@ -30,7 +30,10 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
         let result = subject.build(for: MSeeds(seedNameCards: [seedNameCard]))
 
         // Then
-        XCTAssertEqual(result, expectedResult)
+        XCTAssertEqual(result.list.first?.seed, seedNameCard)
+        XCTAssertEqual(result.list.first?.keyName, name)
+        XCTAssertEqual(result.list.first?.derivedKeys, derivedKeys)
+        XCTAssertEqual(result.list.first?.identicon, identicon)
     }
 
     func test_build_singleDerivedKey_returnsExpectedModel() {
@@ -47,7 +50,10 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
         let result = subject.build(for: MSeeds(seedNameCards: [seedNameCard]))
 
         // Then
-        XCTAssertEqual(result, expectedResult)
+        XCTAssertEqual(result.list.first?.seed, seedNameCard)
+        XCTAssertEqual(result.list.first?.keyName, name)
+        XCTAssertEqual(result.list.first?.derivedKeys, derivedKeys)
+        XCTAssertEqual(result.list.first?.identicon, identicon)
     }
 
     func test_build_multipleDerivedKeys_returnsExpectedModel() {
@@ -64,6 +70,9 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
         let result = subject.build(for: MSeeds(seedNameCards: [seedNameCard]))
 
         // Then
-        XCTAssertEqual(result, expectedResult)
+        XCTAssertEqual(result.list.first?.seed, seedNameCard)
+        XCTAssertEqual(result.list.first?.keyName, name)
+        XCTAssertEqual(result.list.first?.derivedKeys, derivedKeys)
+        XCTAssertEqual(result.list.first?.identicon, identicon)
     }
 }
