@@ -1,6 +1,7 @@
 package io.parity.signer.models
 
 import io.parity.signer.components.ImageContent
+import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.components.toImageContent
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.uniffi.*
@@ -132,73 +133,6 @@ data class KeySetModel(
 fun SeedNameCard.toSeedModel() =
 	KeySetModel(seedName, identicon.toImageContent(), derivedKeysCount)
 
-
-data class KeyCardModel(
-	val network: String,
-	val base58: String,
-	val path: String,
-	val identIcon: ImageContent,
-	val seedName: String,
-	val hasPwd: Boolean = false,
-	val multiselect: Boolean? = null,
-) {
-	companion object {
-
-		fun fromKeyModel(model: KeyModel, networkTitle: String): KeyCardModel =
-			KeyCardModel(
-				network = networkTitle,
-				base58 = model.base58,
-				path = model.path,
-				identIcon = model.identicon,
-				seedName = model.seedName,
-				hasPwd = model.hasPwd,
-				multiselect = model.multiselect,
-			)
-
-		/**
-		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
-		 */
-		fun fromAddress(
-			address_card: MAddressCard,
-			networkTitle: String
-		): KeyCardModel =
-			KeyCardModel(
-				network = networkTitle,
-				base58 = address_card.base58,
-				path = address_card.address.path,
-				hasPwd = address_card.address.hasPwd,
-				identIcon = address_card.address.identicon.toImageContent(),
-				seedName = address_card.address.seedName,
-				multiselect = address_card.multiselect,
-			)
-
-		fun fromAddress(
-			address: Address,
-			base58: String,
-			networkTitle: String
-		): KeyCardModel =
-			KeyCardModel(
-				network = networkTitle,
-				base58 = base58,
-				path = address.path,
-				hasPwd = address.hasPwd,
-				identIcon = address.identicon.toImageContent(),
-				seedName = address.seedName,
-				multiselect = false,
-			)
-
-		fun createStub() = KeyCardModel(
-			network = "Polkadot",
-			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
-			path = "//polkadot//path",
-			identIcon = PreviewData.exampleIdenticonPng,
-			seedName = "Seed Name",
-			hasPwd = false,
-			multiselect = null,
-		)
-	}
-}
-
 /**
  * Local copy of shared [MKeyDetails] class
  */
@@ -210,7 +144,7 @@ data class KeyDetailsModel(
 	val base58: String,
 	val secretExposed: Boolean,
 ) {
-	val isRootKey = address.path.isEmpty()
+	val isRootKey = address.cardBase.path.isEmpty()
 
 	companion object {
 		fun createStubDerived(): KeyDetailsModel {
@@ -223,7 +157,7 @@ data class KeyDetailsModel(
 					"network logo", "network specs"
 				),
 				address = keyCard,
-				base58 = keyCard.base58,
+				base58 = keyCard.cardBase.base58,
 				secretExposed = true,
 			)
 		}
@@ -238,10 +172,9 @@ data class KeyDetailsModel(
 					"network logo", "network specs"
 				),
 				address = KeyCardModel(
-					keyCard.network, keyCard.base58, "",
-					keyCard.identIcon, keyCard.seedName, false
+					keyCard.network, keyCard.cardBase.copy(path = "")
 				),
-				base58 = keyCard.base58,
+				base58 = keyCard.cardBase.base58,
 				secretExposed = true,
 			)
 		}

@@ -26,9 +26,9 @@ import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
 import io.parity.signer.components.sharedcomponents.KeyCard
+import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.components.sharedcomponents.KeySeedCard
 import io.parity.signer.models.Callback
-import io.parity.signer.models.KeyCardModel
 import io.parity.signer.models.KeySetDetailsModel
 import io.parity.signer.models.KeySetModel
 import io.parity.signer.ui.theme.*

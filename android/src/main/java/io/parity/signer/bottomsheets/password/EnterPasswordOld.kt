@@ -1,4 +1,4 @@
-package io.parity.signer.bottomsheets
+package io.parity.signer.bottomsheets.password
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,8 +23,9 @@ import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MEnterPassword
 
+@Deprecated("use EnterPassword")
 @Composable
-fun EnterPassword(
+fun EnterPasswordOld(
 	enterPassword: MEnterPassword,
 	button: (Action, String) -> Unit
 ) {

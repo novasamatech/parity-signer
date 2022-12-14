@@ -25,10 +25,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.components.ImageContent
+import io.parity.signer.components.toImageContent
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
-import io.parity.signer.models.KeyCardModel
+import io.parity.signer.models.KeyModel
 import io.parity.signer.models.abbreviateString
+import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
+import io.parity.signer.uniffi.Address
+import io.parity.signer.uniffi.MAddressCard
 
 
 @Composable
@@ -45,11 +50,11 @@ fun KeyCard(model: KeyCardModel) {
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Text(
-					model.path,
+					model.cardBase.path,
 					color = MaterialTheme.colors.textSecondary,
 					style = SignerTypeface.CaptionM,
 				)
-				if (model.hasPwd) {
+				if (model.cardBase.hasPwd) {
 					Text(
 						" •••• ",
 						color = MaterialTheme.colors.textSecondary,
@@ -66,7 +71,7 @@ fun KeyCard(model: KeyCardModel) {
 			Spacer(Modifier.padding(top = 4.dp))
 
 			Text(
-				model.seedName,
+				model.cardBase.seedName,
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.LabelS,
 			)
@@ -74,7 +79,7 @@ fun KeyCard(model: KeyCardModel) {
 			Spacer(Modifier.padding(top = 10.dp))
 
 			Box(modifier = Modifier.padding(end = 24.dp)) {
-				ShowBase58Collapsible(model.base58)
+				ShowBase58Collapsible(model.cardBase.base58)
 			}
 		}
 
@@ -82,8 +87,8 @@ fun KeyCard(model: KeyCardModel) {
 		//right()
 		Column(horizontalAlignment = Alignment.End) {
 			Box(contentAlignment = Alignment.TopEnd) {
-				IdentIcon(model.identIcon, 36.dp)
-				model.multiselect?.let {
+				IdentIcon(model.cardBase.identIcon, 36.dp)
+				model.cardBase.multiselect?.let {
 					if (it) {
 						Icon(
 							Icons.Default.CheckCircle,
@@ -171,6 +176,108 @@ private fun ShowBase58Collapsible(base58: String) {
 }
 
 
+data class KeyCardModel(
+	val network: String,
+	val cardBase: KeyCardModelBase,
+) {
+	companion object {
+
+		fun fromKeyModel(model: KeyModel, networkTitle: String): KeyCardModel =
+			KeyCardModel(
+				network = networkTitle,
+				cardBase = KeyCardModelBase.fromKeyModel(model)
+			)
+
+		/**
+		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
+		 */
+		fun fromAddress(
+			address_card: MAddressCard,
+			networkTitle: String
+		): KeyCardModel =
+			KeyCardModel(
+				network = networkTitle,
+				cardBase = KeyCardModelBase.fromAddress(address_card)
+			)
+
+		fun fromAddress(
+			address: Address,
+			base58: String,
+			networkTitle: String
+		): KeyCardModel =
+			KeyCardModel(
+				network = networkTitle,
+				cardBase = KeyCardModelBase.fromAddress(address, base58)
+			)
+
+		fun createStub() = KeyCardModel(
+			network = "Polkadot",
+			cardBase = KeyCardModelBase.createStub()
+		)
+	}
+}
+
+
+data class KeyCardModelBase(
+	val base58: String,
+	val path: String,
+	val identIcon: ImageContent,
+	val seedName: String,
+	val hasPwd: Boolean = false,
+	val multiselect: Boolean? = null,
+) {
+	companion object {
+
+		fun fromKeyModel(model: KeyModel): KeyCardModelBase =
+			KeyCardModelBase(
+				base58 = model.base58,
+				path = model.path,
+				identIcon = model.identicon,
+				seedName = model.seedName,
+				hasPwd = model.hasPwd,
+				multiselect = model.multiselect,
+			)
+
+		/**
+		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
+		 */
+		fun fromAddress(
+			address_card: MAddressCard,
+		): KeyCardModelBase =
+			KeyCardModelBase(
+				base58 = address_card.base58,
+				path = address_card.address.path,
+				hasPwd = address_card.address.hasPwd,
+				identIcon = address_card.address.identicon.toImageContent(),
+				seedName = address_card.address.seedName,
+				multiselect = address_card.multiselect,
+			)
+
+		fun fromAddress(
+			address: Address,
+			base58: String,
+		): KeyCardModelBase =
+			KeyCardModelBase(
+				base58 = base58,
+				path = address.path,
+				hasPwd = address.hasPwd,
+				identIcon = address.identicon.toImageContent(),
+				seedName = address.seedName,
+				multiselect = false,
+			)
+
+		fun createStub() = KeyCardModelBase(
+			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
+			path = "//polkadot//path",
+			identIcon = PreviewData.exampleIdenticonPng,
+			seedName = "Seed Name",
+			hasPwd = false,
+			multiselect = null,
+		)
+	}
+}
+
+
 @Preview(
 	name = "day",
 	uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -203,7 +310,7 @@ private fun PreviewKeySeedCard() {
 	SignerNewTheme {
 		KeySeedCard(
 			seedTitle = "Seed title",
-			base58 = KeyCardModel.createStub().base58,
+			base58 = KeyCardModel.createStub().cardBase.base58,
 		)
 	}
 }

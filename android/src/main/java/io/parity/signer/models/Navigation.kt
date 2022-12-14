@@ -3,14 +3,10 @@ package io.parity.signer.models
 import android.util.Log
 import android.widget.Toast
 import io.parity.signer.BuildConfig
-import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.components.NetworkCardModel
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.ScreenData
-import io.parity.signer.uniffi.backendAction
-import io.parity.signer.uniffi.generateSecretKeyQr
-import io.parity.signer.uniffi.MAddressCard
-import java.lang.RuntimeException
+import io.parity.signer.components.sharedcomponents.KeyCardModel
+import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
+import io.parity.signer.uniffi.*
 
 
 @Deprecated("obsolete, for backwards compatibility, use SignerNavigator class")
