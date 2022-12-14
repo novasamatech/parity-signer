@@ -7,8 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import io.parity.signer.bottomsheets.password.EnterPasswordOld
 import io.parity.signer.bottomsheets.LogComment
+import io.parity.signer.bottomsheets.password.EnterPassword
+import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.models.*
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
@@ -23,6 +24,7 @@ import io.parity.signer.screens.logs.toLogsScreenModel
 import io.parity.signer.screens.settings.SettingsScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ModalData
 import io.parity.signer.uniffi.ScreenData
 
@@ -160,11 +162,22 @@ fun BottomSheetSelector(
 							navigator = signerDataModel.navigator,
 						)
 					}
+				is ModalData.EnterPassword ->
+					BottomSheetWrapperRoot(onClosedAction = {
+						navigator.backAction()
+					}) {
+						EnterPassword(
+							modalData.f.toEnterPasswordModel(),
+							proceed = { password ->
+								navigator.navigate(
+									Action.GO_FORWARD,
+									password
+								)
+							},
+							onClose = { navigator.backAction() },
+						)
+					}
 				is ModalData.SignatureReady -> {}//part of camera flow now
-				//old design
-				is ModalData.EnterPassword -> EnterPasswordOld(
-					modalData.f,
-				) { action, string -> navigator.navigate(action, string) }
 				//old design
 				is ModalData.LogComment -> LogComment(signerDataModel = signerDataModel)
 				else -> {}

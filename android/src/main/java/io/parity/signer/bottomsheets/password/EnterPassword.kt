@@ -6,13 +6,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -20,6 +19,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
@@ -30,6 +32,7 @@ import io.parity.signer.components.sharedcomponents.KeyCardPassword
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.red500
 import io.parity.signer.ui.theme.textTertiary
 import io.parity.signer.uniffi.MEnterPassword
 
@@ -39,29 +42,26 @@ fun EnterPassword(
 	proceed: (String) -> Unit,
 	onClose: Callback,
 ) {
-	val password = remember {
-		mutableStateOf("")
-	}
+	var password by rememberSaveable { mutableStateOf("") }
+	var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
-	val canProceed = password.value.isNotBlank()
+	val canProceed = password.isNotBlank()
 
 	Column(
-		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier.imePadding()
 	) {
 		EnterPasswordHeader(
 			onClose = onClose,
 			onProceed = {
-				proceed(password.value)
+				proceed(password)
 				focusManager.clearFocus(true)
 			},
 			isEnabled = canProceed
 		)
 		Column(
-			horizontalAlignment = Alignment.CenterHorizontally,
 			modifier = Modifier
                 .padding(horizontal = 24.dp)
                 .verticalScroll(
@@ -79,20 +79,23 @@ fun EnterPassword(
 //			Text("Attempt " + enterPassword.counter.toString() + " of 3")
 //		}
 
-			//todo https://stackoverflow.com/questions/65304229/toggle-password-field-jetpack-compose
-			//todo placeholder for mark
 			Spacer(modifier = Modifier.padding(top = 16.dp))
 
 			TextField(
-				value = password.value,
-				onValueChange = { password.value = it },
+				value = password,
+				onValueChange = { password = it },
+				modifier = Modifier
+					.focusRequester(focusRequester)
+					.fillMaxWidth(1f),
+				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
 				keyboardOptions = KeyboardOptions(
+					keyboardType = KeyboardType.Password,
 					imeAction = if (canProceed) ImeAction.Done else ImeAction.None
 				),
 				keyboardActions = KeyboardActions(
 					onDone = {
 						if (canProceed) {
-							proceed(password.value)
+							proceed(password)
 							focusManager.clearFocus(true)
 						}
 					}
@@ -101,10 +104,29 @@ fun EnterPassword(
 				singleLine = true,
 				textStyle = SignerTypeface.LabelM,
 				colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
-				modifier = Modifier
-                    .focusRequester(focusRequester)
-                    .fillMaxWidth(1f),
+				trailingIcon = {
+					val image = if (passwordVisible)
+						Icons.Filled.Visibility
+					else Icons.Filled.VisibilityOff
+
+					// Please provide localized description for accessibility services
+					val description =
+						if (passwordVisible) "Hide password" else "Show password"
+
+					IconButton(onClick = { passwordVisible = !passwordVisible }) {
+						Icon(imageVector = image, description)
+					}
+				},
 			)
+
+			if (data.showError) {
+				Text(
+					text = "The password you entered is incorrect. Please try again.",
+					color = MaterialTheme.colors.red500,
+					style = SignerTypeface.CaptionM,
+					modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+				)
+			}
 
 			Text(
 				text = stringResource(R.string.enter_password_description),
@@ -160,11 +182,13 @@ private fun EnterPasswordHeader(
  */
 class EnterPasswordModel(
 	val keyCard: KeyCardModelBase,
+	val showError: Boolean,
 	val attempt: Int,
 ) {
 	companion object {
 		fun createStub(): EnterPasswordModel = EnterPasswordModel(
-			keyCard = KeyCardModelBase.createStub(),
+			keyCard = KeyCardModelBase.createStub().copy(hasPwd = true),
+			showError = true,
 			attempt = 2,
 		)
 	}
@@ -172,6 +196,7 @@ class EnterPasswordModel(
 
 fun MEnterPassword.toEnterPasswordModel() = EnterPasswordModel(
 	keyCard = KeyCardModelBase.fromAddress(authorInfo),
+	showError = false,
 	attempt = counter.toInt(),
 )
 

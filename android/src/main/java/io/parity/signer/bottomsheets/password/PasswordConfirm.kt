@@ -1,4 +1,4 @@
-package io.parity.signer.bottomsheets
+package io.parity.signer.bottomsheets.password
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -28,6 +28,7 @@ import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.MPasswordConfirm
 
+//not redesigned
 @Composable
 fun PasswordConfirm(
 	passwordConfirm: MPasswordConfirm,
