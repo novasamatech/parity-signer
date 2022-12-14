@@ -20,7 +20,7 @@ struct NetworkSelectionModal: View {
             animateBackground: $viewModel.animateBackground,
             ignoredEdges: .bottom,
             content: {
-                VStack {
+                VStack(spacing: 0) {
                     // Header with X button
                     HStack {
                         Localizable.NetworkFilter.Label.header.text
@@ -32,7 +32,7 @@ struct NetworkSelectionModal: View {
                     .padding(.leading, Spacing.large)
                     .padding(.trailing, Spacing.medium)
                     Divider()
-                        .padding(.top, Spacing.medium)
+                        .padding(.vertical, Spacing.medium)
                     // List of networks
                     LazyVStack {
                         ForEach(
@@ -171,6 +171,7 @@ struct NetworkSelectionModal_Previews: PreviewProvider {
         NetworkSelectionModal(
             viewModel: .init(isPresented: Binding<Bool>.constant(true))
         )
+        .environmentObject(NavigationCoordinator())
         .environmentObject(AppState.preview)
     }
 }
