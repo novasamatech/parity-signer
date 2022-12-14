@@ -1,0 +1,20 @@
+# Workaround for handling skipped but required checks
+# https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/troubleshooting-required-status-checks#handling-skipped-but-required-checks
+name:                         Rust backend test for ios
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - stable
+    paths:
+      - 'ios/**'
+      - 'android/**'
+
+jobs:
+  check:
+    name:                     Cargo test on macOS
+    runs-on:                  macos-latest
+    steps:
+      - run: 'echo "No action required" '
