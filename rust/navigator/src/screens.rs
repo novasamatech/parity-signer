@@ -220,7 +220,11 @@ impl KeysState {
 }
 
 impl AddressState {
-    pub fn new(hex_address_key: &str, keys_state: &KeysState, database_name: &str) -> Result<Self> {
+    pub fn new(details_str: &str, keys_state: &KeysState, database_name: &str) -> Result<Self> {
+        let lines: Vec<_> = details_str.lines().collect();
+        let hex_address_key = lines[0];
+        let network_specs_key = lines[1];
+
         let address_key = AddressKey::from_hex(hex_address_key)?;
         let multisigner = if let Ok(m) = address_key.multi_signer() {
             m
@@ -234,7 +238,7 @@ impl AddressState {
                 .is_root();
         Ok(Self {
             seed_name: keys_state.seed_name(),
-            network_specs_key: keys_state.network_specs_key(),
+            network_specs_key: NetworkSpecsKey::from_hex(network_specs_key)?,
             multisigner,
             is_root,
         })

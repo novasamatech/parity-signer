@@ -818,29 +818,6 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_change_network(&self, details_str: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let mut errorline = String::new();
-
-        if let Screen::Keys(ref keys_state) = self.navstate.screen {
-            if let Modal::NetworkSelector(_) = self.navstate.modal {
-                match NetworkSpecsKey::from_hex(details_str) {
-                    Ok(network_specs_key) => {
-                        new_navstate = Navstate::clean_screen(Screen::Keys(
-                            keys_state.change_network(&network_specs_key),
-                        ))
-                    }
-                    Err(e) => {
-                        new_navstate.alert = Alert::Error;
-                        let _ = write!(&mut errorline, "{}", e);
-                    }
-                }
-            }
-        }
-
-        (new_navstate, errorline)
-    }
-
     fn handle_change_password(&self, details_str: &str) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let errorline = String::new();
@@ -1826,7 +1803,6 @@ impl State {
                 Action::NetworkSelector => self.handle_network_selector(),
                 Action::NextUnit => self.handle_next_unit(),
                 Action::PreviousUnit => self.handle_previous_unit(),
-                Action::ChangeNetwork => self.handle_change_network(details_str),
                 Action::CheckPassword => self.handle_change_password(details_str),
                 Action::TransactionFetched => self.handle_transaction_fetched(dbname, details_str),
                 Action::RemoveNetwork => self.handle_remove_network(dbname),
