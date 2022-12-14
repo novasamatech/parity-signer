@@ -81,7 +81,7 @@ fun EnterPassword(
 
 			Spacer(modifier = Modifier.padding(top = 16.dp))
 
-			TextField(
+			OutlinedTextField(
 				value = password,
 				onValueChange = { password = it },
 				modifier = Modifier

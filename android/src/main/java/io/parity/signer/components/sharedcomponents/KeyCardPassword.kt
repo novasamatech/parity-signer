@@ -9,6 +9,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +17,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
@@ -58,9 +60,10 @@ fun KeyCardPassword(
 						style = SignerTypeface.CaptionM,
 					)
 					Icon(
-						Icons.Default.Lock,
+						Icons.Outlined.Lock,
 						contentDescription = stringResource(R.string.description_locked_icon),
 						tint = MaterialTheme.colors.textSecondary,
+						modifier = Modifier.size(14.dp)
 					)
 				}
 			}
