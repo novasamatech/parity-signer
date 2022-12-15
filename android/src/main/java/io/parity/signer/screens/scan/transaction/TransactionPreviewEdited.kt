@@ -30,6 +30,7 @@ import io.parity.signer.uniffi.*
 @Composable
 fun TransactionPreviewEdited(
 	transactions: List<MTransaction>,
+	signature: MSignatureReady?,
 	signerDataModel: SignerDataModel,
 	onBack: Callback,
 	onFinish: Callback,

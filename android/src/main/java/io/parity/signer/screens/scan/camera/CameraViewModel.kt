@@ -34,8 +34,6 @@ class CameraViewModel() : ViewModel() {
 	// payload of currently scanned qr codes for multiqr transaction like metadata update.
 	private var currentMultiQrTransaction = arrayOf<String>()
 
-	private val uniffiInteractor = ServiceLocator.backendLocator.uniffiInteractor
-
 	/**
 	 * Barcode detecting function.
 	 * This uses experimental features
@@ -110,18 +108,6 @@ class CameraViewModel() : ViewModel() {
 
 	private fun addPendingTransaction(payload: String) {
 		_pendingPayloads.value = _pendingPayloads.value + payload
-	}
-
-	suspend fun getTransactionsFromPendingPayload(): List<MTransaction> {
-		val allResults = pendingTransactionPayloads.value.map { payload ->
-			uniffiInteractor.navigate(Action.TRANSACTION_FETCHED, payload)
-		}
-		//todo handle error cases and show ot user?
-		allResults.filterIsInstance<UniffiResult.Error<Any>>().forEach { error ->
-			Log.e("scanVM","Camera scan: " + "transaction parsing failed, ${error.error.message}")
-		}
-		return allResults.filterIsInstance<UniffiResult.Success<ActionResult>>()
-			.mapNotNull { (it.result.screenData as? ScreenData.Transaction)?.f }.flatten()
 	}
 
 	/**

@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ScanScreen(
 	onClose: Callback,
-	onNavigateToTransaction: (List<MTransaction>) -> Unit,
+	performPayloads: suspend (Set<String>) -> Unit,
 ) {
 	val viewModel: CameraViewModel = viewModel()
 
@@ -49,14 +49,12 @@ fun ScanScreen(
 			viewModel.pendingTransactionPayloads
 				.filter { it.isNotEmpty() }
 				.collect {
-					val transactions = viewModel.getTransactionsFromPendingPayload()
-					if (transactions.isNotEmpty()) {
+					val payloads = viewModel.pendingTransactionPayloads.value
+					if (payloads.isNotEmpty()) {
 						//scanned qr codes is signer transaction qr code
-						viewModel.resetPendingTransactions()
-						onNavigateToTransaction(transactions)
-					} else {
-						viewModel.resetPendingTransactions()
+						performPayloads(payloads)
 					}
+					viewModel.resetPendingTransactions()
 				}
 		}
 	}
@@ -83,7 +81,7 @@ fun ScanScreen(
 					viewModel = viewModel,
 					isMultimode = viewModel.isMultiscanMode.collectAsState(),
 					pendingTransactions = viewModel.pendingTransactionPayloads.collectAsState(),
-					onNavigateToTransaction = onNavigateToTransaction,
+					onNavigateToTransaction = performPayloads,
 				)
 			}
 		}
@@ -97,7 +95,7 @@ private fun CameraMultiModProceed(
 	viewModel: CameraViewModel,
 	isMultimode: State<Boolean>,
 	pendingTransactions: State<Set<String>>,
-	onNavigateToTransaction: (List<MTransaction>) -> Unit,
+	onNavigateToTransaction: suspend (Set<String>) -> Unit,
 ) {
 	//todo multisign for multimode implement UI
 //	if (isMultimode.value && pendingTransactions.value.isNotEmpty()) {

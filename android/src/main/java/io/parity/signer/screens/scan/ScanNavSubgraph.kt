@@ -10,10 +10,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.parity.signer.bottomsheets.password.EnterPassword
+import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.screens.scan.ScanScreen
-import io.parity.signer.screens.scan.ScanViewModel
 import io.parity.signer.screens.scan.old.SignatureReady
 import io.parity.signer.screens.scan.transaction.TransactionPreviewEdited
 import io.parity.signer.ui.BottomSheetWrapperRoot
@@ -41,18 +41,46 @@ fun ScanNavSubgraph(
 			}
 			ScanScreen(
 				onClose = { rootNavigator.backAction() },
-				onNavigateToTransaction = { transactions ->
+				performPayloads = { payloads ->
+					val transactions = scanViewModel.performPayloads(payloads)
 					scanViewModel.pendingTransactions.value = transactions
 					navController.navigate(ScanNavSubgraph.transaction)
 				}
 			)
 		}
+		composable(ScanNavSubgraph.password) {
+		//todo scan ios/NativeSigner/Screens/Scan/CameraView.swift:138
+			val backAction = {
+				navController.navigate(ScanNavSubgraph.camera)
+			}
+
+			BackHandler(onBack = backAction)
+			ScanScreen(onClose = { }, performPayloads ={})
+			BottomSheetWrapperRoot(onClosedAction = {
+				backAction
+			}) {
+				EnterPassword(
+//					data = modalData.f.toEnterPasswordModel(),
+//					proceed = { password ->
+//						navigator.navigate(
+//							Action.GO_FORWARD,
+//							password
+//						)
+//					},
+					data = EnterPasswordModel.createStub(), //todo scan
+					proceed = {},
+					onClose = backAction,
+				)
+			}
+		}
 		composable(ScanNavSubgraph.transaction) {
+			//todo scan ios/NativeSigner/Screens/Scan/CameraView.swift:130
 			val transactions = scanViewModel.pendingTransactions.collectAsState()
 
 			Box(modifier = Modifier.statusBarsPadding()) {
 				TransactionPreviewEdited(
 					transactions = transactions.value,
+					signature = null,
 					signerDataModel = signerDataModel,
 					onBack = {
 						//was navigate(Action.GO_BACK, "", "")
@@ -97,4 +125,5 @@ private object ScanNavSubgraph {
 	const val camera = "scan_camera"
 	const val transaction = "scan_transaction"
 	const val signatureReady = "signature ready"
+	const val password = "password"
 }
