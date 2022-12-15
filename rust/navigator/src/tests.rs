@@ -573,8 +573,8 @@ fn bulk_signing_test_passworded() {
 fn export_import_addrs() {
     let dbname_from = "for_tests/export_import_addrs_from";
     let dbname_to = "for_tests/export_import_addrs_to";
-    let polkadot_genesis =
-        H256::from_str("91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3").unwrap();
+    let westend_genesis =
+        H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
 
     populate_cold_nav_test(dbname_from).unwrap();
     populate_cold_nav_test(dbname_to).unwrap();
@@ -584,15 +584,15 @@ fn export_import_addrs() {
     try_create_address(
         "Alice",
         ALICE_SEED_PHRASE,
-        "//polkadot//test",
-        &NetworkSpecsKey::from_parts(&polkadot_genesis, &Encryption::Sr25519),
+        "//westend//0",
+        &NetworkSpecsKey::from_parts(&westend_genesis, &Encryption::Sr25519),
         dbname_from,
     )
     .unwrap();
 
     let selected = HashMap::from([("Alice".to_owned(), ExportedSet::All)]);
     let addrs = export_all_addrs(dbname_from, selected.clone()).unwrap();
-    let addrs = prepare_derivations_preview(addrs);
+    let addrs = prepare_derivations_preview(dbname_from, addrs);
 
     let addrs_expected = vec![SeedKeysPreview {
         name: "Alice".to_owned(),
@@ -605,15 +605,6 @@ fn export_import_addrs() {
         ),
         derived_keys: vec![
             DerivedKeyPreview {
-                address: "14VVJt7kYNpPhz9UNLnxDu6GDJ4vG8i1KaCm4mqdQXtRKU8".to_owned(),
-                derivation_path: Some("//polkadot//test".to_owned()),
-                encryption: Encryption::Sr25519,
-                genesis_hash: H256::from_str(
-                    "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
-                )
-                .unwrap(),
-            },
-            DerivedKeyPreview {
                 address: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_owned(),
                 derivation_path: Some("//westend".to_owned()),
                 encryption: Encryption::Sr25519,
@@ -621,6 +612,11 @@ fn export_import_addrs() {
                     "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
                 )
                 .unwrap(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_westend().to_vec(),
+                },
+                has_pwd: false,
+                network_title: "Westend".to_string(),
             },
             DerivedKeyPreview {
                 address: "ErGkNDDPmnaRZKxwe4VBLonyBJVmucqURFMatEJTwktsuTv".to_owned(),
@@ -630,16 +626,36 @@ fn export_import_addrs() {
                     "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
                 )
                 .unwrap(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_kusama().to_vec(),
+                },
+                has_pwd: false,
+                network_title: "Kusama".to_string(),
+            },
+            DerivedKeyPreview {
+                address: "5HGiBcFgEBMgT6GEuo9SA98sBnGgwHtPKDXiUukT6aqCrKEx".to_owned(),
+                derivation_path: Some("//westend//0".to_owned()),
+                encryption: Encryption::Sr25519,
+                genesis_hash: westend_genesis,
+                identicon: SignerImage::Png {
+                    image: alice_sr_westend_0().to_vec(),
+                },
+                has_pwd: false,
+                network_title: "Westend".to_string(),
             },
             DerivedKeyPreview {
                 address: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_owned(),
                 derivation_path: Some("//polkadot".to_owned()),
                 encryption: Encryption::Sr25519,
-
                 genesis_hash: H256::from_str(
                     "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
                 )
                 .unwrap(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_polkadot().to_vec(),
+                },
+                has_pwd: false,
+                network_title: "Polkadot".to_string(),
             },
         ],
     }];
@@ -663,8 +679,7 @@ fn export_import_addrs() {
         },
     );
     let addrs_filtered = export_all_addrs(dbname_from, selected_hashmap).unwrap();
-    println!("{}", hex::encode(addrs_filtered.encode()));
-    let addrs_filtered = prepare_derivations_preview(addrs_filtered);
+    let addrs_filtered = prepare_derivations_preview(dbname_from, addrs_filtered);
 
     let addrs_expected_filtered = vec![SeedKeysPreview {
         name: "Alice".to_owned(),
@@ -679,8 +694,12 @@ fn export_import_addrs() {
             address: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_owned(),
             derivation_path: Some("//polkadot".to_owned()),
             encryption: Encryption::Sr25519,
-
             genesis_hash: polkadot_genesis,
+            identicon: SignerImage::Png {
+                image: alice_sr_polkadot().to_vec(),
+            },
+            has_pwd: false,
+            network_title: "Polkadot".to_string(),
         }],
     }];
 
@@ -692,7 +711,7 @@ fn export_import_addrs() {
     import_all_addrs(dbname_to, addrs, alice_hash_map).unwrap();
 
     let addrs_new = export_all_addrs(dbname_to, selected).unwrap();
-    let addrs_new = prepare_derivations_preview(addrs_new);
+    let addrs_new = prepare_derivations_preview(dbname_from, addrs_new);
     assert_eq!(addrs_new, addrs_expected);
 }
 
@@ -3991,51 +4010,66 @@ fn flow_test_1() {
                 address: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
                     .parse()
                     .unwrap(),
-                derivation_path: Some("//Alice".parse().unwrap()),
+                derivation_path: Some("//Alice".to_string()),
                 encryption: Encryption::Sr25519,
                 genesis_hash: "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                     .parse()
                     .unwrap(),
+                identicon: SignerImage::default(),
+                has_pwd: false,
+                network_title: "".to_string(),
             },
             DerivedKeyPreview {
                 address: "5FcKjDXS89U79cXvhksZ2pF5XBeafmSM8rqkDVoTHQcXd5Gq"
                     .parse()
                     .unwrap(),
-                derivation_path: Some("//Alice/westend".parse().unwrap()),
+                derivation_path: Some("//Alice/westend".to_string()),
                 encryption: Encryption::Sr25519,
                 genesis_hash: "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                     .parse()
                     .unwrap(),
+                identicon: SignerImage::default(),
+                has_pwd: false,
+                network_title: "".to_string(),
             },
             DerivedKeyPreview {
                 address: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK"
                     .parse()
                     .unwrap(),
-                derivation_path: Some("//Alice/secret//secret".parse().unwrap()),
+                derivation_path: Some("//Alice/secret//secret".to_string()),
                 encryption: Encryption::Sr25519,
                 genesis_hash: "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                     .parse()
                     .unwrap(),
+                identicon: SignerImage::default(),
+                has_pwd: false,
+                network_title: "".to_string(),
             },
             DerivedKeyPreview {
                 address: "5D34dL5prEUaGNQtPPZ3yN5Y6BnkfXunKXXz6fo7ZJbLwRRH"
                     .parse()
                     .unwrap(),
-                derivation_path: Some("//0".parse().unwrap()),
+                derivation_path: Some("//0".to_string()),
                 encryption: Encryption::Sr25519,
                 genesis_hash: "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                     .parse()
                     .unwrap(),
+                identicon: SignerImage::default(),
+                has_pwd: false,
+                network_title: "".to_string(),
             },
             DerivedKeyPreview {
                 address: "5GBNeWRhZc2jXu7D55rBimKYDk8PGk8itRYFTPfC8RJLKG5o"
                     .parse()
                     .unwrap(),
-                derivation_path: Some("//1".parse().unwrap()),
+                derivation_path: Some("//1".to_string()),
                 encryption: Encryption::Sr25519,
                 genesis_hash: "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                     .parse()
                     .unwrap(),
+                identicon: SignerImage::default(),
+                has_pwd: false,
+                network_title: "".to_string(),
             },
         ],
     }];

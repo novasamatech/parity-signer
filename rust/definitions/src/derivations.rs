@@ -1,5 +1,7 @@
 use crate::crypto::Encryption;
+use crate::navigation::SignerImage;
 use sp_core::H256;
+
 use sp_runtime::MultiSigner;
 
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -21,8 +23,7 @@ pub struct DerivedKeyPreview {
     /// Address in the network.
     ///
     /// This is either `ss58` form for substrate-based chains or
-    /// h160 form for ethereum based
-    /// chains
+    /// h160 form for ethereum based chains
     pub address: String,
 
     /// The derivation path of the key if user provided one
@@ -33,4 +34,10 @@ pub struct DerivedKeyPreview {
 
     /// Genesis hash
     pub genesis_hash: H256,
+
+    pub identicon: SignerImage,
+
+    pub has_pwd: bool,
+
+    pub network_title: String,
 }

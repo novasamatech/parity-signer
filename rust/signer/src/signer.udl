@@ -357,6 +357,9 @@ dictionary DerivedKeyPreview {
     string? derivation_path;
     Encryption encryption;
     H256 genesis_hash;
+    SignerImage identicon;
+    boolean has_pwd;
+    string network_title;
 };
 
 dictionary SeedNameCard {

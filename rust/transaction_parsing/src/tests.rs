@@ -1,11 +1,14 @@
 use crate::{produce_output, StubNav};
 use constants::test_values::{
-    alice_sr_alice, bob, ed, id_01, id_02, id_03, types_known, types_unknown, westend_9070,
+    alice_sr_alice, alice_sr_westend_0, bob, ed, id_01, id_02, id_03, types_known, types_unknown,
+    westend_9070,
 };
+
 use db_handling::{
     cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
     manage_history::get_history,
 };
+use definitions::derivations::{DerivedKeyPreview, SeedKeysPreview};
 use definitions::navigation::{MAddressCard, SignerImage, TransactionSignAction};
 use definitions::{
     crypto::Encryption,
@@ -18,9 +21,12 @@ use definitions::{
     },
     network_specs::{OrderedNetworkSpecs, Verifier, VerifierValue},
 };
+
 use pretty_assertions::assert_eq;
+use sp_core::sr25519::Public;
 use sp_core::H256;
 use sp_runtime::MultiSigner;
+use std::convert::TryFrom;
 use std::{fs, str::FromStr};
 
 const ALICE: [u8; 32] = [
@@ -2521,12 +2527,40 @@ fn parse_msg_2() {
 fn import_derivations() {
     let dbname = "for_tests/import_derivations";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let line = "53ffde01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e141c2f2f416c6963653c2f2f416c6963652f77657374656e64582f2f416c6963652f7365637265742f2f7365637265740c2f2f300c2f2f31";
+    let line = "53ffde00041c6d792073656564010146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a04c0354847694263466745424d6754364745756f395341393873426e4767774874504b44586955756b5436617143724b457801302f2f77657374656e642f2f3001e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
     let set_expected = TransactionCardSet {
         importing_derivations: Some(vec![TransactionCard {
             index: 0,
             indent: 0,
-            card: Card::DerivationsCard { f: vec![] },
+            card: Card::DerivationsCard {
+                f: vec![SeedKeysPreview {
+                    name: "my seed".to_string(),
+                    multisigner: Some(MultiSigner::Sr25519(
+                        Public::try_from(
+                            hex::decode(
+                                "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
+                            )
+                            .unwrap()
+                            .as_ref(),
+                        )
+                        .unwrap(),
+                    )),
+                    derived_keys: vec![DerivedKeyPreview {
+                        address: "5HGiBcFgEBMgT6GEuo9SA98sBnGgwHtPKDXiUukT6aqCrKEx".to_string(),
+                        derivation_path: Some("//westend//0".to_string()),
+                        encryption: Encryption::Sr25519,
+                        genesis_hash:
+                            "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                                .parse()
+                                .unwrap(),
+                        identicon: SignerImage::Png {
+                            image: alice_sr_westend_0().to_vec(),
+                        },
+                        has_pwd: false,
+                        network_title: "Westend".to_string(),
+                    }],
+                }],
+            },
         }]),
         ..Default::default()
     };
