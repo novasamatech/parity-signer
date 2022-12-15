@@ -15,7 +15,7 @@ struct NetworkSelectionModal: View {
     var body: some View {
         FullScreenRoundedModal(
             backgroundTapAction: {
-                viewModel.resetAction()
+                viewModel.cancelAction()
             },
             animateBackground: $viewModel.animateBackground,
             ignoredEdges: .bottom,
@@ -27,7 +27,7 @@ struct NetworkSelectionModal: View {
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
-                        CloseModalButton(action: viewModel.resetAction)
+                        CloseModalButton(action: viewModel.cancelAction)
                     }
                     .padding(.leading, Spacing.large)
                     .padding(.trailing, Spacing.medium)
@@ -119,8 +119,13 @@ extension NetworkSelectionModal {
             selectedNetworks = appState.userData.selectedNetworks
         }
 
+        func cancelAction() {
+            navigation.performFake(navigation: .init(action: .goBack))
+            animateDismissal()
+        }
+
         func resetAction() {
-            selectedNetworks = appState.userData.selectedNetworks
+            appState.userData.selectedNetworks = []
             navigation.performFake(navigation: .init(action: .goBack))
             animateDismissal()
         }

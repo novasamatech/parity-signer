@@ -36,8 +36,6 @@ extension KeyDetailsView {
 
         /// Navigation action for selecting main `Address Key`
         var addressKeyNavigation: Navigation?
-        /// Collection of navigation actions for tapping on `Derived Key`
-        var derivedKeysNavigation: [Navigation] = []
         /// Navigation for `Create Derived Key`
         let createDerivedKey: Navigation = .init(action: .newKey)
         /// Name of seed to be removed with `Remove Seed` action
@@ -52,6 +50,7 @@ extension KeyDetailsView {
             self.exportPrivateKeyService = exportPrivateKeyService
             self.keyDetailsService = keyDetailsService
             updateRenderables()
+            subscribeToNetworkChanges()
         }
 
         func use(appState: AppState) {
@@ -60,6 +59,14 @@ extension KeyDetailsView {
 
         func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
+        }
+
+        func subscribeToNetworkChanges() {
+            $isPresentingNetworkSelection.sink { newValue in
+                guard !newValue else { return }
+                self.refreshDerivedKeys()
+            }
+            .store(in: cancelBag)
         }
 
         func updateRenderables() {
@@ -161,7 +168,17 @@ private extension KeyDetailsView.ViewModel {
         guard let keysData = keysData else { return }
         let sortedDerivedKeys = keysData.set
             .sorted(by: { $0.key.address.path < $1.key.address.path })
-        derivedKeys = sortedDerivedKeys
+        let filteredKeys: [MKeyAndNetworkCard]
+        if appState.userData.selectedNetworks.isEmpty {
+            filteredKeys = sortedDerivedKeys
+        } else {
+            filteredKeys = sortedDerivedKeys.filter {
+                appState.userData.selectedNetworks
+                    .map(\.key)
+                    .contains($0.network.networkSpecsKey)
+            }
+        }
+        derivedKeys = filteredKeys
             .map {
                 let details = "\($0.key.addressKey)\n\($0.network.networkSpecsKey)"
                 return DerivedKeyRowModel(
@@ -170,11 +187,6 @@ private extension KeyDetailsView.ViewModel {
                         tapAction: .init(action: .selectKey, details: details)
                     )
                 )
-            }
-        derivedKeysNavigation = sortedDerivedKeys
-            .map {
-                let details = "\($0.key.addressKey)\n\($0.network.networkSpecsKey)"
-                return .init(action: .selectKey, details: details)
             }
     }
 
