@@ -2,11 +2,16 @@ name:                         Rustfmt
 
 on:
   pull_request:
+    paths:
+      - 'rust/**'
+      - '.github/workflows/rust-fmt.yml'
   push:
     branches:
       - master
       - stable
-
+    paths:
+      - 'rust/**'
+      - '.github/workflows/rust-fmt.yml'
 jobs:
   rustfmt:
     name:                     Cargo fmt
@@ -23,7 +28,7 @@ jobs:
         with:
           fetch-depth:        50
           submodules:         'recursive'
- 
+
       - name:                 Install Rust stable toolchain
         uses:                 actions-rs/toolchain@v1.0.7
         with:

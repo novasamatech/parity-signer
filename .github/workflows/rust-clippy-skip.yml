@@ -1,0 +1,21 @@
+# Workaround for handling skipped but required checks
+# https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/troubleshooting-required-status-checks#handling-skipped-but-required-checks
+name:                         Rust clippy
+
+on:
+  pull_request:
+    paths:
+      - '!rust/**'
+      - '.github/workflows/rust-cargo-deny.yml'
+  push:
+    branches:
+      - master
+      - stable
+    paths:
+      - '!rust/**'
+jobs:
+  linter:
+    name:                     Cargo clippy
+    runs-on:                  ubuntu-latest
+    steps:
+      - run: 'echo "No action required" '

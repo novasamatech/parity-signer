@@ -2,11 +2,16 @@ name:                         Rust clippy
 
 on:
   pull_request:
+    paths:
+      - 'rust/**'
+      - '.github/workflows/rust-clippy.yml'
   push:
     branches:
       - master
       - stable
-
+    paths:
+      - 'rust/**'
+      - '.github/workflows/rust-clippy.yml'
 jobs:
   linter:
     name:                     Cargo clippy
