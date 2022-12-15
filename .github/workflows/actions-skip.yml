@@ -4,14 +4,16 @@ name:                         E2E Test
 
 on:
   pull_request:
+    paths:
+      - '!ios/**'
+      - '!rust/**'
   push:
     branches:
       - master
       - stable
-    paths-ignore:
-      - 'ios/**'
-      - 'rust/**'
-      - '.github/workflows/actions.yml'
+    paths:
+      - '!ios/**'
+      - '!rust/**'
 
 jobs:
   check:

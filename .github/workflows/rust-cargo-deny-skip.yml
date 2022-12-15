@@ -4,14 +4,14 @@ name:                     Check cargo deny
 
 on:
   pull_request:
+    paths:
+      - '!rust/**'
   push:
     branches:
       - master
       - stable
     paths:
-      - 'ios/**'
-      - 'android/**'
-
+      - '!rust/**'
 jobs:
   cargo-deny:
     name:                 Cargo deny

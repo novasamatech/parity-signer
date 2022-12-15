@@ -2,13 +2,14 @@ name:                         Rust clippy
 
 on:
   pull_request:
+    paths:
+      - 'rust/**'
   push:
     branches:
       - master
       - stable
-    paths-ignore:
-      - 'ios/**'
-      - 'android/**'
+    paths:
+      - 'rust/**'
 jobs:
   linter:
     name:                     Cargo clippy

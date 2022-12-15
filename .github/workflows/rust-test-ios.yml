@@ -2,13 +2,14 @@ name:                         Rust backend test for ios
 
 on:
   pull_request:
+    paths:
+      - 'rust/**'
   push:
     branches:
       - master
       - stable
-    paths-ignore:
-      - 'ios/**'
-      - 'android/**'
+    paths:
+      - 'rust/**'
 jobs:
   check:
     name:                     Cargo test on macOS

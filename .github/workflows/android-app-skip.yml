@@ -4,15 +4,16 @@ name: Build android app
 
 on:
   pull_request:
+    paths:
+      - '!android/**'
+      - '!rust/**'
   push:
     branches:
       - master
       - stable
-    paths-ignore:
-      - 'android/**'
-      - 'rust/**'
-      - '.github/workflows/android-app.yml'
-
+    paths:
+      - '!android/**'
+      - '!rust/**'
 jobs:
   build:
     name:    Build
