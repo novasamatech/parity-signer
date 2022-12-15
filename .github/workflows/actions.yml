@@ -3,18 +3,10 @@ name:                         E2E Test
 on:
 on:
   pull_request:
-    paths:
-      - 'ios/**'
-      - 'rust/**'
-      - '.github/workflows/actions.yml'
   push:
     branches:
       - master
       - stable
-    paths:
-      - 'ios/**'
-      - 'rust/**'
-      - '.github/workflows/actions.yml'
 
 jobs:
   check:
