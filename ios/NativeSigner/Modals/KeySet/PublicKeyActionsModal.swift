@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PublicKeyActionsModal: View {
     @State private var animateBackground: Bool = false
-
+    let isDerivedKey: Bool
     @Binding private var shouldPresentExportKeysWarningModal: Bool
     @Binding private var isShowingActionSheet: Bool
     @Binding private var shouldPresentRemoveConfirmationModal: Bool
@@ -18,11 +18,13 @@ struct PublicKeyActionsModal: View {
     init(
         shouldPresentExportKeysWarningModal: Binding<Bool> = Binding<Bool>.constant(false),
         isShowingActionSheet: Binding<Bool> = Binding<Bool>.constant(false),
-        shouldPresentRemoveConfirmationModal: Binding<Bool> = Binding<Bool>.constant(false)
+        shouldPresentRemoveConfirmationModal: Binding<Bool> = Binding<Bool>.constant(false),
+        isDerivedKey: Bool
     ) {
         _shouldPresentExportKeysWarningModal = shouldPresentExportKeysWarningModal
         _isShowingActionSheet = isShowingActionSheet
         _shouldPresentRemoveConfirmationModal = shouldPresentRemoveConfirmationModal
+        self.isDerivedKey = isDerivedKey
     }
 
     var body: some View {
@@ -53,21 +55,23 @@ struct PublicKeyActionsModal: View {
                             text: Localizable.PublicKeyDetailsModal.Action.share.key
                         )
                     }
-                    ActionSheetButton(
-                        action: {
-                            animateDismissal {
-                                navigation.perform(navigation: .init(action: .networkSelector))
-                            }
-                        },
-                        icon: Asset.changeNetwork.swiftUIImage,
-                        text: Localizable.PublicKeyDetailsModal.Action.changeNetwork.key
-                    )
-                    ActionSheetButton(
-                        action: { animateDismissal { shouldPresentRemoveConfirmationModal.toggle() } },
-                        icon: Asset.delete.swiftUIImage,
-                        text: Localizable.PublicKeyDetailsModal.Action.delete.key,
-                        style: .destructive
-                    )
+                    if isDerivedKey {
+                        ActionSheetButton(
+                            action: {
+                                animateDismissal {
+                                    navigation.perform(navigation: .init(action: .networkSelector))
+                                }
+                            },
+                            icon: Asset.changeNetwork.swiftUIImage,
+                            text: Localizable.PublicKeyDetailsModal.Action.changeNetwork.key
+                        )
+                        ActionSheetButton(
+                            action: { animateDismissal { shouldPresentRemoveConfirmationModal.toggle() } },
+                            icon: Asset.delete.swiftUIImage,
+                            text: Localizable.PublicKeyDetailsModal.Action.delete.key,
+                            style: .destructive
+                        )
+                    }
                     EmptyButton(
                         action: { animateDismissal() },
                         text: Localizable.AddKeySet.Button.cancel.key,
@@ -95,13 +99,15 @@ struct PublicKeyActionsModal: View {
 struct PublicKeyActionsModal_Previews: PreviewProvider {
     static var previews: some View {
         PublicKeyActionsModal(
-            isShowingActionSheet: Binding<Bool>.constant(true)
+            isShowingActionSheet: Binding<Bool>.constant(true),
+            isDerivedKey: true
         )
         .preferredColorScheme(.dark)
         .previewLayout(.sizeThatFits)
         VStack {
             PublicKeyActionsModal(
-                isShowingActionSheet: Binding<Bool>.constant(true)
+                isShowingActionSheet: Binding<Bool>.constant(true),
+                isDerivedKey: false
             )
             .preferredColorScheme(.light)
             .previewLayout(.sizeThatFits)

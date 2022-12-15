@@ -311,9 +311,9 @@
 "KeyExport.Label.Header" = "Export Private Key";
 "KeyExport.Label.Hide" = "Private Key will be hidden in";
 
-"PublicKeyDetailsModal.Action.Networks" = "Other Networks";
+"PublicKeyDetailsModal.Action.Networks" = "Address on Other Networks";
 "PublicKeyDetailsModal.Action.Share" = "Share Private Key";
-"PublicKeyDetailsModal.Action.ChangeNetwork" = "Change Key's network";
+"PublicKeyDetailsModal.Action.ChangeNetwork" = "Change this Key's network";
 "PublicKeyDetailsModal.Action.Delete" = "Delete";
 
 "PublicKeyDetailsModal.Confirmation.Label.Title" = "Forget this Key?";
