@@ -40,7 +40,7 @@ jobs:
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-spm-
-              
+
       - name:                 Install Rust aarch64-apple-ios target
         uses:                 actions-rs/toolchain@v1.0.7
         with:

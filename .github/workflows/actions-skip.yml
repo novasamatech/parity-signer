@@ -1,0 +1,25 @@
+# Workaround for handling skipped but required checks
+# https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/troubleshooting-required-status-checks#handling-skipped-but-required-checks
+name:                         E2E Test
+
+on:
+  pull_request:
+    paths:
+      - '!ios/**'
+      - '!rust/**'
+      - '.github/workflows/actions-skip.yml'
+  push:
+    branches:
+      - master
+      - stable
+    paths:
+      - '!ios/**'
+      - '!rust/**'
+      - '.github/workflows/actions-skip.yml'
+
+jobs:
+  check:
+    name:                     Check on MacOS
+    runs-on:                  macos-12
+    steps:
+      - run: 'echo "No action required" '
