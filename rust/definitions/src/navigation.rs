@@ -270,10 +270,12 @@ pub struct MSeeds {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MKeyDetails {
-    pub qr: QrData,
     pub pubkey: String,
-    pub network_info: MSCNetworkInfo,
-    pub base58: String,
+    /// If the key is a root key it should not have a particular network
+    /// qr and base58 address
+    pub qr: Option<QrData>,
+    pub network_info: Option<MSCNetworkInfo>,
+    pub base58: Option<String>,
     pub multiselect: Option<bool>,
     pub address: Address,
 }

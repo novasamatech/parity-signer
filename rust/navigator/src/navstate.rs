@@ -1075,7 +1075,7 @@ impl State {
                     match db_handling::identities::remove_key(
                         dbname,
                         &address_state.multisigner(),
-                        &address_state.network_specs_key(),
+                        &address_state.network_specs_key().unwrap(),
                     ) {
                         Ok(()) => {
                             new_navstate = Navstate::clean_screen(Screen::Log);
@@ -1511,7 +1511,7 @@ impl State {
                     dbname,
                     &address_state.multisigner(),
                     &address_state.seed_name(),
-                    &address_state.network_specs_key(),
+                    address_state.network_specs_key().as_ref(),
                 )?;
                 ScreenData::KeyDetails { f }
             }
@@ -1520,7 +1520,7 @@ impl State {
                     dbname,
                     &address_state_multi.multisigner(),
                     &address_state_multi.seed_name(),
-                    &address_state_multi.network_specs_key(),
+                    Some(&address_state_multi.network_specs_key()),
                 )?;
                 let f = MKeyDetailsMulti {
                     key_details,

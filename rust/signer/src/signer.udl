@@ -362,11 +362,11 @@ interface QrData {
 };
 
 dictionary MKeyDetails {
-    QrData qr;
+    QrData? qr;
     string pubkey;
-    MSCNetworkInfo network_info;
+    MSCNetworkInfo? network_info;
     Address address;
-    string base58;
+    string? base58;
     boolean? multiselect;
 };
 

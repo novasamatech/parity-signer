@@ -12,7 +12,7 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
 use definitions::navigation::{MAddressCard, MKeyAndNetworkCard, MKeysNew, QrData, SignerImage};
-use definitions::network_specs::NetworkSpecs;
+use definitions::network_specs::{self, NetworkSpecs};
 use definitions::{
     crypto::Encryption,
     helpers::{
@@ -450,13 +450,30 @@ pub fn export_key<P>(
     db_path: P,
     multisigner: &MultiSigner,
     expected_seed_name: &str,
-    network_specs_key: &NetworkSpecsKey,
+    network_specs_key: Option<&NetworkSpecsKey>,
 ) -> Result<MKeyDetails>
 where
     P: AsRef<Path>,
 {
-    let ordered_network_specs = get_network_specs(&db_path, network_specs_key)?;
-    let network_specs = ordered_network_specs.specs;
+    let (network_info, base58, network_specs) = if let Some(network_specs_key) = network_specs_key {
+        let ordered_network_specs = get_network_specs(&db_path, network_specs_key)?;
+        let network_specs = ordered_network_specs.specs;
+
+        let network_info = MSCNetworkInfo {
+            network_title: network_specs.title.clone(),
+            network_logo: network_specs.logo.clone(),
+            network_specs_key: hex::encode(network_specs_key.key()),
+        };
+        let base58 = print_multisigner_as_base58_or_eth(
+            multisigner,
+            Some(network_specs.base58prefix),
+            network_specs.encryption,
+        );
+
+        (Some(network_info), Some(base58), Some(network_specs))
+    } else {
+        (None, None, None)
+    };
     let address_key = AddressKey::from_multisigner(multisigner);
     let address_details = get_address_details(&db_path, &address_key)?;
     if address_details.seed_name != expected_seed_name {
@@ -466,23 +483,24 @@ where
             real_seed_name: address_details.seed_name,
         });
     }
-    let base58 = print_multisigner_as_base58_or_eth(
-        multisigner,
-        Some(network_specs.base58prefix),
-        network_specs.encryption,
-    );
-
     let public_key = multisigner_to_public(multisigner);
-    let identicon =
-        make_identicon_from_multisigner(multisigner, network_specs.encryption.identicon_style());
-    let qr = {
+    let identicon = make_identicon_from_multisigner(
+        multisigner,
+        network_specs
+            .as_ref()
+            .map(|n| n.encryption.identicon_style())
+            .unwrap_or_else(|| IdenticonStyle::Dots),
+    );
+    let qr = if let (Some(network_specs_key), Some(network_specs), Some(base58)) =
+        (network_specs_key, &network_specs, &base58)
+    {
         if address_details.network_id.contains(network_specs_key) {
             let prefix = if network_specs.encryption == Encryption::Ethereum {
                 "ethereum"
             } else {
                 "substrate"
             };
-            QrData::Regular {
+            Some(QrData::Regular {
                 data: format!(
                     "{}:{}:0x{}",
                     prefix,
@@ -491,13 +509,15 @@ where
                 )
                 .as_bytes()
                 .to_vec(),
-            }
+            })
         } else {
             return Err(Error::NetworkSpecsKeyForAddressNotFound {
                 network_specs_key: network_specs_key.to_owned(),
                 address_key,
             });
         }
+    } else {
+        None
     };
     let address = Address {
         path: address_details.path,
@@ -506,13 +526,6 @@ where
         seed_name: address_details.seed_name,
         secret_exposed: address_details.secret_exposed,
     };
-
-    let network_info = MSCNetworkInfo {
-        network_title: network_specs.title,
-        network_logo: network_specs.logo,
-        network_specs_key: hex::encode(network_specs_key.key()),
-    };
-
     Ok(MKeyDetails {
         qr,
         pubkey: hex::encode(public_key),

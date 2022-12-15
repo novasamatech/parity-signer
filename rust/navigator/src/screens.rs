@@ -12,7 +12,6 @@ use db_handling::{
     identities::get_multisigner_by_address,
     interface_signer::{first_network, SeedDraft},
 };
-use definitions::navigation::MAddressCard;
 use definitions::{
     crypto::Encryption,
     helpers::{make_identicon_from_multisigner, multisigner_to_public, IdenticonStyle},
@@ -20,6 +19,7 @@ use definitions::{
     navigation::Address,
     users::AddressDetails,
 };
+use definitions::{navigation::MAddressCard, network_specs};
 use transaction_signing;
 
 const MAX_COUNT_SET: u8 = 3;
@@ -68,7 +68,7 @@ pub struct KeysState {
 #[derive(Debug, Clone)]
 pub struct AddressState {
     seed_name: String,
-    network_specs_key: NetworkSpecsKey,
+    network_specs_key: Option<NetworkSpecsKey>,
     multisigner: MultiSigner,
     is_root: bool,
 }
@@ -223,7 +223,7 @@ impl AddressState {
     pub fn new(details_str: &str, keys_state: &KeysState, database_name: &str) -> Result<Self> {
         let lines: Vec<_> = details_str.lines().collect();
         let hex_address_key = lines[0];
-        let network_specs_key = lines[1];
+        let network_specs_key = lines.get(1);
 
         let address_key = AddressKey::from_hex(hex_address_key)?;
         let multisigner = if let Ok(m) = address_key.multi_signer() {
@@ -236,9 +236,15 @@ impl AddressState {
         let is_root =
             get_address_details(database_name, &AddressKey::from_multisigner(&multisigner))?
                 .is_root();
+        let network_specs_key = if let Some(network_specs_key) = &network_specs_key {
+            Some(NetworkSpecsKey::from_hex(network_specs_key)?)
+        } else {
+            None
+        };
+
         Ok(Self {
             seed_name: keys_state.seed_name(),
-            network_specs_key: NetworkSpecsKey::from_hex(network_specs_key)?,
+            network_specs_key,
             multisigner,
             is_root,
         })
@@ -246,14 +252,15 @@ impl AddressState {
     pub fn blank_keys_state(&self) -> KeysState {
         KeysState {
             seed_name: self.seed_name(),
-            network_specs_key: self.network_specs_key(),
+            network_specs_key: self.network_specs_key().unwrap(),
             specialty: SpecialtyKeysState::None,
         }
     }
     pub fn seed_name(&self) -> String {
         self.seed_name.to_owned()
     }
-    pub fn network_specs_key(&self) -> NetworkSpecsKey {
+    /// If `None`, this is a root key.
+    pub fn network_specs_key(&self) -> Option<NetworkSpecsKey> {
         self.network_specs_key.to_owned()
     }
     pub fn multisigner(&self) -> MultiSigner {
