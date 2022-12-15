@@ -1,4 +1,4 @@
-package io.parity.signer.ui.navigationselectors
+package io.parity.signer.screens.scan
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box

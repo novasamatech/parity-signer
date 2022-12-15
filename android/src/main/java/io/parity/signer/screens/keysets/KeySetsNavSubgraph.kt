@@ -1,4 +1,4 @@
-package io.parity.signer.ui.navigationselectors
+package io.parity.signer.screens.keysets
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
