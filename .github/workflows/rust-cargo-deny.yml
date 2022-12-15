@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - 'rust/**'
+      - '.github/workflows/rust-cargo-deny.yml'
   push:
     branches:
       - master
       - stable
     paths:
       - 'rust/**'
+      - '.github/workflows/rust-cargo-deny.yml'
 jobs:
   cargo-deny:
     name:                 Cargo deny

@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - '!rust/**'
+      - '.github/workflows/rust-cargo-deny.yml'
   push:
     branches:
       - master

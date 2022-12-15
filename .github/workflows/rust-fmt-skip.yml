@@ -6,12 +6,14 @@ on:
   pull_request:
     paths:
       - '!rust/**'
+      - '.github/workflows/rust-fmt-skip.yml'
   push:
     branches:
       - master
       - stable
     paths:
       - '!rust/**'
+      - '.github/workflows/rust-fmt-skip.yml'
 jobs:
   rustfmt:
     name:                     Cargo fmt
