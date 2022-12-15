@@ -1,8 +1,7 @@
 
+"Shared.Label.PasswordedPathDelimeter" = "///••••";
 
 "common.ok" = "Ok";
-
-
 "Accept" = "Accept";
 "Accept privacy policy?" = "Accept privacy policy?";
 "accounts" = "accounts";
@@ -436,8 +435,6 @@
 "Transaction.EnterPassword.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
 "Transaction.EnterPassword.Error.Title" = "Did you forget your\npassword?";
 "Transaction.EnterPassword.Error.Message" = "Your password was entered incorrectly more than once. Retrieve it and scan the QR code again.";
-"Transaction.EnterPassword.Label.PathDelimeter" = "///••••";
-"Address.Label.PasswordProtectedPath.PathDelimeter" = "///••••";
 "LogsList.Label.Title" = "All Logs";
 "LogsList.More.Action.Add" = "Add Note";
 "LogsList.More.Action.Clear" = "Clear Log";
@@ -460,4 +457,8 @@
 
 "VerifierCertificate.Label.Title" = "Verifier Certificate";
 "VerifierCertificate.Action.Remove" = "Remove certificate";
+
+"NetworkFilter.Label.Header" = "Filter keys by network";
+"NetworkFilter.Action.Reset" = "Reset";
+"NetworkFilter.Action.Done" = "Done";
 

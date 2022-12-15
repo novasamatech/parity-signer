@@ -85,14 +85,14 @@ struct ExportMultipleKeysModal: View {
             case let .keySets(keySets):
                 ForEach(
                     keySets.sorted(by: { $0.keyName < $1.keyName }),
-                    id: \.keyName
+                    id: \.id
                 ) { keyItem($0, isLast: $0 == keySets.last) }
             case let .keys(key, derivedKeys):
                 QRCodeRootFooterView(viewModel: .init(key))
                 Divider()
                 ForEach(
                     derivedKeys.sorted(by: { $0.viewModel.path < $1.viewModel.path }),
-                    id: \.viewModel.path
+                    id: \.id
                 ) {
                     QRCodeAddressFooterView(viewModel: .init($0))
                     if $0 != derivedKeys.last {

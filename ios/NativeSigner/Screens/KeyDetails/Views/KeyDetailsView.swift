@@ -51,7 +51,8 @@ struct KeyDetailsView: View {
             }
         }
         .onAppear {
-            viewModel.set(appState: appState)
+            viewModel.use(navigation: navigation)
+            viewModel.use(appState: appState)
             viewModel.refreshData(dataModel: dataModel)
         }
         .fullScreenCover(
@@ -115,6 +116,14 @@ struct KeyDetailsView: View {
                 viewModel.isPresentingSelectionOverlay.toggle()
             }
         }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingNetworkSelection
+        ) {
+            NetworkSelectionModal(
+                viewModel: .init(isPresented: $viewModel.isPresentingNetworkSelection)
+            )
+            .clearModalBackground()
+        }
     }
 
     var mainList: some View {
@@ -139,7 +148,7 @@ struct KeyDetailsView: View {
                 Asset.switches.swiftUIImage
                     .frame(width: Heights.actionSheetButton)
                     .onTapGesture {
-                        navigation.perform(navigation: .init(action: .networkSelector))
+                        viewModel.onNetworkSelectionTap()
                     }
             }
             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
