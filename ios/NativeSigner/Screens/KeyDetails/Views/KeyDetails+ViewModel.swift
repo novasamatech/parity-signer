@@ -172,7 +172,10 @@ private extension KeyDetailsView.ViewModel {
                 )
             }
         derivedKeysNavigation = sortedDerivedKeys
-            .map { .init(action: .selectKey, details: $0.key.addressKey) }
+            .map {
+                let details = "\($0.key.addressKey)\n\($0.network.networkSpecsKey)"
+                return .init(action: .selectKey, details: details)
+            }
     }
 
     func refreshKeySummary() {
@@ -181,7 +184,8 @@ private extension KeyDetailsView.ViewModel {
             keyName: keysData.root?.address.seedName ?? "",
             base58: keysData.root?.base58 ?? ""
         )
-        addressKeyNavigation = .init(action: .selectKey, details: keysData.root?.addressKey ?? "")
+        let details = "\(keysData.root?.addressKey ?? "")\n\(keysData.set.first?.network.networkSpecsKey ?? "")"
+        addressKeyNavigation = .init(action: .selectKey, details: details)
         removeSeed = keysData.root?.address.seedName ?? ""
     }
 }

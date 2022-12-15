@@ -23,27 +23,25 @@ struct QRCodeRootFooterView: View {
     }
 
     var body: some View {
-        HStack(spacing: Spacing.small) {
-            VStack(alignment: .leading, spacing: Spacing.extraSmall) {
-                Text(Localizable.PublicKeyDetails.Label.keys(viewModel.keyName))
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+        VStack(alignment: .leading, spacing: Spacing.extraSmall) {
+            Text(Localizable.PublicKeyDetails.Label.keys(viewModel.keyName))
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .font(PrimaryFont.bodyM.font)
+            HStack(spacing: Spacing.extraExtraSmall) {
+                Text(showFullAddress ? viewModel.base58 : viewModel.base58.truncateMiddle())
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                     .font(PrimaryFont.bodyM.font)
-                HStack(spacing: Spacing.extraExtraSmall) {
-                    Text(showFullAddress ? viewModel.base58 : viewModel.base58.truncateMiddle())
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                        .font(PrimaryFont.bodyM.font)
-                        .frame(idealWidth: .infinity, alignment: .leading)
-                    if !showFullAddress {
-                        Asset.chevronDown.swiftUIImage
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                            .padding(.leading, Spacing.extraExtraSmall)
-                    }
-                    Spacer()
+                    .frame(idealWidth: .infinity, alignment: .leading)
+                if !showFullAddress {
+                    Asset.chevronDown.swiftUIImage
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .padding(.leading, Spacing.extraExtraSmall)
                 }
-                .onTapGesture {
-                    withAnimation {
-                        showFullAddress.toggle()
-                    }
+                Spacer()
+            }
+            .onTapGesture {
+                withAnimation {
+                    showFullAddress = true
                 }
             }
         }
