@@ -4,14 +4,14 @@ name:                         Rustfmt
 
 on:
   pull_request:
-    paths:
-      - '!rust/**'
+    paths-ignore:
+      - 'rust/**'
   push:
     branches:
       - master
       - stable
-    paths:
-      - '!rust/**'
+    paths-ignore:
+      - 'rust/**'
 
 jobs:
   rustfmt:
