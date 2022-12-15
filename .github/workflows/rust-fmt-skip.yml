@@ -9,8 +9,7 @@ on:
       - master
       - stable
     paths:
-      - 'ios/**'
-      - 'android/**'
+      - '!rust/**'
 
 jobs:
   rustfmt:

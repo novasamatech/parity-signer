@@ -6,9 +6,9 @@ on:
     branches:
       - master
       - stable
-    paths-ignore:
-      - 'ios/**'
-      - 'android/**'
+    paths:
+      - 'rust/**'
+
 jobs:
   rustfmt:
     name:                     Cargo fmt
