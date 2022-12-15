@@ -54,7 +54,7 @@ struct DerivedKeyOverviewRow: View {
     private var fullPath: Text {
         viewModel.hasPassword ?
             Text(
-                "\(viewModel.path)\(Localizable.Path.delimeter.string)\(Image(.lock))"
+                "\(viewModel.path)\(Localizable.Shared.Label.passwordedPathDelimeter.string)\(Image(.lock))"
             ) :
             Text(viewModel.path)
     }
