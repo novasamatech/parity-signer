@@ -15,8 +15,8 @@ import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.screens.scan.old.SignatureReady
-import io.parity.signer.screens.scan.transaction.TransactionPreviewEdited
+import io.parity.signer.screens.scan.items.ScanErrorBottomSheet
+import io.parity.signer.screens.scan.transaction.TransactionScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
 import kotlinx.coroutines.launch
@@ -79,22 +79,33 @@ fun ScanNavSubgraph(
 				)
 			}
 		}
+		composable(ScanNavSubgraph.scanError) {
+			val backAction = {
+				navController.navigate(ScanNavSubgraph.camera)
+			}
+
+			BackHandler(onBack = backAction)
+			ScanScreen(onClose = { }, performPayloads = {})
+			BottomSheetWrapperRoot(onClosedAction = {
+				backAction
+			}) {
+				ScanErrorBottomSheet(
+"error message",//todod pass real error
+					onClose = backAction,
+				)
+			}
+		}
 		composable(ScanNavSubgraph.transaction) {
 			//todo scan ios/NativeSigner/Screens/Scan/CameraView.swift:130
 			val transactions = scanViewModel.pendingTransactions.collectAsState()
 
 			Box(modifier = Modifier.statusBarsPadding()) {
-				TransactionPreviewEdited(
+				TransactionScreen(
 					transactions = transactions.value,
 					signature = null,
-					signerDataModel = signerDataModel,
 					onBack = {
 						//was navigate(Action.GO_BACK, "", "")
 						navController.navigate(ScanNavSubgraph.camera)
-					},
-					onSigReady = { signature ->
-						scanViewModel.signature.value = signature
-						navController.navigate(ScanNavSubgraph.signatureReady)
 					},
 					onFinish = {
 						rootNavigator.navigate(Action.GO_FORWARD)
@@ -111,19 +122,6 @@ fun ScanNavSubgraph(
 				)
 			}
 		}
-		composable(ScanNavSubgraph.signatureReady) {
-			BackHandler() {
-				navController.navigate(ScanNavSubgraph.camera)
-			}
-			BottomSheetWrapperRoot(onClosedAction = {
-				navController.navigate(ScanNavSubgraph.camera)
-			}) {
-				SignatureReady(
-					scanViewModel.signature.collectAsState().value!!,
-					signerDataModel = signerDataModel
-				)
-			}
-		}
 	}
 }
 
@@ -131,6 +129,5 @@ private object ScanNavSubgraph {
 	const val camera = "scan_camera"
 	const val transaction = "scan_transaction"
 	const val scanError = "scan error"
-	const val signatureReady = "signature ready"
 	const val password = "password"
 }

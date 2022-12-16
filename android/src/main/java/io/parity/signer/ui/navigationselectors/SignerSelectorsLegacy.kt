@@ -68,11 +68,6 @@ fun ScreenSelector(
 		)
 		ScreenData.Scan -> {} //in new selector
 		is ScreenData.Transaction -> {} //in new selector
-//			TransactionPreviewOld(
-//				screenData.f,
-//				signerDataModel::navigate,
-//				signerDataModel::signTransaction
-//			)
 		is ScreenData.SeedSelector -> {} //shown in new selector
 		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
 			screenData.f,

@@ -1,5 +1,6 @@
 package io.parity.signer.models
 
+import io.parity.signer.uniffi.Card
 import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.TransactionCard
 
@@ -25,30 +26,26 @@ val MTransaction.issuesCardsFiltered: List<TransactionCard>
 		).flatten()
 
 
-fun MTransaction.isDisplayingErrorOnly() : Boolean =
+fun MTransaction.isDisplayingErrorOnly(): Boolean =
 	nonIssuesCardsFiltered.isEmpty() && issuesCardsFiltered.isNotEmpty()
 
+fun MTransaction.transactionIssues(): String =
+	issuesCardsFiltered
+		.sortedBy { it.index }
+		.map {
+			when (val card = it.card) {
+				is Card.ErrorCard -> {
+					card.f
+				}
+				is Card.WarningCard -> {
+					card.f
+				}
+				else -> null
+			}
+		}
+		.filterNotNull()
+		.joinToString("\n")
 
-//todo dmitry ios functions may become needed
-//    func transactionIssues() -> String {
-//        [
-//            content.error,
-//            content.warning
-//        ]
-//        .compactMap { $0 }
-//        .flatMap { $0 }
-//        .sorted { $0.index < $1.index }
-//        .compactMap {
-//            if case let .errorCard(text) = $0.card {
-//                return text
-//            }
-//            if case let .warningCard(text) = $0.card {
-//                return text
-//            }
-//            return nil
-//        }
-//        .joined(separator: "\n")
-//    }
 
 //    func sortedValueCards() -> [TransactionCard] {
 //        [
