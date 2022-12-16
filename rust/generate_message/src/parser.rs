@@ -572,7 +572,7 @@ pub struct Make {
 
 impl Make {
     pub fn payload(&self) -> Result<Vec<u8>> {
-        Ok(std::fs::read(&self.files_dir.join(&self.payload))?)
+        Ok(std::fs::read(self.files_dir.join(&self.payload))?)
     }
 
     pub fn crypto(&self) -> Result<Crypto> {

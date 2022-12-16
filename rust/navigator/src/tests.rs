@@ -131,7 +131,7 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
                     message
                 }
             };
-            sp_core::ed25519::Pair::verify(&signature, &message, &public)
+            sp_core::ed25519::Pair::verify(&signature, message, &public)
         }
         "5301" => {
             let into_signature: [u8; 64] = match &transaction_hex[4..6] {
@@ -170,7 +170,7 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
                     message
                 }
             };
-            sp_core::sr25519::Pair::verify(&signature, &message, &public)
+            sp_core::sr25519::Pair::verify(&signature, message, &public)
         }
         "5302" => {
             assert!(
@@ -203,7 +203,7 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
                     message
                 }
             };
-            sp_core::ecdsa::Pair::verify(&signature, &message, &public)
+            sp_core::ecdsa::Pair::verify(&signature, message, &public)
         }
         _ => panic!("Transaction has bad format"),
     }
@@ -418,8 +418,8 @@ fn bulk_signing_test_passworded() {
 
     let encoded_transactions = vec![
         hex::decode(&tx_passworded_123_1).unwrap(),
-        hex::decode(&tx_passworded_123_2).unwrap(),
-        hex::decode(&tx_passworded_345_1).unwrap(),
+        hex::decode(tx_passworded_123_2).unwrap(),
+        hex::decode(tx_passworded_345_1).unwrap(),
     ];
 
     // Another bulk in format that is digestible by verification
@@ -5497,7 +5497,7 @@ fn flow_test_1() {
             action.modal_data
         );
     };
-    let sufficient_hex = hex::encode(&sufficient);
+    let sufficient_hex = hex::encode(sufficient);
 
     let mut new_log_with_modal = expected_action.clone();
     assert_eq!(
@@ -5794,7 +5794,7 @@ fn flow_test_1() {
             action.modal_data
         );
     };
-    let sufficient_hex = hex::encode(&sufficient);
+    let sufficient_hex = hex::encode(sufficient);
 
     assert_eq!(
         action, expected_action,
@@ -5884,7 +5884,7 @@ fn flow_test_1() {
         );
     };
 
-    let sufficient_hex = hex::encode(&sufficient);
+    let sufficient_hex = hex::encode(sufficient);
 
     new_log_with_modal.modal_data = Some(ModalData::SufficientCryptoReady {
         f: MSufficientCryptoReady {
