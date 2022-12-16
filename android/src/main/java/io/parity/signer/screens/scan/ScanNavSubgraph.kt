@@ -130,6 +130,7 @@ fun ScanNavSubgraph(
 private object ScanNavSubgraph {
 	const val camera = "scan_camera"
 	const val transaction = "scan_transaction"
+	const val scanError = "scan error"
 	const val signatureReady = "signature ready"
 	const val password = "password"
 }

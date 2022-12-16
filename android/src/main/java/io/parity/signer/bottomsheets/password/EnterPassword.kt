@@ -109,9 +109,9 @@ fun EnterPassword(
 						Icons.Filled.Visibility
 					else Icons.Filled.VisibilityOff
 
-					// Please provide localized description for accessibility services
 					val description =
-						if (passwordVisible) "Hide password" else "Show password"
+						if (passwordVisible) stringResource(R.string.password_hide_password) else stringResource(
+													R.string.password_show_password)
 
 					IconButton(onClick = { passwordVisible = !passwordVisible }) {
 						Icon(imageVector = image, description)
@@ -121,7 +121,7 @@ fun EnterPassword(
 
 			if (data.showError) {
 				Text(
-					text = "The password you entered is incorrect. Please try again.",
+					text = stringResource(R.string.password_error_wrong_password),
 					color = MaterialTheme.colors.red500,
 					style = SignerTypeface.CaptionM,
 					modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),

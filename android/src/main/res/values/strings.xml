@@ -188,6 +188,9 @@
 	<string name="warning_exl">Warning!</string>
     <string name="enter_password_title">Enter the password for</string>
 	<string name="enter_password_description">Enter the password you used for your derivation path</string>
+    <string name="password_hide_password">Hide password</string>
+	<string name="password_show_password">Show password</string>
+	<string name="password_error_wrong_password">The password you entered is incorrect. Please try again.</string>
 
 
 </resources>
