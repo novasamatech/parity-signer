@@ -142,6 +142,7 @@ class ScanViewModel : ViewModel() {
 		signerVM: SignerDataModel, //todo dmitry inbound get seed from it!
 	): SignResult {
 		return when (val authResult =
+			//todo check how to check if user is already authenticated with biometric prompt
 			authentication.authenticate(signerVM.activity)) {
 			AuthResult.AuthSuccess -> {
 				val seedPhrases = seedNames

@@ -97,12 +97,11 @@ fun ScanNavSubgraph(
 		}
 		composable(ScanNavSubgraph.transaction) {
 			//todo scan ios/NativeSigner/Screens/Scan/CameraView.swift:130
-			val transactions = scanViewModel.pendingTransactions.collectAsState()
 
 			Box(modifier = Modifier.statusBarsPadding()) {
 				TransactionScreen(
-					transactions = transactions.value,
-					signature = null,
+					transactions = scanViewModel.pendingTransactions.collectAsState().value,
+					signature = scanViewModel.signature.collectAsState().value,
 					onBack = {
 						//was navigate(Action.GO_BACK, "", "")
 						navController.navigate(ScanNavSubgraph.camera)
