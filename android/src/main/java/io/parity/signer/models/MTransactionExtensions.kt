@@ -4,7 +4,7 @@ import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.TransactionCard
 
 val MTransaction.nonIssuesCardsFiltered: List<TransactionCard>
-	get() {
+	get() =
 		listOfNotNull(
 			content.extensions,
 			content.importingDerivations,
@@ -15,19 +15,18 @@ val MTransaction.nonIssuesCardsFiltered: List<TransactionCard>
 			content.verifier,
 			content.typesInfo,
 		).flatten()
-	}
+
 
 val MTransaction.issuesCardsFiltered: List<TransactionCard>
-	get() {
+	get() =
 		listOfNotNull(
 			content.error,
 			content.warning,
 		).flatten()
-	}
 
-fun MTransaction.isDisplayingErrorOnly() : Boolean {
+
+fun MTransaction.isDisplayingErrorOnly() : Boolean =
 	nonIssuesCardsFiltered.isEmpty() && issuesCardsFiltered.isNotEmpty()
-}
 
 
 //todo dmitry ios functions may become needed

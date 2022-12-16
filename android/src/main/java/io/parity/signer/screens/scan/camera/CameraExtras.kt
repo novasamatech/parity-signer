@@ -127,7 +127,6 @@ internal fun ScanHeader(
 ) {
 	val viewModel: CameraViewModel = viewModel()
 	val torchEnabled by viewModel.isTorchEnabled.collectAsState()
-	val multiMode by viewModel.isMultiscanMode.collectAsState()
 	Row(
 		modifier
 			.fillMaxWidth(1f)
@@ -137,11 +136,6 @@ internal fun ScanHeader(
 			onCloseClicked = onClose
 		)
 		Spacer(modifier = Modifier.weight(1f))
-		if (FeatureOption.MULTI_TRANSACTION_CAMERA.isEnabled()) {
-			CameraMultiSignIcon(isEnabled = multiMode,
-				onClick = { viewModel.isMultiscanMode.value = !multiMode })
-		}
-		Spacer(modifier = Modifier.padding(end = 8.dp))
 		CameraLightIcon(isEnabled = torchEnabled,
 			onClick = {
 				viewModel.isTorchEnabled.value = !torchEnabled

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -18,6 +19,7 @@ import io.parity.signer.screens.scan.old.SignatureReady
 import io.parity.signer.screens.scan.transaction.TransactionPreviewEdited
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
+import kotlinx.coroutines.launch
 
 /**
  * Navigation Subgraph with compose nav controller for those Key Set screens which are not part of general
@@ -30,6 +32,7 @@ fun ScanNavSubgraph(
 ) {
 	val scanViewModel: ScanViewModel = viewModel()
 	val navController = rememberNavController()
+	val scope = rememberCoroutineScope()
 	NavHost(
 		navController = navController,
 		startDestination = ScanNavSubgraph.camera,
@@ -42,20 +45,23 @@ fun ScanNavSubgraph(
 			ScanScreen(
 				onClose = { rootNavigator.backAction() },
 				performPayloads = { payloads ->
-					val transactions = scanViewModel.performPayloads(payloads)
-					scanViewModel.pendingTransactions.value = transactions
-					navController.navigate(ScanNavSubgraph.transaction)
+					scope.launch {
+						val transactions = scanViewModel.performPayload(payloads)
+//						todo scan
+//						scanViewModel.pendingTransactions.value = transactions
+//						navController.navigate(ScanNavSubgraph.transaction)
+					}
 				}
 			)
 		}
 		composable(ScanNavSubgraph.password) {
-		//todo scan ios/NativeSigner/Screens/Scan/CameraView.swift:138
+			//todo scan ios/NativeSigner/Screens/Scan/CameraView.swift:138
 			val backAction = {
 				navController.navigate(ScanNavSubgraph.camera)
 			}
 
 			BackHandler(onBack = backAction)
-			ScanScreen(onClose = { }, performPayloads ={})
+			ScanScreen(onClose = { }, performPayloads = {})
 			BottomSheetWrapperRoot(onClosedAction = {
 				backAction
 			}) {

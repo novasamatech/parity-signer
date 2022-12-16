@@ -17,11 +17,10 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class CameraViewModel() : ViewModel() {
 
-	val isMultiscanMode = MutableStateFlow(false)
-	val isTorchEnabled = MutableStateFlow<Boolean>(false)
+	val isTorchEnabled = MutableStateFlow(false)
 
-	private val _pendingPayloads = MutableStateFlow<Set<String>>(emptySet())
-	val pendingTransactionPayloads: StateFlow<Set<String>> = _pendingPayloads.asStateFlow()
+	private val _pendingPayloads = MutableStateFlow<String?>(null)
+	val pendingTransactionPayloads: StateFlow<String?> = _pendingPayloads.asStateFlow()
 
 	private val _total = MutableStateFlow<Int?>(null)
 	private val _captured = MutableStateFlow<Int?>(null)
@@ -29,7 +28,6 @@ class CameraViewModel() : ViewModel() {
 	// Observables for model data
 	internal val total: StateFlow<Int?> = _total.asStateFlow()
 	internal val captured: StateFlow<Int?> = _captured.asStateFlow()
-
 
 	// payload of currently scanned qr codes for multiqr transaction like metadata update.
 	private var currentMultiQrTransaction = arrayOf<String>()
@@ -120,13 +118,8 @@ class CameraViewModel() : ViewModel() {
 	}
 
 	fun resetPendingTransactions() {
-		_pendingPayloads.value = emptySet()
+		_pendingPayloads.value = null
 		resetScanValues()
 	}
 
-	sealed class CameraNavModel {
-		object None : CameraNavModel()
-		data class TransitionNavigation(val transactions: List<MTransaction>) :
-			CameraNavModel()
-	}
 }

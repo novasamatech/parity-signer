@@ -25,7 +25,7 @@ class ScanViewModel : ViewModel() {
 	private val transactionInProgress = MutableStateFlow<Boolean>(false)
 
 
-	suspend fun performPayloads(payloads: Set<String>): List<MTransaction> {
+	suspend fun performPayloads(payloads: Set<String>): List<MTransaction> {//todo remove?
 		val allResults = payloads.map { payload ->
 			uniffiInteractor.navigate(Action.TRANSACTION_FETCHED, payload)
 		}
@@ -41,8 +41,8 @@ class ScanViewModel : ViewModel() {
 			.flatten()
 	}
 
-	private suspend fun performPayload(payload: String) {
-		if (transactionInProgress.value) { //todo move to progressing list?
+	suspend fun performPayload(payload: String) {
+		if (transactionInProgress.value) {
 			Log.e(TAG, "started transaction while it was in progress, ignoring")
 			return
 		}
