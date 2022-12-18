@@ -87,7 +87,7 @@ impl ContentLoadMeta {
     where
         P: AsRef<Path>,
     {
-        Ok(std::fs::write(filename, &self.to_sign())?)
+        Ok(std::fs::write(filename, self.to_sign())?)
     }
 
     /// Transform [`ContentLoadMeta`] into `Vec<u8>` that could be signed by the verifier.
@@ -142,7 +142,7 @@ impl ContentAddSpecs {
     where
         P: AsRef<Path>,
     {
-        Ok(std::fs::write(file_path, &self.to_sign())?)
+        Ok(std::fs::write(file_path, self.to_sign())?)
     }
 
     /// Transform [`ContentAddSpecs`] into `Vec<u8>` that could be signed by the verifier.
@@ -206,7 +206,7 @@ impl ContentLoadTypes {
     where
         P: AsRef<Path>,
     {
-        Ok(std::fs::write(path, &self.to_sign())?)
+        Ok(std::fs::write(path, self.to_sign())?)
     }
 
     /// Transform [`ContentLoadTypes`] into `Vec<u8>` to be put in the database.  
