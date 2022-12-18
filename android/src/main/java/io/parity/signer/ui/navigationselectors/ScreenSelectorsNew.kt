@@ -39,7 +39,7 @@ fun CombinedScreensSelector(
 	signerDataModel: SignerDataModel
 ) {
 	val rootNavigator = signerDataModel.navigator
-	val seedNames = signerDataModel.seedNames.collectAsState()
+	val seedNames = signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (localNavAction) {
 		LocalNavAction.ShowScan -> {
@@ -81,7 +81,7 @@ fun CombinedScreensSelector(
 				Box(modifier = Modifier.statusBarsPadding()) {
 					SettingsScreen(
 						rootNavigator = rootNavigator,
-						isStrongBoxProtected = signerDataModel.isStrongBoxProtected(),
+						isStrongBoxProtected = signerDataModel.seedStorage.isStrongBoxProtected,
 						appVersion = signerDataModel.getAppVersion(),
 						wipeToFactory = signerDataModel::wipeToFactory,
 						alertState = alertState

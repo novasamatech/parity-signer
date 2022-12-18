@@ -2,7 +2,6 @@ package io.parity.signer.models
 
 import android.util.Log
 import android.widget.Toast
-import io.parity.signer.components.SeedBoxStatus
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.historySeedNameWasShown
@@ -15,18 +14,19 @@ import io.parity.signer.uniffi.updateSeedNames
  * authentication.authenticate(activity) {refreshSeedNames()}
  * which is somewhat asynchronous
  */
-internal fun SignerDataModel.refreshSeedNames(init: Boolean = false) {
-	val allNames = sharedPreferences.all.keys.sorted().toTypedArray()
+internal fun SignerDataModel.tellRustSeedNames(init: Boolean = false) {
+	val allNames = seedStorage.getSeedNames()
 	if (init) {
 		initNavigation(dbName, allNames.toList())
 	} else {
 		updateSeedNames(allNames.toList())
 	}
-	_seedNames.value = allNames
 }
 
 /**
  * Add seed, encrypt it, and create default accounts
+ *
+ * @param createRoots is fake and should always be true. It's added for educational reasons
  */
 fun SignerDataModel.addSeed(
 	seedName: String,
@@ -35,25 +35,15 @@ fun SignerDataModel.addSeed(
 ) {
 
 	// Check if seed name already exists
-	if (seedNames.value.contains(seedName)) {
+	if (seedStorage.lastKnownSeedNames.value.contains(seedName)) {
 		return
 	}
 
 	// Run standard login prompt!
 	ServiceLocator.authentication.authenticate(activity) {
 		try {
-			// First check for seed collision
-			if (sharedPreferences.all.values.contains(seedPhrase)) {
-				error("This seed phrase already exists")
-			}
-
-			// Encrypt and save seed
-			with(sharedPreferences.edit()) {
-				putString(seedName, seedPhrase)
-				apply()
-			}
-
-			refreshSeedNames()
+			seedStorage.addSeed(seedName, seedPhrase)
+			tellRustSeedNames()
 			navigate(
 				button = Action.GO_FORWARD,
 				details = if (createRoots) "true" else "false",
@@ -73,15 +63,11 @@ internal fun SignerDataModel.getSeed(
 	backup: Boolean = false
 ): String {
 	return try {
-		val seedPhrase = sharedPreferences.getString(seedName, "") ?: ""
-		if (seedPhrase.isBlank()) {
-			""
-		} else {
-			if (backup) {
-				historySeedNameWasShown(seedName, dbName)
-			}
-			seedPhrase
+		val seedPhrase = seedStorage.getSeed(seedName)
+		if (backup) {
+			historySeedNameWasShown(seedName, dbName)
 		}
+		seedPhrase
 	} catch (e: java.lang.Exception) {
 		Log.d("get seed failure", e.toString())
 		Toast.makeText(context, "get seed failure: $e", Toast.LENGTH_LONG).show()
@@ -99,8 +85,8 @@ internal fun SignerDataModel.getSeed(
 fun SignerDataModel.removeSeed(seedName: String) {
 	ServiceLocator.authentication.authenticate(activity) {
 		try {
-			sharedPreferences.edit().remove(seedName).apply()
-			refreshSeedNames()
+			seedStorage.removeSeed(seedName)
+			tellRustSeedNames()
 			navigator.navigate(Action.REMOVE_SEED)
 		} catch (e: java.lang.Exception) {
 			Log.d("remove seed error", e.toString())

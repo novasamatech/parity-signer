@@ -29,7 +29,7 @@ fun ScreenSelector(
 	val button1: (Action) -> Unit = { action -> navigate(action, "", "") }
 	val button2: (Action, String) -> Unit =
 		{ action, details -> navigate(action, details, "") }
-	val seedNames = signerDataModel.seedNames.collectAsState()
+	val seedNames = signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
 		is ScreenData.DeriveKey -> NewAddressScreen(
