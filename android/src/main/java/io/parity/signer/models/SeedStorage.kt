@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Storing seed phrase in secure storage
  * All functions requiring user to be authenticated, properties do not.
+ *
+ * This is not safe class to use directly. Use wrappers that checks for authenticated.
  */
 class SeedStorage {
 
@@ -28,6 +30,9 @@ class SeedStorage {
 	private val keyStore = "AndroidKeyStore"
 	private lateinit var sharedPreferences: SharedPreferences
 
+	/**
+	 * @throws UserNotAuthenticatedException
+	 */
 	fun init(appContext: Context) {
 		hasStrongbox = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 			appContext
@@ -74,6 +79,9 @@ class SeedStorage {
 	}
 
 
+	/**
+	 * @throws UserNotAuthenticatedException
+	 */
 	fun getSeedNames(): Array<String> =
 		sharedPreferences.all.keys.sorted().toTypedArray().also {
 			_lastKnownSeedNames.value = it
@@ -81,6 +89,8 @@ class SeedStorage {
 
 	/**
 	 * Add seed, encrypt it, and create default accounts
+	 *
+	 * @throws UserNotAuthenticatedException
 	 */
 	fun addSeed(
 		seedName: String,
@@ -99,7 +109,10 @@ class SeedStorage {
 		}
 	}
 
-	internal fun getSeed(
+	/**
+	 * @throws UserNotAuthenticatedException
+	 */
+	fun getSeed(
 		seedName: String,
 	): String {
 		val seedPhrase = sharedPreferences.getString(seedName, "") ?: ""
@@ -110,10 +123,16 @@ class SeedStorage {
 		}
 	}
 
+	/**
+	 * @throws [UserNotAuthenticatedException]
+	 */
 	fun removeSeed(seedName: String) {
 		sharedPreferences.edit().remove(seedName).apply()
 	}
 
+	/**
+	 * @throws UserNotAuthenticatedException
+	 */
 	fun wipe() {
 		sharedPreferences.edit().clear().commit() // No, not apply(), do it now!
 	}

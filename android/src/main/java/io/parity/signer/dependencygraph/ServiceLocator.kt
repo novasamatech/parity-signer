@@ -3,18 +3,20 @@ package io.parity.signer.dependencygraph
 import android.content.Context
 import io.parity.signer.backend.UniffiInteractor
 import io.parity.signer.models.Authentication
+import io.parity.signer.models.SeedStorage
 
 object ServiceLocator {
 
-	@Volatile private var _backendLocator: BackendLocator? = null
+	fun initAppDependencies(appContext: Context) {
+		_backendLocator = BackendLocator(appContext.getDbNameFromContext())
+	}
+
+	private var _backendLocator: BackendLocator? = null
 	val backendLocator: BackendLocator
 		get() = _backendLocator
 			?: throw RuntimeException("dependency is not initialized yet")
 
-
-	fun initBackendDeps(context: Context) {
-		_backendLocator = BackendLocator(context.getDbNameFromContext())
-	}
+	val seedStorage: SeedStorage = SeedStorage()
 
 	val authentication by lazy { Authentication() }
 }

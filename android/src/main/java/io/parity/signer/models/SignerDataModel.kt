@@ -41,7 +41,7 @@ class SignerDataModel : ViewModel() {
 	// Transaction
 	internal var action = JSONObject()
 
- val seedStorage = SeedStorage()// todo dmitry move to service locator
+ val seedStorage = ServiceLocator.seedStorage
 
 	// Navigator
 	internal val _actionResult = MutableStateFlow(

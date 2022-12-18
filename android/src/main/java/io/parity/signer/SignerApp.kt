@@ -18,7 +18,7 @@ class SignerApp : Application() {
 			SignerExceptionHandler(defaultHandler)
 		)
 
-		ServiceLocator.initBackendDeps(this)
+		ServiceLocator.initAppDependencies(this)
 	}
 }
 
