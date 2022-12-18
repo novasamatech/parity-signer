@@ -1,12 +1,17 @@
-package io.parity.signer.models
+package io.parity.signer.models.storage
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
+import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import io.parity.signer.dependencygraph.getDbNameFromContext
+import io.parity.signer.models.FeatureFlags
+import io.parity.signer.models.FeatureOption
+import io.parity.signer.uniffi.historySeedNameWasShown
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -26,9 +31,10 @@ class SeedStorage {
 
 
 	private lateinit var masterKey: MasterKey
+	private lateinit var dbName: String
 	private var hasStrongbox: Boolean = false
-	private val keyStore = "AndroidKeyStore"
 	private lateinit var sharedPreferences: SharedPreferences
+	private val KEYSTORE_NAME = "AndroidKeyStore"
 
 	/**
 	 * @throws UserNotAuthenticatedException
@@ -41,6 +47,8 @@ class SeedStorage {
 		} else {
 			false
 		}
+
+		dbName = appContext.getDbNameFromContext()
 
 		Log.d("strongbox available:", hasStrongbox.toString())
 
@@ -59,7 +67,7 @@ class SeedStorage {
 				.build()
 		}
 
-		Log.e("ENCRY", "$appContext $keyStore $masterKey")
+		Log.e("ENCRY", "$appContext $KEYSTORE_NAME $masterKey")
 		//we need to be authenticated for this
 		sharedPreferences =
 			if (FeatureFlags.isEnabled(FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT)) {
@@ -70,7 +78,7 @@ class SeedStorage {
 			} else {
 				EncryptedSharedPreferences(
 					appContext,
-					keyStore,
+					KEYSTORE_NAME,
 					masterKey,
 					EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
 					EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
@@ -114,11 +122,15 @@ class SeedStorage {
 	 */
 	fun getSeed(
 		seedName: String,
+		showInLogs: Boolean = false
 	): String {
 		val seedPhrase = sharedPreferences.getString(seedName, "") ?: ""
 		return if (seedPhrase.isBlank()) {
 			""
 		} else {
+			if (showInLogs) {
+				historySeedNameWasShown(seedName, dbName)
+			}
 			seedPhrase
 		}
 	}
@@ -136,5 +148,4 @@ class SeedStorage {
 	fun wipe() {
 		sharedPreferences.edit().clear().commit() // No, not apply(), do it now!
 	}
-
 }

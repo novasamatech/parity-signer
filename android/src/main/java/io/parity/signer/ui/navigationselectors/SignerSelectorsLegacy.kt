@@ -10,6 +10,8 @@ import io.parity.signer.bottomsheets.*
 import io.parity.signer.bottomsheets.password.PasswordConfirm
 import io.parity.signer.components.Documents
 import io.parity.signer.models.*
+import io.parity.signer.models.storage.addSeed
+import io.parity.signer.models.storage.signSufficientCrypto
 import io.parity.signer.screens.*
 import io.parity.signer.screens.logs.logdetails.LogDetails
 import io.parity.signer.screens.networks.NetworkDetails

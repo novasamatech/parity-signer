@@ -14,7 +14,7 @@ import io.parity.signer.components.SeedCard
 import io.parity.signer.components.toImageContent
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.getSeed
+import io.parity.signer.models.storage.getSeed
 import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200

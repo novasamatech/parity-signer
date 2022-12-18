@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.dependencygraph.getDbNameFromContext
+import io.parity.signer.models.storage.tellRustSeedNames
 import io.parity.signer.ui.navigationselectors.OnboardingWasShown
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -2,6 +2,7 @@ package io.parity.signer.models
 
 import android.util.Log
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.models.storage.getSeed
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.DerivationCheck
 import io.parity.signer.uniffi.substratePathCheck

@@ -3,7 +3,7 @@ package io.parity.signer.dependencygraph
 import android.content.Context
 import io.parity.signer.backend.UniffiInteractor
 import io.parity.signer.models.Authentication
-import io.parity.signer.models.SeedStorage
+import io.parity.signer.models.storage.SeedStorage
 
 object ServiceLocator {
 

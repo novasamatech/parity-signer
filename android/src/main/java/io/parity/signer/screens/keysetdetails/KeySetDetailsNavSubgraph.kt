@@ -9,8 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.models.*
-import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenFull
-import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenView
+import io.parity.signer.models.storage.removeSeed
 import io.parity.signer.screens.keysetdetails.backup.SeedBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportScreenFull

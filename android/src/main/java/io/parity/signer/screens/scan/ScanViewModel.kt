@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import io.parity.signer.backend.UniffiResult
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.*
-import io.parity.signer.models.getSeed
+import io.parity.signer.models.storage.getSeed
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 

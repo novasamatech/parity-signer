@@ -1,8 +1,10 @@
-package io.parity.signer.models
+package io.parity.signer.models.storage
 
 import android.util.Log
 import android.widget.Toast
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.navigate
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.historySeedNameWasShown
 import io.parity.signer.uniffi.initNavigation
@@ -63,11 +65,7 @@ internal fun SignerDataModel.getSeed(
 	backup: Boolean = false
 ): String {
 	return try {
-		val seedPhrase = seedStorage.getSeed(seedName)
-		if (backup) {
-			historySeedNameWasShown(seedName, dbName)
-		}
-		seedPhrase
+		seedStorage.getSeed(seedName, backup)
 	} catch (e: java.lang.Exception) {
 		Log.d("get seed failure", e.toString())
 		Toast.makeText(context, "get seed failure: $e", Toast.LENGTH_LONG).show()
