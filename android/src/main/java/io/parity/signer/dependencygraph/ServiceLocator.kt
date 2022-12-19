@@ -9,7 +9,10 @@ import io.parity.signer.models.storage.SeedStorage
 
 object ServiceLocator {
 
+	lateinit var appContext: Context
+
 	fun initAppDependencies(appContext: Context) {
+		this.appContext = appContext
 		_backendScope = BackendScope(appContext.getDbNameFromContext())
 	}
 

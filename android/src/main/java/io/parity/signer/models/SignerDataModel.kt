@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.dependencygraph.getDbNameFromContext
+import io.parity.signer.models.storage.SeedStorage
 import io.parity.signer.models.storage.tellRustSeedNames
 import io.parity.signer.ui.navigationselectors.OnboardingWasShown
 import io.parity.signer.uniffi.*
@@ -42,7 +43,7 @@ class SignerDataModel : ViewModel() {
 	// Transaction
 	internal var action = JSONObject()
 
- val seedStorage = ServiceLocator.seedStorage
+ val seedStorage: SeedStorage = ServiceLocator.seedStorage
 
 	// Navigator
 	internal val _actionResult = MutableStateFlow(
