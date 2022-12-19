@@ -104,9 +104,8 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							bottomBar = {
 								if (NavigationMigrations.shouldShowBar(
 										localNavAction = localNavAction.value,
-										globalNavAction = actionResult.value,
-									)
-									&& actionResult.value?.footer == true
+										globalNavAction = actionResult.value,)
+									&& actionResult.value.footer
 								) {
 									BottomBar(signerDataModel = signerDataModel)
 								}
@@ -114,14 +113,14 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						) { innerPadding ->
 							Box(modifier = Modifier.padding(innerPadding)) {
 								ScreenSelector(
-									screenData = actionResult.value?.screenData
+									screenData = actionResult.value.screenData
 										?: ScreenData.Documents,//default fallback
 									alertState = shieldAlert,
 									navigate = signerDataModel.navigator::navigate,
 									signerDataModel = signerDataModel
 								)
 								ModalSelector(
-									modalData = actionResult.value?.modalData,
+									modalData = actionResult.value.modalData,
 									localNavAction = localNavAction.value,
 									alertState = shieldAlert,
 									navigate = signerDataModel.navigator::navigate,
@@ -136,8 +135,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								.captionBarPadding(),
 						) {
 							CombinedScreensSelector(
-								screenData = actionResult.value.screenData
-									?: ScreenData.Documents,//default fallback
+								screenData = actionResult.value.screenData,
 								localNavAction = localNavAction.value,
 								alertState = shieldAlert,
 								signerDataModel = signerDataModel
@@ -191,7 +189,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						modifier = Modifier.padding(12.dp).fillMaxSize(1f),
 					) {
 						Text(
-							"Please enable airplane mode",
+							text = stringResource(R.string.enable_airplane_mode_error),
 							color = MaterialTheme.colors.Text600
 						)
 					}
