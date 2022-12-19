@@ -6,7 +6,6 @@ import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.navigate
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.historySeedNameWasShown
 import io.parity.signer.uniffi.initNavigation
 import io.parity.signer.uniffi.updateSeedNames
 
@@ -30,6 +29,7 @@ internal fun SignerDataModel.tellRustSeedNames(init: Boolean = false) {
  *
  * @param createRoots is fake and should always be true. It's added for educational reasons
  */
+@Deprecated("Use SeedStorage or better SeedRepository")
 fun SignerDataModel.addSeed(
 	seedName: String,
 	seedPhrase: String,
@@ -60,6 +60,7 @@ fun SignerDataModel.addSeed(
 /**
  * Fetch seed from strongbox; must be in unlocked scope
  */
+@Deprecated("Use SeedStorage or better SeedRepository")
 internal fun SignerDataModel.getSeed(
 	seedName: String,
 	backup: Boolean = false
@@ -80,6 +81,7 @@ internal fun SignerDataModel.getSeed(
  * 2. Synchronizes list of seeds with rust
  * 3. Calls rust remove seed logic
  */
+@Deprecated("Use SeedStorage or better SeedRepository")
 fun SignerDataModel.removeSeed(seedName: String) {
 	ServiceLocator.authentication.authenticate(activity) {
 		try {

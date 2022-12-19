@@ -3,6 +3,7 @@ package io.parity.signer.screens.scan
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import io.parity.signer.backend.UniffiResult
+import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.isDisplayingErrorOnly
 import io.parity.signer.models.storage.RepoResult
@@ -78,25 +79,30 @@ class ScanViewModel : ViewModel() {
 
 		when (transactions.firstOrNull()?.ttype) {
 			TransactionType.SIGN -> {
-//				val actionResult todo from new data model
+				//				this.pendingTransactions = transactions //todo scan save here?
+				val seedNames = transactions
+					.filter { it.ttype == TransactionType.SIGN }
+					.mapNotNull { it.authorInfo?.address?.seedName }
+				val actionResult = signTransaction("", seedNames)
 
-//				                let actionResult = sign(transactions: transactions)
-//                self.transactions = transactions
-//                // Password protected key, continue to modal
-//                if case let .enterPassword(value) = actionResult.modalData {
-//                    enterPassword = value
-//                    isPresentingEnterPassword = true
-//                }
-//                // Transaction ready to sign
-//                if case let .signatureReady(value) = actionResult.modalData {
-//                    signature = value
-//                    continueWithSignature()
-//                }
+				//password protected key, show password
+				when (val modalData = actionResult?.modalData) {
+					is ModalData.EnterPassword -> {
+						val passwordModel = modalData.f.toEnterPasswordModel()
+						//todo show enter password
+					}
+					is ModalData.SignatureReady -> {
+						val signature = modalData.f //todo show signature
+						//todo show transactions qr code
+					}
+					else -> {} //ignore the rest modals
+				}
 			}
 			else -> {
 				// Transaction with error
 				// Transaction that does not require signing (i.e. adding network or metadata)
 				//show transactions
+				//todo show transactions here
 			}
 		}
 
@@ -145,11 +151,7 @@ class ScanViewModel : ViewModel() {
 	): ActionResult? {
 		return when (val phrases = seedRepository.getSeedPhrases(seedNames)) {
 			is RepoResult.Failure -> null
-			is RepoResult.Success -> backendAction(
-				Action.GO_FORWARD,
-				comment,
-				phrases.result
-			)
+			is RepoResult.Success -> backendAction(Action.GO_FORWARD, comment, phrases.result)
 		}
 	}
 }

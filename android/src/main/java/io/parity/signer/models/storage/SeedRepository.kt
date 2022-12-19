@@ -1,5 +1,8 @@
 package io.parity.signer.models.storage
 
+import android.security.keystore.UserNotAuthenticatedException
+import android.util.Log
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import io.parity.signer.models.AuthResult
 import io.parity.signer.models.Authentication
@@ -12,29 +15,39 @@ class SeedRepository(
 ) {
 
 	suspend fun getSeedPhrases(seedNames: List<String>): RepoResult<String> {
-		try {
-			return when (val authResult =
-				authentication.authenticate(activity)) {
-				AuthResult.AuthSuccess -> {
-					val seedPhrases = seedNames
-						.map { storage.getSeed(it) }
-						.filter { it.isNotEmpty() }
-						.joinToString(separator = "\n")
-
-					if (seedPhrases.isNotBlank()) {
-						RepoResult.Success(seedPhrases)
-					} else {
-						RepoResult.Failure(IllegalStateException("all phrases are empty - broken storage?"))
+		return try {
+			try {
+				getSeedPhrasesDangerous(seedNames)
+			} catch (e: UserNotAuthenticatedException) {
+				when (val authResult =
+					authentication.authenticate(activity)) {
+					AuthResult.AuthSuccess -> {
+						getSeedPhrasesDangerous(seedNames)
 					}
-				}
-				AuthResult.AuthError,
-				AuthResult.AuthFailed,
-				AuthResult.AuthUnavailable -> {
-					RepoResult.Failure(RuntimeException("auth error - $authResult"))
+					AuthResult.AuthError,
+					AuthResult.AuthFailed,
+					AuthResult.AuthUnavailable -> {
+						RepoResult.Failure(RuntimeException("auth error - $authResult"))
+					}
 				}
 			}
 		} catch (e: java.lang.Exception) {
-			return RepoResult.Failure(RuntimeException("Unexpected Exception", e))
+			Log.d("get seed failure", e.toString())
+			Toast.makeText(activity, "get seed failure: $e", Toast.LENGTH_LONG).show()
+			RepoResult.Failure(RuntimeException("Unexpected Exception", e))
+		}
+	}
+
+	private fun getSeedPhrasesDangerous(seedNames: List<String>): RepoResult<String> {
+		val seedPhrases = seedNames
+			.map { storage.getSeed(it) }
+			.filter { it.isNotEmpty() }
+			.joinToString(separator = "\n")
+
+		return if (seedPhrases.isNotBlank()) {
+			RepoResult.Success(seedPhrases)
+		} else {
+			RepoResult.Failure(IllegalStateException("all phrases are empty - broken storage?"))
 		}
 	}
 }
