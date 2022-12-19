@@ -3,6 +3,7 @@ package io.parity.signer.screens.scan
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import io.parity.signer.backend.UniffiResult
+import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.isDisplayingErrorOnly
@@ -24,36 +25,23 @@ class ScanViewModel : ViewModel() {
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
 
 
-	var pendingTransactions: MutableStateFlow<List<MTransaction>> =
+	var transactions: MutableStateFlow<List<MTransaction>> =
 		MutableStateFlow(emptyList())
 	var signature: MutableStateFlow<MSignatureReady?> =
 		MutableStateFlow(null)
+	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
+		MutableStateFlow(null)
+	val presentableError: MutableStateFlow<String?> =
+		MutableStateFlow(null)
 
-	private val transactionInProgress = MutableStateFlow<Boolean>(false)
-	val presentableError = MutableStateFlow<String?>(null)
-
-	suspend fun performPayloads(payloads: Set<String>): List<MTransaction> {//todo remove?
-		val allResults = payloads.map { payload ->
-			uniffiInteractor.navigate(Action.TRANSACTION_FETCHED, payload)
-		}
-		//todo handle error cases and show ot user?
-		allResults.filterIsInstance<UniffiResult.Error<Any>>().forEach { error ->
-			Log.e(
-				TAG,
-				"Camera scan: transaction parsing failed, ${error.error.message}"
-			)
-		}
-		return allResults.filterIsInstance<UniffiResult.Success<ActionResult>>()
-			.mapNotNull { (it.result.screenData as? ScreenData.Transaction)?.f }
-			.flatten()
-	}
+	private val transactionIsInProgress = MutableStateFlow<Boolean>(false)
 
 	suspend fun performPayload(payload: String) {
-		if (transactionInProgress.value) {
+		if (transactionIsInProgress.value) {
 			Log.e(TAG, "started transaction while it was in progress, ignoring")
 			return
 		}
-		transactionInProgress.value = true
+		transactionIsInProgress.value = true
 
 		val navigateResponse =
 			uniffiInteractor.navigate(Action.TRANSACTION_FETCHED, payload)
@@ -72,85 +60,61 @@ class ScanViewModel : ViewModel() {
 		if (transactions.all { it.isDisplayingErrorOnly() }) {
 			presentableError.value =
 				transactions.joinToString("\n") { it.transactionIssues() }
-
 			uniffiInteractor.navigate(Action.GO_BACK)
 			return
 		}
 
 		when (transactions.firstOrNull()?.ttype) {
 			TransactionType.SIGN -> {
-				//				this.pendingTransactions = transactions //todo scan save here?
 				val seedNames = transactions
 					.filter { it.ttype == TransactionType.SIGN }
 					.mapNotNull { it.authorInfo?.address?.seedName }
 				val actionResult = signTransaction("", seedNames)
 
+				//todo scan
+				//						if (actionResult.navResult.alertData != null) {
+				//							Log.e(
+				//								"sign error",
+				//								result.navResult.alertData.toString()
+				//							) //todo dmitry show error
+
 				//password protected key, show password
 				when (val modalData = actionResult?.modalData) {
 					is ModalData.EnterPassword -> {
-						val passwordModel = modalData.f.toEnterPasswordModel()
-						//todo show enter password
+						passwordModel.value = modalData.f.toEnterPasswordModel()
 					}
 					is ModalData.SignatureReady -> {
-						val signature = modalData.f //todo show signature
-						//todo show transactions qr code
+						signature.value = modalData.f
 					}
 					else -> {} //ignore the rest modals
 				}
 			}
 			else -> {
-				// Transaction with error
+				// Transaction with error OR
 				// Transaction that does not require signing (i.e. adding network or metadata)
-				//show transactions
-				//todo show transactions here
+				//todo scan actually we won't ask to signature in this case ^^^
 			}
 		}
-
+		this.transactions.value = transactions
 	}
 
 	fun clearTransactionState() {
-		pendingTransactions.value = emptyList()
+		transactions.value = emptyList()
 		signature.value = null
-		transactionInProgress.value = false
+		passwordModel.value = null
+		presentableError.value = null
+		transactionIsInProgress.value = false
 	}
 
-	//				scope.launch {
-	//					val result = transactionVm.signTransaction(
-	//						comment = comment.value,
-	//						seedNames = transactions.mapNotNull { it.authorInfo?.address?.seedName },
-	//						signerVM = signerDataModel,
-	//					)
-	//					//todo dmitry handle non happy cases as well and probably in viewmodel not here
-	//					if (result is SignResult.Success) {
-	//						if (result.navResult.alertData != null) {
-	//							Log.e(
-	//								"sign error",
-	//								result.navResult.alertData.toString()
-	//							) //todo dmitry show error
-	//						} else if (result.navResult.modalData != null) {
-	//							if (result.navResult.modalData is ModalData.SignatureReady) {
-	//								onSigReady((result.navResult.modalData as ModalData.SignatureReady).f)
-	//							} else {
-	//								//todo dmitry show password
-	//								Log.e(
-	//									"sign modal is not handled",
-	//									result.navResult.modalData.toString()
-	//								)
-	//							}
-	//						} else {
-	//							(result.navResult.screenData as? ScreenData.Transaction)?.f?.let { transactions ->
-	////								onSuccess(transactions)
-	////									screenTransactions = transactions
-	//							}
-	//						}
-	//					}
-	//				}
 	private suspend fun signTransaction(
 		comment: String,
 		seedNames: List<String>,
 	): ActionResult? {
 		return when (val phrases = seedRepository.getSeedPhrases(seedNames)) {
-			is RepoResult.Failure -> null
+			is RepoResult.Failure -> {
+				Log.w(TAG,"signature transactions failure ${phrases.error}")
+				null
+			}
 			is RepoResult.Success -> backendAction(Action.GO_FORWARD, comment, phrases.result)
 		}
 	}

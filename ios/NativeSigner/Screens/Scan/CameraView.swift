@@ -219,7 +219,7 @@ struct CameraView: View {
 extension CameraView {
     final class ViewModel: ObservableObject {
         // Overlay presentation
-        @Published var isPresentingProgressSnackbar: Bool = false
+        @Published var isPresentingProgressSnackbar: Bool = vfalse
         @Published var isScanningMultiple: Bool = false
         @Published var header: String = Localizable.Scanner.Label.Scan.Main.header.string
         @Published var message: String = Localizable.Scanner.Label.Scan.Main.message.string

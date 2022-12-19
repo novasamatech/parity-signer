@@ -8,13 +8,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.models.Navigator
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.screens.scan.items.ScanErrorBottomSheet
 import io.parity.signer.screens.scan.transaction.TransactionScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
@@ -27,33 +25,58 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun ScanNavSubgraph(
-	signerDataModel: SignerDataModel,
 	rootNavigator: Navigator,
 ) {
 	val scanViewModel: ScanViewModel = viewModel()
 	val navController = rememberNavController()
 	val scope = rememberCoroutineScope()
-	NavHost(
-		navController = navController,
-		startDestination = ScanNavSubgraph.camera,
-	) {
 
-		composable(ScanNavSubgraph.camera) {
 			BackHandler() {
 				rootNavigator.backAction()
 			}
-			ScanScreen(
-				onClose = { rootNavigator.backAction() },
-				performPayloads = { payloads ->
-					scope.launch {
-						val transactions = scanViewModel.performPayload(payloads)
+
+	val transactions = scanViewModel.transactions.collectAsState()
+	val signature = scanViewModel.signature.collectAsState()
+
+	if (transactions.value.isEmpty()) {
+		ScanScreen(
+			onClose = { rootNavigator.backAction() },
+			performPayloads = { payloads ->
+				scope.launch {
+					val transactions = scanViewModel.performPayload(payloads)
 //						todo scan
 //						scanViewModel.pendingTransactions.value = transactions
 //						navController.navigate(ScanNavSubgraph.transaction)
-					}
 				}
+			}
+		)
+	} else {
+		//todo scan ios/NativeSigner/Screens/Scan/CameraView.swift:130
+		Box(modifier = Modifier.statusBarsPadding()) {
+			TransactionScreen(
+				transactions = scanViewModel.transactions.collectAsState().value,
+				signature = scanViewModel.signature.collectAsState().value,
+				onBack = {
+					//was navigate(Action.GO_BACK, "", "")
+					navController.navigate(ScanNavSubgraph.camera)
+				},
+				onFinish = {
+					rootNavigator.navigate(Action.GO_FORWARD)
+					scanViewModel.transactions.value = emptyList()
+					// todo dmitry handle subsequent modals
+//						rust/navigator/src/navstate.rs:396
+//						val navResult = uniffiinteractor.ProcessBatchTransactions(some_all) and handle
+					//Modal::EnterPassword
+					//Modal::SignatureReady(a);
+					//Screen::Transaction( can come with updated checksum
+					//success will clear to log
+					// alert error
+				},
 			)
 		}
+	}
+	//bottom sheets
+	if ()
 		composable(ScanNavSubgraph.password) {
 			//todo scan ios/NativeSigner/Screens/Scan/CameraView.swift:138
 			val backAction = {
@@ -95,32 +118,7 @@ fun ScanNavSubgraph(
 				)
 			}
 		}
-		composable(ScanNavSubgraph.transaction) {
-			//todo scan ios/NativeSigner/Screens/Scan/CameraView.swift:130
 
-			Box(modifier = Modifier.statusBarsPadding()) {
-				TransactionScreen(
-					transactions = scanViewModel.pendingTransactions.collectAsState().value,
-					signature = scanViewModel.signature.collectAsState().value,
-					onBack = {
-						//was navigate(Action.GO_BACK, "", "")
-						navController.navigate(ScanNavSubgraph.camera)
-					},
-					onFinish = {
-						rootNavigator.navigate(Action.GO_FORWARD)
-						scanViewModel.pendingTransactions.value = emptyList()
-						// todo dmitry handle subsequent modals
-//						rust/navigator/src/navstate.rs:396
-//						val navResult = uniffiinteractor.ProcessBatchTransactions(some_all) and handle
-						//Modal::EnterPassword
-						//Modal::SignatureReady(a);
-						//Screen::Transaction( can come with updated checksum
-						//success will clear to log
-						// alert error
-					},
-				)
-			}
-		}
 	}
 }
 
