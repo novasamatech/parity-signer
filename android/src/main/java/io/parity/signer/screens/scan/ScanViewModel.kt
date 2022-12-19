@@ -19,6 +19,7 @@ class ScanViewModel : ViewModel() {
 
 	private val uniffiInteractor = ServiceLocator.backendLocator.uniffiInteractor
 	private val authentication = ServiceLocator.authentication
+	private val seedStorage = ServiceLocator.seedStorage
 
 
 	var pendingTransactions: MutableStateFlow<List<MTransaction>> =
@@ -143,10 +144,11 @@ class ScanViewModel : ViewModel() {
 	): SignResult {
 		return when (val authResult =
 			//todo check how to check if user is already authenticated with biometric prompt
+			//todo how to get FragmentActivity in compose
 			authentication.authenticate(signerVM.activity)) {
 			AuthResult.AuthSuccess -> {
 				val seedPhrases = seedNames
-					.map { signerVM.getSeed(it) }
+					.map { seedStorage.getSeed(it) }
 					.filter { it.isNotEmpty() }
 					.joinToString(separator = "\n")
 
