@@ -15,7 +15,8 @@ db_handling = { path = "../db_handling", default-features = false, features = ["
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
 thiserror = "1.0.38"
-anyhow = "1.0.66"
+anyhow = "1.0.68"
+
 
 [dev-dependencies]
 pretty_assertions = "1"
