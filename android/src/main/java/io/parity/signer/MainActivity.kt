@@ -43,8 +43,6 @@ class MainActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		ServiceLocator.initActivityDependencies(this)
-		signerDataModel.context = applicationContext
-		signerDataModel.activity = this
 
 		if (savedInstanceState == null) {
 			signerDataModel.lateInit()

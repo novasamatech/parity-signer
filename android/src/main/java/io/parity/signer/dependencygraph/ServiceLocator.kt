@@ -40,7 +40,7 @@ object ServiceLocator {
 		val uniffiInteractor by lazy { UniffiInteractor(dbname) }
 	}
 
-	class ActivityScope(activity: FragmentActivity) {
+	class ActivityScope(val activity: FragmentActivity) {
 		val seedRepository: SeedRepository = SeedRepository(seedStorage,
 			authentication, activity)
 	}

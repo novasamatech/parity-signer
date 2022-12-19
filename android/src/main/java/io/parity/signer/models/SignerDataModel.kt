@@ -17,19 +17,14 @@ import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 
-/**
- * This is single object to handle all interactions with backend
- */
 class SignerDataModel : ViewModel() {
 
 	// Internal model values
 	private val _onBoardingDone = MutableStateFlow(OnboardingWasShown.InProgress)
 
-	// TODO: something about this
-	// It leaks context objects,
-	// but is really quite convenient in composable things
-	lateinit var context: Context
-	lateinit var activity: FragmentActivity
+// todo migrate to use dependencies from ServiceLocator rather than expecting them here
+	val context: Context get() = ServiceLocator.appContext
+	val activity: FragmentActivity get() = ServiceLocator.activityScope!!.activity
 
 	val navigator by lazy { SignerNavigator(this) }
 
@@ -79,14 +74,6 @@ class SignerDataModel : ViewModel() {
 	val localNavAction: StateFlow<LocalNavAction> = _localNavAction
 
 	// MARK: init boilerplate begin
-
-	/**
-	 * Init on object creation, context not passed yet! Pass it and call next init
-	 */
-	init {
-		// actually load RustNative code
-		System.loadLibrary("signer")
-	}
 
 	/**
 	 * Don't forget to call real init after defining context!

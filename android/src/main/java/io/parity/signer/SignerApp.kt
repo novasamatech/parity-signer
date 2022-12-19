@@ -11,6 +11,9 @@ import java.lang.Thread.UncaughtExceptionHandler
 class SignerApp : Application() {
 	override fun onCreate() {
 		super.onCreate()
+		// actually load RustNative code
+		System.loadLibrary("signer")
+
 		initLogging("SIGNER_RUST_LOG")
 
 		val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
