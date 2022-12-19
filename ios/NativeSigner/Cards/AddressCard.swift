@@ -41,7 +41,7 @@ struct AddressCard: View {
                             .font(PrimaryFont.labelM.font)
                         Text(card.address.path)
                         if card.address.hasPwd {
-                            Localizable.Path.delimeter.text
+                            Localizable.Shared.Label.passwordedPathDelimeter.text
                                 .foregroundColor(Asset.accentPink300.swiftUIColor)
                                 .font(PrimaryFont.captionM.font)
                             Image(.lock)

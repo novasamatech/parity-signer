@@ -18,5 +18,28 @@ final class AppState: ObservableObject {
 extension AppState {
     final class UserData {
         var keysData: MKeysNew?
+        var allNetworks: [Network] = []
+        var selectedNetworks: [Network] = []
+
+        init(
+            keysData: MKeysNew? = nil,
+            allNetworks: [Network] = [],
+            selectedNetworks: [Network] = []
+        ) {
+            self.keysData = keysData
+            self.allNetworks = allNetworks
+            self.selectedNetworks = selectedNetworks
+        }
     }
 }
+
+#if DEBUG
+    extension AppState {
+        static let preview = AppState(
+            userData: UserData(
+                keysData: PreviewData.mKeyNew,
+                allNetworks: PreviewData.networks
+            )
+        )
+    }
+#endif

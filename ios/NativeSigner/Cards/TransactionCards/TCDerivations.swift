@@ -75,7 +75,7 @@ private extension DerivedKeyPreview {
     /// Returns either `path` or if password protected, available path with path delimeter and lock icon
     var displayablePath: String {
         true ?
-            "\(derivationPath ?? "")\(Localizable.Address.Label.PasswordProtectedPath.pathDelimeter.string)" :
+            "\(derivationPath ?? "")\(Shared.Label.PasswordedPathDelimeter.string)" :
             derivationPath ?? ""
     }
 }

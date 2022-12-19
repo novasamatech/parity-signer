@@ -126,7 +126,7 @@ where
 {
     if input.len() <= 2953 {
         let qr = png_qr(input, DataType::Regular)?;
-        match std::fs::write(output_name, &qr) {
+        match std::fs::write(output_name, qr) {
             Ok(_) => Ok(()),
             Err(e) => Err(Box::from(format!("Output error {}", e))),
         }

@@ -195,11 +195,11 @@ pub fn make_message(make: Make) -> Result<()> {
         }
         Goal::Text => {
             output_name.set_extension("txt");
-            std::fs::write(&output_name, &hex::encode(&complete_message))?;
+            std::fs::write(&output_name, hex::encode(&complete_message))?;
         }
         Goal::Both => {
             output_name.set_extension("txt");
-            std::fs::write(&output_name, &hex::encode(&complete_message))?;
+            std::fs::write(&output_name, hex::encode(&complete_message))?;
             make_pretty_qr(&complete_message, &output_name).map_err(Error::Qr)?;
         }
     }

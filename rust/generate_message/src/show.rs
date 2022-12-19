@@ -146,7 +146,7 @@ pub fn check_file<P>(path: String, db_path: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
-    let meta_str = std::fs::read_to_string(&path)?;
+    let meta_str = std::fs::read_to_string(path)?;
 
     // `MetaValues` from metadata in file
     let from_file = MetaValues::from_str_metadata(meta_str.trim())?;

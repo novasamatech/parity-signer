@@ -16,7 +16,7 @@ jobs:
           access_token:       ${{ github.token }}
 
       - name:                 Checkout repository
-        uses:                 actions/checkout@v3.1.0
+        uses:                 actions/checkout@v3.2.0
 
       - name:                 Setup Ruby
         uses:                 ruby/setup-ruby@v1
@@ -40,7 +40,7 @@ jobs:
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-spm-
-              
+
       - name:                 Install Rust aarch64-apple-ios target
         uses:                 actions-rs/toolchain@v1.0.7
         with:
