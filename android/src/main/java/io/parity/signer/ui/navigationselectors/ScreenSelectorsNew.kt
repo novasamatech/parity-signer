@@ -40,12 +40,12 @@ fun CombinedScreensSelector(
 	signerDataModel: SignerDataModel
 ) {
 	val rootNavigator = signerDataModel.navigator
-	val seedNames = signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
+	val seedNames =
+		signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (localNavAction) {
 		LocalNavAction.ShowScan -> {
 			ScanNavSubgraph(
-				signerDataModel = signerDataModel,
 				rootNavigator = rootNavigator
 			)
 		}
