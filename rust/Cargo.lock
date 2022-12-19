@@ -61,12 +61,12 @@ checksum = "85965b6739a430150bdd138e2374a98af0c3ee0d030b3bb7fc3bddff58d0102e"
 
 [[package]]
 name = "android_logger"
-version = "0.11.1"
+version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5e9dd62f37dea550caf48c77591dc50bd1a378ce08855be1a0c42a97b7550fb"
+checksum = "4c0c6cfd3264e874d461c0316a78fb78e4147562c68a64881af36fe10573613e"
 dependencies = [
  "android_log-sys",
- "env_logger 0.9.3",
+ "env_logger",
  "log",
  "once_cell",
 ]
@@ -939,16 +939,6 @@ name = "encode_unicode"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a357d28ed41a50f9c765dbfe56cbc04a64e53e5fc58ba79fbc34c10ef3df831f"
-
-[[package]]
-name = "env_logger"
-version = "0.9.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a12e6657c4c97ebab115a42dcee77225f7f482cdd841cf7088c657a42e9e00e7"
-dependencies = [
- "log",
- "regex",
-]
 
 [[package]]
 name = "env_logger"
@@ -3207,7 +3197,7 @@ dependencies = [
  "anyhow",
  "db_handling",
  "definitions",
- "env_logger 0.10.0",
+ "env_logger",
  "ffi-support",
  "generate_message",
  "hex",
