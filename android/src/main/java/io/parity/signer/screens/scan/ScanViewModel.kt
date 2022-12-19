@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import io.parity.signer.backend.UniffiResult
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.*
-import io.parity.signer.models.storage.getSeed
+import io.parity.signer.models.isDisplayingErrorOnly
+import io.parity.signer.models.storage.RepoResult
+import io.parity.signer.models.storage.SeedRepository
+import io.parity.signer.models.transactionIssues
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -17,9 +19,8 @@ private const val TAG = "ScanViewModelTag"
  */
 class ScanViewModel : ViewModel() {
 
-	private val uniffiInteractor = ServiceLocator.backendLocator.uniffiInteractor
-	private val authentication = ServiceLocator.authentication
-	private val seedStorage = ServiceLocator.seedStorage
+	private val uniffiInteractor = ServiceLocator.backendScope.uniffiInteractor
+	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
 
 
 	var pendingTransactions: MutableStateFlow<List<MTransaction>> =
@@ -100,6 +101,7 @@ class ScanViewModel : ViewModel() {
 		}
 
 	}
+
 	fun clearTransactionState() {
 		pendingTransactions.value = emptyList()
 		signature.value = null
@@ -140,37 +142,14 @@ class ScanViewModel : ViewModel() {
 	private suspend fun signTransaction(
 		comment: String,
 		seedNames: List<String>,
-		signerVM: SignerDataModel, //todo dmitry inbound get seed from it!
-	): SignResult {
-		return when (val authResult =
-			//todo check how to check if user is already authenticated with biometric prompt
-			//todo how to get FragmentActivity in compose
-			authentication.authenticate(signerVM.activity)) {
-			AuthResult.AuthSuccess -> {
-				val seedPhrases = seedNames
-					.map { seedStorage.getSeed(it) }
-					.filter { it.isNotEmpty() }
-					.joinToString(separator = "\n")
-
-				if (seedPhrases.isNotBlank()) {
-					SignResult.Success(
-						backendAction(Action.GO_FORWARD, comment, seedPhrases)
-					)
-				} else {
-					SignResult.Failure(null)
-				}
-			}
-			AuthResult.AuthError,
-			AuthResult.AuthFailed,
-			AuthResult.AuthUnavailable -> {
-				SignResult.Failure(authResult)
-			}
+	): ActionResult? {
+		return when (val phrases = seedRepository.getSeedPhrases(seedNames)) {
+			is RepoResult.Failure -> null
+			is RepoResult.Success -> backendAction(
+				Action.GO_FORWARD,
+				comment,
+				phrases.result
+			)
 		}
 	}
-
-	sealed class SignResult {
-		data class Success(val navResult: ActionResult) : SignResult()
-		data class Failure(val auth: AuthResult?) : SignResult()
-	}
-
 }

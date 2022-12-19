@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		ServiceLocator.initActivityDependencies(this)
 		signerDataModel.context = applicationContext
 		signerDataModel.activity = this
 
@@ -56,6 +57,11 @@ class MainActivity : AppCompatActivity() {
 		setContent {
 			SignerApp(signerDataModel)
 		}
+	}
+
+	override fun onDestroy() {
+		ServiceLocator.deinitActivityDependencies()
+		super.onDestroy()
 	}
 }
 

@@ -1,30 +1,48 @@
 package io.parity.signer.dependencygraph
 
 import android.content.Context
+import androidx.fragment.app.FragmentActivity
 import io.parity.signer.backend.UniffiInteractor
 import io.parity.signer.models.Authentication
+import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.models.storage.SeedStorage
 
 object ServiceLocator {
 
 	fun initAppDependencies(appContext: Context) {
-		_backendLocator = BackendLocator(appContext.getDbNameFromContext())
+		_backendScope = BackendScope(appContext.getDbNameFromContext())
 	}
 
-	private var _backendLocator: BackendLocator? = null
-	val backendLocator: BackendLocator
-		get() = _backendLocator
+	fun initActivityDependencies(activity: FragmentActivity) {
+		_activityScope = ActivityScope(activity)
+	}
+
+	fun deinitActivityDependencies() {
+		_activityScope = null
+	}
+
+	private var _backendScope: BackendScope? = null
+	val backendScope: BackendScope
+		get() = _backendScope
 			?: throw RuntimeException("dependency is not initialized yet")
 
-	val seedStorage: SeedStorage = SeedStorage()
+	@Volatile private var _activityScope: ActivityScope? = null
+	val activityScope: ActivityScope? = _activityScope
 
-	val authentication by lazy { Authentication() }
+	val seedStorage: SeedStorage = SeedStorage()
+	val authentication = Authentication()
+
+
+	class BackendScope(dbname: String) {
+		val uniffiInteractor by lazy { UniffiInteractor(dbname) }
+	}
+
+	class ActivityScope(activity: FragmentActivity) {
+		val seedRepository: SeedRepository = SeedRepository(seedStorage,
+			authentication, activity)
+	}
 }
 
 fun Context.getDbNameFromContext() =
 	applicationContext.filesDir.toString() + "/Database"
 
-
-class BackendLocator(dbname: String) {
-	val uniffiInteractor by lazy { UniffiInteractor(dbname) }
-}
