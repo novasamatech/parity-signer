@@ -1,4 +1,4 @@
-package io.parity.signer.screens.scan.items
+package io.parity.signer.screens.scan.elements
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
@@ -66,7 +66,7 @@ fun ScanErrorBottomSheet(
 
 
 @Preview(
-	name = "day",
+	name = "light theme",
 	uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true,
 )

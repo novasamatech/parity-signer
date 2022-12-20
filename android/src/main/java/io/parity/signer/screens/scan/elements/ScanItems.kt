@@ -1,4 +1,4 @@
-package io.parity.signer.screens.scan.items
+package io.parity.signer.screens.scan.elements
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

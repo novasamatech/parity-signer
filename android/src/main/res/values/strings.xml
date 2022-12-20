@@ -192,6 +192,8 @@
 	<string name="password_show_password">Show password</string>
 	<string name="password_error_wrong_password">The password you entered is incorrect. Please try again.</string>
     <string name="enable_airplane_mode_error">Please enable airplane mode</string>
+    <string name="wrong_password_title">Did you forget your password?</string>
+	<string name="wrong_password_message">Your password was entered incorrectly more than once. Retrieve it and scan the QR code again.</string>
 
 
 </resources>
