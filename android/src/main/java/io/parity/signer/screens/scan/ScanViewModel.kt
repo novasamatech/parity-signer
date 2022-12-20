@@ -177,12 +177,10 @@ class ScanViewModel : ViewModel() {
 				)
 			}
 		}
-
-//		todo scan why we can get there? iOS
-//            // If we got `Log`, we need to hide password modal, "navigate" to camera view and present
-//            if case .log = actionResult.screenData {
-//                proceedtoErrorState()
-//            }
+		// If we got `Log`, it's out of attempts to enter password
+		if (actionResult.screenData is ScreenData.Log) {
+			proceedWrongPassword()
+		}
 	}
 
 	private fun proceedWrongPassword() {
