@@ -88,7 +88,11 @@ fun ScanNavSubgraph(
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
 			EnterPassword(
 				data = passwordModel,
-				proceed = scanViewModel::handlePasswordEntered,
+				proceed = { password ->
+					scope.launch {
+						scanViewModel.handlePasswordEntered(password)
+					}
+				},
 				onClose = scanViewModel::clearTransactionState,
 			)
 		}
