@@ -27,10 +27,12 @@ fun ScanNavSubgraph(
 	val scanViewModel: ScanViewModel = viewModel()
 	val scope = rememberCoroutineScope()
 
-	BackHandler() {
-		rootNavigator.backAction()
-		//todo scan actually reimplmenet
+	val backAction = {
+		val wasState = scanViewModel.ifHasStateThenClear()
+		if (!wasState) 		rootNavigator.backAction()
 	}
+
+	BackHandler(onBack = backAction)
 
 	val transactions = scanViewModel.transactions.collectAsState()
 	val signature = scanViewModel.signature.collectAsState()
@@ -38,15 +40,14 @@ fun ScanNavSubgraph(
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 
 
+	//Full screens
+
 	if (transactions.value.isEmpty()) {
 		ScanScreen(
 			onClose = { rootNavigator.backAction() },
 			performPayloads = { payloads ->
 				scope.launch {
 					scanViewModel.performPayload(payloads)
-//						todo scan
-//						scanViewModel.pendingTransactions.value = transactions
-//						navController.navigate(ScanNavSubgraph.transaction)
 				}
 			}
 		)
@@ -56,11 +57,7 @@ fun ScanNavSubgraph(
 			TransactionScreen(
 				transactions = transactions.value,
 				signature = signature.value,
-				onBack = {
-					//was navigate(Action.GO_BACK, "", "")
-					//todo scan
-//					navController.navigate(ScanNavSubgraph.camera)
-				},
+				onBack = backAction,
 				onFinish = {
 					rootNavigator.navigate(Action.GO_FORWARD)
 					scanViewModel.transactions.value = emptyList()
@@ -76,18 +73,11 @@ fun ScanNavSubgraph(
 			)
 		}
 	}
-	//bottom sheets
+
+	//Bottom sheets
 
 	presentableError.value?.let { presentableError ->
-		val backAction = {
-			//todo scan
-//			navController.navigate(ScanNavSubgraph.camera)
-		}
-
-		ScanScreen(onClose = { }, performPayloads = {})
-		BottomSheetWrapperRoot(onClosedAction = {
-			backAction
-		}) {
+		BottomSheetWrapperRoot(onClosedAction = backAction) {
 			ScanErrorBottomSheet(
 				presentableError,
 				onClose = backAction,
@@ -95,15 +85,8 @@ fun ScanNavSubgraph(
 		}
 	} ?: passwordModel.value?.let { passwordModel ->
 		//todo scan ios/NativeSigner/Screens/Scan/CameraView.swift:138
-		val backAction = {
-			//todo scan
-//			navController.navigate(ScanNavSubgraph.camera)
-		}
 
-		ScanScreen(onClose = { }, performPayloads = {})
-		BottomSheetWrapperRoot(onClosedAction = {
-			backAction()
-		}) {
+		BottomSheetWrapperRoot(onClosedAction = backAction) {
 			EnterPassword(
 				data = passwordModel,
 				proceed = {}, //todo scan

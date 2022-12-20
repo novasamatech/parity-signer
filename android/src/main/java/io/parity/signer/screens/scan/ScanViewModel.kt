@@ -98,6 +98,17 @@ class ScanViewModel : ViewModel() {
 		this.transactions.value = transactions
 	}
 
+	fun ifHasStateThenClear(): Boolean {
+		return if ((transactions.value.isNotEmpty()
+				|| signature.value != null
+				|| passwordModel.value != null
+				|| presentableError.value != null) || transactionIsInProgress.value
+		) {
+			clearTransactionState()
+			true
+		} else false
+	}
+
 	fun clearTransactionState() {
 		transactions.value = emptyList()
 		signature.value = null
