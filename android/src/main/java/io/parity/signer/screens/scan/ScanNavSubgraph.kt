@@ -27,18 +27,16 @@ fun ScanNavSubgraph(
 	val scanViewModel: ScanViewModel = viewModel()
 	val scope = rememberCoroutineScope()
 
-	val backAction = {
-		val wasState = scanViewModel.ifHasStateThenClear()
-		if (!wasState) 		rootNavigator.backAction()
-	}
-
-	BackHandler(onBack = backAction)
-
 	val transactions = scanViewModel.transactions.collectAsState()
 	val signature = scanViewModel.signature.collectAsState()
 	val presentableError = scanViewModel.presentableError.collectAsState()
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 
+	val backAction = {
+		val wasState = scanViewModel.ifHasStateThenClear()
+		if (!wasState) 		rootNavigator.backAction()
+	}
+	BackHandler(onBack = backAction)
 
 	//Full screens
 
@@ -84,8 +82,7 @@ fun ScanNavSubgraph(
 			)
 		}
 	} ?: passwordModel.value?.let { passwordModel ->
-		//todo scan ios/NativeSigner/Screens/Scan/CameraView.swift:138
-
+		//ios/NativeSigner/Screens/Scan/CameraView.swift:138
 		BottomSheetWrapperRoot(onClosedAction = backAction) {
 			EnterPassword(
 				data = passwordModel,
