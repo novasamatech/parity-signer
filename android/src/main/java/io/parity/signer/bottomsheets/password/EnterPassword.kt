@@ -183,7 +183,7 @@ private fun EnterPasswordHeader(
 /**
  * Local copy of shared [MEnterPassword] class
  */
-class EnterPasswordModel(
+data class EnterPasswordModel(
 	val keyCard: KeyCardModelBase,
 	val showError: Boolean,
 	val attempt: Int,
@@ -197,9 +197,9 @@ class EnterPasswordModel(
 	}
 }
 
-fun MEnterPassword.toEnterPasswordModel() = EnterPasswordModel(
+fun MEnterPassword.toEnterPasswordModel(withShowError: Boolean = false) = EnterPasswordModel(
 	keyCard = KeyCardModelBase.fromAddress(authorInfo),
-	showError = false,
+	showError = withShowError,
 	attempt = counter.toInt(),
 )
 

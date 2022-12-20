@@ -11,6 +11,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.models.Navigator
 import io.parity.signer.screens.scan.elements.ScanErrorBottomSheet
+import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
 import io.parity.signer.screens.scan.transaction.TransactionScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
@@ -31,10 +32,11 @@ fun ScanNavSubgraph(
 	val signature = scanViewModel.signature.collectAsState()
 	val presentableError = scanViewModel.presentableError.collectAsState()
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
+	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
 
 	val backAction = {
 		val wasState = scanViewModel.ifHasStateThenClear()
-		if (!wasState) 		rootNavigator.backAction()
+		if (!wasState) rootNavigator.backAction()
 	}
 	BackHandler(onBack = backAction)
 
@@ -86,9 +88,17 @@ fun ScanNavSubgraph(
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
 			EnterPassword(
 				data = passwordModel,
-				proceed = {}, //todo scan
+				proceed = scanViewModel::handlePasswordEntered,
 				onClose = scanViewModel::clearTransactionState,
 			)
 		}
+	} ?: if (errorWrongPassword.value) {
+		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
+			WrongPasswordBottomSheet(
+				onOk = backAction
+			)
+		}
+	} else {
+		//no bottom sheet
 	}
 }

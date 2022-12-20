@@ -33,6 +33,7 @@ class ScanViewModel : ViewModel() {
 		MutableStateFlow(null)
 	val presentableError: MutableStateFlow<String?> =
 		MutableStateFlow(null)
+	val errorWrongPassword = MutableStateFlow<Boolean>(false)
 
 	private val transactionIsInProgress = MutableStateFlow<Boolean>(false)
 
@@ -81,28 +82,32 @@ class ScanViewModel : ViewModel() {
 				//password protected key, show password
 				when (val modalData = actionResult?.modalData) {
 					is ModalData.EnterPassword -> {
-						passwordModel.value = modalData.f.toEnterPasswordModel()
+						passwordModel.value = modalData.f.toEnterPasswordModel(withShowError = false)
 					}
 					is ModalData.SignatureReady -> {
 						signature.value = modalData.f
 					}
-					else -> {} //ignore the rest modals
+					//ignore the rest modals
+					else -> {
+						//todo scan actually we won't ask for signature in this case ^^^
+					}
 				}
 			}
 			else -> {
 				// Transaction with error OR
 				// Transaction that does not require signing (i.e. adding network or metadata)
-				//todo scan actually we won't ask to signature in this case ^^^
 			}
 		}
 		this.transactions.value = transactions
 	}
 
 	fun ifHasStateThenClear(): Boolean {
-		return if ((transactions.value.isNotEmpty()
-				|| signature.value != null
-				|| passwordModel.value != null
-				|| presentableError.value != null) || transactionIsInProgress.value
+		return if (transactions.value.isNotEmpty()
+			|| signature.value != null
+			|| passwordModel.value != null
+			|| presentableError.value != null
+			|| transactionIsInProgress.value
+			|| errorWrongPassword.value
 		) {
 			clearTransactionState()
 			true
@@ -115,6 +120,7 @@ class ScanViewModel : ViewModel() {
 		passwordModel.value = null
 		presentableError.value = null
 		transactionIsInProgress.value = false
+		errorWrongPassword.value = false
 	}
 
 	private suspend fun signTransaction(
@@ -123,10 +129,67 @@ class ScanViewModel : ViewModel() {
 	): ActionResult? {
 		return when (val phrases = seedRepository.getSeedPhrases(seedNames)) {
 			is RepoResult.Failure -> {
-				Log.w(TAG,"signature transactions failure ${phrases.error}")
+				Log.w(TAG, "signature transactions failure ${phrases.error}")
 				null
 			}
-			is RepoResult.Success -> backendAction(Action.GO_FORWARD, comment, phrases.result)
+			is RepoResult.Success -> backendAction(
+				Action.GO_FORWARD,
+				comment,
+				phrases.result
+			)
 		}
+	}
+
+	suspend fun handlePasswordEntered(password: String) {
+		val navigateResponse =
+			uniffiInteractor.navigate(Action.GO_FORWARD, password)
+		val actionResult =
+			(navigateResponse as? UniffiResult.Success)?.result
+				?: run {
+			Log.e(
+				TAG, "Error in entering password for a key, " +
+					"navigation resp is $navigateResponse"
+			)
+			return
+		}
+
+		when (val modalData = actionResult.modalData) {
+			// If navigation returned `enterPassword`, it means password is invalid
+			is ModalData.EnterPassword -> {
+				val model = modalData.f.toEnterPasswordModel(true)
+				if (model.attempt > 3) {
+					proceedWrongPassword()
+					return
+				}
+				passwordModel.value = model
+			}
+			//password success
+			is ModalData.SignatureReady -> {
+				//                navigation.performFake(navigation: .init(action: .goBack))
+				signature.value = modalData.f
+				passwordModel.value = null
+			}
+			//ignore the rest modals
+			else -> {
+				Log.e(
+					TAG, "Password is entered for transaction, but neither new password or signature is passed! Should not happen" +
+						"actionResult is $actionResult"
+				)
+			}
+		}
+
+//		todo scan why we can get there? iOS
+//            // If we got `Log`, we need to hide password modal, "navigate" to camera view and present
+//            if case .log = actionResult.screenData {
+//                proceedtoErrorState()
+//            }
+	}
+
+	private fun proceedWrongPassword() {
+//		navigation.performFake(navigation: .init(action: .goBack))
+		//  Fake navigation to camera, as were brought back to `Log` screen on navstate error handling
+//			navigation.performFake(navigation: .init(action: .navbarScan))
+		errorWrongPassword.value = true
+		passwordModel.value = null
 	}
 }
