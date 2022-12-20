@@ -78,7 +78,7 @@ fun ScanNavSubgraph(
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
 			ScanErrorBottomSheet(
 				presentableError,
-				onClose = scanViewModel::clearTransactionState,
+				onOK = scanViewModel::clearTransactionState,
 			)
 		}
 	} ?: passwordModel.value?.let { passwordModel ->

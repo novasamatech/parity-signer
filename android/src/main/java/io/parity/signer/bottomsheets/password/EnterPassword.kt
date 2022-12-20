@@ -51,7 +51,9 @@ fun EnterPassword(
 	val canProceed = password.isNotBlank()
 
 	Column(
-		modifier = Modifier.imePadding()
+		modifier = Modifier
+			.fillMaxWidth(1f)
+			.imePadding()
 	) {
 		EnterPasswordHeader(
 			onClose = onClose,
@@ -63,10 +65,10 @@ fun EnterPassword(
 		)
 		Column(
 			modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .verticalScroll(
-                    rememberScrollState()
-                )
+				.padding(horizontal = 24.dp)
+				.verticalScroll(
+					rememberScrollState()
+				)
 		) {
 			Text(
 				text = stringResource(R.string.enter_password_title),
@@ -111,7 +113,8 @@ fun EnterPassword(
 
 					val description =
 						if (passwordVisible) stringResource(R.string.password_hide_password) else stringResource(
-													R.string.password_show_password)
+							R.string.password_show_password
+						)
 
 					IconButton(onClick = { passwordVisible = !passwordVisible }) {
 						Icon(imageVector = image, description)
