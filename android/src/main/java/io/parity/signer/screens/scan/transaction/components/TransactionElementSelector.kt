@@ -24,8 +24,8 @@ fun TransactionElementSelector(card: TransactionCard) {
 	Box(
 		modifier = Modifier
 			.padding(
-				start = (card.indent.toInt() * 10).dp,
-				end = (card.indent.toInt() * 10).dp
+//				start = (card.indent.toInt() * 10).dp, actually ident is always 0 from rust
+				horizontal = 16.dp
 			)
 			.fillMaxWidth()
 	) {
