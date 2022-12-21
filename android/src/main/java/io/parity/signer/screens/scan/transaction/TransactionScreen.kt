@@ -1,21 +1,21 @@
 package io.parity.signer.screens.scan.transaction
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import io.parity.signer.components.BigButton
+import io.parity.signer.R
 import io.parity.signer.components.KeyCardOld
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
-import io.parity.signer.components.base.PrimaryButton
 import io.parity.signer.components.base.PrimaryButtonWide
+import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyQrCodeProvider
 import io.parity.signer.models.Callback
@@ -52,7 +52,7 @@ fun TransactionScreen(
 }
 
 @Composable
-private fun QrSignatureData(signature: MSignatureReady){
+private fun QrSignatureData(signature: MSignatureReady) {
 	AnimatedQrKeysInfo<List<List<UByte>>>(
 		input = signature.signatures.map { it.getData() },
 		provider = EmptyQrCodeProvider(),
@@ -93,49 +93,52 @@ private fun ActionButtons(
 //					color = MaterialTheme.colors.Text400
 //				)
 
-			PrimaryButtonWide(
-				label = "Done",
-				modifier = Modifier.padding(horizontal = 24.dp,),
+			SecondaryButtonWide(
+				label = stringResource(R.string.transaction_action_done),
+				withBackground = true,
+				modifier = Modifier.padding(horizontal = 24.dp),
 				onClicked = onBack,
 			)
 		}
 		TransactionType.DONE -> {
-			PrimaryButtonWide(
-				label = "Done",
-				modifier = Modifier.padding(horizontal = 24.dp,),
+			SecondaryButtonWide(
+				label = stringResource(R.string.transaction_action_done),
+				withBackground = true,
+				modifier = Modifier.padding(horizontal = 24.dp),
 				onClicked = onBack,
 			)
 		}
 		TransactionType.STUB -> {
-
 			PrimaryButtonWide(
-				label = "Approve",
-				modifier = Modifier.padding(horizontal = 24.dp,),
-				onClicked = onBack,
+				label = stringResource(R.string.transaction_action_approve),
+				modifier = Modifier.padding(horizontal = 24.dp),
+				onClicked = onFinish,
 			)
-
-			PrimaryButtonWide(
-				label = "Decline",
-				modifier = Modifier.padding(horizontal = 24.dp,),
+			Spacer(modifier = Modifier.padding(top = 8.dp))
+			SecondaryButtonWide(
+				label = stringResource(R.string.transaction_action_decline),
+				modifier = Modifier.padding(horizontal = 24.dp),
 				onClicked = onBack,
 			)
 		}
 		TransactionType.READ -> {
-			PrimaryButtonWide(
-				label = "Back",
-				modifier = Modifier.padding(horizontal = 24.dp,),
+			SecondaryButtonWide(
+				label = stringResource(R.string.transaction_action_back),
+				withBackground = true,
+				modifier = Modifier.padding(horizontal = 24.dp),
 				onClicked = onBack,
 			)
 		}
 		TransactionType.IMPORT_DERIVATIONS -> {
 			PrimaryButtonWide(
-				label = "Select seed",
-				modifier = Modifier.padding(horizontal = 24.dp,),
-				onClicked = onBack,
+				label = stringResource(R.string.transaction_action_select_seed),
+				modifier = Modifier.padding(horizontal = 24.dp),
+				onClicked = onFinish,
 			)
-			PrimaryButtonWide(
-				label = "Decline",
-				modifier = Modifier.padding(horizontal = 24.dp,),
+			Spacer(modifier = Modifier.padding(top = 8.dp))
+			SecondaryButtonWide(
+				label = stringResource(R.string.transaction_action_decline),
+				modifier = Modifier.padding(horizontal = 24.dp),
 				onClicked = onBack,
 			)
 		}

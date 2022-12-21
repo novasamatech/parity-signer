@@ -196,6 +196,11 @@
 	<string name="wrong_password_message">Your password was entered incorrectly more than once. Retrieve it and scan the QR code again.</string>
 	<string name="transaction_generic_error_title">Error signing Transaction</string>
 	<string name="transaction_generic_error_description">View the details below to find out more.</string>
+    <string name="transaction_action_done">Done</string>
+	<string name="transaction_action_approve">Approve</string>
+	<string name="transaction_action_decline">Decline</string>
+	<string name="transaction_action_back">Back</string>
+	<string name="transaction_action_select_seed">Select seed</string>
 
 
 </resources>
