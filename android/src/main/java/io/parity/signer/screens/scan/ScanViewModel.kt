@@ -96,6 +96,7 @@ class ScanViewModel : ViewModel() {
 			else -> {
 				// Transaction with error OR
 				// Transaction that does not require signing (i.e. adding network or metadata)
+				// will set them below for any case and show anyway
 			}
 		}
 		this.transactions.value = transactions

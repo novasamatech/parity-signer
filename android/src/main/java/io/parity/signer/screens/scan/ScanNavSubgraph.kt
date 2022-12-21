@@ -34,6 +34,9 @@ fun ScanNavSubgraph(
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
 
+	val showingModals =
+		presentableError.value != null || passwordModel.value != null || errorWrongPassword.value
+
 	val backAction = {
 		val wasState = scanViewModel.ifHasStateThenClear()
 		if (!wasState) rootNavigator.backAction()
@@ -42,7 +45,7 @@ fun ScanNavSubgraph(
 
 	//Full screens
 
-	if (transactions.value.isEmpty()) {
+	if (transactions.value.isEmpty() || showingModals) {
 		ScanScreen(
 			onClose = { rootNavigator.backAction() },
 			performPayloads = { payloads ->
@@ -60,7 +63,7 @@ fun ScanNavSubgraph(
 				onBack = backAction,
 				onFinish = {
 					rootNavigator.navigate(Action.GO_FORWARD)
-					scanViewModel.transactions.value = emptyList()
+					scanViewModel.clearTransactionState()
 					// todo dmitry handle subsequent modals
 //						rust/navigator/src/navstate.rs:396
 //						val navResult = uniffiinteractor.ProcessBatchTransactions(some_all) and handle
