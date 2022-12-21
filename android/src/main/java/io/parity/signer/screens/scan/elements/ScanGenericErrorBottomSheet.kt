@@ -5,7 +5,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -26,7 +28,11 @@ fun ScanErrorBottomSheet(
 	onOK: Callback,
 ) {
 
-	Column(Modifier.fillMaxWidth(1f)) {
+	Column(
+		Modifier
+			.fillMaxWidth(1f)
+			.verticalScroll(rememberScrollState())
+	) {
 		Text(
 			text = stringResource(R.string.transaction_generic_error_title),
 			color = MaterialTheme.colors.primary,

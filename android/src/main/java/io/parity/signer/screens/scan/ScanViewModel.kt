@@ -61,7 +61,7 @@ class ScanViewModel : ViewModel() {
 		if (transactions.all { it.isDisplayingErrorOnly() }) {
 			presentableError.value =
 				transactions.joinToString("\n") { it.transactionIssues() }
-			uniffiInteractor.navigate(Action.GO_BACK)
+			uniffiInteractor.navigate(Action.GO_BACK) //fake call
 			return
 		}
 
