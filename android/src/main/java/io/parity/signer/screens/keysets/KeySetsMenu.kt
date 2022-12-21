@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
-import io.parity.signer.components.base.SecondaryButtonBottomSheet
+import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 
@@ -39,7 +39,7 @@ fun KeySetsMenuBottomSheet(
 			}
 		)
 		Spacer(modifier = Modifier.padding(bottom = 8.dp))
-		SecondaryButtonBottomSheet(
+		SecondaryButtonWide(
 			label = stringResource(R.string.generic_cancel),
 		) {
 			navigator.popBackStack()

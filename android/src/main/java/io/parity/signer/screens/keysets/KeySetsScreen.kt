@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
-import io.parity.signer.components.base.PrimaryButtonBottomSheet
+import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.items.KeySetItem
@@ -67,7 +67,7 @@ fun KeySetsScreen(
 						.align(Alignment.End)
 						.padding(end = 16.dp)
 				)
-				PrimaryButtonBottomSheet(
+				PrimaryButtonWide(
 					label = stringResource(R.string.key_sets_screem_add_key_button),
 					modifier = Modifier
 						.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)

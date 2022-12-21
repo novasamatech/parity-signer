@@ -1,21 +1,29 @@
 package io.parity.signer.screens.scan.transaction
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import io.parity.signer.components.*
+import androidx.compose.ui.unit.dp
+import io.parity.signer.components.BigButton
+import io.parity.signer.components.KeyCardOld
+import io.parity.signer.components.NetworkCard
+import io.parity.signer.components.NetworkCardModel
+import io.parity.signer.components.base.PrimaryButton
+import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyQrCodeProvider
 import io.parity.signer.models.Callback
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.getData
 import io.parity.signer.screens.scan.transaction.components.TransactionPreviewField
-import io.parity.signer.uniffi.*
+import io.parity.signer.uniffi.MSignatureReady
+import io.parity.signer.uniffi.MTransaction
+import io.parity.signer.uniffi.TransactionType
 
 
 /**
@@ -62,7 +70,8 @@ private fun ActionButtons(
 	when (action) {
 		TransactionType.SIGN -> {
 
-			//already signed so we show qr code, so we cannot add log there
+			//already signed and we show qr code in this screen now
+			// , so we cannot add log there
 //			val comment = remember { mutableStateOf("") }
 //				Text(
 //					"LOG NOTE",
@@ -84,34 +93,50 @@ private fun ActionButtons(
 //					color = MaterialTheme.colors.Text400
 //				)
 
-			val scope = rememberCoroutineScope()
-			BigButton(text = "Unlock key and sign", action = {
-//todo scan this should never be the case
-			})
-			BigButton(
-				text = "Decline", action = onBack
+			PrimaryButtonWide(
+				label = "Done",
+				modifier = Modifier.padding(horizontal = 24.dp,),
+				onClicked = onBack,
 			)
 		}
-		TransactionType.DONE -> BigButton(
-			text = "Done", action = onBack
-		)
+		TransactionType.DONE -> {
+			PrimaryButtonWide(
+				label = "Done",
+				modifier = Modifier.padding(horizontal = 24.dp,),
+				onClicked = onBack,
+			)
+		}
 		TransactionType.STUB -> {
-			BigButton(
-				text = "Approve", action = onFinish
+
+			PrimaryButtonWide(
+				label = "Approve",
+				modifier = Modifier.padding(horizontal = 24.dp,),
+				onClicked = onBack,
 			)
-			BigButton(
-				text = "Decline", action = onBack
+
+			PrimaryButtonWide(
+				label = "Decline",
+				modifier = Modifier.padding(horizontal = 24.dp,),
+				onClicked = onBack,
 			)
 		}
-		TransactionType.READ -> BigButton(
-			text = "Back", action = onBack
-		)
-		TransactionType.IMPORT_DERIVATIONS -> {
-			BigButton(
-				text = "Select seed", action = onFinish
+		TransactionType.READ -> {
+			PrimaryButtonWide(
+				label = "Back",
+				modifier = Modifier.padding(horizontal = 24.dp,),
+				onClicked = onBack,
 			)
-			BigButton(
-				text = "Decline", action = onBack
+		}
+		TransactionType.IMPORT_DERIVATIONS -> {
+			PrimaryButtonWide(
+				label = "Select seed",
+				modifier = Modifier.padding(horizontal = 24.dp,),
+				onClicked = onBack,
+			)
+			PrimaryButtonWide(
+				label = "Decline",
+				modifier = Modifier.padding(horizontal = 24.dp,),
+				onClicked = onBack,
 			)
 		}
 	}
@@ -132,3 +157,5 @@ private fun Transactions(screenTransactions: List<MTransaction>) {
 	}
 }
 
+
+private const val TAG = "Transactions screen"

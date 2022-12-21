@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.SecondaryButtonBottomSheet
+import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -39,7 +39,7 @@ internal fun WrongPasswordBottomSheet(onOk: Callback) {
 			style = SignerTypeface.BodyM,
 			modifier = Modifier.padding(horizontal = 32.dp),
 		)
-		SecondaryButtonBottomSheet(
+		SecondaryButtonWide(
 			label = stringResource(id = R.string.generic_ok),
 			modifier = Modifier.padding(24.dp),
 			withBackground = true,

@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.PrimaryButtonBottomSheet
+import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.items.KeyDerivedItem
@@ -103,7 +103,7 @@ fun KeySetDetailsScreenView(
                         .align(Alignment.End)
                         .padding(end = 16.dp)
 				)
-				PrimaryButtonBottomSheet(
+				PrimaryButtonWide(
 					label = stringResource(R.string.key_sets_details_screem_create_derived_button),
 					modifier = Modifier
 						.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)

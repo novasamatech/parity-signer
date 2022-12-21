@@ -15,9 +15,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.PrimaryButtonBottomSheet
+import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
-import io.parity.signer.components.base.SecondaryButtonBottomSheet
+import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.*
@@ -125,12 +125,12 @@ fun MetadataUpdatedScreen(
 				)
 			}
 		}
-		PrimaryButtonBottomSheet(
+		PrimaryButtonWide(
 			label = stringResource(R.string.approve_confirm_button),
 			modifier = Modifier.padding(horizontal = 24.dp),
 			onClicked = onApprove
 		)
-		SecondaryButtonBottomSheet(
+		SecondaryButtonWide(
 			label = stringResource(id = R.string.generic_cancel),
 			modifier = Modifier.padding(horizontal = 24.dp),
 			onClicked = onCancel

@@ -22,7 +22,7 @@ import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.*
 
 @Composable
-fun PrimaryButtonBottomSheet(
+fun PrimaryButtonWide(
 	label: String,
 	modifier: Modifier = Modifier,
 	isEnabled: Boolean = true,
@@ -122,7 +122,7 @@ fun PrimaryButtonGreyDisabled(
 }
 
 @Composable
-fun SecondaryButtonBottomSheet(
+fun SecondaryButtonWide(
 	label: String,
 	modifier: Modifier = Modifier,
 	withBackground: Boolean = false,
@@ -214,7 +214,7 @@ fun SignerDivider(
 private fun PreviewButtons() {
 	SignerNewTheme {
 		Column() {
-			PrimaryButtonBottomSheet("button") {}
+			PrimaryButtonWide("button") {}
 			RowButtonsBottomSheet(
 				labelCancel = "Cancel",
 				labelCta = "Apply",
@@ -242,8 +242,8 @@ private fun PreviewButtons() {
 				isEnabled = false,
 			) {
 			}
-			SecondaryButtonBottomSheet("Secondary Bottom Sheet") {}
-			SecondaryButtonBottomSheet(
+			SecondaryButtonWide("Secondary Bottom Sheet") {}
+			SecondaryButtonWide(
 				"Secondary with background",
 				withBackground = true
 			) {}
