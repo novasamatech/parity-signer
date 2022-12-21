@@ -44,6 +44,8 @@ use definitions::{
     network_specs::{OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
 
+use constants::test_values::alice_sr_secret_abracadabra;
+use db_handling::identities::inject_derivations_has_pwd;
 use definitions::derivations::{DerivedKeyPreview, SeedKeysPreview};
 use definitions::navigation::MAddressCard;
 use pretty_assertions::assert_eq;
@@ -584,15 +586,19 @@ fn export_import_addrs() {
     try_create_address(
         "Alice",
         ALICE_SEED_PHRASE,
-        "//westend//0",
+        "//secret///abracadabra",
         &NetworkSpecsKey::from_parts(&westend_genesis, &Encryption::Sr25519),
         dbname_from,
     )
     .unwrap();
 
+    let mut alice_seeds = HashMap::new();
+    alice_seeds.insert("Alice".to_owned(), ALICE_SEED_PHRASE.to_owned());
+
     let selected = HashMap::from([("Alice".to_owned(), ExportedSet::All)]);
     let addrs = export_all_addrs(dbname_from, selected.clone()).unwrap();
     let addrs = prepare_derivations_preview(dbname_from, addrs);
+    let addrs = inject_derivations_has_pwd(addrs, alice_seeds.clone()).unwrap();
 
     let addrs_expected = vec![SeedKeysPreview {
         name: "Alice".to_owned(),
@@ -615,8 +621,8 @@ fn export_import_addrs() {
                 identicon: SignerImage::Png {
                     image: alice_sr_westend().to_vec(),
                 },
-                has_pwd: false,
-                network_title: "Westend".to_string(),
+                has_pwd: Some(false),
+                network_title: Some("Westend".to_string()),
             },
             DerivedKeyPreview {
                 address: "ErGkNDDPmnaRZKxwe4VBLonyBJVmucqURFMatEJTwktsuTv".to_owned(),
@@ -629,19 +635,19 @@ fn export_import_addrs() {
                 identicon: SignerImage::Png {
                     image: alice_sr_kusama().to_vec(),
                 },
-                has_pwd: false,
-                network_title: "Kusama".to_string(),
+                has_pwd: Some(false),
+                network_title: Some("Kusama".to_string()),
             },
             DerivedKeyPreview {
-                address: "5HGiBcFgEBMgT6GEuo9SA98sBnGgwHtPKDXiUukT6aqCrKEx".to_owned(),
-                derivation_path: Some("//westend//0".to_owned()),
+                address: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_owned(),
+                derivation_path: Some("//secret".to_owned()),
                 encryption: Encryption::Sr25519,
                 genesis_hash: westend_genesis,
                 identicon: SignerImage::Png {
-                    image: alice_sr_westend_0().to_vec(),
+                    image: alice_sr_secret_abracadabra().to_vec(),
                 },
-                has_pwd: false,
-                network_title: "Westend".to_string(),
+                has_pwd: Some(true),
+                network_title: Some("Westend".to_string()),
             },
             DerivedKeyPreview {
                 address: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_owned(),
@@ -654,8 +660,8 @@ fn export_import_addrs() {
                 identicon: SignerImage::Png {
                     image: alice_sr_polkadot().to_vec(),
                 },
-                has_pwd: false,
-                network_title: "Polkadot".to_string(),
+                has_pwd: Some(false),
+                network_title: Some("Polkadot".to_string()),
             },
         ],
     }];
@@ -680,6 +686,7 @@ fn export_import_addrs() {
     );
     let addrs_filtered = export_all_addrs(dbname_from, selected_hashmap).unwrap();
     let addrs_filtered = prepare_derivations_preview(dbname_from, addrs_filtered);
+    let addrs_filtered = inject_derivations_has_pwd(addrs_filtered, alice_seeds.clone()).unwrap();
 
     let addrs_expected_filtered = vec![SeedKeysPreview {
         name: "Alice".to_owned(),
@@ -698,20 +705,18 @@ fn export_import_addrs() {
             identicon: SignerImage::Png {
                 image: alice_sr_polkadot().to_vec(),
             },
-            has_pwd: false,
-            network_title: "Polkadot".to_string(),
+            has_pwd: Some(false),
+            network_title: Some("Polkadot".to_string()),
         }],
     }];
 
     assert_eq!(addrs_filtered, addrs_expected_filtered);
 
-    let mut alice_hash_map = HashMap::new();
-    alice_hash_map.insert("Alice".to_owned(), ALICE_SEED_PHRASE.to_owned());
-
-    import_all_addrs(dbname_to, addrs, alice_hash_map).unwrap();
+    import_all_addrs(dbname_to, addrs).unwrap();
 
     let addrs_new = export_all_addrs(dbname_to, selected).unwrap();
     let addrs_new = prepare_derivations_preview(dbname_from, addrs_new);
+    let addrs_new = inject_derivations_has_pwd(addrs_new, alice_seeds).unwrap();
     assert_eq!(addrs_new, addrs_expected);
 }
 
@@ -4016,8 +4021,8 @@ fn flow_test_1() {
                     .parse()
                     .unwrap(),
                 identicon: SignerImage::default(),
-                has_pwd: false,
-                network_title: "".to_string(),
+                has_pwd: Some(false),
+                network_title: Some("".to_string()),
             },
             DerivedKeyPreview {
                 address: "5FcKjDXS89U79cXvhksZ2pF5XBeafmSM8rqkDVoTHQcXd5Gq"
@@ -4029,8 +4034,8 @@ fn flow_test_1() {
                     .parse()
                     .unwrap(),
                 identicon: SignerImage::default(),
-                has_pwd: false,
-                network_title: "".to_string(),
+                has_pwd: Some(false),
+                network_title: Some("".to_string()),
             },
             DerivedKeyPreview {
                 address: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK"
@@ -4042,8 +4047,8 @@ fn flow_test_1() {
                     .parse()
                     .unwrap(),
                 identicon: SignerImage::default(),
-                has_pwd: false,
-                network_title: "".to_string(),
+                has_pwd: Some(false),
+                network_title: Some("".to_string()),
             },
             DerivedKeyPreview {
                 address: "5D34dL5prEUaGNQtPPZ3yN5Y6BnkfXunKXXz6fo7ZJbLwRRH"
@@ -4055,8 +4060,8 @@ fn flow_test_1() {
                     .parse()
                     .unwrap(),
                 identicon: SignerImage::default(),
-                has_pwd: false,
-                network_title: "".to_string(),
+                has_pwd: Some(false),
+                network_title: Some("".to_string()),
             },
             DerivedKeyPreview {
                 address: "5GBNeWRhZc2jXu7D55rBimKYDk8PGk8itRYFTPfC8RJLKG5o"
@@ -4068,53 +4073,14 @@ fn flow_test_1() {
                     .parse()
                     .unwrap(),
                 identicon: SignerImage::default(),
-                has_pwd: false,
-                network_title: "".to_string(),
+                has_pwd: Some(false),
+                network_title: Some("".to_string()),
             },
         ],
     }];
-    let _expected_action = ActionResult {
-        screen_label: String::new(),
-        back: true,
-        footer: false,
-        footer_button: Some(FooterButton::Scan),
-        right_button: None,
-        screen_name_type: ScreenNameType::H1,
-        screen_data: ScreenData::Transaction {
-            f: vec![MTransaction {
-                content: TransactionCardSet {
-                    importing_derivations: Some(vec![TransactionCard {
-                        index: 0,
-                        indent: 0,
-                        card: Card::DerivationsCard {
-                            f: seed_keys.clone(),
-                        },
-                    }]),
-                    ..Default::default()
-                },
-                ttype: TransactionType::ImportDerivations,
-                author_info: None,
-                network_info: None,
-            }],
-        },
-        modal_data: None,
-        alert_data: None,
-    };
-    // assert_eq!(
-    //     action, expected_action,
-    //     concat!(
-    //         "import, with SelectSeed modal. ",
-    //         "Expected updated Keys screen for Alice westend keys"
-    //     )
-    // );
 
     // frontend is calling an api
-    import_all_addrs(
-        dbname,
-        seed_keys,
-        HashMap::from([("Alice".to_string(), ALICE_SEED_PHRASE.to_string())]),
-    )
-    .unwrap();
+    import_all_addrs(dbname, seed_keys).unwrap();
 
     state.perform(Action::GoBack, "", "").unwrap();
     state.perform(Action::NavbarKeys, "", "").unwrap();

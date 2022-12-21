@@ -37,7 +37,7 @@ pub struct DerivedKeyPreview {
 
     pub identicon: SignerImage,
 
-    pub has_pwd: bool,
+    pub has_pwd: Option<bool>,
 
-    pub network_title: String,
+    pub network_title: Option<String>,
 }

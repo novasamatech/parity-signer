@@ -53,7 +53,7 @@ where
                 .iter()
                 .map(|addr_info| {
                     let multisigner =
-                        base58_or_eth_to_multisigner(&addr_info.address, addr_info.encryption)
+                        base58_or_eth_to_multisigner(&addr_info.address, &addr_info.encryption)
                             .unwrap();
                     let identicon = make_identicon_from_multisigner(
                         &multisigner,
@@ -63,12 +63,12 @@ where
                         NetworkSpecsKey::from_parts(&addr_info.genesis_hash, &addr_info.encryption);
                     let network_title = get_network_specs(&db_path, &network_specs_key)
                         .map(|specs| specs.specs.title)
-                        .unwrap_or_else(|_| "Unknown".to_string());
+                        .ok();
                     DerivedKeyPreview {
                         address: addr_info.address.clone(),
                         derivation_path: addr_info.derivation_path.clone(),
                         identicon,
-                        has_pwd: false,
+                        has_pwd: None, // unknown at this point
                         genesis_hash: addr_info.genesis_hash,
                         encryption: addr_info.encryption,
                         network_title,

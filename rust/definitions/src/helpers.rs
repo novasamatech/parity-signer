@@ -232,7 +232,7 @@ fn print_ethereum_address(public: &ecdsa::Public) -> String {
 
 pub fn base58_or_eth_to_multisigner(
     base58_or_eth: &str,
-    encryption: Encryption,
+    encryption: &Encryption,
 ) -> Result<MultiSigner> {
     match encryption {
         Encryption::Ed25519 => {
@@ -313,7 +313,7 @@ mod tests {
         let multisigner = Sr25519(public);
 
         let ss58 = print_multisigner_as_base58_or_eth(&multisigner, None, encryption);
-        let result = base58_or_eth_to_multisigner(&ss58, Encryption::Sr25519).unwrap();
+        let result = base58_or_eth_to_multisigner(&ss58, &Encryption::Sr25519).unwrap();
         assert_eq!(result, multisigner);
     }
 }
