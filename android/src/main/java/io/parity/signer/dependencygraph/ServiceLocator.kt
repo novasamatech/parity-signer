@@ -30,7 +30,7 @@ object ServiceLocator {
 			?: throw RuntimeException("dependency is not initialized yet")
 
 	@Volatile private var _activityScope: ActivityScope? = null
-	val activityScope: ActivityScope? = _activityScope
+	val activityScope: ActivityScope? get() = _activityScope
 
 	val seedStorage: SeedStorage = SeedStorage()
 	val authentication = Authentication()
