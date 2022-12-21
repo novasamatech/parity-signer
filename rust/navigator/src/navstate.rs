@@ -53,7 +53,7 @@ pub struct Navstate {
 impl Navstate {
     pub fn new() -> Navstate {
         Navstate {
-            screen: Screen::Log,
+            screen: Screen::SeedSelector,
             modal: Modal::Empty,
             alert: Alert::Empty,
         }
@@ -131,7 +131,7 @@ impl State {
                 if self.seed_names.is_empty() {
                     new_navstate = self.correct_seed_selector();
                 } else {
-                    new_navstate = Navstate::clean_screen(Screen::Log);
+                    new_navstate = Navstate::clean_screen(Screen::SeedSelector);
                 }
             }
             Err(e) => {
