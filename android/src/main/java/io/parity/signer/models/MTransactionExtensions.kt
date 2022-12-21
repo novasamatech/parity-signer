@@ -32,7 +32,7 @@ fun MTransaction.isDisplayingErrorOnly(): Boolean =
 fun MTransaction.transactionIssues(): String =
 	issuesCardsFiltered
 		.sortedBy { it.index }
-		.map {
+		.mapNotNull {
 			when (val card = it.card) {
 				is Card.ErrorCard -> {
 					card.f
@@ -43,7 +43,6 @@ fun MTransaction.transactionIssues(): String =
 				else -> null
 			}
 		}
-		.filterNotNull()
 		.joinToString("\n")
 
 
