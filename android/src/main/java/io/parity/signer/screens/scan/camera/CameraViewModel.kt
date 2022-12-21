@@ -105,7 +105,7 @@ class CameraViewModel() : ViewModel() {
 	}
 
 	private fun addPendingTransaction(payload: String) {
-		_pendingPayloads.value = _pendingPayloads.value + payload
+		_pendingPayloads.value = (_pendingPayloads.value ?: "") + payload
 	}
 
 	/**
