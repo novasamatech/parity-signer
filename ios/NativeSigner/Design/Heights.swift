@@ -44,6 +44,8 @@ enum Heights {
     static let networkFilterItem: CGFloat = 48
     static let settingsEntryHeight: CGFloat = 56
     static let verifierCertificateActionHeight: CGFloat = 48
+    /// Height for element in Network Selection Settings
+    static let networkSelectionSettings: CGFloat = 52
 }
 
 enum Sizes {
@@ -55,4 +57,5 @@ enum Sizes {
     static let seedWordPositionWidth: CGFloat = 28
     /// Diameter for ">" button in circle, 28pt
     static let chevronCircleButton: CGFloat = 28
+    static let rightChevronContainerSize: CGFloat = 28
 }
