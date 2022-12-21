@@ -64,7 +64,7 @@ struct VerfierCertificateView: View {
             viewModel.use(data: data)
         }
         .fullScreenCover(isPresented: $viewModel.isPresentingRemoveConfirmation) {
-            HorizontalActionsBottomModal(
+            VerticalActionsBottomModal(
                 viewModel: .removeGeneralVerifier,
                 mainAction: viewModel.onRemoveConfirmationTap(),
                 isShowingBottomAlert: $viewModel.isPresentingRemoveConfirmation

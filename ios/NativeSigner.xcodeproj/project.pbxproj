@@ -16,7 +16,6 @@
 		2D48F35B2760E5DF004B27BE /* RecoverSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F35A2760E5DF004B27BE /* RecoverSeedPhrase.swift */; };
 		2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36027620F49004B27BE /* SeedKeyCard.swift */; };
 		2D48F36F2767419D004B27BE /* PasswordConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36E2767419D004B27BE /* PasswordConfirm.swift */; };
-		2D48F3A62770828B004B27BE /* ManageNetworks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A52770828B004B27BE /* ManageNetworks.swift */; };
 		2D48F3A827708670004B27BE /* NetworkDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A727708670004B27BE /* NetworkDetails.swift */; };
 		2D48F3AC277092FD004B27BE /* MetadataCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3AB277092FD004B27BE /* MetadataCard.swift */; };
 		2D48F3AE2770AD6B004B27BE /* NetworkDetailsMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3AD2770AD6B004B27BE /* NetworkDetailsMenu.swift */; };
@@ -158,6 +157,7 @@
 		6D6430F828CB662B00342E37 /* ExportPrivateKeyModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D91F3EB28C114D1007560F5 /* ExportPrivateKeyModal.swift */; };
 		6D6ACA4128F0B391002FB03A /* CameraPermissionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6ACA4028F0B391002FB03A /* CameraPermissionHandler.swift */; };
 		6D6E99DB28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6E99DA28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift */; };
+		6D71290E294C2A380048558C /* VerticalActionsBottomModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D71290D294C2A380048558C /* VerticalActionsBottomModal.swift */; };
 		6D8045D728D06E6B00237F8C /* PreviewData+Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D628D06E6B00237F8C /* PreviewData+Components.swift */; };
 		6D8045D928D0761E00237F8C /* QRCodeAddressFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */; };
 		6D8045DC28D0840F00237F8C /* MKeyDetails+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */; };
@@ -225,6 +225,7 @@
 		6DC5643B28B8D189003D540B /* KeychainAccessAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643A28B8D189003D540B /* KeychainAccessAdapter.swift */; };
 		6DC5643D28B91EFE003D540B /* NavbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643C28B91EFE003D540B /* NavbarButton.swift */; };
 		6DC5644028B929EA003D540B /* KeyDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643F28B929EA003D540B /* KeyDetailsView.swift */; };
+		6DC9C486294B7F57000E6899 /* NetworkSelectionSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC9C485294B7F57000E6899 /* NetworkSelectionSettings.swift */; };
 		6DCC572728D8C0490014278A /* BackupModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DCC572628D8C0490014278A /* BackupModal.swift */; };
 		6DD9FF1628C8B85300FB6195 /* HorizontalActionsBottomModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD9FF1528C8B85300FB6195 /* HorizontalActionsBottomModal.swift */; };
 		6DD9FF1928C8C9B000FB6195 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD9FF1828C8C9AF00FB6195 /* Animations.swift */; };
@@ -301,7 +302,6 @@
 		2D48F35A2760E5DF004B27BE /* RecoverSeedPhrase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecoverSeedPhrase.swift; sourceTree = "<group>"; };
 		2D48F36027620F49004B27BE /* SeedKeyCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeedKeyCard.swift; sourceTree = "<group>"; };
 		2D48F36E2767419D004B27BE /* PasswordConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordConfirm.swift; sourceTree = "<group>"; };
-		2D48F3A52770828B004B27BE /* ManageNetworks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageNetworks.swift; sourceTree = "<group>"; };
 		2D48F3A727708670004B27BE /* NetworkDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDetails.swift; sourceTree = "<group>"; };
 		2D48F3AB277092FD004B27BE /* MetadataCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetadataCard.swift; sourceTree = "<group>"; };
 		2D48F3AD2770AD6B004B27BE /* NetworkDetailsMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDetailsMenu.swift; sourceTree = "<group>"; };
@@ -448,6 +448,7 @@
 		6D6430F528CB460A00342E37 /* ServiceLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceLocator.swift; sourceTree = "<group>"; };
 		6D6ACA4028F0B391002FB03A /* CameraPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPermissionHandler.swift; sourceTree = "<group>"; };
 		6D6E99DA28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyOverviewRow.swift; sourceTree = "<group>"; };
+		6D71290D294C2A380048558C /* VerticalActionsBottomModal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalActionsBottomModal.swift; sourceTree = "<group>"; };
 		6D8045D628D06E6B00237F8C /* PreviewData+Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreviewData+Components.swift"; sourceTree = "<group>"; };
 		6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeAddressFooterView.swift; sourceTree = "<group>"; };
 		6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKeyDetails+Helpers.swift"; sourceTree = "<group>"; };
@@ -514,6 +515,7 @@
 		6DC5643A28B8D189003D540B /* KeychainAccessAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainAccessAdapter.swift; sourceTree = "<group>"; };
 		6DC5643C28B91EFE003D540B /* NavbarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarButton.swift; sourceTree = "<group>"; };
 		6DC5643F28B929EA003D540B /* KeyDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsView.swift; sourceTree = "<group>"; };
+		6DC9C485294B7F57000E6899 /* NetworkSelectionSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSelectionSettings.swift; sourceTree = "<group>"; };
 		6DCC572628D8C0490014278A /* BackupModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupModal.swift; sourceTree = "<group>"; };
 		6DD9FF1528C8B85300FB6195 /* HorizontalActionsBottomModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalActionsBottomModal.swift; sourceTree = "<group>"; };
 		6DD9FF1828C8C9AF00FB6195 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
@@ -628,7 +630,6 @@
 				2D48F3C52774AEE7004B27BE /* SelectSeedForBackup.swift */,
 				2DA5F8382756666C00D8DD29 /* EventDetails.swift */,
 				2D48F3A727708670004B27BE /* NetworkDetails.swift */,
-				2D48F3A52770828B004B27BE /* ManageNetworks.swift */,
 				2DA5F82A2756631D00D8DD29 /* KeyManager.swift */,
 				6D850BDD292F7B4D00BA9017 /* EnterPasswordModal.swift */,
 			);
@@ -938,6 +939,7 @@
 			isa = PBXGroup;
 			children = (
 				6D52E3A92946F58200AD72F0 /* VerfierCertificateView.swift */,
+				6DC9C485294B7F57000E6899 /* NetworkSelectionSettings.swift */,
 			);
 			path = Subviews;
 			sourceTree = "<group>";
@@ -1396,6 +1398,7 @@
 			isa = PBXGroup;
 			children = (
 				6DD9FF1528C8B85300FB6195 /* HorizontalActionsBottomModal.swift */,
+				6D71290D294C2A380048558C /* VerticalActionsBottomModal.swift */,
 			);
 			path = Alerts;
 			sourceTree = "<group>";
@@ -1881,6 +1884,7 @@
 				6D57DC4B289D614F00005C63 /* BackendNavigationAdapter.swift in Sources */,
 				6DC5643528B69355003D540B /* AccessControlProvidingAssembler.swift in Sources */,
 				2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */,
+				6DC9C486294B7F57000E6899 /* NetworkSelectionSettings.swift in Sources */,
 				6D019968289C937600F4C317 /* AuthenticatedScreenContainer.swift in Sources */,
 				6D16685728F530F4008C664A /* CaptureDeviceConfigurator.swift in Sources */,
 				2DA5F8272756629600D8DD29 /* ScreenSelector.swift in Sources */,
@@ -1917,6 +1921,7 @@
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
 				6D84442428D3424F0072FBAC /* HiddenScrollContainerModifier.swift in Sources */,
 				2D48F3D02777A823004B27BE /* NewSeedBackupModal.swift in Sources */,
+				6D71290E294C2A380048558C /* VerticalActionsBottomModal.swift in Sources */,
 				6D5801D12899130E006C41D8 /* PathMonitorProtocol.swift in Sources */,
 				6D14F978293480A900F8EF44 /* InfoBoxView.swift in Sources */,
 				6D52E3A32946C1B500AD72F0 /* SettingsRowView.swift in Sources */,
@@ -1944,7 +1949,6 @@
 				2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */,
 				2DAA82A927885FCF002917C0 /* TCTXSpecPlain.swift in Sources */,
 				6DFAF36B28AF7F8A0048763B /* Spacing.swift in Sources */,
-				2D48F3A62770828B004B27BE /* ManageNetworks.swift in Sources */,
 				2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */,
 				2DA5F86D27566C3600D8DD29 /* TCAuthorPlain.swift in Sources */,
 				2D48F3C4277492D3004B27BE /* TypesMenu.swift in Sources */,
