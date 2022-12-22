@@ -4,6 +4,7 @@ import io.parity.signer.components.ImageContent
 import io.parity.signer.components.toImageContent
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
+import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.uniffi.Address
 import io.parity.signer.uniffi.Card
 import io.parity.signer.uniffi.MTransaction
@@ -13,11 +14,51 @@ import io.parity.signer.uniffi.MTransaction
  */
 
 data class SigningTransactionModel(
-	val summaryModel: TransactionSummaryModel,
+	val summaryModels: List<TransactionSummaryModel>,
 	val signature: TransactionSignatureRenderable?,
-)
+) {
+	companion object {
+		fun createStub(): SigningTransactionModel =
+			SigningTransactionModel(
+				summaryModels = listOf(
+					TransactionSummaryModel(
+						pallet = "Balances",
+						method = "transfer_keep_alive",
+						destination = "1219xC79CXV31543DDXoQMjuA",
+						value = "0.2 WND"
+					),
+					TransactionSummaryModel(
+						pallet = "Balances2",
+						method = "transfer_keep_alive2",
+						destination = "1219xC79CXV31543DDXoQMjuA2",
+						value = "0.3 WND"
+					)
+				),
+				signature = TransactionSignatureRenderable(
+					path = "//polkadot//1",
+					name = "Parity Keys",
+					base58 = "1219xC79CXV31543DDXoQMjuA",
+					identicon = PreviewData.exampleIdenticonPng,
+					hasPassword = true
+				)
+			)
+	}
+}
 
-fun MTransaction.toSigningTransactionModel(): SigningTransactionModel {
+fun List<MTransaction>.toSigningTransactionModels(): List<SigningTransactionModel> {
+	val fullModelsList: List<SigningTransactionModel> =
+		map { it.toSigningTransactionModel() }
+	val signatures = fullModelsList.map { it.signature }.toSet()
+	return signatures.map { signature ->
+		SigningTransactionModel(signature = signature,
+			summaryModels = fullModelsList
+				.filter { it.signature == signature }
+				.map { it.summaryModels }
+				.flatten())
+	}
+}
+
+private fun MTransaction.toSigningTransactionModel(): SigningTransactionModel {
 	var pallet: String = ""
 	var method: String = ""
 	var destination: String = ""
@@ -46,11 +87,13 @@ fun MTransaction.toSigningTransactionModel(): SigningTransactionModel {
 		}
 	}
 	return SigningTransactionModel(
-		summaryModel = TransactionSummaryModel(
-			pallet = pallet,
-			method = method,
-			destination = destination,
-			value = value,
+		summaryModels = listOf(
+			TransactionSummaryModel(
+				pallet = pallet,
+				method = method,
+				destination = destination,
+				value = value,
+			)
 		),
 		signature = authorInfo?.let { author ->
 			TransactionSignatureRenderable(
@@ -64,7 +107,7 @@ fun MTransaction.toSigningTransactionModel(): SigningTransactionModel {
 	)
 }
 
-fun Address.toDisplayablePathString() : String {
+fun Address.toDisplayablePathString(): String {
 	return if (hasPwd) "$path •••• " else path
 }
 

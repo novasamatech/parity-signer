@@ -43,9 +43,7 @@ fun MetadataUpdatedScreen(
 				.weight(1f)
 				.verticalScroll(rememberScrollState())
 		) {
-			val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
-			val plateShape =
-				RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
+			val plateShape = RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 
 			//verifier
 			Text(
