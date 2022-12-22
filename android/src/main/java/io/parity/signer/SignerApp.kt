@@ -26,7 +26,7 @@ class SignerApp : Application() {
 }
 
 
-class SignerExceptionHandler(private val defaultHandler: UncaughtExceptionHandler) :
+class SignerExceptionHandler(private val defaultHandler: UncaughtExceptionHandler?) :
 	UncaughtExceptionHandler {
 	private val TAG = "SignerExceptionHandler"
 
@@ -36,7 +36,7 @@ class SignerExceptionHandler(private val defaultHandler: UncaughtExceptionHandle
 			Log.e(TAG, "Rust caused ErrorDisplay message was: ${rustStr.s}")
 			submitErrorState("rust error not handled, fix it!")
 		} else {
-			defaultHandler.uncaughtException(t, e)
+			defaultHandler?.uncaughtException(t, e) ?: throw e
 		}
 	}
 
