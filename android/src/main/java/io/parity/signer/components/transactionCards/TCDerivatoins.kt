@@ -6,9 +6,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.Text600
+import io.parity.signer.uniffi.SeedKeysPreview
 
 @Composable
-fun TCDerivations(payload: List<String>) {
+fun TCDerivations(payload: List<SeedKeysPreview>) {
 	Column {
 		Text(
 			"Importing derivations:",
@@ -17,7 +18,7 @@ fun TCDerivations(payload: List<String>) {
 		)
 		for (record in payload) {
 			Text(
-				record,
+				record.name,
 				style = MaterialTheme.typography.body2,
 				color = MaterialTheme.colors.Crypto400
 			)

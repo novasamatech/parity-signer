@@ -53,8 +53,6 @@ use zeroize::Zeroize;
 use constants::ADDRTREE;
 #[cfg(feature = "active")]
 use constants::ALICE_SEED_PHRASE;
-#[cfg(feature = "signer")]
-use constants::TRANSACTION;
 use definitions::derivations::SeedKeysPreview;
 use definitions::helpers::base58_or_eth_to_multisigner;
 #[cfg(feature = "signer")]
@@ -86,7 +84,6 @@ use crate::{
 };
 #[cfg(feature = "signer")]
 use crate::{
-    db_transactions::TrDbColdDerivations,
     helpers::{get_address_details, get_network_specs},
     interface_signer::addresses_set_seed_name_network,
 };
@@ -265,31 +262,48 @@ pub fn import_all_addrs<P: AsRef<Path>>(
     db_path: P,
     seed_derived_keys: Vec<SeedKeysPreview>,
 ) -> Result<()> {
+    // Address preparation set, to be modified and used as `create_address`
+    // input.
+    let mut adds: Vec<(AddressKey, AddressDetails)> = vec![];
+
+    // Associated `Event` set
+    let mut events: Vec<Event> = vec![];
+
     for addr in &seed_derived_keys {
         for derived_key in &addr.derived_keys {
             if let Some(path) = &derived_key.derivation_path {
                 let network_specs_key =
                     NetworkSpecsKey::from_parts(&derived_key.genesis_hash, &derived_key.encryption);
                 let network_specs = get_network_specs(&db_path, &network_specs_key)?;
-                if let Ok(prep_data) = create_derivation_address(
+                match create_derivation_address(
                     &db_path,
-                    &Vec::new(), // a single address is created, no data to check against here
+                    &adds, // a single address is created, no data to check against here
                     path,
                     &network_specs.specs,
                     &addr.name,
                     &derived_key.address,
-                    derived_key.has_pwd.unwrap(),
+                    derived_key
+                        .has_pwd
+                        .ok_or_else(|| Error::MissingPassword(path.to_owned()))?,
                 ) {
-                    let id_batch = upd_id_batch(Batch::default(), prep_data.address_prep);
-                    TrDbCold::new()
-                        .set_addresses(id_batch) // add created address
-                        .set_history(events_to_batch(&db_path, prep_data.history_prep)?) // add corresponding history
-                        .apply(&db_path)?;
+                    // success, updating address preparation set and `Event` set
+                    Ok(prep_data) => {
+                        adds = prep_data.address_prep;
+                        events.extend_from_slice(&prep_data.history_prep);
+                    }
+                    // exactly same address already exists, ignoring it
+                    Err(Error::DerivationExists { .. }) => (),
+
+                    // some other error, processed as a real error
+                    Err(e) => return Err(e),
                 }
             }
         }
     }
-    Ok(())
+    TrDbCold::new()
+        .set_addresses(upd_id_batch(Batch::default(), adds)) // modify addresses data
+        .set_history(events_to_batch(&db_path, events)?) // add corresponding history
+        .apply(&db_path)
 }
 
 #[cfg(feature = "signer")]
@@ -312,66 +326,65 @@ pub fn inject_derivations_has_pwd(
 
     for addr in seed_derived_keys.iter_mut() {
         for mut derived_key in addr.derived_keys.iter_mut() {
-            if let Some(path) = &derived_key.derivation_path {
-                let seed_name = match addr.multisigner {
-                    Some(MultiSigner::Sr25519(p)) => sr25519_signers.get(&p),
-                    Some(MultiSigner::Ed25519(p)) => ed25519_signers.get(&p),
-                    Some(MultiSigner::Ecdsa(p)) => ecdsa_signers.get(&p),
-                    None => None,
-                };
-                if let Some(seed_name) = seed_name {
-                    let seed_phrase = seeds.get(seed_name.as_str()).unwrap();
-                    // create fixed-length string to avoid reallocations
-                    let mut full_address = String::with_capacity(seed_phrase.len() + path.len());
-                    full_address.push_str(seed_phrase);
-                    full_address.push_str(path);
-
-                    let multisigner_pwdless = match derived_key.encryption {
-                        Encryption::Ed25519 => {
-                            match ed25519::Pair::from_string(&full_address, None) {
-                                Ok(a) => {
-                                    full_address.zeroize();
-                                    MultiSigner::Ed25519(a.public())
-                                }
-                                Err(e) => {
-                                    full_address.zeroize();
-                                    return Err(Error::SecretStringError(e));
-                                }
-                            }
-                        }
-                        Encryption::Sr25519 => {
-                            match sr25519::Pair::from_string(&full_address, None) {
-                                Ok(a) => {
-                                    full_address.zeroize();
-                                    MultiSigner::Sr25519(a.public())
-                                }
-                                Err(e) => {
-                                    full_address.zeroize();
-                                    return Err(Error::SecretStringError(e));
-                                }
-                            }
-                        }
-                        Encryption::Ecdsa | Encryption::Ethereum => {
-                            match ecdsa::Pair::from_string(&full_address, None) {
-                                Ok(a) => {
-                                    full_address.zeroize();
-                                    MultiSigner::Ecdsa(a.public())
-                                }
-                                Err(e) => {
-                                    full_address.zeroize();
-                                    return Err(Error::SecretStringError(e));
-                                }
-                            }
-                        }
-                    };
-
-                    let multisigner =
-                        base58_or_eth_to_multisigner(&derived_key.address, &derived_key.encryption)
-                            .unwrap();
-
-                    derived_key.has_pwd = Some(multisigner_pwdless != multisigner);
-                }
+            if derived_key.derivation_path.is_none() {
+                continue;
             }
+            let path = derived_key.derivation_path.as_ref().unwrap();
+            let seed_name = match addr.multisigner {
+                Some(MultiSigner::Sr25519(p)) => sr25519_signers.get(&p),
+                Some(MultiSigner::Ed25519(p)) => ed25519_signers.get(&p),
+                Some(MultiSigner::Ecdsa(p)) => ecdsa_signers.get(&p),
+                None => None,
+            };
+            if seed_name.is_none() {
+                // unknown seed, skipping
+                continue;
+            }
+            let seed_name = seed_name.unwrap();
+            let seed_phrase = seeds.get(seed_name.as_str()).unwrap();
+            // create fixed-length string to avoid reallocations
+            let mut full_address = String::with_capacity(seed_phrase.len() + path.len());
+            full_address.push_str(seed_phrase);
+            full_address.push_str(path);
+
+            let multisigner_pwdless = match derived_key.encryption {
+                Encryption::Ed25519 => match ed25519::Pair::from_string(&full_address, None) {
+                    Ok(a) => {
+                        full_address.zeroize();
+                        MultiSigner::Ed25519(a.public())
+                    }
+                    Err(e) => {
+                        full_address.zeroize();
+                        return Err(Error::SecretStringError(e));
+                    }
+                },
+                Encryption::Sr25519 => match sr25519::Pair::from_string(&full_address, None) {
+                    Ok(a) => {
+                        full_address.zeroize();
+                        MultiSigner::Sr25519(a.public())
+                    }
+                    Err(e) => {
+                        full_address.zeroize();
+                        return Err(Error::SecretStringError(e));
+                    }
+                },
+                Encryption::Ecdsa | Encryption::Ethereum => {
+                    match ecdsa::Pair::from_string(&full_address, None) {
+                        Ok(a) => {
+                            full_address.zeroize();
+                            MultiSigner::Ecdsa(a.public())
+                        }
+                        Err(e) => {
+                            full_address.zeroize();
+                            return Err(Error::SecretStringError(e));
+                        }
+                    }
+                }
+            };
+            let multisigner =
+                base58_or_eth_to_multisigner(&derived_key.address, &derived_key.encryption)
+                    .unwrap();
+            derived_key.has_pwd = Some(multisigner_pwdless != multisigner);
         }
     }
     Ok(seed_derived_keys)
@@ -1455,80 +1468,6 @@ where
     TrDbCold::new()
         .set_addresses(identity_batch) // modify addresses
         .set_history(events_to_batch(&db_path, events)?) // add corresponding history
-        .apply(&db_path)
-}
-
-/// Create a set of addresses using imported derivations set for user-selected
-/// seed.
-///
-/// Function creates addresses in the Signer database for the derivations
-/// received as a part of `derivations` payload. Derivations are already checked
-/// and temporarily stored in `TRANSACTIONS` tree of the Signer database.
-/// Function retrieves the checked data from the database using input checksum.
-///
-/// If an address already exists in the database, i.e. the [`AddressDetails`]
-/// data associated with the [`AddressKey`] contains exactly same derivation
-/// path and `network_id` set contains the network [`NetworkSpecsKey`], it is
-/// ignored.
-///
-/// Collision with address already in the database or with another address from
-/// derivations set produces an error.
-///
-/// Function inputs secret seed phrase as `&str`. It is passed as `&str` into
-/// into `create_address` and used there.
-///
-// TODO this is likely to be considerably changed as soon as UI/UX design
-// appears
-#[cfg(feature = "signer")]
-pub fn import_derivations<P>(
-    checksum: u32,
-    seed_name: &str,
-    seed_phrase: &str,
-    db_path: P,
-) -> Result<()>
-where
-    P: AsRef<Path>,
-{
-    // derivations data retrieved from the database
-    let content_derivations = TrDbColdDerivations::from_storage(&db_path, checksum)?;
-
-    // [`OrderedNetworkSpecs`] for the network in which the addresses are generated
-    let network_specs = content_derivations.network_specs();
-
-    // Address preparation set, to be modified and used as `create_address`
-    // input.
-    let mut adds: Vec<(AddressKey, AddressDetails)> = Vec::new();
-
-    // Associated `Event` set
-    let mut events: Vec<Event> = Vec::new();
-
-    for path in content_derivations.checked_derivations().iter() {
-        // try creating address for each of the derivations
-        match create_address(
-            &db_path,
-            &adds,
-            path,
-            &network_specs.specs,
-            seed_name,
-            seed_phrase,
-        ) {
-            // success, updating address preparation set and `Event` set
-            Ok(prep_data) => {
-                adds = prep_data.address_prep;
-                events.extend_from_slice(&prep_data.history_prep);
-            }
-
-            // exactly same address already exists, ignoring it
-            Err(Error::DerivationExists { .. }) => (),
-
-            // some other error, processed as a real error
-            Err(e) => return Err(e),
-        }
-    }
-    TrDbCold::new()
-        .set_addresses(upd_id_batch(Batch::default(), adds)) // modify addresses data
-        .set_history(events_to_batch(&db_path, events)?) // add corresponding history
-        .set_transaction(make_batch_clear_tree(&db_path, TRANSACTION)?) // clear transaction tree
         .apply(&db_path)
 }
 

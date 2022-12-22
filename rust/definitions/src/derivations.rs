@@ -37,7 +37,9 @@ pub struct DerivedKeyPreview {
 
     pub identicon: SignerImage,
 
+    /// Has to be calculated using `inject_derivations_has_pwd`. Otherwise, `None`
     pub has_pwd: Option<bool>,
 
+    /// Might be `None` if network specs were not imported into the Signer
     pub network_title: Option<String>,
 }
