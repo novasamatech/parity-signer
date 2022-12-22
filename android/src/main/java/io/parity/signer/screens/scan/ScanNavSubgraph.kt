@@ -45,7 +45,8 @@ fun ScanNavSubgraph(
 
 	//Full screens
 
-	if (transactions.value.isEmpty() || showingModals) {
+	val transactionsValue = transactions.value
+	if (transactionsValue == null || showingModals) {
 		ScanScreen(
 			onClose = { rootNavigator.backAction() },
 			performPayloads = { payloads ->
@@ -58,20 +59,13 @@ fun ScanNavSubgraph(
 		//todo scan ios/NativeSigner/Screens/Scan/CameraView.swift:130
 		Box(modifier = Modifier.statusBarsPadding()) {
 			TransactionScreen(
-				transactions = transactions.value,
+				transactions = transactionsValue.transactions,
+				title = transactionsValue.title,
 				signature = signature.value,
 				onBack = backAction,
 				onFinish = {
 					rootNavigator.navigate(Action.GO_FORWARD)
 					scanViewModel.clearTransactionState()
-					// todo dmitry handle subsequent modals
-//						rust/navigator/src/navstate.rs:396
-//						val navResult = uniffiinteractor.ProcessBatchTransactions(some_all) and handle
-					//Modal::EnterPassword
-					//Modal::SignatureReady(a);
-					//Screen::Transaction( can come with updated checksum
-					//success will clear to log
-					// alert error
 				},
 			)
 		}

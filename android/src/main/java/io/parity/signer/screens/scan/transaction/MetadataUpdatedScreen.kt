@@ -34,7 +34,7 @@ fun MetadataUpdatedScreen(
 ) {
 	Column() {
 		ScreenHeader(
-			stringId = R.string.screen_title_update_metadata,
+			title = stringResource(R.string.screen_title_update_metadata),
 			onBack = onCancel
 		)
 

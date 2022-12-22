@@ -52,7 +52,7 @@ fun KeySetDetailsScreenView(
 ) {
 	Column {
 		ScreenHeader(
-			stringId = null,
+			title = null,
 			onBack = { navigator.backAction() },
 			onMenu = onMenu, //navigator.navigate(Action.RIGHT_BUTTON_ACTION) was in rust navigation
 		)

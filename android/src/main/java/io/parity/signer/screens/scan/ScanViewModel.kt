@@ -24,9 +24,11 @@ class ScanViewModel : ViewModel() {
 	private val uniffiInteractor = ServiceLocator.backendScope.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
 
+	data class TransactionsState(val transactions: List<MTransaction>,
+															 val title: String)
 
-	var transactions: MutableStateFlow<List<MTransaction>> =
-		MutableStateFlow(emptyList())
+	var transactions: MutableStateFlow<TransactionsState?> =
+		MutableStateFlow(null)
 	var signature: MutableStateFlow<MSignatureReady?> =
 		MutableStateFlow(null)
 	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
@@ -72,13 +74,6 @@ class ScanViewModel : ViewModel() {
 					.mapNotNull { it.authorInfo?.address?.seedName }
 				val actionResult = signTransaction("", seedNames)
 
-				//todo scan
-				//						if (actionResult.navResult.alertData != null) {
-				//							Log.e(
-				//								"sign error",
-				//								result.navResult.alertData.toString()
-				//							) //todo dmitry show error
-
 				//password protected key, show password
 				when (val modalData = actionResult?.modalData) {
 					is ModalData.EnterPassword -> {
@@ -89,7 +84,8 @@ class ScanViewModel : ViewModel() {
 					}
 					//ignore the rest modals
 					else -> {
-						//todo scan actually we won't ask for signature in this case ^^^
+						//actually we won't ask for signature in this case ^^^
+//						we can get result.navResult.alertData with error from Rust but it's not in new design
 					}
 				}
 			}
@@ -98,12 +94,15 @@ class ScanViewModel : ViewModel() {
 				// Transaction that does not require signing (i.e. adding network or metadata)
 				// will set them below for any case and show anyway
 			}
+			//handle
+			//						rust/navigator/src/navstate.rs:396
+			// alert error
 		}
-		this.transactions.value = transactions
+		this.transactions.value = TransactionsState(transactions, navigateResponse.result.screenLabel)
 	}
 
 	fun ifHasStateThenClear(): Boolean {
-		return if (transactions.value.isNotEmpty()
+		return if (transactions.value != null
 			|| signature.value != null
 			|| passwordModel.value != null
 			|| presentableError.value != null
@@ -116,7 +115,7 @@ class ScanViewModel : ViewModel() {
 	}
 
 	fun clearTransactionState() {
-		transactions.value = emptyList()
+		transactions.value = null
 		signature.value = null
 		passwordModel.value = null
 		presentableError.value = null

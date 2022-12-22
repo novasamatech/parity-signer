@@ -40,7 +40,7 @@ internal fun NewKeySetBackupScreen(
 			.background(MaterialTheme.colors.background),
 	) {
 		ScreenHeader(
-			stringId = R.string.new_key_set_backup_title,
+			title = stringResource(R.string.new_key_set_backup_title),
 			onBack = onBack,
 		)
 		Text(

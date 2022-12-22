@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.panels.BottomBar2
@@ -22,9 +23,9 @@ fun LogsScreen(
 	navigator: Navigator,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
-		ScreenHeader(stringId = R.string.logs_title, onMenu = {
-			navigator.navigate(Action.RIGHT_BUTTON_ACTION)
-		})
+		ScreenHeader(
+			title = stringResource(R.string.logs_title),
+			onMenu = { navigator.navigate(Action.RIGHT_BUTTON_ACTION) })
 		LazyColumn(Modifier.weight(1f)) {
 			items(model.logs.size) { index ->
 				when (val item = model.logs[index]) {

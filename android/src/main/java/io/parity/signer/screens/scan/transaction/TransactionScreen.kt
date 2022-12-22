@@ -11,10 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.KeyCardOld
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components.base.PrimaryButtonWide
+import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyQrCodeProvider
@@ -35,24 +37,28 @@ import io.parity.signer.uniffi.TransactionType
 @Composable
 fun TransactionScreen(
 	transactions: List<MTransaction>,
+	title: String,
 	signature: MSignatureReady?,
 	onBack: Callback,
 	onFinish: Callback,
 ) {
-	Column(
-		Modifier.verticalScroll(rememberScrollState())
-	) {
-		transactions.forEach {
-			Transaction(it)
+	Column(Modifier.fillMaxWidth()) {
+		ScreenHeader(title = title, onBack = onBack)
+		Column(
+			Modifier.verticalScroll(rememberScrollState())
+		) {
+			transactions.forEach {
+				Transaction(it)
+			}
+			signature?.let {
+				QrSignatureData(it)
+			}
+			ActionButtons(
+				transactions,
+				onBack,
+				onFinish
+			)
 		}
-		signature?.let {
-			QrSignatureData(it)
-		}
-		ActionButtons(
-			transactions,
-			onBack,
-			onFinish
-		)
 	}
 }
 
@@ -181,9 +187,8 @@ private fun Transaction(transaction: MTransaction) {
 		TransactionType.READ -> {
 			// Rounded corner summary card
 			TODO() //todo scan
-
+			//todo scan
 		}
-
 		TransactionType.STUB -> {
 			// Used when new network is being added
 			// User when network metadata is being added
