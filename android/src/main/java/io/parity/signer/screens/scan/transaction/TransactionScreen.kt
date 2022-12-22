@@ -20,6 +20,9 @@ import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyQrCodeProvider
 import io.parity.signer.models.Callback
 import io.parity.signer.models.getData
+import io.parity.signer.models.sortedValueCards
+import io.parity.signer.models.transactionIssues
+import io.parity.signer.screens.scan.elements.TransactionErrors
 import io.parity.signer.screens.scan.transaction.components.TransactionPreviewField
 import io.parity.signer.uniffi.MSignatureReady
 import io.parity.signer.uniffi.MTransaction
@@ -39,7 +42,9 @@ fun TransactionScreen(
 	Column(
 		Modifier.verticalScroll(rememberScrollState())
 	) {
-		Transactions(transactions)
+		transactions.forEach {
+			Transaction(it)
+		}
 		signature?.let {
 			QrSignatureData(it)
 		}
@@ -69,7 +74,6 @@ private fun ActionButtons(
 	val action = transactions.first().ttype
 	when (action) {
 		TransactionType.SIGN -> {
-
 			//already signed and we show qr code in this screen now
 			// , so we cannot add log there
 //			val comment = remember { mutableStateOf("") }
@@ -92,7 +96,6 @@ private fun ActionButtons(
 //					style = MaterialTheme.typography.subtitle1,
 //					color = MaterialTheme.colors.Text400
 //				)
-
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_done),
 				withBackground = true,
@@ -145,7 +148,7 @@ private fun ActionButtons(
 	}
 }
 
-@Composable
+@Composable //todo scan remove
 private fun Transactions(screenTransactions: List<MTransaction>) {
 	for (transaction in screenTransactions) {
 		TransactionPreviewField(
@@ -161,4 +164,74 @@ private fun Transactions(screenTransactions: List<MTransaction>) {
 }
 
 
-private const val TAG = "Transactions screen"
+@Composable
+private fun Transaction(transaction: MTransaction) {
+
+	transaction.transactionIssues().let {
+		if (it.isNotEmpty()) {
+			TransactionErrors(
+				errors = it,
+				modifier = Modifier.padding(horizontal = 16.dp)
+			)
+		}
+	}
+
+	when (transaction.ttype) {
+		TransactionType.SIGN,
+		TransactionType.READ -> {
+			// Rounded corner summary card
+			TODO() //todo scan
+
+		}
+
+		TransactionType.STUB -> {
+			// Used when new network is being added
+			// User when network metadata is being added
+			// Cards are redesigned to present new design
+			transaction.sortedValueCards
+			TODO()
+		}
+		TransactionType.DONE,
+		TransactionType.IMPORT_DERIVATIONS -> {
+
+		}
+	}
+}
+
+//    @ViewBuilder todo scan remove
+//    func singleTransaction(content: MTransaction) -> some View {
+//        VStack(alignment: .leading, spacing: Spacing.medium) {
+//            TransactionErrorsView(content: content)
+//                .padding(.horizontal, Spacing.medium)
+//            switch content.ttype {
+//            case .sign,
+//                 .read:
+//                // Rounded corner summary card
+//                TransactionSummaryView(
+//                    renderable: .init(content),
+//                    onTransactionDetailsTap: {
+//                        viewModel.presentDetails(for: content)
+//                    }
+//                )
+//                .padding(.horizontal, Spacing.medium)
+//            // Used when new network is being added
+//            // User when network metadata is being added
+//            // Cards are redesigned to present new design
+//            case .stub:
+//                VStack {
+//                    ForEach(content.sortedValueCards(), id: \.index) { card in
+//                        TransactionCardView(card: card)
+//                    }
+//                }
+//                .padding(Spacing.medium)
+//            case .done,
+//                 .importDerivations:
+//                VStack {
+//                    ForEach(content.sortedValueCards(), id: \.index) { card in
+//                        TransactionCardView(card: card)
+//                    }
+//                }
+//                .padding(Spacing.medium)
+//            }
+//        }
+//    }

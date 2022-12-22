@@ -46,19 +46,18 @@ fun MTransaction.transactionIssues(): String =
 		.joinToString("\n")
 
 
-//    func sortedValueCards() -> [TransactionCard] {
-//        [
-//            content.author,
-//            content.extensions,
-//            content.importingDerivations,
-//            content.message,
-//            content.meta,
-//            content.method,
-//            content.newSpecs,
-//            content.verifier,
-//            content.typesInfo
-//        ]
-//        .compactMap { $0 }
-//        .flatMap { $0 }
-//        .sorted { $0.index < $1.index }
-//    }
+val MTransaction.sortedValueCards: List<TransactionCard>
+	get() =
+		listOfNotNull(
+			content.author,
+			content.extensions,
+			content.importingDerivations,
+			content.message,
+			content.meta,
+			content.method,
+			content.newSpecs,
+			content.verifier,
+			content.typesInfo,
+		).flatten()
+			.sortedBy { it.index }
+
