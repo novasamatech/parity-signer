@@ -11,6 +11,7 @@ import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
 import io.parity.signer.screens.logs.logdetails.LogDetails
+import io.parity.signer.screens.settings.VerifierScreen
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.ModalData
@@ -52,11 +53,7 @@ fun ScreenSelector(
 			screenData.f,
 			button2
 		)
-		is ScreenData.NewSeed -> NewSeedScreen(
-			screenData.f,
-			signerDataModel::navigate,
-			seedNames.value
-		)
+		is ScreenData.NewSeed -> {} // new selector
 		is ScreenData.RecoverSeedName -> RecoverSeedName(
 			screenData.f,
 			signerDataModel::navigate,
@@ -79,19 +76,11 @@ fun ScreenSelector(
 			screenData.f,
 			button2
 		)
-		is ScreenData.Settings -> SettingsScreen(
-			screenData.f,
-			button1 = button1,
-			isStrongBoxProtected = signerDataModel::isStrongBoxProtected,
-			getAppVersion = signerDataModel::getAppVersion,
-			wipeToFactory = signerDataModel::wipeToFactory,
-			alertState = alertState,
-		)
+		is ScreenData.Settings -> {} //new selector
 		is ScreenData.SignSufficientCrypto -> SignSufficientCrypto(
 			screenData.f,
 			signerDataModel::signSufficientCrypto
 		)
-
 		is ScreenData.VVerifier -> VerifierScreen(
 			screenData.f,
 			signerDataModel::wipeToJailbreak
@@ -144,10 +133,7 @@ fun ModalSelector(
 				modalData.f,
 				signerDataModel = signerDataModel
 			)
-			is ModalData.NewSeedBackup -> NewSeedBackup(
-				modalData.f,
-				signerDataModel = signerDataModel
-			)
+			is ModalData.NewSeedBackup -> {}//moved to new selector
 			is ModalData.LogComment -> {} //moved to new sheet
 			is ModalData.SelectSeed -> {
 				SelectSeed(modalData.f, signerDataModel = signerDataModel)

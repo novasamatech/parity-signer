@@ -8,9 +8,7 @@
 import Foundation
 
 extension PreviewData {
-    static let qrCodeContainerViewModel = QRCodeContainerViewModel(
-        qrCode: PreviewData.exampleQRCode
-    )
+    static let qrCodeContainerViewModel = QrData.regular(data: PreviewData.exampleQRCode)
 
     static let animatedQrCodeViewModel = AnimatedQRCodeViewModel(
         qrCodes: [PreviewData.exampleQRCode, PreviewData.exampleQRCode]
@@ -100,5 +98,21 @@ extension PreviewData {
     static let exampleExportMultipleKeysModal = ExportMultipleKeysModalViewModel(
         selectedItems: .keySets(KeySetListViewModelBuilder().build(for: PreviewData.mseeds).list),
         seedNames: mseeds.seedNameCards.map(\.seedName)
+    )
+}
+
+extension PreviewData {
+    static let transactionSummary: TransactionSummaryModel = .init(
+        pallet: "Balances",
+        method: "transfer_keep_alive",
+        destination: "1219xC79CXV31543DDXoQMjuA",
+        value: "0.2 WND"
+    )
+
+    static let transactionSignature: TransactionSignatureRenderable = .init(
+        path: "//polkadot//1",
+        name: "Parity Keys",
+        base58: "1219xC79CXV31543DDXoQMjuA",
+        identicon: PreviewData.exampleIdenticon
     )
 }

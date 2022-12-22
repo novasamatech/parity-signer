@@ -17,16 +17,16 @@ struct NewSeedScreen: View {
     var body: some View {
         VStack(alignment: .leading) {
             Localizable.displayName.text
-                .font(Fontstyle.overline.base)
-                .foregroundColor(Asset.text500.swiftUIColor)
+                .font(PrimaryFont.labelS.font)
+                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Asset.border400.swiftUIColor)
+                    .stroke(Asset.fill12.swiftUIColor)
                     .frame(height: 39)
                 TextField(Localizable.seed.string, text: $seedName, prompt: Localizable.seedName.text)
                     .focused($nameFocused)
-                    .foregroundColor(Asset.text600.swiftUIColor)
-                    .font(Fontstyle.body2.base)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .font(PrimaryFont.bodyL.font)
                     .disableAutocorrection(true)
                     .keyboardType(.asciiCapable)
                     .submitLabel(.done)

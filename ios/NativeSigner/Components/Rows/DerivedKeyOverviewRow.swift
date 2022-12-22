@@ -26,7 +26,7 @@ struct DerivedKeyOverviewViewModel: Equatable {
 extension DerivedKeyOverviewViewModel {
     init(_ key: MKeysCard) {
         path = key.address.path
-        identicon = key.address.identicon
+        identicon = key.address.identicon.svgPayload
         hasPassword = key.address.hasPwd
     }
 }
@@ -43,7 +43,7 @@ struct DerivedKeyOverviewRow: View {
             Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
             fullPath
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                .font(Fontstyle.titleS.base)
+                .font(PrimaryFont.titleS.font)
                 .frame(idealWidth: .infinity, maxWidth: .infinity, alignment: .leading)
         }
         .padding([.top, .bottom], Spacing.extraSmall)
@@ -54,7 +54,7 @@ struct DerivedKeyOverviewRow: View {
     private var fullPath: Text {
         viewModel.hasPassword ?
             Text(
-                "\(viewModel.path)\(Localizable.Path.delimeter.string)\(Image(.lock))"
+                "\(viewModel.path)\(Localizable.Shared.Label.passwordedPathDelimeter.string)\(Image(.lock))"
             ) :
             Text(viewModel.path)
     }

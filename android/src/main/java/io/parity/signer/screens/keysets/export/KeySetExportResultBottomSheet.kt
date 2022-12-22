@@ -44,9 +44,7 @@ fun KeySetExportResultBottomSheet(
 			),
 			onCloseClicked = onClose
 		)
-		val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
-		val plateShape =
-			RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
+		val plateShape = RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 		//scrollable part
 		Column(
 			modifier = Modifier
@@ -157,12 +155,12 @@ private fun PreviewKeySetExportResultBottomSheet() {
 	val keys = mutableSetOf(
 		KeySetModel(
 			"first seed name",
-			PreviewData.exampleIdenticon,
+			PreviewData.exampleIdenticonPng,
 			1.toUInt()
 		),
 		KeySetModel(
 			"second seed name",
-			PreviewData.exampleIdenticon,
+			PreviewData.exampleIdenticonPng,
 			3.toUInt()
 		),
 	)

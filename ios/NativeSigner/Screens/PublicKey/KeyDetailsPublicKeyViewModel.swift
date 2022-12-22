@@ -13,13 +13,13 @@ struct KeyDetailsPublicKeyViewModel: Equatable {
         case address(QRCodeAddressFooterViewModel)
     }
 
-    let qrCode: QRCodeContainerViewModel
+    let qrCode: QrData
     let footer: Footer
     let isKeyExposed: Bool
     let isRootKey: Bool
 
     init(_ keyDetails: MKeyDetails) {
-        qrCode = .init(qrCode: keyDetails.qr)
+        qrCode = keyDetails.qr
         if keyDetails.isRootKey {
             footer = .root(
                 .init(
@@ -30,7 +30,7 @@ struct KeyDetailsPublicKeyViewModel: Equatable {
         } else {
             footer = .address(
                 .init(
-                    identicon: keyDetails.address.identicon,
+                    identicon: keyDetails.address.identicon.svgPayload,
                     rootKeyName: keyDetails.address.seedName,
                     path: keyDetails.address.path,
                     network: keyDetails.networkInfo.networkTitle,
@@ -43,7 +43,7 @@ struct KeyDetailsPublicKeyViewModel: Equatable {
     }
 
     init(
-        qrCode: QRCodeContainerViewModel,
+        qrCode: QrData,
         footer: Footer,
         isKeyExposed: Bool,
         isRootKey: Bool

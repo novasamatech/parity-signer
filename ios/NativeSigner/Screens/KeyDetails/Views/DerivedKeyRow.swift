@@ -24,13 +24,13 @@ struct DerivedKeyRow: View {
             VStack(alignment: .leading) {
                 fullPath
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    .font(Fontstyle.titleS.base)
+                    .font(PrimaryFont.titleS.font)
                 Spacer().frame(height: Spacing.extraExtraSmall)
                 HStack(spacing: Spacing.extraExtraSmall) {
                     Asset.derivedKeyAddress.swiftUIImage
                     Text(viewModel.base58.truncateMiddle())
                         .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                        .font(Fontstyle.bodyM.base)
+                        .font(PrimaryFont.bodyM.font)
                         .lineLimit(1)
                 }
             }
@@ -60,7 +60,7 @@ struct DerivedKeyRow: View {
     private var fullPath: Text {
         viewModel.hasPassword ?
             Text(
-                "\(viewModel.path)\(Localizable.Path.delimeter.string)\(Image(.lock))"
+                "\(viewModel.path)\(Localizable.Shared.Label.passwordedPathDelimeter.string)\(Image(.lock))"
             ) :
             Text(viewModel.path)
     }

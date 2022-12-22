@@ -51,7 +51,8 @@ struct KeyDetailsView: View {
             }
         }
         .onAppear {
-            viewModel.set(appState: appState)
+            viewModel.use(navigation: navigation)
+            viewModel.use(appState: appState)
             viewModel.refreshData(dataModel: dataModel)
         }
         .fullScreenCover(
@@ -115,6 +116,14 @@ struct KeyDetailsView: View {
                 viewModel.isPresentingSelectionOverlay.toggle()
             }
         }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingNetworkSelection
+        ) {
+            NetworkSelectionModal(
+                viewModel: .init(isPresented: $viewModel.isPresentingNetworkSelection)
+            )
+            .clearModalBackground()
+        }
     }
 
     var mainList: some View {
@@ -134,12 +143,12 @@ struct KeyDetailsView: View {
             // Header
             HStack {
                 Localizable.KeyDetails.Label.derived.text
-                    .font(Fontstyle.bodyM.base)
+                    .font(PrimaryFont.bodyM.font)
                 Spacer().frame(maxWidth: .infinity)
                 Asset.switches.swiftUIImage
                     .frame(width: Heights.actionSheetButton)
                     .onTapGesture {
-                        navigation.perform(navigation: .init(action: .networkSelector))
+                        viewModel.onNetworkSelectionTap()
                     }
             }
             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
@@ -206,13 +215,13 @@ private struct KeySummaryView: View {
                         isPresentingSelectionOverlay ? Asset.textAndIconsDisabled.swiftUIColor : Asset
                             .textAndIconsPrimary.swiftUIColor
                     )
-                    .font(Fontstyle.titleL.base)
+                    .font(PrimaryFont.titleL.font)
                 Text(viewModel.base58.truncateMiddle())
                     .foregroundColor(
                         isPresentingSelectionOverlay ? Asset.textAndIconsDisabled.swiftUIColor : Asset
                             .textAndIconsTertiary.swiftUIColor
                     )
-                    .font(Fontstyle.bodyM.base)
+                    .font(PrimaryFont.bodyM.font)
                     .lineLimit(1)
             }
             Spacer()
@@ -322,12 +331,15 @@ private struct KeySummaryView: View {
                         )
                     ),
                     forgetKeyActionHandler: .init(navigation: NavigationCoordinator()),
-                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
+                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(true))
                 )
             }
             .preferredColorScheme(.dark)
             .previewLayout(.sizeThatFits)
             .environmentObject(NavigationCoordinator())
+            .environmentObject(ConnectivityMediator())
+            .environmentObject(SignerDataModel())
+            .environmentObject(AppState())
         }
     }
 #endif

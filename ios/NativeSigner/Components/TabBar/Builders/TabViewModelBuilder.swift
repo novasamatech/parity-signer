@@ -9,20 +9,22 @@ import SwiftUI
 
 /// View model to render `TabBarButton`
 struct TabViewModel: Equatable {
-    let action: Action
+    let action: Action?
     let isActive: Bool
     let icon: Image
     let label: Text
+    let tab: Tab
 }
 
 /// Builds view model for single `TabBarButton` based on current tab bar state
 final class TabViewModelBuilder {
     func build(for tab: Tab, isSelected: Bool) -> TabViewModel {
         TabViewModel(
-            action: action(for: tab),
+            action: tab.action,
             isActive: isSelected,
             icon: icon(for: tab, isSelected: isSelected),
-            label: label(for: tab)
+            label: label(for: tab),
+            tab: tab
         )
     }
 }
@@ -51,19 +53,6 @@ private extension TabViewModelBuilder {
             return Localizable.TabBar.logs.text
         case .settings:
             return Localizable.TabBar.settings.text
-        }
-    }
-
-    func action(for tab: Tab) -> Action {
-        switch tab {
-        case .keys:
-            return .navbarKeys
-        case .scanner:
-            return .navbarScan
-        case .logs:
-            return .navbarLog
-        case .settings:
-            return .navbarSettings
         }
     }
 }

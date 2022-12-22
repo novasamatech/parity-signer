@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HorizontalActionsBottomModalViewModel {
     let title: String
-    let content: String
+    let content: String?
     let dismissActionLabel: LocalizedStringKey
     let mainActionLabel: LocalizedStringKey
 
@@ -25,6 +25,20 @@ struct HorizontalActionsBottomModalViewModel {
         content: Localizable.PublicKeyDetailsModal.Confirmation.Label.content.string,
         dismissActionLabel: Localizable.PublicKeyDetailsModal.Confirmation.Action.cancel.key,
         mainActionLabel: Localizable.PublicKeyDetailsModal.Confirmation.Action.remove.key
+    )
+
+    static let clearLog = HorizontalActionsBottomModalViewModel(
+        title: Localizable.LogsList.ClearConfirmation.Label.title.string,
+        content: nil,
+        dismissActionLabel: Localizable.LogsList.ClearConfirmation.Action.cancel.key,
+        mainActionLabel: Localizable.LogsList.ClearConfirmation.Action.clear.key
+    )
+
+    static let wipeAll = HorizontalActionsBottomModalViewModel(
+        title: Localizable.Settings.Modal.WipeAll.Label.title.string,
+        content: Localizable.Settings.Modal.WipeAll.Label.content.string,
+        dismissActionLabel: Localizable.Settings.Modal.WipeAll.Action.cancel.key,
+        mainActionLabel: Localizable.Settings.Modal.WipeAll.Action.wipe.key
     )
 }
 
@@ -54,12 +68,14 @@ struct HorizontalActionsBottomModal: View {
             content: {
                 VStack(alignment: .center, spacing: Spacing.medium) {
                     Text(viewModel.title)
-                        .font(Fontstyle.titleL.base)
-                    Text(viewModel.content)
-                        .font(Fontstyle.bodyL.base)
-                        .lineSpacing(Spacing.extraExtraSmall)
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .font(PrimaryFont.titleL.font)
+                    if let content = viewModel.content {
+                        Text(content)
+                            .font(PrimaryFont.bodyL.font)
+                            .lineSpacing(Spacing.extraExtraSmall)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    }
                     HStack {
                         SecondaryButton(
                             action: animateDismissal(dismissAction()),

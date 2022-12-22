@@ -49,6 +49,8 @@ final class NavigationCoordinator: ObservableObject {
     /// Currently error is based on `actionResult.alertData` component when app receives `.errorData(message)` value
     @Published var genericError = GenericErrorViewModel()
 
+    @Published var shouldPresentQRScanner = false
+
     /// Enables to override old logic based on `ActionResult` to not include additional components in main view
     /// hierarchy
     /// for screens with updated design approach.
@@ -117,7 +119,12 @@ private extension NavigationCoordinator {
         switch actionResult.screenData {
         case .seedSelector, // Main `Keys` screen
              .keys, // `Key Details` screen
-             .keyDetails: // `Public Key` screen
+             .keyDetails, // `Public Key` screen
+             .transaction,
+             .log,
+             .settings,
+             .vVerifier,
+             .manageNetworks:
             updatedShouldSkipInjectedViews = true
         default:
             updatedShouldSkipInjectedViews = false

@@ -1,6 +1,7 @@
 package io.parity.signer.models
 
 import android.util.Log
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.DerivationCheck
 import io.parity.signer.uniffi.substratePathCheck
@@ -9,7 +10,7 @@ import io.parity.signer.uniffi.substratePathCheck
  * Add key to database; uses phone crypto to fetch seeds!
  */
 fun SignerDataModel.addKey(path: String, seedName: String) {
-	authentication.authenticate(activity) {
+	ServiceLocator.authentication.authenticate(activity) {
 		try {
 			val seedPhrase = getSeed(seedName)
 			if (seedPhrase.isNotBlank()) {
@@ -22,7 +23,7 @@ fun SignerDataModel.addKey(path: String, seedName: String) {
 }
 
 fun SignerDataModel.increment(number: Int, seedName: String) {
-	authentication.authenticate(activity) {
+	ServiceLocator.authentication.authenticate(activity) {
 		try {
 			val seedPhrase = getSeed(seedName)
 			if (seedPhrase.isNotBlank()) {

@@ -1,16 +1,18 @@
 package io.parity.signer.models
 
+import io.parity.signer.dependencygraph.ServiceLocator
+
 
 suspend fun SignerDataModel.getSeedPhraseForBackup(seedName: String,
 ): String? {
-	return when (authentication.authenticate(activity)) {
-		Authentication.AuthResult.AuthSuccess -> {
+	return when (ServiceLocator.authentication.authenticate(activity)) {
+		AuthResult.AuthSuccess -> {
 			val seedPhrase = getSeed(seedName, backup = true)
 			seedPhrase
 		}
-		Authentication.AuthResult.AuthError,
-		Authentication.AuthResult.AuthFailed,
-		Authentication.AuthResult.AuthUnavailable -> {
+		AuthResult.AuthError,
+		AuthResult.AuthFailed,
+		AuthResult.AuthUnavailable -> {
 			null
 		}
 	}

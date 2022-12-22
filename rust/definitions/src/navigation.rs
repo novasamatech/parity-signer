@@ -1,3 +1,4 @@
+use plot_icon::EMPTY_PNG;
 use sp_core::H256;
 
 use crate::{
@@ -10,7 +11,23 @@ pub use crate::network_specs::NetworkSpecs;
 #[derive(PartialEq, Eq, Clone)]
 pub struct SeedNameWithIdenticon {
     pub seed_name: String,
-    pub identicon: Vec<u8>,
+    pub identicon: SignerImage,
+}
+
+/// A single transaction signing action.
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub struct TransactionSignAction {
+    /// Parsed contents of the transaction.
+    pub content: TransactionCardSet,
+
+    /// If this transaction should be signed with a passworded key.
+    pub has_pwd: bool,
+
+    /// Information about the signing key of this transaction.
+    pub author_info: MAddressCard,
+
+    /// Info about the network this tx happens on.
+    pub network_info: OrderedNetworkSpecs,
 }
 
 /// Enum containing card sets for four different outcomes:
@@ -19,25 +36,22 @@ pub struct SeedNameWithIdenticon {
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum TransactionAction {
     Derivations {
-        content: TransactionCardSet,
-        network_info: OrderedNetworkSpecs,
+        content: Box<TransactionCardSet>,
+        network_info: Box<OrderedNetworkSpecs>,
         checksum: u32,
         network_specs_key: NetworkSpecsKey,
     },
     Sign {
-        content: TransactionCardSet,
+        actions: Vec<TransactionSignAction>,
         checksum: u32,
-        has_pwd: bool,
-        author_info: MAddressCard,
-        network_info: OrderedNetworkSpecs,
     },
     Stub {
-        s: TransactionCardSet,
+        s: Box<TransactionCardSet>,
         u: u32,
         stub: StubNav,
     },
     Read {
-        r: TransactionCardSet,
+        r: Box<TransactionCardSet>,
     },
 }
 
@@ -117,7 +131,7 @@ pub enum ScreenData {
     Settings { f: MSettings },
     Log { f: MLog },
     LogDetails { f: MLogDetails },
-    Transaction { f: MTransaction },
+    Transaction { f: Vec<MTransaction> },
     SeedSelector { f: MSeeds },
     KeyDetails { f: MKeyDetails },
     NewSeed { f: MNewSeed },
@@ -172,7 +186,7 @@ pub struct MKeys {
 #[derive(Clone, Default, Debug, PartialEq, Eq)]
 pub struct MSettings {
     pub public_key: Option<String>,
-    pub identicon: Option<Vec<u8>>,
+    pub identicon: Option<SignerImage>,
     pub encryption: Option<String>,
     pub error: Option<String>,
 }
@@ -245,7 +259,7 @@ pub struct MTransaction {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SeedNameCard {
     pub seed_name: String,
-    pub identicon: Vec<u8>,
+    pub identicon: SignerImage,
     pub derived_keys_count: u32,
 }
 
@@ -256,7 +270,7 @@ pub struct MSeeds {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MKeyDetails {
-    pub qr: Vec<u8>,
+    pub qr: QrData,
     pub pubkey: String,
     pub network_info: MSCNetworkInfo,
     pub base58: String,
@@ -297,7 +311,7 @@ pub struct DerivationCheck {
 pub struct Address {
     pub path: String,
     pub has_pwd: bool,
-    pub identicon: Vec<u8>,
+    pub identicon: SignerImage,
     pub seed_name: String,
     pub secret_exposed: bool,
 }
@@ -329,7 +343,7 @@ pub struct MDeriveKey {
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MVerifierDetails {
     pub public_key: String,
-    pub identicon: Vec<u8>,
+    pub identicon: SignerImage,
     pub encryption: String,
 }
 
@@ -344,7 +358,7 @@ pub struct MMetadataRecord {
     pub specname: String,
     pub specs_version: String,
     pub meta_hash: String,
-    pub meta_id_pic: Vec<u8>,
+    pub meta_id_pic: SignerImage,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -411,9 +425,38 @@ pub struct PathAndNetwork {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MSCContent {
-    LoadTypes { types: String, pic: Vec<u8> },
+    LoadTypes { types: String, pic: SignerImage },
     LoadMetadata { name: String, version: u32 },
     AddSpecs { f: MSCNetworkInfo },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum QrData {
+    Regular { data: Vec<u8> },
+    Sensitive { data: Vec<u8> },
+}
+
+impl QrData {
+    /// Get the length of the underlying data
+    pub fn len(&self) -> usize {
+        match self {
+            QrData::Regular { data } | QrData::Sensitive { data } => data.len(),
+        }
+    }
+
+    /// Get a reference to the underlying data.
+    pub fn data(&self) -> &[u8] {
+        match self {
+            QrData::Regular { data } | QrData::Sensitive { data } => data,
+        }
+    }
+
+    /// If the underlying data is empty.
+    pub fn is_empty(&self) -> bool {
+        match self {
+            QrData::Regular { data } | QrData::Sensitive { data } => data.is_empty(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -452,7 +495,7 @@ pub struct MSeedMenu {
 pub struct MNewSeedBackup {
     pub seed: String,
     pub seed_phrase: String,
-    pub identicon: Vec<u8>,
+    pub identicon: SignerImage,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -491,9 +534,11 @@ pub struct MPasswordConfirm {
     pub cropped_path: String,
 }
 
+/// Data about signatures that are ready.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MSignatureReady {
-    pub signature: Vec<u8>,
+    /// Frames of the animated QR code that should be displayed by the UI.
+    pub signatures: Vec<QrData>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -520,7 +565,7 @@ pub struct MManageMetadata {
     pub name: String,
     pub version: String,
     pub meta_hash: String,
-    pub meta_id_pic: Vec<u8>,
+    pub meta_id_pic: SignerImage,
     pub networks: Vec<MMMNetwork>,
 }
 
@@ -528,7 +573,7 @@ pub struct MManageMetadata {
 pub struct MTypesInfo {
     pub types_on_file: bool,
     pub types_hash: Option<String>,
-    pub types_id_pic: Option<Vec<u8>>,
+    pub types_id_pic: Option<SignerImage>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -593,9 +638,23 @@ pub struct MSCFieldNumber {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
+pub enum SignerImage {
+    Svg { image: Vec<u8> },
+    Png { image: Vec<u8> },
+}
+
+impl Default for SignerImage {
+    fn default() -> Self {
+        Self::Png {
+            image: EMPTY_PNG.to_vec(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MSCId {
     pub base58: String,
-    pub identicon: Vec<u8>,
+    pub identicon: SignerImage,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -609,6 +668,18 @@ pub struct MSCNetworkInfo {
     pub network_title: String,
     pub network_logo: String,
     pub network_specs_key: String,
+}
+
+impl From<OrderedNetworkSpecs> for MSCNetworkInfo {
+    fn from(o: OrderedNetworkSpecs) -> Self {
+        MSCNetworkInfo {
+            network_title: o.specs.title,
+            network_logo: o.specs.logo,
+            network_specs_key: hex::encode(
+                NetworkSpecsKey::from_parts(&o.specs.genesis_hash, &o.specs.encryption).key(),
+            ),
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -626,7 +697,7 @@ pub struct MSCTxSpecPlain {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MKeysInfoExport {
-    pub frames: Vec<Vec<u8>>,
+    pub frames: Vec<QrData>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

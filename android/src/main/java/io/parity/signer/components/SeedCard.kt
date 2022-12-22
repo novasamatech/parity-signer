@@ -15,12 +15,13 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.*
+import io.parity.signer.uniffi.SignerImage
 
 @Deprecated("Use new KeySetItem for new screens")
 @Composable
 fun SeedCard(
 	seedName: String,
-	identicon: List<UByte>,
+	identicon: ImageContent,
 	base58: String = "",
 	showAddress: Boolean = false,
 	multiselectMode: Boolean = false,

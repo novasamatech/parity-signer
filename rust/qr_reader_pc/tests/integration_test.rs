@@ -20,7 +20,7 @@ fn check_single_qr_hex() -> Result<(), String> {
 
     match process_qr_image(&gray_img, InProgress::None) {
         Ok(x) => match x {
-            Ready::Yes(a) => result.push_str(&hex::encode(&a)),
+            Ready::Yes(a) => result.push_str(&hex::encode(a)),
             Ready::NotYet(_) => return Err(String::from("Waiting animated QR.")),
         },
         Err(_) => return Err(String::from("QR image processing error.")),

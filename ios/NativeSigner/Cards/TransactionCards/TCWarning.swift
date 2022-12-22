@@ -12,16 +12,18 @@ struct TCWarning: View {
     var body: some View {
         HStack {
             Localizable.warning.text
-                .foregroundColor(Asset.signalDanger.swiftUIColor).font(Fontstyle.body2.base)
             Text(text)
-                .foregroundColor(Asset.signalDanger.swiftUIColor).font(Fontstyle.body2.base)
             Spacer()
-        }.background(Asset.bgDanger.swiftUIColor)
+        }
+        .foregroundColor(Asset.accentRed400.swiftUIColor)
+        .font(PrimaryFont.bodyM.font)
+        .padding(Spacing.small)
+        .containerBackground(isError: true)
     }
 }
 
-// struct TCWarning_Previews: PreviewProvider {
-//    static var previews: some View {
-//        TCWarning()
-//    }
-// }
+struct TCWarning_Previews: PreviewProvider {
+    static var previews: some View {
+        TCWarning(text: "Content of the warning")
+    }
+}

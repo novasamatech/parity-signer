@@ -14,7 +14,7 @@ struct SeedKeyCard: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4)
-                .foregroundColor(Asset.bg200.swiftUIColor)
+                .foregroundColor(Asset.backgroundSecondary.swiftUIColor)
                 .frame(height: 47)
             HStack {
                 ZStack {
@@ -32,11 +32,11 @@ struct SeedKeyCard: View {
                 }.frame(width: 30, height: 30)
                 VStack(alignment: .leading) {
                     Text(seedCard.address.seedName)
-                        .foregroundColor(Asset.text600.swiftUIColor)
-                        .font(Fontstyle.subtitle1.base)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .font(PrimaryFont.labelM.font)
                     Text(seedCard.base58.truncateMiddle(length: 8))
-                        .foregroundColor(Asset.text400.swiftUIColor)
-                        .font(Fontstyle.body1.crypto)
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .font(PrimaryFont.captionM.font)
                 }
                 Spacer()
             }

@@ -14,18 +14,26 @@ struct TCAuthorPublicKey: View {
             Identicon(identicon: value.identicon)
             VStack(alignment: .leading) {
                 Text(Localizable.TCAuthor.signedWith(value.encryption))
-                    .foregroundColor(Asset.text400.swiftUIColor).font(Fontstyle.body2.base)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(PrimaryFont.bodyL.font)
                 Text(value.publicKey)
-                    .font(Fontstyle.body2.crypto)
-                    .foregroundColor(Asset.crypto400.swiftUIColor)
+                    .font(PrimaryFont.captionM.font)
+                    .foregroundColor(Asset.accentPink300.swiftUIColor)
             }
             Spacer()
         }
     }
 }
 
-// struct TCAuthorPublicKey_Previews: PreviewProvider {
-//    static var previews: some View {
-//        TCAuthorPublicKey()
-//    }
-// }
+struct TCAuthorPublicKey_Previews: PreviewProvider {
+    static var previews: some View {
+        TCAuthorPublicKey(
+            value:
+            MVerifierDetails(
+                publicKey: PreviewData.publicKey,
+                identicon: .svg(image: PreviewData.exampleIdenticon),
+                encryption: "sh29919"
+            )
+        )
+    }
+}

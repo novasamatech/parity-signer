@@ -11,8 +11,10 @@ struct TCTypesInfo: View {
     var content: MTypesInfo
     var body: some View {
         HStack {
-            Identicon(identicon: content.typesIdPic ?? [])
-            TCNameValueTemplate(
+            if let identicon = content.typesIdPic {
+                Identicon(identicon: identicon)
+            }
+            TCNamedValueCard(
                 name: Localizable.TCName.typesHash.string,
                 value: content.typesHash ?? ""
             )
@@ -20,8 +22,16 @@ struct TCTypesInfo: View {
     }
 }
 
-// struct TCTypesInfo_Previews: PreviewProvider {
-// static var previews: some View {
-// TCTypesInfo()
-// }
-// }
+struct TCTypesInfo_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack {
+            TCTypesInfo(
+                content: MTypesInfo(
+                    typesOnFile: false,
+                    typesHash: "typesHas",
+                    typesIdPic: .svg(image: PreviewData.exampleIdenticon)
+                )
+            )
+        }
+    }
+}

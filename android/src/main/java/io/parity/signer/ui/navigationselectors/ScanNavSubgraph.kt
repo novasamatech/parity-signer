@@ -1,8 +1,10 @@
 package io.parity.signer.ui.navigationselectors
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -10,12 +12,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.signTransaction
 import io.parity.signer.screens.scan.ScanScreen
+import io.parity.signer.screens.scan.ScanViewModel
+import io.parity.signer.screens.scan.old.SignatureReady
 import io.parity.signer.screens.scan.transaction.TransactionPreviewEdited
-import io.parity.signer.ui.ScanViewModel
+import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.MTransaction
 
 /**
  * Navigation Subgraph with compose nav controller for those Key Set screens which are not part of general
@@ -26,7 +28,7 @@ fun ScanNavSubgraph(
 	signerDataModel: SignerDataModel,
 	rootNavigator: Navigator,
 ) {
-	val scanViewModel : ScanViewModel = viewModel()
+	val scanViewModel: ScanViewModel = viewModel()
 	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
@@ -34,35 +36,57 @@ fun ScanNavSubgraph(
 	) {
 
 		composable(ScanNavSubgraph.camera) {
+			BackHandler() {
+				rootNavigator.backAction()
+			}
 			ScanScreen(
 				onClose = { rootNavigator.backAction() },
-				onNavigateToTransaction = { transaction ->
-					scanViewModel.pendingTransactions = transaction
+				onNavigateToTransaction = { transactions ->
+					scanViewModel.pendingTransactions.value = transactions
 					navController.navigate(ScanNavSubgraph.transaction)
 				}
 			)
 		}
 		composable(ScanNavSubgraph.transaction) {
+			val transactions = scanViewModel.pendingTransactions.collectAsState()
+
 			Box(modifier = Modifier.statusBarsPadding()) {
 				TransactionPreviewEdited(
-					transaction = scanViewModel.pendingTransactions.first(), //todo multisign support missing yet
+					transactions = transactions.value,
+					signerDataModel = signerDataModel,
 					onBack = {
 						//was navigate(Action.GO_BACK, "", "")
 						navController.navigate(ScanNavSubgraph.camera)
 					},
+					onSigReady = { signature ->
+						scanViewModel.signature.value = signature
+						navController.navigate(ScanNavSubgraph.signatureReady)
+					},
 					onFinish = {
 						rootNavigator.navigate(Action.GO_FORWARD)
-						scanViewModel.pendingTransactions = emptyList()
-						// todo multisign handle subsequent modals
+						scanViewModel.pendingTransactions.value = emptyList()
+						// todo dmitry handle subsequent modals
 //						rust/navigator/src/navstate.rs:396
 //						val navResult = uniffiinteractor.ProcessBatchTransactions(some_all) and handle
-							//Modal::EnterPassword
+						//Modal::EnterPassword
 						//Modal::SignatureReady(a);
 						//Screen::Transaction( can come with updated checksum
 						//success will clear to log
-										 // alert error
+						// alert error
 					},
-					signTransaction = signerDataModel::signTransaction,
+				)
+			}
+		}
+		composable(ScanNavSubgraph.signatureReady) {
+			BackHandler() {
+				navController.navigate(ScanNavSubgraph.camera)
+			}
+			BottomSheetWrapperRoot(onClosedAction = {
+				navController.navigate(ScanNavSubgraph.camera)
+			}) {
+				SignatureReady(
+					scanViewModel.signature.collectAsState().value!!,
+					signerDataModel = signerDataModel
 				)
 			}
 		}
@@ -72,4 +96,5 @@ fun ScanNavSubgraph(
 private object ScanNavSubgraph {
 	const val camera = "scan_camera"
 	const val transaction = "scan_transaction"
+	const val signatureReady = "signature ready"
 }

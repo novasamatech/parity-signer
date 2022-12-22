@@ -20,7 +20,6 @@ struct ScreenSelectorView: View {
                 navigation.perform(navigation: navigationRequest)
             },
             getSeed: { seedName in seedsMediator.getSeed(seedName: seedName) },
-            doJailbreak: data.jailbreak,
             pathCheck: { seed, path, network in
                 substratePathCheck(
                     seedName: seed, path: path, network: network, dbname: databaseMediator.databaseName
@@ -31,8 +30,6 @@ struct ScreenSelectorView: View {
             restoreSeed: { seedName, seedPhrase, createRoots in seedsMediator.restoreSeed(
                 seedName: seedName, seedPhrase: seedPhrase, createRoots: createRoots
             ) },
-            sign: { seedName, comment in data.sign(seedName: seedName, comment: comment) },
-            doWipe: data.wipe,
             alertShow: { data.alertShow = true },
             increment: { seedName, _ in
                 let seedPhrase = seedsMediator.getSeed(seedName: seedName)

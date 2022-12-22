@@ -1,13 +1,11 @@
 
+"Shared.Label.PasswordedPathDelimeter" = "///••••";
 
 "common.ok" = "Ok";
-
-
 "Accept" = "Accept";
 "Accept privacy policy?" = "Accept privacy policy?";
 "accounts" = "accounts";
 "Acknowledge and reset" = "Acknowledge and reset";
-"Add metadata" = "Add metadata";
 "Add note" = "Add note";
 "addSeed.uppercased" = "ADD SEED";
 "Airgap your phone" = "Airgap your phone";
@@ -45,7 +43,6 @@
 "error" = "error";
 "error_capitalised" = "Error!";
 "export" = "Export";
-"Factory reset the Signer app. This operation can not be reverted!" = "Factory reset the Signer app. This operation can not be reverted!";
 "find keys" = "find keys";
 "forSeed" = "For seed %@";
 "Forget this key?" = "Forget this key?";
@@ -60,12 +57,10 @@
 "I agree to the privacy policy" = "I agree to the privacy policy";
 "I agree to the terms and conditions" = "I agree to the terms and conditions";
 "I have written down my seed phrase" = "I have written down my seed phrase";
-"I understand" = "I understand";
 "Immortal transaction" = "Immortal transaction";
 "Importing derivations:" = "Importing derivations:";
 "in network" = "in network";
 "items selected" = "items selected";
-"key:" = "key:";
 
 "log.uppercased" = "LOG";
 "LOG NOTE" = "LOG NOTE";
@@ -78,7 +73,6 @@
 "Network name:" = "Network name:";
 "network_was_connected" = "Network was connected!";
 "New seed" = "New seed";
-"NEW NETWORK" = "NEW NETWORK";
 "Next" = "Next";
 "none" = "none";
 "none_capitalised" = "None";
@@ -88,7 +82,6 @@
 "Please protect device with pin or password!" = "Please protect device with pin or password!";
 "Pre-v14 types not installed" = "Pre-v14 types not installed";
 "Recover seed" = "Recover seed";
-"RemoveAllData.Message" = "Remove all data and set general verifier blank so that it could be set later.\nThis operation can not be reverted.\nDo not proceed unless you absolutely know what you are doing,\nthere is no need to use this procedure in most cases.\nMisusing this feature may lead to loss of funds!";
 "Remove key" = "Remove key";
 "Remove metadata" = "Remove metadata";
 "remove_metadata_question" = "Remove metadata?";
@@ -119,7 +112,6 @@
 "This metadata will be removed for all networks" = "This metadata will be removed for all networks";
 "This network will be removed for whole device" = "This network will be removed for whole device";
 "This seed will be removed for all networks. This is not reversible. Are you sure?" = "This seed will be removed for all networks. This is not reversible. Are you sure?";
-"Tip" = "Tip";
 "Transaction failed" = "Transaction failed";
 "Types information needed for support of pre-v14 metadata will be removed. Are you sure?" = "Types information needed for support of pre-v14 metadata will be removed. Are you sure?";
 "unit:" = "unit:";
@@ -127,14 +119,12 @@
 "Unknown network" = "Unknown network";
 "Use Signer in Airplane mode" = "Use Signer in Airplane mode";
 "Used for:" = "Used for:";
-"verifier_certificate" = "Verifier certificate";
+"verifier_certificate" = "Verifier Certificate";
 "verifier_certificate_uppercase" = "VERIFIER CERTIFICATE";
 "verifier_certificate_alt" = "Verifier certificate: ";
 "version" = "version";
 "visible only on this device" = "visible only on this device";
 "Warning!" = "Warning!";
-"Wipe" = "Wipe";
-"Wipe ALL data?" = "Wipe ALL data?";
 "You are about to delete key" = "You are about to delete key";
 "You are about to delete selected keys" = "You are about to delete selected keys";
 
@@ -206,7 +196,7 @@
 "TCName.Tip" = "Tip";
 "TCName.GenesisHash" = "Genesis hash";
 "TCName.Version" = "Version";
-"TCName.TxVersion" = "Tx version";
+"TCName.TxVersion" = "TX version";
 "TCName.TxVersion.uppercased" = "TX version";
 
 "TCName.NetworkName" = "Network name";
@@ -214,8 +204,8 @@
 "TCName.From" = "From";
 "TCName.IdentityField" = "IdentityField";
 "TCName.BlockHash" = "Block hash";
-"TCName.Phase" = "phase";
-"TCName.Period" = "period";
+"TCName.Phase" = "Phase";
+"TCName.Period" = "Period";
 "TCField.Path" = "Path: %@";
 "TCAuthor.SignedWith" = "Signed with %@";
 
@@ -257,13 +247,6 @@
 
 "ExportAddress.header" = "KEY DETAILS";
 "NewSeed.Generate" = "Generate seed phrase";
-
-"TransactionPreview.UnlockSign" = "Unlock key and sign";
-"TransactionPreview.Approve" = "Approve";
-"TransactionPreview.SelectSeed" = "Select seed";
-"TransactionPreview.Decline" = "Decline";
-"CameraView.parsingMultidata" = "PARSING MULTIPART DATA";
-"CameraView.startOver" = "Start over";
 
 // Copy for updated design
 
@@ -350,7 +333,6 @@
 "GenericErrorModal.Label.Title" = "Something has gone wrong.";
 "GenericErrorModal.Label.MessagePrefix" = "View the details below to find out more.";
 "GenericErrorModal.Action.Ok" = "OK";
-"Scanner.Label.Progress" = "From %d / %d captured frames";
 "Error.Navigation.Label.Prefix" = "Internal navigation error.";
 "Error.Navigation.Label.Message" = "Please restart Signer app and try again.\nInternal error description: %@";
 "Error.Navigation.Label.Suffix" = "Report an issue to Signer team via Github at: https://github.com/paritytech/parity-signer/";
@@ -362,3 +344,128 @@
 "KeysExport.KeySets.Label.Info" = "By scanning this QR code into your application you’ll export all keys from the Key Sets shown in the list below";
 "KeysExport.KeySets.Label.Key.Single" = "%@ Key";
 "KeysExport.KeySets.Label.Key.Plural" = "%@ Keys";
+
+
+"Scanner.Label.Scan.Main.Header" = "Scan QR code";
+"Scanner.Label.Scan.Main.Message" = "Sign transaction, add network or update metadata";
+"Scanner.Label.Scan.Multiple.Header" = "Scan Multiple QR codes";
+"Scanner.Label.Scan.Multiple.Message" = "Press the Sign button when you’re done scanning";
+"Scanner.Action.Cancel" = "Cancel";
+"Scanner.Action.Sign" = "Sign";
+"Scanner.Label.Progress" = "%d / %d complete";
+"Scanner.Label.Multipart" = "Scanning";
+"Scanner.Label.SignMultiple" = "Sign %d %@";
+"Scanner.Label.SignMultiple.Suffix.single" = "Transaction";
+"Scanner.Label.SignMultiple.Suffix.plural" = "Transactions";
+
+"TransactionPreview.Label.Title" = "Transaction Details";
+"TransactionPreview.Action.UnlockSign" = "Unlock key and sign";
+"TransactionPreview.Action.Approve" = "Approve";
+"TransactionPreview.Action.SelectSeed" = "Select seed";
+"TransactionPreview.Action.Cancel" = "Cancel";
+"TransactionPreview.Action.Done" = "Done";
+"CameraView.parsingMultidata" = "PARSING MULTIPART DATA";
+"CameraView.startOver" = "Start over";
+
+
+"Transaction.Verifier.Label.Header" = "Verifier Certificate";
+"Transaction.Verifier.Label.Key" = "Key";
+"Transaction.Verifier.Label.Crypto" = "Crypto";
+
+"Transaction.Metadata.Label.Header" = "Add Metadata";
+"Transaction.Metadata.Label.Metadata" = "Metadata";
+"Transaction.Metadata.Label.Metadata" = "Metadata";
+
+"Transaction.AddNetwork.Label.Header" = "New Network";
+"Transaction.AddNetwork.Label.GenesisHash" = "Genesis hash";
+"Transaction.AddNetwork.Label.Name" = "Network name";
+"Transaction.AddNetwork.Label.basePrefix" = "base58 prefix";
+"Transaction.AddNetwork.Label.Decimals" = "Decimals";
+"Transaction.AddNetwork.Label.Unit" = "Unit";
+"Transaction.AddNetwork.Label.Crypto" = "Crypto";
+"Transaction.AddNetwork.Label.Spec" = "Spec name";
+"Transaction.AddNetwork.Label.Logo" = "Logo";
+"Transaction.AddNetwork.Label.Path" = "Default path";
+
+"TransactionSign.Label.Details" = "Transaction Details";
+"TransactionSign.Label.Header.Single" = "Sign Transaction";
+"TransactionSign.Label.Header.Multiple" = "Sign %@ Transactions";
+"TransactionSign.Label.Header.Metadata" = "Add Metadata";
+"TransactionSign.Label.Header.Network" = "Add Network";
+
+"TransactionSign.Label.MultipleTransactionsInfo" = "Please note that by scanning this QR code into your application you’ll sign transactions using all keys shown in the transactions list above";
+"TransactionSign.Label.Sign" = "Sign With";
+"TransactionSign.Label.SignCode" = "Scan QR code to Sign Transaction";
+"TransactionSign.Action.Done" = "Done";
+"TransactionSign.Action.Note" = "Add Log Note";
+"TransactionSign.Action.Error" = "Got It";
+
+"TransactionSign.Label.Details.Pallet" = "Pallet";
+"TransactionSign.Label.Details.Method" = "Method";
+"TransactionSign.Label.Details.Destination" = "Dest";
+"TransactionSign.Label.Details.Value" = "Value";
+
+"TransactionSign.Error.Generic.Title" = "Error signing Transaction";
+"TransactionSign.Error.UnknownNetwork.Title" = "Please add the Network\nyou want to Transact in";
+"TransactionSign.Error.UnknownNetwork.Message" = "You're trying to sign a transaction in a network which has not been added to your Parity Signer.";
+"TransactionSign.Error.UnknownNetwork.Step1" = "Go to ";
+"TransactionSign.Error.UnknownNetwork.Step1.suffix" = "metadata.parity.io";
+"TransactionSign.Error.UnknownNetwork.Step2" = "Choose the network you need ";
+"TransactionSign.Error.UnknownNetwork.Step3" = "Scan \"Chain spec\" QR to add the missing network";
+"TransactionSign.Error.UnknownNetwork.Step4" = "Select \"Metadata\" tab on top, scan QR code with Parity Signer and wait until the update is finished";
+
+"TransactionSign.Error.InvalidNetworkVersion.Title" = "Please update %@ Network Metadata";
+"TransactionSign.Error.InvalidNetworkVersion.Message" = "The Westend network's current metadata is different to the data you're using in the app. Please update it to sign the transaction.";
+"TransactionSign.Error.InvalidNetworkVersion.Step1" = "Go to ";
+"TransactionSign.Error.InvalidNetworkVersion.Step1.suffix" = "metadata.parity.io";
+"TransactionSign.Error.InvalidNetworkVersion.Step2" = "Choose the network you need ";
+"TransactionSign.Error.InvalidNetworkVersion.Step3" = "Scan the metadata’s QR code with the scanner";
+"TransactionSign.Snackbar.Metadata" = "Metadata %@ %@ was added";
+"TransactionSign.Snackbar.NetworkAdded" = "Network %@ was added";
+
+"Transaction.EnterPassword.Action.Done" = "Done";
+"Transaction.EnterPassword.Label.Title" = "Enter the password for";
+"Transaction.EnterPassword.Label.Placeholder" = "Enter password";
+"Transaction.EnterPassword.Label.Explanation" = "Enter the password you used for your derivation path";
+"Transaction.EnterPassword.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
+"Transaction.EnterPassword.Error.Title" = "Did you forget your\npassword?";
+"Transaction.EnterPassword.Error.Message" = "Your password was entered incorrectly more than once. Retrieve it and scan the QR code again.";
+"LogsList.Label.Title" = "All Logs";
+"LogsList.More.Action.Add" = "Add Note";
+"LogsList.More.Action.Clear" = "Clear Log";
+"LogsList.More.Action.Cancel" = "Cancel";
+
+"LogsList.ClearConfirmation.Label.Title" = "Are You Sure?";
+"LogsList.ClearConfirmation.Action.Cancel" = "Cancel";
+"LogsList.ClearConfirmation.Action.Clear" = "Clear Log";
+
+"Settings.Label.Title" = "Settings";
+"Settings.Label.Networks" = "Networks";
+"Settings.Label.Verifier" = "Verifier Certificate";
+"Settings.Label.Backup" = "Backup Keys";
+"Settings.Label.Policy" = "Privacy Policy";
+"Settings.Label.Terms" = "Terms and Conditions";
+"Settings.Label.Feedback" = "Leave Feedback";
+"Settings.Label.Version" = "App version %@";
+"Settings.Label.Wipe" = "Wipe all Data";
+"Settings.Action.Cancel" = "Cancel";
+"Settings.Networks.Label.Title" = "Networks";
+"Settings.Networks.Action.Add" = "Add new network";
+
+"Settings.Modal.WipeAll.Label.Title" = "Wipe All Data";
+"Settings.Modal.WipeAll.Label.Content" = "Factory reset the Signer app. This operation can not be reverted!";
+"Settings.Modal.WipeAll.Action.Wipe" = "Remove";
+"Settings.Modal.WipeAll.Action.Cancel" = "Cancel";
+
+"Settings.Modal.GeneralVerifier.Label.Title" = "Wipe All Data?";
+"Settings.Modal.GeneralVerifier.Label.Content" = "Remove all data and set general verifier blank so that it could be set later. This operation can not be reverted. Do not proceed unless you absolutely know what you are doing, there’s no need to use this procedure in most cases. Misusing this feature may lead to los of funds!";
+"Settings.Modal.GeneralVerifier.Action.Remove" = "I Understand, remove all data";
+"Settings.Modal.GeneralVerifier.Action.Cancel" = "Cancel";
+
+"VerifierCertificate.Label.Title" = "Verifier Certificate";
+"VerifierCertificate.Action.Remove" = "Remove certificate";
+
+"NetworkFilter.Label.Header" = "Filter keys by network";
+"NetworkFilter.Action.Reset" = "Reset";
+"NetworkFilter.Action.Done" = "Done";
+

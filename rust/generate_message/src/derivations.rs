@@ -60,13 +60,13 @@ pub fn process_derivations(x: Derivations) -> Result<()> {
     match x.goal {
         Goal::Qr => make_pretty_qr(&complete_message, &output_name).map_err(Error::Qr)?,
         Goal::Text => std::fs::write(
-            &format!("{}.txt", output_name),
-            &hex::encode(&complete_message),
+            format!("{}.txt", output_name),
+            hex::encode(&complete_message),
         )?,
         Goal::Both => {
             std::fs::write(
-                &format!("{}.txt", output_name),
-                &hex::encode(&complete_message),
+                format!("{}.txt", output_name),
+                hex::encode(&complete_message),
             )?;
             make_pretty_qr(&complete_message, &output_name).map_err(Error::Qr)?
         }

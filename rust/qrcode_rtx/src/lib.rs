@@ -1,15 +1,18 @@
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use bitvec::prelude::{BitVec, Msb0};
-use constants::{qr_palette, BORDER, CHUNK_SIZE, FPS_DEN, FPS_NOM, SCALING};
-use qrcode_static::{png_qr, DataType};
-use qrcodegen::{QrCode, QrCodeEcc};
 use std::fs;
 use std::path::Path;
 
+use bitvec::prelude::{BitVec, Msb0};
+
+use constants::{qr_palette, BORDER, CHUNK_SIZE, FPS_DEN, FPS_NOM, SCALING};
+use definitions::navigation::QrData;
+use qrcode_static::{png_qr, DataType};
+use qrcodegen::{QrCode, QrCodeEcc};
+
 /// function to take data as `Vec<u8>`, apply `raptorq` to get `Vec<EncodingPacket>`
 /// and serialize it to get `Vec<u8>` output
-pub fn make_data_packs(input: &[u8], chunk_size: u16) -> Result<Vec<Vec<u8>>, &'static str> {
+pub fn make_data_packs(input: &[u8], chunk_size: u16) -> Result<Vec<QrData>, &'static str> {
     // checking that data is not too long, set limit for now at 2^31 bit
     if input.len() >= 0x80000000 {
         return Err("Input data is too long, processing not possible");
@@ -28,10 +31,12 @@ pub fn make_data_packs(input: &[u8], chunk_size: u16) -> Result<Vec<Vec<u8>>, &'
     // making `raptorq` Encoder, with defaults
     let raptor_encoder = raptorq::Encoder::with_defaults(input, chunk_size);
     // making EncodingPacket and deserializing each into `Vec<u8>`
-    let out: Vec<Vec<u8>> = raptor_encoder
+    let out: Vec<QrData> = raptor_encoder
         .get_encoded_packets(repair_packets_per_block)
         .iter()
-        .map(|x| [data_size_info.to_vec(), x.serialize()].concat())
+        .map(|x| QrData::Regular {
+            data: [data_size_info.to_vec(), x.serialize()].concat(),
+        })
         .collect();
     let len_check = out[0].len();
     for x in out.iter() {
@@ -47,10 +52,10 @@ pub fn make_data_packs(input: &[u8], chunk_size: u16) -> Result<Vec<Vec<u8>>, &'
 }
 
 /// function to take data as `Vec<Vec<u8>>` with all stuff added and make `Vec<QrCode>`
-fn make_qr_codes(data: Vec<Vec<u8>>) -> Result<Vec<QrCode>, Box<dyn std::error::Error>> {
+fn make_qr_codes(data: Vec<QrData>) -> Result<Vec<QrCode>, Box<dyn std::error::Error>> {
     let mut out: Vec<QrCode> = Vec::new();
     for x in data.iter() {
-        let new = QrCode::encode_binary(x, QrCodeEcc::Low)?;
+        let new = QrCode::encode_binary(x.data(), QrCodeEcc::Low)?;
         out.push(new);
     }
     Ok(out)
@@ -121,7 +126,7 @@ where
 {
     if input.len() <= 2953 {
         let qr = png_qr(input, DataType::Regular)?;
-        match std::fs::write(output_name, &qr) {
+        match std::fs::write(output_name, qr) {
             Ok(_) => Ok(()),
             Err(e) => Err(Box::from(format!("Output error {}", e))),
         }

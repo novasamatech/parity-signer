@@ -29,24 +29,41 @@ struct BigButton: View {
     var isDisabled: Bool = false
 
     var body: some View {
-        let accentColor = isCrypto ? Asset.crypto400.swiftUIColor : Asset.action400.swiftUIColor
-        let bgColor = isDisabled
-            ? Asset.bg200.swiftUIColor
-            : isShaded ? Asset.bg300.swiftUIColor : accentColor
-        let fgColor = isDisabled
-            ? Asset.text300.swiftUIColor
-            : isShaded
-            ? isDangerous ? Asset.signalDanger.swiftUIColor : accentColor
-            : Asset.action600.swiftUIColor
-
         Button(action: action) {
             HStack {
                 Spacer()
-                Text(text).font(Fontstyle.button.base)
+                Text(text).font(PrimaryFont.labelL.font)
                 Spacer()
             }
         }
-        .buttonStyle(BigButtonStyle(bgColor: bgColor, fgColor: fgColor))
+        .buttonStyle(style())
         .disabled(isDisabled)
+    }
+
+    func style() -> BigButtonStyle {
+        let bgColor: Color
+        let fgColor: Color
+
+        switch (isCrypto, isDisabled, isShaded) {
+        case (true, true, _):
+            bgColor = Asset.backgroundTertiary.swiftUIColor
+            fgColor = Asset.textAndIconsTertiary.swiftUIColor
+        case (true, false, true):
+            bgColor = Asset.backgroundTertiary.swiftUIColor
+            fgColor = isDangerous ? Asset.accentRed300.swiftUIColor : Asset.accentPink300.swiftUIColor
+        case (true, false, false):
+            bgColor = Asset.backgroundPrimary.swiftUIColor
+            fgColor = Asset.textAndIconsPrimary.swiftUIColor
+        case (false, true, _):
+            bgColor = Asset.backgroundTertiary.swiftUIColor
+            fgColor = Asset.textAndIconsTertiary.swiftUIColor
+        case (false, false, true):
+            bgColor = Asset.backgroundTertiary.swiftUIColor
+            fgColor = isDangerous ? Asset.accentRed300.swiftUIColor : Asset.textAndIconsPrimary.swiftUIColor
+        case (false, false, false):
+            bgColor = Asset.accentPink500.swiftUIColor
+            fgColor = Asset.accentForegroundText.swiftUIColor
+        }
+        return BigButtonStyle(bgColor: bgColor, fgColor: fgColor)
     }
 }

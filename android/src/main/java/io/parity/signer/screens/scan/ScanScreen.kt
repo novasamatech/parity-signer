@@ -1,44 +1,36 @@
 package io.parity.signer.screens.scan
 
 import android.content.res.Configuration
-import android.util.Log
-import android.view.ViewGroup
 import androidx.camera.core.*
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.barcode.common.Barcode
 import io.parity.signer.R
 import io.parity.signer.components.KeepScreenOn
 import io.parity.signer.models.Callback
-import io.parity.signer.ui.helpers.afterMeasured
+import io.parity.signer.screens.scan.camera.*
+import io.parity.signer.screens.scan.camera.CameraViewInternal
+import io.parity.signer.screens.scan.camera.ScanHeader
+import io.parity.signer.screens.scan.camera.TransparentClipLayout
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.uniffi.MTransaction
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 @Composable
 fun ScanScreen(
@@ -49,17 +41,18 @@ fun ScanScreen(
 
 	val captured by viewModel.captured.collectAsState()
 	val total by viewModel.total.collectAsState()
-	val isMultimode by viewModel.isMultiscanMode.collectAsState()
+	val isMultiscan by viewModel.isMultiscanMode.collectAsState()
 
-	LaunchedEffect(key1 = isMultimode) {
-		if (!isMultimode) {
-			//if multimode - on button click reaction should be handled
+	LaunchedEffect(key1 = isMultiscan) {
+		if (!isMultiscan) {
+			//if multi scan mode - on button click reaction should be handled
 			viewModel.pendingTransactionPayloads
 				.filter { it.isNotEmpty() }
 				.collect {
 					val transactions = viewModel.getTransactionsFromPendingPayload()
 					if (transactions.isNotEmpty()) {
 						//scanned qr codes is signer transaction qr code
+						viewModel.resetPendingTransactions()
 						onNavigateToTransaction(transactions)
 					} else {
 						viewModel.resetPendingTransactions()
@@ -74,7 +67,7 @@ fun ScanScreen(
 			.background(MaterialTheme.colors.background)
 	) {
 		CameraViewPermission(viewModel)
-		CameraBottomText(isMultimode)
+		CameraBottomText(isMultiscan)
 		Column() {
 			Spacer(modifier = Modifier
 				.statusBarsPadding()
@@ -127,8 +120,11 @@ private fun CameraBottomText(isMultimode: Boolean) {
 			.fillMaxSize(1f)
 			.padding(horizontal = 48.dp),
 	) {
-		Spacer(modifier = Modifier.padding(top = 400.dp))
-		Spacer(modifier = Modifier.weight(0.6f))
+		val paddingTop = ScanConstants.CLIP_TOP_PADDING +
+		//square clip height
+			LocalConfiguration.current.screenWidthDp.dp - ScanConstants.CLIP_SIDE_PADDING.times(2)
+		Spacer(modifier = Modifier.padding(top = paddingTop))
+		Spacer(modifier = Modifier.weight(0.5f))
 		Text(
 			text = stringResource(
 				if (isMultimode) {
@@ -156,7 +152,7 @@ private fun CameraBottomText(isMultimode: Boolean) {
 			textAlign = TextAlign.Center,
 			modifier = Modifier.fillMaxWidth(1f),
 		)
-		Spacer(modifier = Modifier.weight(0.3f))
+		Spacer(modifier = Modifier.weight(0.5f))
 	}
 }
 
@@ -172,6 +168,7 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 	val cameraPermissionState =
 		rememberPermissionState(android.Manifest.permission.CAMERA)
 	if (cameraPermissionState.status.isGranted) {
+
 		//camera content itself!
 		CameraViewInternal(viewModel)
 		TransparentClipLayout()
@@ -213,89 +210,6 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 			launch { cameraPermissionState.launchPermissionRequest() }
 		}
 	}
-}
-
-@Composable
-private fun CameraViewInternal(viewModel: CameraViewModel) {
-	val lifecycleOwner = LocalLifecycleOwner.current
-	val context = LocalContext.current
-	val cameraProviderFuture =
-		remember { ProcessCameraProvider.getInstance(context) }
-	val coroutineScope = rememberCoroutineScope()
-
-	AndroidView(
-		factory = { context ->
-
-			val executor = ContextCompat.getMainExecutor(context)
-			val previewView = PreviewView(context).apply {
-				this.scaleType = PreviewView.ScaleType.FILL_CENTER
-				layoutParams = ViewGroup.LayoutParams(
-					ViewGroup.LayoutParams.MATCH_PARENT,
-					ViewGroup.LayoutParams.MATCH_PARENT,
-				)
-			}
-			// mlkit docs: The default option is not recommended because it tries
-			// to scan all barcode formats, which is slow.
-			val options = BarcodeScannerOptions.Builder()
-				.setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
-			val barcodeScanner = BarcodeScanning.getClient(options)
-
-			cameraProviderFuture.addListener({
-				val cameraProvider = cameraProviderFuture.get()
-
-				val preview = androidx.camera.core.Preview.Builder().build().also {
-					it.setSurfaceProvider(previewView.surfaceProvider)
-				}
-
-				val cameraSelector = CameraSelector.Builder()
-					.requireLensFacing(CameraSelector.LENS_FACING_BACK)
-					.build()
-
-				val imageAnalysis = ImageAnalysis.Builder()
-					.setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-					.build()
-					.apply {
-						setAnalyzer(executor) { imageProxy ->
-							viewModel.processFrame(barcodeScanner, imageProxy)
-						}
-					}
-
-				cameraProvider.unbindAll()
-				val camera = cameraProvider.bindToLifecycle(
-					lifecycleOwner,
-					cameraSelector,
-					imageAnalysis,
-					preview
-				)
-				//torch control
-				if (camera.cameraInfo.hasFlashUnit()) {
-					coroutineScope.launch {
-						viewModel.isTorchEnabled.collect {
-							camera.cameraControl.enableTorch(it)
-						}
-					}
-				}
-				//autofocus
-				previewView.afterMeasured {
-					val autoFocusPoint = SurfaceOrientedMeteringPointFactory(1f, 1f)
-						.createPoint(.5f, .5f)
-					try {
-						val autoFocusAction = FocusMeteringAction.Builder(
-							autoFocusPoint,
-							FocusMeteringAction.FLAG_AF
-						).apply {
-							//start auto-focusing every second
-							setAutoCancelDuration(1, TimeUnit.SECONDS)
-						}.build()
-						camera.cameraControl.startFocusAndMetering(autoFocusAction)
-					} catch (e: CameraInfoUnavailableException) {
-						Log.d("ERROR", "cannot access camera", e)
-					}
-				}
-			}, executor)
-			previewView
-		},
-	)
 }
 
 

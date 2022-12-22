@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ExportPrivateKeyViewModel: Equatable {
-    let qrCode: QRCodeContainerViewModel
+    let qrCode: QrData
     let addressFooter: QRCodeAddressFooterViewModel
 }
 
@@ -31,7 +31,7 @@ struct ExportPrivateKeyModal: View {
                     HStack {
                         Localizable.KeyExport.Label.header.text
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            .font(Fontstyle.titleS.base)
+                            .font(PrimaryFont.titleS.font)
                         Spacer()
                         CloseModalButton(action: animateDismissal)
                     }
@@ -39,17 +39,18 @@ struct ExportPrivateKeyModal: View {
                     .padding([.trailing], Spacing.medium)
                     // QR Code container
                     VStack(spacing: 0) {
-                        QRCodeContainerView(viewModel: viewModel.qrCode)
-                            .padding(0.5)
+                        AnimatedQRCodeView(
+                            viewModel: Binding<AnimatedQRCodeViewModel>.constant(
+                                .init(
+                                    qrCodes: [viewModel.qrCode.payload]
+                                )
+                            )
+                        )
+                        .padding(0.5)
                         QRCodeAddressFooterView(viewModel: viewModel.addressFooter)
                     }
                     .fixedSize(horizontal: false, vertical: true)
-                    .background(
-                        RoundedRectangle(cornerRadius: CornerRadius.medium)
-                            .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                            .background(Asset.fill6.swiftUIColor)
-                            .cornerRadius(CornerRadius.medium)
-                    )
+                    .strokeContainerBackground()
                     .padding([.leading, .trailing], Spacing.large)
                     // Bottom "Hide" container
                     ExportPrivateKeyAddressFooter(hideAction: animateDismissal)
@@ -83,7 +84,7 @@ private struct ExportPrivateKeyAddressFooter: View {
         HStack {
             Localizable.KeyExport.Label.hide.text
                 .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                .font(Fontstyle.bodyL.base)
+                .font(PrimaryFont.bodyL.font)
             CircularProgressView(
                 CircularCountdownModel(
                     counter: Constants.keyVisibilityTime,

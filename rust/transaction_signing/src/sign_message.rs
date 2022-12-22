@@ -17,7 +17,6 @@ use definitions::{
     qr_transfers::{ContentAddSpecs, ContentLoadMeta},
     users::AddressDetails,
 };
-use qrcode_static::{png_qr, DataType};
 
 pub(crate) fn sign_as_address_key(
     to_sign: &[u8],
@@ -126,7 +125,7 @@ pub(crate) fn sufficient_crypto_load_types(
                     }],
                 )?)
                 .apply(database_name)?;
-            qr_from_sufficient(s)?
+            s.encode()
         }
         Err(e) => {
             if let Error::WrongPassword = e {
@@ -175,7 +174,7 @@ pub(crate) fn sufficient_crypto_load_metadata(
                     }],
                 )?)
                 .apply(database_name)?;
-            qr_from_sufficient(s)?
+            s.encode()
         }
         Err(e) => {
             if let Error::WrongPassword = e {
@@ -225,7 +224,7 @@ pub(crate) fn sufficient_crypto_add_specs(
                     }],
                 )?)
                 .apply(database_name)?;
-            qr_from_sufficient(s)?
+            s.encode()
         }
         Err(e) => {
             if let Error::WrongPassword = e {
@@ -246,8 +245,4 @@ pub(crate) fn sufficient_crypto_add_specs(
             },
         },
     ))
-}
-
-fn qr_from_sufficient(sufficient: SufficientCrypto) -> Result<Vec<u8>> {
-    Ok(png_qr(&sufficient.encode(), DataType::Regular)?)
 }

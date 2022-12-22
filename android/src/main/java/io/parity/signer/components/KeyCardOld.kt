@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.*
-import io.parity.signer.uniffi.Address
 import io.parity.signer.uniffi.MAddressCard
 
 /**
@@ -30,7 +29,7 @@ fun KeyCardOld(identity: MAddressCard, multiselectMode: Boolean = false) {
 			.padding(8.dp)
 	) {
 		Box(contentAlignment = Alignment.BottomEnd) {
-			IdentIcon(identity.address.identicon)
+			IdentIcon(identity.address.identicon.toImageContent())
 			if (multiselectMode) {
 				identity.multiselect?.let {
 					if (it) {

@@ -6,7 +6,6 @@ on:
     branches:
       - master
       - stable
-
 jobs:
   check:
     name:                     Cargo test on macOS
@@ -19,7 +18,7 @@ jobs:
           access_token:       ${{ github.token }}
 
       - name:                 Checkout sources
-        uses:                 actions/checkout@v3.1.0
+        uses:                 actions/checkout@v3.2.0
         with:
           fetch-depth:        50
           submodules:         'recursive'
@@ -45,7 +44,7 @@ jobs:
         uses:                 actions-rs/install@v0.1
         with:
           crate:              uniffi_bindgen
-          version:            0.21.0 # Must be in sync with version in Cargo.toml
+          version:            0.22.0 # Must be in sync with version in Cargo.toml
           use-tool-cache:     true
 
       - name:                 Rust Cache

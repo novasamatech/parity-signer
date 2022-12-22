@@ -47,12 +47,12 @@ struct SeedPhraseView: View {
             ForEach(viewModel.seeds, id: \.position) { seedWord in
                 HStack {
                     Text(seedWord.position)
-                        .font(Fontstyle.bodyM.crypto)
+                        .font(.robotoMono)
                         .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
                         .padding(.leading, Spacing.extraExtraSmall)
                         .frame(minWidth: Sizes.seedWordPositionWidth, alignment: .trailing)
                     Text(seedWord.word)
-                        .font(Fontstyle.bodyM.crypto)
+                        .font(.robotoMono)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -60,10 +60,7 @@ struct SeedPhraseView: View {
             }
         }
         .padding(Spacing.medium)
-        .background(
-            RoundedRectangle(cornerRadius: CornerRadius.small)
-                .fill(Asset.fill6.swiftUIColor)
-        )
+        .containerBackground(CornerRadius.small)
     }
 }
 

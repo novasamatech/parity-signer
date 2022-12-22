@@ -62,33 +62,13 @@ struct ExportMultipleKeysModal: View {
                         AnimatedQRCodeView(viewModel: $viewModel.qrCode)
                             .padding(0.5)
                             .fixedSize(horizontal: false, vertical: true)
-                        HStack {
-                            Localizable.KeysExport.KeySets.Label.info.text
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            Spacer().frame(maxWidth: Spacing.medium)
-                            Asset.infoIconBold.swiftUIImage
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
-                        }
-                        .padding()
-                        .font(Fontstyle.bodyM.base)
-                        .background(
-                            RoundedRectangle(cornerRadius: CornerRadius.small)
-                                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                                .background(Asset.fill6.swiftUIColor)
-                                .cornerRadius(CornerRadius.small)
-                        )
-                        .padding(.top, Spacing.extraSmall)
+                        InfoBoxView(text: Localizable.KeysExport.KeySets.Label.info.string)
+                            .padding(.top, Spacing.extraSmall)
                         // Keys list
                         keyList
                     }
                     .padding(Spacing.extraSmall)
-                    .background(
-                        RoundedRectangle(cornerRadius: CornerRadius.medium)
-                            .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                            .background(Asset.fill6.swiftUIColor)
-                            .cornerRadius(CornerRadius.medium)
-                    )
+                    .strokeContainerBackground()
                     .padding([.leading, .trailing], Spacing.medium)
                 }
                 .padding(.bottom, Spacing.medium)
@@ -105,14 +85,14 @@ struct ExportMultipleKeysModal: View {
             case let .keySets(keySets):
                 ForEach(
                     keySets.sorted(by: { $0.keyName < $1.keyName }),
-                    id: \.keyName
+                    id: \.id
                 ) { keyItem($0, isLast: $0 == keySets.last) }
             case let .keys(key, derivedKeys):
                 QRCodeRootFooterView(viewModel: .init(key))
                 Divider()
                 ForEach(
                     derivedKeys.sorted(by: { $0.viewModel.path < $1.viewModel.path }),
-                    id: \.viewModel.path
+                    id: \.id
                 ) {
                     QRCodeAddressFooterView(viewModel: .init($0))
                     if $0 != derivedKeys.last {
@@ -130,7 +110,7 @@ private extension ExportMultipleKeysModal {
         HStack {
             Text(headerName)
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                .font(Fontstyle.titleS.base)
+                .font(PrimaryFont.titleS.font)
             Spacer()
             CloseModalButton(action: animateDismissal)
         }
@@ -148,7 +128,7 @@ private extension ExportMultipleKeysModal {
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                 Spacer()
             }
-            .font(Fontstyle.bodyM.base)
+            .font(PrimaryFont.bodyM.font)
             Spacer()
             if !isLast {
                 Divider()
@@ -176,7 +156,7 @@ private struct ExportPrivateKeyAddressFooter: View {
         HStack {
             Localizable.KeyExport.Label.hide.text
                 .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                .font(Fontstyle.bodyL.base)
+                .font(PrimaryFont.bodyL.font)
             CircularProgressView(
                 CircularCountdownModel(
                     counter: Constants.keyVisibilityTime,

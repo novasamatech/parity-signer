@@ -12,18 +12,18 @@ struct TCError: View {
     var body: some View {
         HStack {
             Localizable.errorCapitalised.text
-                .foregroundColor(Asset.signalDanger.swiftUIColor)
-                .font(Fontstyle.body2.base)
             Text(text)
-                .foregroundColor(Asset.signalDanger.swiftUIColor)
-                .font(Fontstyle.body2.base)
             Spacer()
-        }.background(Asset.bgDanger.swiftUIColor)
+        }
+        .foregroundColor(Asset.accentRed300.swiftUIColor)
+        .font(PrimaryFont.bodyM.font)
+        .padding(Spacing.small)
+        .containerBackground(isError: true)
     }
 }
 
-// struct TCError_Previews: PreviewProvider {
-//    static var previews: some View {
-//        TCError()
-//    }
-// }
+struct TCError_Previews: PreviewProvider {
+    static var previews: some View {
+        TCError(text: "Error body I guess")
+    }
+}

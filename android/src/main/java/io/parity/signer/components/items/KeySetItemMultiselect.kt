@@ -92,7 +92,7 @@ private fun PreviewKeySetItemMultiselect() {
 	SignerNewTheme {
 		val model = KeySetModel(
 			"My special key set",
-			PreviewData.exampleIdenticon,
+			PreviewData.exampleIdenticonPng,
 			2.toUInt()
 		)
 		KeySetItemMultiselect(

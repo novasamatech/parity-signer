@@ -47,7 +47,7 @@ fun SufficientCryptoReady(
 				is MscContent.LoadMetadata -> Text("Metadata for " + c.name + " with version " + c.version)
 				is MscContent.LoadTypes -> Column {
 					Text("types " + c.types)
-					IdentIcon(identicon = c.pic)
+					IdentIcon(identicon = c.pic.toImageContent())
 				}
 			}
 		}

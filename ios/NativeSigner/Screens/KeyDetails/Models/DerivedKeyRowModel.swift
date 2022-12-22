@@ -30,7 +30,7 @@ struct DerivedKeyRowViewModel: Equatable {
     init(_ key: MKeysCard) {
         addressKey = key.addressKey
         path = key.address.path
-        identicon = key.address.identicon
+        identicon = key.address.identicon.svgPayload
         hasPassword = key.address.hasPwd
         base58 = key.base58
         rootKeyName = key.address.seedName

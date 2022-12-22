@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct KeySetList: View {
-    @ObservedObject var viewModel: ViewModel
+    @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject var appState: AppState
     @State private var isShowingNewSeedMenu = false
@@ -160,7 +160,7 @@ struct KeySetList: View {
             }) {
                 Localizable.KeySets.More.Action.exportAll.text
                     .foregroundColor(Asset.accentPink300.swiftUIColor)
-                    .font(Fontstyle.labelL.base)
+                    .font(PrimaryFont.labelL.font)
             }
             .padding(.leading, Spacing.medium)
             Spacer()
@@ -174,7 +174,7 @@ struct KeySetList: View {
                             Asset.accentPink300
                             .swiftUIColor
                     )
-                    .font(Fontstyle.labelL.base)
+                    .font(PrimaryFont.labelL.font)
             }
             .disabled(selectedItems.isEmpty)
             .padding(.trailing, Spacing.medium)
@@ -213,9 +213,9 @@ private struct KeyListEmptyState: View {
         VStack(spacing: Spacing.extraSmall) {
             Spacer()
             Text(Localizable.KeySets.Label.Empty.title.key)
-                .font(Fontstyle.titleM.base)
+                .font(PrimaryFont.titleM.font)
             Text(Localizable.KeySets.Label.Empty.subtitle.key)
-                .font(Fontstyle.bodyL.base)
+                .font(PrimaryFont.bodyL.font)
             Spacer()
                 .frame(height: Heights.actionButton + 2 * Spacing.large)
             Spacer()

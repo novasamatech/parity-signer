@@ -33,6 +33,9 @@ use crate::network_specs::NetworkSpecs;
 use crate::types::TypeEntry;
 use sp_core::H256;
 
+#[cfg(feature = "signer")]
+use crate::navigation::SignerImage;
+
 /// `load_metadata` QR code content  
 ///
 /// Messages `load_metadata` are used to update through air-gap the network
@@ -84,7 +87,7 @@ impl ContentLoadMeta {
     where
         P: AsRef<Path>,
     {
-        Ok(std::fs::write(filename, &self.to_sign())?)
+        Ok(std::fs::write(filename, self.to_sign())?)
     }
 
     /// Transform [`ContentLoadMeta`] into `Vec<u8>` that could be signed by the verifier.
@@ -139,7 +142,7 @@ impl ContentAddSpecs {
     where
         P: AsRef<Path>,
     {
-        Ok(std::fs::write(file_path, &self.to_sign())?)
+        Ok(std::fs::write(file_path, self.to_sign())?)
     }
 
     /// Transform [`ContentAddSpecs`] into `Vec<u8>` that could be signed by the verifier.
@@ -203,7 +206,7 @@ impl ContentLoadTypes {
     where
         P: AsRef<Path>,
     {
-        Ok(std::fs::write(path, &self.to_sign())?)
+        Ok(std::fs::write(path, self.to_sign())?)
     }
 
     /// Transform [`ContentLoadTypes`] into `Vec<u8>` to be put in the database.  
@@ -232,7 +235,7 @@ impl ContentLoadTypes {
     /// Types information hash is calculated for `Vec<u8>` of encoded types information,
     /// as it would be stored in the database  
     #[cfg(feature = "signer")]
-    pub fn show(&self) -> (String, Vec<u8>) {
+    pub fn show(&self) -> (String, SignerImage) {
         use sp_core::blake2_256;
 
         let types_hash = blake2_256(&self.store()).as_ref().to_vec();

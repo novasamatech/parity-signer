@@ -3,6 +3,7 @@ package io.parity.signer.models
 import android.util.Log
 import android.widget.Toast
 import io.parity.signer.components.SeedBoxStatus
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.historySeedNameWasShown
 import io.parity.signer.uniffi.initNavigation
@@ -34,12 +35,12 @@ fun SignerDataModel.addSeed(
 ) {
 
 	// Check if seed name already exists
-	if (seedNames.value?.contains(seedName) as Boolean) {
+	if (seedNames.value.contains(seedName)) {
 		return
 	}
 
 	// Run standard login prompt!
-	authentication.authenticate(activity) {
+	ServiceLocator.authentication.authenticate(activity) {
 		try {
 			// First check for seed collision
 			if (sharedPreferences.all.values.contains(seedPhrase)) {
@@ -96,7 +97,7 @@ internal fun SignerDataModel.getSeed(
  * 3. Calls rust remove seed logic
  */
 fun SignerDataModel.removeSeed(seedName: String) {
-	authentication.authenticate(activity) {
+	ServiceLocator.authentication.authenticate(activity) {
 		try {
 			sharedPreferences.edit().remove(seedName).apply()
 			refreshSeedNames()
@@ -108,28 +109,3 @@ fun SignerDataModel.removeSeed(seedName: String) {
 	}
 }
 
-/**
- * All logic required to prepare seed box in seed backup screen
- * todo used only for old backup screen, can be removed
- */
-fun SignerDataModel.getSeedForBackup(
-	seedName: String,
-	setSeedPhrase: (String) -> Unit,
-	setSeedBoxStatus: (SeedBoxStatus) -> Unit
-) {
-	if (alertState.value == AlertState.None) {
-		authentication.authenticate(activity) {
-			val seedPhrase = getSeed(seedName, backup = true)
-			if (seedPhrase.isBlank()) {
-				setSeedPhrase("")
-				setSeedBoxStatus(SeedBoxStatus.Error)
-			} else {
-				setSeedPhrase(seedPhrase)
-				setSeedBoxStatus(SeedBoxStatus.Seed)
-			}
-		}
-	} else {
-		setSeedPhrase("")
-		setSeedBoxStatus(SeedBoxStatus.Network)
-	}
-}

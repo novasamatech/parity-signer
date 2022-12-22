@@ -19,28 +19,36 @@ struct TCEnumVariantName: View {
                 VStack {
                     HStack {
                         Text(value.name)
-                            .foregroundColor(Asset.text600.swiftUIColor)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         Spacer()
                         if !value.docsEnumVariant.isEmpty {
-                            Localizable.questionMark.text
-                                .foregroundColor(Asset.action400.swiftUIColor)
+                            Asset.questionCircle.swiftUIImage
+                                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
                         }
                     }
                     if showDoc {
-                        Text(
-                            AttributedString(fromHexDocs: value.docsEnumVariant) ??
-                                AttributedString(Localizable.Error.docsParsing.string)
-                        )
-                        .foregroundColor(Asset.text600.swiftUIColor)
+                        withAnimation {
+                            VStack(alignment: .leading) {
+                                Text.markdownWithFallback(value.docsEnumVariant)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                HStack {
+                                    Spacer()
+                                }
+                            }
+                            .padding(.horizontal, Spacing.medium)
+                            .padding(.vertical, Spacing.small)
+                            .strokeContainerBackground()
+                        }
                     }
                 }
+                .font(PrimaryFont.bodyL.font)
             }
         ).disabled(value.docsEnumVariant.isEmpty)
     }
 }
 
-// struct TCEnumVariantName_Previews: PreviewProvider {
-// static var previews: some View {
-// TCEnumVariantName()
-// }
-// }
+struct TCEnumVariantName_Previews: PreviewProvider {
+    static var previews: some View {
+        TCEnumVariantName(value: MscEnumVariantName(name: "Name", docsEnumVariant: PreviewData.exampleMarkdownDocs))
+    }
+}

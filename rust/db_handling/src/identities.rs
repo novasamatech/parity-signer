@@ -42,6 +42,7 @@ use sled::Batch;
 use sp_core::H256;
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
+use sp_runtime::MultiSignature;
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_runtime::MultiSigner;
 use std::{collections::HashMap, path::Path};
@@ -74,10 +75,8 @@ use definitions::{
 #[cfg(feature = "signer")]
 use definitions::{
     helpers::make_identicon_from_multisigner,
-    navigation::{Address, MKeyDetails, MSCNetworkInfo},
+    navigation::{Address, MKeyDetails, MSCNetworkInfo, QrData},
 };
-#[cfg(feature = "signer")]
-use qrcode_static::{png_qr_from_string, DataType};
 
 #[cfg(any(feature = "active", feature = "signer"))]
 use crate::{
@@ -98,6 +97,42 @@ lazy_static! {
 // removed seed phrase part
 // last '+' used to be '*', but empty password is an error
     static ref REG_PATH: Regex = Regex::new(r"^(?P<path>(//?[^/]+)*)(///(?P<password>.+))?$").expect("known value");
+}
+
+#[derive(Clone, Encode, Decode)]
+pub enum SignaturesBulk {
+    #[codec(index = 4)]
+    V1(SignaturesBulkV1),
+}
+
+impl From<SignaturesBulkV1> for SignaturesBulk {
+    fn from(s: SignaturesBulkV1) -> Self {
+        Self::V1(s)
+    }
+}
+
+#[derive(Clone, Encode, Decode)]
+pub struct SignaturesBulkV1 {
+    /// Array of signatures.
+    signatures: Vec<MultiSignature>,
+}
+
+impl From<&[MultiSignature]> for SignaturesBulkV1 {
+    fn from(signatures: &[MultiSignature]) -> Self {
+        Self {
+            signatures: signatures.to_owned(),
+        }
+    }
+}
+
+#[derive(Clone, Encode, Decode)]
+pub enum TransactionBulk {
+    V1(TransactionBulkV1),
+}
+
+#[derive(Clone, Encode, Decode)]
+pub struct TransactionBulkV1 {
+    pub encoded_transactions: Vec<Vec<u8>>,
 }
 
 #[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
@@ -1603,7 +1638,7 @@ where
         }],
     )?;
 
-    let mut qr = generate_secret_qr(
+    let qr = generate_secret_qr(
         multisigner,
         &address_details,
         &network_specs.specs.genesis_hash,
@@ -1612,14 +1647,10 @@ where
     )?;
     key_password.zeroize();
 
-    if let Err(e) = TrDbCold::new()
+    TrDbCold::new()
         .set_addresses(identity_batch) // modify addresses
         .set_history(history_batch) // add corresponding history
-        .apply(&db_path)
-    {
-        qr.zeroize();
-        return Err(e);
-    };
+        .apply(&db_path)?;
 
     Ok(MKeyDetails {
         qr,
@@ -1642,8 +1673,9 @@ fn generate_secret_qr(
     genesis_hash: &H256,
     seed_phrase: &str,
     pwd: Option<&str>,
-) -> Result<Vec<u8>> {
+) -> Result<QrData> {
     // create fixed-length string to avoid reallocations
+
     let mut full_address = String::with_capacity(seed_phrase.len() + address_details.path.len());
     full_address.push_str(seed_phrase);
     full_address.push_str(&address_details.path);
@@ -1659,17 +1691,17 @@ fn generate_secret_qr(
         }
     };
 
-    let qr = png_qr_from_string(
-        &format!(
+    let qr = QrData::Sensitive {
+        data: format!(
             "secret:0x{}:{}",
             hex::encode(secret),
             hex::encode(genesis_hash)
-        ),
-        DataType::Sensitive,
-    )
-    .map_err(|e| Error::Qr(e.to_string()));
+        )
+        .as_bytes()
+        .to_vec(),
+    };
     secret.zeroize();
-    qr
+    Ok(qr)
 }
 
 #[cfg(test)]
