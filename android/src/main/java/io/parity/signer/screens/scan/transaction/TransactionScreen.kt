@@ -19,6 +19,8 @@ import io.parity.signer.models.sortedValueCards
 import io.parity.signer.models.transactionIssues
 import io.parity.signer.screens.scan.elements.TransactionErrors
 import io.parity.signer.screens.scan.transaction.components.TransactionElementSelector
+import io.parity.signer.screens.scan.transaction.components.TransactionSummaryView
+import io.parity.signer.screens.scan.transaction.components.toSigningTransactionModels
 import io.parity.signer.uniffi.MSignatureReady
 import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.TransactionType
@@ -40,8 +42,25 @@ fun TransactionScreen(
 		Column(
 			Modifier.verticalScroll(rememberScrollState())
 		) {
-			transactions.forEach {
-				Transaction(it)
+			//new transaction summary
+			transactions.filter { it.shouldShowAsSummaryTransaction() }
+				.toSigningTransactionModels().forEach {
+				TransactionSummaryView(it)//todo scan on click
+					//todo ios/NativeSigner/Screens/Scan/TransactionPreview.swift:51 show details here
+			}
+			//old separate transactions
+			transactions.filter { !it.shouldShowAsSummaryTransaction() }.forEach {
+				Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+					it.sortedValueCards.forEach {
+						TransactionElementSelector(it)
+					}
+				}
+//	transaction.authorInfo?.let {
+//		KeyCardOld(identity = it)
+//	}
+//	transaction.networkInfo?.let {
+//		NetworkCard(NetworkCardModel(it.networkTitle, it.networkLogo))
+//	}
 			}
 			signature?.let {
 				QrSignatureData(it)
@@ -147,9 +166,8 @@ private fun ActionButtons(
 	}
 }
 
-
 @Composable
-private fun Transaction(transaction: MTransaction) {
+private fun TransactionIssues(transaction: MTransaction) {
 	transaction.transactionIssues().let {
 		if (it.isNotEmpty()) {
 			TransactionErrors(
@@ -158,72 +176,21 @@ private fun Transaction(transaction: MTransaction) {
 			)
 		}
 	}
+}
 
-	when (transaction.ttype) {
+private fun MTransaction.shouldShowAsSummaryTransaction(): Boolean {
+	return when (ttype) {
+		// Rounded corner summary card like new transaction to send tokens
 		TransactionType.SIGN,
 		TransactionType.READ -> {
-			// Rounded corner summary card
-			//todo scan
-			transaction.sortedValueCards.forEach {
-				TransactionElementSelector(it)
-			}
+			true
 		}
 		// Used when new network is being added
 		// User when network metadata is being added
-		// Cards are redesigned to present new design
 		TransactionType.STUB,
 		TransactionType.DONE,
 		TransactionType.IMPORT_DERIVATIONS -> {
-			Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-				transaction.sortedValueCards.forEach {
-					TransactionElementSelector(it)
-				}
-			}
+			return false
 		}
 	}
-
-//	transaction.authorInfo?.let {
-//		KeyCardOld(identity = it)
-//	}
-//	transaction.networkInfo?.let {
-//		NetworkCard(NetworkCardModel(it.networkTitle, it.networkLogo))
-//	}
 }
-
-//    @ViewBuilder todo scan remove
-//    func singleTransaction(content: MTransaction) -> some View {
-//        VStack(alignment: .leading, spacing: Spacing.medium) {
-//            TransactionErrorsView(content: content)
-//                .padding(.horizontal, Spacing.medium)
-//            switch content.ttype {
-//            case .sign,
-//                 .read:
-//                // Rounded corner summary card
-//                TransactionSummaryView(
-//                    renderable: .init(content),
-//                    onTransactionDetailsTap: {
-//                        viewModel.presentDetails(for: content)
-//                    }
-//                )
-//                .padding(.horizontal, Spacing.medium)
-//            // Used when new network is being added
-//            // User when network metadata is being added
-//            // Cards are redesigned to present new design
-//            case .stub:
-//                VStack {
-//                    ForEach(content.sortedValueCards(), id: \.index) { card in
-//                        TransactionCardView(card: card)
-//                    }
-//                }
-//                .padding(Spacing.medium)
-//            case .done,
-//                 .importDerivations:
-//                VStack {
-//                    ForEach(content.sortedValueCards(), id: \.index) { card in
-//                        TransactionCardView(card: card)
-//                    }
-//                }
-//                .padding(Spacing.medium)
-//            }
-//        }
-//    }
