@@ -82,10 +82,7 @@ struct ScreenSelector: View {
         case let .manageNetworks(value):
             NetworkSelectionSettings(viewModel: .init(networks: value.networks))
         case let .nNetworkDetails(value):
-            NetworkDetails(
-                content: value,
-                navigationRequest: navigationRequest
-            )
+            NetworkSettingsDetails(viewModel: .init(networkDetails: value))
         case let .signSufficientCrypto(value):
             SignSufficientCrypto(
                 content: value,
