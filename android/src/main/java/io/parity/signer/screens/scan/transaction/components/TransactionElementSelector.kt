@@ -3,6 +3,7 @@ package io.parity.signer.screens.scan.transaction.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -131,5 +132,14 @@ fun TransactionElementSelector(card: TransactionCard) {
 				value = txCard.f,
 			)
 		}
+	}
+}
+
+@Composable
+fun TransactionCards(
+	transactions: List<TransactionCard>,
+) {
+	transactions.forEach {
+		TransactionElementSelector(it)
 	}
 }

@@ -1,9 +1,6 @@
 package io.parity.signer.screens.scan.transaction
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -11,10 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.HeaderBar
-import io.parity.signer.components.KeyCardOld
-import io.parity.signer.components.NetworkCard
-import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SecondaryButtonWide
@@ -25,7 +18,7 @@ import io.parity.signer.models.getData
 import io.parity.signer.models.sortedValueCards
 import io.parity.signer.models.transactionIssues
 import io.parity.signer.screens.scan.elements.TransactionErrors
-import io.parity.signer.screens.scan.transaction.components.TransactionPreviewField
+import io.parity.signer.screens.scan.transaction.components.TransactionElementSelector
 import io.parity.signer.uniffi.MSignatureReady
 import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.TransactionType
@@ -154,30 +147,14 @@ private fun ActionButtons(
 	}
 }
 
-@Composable //todo scan remove
-private fun Transactions(screenTransactions: List<MTransaction>) {
-	for (transaction in screenTransactions) {
-		TransactionPreviewField(
-			cardSet = transaction.content,
-		)
-		transaction.authorInfo?.let {
-			KeyCardOld(identity = it)
-		}
-		transaction.networkInfo?.let {
-			NetworkCard(NetworkCardModel(it.networkTitle, it.networkLogo))
-		}
-	}
-}
-
 
 @Composable
 private fun Transaction(transaction: MTransaction) {
-
 	transaction.transactionIssues().let {
 		if (it.isNotEmpty()) {
 			TransactionErrors(
 				errors = it,
-				modifier = Modifier.padding(horizontal = 16.dp)
+				modifier = Modifier.padding(horizontal = 16.dp),
 			)
 		}
 	}
@@ -186,21 +163,31 @@ private fun Transaction(transaction: MTransaction) {
 		TransactionType.SIGN,
 		TransactionType.READ -> {
 			// Rounded corner summary card
-			TODO() //todo scan
 			//todo scan
+			transaction.sortedValueCards.forEach {
+				TransactionElementSelector(it)
+			}
 		}
-		TransactionType.STUB -> {
-			// Used when new network is being added
-			// User when network metadata is being added
-			// Cards are redesigned to present new design
-			transaction.sortedValueCards
-			TODO()
-		}
+		// Used when new network is being added
+		// User when network metadata is being added
+		// Cards are redesigned to present new design
+		TransactionType.STUB,
 		TransactionType.DONE,
 		TransactionType.IMPORT_DERIVATIONS -> {
-
+			Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+				transaction.sortedValueCards.forEach {
+					TransactionElementSelector(it)
+				}
+			}
 		}
 	}
+
+//	transaction.authorInfo?.let {
+//		KeyCardOld(identity = it)
+//	}
+//	transaction.networkInfo?.let {
+//		NetworkCard(NetworkCardModel(it.networkTitle, it.networkLogo))
+//	}
 }
 
 //    @ViewBuilder todo scan remove
