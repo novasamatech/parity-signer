@@ -16,36 +16,32 @@ struct TCAddNewNetwork: View {
                 .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                 .padding(.leading, Spacing.medium)
                 .padding(.bottom, Spacing.extraSmall)
-            VStack {
-                VStack(alignment: .leading, spacing: Spacing.small) {
-                    rowWrapper(Localizable.Transaction.AddNetwork.Label.name.string, value.title)
-                    rowWrapper(Localizable.Transaction.AddNetwork.Label.basePrefix.string, String(value.base58prefix))
-                    rowWrapper(Localizable.Transaction.AddNetwork.Label.decimals.string, String(value.decimals))
-                    rowWrapper(Localizable.Transaction.AddNetwork.Label.unit.string, value.unit)
-                    VStack(alignment: .leading, spacing: Spacing.extraSmall) {
-                        Localizable.Transaction.AddNetwork.Label.genesisHash.text
-                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                        Text(value.genesisHash.formattedAsString)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        Divider()
-                    }
-                    rowWrapper(Localizable.Transaction.AddNetwork.Label.crypto.string, value.encryption.rawValue)
-                    rowWrapper(Localizable.Transaction.AddNetwork.Label.spec.string, value.name)
-                    HStack {
-                        Text(Localizable.Transaction.AddNetwork.Label.logo.string)
-                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                        Spacer()
-                        Text(value.logo)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            .font(.web3)
-                    }
+            VStack(alignment: .leading, spacing: Spacing.small) {
+                rowWrapper(Localizable.Transaction.AddNetwork.Label.name.string, value.title)
+                rowWrapper(Localizable.Transaction.AddNetwork.Label.basePrefix.string, String(value.base58prefix))
+                rowWrapper(Localizable.Transaction.AddNetwork.Label.decimals.string, String(value.decimals))
+                rowWrapper(Localizable.Transaction.AddNetwork.Label.unit.string, value.unit)
+                VStack(alignment: .leading, spacing: Spacing.extraSmall) {
+                    Localizable.Transaction.AddNetwork.Label.genesisHash.text
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    Text(value.genesisHash.formattedAsString)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     Divider()
-                    rowWrapper(Localizable.Transaction.AddNetwork.Label.path.string, value.pathId, isLast: true)
                 }
-                .padding(Spacing.medium)
+                rowWrapper(Localizable.Transaction.AddNetwork.Label.crypto.string, value.encryption.rawValue)
+                rowWrapper(Localizable.Transaction.AddNetwork.Label.spec.string, value.name)
+                HStack {
+                    Text(Localizable.Transaction.AddNetwork.Label.logo.string)
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    Spacer()
+                    Text(value.logo)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .font(.web3)
+                }
+                Divider()
+                rowWrapper(Localizable.Transaction.AddNetwork.Label.path.string, value.pathId, isLast: true)
             }
-            .background(Asset.fill6Solid.swiftUIColor)
-            .cornerRadius(CornerRadius.medium)
+            .verticalRoundedBackgroundContainer()
         }
     }
 

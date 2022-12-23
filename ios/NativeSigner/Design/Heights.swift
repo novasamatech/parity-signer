@@ -40,6 +40,8 @@ enum Heights {
     static let chevronLogElementWidth: CGFloat = 32
     /// Height for `Network Logo` when used in list collections, 36 pt
     static let networkLogoInCell: CGFloat = 36
+    /// Height for `Network Logo` when used in list collections, 36 pt
+    static let networkLogoInHeader: CGFloat = 56
     /// Height for element in Network Filter modal
     static let networkFilterItem: CGFloat = 48
     static let settingsEntryHeight: CGFloat = 56

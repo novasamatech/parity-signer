@@ -124,7 +124,8 @@ private extension NavigationCoordinator {
              .log,
              .settings,
              .vVerifier,
-             .manageNetworks:
+             .manageNetworks,
+             .nNetworkDetails:
             updatedShouldSkipInjectedViews = true
         default:
             updatedShouldSkipInjectedViews = false
