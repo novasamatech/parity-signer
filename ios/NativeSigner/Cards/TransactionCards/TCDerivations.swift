@@ -48,7 +48,7 @@ struct TCDerivations: View {
     @ViewBuilder
     func derivedKey(_ preview: DerivedKeyPreview) -> some View {
         HStack(alignment: .center, spacing: Spacing.small) {
-            Identicon(identicon: PreviewData.exampleIdenticon, rowHeight: Heights.identiconInCell)
+            Identicon(identicon: preview.identicon, rowHeight: Heights.identiconInCell)
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                 fullPath(preview)
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
@@ -63,7 +63,7 @@ struct TCDerivations: View {
     /// String interpolation for SFSymbols is a bit unstable if creating `String` inline by using conditional logic or
     /// `appending` from `StringProtocol`. Hence less DRY approach and dedicated function to wrap that
     private func fullPath(_ preview: DerivedKeyPreview) -> Text {
-        true ?
+        (preview.hasPwd ?? false) ?
             Text(
                 "\(preview.displayablePath)\(Image(.lock))"
             ) :
@@ -74,7 +74,7 @@ struct TCDerivations: View {
 private extension DerivedKeyPreview {
     /// Returns either `path` or if password protected, available path with path delimeter and lock icon
     var displayablePath: String {
-        true ?
+        (hasPwd ?? false) ?
             "\(derivationPath ?? "")\(Localizable.Shared.Label.passwordedPathDelimeter.string)" :
             derivationPath ?? ""
     }
