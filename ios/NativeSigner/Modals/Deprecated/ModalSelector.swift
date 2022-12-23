@@ -29,11 +29,6 @@ struct ModalSelector: View {
             NetworkDetailsMenu(
                 navigationRequest: navigationRequest
             )
-        case let .manageMetadata(value):
-            ManageMetadata(
-                content: value,
-                navigationRequest: navigationRequest
-            )
         case let .sufficientCryptoReady(value):
             SufficientCryptoReady(content: value)
         case let .typesInfo(value):
@@ -67,6 +62,7 @@ struct ModalSelector: View {
             .signatureReady,
             .logRight,
             .networkSelector,
+            .manageMetadata,
             nil:
             EmptyView()
         }
