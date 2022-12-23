@@ -30,7 +30,7 @@ import io.parity.signer.uniffi.TransactionType
  * Old UI screen edited to work on new screens
  */
 @Composable
-fun TransactionScreen(
+fun TransactionsScreen(
 	transactions: List<MTransaction>,
 	title: String,
 	signature: MSignatureReady?,
@@ -46,7 +46,7 @@ fun TransactionScreen(
 			transactions.filter { it.shouldShowAsSummaryTransaction() }
 				.toSigningTransactionModels().forEach {
 				TransactionSummaryView(it) {}//todo scan on click
-					//todo ios/NativeSigner/Screens/Scan/TransactionPreview.swift:51 show details here
+					//todo scan ios/NativeSigner/Screens/Scan/TransactionPreview.swift:51 show details here
 			}
 			//old separate transactions
 			transactions.filter { !it.shouldShowAsSummaryTransaction() }.forEach {

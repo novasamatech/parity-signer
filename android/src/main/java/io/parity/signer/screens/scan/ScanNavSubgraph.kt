@@ -12,7 +12,7 @@ import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.models.Navigator
 import io.parity.signer.screens.scan.elements.ScanErrorBottomSheet
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
-import io.parity.signer.screens.scan.transaction.TransactionScreen
+import io.parity.signer.screens.scan.transaction.TransactionsScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
 import kotlinx.coroutines.launch
@@ -56,9 +56,9 @@ fun ScanNavSubgraph(
 			}
 		)
 	} else {
-		//todo scan ios/NativeSigner/Screens/Scan/CameraView.swift:130
+		//ios/NativeSigner/Screens/Scan/CameraView.swift:130
 		Box(modifier = Modifier.statusBarsPadding()) {
-			TransactionScreen(
+			TransactionsScreen(
 				transactions = transactionsValue.transactions,
 				title = transactionsValue.title,
 				signature = signature.value,
