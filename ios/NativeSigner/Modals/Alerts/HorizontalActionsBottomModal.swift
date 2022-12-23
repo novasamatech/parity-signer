@@ -40,6 +40,13 @@ struct HorizontalActionsBottomModalViewModel {
         dismissActionLabel: Localizable.Settings.Modal.WipeAll.Action.cancel.key,
         mainActionLabel: Localizable.Settings.Modal.WipeAll.Action.wipe.key
     )
+
+    static let removeMetadata = HorizontalActionsBottomModalViewModel(
+        title: Localizable.Settings.NetworkDetails.DeleteMetadata.Label.title.string,
+        content: Localizable.Settings.NetworkDetails.DeleteMetadata.Label.content.string,
+        dismissActionLabel: Localizable.Settings.NetworkDetails.DeleteMetadata.Action.cancel.key,
+        mainActionLabel: Localizable.Settings.NetworkDetails.DeleteMetadata.Action.remove.key
+    )
 }
 
 struct HorizontalActionsBottomModal: View {

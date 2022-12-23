@@ -16,27 +16,23 @@ struct TCMeta: View {
                 .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                 .padding(.leading, Spacing.medium)
                 .padding(.bottom, Spacing.extraExtraSmall)
-            VStack {
-                VStack(spacing: Spacing.small) {
-                    VStack(alignment: .leading) {
-                        HStack {
-                            Localizable.Transaction.Metadata.Label.metadata.text
-                                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                            Spacer()
-                            Text(value.specname)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            Text(value.specsVersion)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        }
+            VStack(spacing: Spacing.small) {
+                VStack(alignment: .leading) {
+                    HStack {
+                        Localizable.Transaction.Metadata.Label.metadata.text
+                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        Spacer()
+                        Text(value.specname)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        Text(value.specsVersion)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     }
-                    Divider()
-                    Text(value.metaHash)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                 }
-                .padding(Spacing.medium)
+                Divider()
+                Text(value.metaHash)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
             }
-            .background(Asset.fill6Solid.swiftUIColor)
-            .cornerRadius(CornerRadius.medium)
+            .verticalRoundedBackgroundContainer()
         }
     }
 }
