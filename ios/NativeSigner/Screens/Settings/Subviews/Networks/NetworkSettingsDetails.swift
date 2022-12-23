@@ -65,22 +65,9 @@ struct NetworkSettingsDetails: View {
                         )
                         switch viewModel.networkDetails.currentVerifier.ttype {
                         case "general":
-                            rowWrapper(
-                                Localizable.Settings.NetworkDetails.Label.verifier.string,
-                                Localizable.Settings.NetworkDetails.Label.Verifier.general.string,
-                                isLast: true
-                            )
+                            generalVerifier(viewModel.networkDetails.currentVerifier)
                         case "custom":
-                            Identicon(identicon: viewModel.networkDetails.currentVerifier.details.identicon)
-                            VStack {
-                                Localizable.custom.text
-                                Text(viewModel.networkDetails.currentVerifier.details.publicKey)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                Text(
-                                    Localizable
-                                        .encryption(viewModel.networkDetails.currentVerifier.details.encryption)
-                                )
-                            }
+                            customVerifier(viewModel.networkDetails.currentVerifier)
                         case "none":
                             rowWrapper(
                                 Localizable.Settings.NetworkDetails.Label.verifier.string,
@@ -97,19 +84,39 @@ struct NetworkSettingsDetails: View {
                     }
                     .verticalRoundedBackgroundContainer()
                     .padding(.horizontal, Spacing.extraSmall)
-                    .padding(.bottom, Spacing.large)
                     .font(PrimaryFont.bodyL.font)
                     // Metadata
-                    Localizable.Settings.NetworkDetails.Label.metadata.text
-                        .font(PrimaryFont.bodyL.font)
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                        .padding(.leading, Spacing.large)
-                        .padding(.bottom, Spacing.extraSmall)
-                    VStack(spacing: Spacing.small) {
-                        ForEach(viewModel.networkDetails.meta, id: \.metaHash) {
-                            metadata($0)
-                                .padding(.horizontal, Spacing.extraSmall)
+                    if !viewModel.networkDetails.meta.isEmpty {
+                        Localizable.Settings.NetworkDetails.Label.metadata.text
+                            .font(PrimaryFont.bodyL.font)
+                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .padding(.top, Spacing.large)
+                            .padding(.leading, Spacing.large)
+                            .padding(.bottom, Spacing.extraSmall)
+                        VStack(spacing: Spacing.small) {
+                            ForEach(viewModel.networkDetails.meta, id: \.metaHash) {
+                                metadata($0)
+                                    .padding(.horizontal, Spacing.extraSmall)
+                            }
                         }
+                    }
+                    HStack(alignment: .center, spacing: 0) {
+                        Asset.add.swiftUIImage
+                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .frame(width: Heights.networkLogoInCell, height: Heights.networkLogoInCell)
+                            .background(Circle().foregroundColor(Asset.accentPink12.swiftUIColor))
+                            .padding(.trailing, Spacing.small)
+                        Text(Localizable.Settings.NetworkDetails.Action.add.string)
+                            .foregroundColor(Asset.accentPink.swiftUIColor)
+                            .font(PrimaryFont.labelL.font)
+                        Spacer()
+                    }
+                    .contentShape(Rectangle())
+                    .padding(.top, Spacing.large)
+                    .padding(.horizontal, Spacing.medium)
+                    .frame(height: Heights.networkSelectionSettings)
+                    .onTapGesture {
+                        viewModel.onAddTap()
                     }
                     Spacer()
                         .frame(height: Spacing.large)
@@ -202,6 +209,47 @@ struct NetworkSettingsDetails: View {
             }
         }
     }
+
+    @ViewBuilder
+    private func generalVerifier(_ verifier: MVerifier) -> some View {
+        rowWrapper(
+            Localizable.Settings.NetworkDetails.Label.verifier.string,
+            Localizable.Settings.NetworkDetails.Label.Verifier.general.string
+        )
+        verticalRowWrapper(
+            Localizable.Settings.NetworkDetails.Label.Verifier.key.string,
+            verifier.details.publicKey
+        )
+        rowWrapper(
+            Localizable.Settings.NetworkDetails.Label.Verifier.crypto.string,
+            verifier.details.encryption,
+            isLast: true
+        )
+    }
+
+    @ViewBuilder
+    private func customVerifier(_ verifier: MVerifier) -> some View {
+        rowWrapper(
+            Localizable.Settings.NetworkDetails.Label.verifier.string,
+            Localizable.Settings.NetworkDetails.Label.Verifier.custom.string
+        )
+        HStack {
+            Localizable.Settings.NetworkDetails.Label.Verifier.identicon.text
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            Spacer()
+            Identicon(identicon: verifier.details.identicon)
+        }
+        Divider()
+        verticalRowWrapper(
+            Localizable.Settings.NetworkDetails.Label.Verifier.publicKey.string,
+            verifier.details.publicKey
+        )
+        rowWrapper(
+            Localizable.Settings.NetworkDetails.Label.Verifier.crypto.string,
+            verifier.details.encryption,
+            isLast: true
+        )
+    }
 }
 
 extension NetworkSettingsDetails {
@@ -213,7 +261,15 @@ extension NetworkSettingsDetails {
         init(
             networkDetails: MNetworkDetails
         ) {
-            _networkDetails = .init(initialValue: networkDetails)
+            _networkDetails = .init(wrappedValue: networkDetails)
+        }
+
+        func removeMetadata() {
+            isPresentingRemoveMetadataConfirmation = false
+            if case let .nNetworkDetails(updatedDetails) = navigation
+                .performFake(navigation: .init(action: .removeMetadata)).screenData {
+                networkDetails = updatedDetails
+            }
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -226,8 +282,11 @@ extension NetworkSettingsDetails {
 
         func onAddTap() {
             navigation.shouldPresentQRScanner = true
-            navigation.performFake(navigation: .init(action: .goBack))
-            navigation.performFake(navigation: .init(action: .navbarScan))
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.navigation.performFake(navigation: .init(action: .goBack))
+                self.navigation.perform(navigation: .init(action: .goBack))
+                self.navigation.performFake(navigation: .init(action: .navbarScan))
+            }
         }
 
         func didTapDelete(_ metadata: MMetadataRecord) {
@@ -243,14 +302,6 @@ extension NetworkSettingsDetails {
         func cancelMetadataRemoval() {
             isPresentingRemoveMetadataConfirmation = false
             navigation.performFake(navigation: .init(action: .goBack))
-        }
-
-        func removeMetadata() {
-            isPresentingRemoveMetadataConfirmation = false
-            if case let .nNetworkDetails(updatedDetails) = navigation
-                .performFake(navigation: .init(action: .removeMetadata)).screenData {
-                networkDetails = updatedDetails
-            }
         }
     }
 }
