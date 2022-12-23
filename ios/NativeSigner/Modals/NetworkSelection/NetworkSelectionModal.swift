@@ -15,24 +15,24 @@ struct NetworkSelectionModal: View {
     var body: some View {
         FullScreenRoundedModal(
             backgroundTapAction: {
-                viewModel.cancelAction()
+                viewModel.resetAction()
             },
             animateBackground: $viewModel.animateBackground,
             ignoredEdges: .bottom,
             content: {
-                VStack {
+                VStack(spacing: 0) {
                     // Header with X button
                     HStack {
                         Localizable.NetworkFilter.Label.header.text
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
-                        CloseModalButton(action: viewModel.cancelAction)
+                        CloseModalButton(action: viewModel.resetAction)
                     }
                     .padding(.leading, Spacing.large)
                     .padding(.trailing, Spacing.medium)
                     Divider()
-                        .padding(.top, Spacing.medium)
+                        .padding(.vertical, Spacing.medium)
                     // List of networks
                     LazyVStack {
                         ForEach(
@@ -175,6 +175,7 @@ struct NetworkSelectionModal_Previews: PreviewProvider {
         NetworkSelectionModal(
             viewModel: .init(isPresented: Binding<Bool>.constant(true))
         )
+        .environmentObject(NavigationCoordinator())
         .environmentObject(AppState.preview)
     }
 }

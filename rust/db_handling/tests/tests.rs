@@ -2306,13 +2306,13 @@ fn remove_all_westend() {
         let database: Db = open(dbname).unwrap();
         let chainspecs: Tree = database.open_tree(SPECSTREE).unwrap();
         assert!(
-            chainspecs.get(&network_specs_key.key()).unwrap().is_none(),
+            chainspecs.get(network_specs_key.key()).unwrap().is_none(),
             "Westend network specs were not deleted"
         );
         let metadata: Tree = database.open_tree(METATREE).unwrap();
         let prefix_meta = MetaKeyPrefix::from_name("westend");
         assert!(
-            metadata.scan_prefix(&prefix_meta.prefix()).next().is_none(),
+            metadata.scan_prefix(prefix_meta.prefix()).next().is_none(),
             "Some westend metadata was not deleted"
         );
         let identities: Tree = database.open_tree(ADDRTREE).unwrap();

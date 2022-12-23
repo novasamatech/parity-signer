@@ -544,7 +544,7 @@ mod tests {
     #[test]
     fn westend9070() {
         let filename = String::from("for_tests/westend9070");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"westend",
@@ -561,7 +561,7 @@ mod tests {
     #[test]
     fn westend9033() {
         let filename = String::from("for_tests/westend9033");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"westend",
@@ -578,7 +578,7 @@ mod tests {
     #[test]
     fn westend9030() {
         let filename = String::from("for_tests/westend9030");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"westend",
@@ -595,7 +595,7 @@ mod tests {
     #[test]
     fn rococo9004() {
         let filename = String::from("for_tests/rococo9004");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"rococo",
@@ -612,7 +612,7 @@ mod tests {
     #[test]
     fn rococo9002() {
         let filename = String::from("for_tests/rococo9002");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"rococo",
@@ -629,7 +629,7 @@ mod tests {
     #[test]
     fn polkadot9080() {
         let filename = String::from("for_tests/polkadot9080");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"polkadot",
@@ -646,7 +646,7 @@ mod tests {
     #[test]
     fn polkadot30() {
         let filename = String::from("for_tests/polkadot30");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"polkadot",
@@ -663,7 +663,7 @@ mod tests {
     #[test]
     fn polkadot29() {
         let filename = String::from("for_tests/polkadot29");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"polkadot",
@@ -680,7 +680,7 @@ mod tests {
     #[test]
     fn kusama9040() {
         let filename = String::from("for_tests/kusama9040");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"kusama",
@@ -697,7 +697,7 @@ mod tests {
     #[test]
     fn kusama9010() {
         let filename = String::from("for_tests/kusama9010");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"kusama",
@@ -714,7 +714,7 @@ mod tests {
     #[test]
     fn edgeware() {
         let filename = String::from("for_tests/edgeware");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
 
         match MetaValues::from_str_metadata(meta.trim()) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
@@ -730,7 +730,7 @@ mod tests {
     #[test]
     fn centrifuge_amber() {
         let filename = String::from("for_tests/centrifugeAmber");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
 
         match MetaValues::from_str_metadata(meta.trim()) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
@@ -746,7 +746,7 @@ mod tests {
     #[test]
     fn westend9150() {
         let filename = String::from("for_tests/westend9150");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"westend",
@@ -767,7 +767,7 @@ mod tests {
     #[test]
     fn shell200() {
         let filename = String::from("for_tests/shell200");
-        let meta = read_to_string(&filename).unwrap();
+        let meta = read_to_string(filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(meta.trim()).unwrap();
         assert!(
             meta_values.name == *"shell",

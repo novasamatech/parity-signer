@@ -82,10 +82,7 @@ struct ScreenSelector: View {
         case let .vVerifier(value):
             VerfierCertificateView(viewModel: .init(content: value))
         case let .manageNetworks(value):
-            ManageNetworks(
-                content: value,
-                navigationRequest: navigationRequest
-            )
+            NetworkSelectionSettings(viewModel: .init(networks: value.networks))
         case let .nNetworkDetails(value):
             NetworkDetails(
                 content: value,

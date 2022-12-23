@@ -1,8 +1,7 @@
 
+"Shared.Label.PasswordedPathDelimeter" = "///••••";
 
 "common.ok" = "Ok";
-
-
 "Accept" = "Accept";
 "Accept privacy policy?" = "Accept privacy policy?";
 "accounts" = "accounts";
@@ -44,7 +43,6 @@
 "error" = "error";
 "error_capitalised" = "Error!";
 "export" = "Export";
-"Factory reset the Signer app. This operation can not be reverted!" = "Factory reset the Signer app. This operation can not be reverted!";
 "find keys" = "find keys";
 "forSeed" = "For seed %@";
 "Forget this key?" = "Forget this key?";
@@ -59,7 +57,6 @@
 "I agree to the privacy policy" = "I agree to the privacy policy";
 "I agree to the terms and conditions" = "I agree to the terms and conditions";
 "I have written down my seed phrase" = "I have written down my seed phrase";
-"I understand" = "I understand";
 "Immortal transaction" = "Immortal transaction";
 "Importing derivations:" = "Importing derivations:";
 "in network" = "in network";
@@ -85,7 +82,6 @@
 "Please protect device with pin or password!" = "Please protect device with pin or password!";
 "Pre-v14 types not installed" = "Pre-v14 types not installed";
 "Recover seed" = "Recover seed";
-"RemoveAllData.Message" = "Remove all data and set general verifier blank so that it could be set later.\nThis operation can not be reverted.\nDo not proceed unless you absolutely know what you are doing,\nthere is no need to use this procedure in most cases.\nMisusing this feature may lead to loss of funds!";
 "Remove key" = "Remove key";
 "Remove metadata" = "Remove metadata";
 "remove_metadata_question" = "Remove metadata?";
@@ -129,8 +125,6 @@
 "version" = "version";
 "visible only on this device" = "visible only on this device";
 "Warning!" = "Warning!";
-"Wipe" = "Wipe";
-"Wipe ALL data?" = "Wipe ALL data?";
 "You are about to delete key" = "You are about to delete key";
 "You are about to delete selected keys" = "You are about to delete selected keys";
 
@@ -436,8 +430,6 @@
 "Transaction.EnterPassword.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
 "Transaction.EnterPassword.Error.Title" = "Did you forget your\npassword?";
 "Transaction.EnterPassword.Error.Message" = "Your password was entered incorrectly more than once. Retrieve it and scan the QR code again.";
-"Transaction.EnterPassword.Label.PathDelimeter" = "///••••";
-"Address.Label.PasswordProtectedPath.PathDelimeter" = "///••••";
 "LogsList.Label.Title" = "All Logs";
 "LogsList.More.Action.Add" = "Add Note";
 "LogsList.More.Action.Clear" = "Clear Log";
@@ -457,6 +449,18 @@
 "Settings.Label.Version" = "App version %@";
 "Settings.Label.Wipe" = "Wipe all Data";
 "Settings.Action.Cancel" = "Cancel";
+"Settings.Networks.Label.Title" = "Networks";
+"Settings.Networks.Action.Add" = "Add new network";
+
+"Settings.Modal.WipeAll.Label.Title" = "Wipe All Data";
+"Settings.Modal.WipeAll.Label.Content" = "Factory reset the Signer app. This operation can not be reverted!";
+"Settings.Modal.WipeAll.Action.Wipe" = "Remove";
+"Settings.Modal.WipeAll.Action.Cancel" = "Cancel";
+
+"Settings.Modal.GeneralVerifier.Label.Title" = "Wipe All Data?";
+"Settings.Modal.GeneralVerifier.Label.Content" = "Remove all data and set general verifier blank so that it could be set later. This operation can not be reverted. Do not proceed unless you absolutely know what you are doing, there’s no need to use this procedure in most cases. Misusing this feature may lead to los of funds!";
+"Settings.Modal.GeneralVerifier.Action.Remove" = "I Understand, remove all data";
+"Settings.Modal.GeneralVerifier.Action.Cancel" = "Cancel";
 
 "VerifierCertificate.Label.Title" = "Verifier Certificate";
 "VerifierCertificate.Action.Remove" = "Remove certificate";

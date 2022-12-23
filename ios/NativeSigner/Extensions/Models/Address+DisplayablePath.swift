@@ -11,7 +11,7 @@ extension Address {
     /// Returns either `path` or if password protected, available path with path delimeter and lock icon
     var displayablePath: String {
         hasPwd ?
-            "\(path)\(Localizable.Address.Label.PasswordProtectedPath.pathDelimeter.string)" :
+            "\(path)\(Localizable.Shared.Label.passwordedPathDelimeter.string)" :
             path
     }
 }

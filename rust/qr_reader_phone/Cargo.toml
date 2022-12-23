@@ -10,7 +10,7 @@ edition = "2018"
 hex = "0.4.3"
 raptorq = "1.7.0"
 nom = "7.1.1"
-thiserror = "1.0.37"
+thiserror = "1.0.38"
 
 [lib]
 name = "qr_reader_phone"

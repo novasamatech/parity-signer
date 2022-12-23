@@ -123,7 +123,8 @@ private extension NavigationCoordinator {
              .transaction,
              .log,
              .settings,
-             .vVerifier:
+             .vVerifier,
+             .manageNetworks:
             updatedShouldSkipInjectedViews = true
         default:
             updatedShouldSkipInjectedViews = false

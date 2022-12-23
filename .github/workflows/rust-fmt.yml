@@ -6,7 +6,6 @@ on:
     branches:
       - master
       - stable
-
 jobs:
   rustfmt:
     name:                     Cargo fmt
@@ -23,7 +22,7 @@ jobs:
         with:
           fetch-depth:        50
           submodules:         'recursive'
- 
+
       - name:                 Install Rust stable toolchain
         uses:                 actions-rs/toolchain@v1.0.7
         with:

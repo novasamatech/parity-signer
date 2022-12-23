@@ -112,7 +112,7 @@ struct EnterPasswordModal: View {
     private var renderablePath: Text {
         Text(
             // swiftlint:disable:next line_length
-            "\(viewModel.dataModel.authorInfo.address.path)\(Localizable.Transaction.EnterPassword.Label.pathDelimeter.string)\(Image(.lock))"
+            "\(viewModel.dataModel.authorInfo.address.path)\(Localizable.Shared.Label.passwordedPathDelimeter.string)\(Image(.lock))"
         )
     }
 }

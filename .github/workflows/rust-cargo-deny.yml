@@ -6,7 +6,6 @@ on:
     branches:
       - master
       - stable
-
 jobs:
   cargo-deny:
     name:                 Cargo deny
@@ -26,4 +25,3 @@ jobs:
         uses:               EmbarkStudios/cargo-deny-action@8a8607bd8e2b3a514d5a40174cc7c55b229d9ba7 # v1.4.0
         with:
           command:          --manifest-path=./rust/Cargo.toml check ${{ matrix.checks }}
-

@@ -100,7 +100,7 @@ pub fn export_signatures_bulk(
         make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?
     } else {
         let encoded = match signatures[0].1 {
-            SignatureType::Transaction => hex::encode(&signatures[0].0.encode()),
+            SignatureType::Transaction => hex::encode(signatures[0].0.encode()),
             SignatureType::Message => match &signatures[0].0 {
                 MultiSignature::Ed25519(a) => hex::encode(a),
                 MultiSignature::Sr25519(a) => hex::encode(a),

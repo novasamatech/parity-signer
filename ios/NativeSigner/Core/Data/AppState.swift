@@ -37,7 +37,8 @@ extension AppState {
     extension AppState {
         static let preview = AppState(
             userData: UserData(
-                keysData: PreviewData.mKeyNew
+                keysData: PreviewData.mKeyNew,
+                allNetworks: PreviewData.networks
             )
         )
     }

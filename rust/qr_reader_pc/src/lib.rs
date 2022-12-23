@@ -69,7 +69,7 @@ pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String
                 };
             }
             Ready::Yes(a) => {
-                line.push_str(&hex::encode(&a));
+                line.push_str(&hex::encode(a));
                 break;
             }
         }

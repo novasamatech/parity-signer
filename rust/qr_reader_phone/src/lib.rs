@@ -38,7 +38,7 @@ pub fn decode_sequence(set: &[String], cleaned: bool) -> Result<String> {
         if let Ready::NotYet(decoding) = out {
             out = process_decoded_payload(payload, decoding)?;
             if let Ready::Yes(v) = out {
-                final_result = Some(hex::encode(&v));
+                final_result = Some(hex::encode(v));
                 break;
             }
         }
