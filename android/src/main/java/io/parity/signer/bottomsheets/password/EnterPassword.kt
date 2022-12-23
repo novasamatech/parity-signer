@@ -190,7 +190,7 @@ data class EnterPasswordModel(
 ) {
 	companion object {
 		fun createStub(): EnterPasswordModel = EnterPasswordModel(
-			keyCard = KeyCardModelBase.createStub().copy(hasPwd = true),
+			keyCard = KeyCardModelBase.createStub().copy(hasPassword = true),
 			showError = true,
 			attempt = 2,
 		)

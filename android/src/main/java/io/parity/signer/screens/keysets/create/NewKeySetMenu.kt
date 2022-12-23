@@ -36,7 +36,7 @@ fun NewSeedMenu(
 			modifier = Modifier.padding(vertical = 16.dp),
 			onCloseClicked = null
 		)
-		SignerDivider(padding = 24.dp)
+		SignerDivider(sidePadding = 24.dp)
 
 		Column(
 			modifier = Modifier

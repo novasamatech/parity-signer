@@ -45,7 +45,7 @@ fun TransactionScreen(
 			//new transaction summary
 			transactions.filter { it.shouldShowAsSummaryTransaction() }
 				.toSigningTransactionModels().forEach {
-				TransactionSummaryView(it)//todo scan on click
+				TransactionSummaryView(it) {}//todo scan on click
 					//todo ios/NativeSigner/Screens/Scan/TransactionPreview.swift:51 show details here
 			}
 			//old separate transactions

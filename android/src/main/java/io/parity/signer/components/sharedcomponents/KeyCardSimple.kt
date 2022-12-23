@@ -8,7 +8,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,9 +16,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.*
@@ -53,7 +52,7 @@ fun KeyCardPassword(
 					color = MaterialTheme.colors.textSecondary,
 					style = SignerTypeface.CaptionM,
 				)
-				if (model.hasPwd) {
+				if (model.hasPassword) {
 					Text(
 						" •••• ",
 						color = MaterialTheme.colors.textSecondary,
@@ -94,6 +93,61 @@ fun KeyCardPassword(
 }
 
 
+@Composable
+fun KeyCardSignature(
+	model: KeyCardModelBase,
+	modifier: Modifier = Modifier,
+) {
+	Row(
+		modifier
+			.fillMaxWidth(),
+		verticalAlignment = Alignment.CenterVertically,
+	) {
+
+		//left
+		Column(Modifier.weight(1f)) {
+			Row(
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				Text(
+					model.path,
+					color = MaterialTheme.colors.textSecondary,
+					style = SignerTypeface.CaptionM,
+				)
+				if (model.hasPassword) {
+					Text(
+						" •••• ",
+						color = MaterialTheme.colors.textSecondary,
+						style = SignerTypeface.CaptionM,
+					)
+					Icon(
+						Icons.Outlined.Lock,
+						contentDescription = stringResource(R.string.description_locked_icon),
+						tint = MaterialTheme.colors.textSecondary,
+						modifier = Modifier.size(14.dp)
+					)
+				}
+			}
+
+			Spacer(Modifier.padding(top = 4.dp))
+
+			Text(
+				model.seedName,
+				color = MaterialTheme.colors.primary,
+				style = SignerTypeface.BodyM,
+			)
+
+			Spacer(Modifier.padding(top = 4.dp))
+
+			ShowBase58Collapsible(model.base58)
+		}
+
+		//right()
+		IdentIcon(model.identIcon, 36.dp)
+	}
+}
+
+
 @Preview(
 	name = "day",
 	uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -107,8 +161,10 @@ fun KeyCardPassword(
 @Composable
 private fun PreviewKeyCardPassword() {
 	SignerNewTheme {
-		KeyCardPassword(
-			KeyCardModelBase.createStub(),
-		)
+		Column {
+			KeyCardPassword(model = KeyCardModelBase.createStub())
+			SignerDivider()
+			KeyCardSignature(model = KeyCardModelBase.createStub())
+		}
 	}
 }

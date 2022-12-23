@@ -54,7 +54,7 @@ fun KeyCard(model: KeyCardModel) {
 					color = MaterialTheme.colors.textSecondary,
 					style = SignerTypeface.CaptionM,
 				)
-				if (model.cardBase.hasPwd) {
+				if (model.cardBase.hasPassword) {
 					Text(
 						" •••• ",
 						color = MaterialTheme.colors.textSecondary,
@@ -143,7 +143,7 @@ fun KeySeedCard(seedTitle: String, base58: String) {
 }
 
 @Composable
-private fun ShowBase58Collapsible(base58: String) {
+internal fun ShowBase58Collapsible(base58: String) {
 	val expanded = remember { mutableStateOf(false) }
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
@@ -223,7 +223,7 @@ data class KeyCardModelBase(
 	val path: String,
 	val identIcon: ImageContent,
 	val seedName: String,
-	val hasPwd: Boolean = false,
+	val hasPassword: Boolean = false,
 	val multiselect: Boolean? = null,
 ) {
 	companion object {
@@ -234,7 +234,7 @@ data class KeyCardModelBase(
 				path = model.path,
 				identIcon = model.identicon,
 				seedName = model.seedName,
-				hasPwd = model.hasPwd,
+				hasPassword = model.hasPwd,
 				multiselect = model.multiselect,
 			)
 
@@ -247,7 +247,7 @@ data class KeyCardModelBase(
 			KeyCardModelBase(
 				base58 = address_card.base58,
 				path = address_card.address.path,
-				hasPwd = address_card.address.hasPwd,
+				hasPassword = address_card.address.hasPwd,
 				identIcon = address_card.address.identicon.toImageContent(),
 				seedName = address_card.address.seedName,
 				multiselect = address_card.multiselect,
@@ -260,7 +260,7 @@ data class KeyCardModelBase(
 			KeyCardModelBase(
 				base58 = base58,
 				path = address.path,
-				hasPwd = address.hasPwd,
+				hasPassword = address.hasPwd,
 				identIcon = address.identicon.toImageContent(),
 				seedName = address.seedName,
 				multiselect = false,
@@ -271,7 +271,7 @@ data class KeyCardModelBase(
 			path = "//polkadot//path",
 			identIcon = PreviewData.exampleIdenticonPng,
 			seedName = "Seed Name",
-			hasPwd = false,
+			hasPassword = false,
 			multiselect = null,
 		)
 	}

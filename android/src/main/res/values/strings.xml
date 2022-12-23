@@ -201,6 +201,13 @@
 	<string name="transaction_action_decline">Decline</string>
 	<string name="transaction_action_back">Back</string>
 	<string name="transaction_action_select_seed">Select seed</string>
+    <string name="transaction_summary_field_transaction_details">Transaction Details</string>
+	<string name="transaction_summary_field_pallet">Pallet</string>
+	<string name="transaction_summary_field_method">Method</string>
+	<string name="transaction_summary_field_destination">Dest</string>
+	<string name="transaction_summary_field_value">Value</string>
+	<string name="transaction_summary_field_chrvron_description">Transaction details</string>
+	<string name="transaction_summary_field_sign_with">Sign With</string>
 
 
 </resources>

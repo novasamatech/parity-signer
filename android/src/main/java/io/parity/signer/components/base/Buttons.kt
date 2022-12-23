@@ -192,12 +192,12 @@ fun RowButtonsBottomSheet(
 @Composable
 fun SignerDivider(
 	modifier: Modifier = Modifier,
-	padding: Dp = 16.dp,
+	sidePadding: Dp = 16.dp,
 ) {
 	Divider(
 		color = MaterialTheme.colors.appliedSeparator,
 		thickness = 1.dp,
-		modifier = modifier.padding(horizontal = padding),
+		modifier = modifier.padding(horizontal = sidePadding),
 	)
 }
 

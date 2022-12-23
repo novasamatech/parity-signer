@@ -1,6 +1,7 @@
 package io.parity.signer.screens.scan.transaction.components
 
 import io.parity.signer.components.ImageContent
+import io.parity.signer.components.sharedcomponents.KeyCardModelBase
 import io.parity.signer.components.toImageContent
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.models.abbreviateString
@@ -15,7 +16,7 @@ import io.parity.signer.uniffi.MTransaction
 
 data class SigningTransactionModel(
 	val summaryModels: List<TransactionSummaryModel>,
-	val signature: TransactionSignatureRenderable?,
+	val keyModel: KeyCardModelBase?,
 ) {
 	companion object {
 		fun createStub(): SigningTransactionModel =
@@ -34,11 +35,11 @@ data class SigningTransactionModel(
 						value = "0.3 WND"
 					)
 				),
-				signature = TransactionSignatureRenderable(
+				keyModel = KeyCardModelBase(
 					path = "//polkadot//1",
-					name = "Parity Keys",
+					seedName = "Parity Keys",
 					base58 = "1219xC79CXV31543DDXoQMjuA",
-					identicon = PreviewData.exampleIdenticonPng,
+					identIcon = PreviewData.exampleIdenticonPng,
 					hasPassword = true
 				)
 			)
@@ -48,11 +49,11 @@ data class SigningTransactionModel(
 fun List<MTransaction>.toSigningTransactionModels(): List<SigningTransactionModel> {
 	val fullModelsList: List<SigningTransactionModel> =
 		map { it.toSigningTransactionModel() }
-	val signatures = fullModelsList.map { it.signature }.toSet()
+	val signatures = fullModelsList.map { it.keyModel }.toSet()
 	return signatures.map { signature ->
-		SigningTransactionModel(signature = signature,
+		SigningTransactionModel(keyModel = signature,
 			summaryModels = fullModelsList
-				.filter { it.signature == signature }
+				.filter { it.keyModel == signature }
 				.map { it.summaryModels }
 				.flatten())
 	}
@@ -95,12 +96,12 @@ private fun MTransaction.toSigningTransactionModel(): SigningTransactionModel {
 				value = value,
 			)
 		),
-		signature = authorInfo?.let { author ->
-			TransactionSignatureRenderable(
+		keyModel = authorInfo?.let { author ->
+			KeyCardModelBase(
 				path = author.address.toDisplayablePathString(),
-				name = author.address.seedName,
+				seedName = author.address.seedName,
 				base58 = author.base58,
-				identicon = author.address.identicon.toImageContent(),//.svgPayload, on iOS
+				identIcon = author.address.identicon.toImageContent(),//.svgPayload, on iOS
 				hasPassword = author.address.hasPwd
 			)
 		}
