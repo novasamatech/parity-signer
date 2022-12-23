@@ -26,13 +26,15 @@ data class SigningTransactionModel(
 						pallet = "Balances",
 						method = "transfer_keep_alive",
 						destination = "1219xC79CXV31543DDXoQMjuA",
-						value = "0.2 WND"
+						value = "0.2 WND",
+						mTransactionIndex = 0,
 					),
 					TransactionSummaryModel(
 						pallet = "Balances2",
 						method = "transfer_keep_alive2",
 						destination = "1219xC79CXV31543DDXoQMjuA2",
-						value = "0.3 WND"
+						value = "0.3 WND",
+						mTransactionIndex = 1,
 					)
 				),
 				keyModel = KeyCardModelBase(
@@ -94,6 +96,7 @@ private fun MTransaction.toSigningTransactionModel(): SigningTransactionModel {
 				method = method,
 				destination = destination,
 				value = value,
+				mTransactionIndex = 0 //todo scan pass index
 			)
 		),
 		keyModel = authorInfo?.let { author ->
@@ -117,37 +120,8 @@ data class TransactionSummaryModel(
 	val method: String,
 	val destination: String,
 	val value: String,
+	val mTransactionIndex: Int
 )
 
-//fun TransactionSummaryModel.toDetailsRows(): kotlin.collections.List<TransactionDetailsRow> {
-//	return listOf(TransactionDetailsRow("Key"), )
-//}
-
-
-data class TransactionSignatureRenderable(
-	val path: String,
-	val name: String,
-	val base58: String,
-	val identicon: ImageContent,
-	val hasPassword: Boolean,
-)
-
-data class TransactionDetailsRow(
-	val key: String,
-	val value: String,
-)
-
-
-//    var asRenderable: [TransactionDetailsRow] {
-//        let labelKey = Localizable.TransactionSign.Label.Details.self
-//        return [.init(key: labelKey.pallet.string, value: pallet),
-//                .init(key: labelKey.method.string, value: method),
-//                .init(key: labelKey.destination.string, value: destination),
-//                .init(key: labelKey.value.string, value: value)]
-//    }
-//}
-
-// todo scan
-//ios/NativeSigner/Screens/Scan/Models/TransactionSummaryModels.swift:59
 
 

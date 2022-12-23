@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.sharedcomponents.KeyCardSignature
-import io.parity.signer.models.Callback
 import io.parity.signer.screens.scan.transaction.transactionElements.TCNameValueElement
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -31,17 +30,17 @@ import io.parity.signer.ui.theme.textTertiary
 @Composable
 fun TransactionSummaryView(
 	model: SigningTransactionModel,
-	onTransactionClicked: Callback,
+	onTransactionClicked: (mTransactionInex: Int) -> Unit,
 ) {
 	val plateShape =
 		RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 	Column(
 		modifier = Modifier
-			.background(
-				MaterialTheme.colors.fill6,
-				plateShape
-			)
-			.padding(16.dp)
+            .background(
+                MaterialTheme.colors.fill6,
+                plateShape
+            )
+            .padding(16.dp)
 	) {
 		Text(
 			text = stringResource(R.string.transaction_summary_field_transaction_details),
@@ -51,7 +50,9 @@ fun TransactionSummaryView(
 		)
 		model.summaryModels.forEach { summary ->
 			Row(
-				modifier = Modifier.clickable(onClick = onTransactionClicked),
+				modifier = Modifier.clickable(onClick = {
+					onTransactionClicked(summary.mTransactionIndex)
+				}),
 				verticalAlignment = Alignment.CenterVertically,
 			) {
 				//elements
@@ -80,8 +81,8 @@ fun TransactionSummaryView(
 					contentDescription = stringResource(R.string.transaction_summary_field_chrvron_description),
 					colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
 					modifier = Modifier
-						.size(28.dp)
-						.padding(end = 8.dp)
+                        .size(28.dp)
+                        .padding(end = 8.dp)
 				)
 			}
 			SignerDivider(modifier = Modifier.padding(vertical = 8.dp))
