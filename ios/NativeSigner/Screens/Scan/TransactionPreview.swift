@@ -297,9 +297,7 @@ extension TransactionPreview {
             }
         }
 
-        func onImportKeysTap() {
-            import
-        }
+        func onImportKeysTap() {}
 
         func signTransaction() {
             let seedName = dataModel.compactMap { $0.content.authorInfo?.address.seedName }.first
