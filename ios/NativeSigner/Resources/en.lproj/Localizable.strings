@@ -474,6 +474,7 @@
 "Settings.NetworkDetails.DeleteMetadata.Label.Content" = "This metadata will be removed for all networks";
 "Settings.NetworkDetails.DeleteMetadata.Action.Remove" = "Remove";
 "Settings.NetworkDetails.DeleteMetadata.Action.Cancel" = "Cancel";
+"Settings.NetworkDetails.DeleteMetadata.Label.Confirmation" = "Metadata %@ Has Been Removed";
 
 "Settings.Modal.WipeAll.Label.Title" = "Wipe All Data";
 "Settings.Modal.WipeAll.Label.Content" = "Factory reset the Signer app. This operation can not be reverted!";

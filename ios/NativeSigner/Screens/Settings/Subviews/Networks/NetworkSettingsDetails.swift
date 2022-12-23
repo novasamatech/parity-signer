@@ -257,11 +257,15 @@ extension NetworkSettingsDetails {
         @Published var isPresentingRemoveMetadataConfirmation = false
         private weak var navigation: NavigationCoordinator!
         @Published var networkDetails: MNetworkDetails
+        private let snackbarPresentation: BottomSnackbarPresentation
+        private var metadataToDelete: MMetadataRecord?
 
         init(
-            networkDetails: MNetworkDetails
+            networkDetails: MNetworkDetails,
+            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation
         ) {
             _networkDetails = .init(wrappedValue: networkDetails)
+            self.snackbarPresentation = snackbarPresentation
         }
 
         func removeMetadata() {
@@ -269,6 +273,13 @@ extension NetworkSettingsDetails {
             if case let .nNetworkDetails(updatedDetails) = navigation
                 .performFake(navigation: .init(action: .removeMetadata)).screenData {
                 networkDetails = updatedDetails
+                snackbarPresentation.viewModel = .init(
+                    title: Localizable.Settings.NetworkDetails.DeleteMetadata.Label
+                        .confirmation(metadataToDelete?.specsVersion ?? ""),
+                    style: .warning
+                )
+                snackbarPresentation.isSnackbarPresented = true
+                metadataToDelete = nil
             }
         }
 
@@ -290,6 +301,7 @@ extension NetworkSettingsDetails {
         }
 
         func didTapDelete(_ metadata: MMetadataRecord) {
+            metadataToDelete = metadata
             navigation.performFake(navigation: .init(action: .manageMetadata, details: metadata.specsVersion))
             isPresentingRemoveMetadataConfirmation = true
         }
@@ -300,6 +312,7 @@ extension NetworkSettingsDetails {
         }
 
         func cancelMetadataRemoval() {
+            metadataToDelete = nil
             isPresentingRemoveMetadataConfirmation = false
             navigation.performFake(navigation: .init(action: .goBack))
         }
