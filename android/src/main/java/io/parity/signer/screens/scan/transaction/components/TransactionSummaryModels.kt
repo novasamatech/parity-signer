@@ -1,6 +1,5 @@
 package io.parity.signer.screens.scan.transaction.components
 
-import io.parity.signer.components.ImageContent
 import io.parity.signer.components.sharedcomponents.KeyCardModelBase
 import io.parity.signer.components.toImageContent
 import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
@@ -48,7 +47,7 @@ data class SigningTransactionModel(
 	}
 }
 
-fun List<MTransaction>.toSigningTransactionModels(): List<SigningTransactionModel> {
+fun List<IndexedValue<MTransaction>>.toSigningTransactionModels(): List<SigningTransactionModel> {
 	val fullModelsList: List<SigningTransactionModel> =
 		map { it.toSigningTransactionModel() }
 	val signatures = fullModelsList.map { it.keyModel }.toSet()
@@ -61,13 +60,13 @@ fun List<MTransaction>.toSigningTransactionModels(): List<SigningTransactionMode
 	}
 }
 
-private fun MTransaction.toSigningTransactionModel(): SigningTransactionModel {
+private fun IndexedValue<MTransaction>.toSigningTransactionModel(): SigningTransactionModel {
 	var pallet: String = ""
 	var method: String = ""
 	var destination: String = ""
-	var value: String = ""
+	var parameter: String = ""
 
-	val methodCards = content.method?.map { it.card } ?: emptyList()
+	val methodCards = value.content.method?.map { it.card } ?: emptyList()
 	for (methodCard in methodCards) {
 		when (methodCard) {
 			is Card.PalletCard -> {
@@ -82,7 +81,7 @@ private fun MTransaction.toSigningTransactionModel(): SigningTransactionModel {
 				)
 			}
 			is Card.BalanceCard -> {
-				value = "${methodCard.f.amount} ${methodCard.f.units}"
+				parameter = "${methodCard.f.amount} ${methodCard.f.units}"
 			}
 			else -> {
 				//ignore the rest of the cards
@@ -95,11 +94,11 @@ private fun MTransaction.toSigningTransactionModel(): SigningTransactionModel {
 				pallet = pallet,
 				method = method,
 				destination = destination,
-				value = value,
-				mTransactionIndex = 0 //todo scan pass index
+				value = parameter,
+				mTransactionIndex = index
 			)
 		),
-		keyModel = authorInfo?.let { author ->
+		keyModel = value.authorInfo?.let { author ->
 			KeyCardModelBase(
 				path = author.address.toDisplayablePathString(),
 				seedName = author.address.seedName,

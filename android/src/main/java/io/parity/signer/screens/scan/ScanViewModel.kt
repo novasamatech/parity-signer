@@ -183,6 +183,30 @@ class ScanViewModel : ViewModel() {
 		}
 	}
 
+	fun proceedTransactionAction() {
+
+	}
+	//			        func onApproveTap() { todo scan ^^
+//            navigation.perform(navigation: .init(action: .goForward))
+//            isPresented.toggle()
+//            switch dataModel.first?.content.previewType {
+//            case let .addNetwork(network):
+//                snackbarPresentation.viewModel = .init(
+//                    title: Localizable.TransactionSign.Snackbar.networkAdded(network),
+//                    style: .info
+//                )
+//                snackbarPresentation.isSnackbarPresented = true
+//            case let .metadata(network, version):
+//                snackbarPresentation.viewModel = .init(
+//                    title: Localizable.TransactionSign.Snackbar.metadata(network, version),
+//                    style: .info
+//                )
+//                snackbarPresentation.isSnackbarPresented = true
+//            default:
+//                ()
+//            }
+//        }
+
 	private fun proceedWrongPassword() {
 //		navigation.performFake(navigation: .init(action: .goBack))
 		//  Fake navigation to camera, as were brought back to `Log` screen on navstate error handling

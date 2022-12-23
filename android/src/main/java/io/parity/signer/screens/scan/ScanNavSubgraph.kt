@@ -15,6 +15,7 @@ import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
 import io.parity.signer.screens.scan.transaction.TransactionsScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.backendAction
 import kotlinx.coroutines.launch
 
 /**
@@ -62,8 +63,13 @@ fun ScanNavSubgraph(
 				transactions = transactionsValue.transactions,
 				title = transactionsValue.title,
 				signature = signature.value,
-				onBack = backAction,
+				onBack = {
+					backendAction(Action.GO_BACK)
+					backAction()
+								 },
 				onFinish = {
+					//todo scan
+					scanViewModel.proceedTransactionAction()
 					rootNavigator.navigate(Action.GO_FORWARD)
 					scanViewModel.clearTransactionState()
 				},

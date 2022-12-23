@@ -35,7 +35,7 @@ fun TransactionsScreen(
 	title: String,
 	signature: MSignatureReady?,
 	onBack: Callback,
-	onFinish: Callback,
+	onFinish: Callback, //todo scan this leading to general state moving to Scan and it's crashing in selector
 ) {
 	Column(Modifier.fillMaxWidth()) {
 		ScreenHeader(title = title, onBack = onBack)
@@ -43,11 +43,12 @@ fun TransactionsScreen(
 			Modifier.verticalScroll(rememberScrollState())
 		) {
 			//new transaction summary
-			transactions.filter { it.shouldShowAsSummaryTransaction() }
+			transactions.withIndex()
+				.filter { it.value.shouldShowAsSummaryTransaction() }
 				.toSigningTransactionModels().forEach {
-				TransactionSummaryView(it) {}//todo scan on click
+					TransactionSummaryView(it) {}//todo scan on click
 					//todo scan ios/NativeSigner/Screens/Scan/TransactionPreview.swift:51 show details here
-			}
+				}
 			//old separate transactions
 			transactions.filter { !it.shouldShowAsSummaryTransaction() }.forEach {
 				Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -92,28 +93,8 @@ private fun ActionButtons(
 	val action = transactions.first().ttype
 	when (action) {
 		TransactionType.SIGN -> {
-			//already signed and we show qr code in this screen now
-			// , so we cannot add log there
-//			val comment = remember { mutableStateOf("") }
-//				Text(
-//					"LOG NOTE",
-//					style = MaterialTheme.typography.overline,
-//					color = MaterialTheme.colors.Text400
-//				)
-//
-//				val focusManager = LocalFocusManager.current
-//				val focusRequester = remember { FocusRequester() }
-//				SingleTextInput(content = comment,
-//					update = { comment.value = it },
-//					onDone = { },
-//					focusManager = focusManager,
-//					focusRequester = focusRequester
-//				)
-//				Text(
-//					"visible only on this device",
-//					style = MaterialTheme.typography.subtitle1,
-//					color = MaterialTheme.colors.Text400
-//				)
+			AddLogElement()
+
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_done),
 				withBackground = true,
@@ -164,6 +145,33 @@ private fun ActionButtons(
 			)
 		}
 	}
+}
+
+@Composable
+private fun AddLogElement() {
+	//already signed and we show qr code in this screen now
+	// , so we cannot add log there
+//	val comment = remember { mutableStateOf("") }
+//	Text(
+//		"LOG NOTE",
+//		style = MaterialTheme.typography.overline,
+//		color = MaterialTheme.colors.Text400
+//	)
+//
+//	val focusManager = LocalFocusManager.current
+//	val focusRequester = remember { FocusRequester() }
+//	SingleTextInput(
+//		content = comment,
+//		update = { comment.value = it },
+//		onDone = { },
+//		focusManager = focusManager,
+//		focusRequester = focusRequester
+//	)
+//	Text(
+//		"visible only on this device",
+//		style = MaterialTheme.typography.subtitle1,
+//		color = MaterialTheme.colors.Text400
+//	)
 }
 
 @Composable
