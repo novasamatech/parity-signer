@@ -1,6 +1,9 @@
 package io.parity.signer.screens.scan.transaction
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -98,7 +101,7 @@ private fun ActionButtons(
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_done),
 				withBackground = true,
-				modifier = Modifier.padding(horizontal = 24.dp),
+				modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp),
 				onClicked = onBack,
 			)
 		}
@@ -106,20 +109,23 @@ private fun ActionButtons(
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_done),
 				withBackground = true,
-				modifier = Modifier.padding(horizontal = 24.dp),
+				modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp),
 				onClicked = onBack,
 			)
 		}
 		TransactionType.STUB -> {
 			PrimaryButtonWide(
 				label = stringResource(R.string.transaction_action_approve),
-				modifier = Modifier.padding(horizontal = 24.dp),
+				modifier = Modifier
+					.padding(horizontal = 24.dp)
+					.padding(top = 32.dp, bottom = 8.dp),
 				onClicked = onFinish,
 			)
-			Spacer(modifier = Modifier.padding(top = 8.dp))
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_decline),
-				modifier = Modifier.padding(horizontal = 24.dp),
+				modifier = Modifier
+					.padding(horizontal = 24.dp)
+					.padding(bottom = 32.dp),
 				onClicked = onBack,
 			)
 		}
@@ -127,20 +133,23 @@ private fun ActionButtons(
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_back),
 				withBackground = true,
-				modifier = Modifier.padding(horizontal = 24.dp),
+				modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp),
 				onClicked = onBack,
 			)
 		}
 		TransactionType.IMPORT_DERIVATIONS -> {
 			PrimaryButtonWide(
 				label = stringResource(R.string.transaction_action_select_seed),
-				modifier = Modifier.padding(horizontal = 24.dp),
+				modifier = Modifier
+					.padding(horizontal = 24.dp)
+					.padding(top = 32.dp, bottom = 8.dp),
 				onClicked = onFinish,
 			)
-			Spacer(modifier = Modifier.padding(top = 8.dp))
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_decline),
-				modifier = Modifier.padding(horizontal = 24.dp),
+				modifier = Modifier
+					.padding(horizontal = 24.dp)
+					.padding(bottom = 32.dp),
 				onClicked = onBack,
 			)
 		}

@@ -64,7 +64,7 @@ fun ScanNavSubgraph(
 				title = transactionsValue.title,
 				signature = signature.value,
 				onBack = {
-					backendAction(Action.GO_BACK)
+					backendAction(Action.GO_BACK, "", "")
 					backAction()
 								 },
 				onFinish = {
