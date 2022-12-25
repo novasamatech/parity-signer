@@ -36,6 +36,8 @@ class ScanViewModel : ViewModel() {
 	val presentableError: MutableStateFlow<String?> =
 		MutableStateFlow(null)
 	val errorWrongPassword = MutableStateFlow<Boolean>(false)
+	val transactionDetails: MutableStateFlow<MTransaction?> =
+		MutableStateFlow(null)//todo scan
 
 	private val transactionIsInProgress = MutableStateFlow<Boolean>(false)
 

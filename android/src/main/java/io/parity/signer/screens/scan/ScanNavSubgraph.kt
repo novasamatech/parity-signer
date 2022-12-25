@@ -12,6 +12,7 @@ import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.models.Navigator
 import io.parity.signer.screens.scan.elements.ScanErrorBottomSheet
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
+import io.parity.signer.screens.scan.transaction.TransactionDetailsScreen
 import io.parity.signer.screens.scan.transaction.TransactionsScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
@@ -34,78 +35,85 @@ fun ScanNavSubgraph(
 	val presentableError = scanViewModel.presentableError.collectAsState()
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
+	val transactionDetails = scanViewModel.transactionDetails.collectAsState()
 
 	val showingModals =
 		presentableError.value != null || passwordModel.value != null || errorWrongPassword.value
 
 	val backAction = {
-		val wasState = scanViewModel.ifHasStateThenClear()
-		if (!wasState) rootNavigator.backAction()
+		if (transactionDetails.value != null) {
+			scanViewModel.transactionDetails.value = null
+		} else {
+			val wasState = scanViewModel.ifHasStateThenClear()
+			if (!wasState) rootNavigator.backAction()
+		}
 	}
 	BackHandler(onBack = backAction)
 
-	//Full screens
-
-	val transactionsValue = transactions.value
-	if (transactionsValue == null || showingModals) {
-		ScanScreen(
-			onClose = { rootNavigator.backAction() },
-			performPayloads = { payloads ->
-				scope.launch {
-					scanViewModel.performPayload(payloads)
-				}
-			}
-		)
-	} else {
-		//ios/NativeSigner/Screens/Scan/CameraView.swift:130
-		Box(modifier = Modifier.statusBarsPadding()) {
-			TransactionsScreen(
-				transactions = transactionsValue.transactions,
-				title = transactionsValue.title,
-				signature = signature.value,
-				onBack = {
-					backendAction(Action.GO_BACK, "", "")
-					backAction()
-								 },
-				onFinish = {
-					//todo scan
-					scanViewModel.proceedTransactionAction()
-					rootNavigator.navigate(Action.GO_FORWARD)
-					scanViewModel.clearTransactionState()
-				},
-			)
-		}
-	}
-
-	//Bottom sheets
-
-	presentableError.value?.let { presentableError ->
-		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
-			ScanErrorBottomSheet(
-				presentableError,
-				onOK = scanViewModel::clearTransactionState,
-			)
-		}
-	} ?: passwordModel.value?.let { passwordModel ->
-		//ios/NativeSigner/Screens/Scan/CameraView.swift:138
-		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
-			EnterPassword(
-				data = passwordModel,
-				proceed = { password ->
+	transactionDetails.value?.let {
+		TransactionDetailsScreen(transaction = it, onBack = backAction)
+	} ?: run {
+		//Full screens
+		val transactionsValue = transactions.value
+		if (transactionsValue == null || showingModals) {
+			ScanScreen(
+				onClose = { rootNavigator.backAction() },
+				performPayloads = { payloads ->
 					scope.launch {
-						scanViewModel.handlePasswordEntered(password)
+						scanViewModel.performPayload(payloads)
 					}
-				},
-				onClose = scanViewModel::clearTransactionState,
+				}
 			)
+		} else {
+			//ios/NativeSigner/Screens/Scan/CameraView.swift:130
+			Box(modifier = Modifier.statusBarsPadding()) {
+				TransactionsScreen(
+					transactions = transactionsValue.transactions,
+					title = transactionsValue.title,
+					signature = signature.value,
+					onBack = {
+						backendAction(Action.GO_BACK, "", "")
+						backAction()
+					},
+					onFinish = {
+						//todo scan
+						scanViewModel.proceedTransactionAction()
+						rootNavigator.navigate(Action.GO_FORWARD)
+						scanViewModel.clearTransactionState()
+					},
+				)
+			}
 		}
-	} ?: if (errorWrongPassword.value) {
-		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
-			WrongPasswordBottomSheet(
-				onOk = backAction
-			)
+
+		//Bottom sheets
+		presentableError.value?.let { presentableErrorValue ->
+			BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
+				ScanErrorBottomSheet(
+					presentableErrorValue,
+					onOK = scanViewModel::clearTransactionState,
+				)
+			}
+		} ?: passwordModel.value?.let { passwordModelValue ->
+			//ios/NativeSigner/Screens/Scan/CameraView.swift:138
+			BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
+				EnterPassword(
+					data = passwordModelValue,
+					proceed = { password ->
+						scope.launch {
+							scanViewModel.handlePasswordEntered(password)
+						}
+					},
+					onClose = scanViewModel::clearTransactionState,
+				)
+			}
+		} ?: if (errorWrongPassword.value) {
+			BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
+				WrongPasswordBottomSheet(
+					onOk = backAction
+				)
+			}
+		} else {
+			//no bottom sheet
 		}
-	} else {
-		//no bottom sheet
 	}
 }
