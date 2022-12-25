@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,6 +26,8 @@ import io.parity.signer.screens.scan.elements.TransactionErrors
 import io.parity.signer.screens.scan.transaction.components.TransactionElementSelector
 import io.parity.signer.screens.scan.transaction.components.TransactionSummaryView
 import io.parity.signer.screens.scan.transaction.components.toSigningTransactionModels
+import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.textSecondary
 import io.parity.signer.uniffi.MSignatureReady
 import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.TransactionType
@@ -80,6 +84,13 @@ fun TransactionsScreen(
 
 @Composable
 private fun QrSignatureData(signature: MSignatureReady) {
+	Text(
+		text = stringResource(R.string.transaction_qr_header),
+		color = MaterialTheme.colors.primary,
+		style = SignerTypeface.TitleS,
+		modifier = Modifier.padding(horizontal = 8.dp, vertical = 14.dp),
+		maxLines = 1,
+	)
 	AnimatedQrKeysInfo<List<List<UByte>>>(
 		input = signature.signatures.map { it.getData() },
 		provider = EmptyQrCodeProvider(),

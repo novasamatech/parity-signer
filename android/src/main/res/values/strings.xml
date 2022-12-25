@@ -208,6 +208,7 @@
 	<string name="transaction_summary_field_value">Value</string>
 	<string name="transaction_summary_field_chrvron_description">Transaction details</string>
 	<string name="transaction_summary_field_sign_with">Sign With</string>
+	<string name="transaction_qr_header">Sign Transactions</string>
 
 
 </resources>
