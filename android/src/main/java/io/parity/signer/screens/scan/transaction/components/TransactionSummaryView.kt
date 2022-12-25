@@ -36,11 +36,12 @@ fun TransactionSummaryView(
 		RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 	Column(
 		modifier = Modifier
-            .background(
-                MaterialTheme.colors.fill6,
-                plateShape
-            )
-            .padding(16.dp)
+			.padding(vertical = 8.dp)
+			.background(
+				MaterialTheme.colors.fill6,
+				plateShape
+			)
+			.padding(16.dp)
 	) {
 		Text(
 			text = stringResource(R.string.transaction_summary_field_transaction_details),
@@ -81,8 +82,8 @@ fun TransactionSummaryView(
 					contentDescription = stringResource(R.string.transaction_summary_field_chrvron_description),
 					colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
 					modifier = Modifier
-                        .size(28.dp)
-                        .padding(end = 8.dp)
+						.size(28.dp)
+						.padding(end = 8.dp)
 				)
 			}
 			SignerDivider(modifier = Modifier.padding(vertical = 8.dp))

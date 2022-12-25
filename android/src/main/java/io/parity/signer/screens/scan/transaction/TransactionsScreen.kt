@@ -49,27 +49,11 @@ fun TransactionsScreen(
 		Column(
 			Modifier.verticalScroll(rememberScrollState())
 		) {
-			//new transaction summary
-			transactions.withIndex()
-				.filter { it.value.shouldShowAsSummaryTransaction() }
-				.toSigningTransactionModels().forEach {
-					TransactionSummaryView(it) {}//todo scan on click
-					//todo scan ios/NativeSigner/Screens/Scan/TransactionPreview.swift:51 show details here
-				}
-			//old separate transactions
-			transactions.filter { !it.shouldShowAsSummaryTransaction() }.forEach {
-				Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-					it.sortedValueCards.forEach {
-						TransactionElementSelector(it)
-					}
-				}
-//	transaction.authorInfo?.let {
-//		KeyCardOld(identity = it)
-//	}
-//	transaction.networkInfo?.let {
-//		NetworkCard(NetworkCardModel(it.networkTitle, it.networkLogo))
-//	}
+			transactions.forEach {
+				TransactionIssues(it)
 			}
+			//new transaction summary
+			ShowTransactionsPreview(transactions)
 			signature?.let {
 				QrSignatureData(it)
 			}
@@ -79,6 +63,30 @@ fun TransactionsScreen(
 				onFinish
 			)
 		}
+	}
+}
+
+@Composable
+private fun ShowTransactionsPreview(transactions: List<MTransaction>) {
+	transactions.withIndex()
+		.filter { it.value.shouldShowAsSummaryTransaction() }
+		.toSigningTransactionModels().forEach {
+			TransactionSummaryView(it) {}//todo scan on click
+			//todo scan ios/NativeSigner/Screens/Scan/TransactionPreview.swift:51 show details here
+		}
+	//old separate transactions
+	transactions.filter { !it.shouldShowAsSummaryTransaction() }.forEach {
+		Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+			it.sortedValueCards.forEach {
+				TransactionElementSelector(it)
+			}
+		}
+//	transaction.authorInfo?.let {
+//		KeyCardOld(identity = it)
+//	}
+//	transaction.networkInfo?.let {
+//		NetworkCard(NetworkCardModel(it.networkTitle, it.networkLogo))
+//	}
 	}
 }
 
@@ -200,7 +208,7 @@ private fun TransactionIssues(transaction: MTransaction) {
 		if (it.isNotEmpty()) {
 			TransactionErrors(
 				errors = it,
-				modifier = Modifier.padding(horizontal = 16.dp),
+				modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
 			)
 		}
 	}
