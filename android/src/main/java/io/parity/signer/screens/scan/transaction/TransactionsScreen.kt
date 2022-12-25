@@ -203,7 +203,7 @@ private fun AddLogElement() {
 }
 
 @Composable
-private fun TransactionIssues(transaction: MTransaction) {
+internal fun TransactionIssues(transaction: MTransaction) {
 	transaction.transactionIssues().let {
 		if (it.isNotEmpty()) {
 			TransactionErrors(
