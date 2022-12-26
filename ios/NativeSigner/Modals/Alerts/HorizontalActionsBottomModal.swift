@@ -47,6 +47,13 @@ struct HorizontalActionsBottomModalViewModel {
         dismissActionLabel: Localizable.Settings.NetworkDetails.DeleteMetadata.Action.cancel.key,
         mainActionLabel: Localizable.Settings.NetworkDetails.DeleteMetadata.Action.remove.key
     )
+
+    static let removeNetwork = HorizontalActionsBottomModalViewModel(
+        title: Localizable.Settings.NetworkDetails.More.Delete.Label.title.string,
+        content: Localizable.Settings.NetworkDetails.More.Delete.Label.content.string,
+        dismissActionLabel: Localizable.Settings.NetworkDetails.More.Delete.Action.cancel.key,
+        mainActionLabel: Localizable.Settings.NetworkDetails.More.Delete.Action.remove.key
+    )
 }
 
 struct HorizontalActionsBottomModal: View {
