@@ -83,8 +83,6 @@
 "Pre-v14 types not installed" = "Pre-v14 types not installed";
 "Recover seed" = "Recover seed";
 "Remove key" = "Remove key";
-"Remove metadata" = "Remove metadata";
-"remove_metadata_question" = "Remove metadata?";
 "Remove network" = "Remove network";
 "remove_network_question" = "Remove network?";
 "Remove seed" = "Remove seed";
@@ -109,13 +107,11 @@
 "sr25519" = "sr25519";
 "This key already exists:" = "This key already exists:";
 "This key will be removed for this network. Are you sure?" = "This key will be removed for this network. Are you sure?";
-"This metadata will be removed for all networks" = "This metadata will be removed for all networks";
 "This network will be removed for whole device" = "This network will be removed for whole device";
 "This seed will be removed for all networks. This is not reversible. Are you sure?" = "This seed will be removed for all networks. This is not reversible. Are you sure?";
 "Transaction failed" = "Transaction failed";
 "Types information needed for support of pre-v14 metadata will be removed. Are you sure?" = "Types information needed for support of pre-v14 metadata will be removed. Are you sure?";
 "unit:" = "unit:";
-"unknown" = "unknown";
 "Unknown network" = "Unknown network";
 "Use Signer in Airplane mode" = "Use Signer in Airplane mode";
 "Used for:" = "Used for:";
@@ -451,6 +447,42 @@
 "Settings.Action.Cancel" = "Cancel";
 "Settings.Networks.Label.Title" = "Networks";
 "Settings.Networks.Action.Add" = "Add new network";
+"Settings.NetworkDetails.Label.Specs" = "Chain Specs";
+"Settings.NetworkDetails.Label.Name" = "Network name";
+"Settings.NetworkDetails.Label.basePrefix" = "base58 prefix";
+"Settings.NetworkDetails.Label.Decimals" = "decimals";
+"Settings.NetworkDetails.Label.Unit" = "unit";
+"Settings.NetworkDetails.Label.GenesisHash" = "Genesis hash";
+"Settings.NetworkDetails.Label.Metadata" = "Metadata Available";
+"Settings.NetworkDetails.Label.Version" = "Version";
+"Settings.NetworkDetails.Label.Hash" = "Hash";
+"Settings.NetworkDetails.Action.Add" = "Add Network Metadata";
+"Settings.NetworkDetails.Action.Sign" = "Sign this metadata";
+"Settings.NetworkDetails.Action.Delete" = "Delete this metadata";
+
+"Settings.NetworkDetails.Label.Verifier" = "Verifier Certificate";
+"Settings.NetworkDetails.Label.Verifier.Identicon" = "Identicon";
+"Settings.NetworkDetails.Label.Verifier.Key" = "Key";
+"Settings.NetworkDetails.Label.Verifier.Crypto" = "Crypto";
+"Settings.NetworkDetails.Label.Verifier.PublicKey" = "Public Key";
+"Settings.NetworkDetails.Label.Verifier.None" = "None";
+"Settings.NetworkDetails.Label.Verifier.Unknown" = "Unknown";
+"Settings.NetworkDetails.Label.Verifier.General" = "General";
+"Settings.NetworkDetails.Label.Verifier.Custom" = "Custom";
+
+"Settings.NetworkDetails.DeleteMetadata.Label.Title" = "Remove Metadata?";
+"Settings.NetworkDetails.DeleteMetadata.Label.Content" = "This metadata will be removed for all networks";
+"Settings.NetworkDetails.DeleteMetadata.Action.Remove" = "Remove";
+"Settings.NetworkDetails.DeleteMetadata.Action.Cancel" = "Cancel";
+"Settings.NetworkDetails.DeleteMetadata.Label.Confirmation" = "Metadata %@ Has Been Removed";
+
+"Settings.NetworkDetails.More.Action.Sign" = "Sign Network Specs";
+"Settings.NetworkDetails.More.Action.Delete" = "Delete network";
+"Settings.NetworkDetails.More.Delete.Label.Title" = "Remove Network?";
+"Settings.NetworkDetails.More.Delete.Label.Content" = "This network will be removed for whole device";
+"Settings.NetworkDetails.More.Delete.Action.Remove" = "Remove";
+"Settings.NetworkDetails.More.Delete.Action.Cancel" = "Cancel";
+"Settings.NetworkDetails.DeleteNetwork.Label.Confirmation" = "Network %@ Has Been Removed";
 
 "Settings.Modal.WipeAll.Label.Title" = "Wipe All Data";
 "Settings.Modal.WipeAll.Label.Content" = "Factory reset the Signer app. This operation can not be reverted!";
