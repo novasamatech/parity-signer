@@ -64,19 +64,21 @@ struct SeedPhraseView: View {
     }
 }
 
-struct SeedPhraseView_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack {
-            Spacer()
-            SeedPhraseView(
-                viewModel: PreviewData.seedPhraseViewModel
-            )
-            .padding(Spacing.large)
-            Spacer()
+#if DEBUG
+    struct SeedPhraseView_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack {
+                Spacer()
+                SeedPhraseView(
+                    viewModel: PreviewData.seedPhraseViewModel
+                )
+                .padding(Spacing.large)
+                Spacer()
+            }
+            .background(Asset.backgroundSecondary.swiftUIColor)
+            .frame(height: .infinity)
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
         }
-        .background(Asset.backgroundSecondary.swiftUIColor)
-        .frame(height: .infinity)
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif
