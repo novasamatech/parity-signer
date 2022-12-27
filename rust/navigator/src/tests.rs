@@ -597,7 +597,7 @@ fn export_import_addrs() {
 
     let selected = HashMap::from([("Alice".to_owned(), ExportedSet::All)]);
     let addrs = export_all_addrs(dbname_from, selected.clone()).unwrap();
-    let addrs = prepare_derivations_preview(dbname_from, addrs);
+    let addrs = prepare_derivations_preview(dbname_from, addrs).unwrap();
     let addrs = inject_derivations_has_pwd(addrs, alice_seeds.clone()).unwrap();
 
     let addrs_expected = vec![SeedKeysPreview {
@@ -685,7 +685,7 @@ fn export_import_addrs() {
         },
     );
     let addrs_filtered = export_all_addrs(dbname_from, selected_hashmap).unwrap();
-    let addrs_filtered = prepare_derivations_preview(dbname_from, addrs_filtered);
+    let addrs_filtered = prepare_derivations_preview(dbname_from, addrs_filtered).unwrap();
     let addrs_filtered = inject_derivations_has_pwd(addrs_filtered, alice_seeds.clone()).unwrap();
 
     let addrs_expected_filtered = vec![SeedKeysPreview {
@@ -715,7 +715,7 @@ fn export_import_addrs() {
     import_all_addrs(dbname_to, addrs).unwrap();
 
     let addrs_new = export_all_addrs(dbname_to, selected).unwrap();
-    let addrs_new = prepare_derivations_preview(dbname_from, addrs_new);
+    let addrs_new = prepare_derivations_preview(dbname_from, addrs_new).unwrap();
     let addrs_new = inject_derivations_has_pwd(addrs_new, alice_seeds).unwrap();
     assert_eq!(addrs_new, addrs_expected);
 }

@@ -236,15 +236,15 @@ pub fn base58_or_eth_to_multisigner(
 ) -> Result<MultiSigner> {
     match encryption {
         Encryption::Ed25519 => {
-            let pubkey = ed25519::Public::from_ss58check(base58_or_eth).unwrap();
+            let pubkey = ed25519::Public::from_ss58check(base58_or_eth)?;
             Ok(MultiSigner::Ed25519(pubkey))
         }
         Encryption::Sr25519 => {
-            let pubkey = sr25519::Public::from_ss58check(base58_or_eth).unwrap();
+            let pubkey = sr25519::Public::from_ss58check(base58_or_eth)?;
             Ok(MultiSigner::Sr25519(pubkey))
         }
         Encryption::Ethereum | Encryption::Ecdsa => {
-            let pubkey = ecdsa::Public::from_ss58check(base58_or_eth).unwrap();
+            let pubkey = ecdsa::Public::from_ss58check(base58_or_eth)?;
             Ok(MultiSigner::Ecdsa(pubkey))
         }
     }

@@ -22,6 +22,9 @@ pub enum Error {
     Wasm(#[from] crate::error_active::Wasm),
 
     #[error(transparent)]
+    Ss58(#[from] sp_core::crypto::PublicError),
+
+    #[error(transparent)]
     Io(#[from] std::io::Error),
 
     #[error(transparent)]

@@ -342,7 +342,7 @@ pub fn inject_derivations_has_pwd(
             }
             let seed_name = seed_name.unwrap();
             let seed_phrase = seeds.get(seed_name.as_str()).unwrap();
-            // create fixed-length string to avoid reallocations
+            // create fixed-length string to avoid reallocation
             let mut full_address = String::with_capacity(seed_phrase.len() + path.len());
             full_address.push_str(seed_phrase);
             full_address.push_str(path);
@@ -382,8 +382,7 @@ pub fn inject_derivations_has_pwd(
                 }
             };
             let multisigner =
-                base58_or_eth_to_multisigner(&derived_key.address, &derived_key.encryption)
-                    .unwrap();
+                base58_or_eth_to_multisigner(&derived_key.address, &derived_key.encryption)?;
             derived_key.has_pwd = Some(multisigner_pwdless != multisigner);
         }
     }

@@ -19,7 +19,7 @@ where
 {
     let data = unhex(data_hex)?;
     let export_info = <ExportAddrs>::decode(&mut &data[3..])?;
-    let import_info = prepare_derivations_preview(db_path, export_info);
+    let import_info = prepare_derivations_preview(db_path, export_info)?;
     let derivations_card = Card::Derivations(&import_info).card(&mut 0, 0);
     Ok(TransactionAction::Derivations {
         content: Box::new(TransactionCardSet {
@@ -29,7 +29,10 @@ where
     })
 }
 
-pub fn prepare_derivations_preview<P>(db_path: P, export_info: ExportAddrs) -> Vec<SeedKeysPreview>
+pub fn prepare_derivations_preview<P>(
+    db_path: P,
+    export_info: ExportAddrs,
+) -> Result<Vec<SeedKeysPreview>>
 where
     P: AsRef<Path>,
 {
@@ -38,43 +41,40 @@ where
     }
 }
 
-fn prepare_derivations_v1<P>(db_path: P, export_info: ExportAddrsV1) -> Vec<SeedKeysPreview>
+fn prepare_derivations_v1<P>(db_path: P, export_info: ExportAddrsV1) -> Result<Vec<SeedKeysPreview>>
 where
     P: AsRef<Path>,
 {
-    export_info
-        .addrs
-        .into_iter()
-        .map(|addr| SeedKeysPreview {
+    let mut result = Vec::new();
+    for addr in export_info.addrs {
+        let mut derived_keys = vec![];
+        for addr_info in addr.derived_keys {
+            let multisigner =
+                base58_or_eth_to_multisigner(&addr_info.address, &addr_info.encryption)?;
+            let identicon = make_identicon_from_multisigner(
+                &multisigner,
+                addr_info.encryption.identicon_style(),
+            );
+            let network_specs_key =
+                NetworkSpecsKey::from_parts(&addr_info.genesis_hash, &addr_info.encryption);
+            let network_title = get_network_specs(&db_path, &network_specs_key)
+                .map(|specs| specs.specs.title)
+                .ok();
+            derived_keys.push(DerivedKeyPreview {
+                address: addr_info.address.clone(),
+                derivation_path: addr_info.derivation_path.clone(),
+                identicon,
+                has_pwd: None, // unknown at this point
+                genesis_hash: addr_info.genesis_hash,
+                encryption: addr_info.encryption,
+                network_title,
+            })
+        }
+        result.push(SeedKeysPreview {
             name: addr.name,
             multisigner: addr.multisigner,
-            derived_keys: addr
-                .derived_keys
-                .iter()
-                .map(|addr_info| {
-                    let multisigner =
-                        base58_or_eth_to_multisigner(&addr_info.address, &addr_info.encryption)
-                            .unwrap();
-                    let identicon = make_identicon_from_multisigner(
-                        &multisigner,
-                        addr_info.encryption.identicon_style(),
-                    );
-                    let network_specs_key =
-                        NetworkSpecsKey::from_parts(&addr_info.genesis_hash, &addr_info.encryption);
-                    let network_title = get_network_specs(&db_path, &network_specs_key)
-                        .map(|specs| specs.specs.title)
-                        .ok();
-                    DerivedKeyPreview {
-                        address: addr_info.address.clone(),
-                        derivation_path: addr_info.derivation_path.clone(),
-                        identicon,
-                        has_pwd: None, // unknown at this point
-                        genesis_hash: addr_info.genesis_hash,
-                        encryption: addr_info.encryption,
-                        network_title,
-                    }
-                })
-                .collect(),
+            derived_keys,
         })
-        .collect()
+    }
+    Ok(result)
 }
