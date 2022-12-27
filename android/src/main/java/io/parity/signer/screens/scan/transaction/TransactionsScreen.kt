@@ -38,10 +38,11 @@ fun TransactionsScreen(
 	transactions: List<MTransaction>,
 	title: String,
 	signature: MSignatureReady?,
+	modifier: Modifier = Modifier,
 	onBack: Callback,
 	onFinish: Callback, //todo scan this leading to general state moving to Scan and it's crashing in selector
 ) {
-	Column(Modifier.fillMaxSize(1f)) {
+	Column(modifier.fillMaxSize(1f)) {
 		ScreenHeader(title = title, onBack = onBack)
 		Column(
 			Modifier.verticalScroll(rememberScrollState())

@@ -1,7 +1,6 @@
 package io.parity.signer.screens.scan
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -51,7 +50,11 @@ fun ScanNavSubgraph(
 	BackHandler(onBack = backAction)
 
 	transactionDetails.value?.let {
-		TransactionDetailsScreen(transaction = it, onBack = backAction)
+		TransactionDetailsScreen(
+			transaction = it,
+			modifier = Modifier.statusBarsPadding(),
+			onBack = backAction
+		)
 	} ?: run {
 		//Full screens
 		val transactionsValue = transactions.value
@@ -66,23 +69,22 @@ fun ScanNavSubgraph(
 			)
 		} else {
 			//ios/NativeSigner/Screens/Scan/CameraView.swift:130
-			Box(modifier = Modifier.statusBarsPadding()) {
-				TransactionsScreen(
-					transactions = transactionsValue.transactions,
-					title = transactionsValue.title,
-					signature = signature.value,
-					onBack = {
-						backendAction(Action.GO_BACK, "", "")
-						backAction()
-					},
-					onFinish = {
-						//todo scan
-						scanViewModel.proceedTransactionAction()
-						rootNavigator.navigate(Action.GO_FORWARD)
-						scanViewModel.clearTransactionState()
-					},
-				)
-			}
+			TransactionsScreen(
+				transactions = transactionsValue.transactions,
+				title = transactionsValue.title,
+				signature = signature.value,
+				modifier = Modifier.statusBarsPadding(),
+				onBack = {
+					backendAction(Action.GO_BACK, "", "")
+					backAction()
+				},
+				onFinish = {
+					//todo scan
+					scanViewModel.proceedTransactionAction()
+					rootNavigator.navigate(Action.GO_FORWARD)
+					scanViewModel.clearTransactionState()
+				},
+			)
 		}
 
 		//Bottom sheets
