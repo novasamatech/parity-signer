@@ -39,7 +39,6 @@ struct MenuStack<Content: View>: View {
             .padding(.horizontal, 12)
             .padding(.bottom, 24.0)
             .background(Asset.backgroundPrimary.swiftUIColor)
-            .cornerRadius(radius: 8, corners: [.topLeft, .topRight])
             .shadow(color: Color(red: 0.0, green: 0.0, blue: 0.0, opacity: 0.2), radius: 32, x: 0, y: -16)
         }
     }

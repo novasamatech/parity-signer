@@ -41,36 +41,38 @@ struct Identicon: View {
     }
 }
 
-// swiftlint: disable all
-struct Identicon_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(alignment: .center, spacing: 10) {
-            Identicon(identicon: PreviewData.exampleIdenticon)
-            Identicon(
-                identicon: try! Data(
-                    contentsOf: Bundle.main.url(
-                        forResource: "identicon_example",
-                        withExtension: "svg"
-                    )!
-                ),
-                rowHeight: 200
-            )
+#if DEBUG
+    // swiftlint: disable all
+    struct Identicon_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack(alignment: .center, spacing: 10) {
+                Identicon(identicon: PreviewData.exampleIdenticon)
+                Identicon(
+                    identicon: try! Data(
+                        contentsOf: Bundle.main.url(
+                            forResource: "identicon_example",
+                            withExtension: "svg"
+                        )!
+                    ),
+                    rowHeight: 200
+                )
+            }
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
+            VStack(alignment: .center, spacing: 10) {
+                Identicon(
+                    identicon: try! Data(
+                        contentsOf: Bundle.main.url(
+                            forResource: "identicon_example",
+                            withExtension: "svg"
+                        )!
+                    ),
+                    rowHeight: nil
+                )
+            }
+            .frame(maxWidth: 150)
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
         }
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-        VStack(alignment: .center, spacing: 10) {
-            Identicon(
-                identicon: try! Data(
-                    contentsOf: Bundle.main.url(
-                        forResource: "identicon_example",
-                        withExtension: "svg"
-                    )!
-                ),
-                rowHeight: nil
-            )
-        }
-        .frame(maxWidth: 150)
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif
