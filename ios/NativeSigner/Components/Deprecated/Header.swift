@@ -47,16 +47,6 @@ struct Header: View {
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .font(screenNameType == .h1 ? PrimaryFont.titleM.font : PrimaryFont.labelM.font)
                     .tracking(0.1)
-                if rightButton == .multiSelect {
-                    Button(
-                        action: {
-                            navigation.perform(navigation: .init(action: .selectAll))
-                        },
-                        label: {
-                            SmallButton(text: Localizable.selectAll.key)
-                        }
-                    )
-                }
                 Spacer()
                 HStack(spacing: 8.0) {
                     Spacer()
@@ -66,9 +56,8 @@ struct Header: View {
                         },
                         label: {
                             switch rightButton {
-                            case .multiSelect:
-                                EmptyView()
-                            case .none:
+                            case .none,
+                                 .multiSelect:
                                 EmptyView()
                             default:
                                 Image(.ellipsis)
@@ -86,7 +75,7 @@ struct Header: View {
             }
         }
         .frame(height: 32.0)
-        .padding(.all, 8.0)
+        .padding(Spacing.extraSmall)
     }
 }
 

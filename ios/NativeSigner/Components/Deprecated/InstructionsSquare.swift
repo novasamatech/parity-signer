@@ -31,9 +31,3 @@ struct InstructionsSquare: View {
         )
     }
 }
-
-// struct InstructionsSquare_Previews: PreviewProvider {
-//    static var previews: some View {
-//        InstructionsSquare()
-//    }
-// }
