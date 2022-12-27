@@ -27,11 +27,7 @@ struct ScreenSelector: View {
         case let .keys(value):
             KeyDetailsView(
                 viewModel: .init(
-                    keyName: value.root.address.seedName,
-                    exportPrivateKeyService: PrivateKeyQRCodeService(
-                        navigation: navigation,
-                        keys: value
-                    )
+                    keyName: value.root.address.seedName
                 ),
                 forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
                 resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)

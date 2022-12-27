@@ -43,7 +43,7 @@ extension KeyDetailsView {
 
         init(
             keyName: String,
-            exportPrivateKeyService: PrivateKeyQRCodeService,
+            exportPrivateKeyService: PrivateKeyQRCodeService = PrivateKeyQRCodeService(),
             keyDetailsService: KeyDetailsService = KeyDetailsService()
         ) {
             self.keyName = keyName
@@ -131,7 +131,6 @@ extension KeyDetailsView.ViewModel {
                     self.isPresentingConnectivityAlert.toggle()
                 }
             } else {
-                KeyDetailsView.backupModalViewModel = exportPrivateKeyService.backupViewModel()
                 isShowingBackupModal.toggle()
             }
         }
@@ -139,6 +138,10 @@ extension KeyDetailsView.ViewModel {
             shouldPresentSelectionOverlay.toggle()
             isPresentingSelectionOverlay.toggle()
         }
+    }
+
+    func backupViewModel() -> BackupModalViewModel? {
+        exportPrivateKeyService.backupViewModel(keysData)
     }
 
     func keyExportModel() -> ExportMultipleKeysModalViewModel? {
