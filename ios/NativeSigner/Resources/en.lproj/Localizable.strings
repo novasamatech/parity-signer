@@ -476,6 +476,14 @@
 "Settings.NetworkDetails.DeleteMetadata.Action.Cancel" = "Cancel";
 "Settings.NetworkDetails.DeleteMetadata.Label.Confirmation" = "Metadata %@ Has Been Removed";
 
+"Settings.NetworkDetails.More.Action.Sign" = "Sign Network Specs";
+"Settings.NetworkDetails.More.Action.Delete" = "Delete network";
+"Settings.NetworkDetails.More.Delete.Label.Title" = "Remove Network?";
+"Settings.NetworkDetails.More.Delete.Label.Content" = "This network will be removed for whole device";
+"Settings.NetworkDetails.More.Delete.Action.Remove" = "Remove";
+"Settings.NetworkDetails.More.Delete.Action.Cancel" = "Cancel";
+"Settings.NetworkDetails.DeleteNetwork.Label.Confirmation" = "Network %@ Has Been Removed";
+
 "Settings.Modal.WipeAll.Label.Title" = "Wipe All Data";
 "Settings.Modal.WipeAll.Label.Content" = "Factory reset the Signer app. This operation can not be reverted!";
 "Settings.Modal.WipeAll.Action.Wipe" = "Remove";

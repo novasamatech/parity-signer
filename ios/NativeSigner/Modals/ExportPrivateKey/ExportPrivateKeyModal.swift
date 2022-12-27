@@ -25,6 +25,7 @@ struct ExportPrivateKeyModal: View {
                 animateDismissal()
             },
             animateBackground: $animateBackground,
+            safeAreaInsetsMode: .full,
             content: {
                 VStack(alignment: .center) {
                     // Header with X button
