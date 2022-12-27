@@ -323,6 +323,5 @@ pub(crate) fn make_author_info(
             has_pwd: address_details.has_pwd,
             secret_exposed: address_details.secret_exposed,
         },
-        multiselect: None,
     }
 }

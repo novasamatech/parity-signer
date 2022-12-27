@@ -12,7 +12,7 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
 use definitions::navigation::{MAddressCard, MKeyAndNetworkCard, MKeysNew, QrData, SignerImage};
-use definitions::network_specs::{self, NetworkSpecs};
+use definitions::network_specs::NetworkSpecs;
 use definitions::{
     crypto::Encryption,
     helpers::{
@@ -205,7 +205,6 @@ pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<
             base58: print_multisigner_as_base58_or_eth(&root.0, None, root.1.encryption),
             address_key,
             address,
-            multiselect: None,
         }
     });
 
@@ -235,7 +234,6 @@ pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<
                 base58,
                 address_key,
                 swiped: false,
-                multiselect: false,
             };
             let network_specs_key = NetworkSpecsKey::from_parts(
                 &network_specs.specs.genesis_hash,
@@ -311,7 +309,6 @@ where
                 address_key: hex::encode(address_key.key()),
                 base58,
                 swiped,
-                multiselect,
             });
         } else {
             other_id.push((multisigner, address_details, identicon, swiped, multiselect))
@@ -327,7 +324,7 @@ where
     let set: Vec<_> = other_id
         .into_iter()
         .map(
-            |(multisigner, address_details, identicon, swiped, multiselect)| MKeysCard {
+            |(multisigner, address_details, identicon, swiped, _multiselect)| MKeysCard {
                 address_key: hex::encode(AddressKey::from_multisigner(&multisigner).key()),
                 base58: print_multisigner_as_base58_or_eth(
                     &multisigner,
@@ -342,7 +339,6 @@ where
                     secret_exposed: address_details.secret_exposed,
                 },
                 swiped,
-                multiselect,
             },
         )
         .collect();
@@ -450,30 +446,13 @@ pub fn export_key<P>(
     db_path: P,
     multisigner: &MultiSigner,
     expected_seed_name: &str,
-    network_specs_key: Option<&NetworkSpecsKey>,
+    network_specs_key: &NetworkSpecsKey,
 ) -> Result<MKeyDetails>
 where
     P: AsRef<Path>,
 {
-    let (network_info, base58, network_specs) = if let Some(network_specs_key) = network_specs_key {
-        let ordered_network_specs = get_network_specs(&db_path, network_specs_key)?;
-        let network_specs = ordered_network_specs.specs;
-
-        let network_info = MSCNetworkInfo {
-            network_title: network_specs.title.clone(),
-            network_logo: network_specs.logo.clone(),
-            network_specs_key: hex::encode(network_specs_key.key()),
-        };
-        let base58 = print_multisigner_as_base58_or_eth(
-            multisigner,
-            Some(network_specs.base58prefix),
-            network_specs.encryption,
-        );
-
-        (Some(network_info), Some(base58), Some(network_specs))
-    } else {
-        (None, None, None)
-    };
+    let ordered_network_specs = get_network_specs(&db_path, network_specs_key)?;
+    let network_specs = ordered_network_specs.specs;
     let address_key = AddressKey::from_multisigner(multisigner);
     let address_details = get_address_details(&db_path, &address_key)?;
     if address_details.seed_name != expected_seed_name {
@@ -483,42 +462,37 @@ where
             real_seed_name: address_details.seed_name,
         });
     }
-    let public_key = multisigner_to_public(multisigner);
-    let identicon = make_identicon_from_multisigner(
+    let base58 = print_multisigner_as_base58_or_eth(
         multisigner,
-        network_specs
-            .as_ref()
-            .map(|n| n.encryption.identicon_style())
-            .unwrap_or_else(|| IdenticonStyle::Dots),
+        Some(network_specs.base58prefix),
+        network_specs.encryption,
     );
-    let qr = if let (Some(network_specs_key), Some(network_specs), Some(base58)) =
-        (network_specs_key, &network_specs, &base58)
-    {
-        if address_details.network_id.contains(network_specs_key) {
-            let prefix = if network_specs.encryption == Encryption::Ethereum {
-                "ethereum"
-            } else {
-                "substrate"
-            };
-            Some(QrData::Regular {
-                data: format!(
-                    "{}:{}:0x{}",
-                    prefix,
-                    base58,
-                    hex::encode(network_specs.genesis_hash)
-                )
-                .as_bytes()
-                .to_vec(),
-            })
+    let public_key = multisigner_to_public(multisigner);
+    let identicon =
+        make_identicon_from_multisigner(multisigner, network_specs.encryption.identicon_style());
+    let qr = if address_details.network_id.contains(network_specs_key) {
+        let prefix = if network_specs.encryption == Encryption::Ethereum {
+            "ethereum"
         } else {
-            return Err(Error::NetworkSpecsKeyForAddressNotFound {
-                network_specs_key: network_specs_key.to_owned(),
-                address_key,
-            });
+            "substrate"
+        };
+        QrData::Regular {
+            data: format!(
+                "{}:{}:0x{}",
+                prefix,
+                base58,
+                hex::encode(network_specs.genesis_hash)
+            )
+            .as_bytes()
+            .to_vec(),
         }
     } else {
-        None
+        return Err(Error::NetworkSpecsKeyForAddressNotFound {
+            network_specs_key: network_specs_key.to_owned(),
+            address_key,
+        });
     };
+
     let address = Address {
         path: address_details.path,
         has_pwd: address_details.has_pwd,
@@ -526,12 +500,17 @@ where
         seed_name: address_details.seed_name,
         secret_exposed: address_details.secret_exposed,
     };
+
+    let network_info = MSCNetworkInfo {
+        network_title: network_specs.title,
+        network_logo: network_specs.logo,
+        network_specs_key: hex::encode(network_specs_key.key()),
+    };
     Ok(MKeyDetails {
         qr,
         pubkey: hex::encode(public_key),
         network_info,
         base58,
-        multiselect: None,
         address,
     })
 }
@@ -631,7 +610,6 @@ where
                     seed_name,
                     secret_exposed: address_details.secret_exposed,
                 },
-                multiselect: None,
             };
 
             NavDerivationCheck {
@@ -731,7 +709,6 @@ where
                             seed_name: seed_name.to_string(),
                             secret_exposed: address_details.secret_exposed,
                         },
-                        multiselect: None,
                     };
                     NavDerivationCheck {
                         button_good: false,

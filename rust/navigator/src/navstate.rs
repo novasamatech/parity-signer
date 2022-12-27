@@ -1488,31 +1488,21 @@ impl State {
                         keys_state.get_swiped_key(),
                         keys_state.get_multiselect_keys(),
                     )?;
-                let multiselect_mode = keys_state.is_multiselect();
-                let multiselect_count = if let SpecialtyKeysState::MultiSelect(ref multiselect) =
-                    keys_state.get_specialty()
-                {
-                    multiselect.len().to_string()
-                } else {
-                    String::new()
-                };
                 let network = MNetworkCard { title, logo };
-                let f = MKeys {
-                    set,
-                    root,
-                    network,
-                    multiselect_mode,
-                    multiselect_count,
-                };
+                let f = MKeys { set, root, network };
                 ScreenData::Keys { f }
             }
             Screen::KeyDetails(ref address_state) => {
-                let f = db_handling::interface_signer::export_key(
-                    dbname,
-                    &address_state.multisigner(),
-                    &address_state.seed_name(),
-                    address_state.network_specs_key().as_ref(),
-                )?;
+                let f = if let Some(key) = address_state.network_specs_key().as_ref() {
+                    Some(db_handling::interface_signer::export_key(
+                        dbname,
+                        &address_state.multisigner(),
+                        &address_state.seed_name(),
+                        key,
+                    )?)
+                } else {
+                    None
+                };
                 ScreenData::KeyDetails { f }
             }
             Screen::KeyDetailsMulti(ref address_state_multi) => {
@@ -1520,7 +1510,7 @@ impl State {
                     dbname,
                     &address_state_multi.multisigner(),
                     &address_state_multi.seed_name(),
-                    Some(&address_state_multi.network_specs_key()),
+                    &address_state_multi.network_specs_key(),
                 )?;
                 let f = MKeyDetailsMulti {
                     key_details,

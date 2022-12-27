@@ -12,6 +12,7 @@ use db_handling::{
     identities::get_multisigner_by_address,
     interface_signer::{first_network, SeedDraft},
 };
+use definitions::navigation::MAddressCard;
 use definitions::{
     crypto::Encryption,
     helpers::{make_identicon_from_multisigner, multisigner_to_public, IdenticonStyle},
@@ -19,7 +20,6 @@ use definitions::{
     navigation::Address,
     users::AddressDetails,
 };
-use definitions::{navigation::MAddressCard, network_specs};
 use transaction_signing;
 
 const MAX_COUNT_SET: u8 = 3;
@@ -441,7 +441,6 @@ impl SufficientCryptoState {
                 has_pwd: address_details.has_pwd,
                 secret_exposed: address_details.secret_exposed,
             },
-            multiselect: None,
         };
         Self {
             key_selected: Some((

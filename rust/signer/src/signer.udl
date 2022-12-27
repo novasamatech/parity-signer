@@ -269,8 +269,6 @@ dictionary MKeys {
     sequence<MKeysCard> set;
     MKeysCard root;
     MNetworkCard network;
-    boolean multiselect_mode;
-    string multiselect_count;
 };
 
 dictionary MKeysCard {
@@ -278,7 +276,6 @@ dictionary MKeysCard {
     string address_key;
     string base58;
     boolean swiped;
-    boolean multiselect;
 };
 
 dictionary MSettings {
@@ -362,12 +359,11 @@ interface QrData {
 };
 
 dictionary MKeyDetails {
-    QrData? qr;
+    QrData qr;
     string pubkey;
-    MSCNetworkInfo? network_info;
+    MSCNetworkInfo network_info;
     Address address;
-    string? base58;
-    boolean? multiselect;
+    string base58;
 };
 
 dictionary MNewSeed {
@@ -417,7 +413,6 @@ dictionary MAddressCard {
     string base58;
     string address_key;
     Address address;
-    boolean? multiselect;
 };
 
 enum DerivationDestination {
@@ -500,7 +495,7 @@ interface ScreenData {
     LogDetails(MLogDetails f);
     Transaction(sequence<MTransaction> f);
     SeedSelector(MSeeds f);
-    KeyDetails(MKeyDetails f);
+    KeyDetails(MKeyDetails? f);
     NewSeed(MNewSeed f);
     RecoverSeedName(MRecoverSeedName f);
     RecoverSeedPhrase(MRecoverSeedPhrase f);

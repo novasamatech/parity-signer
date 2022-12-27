@@ -1653,15 +1653,14 @@ where
         .apply(&db_path)?;
 
     Ok(MKeyDetails {
-        qr: Some(qr),
+        qr,
         pubkey: hex::encode(public_key),
-        network_info: Some(network_info),
-        base58: Some(print_multisigner_as_base58_or_eth(
+        network_info,
+        base58: print_multisigner_as_base58_or_eth(
             multisigner,
             Some(network_specs.specs.base58prefix),
             address_details.encryption,
-        )),
-        multiselect: None,
+        ),
         address,
     })
 }

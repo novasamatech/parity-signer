@@ -2304,7 +2304,6 @@ fn flow_test_1() {
                         seed_name: "Portia".to_string(),
                     },
                     swiped: false,
-                    multiselect: false,
                 }],
                 root: MKeysCard {
                     address: Address {
@@ -2317,14 +2316,11 @@ fn flow_test_1() {
                     address_key: String::new(),
                     base58: String::new(),
                     swiped: false,
-                    multiselect: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
                     logo: "polkadot".to_string(),
                 },
-                multiselect_mode: false,
-                multiselect_count: String::new(),
             },
         },
         modal_data: None,
@@ -3089,7 +3085,6 @@ fn flow_test_1() {
                         secret_exposed: false,
                     },
                     swiped: false,
-                    multiselect: false,
                 }],
                 // since root == 'false' in state.perform above.
                 // TODO: This has to be wrapped with Option<_>.
@@ -3107,8 +3102,6 @@ fn flow_test_1() {
                     title: "Polkadot".to_string(),
                     logo: "polkadot".to_string(),
                 },
-                multiselect_mode: false,
-                multiselect_count: String::new(),
             },
         },
         modal_data: None,
@@ -3211,7 +3204,6 @@ fn flow_test_1() {
                     secret_exposed: false,
                 },
                 base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
-                multiselect: None,
                 network_info: MSCNetworkInfo {
                     network_title: "Polkadot".to_string(),
                     network_logo: "polkadot".to_string(),
@@ -3353,7 +3345,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3370,7 +3361,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                 ],
                 // since root == 'false' in state.perform above.
@@ -3389,8 +3379,6 @@ fn flow_test_1() {
                     title: "Polkadot".to_string(),
                     logo: "polkadot".to_string(),
                 },
-                multiselect_mode: false,
-                multiselect_count: String::new(),
             },
         },
         modal_data: None,
@@ -3436,14 +3424,12 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
                             "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                                 .to_string(),
                         base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
-                        multiselect: false,
                         swiped: false,
                         address: Address {
                             identicon: SignerImage::Png {
@@ -3471,14 +3457,11 @@ fn flow_test_1() {
                         has_pwd: false,
                     },
                     swiped: false,
-                    multiselect: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
                     logo: "polkadot".to_string(),
                 },
-                multiselect_mode: false,
-                multiselect_count: String::new(),
             },
         },
         modal_data: None,
@@ -3556,7 +3539,6 @@ fn flow_test_1() {
                             secret_exposed: false,
                             seed_name: "Alice".to_string(),
                         },
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -3564,7 +3546,6 @@ fn flow_test_1() {
                                 .to_string(),
                         base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
                         swiped: false,
-                        multiselect: false,
                         address: Address {
                             identicon: SignerImage::Png {
                                 image: alice_sr_polkadot().to_vec(),
@@ -3591,14 +3572,11 @@ fn flow_test_1() {
                             .to_string(),
                     base58: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_string(),
                     swiped: false,
-                    multiselect: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
                     logo: "polkadot".to_string(),
                 },
-                multiselect_mode: false,
-                multiselect_count: String::new(),
             },
         },
         modal_data: Some(ModalData::SeedMenu {
@@ -3943,7 +3921,6 @@ fn flow_test_1() {
                         seed_name: "Alice".to_string(),
                     },
                     swiped: false,
-                    multiselect: false,
                 }],
                 root: MKeysCard {
                     address: Address {
@@ -3959,8 +3936,6 @@ fn flow_test_1() {
                     title: "Westend".to_string(),
                     logo: "westend".to_string(),
                 },
-                multiselect_mode: false,
-                multiselect_count: String::new(),
             },
         },
         modal_data: None,
@@ -4070,7 +4045,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4087,7 +4061,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4104,7 +4077,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4121,7 +4093,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4138,7 +4109,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4155,7 +4125,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                 ],
                 root: MKeysCard {
@@ -4171,14 +4140,11 @@ fn flow_test_1() {
                     address_key: String::new(),
                     base58: String::new(),
                     swiped: false,
-                    multiselect: false,
                 },
                 network: MNetworkCard {
                     title: "Westend".to_string(),
                     logo: "westend".to_string(),
                 },
-                multiselect_mode: false,
-                multiselect_count: String::new(),
             },
         },
         modal_data: None,
@@ -4331,7 +4297,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4348,7 +4313,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4364,8 +4328,6 @@ fn flow_test_1() {
                             secret_exposed: false,
                             seed_name: "Alice".to_string(),
                         },
-                        swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4382,7 +4344,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4399,7 +4360,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4416,7 +4376,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4433,7 +4392,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                 ],
                 root: MKeysCard {
@@ -4450,8 +4408,6 @@ fn flow_test_1() {
                     title: "Westend".to_string(),
                     logo: "westend".to_string(),
                 },
-                multiselect_mode: false,
-                multiselect_count: String::new(),
             },
         },
         modal_data: None,
@@ -4490,7 +4446,6 @@ fn flow_test_1() {
                     seed_name: "Alice".to_string(),
                 },
                 swiped: false,
-                multiselect: false,
             },
         );
     }
@@ -4509,11 +4464,7 @@ fn flow_test_1() {
         )
         .unwrap();
 
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
-        f.set[4].multiselect = true;
-        f.multiselect_mode = true;
-        f.multiselect_count = "1".to_string();
-    };
+    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {};
     expected_action.right_button = Some(RightButton::MultiSelect);
 
     assert_eq!(
@@ -4529,11 +4480,7 @@ fn flow_test_1() {
             "",
         )
         .unwrap();
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
-        f.set[1].multiselect = true;
-        f.multiselect_mode = true;
-        f.multiselect_count = "2".to_string();
-    };
+    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {};
 
     assert_eq!(
         action, expected_action,
@@ -4548,10 +4495,7 @@ fn flow_test_1() {
             "",
         )
         .unwrap();
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
-        f.set[1].multiselect = false;
-        f.multiselect_count = "1".to_string();
-    };
+    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {};
 
     assert_eq!(
         action, expected_action,
@@ -4566,10 +4510,7 @@ fn flow_test_1() {
             "",
         )
         .unwrap();
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
-        f.set[4].multiselect = false;
-        f.multiselect_count = "0".to_string();
-    }
+    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {}
 
     assert_eq!(
         action, expected_action,
@@ -4622,8 +4563,6 @@ fn flow_test_1() {
         f.set.remove(1);
         f.set.remove(2);
         f.set.remove(3);
-        f.multiselect_count = "".to_string();
-        f.multiselect_mode = false;
     }
     expected_action.right_button = Some(RightButton::Backup);
     assert_eq!(
@@ -4641,13 +4580,7 @@ fn flow_test_1() {
     // select all
     let action = state.perform(Action::SelectAll, "", "").unwrap();
 
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
-        for entry in f.set.iter_mut() {
-            entry.multiselect = true;
-        }
-        f.multiselect_count = "3".to_string();
-        f.multiselect_mode = true;
-    }
+    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {}
     expected_action.right_button = Some(RightButton::MultiSelect);
 
     assert_eq!(
@@ -4659,11 +4592,7 @@ fn flow_test_1() {
     let action = state.perform(Action::SelectAll, "", "").unwrap();
 
     if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
-        for entry in f.set.iter_mut() {
-            entry.multiselect = false;
-        }
-        f.multiselect_count = "0".to_string();
-        f.multiselect_mode = true;
+        for entry in f.set.iter_mut() {}
     }
     assert_eq!(
         action, expected_action,
@@ -4671,10 +4600,7 @@ fn flow_test_1() {
     );
     // exit multiselect mode
     let action = state.perform(Action::GoBack, "", "").unwrap();
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
-        f.multiselect_count = "".to_string();
-        f.multiselect_mode = false;
-    }
+    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {}
     expected_action.right_button = Some(RightButton::Backup);
     assert_eq!(
         action, expected_action,
@@ -4725,7 +4651,6 @@ fn flow_test_1() {
                         has_pwd: false,
                         secret_exposed: false,
                     },
-                    multiselect: None,
                     network_info: MSCNetworkInfo {
                         network_title: "Westend".to_string(),
                         network_logo: "westend".to_string(),
@@ -4781,7 +4706,6 @@ fn flow_test_1() {
                         has_pwd: false,
                         secret_exposed: false,
                     },
-                    multiselect: None,
                     base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
                     network_info: MSCNetworkInfo {
                         network_title: "Westend".to_string(),
@@ -4831,7 +4755,6 @@ fn flow_test_1() {
                     pubkey: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    multiselect: None,
                     address: Address {
                         identicon: SignerImage::Png {
                             image: alice_sr_alice().to_vec(),
@@ -4964,7 +4887,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4981,7 +4903,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -4998,7 +4919,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                 ],
                 root: MKeysCard {
@@ -5016,14 +4936,11 @@ fn flow_test_1() {
                             .to_string(),
                     base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
                     swiped: false,
-                    multiselect: false,
                 },
                 network: MNetworkCard {
                     title: "Westend".to_string(),
                     logo: "westend".to_string(),
                 },
-                multiselect_mode: false,
-                multiselect_count: String::new(),
             },
         },
         modal_data: None,
@@ -5046,14 +4963,7 @@ fn flow_test_1() {
     // select all
     let action = state.perform(Action::SelectAll, "", "").unwrap();
 
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
-        for entry in f.set.iter_mut() {
-            entry.multiselect = true;
-        }
-        f.multiselect_count = "4".to_string();
-        f.multiselect_mode = true;
-        f.root.multiselect = true;
-    }
+    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {}
     expected_action.right_button = Some(RightButton::MultiSelect);
 
     assert_eq!(
@@ -5101,7 +5011,6 @@ fn flow_test_1() {
                     has_pwd: false,
                     secret_exposed: false,
                 },
-                multiselect: None,
                 network_info: MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
@@ -5181,7 +5090,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                     MKeysCard {
                         address_key:
@@ -5198,7 +5106,6 @@ fn flow_test_1() {
                             seed_name: "Alice".to_string(),
                         },
                         swiped: false,
-                        multiselect: false,
                     },
                 ],
                 root: MKeysCard {
@@ -5216,14 +5123,11 @@ fn flow_test_1() {
                             .to_string(),
                     base58: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_string(),
                     swiped: false,
-                    multiselect: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
                     logo: "polkadot".to_string(),
                 },
-                multiselect_mode: false,
-                multiselect_count: String::new(),
             },
         },
         modal_data: Some(ModalData::Backup {
@@ -5476,7 +5380,6 @@ fn flow_test_1() {
 
                     secret_exposed: false,
                 },
-                multiselect: None,
             },
             sufficient: vec![],
             content: MSCContent::AddSpecs {
@@ -5780,7 +5683,6 @@ fn flow_test_1() {
                         has_pwd: false,
                         secret_exposed: false,
                     },
-                    multiselect: None,
                 },
                 sufficient: vec![],
                 content: MSCContent::LoadMetadata {
@@ -5899,7 +5801,6 @@ fn flow_test_1() {
                     .to_string(),
                 base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                     .to_string(),
-                multiselect: None,
                 address: Address {
                     identicon: SignerImage::Png {
                         image: alice_sr_root().to_vec(),
@@ -6196,7 +6097,6 @@ fn flow_test_1() {
                     address_key:
                         "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
                             .to_string(),
-                    multiselect: None,
                     address: Address {
                         identicon: SignerImage::Png {
                             image: alice_sr_alice_secret_secret().to_vec(),
@@ -6365,7 +6265,6 @@ fn flow_test_1() {
                         has_pwd: false,
                         secret_exposed: false,
                     },
-                    multiselect: None,
                 }),
                 network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -6565,7 +6464,6 @@ fn flow_test_1() {
                     address_key: String::new(),
                     base58: String::new(),
                     swiped: false,
-                    multiselect: false,
                     address: Address {
                         identicon: SignerImage::default(),
                         has_pwd: false,
@@ -6585,14 +6483,11 @@ fn flow_test_1() {
                     address_key: String::new(),
                     base58: String::new(),
                     swiped: false,
-                    multiselect: false,
                 },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
                     logo: "polkadot".to_string(),
                 },
-                multiselect_mode: false,
-                multiselect_count: String::new(),
             },
         },
         modal_data: None,
@@ -6631,7 +6526,6 @@ fn flow_test_1() {
                     address_key: String::new(),
                     base58: String::new(),
                     swiped: false,
-                    multiselect: false,
                     address: Address {
                         identicon: SignerImage::default(),
                         has_pwd: false,
@@ -6651,8 +6545,6 @@ fn flow_test_1() {
                     title: "Westend".to_string(),
                     logo: "westend".to_string(),
                 },
-                multiselect_mode: false,
-                multiselect_count: String::new(),
             },
         },
         modal_data: None,
@@ -6829,7 +6721,6 @@ fn flow_test_1() {
                 author_info: Some(MAddressCard {
                     address_key: "01".to_string() + &pepper_westend_public,
                     base58: pepper_westend_base58,
-                    multiselect: None,
                     address: Address {
                         identicon: pepper_westend_identicon,
                         seed_name: "Pepper".to_string(),
@@ -7000,7 +6891,6 @@ fn flow_test_1() {
                     address_key: String::new(),
                     base58: String::new(),
                     swiped: false,
-                    multiselect: false,
                     address: Address {
                         identicon: SignerImage::default(),
                         has_pwd: true,
@@ -7020,8 +6910,6 @@ fn flow_test_1() {
                     title: "Westend".to_string(),
                     logo: "westend".to_string(),
                 },
-                multiselect_mode: false,
-                multiselect_count: String::new(),
             },
         },
         modal_data: None,
@@ -7064,7 +6952,6 @@ fn flow_test_1() {
                 author_info: Some(MAddressCard {
                     address_key: "01".to_string() + &pepper_key0_public,
                     base58: pepper_key0_base58.clone(),
-                    multiselect: None,
                     address: Address {
                         identicon: pepper_key0_identicon.clone(),
                         seed_name: "Pepper".to_string(),
@@ -7106,7 +6993,6 @@ fn flow_test_1() {
             author_info: MAddressCard {
                 base58: pepper_key0_base58.clone(),
                 address_key: "01".to_string() + &pepper_key0_public,
-                multiselect: None,
                 address: Address {
                     identicon: pepper_key0_identicon.clone(),
                     seed_name: "Pepper".to_string(),
@@ -7132,7 +7018,6 @@ fn flow_test_1() {
             author_info: MAddressCard {
                 address_key: "01".to_string() + &pepper_key0_public,
                 base58: pepper_key0_base58.clone(),
-                multiselect: None,
                 address: Address {
                     identicon: pepper_key0_identicon.clone(),
                     seed_name: "Pepper".to_string(),
@@ -7160,7 +7045,6 @@ fn flow_test_1() {
             author_info: MAddressCard {
                 address_key: "01".to_string() + &pepper_key0_public,
                 base58: pepper_key0_base58,
-                multiselect: None,
                 address: Address {
                     identicon: pepper_key0_identicon,
                     seed_name: "Pepper".to_string(),
