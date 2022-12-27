@@ -40,6 +40,7 @@ struct BackupModal: View {
             },
             animateBackground: $animateBackground,
             ignoredEdges: .bottom,
+            safeAreaInsetsMode: .full,
             content: {
                 VStack(alignment: .center, spacing: 0) {
                     // Header with X button
