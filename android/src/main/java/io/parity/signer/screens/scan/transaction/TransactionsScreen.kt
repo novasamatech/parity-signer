@@ -1,9 +1,6 @@
 package io.parity.signer.screens.scan.transaction
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -44,7 +41,7 @@ fun TransactionsScreen(
 	onBack: Callback,
 	onFinish: Callback, //todo scan this leading to general state moving to Scan and it's crashing in selector
 ) {
-	Column(Modifier.fillMaxWidth()) {
+	Column(Modifier.fillMaxSize(1f)) {
 		ScreenHeader(title = title, onBack = onBack)
 		Column(
 			Modifier.verticalScroll(rememberScrollState())
@@ -57,6 +54,7 @@ fun TransactionsScreen(
 			signature?.let {
 				QrSignatureData(it)
 			}
+			Spacer(modifier = Modifier.weight(1f))
 			ActionButtons(
 				transactions,
 				onBack,
