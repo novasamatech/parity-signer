@@ -19,9 +19,7 @@ struct NetworkSettingsDetails: View {
                     rightButton: .more,
                     backgroundColor: Asset.backgroundSystem.swiftUIColor
                 ),
-                actionModel: .init(rightBarMenuAction: {
-                    navigation.perform(navigation: .init(action: .rightButtonAction))
-                })
+                actionModel: .init(rightBarMenuAction: viewModel.onMoreMenuTap)
             )
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
@@ -42,49 +40,10 @@ struct NetworkSettingsDetails: View {
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                         .padding(.leading, Spacing.large)
                         .padding(.bottom, Spacing.extraSmall)
-                    VStack(alignment: .leading, spacing: Spacing.small) {
-                        rowWrapper(
-                            Localizable.Settings.NetworkDetails.Label.name.string,
-                            viewModel.networkDetails.name
-                        )
-                        rowWrapper(
-                            Localizable.Settings.NetworkDetails.Label.basePrefix.string,
-                            String(viewModel.networkDetails.base58prefix)
-                        )
-                        rowWrapper(
-                            Localizable.Settings.NetworkDetails.Label.decimals.string,
-                            String(viewModel.networkDetails.decimals)
-                        )
-                        rowWrapper(
-                            Localizable.Settings.NetworkDetails.Label.unit.string,
-                            viewModel.networkDetails.unit
-                        )
-                        verticalRowWrapper(
-                            Localizable.Settings.NetworkDetails.Label.genesisHash.string,
-                            viewModel.networkDetails.genesisHash.formattedAsString
-                        )
-                        switch viewModel.networkDetails.currentVerifier.ttype {
-                        case "general":
-                            generalVerifier(viewModel.networkDetails.currentVerifier)
-                        case "custom":
-                            customVerifier(viewModel.networkDetails.currentVerifier)
-                        case "none":
-                            rowWrapper(
-                                Localizable.Settings.NetworkDetails.Label.verifier.string,
-                                Localizable.Settings.NetworkDetails.Label.Verifier.none.string,
-                                isLast: true
-                            )
-                        default:
-                            rowWrapper(
-                                Localizable.Settings.NetworkDetails.Label.verifier.string,
-                                Localizable.Settings.NetworkDetails.Label.Verifier.unknown.string,
-                                isLast: true
-                            )
-                        }
-                    }
-                    .verticalRoundedBackgroundContainer()
-                    .padding(.horizontal, Spacing.extraSmall)
-                    .font(PrimaryFont.bodyL.font)
+                    networkSpecs()
+                        .verticalRoundedBackgroundContainer()
+                        .padding(.horizontal, Spacing.extraSmall)
+                        .font(PrimaryFont.bodyL.font)
                     // Metadata
                     if !viewModel.networkDetails.meta.isEmpty {
                         Localizable.Settings.NetworkDetails.Label.metadata.text
@@ -135,11 +94,77 @@ struct NetworkSettingsDetails: View {
                 )
                 .clearModalBackground()
             }
+            .fullScreenCover(isPresented: $viewModel.isPresentingRemoveNetworkConfirmation) {
+                HorizontalActionsBottomModal(
+                    viewModel: .removeNetwork,
+                    mainAction: viewModel.removeNetwork(),
+                    dismissAction: viewModel.cancelNetworkRemoval(),
+                    isShowingBottomAlert: $viewModel.isPresentingRemoveNetworkConfirmation
+                )
+                .clearModalBackground()
+            }
+            .fullScreenCover(
+                isPresented: $viewModel.isShowingActionSheet,
+                onDismiss: { viewModel.onMoreActionSheetDismissal() }
+            ) {
+                NetworkSettingsDetailsActionModal(
+                    isShowingActionSheet: $viewModel.isShowingActionSheet,
+                    shouldPresentRemoveNetworkConfirmation: $viewModel.shouldPresentRemoveNetworkConfirmation,
+                    shouldSignSpecs: $viewModel.shouldSignSpecs
+                )
+                .clearModalBackground()
+            }
+        }
+    }
+}
+
+private extension NetworkSettingsDetails {
+    @ViewBuilder
+    func networkSpecs() -> some View {
+        VStack(alignment: .leading, spacing: Spacing.small) {
+            rowWrapper(
+                Localizable.Settings.NetworkDetails.Label.name.string,
+                viewModel.networkDetails.name
+            )
+            rowWrapper(
+                Localizable.Settings.NetworkDetails.Label.basePrefix.string,
+                String(viewModel.networkDetails.base58prefix)
+            )
+            rowWrapper(
+                Localizable.Settings.NetworkDetails.Label.decimals.string,
+                String(viewModel.networkDetails.decimals)
+            )
+            rowWrapper(
+                Localizable.Settings.NetworkDetails.Label.unit.string,
+                viewModel.networkDetails.unit
+            )
+            verticalRowWrapper(
+                Localizable.Settings.NetworkDetails.Label.genesisHash.string,
+                viewModel.networkDetails.genesisHash.formattedAsString
+            )
+            switch viewModel.networkDetails.currentVerifier.ttype {
+            case "general":
+                generalVerifier(viewModel.networkDetails.currentVerifier)
+            case "custom":
+                customVerifier(viewModel.networkDetails.currentVerifier)
+            case "none":
+                rowWrapper(
+                    Localizable.Settings.NetworkDetails.Label.verifier.string,
+                    Localizable.Settings.NetworkDetails.Label.Verifier.none.string,
+                    isLast: true
+                )
+            default:
+                rowWrapper(
+                    Localizable.Settings.NetworkDetails.Label.verifier.string,
+                    Localizable.Settings.NetworkDetails.Label.Verifier.unknown.string,
+                    isLast: true
+                )
+            }
         }
     }
 
     @ViewBuilder
-    private func metadata(_ metadata: MMetadataRecord) -> some View {
+    func metadata(_ metadata: MMetadataRecord) -> some View {
         VStack(alignment: .leading, spacing: Spacing.small) {
             rowWrapper(
                 Localizable.Settings.NetworkDetails.Label.version.string,
@@ -174,9 +199,11 @@ struct NetworkSettingsDetails: View {
         }
         .verticalRoundedBackgroundContainer()
     }
+}
 
+private extension NetworkSettingsDetails {
     @ViewBuilder
-    private func rowWrapper(
+    func rowWrapper(
         _ key: String,
         _ value: String,
         isLast: Bool = false
@@ -194,7 +221,7 @@ struct NetworkSettingsDetails: View {
     }
 
     @ViewBuilder
-    private func verticalRowWrapper(
+    func verticalRowWrapper(
         _ key: String,
         _ value: String,
         isLast: Bool = false
@@ -209,9 +236,11 @@ struct NetworkSettingsDetails: View {
             }
         }
     }
+}
 
+private extension NetworkSettingsDetails {
     @ViewBuilder
-    private func generalVerifier(_ verifier: MVerifier) -> some View {
+    func generalVerifier(_ verifier: MVerifier) -> some View {
         rowWrapper(
             Localizable.Settings.NetworkDetails.Label.verifier.string,
             Localizable.Settings.NetworkDetails.Label.Verifier.general.string
@@ -228,7 +257,7 @@ struct NetworkSettingsDetails: View {
     }
 
     @ViewBuilder
-    private func customVerifier(_ verifier: MVerifier) -> some View {
+    func customVerifier(_ verifier: MVerifier) -> some View {
         rowWrapper(
             Localizable.Settings.NetworkDetails.Label.verifier.string,
             Localizable.Settings.NetworkDetails.Label.Verifier.custom.string
@@ -254,11 +283,16 @@ struct NetworkSettingsDetails: View {
 
 extension NetworkSettingsDetails {
     final class ViewModel: ObservableObject {
-        @Published var isPresentingRemoveMetadataConfirmation = false
         private weak var navigation: NavigationCoordinator!
-        @Published var networkDetails: MNetworkDetails
         private let snackbarPresentation: BottomSnackbarPresentation
         private var metadataToDelete: MMetadataRecord?
+
+        @Published var isPresentingRemoveMetadataConfirmation = false
+        @Published var networkDetails: MNetworkDetails
+        @Published var shouldSignSpecs = false
+        @Published var isShowingActionSheet = false
+        @Published var shouldPresentRemoveNetworkConfirmation = false
+        @Published var isPresentingRemoveNetworkConfirmation = false
 
         init(
             networkDetails: MNetworkDetails,
@@ -314,6 +348,36 @@ extension NetworkSettingsDetails {
         func cancelMetadataRemoval() {
             metadataToDelete = nil
             isPresentingRemoveMetadataConfirmation = false
+            navigation.performFake(navigation: .init(action: .goBack))
+        }
+
+        func onMoreMenuTap() {
+            navigation.performFake(navigation: .init(action: .rightButtonAction))
+            isShowingActionSheet = true
+        }
+
+        func onMoreActionSheetDismissal() {
+            if shouldSignSpecs {
+                navigation.perform(navigation: .init(action: .signNetworkSpecs))
+            }
+            if shouldPresentRemoveNetworkConfirmation {
+                shouldPresentRemoveNetworkConfirmation = false
+                isPresentingRemoveNetworkConfirmation = true
+            }
+        }
+
+        func removeNetwork() {
+            snackbarPresentation.viewModel = .init(
+                title: Localizable.Settings.NetworkDetails.DeleteNetwork.Label
+                    .confirmation(networkDetails.title),
+                style: .warning
+            )
+            snackbarPresentation.isSnackbarPresented = true
+            navigation.perform(navigation: .init(action: .removeNetwork))
+        }
+
+        func cancelNetworkRemoval() {
+            isPresentingRemoveNetworkConfirmation = false
             navigation.performFake(navigation: .init(action: .goBack))
         }
     }
