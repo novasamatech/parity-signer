@@ -21,6 +21,7 @@ struct KeySetList: View {
         ZStack(alignment: .bottom) {
             // Background color
             Asset.backgroundSystem.swiftUIColor
+                .ignoresSafeArea()
             // Main screen
             VStack(spacing: 0) {
                 // Navigation Bar
