@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,6 +19,8 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNetworkMenu
 
 @Composable
+@Deprecated("not working anymore because this logic removed from rust")
+//todo dmitry reimplement locally https://github.com/paritytech/parity-signer/pull/1475/files
 fun NetworkSelector(
 	modalData: MNetworkMenu,
 	button: (Action, String) -> Unit
@@ -32,6 +35,7 @@ fun NetworkSelector(
 				Modifier
 					.weight(1f)
 			)
+			Text("This functionality temolorary not working, android need to implement local version as rust don't support it anymore")
 			Surface(
 				shape = MaterialTheme.shapes.modal,
 				color = MaterialTheme.colors.Bg000,
@@ -52,10 +56,10 @@ fun NetworkSelector(
 					) {
 						items(networks.size) { item ->
 							Row(Modifier.clickable {
-								button(
-									Action.CHANGE_NETWORK,
-									networks[item].key
-								)
+//								button(
+//									Action.CHANGE_NETWORK,
+//									networks[item].key
+//								)
 							}) {
 								NetworkCard(
 									network = NetworkCardModel(
