@@ -17,8 +17,6 @@ data class KeySetDetailsModel(
 	val keys: List<KeyModel>,
 	val root: KeyModel,
 	val network: NetworkModel,
-	val multiselectMode: Boolean,
-	val multiselectCount: String,
 ) {
 	companion object {
 		fun createStub(): KeySetDetailsModel = KeySetDetailsModel(
@@ -30,7 +28,6 @@ data class KeySetDetailsModel(
 					identicon = PreviewData.exampleIdenticonPng,
 					hasPwd = true,
 					path = "//polkadot//path3",
-					multiselect = false,
 					secretExposed = false,
 					seedName = "sdsdsd",
 				),
@@ -41,13 +38,10 @@ data class KeySetDetailsModel(
 				base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
 				hasPwd = true,
 				path = "//polkadot",
-				multiselect = false,
 				secretExposed = false,
 				seedName = "sdsdsd",
 			),
 			network = NetworkModel("network title", "network logo"),
-			multiselectCount = "5",
-			multiselectMode = false,
 		)
 	}
 }
@@ -56,8 +50,6 @@ fun MKeys.toKeySetDetailsModel() = KeySetDetailsModel(
 	keys = set.map { it.toKeysModel() },
 	root = root.toKeysModel(),
 	network = network.toNetworkModel(),
-	multiselectMode = false, // todo dmitry check we are not relying on it
-	multiselectCount = 0, //remove those fields?
 )
 
 /**
@@ -70,7 +62,6 @@ data class KeyModel(
 	val base58: String,
 	val hasPwd: Boolean,
 	val path: String,
-	val multiselect: Boolean,
 	val secretExposed: Boolean
 ) {
 	companion object {
@@ -80,7 +71,6 @@ data class KeyModel(
 			identicon = PreviewData.exampleIdenticonPng,
 			hasPwd = true,
 			path = "//polkadot//path2",
-			multiselect = false,
 			secretExposed = false,
 			seedName = "sdsdsd",
 		)
@@ -93,7 +83,6 @@ fun MKeysCard.toKeysModel() = KeyModel(
 	identicon = address.identicon.toImageContent(),
 	hasPwd = address.hasPwd,
 	path = address.path,
-	multiselect = multiselect,
 	secretExposed = address.secretExposed,
 	seedName = address.seedName,
 )
@@ -152,7 +141,7 @@ data class KeyCardModel(
 				identIcon = model.identicon,
 				seedName = model.seedName,
 				hasPwd = model.hasPwd,
-				multiselect = model.multiselect,
+				multiselect = null,
 			)
 
 		/**
