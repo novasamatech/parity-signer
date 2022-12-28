@@ -29,12 +29,9 @@ extension PreviewData {
             ),
             addressKey: "",
             base58: "",
-            swiped: false,
-            multiselect: false
+            swiped: false
         ),
-        network: .init(title: "", logo: ""),
-        multiselectMode: false,
-        multiselectCount: ""
+        network: .init(title: "", logo: "")
     )
 
     static let mKeyAndNetworkCard = MKeyAndNetworkCard(key: .init(
@@ -47,8 +44,7 @@ extension PreviewData {
         ),
         addressKey: "",
         base58: "",
-        swiped: false,
-        multiselect: false
+        swiped: false
     ), network: .init(networkTitle: "", networkLogo: "", networkSpecsKey: ""))
 
     static let mKeyNew = MKeysNew(
@@ -61,8 +57,7 @@ extension PreviewData {
                 identicon: .svg(image: PreviewData.exampleIdenticon),
                 seedName: "",
                 secretExposed: false
-            ),
-            multiselect: false
+            )
         ),
         set: []
     )
@@ -78,8 +73,7 @@ extension PreviewData {
             seedName: "",
             secretExposed: false
         ),
-        base58: "",
-        multiselect: nil
+        base58: ""
     )
 
     static let exampleErrorMessage =
@@ -209,7 +203,7 @@ extension PreviewData {
                 identicon: .svg(image: PreviewData.exampleIdenticon),
                 seedName: "Seed name",
                 secretExposed: false
-            ), multiselect: nil
+            )
         ),
         networkInfo: .init(
             networkTitle: "Westend",

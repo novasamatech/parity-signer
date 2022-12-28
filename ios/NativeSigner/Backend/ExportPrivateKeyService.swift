@@ -27,7 +27,7 @@ final class ExportPrivateKeyService {
             dbname: databaseMediator.databaseName,
             publicKey: keyDetails.pubkey,
             expectedSeedName: keyDetails.address.seedName,
-            networkSpecsKey: keyDetails.networkInfo?.networkSpecsKey ?? "",
+            networkSpecsKey: keyDetails.networkInfo.networkSpecsKey,
             seedPhrase: seedsMediator.getSeed(seedName: keyDetails.address.seedName),
             keyPassword: nil
         ).qr else { return nil }
@@ -38,8 +38,8 @@ final class ExportPrivateKeyService {
                 identicon: keyDetails.address.identicon.svgPayload,
                 rootKeyName: keyDetails.address.seedName,
                 path: keyDetails.address.path,
-                network: keyDetails.networkInfo?.networkTitle ?? "",
-                base58: keyDetails.base58 ?? ""
+                network: keyDetails.networkInfo.networkTitle,
+                base58: keyDetails.base58
             )
         )
     }

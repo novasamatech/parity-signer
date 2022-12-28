@@ -43,13 +43,17 @@ struct ScreenSelector: View {
                 viewModel: .init(listViewModel: KeySetListViewModelBuilder().build(for: value))
             )
         case let .keyDetails(value):
-            KeyDetailsPublicKeyView(
-                forgetKeyActionHandler: ForgetSingleKeyAction(navigation: navigation),
-                viewModel: KeyDetailsPublicKeyViewModel(value),
-                actionModel: KeyDetailsPublicKeyActionModel(value),
-                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value),
-                resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
-            )
+            if let value = value {
+                KeyDetailsPublicKeyView(
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: navigation),
+                    viewModel: KeyDetailsPublicKeyViewModel(value),
+                    actionModel: KeyDetailsPublicKeyActionModel(value),
+                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value),
+                    resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
+                )
+            } else {
+                EmptyView()
+            }
         case let .newSeed(value):
             NewSeedScreen(
                 content: value,

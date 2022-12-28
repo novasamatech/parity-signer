@@ -221,8 +221,7 @@ struct EnterPasswordModal_Previews: PreviewProvider {
                                 identicon: .svg(image: PreviewData.exampleIdenticon),
                                 seedName: "Parity Keys",
                                 secretExposed: true
-                            ),
-                            multiselect: nil
+                            )
                         ),
                         counter: 2
                     )

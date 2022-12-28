@@ -14,9 +14,6 @@ struct KeyDetailsView: View {
     @EnvironmentObject private var data: SignerDataModel
     @EnvironmentObject private var appState: AppState
 
-    // This view is recreated few times because of Rust navigation, for now we need to store modal view model in static
-    // property because it can't be created earlier as it would trigger passcode request on the device
-    static var backupModalViewModel: BackupModalViewModel!
     let forgetKeyActionHandler: ForgetKeySetAction
     let resetWarningAction: ResetConnectivtyWarningsAction
 
@@ -33,8 +30,25 @@ struct KeyDetailsView: View {
                         viewModel.isShowingActionSheet.toggle()
                     })
                 )
-                // List
-                mainList
+                ScrollView {
+                    // Main key cell
+                    rootKeyHeader()
+                    // Derived Keys header
+                    HStack {
+                        Localizable.KeyDetails.Label.derived.text
+                            .font(PrimaryFont.bodyM.font)
+                        Spacer().frame(maxWidth: .infinity)
+                        Asset.switches.swiftUIImage
+                            .frame(width: Heights.actionSheetButton)
+                            .onTapGesture {
+                                viewModel.onNetworkSelectionTap()
+                            }
+                    }
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .padding(.horizontal, Spacing.large)
+                    // List
+                    mainList
+                }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
             if viewModel.isPresentingSelectionOverlay {
@@ -79,11 +93,15 @@ struct KeyDetailsView: View {
             .clearModalBackground()
         }
         .fullScreenCover(isPresented: $viewModel.isShowingBackupModal) {
-            BackupModal(
-                isShowingBackupModal: $viewModel.isShowingBackupModal,
-                viewModel: KeyDetailsView.backupModalViewModel
-            )
-            .clearModalBackground()
+            if let viewModel = viewModel.backupViewModel() {
+                BackupModal(
+                    isShowingBackupModal: $viewModel.isShowingBackupModal,
+                    viewModel: viewModel
+                )
+                .clearModalBackground()
+            } else {
+                EmptyView()
+            }
         }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingConnectivityAlert,
@@ -130,31 +148,7 @@ struct KeyDetailsView: View {
     }
 
     var mainList: some View {
-        List {
-            // Main key cell
-            if let keySummary = viewModel.keySummary {
-                KeySummaryView(
-                    viewModel: keySummary,
-                    isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
-                )
-                .padding(Padding.detailsCell)
-                .keyDetailsListElement()
-                .onTapGesture { viewModel.onRootKeyTap() }
-            }
-            // Header
-            HStack {
-                Localizable.KeyDetails.Label.derived.text
-                    .font(PrimaryFont.bodyM.font)
-                Spacer().frame(maxWidth: .infinity)
-                Asset.switches.swiftUIImage
-                    .frame(width: Heights.actionSheetButton)
-                    .onTapGesture {
-                        viewModel.onNetworkSelectionTap()
-                    }
-            }
-            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-            .padding(Padding.detailsCell)
-            .keyDetailsListElement()
+        LazyVStack(spacing: 0) {
             // List of derived keys
             ForEach(
                 viewModel.derivedKeys,
@@ -165,7 +159,7 @@ struct KeyDetailsView: View {
                     selectedSeeds: $viewModel.selectedSeeds,
                     isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
                 )
-                .keyDetailsListElement()
+                .contentShape(Rectangle())
                 .onTapGesture {
                     if viewModel.isPresentingSelectionOverlay {
                         let seedName = deriveKey.viewModel.path
@@ -180,27 +174,23 @@ struct KeyDetailsView: View {
                 }
             }
             Spacer()
-                .keyDetailsListElement()
                 .frame(height: Heights.actionButton + Spacing.large)
         }
-        .listStyle(.plain)
-        .hiddenScrollContent()
     }
-}
 
-private struct KeyDetailsListElement: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .listRowBackground(Asset.backgroundPrimary.swiftUIColor)
-            .listRowSeparator(.hidden)
-            .listRowInsets(EdgeInsets())
+    @ViewBuilder
+    func rootKeyHeader() -> some View {
+        if let keySummary = viewModel.keySummary {
+            KeySummaryView(
+                viewModel: keySummary,
+                isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
+            )
+            .padding(Padding.detailsCell)
             .contentShape(Rectangle())
-    }
-}
-
-private extension View {
-    func keyDetailsListElement() -> some View {
-        modifier(KeyDetailsListElement())
+            .onTapGesture { viewModel.onRootKeyTap() }
+        } else {
+            EmptyView()
+        }
     }
 }
 
@@ -209,28 +199,21 @@ private struct KeySummaryView: View {
     @Binding var isPresentingSelectionOverlay: Bool
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                Text(viewModel.keyName)
-                    .foregroundColor(
-                        isPresentingSelectionOverlay ? Asset.textAndIconsDisabled.swiftUIColor : Asset
-                            .textAndIconsPrimary.swiftUIColor
-                    )
-                    .font(PrimaryFont.titleL.font)
+        VStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
+            Text(viewModel.keyName)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .font(PrimaryFont.titleXL.font)
+            HStack {
                 Text(viewModel.base58.truncateMiddle())
-                    .foregroundColor(
-                        isPresentingSelectionOverlay ? Asset.textAndIconsDisabled.swiftUIColor : Asset
-                            .textAndIconsTertiary.swiftUIColor
-                    )
-                    .font(PrimaryFont.bodyM.font)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(PrimaryFont.bodyL.font)
                     .lineLimit(1)
-            }
-            Spacer()
-            if !isPresentingSelectionOverlay {
-                Asset.chevronRight.swiftUIImage
+                Asset.chevronDown.swiftUIImage
                     .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
             }
         }
+        .padding(.vertical, Spacing.medium)
+        .padding(.horizontal, Spacing.large)
     }
 }
 
