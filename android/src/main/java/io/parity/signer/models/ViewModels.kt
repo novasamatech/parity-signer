@@ -56,8 +56,8 @@ fun MKeys.toKeySetDetailsModel() = KeySetDetailsModel(
 	keys = set.map { it.toKeysModel() },
 	root = root.toKeysModel(),
 	network = network.toNetworkModel(),
-	multiselectMode = multiselectMode,
-	multiselectCount = multiselectCount,
+	multiselectMode = multiselectMode, // todo dmitry check we are not relying on it
+	multiselectCount = 0,
 )
 
 /**

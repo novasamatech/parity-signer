@@ -60,10 +60,13 @@ fun CombinedScreensSelector(
 				)
 			is ScreenData.KeyDetails ->
 				Box(modifier = Modifier.statusBarsPadding()) {
-					KeyDetailsPublicKeyScreen(
-						model = screenData.f.toKeyDetailsModel(),
-						rootNavigator = rootNavigator,
-					)
+					screenData.f?.toKeyDetailsModel()?.let { model ->
+						KeyDetailsPublicKeyScreen(
+							model = model,
+							rootNavigator = rootNavigator,
+						)
+					}
+						?: rootNavigator.backAction() //todo dmitry log that root key was pressed. It should not be the case.
 				}
 			is ScreenData.Log ->
 				Box(Modifier.statusBarsPadding()) {

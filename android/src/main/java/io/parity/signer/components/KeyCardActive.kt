@@ -68,7 +68,6 @@ fun KeyCardActive(
 			KeyCardOld(
 				identity = MAddressCard(
 					base58 = keys_card.base58,
-					multiselect = keys_card.multiselect,
 					address = Address(
 					path = keys_card.address.path,
 					hasPwd = keys_card.address.hasPwd,
