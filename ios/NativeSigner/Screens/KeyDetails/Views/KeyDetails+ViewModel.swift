@@ -25,6 +25,7 @@ extension KeyDetailsView {
         @Published var isShowingBackupModal = false
         @Published var isPresentingConnectivityAlert = false
         @Published var isPresentingSelectionOverlay = false
+        @Published var isPresentingRootDetails = false
         @Published var isShowingKeysExportModal = false
         // Network selection
         @Published var isPresentingNetworkSelection = false
@@ -32,10 +33,9 @@ extension KeyDetailsView {
         @Published var keySummary: KeySummaryViewModel?
         @Published var derivedKeys: [DerivedKeyRowModel] = []
         @Published var selectedSeeds: [String] = []
+        @Published var isFilteringActive: Bool = false
         private var cancelBag = CancelBag()
 
-        /// Navigation action for selecting main `Address Key`
-        var addressKeyNavigation: Navigation?
         /// Navigation for `Create Derived Key`
         let createDerivedKey: Navigation = .init(action: .newKey)
         /// Name of seed to be removed with `Remove Seed` action
@@ -55,6 +55,11 @@ extension KeyDetailsView {
 
         func use(appState: AppState) {
             self.appState = appState
+            $isPresentingNetworkSelection.sink { newValue in
+                guard !newValue else { return }
+                self.isFilteringActive = !self.appState.userData.selectedNetworks.isEmpty
+            }
+            .store(in: cancelBag)
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -90,8 +95,8 @@ extension KeyDetailsView {
 
 extension KeyDetailsView.ViewModel {
     func onRootKeyTap() {
-        guard let addressKeyNavigation = addressKeyNavigation, !isPresentingSelectionOverlay else { return }
-        navigation.perform(navigation: addressKeyNavigation)
+        guard !isPresentingSelectionOverlay else { return }
+        isPresentingRootDetails = true
     }
 
     func onNetworkSelectionTap() {
@@ -160,6 +165,10 @@ extension KeyDetailsView.ViewModel {
             seedNames: selectedSeeds
         )
     }
+
+    func rootKeyDetails() -> RootKeyDetailsModal.ViewModel {
+        .init(name: keySummary?.keyName ?? "", publicKey: keySummary?.base58 ?? "")
+    }
 }
 
 private extension KeyDetailsView.ViewModel {
@@ -199,8 +208,6 @@ private extension KeyDetailsView.ViewModel {
             keyName: keysData.root?.address.seedName ?? "",
             base58: keysData.root?.base58 ?? ""
         )
-        let details = "\(keysData.root?.addressKey ?? "")\n\(keysData.set.first?.network.networkSpecsKey ?? "")"
-        addressKeyNavigation = .init(action: .selectKey, details: details)
         removeSeed = keysData.root?.address.seedName ?? ""
     }
 }

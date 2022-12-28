@@ -39,6 +39,10 @@ struct KeyDetailsView: View {
                             .font(PrimaryFont.bodyM.font)
                         Spacer().frame(maxWidth: .infinity)
                         Asset.switches.swiftUIImage
+                            .foregroundColor(
+                                viewModel.isFilteringActive ? Asset.accentPink300.swiftUIColor : Asset
+                                    .textAndIconsTertiary.swiftUIColor
+                            )
                             .frame(width: Heights.actionSheetButton)
                             .onTapGesture {
                                 viewModel.onNetworkSelectionTap()
@@ -142,6 +146,15 @@ struct KeyDetailsView: View {
         ) {
             NetworkSelectionModal(
                 viewModel: .init(isPresented: $viewModel.isPresentingNetworkSelection)
+            )
+            .clearModalBackground()
+        }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingRootDetails
+        ) {
+            RootKeyDetailsModal(
+                isPresented: $viewModel.isPresentingRootDetails,
+                viewModel: viewModel.rootKeyDetails()
             )
             .clearModalBackground()
         }

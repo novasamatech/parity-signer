@@ -144,10 +144,10 @@
 		6D6430F828CB662B00342E37 /* ExportPrivateKeyModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D91F3EB28C114D1007560F5 /* ExportPrivateKeyModal.swift */; };
 		6D6ACA4128F0B391002FB03A /* CameraPermissionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6ACA4028F0B391002FB03A /* CameraPermissionHandler.swift */; };
 		6D6E99DB28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6E99DA28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift */; };
-		6D78E4C72949AA5A001767A3 /* DerivedKeyExportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D78E4C62949AA5A001767A3 /* DerivedKeyExportModel.swift */; };
 		6D71290E294C2A380048558C /* VerticalActionsBottomModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D71290D294C2A380048558C /* VerticalActionsBottomModal.swift */; };
 		6D7129222952B7800048558C /* NetworkSettingsDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7129212952B7800048558C /* NetworkSettingsDetails.swift */; };
 		6D7129252952C3D50048558C /* VerticalRoundedBackgroundContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7129242952C3D50048558C /* VerticalRoundedBackgroundContainer.swift */; };
+		6D78E4C72949AA5A001767A3 /* DerivedKeyExportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D78E4C62949AA5A001767A3 /* DerivedKeyExportModel.swift */; };
 		6D8045D728D06E6B00237F8C /* PreviewData+Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D628D06E6B00237F8C /* PreviewData+Components.swift */; };
 		6D8045D928D0761E00237F8C /* QRCodeAddressFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */; };
 		6D8045DC28D0840F00237F8C /* MKeyDetails+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */; };
@@ -208,6 +208,7 @@
 		6DBF6E4B28EC51D600CC959F /* GenericError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E4A28EC51D600CC959F /* GenericError.swift */; };
 		6DC33717295559EA0067284B /* NetworkSettingsDetailsActionModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33716295559EA0067284B /* NetworkSettingsDetailsActionModal.swift */; };
 		6DC33723295ACF2D0067284B /* CornerRadiusModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33722295ACF2D0067284B /* CornerRadiusModifier.swift */; };
+		6DC33725295BFA4D0067284B /* RootKeyDetailsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33724295BFA4D0067284B /* RootKeyDetailsModal.swift */; };
 		6DC5642E28B652DE003D540B /* AddKeySetModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5642D28B652DE003D540B /* AddKeySetModal.swift */; };
 		6DC5643028B65B9C003D540B /* AnimationDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5642F28B65B9C003D540B /* AnimationDuration.swift */; };
 		6DC5643328B68FC5003D540B /* AccessControlProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643228B68FC5003D540B /* AccessControlProvider.swift */; };
@@ -426,10 +427,10 @@
 		6D6430F528CB460A00342E37 /* ServiceLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceLocator.swift; sourceTree = "<group>"; };
 		6D6ACA4028F0B391002FB03A /* CameraPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPermissionHandler.swift; sourceTree = "<group>"; };
 		6D6E99DA28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyOverviewRow.swift; sourceTree = "<group>"; };
-		6D78E4C62949AA5A001767A3 /* DerivedKeyExportModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyExportModel.swift; sourceTree = "<group>"; };
 		6D71290D294C2A380048558C /* VerticalActionsBottomModal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalActionsBottomModal.swift; sourceTree = "<group>"; };
 		6D7129212952B7800048558C /* NetworkSettingsDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSettingsDetails.swift; sourceTree = "<group>"; };
 		6D7129242952C3D50048558C /* VerticalRoundedBackgroundContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalRoundedBackgroundContainer.swift; sourceTree = "<group>"; };
+		6D78E4C62949AA5A001767A3 /* DerivedKeyExportModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyExportModel.swift; sourceTree = "<group>"; };
 		6D8045D628D06E6B00237F8C /* PreviewData+Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreviewData+Components.swift"; sourceTree = "<group>"; };
 		6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeAddressFooterView.swift; sourceTree = "<group>"; };
 		6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKeyDetails+Helpers.swift"; sourceTree = "<group>"; };
@@ -489,6 +490,7 @@
 		6DBF6E4A28EC51D600CC959F /* GenericError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericError.swift; sourceTree = "<group>"; };
 		6DC33716295559EA0067284B /* NetworkSettingsDetailsActionModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSettingsDetailsActionModal.swift; sourceTree = "<group>"; };
 		6DC33722295ACF2D0067284B /* CornerRadiusModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadiusModifier.swift; sourceTree = "<group>"; };
+		6DC33724295BFA4D0067284B /* RootKeyDetailsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootKeyDetailsModal.swift; sourceTree = "<group>"; };
 		6DC5642D28B652DE003D540B /* AddKeySetModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddKeySetModal.swift; sourceTree = "<group>"; };
 		6DC5642F28B65B9C003D540B /* AnimationDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationDuration.swift; sourceTree = "<group>"; };
 		6DC5643228B68FC5003D540B /* AccessControlProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessControlProvider.swift; sourceTree = "<group>"; };
@@ -1283,6 +1285,7 @@
 				6DC5643F28B929EA003D540B /* KeyDetailsView.swift */,
 				6DA501CB290A48190096DA4E /* KeyDetails+ViewModel.swift */,
 				6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */,
+				6DC33724295BFA4D0067284B /* RootKeyDetailsModal.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1800,6 +1803,7 @@
 				6DE8466E28BF73E40051346A /* DerivedKeyRowModel.swift in Sources */,
 				2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */,
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
+				6DC33725295BFA4D0067284B /* RootKeyDetailsModal.swift in Sources */,
 				2DA5F8A1275F889400D8DD29 /* Headers.swift in Sources */,
 				6D971AC5294229AE00121A36 /* UIFont+Roboto.swift in Sources */,
 				6DC5643328B68FC5003D540B /* AccessControlProvider.swift in Sources */,

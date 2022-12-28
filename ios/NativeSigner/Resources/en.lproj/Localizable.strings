@@ -285,6 +285,7 @@
 "KeyDetails.Overlay.Action.Delete" = "Delete";
 "KeyDetails.Overlay.Action.SelectAll" = "Select All";
 "KeyDetails.Overlay.Action.Export" = "Export";
+"KeyDetails.Root.Label.PublicKey" = "Public key";
 
 "PublicKeyDetails.Label.Title" = "Public Key";
 "PublicKeyDetails.Label.Subtitle" = "Derived Key";
