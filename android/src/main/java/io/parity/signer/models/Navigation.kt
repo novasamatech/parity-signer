@@ -93,6 +93,7 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 						address_card = MAddressCard(
 							address = secretKeyDetailsQR.address,
 							base58 = secretKeyDetailsQR.base58,
+							addressKey = ""// not used there anyway
 						),
 						networkTitle = secretKeyDetailsQR.networkInfo.networkTitle
 					),

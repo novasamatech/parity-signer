@@ -30,6 +30,7 @@ fun SignSufficientCrypto(
 						identity = MAddressCard(
 							base58 = identity.publicKey,
 							address = identity.address,
+							addressKey = identity.addressKey,
 						)
 					)
 				}

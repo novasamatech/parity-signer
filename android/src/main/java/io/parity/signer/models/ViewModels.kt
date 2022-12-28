@@ -56,8 +56,8 @@ fun MKeys.toKeySetDetailsModel() = KeySetDetailsModel(
 	keys = set.map { it.toKeysModel() },
 	root = root.toKeysModel(),
 	network = network.toNetworkModel(),
-	multiselectMode = multiselectMode, // todo dmitry check we are not relying on it
-	multiselectCount = 0,
+	multiselectMode = false, // todo dmitry check we are not relying on it
+	multiselectCount = 0, //remove those fields?
 )
 
 /**
@@ -169,7 +169,7 @@ data class KeyCardModel(
 				hasPwd = address_card.address.hasPwd,
 				identIcon = address_card.address.identicon.toImageContent(),
 				seedName = address_card.address.seedName,
-				multiselect = address_card.multiselect,
+				multiselect = null
 			)
 
 		fun fromAddress(
