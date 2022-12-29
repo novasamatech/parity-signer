@@ -245,7 +245,6 @@ fn print_ids_seed_name_network() {
                 .to_string(),
             base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
             swiped: false,
-            multiselect: false,
         },
         vec![
             MKeysCard {
@@ -262,14 +261,12 @@ fn print_ids_seed_name_network() {
                     seed_name: "Alice".to_string(),
                 },
                 swiped: false,
-                multiselect: false,
             },
             MKeysCard {
                 address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                     .to_string(),
                 base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                 swiped: false,
-                multiselect: false,
                 address: Address {
                     identicon: SignerImage::Png {
                         image: alice_sr_alice().to_vec(),
@@ -411,7 +408,6 @@ fn export_alice_westend() {
             has_pwd: false,
             secret_exposed: false,
         },
-        multiselect: None,
         network_info: MSCNetworkInfo {
             network_title: "Westend".to_string(),
             network_logo: "westend".to_string(),
@@ -572,7 +568,6 @@ fn derive_prep_alice_collided() {
                 address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                     .to_string(),
                 base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                multiselect: None,
                 address: Address {
                     path: "//Alice".to_string(),
                     has_pwd: false,
@@ -647,7 +642,6 @@ fn derive_prep_alice_collided_with_password() {
                 address_key: "0176b68c7ad0e084b37d6a0c8c92d792f6041da5e7ff0c6c3d4a2d6b97772ad46e"
                     .to_string(),
                 base58: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_string(),
-                multiselect: None,
                 address: Address {
                     path: "//secret".to_string(),
                     has_pwd: true,
@@ -833,7 +827,6 @@ fn path_is_known() {
                 seed_name: "Alice".to_string(),
                 secret_exposed: false,
             },
-            multiselect: None,
         }),
         error: None,
     };

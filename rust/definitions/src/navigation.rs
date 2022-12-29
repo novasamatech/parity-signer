@@ -127,7 +127,7 @@ pub struct LogScreenEntry {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ScreenData {
     Scan,
-    Keys { f: MKeys },
+    Keys { f: String },
     Settings { f: MSettings },
     Log { f: MLog },
     LogDetails { f: MLogDetails },

@@ -489,7 +489,7 @@ dictionary MKeysInfoExport {
 [Enum]
 interface ScreenData {
     Scan();
-    Keys(MKeys f);
+    Keys(string f);
     Settings(MSettings f);
     Log(MLog f);
     LogDetails(MLogDetails f);
