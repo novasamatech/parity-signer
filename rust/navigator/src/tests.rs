@@ -46,7 +46,7 @@ use definitions::{
 
 use constants::test_values::alice_sr_secret_abracadabra;
 use db_handling::identities::inject_derivations_has_pwd;
-use definitions::derivations::{DerivedKeyPreview, SeedKeysPreview};
+use definitions::derivations::{DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview};
 use definitions::navigation::MAddressCard;
 use pretty_assertions::assert_eq;
 use sp_core::sr25519::Public;
@@ -623,6 +623,7 @@ fn export_import_addrs() {
                 },
                 has_pwd: Some(false),
                 network_title: Some("Westend".to_string()),
+                status: DerivedKeyStatus::AlreadyExists,
             },
             DerivedKeyPreview {
                 address: "ErGkNDDPmnaRZKxwe4VBLonyBJVmucqURFMatEJTwktsuTv".to_owned(),
@@ -637,6 +638,7 @@ fn export_import_addrs() {
                 },
                 has_pwd: Some(false),
                 network_title: Some("Kusama".to_string()),
+                status: DerivedKeyStatus::AlreadyExists,
             },
             DerivedKeyPreview {
                 address: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_owned(),
@@ -648,6 +650,7 @@ fn export_import_addrs() {
                 },
                 has_pwd: Some(true),
                 network_title: Some("Westend".to_string()),
+                status: DerivedKeyStatus::Importable,
             },
             DerivedKeyPreview {
                 address: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_owned(),
@@ -662,6 +665,7 @@ fn export_import_addrs() {
                 },
                 has_pwd: Some(false),
                 network_title: Some("Polkadot".to_string()),
+                status: DerivedKeyStatus::AlreadyExists,
             },
         ],
     }];
@@ -707,6 +711,7 @@ fn export_import_addrs() {
             },
             has_pwd: Some(false),
             network_title: Some("Polkadot".to_string()),
+            status: DerivedKeyStatus::AlreadyExists,
         }],
     }];
 
@@ -4023,6 +4028,7 @@ fn flow_test_1() {
                 identicon: SignerImage::default(),
                 has_pwd: Some(false),
                 network_title: Some("".to_string()),
+                status: DerivedKeyStatus::Importable,
             },
             DerivedKeyPreview {
                 address: "5FcKjDXS89U79cXvhksZ2pF5XBeafmSM8rqkDVoTHQcXd5Gq"
@@ -4036,6 +4042,7 @@ fn flow_test_1() {
                 identicon: SignerImage::default(),
                 has_pwd: Some(false),
                 network_title: Some("".to_string()),
+                status: DerivedKeyStatus::Importable,
             },
             DerivedKeyPreview {
                 address: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK"
@@ -4049,6 +4056,7 @@ fn flow_test_1() {
                 identicon: SignerImage::default(),
                 has_pwd: Some(false),
                 network_title: Some("".to_string()),
+                status: DerivedKeyStatus::Importable,
             },
             DerivedKeyPreview {
                 address: "5D34dL5prEUaGNQtPPZ3yN5Y6BnkfXunKXXz6fo7ZJbLwRRH"
@@ -4062,6 +4070,7 @@ fn flow_test_1() {
                 identicon: SignerImage::default(),
                 has_pwd: Some(false),
                 network_title: Some("".to_string()),
+                status: DerivedKeyStatus::Importable,
             },
             DerivedKeyPreview {
                 address: "5GBNeWRhZc2jXu7D55rBimKYDk8PGk8itRYFTPfC8RJLKG5o"
@@ -4075,6 +4084,7 @@ fn flow_test_1() {
                 identicon: SignerImage::default(),
                 has_pwd: Some(false),
                 network_title: Some("".to_string()),
+                status: DerivedKeyStatus::Importable,
             },
         ],
     }];

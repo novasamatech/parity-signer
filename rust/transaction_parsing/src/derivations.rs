@@ -1,6 +1,6 @@
-use db_handling::identities::{ExportAddrs, ExportAddrsV1};
+use db_handling::identities::{derivation_check, DerivationCheck, ExportAddrs, ExportAddrsV1};
 
-use definitions::derivations::{DerivedKeyPreview, SeedKeysPreview};
+use definitions::derivations::{DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview};
 
 use db_handling::helpers::get_network_specs;
 use definitions::helpers::{base58_or_eth_to_multisigner, make_identicon_from_multisigner};
@@ -46,9 +46,9 @@ where
     P: AsRef<Path>,
 {
     let mut result = Vec::new();
-    for addr in export_info.addrs {
+    for seed in export_info.addrs {
         let mut derived_keys = vec![];
-        for addr_info in addr.derived_keys {
+        for addr_info in seed.derived_keys {
             let multisigner =
                 base58_or_eth_to_multisigner(&addr_info.address, &addr_info.encryption)?;
             let identicon = make_identicon_from_multisigner(
@@ -60,6 +60,18 @@ where
             let network_title = get_network_specs(&db_path, &network_specs_key)
                 .map(|specs| specs.specs.title)
                 .ok();
+            let check = derivation_check(
+                &seed.name,
+                addr_info.derivation_path.as_ref().unwrap_or(&"".to_owned()),
+                &network_specs_key,
+                &db_path,
+            )?;
+            let status = match check {
+                DerivationCheck::NoPassword(Some(_)) => DerivedKeyStatus::AlreadyExists,
+                DerivationCheck::BadFormat => DerivedKeyStatus::BadFormat,
+                _ if network_title.is_none() => DerivedKeyStatus::NetworkMissing,
+                _ => DerivedKeyStatus::Importable,
+            };
             derived_keys.push(DerivedKeyPreview {
                 address: addr_info.address.clone(),
                 derivation_path: addr_info.derivation_path.clone(),
@@ -68,11 +80,12 @@ where
                 genesis_hash: addr_info.genesis_hash,
                 encryption: addr_info.encryption,
                 network_title,
+                status,
             })
         }
         result.push(SeedKeysPreview {
-            name: addr.name,
-            multisigner: addr.multisigner,
+            name: seed.name,
+            multisigner: seed.multisigner,
             derived_keys,
         })
     }

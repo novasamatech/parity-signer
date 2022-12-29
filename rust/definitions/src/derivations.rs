@@ -42,4 +42,21 @@ pub struct DerivedKeyPreview {
 
     /// Might be `None` if network specs were not imported into the Signer
     pub network_title: Option<String>,
+
+    pub status: DerivedKeyStatus,
+}
+
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub enum DerivedKeyStatus {
+    /// Key can be imported into the Signer
+    Importable,
+
+    /// Key is already into the Signer. Unable to determine for a key with password
+    AlreadyExists,
+
+    /// Key is not importable because of a network mismatch
+    NetworkMissing,
+
+    /// Bad format of the derivation path
+    BadFormat,
 }

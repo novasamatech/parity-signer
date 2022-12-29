@@ -360,6 +360,15 @@ dictionary DerivedKeyPreview {
     SignerImage identicon;
     boolean? has_pwd;
     string? network_title;
+    DerivedKeyStatus status;
+};
+
+[Enum]
+interface DerivedKeyStatus {
+    Importable();
+    AlreadyExists();
+    NetworkMissing();
+    BadFormat();
 };
 
 dictionary SeedNameCard {
