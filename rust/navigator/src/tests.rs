@@ -7,10 +7,8 @@ use std::{collections::HashMap, convert::TryInto, fs, str::FromStr};
 
 use constants::{
     test_values::{
-        alice_sr_0, alice_sr_1, alice_sr_alice, alice_sr_alice_secret_secret,
-        alice_sr_alice_westend, alice_sr_kusama, alice_sr_polkadot, alice_sr_root,
-        alice_sr_secret_path_multipass, alice_sr_westend, alice_sr_westend_0, alice_sr_westend_1,
-        alice_sr_westend_2, bob, empty_png, kusama_9130, kusama_9151, types_known,
+        alice_sr_alice, alice_sr_alice_secret_secret, alice_sr_kusama, alice_sr_polkadot, alice_sr_root,
+        alice_sr_secret_path_multipass, alice_sr_westend, bob, kusama_9130, kusama_9151, types_known,
     },
     ALICE_SEED_PHRASE,
 };
@@ -30,10 +28,9 @@ use definitions::{
     keyring::{AddressKey, NetworkSpecsKey, Order},
     navigation::{
         ActionResult, Address, AlertData, Card, DerivationCheck, DerivationDestination,
-        DerivationEntry, DerivationPack, ExportedSet, FooterButton, History, MBackup, MDeriveKey,
-        MEnterPassword, MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog,
+        DerivationEntry, DerivationPack, ExportedSet, FooterButton, History, MBackup, MDeriveKey, MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti, MLog,
         MLogDetails, MLogRight, MMMNetwork, MMNetwork, MManageMetadata, MManageNetworks,
-        MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup,
+        MMetadataRecord, MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup,
         MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCCall, MSCContent,
         MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion,
         MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
@@ -2266,7 +2263,7 @@ fn flow_test_1() {
         "GoForward on NewSeed screen with non-empty seed name. Expected NewSeed screen with NewSeedBackup modal."
     );
 
-    let mut action = state
+    let action = state
         .perform(Action::GoForward, "true", &seed_phrase_portia)
         .unwrap();
     let expected_action = ActionResult {
@@ -3765,7 +3762,7 @@ fn flow_test_1() {
         alert_data: None,
     };
 
-    let mut keys_westend = expected_action.clone();
+    let keys_westend = expected_action.clone();
 
     assert_eq!(
         action, expected_action,
@@ -5537,7 +5534,7 @@ fn flow_test_1() {
                         index: 0,
                         indent: 0,
                         card: Card::TextCard {
-                            f: card_text.clone(),
+                            f: card_text,
                         },
                     }]),
                     ..Default::default()
@@ -5739,7 +5736,7 @@ fn flow_test_1() {
         )
     );
 
-    let mut action = state
+    let action = state
         .perform(Action::GoForward, "false", &seed_phrase_pepper)
         .unwrap();
     let expected_action = ActionResult {
@@ -5794,7 +5791,7 @@ fn flow_test_1() {
         (
             hex::encode(address.multi_signer().unwrap().as_ref()),
             res.key.base58.clone(),
-            res.key.address.identicon.clone(),
+            res.key.address.identicon,
         )
     };
 
@@ -6093,10 +6090,10 @@ fn flow_test_1() {
         )
     );
 
-    let mut action = state
+    let action = state
         .perform(Action::GoForward, "//0///secret", &seed_phrase_pepper)
         .unwrap();
-    let (pepper_key0_public, pepper_key0_base58, pepper_key0_identicon) = {
+    let (pepper_key0_public, _pepper_key0_base58, _pepper_key0_identicon) = {
         let res = keys_by_seed_name(dbname, "Pepper")
             .unwrap()
             .set
@@ -6109,7 +6106,7 @@ fn flow_test_1() {
         (
             hex::encode(address.multi_signer().unwrap().as_ref()),
             res.key.base58.clone(),
-            res.key.address.identicon.clone(),
+            res.key.address.identicon,
         )
     };
     let expected_action = ActionResult {
@@ -6134,11 +6131,11 @@ fn flow_test_1() {
     );
 
     state.perform(Action::NavbarScan, "", "").unwrap();
-    let message_hex = message_hex.replace(
+    let _message_hex = message_hex.replace(
         "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
         &pepper_key0_public,
     );
-    let verifier_value = VerifierValue::Standard {
+    let _verifier_value = VerifierValue::Standard {
         m: MultiSigner::Sr25519(
             sp_core::sr25519::Public::try_from(hex::decode(&pepper_key0_public).unwrap().as_ref())
                 .unwrap(),
