@@ -3,14 +3,13 @@ package io.parity.signer.models
 import android.util.Log
 import android.widget.Toast
 import io.parity.signer.BuildConfig
-import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.components.NetworkCardModel
+import io.parity.signer.components.toImageContent
+import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ScreenData
 import io.parity.signer.uniffi.backendAction
 import io.parity.signer.uniffi.generateSecretKeyQr
-import io.parity.signer.uniffi.MAddressCard
-import java.lang.RuntimeException
 
 
 @Deprecated("obsolete, for backwards compatibility, use SignerNavigator class")
@@ -89,13 +88,13 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 				)
 				val model = PrivateKeyExportModel(
 					qrData = secretKeyDetailsQR.qr.getData(),
-					keyCard = KeyCardModel.fromAddress(
-						address_card = MAddressCard(
-							address = secretKeyDetailsQR.address,
-							base58 = secretKeyDetailsQR.base58,
-							addressKey = ""// not used there anyway
-						),
-						networkTitle = secretKeyDetailsQR.networkInfo.networkTitle
+					keyCard = KeyCardModel(
+						identIcon = secretKeyDetailsQR.address.identicon.toImageContent(),
+						seedName = secretKeyDetailsQR.address.seedName,
+						hasPwd = secretKeyDetailsQR.address.hasPwd,
+						path = secretKeyDetailsQR.address.path,
+						network = secretKeyDetailsQR.networkInfo.networkTitle,
+						base58 = secretKeyDetailsQR.base58
 					),
 					NetworkCardModel(secretKeyDetailsQR.networkInfo)
 				)
@@ -153,10 +152,11 @@ class EmptyNavigator : Navigator {
 sealed class LocalNavAction {
 	object None : LocalNavAction()
 	class ShowExportPrivateKey( //todo dmitry refactor this to show this screen right on old screen without global navigation
-        val model: PrivateKeyExportModel,
-        val navigator: SignerNavigator
+		val model: PrivateKeyExportModel,
+		val navigator: SignerNavigator
 	) : LocalNavAction()
-	object ShowScan: LocalNavAction()
+
+	object ShowScan : LocalNavAction()
 }
 
 sealed class LocalNavRequest {

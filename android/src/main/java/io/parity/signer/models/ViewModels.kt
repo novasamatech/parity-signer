@@ -14,46 +14,38 @@ import io.parity.signer.uniffi.*
  * Local copy of shared [MKeys] class
  */
 data class KeySetDetailsModel(
-	val keys: List<KeyModel>,
-	val root: KeyModel,
-	val network: NetworkInfoModel,
+	val keys: List<KeyAndNetworkModel>,
+	val root: KeyModel?,
 ) {
 	companion object {
 		fun createStub(): KeySetDetailsModel = KeySetDetailsModel(
 			keys = listOf(
-				KeyModel.createStub(),
-				KeyModel(
-					addressKey = "address key2",
-					base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9sdfsdfsdfS1repo5EYjGG",
-					identicon = PreviewData.exampleIdenticonPng,
-					hasPwd = true,
-					path = "//polkadot//path3",
-					secretExposed = false,
-					seedName = "sdsdsd",
+				KeyAndNetworkModel(
+					key = KeyModel.createStub(),
+					network = NetworkInfoModel.createStub()
+				),
+				KeyAndNetworkModel(
+					key = KeyModel.createStub()
+						.copy(path = "//polkadot//path3"),
+					network = NetworkInfoModel.createStub()
 				),
 			),
-			root = KeyModel(
-				identicon = PreviewData.exampleIdenticonPng,
-				addressKey = "address key",
-				base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
-				hasPwd = true,
-				path = "//polkadot",
-				secretExposed = false,
-				seedName = "sdsdsd",
-			),
-			network = NetworkInfoModel(
-				networkTitle = "network title",
-				networkLogo = "network logo",
-				networkSpecsKey = "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
-			),
+			root = KeyModel.createStub()
+				.copy(path = "//polkadot"),
 		)
 	}
 }
 
-fun MKeys.toKeySetDetailsModel() = KeySetDetailsModel(
-	keys = set.map { it.toKeysModel() },
-	root = root.toKeysModel(),
-	network = network.toNetworkModel(),
+fun MKeysNew.toKeySetDetailsModel() = KeySetDetailsModel(
+	keys = set.map { it.toKeyAndNetworkModel() },
+	root = root?.toKeysModel(),
+)
+
+data class KeyAndNetworkModel(val key: KeyModel, val network: NetworkInfoModel)
+
+fun MKeyAndNetworkCard.toKeyAndNetworkModel() = KeyAndNetworkModel(
+	key = key.toKeyModel(),
+	network = network.toNetworkInfoModel()
 )
 
 /**
@@ -81,7 +73,20 @@ data class KeyModel(
 	}
 }
 
-fun MKeysCard.toKeysModel() = KeyModel(
+fun MAddressCard.toKeysModel() = KeyModel(
+	addressKey = addressKey,
+	base58 = base58,
+	identicon = address.identicon.toImageContent(),
+	hasPwd = address.hasPwd,
+	path = address.path,
+	secretExposed = address.secretExposed,
+	seedName = address.seedName,
+)
+
+/**
+ * [MKeysCard] is the same as MAddressCard but can be swiped.
+ */
+fun MKeysCard.toKeyModel() = KeyModel(
 	addressKey = addressKey,
 	base58 = base58,
 	identicon = address.identicon.toImageContent(),
@@ -243,7 +248,9 @@ data class KeyDetailsModel(
 
 fun MKeyDetails.toKeyDetailsModel() =
 	KeyDetailsModel(
-		qrData = qr.getData(), pubkey = pubkey, networkInfo = networkInfo.toNetworkInfoModel(),
+		qrData = qr.getData(),
+		pubkey = pubkey,
+		networkInfo = networkInfo.toNetworkInfoModel(),
 		address = KeyCardModel.fromAddress(
 			address = address,
 			base58 = base58,
@@ -261,7 +268,15 @@ data class NetworkInfoModel(
 	val networkTitle: String,
 	val networkLogo: String,
 	val networkSpecsKey: String
-)
+) {
+	companion object {
+		fun createStub(): NetworkInfoModel = NetworkInfoModel(
+			networkTitle = "network title",
+			networkLogo = "network logo",
+			networkSpecsKey = "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+		)
+	}
+}
 
 fun MscNetworkInfo.toNetworkInfoModel() =
 	NetworkInfoModel(networkTitle, networkLogo, networkSpecsKey)

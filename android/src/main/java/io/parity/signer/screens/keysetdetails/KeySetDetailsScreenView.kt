@@ -61,9 +61,12 @@ fun KeySetDetailsScreenView(
 				modifier = Modifier.verticalScroll(rememberScrollState())
 			) {
 				//seed
-				SeedKeyViewItem(model.root) {
-					val selectKeyDetails = "${model.root.addressKey}\n${model.network.networkSpecsKey}"
-					navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
+				model.root?.let {
+					SeedKeyViewItem(it) {
+						val selectKeyDetails =
+							"${model.root.addressKey}\n${model.network.networkSpecsKey}"
+						navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
+					}
 				}
 				//filter row
 				Row(
@@ -80,19 +83,20 @@ fun KeySetDetailsScreenView(
 						painter = painterResource(id = R.drawable.ic_tune_28),
 						contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
 						modifier = Modifier
-                            .clickable {
-                                navigator.navigate(
-                                    Action.NETWORK_SELECTOR,
-                                    ""
-                                )
-                            }
-                            .size(28.dp),
+							.clickable {
+								navigator.navigate(
+									Action.NETWORK_SELECTOR,
+									""
+								)
+							}
+							.size(28.dp),
 						tint = MaterialTheme.colors.textTertiary,
 					)
 				}
 				for (key in model.keys) {
 					KeyDerivedItem(model = key) {
-						val selectKeyDetails = "${key.addressKey}\n${model.network.networkSpecsKey}"
+						val selectKeyDetails =
+							"${key.key.addressKey}\n${key.network.networkSpecsKey}"
 						navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
 					}
 				}
@@ -101,9 +105,9 @@ fun KeySetDetailsScreenView(
 			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
 				ExposedIcon(
 					alertState = alertState, navigator = navigator,
-                    Modifier
-                        .align(Alignment.End)
-                        .padding(end = 16.dp)
+					Modifier
+						.align(Alignment.End)
+						.padding(end = 16.dp)
 				)
 				PrimaryButtonBottomSheet(
 					label = stringResource(R.string.key_sets_details_screem_create_derived_button),
@@ -157,8 +161,8 @@ fun SeedKeyViewItem(
 					contentDescription = null,
 					colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
 					modifier = Modifier
-                        .padding(end = 16.dp)
-                        .size(28.dp)
+						.padding(end = 16.dp)
+						.size(28.dp)
 				)
 			}
 		}

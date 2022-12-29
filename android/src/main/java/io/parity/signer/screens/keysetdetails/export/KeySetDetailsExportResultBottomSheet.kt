@@ -85,7 +85,7 @@ fun KeySetDetailsExportResultBottomSheet(
 				val seed = seedList[i]
 				val keyModel = model.keys.first { it.addressKey == seed }
 				KeyCard(
-					KeyCardModel.fromKeyModel(keyModel, model.network.title),
+					KeyCardModel.fromKeyModel(keyModel, model.network.networkTitle),
 				)
 				if (i != seedList.lastIndex) {
 					SignerDivider()
