@@ -24,10 +24,10 @@ struct ScreenSelector: View {
 
     var body: some View {
         switch screenData {
-        case let .keys(value):
+        case let .keys(keyName):
             KeyDetailsView(
                 viewModel: .init(
-                    keyName: value.root.address.seedName
+                    keyName: keyName
                 ),
                 forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
                 resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
