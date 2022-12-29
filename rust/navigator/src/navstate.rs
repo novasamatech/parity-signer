@@ -5,10 +5,9 @@ use db_handling::identities::get_multisigner_by_address;
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
     ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MLog,
-    MLogDetails, MManageNetworks, MNewSeed, MPasswordConfirm, MRecoverSeedName,
-    MRecoverSeedPhrase, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
-    MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData, ScreenNameType,
-    ShieldAlert, TransactionType,
+    MLogDetails, MManageNetworks, MNewSeed, MPasswordConfirm, MRecoverSeedName, MRecoverSeedPhrase,
+    MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSufficientCryptoReady, MTransaction,
+    ModalData, RightButton, ScreenData, ScreenNameType, ShieldAlert, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use std::fmt::Write;

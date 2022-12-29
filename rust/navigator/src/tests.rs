@@ -7,8 +7,9 @@ use std::{collections::HashMap, convert::TryInto, fs, str::FromStr};
 
 use constants::{
     test_values::{
-        alice_sr_alice, alice_sr_alice_secret_secret, alice_sr_kusama, alice_sr_polkadot, alice_sr_root,
-        alice_sr_secret_path_multipass, alice_sr_westend, bob, kusama_9130, kusama_9151, types_known,
+        alice_sr_alice, alice_sr_alice_secret_secret, alice_sr_kusama, alice_sr_polkadot,
+        alice_sr_root, alice_sr_secret_path_multipass, alice_sr_westend, bob, kusama_9130,
+        kusama_9151, types_known,
     },
     ALICE_SEED_PHRASE,
 };
@@ -28,15 +29,16 @@ use definitions::{
     keyring::{AddressKey, NetworkSpecsKey, Order},
     navigation::{
         ActionResult, Address, AlertData, Card, DerivationCheck, DerivationDestination,
-        DerivationEntry, DerivationPack, ExportedSet, FooterButton, History, MBackup, MDeriveKey, MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti, MLog,
-        MLogDetails, MLogRight, MMMNetwork, MMNetwork, MManageMetadata, MManageNetworks,
-        MMetadataRecord, MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup,
-        MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCCall, MSCContent,
-        MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion,
-        MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
-        MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData,
-        Network, NetworkSpecs, PathAndNetwork, QrData, RightButton, ScreenData, ScreenNameType,
-        SeedNameCard, SignerImage, TransactionCard, TransactionCardSet, TransactionType,
+        DerivationEntry, DerivationPack, ExportedSet, FooterButton, History, MBackup, MDeriveKey,
+        MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti, MLog, MLogDetails, MLogRight,
+        MMMNetwork, MMNetwork, MManageMetadata, MManageNetworks, MMetadataRecord, MNetworkDetails,
+        MNetworkMenu, MNewSeed, MNewSeedBackup, MPasswordConfirm, MRawKey, MRecoverSeedName,
+        MRecoverSeedPhrase, MSCCall, MSCContent, MSCCurrency, MSCEnumVariantName, MSCEraMortal,
+        MSCFieldName, MSCId, MSCNameVersion, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings,
+        MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, MTypesInfo,
+        MVerifier, MVerifierDetails, ModalData, Network, NetworkSpecs, PathAndNetwork, QrData,
+        RightButton, ScreenData, ScreenNameType, SeedNameCard, SignerImage, TransactionCard,
+        TransactionCardSet, TransactionType,
     },
     network_specs::{OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -5533,9 +5535,7 @@ fn flow_test_1() {
                     message: Some(vec![TransactionCard {
                         index: 0,
                         indent: 0,
-                        card: Card::TextCard {
-                            f: card_text,
-                        },
+                        card: Card::TextCard { f: card_text },
                     }]),
                     ..Default::default()
                 },
