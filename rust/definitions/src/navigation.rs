@@ -173,13 +173,6 @@ pub struct MNetworkCard {
     pub logo: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct MKeys {
-    pub set: Vec<MKeysCard>,
-    pub root: MKeysCard,
-    pub network: MNetworkCard,
-}
-
 #[derive(Clone, Default, Debug, PartialEq, Eq)]
 pub struct MSettings {
     pub public_key: Option<String>,
