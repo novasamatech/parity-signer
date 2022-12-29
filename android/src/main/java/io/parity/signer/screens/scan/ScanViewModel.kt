@@ -1,8 +1,8 @@
 package io.parity.signer.screens.scan
 
 import android.util.Log
-import androidx.compose.runtime.produceState
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.parity.signer.backend.UniffiResult
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
@@ -12,8 +12,7 @@ import io.parity.signer.models.storage.RepoResult
 import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.models.transactionIssues
 import io.parity.signer.uniffi.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 
 
 private const val TAG = "ScanViewModelTag"
@@ -26,11 +25,13 @@ class ScanViewModel : ViewModel() {
 	private val uniffiInteractor = ServiceLocator.backendScope.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
 
-	data class TransactionsState(val transactions: List<MTransaction>,
-															 val title: String)
+	data class TransactionsState(
+		val transactions: List<MTransaction>,
+		val title: String
+	)
 
 	private var transactions: MutableStateFlow<TransactionsState?> =
-		MutableStateFlow(null)
+		MutableStateFlow(null)  // todo scan migrate to flow
 	private var signature: MutableStateFlow<MSignatureReady?> =
 		MutableStateFlow(null)
 	private var passwordModel: MutableStateFlow<EnterPasswordModel?> =
@@ -41,13 +42,6 @@ class ScanViewModel : ViewModel() {
 	private val transactionDetails: MutableStateFlow<MTransaction?> =
 		MutableStateFlow(null)//todo scan
 
-	val screenState : StateFlow<ScanSubgraphState> = produceState(
-		initialValue = ScanSubgraphState.CameraScan,
-		keys = transactions, signature,
-		producer = {
-			ScanSubgraphState.CameraScan
-		}
-	)
 
 	private val transactionIsInProgress = MutableStateFlow<Boolean>(false)
 
@@ -89,7 +83,8 @@ class ScanViewModel : ViewModel() {
 				//password protected key, show password
 				when (val modalData = actionResult?.modalData) {
 					is ModalData.EnterPassword -> {
-						passwordModel.value = modalData.f.toEnterPasswordModel(withShowError = false)
+						passwordModel.value =
+							modalData.f.toEnterPasswordModel(withShowError = false)
 					}
 					is ModalData.SignatureReady -> {
 						signature.value = modalData.f
@@ -110,7 +105,8 @@ class ScanViewModel : ViewModel() {
 			//						rust/navigator/src/navstate.rs:396
 			// alert error
 		}
-		this.transactions.value = TransactionsState(transactions, navigateResponse.result.screenLabel)
+		this.transactions.value =
+			TransactionsState(transactions, navigateResponse.result.screenLabel)
 	}
 
 	fun ifHasStateThenClear(): Boolean {
@@ -158,12 +154,12 @@ class ScanViewModel : ViewModel() {
 		val actionResult =
 			(navigateResponse as? UniffiResult.Success)?.result
 				?: run {
-			Log.e(
-				TAG, "Error in entering password for a key, " +
-					"navigation resp is $navigateResponse"
-			)
-			return
-		}
+					Log.e(
+						TAG, "Error in entering password for a key, " +
+							"navigation resp is $navigateResponse"
+					)
+					return
+				}
 
 		when (val modalData = actionResult.modalData) {
 			// If navigation returned `enterPassword`, it means password is invalid
@@ -184,7 +180,8 @@ class ScanViewModel : ViewModel() {
 			//ignore the rest modals
 			else -> {
 				Log.e(
-					TAG, "Password is entered for transaction, but neither new password or signature is passed! Should not happen" +
+					TAG,
+					"Password is entered for transaction, but neither new password or signature is passed! Should not happen" +
 						"actionResult is $actionResult"
 				)
 			}
@@ -229,9 +226,18 @@ class ScanViewModel : ViewModel() {
 }
 
 sealed class ScanSubgraphState {
-	data class TransactionDetails(val state: ScanViewModel.TransactionsState)
-	data class TransactionsPreview(val transaction: MTransaction)
-	object CameraScan
-	data class TransactionErrorModal()
-	data class PasswordModal()
+	object CameraScan : ScanSubgraphState()
+	data class TransactionsPreview(
+		val state: ScanViewModel.TransactionsState,
+		val signature: MSignatureReady
+	) : ScanSubgraphState()
+
+	data class TransactionsDetails(
+		val transaction: MTransaction,
+		val restTransactions: TransactionsPreview
+	) : ScanSubgraphState()
+
+	data class PasswordModal(val model: EnterPasswordModel) : ScanSubgraphState()
+	object ErrorWrongPassword : ScanSubgraphState()
+	data class ErrorState(val error: String) : ScanSubgraphState()
 }

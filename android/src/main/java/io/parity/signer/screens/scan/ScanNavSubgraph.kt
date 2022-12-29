@@ -119,3 +119,14 @@ fun ScanNavSubgraph(
 		}
 	}
 }
+
+
+@Composable
+fun ScanNavSubgraph(
+	rootNavigator: Navigator,
+	state: ScanSubgraphState,
+) {
+	when (state) {
+
+	}
+}
