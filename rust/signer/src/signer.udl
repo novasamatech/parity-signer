@@ -265,12 +265,6 @@ dictionary MNetworkCard {
     string logo;
 };
 
-dictionary MKeys {
-    sequence<MKeysCard> set;
-    MKeysCard root;
-    MNetworkCard network;
-};
-
 dictionary MKeysCard {
     Address address;
     string address_key;
