@@ -662,7 +662,6 @@ fn parse_transaction_1() {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
         address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
             .to_string(),
-        multiselect: None,
         address: Address {
             identicon: SignerImage::Png {
                 image: alice_sr_alice().to_vec(),
@@ -1004,7 +1003,6 @@ fn parse_transaction_2() {
 
     let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        multiselect: None,
         address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
             .to_string(),
         address: Address {
@@ -1182,7 +1180,6 @@ fn parse_transaction_3() {
             has_pwd: false,
             secret_exposed: false,
         },
-        multiselect: None,
     };
     let network_info_known = westend_spec();
     let output = produce_output(line, dbname);
@@ -2168,7 +2165,6 @@ fn parse_transaction_6_error_on_parsing() {
                         "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                             .to_string(),
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    multiselect: None,
                     address: Address {
                         identicon: SignerImage::Png {
                             image: alice_sr_alice().to_vec(),
@@ -2266,7 +2262,6 @@ fn parse_transaction_7_error_on_parsing() {
             card: Card::AuthorCard {
                 f: MAddressCard {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    multiselect: None,
                     address_key:
                         "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                             .to_string(),
@@ -2368,7 +2363,6 @@ fn parse_transaction_8_error_on_parsing() {
             card: Card::AuthorCard {
                 f: MAddressCard {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    multiselect: None,
                     address_key:
                         "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                             .to_string(),
@@ -2475,7 +2469,6 @@ fn parse_msg_1() {
         address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
             .to_string(),
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        multiselect: None,
         address: Address {
             identicon: SignerImage::Png {
                 image: alice_sr_alice().to_vec(),

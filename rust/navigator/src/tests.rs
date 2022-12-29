@@ -7,10 +7,9 @@ use std::{collections::HashMap, convert::TryInto, fs, str::FromStr};
 
 use constants::{
     test_values::{
-        alice_sr_0, alice_sr_1, alice_sr_alice, alice_sr_alice_secret_secret,
-        alice_sr_alice_westend, alice_sr_kusama, alice_sr_polkadot, alice_sr_root,
-        alice_sr_secret_path_multipass, alice_sr_westend, alice_sr_westend_0, alice_sr_westend_1,
-        alice_sr_westend_2, bob, empty_png, kusama_9130, kusama_9151, types_known,
+        alice_sr_alice, alice_sr_alice_secret_secret, alice_sr_kusama, alice_sr_polkadot,
+        alice_sr_root, alice_sr_secret_path_multipass, alice_sr_westend, bob, kusama_9130,
+        kusama_9151, types_known,
     },
     ALICE_SEED_PHRASE,
 };
@@ -27,19 +26,19 @@ use definitions::{
         Entry, Event, IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
         NetworkSpecsExport, SignDisplay, SignMessageDisplay, TypesDisplay, TypesExport,
     },
-    keyring::{NetworkSpecsKey, Order},
+    keyring::{AddressKey, NetworkSpecsKey, Order},
     navigation::{
         ActionResult, Address, AlertData, Card, DerivationCheck, DerivationDestination,
         DerivationEntry, DerivationPack, ExportedSet, FooterButton, History, MBackup, MDeriveKey,
-        MEnterPassword, MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog,
-        MLogDetails, MLogRight, MMMNetwork, MMNetwork, MManageMetadata, MManageNetworks,
-        MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup,
-        MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCCall, MSCContent,
-        MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion,
-        MSCNetworkInfo, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
-        MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData,
-        Network, NetworkSpecs, PathAndNetwork, QrData, RightButton, ScreenData, ScreenNameType,
-        SeedNameCard, SignerImage, TransactionCard, TransactionCardSet, TransactionType,
+        MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti, MLog, MLogDetails, MLogRight,
+        MMMNetwork, MMNetwork, MManageMetadata, MManageNetworks, MMetadataRecord, MNetworkDetails,
+        MNetworkMenu, MNewSeed, MNewSeedBackup, MPasswordConfirm, MRawKey, MRecoverSeedName,
+        MRecoverSeedPhrase, MSCCall, MSCContent, MSCCurrency, MSCEnumVariantName, MSCEraMortal,
+        MSCFieldName, MSCId, MSCNameVersion, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings,
+        MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, MTypesInfo,
+        MVerifier, MVerifierDetails, ModalData, Network, NetworkSpecs, PathAndNetwork, QrData,
+        RightButton, ScreenData, ScreenNameType, SeedNameCard, SignerImage, TransactionCard,
+        TransactionCardSet, TransactionType,
     },
     network_specs::{OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -48,6 +47,7 @@ use definitions::navigation::MAddressCard;
 use pretty_assertions::assert_eq;
 
 use crate::{
+    keys_by_seed_name,
     navstate::State,
     states::{SignResult, TransactionState},
     Action,
@@ -83,9 +83,11 @@ lazy_static! {
     static ref OS_MSG: Regex = Regex::new(r#"Os \{[^}]*\}"#).expect("checked_construction");
 }
 
+/* TODO: unused due to temporary in-network-derivation code disablement.
 fn cut_os_msg(error: &str) -> String {
     OS_MSG.replace_all(error, r#"Os {**}"#).to_string()
 }
+*/
 
 fn cut_seed_remove_identicon(data: &mut Option<ModalData>) -> String {
     if let Some(ModalData::NewSeedBackup { f }) = data {
@@ -260,21 +262,6 @@ fn erase_modal_seed_phrase_and_identicon(m: &mut ModalData) -> String {
         res
     } else {
         panic!("expected ModalData::NewSeedBackup got {:?}", m);
-    }
-}
-
-fn erase_base58_address_identicon(m: &mut ScreenData) {
-    if let ScreenData::Keys { f } = m {
-        for key in f.set.iter_mut() {
-            key.address.identicon = SignerImage::default();
-            key.base58 = String::new();
-            key.address_key = String::new();
-        }
-        f.root.address.identicon = SignerImage::default();
-        f.root.base58 = String::new();
-        f.root.address_key = String::new();
-    } else {
-        panic!("expected ScreenData::Keys got {:?}", m);
     }
 }
 
@@ -2280,10 +2267,9 @@ fn flow_test_1() {
         "GoForward on NewSeed screen with non-empty seed name. Expected NewSeed screen with NewSeedBackup modal."
     );
 
-    let mut action = state
+    let action = state
         .perform(Action::GoForward, "true", &seed_phrase_portia)
         .unwrap();
-    erase_base58_address_identicon(&mut action.screen_data);
     let expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
@@ -2292,36 +2278,7 @@ fn flow_test_1() {
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
-            f: MKeys {
-                set: vec![MKeysCard {
-                    address_key: String::new(),
-                    base58: String::new(),
-                    address: Address {
-                        identicon: SignerImage::default(),
-                        has_pwd: false,
-                        path: "//polkadot".to_string(),
-                        secret_exposed: false,
-                        seed_name: "Portia".to_string(),
-                    },
-                    swiped: false,
-                }],
-                root: MKeysCard {
-                    address: Address {
-                        path: "".to_string(),
-                        seed_name: "Portia".to_string(),
-                        identicon: SignerImage::default(),
-                        secret_exposed: false,
-                        has_pwd: false,
-                    },
-                    address_key: String::new(),
-                    base58: String::new(),
-                    swiped: false,
-                },
-                network: MNetworkCard {
-                    title: "Polkadot".to_string(),
-                    logo: "polkadot".to_string(),
-                },
-            },
+            f: "Portia".to_string(),
         },
         modal_data: None,
         alert_data: None,
@@ -3069,40 +3026,7 @@ fn flow_test_1() {
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
-            f: MKeys {
-                set: vec![MKeysCard {
-                    address_key:
-                        "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
-                            .to_string(),
-                    base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
-                    address: Address {
-                        seed_name: "Alice".to_string(),
-                        identicon: SignerImage::Png {
-                            image: alice_sr_polkadot().to_vec(),
-                        },
-                        has_pwd: false,
-                        path: "//polkadot".to_string(),
-                        secret_exposed: false,
-                    },
-                    swiped: false,
-                }],
-                // since root == 'false' in state.perform above.
-                // TODO: This has to be wrapped with Option<_>.
-                root: MKeysCard {
-                    address: Address {
-                        seed_name: "Alice".to_string(),
-                        identicon: SignerImage::Png {
-                            image: empty_png().to_vec(),
-                        },
-                        ..Default::default()
-                    },
-                    ..Default::default()
-                },
-                network: MNetworkCard {
-                    title: "Polkadot".to_string(),
-                    logo: "polkadot".to_string(),
-                },
-            },
+            f: "Alice".to_string(),
         },
         modal_data: None,
         alert_data: None,
@@ -3169,7 +3093,11 @@ fn flow_test_1() {
     let action = state
         .perform(
             Action::SelectKey,
-            "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730",
+            &format!(
+                "{}\n{}",
+                "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730",
+                "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+            ),
             "",
         )
         .unwrap();
@@ -3182,7 +3110,7 @@ fn flow_test_1() {
         right_button: Some(RightButton::KeyMenu),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::KeyDetails {
-            f: MKeyDetails {
+            f: Some(MKeyDetails {
                 qr: QrData::Regular {
                     data: format!(
                         "substrate:{}:0x{}",
@@ -3211,7 +3139,7 @@ fn flow_test_1() {
                         "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
                             .to_string(),
                 },
-            },
+            }),
         },
         modal_data: None,
         alert_data: None,
@@ -3328,58 +3256,7 @@ fn flow_test_1() {
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
-            f: MKeys {
-                set: vec![
-                    MKeysCard {
-                        address_key:
-                            "01e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
-                                .to_string(),
-                        base58: "16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_secret_path_multipass().to_vec(),
-                            },
-                            has_pwd: true,
-                            path: "//secret//path".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
-                                .to_string(),
-                        base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_polkadot().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//polkadot".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                ],
-                // since root == 'false' in state.perform above.
-                // TODO: This has to be wrapped with Option<_>.
-                root: MKeysCard {
-                    address: Address {
-                        seed_name: "Alice".to_string(),
-                        identicon: SignerImage::Png {
-                            image: empty_png().to_vec(),
-                        },
-                        ..Default::default()
-                    },
-                    ..Default::default()
-                },
-                network: MNetworkCard {
-                    title: "Polkadot".to_string(),
-                    logo: "polkadot".to_string(),
-                },
-            },
+            f: "Alice".to_string(),
         },
         modal_data: None,
         alert_data: None,
@@ -3407,62 +3284,7 @@ fn flow_test_1() {
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
-            f: MKeys {
-                set: vec![
-                    MKeysCard {
-                        address_key:
-                            "01e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
-                                .to_string(),
-                        base58: "16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_secret_path_multipass().to_vec(),
-                            },
-                            has_pwd: true,
-                            path: "//secret//path".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
-                                .to_string(),
-                        base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
-                        swiped: false,
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_polkadot().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//polkadot".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                    },
-                ],
-                root: MKeysCard {
-                    address_key:
-                        "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
-                            .to_string(),
-                    base58: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_string(),
-                    address: Address {
-                        path: "".to_string(),
-                        seed_name: "Alice".to_string(),
-                        identicon: SignerImage::Png {
-                            image: alice_sr_root().to_vec(),
-                        },
-                        secret_exposed: false,
-                        has_pwd: false,
-                    },
-                    swiped: false,
-                },
-                network: MNetworkCard {
-                    title: "Polkadot".to_string(),
-                    logo: "polkadot".to_string(),
-                },
-            },
+            f: "Alice".to_string(),
         },
         modal_data: None,
         alert_data: None,
@@ -3522,62 +3344,7 @@ fn flow_test_1() {
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
-            f: MKeys {
-                set: vec![
-                    MKeysCard {
-                        address_key:
-                            "01e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
-                                .to_string(),
-                        base58: "16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb".to_string(),
-                        swiped: false,
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_secret_path_multipass().to_vec(),
-                            },
-                            has_pwd: true,
-                            path: "//secret//path".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                    },
-                    MKeysCard {
-                        address_key:
-                            "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
-                                .to_string(),
-                        base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
-                        swiped: false,
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_polkadot().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//polkadot".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                    },
-                ],
-                root: MKeysCard {
-                    address: Address {
-                        path: "".to_string(),
-                        seed_name: "Alice".to_string(),
-                        identicon: SignerImage::Png {
-                            image: alice_sr_root().to_vec(),
-                        },
-                        secret_exposed: false,
-                        has_pwd: false,
-                    },
-                    address_key:
-                        "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
-                            .to_string(),
-                    base58: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_string(),
-                    swiped: false,
-                },
-                network: MNetworkCard {
-                    title: "Polkadot".to_string(),
-                    logo: "polkadot".to_string(),
-                },
-            },
+            f: "Alice".to_string(),
         },
         modal_data: Some(ModalData::SeedMenu {
             f: MSeedMenu {
@@ -3889,14 +3656,10 @@ fn flow_test_1() {
         )
     );
 
-    state.perform(Action::NetworkSelector, "", "").unwrap();
-    let action = state
-        .perform(
-            Action::ChangeNetwork,
-            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-            "",
-        )
-        .unwrap();
+    let res = state.perform(Action::NetworkSelector, "", "").unwrap();
+
+    dbg!(res);
+
     let expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
@@ -3905,38 +3668,7 @@ fn flow_test_1() {
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
-            f: MKeys {
-                set: vec![MKeysCard {
-                    address_key:
-                        "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
-                            .to_string(),
-                    base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
-                    address: Address {
-                        identicon: SignerImage::Png {
-                            image: alice_sr_westend().to_vec(),
-                        },
-                        has_pwd: false,
-                        path: "//westend".to_string(),
-                        secret_exposed: false,
-                        seed_name: "Alice".to_string(),
-                    },
-                    swiped: false,
-                }],
-                root: MKeysCard {
-                    address: Address {
-                        seed_name: "Alice".to_string(),
-                        identicon: SignerImage::Png {
-                            image: empty_png().to_vec(),
-                        },
-                        ..Default::default()
-                    },
-                    ..Default::default()
-                },
-                network: MNetworkCard {
-                    title: "Westend".to_string(),
-                    logo: "westend".to_string(),
-                },
-            },
+            f: "Alice".to_string(),
         },
         modal_data: None,
         alert_data: None,
@@ -4028,130 +3760,13 @@ fn flow_test_1() {
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
-            f: MKeys {
-                set: vec![
-                    MKeysCard {
-                        address_key:
-                            "012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972"
-                                .to_string(),
-                        base58: "5D34dL5prEUaGNQtPPZ3yN5Y6BnkfXunKXXz6fo7ZJbLwRRH".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_0().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//0".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
-                                .to_string(),
-                        base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_westend().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//westend".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
-                                .to_string(),
-                        base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_alice_secret_secret().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//Alice/secret//secret".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "019cd20feb68e0535a6c1cdeead4601b652cf6af6d76baf370df26ee25adde0805"
-                                .to_string(),
-                        base58: "5FcKjDXS89U79cXvhksZ2pF5XBeafmSM8rqkDVoTHQcXd5Gq".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_alice_westend().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//Alice/westend".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "01b606fc73f57f03cdb4c932d475ab426043e429cecc2ffff0d2672b0df8398c48"
-                                .to_string(),
-                        base58: "5GBNeWRhZc2jXu7D55rBimKYDk8PGk8itRYFTPfC8RJLKG5o".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_1().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//1".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
-                                .to_string(),
-                        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_alice().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//Alice".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                ],
-                root: MKeysCard {
-                    address: Address {
-                        path: "".to_string(),
-                        seed_name: "Alice".to_string(),
-                        identicon: SignerImage::Png {
-                            image: empty_png().to_vec(),
-                        },
-                        secret_exposed: false,
-                        has_pwd: false,
-                    },
-                    address_key: String::new(),
-                    base58: String::new(),
-                    swiped: false,
-                },
-                network: MNetworkCard {
-                    title: "Westend".to_string(),
-                    logo: "westend".to_string(),
-                },
-            },
+            f: "Alice".to_string(),
         },
         modal_data: None,
         alert_data: None,
     };
 
-    let mut keys_westend = expected_action.clone();
+    let keys_westend = expected_action.clone();
 
     assert_eq!(
         action, expected_action,
@@ -4165,29 +3780,7 @@ fn flow_test_1() {
     let mut alice_westend_keys_action = action;
 
     state.perform(Action::NetworkSelector, "", "").unwrap();
-    let action = state
-        .perform(
-            Action::ChangeNetwork,
-            "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
-            "",
-        )
-        .unwrap(); // switching to polkadot, expect no changes
-    assert_eq!(
-        action, alice_polkadot_keys_action,
-        concat!(
-            "Switched network to polkadot. Expected no changes on Keys screen ",
-            "for Alice polkadot keys"
-        )
-    );
 
-    state.perform(Action::NetworkSelector, "", "").unwrap();
-    state
-        .perform(
-            Action::ChangeNetwork,
-            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-            "",
-        )
-        .unwrap();
     let action = state
         .perform(
             Action::Swipe,
@@ -4196,9 +3789,6 @@ fn flow_test_1() {
         )
         .unwrap();
 
-    if let ScreenData::Keys { ref mut f } = keys_westend.screen_data {
-        f.set[1].swiped = true;
-    }
     assert_eq!(
         action, keys_westend,
         "Swipe on Keys screen for Alice westend keys. Expected updated Keys screen.",
@@ -4236,10 +3826,6 @@ fn flow_test_1() {
         )
         .unwrap();
 
-    if let ScreenData::Keys { ref mut f } = keys_westend.screen_data {
-        f.set[1].swiped = false;
-        f.set[3].swiped = true;
-    }
     assert_eq!(
         action, keys_westend,
         concat!(
@@ -4247,10 +3833,6 @@ fn flow_test_1() {
             "is still selected. Expected updated Keys screen"
         )
     );
-
-    if let ScreenData::Keys { ref mut f } = keys_westend.screen_data {
-        f.set.retain(|x| !x.swiped)
-    }
 
     // remove swiped
     let action = state.perform(Action::RemoveKey, "", "").unwrap();
@@ -4280,135 +3862,7 @@ fn flow_test_1() {
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
-            f: MKeys {
-                set: vec![
-                    MKeysCard {
-                        address_key:
-                            "0120c394d410893cac63d993fa71eb8247e6af9a29cda467e836efec678b9f6b7f"
-                                .to_string(),
-                        base58: "5CofVLAGjwvdGXvBiP6ddtZYMVbhT5Xke8ZrshUpj2ZXAnND".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_westend_1().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//westend//1".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972"
-                                .to_string(),
-                        base58: "5D34dL5prEUaGNQtPPZ3yN5Y6BnkfXunKXXz6fo7ZJbLwRRH".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_0().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//0".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
-                                .to_string(),
-                        base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_westend().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//westend".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                    },
-                    MKeysCard {
-                        address_key:
-                            "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
-                                .to_string(),
-                        base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_alice_secret_secret().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//Alice/secret//secret".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "01b606fc73f57f03cdb4c932d475ab426043e429cecc2ffff0d2672b0df8398c48"
-                                .to_string(),
-                        base58: "5GBNeWRhZc2jXu7D55rBimKYDk8PGk8itRYFTPfC8RJLKG5o".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_1().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//1".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
-                                .to_string(),
-                        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_alice().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//Alice".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "01e655361d12f3ccca5f128187cf3f5eea052be722746e392c8b498d0d18723470"
-                                .to_string(),
-                        base58: "5HGiBcFgEBMgT6GEuo9SA98sBnGgwHtPKDXiUukT6aqCrKEx".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_westend_0().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//westend//0".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                ],
-                root: MKeysCard {
-                    address: Address {
-                        seed_name: "Alice".to_string(),
-                        identicon: SignerImage::Png {
-                            image: empty_png().to_vec(),
-                        },
-                        ..Default::default()
-                    },
-                    ..Default::default()
-                },
-                network: MNetworkCard {
-                    title: "Westend".to_string(),
-                    logo: "westend".to_string(),
-                },
-            },
+            f: "Alice".to_string(),
         },
         modal_data: None,
         alert_data: None,
@@ -4429,27 +3883,6 @@ fn flow_test_1() {
         .perform(Action::Increment, "1", ALICE_SEED_PHRASE)
         .unwrap();
 
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
-        f.set.insert(
-            3,
-            MKeysCard {
-                address_key: "014e384fb30994d520094dce42086dbdd4977c11fb2f2cf9ca1c80056684934b08"
-                    .to_string(),
-                base58: "5DqGKX9v7uR92EvmNNmiETZ9PcDBrg2YRYukGhzXHEkKmpfx".to_string(),
-                address: Address {
-                    identicon: SignerImage::Png {
-                        image: alice_sr_westend_2().to_vec(),
-                    },
-                    has_pwd: false,
-                    path: "//westend//2".to_string(),
-                    secret_exposed: false,
-                    seed_name: "Alice".to_string(),
-                },
-                swiped: false,
-            },
-        );
-    }
-
     assert_eq!(
         action, expected_action,
         "Increment on Keys screen with swiped key. Expected updated Keys screen.",
@@ -4464,7 +3897,6 @@ fn flow_test_1() {
         )
         .unwrap();
 
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {};
     expected_action.right_button = Some(RightButton::MultiSelect);
 
     assert_eq!(
@@ -4480,7 +3912,6 @@ fn flow_test_1() {
             "",
         )
         .unwrap();
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {};
 
     assert_eq!(
         action, expected_action,
@@ -4495,7 +3926,6 @@ fn flow_test_1() {
             "",
         )
         .unwrap();
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {};
 
     assert_eq!(
         action, expected_action,
@@ -4510,7 +3940,6 @@ fn flow_test_1() {
             "",
         )
         .unwrap();
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {}
 
     assert_eq!(
         action, expected_action,
@@ -4556,14 +3985,6 @@ fn flow_test_1() {
         .unwrap();
     // remove keys in multiselect mode
     let action = state.perform(Action::RemoveKey, "", "").unwrap();
-
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
-        f.set.remove(0);
-        f.set.remove(0);
-        f.set.remove(1);
-        f.set.remove(2);
-        f.set.remove(3);
-    }
     expected_action.right_button = Some(RightButton::Backup);
     assert_eq!(
         action, expected_action,
@@ -4580,7 +4001,6 @@ fn flow_test_1() {
     // select all
     let action = state.perform(Action::SelectAll, "", "").unwrap();
 
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {}
     expected_action.right_button = Some(RightButton::MultiSelect);
 
     assert_eq!(
@@ -4591,16 +4011,12 @@ fn flow_test_1() {
     // deselect all
     let action = state.perform(Action::SelectAll, "", "").unwrap();
 
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {
-        for entry in f.set.iter_mut() {}
-    }
     assert_eq!(
         action, expected_action,
         "SelectAll on Keys screen with multiselect mode. Expected updated Keys screen.",
     );
     // exit multiselect mode
     let action = state.perform(Action::GoBack, "", "").unwrap();
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {}
     expected_action.right_button = Some(RightButton::Backup);
     assert_eq!(
         action, expected_action,
@@ -4870,78 +4286,7 @@ fn flow_test_1() {
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
-            f: MKeys {
-                set: vec![
-                    MKeysCard {
-                        address_key:
-                            "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
-                                .to_string(),
-                        base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_westend().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//westend".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
-                                .to_string(),
-                        base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_alice_secret_secret().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//Alice/secret//secret".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
-                                .to_string(),
-                        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_alice().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//Alice".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                ],
-                root: MKeysCard {
-                    address: Address {
-                        path: "".to_string(),
-                        seed_name: "Alice".to_string(),
-                        identicon: SignerImage::Png {
-                            image: alice_sr_root().to_vec(),
-                        },
-                        secret_exposed: false,
-                        has_pwd: false,
-                    },
-                    address_key:
-                        "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
-                            .to_string(),
-                    base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
-                    swiped: false,
-                },
-                network: MNetworkCard {
-                    title: "Westend".to_string(),
-                    logo: "westend".to_string(),
-                },
-            },
+            f: "Alice".to_string(),
         },
         modal_data: None,
         alert_data: None,
@@ -4963,7 +4308,6 @@ fn flow_test_1() {
     // select all
     let action = state.perform(Action::SelectAll, "", "").unwrap();
 
-    if let ScreenData::Keys { ref mut f } = expected_action.screen_data {}
     expected_action.right_button = Some(RightButton::MultiSelect);
 
     assert_eq!(
@@ -4978,7 +4322,11 @@ fn flow_test_1() {
     let action = state
         .perform(
             Action::SelectKey,
-            "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
+            &format!(
+                "{}\n{}",
+                "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
+                "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+            ),
             "",
         )
         .unwrap();
@@ -4990,7 +4338,7 @@ fn flow_test_1() {
         right_button: Some(RightButton::KeyMenu),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::KeyDetails {
-            f: MKeyDetails {
+            f: Some(MKeyDetails {
                 qr: QrData::Regular {
                     data: format!(
                         "substrate:{}:0x{}",
@@ -5018,7 +4366,7 @@ fn flow_test_1() {
                         "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                 },
-            },
+            }),
         },
         modal_data: None,
         alert_data: None,
@@ -5073,62 +4421,7 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
-            f: MKeys {
-                set: vec![
-                    MKeysCard {
-                        address_key:
-                            "01e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
-                                .to_string(),
-                        base58: "16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_secret_path_multipass().to_vec(),
-                            },
-                            has_pwd: true,
-                            path: "//secret//path".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                    MKeysCard {
-                        address_key:
-                            "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
-                                .to_string(),
-                        base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
-                        address: Address {
-                            identicon: SignerImage::Png {
-                                image: alice_sr_polkadot().to_vec(),
-                            },
-                            has_pwd: false,
-                            path: "//polkadot".to_string(),
-                            secret_exposed: false,
-                            seed_name: "Alice".to_string(),
-                        },
-                        swiped: false,
-                    },
-                ],
-                root: MKeysCard {
-                    address: Address {
-                        path: "".to_string(),
-                        seed_name: "Alice".to_string(),
-                        identicon: SignerImage::Png {
-                            image: alice_sr_root().to_vec(),
-                        },
-                        secret_exposed: false,
-                        has_pwd: false,
-                    },
-                    address_key:
-                        "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
-                            .to_string(),
-                    base58: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_string(),
-                    swiped: false,
-                },
-                network: MNetworkCard {
-                    title: "Polkadot".to_string(),
-                    logo: "polkadot".to_string(),
-                },
-            },
+            f: "Alice".to_string(),
         },
         modal_data: Some(ModalData::Backup {
             f: MBackup {
@@ -6244,9 +5537,7 @@ fn flow_test_1() {
                     message: Some(vec![TransactionCard {
                         index: 0,
                         indent: 0,
-                        card: Card::TextCard {
-                            f: card_text.clone(),
-                        },
+                        card: Card::TextCard { f: card_text },
                     }]),
                     ..Default::default()
                 },
@@ -6447,10 +5738,9 @@ fn flow_test_1() {
         )
     );
 
-    let mut action = state
+    let action = state
         .perform(Action::GoForward, "false", &seed_phrase_pepper)
         .unwrap();
-    erase_base58_address_identicon(&mut action.screen_data);
     let expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
@@ -6459,36 +5749,7 @@ fn flow_test_1() {
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
-            f: MKeys {
-                set: vec![MKeysCard {
-                    address_key: String::new(),
-                    base58: String::new(),
-                    swiped: false,
-                    address: Address {
-                        identicon: SignerImage::default(),
-                        has_pwd: false,
-                        path: "//polkadot".to_string(),
-                        secret_exposed: false,
-                        seed_name: "Pepper".to_string(),
-                    },
-                }],
-                root: MKeysCard {
-                    address: Address {
-                        path: "".to_string(),
-                        seed_name: "Pepper".to_string(),
-                        identicon: SignerImage::default(),
-                        secret_exposed: false,
-                        has_pwd: false,
-                    },
-                    address_key: String::new(),
-                    base58: String::new(),
-                    swiped: false,
-                },
-                network: MNetworkCard {
-                    title: "Polkadot".to_string(),
-                    logo: "polkadot".to_string(),
-                },
-            },
+            f: "Pepper".to_string(),
         },
         modal_data: None,
         alert_data: None,
@@ -6505,14 +5766,6 @@ fn flow_test_1() {
     state.update_seed_names(vec![String::from("Alice"), String::from("Pepper")]);
 
     state.perform(Action::NetworkSelector, "", "").unwrap();
-    let mut action = state
-        .perform(
-            Action::ChangeNetwork,
-            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-            "",
-        )
-        .unwrap();
-
     let expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
@@ -6521,48 +5774,29 @@ fn flow_test_1() {
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
-            f: MKeys {
-                set: vec![MKeysCard {
-                    address_key: String::new(),
-                    base58: String::new(),
-                    swiped: false,
-                    address: Address {
-                        identicon: SignerImage::default(),
-                        has_pwd: false,
-                        path: "//westend".to_string(),
-                        secret_exposed: false,
-                        seed_name: "Pepper".to_string(),
-                    },
-                }],
-                root: MKeysCard {
-                    address: Address {
-                        seed_name: "Pepper".to_string(),
-                        ..Default::default()
-                    },
-                    ..Default::default()
-                },
-                network: MNetworkCard {
-                    title: "Westend".to_string(),
-                    logo: "westend".to_string(),
-                },
-            },
+            f: "Pepper".to_string(),
         },
         modal_data: None,
         alert_data: None,
     };
 
-    let (pepper_westend_public, pepper_westend_base58, pepper_westend_identicon) =
-        if let ScreenData::Keys { ref f } = action.screen_data {
-            (
-                f.set[0].address_key.strip_prefix("01").unwrap().to_string(),
-                f.set[0].base58.clone(),
-                f.set[0].address.identicon.clone(),
-            )
-        } else {
-            panic!();
-        };
+    let (pepper_westend_public, pepper_westend_base58, pepper_westend_identicon) = {
+        let res = keys_by_seed_name(dbname, "Pepper")
+            .unwrap()
+            .set
+            .iter()
+            .find(|k| k.network.network_title == "Westend")
+            .cloned()
+            .unwrap();
 
-    erase_base58_address_identicon(&mut action.screen_data);
+        let address = AddressKey::from_hex(&res.key.address_key).unwrap();
+        (
+            hex::encode(address.multi_signer().unwrap().as_ref()),
+            res.key.base58.clone(),
+            res.key.address.identicon,
+        )
+    };
+
     assert_eq!(
         action, expected_action,
         "Changed network to westend. Expected Keys screen with no modals",
@@ -6793,13 +6027,6 @@ fn flow_test_1() {
     state.perform(Action::SelectSeed, "Pepper", "").unwrap();
     state.perform(Action::NetworkSelector, "", "").unwrap();
     state
-        .perform(
-            Action::ChangeNetwork,
-            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-            "",
-        )
-        .unwrap();
-    state
         .perform(Action::Swipe, &format!("01{}", pepper_westend_public), "")
         .unwrap();
     state.perform(Action::RemoveKey, "", "").unwrap();
@@ -6815,10 +6042,12 @@ fn flow_test_1() {
         screen_data: ScreenData::DeriveKey {
             f: MDeriveKey {
                 seed_name: "Pepper".to_string(),
-                network_title: "Westend".to_string(),
-                network_logo: "westend".to_string(),
+                // TODO: No derivation network selectability now,
+                // always selects the first one
+                network_title: "Polkadot".to_string(),
+                network_logo: "polkadot".to_string(),
                 network_specs_key:
-                    "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
+                    "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3".to_string(),
                 suggested_derivation: String::new(),
                 keyboard: true,
                 derivation_check: DerivationCheck {
@@ -6863,21 +6092,25 @@ fn flow_test_1() {
         )
     );
 
-    let mut action = state
+    let action = state
         .perform(Action::GoForward, "//0///secret", &seed_phrase_pepper)
         .unwrap();
-    let (pepper_key0_public, pepper_key0_base58, pepper_key0_identicon) =
-        if let ScreenData::Keys { ref f } = action.screen_data {
-            (
-                f.set[0].address_key.strip_prefix("01").unwrap().to_string(),
-                f.set[0].base58.clone(),
-                f.set[0].address.identicon.clone(),
-            )
-        } else {
-            panic!();
-        };
+    let (pepper_key0_public, _pepper_key0_base58, _pepper_key0_identicon) = {
+        let res = keys_by_seed_name(dbname, "Pepper")
+            .unwrap()
+            .set
+            .iter()
+            .find(|k| k.network.network_title == "Polkadot" && k.key.address.path == "//0")
+            .cloned()
+            .unwrap();
 
-    erase_base58_address_identicon(&mut action.screen_data);
+        let address = AddressKey::from_hex(&res.key.address_key).unwrap();
+        (
+            hex::encode(address.multi_signer().unwrap().as_ref()),
+            res.key.base58.clone(),
+            res.key.address.identicon,
+        )
+    };
     let expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
@@ -6886,31 +6119,7 @@ fn flow_test_1() {
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
-            f: MKeys {
-                set: vec![MKeysCard {
-                    address_key: String::new(),
-                    base58: String::new(),
-                    swiped: false,
-                    address: Address {
-                        identicon: SignerImage::default(),
-                        has_pwd: true,
-                        path: "//0".to_string(),
-                        secret_exposed: false,
-                        seed_name: "Pepper".to_string(),
-                    },
-                }],
-                root: MKeysCard {
-                    address: Address {
-                        seed_name: "Pepper".to_string(),
-                        ..Default::default()
-                    },
-                    ..Default::default()
-                },
-                network: MNetworkCard {
-                    title: "Westend".to_string(),
-                    logo: "westend".to_string(),
-                },
-            },
+            f: "Pepper".to_string(),
         },
         modal_data: None,
         alert_data: None,
@@ -6924,10 +6133,20 @@ fn flow_test_1() {
     );
 
     state.perform(Action::NavbarScan, "", "").unwrap();
-    let message_hex = message_hex.replace(
+    let _message_hex = message_hex.replace(
         "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
         &pepper_key0_public,
     );
+    let _verifier_value = VerifierValue::Standard {
+        m: MultiSigner::Sr25519(
+            sp_core::sr25519::Public::try_from(hex::decode(&pepper_key0_public).unwrap().as_ref())
+                .unwrap(),
+        ),
+    };
+
+    // TODO: this is broken until we can derive //0///secret on
+    // Westend instead of Polkadot again.
+    /*
     let action = state
         .perform(Action::TransactionFetched, &message_hex, "")
         .unwrap();
@@ -7067,13 +6286,7 @@ fn flow_test_1() {
     let mut action = state.perform(Action::GoForward, "wrong_three", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
-    let verifier_value = VerifierValue::Standard {
-        m: MultiSigner::Sr25519(
-            sp_core::sr25519::Public::try_from(hex::decode(&pepper_key0_public).unwrap().as_ref())
-                .unwrap(),
-        ),
-    };
-    let network_genesis_hash =
+        let network_genesis_hash =
         H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
     let message = String::from_utf8(hex::decode(&sign_msg).unwrap()).unwrap();
     let expected_action = ActionResult {
@@ -7335,6 +6548,7 @@ fn flow_test_1() {
         action, expected_action,
         "Switched to Log from Settings. Expected Log screen.",
     );
+    */
 
     // no init after population
     populate_cold_nav_test(dbname).unwrap();

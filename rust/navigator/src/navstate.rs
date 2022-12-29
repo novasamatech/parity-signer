@@ -4,11 +4,10 @@ use db_handling::helpers::get_danger_status;
 use db_handling::identities::get_multisigner_by_address;
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
-    ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
-    MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
-    MRecoverSeedPhrase, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
-    MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData, ScreenNameType,
-    ShieldAlert, TransactionType,
+    ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MLog,
+    MLogDetails, MManageNetworks, MNewSeed, MPasswordConfirm, MRecoverSeedName, MRecoverSeedPhrase,
+    MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSufficientCryptoReady, MTransaction,
+    ModalData, RightButton, ScreenData, ScreenNameType, ShieldAlert, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use std::fmt::Write;
@@ -646,6 +645,7 @@ impl State {
                 } else {
                     match AddressState::new(details_str, keys_state, dbname) {
                         Ok(a) => {
+                            dbg!(&a);
                             new_navstate = Navstate::clean_screen(Screen::KeyDetails(a));
                         }
                         Err(e) => {
@@ -1479,19 +1479,9 @@ impl State {
                 let f = MSeeds { seed_name_cards };
                 ScreenData::SelectSeedForBackup { f }
             }
-            Screen::Keys(ref keys_state) => {
-                let (root, set, title, logo) =
-                    db_handling::interface_signer::print_identities_for_seed_name_and_network(
-                        dbname,
-                        &keys_state.seed_name(),
-                        &keys_state.network_specs_key(),
-                        keys_state.get_swiped_key(),
-                        keys_state.get_multiselect_keys(),
-                    )?;
-                let network = MNetworkCard { title, logo };
-                let f = MKeys { set, root, network };
-                ScreenData::Keys { f }
-            }
+            Screen::Keys(ref keys_state) => ScreenData::Keys {
+                f: keys_state.seed_name(),
+            },
             Screen::KeyDetails(ref address_state) => {
                 let f = if let Some(key) = address_state.network_specs_key().as_ref() {
                     Some(db_handling::interface_signer::export_key(
