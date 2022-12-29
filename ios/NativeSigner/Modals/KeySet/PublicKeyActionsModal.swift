@@ -9,7 +9,6 @@ import SwiftUI
 
 struct PublicKeyActionsModal: View {
     @State private var animateBackground: Bool = false
-    let isDerivedKey: Bool
     @Binding private var shouldPresentExportKeysWarningModal: Bool
     @Binding private var isShowingActionSheet: Bool
     @Binding private var shouldPresentRemoveConfirmationModal: Bool
@@ -18,13 +17,11 @@ struct PublicKeyActionsModal: View {
     init(
         shouldPresentExportKeysWarningModal: Binding<Bool> = Binding<Bool>.constant(false),
         isShowingActionSheet: Binding<Bool> = Binding<Bool>.constant(false),
-        shouldPresentRemoveConfirmationModal: Binding<Bool> = Binding<Bool>.constant(false),
-        isDerivedKey: Bool
+        shouldPresentRemoveConfirmationModal: Binding<Bool> = Binding<Bool>.constant(false)
     ) {
         _shouldPresentExportKeysWarningModal = shouldPresentExportKeysWarningModal
         _isShowingActionSheet = isShowingActionSheet
         _shouldPresentRemoveConfirmationModal = shouldPresentRemoveConfirmationModal
-        self.isDerivedKey = isDerivedKey
     }
 
     var body: some View {
@@ -33,15 +30,6 @@ struct PublicKeyActionsModal: View {
             animateBackground: $animateBackground,
             content: {
                 VStack(alignment: .leading, spacing: 0) {
-                    ActionSheetButton(
-                        action: {
-                            animateDismissal {
-                                navigation.perform(navigation: .init(action: .newSeed))
-                            }
-                        },
-                        icon: Asset.otherNetworks.swiftUIImage,
-                        text: Localizable.PublicKeyDetailsModal.Action.networks.key
-                    )
                     // Don't show `Export Private Key` if intermediate state is broken or when key is password protected
                     if let currentKeyDetails = navigation.currentKeyDetails,
                        currentKeyDetails.address.hasPwd == false {
@@ -55,23 +43,12 @@ struct PublicKeyActionsModal: View {
                             text: Localizable.PublicKeyDetailsModal.Action.share.key
                         )
                     }
-                    if isDerivedKey {
-                        ActionSheetButton(
-                            action: {
-                                animateDismissal {
-                                    navigation.perform(navigation: .init(action: .networkSelector))
-                                }
-                            },
-                            icon: Asset.changeNetwork.swiftUIImage,
-                            text: Localizable.PublicKeyDetailsModal.Action.changeNetwork.key
-                        )
-                        ActionSheetButton(
-                            action: { animateDismissal { shouldPresentRemoveConfirmationModal.toggle() } },
-                            icon: Asset.delete.swiftUIImage,
-                            text: Localizable.PublicKeyDetailsModal.Action.delete.key,
-                            style: .destructive
-                        )
-                    }
+                    ActionSheetButton(
+                        action: { animateDismissal { shouldPresentRemoveConfirmationModal.toggle() } },
+                        icon: Asset.delete.swiftUIImage,
+                        text: Localizable.PublicKeyDetailsModal.Action.delete.key,
+                        style: .destructive
+                    )
                     EmptyButton(
                         action: { animateDismissal() },
                         text: Localizable.AddKeySet.Button.cancel.key,
@@ -99,15 +76,13 @@ struct PublicKeyActionsModal: View {
 struct PublicKeyActionsModal_Previews: PreviewProvider {
     static var previews: some View {
         PublicKeyActionsModal(
-            isShowingActionSheet: Binding<Bool>.constant(true),
-            isDerivedKey: true
+            isShowingActionSheet: Binding<Bool>.constant(true)
         )
         .preferredColorScheme(.dark)
         .previewLayout(.sizeThatFits)
         VStack {
             PublicKeyActionsModal(
-                isShowingActionSheet: Binding<Bool>.constant(true),
-                isDerivedKey: false
+                isShowingActionSheet: Binding<Bool>.constant(true)
             )
             .preferredColorScheme(.light)
             .previewLayout(.sizeThatFits)
