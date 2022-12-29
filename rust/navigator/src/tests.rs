@@ -83,9 +83,11 @@ lazy_static! {
     static ref OS_MSG: Regex = Regex::new(r#"Os \{[^}]*\}"#).expect("checked_construction");
 }
 
+/* TODO: unused due to temporary in-network-derivation code disablement.
 fn cut_os_msg(error: &str) -> String {
     OS_MSG.replace_all(error, r#"Os {**}"#).to_string()
 }
+*/
 
 fn cut_seed_remove_identicon(data: &mut Option<ModalData>) -> String {
     if let Some(ModalData::NewSeedBackup { f }) = data {
