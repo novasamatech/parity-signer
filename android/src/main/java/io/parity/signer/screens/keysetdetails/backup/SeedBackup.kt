@@ -106,7 +106,7 @@ private fun SeedBackupBottomSheet(
 )
 @Composable
 private fun PreviewSeedBackupBottomSheet() {
-	val model = KeySetDetailsModel.createStub().toSeedBackupModel()
+	val model = KeySetDetailsModel.createStub().toSeedBackupModel()!!
 	SignerNewTheme {
 		SeedBackupBottomSheet(model,
 			{ _ -> " some long words some some" }, {})
@@ -125,7 +125,7 @@ private fun PreviewSeedBackupBottomSheet() {
 )
 @Composable
 private fun PreviewSeedBackupFullOverlayScreen() {
-	val model = KeySetDetailsModel.createStub().toSeedBackupModel()
+	val model = KeySetDetailsModel.createStub().toSeedBackupModel()!!
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
 			SeedBackupFullOverlayBottomSheet(model,

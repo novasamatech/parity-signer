@@ -14,12 +14,12 @@ import io.parity.signer.uniffi.*
  * Local copy of shared [MKeys] class
  */
 data class KeySetDetailsModel(
-	val keys: List<KeyAndNetworkModel>,
+	val keysAndNetwork: List<KeyAndNetworkModel>,
 	val root: KeyModel?,
 ) {
 	companion object {
 		fun createStub(): KeySetDetailsModel = KeySetDetailsModel(
-			keys = listOf(
+			keysAndNetwork = listOf(
 				KeyAndNetworkModel(
 					key = KeyModel.createStub(),
 					network = NetworkInfoModel.createStub()
@@ -37,7 +37,7 @@ data class KeySetDetailsModel(
 }
 
 fun MKeysNew.toKeySetDetailsModel() = KeySetDetailsModel(
-	keys = set.map { it.toKeyAndNetworkModel() },
+	keysAndNetwork = set.map { it.toKeyAndNetworkModel() },
 	root = root?.toKeysModel(),
 )
 

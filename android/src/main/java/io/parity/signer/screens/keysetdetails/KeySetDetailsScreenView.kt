@@ -32,6 +32,7 @@ import io.parity.signer.components.items.KeyDerivedItem
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.models.*
+import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textDisabled
@@ -62,11 +63,10 @@ fun KeySetDetailsScreenView(
 			) {
 				//seed
 				model.root?.let {
-					SeedKeyViewItem(it) {
-						val selectKeyDetails =
-							"${model.root.addressKey}\n${model.network.networkSpecsKey}"
-						navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
-					}
+					SeedKeyDetails(
+						model = it,
+						Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
+					)
 				}
 				//filter row
 				Row(
@@ -83,18 +83,18 @@ fun KeySetDetailsScreenView(
 						painter = painterResource(id = R.drawable.ic_tune_28),
 						contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
 						modifier = Modifier
-							.clickable {
-								navigator.navigate(
-									Action.NETWORK_SELECTOR,
-									""
-								)
-							}
-							.size(28.dp),
+//                            .clickable { //todo dmitry fix selector for new API
+//                                navigator.navigate(
+//                                    Action.NETWORK_SELECTOR,
+//                                    ""
+//                                )
+//                            }
+                            .size(28.dp),
 						tint = MaterialTheme.colors.textTertiary,
 					)
 				}
-				for (key in model.keys) {
-					KeyDerivedItem(model = key) {
+				for (key in model.keysAndNetwork) {
+					KeyDerivedItem(model = key.key) {
 						val selectKeyDetails =
 							"${key.key.addressKey}\n${key.network.networkSpecsKey}"
 						navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
@@ -105,9 +105,9 @@ fun KeySetDetailsScreenView(
 			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
 				ExposedIcon(
 					alertState = alertState, navigator = navigator,
-					Modifier
-						.align(Alignment.End)
-						.padding(end = 16.dp)
+                    Modifier
+                        .align(Alignment.End)
+                        .padding(end = 16.dp)
 				)
 				PrimaryButtonBottomSheet(
 					label = stringResource(R.string.key_sets_details_screem_create_derived_button),
@@ -161,8 +161,8 @@ fun SeedKeyViewItem(
 					contentDescription = null,
 					colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
 					modifier = Modifier
-						.padding(end = 16.dp)
-						.size(28.dp)
+                        .padding(end = 16.dp)
+                        .size(28.dp)
 				)
 			}
 		}
