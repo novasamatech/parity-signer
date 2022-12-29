@@ -44,6 +44,7 @@ struct VerticalActionsBottomModal: View {
         FullScreenRoundedModal(
             backgroundTapAction: { animateDismissal(dismissAction()) },
             animateBackground: $animateBackground,
+            safeAreaInsetsMode: .full,
             content: {
                 VStack(alignment: .leading, spacing: Spacing.medium) {
                     Text(viewModel.title)
