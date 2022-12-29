@@ -62,7 +62,8 @@ fun KeySetDetailsScreenView(
 			) {
 				//seed
 				SeedKeyViewItem(model.root) {
-					navigator.navigate(Action.SELECT_KEY, model.root.addressKey)
+					val selectKeyDetails = "${model.root.addressKey}\n${model.network.networkSpecsKey}"
+					navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
 				}
 				//filter row
 				Row(
@@ -91,7 +92,8 @@ fun KeySetDetailsScreenView(
 				}
 				for (key in model.keys) {
 					KeyDerivedItem(model = key) {
-						navigator.navigate(Action.SELECT_KEY, key.addressKey)
+						val selectKeyDetails = "${key.addressKey}\n${model.network.networkSpecsKey}"
+						navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
 					}
 				}
 			}

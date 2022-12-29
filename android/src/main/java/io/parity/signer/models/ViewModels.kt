@@ -16,7 +16,7 @@ import io.parity.signer.uniffi.*
 data class KeySetDetailsModel(
 	val keys: List<KeyModel>,
 	val root: KeyModel,
-	val network: NetworkModel,
+	val network: NetworkInfoModel,
 ) {
 	companion object {
 		fun createStub(): KeySetDetailsModel = KeySetDetailsModel(
@@ -41,7 +41,7 @@ data class KeySetDetailsModel(
 				secretExposed = false,
 				seedName = "sdsdsd",
 			),
-			network = NetworkModel("network title", "network logo"),
+			network = NetworkInfoModel("network title", "network logo", "keyspeks..."),
 		)
 	}
 }
