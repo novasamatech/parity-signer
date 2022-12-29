@@ -17,22 +17,6 @@ extension PreviewData {
     )
     static let base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
     static let publicKey = "15Gsc678654FDSG0HA04H0A"
-    static let mkeys = MKeys(
-        set: [],
-        root: .init(
-            address: .init(
-                path: "",
-                hasPwd: false,
-                identicon: .svg(image: PreviewData.exampleIdenticon),
-                seedName: "",
-                secretExposed: false
-            ),
-            addressKey: "",
-            base58: "",
-            swiped: false
-        ),
-        network: .init(title: "", logo: "")
-    )
 
     static let mKeyAndNetworkCard = MKeyAndNetworkCard(key: .init(
         address: .init(

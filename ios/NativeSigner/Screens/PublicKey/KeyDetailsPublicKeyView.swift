@@ -103,8 +103,7 @@ struct KeyDetailsPublicKeyView: View {
             PublicKeyActionsModal(
                 shouldPresentExportKeysWarningModal: $shouldPresentExportKeysWarningModal,
                 isShowingActionSheet: $isShowingActionSheet,
-                shouldPresentRemoveConfirmationModal: $shouldPresentRemoveConfirmationModal,
-                isDerivedKey: !viewModel.isRootKey
+                shouldPresentRemoveConfirmationModal: $shouldPresentRemoveConfirmationModal
             )
             .clearModalBackground()
         }
