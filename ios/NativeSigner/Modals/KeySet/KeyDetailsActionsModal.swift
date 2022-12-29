@@ -27,16 +27,6 @@ struct KeyDetailsActionsModal: View {
                         icon: Asset.selectUnselected.swiftUIImage,
                         text: Localizable.KeySetsModal.Action.export.key
                     )
-                    // Derive Keys
-                    ActionSheetButton(
-                        action: {
-                            animateDismissal {
-                                navigation.perform(navigation: .init(action: .newKey))
-                            }
-                        },
-                        icon: Asset.deriveKey.swiftUIImage,
-                        text: Localizable.KeySetsModal.Action.derive.key
-                    )
                     ActionSheetButton(
                         action: {
                             animateDismissal {
