@@ -36,8 +36,6 @@ class ScanViewModel : ViewModel() {
 	val presentableError: MutableStateFlow<String?> =
 		MutableStateFlow(null)
 	val errorWrongPassword = MutableStateFlow<Boolean>(false)
-	val transactionDetails: MutableStateFlow<MTransaction?> =
-		MutableStateFlow(null)//todo scan
 
 	private val transactionIsInProgress = MutableStateFlow<Boolean>(false)
 
@@ -47,7 +45,6 @@ class ScanViewModel : ViewModel() {
 			return
 		}
 		transactionIsInProgress.value = true
-
 		val navigateResponse =
 			uniffiInteractor.navigate(Action.TRANSACTION_FETCHED, payload)
 		val screenData =

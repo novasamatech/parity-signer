@@ -1,7 +1,8 @@
 package io.parity.signer.screens.scan.transaction
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -16,13 +17,14 @@ import io.parity.signer.uniffi.MTransaction
 
 
 @Composable
-fun TransactionDetailsScreen(
+internal fun TransactionDetailsScreen(
 	transaction: MTransaction,
 	modifier: Modifier = Modifier,
 	onBack: Callback
 ) {
-	//todo scan implement it
-	Column(modifier.fillMaxWidth()) {
+	BackHandler(onBack = onBack)
+
+	Column(modifier.fillMaxSize(1f)) {
 		ScreenHeader(
 			title = stringResource(R.string.transaction_details_screen_header),
 			onBack = onBack

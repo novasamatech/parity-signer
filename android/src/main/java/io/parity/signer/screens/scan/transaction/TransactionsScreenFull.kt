@@ -6,6 +6,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -15,16 +18,12 @@ import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyQrCodeProvider
-import io.parity.signer.models.Callback
-import io.parity.signer.models.getData
-import io.parity.signer.models.sortedValueCards
-import io.parity.signer.models.transactionIssues
+import io.parity.signer.models.*
 import io.parity.signer.screens.scan.elements.TransactionErrors
 import io.parity.signer.screens.scan.transaction.components.TransactionElementSelector
 import io.parity.signer.screens.scan.transaction.components.TransactionSummaryView
 import io.parity.signer.screens.scan.transaction.components.toSigningTransactionModels
 import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.textSecondary
 import io.parity.signer.uniffi.MSignatureReady
 import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.TransactionType
@@ -34,13 +33,45 @@ import io.parity.signer.uniffi.TransactionType
  * Old UI screen edited to work on new screens
  */
 @Composable
-fun TransactionsScreen(
+fun TransactionsScreenFull(
 	transactions: List<MTransaction>,
 	title: String,
 	signature: MSignatureReady?,
 	modifier: Modifier = Modifier,
 	onBack: Callback,
 	onFinish: Callback, //todo scan this leading to general state moving to Scan and it's crashing in selector
+) {
+	val detailedTransaction = remember {
+		mutableStateOf<MTransaction?>(null)
+	}
+	detailedTransaction.value?.let { detaitTransac ->
+		//detailes mode
+		TransactionDetailsScreen(transaction = detaitTransac,
+			modifier = modifier,
+			onBack = { detailedTransaction.value = null })
+	} ?: run {
+		//default view
+		TransactionsScreenFull(
+			modifier,
+			title,
+			onBack,
+			transactions,
+			detailedTransaction,
+			signature,
+			onFinish
+		)
+	}
+}
+
+@Composable
+private fun TransactionsScreenFull(
+	modifier: Modifier,
+	title: String,
+	onBack: Callback,
+	transactions: List<MTransaction>,
+	detailedTransaction: MutableState<MTransaction?>,
+	signature: MSignatureReady?,
+	onFinish: Callback
 ) {
 	Column(modifier.fillMaxSize(1f)) {
 		ScreenHeader(title = title, onBack = onBack)
@@ -51,7 +82,7 @@ fun TransactionsScreen(
 				TransactionIssues(it)
 			}
 			//new transaction summary
-			ShowTransactionsPreview(transactions)
+			ShowTransactionsPreview(transactions, detailedTransaction)
 			signature?.let {
 				QrSignatureData(it)
 			}
@@ -66,12 +97,21 @@ fun TransactionsScreen(
 }
 
 @Composable
-private fun ShowTransactionsPreview(transactions: List<MTransaction>) {
+private fun ShowTransactionsPreview(
+	transactions: List<MTransaction>,
+	detailedTransactionPreview: MutableState<MTransaction?>
+) {
 	transactions.withIndex()
 		.filter { it.value.shouldShowAsSummaryTransaction() }
-		.toSigningTransactionModels().forEach {
-			TransactionSummaryView(it) {}//todo scan on click
-			//todo scan ios/NativeSigner/Screens/Scan/TransactionPreview.swift:51 show details here
+		.toSigningTransactionModels().forEach { transactionModel ->
+			TransactionSummaryView(transactionModel) { index ->
+				try {
+					val transaction = transactions[index]
+					detailedTransactionPreview.value = transaction
+				} catch (e: Exception) {
+					submitErrorState("wrong index of clicked transaction - sync issue? $e")
+				}
+			}
 		}
 	//old separate transactions
 	transactions.filter { !it.shouldShowAsSummaryTransaction() }.forEach {
