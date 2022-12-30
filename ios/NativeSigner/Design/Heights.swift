@@ -27,6 +27,8 @@ enum Heights {
     static let keyCellContainer: CGFloat = 72
     /// Height for `Identicon` when used in list collections
     static let identiconInCell: CGFloat = 36
+    /// Height for `Identicon` when used as inline icon
+    static let identiconSmall: CGFloat = 16
     static let tabbarHeight: CGFloat = 49
     static let textFieldHeight: CGFloat = 48
     static let tabbarAssetHeight: CGFloat = 28

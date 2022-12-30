@@ -192,6 +192,8 @@
 		6DA501D7290BECBE0096DA4E /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D6290BECBE0096DA4E /* AppState.swift */; };
 		6DA501D9290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D8290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift */; };
 		6DA501DB290F16280096DA4E /* KeyDetails+SelectionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */; };
+		6DB99039295E95E9001101DC /* NetworkCapsuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB99038295E95E9001101DC /* NetworkCapsuleView.swift */; };
+		6DB9903B295EA7DE001101DC /* ActionableInfoBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB9903A295EA7DE001101DC /* ActionableInfoBoxView.swift */; };
 		6DBD21F2289A74EE005D539B /* FileManagingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */; };
 		6DBD21F4289A77DE005D539B /* BundleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F3289A77DE005D539B /* BundleProtocol.swift */; };
 		6DBD21FA289A7A26005D539B /* DatabaseMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F9289A7A26005D539B /* DatabaseMediator.swift */; };
@@ -473,6 +475,8 @@
 		6DA501D6290BECBE0096DA4E /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		6DA501D8290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKeyAndNetworkCard+PathAndNetwork.swift"; sourceTree = "<group>"; };
 		6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyDetails+SelectionOverlay.swift"; sourceTree = "<group>"; };
+		6DB99038295E95E9001101DC /* NetworkCapsuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkCapsuleView.swift; sourceTree = "<group>"; };
+		6DB9903A295EA7DE001101DC /* ActionableInfoBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionableInfoBoxView.swift; sourceTree = "<group>"; };
 		6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagingProtocol.swift; sourceTree = "<group>"; };
 		6DBD21F3289A77DE005D539B /* BundleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleProtocol.swift; sourceTree = "<group>"; };
 		6DBD21F9289A7A26005D539B /* DatabaseMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseMediator.swift; sourceTree = "<group>"; };
@@ -825,6 +829,8 @@
 			isa = PBXGroup;
 			children = (
 				6D14F977293480A900F8EF44 /* InfoBoxView.swift */,
+				6DB99038295E95E9001101DC /* NetworkCapsuleView.swift */,
+				6DB9903A295EA7DE001101DC /* ActionableInfoBoxView.swift */,
 			);
 			path = Text;
 			sourceTree = "<group>";
@@ -1923,6 +1929,7 @@
 				6DA501CC290A48190096DA4E /* KeyDetails+ViewModel.swift in Sources */,
 				6DA2ACAE2939EAC300AAEADC /* Event+isImportant.swift in Sources */,
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,
+				6DB99039295E95E9001101DC /* NetworkCapsuleView.swift in Sources */,
 				2DAA8299278738C0002917C0 /* SelectSeed.swift in Sources */,
 				2D48F3E0278305AE004B27BE /* LogComment.swift in Sources */,
 				2D48F3B82771D250004B27BE /* SignSufficientCrypto.swift in Sources */,
@@ -1937,6 +1944,7 @@
 				2D48F3C4277492D3004B27BE /* TypesMenu.swift in Sources */,
 				6DDEF11C28AE2DF3004CA2FD /* TabViewModelBuilder.swift in Sources */,
 				6DBE12D828B3A80A005F3CCC /* KeySetList.swift in Sources */,
+				6DB9903B295EA7DE001101DC /* ActionableInfoBoxView.swift in Sources */,
 				6DA2ACB0293A17DF00AAEADC /* Address+DisplayablePath.swift in Sources */,
 				6D2D244D28CE55A000862726 /* String+Utilities.swift in Sources */,
 				0452BC572767B26600C6DD37 /* Buttons.swift in Sources */,

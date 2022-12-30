@@ -499,8 +499,14 @@
 
 "ImportKeys.Label.Title.Single" = "Import Key";
 "ImportKeys.Label.Title.Multiple" = "Import %@ Keys";
-"ImportKeys.Label.Key.DerivedKey" = "Derived Keys";
+"ImportKeys.Label.Title.Derived" = "%@ Derived Keys Can Be Imported";
 "ImportKeys.Action.Import" = "Import Keys";
+"ImportKeys.Error.Label.KeySetMissing" = "Some keys can not be imported until their key sets are recovered. Please recover the missing Key Sets.";
+"ImportKeys.Error.Action.KeySetMissing" = "Recover Key Set";
+"ImportKeys.Error.Label.NetworkMissing" = "Some keys can not be imported until their networks are added. Please add missing networks and their metadata.";
+"ImportKeys.Error.Action.NetworkMissing" = "Add Network";
+"ImportKeys.Error.Label.AlreadyImported" = "Some are hidden from the list because they have already been imported.";
+
 
 "NetworkFilter.Label.Header" = "Filter keys by network";
 "NetworkFilter.Action.Reset" = "Reset";

@@ -34,8 +34,8 @@ struct TransactionCardSelector: View {
             TCMeta(value: value)
         case let .verifierCard(value): // Used in metadata update, adding new network, redesigned
             TCVerifier(value: value)
-        case let .derivationsCard(value): // Not present on new designs
-            TCDerivations(value: value)
+        case let .derivationsCard(value): // Used for Import Derived Keys flow
+            TCDerivations(value: value, viewModel: .init())
         case let .txSpecPlainCard(value): // Unknown network information for given transaction, not present on new
             // designs
             TCTXSpecPlain(content: value)
