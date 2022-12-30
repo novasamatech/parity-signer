@@ -28,7 +28,8 @@ struct TCDerivations: View {
     @StateObject var viewModel: ViewModel
 
     var body: some View {
-        .padding(.horizontal, Spacing.medium)
+        errorStates()
+            .padding(.horizontal, Spacing.medium)
         VStack(spacing: Spacing.extraSmall) {
             ForEach(viewModel.importableKeySets, id: \.id) { singleKey($0) }
         }
@@ -96,6 +97,49 @@ struct TCDerivations: View {
         .padding(Spacing.medium)
     }
 
+    @ViewBuilder
+    func errorStates() -> some View {
+        VStack(spacing: Spacing.extraSmall) {
+            if viewModel.isKeySetMissing {
+                ActionableInfoBoxView(
+                    renderable: .init(
+                        text: Localizable.ImportKeys.Error.Label.keySetMissing.string
+                    ),
+                    action: .init(
+                        name: Localizable.ImportKeys.Error.Action.keySetMissing.string,
+                        action: {}
+                    )
+                )
+            }
+            if viewModel.isNetworkMissing {
+                ActionableInfoBoxView(
+                    renderable: .init(
+                        text: Localizable.ImportKeys.Error.Label.networkMissing.string
+                    ),
+                    action: .init(
+                        name: Localizable.ImportKeys.Error.Action.networkMissing.string,
+                        action: {}
+                    )
+                )
+            }
+            if viewModel.areKeysAlreadyImported {
+                ActionableInfoBoxView(
+                    renderable: .init(
+                        text: Localizable.ImportKeys.Error.Label.alreadyImported.string
+                    ),
+                    action: nil
+                )
+            }
+            if viewModel.isPathInBadFormat {
+                ActionableInfoBoxView(
+                    renderable: .init(
+                        text: Localizable.ImportKeys.Error.Label.badFormat.string
+                    ),
+                    action: nil
+                )
+            }
+        }
+    }
 }
 
 extension TCDerivations {
@@ -103,12 +147,42 @@ extension TCDerivations {
         @Published var importableKeySets: [DerivedKeysSetRenderable] = []
         @Published var isKeySetMissing: Bool = false
         @Published var isNetworkMissing: Bool = false
+        @Published var isPathInBadFormat: Bool = false
         @Published var areKeysAlreadyImported: Bool = false
 
         init() {}
 
         func updateData(_ value: [SeedKeysPreview]) {
-          // to be added
+            importableKeySets = value
+                .map { seedKeys in
+                    DerivedKeysSetRenderable(
+                        seedName: seedKeys.name,
+                        address: seedKeys.multisigner?.first ?? "address", // to be corrected
+                        keys: seedKeys.derivedKeys
+                            .filter { $0.status == .importable }
+                            .map { DerivedKeysSetRenderable
+                                .DerivedKeyRenderable(
+                                    identicon: $0.identicon,
+                                    path: fullPath($0),
+                                    isPassworded: $0.hasPwd == true,
+                                    address: $0.address,
+                                    networkTitle: $0.networkTitle
+                                )
+                            }
+                    )
+                }
+            areKeysAlreadyImported = value
+                .flatMap(\.derivedKeys)
+                .contains { $0.status == .alreadyExists }
+            isNetworkMissing = value
+                .flatMap(\.derivedKeys)
+                .contains { $0.status == .networkMissing }
+            isKeySetMissing = value
+                .flatMap(\.derivedKeys)
+                .contains { $0.status == .networkMissing }
+            isPathInBadFormat = value
+                .flatMap(\.derivedKeys)
+                .contains { $0.status == .badFormat }
         }
 
         /// String interpolation for SFSymbols is a bit unstable if creating `String` inline by using conditional logic
