@@ -1,7 +1,6 @@
 package io.parity.signer.screens.scan
 
 import android.util.Log
-import androidx.compose.runtime.produceState
 import androidx.lifecycle.ViewModel
 import io.parity.signer.backend.UniffiResult
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
@@ -13,7 +12,6 @@ import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.models.transactionIssues
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 
 private const val TAG = "ScanViewModelTag"
@@ -29,25 +27,17 @@ class ScanViewModel : ViewModel() {
 	data class TransactionsState(val transactions: List<MTransaction>,
 															 val title: String)
 
-	private var transactions: MutableStateFlow<TransactionsState?> =
+	var transactions: MutableStateFlow<TransactionsState?> =
 		MutableStateFlow(null)
-	private var signature: MutableStateFlow<MSignatureReady?> =
+	var signature: MutableStateFlow<MSignatureReady?> =
 		MutableStateFlow(null)
-	private var passwordModel: MutableStateFlow<EnterPasswordModel?> =
+	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
-	private val presentableError: MutableStateFlow<String?> =
+	val presentableError: MutableStateFlow<String?> =
 		MutableStateFlow(null)
-	private val errorWrongPassword = MutableStateFlow<Boolean>(false)
-	private val transactionDetails: MutableStateFlow<MTransaction?> =
+	val errorWrongPassword = MutableStateFlow<Boolean>(false)
+	val transactionDetails: MutableStateFlow<MTransaction?> =
 		MutableStateFlow(null)//todo scan
-
-	val screenState : StateFlow<ScanSubgraphState> = produceState(
-		initialValue = ScanSubgraphState.CameraScan,
-		keys = transactions, signature,
-		producer = {
-			ScanSubgraphState.CameraScan
-		}
-	)
 
 	private val transactionIsInProgress = MutableStateFlow<Boolean>(false)
 
@@ -226,12 +216,4 @@ class ScanViewModel : ViewModel() {
 		errorWrongPassword.value = true
 		passwordModel.value = null
 	}
-}
-
-sealed class ScanSubgraphState {
-	data class TransactionDetails(val state: ScanViewModel.TransactionsState)
-	data class TransactionsPreview(val transaction: MTransaction)
-	object CameraScan
-	data class TransactionErrorModal()
-	data class PasswordModal()
 }
