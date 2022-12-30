@@ -260,8 +260,8 @@ pub struct MSeeds {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MKeyDetails {
-    pub pubkey: String,
     pub qr: QrData,
+    pub pubkey: String,
     pub network_info: MSCNetworkInfo,
     pub base58: String,
     pub address: Address,

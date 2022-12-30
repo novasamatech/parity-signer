@@ -645,7 +645,6 @@ impl State {
                 } else {
                     match AddressState::new(details_str, keys_state, dbname) {
                         Ok(a) => {
-                            dbg!(&a);
                             new_navstate = Navstate::clean_screen(Screen::KeyDetails(a));
                         }
                         Err(e) => {
@@ -1072,18 +1071,22 @@ impl State {
             },
             Screen::KeyDetails(ref address_state) => {
                 if let Modal::KeyDetailsAction = self.navstate.modal {
-                    match db_handling::identities::remove_key(
-                        dbname,
-                        &address_state.multisigner(),
-                        &address_state.network_specs_key().unwrap(),
-                    ) {
-                        Ok(()) => {
-                            new_navstate = Navstate::clean_screen(Screen::Log);
+                    if let Some(network_specs_key) = address_state.network_specs_key() {
+                        match db_handling::identities::remove_key(
+                            dbname,
+                            &address_state.multisigner(),
+                            &network_specs_key,
+                        ) {
+                            Ok(()) => {
+                                new_navstate = Navstate::clean_screen(Screen::Log);
+                            }
+                            Err(e) => {
+                                new_navstate.alert = Alert::Error;
+                                let _ = write!(&mut errorline, "{}", e);
+                            }
                         }
-                        Err(e) => {
-                            new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
-                        }
+                    } else {
+                        println!("RemoveKey does nothing here")
                     }
                 } else {
                     println!("RemoveKey does nothing here")

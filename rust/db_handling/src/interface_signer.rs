@@ -467,32 +467,34 @@ where
         Some(network_specs.base58prefix),
         network_specs.encryption,
     );
+
     let public_key = multisigner_to_public(multisigner);
     let identicon =
         make_identicon_from_multisigner(multisigner, network_specs.encryption.identicon_style());
-    let qr = if address_details.network_id.contains(network_specs_key) {
-        let prefix = if network_specs.encryption == Encryption::Ethereum {
-            "ethereum"
+    let qr = {
+        if address_details.network_id.contains(network_specs_key) {
+            let prefix = if network_specs.encryption == Encryption::Ethereum {
+                "ethereum"
+            } else {
+                "substrate"
+            };
+            QrData::Regular {
+                data: format!(
+                    "{}:{}:0x{}",
+                    prefix,
+                    base58,
+                    hex::encode(network_specs.genesis_hash)
+                )
+                .as_bytes()
+                .to_vec(),
+            }
         } else {
-            "substrate"
-        };
-        QrData::Regular {
-            data: format!(
-                "{}:{}:0x{}",
-                prefix,
-                base58,
-                hex::encode(network_specs.genesis_hash)
-            )
-            .as_bytes()
-            .to_vec(),
+            return Err(Error::NetworkSpecsKeyForAddressNotFound {
+                network_specs_key: network_specs_key.to_owned(),
+                address_key,
+            });
         }
-    } else {
-        return Err(Error::NetworkSpecsKeyForAddressNotFound {
-            network_specs_key: network_specs_key.to_owned(),
-            address_key,
-        });
     };
-
     let address = Address {
         path: address_details.path,
         has_pwd: address_details.has_pwd,
@@ -506,6 +508,7 @@ where
         network_logo: network_specs.logo,
         network_specs_key: hex::encode(network_specs_key.key()),
     };
+
     Ok(MKeyDetails {
         qr,
         pubkey: hex::encode(public_key),

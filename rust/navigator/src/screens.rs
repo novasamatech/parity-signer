@@ -252,6 +252,8 @@ impl AddressState {
     pub fn blank_keys_state(&self) -> KeysState {
         KeysState {
             seed_name: self.seed_name(),
+            // TODO: Derive in network correct implementation:
+            // https://github.com/paritytech/parity-signer/issues/1505
             network_specs_key: self.network_specs_key().unwrap(),
             specialty: SpecialtyKeysState::None,
         }
