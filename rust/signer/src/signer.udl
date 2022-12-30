@@ -233,7 +233,6 @@ enum Action {
     "NetworkSelector",
     "NextUnit",
     "PreviousUnit",
-    "ChangeNetwork",
     "CheckPassword",
     "TransactionFetched",
     "RemoveNetwork",
@@ -266,20 +265,11 @@ dictionary MNetworkCard {
     string logo;
 };
 
-dictionary MKeys {
-    sequence<MKeysCard> set;
-    MKeysCard root;
-    MNetworkCard network;
-    boolean multiselect_mode;
-    string multiselect_count;
-};
-
 dictionary MKeysCard {
     Address address;
     string address_key;
     string base58;
     boolean swiped;
-    boolean multiselect;
 };
 
 dictionary MSettings {
@@ -368,7 +358,6 @@ dictionary MKeyDetails {
     MSCNetworkInfo network_info;
     Address address;
     string base58;
-    boolean? multiselect;
 };
 
 dictionary MNewSeed {
@@ -416,8 +405,8 @@ dictionary Address {
 
 dictionary MAddressCard {
     string base58;
+    string address_key;
     Address address;
-    boolean? multiselect;
 };
 
 enum DerivationDestination {
@@ -494,13 +483,13 @@ dictionary MKeysInfoExport {
 [Enum]
 interface ScreenData {
     Scan();
-    Keys(MKeys f);
+    Keys(string f);
     Settings(MSettings f);
     Log(MLog f);
     LogDetails(MLogDetails f);
     Transaction(sequence<MTransaction> f);
     SeedSelector(MSeeds f);
-    KeyDetails(MKeyDetails f);
+    KeyDetails(MKeyDetails? f);
     NewSeed(MNewSeed f);
     RecoverSeedName(MRecoverSeedName f);
     RecoverSeedPhrase(MRecoverSeedPhrase f);

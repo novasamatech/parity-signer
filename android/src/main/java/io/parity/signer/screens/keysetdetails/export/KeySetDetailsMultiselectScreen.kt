@@ -17,7 +17,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.items.KeyDerivedItemMultiselect
 import io.parity.signer.models.*
-import io.parity.signer.screens.keysetdetails.SeedKeyViewItem
+import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
 import io.parity.signer.screens.keysets.export.ClickableLabel
 import io.parity.signer.ui.theme.*
 
@@ -54,7 +54,9 @@ fun KeySetDetailsMultiselectScreen(
 				.verticalScroll(rememberScrollState())
 		) {
 			//seed
-			SeedKeyViewItem(model.root, null)
+			model.root?.let {
+				SeedKeyDetails(model = it, Modifier.padding(horizontal = 24.dp, vertical = 16.dp))
+			}
 			//filter row
 			Row(
 				modifier = Modifier.padding(horizontal = 24.dp),
@@ -74,10 +76,10 @@ fun KeySetDetailsMultiselectScreen(
 					tint = MaterialTheme.colors.textDisabled,
 				)
 			}
-			for (key in model.keys) {
+			for (key in model.keysAndNetwork) {
 				KeyDerivedItemMultiselect(
-					model = key,
-					isSelected = selected.value.contains(key.addressKey),
+					model = key.key,
+					isSelected = selected.value.contains(key.key.addressKey),
 				) { isSelected, key ->
 					if (isSelected) selected.value += key else selected.value -= key
 				}
@@ -119,7 +121,7 @@ fun KeySetDetailsMultiselectScreen(
 private fun PreviewKeySetDetailsMultiselectScreen() {
 
 	val stabModel = KeySetDetailsModel.createStub()
-	val state = remember { mutableStateOf(setOf(stabModel.keys[1].addressKey)) }
+	val state = remember { mutableStateOf(setOf(stabModel.keysAndNetwork[1].key.addressKey)) }
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			KeySetDetailsMultiselectScreen(stabModel, state, {}, {}, {})

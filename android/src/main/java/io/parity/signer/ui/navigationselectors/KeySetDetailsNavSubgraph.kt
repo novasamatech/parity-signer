@@ -35,7 +35,13 @@ fun KeySetDetailsNavSubgraph(
 				navController = navController,
 				alertState = alertState,
 				onRemoveKeySet = {
-					singleton.removeSeed(model.root.seedName)
+					val root = model.root
+					if (root != null) {
+						singleton.removeSeed(root.seedName)
+					} else {
+						//todo key details check if this functions should be disabled in a first place
+						submitErrorState("came to remove key set but root key is not available")
+					}
 				},
 			)
 		}
@@ -46,21 +52,29 @@ fun KeySetDetailsNavSubgraph(
 			)
 		}
 		composable(KeySetDetailsNavSubgraph.backup) {
-			//background
-			Box(Modifier.statusBarsPadding()) {
-				KeySetDetailsScreenView(
-					model = model,
-					navigator = EmptyNavigator(),
-					alertState = alertState,
-					onMenu = {},
+			//preconditions
+			val backupModel = model.toSeedBackupModel()
+			if (backupModel == null) {
+				submitErrorState("navigated to backup model but without root in KeySet " +
+					"it's impossible to backup")
+				navController.navigate(KeySetDetailsNavSubgraph.home)
+			} else {
+				//background
+				Box(Modifier.statusBarsPadding()) {
+					KeySetDetailsScreenView(
+						model = model,
+						navigator = EmptyNavigator(),
+						alertState = alertState,
+						onMenu = {},
+					)
+				}
+				//content
+				SeedBackupFullOverlayBottomSheet(
+					model = backupModel,
+					getSeedPhraseForBackup = singleton::getSeedPhraseForBackup,
+					onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
 				)
 			}
-			//content
-			SeedBackupFullOverlayBottomSheet(
-				model = model.toSeedBackupModel(),
-				getSeedPhraseForBackup = singleton::getSeedPhraseForBackup,
-				onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
-			)
 		}
 	}
 }

@@ -115,6 +115,7 @@ fn backend_action(
 ///
 /// Accepts list of seed names to avoid calling [`update_seed_names`] every time
 fn init_navigation(dbname: &str, seed_names: Vec<String>) -> Result<(), ErrorDisplayed> {
+    init_logging("Signer".to_string());
     Ok(navigator::init_navigation(dbname, seed_names)?)
 }
 
@@ -263,10 +264,20 @@ fn init_logging(tag: String) {
     );
 }
 
+#[cfg(target_os = "ios")]
+fn init_logging(_tag: String) {
+    use uniffi::deps::log::LevelFilter;
+
+    let _ = oslog::OsLogger::new("io.parity.signer")
+        .level_filter(LevelFilter::Warn)
+        .category_level_filter("SIGNER", LevelFilter::Trace)
+        .init();
+}
+
 /// Placeholder to init logging on non-android platforms
 ///
 /// TODO: is this used?
-#[cfg(not(target_os = "android"))]
+#[cfg(all(not(target_os = "ios"), not(target_os = "android")))]
 fn init_logging(_tag: String) {
     env_logger::init();
 }

@@ -12,7 +12,6 @@ import SwiftUI
 struct AddressCard: View {
     @EnvironmentObject private var data: SignerDataModel
     var card: MAddressCard
-    var multiselectMode: Bool = false
     @GestureState private var dragOffset = CGSize.zero
     let rowHeight: CGFloat = 28
     var body: some View {
@@ -21,20 +20,8 @@ struct AddressCard: View {
             HStack {
                 ZStack {
                     Identicon(identicon: card.address.identicon)
-                    if multiselectMode {
-                        VStack {
-                            Spacer()
-                            HStack {
-                                Spacer()
-                                (
-                                    card.multiselect == true ? Image(.checkmark, variants: [.circle, .fill]) :
-                                        Image(.circle)
-                                )
-                                .imageScale(.large)
-                            }
-                        }
-                    }
-                }.frame(width: 30, height: 30)
+                }
+                .frame(width: 30, height: 30)
                 VStack(alignment: .leading) {
                     HStack {
                         Text(card.address.seedName).foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)

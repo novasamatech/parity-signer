@@ -19,8 +19,11 @@ navigator = { path = "../navigator", default-features = false }
 qr_reader_phone = { path = "../qr_reader_phone" }
 qrcode_static = { path = "../qrcode_static" }
 
-[target.'cfg(not(target_os = "android"))'.dependencies]
+[target.'cfg(all(not(target_os = "android"), not(target_os = "ios")))'.dependencies]
 env_logger = "0.10"
+
+[target.'cfg(target_os = "ios")'.dependencies]
+oslog = "0.2"
 
 [target.'cfg(target_os = "android")'.dependencies]
 android_logger = "0.11"

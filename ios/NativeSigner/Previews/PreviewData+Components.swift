@@ -40,7 +40,7 @@ extension PreviewData {
     ) -> KeyDetailsPublicKeyViewModel {
         KeyDetailsPublicKeyViewModel(
             qrCode: qrCodeContainerViewModel,
-            footer: isRootKey ? .root(qrCodeRootFooterViewModel) : .address(qrCodeAddressFooterViewModel),
+            footer: qrCodeAddressFooterViewModel,
             isKeyExposed: isKeyExposed,
             isRootKey: isRootKey
         )
@@ -89,8 +89,7 @@ extension PreviewData {
     static let exampleBackupViewModel = BackupModalViewModel(
         header: exampleKeySummary,
         derivedKeys: exampleDerivedKeyOverviews,
-        seedPhrase: seedPhraseViewModel,
-        qrCode: qrCodeContainerViewModel
+        seedPhrase: seedPhraseViewModel
     )
 }
 

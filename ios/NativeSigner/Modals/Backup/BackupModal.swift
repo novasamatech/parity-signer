@@ -16,7 +16,6 @@ struct BackupModalViewModel: Equatable {
     let header: KeySummaryViewModel
     let derivedKeys: [DerivedKeyOverviewViewModel]
     let seedPhrase: SeedPhraseViewModel
-    let qrCode: QrData
 }
 
 struct BackupModal: View {
@@ -88,30 +87,11 @@ struct BackupModal: View {
                                     }
                                 }
                             }
-                            // QR Code container
-                            HStack {
-                                Localizable.BackupModal.Label.qrCode.text
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                                    .font(PrimaryFont.bodyL.font)
-                                Spacer()
-                            }
-                            AnimatedQRCodeView(
-                                viewModel: Binding<AnimatedQRCodeViewModel>.constant(
-                                    .init(
-                                        qrCodes: [viewModel.qrCode.payload]
-                                    )
-                                )
-                            )
-                            .fixedSize(horizontal: false, vertical: true)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: CornerRadius.medium)
-                                    .stroke(Asset.fill12.swiftUIColor, lineWidth: 0.5)
-                            )
                             Spacer()
                                 .frame(height: Spacing.componentSpacer)
                         }
-                        .padding([.leading, .trailing], Spacing.large)
-                        .padding(.top, Spacing.medium)
+                        .padding(.horizontal, Spacing.large)
+                        .padding(.vertical, Spacing.medium)
                     }
                 }
                 .onAppear {

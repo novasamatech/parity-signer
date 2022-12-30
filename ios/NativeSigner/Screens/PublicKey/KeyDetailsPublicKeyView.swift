@@ -69,12 +69,7 @@ struct KeyDetailsPublicKeyView: View {
                             )
                         )
                         .padding(0.5)
-                        switch viewModel.footer {
-                        case let .address(viewModel):
-                            QRCodeAddressFooterView(viewModel: viewModel)
-                        case let .root(viewModel):
-                            QRCodeRootFooterView(viewModel: viewModel)
-                        }
+                        QRCodeAddressFooterView(viewModel: viewModel.footer)
                     }
                     .strokeContainerBackground()
                     // Exposed key alert

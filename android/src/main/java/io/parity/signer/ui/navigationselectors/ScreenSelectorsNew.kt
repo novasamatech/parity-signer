@@ -9,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import io.parity.signer.bottomsheets.EnterPassword
 import io.parity.signer.bottomsheets.LogComment
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.*
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
@@ -25,6 +26,7 @@ import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.ModalData
 import io.parity.signer.uniffi.ScreenData
+import io.parity.signer.uniffi.keysBySeedName
 
 @Composable
 fun CombinedScreensSelector(
@@ -51,19 +53,24 @@ fun CombinedScreensSelector(
 					alertState = alertState,
 				)
 			}
-			is ScreenData.Keys ->
+			is ScreenData.Keys -> {
+				val keys = keysBySeedName(signerDataModel.dbName, screenData.f)
 				KeySetDetailsNavSubgraph(
-					model = screenData.f.toKeySetDetailsModel(),
+					model = keys.toKeySetDetailsModel(),
 					rootNavigator = rootNavigator,
 					alertState = alertState,
 					singleton = signerDataModel,
 				)
+			}
 			is ScreenData.KeyDetails ->
 				Box(modifier = Modifier.statusBarsPadding()) {
-					KeyDetailsPublicKeyScreen(
-						model = screenData.f.toKeyDetailsModel(),
-						rootNavigator = rootNavigator,
-					)
+					screenData.f?.toKeyDetailsModel()?.let { model ->
+						KeyDetailsPublicKeyScreen(
+							model = model,
+							rootNavigator = rootNavigator,
+						)
+					}
+						?: rootNavigator.backAction() //todo dmitry log that root key was pressed. It should not be the case.
 				}
 			is ScreenData.Log ->
 				Box(Modifier.statusBarsPadding()) {

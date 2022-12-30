@@ -68,7 +68,7 @@ pub struct KeysState {
 #[derive(Debug, Clone)]
 pub struct AddressState {
     seed_name: String,
-    network_specs_key: NetworkSpecsKey,
+    network_specs_key: Option<NetworkSpecsKey>,
     multisigner: MultiSigner,
     is_root: bool,
 }
@@ -220,7 +220,11 @@ impl KeysState {
 }
 
 impl AddressState {
-    pub fn new(hex_address_key: &str, keys_state: &KeysState, database_name: &str) -> Result<Self> {
+    pub fn new(details_str: &str, keys_state: &KeysState, database_name: &str) -> Result<Self> {
+        let lines: Vec<_> = details_str.lines().collect();
+        let hex_address_key = lines[0];
+        let network_specs_key = lines.get(1);
+
         let address_key = AddressKey::from_hex(hex_address_key)?;
         let multisigner = if let Ok(m) = address_key.multi_signer() {
             m
@@ -232,9 +236,15 @@ impl AddressState {
         let is_root =
             get_address_details(database_name, &AddressKey::from_multisigner(&multisigner))?
                 .is_root();
+        let network_specs_key = if let Some(network_specs_key) = &network_specs_key {
+            Some(NetworkSpecsKey::from_hex(network_specs_key)?)
+        } else {
+            None
+        };
+
         Ok(Self {
             seed_name: keys_state.seed_name(),
-            network_specs_key: keys_state.network_specs_key(),
+            network_specs_key,
             multisigner,
             is_root,
         })
@@ -242,14 +252,17 @@ impl AddressState {
     pub fn blank_keys_state(&self) -> KeysState {
         KeysState {
             seed_name: self.seed_name(),
-            network_specs_key: self.network_specs_key(),
+            // TODO: Derive in network correct implementation:
+            // https://github.com/paritytech/parity-signer/issues/1505
+            network_specs_key: self.network_specs_key().unwrap(),
             specialty: SpecialtyKeysState::None,
         }
     }
     pub fn seed_name(&self) -> String {
         self.seed_name.to_owned()
     }
-    pub fn network_specs_key(&self) -> NetworkSpecsKey {
+    /// If `None`, this is a root key.
+    pub fn network_specs_key(&self) -> Option<NetworkSpecsKey> {
         self.network_specs_key.to_owned()
     }
     pub fn multisigner(&self) -> MultiSigner {
@@ -419,7 +432,10 @@ impl SufficientCryptoState {
         };
 
         let identicon = make_identicon_from_multisigner(multisigner, style);
+        let address_key = hex::encode(AddressKey::from_multisigner(multisigner).key());
         let author_info = MAddressCard {
+            base58: hex::encode(multisigner_to_public(multisigner)),
+            address_key,
             address: Address {
                 identicon,
                 seed_name: address_details.seed_name.clone(),
@@ -427,8 +443,6 @@ impl SufficientCryptoState {
                 has_pwd: address_details.has_pwd,
                 secret_exposed: address_details.secret_exposed,
             },
-            base58: hex::encode(multisigner_to_public(multisigner)),
-            multiselect: None,
         };
         Self {
             key_selected: Some((

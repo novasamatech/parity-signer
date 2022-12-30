@@ -24,12 +24,10 @@ struct ScreenSelector: View {
 
     var body: some View {
         switch screenData {
-        case let .keys(value):
+        case let .keys(keyName):
             KeyDetailsView(
-                dataModel: KeyDetailsDataModel(value),
                 viewModel: .init(
-                    keysData: appState.userData.keysData,
-                    exportPrivateKeyService: PrivateKeyQRCodeService(navigation: navigation, keys: value)
+                    keyName: keyName
                 ),
                 forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
                 resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
@@ -45,13 +43,17 @@ struct ScreenSelector: View {
                 viewModel: .init(listViewModel: KeySetListViewModelBuilder().build(for: value))
             )
         case let .keyDetails(value):
-            KeyDetailsPublicKeyView(
-                forgetKeyActionHandler: ForgetSingleKeyAction(navigation: navigation),
-                viewModel: KeyDetailsPublicKeyViewModel(value),
-                actionModel: KeyDetailsPublicKeyActionModel(value),
-                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value),
-                resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
-            )
+            if let value = value {
+                KeyDetailsPublicKeyView(
+                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: navigation),
+                    viewModel: KeyDetailsPublicKeyViewModel(value),
+                    actionModel: KeyDetailsPublicKeyActionModel(value),
+                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value),
+                    resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
+                )
+            } else {
+                EmptyView()
+            }
         case let .newSeed(value):
             NewSeedScreen(
                 content: value,

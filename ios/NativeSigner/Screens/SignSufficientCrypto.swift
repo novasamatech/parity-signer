@@ -32,8 +32,8 @@ struct SignSufficientCrypto: View {
                                 AddressCard(
                                     card: MAddressCard(
                                         base58: keyrecord.publicKey,
-                                        address: keyrecord.address,
-                                        multiselect: nil
+                                        addressKey: keyrecord.addressKey,
+                                        address: keyrecord.address
                                     )
                                 )
                             }

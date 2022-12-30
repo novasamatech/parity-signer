@@ -1661,7 +1661,6 @@ where
             Some(network_specs.specs.base58prefix),
             address_details.encryption,
         ),
-        multiselect: None,
         address,
     })
 }

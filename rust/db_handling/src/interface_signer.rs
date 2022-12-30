@@ -200,10 +200,11 @@ pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<
             ),
             secret_exposed: root.1.secret_exposed,
         };
+        let address_key = hex::encode(AddressKey::from_multisigner(&root.0).key());
         MAddressCard {
             base58: print_multisigner_as_base58_or_eth(&root.0, None, root.1.encryption),
+            address_key,
             address,
-            multiselect: None,
         }
     });
 
@@ -233,7 +234,6 @@ pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<
                 base58,
                 address_key,
                 swiped: false,
-                multiselect: false,
             };
             let network_specs_key = NetworkSpecsKey::from_parts(
                 &network_specs.specs.genesis_hash,
@@ -242,7 +242,7 @@ pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<
             let network = MSCNetworkInfo {
                 network_title: network_specs.specs.title,
                 network_logo: network_specs.specs.logo,
-                network_specs_key: hex::encode(network_specs_key.encode()),
+                network_specs_key: hex::encode(network_specs_key.key()),
             };
 
             Ok(MKeyAndNetworkCard { key, network })
@@ -309,7 +309,6 @@ where
                 address_key: hex::encode(address_key.key()),
                 base58,
                 swiped,
-                multiselect,
             });
         } else {
             other_id.push((multisigner, address_details, identicon, swiped, multiselect))
@@ -325,7 +324,7 @@ where
     let set: Vec<_> = other_id
         .into_iter()
         .map(
-            |(multisigner, address_details, identicon, swiped, multiselect)| MKeysCard {
+            |(multisigner, address_details, identicon, swiped, _multiselect)| MKeysCard {
                 address_key: hex::encode(AddressKey::from_multisigner(&multisigner).key()),
                 base58: print_multisigner_as_base58_or_eth(
                     &multisigner,
@@ -340,7 +339,6 @@ where
                     secret_exposed: address_details.secret_exposed,
                 },
                 swiped,
-                multiselect,
             },
         )
         .collect();
@@ -516,7 +514,6 @@ where
         pubkey: hex::encode(public_key),
         network_info,
         base58,
-        multiselect: None,
         address,
     })
 }
@@ -605,7 +602,10 @@ where
                 address_details.encryption.identicon_style(),
             );
             let seed_name = seed_name.to_string();
+            let address_key = hex::encode(AddressKey::from_multisigner(&multisigner).key());
             let collision = MAddressCard {
+                base58,
+                address_key,
                 address: Address {
                     path,
                     has_pwd,
@@ -613,8 +613,6 @@ where
                     seed_name,
                     secret_exposed: address_details.secret_exposed,
                 },
-                multiselect: None,
-                base58,
             };
 
             NavDerivationCheck {
@@ -703,8 +701,10 @@ where
                         &multisigner,
                         address_details.encryption.identicon_style(),
                     );
+                    let address_key = hex::encode(AddressKey::from_multisigner(&multisigner).key());
                     let collision_display = MAddressCard {
                         base58: address_base58,
+                        address_key,
                         address: Address {
                             path: address_details.path,
                             has_pwd: address_details.has_pwd,
@@ -712,7 +712,6 @@ where
                             seed_name: seed_name.to_string(),
                             secret_exposed: address_details.secret_exposed,
                         },
-                        multiselect: None,
                     };
                     NavDerivationCheck {
                         button_good: false,
