@@ -30,23 +30,6 @@ fun KeyCardOld(identity: MAddressCard, multiselectMode: Boolean = false) {
 	) {
 		Box(contentAlignment = Alignment.BottomEnd) {
 			IdentIcon(identity.address.identicon.toImageContent())
-			if (multiselectMode) {
-				identity.multiselect?.let {
-					if (it) {
-						Icon(
-							Icons.Default.CheckCircle,
-							"Not multiselected",
-							tint = MaterialTheme.colors.Action400
-						)
-					} else {
-						Icon(
-							Icons.Outlined.Circle,
-							"Multiselected",
-							tint = MaterialTheme.colors.Action400
-						)
-					}
-				}
-			}
 		}
 		Spacer(modifier = Modifier.width(10.dp))
 		Column {

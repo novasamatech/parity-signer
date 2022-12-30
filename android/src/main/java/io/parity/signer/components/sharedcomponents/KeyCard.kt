@@ -143,7 +143,7 @@ fun KeySeedCard(seedTitle: String, base58: String) {
 }
 
 @Composable
-internal fun ShowBase58Collapsible(base58: String) {
+fun ShowBase58Collapsible(base58: String) {
 	val expanded = remember { mutableStateOf(false) }
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
@@ -235,7 +235,6 @@ data class KeyCardModelBase(
 				identIcon = model.identicon,
 				seedName = model.seedName,
 				hasPassword = model.hasPwd,
-				multiselect = model.multiselect,
 			)
 
 		/**
@@ -250,7 +249,6 @@ data class KeyCardModelBase(
 				hasPassword = address_card.address.hasPwd,
 				identIcon = address_card.address.identicon.toImageContent(),
 				seedName = address_card.address.seedName,
-				multiselect = address_card.multiselect,
 			)
 
 		fun fromAddress(

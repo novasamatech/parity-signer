@@ -11,7 +11,10 @@ struct LandingView: View {
     @State private var tacAccept = false
     @State private var ppAccept = false
     @State private var accept = false
+    @State var presentInitialConnectivityWarning: Bool = false
     @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+
     var body: some View {
         VStack {
             DocumentModal()
@@ -45,7 +48,11 @@ struct LandingView: View {
                 BigButton(
                     text: Localizable.next.key,
                     action: {
-                        accept = true
+                        if connectivityMediator.isConnectivityOn {
+                            presentInitialConnectivityWarning = true
+                        } else {
+                            accept = true
+                        }
                     },
                     isDisabled: !(tacAccept && ppAccept)
                 )
@@ -63,6 +70,15 @@ struct LandingView: View {
             }
         }
         .padding()
+        .fullScreenCover(
+            isPresented: $presentInitialConnectivityWarning
+        ) {
+            ErrorBottomModal(
+                viewModel: .connectivityOn(),
+                isShowingBottomAlert: $presentInitialConnectivityWarning
+            )
+            .clearModalBackground()
+        }
     }
 }
 

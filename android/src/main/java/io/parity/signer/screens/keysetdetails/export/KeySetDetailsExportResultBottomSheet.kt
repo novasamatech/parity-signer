@@ -4,19 +4,14 @@ import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
@@ -28,9 +23,7 @@ import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
 import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.components.sharedcomponents.KeySeedCard
-import io.parity.signer.models.Callback
-import io.parity.signer.models.KeySetDetailsModel
-import io.parity.signer.models.KeySetModel
+import io.parity.signer.models.*
 import io.parity.signer.ui.theme.*
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -40,55 +33,71 @@ fun KeySetDetailsExportResultBottomSheet(
 	selectedKeys: Set<String>,
 	onClose: Callback,
 ) {
-	Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
-		BottomSheetHeader(
-			title = pluralStringResource(
-				id = R.plurals.key_export_title,
-				count = selectedKeys.size,
-				selectedKeys.size,
-			),
-			onCloseClicked = onClose
+	//preconditions
+	if (model.root == null) {
+		//todo key details
+		submitErrorState(
+			"KeySetDetailsExport desont' work without root and " +
+				"root is missing, returning and it's ugly user experience, should be " +
+				"impossible to navigate here "
 		)
-		val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
-		val plateShape =
-			RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
-		//scrollable part
-		Column(
-			modifier = Modifier
-				.verticalScroll(rememberScrollState())
-				.weight(weight = 1f, fill = false)
-				.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-				.background(MaterialTheme.colors.fill6, plateShape)
-		) {
-			if (LocalInspectionMode.current) {
-				AnimatedQrKeysInfo(
-					input = Unit,
-					provider = EmptyAnimatedQrKeysProvider(),
-					modifier = Modifier.padding(8.dp)
-				)
-			} else {
-				AnimatedQrKeysInfo(
-					input = KeySetDetailsExportService.GetQrCodesListRequest(model.root.seedName,
-						model.keys.filter { selectedKeys.contains(it.addressKey) }),
-					provider = KeySetDetailsExportService(),
-					modifier = Modifier.padding(8.dp)
-				)
-			}
-			NotificationFrameText(messageRes = R.string.key_set_export_description_content)
-			KeySeedCard(
-				seedTitle = model.root.seedName,
-				base58 = model.root.base58,
+		onClose()
+	} else {
+		Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
+			BottomSheetHeader(
+				title = pluralStringResource(
+					id = R.plurals.key_export_title,
+					count = selectedKeys.size,
+					selectedKeys.size,
+				),
+				onCloseClicked = onClose
 			)
-			SignerDivider()
-			val seedList = selectedKeys.toList()
-			for (i in 0..seedList.lastIndex) {
-				val seed = seedList[i]
-				val keyModel = model.keys.first { it.addressKey == seed }
-				KeyCard(
-					KeyCardModel.fromKeyModel(keyModel, model.network.title),
+			val plateShape =
+				RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
+			//scrollable part
+			Column(
+				modifier = Modifier
+					.verticalScroll(rememberScrollState())
+					.weight(weight = 1f, fill = false)
+					.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+					.background(MaterialTheme.colors.fill6, plateShape)
+			) {
+				if (LocalInspectionMode.current) {
+					AnimatedQrKeysInfo(
+						input = Unit,
+						provider = EmptyAnimatedQrKeysProvider(),
+						modifier = Modifier.padding(8.dp)
+					)
+				} else {
+					AnimatedQrKeysInfo(
+						input = KeySetDetailsExportService.GetQrCodesListRequest(
+							seedName = model.root.seedName,
+							keys = model.keysAndNetwork.map { it.key }
+								.filter { selectedKeys.contains(it.addressKey) }),
+						provider = KeySetDetailsExportService(),
+						modifier = Modifier.padding(8.dp)
+					)
+				}
+				NotificationFrameText(messageRes = R.string.key_set_export_description_content)
+				KeySeedCard(
+					seedTitle = model.root.seedName,
+					base58 = model.root.base58,
 				)
-				if (i != seedList.lastIndex) {
-					SignerDivider()
+				SignerDivider()
+				val seedList = selectedKeys.toList()
+				for (i in 0..seedList.lastIndex) {
+					val seed = seedList[i]
+					val keyModel = model.keysAndNetwork
+						.first { it.key.addressKey == seed }
+					KeyCard(
+						KeyCardModel.fromKeyModel(
+							keyModel.key,
+							keyModel.network.networkTitle
+						),
+					)
+					if (i != seedList.lastIndex) {
+						SignerDivider()
+					}
 				}
 			}
 		}
@@ -134,8 +143,8 @@ private fun KeySetItemInExport(seed: KeySetModel) {
 private fun PreviewKeySetDetailsExportResultBottomSheet() {
 	val model = KeySetDetailsModel.createStub()
 	val selected = setOf(
-		model.keys[0].addressKey,
-		model.keys[1].addressKey,
+		model.keysAndNetwork[0].key.addressKey,
+		model.keysAndNetwork[1].key.addressKey,
 	)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {

@@ -18,8 +18,9 @@ struct KeyDetailsMulti: View {
             VStack {
                 AddressCard(card: MAddressCard(
                     base58: content.keyDetails.base58,
-                    address: content.keyDetails.address,
-                    multiselect: nil
+
+                    addressKey: "",
+                    address: content.keyDetails.address
                 ))
                 NetworkCard(
                     title: content.keyDetails.networkInfo.networkTitle,

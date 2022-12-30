@@ -2,7 +2,7 @@ use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 use sp_runtime::{generic::Era, MultiSigner};
 
 use definitions::helpers::{make_identicon_from_account, make_identicon_from_id20, IdenticonStyle};
-use definitions::keyring::NetworkSpecsKey;
+use definitions::keyring::{AddressKey, NetworkSpecsKey};
 
 use definitions::navigation::MAddressCard;
 use definitions::{
@@ -309,8 +309,10 @@ pub(crate) fn make_author_info(
 ) -> MAddressCard {
     let base58 =
         print_multisigner_as_base58_or_eth(author, Some(base58prefix), address_details.encryption);
+    let address_key = hex::encode(AddressKey::from_multisigner(author).key());
     MAddressCard {
         base58,
+        address_key,
         address: Address {
             identicon: make_identicon_from_multisigner(
                 author,
@@ -321,6 +323,5 @@ pub(crate) fn make_author_info(
             has_pwd: address_details.has_pwd,
             secret_exposed: address_details.secret_exposed,
         },
-        multiselect: None,
     }
 }

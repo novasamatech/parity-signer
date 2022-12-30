@@ -17,25 +17,6 @@ extension PreviewData {
     )
     static let base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
     static let publicKey = "15Gsc678654FDSG0HA04H0A"
-    static let mkeys = MKeys(
-        set: [],
-        root: .init(
-            address: .init(
-                path: "",
-                hasPwd: false,
-                identicon: .svg(image: PreviewData.exampleIdenticon),
-                seedName: "",
-                secretExposed: false
-            ),
-            addressKey: "",
-            base58: "",
-            swiped: false,
-            multiselect: false
-        ),
-        network: .init(title: "", logo: ""),
-        multiselectMode: false,
-        multiselectCount: ""
-    )
 
     static let mKeyAndNetworkCard = MKeyAndNetworkCard(key: .init(
         address: .init(
@@ -47,21 +28,20 @@ extension PreviewData {
         ),
         addressKey: "",
         base58: "",
-        swiped: false,
-        multiselect: false
+        swiped: false
     ), network: .init(networkTitle: "", networkLogo: "", networkSpecsKey: ""))
 
     static let mKeyNew = MKeysNew(
         root: MAddressCard(
             base58: "",
+            addressKey: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
             address: .init(
                 path: "",
                 hasPwd: false,
                 identicon: .svg(image: PreviewData.exampleIdenticon),
                 seedName: "",
                 secretExposed: false
-            ),
-            multiselect: false
+            )
         ),
         set: []
     )
@@ -77,8 +57,7 @@ extension PreviewData {
             seedName: "",
             secretExposed: false
         ),
-        base58: "",
-        multiselect: nil
+        base58: ""
     )
 
     static let exampleErrorMessage =
@@ -201,13 +180,14 @@ extension PreviewData {
         ttype: .sign,
         authorInfo: .init(
             base58: "5ELtQSR8igkgpwCNGKkoGiepCWS6m558T9mchaMax7zwVWUz",
+            addressKey: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
             address: .init(
                 path: "",
                 hasPwd: true,
                 identicon: .svg(image: PreviewData.exampleIdenticon),
                 seedName: "Seed name",
                 secretExposed: false
-            ), multiselect: nil
+            )
         ),
         networkInfo: .init(
             networkTitle: "Westend",

@@ -65,10 +65,6 @@ final class SignerDataModel: ObservableObject {
     /// Should be called once on factory-new state of the app
     /// Populates database with starting values
     func onboard(jailbreak: Bool = false) {
-        guard !connectivityMediator.isConnectivityOn else {
-            alert = true
-            return
-        }
         wipe()
         guard databaseMediator.recreateDatabaseFile() else {
             print("Database could not be recreated")

@@ -8,43 +8,27 @@
 import Foundation
 
 struct KeyDetailsPublicKeyViewModel: Equatable {
-    enum Footer: Equatable {
-        case root(QRCodeRootFooterViewModel)
-        case address(QRCodeAddressFooterViewModel)
-    }
-
     let qrCode: QrData
-    let footer: Footer
+    let footer: QRCodeAddressFooterViewModel
     let isKeyExposed: Bool
     let isRootKey: Bool
 
     init(_ keyDetails: MKeyDetails) {
         qrCode = keyDetails.qr
-        if keyDetails.isRootKey {
-            footer = .root(
-                .init(
-                    keyName: keyDetails.address.seedName,
-                    base58: keyDetails.base58
-                )
-            )
-        } else {
-            footer = .address(
-                .init(
-                    identicon: keyDetails.address.identicon.svgPayload,
-                    rootKeyName: keyDetails.address.seedName,
-                    path: keyDetails.address.path,
-                    network: keyDetails.networkInfo.networkTitle,
-                    base58: keyDetails.base58
-                )
-            )
-        }
+        footer = .init(
+            identicon: keyDetails.address.identicon.svgPayload,
+            rootKeyName: keyDetails.address.seedName,
+            path: keyDetails.address.path,
+            network: keyDetails.networkInfo.networkTitle,
+            base58: keyDetails.base58
+        )
         isKeyExposed = keyDetails.address.secretExposed
         isRootKey = keyDetails.isRootKey
     }
 
     init(
         qrCode: QrData,
-        footer: Footer,
+        footer: QRCodeAddressFooterViewModel,
         isKeyExposed: Bool,
         isRootKey: Bool
     ) {

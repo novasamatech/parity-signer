@@ -127,13 +127,13 @@ pub struct LogScreenEntry {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ScreenData {
     Scan,
-    Keys { f: MKeys },
+    Keys { f: String },
     Settings { f: MSettings },
     Log { f: MLog },
     LogDetails { f: MLogDetails },
     Transaction { f: Vec<MTransaction> },
     SeedSelector { f: MSeeds },
-    KeyDetails { f: MKeyDetails },
+    KeyDetails { f: Option<MKeyDetails> },
     NewSeed { f: MNewSeed },
     RecoverSeedName { f: MRecoverSeedName },
     RecoverSeedPhrase { f: MRecoverSeedPhrase },
@@ -153,7 +153,6 @@ pub struct MKeysCard {
     pub address_key: String,
     pub base58: String,
     pub swiped: bool,
-    pub multiselect: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -172,15 +171,6 @@ pub struct MKeyAndNetworkCard {
 pub struct MNetworkCard {
     pub title: String,
     pub logo: String,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct MKeys {
-    pub set: Vec<MKeysCard>,
-    pub root: MKeysCard,
-    pub network: MNetworkCard,
-    pub multiselect_mode: bool,
-    pub multiselect_count: String,
 }
 
 #[derive(Clone, Default, Debug, PartialEq, Eq)]
@@ -274,7 +264,6 @@ pub struct MKeyDetails {
     pub pubkey: String,
     pub network_info: MSCNetworkInfo,
     pub base58: String,
-    pub multiselect: Option<bool>,
     pub address: Address,
 }
 
@@ -319,8 +308,8 @@ pub struct Address {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MAddressCard {
     pub base58: String,
+    pub address_key: String,
     pub address: Address,
-    pub multiselect: Option<bool>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

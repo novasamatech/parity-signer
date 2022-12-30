@@ -214,14 +214,14 @@ struct EnterPasswordModal_Previews: PreviewProvider {
                     .init(
                         authorInfo: .init(
                             base58: PreviewData.base58,
+                            addressKey: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
                             address: .init(
                                 path: "//polkadot",
                                 hasPwd: true,
                                 identicon: .svg(image: PreviewData.exampleIdenticon),
                                 seedName: "Parity Keys",
                                 secretExposed: true
-                            ),
-                            multiselect: nil
+                            )
                         ),
                         counter: 2
                     )

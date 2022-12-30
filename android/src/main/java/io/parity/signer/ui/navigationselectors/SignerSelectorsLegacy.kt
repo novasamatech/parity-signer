@@ -42,10 +42,11 @@ fun ScreenSelector(
 		)
 		ScreenData.Documents -> Documents()
 		is ScreenData.KeyDetails -> {}//migrated
-		is ScreenData.KeyDetailsMulti -> KeyDetailsMulti(
-			screenData.f,
-			button1,
-		)
+		is ScreenData.KeyDetailsMulti -> {
+			//migrated, now part of KeySetDetails subgraph and old data used
+			submitErrorState("unreacheble state reached - root navigator should never " +
+				"get to Key Details Multi $screenData")
+		}
 		is ScreenData.Keys -> {} //migrated to new selector
 		is ScreenData.Log -> {} //migrated to new selector
 		is ScreenData.LogDetails -> LogDetails(screenData.f)
