@@ -8,16 +8,12 @@
 import SwiftUI
 
 struct KeyDetailsView: View {
-    let dataModel: KeyDetailsDataModel
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @EnvironmentObject private var data: SignerDataModel
     @EnvironmentObject private var appState: AppState
 
-    // This view is recreated few times because of Rust navigation, for now we need to store modal view model in static
-    // property because it can't be created earlier as it would trigger passcode request on the device
-    static var backupModalViewModel: BackupModalViewModel!
     let forgetKeyActionHandler: ForgetKeySetAction
     let resetWarningAction: ResetConnectivtyWarningsAction
 
@@ -34,8 +30,29 @@ struct KeyDetailsView: View {
                         viewModel.isShowingActionSheet.toggle()
                     })
                 )
-                // List
-                mainList
+                ScrollView {
+                    // Main key cell
+                    rootKeyHeader()
+                    // Derived Keys header
+                    HStack {
+                        Localizable.KeyDetails.Label.derived.text
+                            .font(PrimaryFont.bodyM.font)
+                        Spacer().frame(maxWidth: .infinity)
+                        Asset.switches.swiftUIImage
+                            .foregroundColor(
+                                viewModel.isFilteringActive ? Asset.accentPink300.swiftUIColor : Asset
+                                    .textAndIconsTertiary.swiftUIColor
+                            )
+                            .frame(width: Heights.actionSheetButton)
+                            .onTapGesture {
+                                viewModel.onNetworkSelectionTap()
+                            }
+                    }
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .padding(.horizontal, Spacing.large)
+                    // List
+                    mainList
+                }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
             if viewModel.isPresentingSelectionOverlay {
@@ -43,7 +60,7 @@ struct KeyDetailsView: View {
             } else {
                 PrimaryButton(
                     action: {
-                        navigation.perform(navigation: dataModel.createDerivedKey)
+                        navigation.perform(navigation: viewModel.createDerivedKey)
                     },
                     text: Localizable.KeyDetails.Action.create.key
                 )
@@ -53,7 +70,7 @@ struct KeyDetailsView: View {
         .onAppear {
             viewModel.use(navigation: navigation)
             viewModel.use(appState: appState)
-            viewModel.refreshData(dataModel: dataModel)
+            viewModel.refreshData()
         }
         .fullScreenCover(
             isPresented: $viewModel.isShowingActionSheet,
@@ -70,7 +87,7 @@ struct KeyDetailsView: View {
         .fullScreenCover(isPresented: $viewModel.isShowingRemoveConfirmation) {
             HorizontalActionsBottomModal(
                 viewModel: .forgetKeySet,
-                mainAction: forgetKeyActionHandler.forgetKeySet(dataModel.removeSeed),
+                mainAction: forgetKeyActionHandler.forgetKeySet(viewModel.removeSeed),
                 // We need to fake right button action here or Rust machine will break
                 // In old UI, if you dismiss equivalent of this modal, underlying modal would still be there,
                 // so we need to inform Rust we actually hid it
@@ -80,11 +97,15 @@ struct KeyDetailsView: View {
             .clearModalBackground()
         }
         .fullScreenCover(isPresented: $viewModel.isShowingBackupModal) {
-            BackupModal(
-                isShowingBackupModal: $viewModel.isShowingBackupModal,
-                viewModel: KeyDetailsView.backupModalViewModel
-            )
-            .clearModalBackground()
+            if let viewModel = viewModel.backupViewModel() {
+                BackupModal(
+                    isShowingBackupModal: $viewModel.isShowingBackupModal,
+                    viewModel: viewModel
+                )
+                .clearModalBackground()
+            } else {
+                EmptyView()
+            }
         }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingConnectivityAlert,
@@ -104,16 +125,20 @@ struct KeyDetailsView: View {
         .fullScreenCover(
             isPresented: $viewModel.isShowingKeysExportModal
         ) {
-            ExportMultipleKeysModal(
-                viewModel: .init(
-                    viewModel: viewModel.keyExportModel(dataModel: dataModel),
-                    isPresented: $viewModel.isShowingKeysExportModal
+            if let keyExportModel = viewModel.keyExportModel() {
+                ExportMultipleKeysModal(
+                    viewModel: .init(
+                        viewModel: keyExportModel,
+                        isPresented: $viewModel.isShowingKeysExportModal
+                    )
                 )
-            )
-            .clearModalBackground()
-            .onAppear {
-                viewModel.selectedSeeds.removeAll()
-                viewModel.isPresentingSelectionOverlay.toggle()
+                .clearModalBackground()
+                .onAppear {
+                    viewModel.selectedSeeds.removeAll()
+                    viewModel.isPresentingSelectionOverlay.toggle()
+                }
+            } else {
+                EmptyView()
             }
         }
         .fullScreenCover(
@@ -124,39 +149,22 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingRootDetails
+        ) {
+            RootKeyDetailsModal(
+                isPresented: $viewModel.isPresentingRootDetails,
+                viewModel: viewModel.rootKeyDetails()
+            )
+            .clearModalBackground()
+        }
     }
 
     var mainList: some View {
-        List {
-            // Main key cell
-            KeySummaryView(
-                viewModel: dataModel.keySummary,
-                isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
-            )
-            .padding(Padding.detailsCell)
-            .keyDetailsListElement()
-            .onTapGesture {
-                if !viewModel.isPresentingSelectionOverlay {
-                    navigation.perform(navigation: dataModel.addressKeyNavigation)
-                }
-            }
-            // Header
-            HStack {
-                Localizable.KeyDetails.Label.derived.text
-                    .font(PrimaryFont.bodyM.font)
-                Spacer().frame(maxWidth: .infinity)
-                Asset.switches.swiftUIImage
-                    .frame(width: Heights.actionSheetButton)
-                    .onTapGesture {
-                        viewModel.onNetworkSelectionTap()
-                    }
-            }
-            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-            .padding(Padding.detailsCell)
-            .keyDetailsListElement()
+        LazyVStack(spacing: 0) {
             // List of derived keys
             ForEach(
-                dataModel.derivedKeys,
+                viewModel.derivedKeys,
                 id: \.viewModel.addressKey
             ) { deriveKey in
                 DerivedKeyRow(
@@ -164,7 +172,7 @@ struct KeyDetailsView: View {
                     selectedSeeds: $viewModel.selectedSeeds,
                     isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
                 )
-                .keyDetailsListElement()
+                .contentShape(Rectangle())
                 .onTapGesture {
                     if viewModel.isPresentingSelectionOverlay {
                         let seedName = deriveKey.viewModel.path
@@ -179,27 +187,23 @@ struct KeyDetailsView: View {
                 }
             }
             Spacer()
-                .keyDetailsListElement()
                 .frame(height: Heights.actionButton + Spacing.large)
         }
-        .listStyle(.plain)
-        .hiddenScrollContent()
     }
-}
 
-private struct KeyDetailsListElement: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .listRowBackground(Asset.backgroundPrimary.swiftUIColor)
-            .listRowSeparator(.hidden)
-            .listRowInsets(EdgeInsets())
+    @ViewBuilder
+    func rootKeyHeader() -> some View {
+        if let keySummary = viewModel.keySummary {
+            KeySummaryView(
+                viewModel: keySummary,
+                isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
+            )
+            .padding(Padding.detailsCell)
             .contentShape(Rectangle())
-    }
-}
-
-private extension View {
-    func keyDetailsListElement() -> some View {
-        modifier(KeyDetailsListElement())
+            .onTapGesture { viewModel.onRootKeyTap() }
+        } else {
+            EmptyView()
+        }
     }
 }
 
@@ -208,138 +212,131 @@ private struct KeySummaryView: View {
     @Binding var isPresentingSelectionOverlay: Bool
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                Text(viewModel.keyName)
-                    .foregroundColor(
-                        isPresentingSelectionOverlay ? Asset.textAndIconsDisabled.swiftUIColor : Asset
-                            .textAndIconsPrimary.swiftUIColor
-                    )
-                    .font(PrimaryFont.titleL.font)
+        VStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
+            Text(viewModel.keyName)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .font(PrimaryFont.titleXL.font)
+            HStack {
                 Text(viewModel.base58.truncateMiddle())
-                    .foregroundColor(
-                        isPresentingSelectionOverlay ? Asset.textAndIconsDisabled.swiftUIColor : Asset
-                            .textAndIconsTertiary.swiftUIColor
-                    )
-                    .font(PrimaryFont.bodyM.font)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(PrimaryFont.bodyL.font)
                     .lineLimit(1)
-            }
-            Spacer()
-            if !isPresentingSelectionOverlay {
-                Asset.chevronRight.swiftUIImage
+                Asset.chevronDown.swiftUIImage
                     .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
             }
         }
+        .padding(.vertical, Spacing.medium)
+        .padding(.horizontal, Spacing.large)
     }
 }
 
-#if DEBUG
-    struct KeyDetailsView_Previews: PreviewProvider {
-        static var previews: some View {
-            VStack {
-                KeyDetailsView(
-                    dataModel: .init(
-                        keySummary: KeySummaryViewModel(
-                            keyName: "Main Polkadot",
-                            base58: "15Gsc678...0HA04H0A"
-                        ),
-                        derivedKeys: [
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "// polkadot",
-                                    hasPassword: false,
-                                    base58: "15Gsc678654FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            ),
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "// polkadot",
-                                    hasPassword: false,
-                                    base58: "15Gsc678654FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            ),
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "//astar//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
-                                    hasPassword: true,
-                                    base58: "15Gsc678654FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            ),
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
-                                    hasPassword: false,
-                                    base58: "15Gsc678654FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            ),
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "// acala",
-                                    hasPassword: true,
-                                    base58: "15Gsc678654FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            ),
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "// moonbeam",
-                                    hasPassword: true,
-                                    base58: "15Gsc678654FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            ),
-                            DerivedKeyRowModel(
-                                viewModel: DerivedKeyRowViewModel(
-                                    identicon: PreviewData.exampleIdenticon,
-                                    path: "// kilt",
-                                    hasPassword: true,
-                                    base58: "15Gsc6786546423FDSG0HA04H0A"
-                                ),
-                                actionModel: DerivedKeyActionModel(
-                                    tapAction: .init(action: .rightButtonAction)
-                                )
-                            )
-                        ]
-                    ),
-                    viewModel: .init(
-                        keysData: PreviewData.mKeyNew,
-                        exportPrivateKeyService: PrivateKeyQRCodeService(
-                            navigation: NavigationCoordinator(),
-                            keys: PreviewData.mkeys
-                        )
-                    ),
-                    forgetKeyActionHandler: .init(navigation: NavigationCoordinator()),
-                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(true))
-                )
-            }
-            .preferredColorScheme(.dark)
-            .previewLayout(.sizeThatFits)
-            .environmentObject(NavigationCoordinator())
-            .environmentObject(ConnectivityMediator())
-            .environmentObject(SignerDataModel())
-            .environmentObject(AppState())
-        }
-    }
-#endif
+// #if DEBUG
+//    struct KeyDetailsView_Previews: PreviewProvider {
+//        static var previews: some View {
+//            VStack {
+//                KeyDetailsView(
+//                    dataModel: .init(
+//                        keySummary: KeySummaryViewModel(
+//                            keyName: "Main Polkadot",
+//                            base58: "15Gsc678...0HA04H0A"
+//                        ),
+//                        derivedKeys: [
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "// polkadot",
+//                                    hasPassword: false,
+//                                    base58: "15Gsc678654FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            ),
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "// polkadot",
+//                                    hasPassword: false,
+//                                    base58: "15Gsc678654FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            ),
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "//astar//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
+//                                    hasPassword: true,
+//                                    base58: "15Gsc678654FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            ),
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
+//                                    hasPassword: false,
+//                                    base58: "15Gsc678654FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            ),
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "// acala",
+//                                    hasPassword: true,
+//                                    base58: "15Gsc678654FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            ),
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "// moonbeam",
+//                                    hasPassword: true,
+//                                    base58: "15Gsc678654FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            ),
+//                            DerivedKeyRowModel(
+//                                viewModel: DerivedKeyRowViewModel(
+//                                    identicon: PreviewData.exampleIdenticon,
+//                                    path: "// kilt",
+//                                    hasPassword: true,
+//                                    base58: "15Gsc6786546423FDSG0HA04H0A"
+//                                ),
+//                                actionModel: DerivedKeyActionModel(
+//                                    tapAction: .init(action: .rightButtonAction)
+//                                )
+//                            )
+//                        ]
+//                    ),
+//                    viewModel: .init(
+//                        keysData: PreviewData.mKeyNew,
+//                        exportPrivateKeyService: PrivateKeyQRCodeService(
+//                            navigation: NavigationCoordinator(),
+//                            keys: PreviewData.mkeys
+//                        )
+//                    ),
+//                    forgetKeyActionHandler: .init(navigation: NavigationCoordinator()),
+//                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(true))
+//                )
+//            }
+//            .preferredColorScheme(.dark)
+//            .previewLayout(.sizeThatFits)
+//            .environmentObject(NavigationCoordinator())
+//            .environmentObject(ConnectivityMediator())
+//            .environmentObject(SignerDataModel())
+//            .environmentObject(AppState())
+//        }
+//    }
+// #endif

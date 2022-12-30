@@ -4,11 +4,10 @@ use db_handling::helpers::get_danger_status;
 use db_handling::identities::get_multisigner_by_address;
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
-    ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
-    MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
-    MRecoverSeedPhrase, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
-    MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData, ScreenNameType,
-    ShieldAlert, TransactionType,
+    ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MLog,
+    MLogDetails, MManageNetworks, MNewSeed, MPasswordConfirm, MRecoverSeedName, MRecoverSeedPhrase,
+    MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSufficientCryptoReady, MTransaction,
+    ModalData, RightButton, ScreenData, ScreenNameType, ShieldAlert, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use std::fmt::Write;
@@ -777,29 +776,6 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_change_network(&self, details_str: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let mut errorline = String::new();
-
-        if let Screen::Keys(ref keys_state) = self.navstate.screen {
-            if let Modal::NetworkSelector(_) = self.navstate.modal {
-                match NetworkSpecsKey::from_hex(details_str) {
-                    Ok(network_specs_key) => {
-                        new_navstate = Navstate::clean_screen(Screen::Keys(
-                            keys_state.change_network(&network_specs_key),
-                        ))
-                    }
-                    Err(e) => {
-                        new_navstate.alert = Alert::Error;
-                        let _ = write!(&mut errorline, "{}", e);
-                    }
-                }
-            }
-        }
-
-        (new_navstate, errorline)
-    }
-
     fn handle_change_password(&self, details_str: &str) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let errorline = String::new();
@@ -1054,18 +1030,22 @@ impl State {
             },
             Screen::KeyDetails(ref address_state) => {
                 if let Modal::KeyDetailsAction = self.navstate.modal {
-                    match db_handling::identities::remove_key(
-                        dbname,
-                        &address_state.multisigner(),
-                        &address_state.network_specs_key(),
-                    ) {
-                        Ok(()) => {
-                            new_navstate = Navstate::clean_screen(Screen::Log);
+                    if let Some(network_specs_key) = address_state.network_specs_key() {
+                        match db_handling::identities::remove_key(
+                            dbname,
+                            &address_state.multisigner(),
+                            &network_specs_key,
+                        ) {
+                            Ok(()) => {
+                                new_navstate = Navstate::clean_screen(Screen::Log);
+                            }
+                            Err(e) => {
+                                new_navstate.alert = Alert::Error;
+                                let _ = write!(&mut errorline, "{}", e);
+                            }
                         }
-                        Err(e) => {
-                            new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
-                        }
+                    } else {
+                        println!("RemoveKey does nothing here")
                     }
                 } else {
                     println!("RemoveKey does nothing here")
@@ -1457,40 +1437,20 @@ impl State {
                 let f = MSeeds { seed_name_cards };
                 ScreenData::SelectSeedForBackup { f }
             }
-            Screen::Keys(ref keys_state) => {
-                let (root, set, title, logo) =
-                    db_handling::interface_signer::print_identities_for_seed_name_and_network(
-                        dbname,
-                        &keys_state.seed_name(),
-                        &keys_state.network_specs_key(),
-                        keys_state.get_swiped_key(),
-                        keys_state.get_multiselect_keys(),
-                    )?;
-                let multiselect_mode = keys_state.is_multiselect();
-                let multiselect_count = if let SpecialtyKeysState::MultiSelect(ref multiselect) =
-                    keys_state.get_specialty()
-                {
-                    multiselect.len().to_string()
-                } else {
-                    String::new()
-                };
-                let network = MNetworkCard { title, logo };
-                let f = MKeys {
-                    set,
-                    root,
-                    network,
-                    multiselect_mode,
-                    multiselect_count,
-                };
-                ScreenData::Keys { f }
-            }
+            Screen::Keys(ref keys_state) => ScreenData::Keys {
+                f: keys_state.seed_name(),
+            },
             Screen::KeyDetails(ref address_state) => {
-                let f = db_handling::interface_signer::export_key(
-                    dbname,
-                    &address_state.multisigner(),
-                    &address_state.seed_name(),
-                    &address_state.network_specs_key(),
-                )?;
+                let f = if let Some(key) = address_state.network_specs_key().as_ref() {
+                    Some(db_handling::interface_signer::export_key(
+                        dbname,
+                        &address_state.multisigner(),
+                        &address_state.seed_name(),
+                        key,
+                    )?)
+                } else {
+                    None
+                };
                 ScreenData::KeyDetails { f }
             }
             Screen::KeyDetailsMulti(ref address_state_multi) => {
@@ -1781,7 +1741,6 @@ impl State {
                 Action::NetworkSelector => self.handle_network_selector(),
                 Action::NextUnit => self.handle_next_unit(),
                 Action::PreviousUnit => self.handle_previous_unit(),
-                Action::ChangeNetwork => self.handle_change_network(details_str),
                 Action::CheckPassword => self.handle_change_password(details_str),
                 Action::TransactionFetched => self.handle_transaction_fetched(dbname, details_str),
                 Action::RemoveNetwork => self.handle_remove_network(dbname),

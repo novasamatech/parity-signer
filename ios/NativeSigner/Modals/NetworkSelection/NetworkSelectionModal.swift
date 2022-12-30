@@ -86,9 +86,7 @@ struct NetworkSelectionModal: View {
         .padding(.trailing, Spacing.medium)
         .frame(height: Heights.networkFilterItem)
         .onTapGesture {
-            // Currently we don't have app wide support for multiple networks being selected at the same time
-            viewModel.switchToNetwork(network)
-//            viewModel.toggleSelection(network)
+            viewModel.toggleSelection(network)
         }
     }
 }
@@ -121,8 +119,13 @@ extension NetworkSelectionModal {
             selectedNetworks = appState.userData.selectedNetworks
         }
 
+        func cancelAction() {
+            navigation.performFake(navigation: .init(action: .goBack))
+            animateDismissal()
+        }
+
         func resetAction() {
-            selectedNetworks = appState.userData.selectedNetworks
+            appState.userData.selectedNetworks = []
             navigation.performFake(navigation: .init(action: .goBack))
             animateDismissal()
         }
@@ -145,12 +148,13 @@ extension NetworkSelectionModal {
             }
         }
 
-        func switchToNetwork(_ network: Network) {
-            guard !selectedNetworks.contains(network) else { return }
-            selectedNetworks = [network]
-            navigation.perform(navigation: .init(action: .changeNetwork, details: network.key))
-            animateDismissal()
-        }
+//
+//        func switchToNetwork(_ network: Network) {
+//            guard !selectedNetworks.contains(network) else { return }
+//            selectedNetworks = [network]
+//            navigation.perform(navigation: .init(action: .changeNetwork, details: network.key))
+//            animateDismissal()
+//        }
 
         func hide() {
             isPresented.toggle()

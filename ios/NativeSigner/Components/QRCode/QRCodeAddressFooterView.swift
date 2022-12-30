@@ -55,7 +55,7 @@ struct QRCodeAddressFooterView: View {
                     }
                     .onTapGesture {
                         withAnimation {
-                            showFullAddress.toggle()
+                            showFullAddress = true
                         }
                     }
                 }

@@ -24,10 +24,10 @@ struct DerivedKeyOverviewViewModel: Equatable {
 }
 
 extension DerivedKeyOverviewViewModel {
-    init(_ key: MKeysCard) {
-        path = key.address.path
-        identicon = key.address.identicon.svgPayload
-        hasPassword = key.address.hasPwd
+    init(_ key: MKeyAndNetworkCard) {
+        path = key.key.address.path
+        identicon = key.key.address.identicon.svgPayload
+        hasPassword = key.key.address.hasPwd
     }
 }
 

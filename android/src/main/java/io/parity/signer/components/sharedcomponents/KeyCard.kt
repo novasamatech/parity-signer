@@ -137,7 +137,7 @@ fun KeySeedCard(seedTitle: String, base58: String) {
 }
 
 @Composable
-private fun ShowBase58Collapsible(base58: String) {
+fun ShowBase58Collapsible(base58: String) {
 	val expanded = remember { mutableStateOf(false) }
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
