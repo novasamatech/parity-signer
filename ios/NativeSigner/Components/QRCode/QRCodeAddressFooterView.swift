@@ -59,13 +59,7 @@ struct QRCodeAddressFooterView: View {
                         }
                     }
                 }
-                Text(viewModel.network)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(PrimaryFont.captionM.font)
-                    .padding([.top, .bottom], Spacing.extraExtraSmall)
-                    .padding([.leading, .trailing], Spacing.extraSmall)
-                    .background(Asset.fill12.swiftUIColor)
-                    .clipShape(Capsule())
+                NetworkCapsuleView(network: viewModel.network)
             }
         }
         .padding(Spacing.medium)

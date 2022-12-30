@@ -8,23 +8,40 @@
 import SwiftUI
 
 struct RoundedContainerBackground: ViewModifier {
-    var cornerRadius: CGFloat
-    var isError: Bool
+    let cornerRadius: CGFloat
+    let state: State
+
+    enum State {
+        case standard
+        case error
+        case actionableInfo
+
+        var foregroundColor: Color {
+            switch self {
+            case .standard:
+                return Asset.fill6.swiftUIColor
+            case .error:
+                return Asset.accentRed300.swiftUIColor.opacity(0.12)
+            case .actionableInfo:
+                return Asset.accentPink12.swiftUIColor
+            }
+        }
+    }
 
     func body(content: Content) -> some View {
         content
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .foregroundColor(
-                        isError ? Asset.accentRed300.swiftUIColor.opacity(0.12) : Asset.fill6
-                            .swiftUIColor
-                    )
+                    .foregroundColor(state.foregroundColor)
             )
     }
 }
 
 extension View {
-    func containerBackground(_ cornerRadius: CGFloat = CornerRadius.medium, isError: Bool = false) -> some View {
-        modifier(RoundedContainerBackground(cornerRadius: cornerRadius, isError: isError))
+    func containerBackground(
+        _ cornerRadius: CGFloat = CornerRadius.medium,
+        state: RoundedContainerBackground.State = .standard
+    ) -> some View {
+        modifier(RoundedContainerBackground(cornerRadius: cornerRadius, state: state))
     }
 }
