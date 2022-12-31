@@ -128,6 +128,7 @@ fn update_seed_names(seed_names: Vec<String>) -> Result<(), ErrorDisplayed> {
 /// Determines estimated required number of multiframe QR that should be gathered before decoding
 /// is attempted
 fn qrparser_get_packets_total(data: &str, cleaned: bool) -> anyhow::Result<u32, ErrorDisplayed> {
+    log::warn!("get packets total {}", data);
     qr_reader_phone::get_length(data, cleaned).map_err(|e| e.to_string().into())
 }
 

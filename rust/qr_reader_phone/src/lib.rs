@@ -3,6 +3,8 @@
 
 use std::convert::TryFrom;
 
+use banana_recovery::{Share, ShareSet};
+
 mod error;
 mod parser;
 pub mod process_payload;
@@ -25,6 +27,14 @@ pub fn get_length(line: &str, cleaned: bool) -> Result<u32> {
         Ok(frame.total())
     } else if let Ok(frame) = LegacyFrame::try_from(payload.as_ref()) {
         Ok(frame.total as u32)
+    } else if let Ok(banana_spilt_qr) = Share::new(payload) {
+        log::warn!("banana");
+        let share_set = ShareSet::init(banana_spilt_qr);
+        if let banana_recovery::NextAction::MoreShares { have: _, need } = share_set.next_action() {
+            Ok(need as u32)
+        } else {
+            todo!()
+        }
     } else {
         Ok(1)
     }

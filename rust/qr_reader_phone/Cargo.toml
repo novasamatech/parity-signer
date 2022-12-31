@@ -12,6 +12,9 @@ raptorq = "1.7.0"
 nom = "7.1.1"
 thiserror = "1.0.38"
 
+banana_recovery = { git = "https://github.com/paritytech/banana-recovery-rust" }
+log = "0.4.17"
+
 [lib]
 name = "qr_reader_phone"
 crate-type = ["lib"]
