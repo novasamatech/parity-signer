@@ -250,7 +250,7 @@ dependencies = [
 [[package]]
 name = "banana_recovery"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/banana-recovery-rust#ca8e158fb65726bf8c2557047a9bb4bf6505c912"
+source = "git+https://github.com/paritytech/banana-recovery-rust#5c981a2cdd24808be4cabc76bddd7aa830c6bce1"
 dependencies = [
  "base64",
  "bitvec",

@@ -3,7 +3,7 @@
 
 use std::convert::TryFrom;
 
-use banana_recovery::{Share, ShareSet};
+use banana_recovery::Share;
 
 mod error;
 mod parser;
@@ -29,12 +29,7 @@ pub fn get_length(line: &str, cleaned: bool) -> Result<u32> {
         Ok(frame.total as u32)
     } else if let Ok(banana_spilt_qr) = Share::new(payload) {
         log::warn!("banana");
-        let share_set = ShareSet::init(banana_spilt_qr);
-        if let banana_recovery::NextAction::MoreShares { have: _, need } = share_set.next_action() {
-            Ok(need as u32)
-        } else {
-            todo!()
-        }
+        Ok(banana_spilt_qr.required_shards() as u32)
     } else {
         Ok(1)
     }
