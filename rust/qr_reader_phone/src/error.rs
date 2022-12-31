@@ -25,6 +25,9 @@ pub enum Error {
     #[error("Was decoding legacy multi-element qr, and got interrupted by a fountain one.")]
     LegacyInterruptedByFountain,
 
+    #[error("Was decoding legacy multi-element qr, and got interrupted by a banana recovery one.")]
+    LegacyInterruptedByBanana,
+
     #[error(
         "Number of element in legacy multi-element qr sequence exceeds expected sequence length."
     )]

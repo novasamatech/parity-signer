@@ -39,6 +39,7 @@ pub fn decode_sequence(set: &[String], cleaned: bool) -> Result<String> {
     let mut out = Ready::NotYet(InProgress::None);
     let mut final_result: Option<String> = None;
     for x in set {
+        log::warn!("decode sequence {x}");
         let payload = get_payload(x, cleaned)?;
         if let Ready::NotYet(decoding) = out {
             out = process_decoded_payload(payload, decoding)?;
