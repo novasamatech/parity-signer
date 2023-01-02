@@ -160,6 +160,7 @@ extension TCDerivations {
                         address: seedKeys.multisigner?.first ?? "address", // to be corrected
                         keys: seedKeys.derivedKeys
                             .filter { $0.status == .importable }
+                            .filter { $0.hasPwd != nil }
                             .map { DerivedKeysSetRenderable
                                 .DerivedKeyRenderable(
                                     identicon: $0.identicon,
@@ -179,7 +180,7 @@ extension TCDerivations {
                 .contains { $0.status == .networkMissing }
             isKeySetMissing = value
                 .flatMap(\.derivedKeys)
-                .contains { $0.status == .networkMissing }
+                .contains { $0.hasPwd == nil }
             isPathInBadFormat = value
                 .flatMap(\.derivedKeys)
                 .contains { $0.status == .badFormat }

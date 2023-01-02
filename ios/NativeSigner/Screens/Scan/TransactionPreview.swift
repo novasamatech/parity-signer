@@ -61,8 +61,10 @@ struct TransactionPreview: View {
     @ViewBuilder
     func singleTransaction(content: MTransaction) -> some View {
         VStack(alignment: .leading, spacing: Spacing.medium) {
-            TransactionErrorsView(content: content)
-                .padding(.horizontal, Spacing.medium)
+            if !content.transactionIssuesCards().isEmpty {
+                TransactionErrorsView(content: content)
+                    .padding(.horizontal, Spacing.medium)
+            }
             switch content.ttype {
             case .sign,
                  .read:
@@ -77,14 +79,8 @@ struct TransactionPreview: View {
             // Used when new network is being added
             // User when network metadata is being added
             // Cards are redesigned to present new design
-            case .stub:
-                VStack {
-                    ForEach(content.sortedValueCards(), id: \.index) { card in
-                        TransactionCardView(card: card)
-                    }
-                }
-                .padding(Spacing.medium)
-            case .done,
+            case .stub,
+                 .done,
                  .importDerivations:
                 VStack {
                     ForEach(content.sortedValueCards(), id: \.index) { card in
@@ -298,20 +294,6 @@ extension TransactionPreview {
         }
 
         func onImportKeysTap() {}
-
-        func signTransaction() {
-            let seedName = dataModel.compactMap { $0.content.authorInfo?.address.seedName }.first
-            let seedPhrase = seedsMediator.getSeed(seedName: seedName ?? "")
-            let actionResult = navigation.performFake(
-                navigation:
-                .init(
-                    action: .goForward,
-                    details: "",
-                    seedPhrase: seedPhrase
-                )
-            )
-            print(actionResult)
-        }
 
         func presentDetails(for content: MTransaction) {
             selectedDetails = content
