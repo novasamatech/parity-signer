@@ -215,7 +215,7 @@ pub fn export_all_addrs<P: AsRef<Path>>(
                         for selected_derivation in selected_derivations {
                             if selected_derivation.derivation == key.1.path
                                 && selected_derivation.network_specs_key
-                                    == hex::encode(key.1.network_id[0].encode())
+                                    == hex::encode(key.1.network_id[0].key())
                             {
                                 selected = true;
                                 break;
