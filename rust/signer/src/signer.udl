@@ -338,7 +338,7 @@ dictionary TransactionCardSet {
 
 dictionary SeedKeysPreview {
     string name;
-    MultiSigner? multisigner;
+    MultiSigner multisigner;
     sequence<DerivedKeyPreview> derived_keys;
 };
 
@@ -357,7 +357,13 @@ dictionary DerivedKeyPreview {
 interface DerivedKeyStatus {
     Importable();
     AlreadyExists();
+    Invalid(sequence<DerivedKeyError> errors);
+};
+
+[Enum]
+interface DerivedKeyError {
     NetworkMissing();
+    KeySetMissing();
     BadFormat();
 };
 

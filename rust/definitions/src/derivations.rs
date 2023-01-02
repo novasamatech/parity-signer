@@ -10,9 +10,7 @@ pub struct SeedKeysPreview {
     pub name: String,
 
     /// Public key of the root key.
-    ///
-    /// `None` if user has created no root keys.
-    pub multisigner: Option<MultiSigner>,
+    pub multisigner: MultiSigner,
 
     /// Derived keys.
     pub derived_keys: Vec<DerivedKeyPreview>,
@@ -54,8 +52,18 @@ pub enum DerivedKeyStatus {
     /// Key is already into the Signer. Unable to determine for a key with password
     AlreadyExists,
 
-    /// Key is not importable because of a network mismatch
+    Invalid {
+        errors: Vec<DerivedKeyError>,
+    },
+}
+
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub enum DerivedKeyError {
+    /// Network specs were not imported into the Signer
     NetworkMissing,
+
+    /// Seed is not in the Signer
+    KeySetMissing,
 
     /// Bad format of the derivation path
     BadFormat,

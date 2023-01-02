@@ -49,6 +49,7 @@ use definitions::derivations::{DerivedKeyPreview, DerivedKeyStatus, SeedKeysPrev
 use definitions::navigation::MAddressCard;
 use pretty_assertions::assert_eq;
 use sp_core::sr25519::Public;
+use tempfile::tempdir;
 use transaction_parsing::prepare_derivations_preview;
 
 use crate::{
@@ -560,8 +561,8 @@ fn bulk_signing_test_passworded() {
 
 #[test]
 fn export_import_addrs() {
-    let dbname_from = "for_tests/export_import_addrs_from";
-    let dbname_to = "for_tests/export_import_addrs_to";
+    let dbname_from = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let dbname_to = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
     let westend_genesis =
         H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
 
@@ -589,13 +590,11 @@ fn export_import_addrs() {
 
     let addrs_expected = vec![SeedKeysPreview {
         name: "Alice".to_owned(),
-        multisigner: Some(
-            sr25519::Pair::from_phrase(ALICE_SEED_PHRASE, None)
-                .unwrap()
-                .0
-                .public()
-                .into(),
-        ),
+        multisigner: sr25519::Pair::from_phrase(ALICE_SEED_PHRASE, None)
+            .unwrap()
+            .0
+            .public()
+            .into(),
         derived_keys: vec![
             DerivedKeyPreview {
                 address: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_owned(),
@@ -637,7 +636,7 @@ fn export_import_addrs() {
                 },
                 has_pwd: Some(true),
                 network_title: Some("Westend".to_string()),
-                status: DerivedKeyStatus::Importable,
+                status: DerivedKeyStatus::AlreadyExists,
             },
             DerivedKeyPreview {
                 address: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_owned(),
@@ -671,7 +670,7 @@ fn export_import_addrs() {
         ExportedSet::Selected {
             s: vec![PathAndNetwork {
                 derivation: "//polkadot".to_owned(),
-                network_specs_key: hex::encode(network_specs_key.encode()),
+                network_specs_key: hex::encode(network_specs_key.key()),
             }],
         },
     );
@@ -681,13 +680,11 @@ fn export_import_addrs() {
 
     let addrs_expected_filtered = vec![SeedKeysPreview {
         name: "Alice".to_owned(),
-        multisigner: Some(
-            sr25519::Pair::from_phrase(ALICE_SEED_PHRASE, None)
-                .unwrap()
-                .0
-                .public()
-                .into(),
-        ),
+        multisigner: sr25519::Pair::from_phrase(ALICE_SEED_PHRASE, None)
+            .unwrap()
+            .0
+            .public()
+            .into(),
         derived_keys: vec![DerivedKeyPreview {
             address: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_owned(),
             derivation_path: Some("//polkadot".to_owned()),
@@ -714,7 +711,7 @@ fn export_import_addrs() {
 
 #[test]
 fn flow_test_1() {
-    let dbname = "for_tests/flow_test_1";
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
     populate_cold_nav_test(dbname).unwrap();
     init_db(dbname, verifier_alice_sr25519()).unwrap();
     let mut state = State::default();
@@ -3687,9 +3684,7 @@ fn flow_test_1() {
         )
     );
 
-    let res = state.perform(Action::NetworkSelector, "", "").unwrap();
-
-    dbg!(res);
+    state.perform(Action::NetworkSelector, "", "").unwrap();
 
     let expected_action = ActionResult {
         screen_label: String::new(),
@@ -3714,14 +3709,14 @@ fn flow_test_1() {
     let _action = state.perform(Action::TransactionFetched,"53ffde000414416c696365010146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a04c031365a616636425436786336576559435836594e4166363752756d57614569756d77617774376354644b4d553748715701282f2f706f6c6b61646f740191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","").unwrap();
     let seed_keys = vec![SeedKeysPreview {
         name: "Alice".to_string(),
-        multisigner: Some(MultiSigner::Sr25519(
+        multisigner: MultiSigner::Sr25519(
             Public::try_from(
                 hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a")
                     .unwrap()
                     .as_ref(),
             )
             .unwrap(),
-        )),
+        ),
         derived_keys: vec![
             DerivedKeyPreview {
                 address: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
@@ -3734,7 +3729,7 @@ fn flow_test_1() {
                     .unwrap(),
                 identicon: SignerImage::default(),
                 has_pwd: Some(false),
-                network_title: Some("".to_string()),
+                network_title: Some("Westend".to_string()),
                 status: DerivedKeyStatus::Importable,
             },
             DerivedKeyPreview {
@@ -3748,7 +3743,7 @@ fn flow_test_1() {
                     .unwrap(),
                 identicon: SignerImage::default(),
                 has_pwd: Some(false),
-                network_title: Some("".to_string()),
+                network_title: Some("Westend".to_string()),
                 status: DerivedKeyStatus::Importable,
             },
             DerivedKeyPreview {
@@ -3762,7 +3757,7 @@ fn flow_test_1() {
                     .unwrap(),
                 identicon: SignerImage::default(),
                 has_pwd: Some(false),
-                network_title: Some("".to_string()),
+                network_title: Some("Westend".to_string()),
                 status: DerivedKeyStatus::Importable,
             },
             DerivedKeyPreview {
@@ -3776,7 +3771,7 @@ fn flow_test_1() {
                     .unwrap(),
                 identicon: SignerImage::default(),
                 has_pwd: Some(false),
-                network_title: Some("".to_string()),
+                network_title: Some("Westend".to_string()),
                 status: DerivedKeyStatus::Importable,
             },
             DerivedKeyPreview {
@@ -3790,7 +3785,7 @@ fn flow_test_1() {
                     .unwrap(),
                 identicon: SignerImage::default(),
                 has_pwd: Some(false),
-                network_title: Some("".to_string()),
+                network_title: Some("Westend".to_string()),
                 status: DerivedKeyStatus::Importable,
             },
         ],
@@ -3804,13 +3799,7 @@ fn flow_test_1() {
     state.perform(Action::SelectSeed, "Alice", "").unwrap();
     state.perform(Action::RightButtonAction, "", "").unwrap();
     state.perform(Action::NetworkSelector, "", "").unwrap();
-    let action = state
-        .perform(
-            Action::ChangeNetwork,
-            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-            "",
-        )
-        .unwrap();
+    let action = state.perform(Action::NetworkSelector, "", "").unwrap();
 
     let expected_action = ActionResult {
         screen_label: String::new(),

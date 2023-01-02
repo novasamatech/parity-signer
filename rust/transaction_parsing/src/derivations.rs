@@ -1,12 +1,15 @@
-use db_handling::identities::{derivation_check, DerivationCheck, ExportAddrs, ExportAddrsV1};
+use db_handling::identities::{get_all_addresses, is_passworded, ExportAddrs, ExportAddrsV1};
 
-use definitions::derivations::{DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview};
+use definitions::derivations::{
+    DerivedKeyError, DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview,
+};
 
 use db_handling::helpers::get_network_specs;
 use definitions::helpers::{base58_or_eth_to_multisigner, make_identicon_from_multisigner};
 use definitions::keyring::NetworkSpecsKey;
 use definitions::{helpers::unhex, navigation::TransactionCardSet};
 use parity_scale_codec::Decode;
+use sp_runtime::MultiSigner;
 use std::path::Path;
 
 use crate::cards::Card;
@@ -46,9 +49,9 @@ where
     P: AsRef<Path>,
 {
     let mut result = Vec::new();
-    for seed in export_info.addrs {
+    for seed_info in export_info.addrs {
         let mut derived_keys = vec![];
-        for addr_info in seed.derived_keys {
+        for addr_info in seed_info.derived_keys {
             let multisigner =
                 base58_or_eth_to_multisigner(&addr_info.address, &addr_info.encryption)?;
             let identicon = make_identicon_from_multisigner(
@@ -60,21 +63,20 @@ where
             let network_title = get_network_specs(&db_path, &network_specs_key)
                 .map(|specs| specs.specs.title)
                 .ok();
-            let check = derivation_check(
-                &seed.name,
-                addr_info.derivation_path.as_ref().unwrap_or(&"".to_owned()),
-                &network_specs_key,
+            let path = addr_info
+                .derivation_path
+                .clone()
+                .unwrap_or_else(|| "".to_owned());
+            let status = get_derivation_status(
+                &path,
+                &network_title,
+                &seed_info.multisigner,
+                &multisigner,
                 &db_path,
             )?;
-            let status = match check {
-                DerivationCheck::NoPassword(Some(_)) => DerivedKeyStatus::AlreadyExists,
-                DerivationCheck::BadFormat => DerivedKeyStatus::BadFormat,
-                _ if network_title.is_none() => DerivedKeyStatus::NetworkMissing,
-                _ => DerivedKeyStatus::Importable,
-            };
             derived_keys.push(DerivedKeyPreview {
                 address: addr_info.address.clone(),
-                derivation_path: addr_info.derivation_path.clone(),
+                derivation_path: addr_info.derivation_path,
                 identicon,
                 has_pwd: None, // unknown at this point
                 genesis_hash: addr_info.genesis_hash,
@@ -84,10 +86,47 @@ where
             })
         }
         result.push(SeedKeysPreview {
-            name: seed.name,
-            multisigner: seed.multisigner,
+            name: seed_info.name,
+            multisigner: seed_info.multisigner,
             derived_keys,
         })
     }
     Ok(result)
+}
+
+fn get_derivation_status<P>(
+    path: &str,
+    network_title: &Option<String>,
+    seed_multisigner: &MultiSigner,
+    key_multisigner: &MultiSigner,
+    db_path: P,
+) -> Result<DerivedKeyStatus>
+where
+    P: AsRef<Path>,
+{
+    let mut seed_found = false;
+    // FIXME: nested loop, should be optimized
+    for (m, _) in get_all_addresses(db_path)?.into_iter() {
+        if m == *seed_multisigner {
+            seed_found = true;
+        }
+        if m == *key_multisigner {
+            return Ok(DerivedKeyStatus::AlreadyExists);
+        }
+    }
+
+    let mut errors = vec![];
+    if is_passworded(path).is_err() {
+        errors.push(DerivedKeyError::BadFormat);
+    }
+    if network_title.is_none() {
+        errors.push(DerivedKeyError::NetworkMissing);
+    }
+    if !seed_found {
+        errors.push(DerivedKeyError::KeySetMissing);
+    }
+    if !errors.is_empty() {
+        return Ok(DerivedKeyStatus::Invalid { errors });
+    }
+    Ok(DerivedKeyStatus::Importable)
 }

@@ -387,6 +387,9 @@ pub enum Error {
     hex::encode(multisigner_to_public(.multisigner)),
     )]
     NoSeedForKeyPair { multisigner: MultiSigner },
+
+    #[error("No root derivation for seed {0}")]
+    NoRootKeyForSeed(String),
 }
 
 /// DB handling result.

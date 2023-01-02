@@ -148,9 +148,7 @@ pub struct SeedInfo {
     pub name: String,
 
     /// Public key of the root key.
-    ///
-    /// `None` if user has created no root keys.
-    pub multisigner: Option<MultiSigner>,
+    pub multisigner: MultiSigner,
 
     /// Derived keys.
     pub derived_keys: Vec<AddrInfo>,
@@ -196,8 +194,8 @@ pub fn export_all_addrs<P: AsRef<Path>>(
         let multisigner = keys
             .iter()
             .find(|(_, a)| a.path.is_empty())
-            .map(|(m, _)| m)
-            .cloned();
+            .map(|(m, _)| m.to_owned())
+            .ok_or(Error::NoRootKeyForSeed(name.to_owned()))?;
 
         for key in keys {
             if key.1.path.is_empty() {
@@ -331,10 +329,9 @@ pub fn inject_derivations_has_pwd(
             }
             let path = derived_key.derivation_path.as_ref().unwrap();
             let seed_name = match addr.multisigner {
-                Some(MultiSigner::Sr25519(p)) => sr25519_signers.get(&p),
-                Some(MultiSigner::Ed25519(p)) => ed25519_signers.get(&p),
-                Some(MultiSigner::Ecdsa(p)) => ecdsa_signers.get(&p),
-                None => None,
+                MultiSigner::Sr25519(p) => sr25519_signers.get(&p),
+                MultiSigner::Ed25519(p) => ed25519_signers.get(&p),
+                MultiSigner::Ecdsa(p) => ecdsa_signers.get(&p),
             };
             if seed_name.is_none() {
                 // unknown seed, skipping
@@ -1183,7 +1180,7 @@ where
 ///
 // TODO regex and secrets, see `create_address` comments.
 #[cfg(feature = "signer")]
-pub(crate) fn is_passworded(path: &str) -> Result<bool> {
+pub fn is_passworded(path: &str) -> Result<bool> {
     let passworded = REG_PATH
         .captures(path)
         .map(|caps| caps.name("password").is_some())

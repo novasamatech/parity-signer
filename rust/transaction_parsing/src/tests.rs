@@ -2545,7 +2545,7 @@ fn import_derivations() {
             card: Card::DerivationsCard {
                 f: vec![SeedKeysPreview {
                     name: "my seed".to_string(),
-                    multisigner: Some(MultiSigner::Sr25519(
+                    multisigner: MultiSigner::Sr25519(
                         Public::try_from(
                             hex::decode(
                                 "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
@@ -2554,7 +2554,7 @@ fn import_derivations() {
                             .as_ref(),
                         )
                         .unwrap(),
-                    )),
+                    ),
                     derived_keys: vec![DerivedKeyPreview {
                         address: "5HGiBcFgEBMgT6GEuo9SA98sBnGgwHtPKDXiUukT6aqCrKEx".to_string(),
                         derivation_path: Some("//westend//0".to_string()),
