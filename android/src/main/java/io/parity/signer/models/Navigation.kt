@@ -6,6 +6,7 @@ import io.parity.signer.BuildConfig
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.components.sharedcomponents.KeyCardModelBase
+import io.parity.signer.components.toImageContent
 import io.parity.signer.models.storage.getSeed
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.uniffi.*
