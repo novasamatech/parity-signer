@@ -508,7 +508,9 @@
 "ImportKeys.Error.Action.NetworkMissing" = "Add Network";
 "ImportKeys.Error.Label.AlreadyImported" = "Some are hidden from the list because they have already been imported.";
 "ImportKeys.Error.Label.BadFormat" = "Some are hidden from the list because they have already been imported.";
-
+"ImportKeys.Snackbar.Success.Single" = "1 Key Has Been Imported";
+"ImportKeys.Snackbar.Success.Multiple" = "%@ Keys Has Been Imported";
+"ImportKeys.Snackbar.Failure.Unknown" = "Import Keys Has Failed";
 
 "NetworkFilter.Label.Header" = "Filter keys by network";
 "NetworkFilter.Action.Reset" = "Reset";

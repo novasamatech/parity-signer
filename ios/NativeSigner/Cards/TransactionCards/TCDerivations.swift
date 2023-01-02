@@ -139,6 +139,7 @@ struct TCDerivations: View {
                 )
             }
         }
+        .padding(.bottom, Spacing.medium)
     }
 }
 

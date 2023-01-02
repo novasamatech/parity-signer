@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TransactionWrapper: Identifiable {
     let id = UUID()
-    let content: MTransaction
+    var content: MTransaction
 }
 
 struct TransactionPreview: View {
@@ -44,6 +44,7 @@ struct TransactionPreview: View {
         }
         .onAppear {
             viewModel.use(navigation: navigation)
+            viewModel.onAppear()
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .bottomEdgeOverlay(
@@ -80,14 +81,23 @@ struct TransactionPreview: View {
             // User when network metadata is being added
             // Cards are redesigned to present new design
             case .stub,
-                 .done,
-                 .importDerivations:
+                 .done:
                 VStack {
                     ForEach(content.sortedValueCards(), id: \.index) { card in
                         TransactionCardView(card: card)
                     }
                 }
                 .padding(Spacing.medium)
+            case .importDerivations:
+                VStack {
+                    ForEach(content.sortedValueCards(), id: \.index) { card in
+                        TransactionCardSelector(card: card)
+                            .frame(minHeight: Heights.minTransactionCardHeight)
+                            .onAppear {
+                                print("Card info: \(card.index)  \(card.indent)  \(card.card)")
+                            }
+                    }
+                }
             }
         }
     }
@@ -227,12 +237,13 @@ extension TransactionPreview {
         @Binding var isPresented: Bool
         @Published var isDetailsPresented: Bool = false
         @Published var selectedDetails: MTransaction!
+        @Published var dataModel: [TransactionWrapper]
         private weak var navigation: NavigationCoordinator!
         private weak var data: SignerDataModel!
         private let seedsMediator: SeedsMediating
         private let snackbarPresentation: BottomSnackbarPresentation
+        private let importKeysService: ImportDerivedKeysService
 
-        let dataModel: [TransactionWrapper]
         let signature: MSignatureReady?
 
         init(
@@ -240,13 +251,15 @@ extension TransactionPreview {
             content: [MTransaction],
             signature: MSignatureReady?,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation
+            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
+            importKeysService: ImportDerivedKeysService = ImportDerivedKeysService()
         ) {
             _isPresented = isPresented
             dataModel = content.map { TransactionWrapper(content: $0) }
             self.signature = signature
             self.seedsMediator = seedsMediator
             self.snackbarPresentation = snackbarPresentation
+            self.importKeysService = importKeysService
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -293,7 +306,33 @@ extension TransactionPreview {
             }
         }
 
-        func onImportKeysTap() {}
+        func onImportKeysTap() {
+            let importableKeys = dataModel.map(\.content).importableKeys
+            let derivedKeysCount = importableKeys.reduce(into: 0) { $0 += $1.derivedKeys.count }
+
+            importKeysService.importDerivedKeys(importableKeys) { result in
+                switch result {
+                case .success:
+                    if derivedKeysCount == 1 {
+                        self.snackbarPresentation
+                            .viewModel = .init(title: Localizable.ImportKeys.Snackbar.Success.single.string)
+                    } else {
+                        self.snackbarPresentation
+                            .viewModel = .init(
+                                title: Localizable.ImportKeys.Snackbar.Success
+                                    .multiple(derivedKeysCount)
+                            )
+                    }
+                case .failure:
+                    self.snackbarPresentation.viewModel = .init(
+                        title: Localizable.ImportKeys.Snackbar.Failure.unknown.string,
+                        style: .warning
+                    )
+                }
+                self.snackbarPresentation.isSnackbarPresented = true
+                self.isPresented.toggle()
+            }
+        }
 
         func presentDetails(for content: MTransaction) {
             selectedDetails = content

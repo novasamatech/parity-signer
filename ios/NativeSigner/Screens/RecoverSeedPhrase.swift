@@ -75,7 +75,7 @@ struct RecoverSeedPhrase: View {
                                             },
                                             label: {
                                                 Text(guess)
-                                                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                                    .foregroundColor(Asset.accentForegroundText.swiftUIColor)
                                                     .font(PrimaryFont.captionM.font)
                                                     .padding(.horizontal, 12)
                                                     .padding(.vertical, 4)

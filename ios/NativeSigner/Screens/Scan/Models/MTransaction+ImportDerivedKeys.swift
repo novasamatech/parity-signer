@@ -1,5 +1,5 @@
 //
-//  MTransaction+ImportDerived.swift
+//  MTransaction+ImportDerivedKeys.swift
 //  NativeSigner
 //
 //  Created by Krzysztof Rodak on 02/01/2023.
