@@ -195,6 +195,8 @@
 		6DA501DB290F16280096DA4E /* KeyDetails+SelectionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */; };
 		6DB99039295E95E9001101DC /* NetworkCapsuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB99038295E95E9001101DC /* NetworkCapsuleView.swift */; };
 		6DB9903B295EA7DE001101DC /* ActionableInfoBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB9903A295EA7DE001101DC /* ActionableInfoBoxView.swift */; };
+		6DB9903D2962A619001101DC /* MTransaction+ImportDerivedKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB9903C2962A619001101DC /* MTransaction+ImportDerivedKeys.swift */; };
+		6DB9903F2962A97E001101DC /* ImportDerivedKeysService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB9903E2962A97E001101DC /* ImportDerivedKeysService.swift */; };
 		6DBD21F2289A74EE005D539B /* FileManagingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */; };
 		6DBD21F4289A77DE005D539B /* BundleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F3289A77DE005D539B /* BundleProtocol.swift */; };
 		6DBD21FA289A7A26005D539B /* DatabaseMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F9289A7A26005D539B /* DatabaseMediator.swift */; };
@@ -246,7 +248,7 @@
 		6DEFB52828FEA1C200762219 /* KeyListMoreMenuModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEFB52728FEA1C200762219 /* KeyListMoreMenuModal.swift */; };
 		6DEFB52F28FEDA9B00762219 /* AnimatedQRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEFB52E28FEDA9B00762219 /* AnimatedQRCodeView.swift */; };
 		6DEFB53228FEE42D00762219 /* ExportMultipleKeysService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEFB53128FEE42D00762219 /* ExportMultipleKeysService.swift */; };
-		6DF5E7A02922DDAD00F2B5B4 /* TransactionCardSet+TransactionCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF5E79F2922DDAD00F2B5B4 /* TransactionCardSet+TransactionCards.swift */; };
+		6DF5E7A02922DDAD00F2B5B4 /* MTransaction+TransactionCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF5E79F2922DDAD00F2B5B4 /* MTransaction+TransactionCards.swift */; };
 		6DF5E7A22923A08A00F2B5B4 /* AttributedString+Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF5E7A12923A08A00F2B5B4 /* AttributedString+Markdown.swift */; };
 		6DF5E7A42923DD4400F2B5B4 /* Text+Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF5E7A32923DD4400F2B5B4 /* Text+Markdown.swift */; };
 		6DF7257828BE0E08007CD9B6 /* DerivedKeyRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */; };
@@ -479,6 +481,8 @@
 		6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyDetails+SelectionOverlay.swift"; sourceTree = "<group>"; };
 		6DB99038295E95E9001101DC /* NetworkCapsuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkCapsuleView.swift; sourceTree = "<group>"; };
 		6DB9903A295EA7DE001101DC /* ActionableInfoBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionableInfoBoxView.swift; sourceTree = "<group>"; };
+		6DB9903C2962A619001101DC /* MTransaction+ImportDerivedKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTransaction+ImportDerivedKeys.swift"; sourceTree = "<group>"; };
+		6DB9903E2962A97E001101DC /* ImportDerivedKeysService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportDerivedKeysService.swift; sourceTree = "<group>"; };
 		6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagingProtocol.swift; sourceTree = "<group>"; };
 		6DBD21F3289A77DE005D539B /* BundleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleProtocol.swift; sourceTree = "<group>"; };
 		6DBD21F9289A7A26005D539B /* DatabaseMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseMediator.swift; sourceTree = "<group>"; };
@@ -533,7 +537,7 @@
 		6DEFB52728FEA1C200762219 /* KeyListMoreMenuModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyListMoreMenuModal.swift; sourceTree = "<group>"; };
 		6DEFB52E28FEDA9B00762219 /* AnimatedQRCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedQRCodeView.swift; sourceTree = "<group>"; };
 		6DEFB53128FEE42D00762219 /* ExportMultipleKeysService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportMultipleKeysService.swift; sourceTree = "<group>"; };
-		6DF5E79F2922DDAD00F2B5B4 /* TransactionCardSet+TransactionCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionCardSet+TransactionCards.swift"; sourceTree = "<group>"; };
+		6DF5E79F2922DDAD00F2B5B4 /* MTransaction+TransactionCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTransaction+TransactionCards.swift"; sourceTree = "<group>"; };
 		6DF5E7A12923A08A00F2B5B4 /* AttributedString+Markdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributedString+Markdown.swift"; sourceTree = "<group>"; };
 		6DF5E7A32923DD4400F2B5B4 /* Text+Markdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Text+Markdown.swift"; sourceTree = "<group>"; };
 		6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyRow.swift; sourceTree = "<group>"; };
@@ -769,7 +773,6 @@
 				2DE72C0E26A99885002BB752 /* RustNative.swift */,
 				2D7A7BD526C1126C0053C1E0 /* Utils.swift */,
 				2DA5F89127590B4F00D8DD29 /* Documents.swift */,
-				6DF5E79F2922DDAD00F2B5B4 /* TransactionCardSet+TransactionCards.swift */,
 				6DF5E7A12923A08A00F2B5B4 /* AttributedString+Markdown.swift */,
 			);
 			path = Models;
@@ -869,6 +872,8 @@
 		6D199CA0292A8EA200E79113 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				6DF5E79F2922DDAD00F2B5B4 /* MTransaction+TransactionCards.swift */,
+				6DB9903C2962A619001101DC /* MTransaction+ImportDerivedKeys.swift */,
 				6D199CA1292A8EB300E79113 /* TransactionSummaryModels.swift */,
 			);
 			path = Models;
@@ -897,6 +902,7 @@
 				6D42793628DB147800C141DC /* PrivateKeyQRCodeService.swift */,
 				6DEFB53128FEE42D00762219 /* ExportMultipleKeysService.swift */,
 				6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */,
+				6DB9903E2962A97E001101DC /* ImportDerivedKeysService.swift */,
 			);
 			path = Backend;
 			sourceTree = "<group>";
@@ -1868,7 +1874,7 @@
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
 				6DC5643028B65B9C003D540B /* AnimationDuration.swift in Sources */,
 				2DA5F88A2757692F00D8DD29 /* NewSeedScreen.swift in Sources */,
-				6DF5E7A02922DDAD00F2B5B4 /* TransactionCardSet+TransactionCards.swift in Sources */,
+				6DF5E7A02922DDAD00F2B5B4 /* MTransaction+TransactionCards.swift in Sources */,
 				6DBF6E2228E1FB6F00CC959F /* PreviewData+Rust.swift in Sources */,
 				2DA5F86727566C3600D8DD29 /* TCVerifier.swift in Sources */,
 				2DA5F8392756666C00D8DD29 /* EventDetails.swift in Sources */,
@@ -1911,6 +1917,7 @@
 				6D16687D28F84953008C664A /* EnvironmentValues+SafeAreaInsets.swift in Sources */,
 				6D6430F728CB662500342E37 /* ExportPrivateKeyWarningModal.swift in Sources */,
 				6D52E3AA2946F58200AD72F0 /* VerfierCertificateView.swift in Sources */,
+				6DB9903F2962A97E001101DC /* ImportDerivedKeysService.swift in Sources */,
 				6D88CFFA28C6365A001FB0A1 /* ActionSheetButton.swift in Sources */,
 				6DF7751E28B39F630040012E /* KeySetRow.swift in Sources */,
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
@@ -1983,6 +1990,7 @@
 				6D4C0756289B369200B2EE48 /* Assets.swift in Sources */,
 				2DAA82912786FA4B002917C0 /* KeyDetailsMulti.swift in Sources */,
 				6D6430F128CB32CC00342E37 /* Snackbar.swift in Sources */,
+				6DB9903D2962A619001101DC /* MTransaction+ImportDerivedKeys.swift in Sources */,
 				6D17EF8328EDC951008626E9 /* Encryption+RawRepresentable.swift in Sources */,
 				6DBF6E4328EACB7B00CC959F /* ConnectivityMediator.swift in Sources */,
 				6D6430F428CB447900342E37 /* ForgetKeySetAction.swift in Sources */,

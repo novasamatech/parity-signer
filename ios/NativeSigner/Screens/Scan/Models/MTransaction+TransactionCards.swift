@@ -107,7 +107,7 @@ extension MTransaction {
             var keysCount: Int = 0
             sortedValueCards().forEach {
                 if case let .derivationsCard(keys) = $0.card {
-                    keysCount += keys.reduce(into: 0) { $0 += ($1.derivedKeys.count + 1) }
+                    keysCount += keys.reduce(into: 0) { $0 += $1.derivedKeys.count }
                 }
             }
             return .importKeys(keysCount: keysCount)
