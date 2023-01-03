@@ -23,5 +23,10 @@ fun FooterButton.toBottomBarState(): BottomBar2State? =
 
 
 object BottomBarSingleton {
+	/**
+	 * Hack to be able to close Camera screens since it's overlay in new design
+	 * but still one of bottom sheet states in rust perspective that doesn't back
+	 * back action despite it does in new designs
+	 */
 	var lastUsedTab: BottomBar2State = BottomBar2State.KEYS
 }

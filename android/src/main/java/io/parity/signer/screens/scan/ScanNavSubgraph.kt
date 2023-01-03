@@ -12,6 +12,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.components.panels.BottomBar2State
+import io.parity.signer.components.panels.BottomBarSingleton
+import io.parity.signer.components.panels.toAction
 import io.parity.signer.models.Navigator
 import io.parity.signer.screens.scan.elements.ScanErrorBottomSheet
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
@@ -43,9 +45,13 @@ fun ScanNavSubgraph(
 	val showingModals =
 		presentableError.value != null || passwordModel.value != null || errorWrongPassword.value
 
+	val navigateToPrevious = {
+		rootNavigator.navigate(BottomBarSingleton.lastUsedTab.toAction())
+	}
+
 	val backAction = {
 		val wasState = scanViewModel.ifHasStateThenClear()
-		if (!wasState) rootNavigator.backAction()
+		if (!wasState) navigateToPrevious()
 	}
 	BackHandler(onBack = backAction)
 
@@ -55,7 +61,7 @@ fun ScanNavSubgraph(
 	val transactionsValue = transactions.value
 	if (transactionsValue == null || showingModals) {
 		ScanScreen(
-			onClose = { rootNavigator.backAction() },
+			onClose = { navigateToPrevious() },
 			performPayloads = { payloads ->
 				scope.launch {
 					scanViewModel.performPayload(payloads)

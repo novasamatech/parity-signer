@@ -50,13 +50,6 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 			singleton._localNavAction.value = LocalNavAction.None
 		}
 
-		if (button == Action.NAVBAR_SCAN) {
-			//swop rust-side navigation call to a local one so back navigation would work and move us back to where we came from
-			val navBar = singleton.actionResult.value.footerButton?.toBottomBarState() ?: BottomBar2State.KEYS
-			navigate(LocalNavRequest.ShowScan(navBar))
-			return
-		}
-
 		try {
 			val navigationAction = backendAction(button, details, seedPhrase)
 			//Workaround while Rust state machine is keeping state inside as it's needed for exporting private key in different screen
@@ -112,8 +105,6 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 						model, singleton.navigator
 					)
 			}
-			is LocalNavRequest.ShowScan -> singleton._localNavAction.value =
-				LocalNavAction.ShowScan(action.from)
 		}
 	}
 
@@ -163,11 +154,8 @@ sealed class LocalNavAction {
 		val model: PrivateKeyExportModel,
 		val navigator: SignerNavigator
 	) : LocalNavAction()
-
-	data class ShowScan(val from: BottomBar2State) : LocalNavAction()
 }
 
 sealed class LocalNavRequest {
 	data class ShowExportPrivateKey(val publicKey: String) : LocalNavRequest()
-	data class ShowScan(val from: BottomBar2State) : LocalNavRequest()
 }

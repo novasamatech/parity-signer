@@ -44,75 +44,73 @@ fun CombinedScreensSelector(
 	val seedNames =
 		signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
 
-	when (localNavAction) {
-		is LocalNavAction.ShowScan -> {
+	when (screenData) {
+		is ScreenData.SeedSelector -> {
+			KeySetsNavSubgraph(
+				screenData.f.toKeySetsSelectModel(),
+				rootNavigator = rootNavigator,
+				alertState = alertState,
+			)
+		}
+		is ScreenData.Keys -> {
+			val keys = keysBySeedName(signerDataModel.dbName, screenData.f)
+			KeySetDetailsNavSubgraph(
+				model = keys.toKeySetDetailsModel(),
+				rootNavigator = rootNavigator,
+				alertState = alertState,
+				singleton = signerDataModel,
+			)
+		}
+		is ScreenData.KeyDetails ->
+			Box(modifier = Modifier.statusBarsPadding()) {
+				screenData.f?.toKeyDetailsModel()?.let { model ->
+					KeyDetailsPublicKeyScreen(
+						model = model,
+						rootNavigator = rootNavigator,
+					)
+				}
+					?: run {
+						submitErrorState("key details clicked for non existing key details content")
+						rootNavigator.backAction()
+					}
+			}
+		is ScreenData.Log ->
+			Box(Modifier.statusBarsPadding()) {
+				LogsScreen(
+					model = screenData.f.toLogsScreenModel(),
+					navigator = rootNavigator,
+				)
+			}
+		is ScreenData.Settings ->
+			Box(modifier = Modifier.statusBarsPadding()) {
+				SettingsScreen(
+					rootNavigator = rootNavigator,
+					isStrongBoxProtected = signerDataModel.seedStorage.isStrongBoxProtected,
+					appVersion = signerDataModel.getAppVersion(),
+					wipeToFactory = signerDataModel::wipeToFactory,
+					alertState = alertState
+				)
+			}
+		is ScreenData.NewSeed ->
+			Box(
+				modifier = Modifier
+					.statusBarsPadding()
+					.imePadding()
+			) {
+				NewKeySetNameScreen(
+					rootNavigator = rootNavigator,
+					seedNames = seedNames.value,
+				)
+			}
+		is ScreenData.Scan -> {
 			ScanNavSubgraph(
 				rootNavigator = rootNavigator
 			)
 		}
-		else -> when (screenData) {
-			is ScreenData.SeedSelector -> {
-				KeySetsNavSubgraph(
-					screenData.f.toKeySetsSelectModel(),
-					rootNavigator = rootNavigator,
-					alertState = alertState,
-				)
-			}
-			is ScreenData.Keys -> {
-				val keys = keysBySeedName(signerDataModel.dbName, screenData.f)
-				KeySetDetailsNavSubgraph(
-					model = keys.toKeySetDetailsModel(),
-					rootNavigator = rootNavigator,
-					alertState = alertState,
-					singleton = signerDataModel,
-				)
-			}
-			is ScreenData.KeyDetails ->
-				Box(modifier = Modifier.statusBarsPadding()) {
-					screenData.f?.toKeyDetailsModel()?.let { model ->
-						KeyDetailsPublicKeyScreen(
-							model = model,
-							rootNavigator = rootNavigator,
-						)
-					}
-						?: run {
-							submitErrorState("key details clicked for non existing key details content")
-							rootNavigator.backAction()
-						}
-				}
-			is ScreenData.Log ->
-				Box(Modifier.statusBarsPadding()) {
-					LogsScreen(
-						model = screenData.f.toLogsScreenModel(),
-						navigator = rootNavigator,
-					)
-				}
-			is ScreenData.Settings ->
-				Box(modifier = Modifier.statusBarsPadding()) {
-					SettingsScreen(
-						rootNavigator = rootNavigator,
-						isStrongBoxProtected = signerDataModel.seedStorage.isStrongBoxProtected,
-						appVersion = signerDataModel.getAppVersion(),
-						wipeToFactory = signerDataModel::wipeToFactory,
-						alertState = alertState
-					)
-				}
-			is ScreenData.NewSeed ->
-				Box(
-					modifier = Modifier
-                        .statusBarsPadding()
-                        .imePadding()
-				) {
-					NewKeySetNameScreen(
-						rootNavigator = rootNavigator,
-						seedNames = seedNames.value,
-					)
-				}
-			is ScreenData.Scan, is ScreenData.Transaction ->
-				submitErrorState("Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData")
+		is ScreenData.Transaction ->
+			submitErrorState("Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData")
 
-			else -> {} //old Selector showing them
-		}
+		else -> {} //old Selector showing them
 	}
 }
 
