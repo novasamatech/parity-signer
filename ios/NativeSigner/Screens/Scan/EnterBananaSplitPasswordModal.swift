@@ -86,6 +86,7 @@ extension EnterBananaSplitPasswordModal {
         @Published var password: String = ""
         @Published var isValid: Bool = true
         @Published var isActionDisabled: Bool = true
+        @Published var invalidPasswordAttempts: Int = 0
         private var cancelBag = CancelBag()
 
         init(
@@ -112,17 +113,30 @@ extension EnterBananaSplitPasswordModal {
 
         func onDoneTap() {
             // Here we'll need to call `qrparserGetPacketsTotal` again with input password
-
             do {
-//                try qrparserTryDecodeQrSequence(data: qrCodeData, password: password)
-                // success code path:
-                // - dismiss password modal
-                isPresented.toggle()
-                // - navigate to desired screen
+                let result = try qrparserTryDecodeQrSequence(data: qrCodeData, password: password, cleaned: false)
+                if case let .bBananaSplitRecoveryResult(b: bananaResult) = result {
+                    switch bananaResult {
+                    case .requestPassword:
+                        if invalidPasswordAttempts >= 3 {
+                            print("Too many invalid password attempts")
+                            isPresented.toggle()
+                            // dismiss and present error state
+                            return
+                        }
+                        isValid = false
+                        invalidPasswordAttempts += 1
+                    case let .recoveredSeed(s: seed):
+                        // success code path:
+                        // - dismiss password modal
+                        isPresented.toggle()
+                        print("Recovered seed: \(seed)")
+                        // - navigate to desired screen
+                    }
+                }
             } catch {
                 // error code path
                 // - if password invalid
-//                isValid = false
             }
         }
 

@@ -97,7 +97,7 @@ extension CameraService: QRPayloadUpdateReceiving {
 private extension CameraService {
     func handleNew(qrCodePayload: String) {
         if isMultipleTransactionMode {
-            multiTransactionOperation(with: qrCodePayload)
+//            multiTransactionOperation(with: qrCodePayload)
             return
         }
         if bucket.isEmpty {
@@ -107,14 +107,15 @@ private extension CameraService {
         }
     }
 
-    func multiTransactionOperation(with qrCodePayload: String) {
-        guard let parsedPayload = try? qrparserTryDecodeQrSequence(data: [qrCodePayload], cleaned: false)
-        else { return }
-        callbackQueue.async {
-            guard !self.multipleTransactions.contains(parsedPayload) else { return }
-            self.multipleTransactions.append(parsedPayload)
-        }
-    }
+//    func multiTransactionOperation(with qrCodePayload: String) {
+//        guard let parsedPayload = try? qrparserTryDecodeQrSequence(data: [qrCodePayload], password: nil, cleaned:
+//        false)
+//        else { return }
+//        callbackQueue.async {
+//            guard !self.multipleTransactions.contains(parsedPayload) else { return }
+//            self.multipleTransactions.append(parsedPayload)
+//        }
+//    }
 
     func handleNewOperation(with qrCodePayload: String) {
         do {
@@ -146,18 +147,23 @@ private extension CameraService {
 
     func decode(completeOperationPayload: [String]) {
         do {
-            let parsedPayload = try qrparserTryDecodeQrSequence(data: completeOperationPayload, cleaned: false)
-            callbackQueue.async {
-                self.payload = parsedPayload
-                self.shutdown()
+            let result = try qrparserTryDecodeQrSequence(data: completeOperationPayload, password: nil, cleaned: false)
+            switch result {
+            case let .bBananaSplitRecoveryResult(b: bananaResult):
+                switch bananaResult {
+                case .requestPassword:
+                    requestPassword = true
+                    shutdown()
+                default:
+                    // Nothing else can happen here
+                    ()
+                }
+            case let .other(s: payload):
+                callbackQueue.async {
+                    self.payload = payload
+                    self.shutdown()
+                }
             }
-        } catch let ErrorDisplayed.Str(details) {
-            print(details)
-//        } catch let ErrorDisplayed.PasswordRequired {
-//            callbackQueue.async {
-//                self.requestPassword = true
-//                self.shutdown()
-//            }
         } catch {
             print(error.localizedDescription)
         }
