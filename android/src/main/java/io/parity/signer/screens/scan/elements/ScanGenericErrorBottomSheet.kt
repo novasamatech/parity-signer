@@ -27,7 +27,6 @@ fun ScanErrorBottomSheet(
 	errorMessage: String,
 	onOK: Callback,
 ) {
-
 	Column(
 		Modifier
 			.fillMaxWidth(1f)
@@ -67,7 +66,6 @@ fun ScanErrorBottomSheet(
 				modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)
 			)
 		}
-
 		SecondaryButtonWide(
 			label = stringResource(id = R.string.generic_ok),
 			modifier = Modifier.padding(24.dp),

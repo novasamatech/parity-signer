@@ -33,6 +33,7 @@ fun BottomSheetWrapperContent(
 
 	ModalBottomSheetLayout(
 		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
+		sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
 		sheetState = bottomSheetState,
 		sheetContent = {
 			BottomSheetContentWrapperInternal {
@@ -89,6 +90,7 @@ fun BottomSheetWrapperRoot(
 
 	ModalBottomSheetLayout(
 		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
+		sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
 		sheetState = modalBottomSheetState,
 		sheetContent = {
 			BottomSheetContentWrapperInternal {
@@ -136,7 +138,6 @@ private fun BottomSheetContentWrapperInternal(
 			.wrapContentHeight()
 			.heightIn(0.dp, screenHeight - 40.dp)
 			.fillMaxWidth()
-			.clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
 	) {
 		content()
 	}
