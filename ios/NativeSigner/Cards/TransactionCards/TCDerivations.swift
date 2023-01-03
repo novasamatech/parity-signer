@@ -158,7 +158,7 @@ extension TCDerivations {
                 .map { seedKeys in
                     DerivedKeysSetRenderable(
                         seedName: seedKeys.name,
-                        address: seedKeys.multisigner?.first ?? "address", // to be corrected
+                        address: seedKeys.multisigner.first ?? "",
                         keys: seedKeys.derivedKeys
                             .filter { $0.status == .importable }
                             .filter { $0.hasPwd != nil }
@@ -173,18 +173,40 @@ extension TCDerivations {
                             }
                     )
                 }
+            updateErrorStates(value)
+        }
+
+        private func updateErrorStates(_ value: [SeedKeysPreview]) {
             areKeysAlreadyImported = value
                 .flatMap(\.derivedKeys)
                 .contains { $0.status == .alreadyExists }
             isNetworkMissing = value
                 .flatMap(\.derivedKeys)
-                .contains { $0.status == .networkMissing }
+                .contains {
+                    if case let .invalid(error) = $0.status {
+                        return error.contains(.networkMissing)
+                    } else {
+                        return false
+                    }
+                }
             isKeySetMissing = value
                 .flatMap(\.derivedKeys)
-                .contains { $0.hasPwd == nil }
+                .contains {
+                    if case let .invalid(error) = $0.status {
+                        return error.contains(.keySetMissing)
+                    } else {
+                        return false
+                    }
+                }
             isPathInBadFormat = value
                 .flatMap(\.derivedKeys)
-                .contains { $0.status == .badFormat }
+                .contains {
+                    if case let .invalid(error) = $0.status {
+                        return error.contains(.badFormat)
+                    } else {
+                        return false
+                    }
+                }
         }
 
         /// String interpolation for SFSymbols is a bit unstable if creating `String` inline by using conditional logic
@@ -226,7 +248,7 @@ private extension DerivedKeyPreview {
     extension PreviewData {
         static let exampleSeedKeysPreview = SeedKeysPreview(
             name: "Derivation 1",
-            multisigner: [],
+            multisigner: ["long address", "encryption"],
             derivedKeys: [
                 .init(
                     address: "address",
@@ -246,7 +268,7 @@ private extension DerivedKeyPreview {
                     identicon: .svg(image: PreviewData.exampleIdenticon),
                     hasPwd: true,
                     networkTitle: "Westend",
-                    status: .badFormat
+                    status: .invalid(errors: [.badFormat])
                 ),
                 .init(
                     address: "address",
@@ -276,7 +298,17 @@ private extension DerivedKeyPreview {
                     identicon: .svg(image: PreviewData.exampleIdenticon),
                     hasPwd: false,
                     networkTitle: nil,
-                    status: .networkMissing
+                    status: .invalid(errors: [.networkMissing])
+                ),
+                .init(
+                    address: "address",
+                    derivationPath: "//polkadot//staking",
+                    encryption: .ed25519,
+                    genesisHash: .init([3, 4, 5]),
+                    identicon: .svg(image: PreviewData.exampleIdenticon),
+                    hasPwd: true,
+                    networkTitle: nil,
+                    status: .invalid(errors: [.keySetMissing])
                 )
             ]
         )

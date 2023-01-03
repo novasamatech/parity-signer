@@ -9,15 +9,18 @@ import Foundation
 
 final class ImportDerivedKeysService {
     private let databaseMediator: DatabaseMediating
+    private let seedsMediator: SeedsMediating
     private let callQueue: Dispatching
     private let callbackQueue: Dispatching
 
     init(
         databaseMediator: DatabaseMediating = DatabaseMediator(),
+        seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
         callQueue: Dispatching = DispatchQueue(label: "ImportDerivedKeysService", qos: .userInitiated),
         callbackQueue: Dispatching = DispatchQueue.main
     ) {
         self.databaseMediator = databaseMediator
+        self.seedsMediator = seedsMediator
         self.callQueue = callQueue
         self.callbackQueue = callbackQueue
     }
@@ -37,6 +40,26 @@ final class ImportDerivedKeysService {
             self.callbackQueue.async {
                 completion(result)
             }
+        }
+    }
+
+    func updateWithSeeds(
+        _ seedPreviews: [SeedKeysPreview],
+        completion: @escaping (Result<[SeedKeysPreview], ServiceError>) -> Void
+    ) {
+        let seeds = seedsMediator.getAllSeeds()
+        let result: Result<[SeedKeysPreview], ServiceError>
+        do {
+            let filledInSeedPreviews = try populateDerivationsHasPwd(
+                seeds: seeds,
+                seedDerivedKeys: seedPreviews
+            )
+            result = .success(filledInSeedPreviews)
+        } catch {
+            result = .failure(.unknown)
+        }
+        self.callbackQueue.async {
+            completion(result)
         }
     }
 }

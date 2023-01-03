@@ -270,6 +270,42 @@ extension TransactionPreview {
             self.data = data
         }
 
+        func onAppear() {
+            updateImportDerivationsIfNeeeded()
+        }
+
+        /// For `ttype` transaction of `importDerivations`, we need to update data by passing all seed phrases to Rust
+        private func updateImportDerivationsIfNeeeded() {
+            guard let seedPreviews = dataModel.first?.content.importableKeys, !seedPreviews.isEmpty else { return }
+
+            importKeysService.updateWithSeeds(seedPreviews) { result in
+                switch result {
+                case let .success(updatedSeeds):
+                    self.updateImportDerivationsData(updatedSeeds)
+                case .failure:
+                    self.snackbarPresentation.viewModel = .init(
+                        title: Localizable.ImportKeys.Snackbar.Failure.unknown.string,
+                        style: .warning
+                    )
+                    self.snackbarPresentation.isSnackbarPresented = true
+                    self.isPresented.toggle()
+                }
+            }
+        }
+        /// We need to mutate existing data model in an ugly way as Rust data model
+        /// features miriad of enums with associated values and nested array models...
+        ///
+        /// Logic here is to find `TransactionCard` with `importingDerivations` and just replace its
+        /// `.derivationsCard(f: [SeedKeysPreview])` enum value with update `[SeedKeysPreview]`
+        private func updateImportDerivationsData(_ updatedSeeds: [SeedKeysPreview]) {
+            guard let indexToUpdate = dataModel.firstIndex(
+                where: { $0.content.content.importingDerivations != nil }
+            ) else { return }
+
+            let importingDerivations: [TransactionCard] = [.init(index: 0, indent: 0, card: .derivationsCard(f: updatedSeeds))]
+            dataModel[indexToUpdate].content.content.importingDerivations = importingDerivations
+        }
+
         func onBackButtonTap() {
             navigation.performFake(navigation: .init(action: .goBack))
             isPresented.toggle()
