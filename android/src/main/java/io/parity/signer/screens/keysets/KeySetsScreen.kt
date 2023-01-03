@@ -91,7 +91,7 @@ fun KeySetsScreen(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewKeySetsSelectScreen() {
+private fun PreviewKeySetsSelectScreenFull() {
 	val keys = mutableListOf(
 		KeySetModel(
 			"first seed name",
@@ -113,6 +113,59 @@ private fun PreviewKeySetsSelectScreen() {
 			)
 		)
 	}
+	val state = remember { mutableStateOf(AlertState.Past) }
+	val mockModel = KeySetsSelectModel(keys)
+	SignerNewTheme {
+		Box(modifier = Modifier.size(350.dp, 550.dp)) {
+			KeySetsScreen(mockModel, EmptyNavigator(), rememberNavController(), state)
+		}
+	}
+}
+
+@Preview(
+	name = "light", group = "few", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "few",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewKeySetsSelectScreenFew() {
+	val keys = mutableListOf(
+		KeySetModel(
+			"first seed name",
+			PreviewData.exampleIdenticonPng,
+			1.toUInt()
+		),
+		KeySetModel(
+			"second seed name",
+			PreviewData.exampleIdenticonPng,
+			3.toUInt()
+		),
+	)
+	val state = remember { mutableStateOf(AlertState.Past) }
+	val mockModel = KeySetsSelectModel(keys)
+	SignerNewTheme {
+		Box(modifier = Modifier.size(350.dp, 550.dp)) {
+			KeySetsScreen(mockModel, EmptyNavigator(), rememberNavController(), state)
+		}
+	}
+}
+
+@Preview(
+	name = "light", group = "few", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "few",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewKeySetsSelectScreenEmpty() {
+	val keys = emptyList<KeySetModel>()
 	val state = remember { mutableStateOf(AlertState.Past) }
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {

@@ -1,5 +1,6 @@
 package io.parity.signer.screens.scan.transaction
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -26,6 +27,7 @@ import io.parity.signer.screens.scan.transaction.components.TransactionElementSe
 import io.parity.signer.screens.scan.transaction.components.TransactionSummaryView
 import io.parity.signer.screens.scan.transaction.components.toSigningTransactionModels
 import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.backgroundSystem
 import io.parity.signer.uniffi.MSignatureReady
 import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.TransactionType
@@ -75,10 +77,15 @@ internal fun TransactionsScreenFull(
 	signature: MSignatureReady?,
 	onFinish: Callback,
 ) {
-	Column(modifier.fillMaxSize(1f)) {
+	Column(
+		modifier
+			.background(MaterialTheme.colors.backgroundSystem)
+	) {
 		ScreenHeader(title = title, onBack = onBack)
 		Column(
-			Modifier.verticalScroll(rememberScrollState())
+			Modifier
+				.verticalScroll(rememberScrollState())
+				.weight(1f)
 		) {
 			transactions.forEach {
 				TransactionIssues(it)

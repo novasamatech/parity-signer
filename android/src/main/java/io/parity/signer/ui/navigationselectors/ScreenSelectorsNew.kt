@@ -1,5 +1,6 @@
 package io.parity.signer.ui.navigationselectors
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -10,6 +11,8 @@ import androidx.compose.ui.Modifier
 import io.parity.signer.bottomsheets.LogComment
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
+import io.parity.signer.components.panels.BottomBarSingleton
+import io.parity.signer.components.panels.toAction
 import io.parity.signer.models.*
 import io.parity.signer.models.storage.addSeed
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
@@ -107,8 +110,10 @@ fun CombinedScreensSelector(
 				rootNavigator = rootNavigator
 			)
 		}
-		is ScreenData.Transaction ->
-			submitErrorState("Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData")
+		is ScreenData.Transaction ->{
+			Log.e("Selector","Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData")
+			rootNavigator.navigate(BottomBarSingleton.lastUsedTab.toAction())
+		}
 
 		else -> {} //old Selector showing them
 	}
