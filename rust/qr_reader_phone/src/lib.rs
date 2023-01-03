@@ -59,6 +59,11 @@ pub fn decode_sequence(
                         b: BananaSplitRecoveryResult::RequestPassword,
                     });
                 }
+                Ready::BananaSplitReady(s) => {
+                    return Ok(DecodeSequenceResult::BBananaSplitRecoveryResult {
+                        b: BananaSplitRecoveryResult::RecoveredSeed { s },
+                    })
+                }
                 _ => (),
             }
         }
