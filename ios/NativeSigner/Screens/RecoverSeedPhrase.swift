@@ -9,7 +9,6 @@ import SwiftUI
 
 struct RecoverSeedPhrase: View {
     @State private var userInput: String = " "
-    @State private var createRoots: Bool = true
     @State private var shadowUserInput: String = " "
     @FocusState private var focus: Bool
     let content: MRecoverSeedPhrase
@@ -75,7 +74,7 @@ struct RecoverSeedPhrase: View {
                                             },
                                             label: {
                                                 Text(guess)
-                                                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                                    .foregroundColor(Asset.accentForegroundText.swiftUIColor)
                                                     .font(PrimaryFont.captionM.font)
                                                     .padding(.horizontal, 12)
                                                     .padding(.vertical, 4)
@@ -90,30 +89,15 @@ struct RecoverSeedPhrase: View {
                             }
                         }.frame(height: 23)
                         Spacer()
-                        Button(
-                            action: {
-                                createRoots.toggle()
-                            },
-                            label: {
-                                HStack {
-                                    Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
-                                    Localizable.createRootKeys.text
-                                        .multilineTextAlignment(.leading)
-                                    Spacer()
-                                }
-                            }
-                        )
-                        if !focus {
-                            HStack {
-                                BigButton(
-                                    text: Localizable.next.key,
-                                    action: {
-                                        restoreSeed(content.seedName, content.readySeed ?? "", createRoots)
-                                    },
-                                    isDisabled: content.readySeed == nil
-                                )
-                                .padding(.top, 16.0)
-                            }
+                        HStack {
+                            BigButton(
+                                text: Localizable.next.key,
+                                action: {
+                                    restoreSeed(content.seedName, content.readySeed ?? "", true)
+                                },
+                                isDisabled: content.readySeed == nil
+                            )
+                            .padding(.top, 16.0)
                         }
                     }.padding(.horizontal)
                 }
