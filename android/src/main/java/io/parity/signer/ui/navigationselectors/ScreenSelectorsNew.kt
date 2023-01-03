@@ -75,7 +75,10 @@ fun CombinedScreensSelector(
 							rootNavigator = rootNavigator,
 						)
 					}
-						?: rootNavigator.backAction() //todo dmitry log that root key was pressed. It should not be the case.
+						?: run {
+							submitErrorState("key details clicked for non existing key details content")
+							rootNavigator.backAction()
+						}
 				}
 			is ScreenData.Log ->
 				Box(Modifier.statusBarsPadding()) {
@@ -97,8 +100,8 @@ fun CombinedScreensSelector(
 			is ScreenData.NewSeed ->
 				Box(
 					modifier = Modifier
-						.statusBarsPadding()
-						.imePadding()
+                        .statusBarsPadding()
+                        .imePadding()
 				) {
 					NewKeySetNameScreen(
 						rootNavigator = rootNavigator,
