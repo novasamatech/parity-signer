@@ -4,6 +4,8 @@ import android.util.Log
 import android.widget.Toast
 import io.parity.signer.BuildConfig
 import io.parity.signer.components.NetworkCardModel
+import io.parity.signer.components.panels.BottomBar2State
+import io.parity.signer.components.panels.toBottomBarState
 import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.components.sharedcomponents.KeyCardModelBase
 import io.parity.signer.components.toImageContent
@@ -50,7 +52,8 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 
 		if (button == Action.NAVBAR_SCAN) {
 			//swop rust-side navigation call to a local one so back navigation would work and move us back to where we came from
-			navigate(LocalNavRequest.ShowScan)
+			val navBar = singleton.actionResult.value.footerButton?.toBottomBarState() ?: BottomBar2State.KEYS
+			navigate(LocalNavRequest.ShowScan(navBar))
 			return
 		}
 
@@ -109,8 +112,8 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 						model, singleton.navigator
 					)
 			}
-			LocalNavRequest.ShowScan -> singleton._localNavAction.value =
-				LocalNavAction.ShowScan
+			is LocalNavRequest.ShowScan -> singleton._localNavAction.value =
+				LocalNavAction.ShowScan(action.from)
 		}
 	}
 
@@ -156,15 +159,15 @@ class EmptyNavigator : Navigator {
 
 sealed class LocalNavAction {
 	object None : LocalNavAction()
-	class ShowExportPrivateKey( //todo dmitry refactor this to show this screen right on old screen without global navigation
+	data class ShowExportPrivateKey( //todo dmitry refactor this to show this screen right on old screen without global navigation
 		val model: PrivateKeyExportModel,
 		val navigator: SignerNavigator
 	) : LocalNavAction()
 
-	object ShowScan : LocalNavAction()
+	data class ShowScan(val from: BottomBar2State) : LocalNavAction()
 }
 
 sealed class LocalNavRequest {
-	class ShowExportPrivateKey(val publicKey: String) : LocalNavRequest()
-	object ShowScan : LocalNavRequest()
+	data class ShowExportPrivateKey(val publicKey: String) : LocalNavRequest()
+	data class ShowScan(val from: BottomBar2State) : LocalNavRequest()
 }

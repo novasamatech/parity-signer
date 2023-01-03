@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.bottomsheets.password.EnterPassword
+import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.models.Navigator
 import io.parity.signer.screens.scan.elements.ScanErrorBottomSheet
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet

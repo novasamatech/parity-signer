@@ -13,7 +13,7 @@ object NavigationMigrations {
 	): Boolean {
 
 		return when (localNavAction) {
-			LocalNavAction.ShowScan -> false
+			is LocalNavAction.ShowScan -> false
 			else -> when (globalNavAction?.screenData) {
 				is ScreenData.SeedSelector -> false
 				is ScreenData.Keys -> false

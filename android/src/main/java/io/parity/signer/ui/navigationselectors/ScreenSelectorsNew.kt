@@ -45,7 +45,7 @@ fun CombinedScreensSelector(
 		signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (localNavAction) {
-		LocalNavAction.ShowScan -> {
+		is LocalNavAction.ShowScan -> {
 			ScanNavSubgraph(
 				rootNavigator = rootNavigator
 			)
