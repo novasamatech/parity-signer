@@ -457,7 +457,7 @@ impl State {
                     println!("GoForward does nothing here")
                 }
                 transaction_parsing::TransactionAction::Derivations { content: _ } => {
-                    println!("Use api call to import derivations");
+                    new_navstate = Navstate::clean_screen(Screen::SeedSelector);
                 }
             },
             Screen::ManageNetworks => match NetworkSpecsKey::from_hex(details_str) {

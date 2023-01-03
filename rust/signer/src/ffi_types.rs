@@ -1,5 +1,5 @@
 use crate::UniffiCustomTypeConverter;
-use definitions::helpers::{multisigner_to_encryption, multisigner_to_public};
+use definitions::helpers::{get_multisigner, multisigner_to_encryption, multisigner_to_public};
 pub use definitions::{
     crypto::Encryption,
     derivations::{DerivedKeyError, DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview},
@@ -41,8 +41,18 @@ pub type H256 = sp_core::H256;
 impl UniffiCustomTypeConverter for sp_runtime::MultiSigner {
     type Builtin = Vec<String>;
 
-    fn into_custom(_val: Self::Builtin) -> uniffi::Result<Self> {
-        panic!("UI never inputs the MultiSigner")
+    fn into_custom(tuple: Self::Builtin) -> uniffi::Result<Self> {
+        match tuple.as_slice() {
+            [public, encryption] => {
+                let encryption = Encryption::try_from(encryption.to_string())
+                    .map_err(|_| anyhow::Error::msg("unable to parse encryption".to_string()))?;
+                let public = hex::decode(public)
+                    .map_err(|_| anyhow::Error::msg("pubkey error".to_string()))?;
+                Ok(get_multisigner(&public, &encryption)
+                    .map_err(|_| anyhow::Error::msg("invalid multisigner".to_string()))?)
+            }
+            _ => Err(anyhow::Error::msg("invalid multisigner")),
+        }
     }
 
     fn from_custom(obj: Self) -> Self::Builtin {

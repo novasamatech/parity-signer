@@ -114,6 +114,9 @@ pub enum Error {
         that_name: String,
         that_version: u32,
     },
+
+    #[error("Cannot convert {0} to valid encryption.")]
+    UnknownEncryption(String),
 }
 
 /// Error decoding transfer content
