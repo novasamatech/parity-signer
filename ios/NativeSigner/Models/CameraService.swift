@@ -29,9 +29,10 @@ final class CameraService: ObservableObject {
     @Published var captured: Int = 0
 
     @Published var isTorchOn: Bool = false
+    @Published var requestPassword: Bool = false
 
     /// Partial payload to decode, collection of payloads from individual QR codes
-    private var bucket: [String] = []
+    @Published var bucket: [String] = []
 
     let session: AVCaptureSession
     private var isConfigured = false
@@ -124,6 +125,7 @@ private extension CameraService {
             default:
                 callbackQueue.async {
                     self.bucket.append(qrCodePayload)
+                    self.captured = self.bucket.count
                     self.total = proposedTotalFrames
                 }
             }
@@ -149,8 +151,15 @@ private extension CameraService {
                 self.payload = parsedPayload
                 self.shutdown()
             }
+        } catch let ErrorDisplayed.Str(details) {
+            print(details)
+//        } catch let ErrorDisplayed.PasswordRequired {
+//            callbackQueue.async {
+//                self.requestPassword = true
+//                self.shutdown()
+//            }
         } catch {
-            // give up when things go badly?
+            print(error.localizedDescription)
         }
     }
 }

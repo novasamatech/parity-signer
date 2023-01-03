@@ -35,6 +35,10 @@ struct CameraView: View {
                     progressViewModel.current = newValue
                     UIApplication.shared.isIdleTimerDisabled = newValue > 0
                 }
+                .onChange(of: model.requestPassword) { newValue in
+                    guard newValue else { return }
+                    viewModel.presentBananaSplitPassword()
+                }
             VStack {
                 ZStack(alignment: .bottom) {
                     // Blur overlay
@@ -136,6 +140,22 @@ struct CameraView: View {
             )
         }
         .fullScreenCover(
+            isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
+            onDismiss: {
+                model.requestPassword = false
+                model.multipleTransactions = []
+                model.start()
+                viewModel.clearTransactionState()
+            }
+        ) {
+            EnterBananaSplitPasswordModal(
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
+                    qrCodeData: $model.bucket
+                )
+            )
+        }
+        .fullScreenCover(
             isPresented: $viewModel.isPresentingEnterPassword,
             onDismiss: {
                 // Clear password modal state no matter what
@@ -230,6 +250,9 @@ extension CameraView {
         @Published var shouldPresentError: Bool = false
         @Published var isPresentingError: Bool = false
         @Published var isInTransactionProgress: Bool = false
+
+        // Banana split flow
+        @Published var isPresentingEnterBananaSplitPassword: Bool = false
 
         // Data models for modals
         @Published var transactions: [MTransaction] = []
@@ -332,6 +355,10 @@ extension CameraView {
             isPresentingError = false
             shouldPresentError = false
             isInTransactionProgress = false
+        }
+
+        func presentBananaSplitPassword() {
+            isPresentingEnterBananaSplitPassword = true
         }
     }
 }

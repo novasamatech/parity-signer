@@ -502,3 +502,4 @@
 "NetworkFilter.Action.Reset" = "Reset";
 "NetworkFilter.Action.Done" = "Done";
 
+"EnterBananaSplitPasswordModal.Label.Title" = "Enter banana split password";
