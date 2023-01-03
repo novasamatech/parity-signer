@@ -1,17 +1,27 @@
 package io.parity.signer.screens.scan
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import io.parity.signer.R
 import io.parity.signer.backend.UniffiResult
+import io.parity.signer.backend.mapError
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.isDisplayingErrorOnly
+import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.models.storage.RepoResult
 import io.parity.signer.models.storage.SeedRepository
-import io.parity.signer.models.transactionIssues
+import io.parity.signer.screens.scan.transaction.TransactionPreviewType
+import io.parity.signer.screens.scan.transaction.previewType
+import io.parity.signer.screens.scan.transaction.transactionIssues
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 private const val TAG = "ScanViewModelTag"
@@ -24,8 +34,10 @@ class ScanViewModel : ViewModel() {
 	private val uniffiInteractor = ServiceLocator.backendScope.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
 
-	data class TransactionsState(val transactions: List<MTransaction>,
-															 val title: String)
+	data class TransactionsState(
+		val transactions: List<MTransaction>,
+		val title: String
+	)
 
 	var transactions: MutableStateFlow<TransactionsState?> =
 		MutableStateFlow(null)
@@ -76,7 +88,8 @@ class ScanViewModel : ViewModel() {
 				//password protected key, show password
 				when (val modalData = actionResult?.modalData) {
 					is ModalData.EnterPassword -> {
-						passwordModel.value = modalData.f.toEnterPasswordModel(withShowError = false)
+						passwordModel.value =
+							modalData.f.toEnterPasswordModel(withShowError = false)
 					}
 					is ModalData.SignatureReady -> {
 						signature.value = modalData.f
@@ -97,7 +110,8 @@ class ScanViewModel : ViewModel() {
 			//						rust/navigator/src/navstate.rs:396
 			// alert error
 		}
-		this.transactions.value = TransactionsState(transactions, navigateResponse.result.screenLabel)
+		this.transactions.value =
+			TransactionsState(transactions, navigateResponse.result.screenLabel)
 	}
 
 	fun ifHasStateThenClear(): Boolean {
@@ -145,12 +159,12 @@ class ScanViewModel : ViewModel() {
 		val actionResult =
 			(navigateResponse as? UniffiResult.Success)?.result
 				?: run {
-			Log.e(
-				TAG, "Error in entering password for a key, " +
-					"navigation resp is $navigateResponse"
-			)
-			return
-		}
+					Log.e(
+						TAG, "Error in entering password for a key, " +
+							"navigation resp is $navigateResponse"
+					)
+					return
+				}
 
 		when (val modalData = actionResult.modalData) {
 			// If navigation returned `enterPassword`, it means password is invalid
@@ -171,7 +185,8 @@ class ScanViewModel : ViewModel() {
 			//ignore the rest modals
 			else -> {
 				Log.e(
-					TAG, "Password is entered for transaction, but neither new password or signature is passed! Should not happen" +
+					TAG,
+					"Password is entered for transaction, but neither new password or signature is passed! Should not happen" +
 						"actionResult is $actionResult"
 				)
 			}
@@ -182,29 +197,13 @@ class ScanViewModel : ViewModel() {
 		}
 	}
 
-	fun proceedTransactionAction() {
-
+	fun approveTransactionAction(context: Context) {
+		viewModelScope.launch { // can do async
+			uniffiInteractor.navigate(Action.GO_FORWARD)
+				.mapError()
+		}
+		clearTransactionState()
 	}
-	//			        func onApproveTap() { todo scan ^^
-//            navigation.perform(navigation: .init(action: .goForward))
-//            isPresented.toggle()
-//            switch dataModel.first?.content.previewType {
-//            case let .addNetwork(network):
-//                snackbarPresentation.viewModel = .init(
-//                    title: Localizable.TransactionSign.Snackbar.networkAdded(network),
-//                    style: .info
-//                )
-//                snackbarPresentation.isSnackbarPresented = true
-//            case let .metadata(network, version):
-//                snackbarPresentation.viewModel = .init(
-//                    title: Localizable.TransactionSign.Snackbar.metadata(network, version),
-//                    style: .info
-//                )
-//                snackbarPresentation.isSnackbarPresented = true
-//            default:
-//                ()
-//            }
-//        }
 
 	private fun proceedWrongPassword() {
 //		navigation.performFake(navigation: .init(action: .goBack))

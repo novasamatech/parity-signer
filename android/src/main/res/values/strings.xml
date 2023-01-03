@@ -210,6 +210,8 @@
 	<string name="transaction_summary_field_sign_with">Sign With</string>
 	<string name="transaction_qr_header">Sign Transactions</string>
 	<string name="transaction_details_screen_header">Transaction details</string>
-
+	<string name="toast_metadata_added">Metadata %1$s %2$s was added</string>
+	<string name="toast_network_added">Network %1$s was added</string>
 
 </resources>
+

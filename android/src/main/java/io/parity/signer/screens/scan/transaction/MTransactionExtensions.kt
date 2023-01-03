@@ -1,8 +1,9 @@
-package io.parity.signer.models
+package io.parity.signer.screens.scan.transaction
 
 import io.parity.signer.uniffi.Card
 import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.TransactionCard
+import io.parity.signer.uniffi.TransactionType
 
 val MTransaction.nonIssuesCardsFiltered: List<TransactionCard>
 	get() =
@@ -61,3 +62,38 @@ val MTransaction.sortedValueCards: List<TransactionCard>
 		).flatten()
 			.sortedBy { it.index }
 
+
+sealed class TransactionPreviewType {
+	data class AddNetwork(val network: String) : TransactionPreviewType()
+	data class Metadata(val network: String, val version: String) :
+		TransactionPreviewType()
+
+	object Transfer : TransactionPreviewType()
+	object Unknown : TransactionPreviewType()
+}
+
+val MTransaction.previewType: TransactionPreviewType
+	get() = when (ttype) {
+		TransactionType.STUB -> {
+			sortedValueCards.mapNotNull {
+				when (val card = it.card) {
+					is Card.MetaCard -> {
+						TransactionPreviewType.Metadata(
+							network = card.f.specname,
+							version = card.f.specsVersion
+						)
+					}
+					is Card.NewSpecsCard -> {
+						TransactionPreviewType.AddNetwork(network = card.f.name)
+					}
+					else -> null
+				}
+			}.firstOrNull() ?: TransactionPreviewType.Unknown
+		}
+		TransactionType.SIGN -> {
+			TransactionPreviewType.Transfer
+		}
+		TransactionType.READ, TransactionType.IMPORT_DERIVATIONS, TransactionType.DONE -> {
+			TransactionPreviewType.Unknown
+		}
+	}

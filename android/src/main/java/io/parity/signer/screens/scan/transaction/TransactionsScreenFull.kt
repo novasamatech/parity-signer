@@ -39,7 +39,7 @@ fun TransactionsScreenFull(
 	signature: MSignatureReady?,
 	modifier: Modifier = Modifier,
 	onBack: Callback,
-	onFinish: Callback, //todo scan this leading to general state moving to Scan and it's crashing in selector
+	onFinish: Callback,
 ) {
 	val detailedTransaction = remember {
 		mutableStateOf<MTransaction?>(null)
@@ -64,14 +64,14 @@ fun TransactionsScreenFull(
 }
 
 @Composable
-private fun TransactionsScreenFull(
+internal fun TransactionsScreenFull(
 	modifier: Modifier,
 	title: String,
 	onBack: Callback,
 	transactions: List<MTransaction>,
 	detailedTransaction: MutableState<MTransaction?>,
 	signature: MSignatureReady?,
-	onFinish: Callback
+	onFinish: Callback,
 ) {
 	Column(modifier.fillMaxSize(1f)) {
 		ScreenHeader(title = title, onBack = onBack)
@@ -149,10 +149,9 @@ private fun QrSignatureData(signature: MSignatureReady) {
 private fun ActionButtons(
 	transactions: List<MTransaction>,
 	onBack: Callback,
-	onFinish: Callback
+	onFinish: Callback,
 ) {
-	val action = transactions.first().ttype
-	when (action) {
+	when (transactions.first().ttype) {
 		TransactionType.SIGN -> {
 			AddLogElement()
 
@@ -177,7 +176,7 @@ private fun ActionButtons(
 				modifier = Modifier
 					.padding(horizontal = 24.dp)
 					.padding(top = 32.dp, bottom = 8.dp),
-				onClicked = onFinish,
+				onClicked = { onFinish() },
 			)
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_decline),

@@ -11,7 +11,6 @@ import androidx.compose.ui.res.stringResource
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.models.Callback
-import io.parity.signer.models.sortedValueCards
 import io.parity.signer.screens.scan.transaction.components.TransactionElementSelector
 import io.parity.signer.uniffi.MTransaction
 

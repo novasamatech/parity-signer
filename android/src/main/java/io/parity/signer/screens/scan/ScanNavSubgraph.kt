@@ -1,18 +1,24 @@
 package io.parity.signer.screens.scan
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.parity.signer.R
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.models.Navigator
 import io.parity.signer.screens.scan.elements.ScanErrorBottomSheet
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
-import io.parity.signer.screens.scan.transaction.TransactionDetailsScreen
+import io.parity.signer.screens.scan.transaction.TransactionPreviewType
 import io.parity.signer.screens.scan.transaction.TransactionsScreenFull
+import io.parity.signer.screens.scan.transaction.previewType
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.backendAction
@@ -44,6 +50,7 @@ fun ScanNavSubgraph(
 	}
 	BackHandler(onBack = backAction)
 
+	val context = LocalContext.current
 
 	//Full screens
 	val transactionsValue = transactions.value
@@ -65,13 +72,21 @@ fun ScanNavSubgraph(
 			modifier = Modifier.statusBarsPadding(),
 			onBack = {
 				backendAction(Action.GO_BACK, "", "")
-				backAction()
+				scanViewModel.clearTransactionState()
 			},
 			onFinish = {
-				//todo scan
-				scanViewModel.proceedTransactionAction()
-				rootNavigator.navigate(Action.GO_FORWARD)
-				scanViewModel.clearTransactionState()
+				when (val previewType = transactions.value?.transactions?.firstOrNull()?.previewType) {
+					is TransactionPreviewType.AddNetwork -> {
+						Toast.makeText(context, context.getString(R.string.toast_network_added, previewType.network), Toast.LENGTH_LONG).show()
+					}
+					is TransactionPreviewType.Metadata -> {
+						Toast.makeText(context, context.getString(R.string.toast_metadata_added, previewType.network, previewType.version), Toast.LENGTH_LONG).show()
+					}
+					else -> {
+						//nothing
+					}
+				}
+				scanViewModel.approveTransactionAction(context)
 			},
 		)
 	}
