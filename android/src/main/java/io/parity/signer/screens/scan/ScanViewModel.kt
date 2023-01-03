@@ -1,27 +1,20 @@
 package io.parity.signer.screens.scan
 
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.parity.signer.R
 import io.parity.signer.backend.UniffiResult
 import io.parity.signer.backend.mapError
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.models.storage.RepoResult
 import io.parity.signer.models.storage.SeedRepository
-import io.parity.signer.screens.scan.transaction.TransactionPreviewType
-import io.parity.signer.screens.scan.transaction.previewType
+import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 
 private const val TAG = "ScanViewModelTag"
