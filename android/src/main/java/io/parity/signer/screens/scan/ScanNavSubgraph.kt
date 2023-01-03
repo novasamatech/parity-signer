@@ -86,7 +86,7 @@ fun ScanNavSubgraph(
 						//nothing
 					}
 				}
-				scanViewModel.approveTransactionAction(context)
+				scanViewModel.approveTransactionAction()
 			},
 		)
 	}

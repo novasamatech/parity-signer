@@ -197,7 +197,7 @@ class ScanViewModel : ViewModel() {
 		}
 	}
 
-	fun approveTransactionAction(context: Context) {
+	fun approveTransactionAction() {
 		viewModelScope.launch { // can do async
 			uniffiInteractor.navigate(Action.GO_FORWARD)
 				.mapError()
