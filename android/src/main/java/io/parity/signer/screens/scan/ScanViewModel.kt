@@ -106,9 +106,8 @@ class ScanViewModel : ViewModel() {
 				// Transaction that does not require signing (i.e. adding network or metadata)
 				// will set them below for any case and show anyway
 			}
-			//handle
+			//handle alert error
 			//						rust/navigator/src/navstate.rs:396
-			// alert error
 		}
 		this.transactions.value =
 			TransactionsState(transactions, navigateResponse.result.screenLabel)
