@@ -11,7 +11,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.bottomsheets.password.EnterPassword
-import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.components.panels.BottomBarSingleton
 import io.parity.signer.components.panels.toAction
 import io.parity.signer.models.Navigator
@@ -80,12 +79,28 @@ fun ScanNavSubgraph(
 				scanViewModel.clearTransactionState()
 			},
 			onFinish = {
-				when (val previewType = transactions.value?.transactions?.firstOrNull()?.previewType) {
+				when (val previewType =
+					transactions.value?.transactions?.firstOrNull()?.previewType) {
 					is TransactionPreviewType.AddNetwork -> {
-						Toast.makeText(context, context.getString(R.string.toast_network_added, previewType.network), Toast.LENGTH_LONG).show()
+						Toast.makeText(
+							context,
+							context.getString(
+								R.string.toast_network_added,
+								previewType.network
+							),
+							Toast.LENGTH_LONG
+						).show()
 					}
 					is TransactionPreviewType.Metadata -> {
-						Toast.makeText(context, context.getString(R.string.toast_metadata_added, previewType.network, previewType.version), Toast.LENGTH_LONG).show()
+						Toast.makeText(
+							context,
+							context.getString(
+								R.string.toast_metadata_added,
+								previewType.network,
+								previewType.version
+							),
+							Toast.LENGTH_LONG
+						).show()
 					}
 					else -> {
 						//nothing
@@ -114,7 +129,10 @@ fun ScanNavSubgraph(
 						scanViewModel.handlePasswordEntered(password)
 					}
 				},
-				onClose = scanViewModel::clearTransactionState,
+				onClose = {
+					scanViewModel.resetRustModalToNewScan()
+					scanViewModel.clearTransactionState()
+				},
 			)
 		}
 	} ?: if (errorWrongPassword.value) {

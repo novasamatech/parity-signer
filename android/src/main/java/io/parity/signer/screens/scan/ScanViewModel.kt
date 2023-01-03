@@ -198,10 +198,15 @@ class ScanViewModel : ViewModel() {
 	}
 
 	private fun proceedWrongPassword() {
-//		navigation.performFake(navigation: .init(action: .goBack))
-		//  Fake navigation to camera, as were brought back to `Log` screen on navstate error handling
-//			navigation.performFake(navigation: .init(action: .navbarScan))
 		errorWrongPassword.value = true
 		passwordModel.value = null
+		resetRustModalToNewScan()
+	}
+
+	fun resetRustModalToNewScan() {
+		// Dismissing password modal goes to `Log` screen
+		backendAction(Action.GO_BACK, "", "")
+		// Pretending to navigate back to `Scan` so navigation states for new QR code scan will work
+		backendAction(Action.NAVBAR_SCAN, "", "")
 	}
 }
