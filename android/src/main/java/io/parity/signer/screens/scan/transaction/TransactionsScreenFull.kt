@@ -166,13 +166,15 @@ private fun QrSignatureData(signature: MSignatureReady) {
 		text = stringResource(R.string.transaction_qr_header),
 		color = MaterialTheme.colors.primary,
 		style = SignerTypeface.TitleS,
-		modifier = Modifier.padding(horizontal = 8.dp, vertical = 14.dp),
+		modifier = Modifier.padding(horizontal = 24.dp, vertical = 14.dp),
 		maxLines = 1,
 	)
 	AnimatedQrKeysInfo<List<List<UByte>>>(
 		input = signature.signatures.map { it.getData() },
 		provider = EmptyQrCodeProvider(),
-		modifier = Modifier.fillMaxWidth(1f)
+		modifier = Modifier
+            .fillMaxWidth(1f)
+            .padding(horizontal = 24.dp)
 	)
 }
 

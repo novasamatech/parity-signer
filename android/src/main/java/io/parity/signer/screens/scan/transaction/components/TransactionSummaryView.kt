@@ -36,7 +36,7 @@ fun TransactionSummaryView(
 		RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 	Column(
 		modifier = Modifier
-			.padding(vertical = 8.dp)
+			.padding(vertical = 8.dp, horizontal = 16.dp)
 			.background(
 				MaterialTheme.colors.fill6,
 				plateShape
