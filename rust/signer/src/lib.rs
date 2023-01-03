@@ -139,9 +139,10 @@ fn qrparser_get_packets_total(data: &str, cleaned: bool) -> anyhow::Result<u32, 
 /// QR parsing code
 fn qrparser_try_decode_qr_sequence(
     data: &[String],
+    password: Option<String>,
     cleaned: bool,
-) -> anyhow::Result<String, ErrorDisplayed> {
-    qr_reader_phone::decode_sequence(data, cleaned).map_err(|e| e.to_string().into())
+) -> anyhow::Result<DecodeSequenceResult, ErrorDisplayed> {
+    qr_reader_phone::decode_sequence(data, &password, cleaned).map_err(|e| e.to_string().into())
 }
 
 /// Exports secret (private) key as QR code

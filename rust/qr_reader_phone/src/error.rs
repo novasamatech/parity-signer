@@ -16,6 +16,9 @@ pub enum Error {
     #[error(transparent)]
     HexDecoding(#[from] hex::FromHexError),
 
+    #[error(transparent)]
+    BananaSplitError(#[from] banana_recovery::Error),
+
     #[error("Unable to decode on given dataset")]
     UnableToDecode,
 

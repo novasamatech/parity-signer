@@ -1,5 +1,5 @@
 use crate::{Error, LegacyFrame, RaptorqFrame, Result};
-use banana_recovery::{Share, ShareSet};
+use banana_recovery::{NextAction, Share, ShareSet};
 use raptorq::{self, EncodingPacket};
 use std::{collections::HashSet, convert::TryFrom};
 
@@ -49,9 +49,15 @@ pub enum InProgress {
 pub enum Ready {
     NotYet(InProgress),
     Yes(Vec<u8>),
+    BananaSplitPasswordRequest,
+    BananaSplitReady(String),
 }
 
-pub fn process_decoded_payload(payload: Vec<u8>, mut decoding: InProgress) -> Result<Ready> {
+pub fn process_decoded_payload(
+    payload: Vec<u8>,
+    password: &Option<String>,
+    mut decoding: InProgress,
+) -> Result<Ready> {
     if let Ok(share) = Share::new(payload.clone()) {
         match decoding {
             InProgress::None => {
@@ -62,8 +68,18 @@ pub fn process_decoded_payload(payload: Vec<u8>, mut decoding: InProgress) -> Re
             InProgress::BananaRecovery(ref mut recovery) => {
                 let result = recovery.share_set.try_add_share(share);
                 log::warn!("result {:?}", result);
-                log::warn!("next action {:?}", recovery.share_set.next_action());
-                Ok(Ready::NotYet(decoding))
+                match recovery.share_set.next_action() {
+                    NextAction::MoreShares { .. } => Ok(Ready::NotYet(decoding)),
+                    NextAction::AskUserForPassword => {
+                        if let Some(password) = password {
+                            let result = recovery.share_set.recover_with_passphrase(&password)?;
+                            log::warn!("recovered phrase: {result}");
+                            Ok(Ready::BananaSplitReady(result))
+                        } else {
+                            Ok(Ready::BananaSplitPasswordRequest)
+                        }
+                    }
+                }
             }
             _ => {
                 todo!()

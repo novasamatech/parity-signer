@@ -2603,6 +2603,7 @@ name = "qr_reader_phone"
 version = "0.1.0"
 dependencies = [
  "banana_recovery",
+ "definitions",
  "hex",
  "log",
  "nom",
