@@ -20,7 +20,7 @@ struct EnterBananaSplitPasswordModal: View {
                 viewModel.onCancelTap()
             },
             animateBackground: $animateBackground,
-            safeAreaInsetsMode: .full
+            ignoredEdges: .top
         ) {
             VStack(spacing: Spacing.medium) {
                 HStack {
