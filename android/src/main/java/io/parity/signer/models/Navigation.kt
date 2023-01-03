@@ -18,9 +18,12 @@ fun SignerDataModel.navigate(
 	details: String = "",
 	seedPhrase: String = ""
 ) {
-	SignerNavigator(this).navigate(button, details, seedPhrase)
+	navigator.navigate(button, details, seedPhrase)
 }
 
+
+//todo scan ios/NativeSigner/Core/Navigation/NavigationCoordinator.swift:154
+//todo scan ios/NativeSigner/Screens/Containers/AuthenticatedScreenContainer.swift:58
 
 interface Navigator {
 	/**
