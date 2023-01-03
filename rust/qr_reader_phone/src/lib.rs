@@ -49,9 +49,17 @@ pub fn decode_sequence(
         let payload = get_payload(x, cleaned)?;
         if let Ready::NotYet(decoding) = out {
             out = process_decoded_payload(payload, password, decoding)?;
-            if let Ready::Yes(v) = out {
-                final_result = Some(hex::encode(v));
-                break;
+            match out {
+                Ready::Yes(v) => {
+                    final_result = Some(hex::encode(v));
+                    break;
+                }
+                Ready::BananaSplitPasswordRequest => {
+                    return Ok(DecodeSequenceResult::BBananaSplitRecoveryResult {
+                        b: BananaSplitRecoveryResult::RequestPassword,
+                    });
+                }
+                _ => (),
             }
         }
     }

@@ -68,7 +68,9 @@ pub fn process_decoded_payload(
             InProgress::BananaRecovery(ref mut recovery) => {
                 let result = recovery.share_set.try_add_share(share);
                 log::warn!("result {:?}", result);
-                match recovery.share_set.next_action() {
+                let next = recovery.share_set.next_action();
+                log::warn!("next {:?}", next);
+                match next {
                     NextAction::MoreShares { .. } => Ok(Ready::NotYet(decoding)),
                     NextAction::AskUserForPassword => {
                         if let Some(password) = password {
@@ -81,9 +83,7 @@ pub fn process_decoded_payload(
                     }
                 }
             }
-            _ => {
-                todo!()
-            }
+            _ => Err(Error::DynamicInterruptedByStatic),
         }
     } else if let Ok(frame) = RaptorqFrame::try_from(payload.as_ref()) {
         let length = frame.size;
