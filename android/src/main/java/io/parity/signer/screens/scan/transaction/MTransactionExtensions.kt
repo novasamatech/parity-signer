@@ -75,7 +75,7 @@ sealed class TransactionPreviewType {
 val MTransaction.previewType: TransactionPreviewType
 	get() = when (ttype) {
 		TransactionType.STUB -> {
-			sortedValueCards.mapNotNull {
+			sortedValueCards.firstNotNullOfOrNull {
 				when (val card = it.card) {
 					is Card.MetaCard -> {
 						TransactionPreviewType.Metadata(
@@ -88,7 +88,7 @@ val MTransaction.previewType: TransactionPreviewType
 					}
 					else -> null
 				}
-			}.firstOrNull() ?: TransactionPreviewType.Unknown
+			} ?: TransactionPreviewType.Unknown
 		}
 		TransactionType.SIGN -> {
 			TransactionPreviewType.Transfer

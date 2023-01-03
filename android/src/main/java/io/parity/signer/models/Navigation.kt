@@ -4,8 +4,6 @@ import android.util.Log
 import android.widget.Toast
 import io.parity.signer.BuildConfig
 import io.parity.signer.components.NetworkCardModel
-import io.parity.signer.components.panels.BottomBar2State
-import io.parity.signer.components.panels.toBottomBarState
 import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.components.sharedcomponents.KeyCardModelBase
 import io.parity.signer.components.toImageContent
