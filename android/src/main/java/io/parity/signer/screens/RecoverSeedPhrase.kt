@@ -41,7 +41,6 @@ fun RecoverSeedPhrase(
 		seedWordText,
 		selection = TextRange(seedWordText.length)
 	)
-	val createRoots = remember { mutableStateOf(true) }
 
 	Column(
 		verticalArrangement = Arrangement.Top,
@@ -71,21 +70,6 @@ fun RecoverSeedPhrase(
 			guessWord,
 			button
 		)
-		Spacer(Modifier.weight(0.8f))
-		Row(
-			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier.toggleable(
-				value = createRoots.value,
-				role = Role.Checkbox,
-				onValueChange = { createRoots.value = it }
-			)
-		) {
-			Checkbox(
-				checked = createRoots.value,
-				onCheckedChange = { createRoots.value = it }
-			)
-			Text("Create seed keys")
-		}
 		Spacer(Modifier.weight(0.1f))
 		if (recoverSeedPhrase.keyboard) {
 			BigButton(
@@ -96,7 +80,7 @@ fun RecoverSeedPhrase(
 							addSeed(
 								seedName,
 								it,
-								createRoots.value
+								true,
 							)
 						}
 					}
