@@ -72,7 +72,12 @@ sealed class TransactionPreviewType {
 	object Unknown : TransactionPreviewType()
 }
 
-val MTransaction.previewType: TransactionPreviewType
+val List<MTransaction>.previewType: TransactionPreviewType
+	get() = map { it.previewType }
+		.firstOrNull { it != TransactionPreviewType.Unknown }
+		?: TransactionPreviewType.Unknown
+
+private val MTransaction.previewType: TransactionPreviewType
 	get() = when (ttype) {
 		TransactionType.STUB -> {
 			sortedValueCards.firstNotNullOfOrNull {

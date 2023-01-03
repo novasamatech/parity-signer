@@ -212,6 +212,8 @@
 	<string name="transaction_details_screen_header">Transaction details</string>
 	<string name="toast_metadata_added">Metadata %1$s %2$s was added</string>
 	<string name="toast_network_added">Network %1$s was added</string>
+    <string name="transactions_title_network">Add Network</string>
+	<string name="transactions_title_metadata">Add Metadata</string>
 
 </resources>
 

@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
@@ -39,7 +41,6 @@ import io.parity.signer.uniffi.TransactionType
 @Composable
 fun TransactionsScreenFull(
 	transactions: List<MTransaction>,
-	title: String,
 	signature: MSignatureReady?,
 	modifier: Modifier = Modifier,
 	onBack: Callback,
@@ -48,16 +49,17 @@ fun TransactionsScreenFull(
 	val detailedTransaction = remember {
 		mutableStateOf<MTransaction?>(null)
 	}
-	detailedTransaction.value?.let { detaitTransac ->
+	detailedTransaction.value?.let { detailTransac ->
 		//detailes mode
-		TransactionDetailsScreen(transaction = detaitTransac,
+		TransactionDetailsScreen(
+			transaction = detailTransac,
 			modifier = modifier,
-			onBack = { detailedTransaction.value = null })
+			onBack = { detailedTransaction.value = null },
+		)
 	} ?: run {
 		//default view
 		TransactionsScreenFull(
 			modifier,
-			title,
 			onBack,
 			transactions,
 			detailedTransaction,
@@ -70,7 +72,6 @@ fun TransactionsScreenFull(
 @Composable
 internal fun TransactionsScreenFull(
 	modifier: Modifier,
-	title: String,
 	onBack: Callback,
 	transactions: List<MTransaction>,
 	detailedTransaction: MutableState<MTransaction?>,
@@ -81,11 +82,17 @@ internal fun TransactionsScreenFull(
 		modifier
 			.background(MaterialTheme.colors.backgroundSystem)
 	) {
-		ScreenHeader(title = title, onBack = onBack)
+		ScreenHeader(
+			title = getTransactionsTitle(
+				transactionsCount = transactions.size,
+				previewType = transactions.previewType,
+			),
+			onBack = onBack
+		)
 		Column(
-			Modifier
-				.verticalScroll(rememberScrollState())
-				.weight(1f)
+            Modifier
+                .verticalScroll(rememberScrollState())
+                .weight(1f)
 		) {
 			transactions.forEach {
 				TransactionIssues(it)
@@ -102,6 +109,21 @@ internal fun TransactionsScreenFull(
 				onFinish
 			)
 		}
+	}
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun getTransactionsTitle(
+	previewType: TransactionPreviewType,
+	transactionsCount: Int
+): String {
+	return when (previewType) {
+		is TransactionPreviewType.AddNetwork -> stringResource(R.string.transactions_title_network)
+		is TransactionPreviewType.Metadata -> stringResource(R.string.transactions_title_metadata)
+		TransactionPreviewType.Transfer, TransactionPreviewType.Unknown -> pluralStringResource(
+			id = R.plurals.transactions_title_other, transactionsCount,
+		)
 	}
 }
 
@@ -183,15 +205,15 @@ private fun ActionButtons(
 			PrimaryButtonWide(
 				label = stringResource(R.string.transaction_action_approve),
 				modifier = Modifier
-					.padding(horizontal = 24.dp)
-					.padding(top = 32.dp, bottom = 8.dp),
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 32.dp, bottom = 8.dp),
 				onClicked = { onFinish() },
 			)
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_decline),
 				modifier = Modifier
-					.padding(horizontal = 24.dp)
-					.padding(bottom = 32.dp),
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 32.dp),
 				onClicked = onBack,
 			)
 		}
@@ -207,15 +229,15 @@ private fun ActionButtons(
 			PrimaryButtonWide(
 				label = stringResource(R.string.transaction_action_select_seed),
 				modifier = Modifier
-					.padding(horizontal = 24.dp)
-					.padding(top = 32.dp, bottom = 8.dp),
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 32.dp, bottom = 8.dp),
 				onClicked = onFinish,
 			)
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_decline),
 				modifier = Modifier
-					.padding(horizontal = 24.dp)
-					.padding(bottom = 32.dp),
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 32.dp),
 				onClicked = onBack,
 			)
 		}

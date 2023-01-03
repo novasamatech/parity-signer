@@ -71,7 +71,6 @@ fun ScanNavSubgraph(
 		//ios/NativeSigner/Screens/Scan/CameraView.swift:130
 		TransactionsScreenFull(
 			transactions = transactionsValue.transactions,
-			title = transactionsValue.title,
 			signature = signature.value,
 			modifier = Modifier.statusBarsPadding(),
 			onBack = {
@@ -80,7 +79,7 @@ fun ScanNavSubgraph(
 			},
 			onFinish = {
 				when (val previewType =
-					transactions.value?.transactions?.firstOrNull()?.previewType) {
+					transactions.value?.transactions?.previewType) {
 					is TransactionPreviewType.AddNetwork -> {
 						Toast.makeText(
 							context,

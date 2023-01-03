@@ -29,7 +29,6 @@ class ScanViewModel : ViewModel() {
 
 	data class TransactionsState(
 		val transactions: List<MTransaction>,
-		val title: String
 	)
 
 	var transactions: MutableStateFlow<TransactionsState?> =
@@ -103,7 +102,8 @@ class ScanViewModel : ViewModel() {
 			//						rust/navigator/src/navstate.rs:396
 		}
 		this.transactions.value =
-			TransactionsState(transactions, navigateResponse.result.screenLabel)
+			TransactionsState(transactions,)
+		// navigateResponse.result.screenLabel - it's coming empty so generated guess on android
 	}
 
 	fun ifHasStateThenClear(): Boolean {
