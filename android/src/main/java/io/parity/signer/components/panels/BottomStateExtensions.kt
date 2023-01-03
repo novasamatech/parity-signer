@@ -12,15 +12,6 @@ fun BottomBar2State.toAction() =
 		BottomBar2State.SETTINGS -> Action.NAVBAR_SETTINGS
 	}
 
-fun FooterButton.toBottomBarState(): BottomBar2State? =
-	when (this) {
-		FooterButton.LOG -> BottomBar2State.LOGS
-		FooterButton.KEYS -> BottomBar2State.KEYS
-		FooterButton.SETTINGS -> BottomBar2State.SETTINGS
-		FooterButton.SCAN -> null
-		FooterButton.BACK -> null
-	}
-
 
 object BottomBarSingleton {
 	/**
