@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import io.parity.signer.components.BigButton
-import io.parity.signer.components.BottomBar
+import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.TopBar
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.AlertState
@@ -31,7 +31,6 @@ import io.parity.signer.screens.WaitingScreen
 import io.parity.signer.ui.navigationselectors.*
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.Text600
-import io.parity.signer.uniffi.ScreenData
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
