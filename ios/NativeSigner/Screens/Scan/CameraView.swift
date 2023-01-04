@@ -142,13 +142,13 @@ struct CameraView: View {
         .fullScreenCover(
             isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
             onDismiss: {
+                model.start()
                 // User entered invalid password too many times, present error
                 if viewModel.shouldPresentError {
                     viewModel.isPresentingError = true
                     return
                 }
                 viewModel.clearTransactionState()
-                model.start()
 
                 // User proceeded successfully with key recovery, dismiss camera
                 if viewModel.wasBananaSplitKeyRecovered {
