@@ -12,7 +12,6 @@ struct NewSeedBackupModal: View {
     let restoreSeed: (String, String, Bool) -> Void
     let navigationRequest: NavigationRequest
     @State private var confirmBackup = false
-    @State private var createRoots = true
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.backgroundSecondary.swiftUIColor)
@@ -41,25 +40,11 @@ struct NewSeedBackupModal: View {
                             }
                         }
                     )
-                    Button(
-                        action: {
-                            createRoots.toggle()
-                        },
-                        label: {
-                            HStack {
-                                (createRoots ? Image(.checkmark, variant: .square) : Image(.square)).imageScale(.large)
-                                Localizable.createRootKeys.text
-                                    .multilineTextAlignment(.leading)
-                                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                                Spacer()
-                            }
-                        }
-                    )
                     Spacer()
                     BigButton(
                         text: Localizable.next.key,
                         action: {
-                            restoreSeed(content.seed, content.seedPhrase, createRoots)
+                            restoreSeed(content.seed, content.seedPhrase, true)
                         },
                         isDisabled: !confirmBackup
                     )
