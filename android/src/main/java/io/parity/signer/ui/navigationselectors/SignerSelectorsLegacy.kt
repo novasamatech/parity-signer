@@ -10,7 +10,7 @@ import io.parity.signer.bottomsheets.*
 import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
-import io.parity.signer.screens.keyderivation.DerivePasswordConfirmOld
+import io.parity.signer.screens.keyderivation.old.DerivePasswordConfirmOld
 import io.parity.signer.screens.keyderivation.NewAddressScreen
 import io.parity.signer.screens.logs.logdetails.LogDetails
 import io.parity.signer.screens.settings.VerifierScreen
