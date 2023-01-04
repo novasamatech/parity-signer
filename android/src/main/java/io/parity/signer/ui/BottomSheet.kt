@@ -98,13 +98,13 @@ fun BottomSheetWrapperRoot(
 	)
 
 	BackHandler(enabled = modalBottomSheetState.isVisible) {
-		handle.hide()
+		coroutineScope.launch { modalBottomSheetState.hide() }
 	}
 
 	//show once view is create to have initial open animation
 	LaunchedEffect(key1 = modalBottomSheetState) {
 		modalBottomSheetState.show()
-		wasSheetShown = true
+		//sometimes never happen. Show suspends forever like for password dialog
 	}
 
 	// Take action based on hidden state
@@ -115,7 +115,9 @@ fun BottomSheetWrapperRoot(
 					onClosedAction()
 				}
 			}
-			else -> {}
+			else -> {
+				wasSheetShown = true
+			}
 		}
 	}
 }
