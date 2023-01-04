@@ -110,8 +110,10 @@ final class SeedsMediator: SeedsMediating {
 
     @discardableResult
     func restoreSeed(seedName: String, seedPhrase: String, navigate: Bool) -> Bool {
-        guard !checkSeedPhraseCollision(seedPhrase: seedPhrase),
-              let finalSeedPhrase = seedPhrase.data(using: .utf8) else { return false }
+        guard let finalSeedPhrase = seedPhrase.data(using: .utf8) else { return false }
+        if navigate, checkSeedPhraseCollision(seedPhrase: seedPhrase) {
+            return false
+        }
         let saveSeedResult = keychainAccessAdapter.saveSeed(
             with: seedName,
             seedPhrase: finalSeedPhrase
