@@ -63,11 +63,13 @@ class CameraViewModel() : ViewModel() {
 								if (proposeTotal == 1) {
 									try {
 										val payload = qrparserTryDecodeQrSequence(
-											listOf(payloadString),
-											true
-										)
+											data = listOf(payloadString),
+											password = null,
+											cleaned = true,
+										) as? DecodeSequenceResult.Other
+										val actualPayload = payload?.s ?: "" //todo dmitry banana split handle #1506 gh
 										resetScanValues()
-										addPendingTransaction(payload)
+										addPendingTransaction(actualPayload)
 									} catch (e: java.lang.Exception) {
 										Log.e("scanVM", "Single frame decode failed $e")
 									}
@@ -83,12 +85,14 @@ class CameraViewModel() : ViewModel() {
 							if ((currentMultiQrTransaction.size + 1) >= (total.value ?: 0)) {
 								try {
 									val payload = qrparserTryDecodeQrSequence(
-										currentMultiQrTransaction.toList(),
-										true
-									)
-									if (payload.isNotEmpty()) {
+										data = currentMultiQrTransaction.toList(),
+										password = null,
+										cleaned = true,
+									) as? DecodeSequenceResult.Other
+									val actualPayload = payload?.s ?: "" //todo dmitry banana split handle #1506 gh
+									if (actualPayload.isNotEmpty()) {
 										resetScanValues()
-										addPendingTransaction(payload)
+										addPendingTransaction(actualPayload)
 									}
 								} catch (e: java.lang.Exception) {
 									Log.e("scanVM", "failed to parse sequence $e")
