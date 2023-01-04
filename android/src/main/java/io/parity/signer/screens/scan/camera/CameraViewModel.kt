@@ -6,8 +6,6 @@ import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
-import io.parity.signer.backend.UniffiResult
-import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,8 +17,9 @@ class CameraViewModel() : ViewModel() {
 
 	val isTorchEnabled = MutableStateFlow(false)
 
-	private val _pendingPayloads = MutableStateFlow<String?>(null)
-	val pendingTransactionPayloads: StateFlow<String?> = _pendingPayloads.asStateFlow()
+	private val _pendingPayloads = MutableStateFlow<Set<String>>(emptySet())
+	val pendingTransactionPayloads: StateFlow<Set<String>> =
+		_pendingPayloads.asStateFlow()
 
 	private val _total = MutableStateFlow<Int?>(null)
 	private val _captured = MutableStateFlow<Int?>(null)
@@ -97,7 +96,7 @@ class CameraViewModel() : ViewModel() {
 				}
 			}
 			.addOnFailureListener {
-				Log.e("scanVM","Scan failed " + it.message.toString())
+				Log.e("scanVM", "Scan failed " + it.message.toString())
 			}
 			.addOnCompleteListener {
 				imageProxy.close()
@@ -105,7 +104,7 @@ class CameraViewModel() : ViewModel() {
 	}
 
 	private fun addPendingTransaction(payload: String) {
-		_pendingPayloads.value = (_pendingPayloads.value ?: "") + payload
+		_pendingPayloads.value += payload
 	}
 
 	/**
@@ -118,7 +117,7 @@ class CameraViewModel() : ViewModel() {
 	}
 
 	fun resetPendingTransactions() {
-		_pendingPayloads.value = null
+		_pendingPayloads.value = emptySet()
 		resetScanValues()
 	}
 

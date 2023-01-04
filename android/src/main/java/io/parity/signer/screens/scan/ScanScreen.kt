@@ -42,11 +42,10 @@ fun ScanScreen(
 	LaunchedEffect(Unit) {
 		//if multi scan mode - on button click reaction should be handled
 		viewModel.pendingTransactionPayloads
-			.filterNotNull()
-			.filter { it.isNotBlank() }
+			.filter { it.isNotEmpty() }
 			.collect {
 				//scanned qr codes is signer transaction qr code
-				performPayloads(it)
+				performPayloads(it.joinToString(separator = ""))
 				viewModel.resetPendingTransactions()
 			}
 	}

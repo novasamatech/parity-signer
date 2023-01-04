@@ -8,6 +8,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.bottomsheets.password.EnterPassword
@@ -33,7 +34,6 @@ fun ScanNavSubgraph(
 	rootNavigator: Navigator,
 ) {
 	val scanViewModel: ScanViewModel = viewModel()
-	val scope = rememberCoroutineScope()
 
 	val transactions = scanViewModel.transactions.collectAsState()
 	val signature = scanViewModel.signature.collectAsState()
@@ -62,7 +62,7 @@ fun ScanNavSubgraph(
 		ScanScreen(
 			onClose = { navigateToPrevious() },
 			performPayloads = { payloads ->
-				scope.launch {
+				scanViewModel.viewModelScope.launch {
 					scanViewModel.performPayload(payloads)
 				}
 			}
@@ -109,12 +109,11 @@ fun ScanNavSubgraph(
 			},
 		)
 	}
-
 	//Bottom sheets
 	presentableError.value?.let { presentableErrorValue ->
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
 			ScanErrorBottomSheet(
-				presentableErrorValue,
+				errorMessage = presentableErrorValue,
 				onOK = scanViewModel::clearTransactionState,
 			)
 		}
@@ -124,7 +123,7 @@ fun ScanNavSubgraph(
 			EnterPassword(
 				data = passwordModelValue,
 				proceed = { password ->
-					scope.launch {
+					scanViewModel.viewModelScope.launch {
 						scanViewModel.handlePasswordEntered(password)
 					}
 				},
