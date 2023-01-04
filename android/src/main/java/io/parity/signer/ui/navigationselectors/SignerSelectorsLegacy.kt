@@ -10,6 +10,8 @@ import io.parity.signer.bottomsheets.*
 import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
+import io.parity.signer.screens.keyderivation.DerivePasswordConfirmOld
+import io.parity.signer.screens.keyderivation.NewAddressScreen
 import io.parity.signer.screens.logs.logdetails.LogDetails
 import io.parity.signer.screens.settings.VerifierScreen
 import io.parity.signer.uniffi.Action
@@ -113,7 +115,7 @@ fun ModalSelector(
 				button2
 			)
 			is ModalData.Backup -> {} //new screen is part of key details subgraph
-			is ModalData.PasswordConfirm -> PasswordConfirm(
+			is ModalData.PasswordConfirm -> DerivePasswordConfirmOld(
 				modalData.f,
 				signerDataModel = signerDataModel
 			)

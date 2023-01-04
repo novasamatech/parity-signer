@@ -1,4 +1,4 @@
-package io.parity.signer.bottomsheets
+package io.parity.signer.screens.keyderivation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -29,7 +29,11 @@ import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.MPasswordConfirm
 
 @Composable
-fun PasswordConfirm(
+	/**
+	 * in Rust used only for derivation.
+	 * PasswordConfirm Modal state.
+	 */
+fun DerivePasswordConfirmOld(
 	passwordConfirm: MPasswordConfirm,
 	signerDataModel: SignerDataModel
 ) {
