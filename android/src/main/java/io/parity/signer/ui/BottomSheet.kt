@@ -71,7 +71,7 @@ fun BottomSheetWrapperRoot(
 			override fun hide() {
 				wasSheetClosed = true
 				coroutineScope.launch {
-					if (!modalBottomSheetState.isVisible) {
+					if (modalBottomSheetState.isVisible) {
 						modalBottomSheetState.hide()
 					}
 				}
@@ -98,7 +98,7 @@ fun BottomSheetWrapperRoot(
 	)
 
 	BackHandler(enabled = modalBottomSheetState.isVisible) {
-		coroutineScope.launch { modalBottomSheetState.hide() }
+		handle.hide()
 	}
 
 	//show once view is create to have initial open animation
