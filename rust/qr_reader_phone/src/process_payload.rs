@@ -74,7 +74,7 @@ pub fn process_decoded_payload(
                     NextAction::MoreShares { .. } => Ok(Ready::NotYet(decoding)),
                     NextAction::AskUserForPassword => {
                         if let Some(password) = password {
-                            let result = match recovery.share_set.recover_with_passphrase(&password)
+                            let result = match recovery.share_set.recover_with_passphrase(password)
                             {
                                 Ok(seed) => seed,
                                 Err(banana_recovery::Error::DecodingFailed) => {
