@@ -77,7 +77,7 @@ cargo {
 	targetDirectory = "../rust/target"
 	libname = "signer"
 	targets = ["arm", "arm64", "x86_64"]
-	apiLevel = 21
+	apiLevel = 24 //NDK API level, not SDK
 	profile = 'release'
 	extraCargoBuildArguments = ["--locked"]
 }
