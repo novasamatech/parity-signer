@@ -16,6 +16,9 @@ pub enum Error {
     #[error(transparent)]
     HexDecoding(#[from] hex::FromHexError),
 
+    #[error("Banana Split password is wrong")]
+    BananaSplitWrongPassword,
+
     #[error(transparent)]
     BananaSplitError(#[from] banana_recovery::Error),
 

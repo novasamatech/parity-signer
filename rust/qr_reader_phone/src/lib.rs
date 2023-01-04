@@ -12,7 +12,7 @@ mod parser;
 pub mod process_payload;
 
 use crate::parser::{parse_qr_payload, LegacyFrame, RaptorqFrame};
-use error::{Error, Result};
+pub use error::{Error, Result};
 use process_payload::{process_decoded_payload, InProgress, Ready};
 
 pub fn get_payload(line: &str, cleaned: bool) -> Result<Vec<u8>> {

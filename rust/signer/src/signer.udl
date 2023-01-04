@@ -4,6 +4,13 @@ interface ErrorDisplayed {
     MutexPoisoned();
 };
 
+[Error]
+interface QrSequenceDecodeError {
+    BananaSplitWrongPassword();
+    BananaSplit(string s);
+    GenericError(string s);
+};
+
 dictionary MetaValuesDisplay {
     string name;
     u32 version;
@@ -530,7 +537,7 @@ namespace signer {
     [Throws=ErrorDisplayed]
     u32 qrparser_get_packets_total([ByRef] string data, boolean cleaned);
 
-    [Throws=ErrorDisplayed]
+    [Throws=QrSequenceDecodeError]
     DecodeSequenceResult qrparser_try_decode_qr_sequence([ByRef] sequence<string> data, string? password, boolean cleaned);
 
     [Throws=ErrorDisplayed]
