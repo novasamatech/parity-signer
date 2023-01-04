@@ -141,28 +141,26 @@ extension EnterBananaSplitPasswordModal {
         func onDoneTap() {
             do {
                 let result = try qrparserTryDecodeQrSequence(data: qrCodeData, password: password, cleaned: false)
-                if case let .bBananaSplitRecoveryResult(b: bananaResult) = result {
-                    switch bananaResult {
-                    case .requestPassword:
-                        if invalidPasswordAttempts >= 3 {
-                            isPresented.toggle()
-                            // present error state after dismissal
-                            return
-                        }
-                        isPasswordValid = false
-                        invalidPasswordAttempts += 1
-                    case let .recoveredSeed(s: seedPhrase):
-                        navigation.performFake(navigation: .init(action: .navbarKeys))
-                        navigation.performFake(navigation: .init(action: .rightButtonAction))
-                        navigation.performFake(navigation: .init(action: .recoverSeed))
-                        navigation.performFake(navigation: .init(action: .goForward, details: seedName))
-                        seedsMediator.restoreSeed(seedName: seedName, seedPhrase: seedPhrase, navigate: false)
-                        navigation.performFake(navigation: .init(action: .goBack))
-                        navigation.overrideQRScannerDismissalNavigation = .init(action: .selectSeed, details: seedName)
-                        isKeyRecovered = true
-                        isPresented.toggle()
-                    }
+                if case let .bBananaSplitRecoveryResult(b: bananaResult) = result,
+                   case let .recoveredSeed(s: seedPhrase) = bananaResult {
+                    navigation.performFake(navigation: .init(action: .navbarKeys))
+                    navigation.performFake(navigation: .init(action: .rightButtonAction))
+                    navigation.performFake(navigation: .init(action: .recoverSeed))
+                    navigation.performFake(navigation: .init(action: .goForward, details: seedName))
+                    seedsMediator.restoreSeed(seedName: seedName, seedPhrase: seedPhrase, navigate: false)
+                    navigation.performFake(navigation: .init(action: .goBack))
+                    navigation.overrideQRScannerDismissalNavigation = .init(action: .selectSeed, details: seedName)
+                    isKeyRecovered = true
+                    isPresented.toggle()
                 }
+            } catch QrSequenceDecodeError.BananaSplitWrongPassword {
+                if invalidPasswordAttempts >= 3 {
+                    isPresented.toggle()
+                    // present error state after dismissal
+                    return
+                }
+                isPasswordValid = false
+                invalidPasswordAttempts += 1
             } catch {
                 print(error.localizedDescription)
             }
