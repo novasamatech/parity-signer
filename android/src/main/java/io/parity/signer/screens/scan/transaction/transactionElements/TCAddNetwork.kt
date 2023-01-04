@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.models.encodeHex
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
 import io.parity.signer.ui.theme.textSecondary
@@ -61,7 +62,7 @@ fun TCAddNetwork(specs: NetworkSpecs) {
 			SignerDivider()
 			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_new_network_genesis),
-				value = specs.genesisHash.toString(),
+				value = specs.genesisHash.toUByteArray().toByteArray().encodeHex(),
 				valueInSameLine = false,
 			)
 			SignerDivider()
