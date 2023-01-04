@@ -201,6 +201,7 @@ private extension CameraService {
 
     func clearLocalState() {
         callbackQueue.async {
+            self.requestPassword = false
             self.total = 0
             self.captured = 0
             self.bucket = []

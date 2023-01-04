@@ -142,12 +142,18 @@ struct CameraView: View {
         .fullScreenCover(
             isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
             onDismiss: {
-                model.requestPassword = false
-                model.multipleTransactions = []
+                // User entered invalid password too many times, present error
+                if viewModel.shouldPresentError {
+                    viewModel.presentableError = .signingForgotPassword()
+                    viewModel.isPresentingError = true
+                    return
+                }
                 viewModel.clearTransactionState()
                 model.start()
+
+                // User proceeded successfully with key recovery, dismiss camera
                 if viewModel.wasBananaSplitKeyRecovered {
-                    self.viewModel.dismissView()
+                    viewModel.dismissView()
                 }
             }
         ) {
@@ -155,6 +161,7 @@ struct CameraView: View {
                 viewModel: .init(
                     isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
                     isKeyRecovered: $viewModel.wasBananaSplitKeyRecovered,
+                    isErrorPresented: $viewModel.shouldPresentError,
                     qrCodeData: $model.bucket
                 )
             )

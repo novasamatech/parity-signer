@@ -107,6 +107,7 @@ extension EnterBananaSplitPasswordModal {
         private weak var navigation: NavigationCoordinator!
         @Binding var isPresented: Bool
         @Binding var isKeyRecovered: Bool
+        @Binding var isErrorPresented: Bool
         @Binding var qrCodeData: [String]
         @Published var seedName: String = ""
         @Published var password: String = ""
@@ -120,11 +121,13 @@ extension EnterBananaSplitPasswordModal {
         init(
             isPresented: Binding<Bool>,
             isKeyRecovered: Binding<Bool>,
+            isErrorPresented: Binding<Bool>,
             qrCodeData: Binding<[String]>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             _isPresented = isPresented
             _isKeyRecovered = isKeyRecovered
+            _isErrorPresented = isErrorPresented
             _qrCodeData = qrCodeData
             self.seedsMediator = seedsMediator
             subscribeToUpdates()
@@ -154,13 +157,16 @@ extension EnterBananaSplitPasswordModal {
                     isPresented.toggle()
                 }
             } catch QrSequenceDecodeError.BananaSplitWrongPassword {
-                if invalidPasswordAttempts >= 3 {
+                invalidPasswordAttempts += 1
+                if invalidPasswordAttempts > 3 {
+                    isErrorPresented = true
                     isPresented.toggle()
-                    // present error state after dismissal
                     return
                 }
                 isPasswordValid = false
-                invalidPasswordAttempts += 1
+            } catch let QrSequenceDecodeError.BananaSplit(s: errorDetail) {
+                print(errorDetail)
+                ()
             } catch {
                 print(error.localizedDescription)
             }
@@ -184,16 +190,19 @@ extension EnterBananaSplitPasswordModal {
     }
 }
 
-struct EnterBananaSplitPasswordModal_Previews: PreviewProvider {
-    static var previews: some View {
-        EnterBananaSplitPasswordModal(
-            viewModel: .init(
-                isPresented: .constant(true),
-                isKeyRecovered: .constant(false),
-                qrCodeData: .constant([])
+#if DEBUG
+    struct EnterBananaSplitPasswordModal_Previews: PreviewProvider {
+        static var previews: some View {
+            EnterBananaSplitPasswordModal(
+                viewModel: .init(
+                    isPresented: .constant(true),
+                    isKeyRecovered: .constant(false),
+                    isErrorPresented: .constant(false),
+                    qrCodeData: .constant([])
+                )
             )
-        )
-        .environmentObject(NavigationCoordinator())
-        .preferredColorScheme(.dark)
+            .environmentObject(NavigationCoordinator())
+            .preferredColorScheme(.dark)
+        }
     }
-}
+#endif
