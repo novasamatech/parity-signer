@@ -1,15 +1,12 @@
 package io.parity.signer.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.backgroundTertiary
 import kotlinx.coroutines.launch
@@ -100,7 +97,7 @@ fun BottomSheetWrapperRoot(
 		content = {},
 	)
 
-	BackHandler {
+	BackHandler(enabled = modalBottomSheetState.isVisible) {
 		coroutineScope.launch { modalBottomSheetState.hide() }
 	}
 
