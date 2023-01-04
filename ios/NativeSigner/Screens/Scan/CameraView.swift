@@ -47,7 +47,7 @@ struct CameraView: View {
                     VStack {
                         HStack(spacing: Spacing.small) {
                             CameraButton(
-                                action: { viewModel.isPresented.toggle() },
+                                action: viewModel.dismissView,
                                 icon: Asset.xmarkButton.swiftUIImage
                             )
                             Spacer()
@@ -144,13 +144,17 @@ struct CameraView: View {
             onDismiss: {
                 model.requestPassword = false
                 model.multipleTransactions = []
-                model.start()
                 viewModel.clearTransactionState()
+                model.start()
+                if viewModel.wasBananaSplitKeyRecovered {
+                    self.viewModel.dismissView()
+                }
             }
         ) {
             EnterBananaSplitPasswordModal(
                 viewModel: .init(
                     isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
+                    isKeyRecovered: $viewModel.wasBananaSplitKeyRecovered,
                     qrCodeData: $model.bucket
                 )
             )
@@ -253,6 +257,7 @@ extension CameraView {
 
         // Banana split flow
         @Published var isPresentingEnterBananaSplitPassword: Bool = false
+        @Published var wasBananaSplitKeyRecovered: Bool = false
 
         // Data models for modals
         @Published var transactions: [MTransaction] = []
@@ -359,6 +364,10 @@ extension CameraView {
 
         func presentBananaSplitPassword() {
             isPresentingEnterBananaSplitPassword = true
+        }
+
+        func dismissView() {
+            isPresented = false
         }
     }
 }

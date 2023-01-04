@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NewSeedBackupModal: View {
     let content: MNewSeedBackup
-    let restoreSeed: (String, String, Bool) -> Void
+    let restoreSeed: (String, String) -> Void
     let navigationRequest: NavigationRequest
     @State private var confirmBackup = false
     var body: some View {
@@ -44,7 +44,7 @@ struct NewSeedBackupModal: View {
                     BigButton(
                         text: Localizable.next.key,
                         action: {
-                            restoreSeed(content.seed, content.seedPhrase, true)
+                            restoreSeed(content.seed, content.seedPhrase)
                         },
                         isDisabled: !confirmBackup
                     )

@@ -152,8 +152,10 @@ private extension CameraService {
             case let .bBananaSplitRecoveryResult(b: bananaResult):
                 switch bananaResult {
                 case .requestPassword:
-                    requestPassword = true
-                    shutdown()
+                    callbackQueue.async {
+                        self.requestPassword = true
+                        self.shutdown()
+                    }
                 default:
                     // Nothing else can happen here
                     ()

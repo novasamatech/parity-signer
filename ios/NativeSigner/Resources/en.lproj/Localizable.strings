@@ -502,4 +502,10 @@
 "NetworkFilter.Action.Reset" = "Reset";
 "NetworkFilter.Action.Done" = "Done";
 
-"EnterBananaSplitPasswordModal.Label.Title" = "Enter banana split password";
+"EnterBananaSplitPasswordModal.Label.Title" = "Banana Split Recovery";
+"EnterBananaSplitPasswordModal.Label.EnterName" = "Enter display name for recovered key set";
+"EnterBananaSplitPasswordModal.Label.EnterPassword" = "Enter banana split password";
+"EnterBananaSplitPasswordModal.Placeholder.EnterName" = "Display name";
+"EnterBananaSplitPasswordModal.Placeholder.EnterPassword" = "Password";
+"EnterBananaSplitPasswordModal.Error.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
+"EnterBananaSplitPasswordModal.Error.Label.InvalidSeedName" = "Given display name already exists.\nPlease try again.";

@@ -12,7 +12,7 @@ struct RecoverSeedPhrase: View {
     @State private var shadowUserInput: String = " "
     @FocusState private var focus: Bool
     let content: MRecoverSeedPhrase
-    let restoreSeed: (String, String, Bool) -> Void
+    let restoreSeed: (String, String) -> Void
     let navigationRequest: NavigationRequest
 
     var body: some View {
@@ -93,7 +93,7 @@ struct RecoverSeedPhrase: View {
                             BigButton(
                                 text: Localizable.next.key,
                                 action: {
-                                    restoreSeed(content.seedName, content.readySeed ?? "", true)
+                                    restoreSeed(content.seedName, content.readySeed ?? "")
                                 },
                                 isDisabled: content.readySeed == nil
                             )

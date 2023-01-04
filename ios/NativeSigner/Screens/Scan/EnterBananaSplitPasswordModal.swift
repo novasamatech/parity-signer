@@ -11,8 +11,8 @@ struct EnterBananaSplitPasswordModal: View {
     @EnvironmentObject private var navigation: NavigationCoordinator
     @StateObject var viewModel: ViewModel
     @FocusState var focusedField: SecurePrimaryTextField.Field?
+    @FocusState var focusSeedName: Bool
     @State var animateBackground: Bool = false
-    @Environment(\.safeAreaInsets) private var safeAreaInsets
 
     var body: some View {
         FullScreenRoundedModal(
@@ -47,32 +47,56 @@ struct EnterBananaSplitPasswordModal: View {
                 .padding(.horizontal, Spacing.extraSmall)
                 VStack(alignment: .leading, spacing: 0) {
                     Localizable.EnterBananaSplitPasswordModal.Label.title.text
-                        .font(PrimaryFont.titleL.font)
+                        .font(PrimaryFont.titleM.font)
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .padding(.bottom, Spacing.small)
+                    Localizable.EnterBananaSplitPasswordModal.Label.enterName.text
+                        .font(PrimaryFont.bodyM.font)
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .padding(.bottom, Spacing.extraSmall)
+                    TextField("", text: $viewModel.seedName)
+                        .primaryTextFieldStyle(
+                            Localizable.EnterBananaSplitPasswordModal.Placeholder.enterName.string,
+                            text: $viewModel.seedName
+                        )
+                        .submitLabel(.next)
+                        .focused($focusSeedName)
+                        .onSubmit {
+                            focusedField = .secure
+                        }
+                        .padding(.bottom, Spacing.small)
+                    if !viewModel.isNameValid {
+                        Localizable.EnterBananaSplitPasswordModal.Error.Label.invalidSeedName.text
+                            .foregroundColor(Asset.accentRed300.swiftUIColor)
+                            .font(PrimaryFont.captionM.font)
+                            .padding(.bottom, Spacing.small)
+                    }
+                    Localizable.EnterBananaSplitPasswordModal.Label.enterPassword.text
+                        .font(PrimaryFont.bodyM.font)
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                         .padding(.bottom, Spacing.extraSmall)
                     SecurePrimaryTextField(
-                        placeholder: Localizable.Transaction.EnterPassword.Label.placeholder.string,
+                        placeholder: Localizable.EnterBananaSplitPasswordModal.Placeholder.enterPassword.string,
                         text: $viewModel.password,
-                        isValid: $viewModel.isValid,
+                        isValid: $viewModel.isPasswordValid,
                         focusedField: _focusedField,
                         onCommit: { viewModel.onDoneTap() }
                     )
-                    .padding(.top, Spacing.medium)
-                    if !viewModel.isValid {
-                        Localizable.Transaction.EnterPassword.Label.invalidPassword.text
+                    .padding(.bottom, Spacing.small)
+                    if !viewModel.isPasswordValid {
+                        Localizable.EnterBananaSplitPasswordModal.Error.Label.invalidPassword.text
                             .foregroundColor(Asset.accentRed300.swiftUIColor)
                             .font(PrimaryFont.captionM.font)
-                            .padding(.top, Spacing.extraSmall)
                             .padding(.bottom, Spacing.small)
                     }
                 }
                 .padding(.horizontal, Spacing.large)
-                .padding(.bottom, Spacing.large)
+                .padding(.bottom, Spacing.small)
             }
             .background(Asset.backgroundTertiary.swiftUIColor)
             .onAppear {
                 viewModel.use(navigation: navigation)
-                focusedField = .secure
+                focusSeedName = true
             }
         }
     }
@@ -82,19 +106,27 @@ extension EnterBananaSplitPasswordModal {
     final class ViewModel: ObservableObject {
         private weak var navigation: NavigationCoordinator!
         @Binding var isPresented: Bool
+        @Binding var isKeyRecovered: Bool
         @Binding var qrCodeData: [String]
+        @Published var seedName: String = ""
         @Published var password: String = ""
-        @Published var isValid: Bool = true
+        @Published var isNameValid: Bool = true
+        @Published var isPasswordValid: Bool = true
         @Published var isActionDisabled: Bool = true
         @Published var invalidPasswordAttempts: Int = 0
         private var cancelBag = CancelBag()
+        private let seedsMediator: SeedsMediating
 
         init(
             isPresented: Binding<Bool>,
-            qrCodeData: Binding<[String]>
+            isKeyRecovered: Binding<Bool>,
+            qrCodeData: Binding<[String]>,
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             _isPresented = isPresented
+            _isKeyRecovered = isKeyRecovered
             _qrCodeData = qrCodeData
+            self.seedsMediator = seedsMediator
             subscribeToUpdates()
         }
 
@@ -103,46 +135,51 @@ extension EnterBananaSplitPasswordModal {
         }
 
         func onCancelTap() {
-            // We need to figure out how to get back to proper nav state / other actions, when cancelled
-            // Most probably:
-            // - dismiss modal
-//            isPresented.toggle()
-            // - turn on camera again
-            // - clear camera state
+            isPresented.toggle()
         }
 
         func onDoneTap() {
-            // Here we'll need to call `qrparserGetPacketsTotal` again with input password
             do {
                 let result = try qrparserTryDecodeQrSequence(data: qrCodeData, password: password, cleaned: false)
                 if case let .bBananaSplitRecoveryResult(b: bananaResult) = result {
                     switch bananaResult {
                     case .requestPassword:
                         if invalidPasswordAttempts >= 3 {
-                            print("Too many invalid password attempts")
                             isPresented.toggle()
-                            // dismiss and present error state
+                            // present error state after dismissal
                             return
                         }
-                        isValid = false
+                        isPasswordValid = false
                         invalidPasswordAttempts += 1
-                    case let .recoveredSeed(s: seed):
-                        // success code path:
-                        // - dismiss password modal
+                    case let .recoveredSeed(s: seedPhrase):
+                        navigation.performFake(navigation: .init(action: .navbarKeys))
+                        navigation.performFake(navigation: .init(action: .rightButtonAction))
+                        navigation.performFake(navigation: .init(action: .recoverSeed))
+                        navigation.performFake(navigation: .init(action: .goForward, details: seedName))
+                        seedsMediator.restoreSeed(seedName: seedName, seedPhrase: seedPhrase, navigate: false)
+                        navigation.performFake(navigation: .init(action: .goBack))
+                        navigation.overrideQRScannerDismissalNavigation = .init(action: .selectSeed, details: seedName)
+                        isKeyRecovered = true
                         isPresented.toggle()
-                        print("Recovered seed: \(seed)")
-                        // - navigate to desired screen
                     }
                 }
             } catch {
-                // error code path
-                // - if password invalid
+                print(error.localizedDescription)
             }
         }
 
         private func subscribeToUpdates() {
             $password.sink { newValue in
-                self.isActionDisabled = newValue.isEmpty
+                self.isActionDisabled = newValue.isEmpty || self.seedName.isEmpty
+            }
+            .store(in: cancelBag)
+            $seedName.sink { newValue in
+                self.isActionDisabled = newValue.isEmpty || self.password.isEmpty
+                if !newValue.isEmpty {
+                    self.isNameValid = !self.seedsMediator.checkSeedCollision(seedName: newValue)
+                } else {
+                    self.isNameValid = true
+                }
             }
             .store(in: cancelBag)
         }
@@ -154,6 +191,7 @@ struct EnterBananaSplitPasswordModal_Previews: PreviewProvider {
         EnterBananaSplitPasswordModal(
             viewModel: .init(
                 isPresented: .constant(true),
+                isKeyRecovered: .constant(false),
                 qrCodeData: .constant([])
             )
         )

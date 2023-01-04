@@ -33,13 +33,11 @@ protocol SeedsMediating: AnyObject {
     /// - Parameters:
     ///   - seedName: seed name
     ///   - seedPhrase: seed phrase to be saved
-    ///   - createRoots: choose whether empty derivations for every network should be created
-    func restoreSeed(seedName: String, seedPhrase: String, createRoots: Bool)
+    func restoreSeed(seedName: String, seedPhrase: String, navigate: Bool)
     /// Checks for existance of `seedName` in Keychain
     /// Each seed name needs to be unique, this helps to not overwrite old seeds
     /// - Parameter seedName: seedName to be checked
     /// - Returns: informs whethere there is collision or not.
-    /// Current `false` is also returned if `seedName` cannot be encoded into data
     func checkSeedCollision(seedName: String) -> Bool
     /// Fetches seed by `seedName` from Keychain
     /// Also calls auth screen automatically; no need to call it specially or wrap
@@ -107,7 +105,7 @@ final class SeedsMediator: SeedsMediating {
         }
     }
 
-    func restoreSeed(seedName: String, seedPhrase: String, createRoots: Bool) {
+    func restoreSeed(seedName: String, seedPhrase: String, navigate: Bool) {
         guard signerDataModel.authenticated,
               !checkSeedPhraseCollision(seedPhrase: seedPhrase),
               let finalSeedPhrase = seedPhrase.data(using: .utf8) else { return }
@@ -120,11 +118,19 @@ final class SeedsMediator: SeedsMediating {
             seedNames.append(seedName)
             seedNames.sort()
             attemptToUpdate(seedNames: seedNames)
-            signerDataModel.navigation.perform(navigation: .init(
-                action: .goForward,
-                details: createRoots ? Constants.true : Constants.false,
-                seedPhrase: seedPhrase
-            ))
+            if navigate {
+                signerDataModel.navigation.perform(navigation: .init(
+                    action: .goForward,
+                    details: Constants.true,
+                    seedPhrase: seedPhrase
+                ))
+            } else {
+                signerDataModel.navigation.performFake(navigation: .init(
+                    action: .goForward,
+                    details: Constants.true,
+                    seedPhrase: seedPhrase
+                ))
+            }
         case .failure:
             ()
             // We should inform user with some dedicated UI state for that error, maybe just system alert
