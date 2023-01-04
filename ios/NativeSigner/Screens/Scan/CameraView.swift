@@ -144,7 +144,6 @@ struct CameraView: View {
             onDismiss: {
                 // User entered invalid password too many times, present error
                 if viewModel.shouldPresentError {
-                    viewModel.presentableError = .signingForgotPassword()
                     viewModel.isPresentingError = true
                     return
                 }
@@ -162,6 +161,7 @@ struct CameraView: View {
                     isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
                     isKeyRecovered: $viewModel.wasBananaSplitKeyRecovered,
                     isErrorPresented: $viewModel.shouldPresentError,
+                    presentableError: $viewModel.presentableError,
                     qrCodeData: $model.bucket
                 )
             )

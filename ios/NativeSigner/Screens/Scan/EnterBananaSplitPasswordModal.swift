@@ -108,6 +108,7 @@ extension EnterBananaSplitPasswordModal {
         @Binding var isPresented: Bool
         @Binding var isKeyRecovered: Bool
         @Binding var isErrorPresented: Bool
+        @Binding var presentableError: ErrorBottomModalViewModel
         @Binding var qrCodeData: [String]
         @Published var seedName: String = ""
         @Published var password: String = ""
@@ -122,12 +123,14 @@ extension EnterBananaSplitPasswordModal {
             isPresented: Binding<Bool>,
             isKeyRecovered: Binding<Bool>,
             isErrorPresented: Binding<Bool>,
+            presentableError: Binding<ErrorBottomModalViewModel>,
             qrCodeData: Binding<[String]>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             _isPresented = isPresented
             _isKeyRecovered = isKeyRecovered
             _isErrorPresented = isErrorPresented
+            _presentableError = presentableError
             _qrCodeData = qrCodeData
             self.seedsMediator = seedsMediator
             subscribeToUpdates()
@@ -159,16 +162,18 @@ extension EnterBananaSplitPasswordModal {
             } catch QrSequenceDecodeError.BananaSplitWrongPassword {
                 invalidPasswordAttempts += 1
                 if invalidPasswordAttempts > 3 {
+                    presentableError = .signingForgotPassword()
                     isErrorPresented = true
                     isPresented.toggle()
                     return
                 }
                 isPasswordValid = false
             } catch let QrSequenceDecodeError.BananaSplit(s: errorDetail) {
-                print(errorDetail)
-                ()
+                presentableError = .alertError(message: errorDetail)
+            } catch let QrSequenceDecodeError.GenericError(s: errorDetail) {
+                presentableError = .alertError(message: errorDetail)
             } catch {
-                print(error.localizedDescription)
+                presentableError = .alertError(message: error.localizedDescription)
             }
         }
 
@@ -198,6 +203,7 @@ extension EnterBananaSplitPasswordModal {
                     isPresented: .constant(true),
                     isKeyRecovered: .constant(false),
                     isErrorPresented: .constant(false),
+                    presentableError: .constant(.signingForgotPassword()),
                     qrCodeData: .constant([])
                 )
             )
