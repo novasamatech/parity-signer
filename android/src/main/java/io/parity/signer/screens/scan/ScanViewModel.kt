@@ -189,14 +189,6 @@ class ScanViewModel : ViewModel() {
 		}
 	}
 
-	fun approveTransactionAction() {
-		viewModelScope.launch { // can do async
-			uniffiInteractor.navigate(Action.GO_FORWARD)
-				.mapError()
-		}
-		clearTransactionState()
-	}
-
 	private fun proceedWrongPassword() {
 		errorWrongPassword.value = true
 		passwordModel.value = null

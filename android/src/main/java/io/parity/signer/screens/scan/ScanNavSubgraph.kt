@@ -101,7 +101,8 @@ fun ScanNavSubgraph(
 						//nothing
 					}
 				}
-				scanViewModel.approveTransactionAction()
+				scanViewModel.clearTransactionState()
+				rootNavigator.navigate(Action.GO_FORWARD)
 			},
 		)
 	}

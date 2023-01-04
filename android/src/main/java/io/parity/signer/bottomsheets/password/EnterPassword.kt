@@ -139,7 +139,7 @@ fun EnterPassword(
 		}
 	}
 
-	DisposableEffect(Unit) {
+	DisposableEffect(data) {
 		focusRequester.requestFocus()
 		onDispose { focusManager.clearFocus() }
 	}
