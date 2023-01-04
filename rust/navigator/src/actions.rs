@@ -24,6 +24,7 @@ pub enum Action {
     NetworkSelector,
     NextUnit,
     PreviousUnit,
+    ChangeNetwork,
     CheckPassword,
     TransactionFetched,
     RemoveNetwork,

@@ -282,7 +282,7 @@ pub fn import_all_addrs<P: AsRef<Path>>(
                     &derived_key.address,
                     derived_key
                         .has_pwd
-                        .ok_or_else(|| Error::MissingPassword(path.to_owned()))?,
+                        .ok_or_else(|| Error::MissingPasswordInfo(path.to_owned()))?,
                 ) {
                     // success, updating address preparation set and `Event` set
                     Ok(prep_data) => {

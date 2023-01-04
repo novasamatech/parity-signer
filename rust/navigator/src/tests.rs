@@ -3,6 +3,7 @@ use parity_scale_codec::Encode;
 use regex::Regex;
 use sp_core::{blake2_256, sr25519, Pair, H256};
 use sp_runtime::MultiSigner;
+
 use std::{collections::HashMap, convert::TryInto, fs, str::FromStr};
 
 use constants::{
@@ -43,9 +44,12 @@ use definitions::{
     network_specs::{OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
 
-use constants::test_values::alice_sr_secret_abracadabra;
+use constants::test_values::{
+    alice_sr_0, alice_sr_1, alice_sr_alice_westend, alice_sr_secret_abracadabra,
+};
 use db_handling::identities::inject_derivations_has_pwd;
 use definitions::derivations::{DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview};
+use definitions::navigation::Card::DerivationsCard;
 use definitions::navigation::MAddressCard;
 use pretty_assertions::assert_eq;
 use sp_core::sr25519::Public;
@@ -3706,7 +3710,8 @@ fn flow_test_1() {
     );
 
     state.perform(Action::NavbarScan, "", "").unwrap();
-    let _action = state.perform(Action::TransactionFetched,"53ffde000414416c696365010146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a04c031365a616636425436786336576559435836594e4166363752756d57614569756d77617774376354644b4d553748715701282f2f706f6c6b61646f740191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","").unwrap();
+    let action = state.perform(Action::TransactionFetched,"53ffde000414416c6963650146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a14c03547727776614546357a58623236467a397263517044575335374374455248704e6568584350634e6f48474b75745159011c2f2f416c69636501e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423ec03546634b6a4458533839553739635876686b735a3270463558426561666d534d3872716b44566f544851635864354771013c2f2f416c6963652f77657374656e6401e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423ec035463167614d45644c547a6f594656366859715839416e5a596734626b6e75594535486356586d6e4b6931655343584b01582f2f416c6963652f7365637265742f2f73656372657401e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423ec035443334644c357072455561474e517450505a33794e355936426e6b6658756e4b58587a36666f375a4a624c77525248010c2f2f3001e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423ec03547424e655752685a63326a5875374435357242696d4b59446b3850476b3869745259465450664338524a4c4b47356f010c2f2f3101e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","").unwrap();
+
     let seed_keys = vec![SeedKeysPreview {
         name: "Alice".to_string(),
         multisigner: MultiSigner::Sr25519(
@@ -3727,8 +3732,10 @@ fn flow_test_1() {
                 genesis_hash: "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                     .parse()
                     .unwrap(),
-                identicon: SignerImage::default(),
-                has_pwd: Some(false),
+                identicon: SignerImage::Png {
+                    image: alice_sr_alice().to_vec(),
+                },
+                has_pwd: None,
                 network_title: Some("Westend".to_string()),
                 status: DerivedKeyStatus::Importable,
             },
@@ -3741,8 +3748,10 @@ fn flow_test_1() {
                 genesis_hash: "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                     .parse()
                     .unwrap(),
-                identicon: SignerImage::default(),
-                has_pwd: Some(false),
+                identicon: SignerImage::Png {
+                    image: alice_sr_alice_westend().to_vec(),
+                },
+                has_pwd: None,
                 network_title: Some("Westend".to_string()),
                 status: DerivedKeyStatus::Importable,
             },
@@ -3755,8 +3764,10 @@ fn flow_test_1() {
                 genesis_hash: "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                     .parse()
                     .unwrap(),
-                identicon: SignerImage::default(),
-                has_pwd: Some(false),
+                identicon: SignerImage::Png {
+                    image: alice_sr_alice_secret_secret().to_vec(),
+                },
+                has_pwd: None,
                 network_title: Some("Westend".to_string()),
                 status: DerivedKeyStatus::Importable,
             },
@@ -3769,8 +3780,10 @@ fn flow_test_1() {
                 genesis_hash: "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                     .parse()
                     .unwrap(),
-                identicon: SignerImage::default(),
-                has_pwd: Some(false),
+                identicon: SignerImage::Png {
+                    image: alice_sr_0().to_vec(),
+                },
+                has_pwd: None,
                 network_title: Some("Westend".to_string()),
                 status: DerivedKeyStatus::Importable,
             },
@@ -3783,24 +3796,86 @@ fn flow_test_1() {
                 genesis_hash: "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                     .parse()
                     .unwrap(),
-                identicon: SignerImage::default(),
-                has_pwd: Some(false),
+                identicon: SignerImage::Png {
+                    image: alice_sr_1().to_vec(),
+                },
+                has_pwd: None,
                 network_title: Some("Westend".to_string()),
                 status: DerivedKeyStatus::Importable,
             },
         ],
     }];
 
+    let expected_action = ActionResult {
+        screen_label: String::new(),
+        back: true,
+        footer: false,
+        footer_button: Some(FooterButton::Scan),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
+        screen_data: ScreenData::Transaction {
+            f: vec![MTransaction {
+                content: TransactionCardSet {
+                    author: None,
+                    error: None,
+                    extensions: None,
+                    importing_derivations: Some(vec![TransactionCard {
+                        index: 0,
+                        indent: 0,
+                        card: DerivationsCard {
+                            f: seed_keys.clone(),
+                        },
+                    }]),
+                    message: None,
+                    meta: None,
+                    method: None,
+                    new_specs: None,
+                    verifier: None,
+                    warning: None,
+                    types_info: None,
+                },
+                ttype: TransactionType::ImportDerivations,
+                author_info: None,
+                network_info: None,
+            }],
+        },
+        modal_data: None,
+        alert_data: None,
+    };
+
+    assert_eq!(
+        action, expected_action,
+        concat!(
+            "GoForward on Transaction screen with derivations import. ",
+            "Expected Transaction screen with SeedKeysPreview model"
+        )
+    );
+
     // frontend is calling an api
+    let mut seeds = HashMap::new();
+    seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
+    let seed_keys = inject_derivations_has_pwd(seed_keys, seeds).unwrap();
     import_all_addrs(dbname, seed_keys).unwrap();
 
-    state.perform(Action::GoBack, "", "").unwrap();
-    state.perform(Action::NavbarKeys, "", "").unwrap();
-    state.perform(Action::SelectSeed, "Alice", "").unwrap();
-    state.perform(Action::RightButtonAction, "", "").unwrap();
+    // After successful import => select seed
+    let action = state.perform(Action::GoForward, "", "").unwrap();
+    assert_eq!(
+        action.screen_label, "Select seed",
+        concat!(
+            "GoForward on Transaction screen with derivations ",
+            "import. Should go to SelectSeed screen"
+        )
+    );
+    // select seed to view keys
+    let action = state.perform(Action::SelectSeed, "Alice", "").unwrap();
     state.perform(Action::NetworkSelector, "", "").unwrap();
-    let action = state.perform(Action::NetworkSelector, "", "").unwrap();
-
+    state
+        .perform(
+            Action::ChangeNetwork,
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            "",
+        )
+        .unwrap();
     let expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
