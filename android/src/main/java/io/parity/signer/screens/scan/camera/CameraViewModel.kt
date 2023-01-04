@@ -105,6 +105,7 @@ class CameraViewModel() : ViewModel() {
 
 	private fun addPendingTransaction(payload: String) {
 		_pendingPayloads.value += payload
+		Log.e("TAGG", "added data")
 	}
 
 	/**

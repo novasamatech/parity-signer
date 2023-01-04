@@ -26,7 +26,6 @@ import io.parity.signer.screens.scan.camera.*
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 @Composable
@@ -40,6 +39,8 @@ fun ScanScreen(
 	val total by viewModel.total.collectAsState()
 
 	LaunchedEffect(Unit) {
+		//there can be data from last time camera was open since it's scanning during transition to a new screen
+		viewModel.resetPendingTransactions()
 		//if multi scan mode - on button click reaction should be handled
 		viewModel.pendingTransactionPayloads
 			.filter { it.isNotEmpty() }
@@ -51,17 +52,17 @@ fun ScanScreen(
 	}
 
 	Box(
-        Modifier
-            .fillMaxSize(1f)
-            .background(MaterialTheme.colors.background)
+		Modifier
+			.fillMaxSize(1f)
+			.background(MaterialTheme.colors.background)
 	) {
 		CameraViewPermission(viewModel)
 		CameraBottomText()
 		Column() {
 			Spacer(
 				modifier = Modifier
-                    .statusBarsPadding()
-                    .padding(top = 12.dp)
+					.statusBarsPadding()
+					.padding(top = 12.dp)
 			)
 			ScanHeader(onClose = onClose)
 
@@ -78,9 +79,9 @@ fun ScanScreen(
 @Composable
 private fun CameraBottomText() {
 	Column(
-        Modifier
-            .fillMaxSize(1f)
-            .padding(horizontal = 48.dp),
+		Modifier
+			.fillMaxSize(1f)
+			.padding(horizontal = 48.dp),
 	) {
 		val paddingTop = ScanConstants.CLIP_TOP_PADDING +
 			//square clip height
@@ -154,8 +155,8 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 			style = SignerTypeface.BodyL,
 			textAlign = TextAlign.Center,
 			modifier = Modifier
-                .fillMaxWidth(1f)
-                .padding(top = 150.dp),
+				.fillMaxWidth(1f)
+				.padding(top = 150.dp),
 		)
 		rationalShown.value = true
 		LaunchedEffect(key1 = Unit) {

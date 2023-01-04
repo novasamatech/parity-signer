@@ -22,9 +22,6 @@ fun SignerDataModel.navigate(
 }
 
 
-//todo scan ios/NativeSigner/Core/Navigation/NavigationCoordinator.swift:154
-//todo scan ios/NativeSigner/Screens/Containers/AuthenticatedScreenContainer.swift:58
-
 interface Navigator {
 	/**
 	 * For old Rust-backed navigation actions

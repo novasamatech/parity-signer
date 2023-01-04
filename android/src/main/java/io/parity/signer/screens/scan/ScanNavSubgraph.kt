@@ -5,7 +5,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
@@ -62,13 +61,10 @@ fun ScanNavSubgraph(
 		ScanScreen(
 			onClose = { navigateToPrevious() },
 			performPayloads = { payloads ->
-				scanViewModel.viewModelScope.launch {
-					scanViewModel.performPayload(payloads)
-				}
+				scanViewModel.performPayload(payloads)
 			}
 		)
 	} else {
-		//ios/NativeSigner/Screens/Scan/CameraView.swift:130
 		TransactionsScreenFull(
 			transactions = transactionsValue.transactions,
 			signature = signature.value,
