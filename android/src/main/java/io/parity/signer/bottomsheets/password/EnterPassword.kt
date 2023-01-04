@@ -52,7 +52,6 @@ fun EnterPassword(
 
 	Column(
 		modifier = Modifier
-			.fillMaxWidth(1f)
 			.imePadding()
 	) {
 		EnterPasswordHeader(
@@ -138,6 +137,11 @@ fun EnterPassword(
 				modifier = Modifier.padding(top = 8.dp, bottom = 30.dp),
 			)
 		}
+	}
+
+	DisposableEffect(Unit) {
+		focusRequester.requestFocus()
+		onDispose { focusManager.clearFocus() }
 	}
 }
 

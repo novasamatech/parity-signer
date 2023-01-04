@@ -114,8 +114,10 @@ fun ScanNavSubgraph(
 			)
 		}
 	} ?: passwordModel.value?.let { passwordModelValue ->
-		//ios/NativeSigner/Screens/Scan/CameraView.swift:138
-		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
+		BottomSheetWrapperRoot(onClosedAction = {
+			scanViewModel.resetRustModalToNewScan()
+			scanViewModel.clearTransactionState()
+		}) {
 			EnterPassword(
 				data = passwordModelValue,
 				proceed = { password ->
@@ -132,7 +134,7 @@ fun ScanNavSubgraph(
 	} ?: if (errorWrongPassword.value) {
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
 			WrongPasswordBottomSheet(
-				onOk = backAction
+				onOk = scanViewModel::clearTransactionState
 			)
 		}
 	} else {
