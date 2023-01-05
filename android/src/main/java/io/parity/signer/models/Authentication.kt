@@ -234,6 +234,7 @@ class Authentication {
 				}
 			}
 		}
+
 }
 
 sealed class AuthResult {

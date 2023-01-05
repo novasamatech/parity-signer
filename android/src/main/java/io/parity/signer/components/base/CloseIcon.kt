@@ -46,7 +46,7 @@ fun CloseIcon(
 			contentDescription = stringResource(R.string.description_close_button),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
-				.size(20.dp)
+				.size(24.dp)
 		)
 	}
 }

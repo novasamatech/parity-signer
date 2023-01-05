@@ -11,6 +11,9 @@ import java.lang.Thread.UncaughtExceptionHandler
 class SignerApp : Application() {
 	override fun onCreate() {
 		super.onCreate()
+		// actually load RustNative code
+		System.loadLibrary("signer")
+
 		initLogging("SIGNER_RUST_LOG")
 
 		val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
@@ -18,12 +21,12 @@ class SignerApp : Application() {
 			SignerExceptionHandler(defaultHandler)
 		)
 
-		ServiceLocator.initBackendDeps(this)
+		ServiceLocator.initAppDependencies(this)
 	}
 }
 
 
-class SignerExceptionHandler(private val defaultHandler: UncaughtExceptionHandler) :
+class SignerExceptionHandler(private val defaultHandler: UncaughtExceptionHandler?) :
 	UncaughtExceptionHandler {
 	private val TAG = "SignerExceptionHandler"
 
@@ -33,7 +36,7 @@ class SignerExceptionHandler(private val defaultHandler: UncaughtExceptionHandle
 			Log.e(TAG, "Rust caused ErrorDisplay message was: ${rustStr.s}")
 			submitErrorState("rust error not handled, fix it!")
 		} else {
-			defaultHandler.uncaughtException(t, e)
+			defaultHandler?.uncaughtException(t, e) ?: throw e
 		}
 	}
 

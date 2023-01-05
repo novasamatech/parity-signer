@@ -98,8 +98,8 @@ fun KeyDetailsPublicKeyScreen(
 					}
 					if (model.isRootKey) {
 						KeySeedCard(
-							seedTitle = model.address.seedName,
-							base58 = model.address.base58
+							seedTitle = model.address.cardBase.seedName,
+							base58 = model.address.cardBase.base58
 						)
 					} else {
 						KeyCard(model.address)

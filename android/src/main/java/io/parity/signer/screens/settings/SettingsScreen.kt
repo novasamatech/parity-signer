@@ -43,7 +43,7 @@ fun SettingsScreen(
 	var confirm by remember { mutableStateOf(false) }
 
 	Column(Modifier.background(MaterialTheme.colors.background)) {
-		ScreenHeader(stringId = R.string.settings_title)
+		ScreenHeader(title = stringResource(R.string.settings_title))
 		Box(modifier = Modifier.weight(1f)) {
 			Column(Modifier.verticalScroll(rememberScrollState())) {
 				SettingsElement(name = stringResource(R.string.settings_networks)) {
