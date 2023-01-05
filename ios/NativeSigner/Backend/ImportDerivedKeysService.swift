@@ -58,7 +58,7 @@ final class ImportDerivedKeysService {
         } catch {
             result = .failure(.unknown)
         }
-        self.callbackQueue.async {
+        callbackQueue.async {
             completion(result)
         }
     }

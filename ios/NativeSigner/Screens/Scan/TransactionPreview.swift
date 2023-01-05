@@ -276,7 +276,8 @@ extension TransactionPreview {
 
         /// For `ttype` transaction of `importDerivations`, we need to update data by passing all seed phrases to Rust
         private func updateImportDerivationsIfNeeeded() {
-            guard let seedPreviews = dataModel.first?.content.importableKeys, !seedPreviews.isEmpty else { return }
+            let seedPreviews = dataModel.map(\.content).allImportDerivedKeys
+            guard !seedPreviews.isEmpty else { return }
 
             importKeysService.updateWithSeeds(seedPreviews) { result in
                 switch result {
@@ -292,18 +293,17 @@ extension TransactionPreview {
                 }
             }
         }
+
         /// We need to mutate existing data model in an ugly way as Rust data model
         /// features miriad of enums with associated values and nested array models...
         ///
         /// Logic here is to find `TransactionCard` with `importingDerivations` and just replace its
         /// `.derivationsCard(f: [SeedKeysPreview])` enum value with update `[SeedKeysPreview]`
         private func updateImportDerivationsData(_ updatedSeeds: [SeedKeysPreview]) {
-            guard let indexToUpdate = dataModel.firstIndex(
-                where: { $0.content.content.importingDerivations != nil }
-            ) else { return }
-
-            let importingDerivations: [TransactionCard] = [.init(index: 0, indent: 0, card: .derivationsCard(f: updatedSeeds))]
-            dataModel[indexToUpdate].content.content.importingDerivations = importingDerivations
+            guard let indexToUpdate = dataModel.firstIndex(where: { $0.content.content.importingDerivations != nil })
+            else { return }
+            dataModel[indexToUpdate].content.content
+                .importingDerivations = [.init(index: 0, indent: 0, card: .derivationsCard(f: updatedSeeds))]
         }
 
         func onBackButtonTap() {
@@ -343,10 +343,10 @@ extension TransactionPreview {
         }
 
         func onImportKeysTap() {
-            let importableKeys = dataModel.map(\.content).importableKeys
-            let derivedKeysCount = importableKeys.reduce(into: 0) { $0 += $1.derivedKeys.count }
+            let importableKeys = dataModel.map(\.content).importableSeedKeysPreviews
 
             importKeysService.importDerivedKeys(importableKeys) { result in
+                let derivedKeysCount = self.dataModel.map(\.content).importableKeysCount
                 switch result {
                 case .success:
                     if derivedKeysCount == 1 {
@@ -365,6 +365,7 @@ extension TransactionPreview {
                         style: .warning
                     )
                 }
+                self.navigation.performFake(navigation: .init(action: .goBack))
                 self.snackbarPresentation.isSnackbarPresented = true
                 self.isPresented.toggle()
             }
@@ -377,6 +378,7 @@ extension TransactionPreview {
     }
 }
 
+#if DEBUG
 struct TransactionPreview_Previews: PreviewProvider {
     static var previews: some View {
         // Single transaction
@@ -399,3 +401,4 @@ struct TransactionPreview_Previews: PreviewProvider {
 //        .preferredColorScheme(.dark)
     }
 }
+#endif

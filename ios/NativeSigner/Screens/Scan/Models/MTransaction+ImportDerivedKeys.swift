@@ -14,8 +14,17 @@ extension Array where Element == MTransaction {
     }
 
     /// Extracts list of all `SeedKeysPreview` that are within given `[MTransaction]`
-    var importableKeys: [SeedKeysPreview] {
-        reduce(into: []) { $0 += $1.importableKeys }
+    var allImportDerivedKeys: [SeedKeysPreview] {
+        reduce(into: []) { $0 += $1.allImportDerivedKeys }
+    }
+
+    var importableKeysCount: Int {
+        reduce(0) { $0 + $1.importableKeysCount }
+    }
+
+    /// Extracts list of importable `SeedKeysPreview` that are within given `[MTransaction]`
+    var importableSeedKeysPreviews: [SeedKeysPreview] {
+        reduce(into: []) { $0 += $1.importableSeedKeysPreviews }
     }
 }
 
@@ -38,7 +47,7 @@ extension MTransaction {
     }
 
     /// Extracts list of all `SeedKeysPreview` that are within given `MTransaction`
-    var importableKeys: [SeedKeysPreview] {
+    var allImportDerivedKeys: [SeedKeysPreview] {
         switch ttype {
         case .importDerivations:
             var importableKeys: [SeedKeysPreview] = []
@@ -48,6 +57,37 @@ extension MTransaction {
                 }
             }
             return importableKeys
+        default:
+            return []
+        }
+    }
+
+    var importableKeysCount: Int {
+        switch ttype {
+        case .importDerivations:
+            var importableKeysCount = 0
+            sortedValueCards().forEach {
+                if case let .derivationsCard(keys) = $0.card {
+                    importableKeysCount += keys.reduce(0) { $0 + $1.importableKeysCount }
+                }
+            }
+            return importableKeysCount
+        default:
+            return 0
+        }
+    }
+
+    /// Extracts list of importable `SeedKeysPreview` that are within given `MTransaction`
+    var importableSeedKeysPreviews: [SeedKeysPreview] {
+        switch ttype {
+        case .importDerivations:
+            var importableSeedKeysPreviews: [SeedKeysPreview] = []
+            sortedValueCards().forEach {
+                if case let .derivationsCard(keys) = $0.card {
+                    importableSeedKeysPreviews += keys.filter(\.isImportable)
+                }
+            }
+            return importableSeedKeysPreviews
         default:
             return []
         }

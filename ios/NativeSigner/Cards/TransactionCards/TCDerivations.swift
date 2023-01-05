@@ -24,7 +24,7 @@ struct DerivedKeysSetRenderable: Equatable, Identifiable {
 }
 
 struct TCDerivations: View {
-    let value: [SeedKeysPreview]
+    @Binding var value: [SeedKeysPreview]
     @StateObject var viewModel: ViewModel
 
     var body: some View {
@@ -37,6 +37,9 @@ struct TCDerivations: View {
         .onAppear {
             viewModel.updateData(value)
         }
+        .onChange(of: value, perform: { newValue in
+            viewModel.updateData(newValue)
+        })
     }
 
     @ViewBuilder
@@ -236,9 +239,9 @@ private extension DerivedKeyPreview {
         static var previews: some View {
             VStack {
                 TCDerivations(
-                    value: [
+                    value: .constant([
                         PreviewData.exampleSeedKeysPreview
-                    ],
+                    ]),
                     viewModel: .init()
                 )
             }

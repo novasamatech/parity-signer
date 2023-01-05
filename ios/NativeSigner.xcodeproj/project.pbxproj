@@ -210,6 +210,7 @@
 		6DBF6E2B28E58D7900CC959F /* ResetConnectivtyWarningsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E2A28E58D7900CC959F /* ResetConnectivtyWarningsAction.swift */; };
 		6DBF6E4328EACB7B00CC959F /* ConnectivityMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E4228EACB7B00CC959F /* ConnectivityMediator.swift */; };
 		6DBF6E4B28EC51D600CC959F /* GenericError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E4A28EC51D600CC959F /* GenericError.swift */; };
+		6DC0FC98296695D000A45883 /* SeedKeysPreview+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC0FC97296695D000A45883 /* SeedKeysPreview+Helpers.swift */; };
 		6DC33717295559EA0067284B /* NetworkSettingsDetailsActionModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33716295559EA0067284B /* NetworkSettingsDetailsActionModal.swift */; };
 		6DC33723295ACF2D0067284B /* CornerRadiusModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33722295ACF2D0067284B /* CornerRadiusModifier.swift */; };
 		6DC33725295BFA4D0067284B /* RootKeyDetailsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33724295BFA4D0067284B /* RootKeyDetailsModal.swift */; };
@@ -496,6 +497,7 @@
 		6DBF6E2A28E58D7900CC959F /* ResetConnectivtyWarningsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetConnectivtyWarningsAction.swift; sourceTree = "<group>"; };
 		6DBF6E4228EACB7B00CC959F /* ConnectivityMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMediator.swift; sourceTree = "<group>"; };
 		6DBF6E4A28EC51D600CC959F /* GenericError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericError.swift; sourceTree = "<group>"; };
+		6DC0FC97296695D000A45883 /* SeedKeysPreview+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SeedKeysPreview+Helpers.swift"; sourceTree = "<group>"; };
 		6DC33716295559EA0067284B /* NetworkSettingsDetailsActionModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSettingsDetailsActionModal.swift; sourceTree = "<group>"; };
 		6DC33722295ACF2D0067284B /* CornerRadiusModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadiusModifier.swift; sourceTree = "<group>"; };
 		6DC33724295BFA4D0067284B /* RootKeyDetailsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootKeyDetailsModal.swift; sourceTree = "<group>"; };
@@ -875,6 +877,7 @@
 				6DF5E79F2922DDAD00F2B5B4 /* MTransaction+TransactionCards.swift */,
 				6DB9903C2962A619001101DC /* MTransaction+ImportDerivedKeys.swift */,
 				6D199CA1292A8EB300E79113 /* TransactionSummaryModels.swift */,
+				6DC0FC97296695D000A45883 /* SeedKeysPreview+Helpers.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1812,6 +1815,7 @@
 				2DA5F86327566C3600D8DD29 /* TCCall.swift in Sources */,
 				6DDEF14328AE8794004CA2FD /* SecondaryButton.swift in Sources */,
 				6D0FA73B2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift in Sources */,
+				6DC0FC98296695D000A45883 /* SeedKeysPreview+Helpers.swift in Sources */,
 				6DE8466E28BF73E40051346A /* DerivedKeyRowModel.swift in Sources */,
 				2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */,
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
