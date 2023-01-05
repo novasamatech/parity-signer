@@ -33,9 +33,9 @@ import io.parity.signer.ui.theme.*
 @Composable
 fun KeyCard(model: KeyCardModel) {
 	Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+		Modifier
+			.fillMaxWidth()
+			.padding(16.dp)
 	) {
 
 		//left
@@ -101,22 +101,28 @@ fun KeyCard(model: KeyCardModel) {
 
 			Spacer(Modifier.padding(top = 14.dp))
 
-			Box(
-				modifier = Modifier
-                    .background(
-                        MaterialTheme.colors.fill12,
-                        RoundedCornerShape(12.dp)
-                    )
-                    .padding(horizontal = 8.dp, vertical = 2.dp),
-				contentAlignment = Alignment.Center,
-			) {
-				Text(
-					model.network,
-					color = MaterialTheme.colors.textTertiary,
-					style = SignerTypeface.CaptionM,
-				)
-			}
+			val networkName = model.network
+			NetworkLabel(networkName)
 		}
+	}
+}
+
+@Composable
+private fun NetworkLabel(networkName: String) {
+	Box(
+		modifier = Modifier
+			.background(
+				MaterialTheme.colors.fill12,
+				RoundedCornerShape(12.dp)
+			)
+			.padding(horizontal = 8.dp, vertical = 2.dp),
+		contentAlignment = Alignment.Center,
+	) {
+		Text(
+			networkName,
+			color = MaterialTheme.colors.textTertiary,
+			style = SignerTypeface.CaptionM,
+		)
 	}
 }
 
@@ -203,5 +209,24 @@ private fun PreviewKeySeedCard() {
 			seedTitle = "Seed title",
 			base58 = KeyCardModel.createStub().base58,
 		)
+	}
+}
+
+@Preview(
+	name = "day",
+	uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true,
+)
+@Preview(
+	name = "dark theme",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	backgroundColor = 0xFFFFFFFF
+)
+@Composable
+private fun PreviewNetworkLabel() {
+	SignerNewTheme {
+		Box(Modifier.size(width = 100.dp, height = 500.dp)) {
+			NetworkLabel("Polkadot")
+		}
 	}
 }
