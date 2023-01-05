@@ -22,9 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.models.Callback
-import io.parity.signer.models.FeatureOption
-import io.parity.signer.screens.scan.items.CameraLightIcon
-import io.parity.signer.screens.scan.items.CameraMultiSignIcon
+import io.parity.signer.screens.scan.elements.CameraLightIcon
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.forcedFill40
 import io.parity.signer.ui.theme.pink500
@@ -127,7 +125,6 @@ internal fun ScanHeader(
 ) {
 	val viewModel: CameraViewModel = viewModel()
 	val torchEnabled by viewModel.isTorchEnabled.collectAsState()
-	val multiMode by viewModel.isMultiscanMode.collectAsState()
 	Row(
 		modifier
 			.fillMaxWidth(1f)
@@ -137,11 +134,6 @@ internal fun ScanHeader(
 			onCloseClicked = onClose
 		)
 		Spacer(modifier = Modifier.weight(1f))
-		if (FeatureOption.MULTI_TRANSACTION_CAMERA.isEnabled()) {
-			CameraMultiSignIcon(isEnabled = multiMode,
-				onClick = { viewModel.isMultiscanMode.value = !multiMode })
-		}
-		Spacer(modifier = Modifier.padding(end = 8.dp))
 		CameraLightIcon(isEnabled = torchEnabled,
 			onClick = {
 				viewModel.isTorchEnabled.value = !torchEnabled

@@ -10,7 +10,7 @@ import io.parity.signer.dependencygraph.ServiceLocator
  */
 class EmptyQrCodeProvider : AnimatedQrKeysProvider<List<List<UByte>>> {
 	private val uniffiInteractor: UniffiInteractor =
-		ServiceLocator.backendLocator.uniffiInteractor
+		ServiceLocator.backendScope.uniffiInteractor
 
 	override suspend fun getQrCodesList(input: List<List<UByte>>): AnimatedQrImages? {
 		return uniffiInteractor.encodeToQrImages(input).mapError()

@@ -6,12 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.HdrPlus
-import androidx.compose.material.icons.filled.PlusOne
-import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -20,12 +15,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetConfirmDialog
-import io.parity.signer.components.base.SecondaryButtonBottomSheet
-import io.parity.signer.models.AlertState
+import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.models.Callback
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
-import io.parity.signer.screens.keydetails.KeyDetailsDeleteConfirmBottomSheet
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
@@ -77,7 +70,7 @@ private fun LogsMenuGeneral(
 			onclick = onDeleteClicked
 		)
 		Spacer(modifier = Modifier.padding(bottom = 8.dp))
-		SecondaryButtonBottomSheet(
+		SecondaryButtonWide(
 			label = stringResource(R.string.generic_cancel),
 		) {
 			navigator.backAction()

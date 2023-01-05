@@ -1,4 +1,4 @@
-package io.parity.signer.components
+package io.parity.signer.components.panels
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -30,6 +30,7 @@ import io.parity.signer.uniffi.actionGetName
  * Bar to be shown on the bottom of screen;
  */
 @Composable
+@Deprecated("not used")
 fun BottomBar(
 	signerDataModel: SignerDataModel,
 ) {
