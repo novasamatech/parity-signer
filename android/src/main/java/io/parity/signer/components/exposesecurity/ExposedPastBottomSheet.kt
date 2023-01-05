@@ -15,8 +15,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.PrimaryButtonBottomSheet
-import io.parity.signer.components.base.SecondaryButtonBottomSheet
+import io.parity.signer.components.base.PrimaryButtonWide
+import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -62,14 +62,14 @@ fun ExposedPastBottomSheet(
 
 			)
 		Spacer(modifier = Modifier.padding(top = 24.dp))
-		PrimaryButtonBottomSheet(
+		PrimaryButtonWide(
 			label = stringResource(R.string.exposed_before_cancel_button),
 			modifier = Modifier.padding(horizontal = 32.dp),
 		) {
 			close()
 		}
 		Spacer(modifier = Modifier.padding(top = 8.dp))
-		SecondaryButtonBottomSheet(
+		SecondaryButtonWide(
 			label = stringResource(R.string.exposed_before_proceed_button),
 			modifier = Modifier.padding(horizontal = 32.dp),
 		) {

@@ -17,8 +17,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.PrimaryButtonBottomSheet
-import io.parity.signer.components.base.SecondaryButtonBottomSheet
+import io.parity.signer.components.base.PrimaryButtonWide
+import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.LocalNavRequest
 import io.parity.signer.models.Navigator
@@ -57,13 +57,13 @@ fun ConfirmExportPrivateKeyMenu(
 			textAlign = TextAlign.Center,
 		)
 
-		PrimaryButtonBottomSheet(stringResource(R.string.export_private_key_confirm_title)) {
+		PrimaryButtonWide(stringResource(R.string.export_private_key_confirm_title)) {
 			navigator.navigate(LocalNavRequest.ShowExportPrivateKey(publicKey))
 		}
 
 		Spacer(modifier = Modifier.padding(bottom = 8.dp))
 
-		SecondaryButtonBottomSheet(stringResource(R.string.generic_cancel)) {
+		SecondaryButtonWide(stringResource(R.string.generic_cancel)) {
 			navigator.backAction()
 		}
 		Spacer(modifier = Modifier.padding(bottom = 24.dp))

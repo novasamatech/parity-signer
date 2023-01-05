@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import io.parity.signer.components.BigButton
-import io.parity.signer.components.BottomBar
+import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.TopBar
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.AlertState
@@ -31,7 +31,6 @@ import io.parity.signer.screens.WaitingScreen
 import io.parity.signer.ui.navigationselectors.*
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.Text600
-import io.parity.signer.uniffi.ScreenData
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -42,8 +41,7 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		signerDataModel.context = applicationContext
-		signerDataModel.activity = this
+		ServiceLocator.initActivityDependencies(this)
 
 		if (savedInstanceState == null) {
 			signerDataModel.lateInit()
@@ -56,6 +54,11 @@ class MainActivity : AppCompatActivity() {
 		setContent {
 			SignerApp(signerDataModel)
 		}
+	}
+
+	override fun onDestroy() {
+		ServiceLocator.deinitActivityDependencies()
+		super.onDestroy()
 	}
 }
 
@@ -100,9 +103,8 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							bottomBar = {
 								if (NavigationMigrations.shouldShowBar(
 										localNavAction = localNavAction.value,
-										globalNavAction = actionResult.value,
-									)
-									&& actionResult.value?.footer == true
+										globalNavAction = actionResult.value,)
+									&& actionResult.value.footer
 								) {
 									BottomBar(signerDataModel = signerDataModel)
 								}
@@ -110,14 +112,13 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						) { innerPadding ->
 							Box(modifier = Modifier.padding(innerPadding)) {
 								ScreenSelector(
-									screenData = actionResult.value?.screenData
-										?: ScreenData.Documents,//default fallback
+									screenData = actionResult.value.screenData,
 									alertState = shieldAlert,
 									navigate = signerDataModel.navigator::navigate,
 									signerDataModel = signerDataModel
 								)
 								ModalSelector(
-									modalData = actionResult.value?.modalData,
+									modalData = actionResult.value.modalData,
 									localNavAction = localNavAction.value,
 									alertState = shieldAlert,
 									navigate = signerDataModel.navigator::navigate,
@@ -132,8 +133,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								.captionBarPadding(),
 						) {
 							CombinedScreensSelector(
-								screenData = actionResult.value.screenData
-									?: ScreenData.Documents,//default fallback
+								screenData = actionResult.value.screenData,
 								localNavAction = localNavAction.value,
 								alertState = shieldAlert,
 								signerDataModel = signerDataModel
@@ -187,7 +187,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						modifier = Modifier.padding(12.dp).fillMaxSize(1f),
 					) {
 						Text(
-							"Please enable airplane mode",
+							text = stringResource(R.string.enable_airplane_mode_error),
 							color = MaterialTheme.colors.Text600
 						)
 					}

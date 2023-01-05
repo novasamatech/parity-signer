@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
-import io.parity.signer.components.base.PrimaryButtonBottomSheet
+import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.items.KeySetItem
@@ -25,7 +25,6 @@ import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.models.*
 import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.ui.navigationselectors.KeySetsNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.backgroundSystem
 import io.parity.signer.uniffi.Action
@@ -42,7 +41,7 @@ fun KeySetsScreen(
 ) {
 	Column(Modifier.background(MaterialTheme.colors.backgroundSystem)) {
 		ScreenHeader(
-			R.string.key_sets_screem_title,
+			stringResource(R.string.key_sets_screem_title),
 			onMenu = { localNavigator.navigate(KeySetsNavSubgraph.homeMenu) }
 		)
 		Box(modifier = Modifier.weight(1f)) {
@@ -68,7 +67,7 @@ fun KeySetsScreen(
 						.align(Alignment.End)
 						.padding(end = 16.dp)
 				)
-				PrimaryButtonBottomSheet(
+				PrimaryButtonWide(
 					label = stringResource(R.string.key_sets_screem_add_key_button),
 					modifier = Modifier
 						.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)
@@ -92,7 +91,7 @@ fun KeySetsScreen(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewKeySetsSelectScreen() {
+private fun PreviewKeySetsSelectScreenFull() {
 	val keys = mutableListOf(
 		KeySetModel(
 			"first seed name",
@@ -114,6 +113,59 @@ private fun PreviewKeySetsSelectScreen() {
 			)
 		)
 	}
+	val state = remember { mutableStateOf(AlertState.Past) }
+	val mockModel = KeySetsSelectModel(keys)
+	SignerNewTheme {
+		Box(modifier = Modifier.size(350.dp, 550.dp)) {
+			KeySetsScreen(mockModel, EmptyNavigator(), rememberNavController(), state)
+		}
+	}
+}
+
+@Preview(
+	name = "light", group = "few", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "few",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewKeySetsSelectScreenFew() {
+	val keys = mutableListOf(
+		KeySetModel(
+			"first seed name",
+			PreviewData.exampleIdenticonPng,
+			1.toUInt()
+		),
+		KeySetModel(
+			"second seed name",
+			PreviewData.exampleIdenticonPng,
+			3.toUInt()
+		),
+	)
+	val state = remember { mutableStateOf(AlertState.Past) }
+	val mockModel = KeySetsSelectModel(keys)
+	SignerNewTheme {
+		Box(modifier = Modifier.size(350.dp, 550.dp)) {
+			KeySetsScreen(mockModel, EmptyNavigator(), rememberNavController(), state)
+		}
+	}
+}
+
+@Preview(
+	name = "light", group = "few", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "few",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewKeySetsSelectScreenEmpty() {
+	val keys = emptyList<KeySetModel>()
 	val state = remember { mutableStateOf(AlertState.Past) }
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {

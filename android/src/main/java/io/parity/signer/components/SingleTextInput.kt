@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
@@ -22,6 +19,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.*
 
+@Deprecated("This is old design component. Use OutlinedTextField() directly like in new screens")
 @Composable
 fun SingleTextInput(
 	content: MutableState<String>,
@@ -40,7 +38,7 @@ fun SingleTextInput(
 		border = BorderStroke(1.dp, MaterialTheme.colors.Border400),
 		modifier = Modifier.padding(vertical = 10.dp)
 	) {
-		TextField(
+		OutlinedTextField(
 			value = content.value,
 			onValueChange = update,
 			singleLine = true,
