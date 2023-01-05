@@ -14,7 +14,7 @@ import io.parity.signer.components.SeedCard
 import io.parity.signer.components.toImageContent
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.getSeed
+import io.parity.signer.models.storage.getSeed
 import io.parity.signer.models.navigate
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
@@ -28,7 +28,7 @@ fun SelectSeed(seeds: MSeeds, signerDataModel: SignerDataModel) {
 
 	Surface(
 		color = MaterialTheme.colors.Bg100,
-		shape = MaterialTheme.shapes.modal
+		shape = MaterialTheme.shapes.modal,
 	) {
 		LazyColumn(
 			modifier = Modifier.padding(20.dp)
@@ -42,7 +42,8 @@ fun SelectSeed(seeds: MSeeds, signerDataModel: SignerDataModel) {
 					Row(
 						Modifier
 							.clickable {
-								ServiceLocator.authentication.authenticate(signerDataModel.activity) {
+								val authentication = ServiceLocator.authentication
+								authentication.authenticate(signerDataModel.activity) {
 									val seedName = cards[item].seedName
 									val seedPhrase = signerDataModel.getSeed(seedName)
 									if (seedPhrase.isNotBlank()) {

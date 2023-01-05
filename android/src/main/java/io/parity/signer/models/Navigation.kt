@@ -4,12 +4,12 @@ import android.util.Log
 import android.widget.Toast
 import io.parity.signer.BuildConfig
 import io.parity.signer.components.NetworkCardModel
+import io.parity.signer.components.sharedcomponents.KeyCardModel
+import io.parity.signer.components.sharedcomponents.KeyCardModelBase
 import io.parity.signer.components.toImageContent
+import io.parity.signer.models.storage.getSeed
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.ScreenData
-import io.parity.signer.uniffi.backendAction
-import io.parity.signer.uniffi.generateSecretKeyQr
+import io.parity.signer.uniffi.*
 
 
 @Deprecated("obsolete, for backwards compatibility, use SignerNavigator class")
@@ -18,7 +18,7 @@ fun SignerDataModel.navigate(
 	details: String = "",
 	seedPhrase: String = ""
 ) {
-	SignerNavigator(this).navigate(button, details, seedPhrase)
+	navigator.navigate(button, details, seedPhrase)
 }
 
 
@@ -43,12 +43,6 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 		if (singleton.localNavAction.value != LocalNavAction.None) {
 			//if state machine navigation triggered - remove platform layers on top
 			singleton._localNavAction.value = LocalNavAction.None
-		}
-
-		if (button == Action.NAVBAR_SCAN) {
-			//swop rust-side navigation call to a local one so back navigation would work and move us back to where we came from
-			navigate(LocalNavRequest.ShowScan)
-			return
 		}
 
 		try {
@@ -89,12 +83,14 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 				val model = PrivateKeyExportModel(
 					qrData = secretKeyDetailsQR.qr.getData(),
 					keyCard = KeyCardModel(
-						identIcon = secretKeyDetailsQR.address.identicon.toImageContent(),
-						seedName = secretKeyDetailsQR.address.seedName,
-						hasPwd = secretKeyDetailsQR.address.hasPwd,
-						path = secretKeyDetailsQR.address.path,
 						network = secretKeyDetailsQR.networkInfo.networkTitle,
-						base58 = secretKeyDetailsQR.base58
+						cardBase = KeyCardModelBase(
+							identIcon = secretKeyDetailsQR.address.identicon.toImageContent(),
+							seedName = secretKeyDetailsQR.address.seedName,
+							hasPassword = secretKeyDetailsQR.address.hasPwd,
+							path = secretKeyDetailsQR.address.path,
+							base58 = secretKeyDetailsQR.base58,
+						)
 					),
 					NetworkCardModel(secretKeyDetailsQR.networkInfo)
 				)
@@ -104,8 +100,6 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 						model, singleton.navigator
 					)
 			}
-			LocalNavRequest.ShowScan -> singleton._localNavAction.value =
-				LocalNavAction.ShowScan
 		}
 	}
 
@@ -151,15 +145,12 @@ class EmptyNavigator : Navigator {
 
 sealed class LocalNavAction {
 	object None : LocalNavAction()
-	class ShowExportPrivateKey( //todo dmitry refactor this to show this screen right on old screen without global navigation
+	data class ShowExportPrivateKey( //todo dmitry refactor this to show this screen right on old screen without global navigation
 		val model: PrivateKeyExportModel,
 		val navigator: SignerNavigator
 	) : LocalNavAction()
-
-	object ShowScan : LocalNavAction()
 }
 
 sealed class LocalNavRequest {
-	class ShowExportPrivateKey(val publicKey: String) : LocalNavRequest()
-	object ShowScan : LocalNavRequest()
+	data class ShowExportPrivateKey(val publicKey: String) : LocalNavRequest()
 }

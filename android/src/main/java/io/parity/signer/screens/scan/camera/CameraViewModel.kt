@@ -6,8 +6,6 @@ import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
-import io.parity.signer.backend.UniffiResult
-import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,11 +15,11 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class CameraViewModel() : ViewModel() {
 
-	val isMultiscanMode = MutableStateFlow(false)
-	val isTorchEnabled = MutableStateFlow<Boolean>(false)
+	val isTorchEnabled = MutableStateFlow(false)
 
 	private val _pendingPayloads = MutableStateFlow<Set<String>>(emptySet())
-	val pendingTransactionPayloads: StateFlow<Set<String>> = _pendingPayloads.asStateFlow()
+	val pendingTransactionPayloads: StateFlow<Set<String>> =
+		_pendingPayloads.asStateFlow()
 
 	private val _total = MutableStateFlow<Int?>(null)
 	private val _captured = MutableStateFlow<Int?>(null)
@@ -30,11 +28,8 @@ class CameraViewModel() : ViewModel() {
 	internal val total: StateFlow<Int?> = _total.asStateFlow()
 	internal val captured: StateFlow<Int?> = _captured.asStateFlow()
 
-
 	// payload of currently scanned qr codes for multiqr transaction like metadata update.
 	private var currentMultiQrTransaction = arrayOf<String>()
-
-	private val uniffiInteractor = ServiceLocator.backendLocator.uniffiInteractor
 
 	/**
 	 * Barcode detecting function.
@@ -101,7 +96,7 @@ class CameraViewModel() : ViewModel() {
 				}
 			}
 			.addOnFailureListener {
-				Log.e("scanVM","Scan failed " + it.message.toString())
+				Log.e("scanVM", "Scan failed " + it.message.toString())
 			}
 			.addOnCompleteListener {
 				imageProxy.close()
@@ -109,19 +104,7 @@ class CameraViewModel() : ViewModel() {
 	}
 
 	private fun addPendingTransaction(payload: String) {
-		_pendingPayloads.value = _pendingPayloads.value + payload
-	}
-
-	suspend fun getTransactionsFromPendingPayload(): List<MTransaction> {
-		val allResults = pendingTransactionPayloads.value.map { payload ->
-			uniffiInteractor.navigate(Action.TRANSACTION_FETCHED, payload)
-		}
-		//todo handle error cases and show ot user?
-		allResults.filterIsInstance<UniffiResult.Error<Any>>().forEach { error ->
-			Log.e("scanVM","Camera scan: " + "transaction parsing failed, ${error.error.message}")
-		}
-		return allResults.filterIsInstance<UniffiResult.Success<ActionResult>>()
-			.mapNotNull { (it.result.screenData as? ScreenData.Transaction)?.f }.flatten()
+		_pendingPayloads.value += payload
 	}
 
 	/**
@@ -138,9 +121,4 @@ class CameraViewModel() : ViewModel() {
 		resetScanValues()
 	}
 
-	sealed class CameraNavModel {
-		object None : CameraNavModel()
-		data class TransitionNavigation(val transactions: List<MTransaction>) :
-			CameraNavModel()
-	}
 }
