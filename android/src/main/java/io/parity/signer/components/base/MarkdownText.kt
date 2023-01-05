@@ -3,6 +3,7 @@ package io.parity.signer.components.base
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,13 +21,15 @@ fun MarkdownText(
 	modifier: Modifier = Modifier,
 	onLinkClicked: ((String) -> Unit)? = null
 ) {
-	MaterialRichText(
-		modifier = modifier,
-		style = RichTextStyle(
-			stringStyle = RichTextStringStyle()
-		)
-	) {
-		Markdown(content.string, onLinkClicked = onLinkClicked)
+	Surface() { // so onSurface will be used for text color otherwise it's default black
+		MaterialRichText(
+			modifier = modifier,
+			style = RichTextStyle(
+				stringStyle = RichTextStringStyle()
+			)
+		) {
+			Markdown(content.string, onLinkClicked = onLinkClicked)
+		}
 	}
 }
 
@@ -57,7 +60,7 @@ private fun PreviewMarkdownText() {
 		"Same as the [`transfer`] call, but with a check that the transfer will not kill the"
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp)) {
-			MarkdownText(content = content.toRichTextStr(),)
+			MarkdownText(content = content.toRichTextStr())
 		}
 	}
 }
