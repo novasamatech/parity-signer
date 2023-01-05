@@ -148,5 +148,12 @@
 	<string name="new_key_set_backup_bottomsheet_title">Please confirm that you have you written down your secret recovery phrase</string>
 	<string name="new_key_set_backup_bottomsheet_checkbox_written">I’ve written down my secret recovery phrase</string>
 	<string name="new_key_set_backup_bottomsheet_checkbox_keep_careful">I understand that if I lose my secret phrase, my funds will be lost forever</string>
+	<string name="derivation_screen_title">Create Derived Key</string>
+	<string name="derivation_screen_network_header">Choose Network</string>
+	<string name="derivation_screen_network_label">Network</string>
+	<string name="derivation_screen_derivation_header">Derivation Path</string>
+	<string name="derivation_screen_dirivation_help_content_description">Derivation help button</string>
+	<string name="derivation_screen_path_placeholder">// Add Path Name</string>
+	<string name="derivation_screen_derivation_note_description">Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.</string>
 
 </resources>

@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
@@ -38,14 +39,14 @@ fun DeriveKeyBaseScreen(onClose: Callback) {
 
 	Column() {
 		ScreenHeaderClose(
-			title = "Create Derived Key",
+			title = stringResource(R.string.derivation_screen_title),
 			onClose = { /*TODO*/ },
 			onMenu = {},
 			differentMenuIcon = Icons.Filled.HelpOutline
 		)
 
 		Text(
-			text = "Choose Network",
+			text = stringResource(R.string.derivation_screen_network_header),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
 		)
@@ -61,7 +62,7 @@ fun DeriveKeyBaseScreen(onClose: Callback) {
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Text(
-				text = "Network",
+				text = stringResource(R.string.derivation_screen_network_label),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleS,
 			)
@@ -72,13 +73,13 @@ fun DeriveKeyBaseScreen(onClose: Callback) {
 
 		Row {
 			Text(
-				text = "Derivation Path ",
+				text = stringResource(R.string.derivation_screen_derivation_header),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleS,
 			)
 			Image(
 				imageVector = Icons.Filled.Help,
-				contentDescription = "Derivation help clicked",
+				contentDescription = stringResource(R.string.derivation_screen_dirivation_help_content_description),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.pink300),
 				modifier = Modifier
 					.padding(horizontal = 8.dp)
@@ -99,7 +100,7 @@ fun DeriveKeyBaseScreen(onClose: Callback) {
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Text(
-				text = path.value.ifEmpty { "// Add Path Name" },
+				text = path.value.ifEmpty { stringResource(R.string.derivation_screen_path_placeholder) },
 				color = if (path.value.isEmpty()) {
 					MaterialTheme.colors.textTertiary
 				} else {
@@ -111,7 +112,7 @@ fun DeriveKeyBaseScreen(onClose: Callback) {
 			ChevronRight()
 		}
 		Text(
-			text = "Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.",
+			text = stringResource(R.string.derivation_screen_derivation_note_description),
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.CaptionM,
 		)
