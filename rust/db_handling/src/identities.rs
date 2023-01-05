@@ -193,12 +193,12 @@ pub fn export_all_addrs<P: AsRef<Path>>(
 
         let multisigner = keys
             .iter()
-            .find(|(_, a)| a.path.is_empty())
+            .find(|(_, a)| a.is_root())
             .map(|(m, _)| m.to_owned())
             .ok_or(Error::NoRootKeyForSeed(name.to_owned()))?;
 
         for key in keys {
-            if key.1.path.is_empty() {
+            if key.1.is_root() {
                 continue;
             }
 
@@ -269,32 +269,31 @@ pub fn import_all_addrs<P: AsRef<Path>>(
 
     for addr in &seed_derived_keys {
         for derived_key in &addr.derived_keys {
-            if let Some(path) = &derived_key.derivation_path {
-                let network_specs_key =
-                    NetworkSpecsKey::from_parts(&derived_key.genesis_hash, &derived_key.encryption);
-                let network_specs = get_network_specs(&db_path, &network_specs_key)?;
-                match create_derivation_address(
-                    &db_path,
-                    &adds, // a single address is created, no data to check against here
-                    path,
-                    &network_specs.specs,
-                    &addr.name,
-                    &derived_key.address,
-                    derived_key
-                        .has_pwd
-                        .ok_or_else(|| Error::MissingPasswordInfo(path.to_owned()))?,
-                ) {
-                    // success, updating address preparation set and `Event` set
-                    Ok(prep_data) => {
-                        adds = prep_data.address_prep;
-                        events.extend_from_slice(&prep_data.history_prep);
-                    }
-                    // exactly same address already exists, ignoring it
-                    Err(Error::DerivationExists { .. }) => (),
-
-                    // some other error, processed as a real error
-                    Err(e) => return Err(e),
+            let path = derived_key.derivation_path.clone().unwrap_or_default();
+            let network_specs_key =
+                NetworkSpecsKey::from_parts(&derived_key.genesis_hash, &derived_key.encryption);
+            let network_specs = get_network_specs(&db_path, &network_specs_key)?;
+            match create_derivation_address(
+                &db_path,
+                &adds, // a single address is created, no data to check against here
+                &path,
+                &network_specs.specs,
+                &addr.name,
+                &derived_key.address,
+                derived_key
+                    .has_pwd
+                    .ok_or_else(|| Error::MissingPasswordInfo(path.to_owned()))?,
+            ) {
+                // success, updating address preparation set and `Event` set
+                Ok(prep_data) => {
+                    adds = prep_data.address_prep;
+                    events.extend_from_slice(&prep_data.history_prep);
                 }
+                // exactly same address already exists, ignoring it
+                Err(Error::DerivationExists { .. }) => (),
+
+                // some other error, processed as a real error
+                Err(e) => return Err(e),
             }
         }
     }
@@ -324,10 +323,7 @@ pub fn inject_derivations_has_pwd(
 
     for addr in seed_derived_keys.iter_mut() {
         for mut derived_key in addr.derived_keys.iter_mut() {
-            if derived_key.derivation_path.is_none() {
-                continue;
-            }
-            let path = derived_key.derivation_path.as_ref().unwrap();
+            let path = derived_key.derivation_path.clone().unwrap_or_default();
             let seed_name = match addr.multisigner {
                 MultiSigner::Sr25519(p) => sr25519_signers.get(&p),
                 MultiSigner::Ed25519(p) => ed25519_signers.get(&p),
@@ -342,7 +338,7 @@ pub fn inject_derivations_has_pwd(
             // create fixed-length string to avoid reallocation
             let mut full_address = String::with_capacity(seed_phrase.len() + path.len());
             full_address.push_str(seed_phrase);
-            full_address.push_str(path);
+            full_address.push_str(&path);
 
             let multisigner_pwdless = match derived_key.encryption {
                 Encryption::Ed25519 => match ed25519::Pair::from_string(&full_address, None) {

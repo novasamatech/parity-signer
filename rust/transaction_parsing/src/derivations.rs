@@ -63,10 +63,7 @@ where
             let network_title = get_network_specs(&db_path, &network_specs_key)
                 .map(|specs| specs.specs.title)
                 .ok();
-            let path = addr_info
-                .derivation_path
-                .clone()
-                .unwrap_or_else(|| "".to_owned());
+            let path = addr_info.derivation_path.clone().unwrap_or_default();
             let status = get_derivation_status(
                 &path,
                 &network_title,
