@@ -90,7 +90,6 @@ fun TCValueWithMarkdownTrio(
 					style = SignerTypeface.BodyL,
 					color = if (value.isNumber) MaterialTheme.colors.pink300 else MaterialTheme.colors.primary,
 				)
-				//todo markdowns below
 				MarkdownText(content = value.docsFieldName)
 				MarkdownText(content = value.docsType)
 //				Text(
