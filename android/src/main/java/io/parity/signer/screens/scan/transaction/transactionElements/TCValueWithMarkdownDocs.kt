@@ -108,7 +108,7 @@ fun MscCall.toTransactionCallModel() = TCWithMarkdownDocsModel(
 fun MscEnumVariantName.toTransactionCallModel() = TCWithMarkdownDocsModel(
 	methodName = name,
 	docs = docsEnumVariant.toRichTextStr(),
-	isMethod = true,
+	isMethod = false,
 )
 
 
