@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.QuestionMark
+import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,8 +50,9 @@ fun TCValueWithToogleDocs(
 				value = payload.methodName
 			)
 			if (payload.docs.string.isNotEmpty()) {
+				Spacer(modifier = Modifier.weight(1f))
 				Image(
-					imageVector = Icons.Default.QuestionMark,
+					imageVector = Icons.Filled.HelpOutline,
 					contentDescription = null,
 					colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
 					modifier = Modifier
