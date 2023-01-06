@@ -32,7 +32,12 @@ final class ImportDerivedKeysService {
         callQueue.async {
             let result: Result<Void, ServiceError>
             do {
-                try importDerivations(dbname: self.databaseMediator.databaseName, seedDerivedKeys: seedPreviews)
+                var seedPreviewsToImport = seedPreviews
+                for (index, seedPreview) in seedPreviewsToImport.enumerated() {
+                    seedPreviewsToImport[index].derivedKeys = seedPreview.derivedKeys
+                        .filter { $0.status == .importable }
+                }
+                try importDerivations(dbname: self.databaseMediator.databaseName, seedDerivedKeys: seedPreviewsToImport)
                 result = .success(())
             } catch {
                 result = .failure(.unknown)
