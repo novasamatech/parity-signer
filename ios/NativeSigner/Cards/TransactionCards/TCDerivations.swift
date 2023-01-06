@@ -108,10 +108,7 @@ struct TCDerivations: View {
                     renderable: .init(
                         text: Localizable.ImportKeys.Error.Label.keySetMissing.string
                     ),
-                    action: .init(
-                        name: Localizable.ImportKeys.Error.Action.keySetMissing.string,
-                        action: {}
-                    )
+                    action: nil
                 )
             }
             if viewModel.isNetworkMissing {
@@ -119,10 +116,7 @@ struct TCDerivations: View {
                     renderable: .init(
                         text: Localizable.ImportKeys.Error.Label.networkMissing.string
                     ),
-                    action: .init(
-                        name: Localizable.ImportKeys.Error.Action.networkMissing.string,
-                        action: {}
-                    )
+                    action: nil
                 )
             }
             if viewModel.areKeysAlreadyImported {
