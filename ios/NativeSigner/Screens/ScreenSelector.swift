@@ -18,7 +18,7 @@ struct ScreenSelector: View {
     let pathCheck: (String, String, String) -> DerivationCheck
     let createAddress: (String, String) -> Void
     let checkSeedCollision: (String) -> Bool
-    let restoreSeed: (String, String, Bool) -> Void
+    let restoreSeed: (String, String) -> Void
     let alertShow: () -> Void
     let increment: (String, String) -> Void
 

@@ -35,6 +35,10 @@ struct CameraView: View {
                     progressViewModel.current = newValue
                     UIApplication.shared.isIdleTimerDisabled = newValue > 0
                 }
+                .onChange(of: model.requestPassword) { newValue in
+                    guard newValue else { return }
+                    viewModel.presentBananaSplitPassword()
+                }
             VStack {
                 ZStack(alignment: .bottom) {
                     // Blur overlay
@@ -43,7 +47,7 @@ struct CameraView: View {
                     VStack {
                         HStack(spacing: Spacing.small) {
                             CameraButton(
-                                action: { viewModel.isPresented.toggle() },
+                                action: viewModel.dismissView,
                                 icon: Asset.xmarkButton.swiftUIImage
                             )
                             Spacer()
@@ -132,6 +136,33 @@ struct CameraView: View {
                     isPresented: $viewModel.isPresentingTransactionPreview,
                     content: viewModel.transactions,
                     signature: viewModel.signature
+                )
+            )
+        }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
+            onDismiss: {
+                model.start()
+                // User entered invalid password too many times, present error
+                if viewModel.shouldPresentError {
+                    viewModel.isPresentingError = true
+                    return
+                }
+                viewModel.clearTransactionState()
+
+                // User proceeded successfully with key recovery, dismiss camera
+                if viewModel.wasBananaSplitKeyRecovered {
+                    viewModel.dismissView()
+                }
+            }
+        ) {
+            EnterBananaSplitPasswordModal(
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
+                    isKeyRecovered: $viewModel.wasBananaSplitKeyRecovered,
+                    isErrorPresented: $viewModel.shouldPresentError,
+                    presentableError: $viewModel.presentableError,
+                    qrCodeData: $model.bucket
                 )
             )
         }
@@ -230,6 +261,10 @@ extension CameraView {
         @Published var shouldPresentError: Bool = false
         @Published var isPresentingError: Bool = false
         @Published var isInTransactionProgress: Bool = false
+
+        // Banana split flow
+        @Published var isPresentingEnterBananaSplitPassword: Bool = false
+        @Published var wasBananaSplitKeyRecovered: Bool = false
 
         // Data models for modals
         @Published var transactions: [MTransaction] = []
@@ -332,6 +367,14 @@ extension CameraView {
             isPresentingError = false
             shouldPresentError = false
             isInTransactionProgress = false
+        }
+
+        func presentBananaSplitPassword() {
+            isPresentingEnterBananaSplitPassword = true
+        }
+
+        func dismissView() {
+            isPresented = false
         }
     }
 }
