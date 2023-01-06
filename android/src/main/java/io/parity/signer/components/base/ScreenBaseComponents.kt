@@ -28,7 +28,7 @@ import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun ScreenHeader(
-	@StringRes stringId: Int?,
+	title: String?,
 	onBack: (() -> Unit)? = null,
 	onMenu: (() -> Unit)? = null,
 ) {
@@ -53,9 +53,9 @@ fun ScreenHeader(
 			Spacer(modifier = Modifier.padding(start = 44.dp))
 		}
 		//center
-		if (stringId != null) {
+		if (title != null) {
 			Text(
-				text = stringResource(stringId),
+				text = title,
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleS,
 				textAlign = TextAlign.Center,
@@ -178,12 +178,12 @@ private fun PreviewScreenBaseComponent() {
 				onMenu = {},
 			)
 			ScreenHeader(
-				R.string.key_sets_screem_title,
+				stringResource(R.string.key_sets_screem_title),
 				onBack = null,
 				onMenu = {},
 			)
 			ScreenHeader(
-				R.string.key_sets_screem_title,
+				stringResource(id = R.string.key_sets_screem_title),
 				onBack = null,
 				onMenu = null,
 			)

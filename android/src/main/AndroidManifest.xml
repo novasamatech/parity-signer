@@ -16,6 +16,7 @@
 		android:theme="@style/Theme.ParitySigner">
 		<activity
 			android:name=".MainActivity"
+			android:windowSoftInputMode="adjustResize"
 			android:exported="true"
 			android:theme="@style/Theme.ParitySigner.NoActionBar"
 			android:screenOrientation="portrait">
@@ -26,5 +27,4 @@
 			</intent-filter>
 		</activity>
 	</application>
-
 </manifest>

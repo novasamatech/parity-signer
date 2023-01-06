@@ -9,7 +9,6 @@ object FeatureFlags {
 
 		return when (feature) {
 			FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT -> false
-			FeatureOption.MULTI_TRANSACTION_CAMERA -> false
 			FeatureOption.EXPORT_SECRET_KEY -> false //unused
 		}
 	}
@@ -20,7 +19,6 @@ object FeatureFlags {
 
 enum class FeatureOption {
 	SKIP_UNLOCK_FOR_DEVELOPMENT,
-	MULTI_TRANSACTION_CAMERA,
 	EXPORT_SECRET_KEY; //unused as sample
 
 	fun isEnabled() = FeatureFlags.isEnabled(this)

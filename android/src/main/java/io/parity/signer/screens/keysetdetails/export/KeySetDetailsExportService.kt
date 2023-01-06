@@ -12,7 +12,7 @@ import io.parity.signer.models.getData
 class KeySetDetailsExportService :
 	AnimatedQrKeysProvider<KeySetDetailsExportService.GetQrCodesListRequest> {
 	private val uniffiInteractor: UniffiInteractor =
-		ServiceLocator.backendLocator.uniffiInteractor
+		ServiceLocator.backendScope.uniffiInteractor
 
 	override suspend fun getQrCodesList(input: GetQrCodesListRequest): AnimatedQrImages? {
 		return uniffiInteractor.exportSeedWithKeys(

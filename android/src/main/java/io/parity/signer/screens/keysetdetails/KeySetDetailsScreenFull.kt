@@ -7,7 +7,6 @@ import androidx.compose.runtime.*
 import androidx.navigation.NavController
 import io.parity.signer.models.*
 import io.parity.signer.ui.BottomSheetWrapperContent
-import io.parity.signer.ui.navigationselectors.KeySetDetailsNavSubgraph
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)

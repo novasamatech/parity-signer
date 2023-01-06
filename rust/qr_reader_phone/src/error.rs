@@ -16,6 +16,12 @@ pub enum Error {
     #[error(transparent)]
     HexDecoding(#[from] hex::FromHexError),
 
+    #[error("Banana Split password is wrong")]
+    BananaSplitWrongPassword,
+
+    #[error(transparent)]
+    BananaSplitError(#[from] banana_recovery::Error),
+
     #[error("Unable to decode on given dataset")]
     UnableToDecode,
 
@@ -24,6 +30,9 @@ pub enum Error {
 
     #[error("Was decoding legacy multi-element qr, and got interrupted by a fountain one.")]
     LegacyInterruptedByFountain,
+
+    #[error("Was decoding legacy multi-element qr, and got interrupted by a banana recovery one.")]
+    LegacyInterruptedByBanana,
 
     #[error(
         "Number of element in legacy multi-element qr sequence exceeds expected sequence length."

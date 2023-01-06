@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetConfirmDialog
-import io.parity.signer.components.base.SecondaryButtonBottomSheet
+import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.Callback
 import io.parity.signer.models.EmptyNavigator
@@ -123,7 +123,7 @@ fun KeyDetailsMenuGeneral(
 			onclick = onDeleteClicked
 		)
 		Spacer(modifier = Modifier.padding(bottom = 8.dp))
-		SecondaryButtonBottomSheet(
+		SecondaryButtonWide(
 			label = stringResource(R.string.generic_cancel),
 		) {
 			navigator.backAction()

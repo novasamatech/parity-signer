@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.NotificationFrameTextImportant
-import io.parity.signer.components.base.PrimaryButtonBottomSheet
+import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.models.Callback
 import io.parity.signer.screens.keysetdetails.backup.BackupPhraseBox
@@ -40,7 +40,7 @@ internal fun NewKeySetBackupScreen(
 			.background(MaterialTheme.colors.background),
 	) {
 		ScreenHeader(
-			stringId = R.string.new_key_set_backup_title,
+			title = stringResource(R.string.new_key_set_backup_title),
 			onBack = onBack,
 		)
 		Text(
@@ -60,7 +60,7 @@ internal fun NewKeySetBackupScreen(
 		)
 		Spacer(modifier = Modifier.weight(1f))
 
-		PrimaryButtonBottomSheet(
+		PrimaryButtonWide(
 			label = stringResource(R.string.new_key_set_backup_cta),
 			modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
 			onClicked = onProceed,

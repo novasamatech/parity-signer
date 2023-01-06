@@ -22,6 +22,7 @@ fn check_single_qr_hex() -> Result<(), String> {
         Ok(x) => match x {
             Ready::Yes(a) => result.push_str(&hex::encode(a)),
             Ready::NotYet(_) => return Err(String::from("Waiting animated QR.")),
+            _ => (),
         },
         Err(_) => return Err(String::from("QR image processing error.")),
     };

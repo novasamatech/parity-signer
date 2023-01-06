@@ -2,16 +2,13 @@ package io.parity.signer.models
 
 import android.annotation.SuppressLint
 import android.content.*
-import android.content.pm.PackageManager
-import android.os.Build
 import android.provider.Settings
-import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.dependencygraph.getDbNameFromContext
+import io.parity.signer.models.storage.SeedStorage
+import io.parity.signer.models.storage.tellRustSeedNames
 import io.parity.signer.ui.navigationselectors.OnboardingWasShown
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,21 +17,14 @@ import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 
-/**
- * This is single object to handle all interactions with backend
- */
 class SignerDataModel : ViewModel() {
 
 	// Internal model values
 	private val _onBoardingDone = MutableStateFlow(OnboardingWasShown.InProgress)
 
-	// TODO: something about this
-	// It leaks context objects,
-	// but is really quite convenient in composable things
-	lateinit var context: Context
-	lateinit var activity: FragmentActivity
-	private lateinit var masterKey: MasterKey
-	private var hasStrongbox: Boolean = false
+// todo migrate to use dependencies from ServiceLocator rather than expecting them here
+	val context: Context get() = ServiceLocator.appContext
+	val activity: FragmentActivity get() = ServiceLocator.activityScope!!.activity
 
 	val navigator by lazy { SignerNavigator(this) }
 
@@ -48,10 +38,7 @@ class SignerDataModel : ViewModel() {
 	// Transaction
 	internal var action = JSONObject()
 
-	// Internal storage for model data:
-
-	// Seeds
-	internal val _seedNames = MutableStateFlow(arrayOf<String>())
+ val seedStorage: SeedStorage = ServiceLocator.seedStorage
 
 	// Navigator
 	internal val _actionResult = MutableStateFlow(
@@ -74,10 +61,6 @@ class SignerDataModel : ViewModel() {
 
 	// Data storage locations
 	internal var dbName: String = ""
-	private val keyStore = "AndroidKeyStore"
-	internal lateinit var sharedPreferences: SharedPreferences
-
-	val seedNames: StateFlow<Array<String>> = _seedNames
 
 	// Observables for screens state
 
@@ -93,28 +76,11 @@ class SignerDataModel : ViewModel() {
 	// MARK: init boilerplate begin
 
 	/**
-	 * Init on object creation, context not passed yet! Pass it and call next init
-	 */
-	init {
-		// actually load RustNative code
-		System.loadLibrary("signer")
-	}
-
-	/**
 	 * Don't forget to call real init after defining context!
 	 */
 	fun lateInit() {
 		// Define local database name
 		dbName = context.getDbNameFromContext()
-		hasStrongbox = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-			context
-				.packageManager
-				.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
-		} else {
-			false
-		}
-
-		Log.d("strongbox available:", hasStrongbox.toString())
 
 		// Airplane mode detector
 		isAirplaneOn()
@@ -129,37 +95,10 @@ class SignerDataModel : ViewModel() {
 
 		context.registerReceiver(receiver, intentFilter)
 
-		// Init crypto for seeds:
-		// https://developer.android.com/training/articles/keystore
-		masterKey = if (hasStrongbox) {
-			MasterKey.Builder(context)
-				.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-				.setRequestStrongBoxBacked(true)
-				.setUserAuthenticationRequired(true)
-				.build()
-		} else {
-			MasterKey.Builder(context)
-				.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-				.setUserAuthenticationRequired(true)
-				.build()
-		}
-
 		// Imitate ios behavior
-		Log.e("ENCRY", "$context $keyStore $masterKey")
 		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
-			sharedPreferences =
-				if (FeatureFlags.isEnabled(FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT)) {
-					context.getSharedPreferences("FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT", Context.MODE_PRIVATE)
-				} else {
-					EncryptedSharedPreferences(
-						context,
-						keyStore,
-						masterKey,
-						EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-						EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-					)
-				}
+			seedStorage.init(context)
 			totalRefresh()
 		}
 	}
@@ -191,7 +130,7 @@ class SignerDataModel : ViewModel() {
 	@SuppressLint("ApplySharedPref")
 	fun wipe() {
 		deleteDir(File(dbName))
-		sharedPreferences.edit().clear().commit() // No, not apply(), do it now!
+		seedStorage.wipe()
 	}
 
 	/**
@@ -277,7 +216,7 @@ class SignerDataModel : ViewModel() {
 		if (checkRefresh) {
 			getAlertState()
 			isAirplaneOn()
-			refreshSeedNames(init = true)
+			tellRustSeedNames(init = true)
 			navigator.navigate(Action.START)
 		}
 	}
@@ -301,10 +240,6 @@ class SignerDataModel : ViewModel() {
 		authentication.authenticate(activity) {
 			jailbreak()
 		}
-	}
-
-	fun isStrongBoxProtected(): Boolean {
-		return masterKey.isStrongBoxBacked
 	}
 
 	fun getAppVersion(): String {
