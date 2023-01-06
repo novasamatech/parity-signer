@@ -83,6 +83,15 @@ struct ErrorBottomModalViewModel {
         )
     }
 
+    static func allKeysAlreadyExist(_ action: @escaping @autoclosure () -> Void = {}())
+        -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.ImportKeys.ErrorModal.AlreadyExists.Label.title.string,
+            content: Localizable.ImportKeys.ErrorModal.AlreadyExists.Label.content.string,
+            secondaryAction: .init(label: Localizable.ImportKeys.ErrorModal.AlreadyExists.Action.ok.key, action: action)
+        )
+    }
+
     static func signingUnknownNetwork(
         _ networkName: String,
         _ action: @escaping @autoclosure () -> Void = {}()

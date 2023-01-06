@@ -44,13 +44,15 @@ extension Array where Element == MTransaction {
                 }
             }
             .flatMap { $0 }
-        return Dictionary(
+        let mostCommonError = Dictionary(
             uniqueKeysWithValues: [.networkMissing, .keySetMissing, .badFormat]
                 .map { error -> (DerivedKeyError, Int) in (
                     error,
                     allErrors.filter { $0 == error }.count
                 ) }
-        ).max(by: { $0.value < $1.value })?.key
+        ).max(by: { $0.value < $1.value })
+
+        return (mostCommonError?.value ?? 0) > 0 ? mostCommonError?.key : nil
     }
 }
 

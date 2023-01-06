@@ -520,6 +520,9 @@
 "ImportKeys.ErrorModal.BadFormat.Label.Title" = "Import keys paths in bad format";
 "ImportKeys.ErrorModal.BadFormat.Label.Content" = "Some keys paths are in bad format so they cannot be imported";
 "ImportKeys.ErrorModal.BadFormat.Action.ok" = "Got It";
+"ImportKeys.ErrorModal.AlreadyExists.Label.Title" = "Derived keys already exist";
+"ImportKeys.ErrorModal.AlreadyExists.Label.Content" = "All of the scanned derived keys are already imported";
+"ImportKeys.ErrorModal.AlreadyExists.Action.ok" = "Got It";
 
 "NetworkFilter.Label.Header" = "Filter keys by network";
 "NetworkFilter.Action.Reset" = "Reset";

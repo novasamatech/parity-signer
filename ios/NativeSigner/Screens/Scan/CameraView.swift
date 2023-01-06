@@ -20,7 +20,9 @@ struct CameraView: View {
             // Full screen camera preview
             CameraPreview(session: model.session)
                 .onReceive(model.$payload) { payload in
-                    viewModel.checkForTransactionNavigation(payload)
+                    DispatchQueue.main.async {
+                        self.viewModel.checkForTransactionNavigation(payload)
+                    }
                 }
                 .onChange(of: model.total) { total in
                     progressViewModel.total = total
@@ -372,6 +374,7 @@ extension CameraView.ViewModel {
     func continueImportDerivedKeys(_ transactions: [MTransaction]) {
         // We always need to `.goBack` as even if camera is dismissed without import,
         // navigation "forward" already happened
+
         navigation.performFake(navigation: .init(action: .goBack))
         if let importError = transactions.dominantImportError {
             switch importError {
@@ -382,6 +385,9 @@ extension CameraView.ViewModel {
             case .badFormat:
                 presentableError = .importDerivedKeysBadFormat()
             }
+            isPresentingError = true
+        } else if !transactions.hasImportableKeys {
+            presentableError = .allKeysAlreadyExist()
             isPresentingError = true
         } else {
             self.transactions = transactions
