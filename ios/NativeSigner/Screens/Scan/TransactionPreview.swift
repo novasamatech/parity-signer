@@ -365,6 +365,7 @@ extension TransactionPreview {
                         style: .warning
                     )
                 }
+
                 self.navigation.performFake(navigation: .init(action: .goBack))
                 self.snackbarPresentation.isSnackbarPresented = true
                 self.isPresented.toggle()
@@ -379,26 +380,26 @@ extension TransactionPreview {
 }
 
 #if DEBUG
-struct TransactionPreview_Previews: PreviewProvider {
-    static var previews: some View {
-        // Single transaction
-        TransactionPreview(viewModel: .init(
-            isPresented: Binding<Bool>.constant(true),
-            content: [PreviewData.signTransaction],
-            signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
-        ))
-        .environmentObject(NavigationCoordinator())
-        .environmentObject(SignerDataModel())
-        .preferredColorScheme(.dark)
-        // Multi transaction (i.e. different QR code design)
-        TransactionPreview(viewModel: .init(
-            isPresented: Binding<Bool>.constant(true),
-            content: [PreviewData.signTransaction, PreviewData.signTransaction],
-            signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
-        ))
-        .environmentObject(NavigationCoordinator())
-        .environmentObject(SignerDataModel())
+    struct TransactionPreview_Previews: PreviewProvider {
+        static var previews: some View {
+            // Single transaction
+            TransactionPreview(viewModel: .init(
+                isPresented: Binding<Bool>.constant(true),
+                content: [PreviewData.signTransaction],
+                signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
+            ))
+            .environmentObject(NavigationCoordinator())
+            .environmentObject(SignerDataModel())
+            .preferredColorScheme(.dark)
+            // Multi transaction (i.e. different QR code design)
+            TransactionPreview(viewModel: .init(
+                isPresented: Binding<Bool>.constant(true),
+                content: [PreviewData.signTransaction, PreviewData.signTransaction],
+                signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
+            ))
+            .environmentObject(NavigationCoordinator())
+            .environmentObject(SignerDataModel())
 //        .preferredColorScheme(.dark)
+        }
     }
-}
 #endif

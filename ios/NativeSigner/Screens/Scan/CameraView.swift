@@ -20,7 +20,7 @@ struct CameraView: View {
             // Full screen camera preview
             CameraPreview(session: model.session)
                 .onReceive(model.$payload) { payload in
-                    viewModel.checkForTransactionNavigation(payload, model: model)
+                    viewModel.checkForTransactionNavigation(payload)
                 }
                 .onChange(of: model.total) { total in
                     progressViewModel.total = total
@@ -253,7 +253,7 @@ extension CameraView {
             self.navigation = navigation
         }
 
-        func checkForTransactionNavigation(_ payload: String?, model _: CameraService) {
+        func checkForTransactionNavigation(_ payload: String?) {
             guard payload != nil, !isInTransactionProgress else { return }
             isInTransactionProgress = true
             let actionResult = navigation.performFake(
@@ -273,52 +273,20 @@ extension CameraView {
                 isPresentingError = true
                 return
             }
-            // Handle rest of transactions with optional error payload, type is assumed based on first error
+            // Handle rest of transactions with optional error payload
+            // Type is assumed based on first error
             let firstTransaction = transactions.first
             switch firstTransaction?.ttype {
             case .sign:
-                let actionResult = sign(transactions: transactions)
-                self.transactions = transactions
-                // Password protected key, continue to modal
-                if case let .enterPassword(value) = actionResult.modalData {
-                    enterPassword = value
-                    isPresentingEnterPassword = true
-                }
-                // Transaction ready to sign
-                if case let .signatureReady(value) = actionResult.modalData {
-                    signature = value
-                    continueWithSignature()
-                }
+                continueTransactionSignature(transactions)
+            case .importDerivations:
+                continueImportDerivedKeys(transactions)
             default:
                 // Transaction with error
                 // Transaction that does not require signing (i.e. adding network or metadata)
                 self.transactions = transactions
                 isPresentingTransactionPreview = true
             }
-        }
-
-        func onMultipleTransactionSign(_ payloads: [String], model _: CameraService) {
-            var transactions: [MTransaction] = []
-            for payload in payloads {
-                let actionResult = navigation.performFake(
-                    navigation: .init(
-                        action: .transactionFetched,
-                        details: payload
-                    )
-                )
-                if case let .transaction(value) = actionResult.screenData {
-                    transactions += value
-                }
-            }
-            self.transactions = transactions
-            isPresentingTransactionPreview = true
-        }
-
-        func onScanMultipleTap(model: CameraService) {
-            model.multipleTransactions = []
-            model.isMultipleTransactionMode.toggle()
-            isScanningMultiple.toggle()
-            updateTexts()
         }
 
         func continueWithSignature() {
@@ -333,6 +301,74 @@ extension CameraView {
             shouldPresentError = false
             isInTransactionProgress = false
         }
+    }
+}
+
+// MARK: - Transaction Signature
+
+extension CameraView.ViewModel {
+    func continueTransactionSignature(_ transactions: [MTransaction]) {
+        let actionResult = sign(transactions: transactions)
+        self.transactions = transactions
+        // Password protected key, continue to modal
+        if case let .enterPassword(value) = actionResult.modalData {
+            enterPassword = value
+            isPresentingEnterPassword = true
+        }
+        // Transaction ready to sign
+        if case let .signatureReady(value) = actionResult.modalData {
+            signature = value
+            continueWithSignature()
+        }
+    }
+}
+
+// MARK: - Import Derived Keys
+
+extension CameraView.ViewModel {
+    func continueImportDerivedKeys(_ transactions: [MTransaction]) {
+        if let importError = transactions.dominantImportError {
+            switch importError {
+            case .networkMissing:
+                presentableError = .importDerivedKeysMissingNetwork()
+            case .keySetMissing:
+                presentableError = .importDerivedKeysMissingKeySet()
+            case .badFormat:
+                presentableError = .importDerivedKeysBadFormat()
+            }
+            isPresentingError = true
+        } else {
+            self.transactions = transactions
+            isPresentingTransactionPreview = true
+        }
+    }
+}
+
+// MARK: - Mutliple Transactions mode
+
+extension CameraView.ViewModel {
+    func onMultipleTransactionSign(_ payloads: [String], model _: CameraService) {
+        var transactions: [MTransaction] = []
+        for payload in payloads {
+            let actionResult = navigation.performFake(
+                navigation: .init(
+                    action: .transactionFetched,
+                    details: payload
+                )
+            )
+            if case let .transaction(value) = actionResult.screenData {
+                transactions += value
+            }
+        }
+        self.transactions = transactions
+        isPresentingTransactionPreview = true
+    }
+
+    func onScanMultipleTap(model: CameraService) {
+        model.multipleTransactions = []
+        model.isMultipleTransactionMode.toggle()
+        isScanningMultiple.toggle()
+        updateTexts()
     }
 }
 

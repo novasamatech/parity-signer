@@ -26,6 +26,32 @@ extension Array where Element == MTransaction {
     var importableSeedKeysPreviews: [SeedKeysPreview] {
         reduce(into: []) { $0 += $1.importableSeedKeysPreviews }
     }
+
+    /// Rust error state for import derived keys is different comparing to UI requirements,
+    /// hence we need this support function to find out what is the proper UI error to show
+    /// if there are no importable keys left
+    var dominantImportError: DerivedKeyError? {
+        guard !hasImportableKeys else { return nil }
+        let importableKeys = allImportDerivedKeys
+
+        let allErrors: [DerivedKeyError] = importableKeys
+            .flatMap(\.derivedKeys)
+            .compactMap {
+                if case let .invalid(errors) = $0.status {
+                    return errors
+                } else {
+                    return nil
+                }
+            }
+            .flatMap { $0 }
+        return Dictionary(
+            uniqueKeysWithValues: [.networkMissing, .keySetMissing, .badFormat]
+                .map { error -> (DerivedKeyError, Int) in (
+                    error,
+                    allErrors.filter { $0 == error }.count
+                ) }
+        ).max(by: { $0.value < $1.value })?.key
+    }
 }
 
 extension MTransaction {
@@ -33,14 +59,14 @@ extension MTransaction {
     var hasImportableKeys: Bool {
         switch ttype {
         case .importDerivations:
-            var hasValidKeys: Bool = false
+            var hasImportableKeys: Bool = false
             sortedValueCards().forEach {
                 if case let .derivationsCard(keys) = $0.card {
-                    hasValidKeys = keys
-                        .reduce(hasValidKeys) { $0 || $1.derivedKeys.contains { $0.status == .importable }}
+                    hasImportableKeys = keys
+                        .reduce(hasImportableKeys) { $0 || $1.derivedKeys.contains { $0.status == .importable }}
                 }
             }
-            return hasValidKeys
+            return hasImportableKeys
         default:
             return false
         }

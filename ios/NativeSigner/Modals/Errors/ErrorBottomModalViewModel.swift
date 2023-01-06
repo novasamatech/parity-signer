@@ -50,6 +50,39 @@ struct ErrorBottomModalViewModel {
         )
     }
 
+    static func importDerivedKeysMissingNetwork(_ action: @escaping @autoclosure () -> Void = {}())
+        -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.ImportKeys.ErrorModal.MissingNetwork.Label.title.string,
+            content: Localizable.ImportKeys.ErrorModal.MissingNetwork.Label.content.string,
+            secondaryAction: .init(
+                label: Localizable.ImportKeys.ErrorModal.MissingNetwork.Action.ok.key,
+                action: action
+            )
+        )
+    }
+
+    static func importDerivedKeysMissingKeySet(_ action: @escaping @autoclosure () -> Void = {}())
+        -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.ImportKeys.ErrorModal.MissingKeySets.Label.title.string,
+            content: Localizable.ImportKeys.ErrorModal.MissingKeySets.Label.content.string,
+            secondaryAction: .init(
+                label: Localizable.ImportKeys.ErrorModal.MissingKeySets.Action.ok.key,
+                action: action
+            )
+        )
+    }
+
+    static func importDerivedKeysBadFormat(_ action: @escaping @autoclosure () -> Void = {}())
+        -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.ImportKeys.ErrorModal.BadFormat.Label.title.string,
+            content: Localizable.ImportKeys.ErrorModal.BadFormat.Label.content.string,
+            secondaryAction: .init(label: Localizable.ImportKeys.ErrorModal.BadFormat.Action.ok.key, action: action)
+        )
+    }
+
     static func signingUnknownNetwork(
         _ networkName: String,
         _ action: @escaping @autoclosure () -> Void = {}()
