@@ -221,6 +221,18 @@ pub struct TransactionCard {
     pub card: Card,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum BananaSplitRecoveryResult {
+    RequestPassword,
+    RecoveredSeed { s: String },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum DecodeSequenceResult {
+    BBananaSplitRecoveryResult { b: BananaSplitRecoveryResult },
+    Other { s: String },
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct TransactionCardSet {
     pub author: Option<Vec<TransactionCard>>,

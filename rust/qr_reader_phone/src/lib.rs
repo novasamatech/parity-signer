@@ -3,12 +3,16 @@
 
 use std::convert::TryFrom;
 
+use banana_recovery::Share;
+
+use definitions::navigation::{BananaSplitRecoveryResult, DecodeSequenceResult};
+
 mod error;
 mod parser;
 pub mod process_payload;
 
 use crate::parser::{parse_qr_payload, LegacyFrame, RaptorqFrame};
-use error::{Error, Result};
+pub use error::{Error, Result};
 use process_payload::{process_decoded_payload, InProgress, Ready};
 
 pub fn get_payload(line: &str, cleaned: bool) -> Result<Vec<u8>> {
@@ -25,26 +29,47 @@ pub fn get_length(line: &str, cleaned: bool) -> Result<u32> {
         Ok(frame.total())
     } else if let Ok(frame) = LegacyFrame::try_from(payload.as_ref()) {
         Ok(frame.total as u32)
+    } else if let Ok(banana_spilt_qr) = Share::new(payload) {
+        log::warn!("banana");
+        Ok(banana_spilt_qr.required_shards() as u32)
     } else {
         Ok(1)
     }
 }
 
-pub fn decode_sequence(set: &[String], cleaned: bool) -> Result<String> {
+pub fn decode_sequence(
+    set: &[String],
+    password: &Option<String>,
+    cleaned: bool,
+) -> Result<DecodeSequenceResult> {
     let mut out = Ready::NotYet(InProgress::None);
     let mut final_result: Option<String> = None;
     for x in set {
+        log::warn!("decode sequence {x}");
         let payload = get_payload(x, cleaned)?;
         if let Ready::NotYet(decoding) = out {
-            out = process_decoded_payload(payload, decoding)?;
-            if let Ready::Yes(v) = out {
-                final_result = Some(hex::encode(v));
-                break;
+            out = process_decoded_payload(payload, password, decoding)?;
+            match out {
+                Ready::Yes(v) => {
+                    final_result = Some(hex::encode(v));
+                    break;
+                }
+                Ready::BananaSplitPasswordRequest => {
+                    return Ok(DecodeSequenceResult::BBananaSplitRecoveryResult {
+                        b: BananaSplitRecoveryResult::RequestPassword,
+                    });
+                }
+                Ready::BananaSplitReady(s) => {
+                    return Ok(DecodeSequenceResult::BBananaSplitRecoveryResult {
+                        b: BananaSplitRecoveryResult::RecoveredSeed { s },
+                    })
+                }
+                _ => (),
             }
         }
     }
     match final_result {
-        Some(a) => Ok(a),
+        Some(s) => Ok(DecodeSequenceResult::Other { s }),
         None => Err(Error::UnableToDecode),
     }
 }
@@ -91,14 +116,14 @@ mod tests {
             "400021456".to_string(),
             "400021578".to_string(),
         ];
-        let result = decode_sequence(&jsonline, false);
+        let result = decode_sequence(&jsonline, &None, false);
         assert!(result.is_ok(), "Expected ok, {:?}", result);
     }
 
     #[test]
     fn legacy_multiframe_one_frame() {
         let jsonline = vec!["400be00000100005301025a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969a40403005a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe9690700e40b5402c5005c00ec07000004000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafebcd1b489599db4424ed928804ddad3a4689fb8c835151ef34bc250bb845cdc1eb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe0ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec".to_string()];
-        let result = decode_sequence(&jsonline, false);
+        let result = decode_sequence(&jsonline, &None, false);
         assert!(result.is_ok(), "Expected ok, {:?}", result);
     }
 

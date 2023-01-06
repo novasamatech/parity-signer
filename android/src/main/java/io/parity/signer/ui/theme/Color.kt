@@ -76,6 +76,9 @@ val Colors.pink500: Color
 val Colors.pink300: Color
 	get() = Color(0xFFF272B6)
 
+val Colors.backgroundDanger: Color
+	get() = Color(0x1FF272B6)
+
 val Colors.red400: Color
 	get() = Color(0xFFFD4935)
 
@@ -90,4 +93,7 @@ val Colors.forcedFill30: Color
 
 val Colors.forcedFill40: Color
 	get() = Color(0x66000000)
+
+val Colors.red500fill12: Color
+	get() = Color(0x1FFE8D81)
 

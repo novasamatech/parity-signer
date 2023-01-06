@@ -34,6 +34,7 @@ fun BottomBar2(
 	navigator: Navigator,
 	state: BottomBar2State,
 ) {
+	BottomBarSingleton.lastUsedTab = state
 	BottomAppBar(
 		backgroundColor = MaterialTheme.colors.backgroundSecondary,
 		elevation = 8.dp,

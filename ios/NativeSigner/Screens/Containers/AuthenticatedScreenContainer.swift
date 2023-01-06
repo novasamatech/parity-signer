@@ -55,12 +55,17 @@ struct AuthenticatedScreenContainer: View {
                     navigation.performFake(navigation: .init(action: .navbarScan))
                     isShowingQRScanner = true
                 } else {
-                    // "Pretend" to go back to previous tab (as we don't change `selectedTab` when showing QR screen
-                    // now), but do
-                    // it for real before dismissing QR code scanner to have dataset to display as we might have
-                    // ventured
-                    // into transaction details
-                    if let action = navigation.selectedTab.action {
+                    if let overrideNavigation = navigation.overrideQRScannerDismissalNavigation {
+                        // Override default tab navigation when we want to end on specific screen after camera
+                        // dismissal
+                        navigation.perform(navigation: overrideNavigation)
+                        navigation.overrideQRScannerDismissalNavigation = nil
+                    } else if let action = navigation.selectedTab.action {
+                        // "Pretend" to go back to previous tab (as we don't change `selectedTab` when showing QR screen
+                        // now), but do
+                        // it for real before dismissing QR code scanner to have dataset to display as we might have
+                        // ventured
+                        // into transaction details
                         navigation.perform(navigation: .init(action: action))
                     }
                     isShowingQRScanner = false

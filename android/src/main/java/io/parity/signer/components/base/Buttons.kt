@@ -22,7 +22,7 @@ import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.*
 
 @Composable
-fun PrimaryButtonBottomSheet(
+fun PrimaryButtonWide(
 	label: String,
 	modifier: Modifier = Modifier,
 	isEnabled: Boolean = true,
@@ -104,7 +104,7 @@ fun PrimaryButtonGreyDisabled(
 				},
 				RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
 			)
-			.padding(vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)),
+			.padding(vertical = 12.dp), // in other places 16, but this is exception to show in header
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		Text(
@@ -122,7 +122,7 @@ fun PrimaryButtonGreyDisabled(
 }
 
 @Composable
-fun SecondaryButtonBottomSheet(
+fun SecondaryButtonWide(
 	label: String,
 	modifier: Modifier = Modifier,
 	withBackground: Boolean = false,
@@ -192,12 +192,12 @@ fun RowButtonsBottomSheet(
 @Composable
 fun SignerDivider(
 	modifier: Modifier = Modifier,
-	padding: Dp = 16.dp,
+	sidePadding: Dp = 16.dp,
 ) {
 	Divider(
 		color = MaterialTheme.colors.appliedSeparator,
 		thickness = 1.dp,
-		modifier = modifier.padding(horizontal = padding),
+		modifier = modifier.padding(horizontal = sidePadding),
 	)
 }
 
@@ -214,7 +214,7 @@ fun SignerDivider(
 private fun PreviewButtons() {
 	SignerNewTheme {
 		Column() {
-			PrimaryButtonBottomSheet("button") {}
+			PrimaryButtonWide("button") {}
 			RowButtonsBottomSheet(
 				labelCancel = "Cancel",
 				labelCta = "Apply",
@@ -242,8 +242,8 @@ private fun PreviewButtons() {
 				isEnabled = false,
 			) {
 			}
-			SecondaryButtonBottomSheet("Secondary Bottom Sheet") {}
-			SecondaryButtonBottomSheet(
+			SecondaryButtonWide("Secondary Bottom Sheet") {}
+			SecondaryButtonWide(
 				"Secondary with background",
 				withBackground = true
 			) {}

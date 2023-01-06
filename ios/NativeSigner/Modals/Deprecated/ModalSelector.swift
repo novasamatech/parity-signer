@@ -14,7 +14,7 @@ struct ModalSelector: View {
     let alertShow: () -> Void
     let navigationRequest: NavigationRequest
     let removeSeed: (String) -> Void
-    let restoreSeed: (String, String, Bool) -> Void
+    let restoreSeed: (String, String) -> Void
     let createAddress: (String, String) -> Void
     let sign: (String, String) -> Void
 

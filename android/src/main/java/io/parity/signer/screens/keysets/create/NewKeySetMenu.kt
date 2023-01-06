@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
-import io.parity.signer.components.base.SecondaryButtonBottomSheet
+import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.models.AlertState
 import io.parity.signer.models.EmptyNavigator
@@ -36,7 +36,7 @@ fun NewSeedMenu(
 			modifier = Modifier.padding(vertical = 16.dp),
 			onCloseClicked = null
 		)
-		SignerDivider(padding = 24.dp)
+		SignerDivider(sidePadding = 24.dp)
 
 		Column(
 			modifier = Modifier
@@ -66,7 +66,7 @@ fun NewSeedMenu(
 			)
 
 			Spacer(modifier = Modifier.padding(bottom = 8.dp))
-			SecondaryButtonBottomSheet(
+			SecondaryButtonWide(
 				label = stringResource(R.string.generic_cancel),
 			) {
 				navigator.backAction()

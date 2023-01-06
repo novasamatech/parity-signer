@@ -7,10 +7,14 @@ import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.components.exposesecurity.ShieldAlert
 import io.parity.signer.bottomsheets.*
+import io.parity.signer.bottomsheets.password.PasswordConfirm
 import io.parity.signer.components.Documents
 import io.parity.signer.models.*
+import io.parity.signer.models.storage.addSeed
+import io.parity.signer.models.storage.signSufficientCrypto
 import io.parity.signer.screens.*
 import io.parity.signer.screens.logs.logdetails.LogDetails
+import io.parity.signer.screens.networks.NetworkDetails
 import io.parity.signer.screens.settings.VerifierScreen
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
@@ -27,7 +31,7 @@ fun ScreenSelector(
 	val button1: (Action) -> Unit = { action -> navigate(action, "", "") }
 	val button2: (Action, String) -> Unit =
 		{ action, details -> navigate(action, details, "") }
-	val seedNames = signerDataModel.seedNames.collectAsState()
+	val seedNames = signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
 		is ScreenData.DeriveKey -> NewAddressScreen(
@@ -67,11 +71,6 @@ fun ScreenSelector(
 		)
 		ScreenData.Scan -> {} //in new selector
 		is ScreenData.Transaction -> {} //in new selector
-//			TransactionPreviewOld(
-//				screenData.f,
-//				signerDataModel::navigate,
-//				signerDataModel::signTransaction
-//			)
 		is ScreenData.SeedSelector -> {} //shown in new selector
 		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
 			screenData.f,

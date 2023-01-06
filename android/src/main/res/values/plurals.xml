@@ -19,4 +19,11 @@
 		<item quantity="one">Export %1$d Key</item>
 		<item quantity="other">Export %1$d Keys</item>
 	</plurals>
+
+	<plurals name="transactions_title_other">
+		<item quantity="one">Sign Transaction</item>
+		<item quantity="other">Sign %1$d Transactions</item>
+	</plurals>
 </resources>
+
+

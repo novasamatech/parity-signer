@@ -18,7 +18,7 @@ class DateUtilsTest {
 			.setTimeOfDay(13, 45, 0)
 			.build()
 		assertEquals(date!!.get(Calendar.HOUR_OF_DAY), 13)
-		assertEquals(date!!.get(Calendar.YEAR), 2014)
+		assertEquals(date.get(Calendar.YEAR), 2014)
 		assertEquals(expected, date)
 	}
 

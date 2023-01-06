@@ -22,7 +22,6 @@ fun NetworkCard(
 	network: NetworkCardModel,
 	selected: Boolean = false
 ) {
-
 	Surface(
 		shape = MaterialTheme.shapes.large,
 		color = MaterialTheme.colors.Bg200,

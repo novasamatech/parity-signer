@@ -80,6 +80,34 @@ impl Display for ErrorDisplayed {
     }
 }
 
+/// An error type for QR sequence decoding errors.
+#[derive(Debug)]
+pub enum QrSequenceDecodeError {
+    BananaSplitWrongPassword,
+    BananaSplit { s: String },
+    GenericError { s: String },
+}
+
+impl Display for QrSequenceDecodeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("TODO")
+    }
+}
+
+impl From<qr_reader_phone::Error> for QrSequenceDecodeError {
+    fn from(value: qr_reader_phone::Error) -> Self {
+        match value {
+            qr_reader_phone::Error::BananaSplitWrongPassword => Self::BananaSplitWrongPassword,
+            qr_reader_phone::Error::BananaSplitError(e) => Self::BananaSplit {
+                s: format!("{}", e),
+            },
+            other => QrSequenceDecodeError::GenericError {
+                s: format!("{}", other),
+            },
+        }
+    }
+}
+
 include!(concat!(env!("OUT_DIR"), "/signer.uniffi.rs"));
 
 fn action_get_name(action: &Action) -> Option<FooterButton> {
@@ -129,6 +157,7 @@ fn update_seed_names(seed_names: Vec<String>) -> Result<(), ErrorDisplayed> {
 /// Determines estimated required number of multiframe QR that should be gathered before decoding
 /// is attempted
 fn qrparser_get_packets_total(data: &str, cleaned: bool) -> anyhow::Result<u32, ErrorDisplayed> {
+    log::warn!("get packets total {}", data);
     qr_reader_phone::get_length(data, cleaned).map_err(|e| e.to_string().into())
 }
 
@@ -139,9 +168,14 @@ fn qrparser_get_packets_total(data: &str, cleaned: bool) -> anyhow::Result<u32, 
 /// QR parsing code
 fn qrparser_try_decode_qr_sequence(
     data: &[String],
+    password: Option<String>,
     cleaned: bool,
-) -> anyhow::Result<String, ErrorDisplayed> {
-    qr_reader_phone::decode_sequence(data, cleaned).map_err(|e| e.to_string().into())
+) -> anyhow::Result<DecodeSequenceResult, QrSequenceDecodeError> {
+    let res = qr_reader_phone::decode_sequence(data, &password, cleaned);
+
+    log::warn!("result in qr_parser_try_decode_qr {:?}", res);
+
+    Ok(res?)
 }
 
 /// Exports secret (private) key as QR code

@@ -5,10 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.components.base.DotsIndicator
-import io.parity.signer.components.base.PrimaryButton
 import io.parity.signer.components.base.PrimaryButtonGreyDisabled
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
@@ -48,9 +44,9 @@ fun NewKeySetNameScreen(
 	val canProceed = keySetName.isNotEmpty() && !seedNames.contains(keySetName)
 
 	Column(
-        Modifier
-            .fillMaxSize(1f)
-            .background(MaterialTheme.colors.background),
+		Modifier
+			.fillMaxSize(1f)
+			.background(MaterialTheme.colors.background),
 	) {
 		NewSeedHeader(rootNavigator, canProceed, keySetName, focusManager)
 		Text(
@@ -64,11 +60,11 @@ fun NewKeySetNameScreen(
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.LabelM,
 			modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 8.dp, bottom = 20.dp),
+				.padding(horizontal = 24.dp)
+				.padding(top = 8.dp, bottom = 20.dp),
 		)
 
-		TextField(
+		OutlinedTextField(
 			value = keySetName,
 			onValueChange = { newStr -> keySetName = newStr },
 			keyboardOptions = KeyboardOptions(
@@ -86,9 +82,9 @@ fun NewKeySetNameScreen(
 			textStyle = SignerTypeface.LabelM,
 			colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
 			modifier = Modifier
-                .focusRequester(focusRequester)
-                .fillMaxWidth(1f)
-                .padding(horizontal = 24.dp),
+				.focusRequester(focusRequester)
+				.fillMaxWidth(1f)
+				.padding(horizontal = 24.dp),
 		)
 
 		Text(
@@ -96,8 +92,8 @@ fun NewKeySetNameScreen(
 			color = MaterialTheme.colors.textSecondary,
 			style = SignerTypeface.CaptionM,
 			modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 16.dp, bottom = 16.dp),
+				.padding(horizontal = 24.dp)
+				.padding(top = 16.dp, bottom = 16.dp),
 		)
 	}
 

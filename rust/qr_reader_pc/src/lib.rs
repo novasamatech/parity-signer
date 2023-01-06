@@ -72,6 +72,7 @@ pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String
                 line.push_str(&hex::encode(a));
                 break;
             }
+            _ => todo!(),
         }
 
         if highgui::wait_key(10)? > 0 {
@@ -147,7 +148,7 @@ pub fn process_qr_image(image: &GrayImage, decoding: InProgress) -> anyhow::Resu
 
     match codes.last() {
         Some(Ok(code)) => match code.decode() {
-            Ok(decoded) => process_decoded_payload(decoded.payload, decoding)
+            Ok(decoded) => process_decoded_payload(decoded.payload, &None, decoding)
                 .map_err(|e| anyhow!(e.to_string())),
             Err(_) => Ok(Ready::NotYet(decoding)),
         },

@@ -33,13 +33,12 @@ protocol SeedsMediating: AnyObject {
     /// - Parameters:
     ///   - seedName: seed name
     ///   - seedPhrase: seed phrase to be saved
-    ///   - createRoots: choose whether empty derivations for every network should be created
-    func restoreSeed(seedName: String, seedPhrase: String, createRoots: Bool)
+    @discardableResult
+    func restoreSeed(seedName: String, seedPhrase: String, navigate: Bool) -> Bool
     /// Checks for existance of `seedName` in Keychain
     /// Each seed name needs to be unique, this helps to not overwrite old seeds
     /// - Parameter seedName: seedName to be checked
     /// - Returns: informs whethere there is collision or not.
-    /// Current `false` is also returned if `seedName` cannot be encoded into data
     func checkSeedCollision(seedName: String) -> Bool
     /// Fetches seed by `seedName` from Keychain
     /// Also calls auth screen automatically; no need to call it specially or wrap
@@ -56,6 +55,8 @@ protocol SeedsMediating: AnyObject {
     func removeSeed(seedName: String)
     /// Clear all seeds from Keychain
     func removeAllSeeds()
+
+    func checkSeedPhraseCollision(seedPhrase: String) -> Bool
 }
 
 /// Class handling all seeds-related operations that require access to Keychain
@@ -108,10 +109,12 @@ final class SeedsMediator: SeedsMediating {
         }
     }
 
-    func restoreSeed(seedName: String, seedPhrase: String, createRoots: Bool) {
-        guard signerDataModel.authenticated,
-              !checkSeedPhraseCollision(seedPhrase: seedPhrase),
-              let finalSeedPhrase = seedPhrase.data(using: .utf8) else { return }
+    @discardableResult
+    func restoreSeed(seedName: String, seedPhrase: String, navigate: Bool) -> Bool {
+        guard let finalSeedPhrase = seedPhrase.data(using: .utf8) else { return false }
+        if navigate, checkSeedPhraseCollision(seedPhrase: seedPhrase) {
+            return false
+        }
         let saveSeedResult = keychainAccessAdapter.saveSeed(
             with: seedName,
             seedPhrase: finalSeedPhrase
@@ -121,14 +124,22 @@ final class SeedsMediator: SeedsMediating {
             seedNames.append(seedName)
             seedNames.sort()
             attemptToUpdate(seedNames: seedNames)
-            signerDataModel.navigation.perform(navigation: .init(
-                action: .goForward,
-                details: createRoots ? Constants.true : Constants.false,
-                seedPhrase: seedPhrase
-            ))
+            if navigate {
+                signerDataModel.navigation.perform(navigation: .init(
+                    action: .goForward,
+                    details: Constants.true,
+                    seedPhrase: seedPhrase
+                ))
+            } else {
+                signerDataModel.navigation.performFake(navigation: .init(
+                    action: .goForward,
+                    details: Constants.true,
+                    seedPhrase: seedPhrase
+                ))
+            }
+            return true
         case .failure:
-            ()
-            // We should inform user with some dedicated UI state for that error, maybe just system alert
+            return false
         }
     }
 
@@ -210,16 +221,6 @@ final class SeedsMediator: SeedsMediating {
     func removeAllSeeds() {
         keychainAccessAdapter.removeAllSeeds()
     }
-}
-
-private extension SeedsMediator {
-    func attemptToUpdate(seedNames: [String]) {
-        do {
-            try updateSeedNames(seedNames: seedNames)
-        } catch {
-            signerDataModel.authenticated = false
-        }
-    }
 
     func checkSeedPhraseCollision(seedPhrase: String) -> Bool {
         guard let seedPhraseAsData = seedPhrase.data(using: .utf8) else {
@@ -235,6 +236,16 @@ private extension SeedsMediator {
         case .failure:
             signerDataModel.authenticated = false
             return false
+        }
+    }
+}
+
+private extension SeedsMediator {
+    func attemptToUpdate(seedNames: [String]) {
+        do {
+            try updateSeedNames(seedNames: seedNames)
+        } catch {
+            signerDataModel.authenticated = false
         }
     }
 }

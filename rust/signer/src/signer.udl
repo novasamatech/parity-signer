@@ -4,6 +4,13 @@ interface ErrorDisplayed {
     MutexPoisoned();
 };
 
+[Error]
+interface QrSequenceDecodeError {
+    BananaSplitWrongPassword();
+    BananaSplit(string s);
+    GenericError(string s);
+};
+
 dictionary MetaValuesDisplay {
     string name;
     u32 version;
@@ -513,6 +520,18 @@ dictionary MKeysInfoExport {
 };
 
 [Enum]
+interface BananaSplitRecoveryResult {
+    RequestPassword();
+    RecoveredSeed(string s);
+};
+
+[Enum]
+interface DecodeSequenceResult {
+    BBananaSplitRecoveryResult(BananaSplitRecoveryResult b);
+    Other(string s);
+};
+
+[Enum]
 interface ScreenData {
     Scan();
     Keys(string f);
@@ -550,8 +569,8 @@ namespace signer {
     [Throws=ErrorDisplayed]
     u32 qrparser_get_packets_total([ByRef] string data, boolean cleaned);
 
-    [Throws=ErrorDisplayed]
-    string qrparser_try_decode_qr_sequence([ByRef] sequence<string> data, boolean cleaned);
+    [Throws=QrSequenceDecodeError]
+    DecodeSequenceResult qrparser_try_decode_qr_sequence([ByRef] sequence<string> data, string? password, boolean cleaned);
 
     [Throws=ErrorDisplayed]
     MKeyDetails generate_secret_key_qr([ByRef] string dbname, [ByRef] string public_key, [ByRef] string expected_seed_name, [ByRef] string network_specs_key, [ByRef] string seed_phrase, string? key_password);

@@ -1,15 +1,12 @@
 package io.parity.signer.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.backgroundTertiary
 import kotlinx.coroutines.launch
@@ -33,6 +30,7 @@ fun BottomSheetWrapperContent(
 
 	ModalBottomSheetLayout(
 		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
+		sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
 		sheetState = bottomSheetState,
 		sheetContent = {
 			BottomSheetContentWrapperInternal {
@@ -73,7 +71,7 @@ fun BottomSheetWrapperRoot(
 			override fun hide() {
 				wasSheetClosed = true
 				coroutineScope.launch {
-					if (!modalBottomSheetState.isVisible) {
+					if (modalBottomSheetState.isVisible) {
 						modalBottomSheetState.hide()
 					}
 				}
@@ -89,6 +87,7 @@ fun BottomSheetWrapperRoot(
 
 	ModalBottomSheetLayout(
 		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
+		sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
 		sheetState = modalBottomSheetState,
 		sheetContent = {
 			BottomSheetContentWrapperInternal {
@@ -98,14 +97,14 @@ fun BottomSheetWrapperRoot(
 		content = {},
 	)
 
-	BackHandler {
+	BackHandler(enabled = modalBottomSheetState.isVisible) {
 		coroutineScope.launch { modalBottomSheetState.hide() }
 	}
 
 	//show once view is create to have initial open animation
 	LaunchedEffect(key1 = modalBottomSheetState) {
 		modalBottomSheetState.show()
-		wasSheetShown = true
+		//sometimes never happen. Show suspends forever like for password dialog
 	}
 
 	// Take action based on hidden state
@@ -116,7 +115,9 @@ fun BottomSheetWrapperRoot(
 					onClosedAction()
 				}
 			}
-			else -> {}
+			else -> {
+				wasSheetShown = true
+			}
 		}
 	}
 }
@@ -136,7 +137,6 @@ private fun BottomSheetContentWrapperInternal(
 			.wrapContentHeight()
 			.heightIn(0.dp, screenHeight - 40.dp)
 			.fillMaxWidth()
-			.clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
 	) {
 		content()
 	}

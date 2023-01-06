@@ -93,6 +93,7 @@
 		6D17EF8628EEEDDA008626E9 /* CameraPreviewUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D17EF8528EEEDDA008626E9 /* CameraPreviewUIView.swift */; };
 		6D199C9F292A8D1100E79113 /* TransactionDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D199C9E292A8D1100E79113 /* TransactionDetailsView.swift */; };
 		6D199CA2292A8EB300E79113 /* TransactionSummaryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D199CA1292A8EB300E79113 /* TransactionSummaryModels.swift */; };
+		6D220A2C2963DBC300122DA8 /* EnterBananaSplitPasswordModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D220A2B2963DBC300122DA8 /* EnterBananaSplitPasswordModal.swift */; };
 		6D2779C828B3D33100570055 /* NavigationBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779C728B3D33100570055 /* NavigationBarView.swift */; };
 		6D2779CA28B3E58600570055 /* KeySetListViewModelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779C928B3E58600570055 /* KeySetListViewModelBuilder.swift */; };
 		6D2779CE28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779CD28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift */; };
@@ -382,6 +383,7 @@
 		6D17EF8528EEEDDA008626E9 /* CameraPreviewUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewUIView.swift; sourceTree = "<group>"; };
 		6D199C9E292A8D1100E79113 /* TransactionDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsView.swift; sourceTree = "<group>"; };
 		6D199CA1292A8EB300E79113 /* TransactionSummaryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionSummaryModels.swift; sourceTree = "<group>"; };
+		6D220A2B2963DBC300122DA8 /* EnterBananaSplitPasswordModal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnterBananaSplitPasswordModal.swift; sourceTree = "<group>"; };
 		6D2779C728B3D33100570055 /* NavigationBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarView.swift; sourceTree = "<group>"; };
 		6D2779C928B3E58600570055 /* KeySetListViewModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetListViewModelBuilder.swift; sourceTree = "<group>"; };
 		6D2779CD28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetListViewModelBuilderTests.swift; sourceTree = "<group>"; };
@@ -621,7 +623,6 @@
 				2D48F35A2760E5DF004B27BE /* RecoverSeedPhrase.swift */,
 				2D48F3C52774AEE7004B27BE /* SelectSeedForBackup.swift */,
 				2DA5F8382756666C00D8DD29 /* EventDetails.swift */,
-				6D850BDD292F7B4D00BA9017 /* EnterPasswordModal.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -861,6 +862,8 @@
 		6D199C9D292A8CF300E79113 /* Scan */ = {
 			isa = PBXGroup;
 			children = (
+				6D850BDD292F7B4D00BA9017 /* EnterPasswordModal.swift */,
+				6D220A2B2963DBC300122DA8 /* EnterBananaSplitPasswordModal.swift */,
 				6D199CA0292A8EA200E79113 /* Models */,
 				2DA5F8302756652600D8DD29 /* CameraView.swift */,
 				2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */,
@@ -1961,6 +1964,7 @@
 				6DDEF11C28AE2DF3004CA2FD /* TabViewModelBuilder.swift in Sources */,
 				6DBE12D828B3A80A005F3CCC /* KeySetList.swift in Sources */,
 				6DB9903B295EA7DE001101DC /* ActionableInfoBoxView.swift in Sources */,
+				6D220A2C2963DBC300122DA8 /* EnterBananaSplitPasswordModal.swift in Sources */,
 				6DA2ACB0293A17DF00AAEADC /* Address+DisplayablePath.swift in Sources */,
 				6D2D244D28CE55A000862726 /* String+Utilities.swift in Sources */,
 				0452BC572767B26600C6DD37 /* Buttons.swift in Sources */,
