@@ -39,9 +39,7 @@ struct ScreenSelector: View {
         case let .logDetails(value):
             EventDetails(content: value)
         case let .seedSelector(value):
-            KeySetList(
-                viewModel: .init(listViewModel: KeySetListViewModelBuilder().build(for: value))
-            )
+            KeySetList(viewModel: .init(), dataModel: .constant(value))
         case let .keyDetails(value):
             if let value = value {
                 KeyDetailsPublicKeyView(
