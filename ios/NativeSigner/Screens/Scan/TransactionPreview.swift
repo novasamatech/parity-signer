@@ -366,7 +366,6 @@ extension TransactionPreview {
                     )
                 }
 
-                self.navigation.performFake(navigation: .init(action: .goBack))
                 self.snackbarPresentation.isSnackbarPresented = true
                 self.isPresented.toggle()
             }

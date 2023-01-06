@@ -370,6 +370,9 @@ extension CameraView.ViewModel {
 
 extension CameraView.ViewModel {
     func continueImportDerivedKeys(_ transactions: [MTransaction]) {
+        // We always need to `.goBack` as even if camera is dismissed without import,
+        // navigation "forward" already happened
+        navigation.performFake(navigation: .init(action: .goBack))
         if let importError = transactions.dominantImportError {
             switch importError {
             case .networkMissing:
