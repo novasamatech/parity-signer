@@ -15,7 +15,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
@@ -27,12 +26,9 @@ import io.parity.signer.R
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.components.base.DotsIndicator
 import io.parity.signer.components.base.PrimaryButtonGreyDisabled
-import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.models.Callback
-import io.parity.signer.models.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.uniffi.Action
 
 
 @Composable

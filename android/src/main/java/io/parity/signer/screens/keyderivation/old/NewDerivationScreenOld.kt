@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keyderivation
+package io.parity.signer.screens.keyderivation.old
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme

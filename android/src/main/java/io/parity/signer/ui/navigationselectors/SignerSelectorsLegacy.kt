@@ -13,7 +13,7 @@ import io.parity.signer.models.storage.addSeed
 import io.parity.signer.models.storage.signSufficientCrypto
 import io.parity.signer.screens.*
 import io.parity.signer.screens.keyderivation.old.DerivePasswordConfirmOld
-import io.parity.signer.screens.keyderivation.NewAddressScreen
+import io.parity.signer.screens.keyderivation.old.NewAddressScreen
 import io.parity.signer.screens.logs.logdetails.LogDetails
 import io.parity.signer.screens.networks.NetworkDetails
 import io.parity.signer.screens.settings.VerifierScreen

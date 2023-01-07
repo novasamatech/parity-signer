@@ -27,7 +27,8 @@ import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.*
 
-
+//todo derivations - how to show errors? Like path already exists
+//todo handle wrong path?
 @Composable
 fun DeriveKeyBaseScreen(onClose: Callback) {
 	val onNetworkSelect = {}
