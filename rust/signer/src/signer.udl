@@ -576,7 +576,7 @@ namespace signer {
     sequence<u8> encode_to_qr([ByRef] sequence<u8> payload, boolean is_danger);
 
     [Throws=ErrorDisplayed]
-    sequence<MSCNetworkInfo> get_all_networks([ByRef] string dbname);
+    sequence<MMNetwork> get_all_networks([ByRef] string dbname);
 
     void init_logging(string tag);
 };
