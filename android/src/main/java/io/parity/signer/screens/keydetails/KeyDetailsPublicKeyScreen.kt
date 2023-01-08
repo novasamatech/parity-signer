@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -115,9 +114,8 @@ fun KeyDetailsPublicKeyScreen(
 
 @Composable
 private fun ExposedKeyAlarm() {
-	val innerRoun = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 	val innerShape =
-		RoundedCornerShape(innerRoun, innerRoun, innerRoun, innerRoun)
+		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 	Row(
 		modifier = Modifier
 			.padding(vertical = 8.dp, horizontal = 24.dp)

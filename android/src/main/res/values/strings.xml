@@ -8,6 +8,7 @@
 	<string name="remove_key_set_confirm_cta">Remove</string>
 	<string name="generic_cancel">Cancel</string>
 	<string name="generic_done">Done</string>
+	<string name="generic_back">Back</string>
 	<string name="export_private_key_confirm_title">Export Private Key</string>
 	<string name="export_private_key_confirm_text">A private key can be used to sign transactions. This key will be marked as a hot key after export.</string>
 	<string name="export_private_key_confirm_cta">Export Private Key</string>
@@ -235,6 +236,10 @@
 	<string name="derivation_help_keys_message1">If you would like to create and manage several accounts on the network using the same secret recovery phrase, you can use derived keys. </string>
 	<string name="derivation_help_keys_message2">We can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase.</string>
 	<string name="derivation_help_keys_message3">The main reason to use derived keys is how easy it is to backup (and restore from a backup) a derivation path compared to seed phrase.</string>
+	<string name="new_derivation_conformation_title">Write Down Your Derivation Path</string>
+	<string name="new_derivation_conformation_message">Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.</string>
+	<string name="new_derivation_conformation_path_headline">Derivation Path Name</string>
+	<string name="new_derivation_conformation_checkbox_wrote_down">I have written down my derivation path name</string>
 
 
 </resources>
