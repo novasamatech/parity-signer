@@ -23,7 +23,7 @@ class DerivationPathAnalyzer {
 	}
 
 	fun getHint(path: String): Hint {
-		when {
+		return when {
 			path.endsWith("///") -> Hint.CREATE_PASSWORD
 			path.endsWith("//") -> Hint.PATH_NAME
 			else -> Hint.NONE
@@ -54,10 +54,7 @@ class DerivationPathVisualTransformation : VisualTransformation {
 		val content = if (pathAnalyzer.isCorrect(text.text)) {
 			buildAnnotatedString {
 				append(hidePasswords(text.text))
-
-				pathAnalyzer.getPassword(text.text)?.let { password ->
-					append(AnnotatedString(maskStar.toString().repeat(password.length)))
-				}
+				pathAnalyzer.getHint(text.text)
 			}
 		} else {
 			text

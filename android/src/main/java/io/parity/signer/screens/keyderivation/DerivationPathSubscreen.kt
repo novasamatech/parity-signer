@@ -120,7 +120,6 @@ private fun DerivationPathHeader(
 			) {
 				if (canProceed) {
 					onDone()
-//					focusManager.clearFocus(true) todo put it in onDone,
 				}
 			}
 		}
@@ -139,6 +138,6 @@ private fun DerivationPathHeader(
 @Composable
 private fun PreviewDerivationPathScreen() {
 	SignerNewTheme {
-		DerivationPathScreen()
+		DerivationPathScreen({},{})
 	}
 }
