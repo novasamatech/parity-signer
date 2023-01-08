@@ -1,11 +1,15 @@
 package io.parity.signer.screens.keyderivation
 
 import android.content.Context
+import androidx.compose.material.Colors
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.withStyle
+import io.parity.signer.ui.theme.textTertiary
 import kotlin.math.min
 
 
@@ -44,9 +48,13 @@ class DerivationPathAnalyzer {
 }
 
 
-//todo what to show what to show if wrong path
+//todo derivation what to show what to show if wrong path
 //PasswordVisualTransformation
-class DerivationPathVisualTransformation : VisualTransformation {
+class DerivationPathVisualTransformation(
+	val context: Context,
+	val themeColors: Colors
+) :
+	VisualTransformation {
 
 	val pathAnalyzer = DerivationPathAnalyzer()
 
@@ -54,7 +62,13 @@ class DerivationPathVisualTransformation : VisualTransformation {
 		val content = if (pathAnalyzer.isCorrect(text.text)) {
 			buildAnnotatedString {
 				append(hidePasswords(text.text))
-				pathAnalyzer.getHint(text.text)
+				pathAnalyzer.getHint(text.text).getLocalizedString(context)
+					?.let { hint ->
+						append(" ")
+						withStyle(SpanStyle(color = themeColors.textTertiary)) {
+							append(hint)
+						}
+					}
 			}
 		} else {
 			text
@@ -66,7 +80,9 @@ class DerivationPathVisualTransformation : VisualTransformation {
 		val maskStar: String = '\u2022'.toString()
 		var newText = text
 		val passwords = text.split("///").drop(1)
-		passwords.forEach{pass -> newText = newText.replace(pass, maskStar.repeat(pass.length))}
+		passwords.forEach { pass ->
+			newText = newText.replace(pass, maskStar.repeat(pass.length))
+		}
 		return newText
 	}
 

@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -60,6 +61,10 @@ fun DerivationPathScreen(
 			onValueChange = { newStr -> path.value = newStr },
 			keyboardOptions = KeyboardOptions(
 				imeAction = if (canProceed) ImeAction.Done else ImeAction.None
+			),
+			visualTransformation = DerivationPathVisualTransformation(
+				LocalContext.current,
+				MaterialTheme.colors
 			),
 			keyboardActions = KeyboardActions(
 				onDone = {
@@ -138,6 +143,6 @@ private fun DerivationPathHeader(
 @Composable
 private fun PreviewDerivationPathScreen() {
 	SignerNewTheme {
-		DerivationPathScreen({},{})
+		DerivationPathScreen({}, {})
 	}
 }
