@@ -26,6 +26,16 @@ class DerivationPathAnalyzer {
 		return path.split("///").lastOrNull()
 	}
 
+	fun hidePasswords(text: String): String {
+		val maskStar: String = '\u2022'.toString()
+		var newText = text
+		val passwords = text.split("///").drop(1)
+		passwords.forEach { pass ->
+			newText = newText.replace(pass, maskStar.repeat(pass.length))
+		}
+		return newText
+	}
+
 	fun getHint(path: String): Hint {
 		return when {
 			path.endsWith("///") -> Hint.CREATE_PASSWORD
@@ -61,7 +71,7 @@ class DerivationPathVisualTransformation(
 	override fun filter(text: AnnotatedString): TransformedText {
 		val content = if (pathAnalyzer.isCorrect(text.text)) {
 			buildAnnotatedString {
-				append(hidePasswords(text.text))
+				append(pathAnalyzer.hidePasswords(text.text))
 				pathAnalyzer.getHint(text.text).getLocalizedString(context)
 					?.let { hint ->
 						append(" ")
@@ -76,15 +86,6 @@ class DerivationPathVisualTransformation(
 		return TransformedText(content, DerivationOffsetMapping(text.length))
 	}
 
-	private fun hidePasswords(text: String): String {
-		val maskStar: String = '\u2022'.toString()
-		var newText = text
-		val passwords = text.split("///").drop(1)
-		passwords.forEach { pass ->
-			newText = newText.replace(pass, maskStar.repeat(pass.length))
-		}
-		return newText
-	}
 
 	/**
 	 * We append hint to original but transformed cannot be smaller than original
