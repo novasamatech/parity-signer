@@ -1,5 +1,6 @@
 package io.parity.signer.screens.scan.transaction
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -78,6 +79,8 @@ internal fun TransactionsScreenFull(
 	signature: MSignatureReady?,
 	onFinish: Callback,
 ) {
+	// otherwise rust state machine will stuck in transaction state and won't allow navigation to default NAVBAR action when user leaves camera.
+	BackHandler(onBack = onBack)
 	Column(
 		modifier
 			.background(MaterialTheme.colors.backgroundSystem)
@@ -90,9 +93,9 @@ internal fun TransactionsScreenFull(
 			onBack = onBack
 		)
 		Column(
-            Modifier
-                .verticalScroll(rememberScrollState())
-                .weight(1f)
+			Modifier
+				.verticalScroll(rememberScrollState())
+				.weight(1f)
 		) {
 			transactions.forEach {
 				TransactionIssues(it)
