@@ -281,18 +281,8 @@ fn encode_to_qr(payload: &[u8], is_danger: bool) -> anyhow::Result<Vec<u8>, Stri
 }
 
 /// Get all networks registered within this device
-fn get_all_networks(dbname: &str) -> anyhow::Result<Vec<MSCNetworkInfo>, String> {
-    Ok(db_handling::helpers::get_all_networks(dbname)
-        .map_err(|e| format!("{}", e))?
-        .into_iter()
-        .map(|o| MSCNetworkInfo {
-            network_title: o.specs.title,
-            network_logo: o.specs.logo,
-            network_specs_key: hex::encode(
-                NetworkSpecsKey::from_parts(&o.specs.genesis_hash, &o.specs.encryption).key(),
-            ),
-        })
-        .collect())
+fn get_all_networks(dbname: &str) -> anyhow::Result<Vec<MMNetwork>, String> {
+    db_handling::interface_signer::show_all_networks(dbname).map_err(|e| format!("{}", e))
 }
 
 /// Must be called once to initialize logging from Rust in development mode.
