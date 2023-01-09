@@ -17,8 +17,11 @@ struct ConnectivityAlertOverlay: View {
             if viewModel.isConnectivityAlertOn {
                 HStack {
                     Spacer()
-                    ConnectivityAlertButton(action: viewModel.onTapAction)
-                        .padding(Spacing.medium)
+                    ConnectivityAlertButton(
+                        action: viewModel.onTapAction,
+                        isConnectivityOn: connectivityMediator.isConnectivityOn
+                    )
+                    .padding(Spacing.medium)
                 }
             } else {
                 EmptyView()

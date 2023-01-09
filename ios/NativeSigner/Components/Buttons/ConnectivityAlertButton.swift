@@ -9,11 +9,14 @@ import SwiftUI
 
 struct ConnectivityAlertButton: View {
     private let action: () -> Void
+    private let isConnectivityOn: Bool
 
     init(
-        action: @escaping () -> Void
+        action: @escaping () -> Void,
+        isConnectivityOn: Bool
     ) {
         self.action = action
+        self.isConnectivityOn = isConnectivityOn
     }
 
     var body: some View {
@@ -28,8 +31,13 @@ struct ConnectivityAlertButton: View {
                             alignment: .center
                         )
                         .foregroundColor(Asset.accentRed400.swiftUIColor)
-                    Asset.connectivityShield.swiftUIImage
-                        .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                    if isConnectivityOn {
+                        Asset.connectivityIsOn.swiftUIImage
+                            .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                    } else {
+                        Asset.connectivityWasOn.swiftUIImage
+                            .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                    }
                 }
             }
         )
