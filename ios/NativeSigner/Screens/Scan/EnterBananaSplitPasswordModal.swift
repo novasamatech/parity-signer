@@ -162,7 +162,7 @@ extension EnterBananaSplitPasswordModal {
                     navigation.overrideQRScannerDismissalNavigation = .init(action: .selectSeed, details: seedName)
                     isKeyRecovered = true
                     isPresented.toggle()
-                } 
+                }
             } catch QrSequenceDecodeError.BananaSplitWrongPassword {
                 invalidPasswordAttempts += 1
                 if invalidPasswordAttempts > 3 {
