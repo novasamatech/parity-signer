@@ -329,12 +329,19 @@ pub fn inject_derivations_has_pwd(
                 MultiSigner::Ed25519(p) => ed25519_signers.get(&p),
                 MultiSigner::Ecdsa(p) => ecdsa_signers.get(&p),
             };
-            if seed_name.is_none() {
-                // unknown seed, skipping
+
+            let seed_name = if let Some(seed_name) = seed_name {
+                seed_name
+            } else {
                 continue;
-            }
-            let seed_name = seed_name.unwrap();
-            let seed_phrase = seeds.get(seed_name.as_str()).unwrap();
+            };
+
+            let seed_phrase = if let Some(seed_phrase) = seeds.get(seed_name.as_str()) {
+                seed_phrase
+            } else {
+                continue;
+            };
+
             // create fixed-length string to avoid reallocation
             let mut full_address = String::with_capacity(seed_phrase.len() + path.len());
             full_address.push_str(seed_phrase);
