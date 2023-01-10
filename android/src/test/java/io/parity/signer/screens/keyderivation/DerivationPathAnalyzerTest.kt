@@ -23,7 +23,7 @@ class DerivationPathAnalyzerTest {
 		assertEquals("//seed///", analyzer.hidePasswords("//seed///"))
 		assertEquals("//seed///••••", analyzer.hidePasswords("//seed///dfgf"))
 		assertEquals("//seed//1///••••", analyzer.hidePasswords("//seed//1///dfgf"))
-		assertEquals("//seed///••••///••••", analyzer.hidePasswords("//seed///sdfg///hjkj"))
+		assertEquals("//seed///•••••••••••", analyzer.hidePasswords("//seed///sdfg///hjkj"))
 		assertEquals("//seed", analyzer.hidePasswords("//seed"))
 	}
 
@@ -33,6 +33,9 @@ class DerivationPathAnalyzerTest {
 		assertEquals("", analyzer.getPassword("//seed///"))
 		assertEquals("gg", analyzer.getPassword("//seed///gg"))
 		assertEquals("gg", analyzer.getPassword("//seed//1///gg"))
+		assertEquals("/gg", analyzer.getPassword("//seed//1////gg"))
+		assertEquals("/gg///ss", analyzer.getPassword("//seed//1////gg///ss"))
+
 		assertNull(analyzer.getPassword("//seed//"))
 		assertNull(analyzer.getPassword("//"))
 		assertNull(analyzer.getPassword(""))

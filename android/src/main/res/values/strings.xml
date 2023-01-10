@@ -244,7 +244,8 @@
 	<string name="derivation_path_screen_help_tile_message">Learn more about /soft, //hard, ///password derivation methods</string>
 	<string name="derivation_path_screen_subinput_hint">Path name example //network//1</string>
 	<string name="derivation_path_screen_password_input_button">/// Password</string>
-
+	<string name="derivation_path_hint_create_password">Create a Password</string>
+	<string name="derivation_path_hint_enter_path_name">Enter Path Name</string>
 
 </resources>
 

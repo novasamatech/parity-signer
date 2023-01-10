@@ -9,6 +9,7 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
+import io.parity.signer.R
 import io.parity.signer.ui.theme.textTertiary
 import kotlin.math.min
 
@@ -23,22 +24,26 @@ class DerivationPathAnalyzer {
 	}
 
 	fun getPassword(path: String): String? {
-		return path.split("///").drop(1).lastOrNull()
+		return if (path.contains("///")) {
+			path.substringAfter("///")
+		} else {
+			null
+		}
 	}
 
 	fun hidePasswords(text: String): String {
 		val maskStar: String = '\u2022'.toString()
-		var newText = text
-		val passwords = text.split("///").drop(1)
-		passwords.forEach { pass ->
-			newText = newText.replace(pass, maskStar.repeat(pass.length))
+		val password = getPassword(text)
+		return if (password == null) {
+			text
+		}else {
+			text.replace(password, maskStar.repeat(password.length))
 		}
-		return newText
 	}
 
 	fun getHint(path: String): Hint {
 		return when {
-			path.endsWith("///") -> Hint.CREATE_PASSWORD
+			getPassword(path) == "" -> Hint.CREATE_PASSWORD
 			path.endsWith("//") -> Hint.PATH_NAME
 			else -> Hint.NONE
 		}
@@ -49,8 +54,8 @@ class DerivationPathAnalyzer {
 
 		fun getLocalizedString(context: Context): String? {
 			return when (this) {
-				PATH_NAME -> "EnterPathName"
-				CREATE_PASSWORD -> "Create a Password"
+				PATH_NAME -> context.getString(R.string.derivation_path_hint_enter_path_name)
+				CREATE_PASSWORD -> context.getString(R.string.derivation_path_hint_create_password)
 				NONE -> null
 			}
 		}
@@ -60,17 +65,16 @@ class DerivationPathAnalyzer {
 
 //todo derivation what to show what to show if wrong path
 //PasswordVisualTransformation
-class DerivationPathVisualTransformation(
+data class DerivationPathVisualTransformation(
 	val context: Context,
 	val themeColors: Colors
-) :
-	VisualTransformation {
+) : VisualTransformation {
 
 	val pathAnalyzer = DerivationPathAnalyzer()
 
 	override fun filter(text: AnnotatedString): TransformedText {
-		val content = if (pathAnalyzer.isCorrect(text.text)) {
-			buildAnnotatedString {
+//		val content = if (pathAnalyzer.isCorrect(text.text)) {
+		val content =	buildAnnotatedString {
 				append(pathAnalyzer.hidePasswords(text.text))
 				pathAnalyzer.getHint(text.text).getLocalizedString(context)
 					?.let { hint ->
@@ -80,12 +84,11 @@ class DerivationPathVisualTransformation(
 						}
 					}
 			}
-		} else {
-			text
-		}
+//		} else {
+//			text
+//		}
 		return TransformedText(content, DerivationOffsetMapping(text.length))
 	}
-
 
 	/**
 	 * We append hint to original but transformed cannot be smaller than original
