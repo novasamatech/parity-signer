@@ -20,7 +20,7 @@ parity-scale-codec = "3.2.1"
 
 [dev-dependencies]
 pretty_assertions = "1"
-regex = { version = "1.7.0" }
+regex = { version = "1.7.1" }
 
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
 
