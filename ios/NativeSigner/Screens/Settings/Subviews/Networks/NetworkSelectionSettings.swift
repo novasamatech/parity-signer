@@ -23,7 +23,7 @@ struct NetworkSelectionSettings: View {
             )
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    ForEach(viewModel.networks.sorted(by: { $0.order < $1.order }), id: \.key) {
+                    ForEach(viewModel.networks, id: \.key) {
                         item(for: $0)
                     }
                     HStack(alignment: .center, spacing: 0) {
