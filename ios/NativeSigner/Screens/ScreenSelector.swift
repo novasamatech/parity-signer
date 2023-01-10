@@ -73,12 +73,7 @@ struct ScreenSelector: View {
                 navigationRequest: navigationRequest
             )
         case let .deriveKey(value):
-            NewAddressScreen(
-                content: value,
-                pathCheck: pathCheck,
-                createAddress: createAddress,
-                navigationRequest: navigationRequest
-            )
+            CreateDerivedKeyView(viewModel: .init(seedName: value.seedName))
         case let .vVerifier(value):
             VerfierCertificateView(viewModel: .init(content: value))
         case let .manageNetworks(value):

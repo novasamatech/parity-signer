@@ -19,12 +19,24 @@ struct CreateDerivedKeyView: View {
                     leftButton: .xmark,
                     rightButton: .questionmark,
                     backgroundColor: Asset.backgroundSystem.swiftUIColor
+                ),
+                actionModel: .init(
+                    rightBarMenuAction: viewModel.onRightNavigationButtonTap
                 )
             )
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
+        }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingInfoModal
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableInfoModal,
+                isShowingBottomAlert: $viewModel.isPresentingInfoModal
+            )
+            .clearModalBackground()
         }
     }
 }
@@ -36,6 +48,9 @@ extension CreateDerivedKeyView {
         private let createKeyService: CreateDerivedKeyService
         private let seedName: String
         @Published var networks: [MmNetwork] = []
+
+        @Published var isPresentingInfoModal: Bool = false
+        @Published var presentableInfoModal: ErrorBottomModalViewModel = .derivedKeysInfo()
 
         init(
             seedName: String,
@@ -50,6 +65,13 @@ extension CreateDerivedKeyView {
         func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
         }
+
+        func onRightNavigationButtonTap() {
+            presentableInfoModal = .derivedKeysInfo()
+            isPresentingInfoModal = true
+        }
+
+        func onDerivationPathQuestionTap() {}
     }
 }
 

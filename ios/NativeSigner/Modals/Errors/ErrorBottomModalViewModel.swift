@@ -180,4 +180,25 @@ struct ErrorBottomModalViewModel {
             secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
         )
     }
+
+    static func derivedKeysInfo(_ action: @escaping @autoclosure () -> Void = {}())
+        -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.CreateDerivedKey.InfoModal.DerivedKeys.title.string,
+            content: Localizable.CreateDerivedKey.InfoModal.DerivedKeys.content.string,
+            secondaryAction: .init(label: Localizable.CreateDerivedKey.InfoModal.DerivedKeys.action.key, action: action)
+        )
+    }
+
+    static func derivationPathsInfo(_ action: @escaping @autoclosure () -> Void = {}())
+        -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.CreateDerivedKey.InfoModal.DerivationPaths.title.string,
+            content: Localizable.CreateDerivedKey.InfoModal.DerivationPaths.content.string,
+            secondaryAction: .init(
+                label: Localizable.CreateDerivedKey.InfoModal.DerivationPaths.action.key,
+                action: action
+            )
+        )
+    }
 }
