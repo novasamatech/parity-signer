@@ -96,15 +96,12 @@ struct ScreenSelector: View {
             )
         case .documents:
             DocumentModal()
-        case let .keyDetailsMulti(value):
-            KeyDetailsMulti(
-                content: value,
-                navigationRequest: navigationRequest
-            )
         // Screens handled outside of Rust navigation
         case .scan:
             EmptyView()
         case .transaction:
+            EmptyView()
+        case .keyDetailsMulti:
             EmptyView()
         }
     }
