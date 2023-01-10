@@ -240,6 +240,10 @@
 	<string name="new_derivation_conformation_message">Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.</string>
 	<string name="new_derivation_conformation_path_headline">Derivation Path Name</string>
 	<string name="new_derivation_conformation_checkbox_wrote_down">I have written down my derivation path name</string>
+    <string name="derivation_path_screen_title">Derivation Path Name</string>
+	<string name="derivation_path_screen_help_tile_message">Learn more about /soft, //hard, ///password derivation methods</string>
+	<string name="derivation_path_screen_subinput_hint">Path name example //network//1</string>
+	<string name="derivation_path_screen_password_input_button">/// Password</string>
 
 
 </resources>

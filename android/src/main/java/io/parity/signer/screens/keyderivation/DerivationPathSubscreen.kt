@@ -12,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -23,11 +24,11 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.CloseIcon
-import io.parity.signer.components.base.DotsIndicator
 import io.parity.signer.components.base.PrimaryButtonGreyDisabled
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.*
@@ -35,13 +36,14 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 fun DerivationPathScreen(
+	initialPath: String = "//",
 	onDerivationHelp: Callback,
 	onClose: Callback,
 	onDone: Callback,
 ) {
 	val canProceed = true
 	val path = remember {
-		mutableStateOf("//")
+		mutableStateOf(initialPath)
 	}
 
 	val focusManager = LocalFocusManager.current
@@ -109,11 +111,11 @@ fun DerivationPathScreen(
 				colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.backgroundDanger),
 				onClick = { path.value = path.value + "///" },
 			) {
-				Text(text = "/// Password")
+				Text(text = stringResource(R.string.derivation_path_screen_password_input_button))
 			}
 		}
 		Text(
-			text = "Path name example //network//1",
+			text = stringResource(R.string.derivation_path_screen_subinput_hint),
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.CaptionM,
 			modifier = Modifier.padding(horizontal = 24.dp)
@@ -124,6 +126,11 @@ fun DerivationPathScreen(
 				.padding(horizontal = 24.dp)
 				.clickable(onClick = onDerivationHelp)
 		)
+	}
+
+	DisposableEffect(Unit) {
+		focusRequester.requestFocus()
+		onDispose { focusManager.clearFocus() }
 	}
 }
 
@@ -141,7 +148,7 @@ private fun DerivationAlarm(modifier: Modifier = Modifier) {
 
 	) {
 		Text(
-			text = "Learn more about /soft, //hard, ///password derivation methods",
+			text = stringResource(R.string.derivation_path_screen_help_tile_message),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.BodyM,
 			modifier = Modifier
@@ -187,7 +194,13 @@ private fun DerivationPathHeader(
 			modifier = Modifier.fillMaxWidth(1f),
 			contentAlignment = Alignment.Center,
 		) {
-			DotsIndicator(totalDots = 2, selectedIndex = 1)
+			Text(
+				text = stringResource(R.string.derivation_path_screen_title),
+				color = MaterialTheme.colors.primary,
+				style = SignerTypeface.TitleS,
+				textAlign = TextAlign.Center,
+				modifier = Modifier.fillMaxWidth(1f)
+			)
 		}
 		Box(
 			modifier = Modifier.fillMaxWidth(1f),
@@ -205,6 +218,8 @@ private fun DerivationPathHeader(
 	}
 }
 
+
+
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -217,6 +232,23 @@ private fun DerivationPathHeader(
 @Composable
 private fun PreviewDerivationPathScreen() {
 	SignerNewTheme {
-		DerivationPathScreen({}, {}, {})
+		DerivationPathScreen(initialPath = "//",{}, {}, {})
+	}
+}
+
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewDerivationPathPassworded() {
+	SignerNewTheme {
+		DerivationPathScreen(initialPath = "//seed//1///ggg",{}, {}, {})
 	}
 }

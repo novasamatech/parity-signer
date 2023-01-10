@@ -10,6 +10,7 @@ class DerivationPathAnalyzerTest {
 	fun testHint() {
 		val analyzer = DerivationPathAnalyzer()
 		assertEquals(DerivationPathAnalyzer.Hint.CREATE_PASSWORD, analyzer.getHint("//seed///"))
+		assertEquals(DerivationPathAnalyzer.Hint.CREATE_PASSWORD, analyzer.getHint("//seed//1///"))
 		assertEquals(DerivationPathAnalyzer.Hint.PATH_NAME, analyzer.getHint("//seed//"))
 		assertEquals(DerivationPathAnalyzer.Hint.PATH_NAME, analyzer.getHint("//"))
 		assertEquals(DerivationPathAnalyzer.Hint.NONE, analyzer.getHint("//seed///sd"))
@@ -21,8 +22,8 @@ class DerivationPathAnalyzerTest {
 		val analyzer = DerivationPathAnalyzer()
 		assertEquals("//seed///", analyzer.hidePasswords("//seed///"))
 		assertEquals("//seed///••••", analyzer.hidePasswords("//seed///dfgf"))
+		assertEquals("//seed//1///••••", analyzer.hidePasswords("//seed//1///dfgf"))
 		assertEquals("//seed///••••///••••", analyzer.hidePasswords("//seed///sdfg///hjkj"))
 		assertEquals("//seed", analyzer.hidePasswords("//seed"))
-
 	}
 }
