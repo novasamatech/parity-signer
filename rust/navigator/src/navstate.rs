@@ -19,8 +19,8 @@ use crate::alerts::Alert;
 use crate::export_signatures_bulk;
 use crate::modals::Modal;
 use crate::screens::{
-    AddressState, AddressStateMulti, DeriveState, KeysState, RecoverSeedPhraseState, Screen,
-    SpecialtyKeysState, SufficientCryptoState,
+    AddressState, DeriveState, KeysState, RecoverSeedPhraseState, Screen, SpecialtyKeysState,
+    SufficientCryptoState,
 };
 use crate::states::{SignResult, TransactionState};
 use db_handling::interface_signer::{get_all_seed_names_with_identicons, guess};
@@ -749,55 +749,6 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_next_unit(&self) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let errorline = String::new();
-
-        match self.navstate.screen {
-            Screen::KeyDetailsMulti(ref address_state_multi) => {
-                new_navstate =
-                    Navstate::clean_screen(Screen::KeyDetailsMulti(address_state_multi.next()));
-            }
-            _ => println!("NextUnit does nothing here"),
-        }
-        (new_navstate, errorline)
-    }
-
-    fn handle_previous_unit(&self) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let errorline = String::new();
-        match self.navstate.screen {
-            Screen::KeyDetailsMulti(ref address_state_multi) => {
-                new_navstate =
-                    Navstate::clean_screen(Screen::KeyDetailsMulti(address_state_multi.previous()));
-            }
-            _ => println!("PreviousUnit does nothing here"),
-        }
-        (new_navstate, errorline)
-    }
-
-    fn handle_change_network(&self, details_str: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let mut errorline = String::new();
-
-        if let Screen::Keys(ref keys_state) = self.navstate.screen {
-            if let Modal::NetworkSelector(_) = self.navstate.modal {
-                match NetworkSpecsKey::from_hex(details_str) {
-                    Ok(network_specs_key) => {
-                        new_navstate = Navstate::clean_screen(Screen::Keys(
-                            keys_state.change_network(&network_specs_key),
-                        ))
-                    }
-                    Err(e) => {
-                        new_navstate.alert = Alert::Error;
-                        let _ = write!(&mut errorline, "{}", e);
-                    }
-                }
-            }
-        }
-        (new_navstate, errorline)
-    }
-
     fn handle_change_password(&self, details_str: &str) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let errorline = String::new();
@@ -1161,125 +1112,6 @@ impl State {
                 }
             }
             _ => println!("ShowLogDetails does nothing here"),
-        }
-
-        (new_navstate, errorline)
-    }
-
-    fn handle_swipe(&self, details_str: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let mut errorline = String::new();
-        match self.navstate.screen {
-            Screen::Keys(ref keys_state) => match process_hex_address_key(details_str) {
-                Ok(multisigner) => {
-                    new_navstate =
-                        Navstate::clean_screen(Screen::Keys(keys_state.swipe(&multisigner)));
-                }
-                Err(e) => {
-                    new_navstate.alert = Alert::Error;
-                    let _ = write!(&mut errorline, "{}", e);
-                }
-            },
-            _ => println!("Swipe does nothing here"),
-        }
-
-        (new_navstate, errorline)
-    }
-
-    fn handle_long_tap(&self, details_str: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let mut errorline = String::new();
-        match self.navstate.screen {
-            Screen::Keys(ref keys_state) => match process_hex_address_key(details_str) {
-                Ok(multisigner) => {
-                    new_navstate = Navstate::clean_screen(Screen::Keys(
-                        keys_state.select_single(&multisigner),
-                    ));
-                }
-                Err(e) => {
-                    new_navstate.alert = Alert::Error;
-                    let _ = write!(&mut errorline, "{}", e);
-                }
-            },
-            _ => println!("LongTap does nothing here"),
-        }
-
-        (new_navstate, errorline)
-    }
-
-    fn handle_select_all(&self, dbname: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let mut errorline = String::new();
-
-        match self.navstate.screen {
-            Screen::Keys(ref keys_state) => match keys_state.get_specialty() {
-                SpecialtyKeysState::MultiSelect(ref multiselect) => {
-                    match db_handling::interface_signer::addresses_set_seed_name_network(
-                        dbname,
-                        &keys_state.seed_name(),
-                        &keys_state.network_specs_key(),
-                    ) {
-                        Ok(set) => {
-                            let all: Vec<MultiSigner> = set
-                                .into_iter()
-                                .map(|(multisigner, _)| multisigner)
-                                .collect();
-                            let mut complete = true;
-                            for multisigner in all.iter() {
-                                if !multiselect.contains(multisigner) {
-                                    complete = false
-                                }
-                            }
-                            let new_multiselect = {
-                                if complete {
-                                    Vec::new()
-                                } else {
-                                    all
-                                }
-                            };
-                            new_navstate = Navstate::clean_screen(Screen::Keys(
-                                keys_state.select_set(new_multiselect),
-                            ));
-                        }
-                        Err(e) => {
-                            new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
-                        }
-                    }
-                }
-                _ => println!("SelectAll does nothing here"),
-            },
-            _ => println!("SelectAll does nothing here"),
-        }
-
-        (new_navstate, errorline)
-    }
-
-    fn handle_export_multi_select(&self, dbname: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let mut errorline = String::new();
-
-        match self.navstate.screen {
-            Screen::Keys(ref keys_state) => {
-                if let SpecialtyKeysState::MultiSelect(ref multiselect) = keys_state.get_specialty()
-                {
-                    match AddressStateMulti::new(
-                        keys_state.seed_name(),
-                        keys_state.network_specs_key(),
-                        multiselect,
-                        dbname,
-                    ) {
-                        Ok(a) => new_navstate = Navstate::clean_screen(Screen::KeyDetailsMulti(a)),
-                        Err(e) => {
-                            new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
-                        }
-                    }
-                } else {
-                    println!("ExportMultiSelect does nothing here")
-                }
-            }
-            _ => println!("ExportMultiSelect does nothing here"),
         }
 
         (new_navstate, errorline)
@@ -1761,9 +1593,6 @@ impl State {
                 Action::RecoverSeed => self.handle_recover_seed(),
                 Action::BackupSeed => self.handle_backup_seed(dbname, details_str),
                 Action::NetworkSelector => self.handle_network_selector(),
-                Action::NextUnit => self.handle_next_unit(),
-                Action::PreviousUnit => self.handle_previous_unit(),
-                Action::ChangeNetwork => self.handle_change_network(details_str),
                 Action::CheckPassword => self.handle_change_password(details_str),
                 Action::TransactionFetched => self.handle_transaction_fetched(dbname, details_str),
                 Action::RemoveNetwork => self.handle_remove_network(dbname),
@@ -1780,10 +1609,6 @@ impl State {
                 Action::ClearLog => self.handle_clear_log(dbname),
                 Action::CreateLogComment => self.handle_create_log_comment(),
                 Action::ShowLogDetails => self.handle_show_log_details(details_str),
-                Action::Swipe => self.handle_swipe(details_str),
-                Action::LongTap => self.handle_long_tap(details_str),
-                Action::SelectAll => self.handle_select_all(dbname),
-                Action::ExportMultiSelect => self.handle_export_multi_select(dbname),
                 Action::Increment => self.handle_increment(details_str, dbname, secret_seed_phrase),
                 Action::ShowDocuments => self.handle_show_documents(),
                 Action::TextEntry => self.handle_text_entry(details_str),
@@ -2024,11 +1849,3 @@ fn process_hex_address_key_address_details(
     let address_details = db_handling::helpers::get_address_details(dbname, &address_key)?;
     Ok((multisigner, address_details))
 }
-
-fn process_hex_address_key(hex_address_key: &str) -> Result<MultiSigner> {
-    let address_key = AddressKey::from_hex(hex_address_key)?;
-    Ok(address_key.multi_signer()?)
-}
-
-//TODO: tests should probably be performed here, as static object in lib.rs
-//will only allow for 1-2 integration tests
