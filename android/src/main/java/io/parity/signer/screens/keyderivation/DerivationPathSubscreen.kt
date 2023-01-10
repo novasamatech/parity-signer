@@ -11,11 +11,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.HelpOutline
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -25,7 +25,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,16 +45,19 @@ fun DerivationPathScreen(
 	onDone: Callback,
 ) {
 	val canProceed = true
-	val path = remember {
-		mutableStateOf(initialPath)
-	}
+	val path = remember { mutableStateOf(TextFieldValue(initialPath)) }
+	val password = remember { mutableStateOf("") }
+	var passwordVisible by remember { mutableStateOf(false) }
+
 	val pathAnalyzer = remember {
 		DerivationPathAnalyzer()
 	}
-	val hasPassword = pathAnalyzer.getPassword(path.value) != null
+	val hasPassword = pathAnalyzer.getPassword(path.value.text) != null
 
 	val focusManager = LocalFocusManager.current
-	val focusRequester = remember { FocusRequester() }
+	val pathFocusRequester = remember { FocusRequester() }
+	val passwordFocusRequester = remember { FocusRequester() }
+
 
 	val onDoneLocal = {
 		onDone()
@@ -87,7 +91,7 @@ fun DerivationPathScreen(
 			textStyle = SignerTypeface.LabelM,
 			colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
 			modifier = Modifier
-				.focusRequester(focusRequester)
+				.focusRequester(pathFocusRequester)
 				.fillMaxWidth(1f)
 				.padding(horizontal = 24.dp)
 		)
@@ -103,7 +107,13 @@ fun DerivationPathScreen(
 			) {
 				Surface(
 					modifier = Modifier
-						.clickable { path.value = path.value + "/" }
+						.clickable {
+							val newText = path.value.text + "/"
+							path.value = TextFieldValue(
+								text = newText,
+								selection = TextRange(newText.length),
+							)
+						}
 						.background(hintBackground, RoundedCornerShape(24.dp))
 						.padding(vertical = 8.dp, horizontal = 20.dp),
 				) {
@@ -115,7 +125,13 @@ fun DerivationPathScreen(
 				}
 				Surface(
 					modifier = Modifier
-						.clickable { path.value = path.value + "//" }
+						.clickable {
+							val newText = path.value.text + "//"
+							path.value = TextFieldValue(
+								text = newText,
+								selection = TextRange(newText.length),
+							)
+						}
 						.background(hintBackground, RoundedCornerShape(24.dp))
 						.padding(vertical = 8.dp, horizontal = 20.dp),
 				) {
@@ -127,7 +143,13 @@ fun DerivationPathScreen(
 				}
 				Surface(
 					modifier = Modifier
-						.clickable { path.value = path.value + "///" }
+						.clickable {
+							val newText = path.value.text + "///"
+							path.value = TextFieldValue(
+								text = newText,
+								selection = TextRange(newText.length),
+							)
+						}
 						.background(hintBackground, RoundedCornerShape(24.dp))
 						.padding(vertical = 8.dp, horizontal = 20.dp),
 				) {
@@ -145,6 +167,53 @@ fun DerivationPathScreen(
 			style = SignerTypeface.CaptionM,
 			modifier = Modifier.padding(horizontal = 24.dp)
 		)
+
+		if (hasPassword) {
+			Text(
+				text = stringResource(R.string.enter_password_title),
+				color = MaterialTheme.colors.primary,
+				style = SignerTypeface.TitleL,
+			)
+			OutlinedTextField(
+				value = password.value,
+				onValueChange = { password.value = it },
+				modifier = Modifier
+					.focusRequester(passwordFocusRequester)
+					.fillMaxWidth(1f),
+				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+				keyboardOptions = KeyboardOptions(
+					keyboardType = KeyboardType.Password,
+					imeAction = if (canProceed) ImeAction.Done else ImeAction.None
+				),
+				keyboardActions = KeyboardActions(
+					onDone = {
+//						if (canProceed) {
+//							proceed(password)
+//							focusManager.clearFocus(true)
+//						}
+					}
+				),
+				label = { Text(text = "Confirm Password") },
+				singleLine = true,
+				textStyle = SignerTypeface.LabelM,
+				colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
+				trailingIcon = {
+					val image = if (passwordVisible)
+						Icons.Filled.Visibility
+					else Icons.Filled.VisibilityOff
+
+					val description =
+						if (passwordVisible) stringResource(R.string.password_hide_password) else stringResource(
+							R.string.password_show_password
+						)
+
+					IconButton(onClick = { passwordVisible = !passwordVisible }) {
+						Icon(imageVector = image, description)
+					}
+				},
+			)
+		}
+
 		DerivationAlarm(
 			Modifier
 				.padding(top = 16.dp, bottom = 16.dp)
@@ -154,7 +223,7 @@ fun DerivationPathScreen(
 	}
 
 	DisposableEffect(Unit) {
-		focusRequester.requestFocus()
+		pathFocusRequester.requestFocus()
 		onDispose { focusManager.clearFocus() }
 	}
 }

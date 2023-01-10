@@ -246,6 +246,7 @@
 	<string name="derivation_path_screen_password_input_button">/// Password</string>
 	<string name="derivation_path_hint_create_password">Create a Password</string>
 	<string name="derivation_path_hint_enter_path_name">Enter Path Name</string>
+	<string name="enter_password_input_label">Enter password</string>
 
 </resources>
 

@@ -101,7 +101,7 @@ fun EnterPassword(
 						}
 					}
 				),
-				label = { Text(text = "Enter password") },
+				label = { Text(text = stringResource(R.string.enter_password_input_label)) },
 				singleLine = true,
 				textStyle = SignerTypeface.LabelM,
 				colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
