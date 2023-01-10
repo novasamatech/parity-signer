@@ -174,7 +174,7 @@ private fun DerivationAlarm(modifier: Modifier = Modifier) {
 	) {
 		Text(
 			text = stringResource(R.string.derivation_path_screen_help_tile_message),
-			color = MaterialTheme.colors.primary,
+			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.BodyM,
 			modifier = Modifier
 				.weight(1f)
