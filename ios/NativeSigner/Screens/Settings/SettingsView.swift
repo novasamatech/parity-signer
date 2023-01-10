@@ -13,34 +13,42 @@ struct SettingsView: View {
     @EnvironmentObject private var data: SignerDataModel
 
     var body: some View {
-        VStack(spacing: 0) {
-            NavigationBarView(
-                viewModel: NavigationBarViewModel(
-                    title: Localizable.Settings.Label.title.string,
-                    leftButton: .empty,
-                    rightButton: .empty,
-                    backgroundColor: Asset.backgroundSystem.swiftUIColor
+        ZStack(alignment: .bottom) {
+            VStack(spacing: 0) {
+                NavigationBarView(
+                    viewModel: NavigationBarViewModel(
+                        title: Localizable.Settings.Label.title.string,
+                        leftButton: .empty,
+                        rightButton: .empty,
+                        backgroundColor: Asset.backgroundSystem.swiftUIColor
+                    )
                 )
-            )
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(viewModel.renderable.items, id: \.id) { renderable in
-                        SettingsRowView(renderable: renderable)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                viewModel.onTapAction(renderable.item)
-                            }
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(viewModel.renderable.items, id: \.id) { renderable in
+                            SettingsRowView(renderable: renderable)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    viewModel.onTapAction(renderable.item)
+                                }
+                        }
+                        Text(Localizable.Settings.Label.version(ApplicationInformation.cfBundleShortVersionString))
+                            .font(PrimaryFont.captionM.font)
+                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                            .padding(.top, Spacing.medium)
+                            .padding(.horizontal, Spacing.large)
+                            .padding(.bottom, Spacing.extraSmall)
                     }
-                    Text(Localizable.Settings.Label.version(ApplicationInformation.cfBundleShortVersionString))
-                        .font(PrimaryFont.captionM.font)
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                        .padding(.top, Spacing.medium)
-                        .padding(.horizontal, Spacing.large)
-                        .padding(.bottom, Spacing.extraSmall)
                 }
             }
+            .background(Asset.backgroundPrimary.swiftUIColor)
+            ConnectivityAlertOverlay(
+                viewModel: .init(resetWarningAction: ResetConnectivtyWarningsAction(
+                    alert: $data
+                        .alert
+                ))
+            )
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
             viewModel.use(data: data)
