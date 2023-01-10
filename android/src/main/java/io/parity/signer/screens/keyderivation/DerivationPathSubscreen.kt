@@ -2,6 +2,7 @@ package io.parity.signer.screens.keyderivation
 
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
@@ -91,33 +93,49 @@ fun DerivationPathScreen(
 		)
 		if (!hasPassword) {
 			//suggestion slashes
-//		val hintBackground = MaterialTheme.colors.fill6 + MaterialTheme.colors.backgroundDanger
+			val hintBackground =
+				MaterialTheme.colors.fill6.compositeOver(MaterialTheme.colors.backgroundDanger)
 			Row(
 				modifier = Modifier
 					.padding(top = 8.dp, bottom = 16.dp)
 					.padding(horizontal = 24.dp),
 				horizontalArrangement = Arrangement.spacedBy(4.dp)
 			) {
-				Button(
-					shape = RoundedCornerShape(24.dp),
-					colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.backgroundDanger),
-					onClick = { path.value = path.value + "/" },
+				Surface(
+					modifier = Modifier
+						.clickable { path.value = path.value + "/" }
+						.background(hintBackground, RoundedCornerShape(24.dp))
+						.padding(vertical = 8.dp, horizontal = 20.dp),
 				) {
-					Text(text = "/")
+					Text(
+						text = "/",
+						color = MaterialTheme.colors.pink300,
+						style = SignerTypeface.LabelS,
+					)
 				}
-				Button(
-					shape = RoundedCornerShape(24.dp),
-					colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.backgroundDanger),
-					onClick = { path.value = path.value + "//" },
+				Surface(
+					modifier = Modifier
+						.clickable { path.value = path.value + "//" }
+						.background(hintBackground, RoundedCornerShape(24.dp))
+						.padding(vertical = 8.dp, horizontal = 20.dp),
 				) {
-					Text(text = "//")
+					Text(
+						text = "//",
+						color = MaterialTheme.colors.pink300,
+						style = SignerTypeface.LabelS,
+					)
 				}
-				Button(
-					shape = RoundedCornerShape(24.dp),
-					colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.backgroundDanger),
-					onClick = { path.value = path.value + "///" },
+				Surface(
+					modifier = Modifier
+						.clickable { path.value = path.value + "///" }
+						.background(hintBackground, RoundedCornerShape(24.dp))
+						.padding(vertical = 8.dp, horizontal = 20.dp),
 				) {
-					Text(text = stringResource(R.string.derivation_path_screen_password_input_button))
+					Text(
+						text = stringResource(R.string.derivation_path_screen_password_input_button),
+						color = MaterialTheme.colors.pink300,
+						style = SignerTypeface.LabelS,
+					)
 				}
 			}
 		}
@@ -226,7 +244,6 @@ private fun DerivationPathHeader(
 }
 
 
-
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -239,7 +256,7 @@ private fun DerivationPathHeader(
 @Composable
 private fun PreviewDerivationPathScreen() {
 	SignerNewTheme {
-		DerivationPathScreen(initialPath = "//",{}, {}, {})
+		DerivationPathScreen(initialPath = "//", {}, {}, {})
 	}
 }
 
@@ -256,6 +273,6 @@ private fun PreviewDerivationPathScreen() {
 @Composable
 private fun PreviewDerivationPathPassworded() {
 	SignerNewTheme {
-		DerivationPathScreen(initialPath = "//seed//1///ggg",{}, {}, {})
+		DerivationPathScreen(initialPath = "//seed//1///ggg", {}, {}, {})
 	}
 }
