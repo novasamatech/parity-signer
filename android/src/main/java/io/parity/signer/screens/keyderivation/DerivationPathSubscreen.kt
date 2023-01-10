@@ -1,15 +1,16 @@
 package io.parity.signer.screens.keyderivation
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,6 +20,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,18 +30,18 @@ import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.components.base.DotsIndicator
 import io.parity.signer.components.base.PrimaryButtonGreyDisabled
 import io.parity.signer.models.Callback
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.*
 
 
 @Composable
 fun DerivationPathScreen(
+	onDerivationHelp: Callback,
 	onClose: Callback,
 	onDone: Callback,
 ) {
 	val canProceed = true
 	val path = remember {
-		mutableStateOf("")
+		mutableStateOf("//")
 	}
 
 	val focusManager = LocalFocusManager.current
@@ -79,11 +81,83 @@ fun DerivationPathScreen(
 			modifier = Modifier
 				.focusRequester(focusRequester)
 				.fillMaxWidth(1f)
-				.padding(horizontal = 24.dp),
+				.padding(horizontal = 24.dp)
+		)
+		//suggestion slashes
+//		val hintBackground = MaterialTheme.colors.fill6 + MaterialTheme.colors.backgroundDanger
+		Row(
+			Modifier
+				.padding(top = 8.dp, bottom = 16.dp)
+				.padding(horizontal = 24.dp)
+		) {
+			Button(
+				shape = RoundedCornerShape(24.dp),
+				colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.backgroundDanger),
+				onClick = { path.value = path.value + "/" },
+			) {
+				Text(text = "/")
+			}
+			Button(
+				shape = RoundedCornerShape(24.dp),
+				colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.backgroundDanger),
+				onClick = { path.value = path.value + "//" },
+			) {
+				Text(text = "//")
+			}
+			Button(
+				shape = RoundedCornerShape(24.dp),
+				colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.backgroundDanger),
+				onClick = { path.value = path.value + "///" },
+			) {
+				Text(text = "/// Password")
+			}
+		}
+		Text(
+			text = "Path name example //network//1",
+			color = MaterialTheme.colors.textTertiary,
+			style = SignerTypeface.CaptionM,
+			modifier = Modifier.padding(horizontal = 24.dp)
+		)
+		DerivationAlarm(
+			Modifier
+				.padding(top = 16.dp, bottom = 16.dp)
+				.padding(horizontal = 24.dp)
+				.clickable(onClick = onDerivationHelp)
 		)
 	}
 }
 
+@Composable
+private fun DerivationAlarm(modifier: Modifier = Modifier) {
+	val innerShape =
+		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+	Row(
+		modifier = modifier
+			.padding(vertical = 8.dp)
+			.border(
+				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+				innerShape
+			)
+
+	) {
+		Text(
+			text = "Learn more about /soft, //hard, ///password derivation methods",
+			color = MaterialTheme.colors.primary,
+			style = SignerTypeface.BodyM,
+			modifier = Modifier
+				.weight(1f)
+				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+		)
+		Icon(
+			imageVector = Icons.Outlined.HelpOutline,
+			contentDescription = null,
+			tint = MaterialTheme.colors.pink300,
+			modifier = Modifier
+				.align(Alignment.CenterVertically)
+				.padding(start = 18.dp, end = 18.dp)
+		)
+	}
+}
 
 /**
  * io/parity/signer/screens/keysets/create/NewKeySetNameScreen.kt:107
@@ -143,6 +217,6 @@ private fun DerivationPathHeader(
 @Composable
 private fun PreviewDerivationPathScreen() {
 	SignerNewTheme {
-		DerivationPathScreen({}, {})
+		DerivationPathScreen({}, {}, {})
 	}
 }
