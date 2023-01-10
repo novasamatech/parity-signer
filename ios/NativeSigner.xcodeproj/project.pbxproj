@@ -150,6 +150,7 @@
 		6D7129252952C3D50048558C /* VerticalRoundedBackgroundContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7129242952C3D50048558C /* VerticalRoundedBackgroundContainer.swift */; };
 		6D77F31F296D0C5600044C7C /* CreateDerivedKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77F31E296D0C5600044C7C /* CreateDerivedKeyView.swift */; };
 		6D77F321296D0D4600044C7C /* GetAllNetworksService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77F320296D0D4600044C7C /* GetAllNetworksService.swift */; };
+		6D77F323296D4D8900044C7C /* CreateDerivedKeyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77F322296D4D8900044C7C /* CreateDerivedKeyService.swift */; };
 		6D78E4C72949AA5A001767A3 /* DerivedKeyExportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D78E4C62949AA5A001767A3 /* DerivedKeyExportModel.swift */; };
 		6D8045D728D06E6B00237F8C /* PreviewData+Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D628D06E6B00237F8C /* PreviewData+Components.swift */; };
 		6D8045D928D0761E00237F8C /* QRCodeAddressFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */; };
@@ -436,6 +437,7 @@
 		6D7129242952C3D50048558C /* VerticalRoundedBackgroundContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalRoundedBackgroundContainer.swift; sourceTree = "<group>"; };
 		6D77F31E296D0C5600044C7C /* CreateDerivedKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDerivedKeyView.swift; sourceTree = "<group>"; };
 		6D77F320296D0D4600044C7C /* GetAllNetworksService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetAllNetworksService.swift; sourceTree = "<group>"; };
+		6D77F322296D4D8900044C7C /* CreateDerivedKeyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDerivedKeyService.swift; sourceTree = "<group>"; };
 		6D78E4C62949AA5A001767A3 /* DerivedKeyExportModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyExportModel.swift; sourceTree = "<group>"; };
 		6D8045D628D06E6B00237F8C /* PreviewData+Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreviewData+Components.swift"; sourceTree = "<group>"; };
 		6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeAddressFooterView.swift; sourceTree = "<group>"; };
@@ -900,6 +902,7 @@
 				6DEFB53128FEE42D00762219 /* ExportMultipleKeysService.swift */,
 				6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */,
 				6D77F320296D0D4600044C7C /* GetAllNetworksService.swift */,
+				6D77F322296D4D8900044C7C /* CreateDerivedKeyService.swift */,
 			);
 			path = Backend;
 			sourceTree = "<group>";
@@ -2007,6 +2010,7 @@
 				6D95E97528B500EE00E28A11 /* Heights.swift in Sources */,
 				6D8045DE28D087D400237F8C /* QRCodeRootFooterView.swift in Sources */,
 				6D42793728DB147800C141DC /* PrivateKeyQRCodeService.swift in Sources */,
+				6D77F323296D4D8900044C7C /* CreateDerivedKeyService.swift in Sources */,
 				6D5801D928991F48006C41D8 /* ProcessInfoProtocol.swift in Sources */,
 				6DA501D7290BECBE0096DA4E /* AppState.swift in Sources */,
 				6D019972289D183200F4C317 /* Navigation.swift in Sources */,

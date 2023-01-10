@@ -33,13 +33,18 @@ extension CreateDerivedKeyView {
     final class ViewModel: ObservableObject {
         private weak var navigation: NavigationCoordinator!
         private let networkService: GetAllNetworksService
-
+        private let createKeyService: CreateDerivedKeyService
+        private let seedName: String
         @Published var networks: [MmNetwork] = []
 
         init(
-            networkService: GetAllNetworksService = GetAllNetworksService()
+            seedName: String,
+            networkService: GetAllNetworksService = GetAllNetworksService(),
+            createKeyService: CreateDerivedKeyService = CreateDerivedKeyService()
         ) {
+            self.seedName = seedName
             self.networkService = networkService
+            self.createKeyService = createKeyService
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -48,11 +53,13 @@ extension CreateDerivedKeyView {
     }
 }
 
-struct CreateDerivedKeyView_Previews: PreviewProvider {
-    static var previews: some View {
-        CreateDerivedKeyView(
-            viewModel: .init()
-        )
-        .environmentObject(NavigationCoordinator())
+#if DEBUG
+    struct CreateDerivedKeyView_Previews: PreviewProvider {
+        static var previews: some View {
+            CreateDerivedKeyView(
+                viewModel: .init(seedName: "Parity Keys")
+            )
+            .environmentObject(NavigationCoordinator())
+        }
     }
-}
+#endif
