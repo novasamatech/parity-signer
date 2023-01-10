@@ -45,6 +45,10 @@ fun DerivationPathScreen(
 	val path = remember {
 		mutableStateOf(initialPath)
 	}
+	val pathAnalyzer = remember {
+		DerivationPathAnalyzer()
+	}
+	val hasPassword = pathAnalyzer.getPassword(path.value) != null
 
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
@@ -85,33 +89,36 @@ fun DerivationPathScreen(
 				.fillMaxWidth(1f)
 				.padding(horizontal = 24.dp)
 		)
-		//suggestion slashes
+		if (!hasPassword) {
+			//suggestion slashes
 //		val hintBackground = MaterialTheme.colors.fill6 + MaterialTheme.colors.backgroundDanger
-		Row(
-			Modifier
-				.padding(top = 8.dp, bottom = 16.dp)
-				.padding(horizontal = 24.dp)
-		) {
-			Button(
-				shape = RoundedCornerShape(24.dp),
-				colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.backgroundDanger),
-				onClick = { path.value = path.value + "/" },
+			Row(
+				modifier = Modifier
+					.padding(top = 8.dp, bottom = 16.dp)
+					.padding(horizontal = 24.dp),
+				horizontalArrangement = Arrangement.spacedBy(4.dp)
 			) {
-				Text(text = "/")
-			}
-			Button(
-				shape = RoundedCornerShape(24.dp),
-				colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.backgroundDanger),
-				onClick = { path.value = path.value + "//" },
-			) {
-				Text(text = "//")
-			}
-			Button(
-				shape = RoundedCornerShape(24.dp),
-				colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.backgroundDanger),
-				onClick = { path.value = path.value + "///" },
-			) {
-				Text(text = stringResource(R.string.derivation_path_screen_password_input_button))
+				Button(
+					shape = RoundedCornerShape(24.dp),
+					colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.backgroundDanger),
+					onClick = { path.value = path.value + "/" },
+				) {
+					Text(text = "/")
+				}
+				Button(
+					shape = RoundedCornerShape(24.dp),
+					colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.backgroundDanger),
+					onClick = { path.value = path.value + "//" },
+				) {
+					Text(text = "//")
+				}
+				Button(
+					shape = RoundedCornerShape(24.dp),
+					colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.backgroundDanger),
+					onClick = { path.value = path.value + "///" },
+				) {
+					Text(text = stringResource(R.string.derivation_path_screen_password_input_button))
+				}
 			}
 		}
 		Text(

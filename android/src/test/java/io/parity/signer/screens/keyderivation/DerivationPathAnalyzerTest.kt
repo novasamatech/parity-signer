@@ -26,4 +26,17 @@ class DerivationPathAnalyzerTest {
 		assertEquals("//seed///••••///••••", analyzer.hidePasswords("//seed///sdfg///hjkj"))
 		assertEquals("//seed", analyzer.hidePasswords("//seed"))
 	}
+
+	@Test
+	fun gettingPassword() {
+		val analyzer = DerivationPathAnalyzer()
+		assertEquals("", analyzer.getPassword("//seed///"))
+		assertEquals("gg", analyzer.getPassword("//seed///gg"))
+		assertEquals("gg", analyzer.getPassword("//seed//1///gg"))
+		assertNull(analyzer.getPassword("//seed//"))
+		assertNull(analyzer.getPassword("//"))
+		assertNull(analyzer.getPassword(""))
+		assertNull(analyzer.getPassword("//seed//sdfsdf//"))
+
+	}
 }

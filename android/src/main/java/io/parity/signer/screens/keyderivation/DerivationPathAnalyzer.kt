@@ -23,7 +23,7 @@ class DerivationPathAnalyzer {
 	}
 
 	fun getPassword(path: String): String? {
-		return path.split("///").lastOrNull()
+		return path.split("///").drop(1).lastOrNull()
 	}
 
 	fun hidePasswords(text: String): String {
