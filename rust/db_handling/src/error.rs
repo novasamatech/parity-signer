@@ -380,9 +380,6 @@ pub enum Error {
     #[error("Wrong password.")]
     WrongPassword,
 
-    #[error("Missing information about whether the path {0} is passworded.")]
-    MissingPasswordInfo(String),
-
     #[error("Key pair with public key {} can't be expressed as a direct derivation from a seed",
     hex::encode(multisigner_to_public(.multisigner)),
     )]

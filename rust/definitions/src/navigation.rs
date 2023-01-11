@@ -1,7 +1,7 @@
 use plot_icon::EMPTY_PNG;
 use sp_core::H256;
 
-use crate::derivations::SeedKeysPreview;
+use crate::derivations::ExportAddrsContainer;
 use crate::{
     crypto::Encryption, history::Event, keyring::NetworkSpecsKey,
     network_specs::OrderedNetworkSpecs,
@@ -709,7 +709,7 @@ pub enum Card {
     BlockHashCard { f: String },
     CallCard { f: MSCCall },
     DefaultCard { f: String },
-    DerivationsCard { f: Vec<SeedKeysPreview> },
+    DerivationsCard { f: ExportAddrsContainer },
     EnumVariantNameCard { f: MSCEnumVariantName },
     EraImmortalCard,
     EraMortalCard { f: MSCEraMortal },

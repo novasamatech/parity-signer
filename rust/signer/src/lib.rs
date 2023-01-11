@@ -25,8 +25,11 @@
 mod ffi_types;
 
 use crate::ffi_types::*;
-use db_handling::identities::{import_all_addrs, inject_derivations_has_pwd};
+use db_handling::identities::import_all_addrs;
+use definitions::derivations::{ExportAddrs, ExportAddrsContainer, SeedKeysPreviewSummary};
+use std::path::Path;
 use std::{collections::HashMap, fmt::Display, str::FromStr};
+use transaction_parsing::prepare_derivations_preview;
 
 /// Container for severe error message
 ///
@@ -203,17 +206,21 @@ fn generate_secret_key_qr(
 
 fn import_derivations(
     dbname: &str,
-    seed_derived_keys: Vec<SeedKeysPreview>,
+    seed_derived_keys: SeedKeysPreviewSummary,
 ) -> Result<(), anyhow::Error> {
     import_all_addrs(dbname, seed_derived_keys).map_err(Into::into)
 }
 
 /// Calculate if derivation path has a password
-fn populate_derivations_has_pwd(
+fn get_derivations_preview<P>(
+    dbname: P,
+    export_info: ExportAddrsContainer,
     seeds: HashMap<String, String>,
-    seed_derived_keys: Vec<SeedKeysPreview>,
-) -> Result<Vec<SeedKeysPreview>, anyhow::Error> {
-    inject_derivations_has_pwd(seed_derived_keys, seeds).map_err(Into::into)
+) -> Result<SeedKeysPreviewSummary, anyhow::Error>
+where
+    P: AsRef<Path>,
+{
+    prepare_derivations_preview(dbname, export_info, seeds).map_err(Into::into)
 }
 
 /// Checks derivation path for validity and collisions

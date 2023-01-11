@@ -8,7 +8,7 @@ use db_handling::{
     cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
     manage_history::get_history,
 };
-use definitions::derivations::{DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview};
+use definitions::derivations::{DerivedKeyPreview, SeedKeysPreview};
 use definitions::navigation::{MAddressCard, SignerImage, TransactionSignAction};
 use definitions::{
     crypto::Encryption,
@@ -2568,7 +2568,6 @@ fn import_derivations() {
                         },
                         has_pwd: None,
                         network_title: Some("Westend".to_string()),
-                        status: DerivedKeyStatus::Importable,
                     }],
                 }],
             },

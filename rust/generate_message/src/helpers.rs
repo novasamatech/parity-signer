@@ -1,7 +1,5 @@
 //! Helpers
-use db_handling::identities::{
-    AddrInfo, ExportAddrs, ExportAddrsV1, SeedInfo, TransactionBulk, TransactionBulkV1,
-};
+use db_handling::identities::{TransactionBulk, TransactionBulkV1};
 use parity_scale_codec::Encode;
 use qrcode_rtx::transform_into_qr_apng;
 use serde_json::{map::Map, value::Value};
@@ -15,6 +13,7 @@ use db_handling::{
     db_transactions::TrDbHot,
     helpers::{make_batch_clear_tree, open_db, open_tree},
 };
+use definitions::derivations::{AddrInfo, ExportAddrs, ExportAddrsV1, SeedInfo};
 use definitions::{
     crypto::Encryption,
     helpers::unhex,

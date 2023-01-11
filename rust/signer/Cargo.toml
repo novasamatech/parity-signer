@@ -15,6 +15,7 @@ sp-core = { git = "https://github.com/paritytech/substrate", default-features = 
 
 db_handling = { path = "../db_handling", default-features = false, features = ["signer"] }
 definitions = { path = "../definitions", default-features = false, features = ["signer"] }
+transaction_parsing = {path = "../transaction_parsing"}
 navigator = { path = "../navigator", default-features = false }
 qr_reader_phone = { path = "../qr_reader_phone" }
 qrcode_static = { path = "../qrcode_static" }

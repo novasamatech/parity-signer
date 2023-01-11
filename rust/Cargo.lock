@@ -3299,6 +3299,7 @@ dependencies = [
  "qrcode_static",
  "sp-core",
  "sp-runtime",
+ "transaction_parsing",
  "uniffi",
  "uniffi_build",
 ]
