@@ -9,6 +9,7 @@ import SwiftUI
 
 struct KeySetList: View {
     @StateObject var viewModel: ViewModel
+    @EnvironmentObject private var data: SignerDataModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject var appState: AppState
     @Binding var dataModel: MSeeds
@@ -67,18 +68,27 @@ struct KeySetList: View {
             VStack {
                 // Add Key Set
                 if !isExportKeysSelected {
-                    PrimaryButton(
-                        action: {
-                            // We need to call this conditionally, as if there are no seeds,
-                            // Rust does not expect `rightButtonAction` called before `addSeed` / `recoverSeed`
-                            if !viewModel.listViewModel.list.isEmpty {
-                                navigation.perform(navigation: .init(action: .rightButtonAction))
-                            }
-                            isShowingNewSeedMenu.toggle()
-                        },
-                        text: Localizable.KeySets.Action.add.key
-                    )
-                    .padding(Spacing.large)
+                    VStack(spacing: 0) {
+                        ConnectivityAlertOverlay(
+                            viewModel: .init(resetWarningAction: ResetConnectivtyWarningsAction(
+                                alert: $data
+                                    .alert
+                            ))
+                        )
+                        PrimaryButton(
+                            action: {
+                                // We need to call this conditionally, as if there are no seeds,
+                                // Rust does not expect `rightButtonAction` called before `addSeed` / `recoverSeed`
+                                if !viewModel.listViewModel.list.isEmpty {
+                                    navigation.perform(navigation: .init(action: .rightButtonAction))
+                                }
+                                isShowingNewSeedMenu.toggle()
+                            },
+                            text: Localizable.KeySets.Action.add.key
+                        )
+                        .padding(.horizontal, Spacing.large)
+                        .padding(.bottom, Spacing.large)
+                    }
                 }
                 TabBarView(
                     selectedTab: $navigation.selectedTab
@@ -245,6 +255,8 @@ private struct KeyListEmptyState: View {
             .preferredColorScheme(.dark)
             .previewLayout(.sizeThatFits)
             .environmentObject(NavigationCoordinator())
+            .environmentObject(SignerDataModel())
+            .environmentObject(AppState.preview)
         }
     }
 #endif
