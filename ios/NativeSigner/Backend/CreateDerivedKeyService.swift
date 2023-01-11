@@ -29,10 +29,10 @@ final class CreateDerivedKeyService {
         _ seedName: String,
         _ path: String,
         _ network: String,
-        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+        _ completion: @escaping (Result<Void, Error>) -> Void
     ) {
         callQueue.async {
-            let result: Result<Void, ServiceError>
+            let result: Result<Void, Error>
             let seedPhrase = self.seedsMediator.getSeed(seedName: seedName)
             do {
                 try tryCreateAddress(
@@ -44,7 +44,7 @@ final class CreateDerivedKeyService {
                 )
                 result = .success(())
             } catch {
-                result = .failure(.unknown)
+                result = .failure(error)
             }
             self.callbackQueue.async {
                 completion(result)
@@ -55,10 +55,10 @@ final class CreateDerivedKeyService {
     func createDerivedKeyOnAllNetworks(
         _ seedName: String,
         _ path: String,
-        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+        _ completion: @escaping (Result<Void, Error>) -> Void
     ) {
         callQueue.async {
-            let result: Result<Void, ServiceError>
+            let result: Result<Void, Error>
             let seedPhrase = self.seedsMediator.getSeed(seedName: seedName)
             do {
                 try getAllNetworks(
@@ -75,7 +75,7 @@ final class CreateDerivedKeyService {
                 }
                 result = .success(())
             } catch {
-                result = .failure(.unknown)
+                result = .failure(error)
             }
             self.callbackQueue.async {
                 completion(result)

@@ -42,12 +42,16 @@ enum Heights {
     static let networkLogoInCell: CGFloat = 36
     /// Height for `Network Logo` when used in list collections, 36 pt
     static let networkLogoInHeader: CGFloat = 56
+    /// Height for `Network Logo` when used in small capsule view, 24 pt
+    static let networkLogoInCapsule: CGFloat = 24
     /// Height for element in Network Filter modal
     static let networkFilterItem: CGFloat = 48
     static let settingsEntryHeight: CGFloat = 56
     static let verifierCertificateActionHeight: CGFloat = 48
     /// Height for element in Network Selection Settings
     static let networkSelectionSettings: CGFloat = 52
+    static let selectionBox: CGFloat = 48
+    static let capsuleSelectionView: CGFloat = 28
 }
 
 enum Sizes {
@@ -60,4 +64,5 @@ enum Sizes {
     /// Diameter for ">" button in circle, 28pt
     static let chevronCircleButton: CGFloat = 28
     static let rightChevronContainerSize: CGFloat = 28
+    static let roundedQuestionmark: CGFloat = 24
 }

@@ -12,7 +12,7 @@ struct CreateDerivedKeyView: View {
     @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
                     title: Localizable.CreateDerivedKey.Label.title.string,
@@ -24,6 +24,41 @@ struct CreateDerivedKeyView: View {
                     rightBarMenuAction: viewModel.onRightNavigationButtonTap
                 )
             )
+            VStack(alignment: .leading, spacing: 0) {
+                Localizable.CreateDerivedKey.Label.Header.network.text
+                    .font(PrimaryFont.bodyL.font)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .padding(.bottom, Spacing.medium)
+                networkSelectionInput()
+                    .padding(.bottom, Spacing.large)
+                HStack(spacing: Spacing.extraExtraSmall) {
+                    Localizable.CreateDerivedKey.Label.Header.path.text
+                        .font(PrimaryFont.bodyL.font)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    Asset.smallRoundQuestionmark.swiftUIImage
+                        .foregroundColor(Asset.accentPink300.swiftUIColor)
+                        .frame(width: Sizes.roundedQuestionmark, height: Sizes.roundedQuestionmark)
+                }
+                .containerShape(Rectangle())
+                .onTapGesture {
+                    viewModel.onDerivationPathQuestionTap()
+                }
+                .padding(.bottom, Spacing.medium)
+                derivationPathInput()
+                    .padding(.bottom, Spacing.small)
+                Localizable.CreateDerivedKey.Label.Footer.path.text
+                    .font(PrimaryFont.captionM.font)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                Spacer()
+                PrimaryButton(
+                    action: viewModel.onCreateDerivedKeyTap,
+                    text: Localizable.CreateDerivedKey.Action.add.key,
+                    style: .primary(isDisabled: $viewModel.isActionDisabled)
+                )
+            }
+            .padding(.horizontal, Spacing.large)
+            .padding(.bottom, Spacing.large)
+            .padding(.top, Spacing.medium)
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
@@ -39,6 +74,70 @@ struct CreateDerivedKeyView: View {
             .clearModalBackground()
         }
     }
+
+    @ViewBuilder
+    func networkSelectionInput() -> some View {
+        HStack(spacing: 0) {
+            Spacer()
+                .frame(width: Spacing.medium)
+            if let network = viewModel.selectedNetwork {
+                Localizable.CreateDerivedKey.Label.Network.single.text
+                    .font(PrimaryFont.bodyL.font)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                Spacer()
+                HStack(spacing: 0) {
+                    NetworkLogoIcon(logo: network.logo, size: Heights.networkLogoInCapsule)
+                        .padding(.trailing, Spacing.extraSmall)
+                    Text(network.title)
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .font(PrimaryFont.bodyM.font)
+                        .padding(.trailing, Spacing.extraSmall)
+                }
+                .padding(Spacing.minimal)
+                .background(Asset.fill12.swiftUIColor)
+                .clipShape(Capsule())
+            } else {
+                Localizable.CreateDerivedKey.Label.Network.onAny.text
+                    .font(PrimaryFont.bodyL.font)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                Spacer()
+            }
+            Asset.chevronRight.swiftUIImage
+                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                .padding(.leading, Spacing.small)
+            Spacer()
+                .frame(width: Spacing.small)
+        }
+        .frame(height: Heights.selectionBox)
+        .containerBackground(CornerRadius.extraSmall)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            viewModel.onNetworkSelectionTap()
+        }
+    }
+
+    @ViewBuilder
+    func derivationPathInput() -> some View {
+        HStack(spacing: 0) {
+            Spacer()
+                .frame(width: Spacing.medium)
+            Localizable.CreateDerivedKey.Label.Placeholder.path.text
+                .font(PrimaryFont.bodyL.font)
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            Spacer()
+            Asset.chevronRight.swiftUIImage
+                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                .padding(.leading, Spacing.small)
+            Spacer()
+                .frame(width: Spacing.small)
+        }
+        .frame(height: Heights.selectionBox)
+        .containerBackground(CornerRadius.extraSmall)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            viewModel.onDerivationPathTap()
+        }
+    }
 }
 
 extension CreateDerivedKeyView {
@@ -47,10 +146,20 @@ extension CreateDerivedKeyView {
         private let networkService: GetAllNetworksService
         private let createKeyService: CreateDerivedKeyService
         private let seedName: String
-        @Published var networks: [MmNetwork] = []
-
+        // State presentatation
         @Published var isPresentingInfoModal: Bool = false
         @Published var presentableInfoModal: ErrorBottomModalViewModel = .derivedKeysInfo()
+        @Published var isActionDisabled: Bool = true
+
+        /// If `nil`, switch to `Allowed to use on any network`
+        @Published var selectedNetwork: MmNetwork? = .init(
+            key: "polkadot",
+            title: "Polkadot",
+            logo: "polkadot",
+            order: 0
+        )
+        @Published var derivationPath: String?
+        private let cancelBag = CancelBag()
 
         init(
             seedName: String,
@@ -60,6 +169,7 @@ extension CreateDerivedKeyView {
             self.seedName = seedName
             self.networkService = networkService
             self.createKeyService = createKeyService
+            subscribeToChanges()
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -71,7 +181,37 @@ extension CreateDerivedKeyView {
             isPresentingInfoModal = true
         }
 
-        func onDerivationPathQuestionTap() {}
+        func onDerivationPathQuestionTap() {
+            presentableInfoModal = .derivationPathsInfo()
+            isPresentingInfoModal = true
+        }
+
+        func onNetworkSelectionTap() {}
+
+        func onDerivationPathTap() {}
+
+        func onCreateDerivedKeyTap() {
+            guard let derivationPath = derivationPath else { return }
+            let completion: (Result<Void, Error>) -> Void = { result in
+                switch result {
+                case .success:
+                    self.navigation.perform(navigation: .init(action: .goBack))
+                case let .failure(error):
+                    self.presentableInfoModal = .alertError(message: error.localizedDescription)
+                }
+            }
+            if let selectedNetwork = selectedNetwork {
+                createKeyService.createDerivedKey(seedName, derivationPath, selectedNetwork.key, completion)
+            } else {
+                createKeyService.createDerivedKeyOnAllNetworks(seedName, derivationPath, completion)
+            }
+        }
+
+        private func subscribeToChanges() {
+            $derivationPath.sink {
+                self.isActionDisabled = $0 == nil || ($0?.isEmpty == true)
+            }.store(in: cancelBag)
+        }
     }
 }
 

@@ -518,6 +518,10 @@
 "CreateDerivedKey.Label.Placeholder.Path" = "// Add Path Name";
 "CreateDerivedKey.Label.Footer.Path" = "Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.";
 "CreateDerivedKey.Action.Add" = "Create Derived Key";
+"CreateDerivedKey.Label.Network.Single" = "Network";
+"CreateDerivedKey.Label.Network.OnAny" = "Allow use on any network";
+
+
 "CreateDerivedKey.InfoModal.DerivedKeys.Title" = "Derived Keys";
 "CreateDerivedKey.InfoModal.DerivedKeys.Content" = "If you would like to create and manage several accounts on the network using the same secret recovery phrase, you can use derived keys.\n\nWe can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase.\n\nThe main reason to use derived keys is how easy it is to backup (and restore from a backup) a derivation path compared to seed phrase.";
 "CreateDerivedKey.InfoModal.DerivedKeys.Action" = "Got It";

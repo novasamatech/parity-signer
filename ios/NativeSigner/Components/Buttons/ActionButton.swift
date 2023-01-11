@@ -25,8 +25,8 @@ struct ActionButtonStyle: ButtonStyle {
 
     static func primary(isDisabled: Binding<Bool> = Binding<Bool>.constant(false)) -> ActionButtonStyle {
         ActionButtonStyle(
-            backgroundColor: Asset.accentPink500.swiftUIColor,
-            foregroundColor: (isDisabled.wrappedValue ? Asset.accentForegroundTextDisabled : Asset.accentForegroundText)
+            backgroundColor: isDisabled.wrappedValue ? Asset.fill18.swiftUIColor : Asset.accentPink500.swiftUIColor,
+            foregroundColor: Asset.accentForegroundText
                 .swiftUIColor,
             isDisabled: isDisabled
         )
