@@ -78,16 +78,13 @@ fun DerivationPathScreen(
 				imeAction = if (canProceed) ImeAction.Done else ImeAction.None
 			),
 			visualTransformation = DerivationPathVisualTransformation(
-				LocalContext.current,
-				MaterialTheme.colors
+				LocalContext.current, MaterialTheme.colors
 			),
-			keyboardActions = KeyboardActions(
-				onDone = {
-					if (canProceed) {
-						onDoneLocal()
-					}
+			keyboardActions = KeyboardActions(onDone = {
+				if (canProceed) {
+					onDoneLocal()
 				}
-			),
+			}),
 			singleLine = true,
 			textStyle = SignerTypeface.LabelM,
 			colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
@@ -166,7 +163,9 @@ fun DerivationPathScreen(
 			text = stringResource(R.string.derivation_path_screen_subinput_hint),
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.CaptionM,
-			modifier = Modifier.padding(horizontal = 24.dp)
+			modifier = Modifier
+				.padding(horizontal = 24.dp)
+				.padding(vertical = 8.dp)
 		)
 
 		if (hasPassword) {
@@ -174,11 +173,13 @@ fun DerivationPathScreen(
 				text = stringResource(R.string.enter_password_title),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleL,
+				modifier = Modifier.padding(horizontal = 24.dp)
 			)
 			OutlinedTextField(
 				value = password.value,
 				onValueChange = { password.value = it },
 				modifier = Modifier
+					.padding(horizontal = 24.dp)
 					.focusRequester(passwordFocusRequester)
 					.fillMaxWidth(1f),
 				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -186,21 +187,18 @@ fun DerivationPathScreen(
 					keyboardType = KeyboardType.Password,
 					imeAction = if (canProceed) ImeAction.Done else ImeAction.None
 				),
-				keyboardActions = KeyboardActions(
-					onDone = {
+				keyboardActions = KeyboardActions(onDone = {
 //						if (canProceed) {
 //							proceed(password)
 //							focusManager.clearFocus(true)
 //						}
-					}
-				),
+				}),
 				label = { Text(text = "Confirm Password") },
 				singleLine = true,
 				textStyle = SignerTypeface.LabelM,
 				colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
 				trailingIcon = {
-					val image = if (passwordVisible)
-						Icons.Filled.Visibility
+					val image = if (passwordVisible) Icons.Filled.Visibility
 					else Icons.Filled.VisibilityOff
 
 					val description =
@@ -217,7 +215,7 @@ fun DerivationPathScreen(
 
 		DerivationAlarm(
 			Modifier
-				.padding(top = 16.dp, bottom = 16.dp)
+				.padding(top = 8.dp, bottom = 8.dp)
 				.padding(horizontal = 24.dp)
 				.clickable(onClick = onDerivationHelp)
 		)
@@ -237,8 +235,7 @@ private fun DerivationAlarm(modifier: Modifier = Modifier) {
 		modifier = modifier
 			.padding(vertical = 8.dp)
 			.border(
-				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-				innerShape
+				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke), innerShape
 			)
 
 	) {
@@ -271,8 +268,12 @@ private fun DerivationPathHeader(
 	onDone: Callback,
 ) {
 	Box(
-		modifier = Modifier
-			.padding(start = 24.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+		modifier = Modifier.padding(
+			start = 24.dp,
+			end = 8.dp,
+			top = 8.dp,
+			bottom = 8.dp
+		),
 		contentAlignment = Alignment.Center,
 	) {
 		Box(
@@ -312,7 +313,6 @@ private fun DerivationPathHeader(
 		}
 	}
 }
-
 
 
 @Preview(
