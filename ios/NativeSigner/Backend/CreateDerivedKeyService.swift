@@ -82,4 +82,13 @@ final class CreateDerivedKeyService {
             }
         }
     }
+
+    func checkForCollision(
+        _ seedName: String,
+        _ path: String,
+        _ network: String
+    ) -> Bool {
+        substratePathCheck(seedName: seedName, path: path, network: network, dbname: databaseMediator.databaseName)
+            .buttonGood
+    }
 }

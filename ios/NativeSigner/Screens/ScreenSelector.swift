@@ -15,7 +15,6 @@ struct ScreenSelector: View {
     let screenData: ScreenData
     let navigationRequest: NavigationRequest
     let getSeed: (String) -> String
-    let pathCheck: (String, String, String) -> DerivationCheck
     let createAddress: (String, String) -> Void
     let checkSeedCollision: (String) -> Bool
     let restoreSeed: (String, String) -> Void
