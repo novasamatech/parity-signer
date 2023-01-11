@@ -10,6 +10,7 @@ import SwiftUI
 struct CreateDerivedKeyView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var appState: AppState
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -63,6 +64,7 @@ struct CreateDerivedKeyView: View {
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
+            viewModel.use(appState: appState)
         }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingInfoModal
@@ -70,6 +72,17 @@ struct CreateDerivedKeyView: View {
             ErrorBottomModal(
                 viewModel: viewModel.presentableInfoModal,
                 isShowingBottomAlert: $viewModel.isPresentingInfoModal
+            )
+            .clearModalBackground()
+        }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingNetworkSelection
+        ) {
+            ChooseNetworkForKeyView(
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingNetworkSelection,
+                    selectedNetwork: $viewModel.selectedNetwork
+                )
             )
             .clearModalBackground()
         }
@@ -143,6 +156,7 @@ struct CreateDerivedKeyView: View {
 extension CreateDerivedKeyView {
     final class ViewModel: ObservableObject {
         private weak var navigation: NavigationCoordinator!
+        private weak var appState: AppState!
         private let networkService: GetAllNetworksService
         private let createKeyService: CreateDerivedKeyService
         private let seedName: String
@@ -150,6 +164,8 @@ extension CreateDerivedKeyView {
         @Published var isPresentingInfoModal: Bool = false
         @Published var presentableInfoModal: ErrorBottomModalViewModel = .derivedKeysInfo()
         @Published var isActionDisabled: Bool = true
+
+        @Published var isPresentingNetworkSelection: Bool = false
 
         /// If `nil`, switch to `Allowed to use on any network`
         @Published var selectedNetwork: MmNetwork? = .init(
@@ -176,6 +192,16 @@ extension CreateDerivedKeyView {
             self.navigation = navigation
         }
 
+        func use(appState: AppState) {
+            self.appState = appState
+            networkService.getNetworks {
+                if case let .success(networks) = $0 {
+                    appState.userData.allNetworks = networks
+                    self.selectedNetwork = networks.first
+                }
+            }
+        }
+
         func onRightNavigationButtonTap() {
             presentableInfoModal = .derivedKeysInfo()
             isPresentingInfoModal = true
@@ -186,7 +212,9 @@ extension CreateDerivedKeyView {
             isPresentingInfoModal = true
         }
 
-        func onNetworkSelectionTap() {}
+        func onNetworkSelectionTap() {
+            isPresentingNetworkSelection = true
+        }
 
         func onDerivationPathTap() {}
 
