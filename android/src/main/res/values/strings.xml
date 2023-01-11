@@ -247,6 +247,8 @@
 	<string name="derivation_path_hint_create_password">Create a Password</string>
 	<string name="derivation_path_hint_enter_path_name">Enter Path Name</string>
 	<string name="enter_password_input_label">Enter password</string>
+    <string name="network_selection_buttomsheet_title">Choose Network</string>
+    <string name="network_selection_selected_network_mark">Selected network</string>
 
 </resources>
 

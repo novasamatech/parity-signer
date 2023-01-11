@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keyderivation
+package io.parity.signer.screens.keyderivation.derivationsubscreens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
