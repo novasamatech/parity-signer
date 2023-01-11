@@ -4,7 +4,7 @@ use sp_runtime::{generic::Era, MultiSigner};
 use definitions::helpers::{make_identicon_from_account, make_identicon_from_id20, IdenticonStyle};
 use definitions::keyring::{AddressKey, NetworkSpecsKey};
 
-use definitions::derivations::ExportAddrsContainer;
+use definitions::derivations::SeedKeysPreview;
 use definitions::navigation::MAddressCard;
 use definitions::{
     crypto::Encryption,
@@ -44,7 +44,7 @@ pub(crate) enum Card<'a> {
     NewSpecs(&'a NetworkSpecs),
     NetworkInfo(&'a OrderedNetworkSpecs),
     NetworkGenesisHash(&'a [u8]),
-    Derivations(&'a ExportAddrsContainer),
+    Derivations(&'a [SeedKeysPreview]),
     Warning(Warning<'a>),
     Error(Error),
 }
@@ -286,7 +286,7 @@ impl<'a> Card<'a> {
                 },
             },
             Card::NetworkGenesisHash(x) => NavCard::NetworkGenesisHashCard { f: hex::encode(x) },
-            Card::Derivations(x) => NavCard::DerivationsCard { f: (*x).clone() },
+            Card::Derivations(x) => NavCard::DerivationsCard { f: x.to_vec() },
             Card::Warning(warn) => NavCard::WarningCard { f: warn.show() },
             Card::Error(err) => NavCard::ErrorCard {
                 f: format!("Bad input data. {}", err),

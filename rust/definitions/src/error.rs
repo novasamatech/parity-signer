@@ -117,9 +117,6 @@ pub enum Error {
 
     #[error("Cannot convert {0} to valid encryption.")]
     UnknownEncryption(String),
-
-    #[error("Ethereum addresses are not supported here.")]
-    EthereumAddressNotSupported,
 }
 
 /// Error decoding transfer content

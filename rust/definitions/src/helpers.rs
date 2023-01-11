@@ -230,21 +230,23 @@ fn print_ethereum_address(public: &ecdsa::Public) -> String {
     format!("0x{:?}", HexDisplay::from(&account.as_bytes()))
 }
 
-pub fn base58_to_multisigner(base58: &str, encryption: &Encryption) -> Result<MultiSigner> {
+pub fn base58_or_eth_to_multisigner(
+    base58_or_eth: &str,
+    encryption: &Encryption,
+) -> Result<MultiSigner> {
     match encryption {
         Encryption::Ed25519 => {
-            let pubkey = ed25519::Public::from_ss58check(base58)?;
+            let pubkey = ed25519::Public::from_ss58check(base58_or_eth)?;
             Ok(MultiSigner::Ed25519(pubkey))
         }
         Encryption::Sr25519 => {
-            let pubkey = sr25519::Public::from_ss58check(base58)?;
+            let pubkey = sr25519::Public::from_ss58check(base58_or_eth)?;
             Ok(MultiSigner::Sr25519(pubkey))
         }
-        Encryption::Ecdsa => {
-            let pubkey = ecdsa::Public::from_ss58check(base58)?;
+        Encryption::Ethereum | Encryption::Ecdsa => {
+            let pubkey = ecdsa::Public::from_ss58check(base58_or_eth)?;
             Ok(MultiSigner::Ecdsa(pubkey))
         }
-        Encryption::Ethereum => Err(Error::EthereumAddressNotSupported),
     }
 }
 
@@ -311,7 +313,7 @@ mod tests {
         let multisigner = Sr25519(public);
 
         let ss58 = print_multisigner_as_base58_or_eth(&multisigner, None, encryption);
-        let result = base58_to_multisigner(&ss58, &Encryption::Sr25519).unwrap();
+        let result = base58_or_eth_to_multisigner(&ss58, &Encryption::Sr25519).unwrap();
         assert_eq!(result, multisigner);
     }
 }

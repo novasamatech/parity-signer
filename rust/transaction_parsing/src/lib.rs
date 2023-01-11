@@ -12,7 +12,7 @@ use add_specs::add_specs;
 pub mod cards;
 use cards::Card;
 pub mod check_signature;
-pub mod derivations;
+mod derivations;
 pub use derivations::prepare_derivations_preview;
 use derivations::process_derivations;
 mod helpers;
