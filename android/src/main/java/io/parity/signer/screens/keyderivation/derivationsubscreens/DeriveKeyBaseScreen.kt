@@ -27,8 +27,7 @@ import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.*
 
-//todo derivations - how to show errors? Like path already exists
-//todo handle wrong path?
+//todo derivations handle wrong path?
 @Composable
 fun DeriveKeyBaseScreen(onClose: Callback) {
 	val onNetworkSelect = {}
@@ -50,9 +49,12 @@ fun DeriveKeyBaseScreen(onClose: Callback) {
 			text = stringResource(R.string.derivation_screen_network_header),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
+			modifier = Modifier.padding(horizontal = 24.dp),
 		)
 		Row(
 			modifier = Modifier
+				.padding(horizontal = 24.dp)
+				.padding(top = 14.dp, bottom = 8.dp)
 				.fillMaxWidth(1f)
 				.clickable(onClick = onNetworkSelect)
 				.background(
@@ -72,7 +74,10 @@ fun DeriveKeyBaseScreen(onClose: Callback) {
 			ChevronRight()
 		}
 
-		Row {
+		Row(
+			modifier = Modifier
+				.padding(horizontal = 24.dp, vertical = 14.dp)
+		) {
 			Text(
 				text = stringResource(R.string.derivation_screen_derivation_header),
 				color = MaterialTheme.colors.primary,
@@ -91,6 +96,7 @@ fun DeriveKeyBaseScreen(onClose: Callback) {
 		}
 		Row(
 			modifier = Modifier
+				.padding(horizontal = 24.dp)
 				.fillMaxWidth(1f)
 				.clickable(onClick = onPathClicked)
 				.background(
@@ -116,6 +122,8 @@ fun DeriveKeyBaseScreen(onClose: Callback) {
 			text = stringResource(R.string.derivation_screen_derivation_note_description),
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.CaptionM,
+			modifier = Modifier
+				.padding(horizontal = 24.dp, vertical = 12.dp),
 		)
 	}
 }
