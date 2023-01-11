@@ -58,6 +58,15 @@ struct KeyDetailsView: View {
             if viewModel.isPresentingSelectionOverlay {
                 selectKeysOverlay
             } else {
+<<<<<<< Updated upstream
+                PrimaryButton(
+                    action: {
+                        navigation.perform(navigation: viewModel.createDerivedKey)
+                    },
+                    text: Localizable.KeyDetails.Action.create.key
+                )
+                .padding(Spacing.large)
+=======
                 VStack(spacing: 0) {
                     ConnectivityAlertOverlay(
                         viewModel: .init(resetWarningAction: ResetConnectivtyWarningsAction(
@@ -67,13 +76,14 @@ struct KeyDetailsView: View {
                     )
                     PrimaryButton(
                         action: {
-                            navigation.perform(navigation: viewModel.createDerivedKey)
+                            navigation.perform(navigation: dataModel.createDerivedKey)
                         },
                         text: Localizable.KeyDetails.Action.create.key
                     )
                     .padding(.horizontal, Spacing.large)
                     .padding(.bottom, Spacing.large)
                 }
+>>>>>>> Stashed changes
             }
         }
         .onAppear {
