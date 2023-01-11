@@ -4380,7 +4380,7 @@ fn flow_test_1() {
     };
     let sufficient_hex = hex::encode(sufficient);
 
-    let mut new_log_with_modal = expected_action.clone();
+    let mut new_log_with_modal = expected_action;
     /*
     assert_eq!(
         action, expected_action,
