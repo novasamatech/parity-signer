@@ -587,6 +587,15 @@ pub enum Error {
 
     #[error("Parser error: {0}")]
     ParserError(String),
+
+    /// Error in [`SecretString`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/type.SecretString.html).
+    ///
+    /// `SecretString` consists of combined seed phrase and derivation.
+    ///
+    /// Associated error content is
+    /// [`SecretStringError`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/enum.SecretStringError.html).
+    #[error("Secret string error: {}", format!("{:?}", .0))]
+    SecretStringError(sp_core::crypto::SecretStringError),
 }
 
 fn display_parsing_errors(network_name: &str, errors: &[(u32, parser::Error)]) -> String {

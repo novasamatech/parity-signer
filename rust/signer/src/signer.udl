@@ -337,35 +337,61 @@ dictionary TransactionCardSet {
     sequence<TransactionCard>? types_info;
 };
 
+dictionary SeedKeysPreviewSummary {
+    sequence<SeedKeysPreview> seed_keys;
+    u32 already_existing_key_count;
+};
+
 dictionary SeedKeysPreview {
     string name;
     MultiSigner multisigner;
-    sequence<DerivedKeyPreview> derived_keys;
+    sequence<DerivedKeyPreview> importable_keys;
+    sequence<DerivedKeyPreview> already_existing_keys;
+    sequence<DerivedKeyInfo> non_importable_keys;
+    boolean is_key_set_missing;
 };
 
 dictionary DerivedKeyPreview {
     string address;
-    string? derivation_path;
+    string derivation_path;
     Encryption encryption;
     H256 genesis_hash;
     SignerImage identicon;
-    boolean? has_pwd;
-    string? network_title;
-    DerivedKeyStatus status;
+    boolean has_pwd;
+    string network_title;
 };
 
-[Enum]
-interface DerivedKeyStatus {
-    Importable();
-    AlreadyExists();
-    Invalid(sequence<DerivedKeyError> errors);
+dictionary DerivedKeyInfo {
+    string derivation_path;
+    DerivedKeyError key_error;
 };
 
 [Enum]
 interface DerivedKeyError {
     NetworkMissing();
-    KeySetMissing();
     BadFormat();
+};
+
+[Enum]
+interface ExportAddrsContainer {
+    V1(ExportAddrsV1 data);
+};
+
+dictionary ExportAddrsV1 {
+    sequence<SeedInfo> addrs;
+};
+
+dictionary SeedInfo {
+    string name;
+    MultiSigner multisigner;
+    sequence<AddrInfo> derived_keys;
+};
+
+dictionary AddrInfo {
+    string address;
+    string? derivation_path;
+    Encryption encryption;
+    H256 genesis_hash;
 };
 
 dictionary SeedNameCard {
@@ -569,10 +595,10 @@ namespace signer {
     MKeyDetails generate_secret_key_qr([ByRef] string dbname, [ByRef] string public_key, [ByRef] string expected_seed_name, [ByRef] string network_specs_key, [ByRef] string seed_phrase, string? key_password);
 
     [Throws=ErrorDisplayed]
-    void import_derivations([ByRef] string dbname, sequence<SeedKeysPreview> seed_derived_keys);
+    void import_derivations([ByRef] string dbname, SeedKeysPreviewSummary seed_derived_keys);
 
     [Throws=ErrorDisplayed]
-    sequence<SeedKeysPreview> populate_derivations_has_pwd(record<string, string> seeds, sequence<SeedKeysPreview> seed_derived_keys);
+    SeedKeysPreviewSummary get_derivations_preview([ByRef] string dbname, ExportAddrsContainer export_info, record<string, string> seeds);
 
     DerivationCheck substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
 
@@ -826,7 +852,7 @@ interface Card {
     BlockHashCard(string f);
     CallCard(MSCCall f);
     DefaultCard(string f);
-    DerivationsCard(sequence<SeedKeysPreview> f);
+    DerivationsCard(ExportAddrsContainer f);
     EnumVariantNameCard(MSCEnumVariantName f);
     EraImmortalCard();
     EraMortalCard(MSCEraMortal f);

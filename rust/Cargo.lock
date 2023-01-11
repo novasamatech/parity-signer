@@ -2142,9 +2142,6 @@ dependencies = [
  "pretty_assertions",
  "qrcode_rtx",
  "regex",
- "sp-core",
- "sp-runtime",
- "tempfile",
  "sp-core 6.0.0",
  "sp-runtime 6.0.0",
  "tempfile",
@@ -3506,6 +3503,7 @@ dependencies = [
  "qrcode_static",
  "sp-core 6.0.0",
  "sp-runtime 6.0.0",
+ "transaction_parsing",
  "uniffi",
  "uniffi_build",
 ]
