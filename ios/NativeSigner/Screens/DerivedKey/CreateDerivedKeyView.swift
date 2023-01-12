@@ -166,14 +166,10 @@ extension CreateDerivedKeyView {
         @Published var isActionDisabled: Bool = true
 
         @Published var isPresentingNetworkSelection: Bool = false
+        @Published var isPresentingDerivationPath: Bool = false
 
         /// If `nil`, switch to `Allowed to use on any network`
-        @Published var selectedNetwork: MmNetwork? = .init(
-            key: "polkadot",
-            title: "Polkadot",
-            logo: "polkadot",
-            order: 0
-        )
+        @Published var selectedNetwork: MmNetwork?
         @Published var derivationPath: String?
         private let cancelBag = CancelBag()
 
