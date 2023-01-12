@@ -13,7 +13,7 @@ import io.parity.signer.models.storage.addSeed
 import io.parity.signer.models.storage.signSufficientCrypto
 import io.parity.signer.screens.*
 import io.parity.signer.screens.keyderivation.old.DerivePasswordConfirmOld
-import io.parity.signer.screens.keyderivation.old.NewAddressScreen
+import io.parity.signer.screens.keyderivation.old.DeriveScreenOld
 import io.parity.signer.screens.logs.logdetails.LogDetails
 import io.parity.signer.screens.networks.NetworkDetails
 import io.parity.signer.screens.settings.VerifierScreen
@@ -34,12 +34,16 @@ fun ScreenSelector(
 	val seedNames = signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
-		is ScreenData.DeriveKey -> NewAddressScreen(
-			screenData.f,
-			button = button2,
-			addKey = signerDataModel::addKey,
-			checkPath = signerDataModel::checkPath,
-		)
+		is ScreenData.DeriveKey -> {
+			if (FeatureFlags.isDisabled(FeatureOption.NEW_DERIVATION)) {
+				DeriveScreenOld(
+					screenData.f,
+					button = button2,
+					addKey = signerDataModel::addKey,
+					checkPath = signerDataModel::checkPath,
+				)
+			}
+		}
 		ScreenData.Documents -> Documents()
 		is ScreenData.KeyDetails -> {}//migrated
 		is ScreenData.KeyDetailsMulti -> {
@@ -112,10 +116,14 @@ fun ModalSelector(
 				button2
 			)
 			is ModalData.Backup -> {} //new screen is part of key details subgraph
-			is ModalData.PasswordConfirm -> DerivePasswordConfirmOld(
-				modalData.f,
-				signerDataModel = signerDataModel
-			)
+			is ModalData.PasswordConfirm -> {
+				if (FeatureFlags.isDisabled(FeatureOption.NEW_DERIVATION)) {
+					DerivePasswordConfirmOld(
+						modalData.f,
+						signerDataModel = signerDataModel
+					)
+				}
+			}
 			is ModalData.SignatureReady -> {} //in new selector
 			is ModalData.EnterPassword -> {} //in new selector
 			is ModalData.LogRight -> {} //migrated to bottom sheet

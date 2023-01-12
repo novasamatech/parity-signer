@@ -15,6 +15,7 @@ import io.parity.signer.components.panels.BottomBarSingleton
 import io.parity.signer.components.panels.toAction
 import io.parity.signer.models.*
 import io.parity.signer.models.storage.addSeed
+import io.parity.signer.screens.keyderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
@@ -110,11 +111,20 @@ fun CombinedScreensSelector(
 				rootNavigator = rootNavigator
 			)
 		}
-		is ScreenData.Transaction ->{
-			Log.e("Selector","Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData")
+		is ScreenData.Transaction -> {
+			Log.e(
+				"Selector",
+				"Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData"
+			)
 			rootNavigator.navigate(BottomBarSingleton.lastUsedTab.toAction())
 		}
-
+		is ScreenData.DeriveKey -> {
+			if (FeatureFlags.isEnabled(FeatureOption.NEW_DERIVATION)) {
+				DerivationCreateSubgraph(
+					screenData.f.seedName, screenData.f.networkSpecsKey
+				)
+			}
+		}
 		else -> {} //old Selector showing them
 	}
 }

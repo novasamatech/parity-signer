@@ -14,7 +14,7 @@ import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.*
 
 @Composable
-fun NewAddressScreen(
+fun DeriveScreenOld(
 	deriveKey: MDeriveKey,
 	button: (Action, String) -> Unit,
 	addKey: (String, String) -> Unit,

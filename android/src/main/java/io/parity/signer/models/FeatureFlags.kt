@@ -10,6 +10,7 @@ object FeatureFlags {
 		return when (feature) {
 			FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT -> false
 			FeatureOption.EXPORT_SECRET_KEY -> false //unused
+			FeatureOption.NEW_DERIVATION -> true
 		}
 	}
 
@@ -18,6 +19,7 @@ object FeatureFlags {
 
 
 enum class FeatureOption {
+	NEW_DERIVATION,
 	SKIP_UNLOCK_FOR_DEVELOPMENT,
 	EXPORT_SECRET_KEY; //unused as sample
 

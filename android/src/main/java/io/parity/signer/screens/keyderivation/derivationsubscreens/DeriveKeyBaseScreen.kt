@@ -29,10 +29,12 @@ import io.parity.signer.ui.theme.*
 
 //todo derivations handle wrong path?
 @Composable
-fun DeriveKeyBaseScreen(onClose: Callback) {
-	val onNetworkSelect = {}
-	val onDerivationHelpClicked = {}
-	val onPathClicked = {}
+fun DeriveKeyBaseScreen(
+	onClose: Callback,
+	onNetworkSelectClicked: Callback,
+	onDerivationHelpClicked: Callback,
+	onPathClicked: Callback,
+) {
 	val path = remember {
 		mutableStateOf<String>("")
 	}
@@ -56,7 +58,7 @@ fun DeriveKeyBaseScreen(onClose: Callback) {
 				.padding(horizontal = 24.dp)
 				.padding(top = 14.dp, bottom = 8.dp)
 				.fillMaxWidth(1f)
-				.clickable(onClick = onNetworkSelect)
+				.clickable(onClick = onNetworkSelectClicked)
 				.background(
 					MaterialTheme.colors.fill6,
 					RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
@@ -171,6 +173,6 @@ private fun ChevronRight() {
 @Composable
 private fun PreviewDeriveKeyBaseScreen() {
 	SignerNewTheme {
-		DeriveKeyBaseScreen({})
+		DeriveKeyBaseScreen({},{},{},{})
 	}
 }
