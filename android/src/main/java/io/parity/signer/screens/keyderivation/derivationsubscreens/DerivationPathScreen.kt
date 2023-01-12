@@ -42,10 +42,10 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 fun DerivationPathScreen(
-	initialPath: String = "//",
+	initialPath: String,
 	onDerivationHelp: Callback,
 	onClose: Callback,
-	onDone: Callback,
+	onDone: (String) -> Unit,
 ) {
 	val canProceed = true
 	val path = remember { mutableStateOf(TextFieldValue(initialPath)) }
@@ -63,7 +63,7 @@ fun DerivationPathScreen(
 
 
 	val onDoneLocal = {
-		onDone()
+		onDone(path.value.text)
 		focusManager.clearFocus(true)
 	}
 

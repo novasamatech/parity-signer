@@ -1,6 +1,7 @@
 package io.parity.signer.screens.keyderivation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,6 +22,8 @@ fun DerivationCreateSubgraph(
 	val deriveViewModel: DerivationCreateViewModel = viewModel()
 	deriveViewModel.setInitValues(seedName, networkSpecsKey, rootNavigator)
 
+	val path = deriveViewModel.path.collectAsState()
+
 	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
@@ -28,18 +31,21 @@ fun DerivationCreateSubgraph(
 	) {
 		composable(DerivationCreateSubgraph.home) {
 			DeriveKeyBaseScreen(
-				onClose = {}, //todo derivations,
-				onNetworkSelectClicked = {},
+				onClose = { rootNavigator.backAction() },
+				onNetworkSelectClicked = {},//todo derivations,
 				onDerivationHelpClicked = {},
-				onPathClicked = {},
+				onPathClicked = { navController.navigate(DerivationCreateSubgraph.path) },
 			)
 		}
 		composable(DerivationCreateSubgraph.path) {
 			DerivationPathScreen(
-//				initialPath = ,
+				initialPath = path.value,
 				onDerivationHelp = { /*TODO*/ },
-				onClose = { /*TODO*/ },
-				onDone = { /*TODO*/ }
+				onClose = { navController.navigate(DerivationCreateSubgraph.home) },
+				onDone = { newPath ->
+					deriveViewModel.updatePath(newPath)
+					navController.navigate(DerivationCreateSubgraph.home)
+				}
 			)
 		}
 		composable(DerivationCreateSubgraph.confirmation) {

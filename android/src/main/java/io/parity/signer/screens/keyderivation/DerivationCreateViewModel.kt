@@ -9,8 +9,13 @@ import io.parity.signer.models.Navigator
 import io.parity.signer.models.NetworkModel
 import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.models.storage.mapError
+import io.parity.signer.screens.scan.ScanViewModel
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.ErrorDisplayed
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.runBlocking
 
 
@@ -26,7 +31,13 @@ class DerivationCreateViewModel : ViewModel() {
 
 	val all_networks = viewModelScope.async { getNetworks() }
 
+	private val _path: MutableStateFlow<String> =
+		MutableStateFlow("//")
+	val path: StateFlow<String> = _path.asStateFlow()
 
+	fun updatePath(newPath: String) {
+		_path.value = newPath
+	}
 	fun setInitValues(seed: String, network: String, rootNavigator: Navigator) {
 		seedName = seed
 		selectedNetworkSpecs = network
