@@ -1,3 +1,4 @@
+use std::convert::TryInto;
 use std::str::FromStr;
 
 use crate::{parse_and_display_set, Error};
@@ -34,12 +35,17 @@ fn specs() -> ShortSpecs {
     }
 }
 
-#[allow(clippy::all)]
 #[subxt::subxt(runtime_metadata_path = "for_tests/westend9111.scale")]
 mod westend9111 {}
 
 #[subxt::subxt(runtime_metadata_path = "for_tests/westend9122.scale")]
 mod westend9122 {}
+
+#[subxt::subxt(runtime_metadata_path = "for_tests/acala2012.scale")]
+mod acala2012 {}
+
+#[subxt::subxt(runtime_metadata_path = "for_tests/moonbase1802.scale")]
+mod moonbase1802 {}
 
 #[derive(parity_scale_codec::Encode)]
 struct Method {
@@ -314,10 +320,10 @@ block_hash: 98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84";
 
 #[test]
 fn tr_5() {
-    use westend9122::runtime_types::westend_runtime::Call;
     use westend9122::runtime_types::frame_system::pallet::Call as SystemCall;
+    use westend9122::runtime_types::westend_runtime::Call;
 
-    let remark = 
+    let remark =
 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Congue eu consequat ac felis donec. Turpis egestas integer eget aliquet nibh praesent. Neque convallis a cras semper auctor neque. Netus et malesuada fames ac turpis egestas sed tempus. Pellentesque habitant morbi tristique senectus et netus et. Pretium vulputate sapien nec sagittis aliquam. Convallis aenean et tortor at risus viverra. Vivamus arcu felis bibendum ut tristique et egestas quis ipsum. Malesuada proin libero nunc consequat interdum varius. ".as_bytes().to_vec();
 
     let call = SystemCall::remark { remark };
@@ -325,9 +331,7 @@ fn tr_5() {
     let genesis_hash =
         H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
     let block_hash =
-        H256::from_str(
-"1b2b0a177ad4f3f93f9a56dae700e938a40201a5beabbda160a74c70e612c66a"
-    ).unwrap();
+        H256::from_str("1b2b0a177ad4f3f93f9a56dae700e938a40201a5beabbda160a74c70e612c66a").unwrap();
 
     let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
         9122,
@@ -368,12 +372,48 @@ network: westend9122,
 tx_version: 7,
 block_hash: 1b2b0a177ad4f3f93f9a56dae700e938a40201a5beabbda160a74c70e612c66a";
 
-    assert_eq!(reply,reply_known);
+    assert_eq!(reply, reply_known);
 }
 
 #[test]
 fn tr_6() {
-    let data = hex::decode("a80a0000dc621b10081b4b51335553ef8df227feb0327649d00beab6e09c10a1dce973590b00407a10f35a24010000dc07000001000000fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620").unwrap();
+    use acala2012::runtime_types::{
+        acala_runtime::Call, pallet_balances::pallet::Call as BalancesCall,
+    };
+
+    let dest = AccountId32::from_ss58check("25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C")
+        .unwrap()
+        .into();
+
+    let call = BalancesCall::transfer {
+        dest,
+        value: 100_000_000_000_000,
+    };
+
+    let call = Call::Balances(call);
+    let call = call.encode();
+
+    let call = Method { method: call };
+    let genesis_hash =
+        H256::from_str("fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c").unwrap();
+    let block_hash =
+        H256::from_str("5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620").unwrap();
+    let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
+        2012,
+        1,
+        0,
+        genesis_hash,
+        BaseExtrinsicParamsBuilder::new()
+            .tip(PlainTip::new(0))
+            .era(Era::Mortal(32, 18), block_hash),
+    );
+    let mut extensions = vec![];
+    params.encode_extra_to(&mut extensions);
+    params.encode_additional_to(&mut extensions);
+    let mut tx = call.encode();
+
+    tx.extend_from_slice(extensions.as_slice());
+
     let specs_acala = ShortSpecs {
         base58prefix: 10,
         decimals: 12,
@@ -385,8 +425,7 @@ fn tr_6() {
         name: "acala".to_string(),
         unit: "ACA".to_string(),
     };
-    let reply =
-        parse_and_display_set(&data, &metadata("for_tests/acala2012"), &specs_acala).unwrap();
+    let reply = parse_and_display_set(&tx, &metadata("for_tests/acala2012"), &specs_acala).unwrap();
     let reply_known = r#"
 Method:
 
@@ -407,33 +446,60 @@ tip: 0 pACA,
 network: acala2012,
 tx_version: 1,
 block_hash: 5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620"#;
-    assert!(
-        reply == reply_known,
-        "Expected: {}\nReceived: {}",
-        reply_known,
-        reply
-    );
+    assert_eq!(reply, reply_known);
 }
 
 #[test]
 fn tr_7() {
-    let data = hex::decode(concat!(
-           "780300e855f5e79ca68ecae0fe99a3fa46806461740e1a0f0000c16ff28623e40000000a0700000200000091bc6e169807aaa54802737e1c504b2577d4fafedd5a02c10293b1cd60e395272470dff6295dd9bb3e5a89c9eb7647d7c5ae525618d77757171718dc034be8f5")
-        ).unwrap();
+    use moonbase1802::runtime_types::{
+        account::AccountId20, moonbase_runtime::Call, pallet_balances::pallet::Call as BalancesCall,
+    };
+
+    let dest = AccountId20(
+        TryInto::<[u8; 20]>::try_into(
+            hex::decode("e855f5e79ca68ecae0fe99a3fa46806461740e1a").unwrap(),
+        )
+        .unwrap(),
+    );
+
+    let call = BalancesCall::transfer {
+        dest,
+        value: 10_000_000_000_000_000,
+    };
+    let call = Call::Balances(call);
+    let call = call.encode();
+    let call = Method { method: call };
+
+    let genesis_hash =
+        H256::from_str("91bc6e169807aaa54802737e1c504b2577d4fafedd5a02c10293b1cd60e39527").unwrap();
+    let block_hash =
+        H256::from_str("2470dff6295dd9bb3e5a89c9eb7647d7c5ae525618d77757171718dc034be8f5").unwrap();
+    let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
+        1802,
+        2,
+        0,
+        genesis_hash,
+        BaseExtrinsicParamsBuilder::new()
+            .tip(PlainTip::new(0))
+            .era(Era::Mortal(32, 14), block_hash),
+    );
+    let mut extensions = vec![];
+    params.encode_extra_to(&mut extensions);
+    params.encode_additional_to(&mut extensions);
+    let mut tx = call.encode();
+
+    tx.extend_from_slice(extensions.as_slice());
+
     let specs_moonbase = ShortSpecs {
         base58prefix: 1287,
         decimals: 18,
-        genesis_hash: [
-            145, 188, 110, 22, 152, 7, 170, 165, 72, 2, 115, 126, 28, 80, 75, 37, 119, 212, 250,
-            254, 221, 90, 2, 193, 2, 147, 177, 205, 96, 227, 149, 39,
-        ]
-        .into(),
+        genesis_hash,
         name: "moonbase".to_string(),
         unit: "DEV".to_string(),
     };
 
     let reply =
-        parse_and_display_set(&data, &metadata("for_tests/moonbase1802"), &specs_moonbase).unwrap();
+        parse_and_display_set(&tx, &metadata("for_tests/moonbase1802"), &specs_moonbase).unwrap();
 
     let reply_known = r#"
 Method:
