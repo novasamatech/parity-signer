@@ -47,9 +47,14 @@ struct CreateDerivedKeyView: View {
                 .padding(.bottom, Spacing.medium)
                 derivationPathInput()
                     .padding(.bottom, Spacing.small)
-                Localizable.CreateDerivedKey.Label.Footer.path.text
-                    .font(PrimaryFont.captionM.font)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                HStack {
+                    Localizable.CreateDerivedKey.Label.Footer.path.text
+                        .font(PrimaryFont.captionM.font)
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    Spacer()
+                    Asset.infoIconBold.swiftUIImage
+                        .foregroundColor(Asset.accentPink300.swiftUIColor)
+                }
                 Spacer()
                 PrimaryButton(
                     action: viewModel.onCreateDerivedKeyTap,
@@ -96,6 +101,17 @@ struct CreateDerivedKeyView: View {
                     selectedNetworks: .constant([])
                 )
             )
+        }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingConfirmation
+        ) {
+            CreateDerivedKeyConfirmationView(
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingConfirmation,
+                    derivationPath: $viewModel.derivationPath
+                )
+            )
+            .clearModalBackground()
         }
     }
 
@@ -145,9 +161,13 @@ struct CreateDerivedKeyView: View {
         HStack(spacing: 0) {
             Spacer()
                 .frame(width: Spacing.medium)
-            Localizable.CreateDerivedKey.Label.Placeholder.path.text
-                .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            Text(
+                viewModel.derivationPath.isEmpty ?
+                    Localizable.CreateDerivedKey.Label.Placeholder.path.string :
+                    viewModel.derivationPath
+            )
+            .font(PrimaryFont.bodyL.font)
+            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
             Spacer()
             Asset.chevronRight.swiftUIImage
                 .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
@@ -178,6 +198,7 @@ extension CreateDerivedKeyView {
 
         @Published var isPresentingNetworkSelection: Bool = false
         @Published var isPresentingDerivationPath: Bool = false
+        @Published var isPresentingConfirmation: Bool = false
 
         /// If `nil`, switch to `Allowed to use on any network`
         @Published var selectedNetwork: MmNetwork?
@@ -231,9 +252,10 @@ extension CreateDerivedKeyView {
             let completion: (Result<Void, Error>) -> Void = { result in
                 switch result {
                 case .success:
-                    self.navigation.perform(navigation: .init(action: .goBack))
+                    self.isPresentingConfirmation = true
                 case let .failure(error):
                     self.presentableInfoModal = .alertError(message: error.localizedDescription)
+                    self.isPresentingInfoModal = true
                 }
             }
             if let selectedNetwork = selectedNetwork {
