@@ -104,7 +104,7 @@
 	<string name="add_key_set_menu_title">Add Key Set</string>
 	<string name="add_key_set_menu_add">Add new Key Set</string>
 	<string name="add_key_set_menu_recover">Recover Key Set</string>
-    <string name="new_key_set_title">Key Set Name</string>
+	<string name="new_key_set_title">Key Set Name</string>
 	<string name="new_key_set_subtitle">Enter a name that will help you identify this key set</string>
 	<string name="new_key_set_description">Name examples: Main account, My validator, Dotsama crowdloans, etc</string>
 	<string name="description_multisign_mode">multi sign mode</string>
@@ -120,14 +120,14 @@
 	<string name="update_metadata_keyword_metadata">Metadata</string>
 	<string name="scan_progress_bar_title">Multipart data</string>
 	<string name="scan_progress_bar_progress">%1$d / %2$d complete</string>
-    <string name="generic_ok">OK</string>
+	<string name="generic_ok">OK</string>
 	<string name="camera_jastification_title">Camera required!</string>
 	<string name="camera_jastification_message">To work with QR code we need camera permission, this is main functionality of this app!</string>
 	<string name="camera_no_permission_text">Camera permission not granted</string>
-    <string name="general_got_it">Got it</string>
+	<string name="general_got_it">Got it</string>
 	<string name="exposed_now_title">Network Connected</string>
 	<string name="exposed_now_message">Signer detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.</string>
-    <string name="exposed_past_title">Network Was Connected!</string>
+	<string name="exposed_past_title">Network Was Connected!</string>
 	<string name="exposed_past_message">Your Signer device has connected to a WIFI, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use.</string>
 	<string name="exposed_before_cancel_button">Go Back</string>
 	<string name="exposed_before_proceed_button">Acknowledge and Proceed</string>
@@ -139,7 +139,7 @@
 	<string name="settings_wipe_data">Wipe all Data</string>
 	<string name="settings_hardware_key">Hardware seed protection: %1$s</string>
 	<string name="settings_version">Signer version: %1$s</string>
-    <string name="button_next">Next</string>
+	<string name="button_next">Next</string>
 	<string name="new_key_set_backup_title">Recovery Phrase</string>
 	<string name="new_key_set_backup_subtitle">Write down your Secret Recovery Phrase</string>
 	<string name="new_key_set_backup_warning_message">Write it down on a paper and keep  it in a safe place. </string>
@@ -147,7 +147,7 @@
 	<string name="new_key_set_backup_bottomsheet_title">Please confirm that you have you written down your secret recovery phrase</string>
 	<string name="new_key_set_backup_bottomsheet_checkbox_written">I’ve written down my secret recovery phrase</string>
 	<string name="new_key_set_backup_bottomsheet_checkbox_keep_careful">I understand that if I lose my secret phrase, my funds will be lost forever</string>
-    <string name="transaction_field_from">From</string>
+	<string name="transaction_field_from">From</string>
 	<string name="transaction_field_bitvec">BitVec</string>
 	<string name="transaction_field_backhash">Block hash</string>
 	<string name="transaction_field_transaction_immortal">Immortal transaction</string>
@@ -166,9 +166,9 @@
 	<string name="transaction_field_import_derivations">Importing derivations</string>
 	<string name="transaction_field_error">Error!</string>
 	<string name="transaction_field_path">Path %1$s</string>
-    <string name="transaction_metadata_header">Add metadata</string>
+	<string name="transaction_metadata_header">Add metadata</string>
 	<string name="transaction_metadata_label">Metadata</string>
-    <string name="transaction_new_network_header">New Network</string>
+	<string name="transaction_new_network_header">New Network</string>
 	<string name="transaction_new_network_network_name">Network name</string>
 	<string name="transaction_new_network_base58">base58 prefix</string>
 	<string name="transaction_new_network_decimals">Decimals</string>
@@ -187,22 +187,22 @@
 	<string name="transaction_unknown_network_tx_version">Tx version</string>
 	<string name="transaction_types_info_hash">Types hash</string>
 	<string name="warning_exl">Warning!</string>
-    <string name="enter_password_title">Enter the password for</string>
+	<string name="enter_password_title">Enter the password for</string>
 	<string name="enter_password_description">Enter the password you used for your derivation path</string>
-    <string name="password_hide_password">Hide password</string>
+	<string name="password_hide_password">Hide password</string>
 	<string name="password_show_password">Show password</string>
 	<string name="password_error_wrong_password">The password you entered is incorrect. Please try again.</string>
-    <string name="enable_airplane_mode_error">Please enable airplane mode</string>
-    <string name="wrong_password_title">Did you forget your password?</string>
+	<string name="enable_airplane_mode_error">Please enable airplane mode</string>
+	<string name="wrong_password_title">Did you forget your password?</string>
 	<string name="wrong_password_message">Your password was entered incorrectly more than once. Retrieve it and scan the QR code again.</string>
 	<string name="transaction_generic_error_title">Error signing Transaction</string>
 	<string name="transaction_generic_error_description">View the details below to find out more.</string>
-    <string name="transaction_action_done">Done</string>
+	<string name="transaction_action_done">Done</string>
 	<string name="transaction_action_approve">Approve</string>
 	<string name="transaction_action_decline">Decline</string>
 	<string name="transaction_action_back">Back</string>
 	<string name="transaction_action_select_seed">Select seed</string>
-    <string name="transaction_summary_field_transaction_details">Transaction Details</string>
+	<string name="transaction_summary_field_transaction_details">Transaction Details</string>
 	<string name="transaction_summary_field_pallet">Pallet</string>
 	<string name="transaction_summary_field_method">Method</string>
 	<string name="transaction_summary_field_destination">Dest</string>
@@ -213,7 +213,7 @@
 	<string name="transaction_details_screen_header">Transaction details</string>
 	<string name="toast_metadata_added">Metadata %1$s %2$s was added</string>
 	<string name="toast_network_added">Network %1$s was added</string>
-    <string name="transactions_title_network">Add Network</string>
+	<string name="transactions_title_network">Add Network</string>
 	<string name="transactions_title_metadata">Add Metadata</string>
 	<string name="derivation_screen_title">Create Derived Key</string>
 	<string name="derivation_screen_network_header">Choose Network</string>
@@ -229,6 +229,7 @@
 	<string name="derivation_help_path_message">If you would like to create and manage several accounts on the network using the same seed, you can use derivation paths. We can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase. Many Polkadot key generation tools support hard and soft derivation. For instance, if you intend to create an account to be used on the Polkadot chain, you can derive a hard key child account using // after the mnemonic phrase.</string>
 	<string name="derivation_help_path_header1">/ Soft derivation</string>
 	<string name="derivation_help_path_header2">// Hard derivation</string>
+
 	<string name="derivation_help_path_header3">/// Password derivation</string>
 	<string name="derivation_help_path_message1">A soft derivation allows someone to potentially \"go backwards\" to figure out the initial account\'s private key if they know the derived account\'s private key. It is also possible to determine that different accounts generated from the same seed are linked to that seed.</string>
 	<string name="derivation_help_path_message2">A hard derivation path does not allow either of these - even if you know a derived private key, it\'s not feasible to figure out the private key of the root address, and it\'s impossible to prove that the first account is linked with the second.</string>
@@ -240,15 +241,16 @@
 	<string name="new_derivation_conformation_message">Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.</string>
 	<string name="new_derivation_conformation_path_headline">Derivation Path Name</string>
 	<string name="new_derivation_conformation_checkbox_wrote_down">I have written down my derivation path name</string>
-    <string name="derivation_path_screen_title">Derivation Path Name</string>
+	<string name="derivation_path_screen_title">Derivation Path Name</string>
+	<string name="derivation_path_screen_help_tile_message_highlited_part">/soft, //hard, ///password</string>
 	<string name="derivation_path_screen_help_tile_message">Learn more about /soft, //hard, ///password derivation methods</string>
 	<string name="derivation_path_screen_subinput_hint">Path name example //network//1</string>
 	<string name="derivation_path_screen_password_input_button">/// Password</string>
 	<string name="derivation_path_hint_create_password">Create a Password</string>
 	<string name="derivation_path_hint_enter_path_name">Enter Path Name</string>
 	<string name="enter_password_input_label">Enter password</string>
-    <string name="network_selection_buttomsheet_title">Choose Network</string>
-    <string name="network_selection_selected_network_mark">Selected network</string>
+	<string name="network_selection_buttomsheet_title">Choose Network</string>
+	<string name="network_selection_selected_network_mark">Selected network</string>
 
 </resources>
 

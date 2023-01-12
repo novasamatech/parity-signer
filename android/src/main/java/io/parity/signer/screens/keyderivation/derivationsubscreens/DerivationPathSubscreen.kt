@@ -24,7 +24,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -239,8 +241,23 @@ private fun DerivationAlarm(modifier: Modifier = Modifier) {
 			)
 
 	) {
+
+		val derivationAlarmText = buildAnnotatedString {
+			val str =
+				stringResource(R.string.derivation_path_screen_help_tile_message)
+			val boldStr =
+				stringResource(R.string.derivation_path_screen_help_tile_message_highlited_part)
+			val startIndex = str.indexOf(boldStr)
+			val endIndex = startIndex + boldStr.length
+			append(str)
+			addStyle(
+				style = SpanStyle(color = MaterialTheme.colors.pink300),
+				start = startIndex,
+				end = endIndex
+			)
+		}
 		Text(
-			text = stringResource(R.string.derivation_path_screen_help_tile_message),
+			text = derivationAlarmText,
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.BodyM,
 			modifier = Modifier
