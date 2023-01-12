@@ -4385,7 +4385,6 @@ dependencies = [
  "futures",
  "getrandom 0.2.6",
  "hex",
- "jsonrpsee",
  "parity-scale-codec",
  "parking_lot 0.12.1",
  "scale-decode",
