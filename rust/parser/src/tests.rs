@@ -1,8 +1,19 @@
+use std::convert::TryInto;
+use std::str::FromStr;
+
 use crate::{parse_and_display_set, Error};
 use definitions::network_specs::ShortSpecs;
 use frame_metadata::RuntimeMetadata;
 use parity_scale_codec::Decode;
+use parity_scale_codec::Encode;
 use pretty_assertions::assert_eq;
+use sp_core::H256;
+
+use subxt::{
+    config::PolkadotConfig,
+    ext::{sp_core::crypto::Ss58Codec, sp_runtime::AccountId32},
+    tx::{BaseExtrinsicParams, BaseExtrinsicParamsBuilder, Era, ExtrinsicParams, PlainTip},
+};
 
 fn metadata(filename: &str) -> RuntimeMetadata {
     let metadata_hex = std::fs::read_to_string(filename).unwrap();
@@ -24,10 +35,106 @@ fn specs() -> ShortSpecs {
     }
 }
 
+#[subxt::subxt(runtime_metadata_path = "for_tests/westend9111.scale")]
+mod westend9111 {}
+
+#[subxt::subxt(runtime_metadata_path = "for_tests/westend9122.scale")]
+mod westend9122 {}
+
+#[subxt::subxt(runtime_metadata_path = "for_tests/acala2012.scale")]
+mod acala2012 {}
+
+#[allow(clippy::*)]
+#[subxt::subxt(runtime_metadata_path = "for_tests/moonbase1802.scale")]
+mod moonbase1802 {}
+
+// This struct is needed as a way to add a `Compact`
+// length in front of the encoded method payload.
+#[derive(parity_scale_codec::Encode)]
+struct Method {
+    method: Vec<u8>,
+}
+
+fn westend_genesis() -> H256 {
+    H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap()
+}
+
+fn moonbase_genesis() -> H256 {
+    H256::from_str("91bc6e169807aaa54802737e1c504b2577d4fafedd5a02c10293b1cd60e39527").unwrap()
+}
+
+fn acala_genesis() -> H256 {
+    H256::from_str("fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c").unwrap()
+}
+
+// Encode `Call` and `Extensions` into a payload that UOS compatible.
+fn encode_call_and_params<I, H, C: Encode, P: ExtrinsicParams<I, H>>(
+    call: &C,
+    params: &P,
+) -> Vec<u8> {
+    let call = call.encode();
+
+    let call = Method { method: call };
+
+    let mut extensions = vec![];
+    params.encode_extra_to(&mut extensions);
+    params.encode_additional_to(&mut extensions);
+    let mut tx = call.encode();
+
+    tx.extend_from_slice(extensions.as_slice());
+
+    tx
+}
+
 #[test]
 fn tr_1() {
-    let data = hex::decode("4d0210020806000046ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a07001b2c3ef70006050c0008264834504a64ace1373f0c8ed5d57381ddf54a2f67a318fa42b1352681606d00aebb0211dbb07b4d335a657257b8ac5e53794c901e4f616d4a254f2490c43934009ae581fef1fc06828723715731adcf810e42ce4dadad629b1b7fa5c3c144a81d550008009723000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff").unwrap();
-    let reply = parse_and_display_set(&data, &metadata("for_tests/westend9111"), &specs()).unwrap();
+    use westend9111::runtime_types::{
+        pallet_staking::{pallet::pallet::Call as StakingCall, RewardDestination},
+        pallet_utility::pallet::Call as UtilityCall,
+        westend_runtime::Call,
+    };
+    let mut calls = Vec::new();
+
+    let staking_call_bond = StakingCall::bond {
+        controller: AccountId32::from_ss58check("5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV")
+            .unwrap()
+            .into(),
+        value: 1061900000000,
+        payee: RewardDestination::Staked,
+    };
+    calls.push(Call::Staking(staking_call_bond));
+
+    let staking_call_nominate = StakingCall::nominate {
+        targets: [
+            "5CFPcUJgYgWryPaV1aYjSbTpbTLu42V32Ytw1L9rfoMAsfGh",
+            "5G1ojzh47Yt8KoYhuAjXpHcazvsoCXe3G8LZchKDvumozJJJ",
+            "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f",
+        ]
+        .iter()
+        .map(|addr| AccountId32::from_ss58check(addr).unwrap().into())
+        .collect(),
+    };
+
+    let genesis_hash = westend_genesis();
+    let block_hash =
+        H256::from_str("5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff").unwrap();
+    let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
+        9111,
+        7,
+        2,
+        genesis_hash,
+        BaseExtrinsicParamsBuilder::new()
+            .tip(PlainTip::new(0))
+            .era(Era::Mortal(64, 5), block_hash),
+    );
+
+    calls.push(Call::Staking(staking_call_nominate));
+
+    let batch = UtilityCall::batch_all { calls };
+    let tx = Call::Utility(batch);
+
+    let tx = encode_call_and_params(&tx, &params);
+    let reply = parse_and_display_set(&tx, &metadata("for_tests/westend9111"), &specs()).unwrap();
     let reply_known = r#"
 Method:
 
@@ -62,31 +169,74 @@ tip: 0 pWND,
 network: westend9111,
 tx_version: 7,
 block_hash: 5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff"#;
-    assert!(
-        reply == reply_known,
-        "Expected: {}\nReceived: {}",
-        reply_known,
-        reply
-    );
+    assert_eq!(reply, reply_known,);
 }
 
 #[test]
 fn tr_2() {
-    let data = hex::decode("4d0210020806000046ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a07001b2c3ef70006050c0008264834504a64ace1373f0c8ed5d57381ddf54a2f67a318fa42b1352681606d00aebb0211dbb07b4d335a657257b8ac5e53794c901e4f616d4a254f2490c43934009ae581fef1fc06828723715731adcf810e42ce4dadad629b1b7fa5c3c144a81d550008009723000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff").unwrap();
+    use westend9111::runtime_types::{
+        pallet_staking::{pallet::pallet::Call as StakingCall, RewardDestination},
+        pallet_utility::pallet::Call as UtilityCall,
+        westend_runtime::Call,
+    };
+    let mut calls = Vec::new();
+
+    let staking_call_bond = StakingCall::bond {
+        controller: AccountId32::from_ss58check("5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV")
+            .unwrap()
+            .into(),
+        value: 1061900000000,
+        payee: RewardDestination::Staked,
+    };
+    calls.push(Call::Staking(staking_call_bond));
+
+    let staking_call_nominate = StakingCall::nominate {
+        targets: [
+            "5CFPcUJgYgWryPaV1aYjSbTpbTLu42V32Ytw1L9rfoMAsfGh",
+            "5G1ojzh47Yt8KoYhuAjXpHcazvsoCXe3G8LZchKDvumozJJJ",
+            "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f",
+        ]
+        .iter()
+        .map(|addr| AccountId32::from_ss58check(addr).unwrap().into())
+        .collect(),
+    };
+
+    let genesis_hash = westend_genesis();
+    let block_hash =
+        H256::from_str("5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff").unwrap();
+    let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
+        9111,
+        7,
+        2,
+        genesis_hash,
+        BaseExtrinsicParamsBuilder::new()
+            .tip(PlainTip::new(0))
+            .era(Era::Mortal(64, 5), block_hash),
+    );
+
+    calls.push(Call::Staking(staking_call_nominate));
+
+    let batch = UtilityCall::batch_all { calls };
+
+    let tx = Call::Utility(batch);
+
+    let tx = encode_call_and_params(&tx, &params);
     let reply =
-        parse_and_display_set(&data, &metadata("for_tests/westend9120"), &specs()).unwrap_err();
+        parse_and_display_set(&tx, &metadata("for_tests/westend9120"), &specs()).unwrap_err();
+
     if let Error::WrongNetworkVersion {
         as_decoded,
         in_metadata,
     } = reply
     {
         assert_eq!(as_decoded, "9111".to_string());
-        assert_eq!(in_metadata, 9120);
+        assert_eq!(in_metadata, 9120)
     } else {
         panic!("Expected Error::WrongNetworkVersion, got {:?}", reply);
     }
 }
 
+// Unable to use subxt, metadata v12.
 #[test]
 fn tr_3() {
     let data = hex::decode("a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33").unwrap();
@@ -121,8 +271,35 @@ block_hash: 538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33";
 
 #[test]
 fn tr_4() {
-    let data = hex::decode("9c0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480284d717d5031504025a62029723000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84").unwrap();
-    let reply = parse_and_display_set(&data, &metadata("for_tests/westend9111"), &specs()).unwrap();
+    use westend9111::runtime_types::{
+        pallet_balances::pallet::Call as BalancesCall, westend_runtime::Call,
+    };
+
+    let dest = AccountId32::from_ss58check("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty")
+        .unwrap()
+        .into();
+    let genesis_hash = westend_genesis();
+    let block_hash =
+        H256::from_str("98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84").unwrap();
+    let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
+        9111,
+        7,
+        261,
+        genesis_hash,
+        BaseExtrinsicParamsBuilder::new()
+            .tip(PlainTip::new(10_000_000))
+            .era(Era::Mortal(64, 61), block_hash),
+    );
+    let call = BalancesCall::transfer_keep_alive {
+        dest,
+        value: 100_000_000,
+    };
+
+    let call = Call::Balances(call);
+
+    let tx = encode_call_and_params(&call, &params);
+
+    let reply = parse_and_display_set(&tx, &metadata("for_tests/westend9111"), &specs()).unwrap();
     let reply_known = "
 Method:
 
@@ -143,18 +320,35 @@ tip: 10.000000 uWND,
 network: westend9111,
 tx_version: 7,
 block_hash: 98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84";
-    assert!(
-        reply == reply_known,
-        "Expected: {}\nReceived: {}",
-        reply_known,
-        reply
-    );
+    assert_eq!(reply, reply_known);
 }
 
 #[test]
 fn tr_5() {
-    let data = hex::decode("2509000115094c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20436f6e67756520657520636f6e7365717561742061632066656c697320646f6e65632e20547572706973206567657374617320696e7465676572206567657420616c6971756574206e696268207072616573656e742e204e6571756520636f6e76616c6c6973206120637261732073656d70657220617563746f72206e657175652e204e65747573206574206d616c6573756164612066616d6573206163207475727069732065676573746173207365642074656d7075732e2050656c6c656e746573717565206861626974616e74206d6f726269207472697374697175652073656e6563747573206574206e657475732065742e205072657469756d2076756c7075746174652073617069656e206e656320736167697474697320616c697175616d2e20436f6e76616c6c69732061656e65616e20657420746f72746f7220617420726973757320766976657272612e20566976616d757320617263752066656c697320626962656e64756d207574207472697374697175652065742065676573746173207175697320697073756d2e204d616c6573756164612070726f696e206c696265726f206e756e6320636f6e73657175617420696e74657264756d207661726975732e2045022c00a223000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e1b2b0a177ad4f3f93f9a56dae700e938a40201a5beabbda160a74c70e612c66a").unwrap();
-    let reply = parse_and_display_set(&data, &metadata("for_tests/westend9122"), &specs()).unwrap();
+    use westend9122::runtime_types::frame_system::pallet::Call as SystemCall;
+    use westend9122::runtime_types::westend_runtime::Call;
+
+    let remark =
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Congue eu consequat ac felis donec. Turpis egestas integer eget aliquet nibh praesent. Neque convallis a cras semper auctor neque. Netus et malesuada fames ac turpis egestas sed tempus. Pellentesque habitant morbi tristique senectus et netus et. Pretium vulputate sapien nec sagittis aliquam. Convallis aenean et tortor at risus viverra. Vivamus arcu felis bibendum ut tristique et egestas quis ipsum. Malesuada proin libero nunc consequat interdum varius. ".as_bytes().to_vec();
+
+    let call = SystemCall::remark { remark };
+    let call = Call::System(call);
+    let genesis_hash = westend_genesis();
+    let block_hash =
+        H256::from_str("1b2b0a177ad4f3f93f9a56dae700e938a40201a5beabbda160a74c70e612c66a").unwrap();
+
+    let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
+        9122,
+        7,
+        11,
+        genesis_hash,
+        BaseExtrinsicParamsBuilder::new()
+            .tip(PlainTip::new(0))
+            .era(Era::Mortal(64, 36), block_hash),
+    );
+
+    let tx = encode_call_and_params(&call, &params);
+    let reply = parse_and_display_set(&tx, &metadata("for_tests/westend9122"), &specs()).unwrap();
     let reply_known = "
 Method:
 
@@ -172,30 +366,50 @@ tip: 0 pWND,
 network: westend9122,
 tx_version: 7,
 block_hash: 1b2b0a177ad4f3f93f9a56dae700e938a40201a5beabbda160a74c70e612c66a";
-    assert!(
-        reply == reply_known,
-        "Expected: {}\nReceived: {}",
-        reply_known,
-        reply
-    );
+
+    assert_eq!(reply, reply_known);
 }
 
 #[test]
 fn tr_6() {
-    let data = hex::decode("a80a0000dc621b10081b4b51335553ef8df227feb0327649d00beab6e09c10a1dce973590b00407a10f35a24010000dc07000001000000fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620").unwrap();
+    use acala2012::runtime_types::{
+        acala_runtime::Call, pallet_balances::pallet::Call as BalancesCall,
+    };
+
+    let dest = AccountId32::from_ss58check("25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C")
+        .unwrap()
+        .into();
+
+    let call = BalancesCall::transfer {
+        dest,
+        value: 100_000_000_000_000,
+    };
+
+    let call = Call::Balances(call);
+
+    let genesis_hash = acala_genesis();
+    let block_hash =
+        H256::from_str("5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620").unwrap();
+    let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
+        2012,
+        1,
+        0,
+        genesis_hash,
+        BaseExtrinsicParamsBuilder::new()
+            .tip(PlainTip::new(0))
+            .era(Era::Mortal(32, 18), block_hash),
+    );
+
+    let tx = encode_call_and_params(&call, &params);
+
     let specs_acala = ShortSpecs {
         base58prefix: 10,
         decimals: 12,
-        genesis_hash: [
-            252, 65, 185, 189, 142, 248, 254, 83, 213, 140, 126, 166, 124, 121, 76, 126, 201, 167,
-            61, 175, 5, 230, 213, 75, 20, 255, 99, 66, 201, 155, 166, 76,
-        ]
-        .into(),
+        genesis_hash,
         name: "acala".to_string(),
         unit: "ACA".to_string(),
     };
-    let reply =
-        parse_and_display_set(&data, &metadata("for_tests/acala2012"), &specs_acala).unwrap();
+    let reply = parse_and_display_set(&tx, &metadata("for_tests/acala2012"), &specs_acala).unwrap();
     let reply_known = r#"
 Method:
 
@@ -216,33 +430,53 @@ tip: 0 pACA,
 network: acala2012,
 tx_version: 1,
 block_hash: 5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620"#;
-    assert!(
-        reply == reply_known,
-        "Expected: {}\nReceived: {}",
-        reply_known,
-        reply
-    );
+    assert_eq!(reply, reply_known);
 }
 
 #[test]
 fn tr_7() {
-    let data = hex::decode(concat!(
-           "780300e855f5e79ca68ecae0fe99a3fa46806461740e1a0f0000c16ff28623e40000000a0700000200000091bc6e169807aaa54802737e1c504b2577d4fafedd5a02c10293b1cd60e395272470dff6295dd9bb3e5a89c9eb7647d7c5ae525618d77757171718dc034be8f5")
-        ).unwrap();
+    use moonbase1802::runtime_types::{
+        account::AccountId20, moonbase_runtime::Call, pallet_balances::pallet::Call as BalancesCall,
+    };
+
+    let dest = AccountId20(
+        TryInto::<[u8; 20]>::try_into(
+            hex::decode("e855f5e79ca68ecae0fe99a3fa46806461740e1a").unwrap(),
+        )
+        .unwrap(),
+    );
+
+    let call = BalancesCall::transfer {
+        dest,
+        value: 10_000_000_000_000_000,
+    };
+    let call = Call::Balances(call);
+
+    let genesis_hash = moonbase_genesis();
+    let block_hash =
+        H256::from_str("2470dff6295dd9bb3e5a89c9eb7647d7c5ae525618d77757171718dc034be8f5").unwrap();
+    let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
+        1802,
+        2,
+        0,
+        genesis_hash,
+        BaseExtrinsicParamsBuilder::new()
+            .tip(PlainTip::new(0))
+            .era(Era::Mortal(32, 14), block_hash),
+    );
+
+    let tx = encode_call_and_params(&call, &params);
+
     let specs_moonbase = ShortSpecs {
         base58prefix: 1287,
         decimals: 18,
-        genesis_hash: [
-            145, 188, 110, 22, 152, 7, 170, 165, 72, 2, 115, 126, 28, 80, 75, 37, 119, 212, 250,
-            254, 221, 90, 2, 193, 2, 147, 177, 205, 96, 227, 149, 39,
-        ]
-        .into(),
+        genesis_hash,
         name: "moonbase".to_string(),
         unit: "DEV".to_string(),
     };
 
     let reply =
-        parse_and_display_set(&data, &metadata("for_tests/moonbase1802"), &specs_moonbase).unwrap();
+        parse_and_display_set(&tx, &metadata("for_tests/moonbase1802"), &specs_moonbase).unwrap();
 
     let reply_known = r#"
 Method:
