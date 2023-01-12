@@ -2,6 +2,7 @@ package io.parity.signer.screens.keyderivation
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.parity.signer.backend.mapError
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.Navigator
@@ -9,6 +10,7 @@ import io.parity.signer.models.NetworkModel
 import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.models.storage.mapError
 import io.parity.signer.uniffi.Action
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 
 
@@ -21,6 +23,9 @@ class DerivationCreateViewModel : ViewModel() {
 	private lateinit var rootNavigator: Navigator
 	private lateinit var seedName: String
 	private lateinit var selectedNetworkSpecs: String
+
+	val all_networks = viewModelScope.async { getNetworks() }
+
 
 	fun setInitValues(seed: String, network: String, rootNavigator: Navigator) {
 		seedName = seed
@@ -52,7 +57,7 @@ class DerivationCreateViewModel : ViewModel() {
 	}
 
 
-	suspend fun addKey(path: String, seedName: String) {
+	suspend fun proceedCreateKey(path: String, seedName: String) {
 		try {
 			val phrase = seedRepository.getSeedPhraseForceAuth(seedName).mapError()
 			if (phrase?.isNotBlank() == true) {
