@@ -68,7 +68,8 @@ fun KeySetsNavSubgraph(
 	}
 }
 
-object KeySetsNavSubgraph {
+
+internal object KeySetsNavSubgraph {
 	const val home = "keysets_home"
 	const val homeMenu = "keysets_menu"
 	const val export = "keysets_export"

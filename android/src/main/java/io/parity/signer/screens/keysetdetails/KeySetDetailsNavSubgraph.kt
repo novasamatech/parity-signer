@@ -78,7 +78,7 @@ fun KeySetDetailsNavSubgraph(
 	}
 }
 
-object KeySetDetailsNavSubgraph {
+internal object KeySetDetailsNavSubgraph {
 	const val home = "keyset_details_home"
 	const val multiselect = "keyset_details_multiselect"
 	const val backup = "keyset_details_backup"
