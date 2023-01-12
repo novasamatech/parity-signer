@@ -48,9 +48,42 @@ mod acala2012 {}
 #[subxt::subxt(runtime_metadata_path = "for_tests/moonbase1802.scale")]
 mod moonbase1802 {}
 
+// This struct is needed as a way to add a `Compact`
+// length in front of the encoded method payload.
 #[derive(parity_scale_codec::Encode)]
 struct Method {
     method: Vec<u8>,
+}
+
+fn westend_genesis() -> H256 {
+    H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap()
+}
+
+fn moonbase_genesis() -> H256 {
+    H256::from_str("91bc6e169807aaa54802737e1c504b2577d4fafedd5a02c10293b1cd60e39527").unwrap()
+}
+
+fn acala_genesis() -> H256 {
+    H256::from_str("fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c").unwrap()
+}
+
+// Encode `Call` and `Extensions` into a payload that UOS compatible.
+fn encode_call_and_params<I, H, C: Encode, P: ExtrinsicParams<I, H>>(
+    call: &C,
+    params: &P,
+) -> Vec<u8> {
+    let call = call.encode();
+
+    let call = Method { method: call };
+
+    let mut extensions = vec![];
+    params.encode_extra_to(&mut extensions);
+    params.encode_additional_to(&mut extensions);
+    let mut tx = call.encode();
+
+    tx.extend_from_slice(extensions.as_slice());
+
+    tx
 }
 
 #[test]
@@ -82,8 +115,7 @@ fn tr_1() {
         .collect(),
     };
 
-    let genesis_hash =
-        H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
+    let genesis_hash = westend_genesis();
     let block_hash =
         H256::from_str("5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff").unwrap();
     let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
@@ -99,19 +131,9 @@ fn tr_1() {
     calls.push(Call::Staking(staking_call_nominate));
 
     let batch = UtilityCall::batch_all { calls };
-
     let tx = Call::Utility(batch);
-    let tx = tx.encode();
 
-    let call = Method { method: tx };
-
-    let mut extensions = vec![];
-    params.encode_extra_to(&mut extensions);
-    params.encode_additional_to(&mut extensions);
-    let mut tx = call.encode();
-
-    tx.extend_from_slice(extensions.as_slice());
-
+    let tx = encode_call_and_params(&tx, &params);
     let reply = parse_and_display_set(&tx, &metadata("for_tests/westend9111"), &specs()).unwrap();
     let reply_known = r#"
 Method:
@@ -179,8 +201,7 @@ fn tr_2() {
         .collect(),
     };
 
-    let genesis_hash =
-        H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
+    let genesis_hash = westend_genesis();
     let block_hash =
         H256::from_str("5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff").unwrap();
     let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
@@ -198,17 +219,8 @@ fn tr_2() {
     let batch = UtilityCall::batch_all { calls };
 
     let tx = Call::Utility(batch);
-    let tx = tx.encode();
 
-    let call = Method { method: tx };
-
-    let mut extensions = vec![];
-    params.encode_extra_to(&mut extensions);
-    params.encode_additional_to(&mut extensions);
-    let mut tx = call.encode();
-
-    tx.extend_from_slice(extensions.as_slice());
-
+    let tx = encode_call_and_params(&tx, &params);
     let reply =
         parse_and_display_set(&tx, &metadata("for_tests/westend9120"), &specs()).unwrap_err();
 
@@ -266,8 +278,7 @@ fn tr_4() {
     let dest = AccountId32::from_ss58check("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty")
         .unwrap()
         .into();
-    let genesis_hash =
-        H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
+    let genesis_hash = westend_genesis();
     let block_hash =
         H256::from_str("98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84").unwrap();
     let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
@@ -285,15 +296,8 @@ fn tr_4() {
     };
 
     let call = Call::Balances(call);
-    let call = call.encode();
-    let call = Method { method: call };
 
-    let mut extensions = vec![];
-    params.encode_extra_to(&mut extensions);
-    params.encode_additional_to(&mut extensions);
-    let mut tx = call.encode();
-
-    tx.extend_from_slice(extensions.as_slice());
+    let tx = encode_call_and_params(&call, &params);
 
     let reply = parse_and_display_set(&tx, &metadata("for_tests/westend9111"), &specs()).unwrap();
     let reply_known = "
@@ -329,8 +333,7 @@ fn tr_5() {
 
     let call = SystemCall::remark { remark };
     let call = Call::System(call);
-    let genesis_hash =
-        H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
+    let genesis_hash = westend_genesis();
     let block_hash =
         H256::from_str("1b2b0a177ad4f3f93f9a56dae700e938a40201a5beabbda160a74c70e612c66a").unwrap();
 
@@ -344,16 +347,7 @@ fn tr_5() {
             .era(Era::Mortal(64, 36), block_hash),
     );
 
-    let call = call.encode();
-    let call = Method { method: call };
-
-    let mut extensions = vec![];
-    params.encode_extra_to(&mut extensions);
-    params.encode_additional_to(&mut extensions);
-    let mut tx = call.encode();
-
-    tx.extend_from_slice(extensions.as_slice());
-
+    let tx = encode_call_and_params(&call, &params);
     let reply = parse_and_display_set(&tx, &metadata("for_tests/westend9122"), &specs()).unwrap();
     let reply_known = "
 Method:
@@ -392,11 +386,8 @@ fn tr_6() {
     };
 
     let call = Call::Balances(call);
-    let call = call.encode();
 
-    let call = Method { method: call };
-    let genesis_hash =
-        H256::from_str("fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c").unwrap();
+    let genesis_hash = acala_genesis();
     let block_hash =
         H256::from_str("5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620").unwrap();
     let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
@@ -408,21 +399,13 @@ fn tr_6() {
             .tip(PlainTip::new(0))
             .era(Era::Mortal(32, 18), block_hash),
     );
-    let mut extensions = vec![];
-    params.encode_extra_to(&mut extensions);
-    params.encode_additional_to(&mut extensions);
-    let mut tx = call.encode();
 
-    tx.extend_from_slice(extensions.as_slice());
+    let tx = encode_call_and_params(&call, &params);
 
     let specs_acala = ShortSpecs {
         base58prefix: 10,
         decimals: 12,
-        genesis_hash: [
-            252, 65, 185, 189, 142, 248, 254, 83, 213, 140, 126, 166, 124, 121, 76, 126, 201, 167,
-            61, 175, 5, 230, 213, 75, 20, 255, 99, 66, 201, 155, 166, 76,
-        ]
-        .into(),
+        genesis_hash,
         name: "acala".to_string(),
         unit: "ACA".to_string(),
     };
@@ -468,11 +451,8 @@ fn tr_7() {
         value: 10_000_000_000_000_000,
     };
     let call = Call::Balances(call);
-    let call = call.encode();
-    let call = Method { method: call };
 
-    let genesis_hash =
-        H256::from_str("91bc6e169807aaa54802737e1c504b2577d4fafedd5a02c10293b1cd60e39527").unwrap();
+    let genesis_hash = moonbase_genesis();
     let block_hash =
         H256::from_str("2470dff6295dd9bb3e5a89c9eb7647d7c5ae525618d77757171718dc034be8f5").unwrap();
     let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
@@ -484,12 +464,8 @@ fn tr_7() {
             .tip(PlainTip::new(0))
             .era(Era::Mortal(32, 14), block_hash),
     );
-    let mut extensions = vec![];
-    params.encode_extra_to(&mut extensions);
-    params.encode_additional_to(&mut extensions);
-    let mut tx = call.encode();
 
-    tx.extend_from_slice(extensions.as_slice());
+    let tx = encode_call_and_params(&call, &params);
 
     let specs_moonbase = ShortSpecs {
         base58prefix: 1287,
