@@ -86,6 +86,17 @@ struct CreateDerivedKeyView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingDerivationPath
+        ) {
+            DerivationPathNameView(
+                viewModel: .init(
+                    derivationPath: $viewModel.derivationPath,
+                    isPresented: $viewModel.isPresentingDerivationPath,
+                    selectedNetworks: .constant([])
+                )
+            )
+        }
     }
 
     @ViewBuilder
@@ -170,7 +181,7 @@ extension CreateDerivedKeyView {
 
         /// If `nil`, switch to `Allowed to use on any network`
         @Published var selectedNetwork: MmNetwork?
-        @Published var derivationPath: String?
+        @Published var derivationPath: String = ""
         private let cancelBag = CancelBag()
 
         init(
@@ -212,10 +223,11 @@ extension CreateDerivedKeyView {
             isPresentingNetworkSelection = true
         }
 
-        func onDerivationPathTap() {}
+        func onDerivationPathTap() {
+            isPresentingDerivationPath = true
+        }
 
         func onCreateDerivedKeyTap() {
-            guard let derivationPath = derivationPath else { return }
             let completion: (Result<Void, Error>) -> Void = { result in
                 switch result {
                 case .success:
@@ -233,7 +245,7 @@ extension CreateDerivedKeyView {
 
         private func subscribeToChanges() {
             $derivationPath.sink {
-                self.isActionDisabled = $0 == nil || ($0?.isEmpty == true)
+                self.isActionDisabled = $0.isEmpty == true
             }.store(in: cancelBag)
         }
     }
