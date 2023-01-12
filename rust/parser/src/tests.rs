@@ -72,16 +72,10 @@ fn tr_1() {
         .collect(),
     };
 
-    let genesis_hash = H256::from_str(
-        "
-e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-    )
-    .unwrap();
-    let block_hash = H256::from_str(
-        "
-5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff",
-    )
-    .unwrap();
+    let genesis_hash =
+        H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
+    let block_hash =
+        H256::from_str("5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff").unwrap();
     let params = BaseExtrinsicParams::<PolkadotConfig, PlainTip>::new(
         9111,
         7,
