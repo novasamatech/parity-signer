@@ -4,8 +4,10 @@ import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
+import io.parity.signer.backend.UniffiResult
 import io.parity.signer.models.AuthResult
 import io.parity.signer.models.Authentication
+import io.parity.signer.models.submitErrorState
 
 
 class SeedRepository(
@@ -14,6 +16,9 @@ class SeedRepository(
 	private val activity: FragmentActivity,
 ) {
 
+	/**
+	 * Try to get phrases if timeout if
+	 */
 	suspend fun getSeedPhrases(seedNames: List<String>): RepoResult<String> {
 		return try {
 			try {
@@ -38,6 +43,24 @@ class SeedRepository(
 		}
 	}
 
+	/**
+	 * Force ask for authentication and get seed phrase
+	 */
+	suspend fun getSeedPhraseForceAuth(seed: String): RepoResult<String> {
+		return when (val authResult =
+			authentication.authenticate(activity)) {
+			AuthResult.AuthSuccess -> {
+				getSeedPhrasesDangerous(listOf(seed))
+			}
+			AuthResult.AuthError,
+			AuthResult.AuthFailed,
+			AuthResult.AuthUnavailable -> {
+				RepoResult.Failure(RuntimeException("auth error - $authResult"))
+			}
+		}
+	}
+
+
 	private fun getSeedPhrasesDangerous(seedNames: List<String>): RepoResult<String> {
 		val seedPhrases = seedNames
 			.map { storage.getSeed(it) }
@@ -56,4 +79,14 @@ sealed class RepoResult<T> {
 	data class Success<T>(val result: T) : RepoResult<T>()
 	data class Failure<T>(val error: Throwable) : RepoResult<T>()
 }
-
+fun <T> RepoResult<T>.mapError(): T? {
+	return when (this) {
+		is RepoResult.Failure -> {
+			submitErrorState("uniffi interaction exception $error")
+			null
+		}
+		is RepoResult.Success -> {
+			result
+		}
+	}
+}

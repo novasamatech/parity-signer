@@ -10,6 +10,7 @@ import io.parity.signer.uniffi.substratePathCheck
 /**
  * Add key to database; uses phone crypto to fetch seeds!
  */
+@Deprecated("use DerivationCreateViewModel for that")
 fun SignerDataModel.addKey(path: String, seedName: String) {
 	ServiceLocator.authentication.authenticate(activity) {
 		try {
@@ -36,6 +37,8 @@ fun SignerDataModel.increment(number: Int, seedName: String) {
 	}
 }
 
+//todo derivation remove
+@Deprecated("use DerivationCreateViewModel for that")
 fun SignerDataModel.checkPath(
 	seedName: String,
 	path: String,

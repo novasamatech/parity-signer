@@ -121,7 +121,7 @@ fun CombinedScreensSelector(
 		is ScreenData.DeriveKey -> {
 			if (FeatureFlags.isEnabled(FeatureOption.NEW_DERIVATION)) {
 				DerivationCreateSubgraph(
-					screenData.f.seedName, screenData.f.networkSpecsKey
+					rootNavigator, screenData.f.seedName, screenData.f.networkSpecsKey
 				)
 			}
 		}
