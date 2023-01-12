@@ -44,6 +44,7 @@ mod westend9122 {}
 #[subxt::subxt(runtime_metadata_path = "for_tests/acala2012.scale")]
 mod acala2012 {}
 
+#[allow(clippy::*)]
 #[subxt::subxt(runtime_metadata_path = "for_tests/moonbase1802.scale")]
 mod moonbase1802 {}
 
