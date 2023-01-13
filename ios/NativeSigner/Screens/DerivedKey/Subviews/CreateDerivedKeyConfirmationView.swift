@@ -77,6 +77,8 @@ struct CreateDerivedKeyConfirmationView: View {
 extension CreateDerivedKeyConfirmationView {
     final class ViewModel: ObservableObject {
         private weak var navigation: NavigationCoordinator!
+        private let snackbarPresentation: BottomSnackbarPresentation
+
         @Published var animateBackground: Bool = false
         @Binding var isPresented: Bool
         @Binding var derivationPath: String
@@ -85,10 +87,12 @@ extension CreateDerivedKeyConfirmationView {
 
         init(
             isPresented: Binding<Bool>,
-            derivationPath: Binding<String>
+            derivationPath: Binding<String>,
+            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation
         ) {
             _isPresented = isPresented
             _derivationPath = derivationPath
+            self.snackbarPresentation = snackbarPresentation
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -99,8 +103,17 @@ extension CreateDerivedKeyConfirmationView {
             Animations.chainAnimation(
                 animateBackground.toggle(),
                 // swiftformat:disable all
-                delayedAnimationClosure: self.navigation.perform(navigation: .init(action: .goBack))
+                delayedAnimationClosure: self.confirmAction()
             )
+        }
+
+        func confirmAction() {
+            navigation.perform(navigation: .init(action: .goBack))
+            snackbarPresentation.viewModel = .init(
+                title: Localizable.CreateDerivedKey.Snackbar.created.string,
+                style: .info
+            )
+            snackbarPresentation.isSnackbarPresented = true
         }
 
         func toggleCheckbox() {

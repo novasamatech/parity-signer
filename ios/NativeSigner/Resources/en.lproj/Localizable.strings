@@ -537,6 +537,7 @@
 "CreateDerivedKey.Modal.Path.Error.PathInvalid" = "Given derivation path is invalid";
 "CreateDerivedKey.Modal.Path.Info" = "Learn more about /soft, //hard,\n///password derivation methods";
 "CreateDerivedKey.Modal.Path.Info.highlight" = "/soft, //hard,\n///password";
+"CreateDerivedKey.Snackbar.Created" = "Derived Key has been created";
 
 "CreateDerivedKey.Modal.Confirmation.Title" = "Write Down Your\nDerivation Path Name";
 "CreateDerivedKey.Modal.Confirmation.Content" = "Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.";
