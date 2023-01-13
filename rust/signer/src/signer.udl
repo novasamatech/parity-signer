@@ -546,6 +546,9 @@ namespace signer {
     DerivationCheck substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
 
     [Throws=ErrorDisplayed]
+    void try_create_address([ByRef] string seed_name, [ByRef] string seed_phrase, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
     void history_init_history_with_cert([ByRef] string dbname);
 
     [Throws=ErrorDisplayed]

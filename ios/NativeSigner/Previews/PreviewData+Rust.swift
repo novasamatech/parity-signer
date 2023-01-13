@@ -198,10 +198,10 @@ extension PreviewData {
 }
 
 extension PreviewData {
-    static let networks: [Network] = [
-        Network(key: "polkadot", logo: "polkadot", order: 1, selected: false, title: "Polkadot"),
-        Network(key: "kusama", logo: "kusama", order: 2, selected: false, title: "Kusama"),
-        Network(key: "westend", logo: "westend", order: 3, selected: false, title: "Westend"),
-        Network(key: "astar", logo: "astar", order: 4, selected: false, title: "Astar")
+    static let networks: [MmNetwork] = [
+        MmNetwork(key: "polkadot", title: "Polkadot", logo: "polkadot", order: 1),
+        MmNetwork(key: "kusama", title: "Kusama", logo: "kusama", order: 2),
+        MmNetwork(key: "westend", title: "Westend", logo: "westend", order: 3),
+        MmNetwork(key: "astar", title: "Astar", logo: "astar", order: 4)
     ]
 }

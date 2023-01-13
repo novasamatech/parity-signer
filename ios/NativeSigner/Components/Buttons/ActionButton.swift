@@ -25,8 +25,10 @@ struct ActionButtonStyle: ButtonStyle {
 
     static func primary(isDisabled: Binding<Bool> = Binding<Bool>.constant(false)) -> ActionButtonStyle {
         ActionButtonStyle(
-            backgroundColor: Asset.accentPink500.swiftUIColor,
-            foregroundColor: (isDisabled.wrappedValue ? Asset.accentForegroundTextDisabled : Asset.accentForegroundText)
+            backgroundColor: isDisabled.wrappedValue ? Asset.accentPink500Disabled.swiftUIColor : Asset.accentPink500
+                .swiftUIColor,
+            foregroundColor: isDisabled.wrappedValue ? Asset.accentPink500TextDisabled.swiftUIColor : Asset
+                .accentForegroundText
                 .swiftUIColor,
             isDisabled: isDisabled
         )
@@ -90,5 +92,6 @@ struct ActionButton: View {
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(style)
+        .disabled(style.isDisabled)
     }
 }

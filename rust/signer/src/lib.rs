@@ -215,6 +215,18 @@ fn substrate_path_check(
     db_handling::interface_signer::dynamic_path_check(dbname, seed_name, path, network)
 }
 
+fn try_create_address(
+    seed_name: &str,
+    seed_phrase: &str,
+    path: &str,
+    network: &str,
+    dbname: &str,
+) -> anyhow::Result<(), String> {
+    let network = NetworkSpecsKey::from_hex(network).map_err(|e| format!("{}", e))?;
+    db_handling::identities::try_create_address(seed_name, seed_phrase, path, &network, dbname)
+        .map_err(|e| format!("{}", e))
+}
+
 /// Must be called once on normal first start of the app upon accepting conditions; relies on old
 /// data being already removed
 fn history_init_history_with_cert(dbname: &str) -> anyhow::Result<(), String> {

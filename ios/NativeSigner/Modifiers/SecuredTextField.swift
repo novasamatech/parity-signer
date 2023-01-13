@@ -25,14 +25,12 @@ struct SecurePrimaryTextField: View {
         ZStack(alignment: .trailing) {
             ZStack {
                 SecureField("", text: $text, onCommit: {
-                    focusedField = .secure
                     onCommit()
                 })
                 .transaction { $0.animation = nil }
                 .focused($focusedField, equals: .secure)
                 .opacity(isSecured ? 1 : 0)
                 TextField("", text: $text, onCommit: {
-                    focusedField = .plain
                     onCommit()
                 })
                 .transaction { $0.animation = nil }
