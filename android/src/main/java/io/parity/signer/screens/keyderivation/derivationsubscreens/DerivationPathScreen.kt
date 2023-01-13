@@ -35,6 +35,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.components.base.PrimaryButtonGreyDisabled
 import io.parity.signer.models.Callback
+import io.parity.signer.screens.keyderivation.DerivationCreateViewModel
 import io.parity.signer.screens.keyderivation.DerivationPathAnalyzer
 import io.parity.signer.screens.keyderivation.DerivationPathVisualTransformation
 import io.parity.signer.ui.theme.*
@@ -46,9 +47,9 @@ fun DerivationPathScreen(
 	onDerivationHelp: Callback,
 	onClose: Callback,
 	onDone: (String) -> Unit,
+	validator: (String) -> DerivationCreateViewModel.DerivationPathValidity,
 	modifier: Modifier = Modifier,
 ) {
-	val canProceed = true //todo derivation
 	val path = remember {
 		mutableStateOf(
 			TextFieldValue(
@@ -57,12 +58,11 @@ fun DerivationPathScreen(
 			)
 		)
 	}
+	val canProceed =
+		validator(path.value.text) == DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD
 	val password = remember { mutableStateOf("") }
 	var passwordVisible by remember { mutableStateOf(false) }
 
-//	val pathAnalyzer = remember { //todo derivation remove?
-//		DerivationPathAnalyzer()
-//	}
 	val hasPassword = DerivationPathAnalyzer.getPassword(path.value.text) != null
 
 	val focusManager = LocalFocusManager.current
@@ -98,9 +98,9 @@ fun DerivationPathScreen(
 			textStyle = SignerTypeface.LabelM,
 			colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
 			modifier = Modifier
-                .focusRequester(pathFocusRequester)
-                .fillMaxWidth(1f)
-                .padding(horizontal = 24.dp)
+				.focusRequester(pathFocusRequester)
+				.fillMaxWidth(1f)
+				.padding(horizontal = 24.dp)
 		)
 		if (!hasPassword) {
 			//suggestion slashes
@@ -108,21 +108,21 @@ fun DerivationPathScreen(
 				MaterialTheme.colors.fill6.compositeOver(MaterialTheme.colors.backgroundDanger)
 			Row(
 				modifier = Modifier
-                    .padding(top = 8.dp, bottom = 16.dp)
-                    .padding(horizontal = 24.dp),
+					.padding(top = 8.dp, bottom = 16.dp)
+					.padding(horizontal = 24.dp),
 				horizontalArrangement = Arrangement.spacedBy(4.dp)
 			) {
 				Surface(
 					modifier = Modifier
-                        .clickable {
-                            val newText = path.value.text + "/"
-                            path.value = TextFieldValue(
-                                text = newText,
-                                selection = TextRange(newText.length),
-                            )
-                        }
-                        .background(hintBackground, RoundedCornerShape(24.dp))
-                        .padding(vertical = 8.dp, horizontal = 20.dp),
+						.clickable {
+							val newText = path.value.text + "/"
+							path.value = TextFieldValue(
+								text = newText,
+								selection = TextRange(newText.length),
+							)
+						}
+						.background(hintBackground, RoundedCornerShape(24.dp))
+						.padding(vertical = 8.dp, horizontal = 20.dp),
 				) {
 					Text(
 						text = "/",
@@ -132,15 +132,15 @@ fun DerivationPathScreen(
 				}
 				Surface(
 					modifier = Modifier
-                        .clickable {
-                            val newText = path.value.text + "//"
-                            path.value = TextFieldValue(
-                                text = newText,
-                                selection = TextRange(newText.length),
-                            )
-                        }
-                        .background(hintBackground, RoundedCornerShape(24.dp))
-                        .padding(vertical = 8.dp, horizontal = 20.dp),
+						.clickable {
+							val newText = path.value.text + "//"
+							path.value = TextFieldValue(
+								text = newText,
+								selection = TextRange(newText.length),
+							)
+						}
+						.background(hintBackground, RoundedCornerShape(24.dp))
+						.padding(vertical = 8.dp, horizontal = 20.dp),
 				) {
 					Text(
 						text = "//",
@@ -150,15 +150,15 @@ fun DerivationPathScreen(
 				}
 				Surface(
 					modifier = Modifier
-                        .clickable {
-                            val newText = path.value.text + "///"
-                            path.value = TextFieldValue(
-                                text = newText,
-                                selection = TextRange(newText.length),
-                            )
-                        }
-                        .background(hintBackground, RoundedCornerShape(24.dp))
-                        .padding(vertical = 8.dp, horizontal = 20.dp),
+						.clickable {
+							val newText = path.value.text + "///"
+							path.value = TextFieldValue(
+								text = newText,
+								selection = TextRange(newText.length),
+							)
+						}
+						.background(hintBackground, RoundedCornerShape(24.dp))
+						.padding(vertical = 8.dp, horizontal = 20.dp),
 				) {
 					Text(
 						text = stringResource(R.string.derivation_path_screen_password_input_button),
@@ -173,8 +173,8 @@ fun DerivationPathScreen(
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.CaptionM,
 			modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(vertical = 8.dp)
+				.padding(horizontal = 24.dp)
+				.padding(vertical = 8.dp)
 		)
 
 		if (hasPassword) {
@@ -188,9 +188,9 @@ fun DerivationPathScreen(
 				value = password.value,
 				onValueChange = { password.value = it },
 				modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .focusRequester(passwordFocusRequester)
-                    .fillMaxWidth(1f),
+					.padding(horizontal = 24.dp)
+					.focusRequester(passwordFocusRequester)
+					.fillMaxWidth(1f),
 				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
 				keyboardOptions = KeyboardOptions(
 					keyboardType = KeyboardType.Password,
@@ -223,13 +223,13 @@ fun DerivationPathScreen(
 			)
 		}
 		DerivationAlarm(
-            Modifier
-                .padding(top = 8.dp, bottom = 8.dp)
-                .padding(horizontal = 24.dp)
-                .clickable(onClick = {
-									focusManager.clearFocus()
-									onDerivationHelp()
-								})
+			Modifier
+				.padding(top = 8.dp, bottom = 8.dp)
+				.padding(horizontal = 24.dp)
+				.clickable(onClick = {
+					focusManager.clearFocus()
+					onDerivationHelp()
+				})
 		)
 	}
 
@@ -245,11 +245,11 @@ private fun DerivationAlarm(modifier: Modifier = Modifier) {
 		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 	Row(
 		modifier = modifier
-            .padding(vertical = 8.dp)
-            .border(
-                BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-                innerShape
-            )
+			.padding(vertical = 8.dp)
+			.border(
+				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+				innerShape
+			)
 
 	) {
 
@@ -272,16 +272,16 @@ private fun DerivationAlarm(modifier: Modifier = Modifier) {
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.BodyM,
 			modifier = Modifier
-                .weight(1f)
-                .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+				.weight(1f)
+				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
 		)
 		Icon(
 			imageVector = Icons.Outlined.HelpOutline,
 			contentDescription = null,
 			tint = MaterialTheme.colors.pink300,
 			modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .padding(start = 18.dp, end = 18.dp)
+				.align(Alignment.CenterVertically)
+				.padding(start = 18.dp, end = 18.dp)
 		)
 	}
 }
@@ -354,7 +354,12 @@ private fun DerivationPathHeader(
 @Composable
 private fun PreviewDerivationPathScreen() {
 	SignerNewTheme {
-		DerivationPathScreen(initialPath = "//", {}, {}, {})
+		DerivationPathScreen(
+			initialPath = "//",
+			{},
+			{},
+			{},
+			{ _ -> DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD })
 	}
 }
 
@@ -371,6 +376,11 @@ private fun PreviewDerivationPathScreen() {
 @Composable
 private fun PreviewDerivationPathPassworded() {
 	SignerNewTheme {
-		DerivationPathScreen(initialPath = "//seed//1///ggg", {}, {}, {})
+		DerivationPathScreen(
+			initialPath = "//seed//1///ggg",
+			{},
+			{},
+			{},
+			{ _ -> DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD })
 	}
 }

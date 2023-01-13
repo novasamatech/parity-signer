@@ -118,14 +118,20 @@ fun DerivationCreateSubgraph(
 		composable(DerivationCreateSubgraph.path) {
 			val subNavController = rememberNavController()
 
-			DerivationPathScreen(initialPath = path.value, onDerivationHelp = {
-				subNavController.navigate(PathDerivationSheetsSubGraph.help)
-			}, onClose = { navController.popBackStack() }, onDone = { newPath ->
-				deriveViewModel.updatePath(newPath)
-				navController.popBackStack()
-			}, modifier = Modifier
-				.statusBarsPadding()
-				.imePadding()
+			DerivationPathScreen(
+				initialPath = path.value,
+				onDerivationHelp = {
+					subNavController.navigate(PathDerivationSheetsSubGraph.help)
+				},
+				onClose = { navController.popBackStack() },
+				onDone = { newPath ->
+					deriveViewModel.updatePath(newPath)
+					navController.popBackStack()
+				},
+				validator = deriveViewModel::checkPath,
+				modifier = Modifier
+					.statusBarsPadding()
+					.imePadding(),
 			)
 			//bottom sheets
 			NavHost(
