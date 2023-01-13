@@ -529,6 +529,7 @@
 "CreateDerivedKey.Modal.Path.Action.HardPath" = "//";
 "CreateDerivedKey.Modal.Path.Action.PasswordedPath" = "///Password";
 "CreateDerivedKey.Modal.Path.Footer.Path" = "Path name example //network//1";
+"CreateDerivedKey.Modal.Path.Suggestion.Path" = "Enter path name";
 "CreateDerivedKey.Modal.Path.Header.Password" = "Confirm Password";
 "CreateDerivedKey.Modal.Path.Placeholder.Password" = "Confirm Password";
 "CreateDerivedKey.Modal.Path.Placeholder.Path" = "//network//1";

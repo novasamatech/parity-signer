@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum DerivationPathComponent: String, CustomStringConvertible {
+enum DerivationPathComponent: String, CustomStringConvertible, CaseIterable {
     case soft = "/"
     case hard = "//"
     case passworded = "///"

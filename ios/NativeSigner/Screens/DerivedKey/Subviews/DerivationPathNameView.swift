@@ -60,6 +60,12 @@ struct DerivationPathNameView: View {
                         .font(PrimaryFont.captionM.font)
                         .padding(.bottom, Spacing.small)
                 }
+                if viewModel.isEntrySuggestionActive {
+                    Localizable.CreateDerivedKey.Modal.Path.Suggestion.path.text
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .font(PrimaryFont.captionM.font)
+                        .padding(.bottom, Spacing.small)
+                }
                 quickActions()
                     .padding(.bottom, Spacing.extraSmall)
                 Localizable.CreateDerivedKey.Modal.Path.Footer.path.text
@@ -177,6 +183,10 @@ extension DerivationPathNameView {
         @Binding var isPresented: Bool
         private var skipValidation = false
         private let cancelBag = CancelBag()
+
+        var isEntrySuggestionActive: Bool {
+            DerivationPathComponent.allCases.contains { inputText == $0.description } && derivationPathError == nil
+        }
 
         // State presentatation
         @Published var isPresentingInfoModal: Bool = false
