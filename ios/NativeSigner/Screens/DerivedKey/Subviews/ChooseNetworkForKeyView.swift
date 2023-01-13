@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+enum NetworkSelection {
+    case network(MmNetwork)
+    case allowedOnAnyNetwork([MmNetwork])
+}
+
 struct ChooseNetworkForKeyView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var appState: AppState
@@ -83,7 +88,7 @@ struct ChooseNetworkForKeyView: View {
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                 .font(PrimaryFont.titleS.font)
             Spacer()
-            if viewModel.selectedNetwork == nil {
+            if case .allowedOnAnyNetwork = viewModel.networkSelection {
                 Asset.checkmarkList.swiftUIImage
                     .foregroundColor(Asset.accentPink300.swiftUIColor)
             }
@@ -93,7 +98,7 @@ struct ChooseNetworkForKeyView: View {
         .padding(.trailing, Spacing.medium)
         .frame(height: Heights.networkFilterItem)
         .onTapGesture {
-            viewModel.selectNetwork(nil)
+            viewModel.selectAllNetworks()
         }
     }
 }
@@ -103,15 +108,15 @@ extension ChooseNetworkForKeyView {
         private weak var appState: AppState!
         @Published var animateBackground: Bool = false
         @Published var networks: [MmNetwork] = []
-        @Binding var selectedNetwork: MmNetwork?
+        @Binding var networkSelection: NetworkSelection
         @Binding var isPresented: Bool
 
         init(
             isPresented: Binding<Bool>,
-            selectedNetwork: Binding<MmNetwork?>
+            networkSelection: Binding<NetworkSelection>
         ) {
             _isPresented = isPresented
-            _selectedNetwork = selectedNetwork
+            _networkSelection = networkSelection
         }
 
         func use(appState: AppState) {
@@ -124,11 +129,19 @@ extension ChooseNetworkForKeyView {
         }
 
         func isSelected(_ network: MmNetwork) -> Bool {
-            selectedNetwork == network
+            if case let .network(selectedNetwork) = networkSelection {
+                return selectedNetwork == network
+            }
+            return false
         }
 
-        func selectNetwork(_ network: MmNetwork?) {
-            selectedNetwork = network
+        func selectNetwork(_ network: MmNetwork) {
+            networkSelection = .network(network)
+            animateDismissal()
+        }
+
+        func selectAllNetworks() {
+            networkSelection = .allowedOnAnyNetwork(networks)
             animateDismissal()
         }
 
@@ -152,7 +165,7 @@ struct ChooseNetworkForKeyView_Previews: PreviewProvider {
         ChooseNetworkForKeyView(
             viewModel: .init(
                 isPresented: .constant(true),
-                selectedNetwork: .constant(nil)
+                networkSelection: .constant(.allowedOnAnyNetwork([]))
             )
         )
         .environmentObject(NavigationCoordinator())

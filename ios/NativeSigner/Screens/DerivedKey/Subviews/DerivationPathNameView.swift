@@ -5,6 +5,7 @@
 //  Created by Krzysztof Rodak on 11/01/2023.
 //
 
+import Combine
 import SwiftUI
 
 struct DerivationPathNameView: View {
@@ -21,7 +22,10 @@ struct DerivationPathNameView: View {
                 viewModel: NavigationBarViewModel(
                     title: Localizable.CreateDerivedKey.Label.title.string,
                     leftButton: .xmark,
-                    rightButton: .action(Localizable.CreateDerivedKey.Modal.Path.Action.navigation.key),
+                    rightButton: .activeAction(
+                        Localizable.CreateDerivedKey.Modal.Path.Action.navigation.key,
+                        $viewModel.isMainActionDisabled
+                    ),
                     backgroundColor: Asset.backgroundSystem.swiftUIColor
                 ),
                 actionModel: .init(
@@ -30,13 +34,13 @@ struct DerivationPathNameView: View {
                 )
             )
             VStack(alignment: .leading, spacing: 0) {
-                TextField("", text: $viewModel.maskedText)
+                TextField("", text: $viewModel.inputText)
                     .primaryTextFieldStyle(
                         Localizable.CreateDerivedKey.Modal.Path.Placeholder.path.string,
-                        text: $viewModel.maskedText
+                        text: $viewModel.inputText,
+                        isValid: .constant(viewModel.derivationPathError == nil)
                     )
                     .autocorrectionDisabled()
-
                     .submitLabel(.next)
                     .focused($focusedPath)
                     .onSubmit {
@@ -44,34 +48,18 @@ struct DerivationPathNameView: View {
                             focusedField = .secure
                         }
                     }
-                    .onChange(of: viewModel.maskedText) { newValue in
-//                        guard !isUpdatingText else { return }
-//                        // Handle new characters appending (real ones, not masked "•")
-//                        // Support multiple characters change in one edit
-//                        if newValue.count > self.viewModel.inputText.count {
-//                            self.viewModel
-//                                .inputText += String(newValue.suffix(newValue.count - viewModel.inputText.count))
-//                        }
-//                        // Handle delete action, support multiple characters change in one edit
-//                        if newValue.count < self.viewModel.inputText.count {
-//                            self.viewModel
-//                                .inputText = String(self.viewModel.inputText.prefix(newValue.count))
-//                        }
-                        let components = newValue
-                            .components(separatedBy: ViewModel.DerivationPathComponent.passworded.description)
-                        if components.count > 1 {
-                            self.viewModel.isPassworded = true
-//                            self.isUpdatingText = true
-//                            self.viewModel
-//                                .maskedText = components[0] + "///" + String(repeating: "•", count:
-//                                components[1].count)
-//                            isUpdatingText = false
-                        } else {
-//                            self.viewModel.isPassworded = false
-//                            self.viewModel.inputText = newValue
-                        }
+                    .onChange(of: viewModel.inputText) { newValue in
+                        self.viewModel.isPassworded = newValue
+                            .contains(DerivationPathComponent.passworded.description)
+                        self.viewModel.validateDerivationPath()
                     }
                     .padding(.bottom, Spacing.extraSmall)
+                if let derivationPathError = viewModel.derivationPathError {
+                    Text(derivationPathError)
+                        .foregroundColor(Asset.accentRed300.swiftUIColor)
+                        .font(PrimaryFont.captionM.font)
+                        .padding(.bottom, Spacing.small)
+                }
                 quickActions()
                     .padding(.bottom, Spacing.extraSmall)
                 Localizable.CreateDerivedKey.Modal.Path.Footer.path.text
@@ -106,23 +94,24 @@ struct DerivationPathNameView: View {
                 AttributedInfoBoxView(text: Localizable.createDerivedKeyModalPathInfo())
                     .onTapGesture { viewModel.onInfoBoxTap() }
                     .padding(.vertical, Spacing.extraSmall)
-//                Text("Masked Text: " + viewModel.maskedText)
-//                Text("Input Text: " + viewModel.inputText)
                 Spacer()
             }
             .padding(.horizontal, Spacing.large)
             .padding(.vertical, Spacing.medium)
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
+            focusedPath = true
         }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingInfoModal
         ) {
-            ErrorBottomModal(
-                viewModel: viewModel.presentableInfoModal,
-                isShowingBottomAlert: $viewModel.isPresentingInfoModal
+            DerivationMethodsInfoView(
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingInfoModal
+                )
             )
             .clearModalBackground()
         }
@@ -171,24 +160,19 @@ extension View {
 
 extension DerivationPathNameView {
     final class ViewModel: ObservableObject {
-        enum DerivationPathComponent: String, CustomStringConvertible {
-            case soft = "/"
-            case hard = "//"
-            case passworded = "///"
-
-            var description: String { rawValue }
-        }
-
         private weak var navigation: NavigationCoordinator!
         private let createKeyService: CreateDerivedKeyService
 
-        @Published var isPassworded: Bool = false
+        private let seedName: String
         @Published var inputText: String = ""
         @Published var maskedText: String = ""
         @Published var passwordConfirmation: String = ""
+        @Published var isPassworded: Bool = false
         @Published var isPasswordValid: Bool = true
+        @Published var isMainActionDisabled: Bool = true
+        @Published var derivationPathError: String?
         @Binding var derivationPath: String
-        @Binding var selectedNetworks: [MmNetwork]
+        @Binding var networkSelection: NetworkSelection
         @Binding var isPresented: Bool
         private let cancelBag = CancelBag()
 
@@ -197,14 +181,16 @@ extension DerivationPathNameView {
         @Published var presentableInfoModal: ErrorBottomModalViewModel = .derivationPathsInfo()
 
         init(
+            seedName: String,
             derivationPath: Binding<String>,
             isPresented: Binding<Bool>,
-            selectedNetworks: Binding<[MmNetwork]>,
+            networkSelection: Binding<NetworkSelection>,
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService()
         ) {
+            self.seedName = seedName
             _derivationPath = derivationPath
             _isPresented = isPresented
-            _selectedNetworks = selectedNetworks
+            _networkSelection = networkSelection
             self.createKeyService = createKeyService
             subscribeToChanges()
         }
@@ -231,24 +217,80 @@ extension DerivationPathNameView {
         }
 
         func onSoftPathTap() {
-            maskedText.append(DerivationPathComponent.soft.description)
+            inputText.append(DerivationPathComponent.soft.description)
         }
 
         func onHardPathTap() {
-            maskedText.append(DerivationPathComponent.hard.description)
+            inputText.append(DerivationPathComponent.hard.description)
         }
 
         func onPasswordedPathTap() {
-            maskedText.append(DerivationPathComponent.passworded.description)
+            inputText.append(DerivationPathComponent.passworded.description)
+        }
+
+        func validateDerivationPath() {
+            guard !inputText.isEmpty else {
+                derivationPathError = nil
+                return
+            }
+            switch networkSelection {
+            case let .network(network):
+                pathErrorCheck(createKeyService.checkForCollision(seedName, inputText, network.key))
+            case let .allowedOnAnyNetwork(networks):
+                let checks = networks
+                    .map { network in createKeyService.checkForCollision(seedName, inputText, network.key) }
+                if let firstEncounteredError = checks.first(where: { $0.buttonGood == false || $0.error != nil }) {
+                    pathErrorCheck(firstEncounteredError)
+                } else {
+                    derivationPathError = nil
+                }
+            }
+        }
+
+        private func pathErrorCheck(_ derivationCheck: DerivationCheck) {
+            if derivationCheck.collision != nil {
+                derivationPathError = Localizable.CreateDerivedKey.Modal.Path.Error.alreadyExists.string
+            } else if !derivationCheck.buttonGood {
+                derivationPathError = Localizable.CreateDerivedKey.Modal.Path.Error.pathInvalid.string
+            } else if derivationCheck.error != nil {
+                derivationPathError = derivationCheck.error
+            } else {
+                derivationPathError = nil
+            }
         }
 
         func onPasswordConfirmationDoneTap() {
-            guard let password = maskedText
-                .components(separatedBy: ViewModel.DerivationPathComponent.passworded.description).last else { return }
+            guard let password = inputText
+                .components(separatedBy: DerivationPathComponent.passworded.description).last else { return }
             isPasswordValid = password == passwordConfirmation
         }
 
-        private func subscribeToChanges() {}
+        private func subscribeToChanges() {
+            let passwordValidators = Publishers
+                .CombineLatest3($isPassworded, $isPasswordValid, $passwordConfirmation)
+            let inputValidators = Publishers
+                .CombineLatest($inputText, $derivationPathError)
+            passwordValidators.combineLatest(inputValidators)
+                .map { passwordValidators, inputValidators -> Bool in
+                    let (isPassworded, isPasswordValid, passwordConfirmation) = passwordValidators
+                    let (inputText, derivationPathError) = inputValidators
+                    if isPassworded {
+                        return (
+                            !isPasswordValid ||
+                                passwordConfirmation.isEmpty ||
+                                inputText.components(separatedBy: DerivationPathComponent.passworded.description)
+                                .last == nil ||
+                                inputText.components(separatedBy: DerivationPathComponent.passworded.description)
+                                .last != passwordConfirmation ||
+                                self.derivationPathError != nil
+                        )
+                    } else {
+                        return inputText.isEmpty || derivationPathError != nil
+                    }
+                }
+                .assign(to: \.isMainActionDisabled, on: self)
+                .store(in: cancelBag)
+        }
     }
 }
 
@@ -257,9 +299,10 @@ extension DerivationPathNameView {
         static var previews: some View {
             DerivationPathNameView(
                 viewModel: .init(
+                    seedName: "Keys",
                     derivationPath: .constant("path"),
                     isPresented: .constant(true),
-                    selectedNetworks: .constant([])
+                    networkSelection: .constant(.allowedOnAnyNetwork([]))
                 )
             )
             .environmentObject(NavigationCoordinator())

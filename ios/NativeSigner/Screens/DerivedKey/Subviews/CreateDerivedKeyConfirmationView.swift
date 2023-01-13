@@ -31,7 +31,7 @@ struct CreateDerivedKeyConfirmationView: View {
                             .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                             .font(PrimaryFont.bodyL.font)
                             .padding(.bottom, Spacing.extraSmall)
-                        Text(viewModel.derivationPath)
+                        Text(viewModel.derivationPath.formattedAsPasswordedPath)
                             .foregroundColor(Asset.accentPink300.swiftUIColor)
                             .font(PrimaryFont.bodyL.font)
                             .padding(.bottom, Spacing.extraSmall)

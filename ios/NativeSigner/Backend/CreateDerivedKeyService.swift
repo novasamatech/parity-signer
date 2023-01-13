@@ -87,8 +87,7 @@ final class CreateDerivedKeyService {
         _ seedName: String,
         _ path: String,
         _ network: String
-    ) -> Bool {
+    ) -> DerivationCheck {
         substratePathCheck(seedName: seedName, path: path, network: network, dbname: databaseMediator.databaseName)
-            .buttonGood
     }
 }

@@ -86,7 +86,7 @@ struct CreateDerivedKeyView: View {
             ChooseNetworkForKeyView(
                 viewModel: .init(
                     isPresented: $viewModel.isPresentingNetworkSelection,
-                    selectedNetwork: $viewModel.selectedNetwork
+                    networkSelection: $viewModel.networkSelection
                 )
             )
             .clearModalBackground()
@@ -96,9 +96,10 @@ struct CreateDerivedKeyView: View {
         ) {
             DerivationPathNameView(
                 viewModel: .init(
+                    seedName: viewModel.seedName,
                     derivationPath: $viewModel.derivationPath,
                     isPresented: $viewModel.isPresentingDerivationPath,
-                    selectedNetworks: .constant([])
+                    networkSelection: $viewModel.networkSelection
                 )
             )
         }
@@ -120,7 +121,8 @@ struct CreateDerivedKeyView: View {
         HStack(spacing: 0) {
             Spacer()
                 .frame(width: Spacing.medium)
-            if let network = viewModel.selectedNetwork {
+            switch viewModel.networkSelection {
+            case let .network(network):
                 Localizable.CreateDerivedKey.Label.Network.single.text
                     .font(PrimaryFont.bodyL.font)
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
@@ -136,7 +138,7 @@ struct CreateDerivedKeyView: View {
                 .padding(Spacing.minimal)
                 .background(Asset.fill12.swiftUIColor)
                 .clipShape(Capsule())
-            } else {
+            case .allowedOnAnyNetwork:
                 Localizable.CreateDerivedKey.Label.Network.onAny.text
                     .font(PrimaryFont.bodyL.font)
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
@@ -164,7 +166,7 @@ struct CreateDerivedKeyView: View {
             Text(
                 viewModel.derivationPath.isEmpty ?
                     Localizable.CreateDerivedKey.Label.Placeholder.path.string :
-                    viewModel.derivationPath
+                    viewModel.derivationPath.formattedAsPasswordedPath
             )
             .font(PrimaryFont.bodyL.font)
             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
@@ -190,7 +192,7 @@ extension CreateDerivedKeyView {
         private weak var appState: AppState!
         private let networkService: GetAllNetworksService
         private let createKeyService: CreateDerivedKeyService
-        private let seedName: String
+        let seedName: String
         // State presentatation
         @Published var isPresentingInfoModal: Bool = false
         @Published var presentableInfoModal: ErrorBottomModalViewModel = .derivedKeysInfo()
@@ -200,8 +202,7 @@ extension CreateDerivedKeyView {
         @Published var isPresentingDerivationPath: Bool = false
         @Published var isPresentingConfirmation: Bool = false
 
-        /// If `nil`, switch to `Allowed to use on any network`
-        @Published var selectedNetwork: MmNetwork?
+        @Published var networkSelection: NetworkSelection = .allowedOnAnyNetwork([])
         @Published var derivationPath: String = ""
         private let cancelBag = CancelBag()
 
@@ -225,7 +226,9 @@ extension CreateDerivedKeyView {
             networkService.getNetworks {
                 if case let .success(networks) = $0 {
                     appState.userData.allNetworks = networks
-                    self.selectedNetwork = networks.first
+                    if let network = networks.first {
+                        self.networkSelection = .network(network)
+                    }
                 }
             }
         }
@@ -258,9 +261,10 @@ extension CreateDerivedKeyView {
                     self.isPresentingInfoModal = true
                 }
             }
-            if let selectedNetwork = selectedNetwork {
-                createKeyService.createDerivedKey(seedName, derivationPath, selectedNetwork.key, completion)
-            } else {
+            switch networkSelection {
+            case let .network(network):
+                createKeyService.createDerivedKey(seedName, derivationPath, network.key, completion)
+            case .allowedOnAnyNetwork:
                 createKeyService.createDerivedKeyOnAllNetworks(seedName, derivationPath, completion)
             }
         }
