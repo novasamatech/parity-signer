@@ -87,7 +87,9 @@ fun DerivationPathScreen(
 				imeAction = if (canProceed) ImeAction.Done else ImeAction.None
 			),
 			visualTransformation = DerivationPathVisualTransformation(
-				LocalContext.current, MaterialTheme.colors
+				context = LocalContext.current,
+				themeColors = MaterialTheme.colors,
+				hidePassword = !passwordVisible,
 			),
 			keyboardActions = KeyboardActions(onDone = {
 				if (canProceed) {

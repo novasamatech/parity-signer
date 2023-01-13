@@ -42,6 +42,7 @@ class DerivationPathAnalyzer {
 			}
 		}
 	}
+
 	companion object {
 		fun getPassword(path: String): String? {
 			return if (path.contains("///")) {
@@ -50,12 +51,13 @@ class DerivationPathAnalyzer {
 				null
 			}
 		}
+
 		fun hidePasswords(text: String): String {
 			val maskStar: String = '\u2022'.toString()
 			val password = getPassword(text)
 			return if (password == null) {
 				text
-			}else {
+			} else {
 				text.replace(password, maskStar.repeat(password.length))
 			}
 		}
@@ -63,26 +65,29 @@ class DerivationPathAnalyzer {
 }
 
 
-//todo derivation what to show what to show if wrong path
-//PasswordVisualTransformation
 data class DerivationPathVisualTransformation(
 	val context: Context,
-	val themeColors: Colors
+	val themeColors: Colors,
+	val hidePassword: Boolean,
 ) : VisualTransformation {
 
 	val pathAnalyzer = DerivationPathAnalyzer()
 
 	override fun filter(text: AnnotatedString): TransformedText {
-		val content =	buildAnnotatedString {
+		val content = buildAnnotatedString {
+			if (hidePassword) {
 				append(DerivationPathAnalyzer.hidePasswords(text.text))
-				pathAnalyzer.getHint(text.text).getLocalizedString(context)
-					?.let { hint ->
-						append(" ")
-						withStyle(SpanStyle(color = themeColors.textTertiary)) {
-							append(hint)
-						}
-					}
+			} else {
+				append(text.text)
 			}
+			pathAnalyzer.getHint(text.text).getLocalizedString(context)
+				?.let { hint ->
+					append(" ")
+					withStyle(SpanStyle(color = themeColors.textTertiary)) {
+						append(hint)
+					}
+				}
+		}
 		return TransformedText(content, DerivationOffsetMapping(text.length))
 	}
 
