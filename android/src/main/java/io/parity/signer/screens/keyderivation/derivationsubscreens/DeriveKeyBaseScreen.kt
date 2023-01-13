@@ -131,7 +131,7 @@ fun DeriveKeyBaseScreen(
 		PrimaryButtonWide(
 			label = stringResource(R.string.derivation_screen_derivation_button_create),
 			modifier = Modifier.padding(24.dp),
-			isEnabled = false, //todo derivation
+			isEnabled = true, //todo derivation
 			onClicked = onCreateClicked,
 		)
 	}
