@@ -29,9 +29,10 @@ final class CameraService: ObservableObject {
     @Published var captured: Int = 0
 
     @Published var isTorchOn: Bool = false
+    @Published var requestPassword: Bool = false
 
     /// Partial payload to decode, collection of payloads from individual QR codes
-    private var bucket: [String] = []
+    @Published var bucket: [String] = []
 
     let session: AVCaptureSession
     private var isConfigured = false
@@ -96,7 +97,7 @@ extension CameraService: QRPayloadUpdateReceiving {
 private extension CameraService {
     func handleNew(qrCodePayload: String) {
         if isMultipleTransactionMode {
-            multiTransactionOperation(with: qrCodePayload)
+//            multiTransactionOperation(with: qrCodePayload)
             return
         }
         if bucket.isEmpty {
@@ -106,14 +107,15 @@ private extension CameraService {
         }
     }
 
-    func multiTransactionOperation(with qrCodePayload: String) {
-        guard let parsedPayload = try? qrparserTryDecodeQrSequence(data: [qrCodePayload], cleaned: false)
-        else { return }
-        callbackQueue.async {
-            guard !self.multipleTransactions.contains(parsedPayload) else { return }
-            self.multipleTransactions.append(parsedPayload)
-        }
-    }
+//    func multiTransactionOperation(with qrCodePayload: String) {
+//        guard let parsedPayload = try? qrparserTryDecodeQrSequence(data: [qrCodePayload], password: nil, cleaned:
+//        false)
+//        else { return }
+//        callbackQueue.async {
+//            guard !self.multipleTransactions.contains(parsedPayload) else { return }
+//            self.multipleTransactions.append(parsedPayload)
+//        }
+//    }
 
     func handleNewOperation(with qrCodePayload: String) {
         do {
@@ -124,6 +126,7 @@ private extension CameraService {
             default:
                 callbackQueue.async {
                     self.bucket.append(qrCodePayload)
+                    self.captured = self.bucket.count
                     self.total = proposedTotalFrames
                 }
             }
@@ -144,13 +147,27 @@ private extension CameraService {
 
     func decode(completeOperationPayload: [String]) {
         do {
-            let parsedPayload = try qrparserTryDecodeQrSequence(data: completeOperationPayload, cleaned: false)
-            callbackQueue.async {
-                self.payload = parsedPayload
-                self.shutdown()
+            let result = try qrparserTryDecodeQrSequence(data: completeOperationPayload, password: nil, cleaned: false)
+            switch result {
+            case let .bBananaSplitRecoveryResult(b: bananaResult):
+                switch bananaResult {
+                case .requestPassword:
+                    callbackQueue.async {
+                        self.requestPassword = true
+                        self.shutdown()
+                    }
+                default:
+                    // Nothing else can happen here
+                    ()
+                }
+            case let .other(s: payload):
+                callbackQueue.async {
+                    self.payload = payload
+                    self.shutdown()
+                }
             }
         } catch {
-            // give up when things go badly?
+            print(error.localizedDescription)
         }
     }
 }
@@ -184,6 +201,7 @@ private extension CameraService {
 
     func clearLocalState() {
         callbackQueue.async {
+            self.requestPassword = false
             self.total = 0
             self.captured = 0
             self.bucket = []

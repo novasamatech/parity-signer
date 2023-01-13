@@ -45,6 +45,13 @@ final class NavigationCoordinator: ObservableObject {
     /// This should be removed once navigation is moved to native system.
     @Published var selectedTab: Tab = .keys
 
+    /// Informs main view dispatcher whether we should get back to previous tab when dismissing camera view
+    /// or navigate to explicit screen
+    /// For some flow, i.e. Key Set Recovery, default navigation would not be intended
+    ///
+    /// Should be reseted after one dismissal when set to `nil`, so tab navigation is treated as default each other time
+    @Published var overrideQRScannerDismissalNavigation: Navigation?
+
     /// Responsible for presentation of generic error bottom sheet alert component
     /// Currently error is based on `actionResult.alertData` component when app receives `.errorData(message)` value
     @Published var genericError = GenericErrorViewModel()
@@ -125,7 +132,8 @@ private extension NavigationCoordinator {
              .settings,
              .vVerifier,
              .manageNetworks,
-             .nNetworkDetails:
+             .nNetworkDetails,
+             .deriveKey:
             updatedShouldSkipInjectedViews = true
         default:
             updatedShouldSkipInjectedViews = false

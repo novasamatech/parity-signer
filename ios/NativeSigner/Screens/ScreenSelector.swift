@@ -15,10 +15,9 @@ struct ScreenSelector: View {
     let screenData: ScreenData
     let navigationRequest: NavigationRequest
     let getSeed: (String) -> String
-    let pathCheck: (String, String, String) -> DerivationCheck
     let createAddress: (String, String) -> Void
     let checkSeedCollision: (String) -> Bool
-    let restoreSeed: (String, String, Bool) -> Void
+    let restoreSeed: (String, String) -> Void
     let alertShow: () -> Void
     let increment: (String, String) -> Void
 
@@ -73,12 +72,7 @@ struct ScreenSelector: View {
                 navigationRequest: navigationRequest
             )
         case let .deriveKey(value):
-            NewAddressScreen(
-                content: value,
-                pathCheck: pathCheck,
-                createAddress: createAddress,
-                navigationRequest: navigationRequest
-            )
+            CreateDerivedKeyView(viewModel: .init(seedName: value.seedName))
         case let .vVerifier(value):
             VerfierCertificateView(viewModel: .init(content: value))
         case let .manageNetworks(value):

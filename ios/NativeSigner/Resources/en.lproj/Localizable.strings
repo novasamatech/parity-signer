@@ -502,3 +502,62 @@
 "NetworkFilter.Action.Reset" = "Reset";
 "NetworkFilter.Action.Done" = "Done";
 
+"EnterBananaSplitPasswordModal.Label.Title" = "Banana Split Recovery";
+"EnterBananaSplitPasswordModal.Label.EnterName" = "Enter display name for recovered key set";
+"EnterBananaSplitPasswordModal.Label.EnterPassword" = "Enter banana split password";
+"EnterBananaSplitPasswordModal.Placeholder.EnterName" = "Display name";
+"EnterBananaSplitPasswordModal.Placeholder.EnterPassword" = "Password";
+"EnterBananaSplitPasswordModal.Error.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
+"EnterBananaSplitPasswordModal.Error.Label.InvalidSeedName" = "Given display name already exists.\nPlease try again.";
+"EnterBananaSplitPasswordModal.Error.SeedPhraseExists.Title" = "Seed phrase already exists";
+"EnterBananaSplitPasswordModal.Error.SeedPhraseExists.Message" = "Seed phrase that you are trying to recover already exists in the app.";
+
+"CreateDerivedKey.Label.Title" = "Create Derived Key";
+"CreateDerivedKey.Label.Header.Network" = "Choose Network";
+"CreateDerivedKey.Label.Header.Path" = "Derivation Path";
+"CreateDerivedKey.Label.Placeholder.Path" = "// Add Path Name";
+"CreateDerivedKey.Label.Footer.Path" = "Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.";
+"CreateDerivedKey.Action.Add" = "Create Derived Key";
+"CreateDerivedKey.Label.Network.Single" = "Network";
+"CreateDerivedKey.Label.Network.OnAny" = "Allow use on any network";
+"CreateDerivedKey.Modal.Network.Title" = "Choose Network";
+"CreateDerivedKey.Modal.Network.OnAny" = "Allow use on any network";
+
+"CreateDerivedKey.Modal.Path.Title" = "Derivation Path Name";
+"CreateDerivedKey.Modal.Path.Action.Navigation" = "Done";
+"CreateDerivedKey.Modal.Path.Action.SoftPath" = " / ";
+"CreateDerivedKey.Modal.Path.Action.HardPath" = "//";
+"CreateDerivedKey.Modal.Path.Action.PasswordedPath" = "///Password";
+"CreateDerivedKey.Modal.Path.Footer.Path" = "Path name example //network//1";
+"CreateDerivedKey.Modal.Path.Suggestion.Path" = "Enter path name";
+"CreateDerivedKey.Modal.Path.Header.Password" = "Confirm Password";
+"CreateDerivedKey.Modal.Path.Placeholder.Password" = "Confirm Password";
+"CreateDerivedKey.Modal.Path.Placeholder.Path" = "//network//1";
+"CreateDerivedKey.Modal.Path.Error.Password" = "Passwords don’t match";
+"CreateDerivedKey.Modal.Path.Error.AlreadyExists" = "Key with this Derivation path name already exists";
+"CreateDerivedKey.Modal.Path.Error.PathInvalid" = "Given derivation path is invalid";
+"CreateDerivedKey.Modal.Path.Info" = "Learn more about /soft, //hard,\n///password derivation methods";
+"CreateDerivedKey.Modal.Path.Info.highlight" = "/soft, //hard,\n///password";
+"CreateDerivedKey.Snackbar.Created" = "Derived Key has been created";
+
+"CreateDerivedKey.Modal.Confirmation.Title" = "Write Down Your\nDerivation Path Name";
+"CreateDerivedKey.Modal.Confirmation.Content" = "Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.";
+"CreateDerivedKey.Modal.Confirmation.Header" = "Derivation Path Name";
+"CreateDerivedKey.Modal.Confirmation.Confirmation" = "I have written down my derivation path name";
+"CreateDerivedKey.Modal.Confirmation.Action" = "Done";
+
+"CreateDerivedKey.InfoModal.DerivedKeys.Title" = "Derived Keys";
+"CreateDerivedKey.InfoModal.DerivedKeys.Content" = "If you would like to create and manage several accounts on the network using the same secret recovery phrase, you can use derived keys.\n\nWe can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase.\n\nThe main reason to use derived keys is how easy it is to backup (and restore from a backup) a derivation path compared to seed phrase.";
+"CreateDerivedKey.InfoModal.DerivedKeys.Action" = "Got It";
+"CreateDerivedKey.InfoModal.DerivationPaths.Title" = "Derivation Paths";
+"CreateDerivedKey.InfoModal.DerivationPaths.Content" = "If you would like to create and manage several accounts on the network using the same seed, you can use derivation paths. We can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase. Many Polkadot key generation tools support hard and soft derivation. For instance, if you intend to create an account to be used on the Polkadot chain, you can derive a hard key child account using // after the mnemonic phrase.";
+"CreateDerivedKey.InfoModal.DerivationPaths.Action" = "Got It";
+"CreateDerivedKey.InfoModal.DerivationMethods.Title" = "Derivation Methods";
+"CreateDerivedKey.InfoModal.DerivationMethods.Soft.Title" = "/ Soft derivation";
+"CreateDerivedKey.InfoModal.DerivationMethods.Soft.Content" = "A soft derivation allows someone to potentially \"go backwards\" to figure out the initial account's private key if they know the derived account's private key. It is also possible to determine that different accounts generated from the same seed are linked to that seed.";
+"CreateDerivedKey.InfoModal.DerivationMethods.Hard.Title" = "// Hard derivation";
+"CreateDerivedKey.InfoModal.DerivationMethods.Hard.Content" = "A hard derivation path does not allow either of these - even if you know a derived private key, it's not feasible to figure out the private key of the root address, and it's impossible to prove that the first account is linked with the second.";
+"CreateDerivedKey.InfoModal.DerivationMethods.Password.Title" = "/// Password derivation";
+"CreateDerivedKey.InfoModal.DerivationMethods.Password.Content" = "In this type of derivation, if the mnemonic phrase would leak, accounts cannot be derived without the initial password. In fact, for soft- and hard-derived accounts, if someone knows the mnemonic phrase and the derivation path, they will have access to your account. For password-derived accounts, the password is applied on the derivation path. You can know the mnemonic phrase and the derivation path, but without the password it is not possible to access the account. In mathematical terms, if we have a written derivation path and a password, we can calculate the real derivation path as f(written derivation path, password); where f is a function. We can then calculate the account key pair using f(seed, real derivation path). Note that unlike hard and soft derivations that can be mixed, only a single password should be specified per derivation.";
+"CreateDerivedKey.InfoModal.DerivationMethods.Action" = "Got It";
+

@@ -20,15 +20,10 @@ struct ScreenSelectorView: View {
                 navigation.perform(navigation: navigationRequest)
             },
             getSeed: { seedName in seedsMediator.getSeed(seedName: seedName) },
-            pathCheck: { seed, path, network in
-                substratePathCheck(
-                    seedName: seed, path: path, network: network, dbname: databaseMediator.databaseName
-                )
-            },
             createAddress: { path, seedName in data.createAddress(path: path, seedName: seedName) },
             checkSeedCollision: { seedName in seedsMediator.checkSeedCollision(seedName: seedName) },
-            restoreSeed: { seedName, seedPhrase, createRoots in seedsMediator.restoreSeed(
-                seedName: seedName, seedPhrase: seedPhrase, createRoots: createRoots
+            restoreSeed: { seedName, seedPhrase in seedsMediator.restoreSeed(
+                seedName: seedName, seedPhrase: seedPhrase, navigate: true
             ) },
             alertShow: { data.alertShow = true },
             increment: { seedName, _ in

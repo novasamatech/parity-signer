@@ -10,29 +10,38 @@ import SwiftUI
 struct LogsListView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var data: SignerDataModel
 
     var body: some View {
-        VStack(spacing: 0) {
-            NavigationBarView(
-                viewModel: NavigationBarViewModel(
-                    title: Localizable.LogsList.Label.title.string,
-                    leftButton: .empty,
-                    rightButton: .more,
-                    backgroundColor: Asset.backgroundSystem.swiftUIColor
-                ),
-                actionModel: .init(
-                    rightBarMenuAction: viewModel.onMoreMenuTap
+        ZStack(alignment: .bottom) {
+            VStack(spacing: 0) {
+                NavigationBarView(
+                    viewModel: NavigationBarViewModel(
+                        title: Localizable.LogsList.Label.title.string,
+                        leftButton: .empty,
+                        rightButton: .more,
+                        backgroundColor: Asset.backgroundSystem.swiftUIColor
+                    ),
+                    actionModel: .init(
+                        rightBarMenuAction: viewModel.onMoreMenuTap
+                    )
                 )
-            )
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 0) {
-                    ForEach(viewModel.renderables, id: \.id) { renderable in
-                        LogEntryView(viewModel: .init(renderable: renderable))
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        ForEach(viewModel.renderables, id: \.id) { renderable in
+                            LogEntryView(viewModel: .init(renderable: renderable))
+                        }
                     }
                 }
             }
+            .background(Asset.backgroundPrimary.swiftUIColor)
+            ConnectivityAlertOverlay(
+                viewModel: .init(resetWarningAction: ResetConnectivtyWarningsAction(
+                    alert: $data
+                        .alert
+                ))
+            )
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
             viewModel.loadData()
@@ -118,6 +127,7 @@ extension LogsListView {
                 events: [.databaseInitiated, .deviceWasOnline, .historyCleared, .identitiesWiped]
             )])))
             .environmentObject(NavigationCoordinator())
+            .environmentObject(SignerDataModel())
         }
     }
 #endif

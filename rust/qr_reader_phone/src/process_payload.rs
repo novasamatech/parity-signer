@@ -1,4 +1,5 @@
 use crate::{Error, LegacyFrame, RaptorqFrame, Result};
+use banana_recovery::{NextAction, Share, ShareSet};
 use raptorq::{self, EncodingPacket};
 use std::{collections::HashSet, convert::TryFrom};
 
@@ -28,27 +29,70 @@ pub struct LegacyMulti {
     elements: Vec<Element>,
 }
 
+pub struct BananaRecovery {
+    share_set: ShareSet,
+}
+
 #[derive(PartialEq, Eq)]
 pub struct Element {
     number: u16,
     contents: Vec<u8>,
 }
 
-#[derive(PartialEq, Eq)]
 pub enum InProgress {
     None,
     Fountain(Fountain),
     LegacyMulti(LegacyMulti),
+    BananaRecovery(BananaRecovery),
 }
 
-#[derive(PartialEq, Eq)]
 pub enum Ready {
     NotYet(InProgress),
     Yes(Vec<u8>),
+    BananaSplitPasswordRequest,
+    BananaSplitReady(String),
 }
 
-pub fn process_decoded_payload(payload: Vec<u8>, mut decoding: InProgress) -> Result<Ready> {
-    if let Ok(frame) = RaptorqFrame::try_from(payload.as_ref()) {
+pub fn process_decoded_payload(
+    payload: Vec<u8>,
+    password: &Option<String>,
+    mut decoding: InProgress,
+) -> Result<Ready> {
+    if let Ok(share) = Share::new(payload.clone()) {
+        match decoding {
+            InProgress::None => {
+                let share_set = ShareSet::init(share);
+                decoding = InProgress::BananaRecovery(BananaRecovery { share_set });
+                Ok(Ready::NotYet(decoding))
+            }
+            InProgress::BananaRecovery(ref mut recovery) => {
+                let result = recovery.share_set.try_add_share(share);
+                log::warn!("result {:?}", result);
+                let next = recovery.share_set.next_action();
+                log::warn!("next {:?}", next);
+                match next {
+                    NextAction::MoreShares { .. } => Ok(Ready::NotYet(decoding)),
+                    NextAction::AskUserForPassword => {
+                        if let Some(password) = password {
+                            let result = match recovery.share_set.recover_with_passphrase(password)
+                            {
+                                Ok(seed) => seed,
+                                Err(banana_recovery::Error::DecodingFailed) => {
+                                    return Err(Error::BananaSplitWrongPassword);
+                                }
+                                Err(e) => return Err(e.into()),
+                            };
+                            log::warn!("recovered phrase: {result}");
+                            Ok(Ready::BananaSplitReady(result))
+                        } else {
+                            Ok(Ready::BananaSplitPasswordRequest)
+                        }
+                    }
+                }
+            }
+            _ => Err(Error::DynamicInterruptedByStatic),
+        }
+    } else if let Ok(frame) = RaptorqFrame::try_from(payload.as_ref()) {
         let length = frame.size;
         let total = frame.total();
         let new_packet = frame.payload;
@@ -88,6 +132,7 @@ pub fn process_decoded_payload(payload: Vec<u8>, mut decoding: InProgress) -> Re
                 }
             }
             InProgress::LegacyMulti(_) => Err(Error::LegacyInterruptedByFountain),
+            InProgress::BananaRecovery(_) => Err(Error::LegacyInterruptedByBanana),
         }
     } else if let Ok(frame) = LegacyFrame::try_from(payload.as_ref()) {
         let length = frame.total;
@@ -109,6 +154,7 @@ pub fn process_decoded_payload(payload: Vec<u8>, mut decoding: InProgress) -> Re
                 }
             }
             InProgress::Fountain(_) => Err(Error::FountainInterruptedByLegacy),
+            InProgress::BananaRecovery(_) => Err(Error::LegacyInterruptedByFountain),
             InProgress::LegacyMulti(mut collected) => {
                 if collected.length != length {
                     return Err(Error::ConflictingLegacyLengths(collected.length, length));

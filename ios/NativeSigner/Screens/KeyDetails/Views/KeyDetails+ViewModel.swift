@@ -10,6 +10,7 @@ import Foundation
 extension KeyDetailsView {
     final class ViewModel: ObservableObject {
         let keyDetailsService: KeyDetailsService
+        private let networksService: GetAllNetworksService
         let exportPrivateKeyService: PrivateKeyQRCodeService
         let keyName: String
         /// `MKwysNew` will currently be `nil` when navigating through given navigation path:
@@ -44,11 +45,13 @@ extension KeyDetailsView {
         init(
             keyName: String,
             exportPrivateKeyService: PrivateKeyQRCodeService = PrivateKeyQRCodeService(),
-            keyDetailsService: KeyDetailsService = KeyDetailsService()
+            keyDetailsService: KeyDetailsService = KeyDetailsService(),
+            networksService: GetAllNetworksService = GetAllNetworksService()
         ) {
             self.keyName = keyName
             self.exportPrivateKeyService = exportPrivateKeyService
             self.keyDetailsService = keyDetailsService
+            self.networksService = networksService
             updateRenderables()
             subscribeToNetworkChanges()
         }
@@ -100,11 +103,12 @@ extension KeyDetailsView.ViewModel {
     }
 
     func onNetworkSelectionTap() {
-        guard case let .networkSelector(networksContainer) = navigation
-            .performFake(navigation: .init(action: .networkSelector)).modalData else { return }
-
-        appState.userData.allNetworks = networksContainer.networks
-        isPresentingNetworkSelection = true
+        networksService.getNetworks { result in
+            if case let .success(networks) = result {
+                self.appState.userData.allNetworks = networks
+                self.isPresentingNetworkSelection = true
+            }
+        }
     }
 
     func onDerivedKeyTap(_ deriveKey: DerivedKeyRowModel) {

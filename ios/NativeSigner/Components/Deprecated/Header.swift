@@ -12,10 +12,7 @@ struct Header: View {
     let screenLabel: String
     let screenNameType: ScreenNameType?
     let rightButton: RightButton?
-    let alert: Bool
-    let alertShow: () -> Void
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SignerDataModel
 
     var body: some View {
         VStack {
@@ -65,10 +62,6 @@ struct Header: View {
                                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             }
                         }
-                    )
-                    NavbarShield(
-                        alert: alert,
-                        resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
                     )
                 }
                 .frame(width: 72.0)

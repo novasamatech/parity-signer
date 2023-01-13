@@ -21,8 +21,8 @@ struct ModalSelectorView: View {
                 navigation.perform(navigation: navigationRequest)
             },
             removeSeed: { seedName in seedsMediator.removeSeed(seedName: seedName) },
-            restoreSeed: { seedName, seedPhrase, createSeedKeys in seedsMediator.restoreSeed(
-                seedName: seedName, seedPhrase: seedPhrase, createRoots: createSeedKeys
+            restoreSeed: { seedName, seedPhrase in seedsMediator.restoreSeed(
+                seedName: seedName, seedPhrase: seedPhrase, navigate: true
             ) },
             createAddress: { path, seedName in data.createAddress(path: path, seedName: seedName) },
             sign: { seedName, comment in data.sign(seedName: seedName, comment: comment) }

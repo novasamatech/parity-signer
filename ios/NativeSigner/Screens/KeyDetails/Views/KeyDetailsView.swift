@@ -58,13 +58,22 @@ struct KeyDetailsView: View {
             if viewModel.isPresentingSelectionOverlay {
                 selectKeysOverlay
             } else {
-                PrimaryButton(
-                    action: {
-                        navigation.perform(navigation: viewModel.createDerivedKey)
-                    },
-                    text: Localizable.KeyDetails.Action.create.key
-                )
-                .padding(Spacing.large)
+                VStack(spacing: 0) {
+                    ConnectivityAlertOverlay(
+                        viewModel: .init(resetWarningAction: ResetConnectivtyWarningsAction(
+                            alert: $data
+                                .alert
+                        ))
+                    )
+                    PrimaryButton(
+                        action: {
+                            navigation.perform(navigation: viewModel.createDerivedKey)
+                        },
+                        text: Localizable.KeyDetails.Action.create.key
+                    )
+                    .padding(.horizontal, Spacing.large)
+                    .padding(.bottom, Spacing.large)
+                }
             }
         }
         .onAppear {

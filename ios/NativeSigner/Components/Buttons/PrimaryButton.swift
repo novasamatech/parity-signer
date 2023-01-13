@@ -31,7 +31,6 @@ struct PrimaryButton: View {
     }
 }
 
-//
 // struct PrimaryButton_Previews: PreviewProvider {
 //    static var previews: some View {
 //        VStack(alignment: .center, spacing: 30) {

@@ -13,13 +13,15 @@ enum NavigationLeftButton: Equatable {
     case xmark
 }
 
-enum NavigationRightButton: Equatable {
+enum NavigationRightButton {
     case empty
     case more
     case action(LocalizedStringKey)
+    case activeAction(LocalizedStringKey, Binding<Bool>)
+    case questionmark
 }
 
-struct NavigationBarViewModel: Equatable {
+struct NavigationBarViewModel {
     let title: String?
     let subtitle: String?
     let leftButton: NavigationLeftButton
@@ -109,8 +111,22 @@ struct NavigationBarView: View {
                     action: actionModel.rightBarMenuAction ?? {},
                     icon: Asset.moreDots.swiftUIImage
                 )
+            case .questionmark:
+                NavbarButton(
+                    action: actionModel.rightBarMenuAction ?? {},
+                    icon: Asset.navbarQuestion.swiftUIImage
+                )
             case let .action(title):
-                NavbarActionButton(action: actionModel.rightBarMenuAction ?? {}, title: title)
+                NavbarActionButton(
+                    action: actionModel.rightBarMenuAction ?? {},
+                    title: title
+                )
+            case let .activeAction(title, isDisabled):
+                NavbarActionButton(
+                    action: actionModel.rightBarMenuAction ?? {},
+                    title: title,
+                    isDisabled: isDisabled
+                )
             }
         }
         .padding([.leading, .trailing], Spacing.extraExtraSmall)
