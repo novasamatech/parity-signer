@@ -43,7 +43,7 @@ fun TopBar(
 				.weight(0.2f, fill = true)
 				.width(72.dp)
 		) {
-			if (actionResult.value?.back == true) {
+			if (actionResult.value.back == true) {
 				Button(
 					colors = buttonColors(
 						contentColor = MaterialTheme.colors.Action400,
@@ -53,7 +53,7 @@ fun TopBar(
 						signerDataModel.navigate(Action.GO_BACK)
 					}
 				) {
-					if (actionResult.value?.rightButton == RightButton.MULTI_SELECT) {
+					if (actionResult.value.rightButton == RightButton.MULTI_SELECT) {
 						Icon(
 							Icons.Default.Close,
 							"go back",
@@ -74,18 +74,13 @@ fun TopBar(
 			modifier = Modifier.weight(0.6f, fill = true)
 		) {
 			Text(
-				actionResult.value?.screenLabel ?: "",
-				style = if (actionResult.value?.screenNameType == ScreenNameType.H1) {
+				actionResult.value.screenLabel ?: "",
+				style = if (actionResult.value.screenNameType == ScreenNameType.H1) {
 					MaterialTheme.typography.h2
 				} else {
 					MaterialTheme.typography.h4
 				}
 			)
-			if (actionResult.value?.rightButton == RightButton.MULTI_SELECT) {
-				SmallButton(text = "Select all") {
-					signerDataModel.navigate(Action.SELECT_ALL)
-				}
-			}
 		}
 		Row(
 			horizontalArrangement = Arrangement.End,
@@ -94,7 +89,7 @@ fun TopBar(
 				.width(72.dp)
 		) {
 			IconButton(onClick = { signerDataModel.navigate(Action.RIGHT_BUTTON_ACTION) }) {
-				when (actionResult.value?.rightButton) {
+				when (actionResult.value.rightButton) {
 					RightButton.NEW_SEED -> {
 						Icon(
 							Icons.Default.AddCircleOutline,
