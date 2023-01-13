@@ -13,6 +13,7 @@ import io.parity.signer.screens.keyderivation.derivationsubscreens.DerivationCre
 import io.parity.signer.screens.keyderivation.derivationsubscreens.DerivationPathScreen
 import io.parity.signer.screens.keyderivation.derivationsubscreens.DeriveKeyBaseScreen
 import io.parity.signer.screens.keyderivation.derivationsubscreens.NetworkSelectionBottomSheet
+import io.parity.signer.screens.keyderivation.help.DerivationKeysHelpBottomSheet
 import io.parity.signer.screens.keyderivation.help.DerivationMethodsHelpBottomSheet
 import io.parity.signer.screens.keyderivation.help.DerivationPathHelpBottomSheet
 import io.parity.signer.ui.BottomSheetWrapperRoot
@@ -82,7 +83,7 @@ fun DerivationCreateSubgraph(
 				}
 				composable(HomeDerivationSheetsSubGraph.derivationMenuHelp) {
 					BottomSheetWrapperRoot(onClosedAction = closeAction) {
-						DerivationMethodsHelpBottomSheet(
+						DerivationKeysHelpBottomSheet(
 							onClose = closeAction,
 						)
 					}
@@ -132,8 +133,7 @@ fun DerivationCreateSubgraph(
 				composable(PathDerivationSheetsSubGraph.empty) {}
 				composable(PathDerivationSheetsSubGraph.help) {
 					BottomSheetWrapperRoot(onClosedAction = closeAction) {
-						DerivationPathHelpBottomSheet(
-							//todo derivation check whoch bottom sheet from where, it's mixed
+						DerivationMethodsHelpBottomSheet(
 							onClose = closeAction,
 						)
 					}
