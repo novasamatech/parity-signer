@@ -20,26 +20,26 @@ class DerivationPathAnalyzerTest {
 	@Test
 	fun testHidePassword() {
 		val analyzer = DerivationPathAnalyzer()
-		assertEquals("//seed///", analyzer.hidePasswords("//seed///"))
-		assertEquals("//seed///••••", analyzer.hidePasswords("//seed///dfgf"))
-		assertEquals("//seed//1///••••", analyzer.hidePasswords("//seed//1///dfgf"))
-		assertEquals("//seed///•••••••••••", analyzer.hidePasswords("//seed///sdfg///hjkj"))
-		assertEquals("//seed", analyzer.hidePasswords("//seed"))
+		assertEquals("//seed///", DerivationPathAnalyzer.hidePasswords("//seed///"))
+		assertEquals("//seed///••••", DerivationPathAnalyzer.hidePasswords("//seed///dfgf"))
+		assertEquals("//seed//1///••••", DerivationPathAnalyzer.hidePasswords("//seed//1///dfgf"))
+		assertEquals("//seed///•••••••••••", DerivationPathAnalyzer.hidePasswords("//seed///sdfg///hjkj"))
+		assertEquals("//seed", DerivationPathAnalyzer.hidePasswords("//seed"))
 	}
 
 	@Test
 	fun gettingPassword() {
 		val analyzer = DerivationPathAnalyzer()
-		assertEquals("", analyzer.getPassword("//seed///"))
-		assertEquals("gg", analyzer.getPassword("//seed///gg"))
-		assertEquals("gg", analyzer.getPassword("//seed//1///gg"))
-		assertEquals("/gg", analyzer.getPassword("//seed//1////gg"))
-		assertEquals("/gg///ss", analyzer.getPassword("//seed//1////gg///ss"))
+		assertEquals("", DerivationPathAnalyzer.getPassword("//seed///"))
+		assertEquals("gg", DerivationPathAnalyzer.getPassword("//seed///gg"))
+		assertEquals("gg", DerivationPathAnalyzer.getPassword("//seed//1///gg"))
+		assertEquals("/gg", DerivationPathAnalyzer.getPassword("//seed//1////gg"))
+		assertEquals("/gg///ss", DerivationPathAnalyzer.getPassword("//seed//1////gg///ss"))
 
-		assertNull(analyzer.getPassword("//seed//"))
-		assertNull(analyzer.getPassword("//"))
-		assertNull(analyzer.getPassword(""))
-		assertNull(analyzer.getPassword("//seed//sdfsdf//"))
+		assertNull(DerivationPathAnalyzer.getPassword("//seed//"))
+		assertNull(DerivationPathAnalyzer.getPassword("//"))
+		assertNull(DerivationPathAnalyzer.getPassword(""))
+		assertNull(DerivationPathAnalyzer.getPassword("//seed//sdfsdf//"))
 
 	}
 }

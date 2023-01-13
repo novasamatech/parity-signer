@@ -45,6 +45,7 @@ fun DerivationCreateSubgraph(
 			val subNavController = rememberNavController()
 			DeriveKeyBaseScreen(
 				path = path.value,
+				isPathValid = deriveViewModel.checkPath(path.value) == DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD,
 				selectedNetwork = selectedNetwork.value,
 				onClose = { rootNavigator.backAction() },
 				onNetworkSelectClicked = {
@@ -60,8 +61,7 @@ fun DerivationCreateSubgraph(
 				onCreateClicked = {
 					subNavController.navigate(HomeDerivationSheetsSubGraph.confirmation)
 				},
-				modifier = Modifier
-					.statusBarsPadding()
+				modifier = Modifier.statusBarsPadding()
 			)
 
 			//bottom sheets
@@ -118,19 +118,14 @@ fun DerivationCreateSubgraph(
 		composable(DerivationCreateSubgraph.path) {
 			val subNavController = rememberNavController()
 
-			DerivationPathScreen(
-				initialPath = path.value,
-				onDerivationHelp = {
-					subNavController.navigate(PathDerivationSheetsSubGraph.help)
-				},
-				onClose = { navController.popBackStack() },
-				onDone = { newPath ->
-					deriveViewModel.updatePath(newPath)
-					navController.popBackStack()
-				},
-				modifier = Modifier
-					.statusBarsPadding()
-					.imePadding()
+			DerivationPathScreen(initialPath = path.value, onDerivationHelp = {
+				subNavController.navigate(PathDerivationSheetsSubGraph.help)
+			}, onClose = { navController.popBackStack() }, onDone = { newPath ->
+				deriveViewModel.updatePath(newPath)
+				navController.popBackStack()
+			}, modifier = Modifier
+				.statusBarsPadding()
+				.imePadding()
 			)
 			//bottom sheets
 			NavHost(

@@ -26,10 +26,10 @@ fun DerivationPathHelpBottomSheet(
 	onClose: Callback,
 ) {
 	Column(
-		Modifier
-			.background(MaterialTheme.colors.backgroundTertiary)
-			.verticalScroll(rememberScrollState())
-			.padding(horizontal = 24.dp)
+        Modifier
+            .background(MaterialTheme.colors.backgroundTertiary)
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp)
 	) {
 		Text(
 			text = stringResource(R.string.derivation_help_path_title),
@@ -55,7 +55,6 @@ fun DerivationPathHelpBottomSheet(
 			onClicked = onClose
 		)
 	}
-
 }
 
 

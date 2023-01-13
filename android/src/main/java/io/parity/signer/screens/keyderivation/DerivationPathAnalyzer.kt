@@ -23,24 +23,6 @@ class DerivationPathAnalyzer {
 		return REG_PATH.matches(path)
 	}
 
-	fun getPassword(path: String): String? {
-		return if (path.contains("///")) {
-			path.substringAfter("///")
-		} else {
-			null
-		}
-	}
-
-	fun hidePasswords(text: String): String {
-		val maskStar: String = '\u2022'.toString()
-		val password = getPassword(text)
-		return if (password == null) {
-			text
-		}else {
-			text.replace(password, maskStar.repeat(password.length))
-		}
-	}
-
 	fun getHint(path: String): Hint {
 		return when {
 			getPassword(path) == "" -> Hint.CREATE_PASSWORD
@@ -60,6 +42,24 @@ class DerivationPathAnalyzer {
 			}
 		}
 	}
+	companion object {
+		fun getPassword(path: String): String? {
+			return if (path.contains("///")) {
+				path.substringAfter("///")
+			} else {
+				null
+			}
+		}
+		fun hidePasswords(text: String): String {
+			val maskStar: String = '\u2022'.toString()
+			val password = getPassword(text)
+			return if (password == null) {
+				text
+			}else {
+				text.replace(password, maskStar.repeat(password.length))
+			}
+		}
+	}
 }
 
 
@@ -73,9 +73,8 @@ data class DerivationPathVisualTransformation(
 	val pathAnalyzer = DerivationPathAnalyzer()
 
 	override fun filter(text: AnnotatedString): TransformedText {
-//		val content = if (pathAnalyzer.isCorrect(text.text)) {
 		val content =	buildAnnotatedString {
-				append(pathAnalyzer.hidePasswords(text.text))
+				append(DerivationPathAnalyzer.hidePasswords(text.text))
 				pathAnalyzer.getHint(text.text).getLocalizedString(context)
 					?.let { hint ->
 						append(" ")
@@ -84,9 +83,6 @@ data class DerivationPathVisualTransformation(
 						}
 					}
 			}
-//		} else {
-//			text
-//		}
 		return TransformedText(content, DerivationOffsetMapping(text.length))
 	}
 

@@ -55,7 +55,7 @@ class DerivationCreateViewModel : ViewModel() {
 
 	fun checkPath(path: String): DerivationPathValidity {
 		return when {
-			pathAnalyzer.getPassword(path) == null -> DerivationPathValidity.EMPTY_PASSWORD
+			DerivationPathAnalyzer.getPassword(path) == null -> DerivationPathValidity.EMPTY_PASSWORD
 			!pathAnalyzer.isCorrect(path) -> DerivationPathValidity.WRONG_PATH
 //			uniffiInteractor.validateDerivationPath(path).mapError() //todo derivation
 			else -> DerivationPathValidity.ALL_GOOD

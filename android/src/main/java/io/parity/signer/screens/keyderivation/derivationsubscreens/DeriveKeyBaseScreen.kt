@@ -25,6 +25,7 @@ import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.models.Callback
 import io.parity.signer.models.NetworkModel
+import io.parity.signer.screens.keyderivation.DerivationPathAnalyzer
 import io.parity.signer.screens.keyderivation.INITIAL_DERIVATION_PATH
 import io.parity.signer.ui.theme.*
 
@@ -32,6 +33,7 @@ import io.parity.signer.ui.theme.*
 fun DeriveKeyBaseScreen(
 	selectedNetwork: NetworkModel,
 	path: String,
+	isPathValid: Boolean,
 	onClose: Callback,
 	onNetworkSelectClicked: Callback,
 	onDerivationPathHelpClicked: Callback,
@@ -113,8 +115,8 @@ fun DeriveKeyBaseScreen(
 				text = if (path == INITIAL_DERIVATION_PATH) {
 					stringResource(R.string.derivation_screen_path_placeholder)
 				} else {
-					path
-				}, //todo derivation hide password
+					DerivationPathAnalyzer.hidePasswords(path)
+				},
 				color = MaterialTheme.colors.textTertiary,
 				style = SignerTypeface.TitleS,
 			)
@@ -131,7 +133,7 @@ fun DeriveKeyBaseScreen(
 		PrimaryButtonWide(
 			label = stringResource(R.string.derivation_screen_derivation_button_create),
 			modifier = Modifier.padding(24.dp),
-			isEnabled = true, //todo derivation
+			isEnabled = isPathValid,
 			onClicked = onCreateClicked,
 		)
 	}
@@ -180,6 +182,7 @@ private fun PreviewDeriveKeyBaseScreen() {
 	SignerNewTheme {
 		DeriveKeyBaseScreen(
 			selectedNetwork = NetworkModel.createStub(),
+			isPathValid = true,
 			path = INITIAL_DERIVATION_PATH,
 			onClose = {},
 			onNetworkSelectClicked = {},

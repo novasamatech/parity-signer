@@ -60,10 +60,10 @@ fun DerivationPathScreen(
 	val password = remember { mutableStateOf("") }
 	var passwordVisible by remember { mutableStateOf(false) }
 
-	val pathAnalyzer = remember {
-		DerivationPathAnalyzer()
-	}
-	val hasPassword = pathAnalyzer.getPassword(path.value.text) != null
+//	val pathAnalyzer = remember { //todo derivation remove?
+//		DerivationPathAnalyzer()
+//	}
+	val hasPassword = DerivationPathAnalyzer.getPassword(path.value.text) != null
 
 	val focusManager = LocalFocusManager.current
 	val pathFocusRequester = remember { FocusRequester() }
@@ -197,6 +197,7 @@ fun DerivationPathScreen(
 					imeAction = if (canProceed) ImeAction.Done else ImeAction.None
 				),
 				keyboardActions = KeyboardActions(onDone = {
+					//todo derivations
 //						if (canProceed) {
 //							proceed(password)
 //							focusManager.clearFocus(true)
