@@ -103,6 +103,7 @@ struct DerivationPathNameView: View {
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
+            viewModel.onAppear()
             focusedPath = true
         }
         .fullScreenCover(
@@ -174,6 +175,7 @@ extension DerivationPathNameView {
         @Binding var derivationPath: String
         @Binding var networkSelection: NetworkSelection
         @Binding var isPresented: Bool
+        private var skipValidation = false
         private let cancelBag = CancelBag()
 
         // State presentatation
@@ -197,6 +199,15 @@ extension DerivationPathNameView {
 
         func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
+        }
+
+        func onAppear() {
+            if derivationPath.isEmpty {
+                skipValidation = true
+                inputText = DerivationPathComponent.hard.description
+            } else {
+                inputText = derivationPath
+            }
         }
 
         func onDismissTap() {
@@ -229,6 +240,10 @@ extension DerivationPathNameView {
         }
 
         func validateDerivationPath() {
+            guard !skipValidation else {
+                skipValidation = false
+                return
+            }
             guard !inputText.isEmpty else {
                 derivationPathError = nil
                 return
