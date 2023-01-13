@@ -46,6 +46,7 @@ fun DerivationPathScreen(
 	onDerivationHelp: Callback,
 	onClose: Callback,
 	onDone: (String) -> Unit,
+	modifier: Modifier = Modifier,
 ) {
 	val canProceed = true //todo derivation
 	val path = remember {
@@ -73,7 +74,7 @@ fun DerivationPathScreen(
 		focusManager.clearFocus(true)
 	}
 
-	Column() {
+	Column(modifier = modifier) {
 		DerivationPathHeader(
 			canProceed = canProceed,
 			onClose = onClose,
@@ -224,7 +225,10 @@ fun DerivationPathScreen(
             Modifier
                 .padding(top = 8.dp, bottom = 8.dp)
                 .padding(horizontal = 24.dp)
-                .clickable(onClick = onDerivationHelp)
+                .clickable(onClick = {
+									focusManager.clearFocus()
+									onDerivationHelp()
+								})
 		)
 	}
 

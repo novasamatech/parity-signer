@@ -38,9 +38,10 @@ fun DeriveKeyBaseScreen(
 	onDerivationMenuHelpClicked: Callback,
 	onPathClicked: Callback,
 	onCreateClicked: Callback,
+	modifier: Modifier = Modifier
 ) {
 
-	Column() {
+	Column(modifier = modifier) {
 		ScreenHeaderClose(
 			title = stringResource(R.string.derivation_screen_title),
 			onClose = onClose,

@@ -125,8 +125,6 @@ fun CombinedScreensSelector(
 				Box(
 					modifier = Modifier
 						.background(MaterialTheme.colors.background)
-						.statusBarsPadding()
-						.imePadding()
 				) {
 					DerivationCreateSubgraph(
 						rootNavigator, screenData.f.seedName, screenData.f.networkSpecsKey

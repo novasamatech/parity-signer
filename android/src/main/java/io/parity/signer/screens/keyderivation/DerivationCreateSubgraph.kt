@@ -1,7 +1,10 @@
 package io.parity.signer.screens.keyderivation
 
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -57,6 +60,8 @@ fun DerivationCreateSubgraph(
 				onCreateClicked = {
 					subNavController.navigate(HomeDerivationSheetsSubGraph.confirmation)
 				},
+				modifier = Modifier
+					.statusBarsPadding()
 			)
 
 			//bottom sheets
@@ -122,7 +127,10 @@ fun DerivationCreateSubgraph(
 				onDone = { newPath ->
 					deriveViewModel.updatePath(newPath)
 					navController.popBackStack()
-				}
+				},
+				modifier = Modifier
+					.statusBarsPadding()
+					.imePadding()
 			)
 			//bottom sheets
 			NavHost(
