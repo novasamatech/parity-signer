@@ -49,6 +49,10 @@ class DerivationCreateViewModel : ViewModel() {
 		return uniffiInteractor.getAllNetworks().mapError()
 	}
 
+	fun updateSelectedNetwork(newNetwork: NetworkModel) {
+		_selectedNetwork.value = newNetwork
+	}
+
 	fun checkPath(path: String): DerivationPathValidity {
 		return when {
 			pathAnalyzer.getPassword(path) == null -> DerivationPathValidity.EMPTY_PASSWORD
@@ -69,11 +73,11 @@ class DerivationCreateViewModel : ViewModel() {
 	}
 
 
-	suspend fun proceedCreateKey(path: String, seedName: String) {
+	suspend fun proceedCreateKey() {
 		try {
 			val phrase = seedRepository.getSeedPhraseForceAuth(seedName).mapError()
 			if (phrase?.isNotBlank() == true) {
-				rootNavigator.navigate(Action.GO_FORWARD, path, phrase)
+				rootNavigator.navigate(Action.GO_FORWARD, path.value, phrase)
 			}
 		} catch (e: java.lang.Exception) {
 			Log.e("Add key error", e.toString())

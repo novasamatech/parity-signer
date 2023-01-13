@@ -114,11 +114,7 @@ fun DeriveKeyBaseScreen(
 				} else {
 					path
 				}, //todo derivation hide password
-				color = if (path.isEmpty()) {
-					MaterialTheme.colors.textTertiary
-				} else {
-					MaterialTheme.colors.primary
-				},
+				color = MaterialTheme.colors.textTertiary,
 				style = SignerTypeface.TitleS,
 			)
 			Spacer(modifier = Modifier.weight(1f))

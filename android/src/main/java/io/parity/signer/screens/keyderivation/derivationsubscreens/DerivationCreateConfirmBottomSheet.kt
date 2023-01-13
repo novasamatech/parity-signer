@@ -22,7 +22,7 @@ import io.parity.signer.ui.theme.*
 
 
 @Composable
-fun NewDerivationConfirmBottomSheet(
+fun DerivationCreateConfirmBottomSheet(
 	path: String,
 	onCancel: Callback,
 	onDone: Callback,
@@ -96,8 +96,8 @@ fun NewDerivationConfirmBottomSheet(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewNewDerivationConfirmBottomSheet() {
+private fun PreviewDerivationCreateConfirmBottomSheet() {
 	SignerNewTheme {
-		NewDerivationConfirmBottomSheet("//polkadot//1///pass", {}, {})
+		DerivationCreateConfirmBottomSheet("//polkadot//1///pass", {}, {})
 	}
 }
