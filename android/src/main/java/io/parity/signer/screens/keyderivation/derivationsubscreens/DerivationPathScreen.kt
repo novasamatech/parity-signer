@@ -61,7 +61,6 @@ fun DerivationPathScreen(
 	val pathFocusRequester = remember { FocusRequester() }
 	val passwordFocusRequester = remember { FocusRequester() }
 
-
 	val onDoneLocal = {
 		onDone(path.value.text)
 		focusManager.clearFocus(true)
@@ -174,7 +173,7 @@ fun DerivationPathScreen(
 			Text(
 				text = stringResource(R.string.enter_password_title),
 				color = MaterialTheme.colors.primary,
-				style = SignerTypeface.TitleL,
+				style = SignerTypeface.TitleS,
 				modifier = Modifier.padding(horizontal = 24.dp)
 			)
 			OutlinedTextField(

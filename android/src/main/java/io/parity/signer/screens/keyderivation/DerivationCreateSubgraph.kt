@@ -9,7 +9,6 @@ import androidx.navigation.compose.rememberNavController
 import io.parity.signer.models.Navigator
 import io.parity.signer.screens.keyderivation.derivationsubscreens.DerivationPathScreen
 import io.parity.signer.screens.keyderivation.derivationsubscreens.DeriveKeyBaseScreen
-import io.parity.signer.screens.keysetdetails.KeySetDetailsNavSubgraph
 
 
 @Composable
@@ -28,7 +27,7 @@ fun DerivationCreateSubgraph(
 	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
-		startDestination = KeySetDetailsNavSubgraph.home,
+		startDestination = DerivationCreateSubgraph.home,
 	) {
 		composable(DerivationCreateSubgraph.home) {
 			DeriveKeyBaseScreen(
@@ -39,6 +38,7 @@ fun DerivationCreateSubgraph(
 				onDerivationMenuHelpClicked = {},
 				onDerivationPathHelpClicked = {},
 				onPathClicked = { navController.navigate(DerivationCreateSubgraph.path) },
+				onCreateClicked = { navController.navigate(DerivationCreateSubgraph.confirmation) },
 			)
 		}
 		composable(DerivationCreateSubgraph.path) {

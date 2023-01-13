@@ -1,9 +1,11 @@
 package io.parity.signer.ui.navigationselectors
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -120,9 +122,16 @@ fun CombinedScreensSelector(
 		}
 		is ScreenData.DeriveKey -> {
 			if (FeatureFlags.isEnabled(FeatureOption.NEW_DERIVATION)) {
-				DerivationCreateSubgraph(
-					rootNavigator, screenData.f.seedName, screenData.f.networkSpecsKey
-				)
+				Box(
+					modifier = Modifier
+						.background(MaterialTheme.colors.background)
+						.statusBarsPadding()
+						.imePadding()
+				) {
+					DerivationCreateSubgraph(
+						rootNavigator, screenData.f.seedName, screenData.f.networkSpecsKey
+					)
+				}
 			}
 		}
 		else -> {} //old Selector showing them

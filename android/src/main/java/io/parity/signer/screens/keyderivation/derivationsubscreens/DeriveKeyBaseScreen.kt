@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.models.Callback
 import io.parity.signer.models.NetworkModel
@@ -36,6 +37,7 @@ fun DeriveKeyBaseScreen(
 	onDerivationPathHelpClicked: Callback,
 	onDerivationMenuHelpClicked: Callback,
 	onPathClicked: Callback,
+	onCreateClicked: Callback,
 ) {
 
 	Column() {
@@ -76,8 +78,7 @@ fun DeriveKeyBaseScreen(
 		}
 
 		Row(
-			modifier = Modifier
-				.padding(horizontal = 24.dp, vertical = 14.dp)
+			modifier = Modifier.padding(horizontal = 24.dp, vertical = 14.dp)
 		) {
 			Text(
 				text = stringResource(R.string.derivation_screen_derivation_header),
@@ -127,8 +128,14 @@ fun DeriveKeyBaseScreen(
 			text = stringResource(R.string.derivation_screen_derivation_note_description),
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.CaptionM,
-			modifier = Modifier
-				.padding(horizontal = 24.dp, vertical = 12.dp),
+			modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+		)
+		Spacer(modifier = Modifier.weight(1f))
+		PrimaryButtonWide(
+			label = stringResource(R.string.derivation_screen_derivation_button_create),
+			modifier = Modifier.padding(24.dp),
+			isEnabled = false, //todo derivation
+			onClicked = onCreateClicked,
 		)
 	}
 }
@@ -138,8 +145,7 @@ private fun NetworkLabel(networkName: String) {
 	Box(
 		modifier = Modifier
 			.background(
-				MaterialTheme.colors.fill12,
-				RoundedCornerShape(12.dp)
+				MaterialTheme.colors.fill12, RoundedCornerShape(12.dp)
 			)
 			.padding(horizontal = 8.dp, vertical = 2.dp),
 		contentAlignment = Alignment.Center,
@@ -158,8 +164,7 @@ private fun ChevronRight() {
 		imageVector = Icons.Filled.ChevronRight,
 		contentDescription = null,
 		colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
-		modifier = Modifier
-			.size(28.dp)
+		modifier = Modifier.size(28.dp)
 	)
 }
 
@@ -177,12 +182,13 @@ private fun ChevronRight() {
 private fun PreviewDeriveKeyBaseScreen() {
 	SignerNewTheme {
 		DeriveKeyBaseScreen(
-			NetworkModel.createStub(),
-			INITIAL_DERIVATION_PATH,
-			{},
-			{},
-			{},
-			{},
-			{})
+			selectedNetwork = NetworkModel.createStub(),
+			path = INITIAL_DERIVATION_PATH,
+			onClose = {},
+			onNetworkSelectClicked = {},
+			onDerivationPathHelpClicked = {},
+			onDerivationMenuHelpClicked = {},
+			onPathClicked = {},
+			onCreateClicked = {})
 	}
 }
