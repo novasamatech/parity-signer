@@ -23,6 +23,7 @@ fun DerivationCreateSubgraph(
 	deriveViewModel.setInitValues(seedName, networkSpecsKey, rootNavigator)
 
 	val path = deriveViewModel.path.collectAsState()
+	val selectedNetwork = deriveViewModel.selectedNetwork.collectAsState()
 
 	val navController = rememberNavController()
 	NavHost(
@@ -31,9 +32,12 @@ fun DerivationCreateSubgraph(
 	) {
 		composable(DerivationCreateSubgraph.home) {
 			DeriveKeyBaseScreen(
+				path = path.value,
+				selectedNetwork = selectedNetwork.value,
 				onClose = { rootNavigator.backAction() },
 				onNetworkSelectClicked = {},//todo derivations,
-				onDerivationHelpClicked = {},
+				onDerivationMenuHelpClicked = {},
+				onDerivationPathHelpClicked = {},
 				onPathClicked = { navController.navigate(DerivationCreateSubgraph.path) },
 			)
 		}

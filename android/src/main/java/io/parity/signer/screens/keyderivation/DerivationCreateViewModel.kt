@@ -2,17 +2,13 @@ package io.parity.signer.screens.keyderivation
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import io.parity.signer.backend.mapError
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.NetworkModel
 import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.models.storage.mapError
-import io.parity.signer.screens.scan.ScanViewModel
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.ErrorDisplayed
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,20 +23,25 @@ class DerivationCreateViewModel : ViewModel() {
 
 	private lateinit var rootNavigator: Navigator
 	private lateinit var seedName: String
-	private lateinit var selectedNetworkSpecs: String
 
-	val all_networks = viewModelScope.async { getNetworks() }
+	val allNetworks: List<NetworkModel> = runBlocking { getNetworks() }!!
 
 	private val _path: MutableStateFlow<String> =
-		MutableStateFlow("//")
+		MutableStateFlow(INITIAL_DERIVATION_PATH)
 	val path: StateFlow<String> = _path.asStateFlow()
+
+	private val _selectedNetwork: MutableStateFlow<NetworkModel> =
+		MutableStateFlow(allNetworks.first())
+	val selectedNetwork: StateFlow<NetworkModel> = _selectedNetwork.asStateFlow()
 
 	fun updatePath(newPath: String) {
 		_path.value = newPath
 	}
+
 	fun setInitValues(seed: String, network: String, rootNavigator: Navigator) {
 		seedName = seed
-		selectedNetworkSpecs = network
+		allNetworks.firstOrNull { it.key == network }
+			?.let { _selectedNetwork.value = it }
 		this.rootNavigator = rootNavigator
 	}
 
@@ -62,7 +63,7 @@ class DerivationCreateViewModel : ViewModel() {
 			uniffiInteractor.validateDerivationPath(
 				path,
 				seedName,
-				selectedNetworkSpecs
+				selectedNetwork.value.key
 			).mapError()
 		}
 	}
@@ -84,6 +85,6 @@ class DerivationCreateViewModel : ViewModel() {
 	}
 }
 
-
+internal const val INITIAL_DERIVATION_PATH = "//"
 
 

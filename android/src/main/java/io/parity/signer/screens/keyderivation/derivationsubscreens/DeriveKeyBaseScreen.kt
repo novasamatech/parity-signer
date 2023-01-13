@@ -13,8 +13,6 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -25,25 +23,26 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.models.Callback
+import io.parity.signer.models.NetworkModel
+import io.parity.signer.screens.keyderivation.INITIAL_DERIVATION_PATH
 import io.parity.signer.ui.theme.*
 
-//todo derivations handle wrong path?
 @Composable
 fun DeriveKeyBaseScreen(
+	selectedNetwork: NetworkModel,
+	path: String,
 	onClose: Callback,
 	onNetworkSelectClicked: Callback,
-	onDerivationHelpClicked: Callback,
+	onDerivationPathHelpClicked: Callback,
+	onDerivationMenuHelpClicked: Callback,
 	onPathClicked: Callback,
 ) {
-	val path = remember {
-		mutableStateOf<String>("")
-	}
 
 	Column() {
 		ScreenHeaderClose(
 			title = stringResource(R.string.derivation_screen_title),
-			onClose = { /*TODO*/ },
-			onMenu = {},
+			onClose = onClose,
+			onMenu = onDerivationMenuHelpClicked,
 			differentMenuIcon = Icons.Filled.HelpOutline
 		)
 
@@ -72,7 +71,7 @@ fun DeriveKeyBaseScreen(
 				style = SignerTypeface.TitleS,
 			)
 			Spacer(modifier = Modifier.weight(1f))
-			NetworkLabel(networkName = "Polkadot") //todo pass
+			NetworkLabel(networkName = selectedNetwork.title)
 			ChevronRight()
 		}
 
@@ -91,7 +90,7 @@ fun DeriveKeyBaseScreen(
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.pink300),
 				modifier = Modifier
 					.padding(horizontal = 8.dp)
-					.clickable(onClick = onDerivationHelpClicked)
+					.clickable(onClick = onDerivationPathHelpClicked)
 					.size(18.dp)
 					.align(Alignment.CenterVertically)
 			)
@@ -109,8 +108,12 @@ fun DeriveKeyBaseScreen(
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Text(
-				text = path.value.ifEmpty { stringResource(R.string.derivation_screen_path_placeholder) },
-				color = if (path.value.isEmpty()) {
+				text = if (path == INITIAL_DERIVATION_PATH) {
+					stringResource(R.string.derivation_screen_path_placeholder)
+				} else {
+					path
+				}, //todo derivation hide password
+				color = if (path.isEmpty()) {
 					MaterialTheme.colors.textTertiary
 				} else {
 					MaterialTheme.colors.primary
@@ -173,6 +176,13 @@ private fun ChevronRight() {
 @Composable
 private fun PreviewDeriveKeyBaseScreen() {
 	SignerNewTheme {
-		DeriveKeyBaseScreen({},{},{},{})
+		DeriveKeyBaseScreen(
+			NetworkModel.createStub(),
+			INITIAL_DERIVATION_PATH,
+			{},
+			{},
+			{},
+			{},
+			{})
 	}
 }
