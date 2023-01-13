@@ -15,7 +15,7 @@ struct AttributedInfoBoxView: View {
             Text(text)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Spacer().frame(maxWidth: Spacing.medium)
-            Asset.infoIconBold.swiftUIImage
+            Asset.helpOutline.swiftUIImage
                 .foregroundColor(Asset.accentPink300.swiftUIColor)
         }
         .padding()
