@@ -1,20 +1,25 @@
 //
-//  NetworkSelectionModal.swift
+//  ChooseNetworkForKeyView.swift
 //  NativeSigner
 //
-//  Created by Krzysztof Rodak on 12/12/2022.
+//  Created by Krzysztof Rodak on 11/01/2023.
 //
 
 import SwiftUI
 
-struct NetworkSelectionModal: View {
+enum NetworkSelection {
+    case network(MmNetwork)
+    case allowedOnAnyNetwork([MmNetwork])
+}
+
+struct ChooseNetworkForKeyView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var appState: AppState
 
     var body: some View {
         FullScreenRoundedModal(
             backgroundTapAction: {
-                viewModel.resetAction()
+                viewModel.cancelAction()
             },
             animateBackground: $viewModel.animateBackground,
             ignoredEdges: .bottom,
@@ -22,18 +27,18 @@ struct NetworkSelectionModal: View {
                 VStack(spacing: 0) {
                     // Header with X button
                     HStack {
-                        Localizable.NetworkFilter.Label.header.text
+                        Localizable.CreateDerivedKey.Modal.Network.title.text
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
-                        CloseModalButton(action: viewModel.resetAction)
+                        CloseModalButton(action: viewModel.cancelAction)
                     }
                     .padding(.leading, Spacing.large)
                     .padding(.trailing, Spacing.medium)
                     Divider()
-                        .padding(.vertical, Spacing.medium)
+                        .padding(Spacing.medium)
                     // List of networks
-                    LazyVStack {
+                    LazyVStack(spacing: Spacing.extraSmall) {
                         ForEach(
                             viewModel.networks,
                             id: \.key
@@ -41,25 +46,12 @@ struct NetworkSelectionModal: View {
                             item(for: $0)
                         }
                     }
-                    // Bottom actions
-                    HStack(spacing: Spacing.extraSmall) {
-                        SecondaryButton(
-                            action: viewModel.resetAction(),
-                            text: Localizable.NetworkFilter.Action.reset.key
-                        )
-                        PrimaryButton(
-                            action: viewModel.doneAction,
-                            text: Localizable.NetworkFilter.Action.done.key,
-                            style: .primary()
-                        )
-                    }
-                    .padding(Spacing.large)
+                    .padding(.bottom, Spacing.small)
                 }
             }
         )
         .onAppear {
             viewModel.use(appState: appState)
-            viewModel.loadCurrentSelection()
         }
     }
 
@@ -70,12 +62,11 @@ struct NetworkSelectionModal: View {
                 .padding(.trailing, Spacing.small)
             Text(network.title)
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                .font(PrimaryFont.labelM.font)
+                .font(PrimaryFont.titleS.font)
             Spacer()
             if viewModel.isSelected(network) {
-                Asset.checkmarkChecked.swiftUIImage
-            } else {
-                Asset.checkmarkUnchecked.swiftUIImage
+                Asset.checkmarkList.swiftUIImage
+                    .foregroundColor(Asset.accentPink300.swiftUIColor)
             }
         }
         .contentShape(Rectangle())
@@ -83,23 +74,46 @@ struct NetworkSelectionModal: View {
         .padding(.trailing, Spacing.medium)
         .frame(height: Heights.networkFilterItem)
         .onTapGesture {
-            viewModel.toggleSelection(network)
+            viewModel.selectNetwork(network)
+        }
+    }
+
+    @ViewBuilder
+    func allowOnAnyNetwork() -> some View {
+        HStack(alignment: .center, spacing: 0) {
+            Localizable.CreateDerivedKey.Modal.Network.onAny.text
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .font(PrimaryFont.titleS.font)
+            Spacer()
+            if case .allowedOnAnyNetwork = viewModel.networkSelection {
+                Asset.checkmarkList.swiftUIImage
+                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+            }
+        }
+        .contentShape(Rectangle())
+        .padding(.leading, Spacing.large)
+        .padding(.trailing, Spacing.medium)
+        .frame(height: Heights.networkFilterItem)
+        .onTapGesture {
+            viewModel.selectAllNetworks()
         }
     }
 }
 
-extension NetworkSelectionModal {
+extension ChooseNetworkForKeyView {
     final class ViewModel: ObservableObject {
         private weak var appState: AppState!
         @Published var animateBackground: Bool = false
         @Published var networks: [MmNetwork] = []
-        @Published var selectedNetworks: [MmNetwork] = []
+        @Binding var networkSelection: NetworkSelection
         @Binding var isPresented: Bool
 
         init(
-            isPresented: Binding<Bool>
+            isPresented: Binding<Bool>,
+            networkSelection: Binding<NetworkSelection>
         ) {
             _isPresented = isPresented
+            _networkSelection = networkSelection
         }
 
         func use(appState: AppState) {
@@ -107,46 +121,25 @@ extension NetworkSelectionModal {
             networks = appState.userData.allNetworks
         }
 
-        func loadCurrentSelection() {
-            selectedNetworks = appState.userData.selectedNetworks
-        }
-
         func cancelAction() {
             animateDismissal()
         }
 
-        func resetAction() {
-            appState.userData.selectedNetworks = []
-            animateDismissal()
-        }
-
-        func doneAction() {
-            appState.userData.selectedNetworks = selectedNetworks
-            animateDismissal()
-        }
-
         func isSelected(_ network: MmNetwork) -> Bool {
-            selectedNetworks.contains(network)
-        }
-
-        func toggleSelection(_ network: MmNetwork) {
-            if selectedNetworks.contains(network) {
-                selectedNetworks.removeAll { $0 == network }
-            } else {
-                selectedNetworks.append(network)
+            if case let .network(selectedNetwork) = networkSelection {
+                return selectedNetwork == network
             }
+            return false
         }
 
-//
-//        func switchToNetwork(_ network: Network) {
-//            guard !selectedNetworks.contains(network) else { return }
-//            selectedNetworks = [network]
-//            navigation.perform(navigation: .init(action: .changeNetwork, details: network.key))
-//            animateDismissal()
-//        }
+        func selectNetwork(_ network: MmNetwork) {
+            networkSelection = .network(network)
+            animateDismissal()
+        }
 
-        func hide() {
-            isPresented.toggle()
+        func selectAllNetworks() {
+            networkSelection = .allowedOnAnyNetwork(networks)
+            animateDismissal()
         }
 
         func animateDismissal() {
@@ -156,15 +149,24 @@ extension NetworkSelectionModal {
                 delayedAnimationClosure: self.hide()
             )
         }
+
+        private func hide() {
+            isPresented.toggle()
+        }
     }
 }
 
-struct NetworkSelectionModal_Previews: PreviewProvider {
+#if DEBUG
+struct ChooseNetworkForKeyView_Previews: PreviewProvider {
     static var previews: some View {
-        NetworkSelectionModal(
-            viewModel: .init(isPresented: Binding<Bool>.constant(true))
+        ChooseNetworkForKeyView(
+            viewModel: .init(
+                isPresented: .constant(true),
+                networkSelection: .constant(.allowedOnAnyNetwork([]))
+            )
         )
         .environmentObject(NavigationCoordinator())
         .environmentObject(AppState.preview)
     }
 }
+#endif

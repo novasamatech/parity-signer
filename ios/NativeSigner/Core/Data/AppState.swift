@@ -18,13 +18,13 @@ final class AppState: ObservableObject {
 extension AppState {
     final class UserData {
         var keysData: MKeysNew?
-        var allNetworks: [Network] = []
-        var selectedNetworks: [Network] = []
+        var allNetworks: [MmNetwork] = []
+        var selectedNetworks: [MmNetwork] = []
 
         init(
             keysData: MKeysNew? = nil,
-            allNetworks: [Network] = [],
-            selectedNetworks: [Network] = []
+            allNetworks: [MmNetwork] = [],
+            selectedNetworks: [MmNetwork] = []
         ) {
             self.keysData = keysData
             self.allNetworks = allNetworks
