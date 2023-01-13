@@ -58,10 +58,12 @@ fun DerivationPathScreen(
 			)
 		)
 	}
+	val pathValidity = validator(path.value.text)
 	val canProceed =
-		validator(path.value.text) == DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD
+		pathValidity == DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD
 	val password = remember { mutableStateOf("") }
 	var passwordVisible by remember { mutableStateOf(false) }
+	var passwordNotMatch by remember { mutableStateOf(false) }
 
 	val hasPassword = DerivationPathAnalyzer.getPassword(path.value.text) != null
 
@@ -70,8 +72,13 @@ fun DerivationPathScreen(
 	val passwordFocusRequester = remember { FocusRequester() }
 
 	val onDoneLocal = {
-		onDone(path.value.text)
-		focusManager.clearFocus(true)
+		val pathValue = path.value.text
+		if (hasPassword && DerivationPathAnalyzer.getPassword(pathValue) != password.value) {
+			passwordNotMatch = true
+		} else {
+			onDone(path.value.text)
+			focusManager.clearFocus(true)
+		}
 	}
 
 	Column(modifier = modifier) {
@@ -84,7 +91,7 @@ fun DerivationPathScreen(
 			value = path.value, //hide password, add hint
 			onValueChange = { newStr -> path.value = newStr },
 			keyboardOptions = KeyboardOptions(
-				imeAction = if (canProceed) ImeAction.Done else ImeAction.None
+				imeAction = if (canProceed) ImeAction.Done else ImeAction.None //todo derivation
 			),
 			visualTransformation = DerivationPathVisualTransformation(
 				context = LocalContext.current,
@@ -96,6 +103,7 @@ fun DerivationPathScreen(
 					onDoneLocal()
 				}
 			}),
+			isError = pathValidity != DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD,
 			singleLine = true,
 			textStyle = SignerTypeface.LabelM,
 			colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
@@ -104,6 +112,30 @@ fun DerivationPathScreen(
 				.fillMaxWidth(1f)
 				.padding(horizontal = 24.dp)
 		)
+		val errorForPath = when (pathValidity) {
+			DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD -> null
+			DerivationCreateViewModel.DerivationPathValidity.WRONG_PATH -> stringResource(
+				R.string.derivation_path_screen_error_wrong_path
+			)
+			DerivationCreateViewModel.DerivationPathValidity.COLLISION_PATH -> stringResource(
+				R.string.derivation_path_screen_error_collision_path
+			)
+			DerivationCreateViewModel.DerivationPathValidity.EMPTY_PASSWORD -> stringResource(
+				R.string.derivation_path_screen_error_password_empty
+			)
+			DerivationCreateViewModel.DerivationPathValidity.CONTAIN_SPACES -> stringResource(
+				R.string.derivation_path_screen_error_contain_spaces
+			)
+		}
+		errorForPath?.let { error ->
+			Text(
+				text = error,
+				color = MaterialTheme.colors.red500,
+				style = SignerTypeface.CaptionM,
+			)
+		}
+
+
 		if (!hasPassword) {
 			//suggestion slashes
 			val hintBackground =
@@ -205,7 +237,8 @@ fun DerivationPathScreen(
 //							focusManager.clearFocus(true)
 //						}
 				}),
-				label = { Text(text = "Confirm Password") },
+				isError = passwordNotMatch,
+				label = { Text(text = stringResource(R.string.derivation_path_screen_password_empty_hint)) },
 				singleLine = true,
 				textStyle = SignerTypeface.LabelM,
 				colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
@@ -223,6 +256,13 @@ fun DerivationPathScreen(
 					}
 				},
 			)
+			if (passwordNotMatch) {
+				Text(
+					text = stringResource(R.string.derivation_path_screen_password_error_not_match),
+					color = MaterialTheme.colors.red500,
+					style = SignerTypeface.CaptionM,
+				)
+			}
 		}
 		DerivationAlarm(
 			Modifier

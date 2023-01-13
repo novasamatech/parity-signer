@@ -252,6 +252,12 @@
 	<string name="network_selection_buttomsheet_title">Choose Network</string>
 	<string name="network_selection_selected_network_mark">Selected network</string>
   <string name="derivation_screen_derivation_button_create">Create Derived Key</string>
+    <string name="derivation_path_screen_error_wrong_path">Derivation path is wrong</string>
+	<string name="derivation_path_screen_error_collision_path">Key with this Derivation path name already exists</string>
+	<string name="derivation_path_screen_error_password_empty">Password is empty</string>
+	<string name="derivation_path_screen_error_contain_spaces">The derivation path name can’t contain spaces</string>
+	<string name="derivation_path_screen_password_empty_hint">Confirm Password</string>
+	<string name="derivation_path_screen_password_error_not_match">Passwords don’t match</string>
 
 </resources>
 

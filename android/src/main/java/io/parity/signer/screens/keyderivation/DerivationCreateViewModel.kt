@@ -9,6 +9,7 @@ import io.parity.signer.models.NetworkModel
 import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.models.storage.mapError
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.DerivationCheck
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,15 +56,23 @@ class DerivationCreateViewModel : ViewModel() {
 
 	fun checkPath(path: String): DerivationPathValidity {
 		return when {
-			DerivationPathAnalyzer.getPassword(path) == null -> DerivationPathValidity.EMPTY_PASSWORD
+			DerivationPathAnalyzer.getPassword(path)
+				?.isEmpty() == true -> DerivationPathValidity.EMPTY_PASSWORD
+			path.contains(' ') -> DerivationPathValidity.CONTAIN_SPACES
 			!pathAnalyzer.isCorrect(path) -> DerivationPathValidity.WRONG_PATH
-//			uniffiInteractor.validateDerivationPath(path).mapError() //todo derivation
-			else -> DerivationPathValidity.ALL_GOOD
+			else -> {
+				val backendCheck = getBackendCheck(path)
+				when {
+					backendCheck?.collision != null -> DerivationPathValidity.COLLISION_PATH
+					backendCheck?.buttonGood == false -> DerivationPathValidity.WRONG_PATH
+					else -> DerivationPathValidity.ALL_GOOD
+				}
+			}
 		}
 	}
 
-	private fun getBackendCheck(path: String) {
-		runBlocking {
+	private fun getBackendCheck(path: String): DerivationCheck? {
+		return runBlocking {
 			uniffiInteractor.validateDerivationPath(
 				path,
 				seedName,
@@ -85,7 +94,7 @@ class DerivationCreateViewModel : ViewModel() {
 	}
 
 	enum class DerivationPathValidity {
-		ALL_GOOD, WRONG_PATH, COLLISION_PATH, EMPTY_PASSWORD,
+		ALL_GOOD, WRONG_PATH, COLLISION_PATH, EMPTY_PASSWORD, CONTAIN_SPACES
 	}
 }
 
