@@ -84,12 +84,16 @@ class DerivationCreateViewModel : ViewModel() {
 
 	suspend fun proceedCreateKey() {
 		try {
-			val phrase = seedRepository.getSeedPhraseForceAuth(seedName).mapError()
-			if (phrase?.isNotBlank() == true) {
+			val phrase =
+				seedRepository.getSeedPhraseForceAuth(seedName).mapError() ?: return
+			if (phrase.isNotBlank()) {
+				//todo derivation extra step for password?
 				rootNavigator.navigate(Action.GO_FORWARD, path.value, phrase)
+			} else {
+				Log.e(TAG, "Seed phrase received but it's empty")
 			}
 		} catch (e: java.lang.Exception) {
-			Log.e("Add key error", e.toString())
+			Log.e(TAG, e.toString())
 		}
 	}
 
@@ -99,5 +103,5 @@ class DerivationCreateViewModel : ViewModel() {
 }
 
 internal const val INITIAL_DERIVATION_PATH = "//"
-
+private const val TAG = "DerivationCreateViewModel"
 
