@@ -139,6 +139,8 @@ fun DerivationPathScreen(
 				text = error,
 				color = MaterialTheme.colors.red500,
 				style = SignerTypeface.CaptionM,
+				modifier = Modifier
+					.padding(horizontal = 24.dp)
 			)
 		}
 
@@ -264,6 +266,7 @@ fun DerivationPathScreen(
 					text = stringResource(R.string.derivation_path_screen_password_error_not_match),
 					color = MaterialTheme.colors.red500,
 					style = SignerTypeface.CaptionM,
+					modifier = Modifier.padding(horizontal = 24.dp)
 				)
 			}
 		}

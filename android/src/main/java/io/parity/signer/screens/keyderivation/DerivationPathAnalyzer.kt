@@ -15,12 +15,11 @@ import kotlin.math.min
 
 
 class DerivationPathAnalyzer {
-	// stolen from rust/db_handling/src/identities.rs:99 where it was stolen from sp_core //todo
-	private val REG_PATH: Regex = "^(//?[^/]*)(///+)?$".toRegex()
+	// stolen from rust/db_handling/src/identities.rs:99 where it was stolen from sp_core
+	private val regexCheckPath: Regex = "^((//?[^/]+)+)(///.*)?$".toRegex()
 
-	//todo rust/db_handling/src/identities.rs:1123 - validation
 	fun isCorrect(path: String): Boolean {
-		return REG_PATH.matches(path)
+		return regexCheckPath.matches(path)
 	}
 
 	fun getHint(path: String): Hint {

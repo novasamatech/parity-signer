@@ -40,6 +40,20 @@ class DerivationPathAnalyzerTest {
 		assertNull(DerivationPathAnalyzer.getPassword("//"))
 		assertNull(DerivationPathAnalyzer.getPassword(""))
 		assertNull(DerivationPathAnalyzer.getPassword("//seed//sdfsdf//"))
+	}
 
+	@Test
+	fun checkIsCorrect() {
+		val analyzer = DerivationPathAnalyzer()
+		assertTrue(analyzer.isCorrect("//seed"))
+		assertTrue(analyzer.isCorrect("//seed///sdfsdf"))
+		assertTrue(analyzer.isCorrect("//seed//sdfsdf"))
+		assertTrue(analyzer.isCorrect("/asdd"))
+		assertTrue(analyzer.isCorrect("//seed///")) // no password is another error
+
+		assertFalse(analyzer.isCorrect("//"))
+		assertFalse(analyzer.isCorrect("///"))
+		assertFalse(analyzer.isCorrect("///sdf"))
+		assertFalse(analyzer.isCorrect(""))
 	}
 }
