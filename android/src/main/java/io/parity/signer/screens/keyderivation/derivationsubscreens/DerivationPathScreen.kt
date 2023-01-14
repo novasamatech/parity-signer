@@ -257,7 +257,11 @@ fun DerivationPathScreen(
 						)
 
 					IconButton(onClick = { passwordVisible = !passwordVisible }) {
-						Icon(imageVector = image, description)
+						Icon(
+							imageVector = image,
+							contentDescription = description,
+							tint = MaterialTheme.colors.textTertiary,
+						)
 					}
 				},
 			)
