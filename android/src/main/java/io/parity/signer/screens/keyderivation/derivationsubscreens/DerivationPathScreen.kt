@@ -66,6 +66,11 @@ fun DerivationPathScreen(
 	var passwordNotMatch by remember { mutableStateOf(false) }
 
 	val hasPassword = DerivationPathAnalyzer.getPassword(path.value.text) != null
+	if (!hasPassword) {
+		passwordNotMatch = false
+	} else if (DerivationPathAnalyzer.getPassword(path.value.text) == password.value) {
+		passwordNotMatch = false
+	}
 
 	val focusManager = LocalFocusManager.current
 	val pathFocusRequester = remember { FocusRequester() }
