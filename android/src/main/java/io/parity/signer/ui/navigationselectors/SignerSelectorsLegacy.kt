@@ -12,8 +12,6 @@ import io.parity.signer.models.*
 import io.parity.signer.models.storage.addSeed
 import io.parity.signer.models.storage.signSufficientCrypto
 import io.parity.signer.screens.*
-import io.parity.signer.screens.keyderivation.old.DerivePasswordConfirmOld
-import io.parity.signer.screens.keyderivation.old.DeriveScreenOld
 import io.parity.signer.screens.logs.logdetails.LogDetails
 import io.parity.signer.screens.networks.NetworkDetails
 import io.parity.signer.screens.settings.VerifierScreen
@@ -34,16 +32,7 @@ fun ScreenSelector(
 	val seedNames = signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
-		is ScreenData.DeriveKey -> {
-			if (FeatureFlags.isDisabled(FeatureOption.NEW_DERIVATION)) {
-				DeriveScreenOld(
-					screenData.f,
-					button = button2,
-					addKey = signerDataModel::addKey,
-					checkPath = signerDataModel::checkPath,
-				)
-			}
-		}
+		is ScreenData.DeriveKey -> {} // migrated
 		ScreenData.Documents -> Documents()
 		is ScreenData.KeyDetails -> {}//migrated
 		is ScreenData.KeyDetailsMulti -> {
@@ -113,16 +102,14 @@ fun ModalSelector(
 			is ModalData.SeedMenu -> {} //migrated
 			is ModalData.NetworkSelector -> NetworkSelector(
 				modalData.f,
-				button2
+				button2,
 			)
 			is ModalData.Backup -> {} //new screen is part of key details subgraph
 			is ModalData.PasswordConfirm -> {
-				if (FeatureFlags.isDisabled(FeatureOption.NEW_DERIVATION)) {
-					DerivePasswordConfirmOld(
-						modalData.f,
-						signerDataModel = signerDataModel
-					)
-				}
+				//this is part of Derivation flow and should never called here
+				submitErrorState("unreacheble state reached - root navigator should never " +
+					"get to confirm password as it's part derivation details and never " +
+					"called now $modalData")
 			}
 			is ModalData.SignatureReady -> {} //in new selector
 			is ModalData.EnterPassword -> {} //in new selector

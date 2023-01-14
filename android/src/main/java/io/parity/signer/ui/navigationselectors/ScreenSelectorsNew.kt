@@ -121,15 +121,13 @@ fun CombinedScreensSelector(
 			rootNavigator.navigate(BottomBarSingleton.lastUsedTab.toAction())
 		}
 		is ScreenData.DeriveKey -> {
-			if (FeatureFlags.isEnabled(FeatureOption.NEW_DERIVATION)) {
-				Box(
-					modifier = Modifier
-						.background(MaterialTheme.colors.background)
-				) {
-					DerivationCreateSubgraph(
-						rootNavigator, screenData.f.seedName, screenData.f.networkSpecsKey
-					)
-				}
+			Box(
+				modifier = Modifier
+					.background(MaterialTheme.colors.background)
+			) {
+				DerivationCreateSubgraph(
+					rootNavigator, screenData.f.seedName, screenData.f.networkSpecsKey
+				)
 			}
 		}
 		else -> {} //old Selector showing them
