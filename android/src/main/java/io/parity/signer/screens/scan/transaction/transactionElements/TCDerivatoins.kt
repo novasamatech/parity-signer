@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import io.parity.signer.R
 import io.parity.signer.ui.theme.*
+import io.parity.signer.uniffi.SeedKeysPreview
 
 @Composable
 fun TCDerivations(payload: List<String>) {

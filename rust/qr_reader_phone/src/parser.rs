@@ -13,11 +13,18 @@ use nom::{bits, IResult};
 use crate::{Error, Result};
 
 pub(crate) struct RaptorqFrame {
+    // size of the original message in bytes
     pub(crate) size: u32,
+
+    // current frame payload
     pub(crate) payload: Vec<u8>,
 }
 
 impl RaptorqFrame {
+    // https://github.com/cberner/raptorq/blob/afe2e83206efdc90c3da614e381bf2884994d844/src/base.rs#L77
+    const HEADER_SIZE: u32 = 4;
+
+    // total number of frames needed to reconstruct the original message
     pub(crate) fn total(&self) -> u32 {
         // Decoding algorithm is probabilistic, see documentation of the `raptorq` crate
         // Rephrasing from there, the probability to decode message with h
@@ -27,7 +34,10 @@ impl RaptorqFrame {
         // If one additional packet is added, it is ~ 0.99998.
         // It was decided to add one additional packet in the printed estimate, so that
         // the user expectations are lower.
-        self.size / (self.payload.len() as u32) + 1
+        self.size
+            .checked_div(self.payload.len() as u32 - Self::HEADER_SIZE)
+            .unwrap_or_default()
+            + 1
     }
 }
 

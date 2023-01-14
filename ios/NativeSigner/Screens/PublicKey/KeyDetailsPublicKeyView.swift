@@ -83,7 +83,7 @@ struct KeyDetailsPublicKeyView: View {
                         .padding()
                         .foregroundColor(Asset.accentRed300.swiftUIColor)
                         .font(PrimaryFont.bodyM.font)
-                        .strokeContainerBackground(CornerRadius.small, isError: true)
+                        .strokeContainerBackground(CornerRadius.small, state: .error)
                     }
                 }
                 .padding([.leading, .trailing], Spacing.large)

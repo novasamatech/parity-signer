@@ -38,9 +38,7 @@ struct ScreenSelector: View {
         case let .logDetails(value):
             EventDetails(content: value)
         case let .seedSelector(value):
-            KeySetList(
-                viewModel: .init(listViewModel: KeySetListViewModelBuilder().build(for: value))
-            )
+            KeySetList(viewModel: .init(), dataModel: .constant(value))
         case let .keyDetails(value):
             if let value = value {
                 KeyDetailsPublicKeyView(
@@ -92,15 +90,12 @@ struct ScreenSelector: View {
             )
         case .documents:
             DocumentModal()
-        case let .keyDetailsMulti(value):
-            KeyDetailsMulti(
-                content: value,
-                navigationRequest: navigationRequest
-            )
         // Screens handled outside of Rust navigation
         case .scan:
             EmptyView()
         case .transaction:
+            EmptyView()
+        case .keyDetailsMulti:
             EmptyView()
         }
     }

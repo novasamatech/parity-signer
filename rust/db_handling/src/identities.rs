@@ -53,8 +53,8 @@ use zeroize::Zeroize;
 use constants::ADDRTREE;
 #[cfg(feature = "active")]
 use constants::ALICE_SEED_PHRASE;
-#[cfg(feature = "signer")]
-use constants::TRANSACTION;
+use definitions::derivations::SeedKeysPreview;
+use definitions::helpers::base58_or_eth_to_multisigner;
 #[cfg(feature = "signer")]
 use definitions::helpers::print_multisigner_as_base58_or_eth;
 #[cfg(feature = "signer")]
@@ -62,8 +62,6 @@ use definitions::helpers::{get_multisigner, unhex};
 #[cfg(feature = "signer")]
 use definitions::navigation::ExportedSet;
 use definitions::network_specs::NetworkSpecs;
-#[cfg(feature = "active")]
-use definitions::qr_transfers::ContentDerivations;
 #[cfg(any(feature = "active", feature = "signer"))]
 use definitions::{
     crypto::Encryption,
@@ -86,7 +84,6 @@ use crate::{
 };
 #[cfg(feature = "signer")]
 use crate::{
-    db_transactions::TrDbColdDerivations,
     helpers::{get_address_details, get_network_specs},
     interface_signer::addresses_set_seed_name_network,
 };
@@ -151,9 +148,7 @@ pub struct SeedInfo {
     pub name: String,
 
     /// Public key of the root key.
-    ///
-    /// `None` if user has created no root keys.
-    pub multisigner: Option<MultiSigner>,
+    pub multisigner: MultiSigner,
 
     /// Derived keys.
     pub derived_keys: Vec<AddrInfo>,
@@ -198,12 +193,12 @@ pub fn export_all_addrs<P: AsRef<Path>>(
 
         let multisigner = keys
             .iter()
-            .find(|(_, a)| a.path.is_empty())
-            .map(|(m, _)| m)
-            .cloned();
+            .find(|(_, a)| a.is_root())
+            .map(|(m, _)| m.to_owned())
+            .ok_or(Error::NoRootKeyForSeed(name.to_owned()))?;
 
         for key in keys {
-            if key.1.path.is_empty() {
+            if key.1.is_root() {
                 continue;
             }
 
@@ -218,7 +213,7 @@ pub fn export_all_addrs<P: AsRef<Path>>(
                         for selected_derivation in selected_derivations {
                             if selected_derivation.derivation == key.1.path
                                 && selected_derivation.network_specs_key
-                                    == hex::encode(key.1.network_id[0].encode())
+                                    == hex::encode(key.1.network_id[0].key())
                             {
                                 selected = true;
                                 break;
@@ -263,20 +258,56 @@ pub fn export_all_addrs<P: AsRef<Path>>(
 #[cfg(feature = "signer")]
 pub fn import_all_addrs<P: AsRef<Path>>(
     db_path: P,
-    seed_phrases: HashMap<String, String>,
-    export_info: ExportAddrs,
+    seed_derived_keys: Vec<SeedKeysPreview>,
 ) -> Result<()> {
-    match export_info {
-        ExportAddrs::V1(v1) => import_all_addrs_v1(db_path, v1, seed_phrases),
+    // Address preparation set, to be modified and used as `create_address`
+    // input.
+    let mut adds: Vec<(AddressKey, AddressDetails)> = vec![];
+
+    // Associated `Event` set
+    let mut events: Vec<Event> = vec![];
+
+    for addr in &seed_derived_keys {
+        for derived_key in &addr.derived_keys {
+            let path = derived_key.derivation_path.clone().unwrap_or_default();
+            let network_specs_key =
+                NetworkSpecsKey::from_parts(&derived_key.genesis_hash, &derived_key.encryption);
+            let network_specs = get_network_specs(&db_path, &network_specs_key)?;
+            match create_derivation_address(
+                &db_path,
+                &adds, // a single address is created, no data to check against here
+                &path,
+                &network_specs.specs,
+                &addr.name,
+                &derived_key.address,
+                derived_key
+                    .has_pwd
+                    .ok_or_else(|| Error::MissingPasswordInfo(path.to_owned()))?,
+            ) {
+                // success, updating address preparation set and `Event` set
+                Ok(prep_data) => {
+                    adds = prep_data.address_prep;
+                    events.extend_from_slice(&prep_data.history_prep);
+                }
+                // exactly same address already exists, ignoring it
+                Err(Error::DerivationExists { .. }) => (),
+
+                // some other error, processed as a real error
+                Err(e) => return Err(e),
+            }
+        }
     }
+    TrDbCold::new()
+        .set_addresses(upd_id_batch(Batch::default(), adds)) // modify addresses data
+        .set_history(events_to_batch(&db_path, events)?) // add corresponding history
+        .apply(&db_path)
 }
 
 #[cfg(feature = "signer")]
-fn import_all_addrs_v1<P: AsRef<Path>>(
-    db_path: P,
-    v1: ExportAddrsV1,
+pub fn inject_derivations_has_pwd(
+    mut seed_derived_keys: Vec<SeedKeysPreview>,
     seeds: HashMap<String, String>,
-) -> Result<()> {
+) -> Result<Vec<SeedKeysPreview>> {
     let mut sr25519_signers = HashMap::new();
     let mut ed25519_signers = HashMap::new();
     let mut ecdsa_signers = HashMap::new();
@@ -290,32 +321,72 @@ fn import_all_addrs_v1<P: AsRef<Path>>(
         ecdsa_signers.insert(ecdsa_public, k);
     }
 
-    for addr in &v1.addrs {
-        for derived_key in &addr.derived_keys {
-            if let Some(derivation_path) = &derived_key.derivation_path {
-                let seed_name = match addr.multisigner {
-                    Some(MultiSigner::Sr25519(p)) => sr25519_signers.get(&p),
-                    Some(MultiSigner::Ed25519(p)) => ed25519_signers.get(&p),
-                    Some(MultiSigner::Ecdsa(p)) => ecdsa_signers.get(&p),
-                    None => None,
-                };
-                if let Some(seed_name) = seed_name {
-                    let _ = try_create_address(
-                        seed_name,
-                        seeds.get(seed_name.as_str()).unwrap(),
-                        derivation_path,
-                        &NetworkSpecsKey::from_parts(
-                            &derived_key.genesis_hash,
-                            &derived_key.encryption,
-                        ),
-                        &db_path,
-                    );
+    for addr in seed_derived_keys.iter_mut() {
+        for mut derived_key in addr.derived_keys.iter_mut() {
+            let path = derived_key.derivation_path.clone().unwrap_or_default();
+            let seed_name = match addr.multisigner {
+                MultiSigner::Sr25519(p) => sr25519_signers.get(&p),
+                MultiSigner::Ed25519(p) => ed25519_signers.get(&p),
+                MultiSigner::Ecdsa(p) => ecdsa_signers.get(&p),
+            };
+
+            let seed_name = if let Some(seed_name) = seed_name {
+                seed_name
+            } else {
+                continue;
+            };
+
+            let seed_phrase = if let Some(seed_phrase) = seeds.get(seed_name.as_str()) {
+                seed_phrase
+            } else {
+                continue;
+            };
+
+            // create fixed-length string to avoid reallocation
+            let mut full_address = String::with_capacity(seed_phrase.len() + path.len());
+            full_address.push_str(seed_phrase);
+            full_address.push_str(&path);
+
+            let multisigner_pwdless = match derived_key.encryption {
+                Encryption::Ed25519 => match ed25519::Pair::from_string(&full_address, None) {
+                    Ok(a) => {
+                        full_address.zeroize();
+                        MultiSigner::Ed25519(a.public())
+                    }
+                    Err(e) => {
+                        full_address.zeroize();
+                        return Err(Error::SecretStringError(e));
+                    }
+                },
+                Encryption::Sr25519 => match sr25519::Pair::from_string(&full_address, None) {
+                    Ok(a) => {
+                        full_address.zeroize();
+                        MultiSigner::Sr25519(a.public())
+                    }
+                    Err(e) => {
+                        full_address.zeroize();
+                        return Err(Error::SecretStringError(e));
+                    }
+                },
+                Encryption::Ecdsa | Encryption::Ethereum => {
+                    match ecdsa::Pair::from_string(&full_address, None) {
+                        Ok(a) => {
+                            full_address.zeroize();
+                            MultiSigner::Ecdsa(a.public())
+                        }
+                        Err(e) => {
+                            full_address.zeroize();
+                            return Err(Error::SecretStringError(e));
+                        }
+                    }
                 }
-            }
+            };
+            let multisigner =
+                base58_or_eth_to_multisigner(&derived_key.address, &derived_key.encryption)?;
+            derived_key.has_pwd = Some(multisigner_pwdless != multisigner);
         }
     }
-
-    Ok(())
+    Ok(seed_derived_keys)
 }
 
 /// Get all existing addresses from the database.
@@ -545,15 +616,6 @@ where
     if seed_phrase.is_empty() {
         return Err(Error::EmptySeed);
     }
-
-    // Check that the seed name is not empty.
-    if seed_name.is_empty() {
-        return Err(Error::EmptySeedName);
-    }
-    let mut address_prep = input_batch_prep.to_vec();
-    let network_specs_key =
-        NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
-
     // create fixed-length string to avoid reallocations
     let mut full_address = String::with_capacity(seed_phrase.len() + path.len());
     full_address.push_str(seed_phrase);
@@ -594,11 +656,6 @@ where
         }
     };
 
-    let public_key = multisigner_to_public(&multisigner);
-    let address_key = AddressKey::from_multisigner(&multisigner);
-
-    // derivation path is cut here, only cropped part (without password) gets
-    // stored
     // TODO regex elements may keep the line with password somewhere, how to
     // zeroize then? checked regex crate and it appears that only references are
     // moved around; need to double-check later;
@@ -609,6 +666,65 @@ where
         },
         None => ("", false),
     };
+
+    do_create_address(
+        db_path,
+        input_batch_prep,
+        cropped_path,
+        network_specs,
+        seed_name,
+        multisigner,
+        has_pwd,
+    )
+}
+
+#[cfg(any(feature = "active", feature = "signer"))]
+pub(crate) fn create_derivation_address<P>(
+    db_path: P,
+    input_batch_prep: &[(AddressKey, AddressDetails)],
+    path: &str,
+    network_specs: &NetworkSpecs,
+    seed_name: &str,
+    ss58: &str,
+    has_pwd: bool,
+) -> Result<PrepData>
+where
+    P: AsRef<Path>,
+{
+    let multisigner = base58_or_eth_to_multisigner(ss58, &network_specs.encryption)?;
+    do_create_address(
+        db_path,
+        input_batch_prep,
+        path,
+        network_specs,
+        seed_name,
+        multisigner,
+        has_pwd,
+    )
+}
+
+fn do_create_address<P>(
+    db_path: P,
+    input_batch_prep: &[(AddressKey, AddressDetails)],
+    cropped_path: &str,
+    network_specs: &NetworkSpecs,
+    seed_name: &str,
+    multisigner: MultiSigner,
+    has_pwd: bool,
+) -> Result<PrepData>
+where
+    P: AsRef<Path>,
+{
+    // Check that the seed name is not empty.
+    if seed_name.is_empty() {
+        return Err(Error::EmptySeedName);
+    }
+    let mut address_prep = input_batch_prep.to_vec();
+    let network_specs_key =
+        NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
+
+    let public_key = multisigner_to_public(&multisigner);
+    let address_key = AddressKey::from_multisigner(&multisigner);
 
     // prepare history log here
     let identity_history = IdentityHistory::get(
@@ -1067,7 +1183,7 @@ where
 ///
 // TODO regex and secrets, see `create_address` comments.
 #[cfg(feature = "signer")]
-pub(crate) fn is_passworded(path: &str) -> Result<bool> {
+pub fn is_passworded(path: &str) -> Result<bool> {
     let passworded = REG_PATH
         .captures(path)
         .map(|caps| caps.name("password").is_some())
@@ -1354,80 +1470,6 @@ where
         .apply(&db_path)
 }
 
-/// Create a set of addresses using imported derivations set for user-selected
-/// seed.
-///
-/// Function creates addresses in the Signer database for the derivations
-/// received as a part of `derivations` payload. Derivations are already checked
-/// and temporarily stored in `TRANSACTIONS` tree of the Signer database.
-/// Function retrieves the checked data from the database using input checksum.
-///
-/// If an address already exists in the database, i.e. the [`AddressDetails`]
-/// data associated with the [`AddressKey`] contains exactly same derivation
-/// path and `network_id` set contains the network [`NetworkSpecsKey`], it is
-/// ignored.
-///
-/// Collision with address already in the database or with another address from
-/// derivations set produces an error.
-///
-/// Function inputs secret seed phrase as `&str`. It is passed as `&str` into
-/// into `create_address` and used there.
-///
-// TODO this is likely to be considerably changed as soon as UI/UX design
-// appears
-#[cfg(feature = "signer")]
-pub fn import_derivations<P>(
-    checksum: u32,
-    seed_name: &str,
-    seed_phrase: &str,
-    db_path: P,
-) -> Result<()>
-where
-    P: AsRef<Path>,
-{
-    // derivations data retrieved from the database
-    let content_derivations = TrDbColdDerivations::from_storage(&db_path, checksum)?;
-
-    // [`OrderedNetworkSpecs`] for the network in which the addresses are generated
-    let network_specs = content_derivations.network_specs();
-
-    // Address preparation set, to be modified and used as `create_address`
-    // input.
-    let mut adds: Vec<(AddressKey, AddressDetails)> = Vec::new();
-
-    // Associated `Event` set
-    let mut events: Vec<Event> = Vec::new();
-
-    for path in content_derivations.checked_derivations().iter() {
-        // try creating address for each of the derivations
-        match create_address(
-            &db_path,
-            &adds,
-            path,
-            &network_specs.specs,
-            seed_name,
-            seed_phrase,
-        ) {
-            // success, updating address preparation set and `Event` set
-            Ok(prep_data) => {
-                adds = prep_data.address_prep;
-                events.extend_from_slice(&prep_data.history_prep);
-            }
-
-            // exactly same address already exists, ignoring it
-            Err(Error::DerivationExists { .. }) => (),
-
-            // some other error, processed as a real error
-            Err(e) => return Err(e),
-        }
-    }
-    TrDbCold::new()
-        .set_addresses(upd_id_batch(Batch::default(), adds)) // modify addresses data
-        .set_history(events_to_batch(&db_path, events)?) // add corresponding history
-        .set_transaction(make_batch_clear_tree(&db_path, TRANSACTION)?) // clear transaction tree
-        .apply(&db_path)
-}
-
 /// Check derivations before offering user to import them.
 ///
 /// Signer allows bulk import only for valid derivations, with or without
@@ -1451,62 +1493,6 @@ pub fn check_derivation_set(derivations: &[String]) -> Result<()> {
         }
     }
     Ok(())
-}
-
-/// Prepare derivations import content [`ContentDerivations`].
-///
-/// Function is used on the active side. It inputs information about network in
-/// which the derivations would be created (genesis hash and `Encryption`), and
-/// the plain text user derivations set.
-///
-/// Derivations allowed in the import set must be valid, with or without
-/// password. The derivations source file must have derivations as a list with
-/// each new derivation on the new line.
-///
-/// The source plain text is cut in lines and each line is processes using regex,
-/// all invalid derivations are ignored. Function prints found valid
-/// password-free derivations as is and passworded with only public part
-/// visible (e.g. `//alice///<password>`).
-#[cfg(feature = "active")]
-pub fn prepare_derivations_import(
-    encryption: &Encryption,
-    genesis_hash: H256,
-    content: &str,
-) -> Result<ContentDerivations> {
-    let mut derivations: Vec<String> = Vec::new();
-    let mut display_derivations: Vec<String> = Vec::new();
-    let content_set: Vec<&str> = content.trim().split('\n').collect();
-    for path in content_set.iter() {
-        if let Some(caps) = REG_PATH.captures(path) {
-            if let Some(p) = caps.name("path") {
-                derivations.push(path.to_string());
-                let display = {
-                    if caps.name("password").is_none() {
-                        p.as_str().to_string()
-                    } else {
-                        format!("{}///<password>", p.as_str())
-                    }
-                };
-                display_derivations.push(display);
-            }
-        }
-    }
-    if display_derivations.is_empty() {
-        return Err(Error::NoValidDerivationToExport);
-    } else {
-        println!(
-            "Found and used {} valid derivations:",
-            display_derivations.len()
-        );
-        for x in display_derivations.iter() {
-            println!("\"{}\"", x);
-        }
-    }
-    Ok(ContentDerivations::generate(
-        encryption,
-        genesis_hash,
-        &derivations,
-    ))
 }
 
 #[cfg(feature = "signer")]

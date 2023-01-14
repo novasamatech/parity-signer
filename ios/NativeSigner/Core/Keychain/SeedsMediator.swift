@@ -44,6 +44,7 @@ protocol SeedsMediating: AnyObject {
     /// Also calls auth screen automatically; no need to call it specially or wrap
     /// - Parameter seedName: seed name to fetch
     func getSeed(seedName: String) -> String
+    func getAllSeeds() -> [String: String]
     func getSeeds(seedNames: Set<String>) -> [String: String]
     /// Gets seed backup by `seedName` from Keychain
     /// Calls auth screen automatically; no need to call it specially or wrap
@@ -192,6 +193,10 @@ final class SeedsMediator: SeedsMediating {
             signerDataModel.authenticated = false
             return [:]
         }
+    }
+
+    func getAllSeeds() -> [String: String] {
+        getSeeds(seedNames: Set(seedNames))
     }
 
     func removeSeed(seedName: String) {
