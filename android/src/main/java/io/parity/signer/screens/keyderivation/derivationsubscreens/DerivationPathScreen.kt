@@ -91,7 +91,7 @@ fun DerivationPathScreen(
 			value = path.value, //hide password, add hint
 			onValueChange = { newStr -> path.value = newStr },
 			keyboardOptions = KeyboardOptions(
-				imeAction = if (canProceed) ImeAction.Done else ImeAction.None //todo derivation
+				imeAction = if (canProceed) ImeAction.Done else ImeAction.None
 			),
 			visualTransformation = DerivationPathVisualTransformation(
 				context = LocalContext.current,
@@ -99,7 +99,9 @@ fun DerivationPathScreen(
 				hidePassword = !passwordVisible,
 			),
 			keyboardActions = KeyboardActions(onDone = {
-				if (canProceed) {
+				if (hasPassword) {
+					passwordFocusRequester.requestFocus()
+				} else {
 					onDoneLocal()
 				}
 			}),
@@ -228,14 +230,10 @@ fun DerivationPathScreen(
 				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
 				keyboardOptions = KeyboardOptions(
 					keyboardType = KeyboardType.Password,
-					imeAction = if (canProceed) ImeAction.Done else ImeAction.None
+					imeAction = ImeAction.Done
 				),
 				keyboardActions = KeyboardActions(onDone = {
-					//todo derivations
-//						if (canProceed) {
-//							proceed(password)
-//							focusManager.clearFocus(true)
-//						}
+					onDoneLocal()
 				}),
 				isError = passwordNotMatch,
 				label = { Text(text = stringResource(R.string.derivation_path_screen_password_empty_hint)) },
