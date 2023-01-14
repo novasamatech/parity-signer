@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TransactionWrapper: Identifiable {
     let id = UUID()
-    let content: MTransaction
+    var content: MTransaction
 }
 
 struct TransactionPreview: View {
@@ -44,6 +44,7 @@ struct TransactionPreview: View {
         }
         .onAppear {
             viewModel.use(navigation: navigation)
+            viewModel.onAppear()
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .bottomEdgeOverlay(
@@ -61,8 +62,10 @@ struct TransactionPreview: View {
     @ViewBuilder
     func singleTransaction(content: MTransaction) -> some View {
         VStack(alignment: .leading, spacing: Spacing.medium) {
-            TransactionErrorsView(content: content)
-                .padding(.horizontal, Spacing.medium)
+            if !content.transactionIssuesCards().isEmpty {
+                TransactionErrorsView(content: content)
+                    .padding(.horizontal, Spacing.medium)
+            }
             switch content.ttype {
             case .sign,
                  .read:
@@ -77,21 +80,24 @@ struct TransactionPreview: View {
             // Used when new network is being added
             // User when network metadata is being added
             // Cards are redesigned to present new design
-            case .stub:
+            case .stub,
+                 .done:
                 VStack {
                     ForEach(content.sortedValueCards(), id: \.index) { card in
                         TransactionCardView(card: card)
                     }
                 }
                 .padding(Spacing.medium)
-            case .done,
-                 .importDerivations:
+            case .importDerivations:
                 VStack {
                     ForEach(content.sortedValueCards(), id: \.index) { card in
-                        TransactionCardView(card: card)
+                        TransactionCardSelector(card: card)
+                            .frame(minHeight: Heights.minTransactionCardHeight)
+                            .onAppear {
+                                print("Card info: \(card.index)  \(card.indent)  \(card.card)")
+                            }
                     }
                 }
-                .padding(Spacing.medium)
             }
         }
     }
@@ -148,12 +154,16 @@ struct TransactionPreview: View {
                     text: Localizable.TransactionPreview.Action.done.key,
                     style: .secondary()
                 )
-            case .stub,
-                 .importDerivations:
+            case .stub:
                 PrimaryButton(
                     action: viewModel.onApproveTap,
-                    text: transactionType == .stub ? Localizable.TransactionPreview.Action.approve.key : Localizable
-                        .TransactionPreview.Action.selectSeed.key,
+                    text: Localizable.TransactionPreview.Action.approve.key,
+                    style: .primary()
+                )
+            case .importDerivations:
+                PrimaryButton(
+                    action: viewModel.onImportKeysTap,
+                    text: Localizable.ImportKeys.Action.import.key,
                     style: .primary()
                 )
             case .done,
@@ -210,10 +220,14 @@ struct TransactionPreview: View {
             return Localizable.TransactionSign.Label.Header.network.string
         case .metadata:
             return Localizable.TransactionSign.Label.Header.metadata.string
+        case let .importKeys(keysCount):
+            return keysCount == 1 ?
+                Localizable.ImportKeys.Label.Title.single.string :
+                Localizable.ImportKeys.Label.Title.multiple(keysCount)
         default:
             return transactionsCount == 1 ?
                 Localizable.TransactionSign.Label.Header.single.string :
-                Localizable.TransactionSign.Label.Header.multiple(viewModel.dataModel.count)
+                Localizable.TransactionSign.Label.Header.multiple(transactionsCount)
         }
     }
 }
@@ -223,12 +237,13 @@ extension TransactionPreview {
         @Binding var isPresented: Bool
         @Published var isDetailsPresented: Bool = false
         @Published var selectedDetails: MTransaction!
+        @Published var dataModel: [TransactionWrapper]
         private weak var navigation: NavigationCoordinator!
         private weak var data: SignerDataModel!
         private let seedsMediator: SeedsMediating
         private let snackbarPresentation: BottomSnackbarPresentation
+        private let importKeysService: ImportDerivedKeysService
 
-        let dataModel: [TransactionWrapper]
         let signature: MSignatureReady?
 
         init(
@@ -236,13 +251,15 @@ extension TransactionPreview {
             content: [MTransaction],
             signature: MSignatureReady?,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation
+            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
+            importKeysService: ImportDerivedKeysService = ImportDerivedKeysService()
         ) {
             _isPresented = isPresented
             dataModel = content.map { TransactionWrapper(content: $0) }
             self.signature = signature
             self.seedsMediator = seedsMediator
             self.snackbarPresentation = snackbarPresentation
+            self.importKeysService = importKeysService
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -251,6 +268,42 @@ extension TransactionPreview {
 
         func use(data: SignerDataModel) {
             self.data = data
+        }
+
+        func onAppear() {
+            updateImportDerivationsIfNeeeded()
+        }
+
+        /// For `ttype` transaction of `importDerivations`, we need to update data by passing all seed phrases to Rust
+        private func updateImportDerivationsIfNeeeded() {
+            let seedPreviews = dataModel.map(\.content).allImportDerivedKeys
+            guard !seedPreviews.isEmpty else { return }
+
+            importKeysService.updateWithSeeds(seedPreviews) { result in
+                switch result {
+                case let .success(updatedSeeds):
+                    self.updateImportDerivationsData(updatedSeeds)
+                case .failure:
+                    self.snackbarPresentation.viewModel = .init(
+                        title: Localizable.ImportKeys.Snackbar.Failure.unknown.string,
+                        style: .warning
+                    )
+                    self.snackbarPresentation.isSnackbarPresented = true
+                    self.isPresented.toggle()
+                }
+            }
+        }
+
+        /// We need to mutate existing data model in an ugly way as Rust data model
+        /// features miriad of enums with associated values and nested array models...
+        ///
+        /// Logic here is to find `TransactionCard` with `importingDerivations` and just replace its
+        /// `.derivationsCard(f: [SeedKeysPreview])` enum value with update `[SeedKeysPreview]`
+        private func updateImportDerivationsData(_ updatedSeeds: [SeedKeysPreview]) {
+            guard let indexToUpdate = dataModel.firstIndex(where: { $0.content.content.importingDerivations != nil })
+            else { return }
+            dataModel[indexToUpdate].content.content
+                .importingDerivations = [.init(index: 0, indent: 0, card: .derivationsCard(f: updatedSeeds))]
         }
 
         func onBackButtonTap() {
@@ -289,18 +342,33 @@ extension TransactionPreview {
             }
         }
 
-        func signTransaction() {
-            let seedName = dataModel.compactMap { $0.content.authorInfo?.address.seedName }.first
-            let seedPhrase = seedsMediator.getSeed(seedName: seedName ?? "")
-            let actionResult = navigation.performFake(
-                navigation:
-                .init(
-                    action: .goForward,
-                    details: "",
-                    seedPhrase: seedPhrase
-                )
-            )
-            print(actionResult)
+        func onImportKeysTap() {
+            let importableKeys = dataModel.map(\.content).importableSeedKeysPreviews
+
+            importKeysService.importDerivedKeys(importableKeys) { result in
+                let derivedKeysCount = self.dataModel.map(\.content).importableKeysCount
+                switch result {
+                case .success:
+                    if derivedKeysCount == 1 {
+                        self.snackbarPresentation
+                            .viewModel = .init(title: Localizable.ImportKeys.Snackbar.Success.single.string)
+                    } else {
+                        self.snackbarPresentation
+                            .viewModel = .init(
+                                title: Localizable.ImportKeys.Snackbar.Success
+                                    .multiple(derivedKeysCount)
+                            )
+                    }
+                case .failure:
+                    self.snackbarPresentation.viewModel = .init(
+                        title: Localizable.ImportKeys.Snackbar.Failure.unknown.string,
+                        style: .warning
+                    )
+                }
+
+                self.snackbarPresentation.isSnackbarPresented = true
+                self.isPresented.toggle()
+            }
         }
 
         func presentDetails(for content: MTransaction) {
@@ -310,25 +378,27 @@ extension TransactionPreview {
     }
 }
 
-struct TransactionPreview_Previews: PreviewProvider {
-    static var previews: some View {
-        // Single transaction
-        TransactionPreview(viewModel: .init(
-            isPresented: Binding<Bool>.constant(true),
-            content: [PreviewData.signTransaction],
-            signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
-        ))
-        .environmentObject(NavigationCoordinator())
-        .environmentObject(SignerDataModel())
-        .preferredColorScheme(.dark)
-        // Multi transaction (i.e. different QR code design)
-        TransactionPreview(viewModel: .init(
-            isPresented: Binding<Bool>.constant(true),
-            content: [PreviewData.signTransaction, PreviewData.signTransaction],
-            signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
-        ))
-        .environmentObject(NavigationCoordinator())
-        .environmentObject(SignerDataModel())
+#if DEBUG
+    struct TransactionPreview_Previews: PreviewProvider {
+        static var previews: some View {
+            // Single transaction
+            TransactionPreview(viewModel: .init(
+                isPresented: Binding<Bool>.constant(true),
+                content: [PreviewData.signTransaction],
+                signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
+            ))
+            .environmentObject(NavigationCoordinator())
+            .environmentObject(SignerDataModel())
+            .preferredColorScheme(.dark)
+            // Multi transaction (i.e. different QR code design)
+            TransactionPreview(viewModel: .init(
+                isPresented: Binding<Bool>.constant(true),
+                content: [PreviewData.signTransaction, PreviewData.signTransaction],
+                signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
+            ))
+            .environmentObject(NavigationCoordinator())
+            .environmentObject(SignerDataModel())
 //        .preferredColorScheme(.dark)
+        }
     }
-}
+#endif

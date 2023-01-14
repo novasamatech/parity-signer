@@ -25,7 +25,6 @@ use parity_scale_codec::{Decode, Encode};
 #[cfg(feature = "active")]
 use std::path::Path;
 
-use crate::crypto::Encryption;
 use crate::error::Result;
 #[cfg(feature = "signer")]
 use crate::helpers::pic_types;
@@ -241,59 +240,5 @@ impl ContentLoadTypes {
         let types_hash = blake2_256(&self.store()).as_ref().to_vec();
         let types_id_pic = pic_types(&types_hash);
         (hex::encode(types_hash), types_id_pic)
-    }
-}
-
-/// Derivations import QR code content  
-///
-/// Derivations import could be used to generate or to restore a set of
-/// derivations in Signer avoiding manual adding.  
-///
-/// Popular request.  
-///
-/// In addition to derivations themselves, contains information about encryption
-/// and genesis hash of the network in which the corresponding keys would be
-/// generated or updated.  
-#[derive(Decode, Encode)]
-pub struct ContentDerivations(Vec<u8>);
-
-#[derive(Decode, Encode)]
-struct DecodedContentDerivations {
-    encryption: Encryption,
-    genesis_hash: H256,
-    derivations: Vec<String>,
-}
-
-impl ContentDerivations {
-    /// Generate [`ContentDerivations`] from network encryption [`Encryption`],
-    /// genesis hash `H256`, and set of derivations `&[String]`.  
-    pub fn generate(encryption: &Encryption, genesis_hash: H256, derivations: &[String]) -> Self {
-        Self(
-            DecodedContentDerivations {
-                encryption: encryption.to_owned(),
-                genesis_hash,
-                derivations: derivations.to_vec(),
-            }
-            .encode(),
-        )
-    }
-
-    /// Transform `&[u8]` slice into [`ContentDerivations`].  
-    pub fn from_slice(slice: &[u8]) -> Self {
-        Self(slice.to_vec())
-    }
-
-    /// Get encryption [`Encryption`], genesis hash `H256` and derivations `Vec<String>`
-    /// from [`ContentDerivations`] as a tuple.
-    #[cfg(feature = "signer")]
-    pub fn encryption_genhash_derivations(&self) -> Result<(Encryption, H256, Vec<String>)> {
-        let a = <DecodedContentDerivations>::decode(&mut &self.0[..])?;
-        Ok((a.encryption, a.genesis_hash, a.derivations))
-    }
-
-    /// Transform [`ContentDerivations`] into `Vec<u8>` that is concatenated with
-    /// prelude to get the QR code data.  
-    pub fn to_transfer(&self) -> Vec<u8> {
-        self.0.to_vec()
     }
 }

@@ -498,6 +498,32 @@
 "VerifierCertificate.Label.Title" = "Verifier Certificate";
 "VerifierCertificate.Action.Remove" = "Remove certificate";
 
+"ImportKeys.Label.Title.Single" = "Import Key";
+"ImportKeys.Label.Title.Multiple" = "Import %@ Keys";
+"ImportKeys.Label.Title.Derived" = "%@ Derived Keys Can Be Imported";
+"ImportKeys.Action.Import" = "Import Keys";
+"ImportKeys.Error.Label.KeySetMissing" = "Some keys can not be imported until their key sets are recovered. Please recover the missing Key Sets.";
+"ImportKeys.Error.Action.KeySetMissing" = "Recover Key Set";
+"ImportKeys.Error.Label.NetworkMissing" = "Some keys can not be imported until their networks are added. Please add missing networks and their metadata.";
+"ImportKeys.Error.Action.NetworkMissing" = "Add Network";
+"ImportKeys.Error.Label.AlreadyImported" = "Some are hidden from the list because they have already been imported.";
+"ImportKeys.Error.Label.BadFormat" = "Some are hidden from the list because they have already been imported.";
+"ImportKeys.Snackbar.Success.Single" = "1 Key Has Been Imported";
+"ImportKeys.Snackbar.Success.Multiple" = "%@ Keys Has Been Imported";
+"ImportKeys.Snackbar.Failure.Unknown" = "Import Keys Has Failed";
+"ImportKeys.ErrorModal.MissingNetwork.Label.Title" = "Please add missing networks and their metadata.";
+"ImportKeys.ErrorModal.MissingNetwork.Label.Content" = "Some keys can not be imported until their networks are added.";
+"ImportKeys.ErrorModal.MissingNetwork.Action.ok" = "Got It";
+"ImportKeys.ErrorModal.MissingKeySets.Label.Title" = "Please recover the missing Key Sets.";
+"ImportKeys.ErrorModal.MissingKeySets.Label.Content" = "Some keys can not be imported until their key sets are recovered.";
+"ImportKeys.ErrorModal.MissingKeySets.Action.ok" = "Got It";
+"ImportKeys.ErrorModal.BadFormat.Label.Title" = "Import keys paths in bad format";
+"ImportKeys.ErrorModal.BadFormat.Label.Content" = "Some keys paths are in bad format so they cannot be imported";
+"ImportKeys.ErrorModal.BadFormat.Action.ok" = "Got It";
+"ImportKeys.ErrorModal.AlreadyExists.Label.Title" = "Derived keys already exist";
+"ImportKeys.ErrorModal.AlreadyExists.Label.Content" = "All of the scanned derived keys are already imported";
+"ImportKeys.ErrorModal.AlreadyExists.Action.ok" = "Got It";
+
 "NetworkFilter.Label.Header" = "Filter keys by network";
 "NetworkFilter.Action.Reset" = "Reset";
 "NetworkFilter.Action.Done" = "Done";

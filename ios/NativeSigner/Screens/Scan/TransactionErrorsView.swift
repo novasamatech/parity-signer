@@ -21,7 +21,7 @@ struct TransactionErrorsView: View {
             .padding(Spacing.medium)
             .font(PrimaryFont.bodyM.font)
             .foregroundColor(Asset.accentRed300.swiftUIColor)
-            .strokeContainerBackground(CornerRadius.small, isError: true)
+            .strokeContainerBackground(CornerRadius.small, state: .error)
         } else {
             EmptyView()
         }

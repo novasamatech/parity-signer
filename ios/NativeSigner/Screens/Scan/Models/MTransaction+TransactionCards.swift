@@ -97,11 +97,14 @@ extension MTransaction {
         case addNetwork(network: String)
         case metadata(network: String, version: String)
         case transfer
+        case importKeys(keysCount: Int)
         case unknown
     }
 
     var previewType: TransactionPreviewType {
         switch ttype {
+        case .importDerivations:
+            return .importKeys(keysCount: importableKeysCount)
         case .stub:
             return sortedValueCards().compactMap {
                 switch $0.card {

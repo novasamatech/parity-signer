@@ -18,7 +18,7 @@ struct TCError: View {
         .foregroundColor(Asset.accentRed300.swiftUIColor)
         .font(PrimaryFont.bodyM.font)
         .padding(Spacing.small)
-        .containerBackground(isError: true)
+        .containerBackground(state: .error)
     }
 }
 
