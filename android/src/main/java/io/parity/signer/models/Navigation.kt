@@ -72,14 +72,25 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 					if (BuildConfig.DEBUG) throw RuntimeException("Invalid navigation state - cannot export key. You should never see it. ${keyDetails == null}")
 					return
 				}
-				val secretKeyDetailsQR = generateSecretKeyQr(
-					dbname = singleton.dbName,
-					publicKey = action.publicKey,
-					expectedSeedName = keyDetails.address.seedName,
-					networkSpecsKey = keyDetails.networkInfo.networkSpecsKey,
-					seedPhrase = singleton.getSeed(keyDetails.address.seedName),
-					keyPassword = null
-				)
+				val secretKeyDetailsQR = try {
+					generateSecretKeyQr(
+						dbname = singleton.dbName,
+						publicKey = action.publicKey,
+						expectedSeedName = keyDetails.address.seedName,
+						networkSpecsKey = keyDetails.networkInfo.networkSpecsKey,
+						seedPhrase = singleton.getSeed(keyDetails.address.seedName),
+						keyPassword = null
+					)
+				} catch (e: Exception) {
+					//todo issue #1533
+					Toast.makeText(
+						singleton.context,
+						"For passworded keys not yet supported",
+						Toast.LENGTH_LONG
+					).show()
+					navigate(Action.GO_BACK) // close bottom sheet from rust stack
+					return
+				}
 				val model = PrivateKeyExportModel(
 					qrData = secretKeyDetailsQR.qr.getData(),
 					keyCard = KeyCardModel(
