@@ -113,7 +113,10 @@ fun DerivationPathScreen(
 			isError = pathValidity != DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD,
 			singleLine = true,
 			textStyle = SignerTypeface.LabelM,
-			colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
+			colors = TextFieldDefaults.textFieldColors(
+				textColor = MaterialTheme.colors.primary,
+				errorCursorColor = MaterialTheme.colors.primary,
+			),
 			modifier = Modifier
 				.focusRequester(pathFocusRequester)
 				.fillMaxWidth(1f)
@@ -246,7 +249,10 @@ fun DerivationPathScreen(
 				label = { Text(text = stringResource(R.string.derivation_path_screen_password_empty_hint)) },
 				singleLine = true,
 				textStyle = SignerTypeface.LabelM,
-				colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
+				colors = TextFieldDefaults.textFieldColors(
+					textColor = MaterialTheme.colors.primary,
+					errorCursorColor = MaterialTheme.colors.primary,
+				),
 				trailingIcon = {
 					val image = if (passwordVisible) Icons.Filled.Visibility
 					else Icons.Filled.VisibilityOff
