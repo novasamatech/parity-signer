@@ -9,7 +9,6 @@ import SwiftUI
 
 struct NetworkSelectionModal: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var appState: AppState
 
     var body: some View {
@@ -36,9 +35,8 @@ struct NetworkSelectionModal: View {
                     // List of networks
                     LazyVStack {
                         ForEach(
-                            viewModel.networks
-                                .sorted(by: { $0.order < $1.order }),
-                            id: \.order
+                            viewModel.networks,
+                            id: \.key
                         ) {
                             item(for: $0)
                         }
@@ -61,13 +59,12 @@ struct NetworkSelectionModal: View {
         )
         .onAppear {
             viewModel.use(appState: appState)
-            viewModel.use(navigation: navigation)
             viewModel.loadCurrentSelection()
         }
     }
 
     @ViewBuilder
-    func item(for network: Network) -> some View {
+    func item(for network: MmNetwork) -> some View {
         HStack(alignment: .center, spacing: 0) {
             NetworkLogoIcon(logo: network.logo)
                 .padding(.trailing, Spacing.small)
@@ -94,10 +91,9 @@ struct NetworkSelectionModal: View {
 extension NetworkSelectionModal {
     final class ViewModel: ObservableObject {
         private weak var appState: AppState!
-        private weak var navigation: NavigationCoordinator!
         @Published var animateBackground: Bool = false
-        @Published var networks: [Network] = []
-        @Published var selectedNetworks: [Network] = []
+        @Published var networks: [MmNetwork] = []
+        @Published var selectedNetworks: [MmNetwork] = []
         @Binding var isPresented: Bool
 
         init(
@@ -111,36 +107,29 @@ extension NetworkSelectionModal {
             networks = appState.userData.allNetworks
         }
 
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-        }
-
         func loadCurrentSelection() {
             selectedNetworks = appState.userData.selectedNetworks
         }
 
         func cancelAction() {
-            navigation.performFake(navigation: .init(action: .goBack))
             animateDismissal()
         }
 
         func resetAction() {
             appState.userData.selectedNetworks = []
-            navigation.performFake(navigation: .init(action: .goBack))
             animateDismissal()
         }
 
         func doneAction() {
             appState.userData.selectedNetworks = selectedNetworks
-            navigation.performFake(navigation: .init(action: .goBack))
             animateDismissal()
         }
 
-        func isSelected(_ network: Network) -> Bool {
+        func isSelected(_ network: MmNetwork) -> Bool {
             selectedNetworks.contains(network)
         }
 
-        func toggleSelection(_ network: Network) {
+        func toggleSelection(_ network: MmNetwork) {
             if selectedNetworks.contains(network) {
                 selectedNetworks.removeAll { $0 == network }
             } else {

@@ -231,6 +231,18 @@ fn substrate_path_check(
     db_handling::interface_signer::dynamic_path_check(dbname, seed_name, path, network)
 }
 
+fn try_create_address(
+    seed_name: &str,
+    seed_phrase: &str,
+    path: &str,
+    network: &str,
+    dbname: &str,
+) -> anyhow::Result<(), String> {
+    let network = NetworkSpecsKey::from_hex(network).map_err(|e| format!("{}", e))?;
+    db_handling::identities::try_create_address(seed_name, seed_phrase, path, &network, dbname)
+        .map_err(|e| format!("{}", e))
+}
+
 /// Must be called once on normal first start of the app upon accepting conditions; relies on old
 /// data being already removed
 fn history_init_history_with_cert(dbname: &str) -> anyhow::Result<(), String> {
@@ -294,6 +306,11 @@ fn encode_to_qr(payload: &[u8], is_danger: bool) -> anyhow::Result<Vec<u8>, Stri
         DataType::Regular
     };
     qrcode_static::png_qr(payload, sensitivity).map_err(|e| format!("{}", e))
+}
+
+/// Get all networks registered within this device
+fn get_all_networks(dbname: &str) -> anyhow::Result<Vec<MMNetwork>, String> {
+    db_handling::interface_signer::show_all_networks(dbname).map_err(|e| format!("{}", e))
 }
 
 /// Must be called once to initialize logging from Rust in development mode.
