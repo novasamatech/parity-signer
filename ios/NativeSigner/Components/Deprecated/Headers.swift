@@ -7,23 +7,16 @@
 
 import SwiftUI
 
-struct HeadingOverline: View {
-    var text: LocalizedStringKey
-    var body: some View {
-        Text(text)
-            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-            .font(PrimaryFont.labelS.font)
-            .tracking(0.5)
-            .textCase(.uppercase)
-    }
-}
-
 struct HeaderBar: View {
     var line1: LocalizedStringKey
     var line2: LocalizedStringKey
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            HeadingOverline(text: line1)
+            Text(line1)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .font(PrimaryFont.labelS.font)
+                .tracking(0.5)
+                .textCase(.uppercase)
             Text(line2)
                 .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                 .font(PrimaryFont.bodyM.font)

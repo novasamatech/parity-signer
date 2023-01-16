@@ -9,44 +9,29 @@ import SwiftUI
 
 struct ModalSelector: View {
     @EnvironmentObject private var data: SignerDataModel
-    let modalData: ModalData?
-    let alert: Bool
-    let alertShow: () -> Void
-    let navigationRequest: NavigationRequest
-    let removeSeed: (String) -> Void
-    let restoreSeed: (String, String) -> Void
-    let createAddress: (String, String) -> Void
-    let sign: (String, String) -> Void
+    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
-        switch modalData {
+        switch navigation.actionResult.modalData {
         case let .passwordConfirm(value):
             PasswordConfirm(
-                content: value,
-                createAddress: createAddress
+                content: value
             )
         case let .sufficientCryptoReady(value):
             SufficientCryptoReady(content: value)
         case let .typesInfo(value):
             TypesMenu(
-                content: value,
-                navigationRequest: navigationRequest
+                content: value
             )
         case let .newSeedBackup(value):
             NewSeedBackupModal(
-                content: value,
-                restoreSeed: restoreSeed,
-                navigationRequest: navigationRequest
+                content: value
             )
         case .logComment:
-            LogComment(
-                navigationRequest: navigationRequest
-            )
+            LogComment()
         case let .selectSeed(value):
             SelectSeed(
-                content: value,
-                sign: sign,
-                navigationRequest: navigationRequest
+                content: value
             )
         // Handled in native navigation
         case
