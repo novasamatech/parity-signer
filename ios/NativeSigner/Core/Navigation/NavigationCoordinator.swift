@@ -133,7 +133,8 @@ private extension NavigationCoordinator {
              .vVerifier,
              .manageNetworks,
              .nNetworkDetails,
-             .deriveKey:
+             .deriveKey,
+             .newSeed:
             updatedShouldSkipInjectedViews = true
         default:
             updatedShouldSkipInjectedViews = false

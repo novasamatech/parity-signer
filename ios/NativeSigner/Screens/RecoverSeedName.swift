@@ -11,8 +11,7 @@ struct RecoverSeedName: View {
     @State private var seedName: String = ""
     @FocusState private var nameFocused: Bool
     let content: MRecoverSeedName
-    let checkSeedCollision: (String) -> Bool
-    let navigationRequest: NavigationRequest
+    @EnvironmentObject var navigation: NavigationCoordinator
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -29,8 +28,8 @@ struct RecoverSeedName: View {
                     .keyboardType(.asciiCapable)
                     .submitLabel(.done)
                     .onSubmit {
-                        if !seedName.isEmpty, !checkSeedCollision(seedName) {
-                            navigationRequest(.init(action: .goForward, details: seedName))
+                        if !seedName.isEmpty, !ServiceLocator.seedsMediator.checkSeedCollision(seedName: seedName) {
+                            navigation.perform(navigation: .init(action: .goForward, details: seedName))
                         }
                     }
                     .onAppear(perform: {
@@ -41,12 +40,15 @@ struct RecoverSeedName: View {
             }
             Localizable.displayNameVisibleOnlyToYou.text.font(.callout)
             Spacer()
-            BigButton(
-                text: Localizable.next.key,
+            PrimaryButton(
                 action: {
-                    navigationRequest(.init(action: .goForward, details: seedName))
+                    navigation.perform(navigation: .init(action: .goForward, details: seedName))
                 },
-                isDisabled: seedName.isEmpty || checkSeedCollision(seedName)
+                text: Localizable.next.key,
+                style: .primary(isDisabled: .constant(
+                    (seedName.isEmpty) || ServiceLocator.seedsMediator
+                        .checkSeedCollision(seedName: seedName)
+                ))
             )
             Spacer()
         }.padding()

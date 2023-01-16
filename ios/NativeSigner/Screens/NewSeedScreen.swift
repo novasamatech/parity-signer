@@ -8,51 +8,68 @@
 import SwiftUI
 
 struct NewSeedScreen: View {
+    let content: MNewSeed
     @State private var seedName: String = ""
     @FocusState private var nameFocused: Bool
-    let content: MNewSeed
-    let checkSeedCollision: (String) -> Bool
-    let navigationRequest: NavigationRequest
+    @EnvironmentObject var navigation: NavigationCoordinator
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Localizable.displayName.text
-                .font(PrimaryFont.labelS.font)
-                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Asset.fill12.swiftUIColor)
-                    .frame(height: 39)
-                TextField(Localizable.seed.string, text: $seedName, prompt: Localizable.seedName.text)
-                    .focused($nameFocused)
+        VStack(alignment: .leading, spacing: 0) {
+            NavigationBarView(
+                viewModel: .init(
+                    title: nil,
+                    leftButton: .xmark,
+                    rightButton:
+                    .activeAction(
+                        Localizable.NewSeed.Name.Action.next.key,
+                        .constant(
+                            (seedName.isEmpty) || ServiceLocator.seedsMediator
+                                .checkSeedCollision(seedName: seedName)
+                        )
+                    )
+                ),
+                actionModel: .init(
+                    rightBarMenuAction: {
+                        self.nameFocused = false
+                        self.navigation.perform(navigation: .init(action: .goForward, details: seedName))
+                    }
+                )
+            )
+            VStack(alignment: .leading, spacing: 0) {
+                Localizable.NewSeed.Name.Label.title.text
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .font(PrimaryFont.titleL.font)
+                    .padding(.top, Spacing.extraSmall)
+                Localizable.NewSeed.Name.Label.header.text
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .font(PrimaryFont.bodyL.font)
+                    .padding(.vertical, Spacing.extraSmall)
+                TextField("", text: $seedName)
+                    .primaryTextFieldStyle(
+                        Localizable.NewSeed.Name.Label.placeholder.string,
+                        text: $seedName
+                    )
+                    .focused($nameFocused)
                     .disableAutocorrection(true)
                     .keyboardType(.asciiCapable)
                     .submitLabel(.done)
                     .onSubmit {
                         nameFocused = false
-                        if !seedName.isEmpty, !checkSeedCollision(seedName) {
-                            navigationRequest(.init(action: .goForward, details: seedName))
+                        if !seedName.isEmpty, !ServiceLocator.seedsMediator.checkSeedCollision(seedName: seedName) {
+                            navigation.perform(navigation: .init(action: .goForward, details: seedName))
                         }
                     }
                     .onAppear(perform: {
                         nameFocused = content.keyboard
                     })
-                    .padding(.horizontal, 8)
+                    .padding(.vertical, Spacing.medium)
+                Localizable.NewSeed.Name.Label.footer.text
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(PrimaryFont.captionM.font)
+                Spacer()
             }
-            Localizable.displayNameIsVisibleOnlyOnThisDevice.text.font(.callout)
-            Spacer()
-            BigButton(
-                text: Localizable.NewSeed.generate.key,
-                action: {
-                    nameFocused = false
-                    navigationRequest(.init(action: .goForward, details: seedName))
-                },
-                isDisabled: (seedName.isEmpty) || checkSeedCollision(seedName)
-            )
-            Spacer()
-        }.padding()
+            .padding(.horizontal, Spacing.large)
+        }
     }
 }
 

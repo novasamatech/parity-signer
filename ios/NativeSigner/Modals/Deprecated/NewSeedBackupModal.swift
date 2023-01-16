@@ -14,43 +14,59 @@ struct NewSeedBackupModal: View {
     @EnvironmentObject var navigation: NavigationCoordinator
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.backgroundSecondary.swiftUIColor)
-            VStack {
-                HeaderBar(line1: Localizable.backupSeedPhrase.key, line2: LocalizedStringKey(content.seed))
+        VStack {
+            NavigationBarView(
+                viewModel: .init(
+                    title: nil,
+                    leftButton: .arrow
+                )
+            )
+            VStack(alignment: .center, spacing: 0) {
+                Localizable.NewSeed.Backup.Label.header.text
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .font(PrimaryFont.bodyL.font)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(Spacing.extraSmall)
+            }
+            .padding(.top, Spacing.extraSmall)
+            .padding(.bottom, Spacing.medium)
+            .padding(.horizontal, Spacing.medium)
+            VStack(alignment: .leading, spacing: 0) {
                 SeedPhraseView(viewModel: .init(seedPhrase: content.seedPhrase))
-                VStack(spacing: 16) {
-                    Button(
-                        action: {
-                            confirmBackup.toggle()
-                        },
-                        label: {
-                            HStack {
-                                (confirmBackup ? Image(.checkmark, variant: .square) : Image(.square))
-                                    .imageScale(.large)
-                                Localizable.iHaveWrittenDownMySeedPhrase.text
-                                    .multilineTextAlignment(.leading)
-                                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                                Spacer()
-                            }
+                    .padding(.bottom, Spacing.medium)
+                Button(
+                    action: {
+                        confirmBackup.toggle()
+                    },
+                    label: {
+                        HStack {
+                            (confirmBackup ? Asset.checkboxChecked.swiftUIImage : Asset.checkboxEmpty.swiftUIImage)
+                                .foregroundColor(Asset.accentPink300.swiftUIColor)
+                            Localizable.iHaveWrittenDownMySeedPhrase.text
+                                .multilineTextAlignment(.leading)
+                                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            Spacer()
                         }
-                    )
-                    Spacer()
-                    PrimaryButton(
-                        action: {
-                            ServiceLocator.seedsMediator.restoreSeed(
-                                seedName: content.seed,
-                                seedPhrase: content.seedPhrase,
-                                navigate: true
-                            )
-                        },
-                        text: Localizable.next.key,
-                        style: .primary(isDisabled: .constant(!confirmBackup))
-                    )
-                    .padding(.vertical, 16.0)
-                }
-            }.padding(16)
+                    }
+                )
+                .padding(.vertical, Spacing.small)
+                Spacer()
+                PrimaryButton(
+                    action: {
+                        ServiceLocator.seedsMediator.restoreSeed(
+                            seedName: content.seed,
+                            seedPhrase: content.seedPhrase,
+                            navigate: true
+                        )
+                    },
+                    text: Localizable.NewSeed.Backup.Action.create.key,
+                    style: .primary(isDisabled: .constant(!confirmBackup))
+                )
+                .padding(.vertical, Spacing.medium)
+            }
+            .padding(.horizontal, Spacing.medium)
         }
+        .background(Asset.backgroundSecondary.swiftUIColor)
     }
 }
 

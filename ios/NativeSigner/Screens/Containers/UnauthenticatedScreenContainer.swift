@@ -15,12 +15,13 @@ struct UnauthenticatedScreenContainer: View {
         Button(
             action: { seedsMediator.refreshSeeds() },
             label: {
-                BigButton(
-                    text: Localizable.unlockApp.key,
+                PrimaryButton(
                     action: {
                         seedsMediator.refreshSeeds()
                         data.totalRefresh()
-                    }
+                    },
+                    text: Localizable.unlockApp.key,
+                    style: .primary()
                 )
             }
         )
