@@ -10,7 +10,7 @@ import SwiftUI
 struct TypesMenu: View {
     var content: MTypesInfo
 
-    let navigationRequest: NavigationRequest
+    @EnvironmentObject var navigation: NavigationCoordinator
     @State private var removeTypesAlert = false
     var body: some View {
         MenuStack {
@@ -24,23 +24,25 @@ struct TypesMenu: View {
                 Localizable.preV14TypesNotInstalled.text
             }
             MenuButtonsStack {
-                BigButton(
+                PrimaryButton(
+                    action: {
+                        navigation.perform(navigation: .init(action: .signTypes))
+                    },
                     text: Localizable.signTypes.key,
-                    isShaded: true,
-                    isCrypto: true,
-                    action: { navigationRequest(.init(action: .signTypes)) }
+                    style: .primary()
                 )
-                BigButton(
+                PrimaryButton(
+                    action: {
+                        removeTypesAlert = true
+                    },
                     text: Localizable.deleteTypes.key,
-                    isShaded: true,
-                    isDangerous: true,
-                    action: { removeTypesAlert = true }
+                    style: .primaryDestructive()
                 )
             }
         }
         .gesture(DragGesture().onEnded { drag in
             if drag.translation.height > 40 {
-                navigationRequest(.init(action: .goBack))
+                navigation.perform(navigation: .init(action: .goBack))
             }
         })
         .alert(isPresented: $removeTypesAlert, content: {
@@ -50,7 +52,7 @@ struct TypesMenu: View {
                 primaryButton: .cancel(Localizable.cancel.text),
                 secondaryButton: .destructive(
                     Localizable.removeTypes.text,
-                    action: { navigationRequest(.init(action: .removeTypes)) }
+                    action: { self.navigation.perform(navigation: .init(action: .removeTypes)) }
                 )
             )
         })

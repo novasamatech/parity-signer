@@ -10,19 +10,9 @@ import SwiftUI
 struct ScreenSelector: View {
     @EnvironmentObject private var data: SignerDataModel
     @EnvironmentObject var navigation: NavigationCoordinator
-    @EnvironmentObject var appState: AppState
-
-    let screenData: ScreenData
-    let navigationRequest: NavigationRequest
-    let getSeed: (String) -> String
-    let createAddress: (String, String) -> Void
-    let checkSeedCollision: (String) -> Bool
-    let restoreSeed: (String, String) -> Void
-    let alertShow: () -> Void
-    let increment: (String, String) -> Void
 
     var body: some View {
-        switch screenData {
+        switch navigation.actionResult.screenData {
         case let .keys(keyName):
             KeyDetailsView(
                 viewModel: .init(
@@ -53,21 +43,15 @@ struct ScreenSelector: View {
             }
         case let .newSeed(value):
             NewSeedScreen(
-                content: value,
-                checkSeedCollision: checkSeedCollision,
-                navigationRequest: navigationRequest
+                content: value
             )
         case let .recoverSeedName(value):
             RecoverSeedName(
-                content: value,
-                checkSeedCollision: checkSeedCollision,
-                navigationRequest: navigationRequest
+                content: value
             )
         case let .recoverSeedPhrase(value):
             RecoverSeedPhrase(
-                content: value,
-                restoreSeed: restoreSeed,
-                navigationRequest: navigationRequest
+                content: value
             )
         case let .deriveKey(value):
             CreateDerivedKeyView(viewModel: .init(seedName: value.seedName))
@@ -79,14 +63,11 @@ struct ScreenSelector: View {
             NetworkSettingsDetails(viewModel: .init(networkDetails: value))
         case let .signSufficientCrypto(value):
             SignSufficientCrypto(
-                content: value,
-                navigationRequest: navigationRequest,
-                getSeed: getSeed
+                content: value
             )
         case let .selectSeedForBackup(value):
             SelectSeedForBackup(
-                content: value,
-                navigationRequest: navigationRequest
+                content: value
             )
         case .documents:
             DocumentModal()
