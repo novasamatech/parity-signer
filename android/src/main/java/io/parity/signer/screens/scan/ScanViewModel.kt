@@ -35,6 +35,8 @@ class ScanViewModel : ViewModel() {
 		MutableStateFlow(null)
 	var signature: MutableStateFlow<MSignatureReady?> =
 		MutableStateFlow(null)
+	var bananaSplitPassword: MutableStateFlow<String?> =
+		MutableStateFlow(null)
 	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
 	val presentableError: MutableStateFlow<String?> =
@@ -107,22 +109,27 @@ class ScanViewModel : ViewModel() {
 	}
 
 	fun ifHasStateThenClear(): Boolean {
-		return if (transactions.value != null
+		return if (
+			transactions.value != null
 			|| signature.value != null
 			|| passwordModel.value != null
 			|| presentableError.value != null
 			|| transactionIsInProgress.value
 			|| errorWrongPassword.value
+			|| bananaSplitPassword.value != null
 		) {
 			clearTransactionState()
 			true
-		} else false
+		} else {
+			false
+		}
 	}
 
 	fun clearTransactionState() {
 		transactions.value = null
 		signature.value = null
 		passwordModel.value = null
+		bananaSplitPassword.value = null
 		presentableError.value = null
 		transactionIsInProgress.value = false
 		errorWrongPassword.value = false

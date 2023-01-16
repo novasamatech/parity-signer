@@ -14,6 +14,7 @@ import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.components.panels.BottomBarSingleton
 import io.parity.signer.components.panels.toAction
 import io.parity.signer.models.Navigator
+import io.parity.signer.screens.scan.bananasplit.BananaSplitPasswordScreen
 import io.parity.signer.screens.scan.camera.ScanScreen
 import io.parity.signer.screens.scan.elements.ScanErrorBottomSheet
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
@@ -37,6 +38,8 @@ fun ScanNavSubgraph(
 
 	val transactions = scanViewModel.transactions.collectAsState()
 	val signature = scanViewModel.signature.collectAsState()
+	val bananaSplitPassword = scanViewModel.bananaSplitPassword.collectAsState()
+
 	val presentableError = scanViewModel.presentableError.collectAsState()
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
@@ -58,14 +61,27 @@ fun ScanNavSubgraph(
 
 	//Full screens
 	val transactionsValue = transactions.value
-	if (transactionsValue == null || showingModals) {
+	val bananaQrData = bananaSplitPassword.value
+	if (bananaQrData != null) {
+
+		BananaSplitPasswordScreen(
+			onClose = { /*TODO*/ },
+			onDone = {}, //todo banana split
+			onShowError = { error -> },
+		)
+	} else if (transactionsValue == null || showingModals) {
+
 		ScanScreen(
 			onClose = { navigateToPrevious() },
 			performPayloads = { payloads ->
 				scanViewModel.performPayload(payloads)
+			},
+			onBananaSplit = { payloads ->
+				scanViewModel.bananaSplitPassword.value = payloads
 			}
 		)
 	} else {
+
 		TransactionsScreenFull(
 			transactions = transactionsValue.transactions,
 			signature = signature.value,

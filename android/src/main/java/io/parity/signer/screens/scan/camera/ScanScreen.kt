@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 fun ScanScreen(
 	onClose: Callback,
 	performPayloads: suspend (String) -> Unit,
+	onBananaSplit: (String) -> Unit,
 ) {
 	val viewModel: CameraViewModel = viewModel()
 
@@ -179,7 +180,7 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 private fun PreviewScanScreen() {
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			ScanScreen({}, { _ -> })
+			ScanScreen({}, { _ -> }, { _ -> })
 		}
 	}
 }

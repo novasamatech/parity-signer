@@ -37,11 +37,12 @@ import io.parity.signer.ui.theme.red500
 fun BananaSplitPasswordScreen(
 	onClose: Callback,
 	onDone: Callback,
+	onShowError: (String) -> Unit,
 ) {
-	var canProceed by remember { mutableStateOf(false) } //todo banana
-
 	var name by remember { mutableStateOf("") }
 	var password by remember { mutableStateOf("") }
+
+	val canProceed = name.isNotEmpty() && password.isNotEmpty()
 
 	val focusManager = LocalFocusManager.current
 	val pathFocusRequester = remember { FocusRequester() }
@@ -180,6 +181,7 @@ private fun PreviewBananaSplitPasswordScreen() {
 		BananaSplitPasswordScreen(
 			onClose = {},
 			onDone = {},
+			onShowError = {_ ->}
 		)
 	}
 }
