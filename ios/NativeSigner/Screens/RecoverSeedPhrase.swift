@@ -8,12 +8,11 @@
 import SwiftUI
 
 struct RecoverSeedPhrase: View {
+    @EnvironmentObject var navigation: NavigationCoordinator
     @State private var userInput: String = " "
     @State private var shadowUserInput: String = " "
     @FocusState private var focus: Bool
     let content: MRecoverSeedPhrase
-    let restoreSeed: (String, String) -> Void
-    let navigationRequest: NavigationRequest
 
     var body: some View {
         ZStack {
@@ -28,13 +27,13 @@ struct RecoverSeedPhrase: View {
                             )
                             .lineLimit(nil)
                             .fixedSize(horizontal: false, vertical: true)
-                            .font(PrimaryFont.labelM.font)
+                            .font(.robotoMono)
                             .foregroundColor(Asset.accentPink300.swiftUIColor)
                             .padding(12)
                             Divider().foregroundColor(Asset.fill12.swiftUIColor)
                             HStack {
                                 Text(">").foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                                    .font(PrimaryFont.bodyL.font)
+                                    .font(.robotoMono)
                                 TextField(Localizable.seed.string, text: $userInput, prompt: Localizable.seedName.text)
                                     .focused($focus)
                                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
@@ -44,7 +43,7 @@ struct RecoverSeedPhrase: View {
                                     .keyboardType(.asciiCapable)
                                     .submitLabel(.done)
                                     .onChange(of: userInput, perform: { word in
-                                        navigationRequest(.init(action: .textEntry, details: word))
+                                        navigation.perform(navigation: .init(action: .textEntry, details: word))
                                         shadowUserInput = word
                                     })
                                     .onSubmit {}
@@ -67,37 +66,33 @@ struct RecoverSeedPhrase: View {
                         ScrollView(.horizontal) {
                             LazyHStack {
                                 ForEach(content.guessSet, id: \.self) { guess in
-                                    VStack {
-                                        Button(
-                                            action: {
-                                                navigationRequest(.init(action: .pushWord, details: guess))
-                                            },
-                                            label: {
-                                                Text(guess)
-                                                    .foregroundColor(Asset.accentForegroundText.swiftUIColor)
-                                                    .font(PrimaryFont.captionM.font)
-                                                    .padding(.horizontal, 12)
-                                                    .padding(.vertical, 4)
-                                                    .background(
-                                                        RoundedRectangle(cornerRadius: 4)
-                                                            .foregroundColor(Asset.accentPink300.swiftUIColor)
-                                                    )
-                                            }
-                                        )
-                                    }
+                                    Text(guess)
+                                        .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                        .font(PrimaryFont.labelS.font)
+                                        .padding([.top, .bottom], Spacing.extraSmall)
+                                        .padding([.leading, .trailing], Spacing.small)
+                                        .background(Asset.accentPink12.swiftUIColor)
+                                        .clipShape(Capsule())
+                                        .onTapGesture {
+                                            navigation.perform(navigation: .init(action: .pushWord, details: guess))
+                                        }
                                 }
                             }
-                        }.frame(height: 23)
+                        }
                         Spacer()
                         HStack {
-                            BigButton(
-                                text: Localizable.next.key,
+                            PrimaryButton(
                                 action: {
-                                    restoreSeed(content.seedName, content.readySeed ?? "")
+                                    ServiceLocator.seedsMediator.restoreSeed(
+                                        seedName: content.seedName,
+                                        seedPhrase: content.readySeed ?? "",
+                                        navigate: true
+                                    )
                                 },
-                                isDisabled: content.readySeed == nil
+                                text: Localizable.next.key,
+                                style: .primary(isDisabled: .constant(content.readySeed == nil))
                             )
-                            .padding(.top, 16.0)
+                            .padding(Spacing.medium)
                         }
                     }.padding(.horizontal)
                 }

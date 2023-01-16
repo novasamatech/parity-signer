@@ -303,10 +303,7 @@ extension DerivationPathNameView {
                         return (
                             !isPasswordValid ||
                                 passwordConfirmation.isEmpty ||
-                                inputText.components(separatedBy: DerivationPathComponent.passworded.description)
-                                .last == nil ||
-                                inputText.components(separatedBy: DerivationPathComponent.passworded.description)
-                                .last != passwordConfirmation ||
+                                !self.isPasswordConfirmationValid() ||
                                 self.derivationPathError != nil
                         )
                     } else {
@@ -315,6 +312,15 @@ extension DerivationPathNameView {
                 }
                 .assign(to: \.isMainActionDisabled, on: self)
                 .store(in: cancelBag)
+        }
+
+        private func isPasswordConfirmationValid() -> Bool {
+            guard isPassworded else { return true }
+            if let range = inputText.range(of: DerivationPathComponent.passworded.description) {
+                let substring = inputText.suffix(from: range.upperBound)
+                return substring == passwordConfirmation
+            }
+            return false
         }
     }
 }

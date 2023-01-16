@@ -19,13 +19,23 @@ struct AuthenticatedScreenContainer: View {
     var body: some View {
         VStack(spacing: 0) {
             if !navigation.shouldSkipInjectedViews {
-                HeaderViewContainer()
+                NavigationBarView(
+                    viewModel: .init(
+                        title: navigation.actionResult.screenLabel,
+                        leftButton: navigation.actionResult.back ? .arrow : .empty,
+                        rightButton: [.none, .multiSelect]
+                            .contains(navigation.actionResult.rightButton) ? .empty : .more
+                    ),
+                    actionModel: .init(
+                        rightBarMenuAction: { self.navigation.perform(navigation: .init(action: .rightButtonAction)) }
+                    )
+                )
             }
             ZStack {
                 VStack(spacing: 0) {
-                    ScreenSelectorView()
+                    ScreenSelector()
                 }
-                ModalSelectorView()
+                ModalSelector()
             }
             .gesture(
                 DragGesture().updating($dragOffset, body: { value, _, _ in

@@ -110,7 +110,7 @@ final class SeedsMediator: SeedsMediating {
     }
 
     @discardableResult
-    func restoreSeed(seedName: String, seedPhrase: String, navigate: Bool) -> Bool {
+    func restoreSeed(seedName: String, seedPhrase: String, navigate: Bool = true) -> Bool {
         guard let finalSeedPhrase = seedPhrase.data(using: .utf8) else { return false }
         if navigate, checkSeedPhraseCollision(seedPhrase: seedPhrase) {
             return false

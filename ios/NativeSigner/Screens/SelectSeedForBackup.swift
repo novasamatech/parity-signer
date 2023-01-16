@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SelectSeedForBackup: View {
     let content: MSeeds
-    let navigationRequest: NavigationRequest
+    @EnvironmentObject var navigation: NavigationCoordinator
     var body: some View {
         VStack {
             ScrollView {
@@ -21,7 +21,8 @@ struct SelectSeedForBackup: View {
                         HStack {
                             Button(
                                 action: {
-                                    navigationRequest(.init(action: .backupSeed, details: seedNameCard.seedName))
+                                    navigation
+                                        .perform(navigation: .init(action: .backupSeed, details: seedNameCard.seedName))
                                 },
                                 label: {
                                     SeedCardForManager(seedNameCard: seedNameCard)
