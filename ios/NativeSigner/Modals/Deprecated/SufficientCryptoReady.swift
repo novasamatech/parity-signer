@@ -20,10 +20,14 @@ struct SufficientCryptoReady: View {
                     line1: Localizable.yourSignature.key,
                     line2: Localizable.scanItIntoYourApplication.key
                 )
-                Image(uiImage: UIImage(data: Data(content.sufficient)) ?? UIImage())
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .padding(12)
+                AnimatedQRCodeView(
+                    viewModel: Binding<AnimatedQRCodeViewModel>.constant(
+                        .init(
+                            qrCodes: [content.sufficient]
+                        )
+                    )
+                )
+                .padding(Spacing.small)
                 AddressCard(card: content.authorInfo)
                 switch content.content {
                 case let .addSpecs(network):

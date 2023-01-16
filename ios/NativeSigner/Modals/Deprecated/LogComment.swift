@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LogComment: View {
-    let navigationRequest: NavigationRequest
+    @EnvironmentObject var navigation: NavigationCoordinator
     @State private var comment: String = ""
     @FocusState private var focused: Bool
     var body: some View {
@@ -38,7 +38,7 @@ struct LogComment: View {
                                 focused = true
                             }
                             .onSubmit {
-                                navigationRequest(.init(action: .goForward, details: comment))
+                                navigation.perform(navigation: .init(action: .goForward, details: comment))
                             }
                     }
                 }

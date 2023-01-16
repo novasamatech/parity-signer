@@ -9,8 +9,8 @@ import SwiftUI
 
 struct SignSufficientCrypto: View {
     let content: MSignSufficientCrypto
-    let navigationRequest: NavigationRequest
-    let getSeed: (String) -> String
+    @EnvironmentObject var navigation: NavigationCoordinator
+    let seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
     var body: some View {
         VStack {
             Localizable.selectKeyForSigning.text
@@ -19,9 +19,9 @@ struct SignSufficientCrypto: View {
                     ForEach(content.identities, id: \.addressKey) { keyrecord in
                         Button(
                             action: {
-                                let seedPhrase = getSeed(keyrecord.address.seedName)
+                                let seedPhrase = seedsMediator.getSeed(seedName: keyrecord.address.seedName)
                                 if !seedPhrase.isEmpty {
-                                    navigationRequest(.init(
+                                    navigation.perform(navigation: .init(
                                         action: .goForward,
                                         details: keyrecord.addressKey,
                                         seedPhrase: seedPhrase
