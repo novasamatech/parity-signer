@@ -9,21 +9,16 @@ import SwiftUI
 
 struct NewSeedBackupModal: View {
     let content: MNewSeedBackup
-    let restoreSeed: (String, String) -> Void
-    let navigationRequest: NavigationRequest
     @State private var confirmBackup = false
+
+    @EnvironmentObject var navigation: NavigationCoordinator
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.backgroundSecondary.swiftUIColor)
             VStack {
                 HeaderBar(line1: Localizable.backupSeedPhrase.key, line2: LocalizedStringKey(content.seed))
-                ZStack {
-                    Text(content.seedPhrase)
-                        .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                        .foregroundColor(Asset.accentPink300.swiftUIColor)
-                        .padding(8)
-                }
-                .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.backgroundSecondary.swiftUIColor))
+                SeedPhraseView(viewModel: .init(seedPhrase: content.seedPhrase))
                 VStack(spacing: 16) {
                     Button(
                         action: {
@@ -41,12 +36,16 @@ struct NewSeedBackupModal: View {
                         }
                     )
                     Spacer()
-                    BigButton(
-                        text: Localizable.next.key,
+                    PrimaryButton(
                         action: {
-                            restoreSeed(content.seed, content.seedPhrase)
+                            ServiceLocator.seedsMediator.restoreSeed(
+                                seedName: content.seed,
+                                seedPhrase: content.seedPhrase,
+                                navigate: true
+                            )
                         },
-                        isDisabled: !confirmBackup
+                        text: Localizable.next.key,
+                        style: .primary(isDisabled: .constant(!confirmBackup))
                     )
                     .padding(.vertical, 16.0)
                 }
