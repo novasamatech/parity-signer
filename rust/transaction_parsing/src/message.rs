@@ -36,10 +36,13 @@ where
 
     match try_get_network_specs(&db_path, &network_specs_key)? {
         Some(network_specs) => {
-            let address_key = AddressKey::from_multisigner(&author_multi_signer);
+            let address_key = AddressKey::new(
+                author_multi_signer.clone(),
+                network_specs.specs.base58prefix,
+            );
             match try_get_address_details(&db_path, &address_key)? {
                 Some(address_details) => {
-                    if address_details.network_id.contains(&network_specs_key) {
+                    if address_details.network_id == network_specs_key {
                         let message_card = Card::ParserCard(&ParserCard::Text(display_msg))
                             .card(&mut index, indent);
                         let sign = TrDbColdSignOne::generate(

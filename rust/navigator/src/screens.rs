@@ -8,7 +8,7 @@ use crate::{
     states::TransactionState,
 };
 use db_handling::{
-    helpers::get_address_details,
+    helpers::{get_address_details, get_network_specs},
     identities::get_multisigner_by_address,
     interface_signer::{first_network, SeedDraft},
 };
@@ -224,27 +224,23 @@ impl AddressState {
         let lines: Vec<_> = details_str.lines().collect();
         let hex_address_key = lines[0];
         let network_specs_key = lines.get(1);
-
-        let address_key = AddressKey::from_hex(hex_address_key)?;
-        let multisigner = if let Ok(m) = address_key.multi_signer() {
-            m
-        } else if let Some(key) = get_multisigner_by_address(database_name, &address_key)? {
-            key
-        } else {
-            return Err(Error::KeyNotFound(format!("{:?}", address_key)));
-        };
-        let is_root =
-            get_address_details(database_name, &AddressKey::from_multisigner(&multisigner))?
-                .is_root();
         let network_specs_key = if let Some(network_specs_key) = &network_specs_key {
-            Some(NetworkSpecsKey::from_hex(network_specs_key)?)
+            NetworkSpecsKey::from_hex(network_specs_key)?
         } else {
-            None
+            return Err(Error::KeyNotFound("network specs key".to_string()));
         };
+        let address_key = AddressKey::from_hex(hex_address_key)?;
+        let multisigner = address_key.multi_signer().clone();
+        let network_specs = get_network_specs(database_name, &network_specs_key)?;
+        let is_root = get_address_details(
+            database_name,
+            &AddressKey::new(multisigner.clone(), network_specs.specs.base58prefix),
+        )?
+        .is_root();
 
         Ok(Self {
             seed_name: keys_state.seed_name(),
-            network_specs_key,
+            network_specs_key: Some(network_specs_key),
             multisigner,
             is_root,
         })
@@ -281,9 +277,13 @@ impl AddressStateMulti {
         database_name: &str,
     ) -> Result<Self> {
         let mut set: Vec<(MultiSigner, bool)> = Vec::new();
+        let network = get_network_specs(database_name, &network_specs_key)?;
+
         for multisigner in multiselect.iter() {
-            let address_details =
-                get_address_details(database_name, &AddressKey::from_multisigner(multisigner))?;
+            let address_details = get_address_details(
+                database_name,
+                &AddressKey::new(multisigner.clone(), network.specs.base58prefix),
+            )?;
             set.push((multisigner.to_owned(), address_details.is_root()))
         }
         Ok(Self {
@@ -432,7 +432,7 @@ impl SufficientCryptoState {
         };
 
         let identicon = make_identicon_from_multisigner(multisigner, style);
-        let address_key = hex::encode(AddressKey::from_multisigner(multisigner).key());
+        let address_key = hex::encode(AddressKey::new(multisigner.clone(), 42).key());
         let author_info = MAddressCard {
             base58: hex::encode(multisigner_to_public(multisigner)),
             address_key,
@@ -592,7 +592,7 @@ mod tests {
             seed_name: String::from("Alice"),
             path: String::from("//alice"),
             has_pwd: false,
-            network_id: Vec::new(),
+            network_id: NetworkSpecsKey::from_hex("").unwrap(),
             encryption: Encryption::Sr25519,
             secret_exposed: false,
         }

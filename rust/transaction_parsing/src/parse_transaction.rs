@@ -1,6 +1,6 @@
 use db_handling::{
     db_transactions::{SignContent, TrDbColdSign, TrDbColdSignOne},
-    helpers::{try_get_address_details, try_get_network_specs},
+    helpers::{get_all_networks, try_get_address_details, try_get_network_specs},
 };
 use definitions::{
     history::{Entry, Event, SignDisplay},
@@ -65,12 +65,15 @@ where
 
     match try_get_network_specs(&db_path, &network_specs_key)? {
         Some(network_specs) => {
-            let address_key = AddressKey::from_multisigner(&author_multi_signer);
+            let address_key = AddressKey::new(
+                author_multi_signer.clone(),
+                network_specs.specs.base58prefix,
+            );
             let mut history: Vec<Event> = Vec::new();
 
             let mut cards_prep = match try_get_address_details(&db_path, &address_key)? {
                 Some(address_details) => {
-                    if address_details.network_id.contains(&network_specs_key) {
+                    if address_details.network_id == network_specs_key {
                         CardsPrep::SignProceed(address_details, None)
                     } else {
                         let author_card = (Card::Author {
@@ -311,17 +314,22 @@ where
             Event::TransactionSigned { ref sign_display }
             | Event::TransactionSignError { ref sign_display } => {
                 let VerifierValue::Standard { ref m } = sign_display.signed_by;
-                let address_key = AddressKey::from_multisigner(m);
+                let network = get_all_networks(&db_path)?
+                    .iter()
+                    .find(|network| sign_display.network_name == network.specs.name)
+                    .cloned()
+                    .unwrap();
+
+                let address_key = AddressKey::new(m.clone(), network.specs.base58prefix);
                 let verifier_details = Some(sign_display.signed_by.show_card());
 
                 if let Some(address_details) = try_get_address_details(&db_path, &address_key)? {
                     let mut specs_found = None;
-                    for id in &address_details.network_id {
-                        let specs = try_get_network_specs(&db_path, id)?;
-                        if let Some(ordered_specs) = specs {
-                            if ordered_specs.specs.name == sign_display.network_name {
-                                specs_found = Some(ordered_specs);
-                            }
+                    let id = &address_details.network_id;
+                    let specs = try_get_network_specs(&db_path, id)?;
+                    if let Some(ordered_specs) = specs {
+                        if ordered_specs.specs.name == sign_display.network_name {
+                            specs_found = Some(ordered_specs);
                         }
                     }
 

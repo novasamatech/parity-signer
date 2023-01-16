@@ -5480,7 +5480,7 @@ fn flow_test_1() {
 
         let address = AddressKey::from_hex(&res.key.address_key).unwrap();
         (
-            hex::encode(address.multi_signer().unwrap().as_ref()),
+            hex::encode(address.multi_signer().as_ref()),
             res.key.base58.clone(),
             res.key.address.identicon,
         )
@@ -5792,7 +5792,7 @@ fn flow_test_1() {
 
         let address = AddressKey::from_hex(&res.key.address_key).unwrap();
         (
-            hex::encode(address.multi_signer().unwrap().as_ref()),
+            hex::encode(address.multi_signer().as_ref()),
             res.key.base58.clone(),
             res.key.address.identicon,
         )

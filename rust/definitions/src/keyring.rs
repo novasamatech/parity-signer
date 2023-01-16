@@ -183,17 +183,20 @@ impl VerifierKey {
 /// however, the database stores them under same [`AddressKey`], with a set of
 /// allowed networks.  
 #[derive(Decode, Encode, Debug, PartialEq, Eq, Clone)]
-pub struct AddressKey(Vec<u8>);
-
-/// Decoded `AddressKey` content, struct with `MultiSigner` inside  
-#[derive(Decode, Encode)]
-struct AddressKeyContent(MultiSigner);
+pub struct AddressKey {
+    multisigner: MultiSigner,
+    base58prefix: u16,
+}
 
 impl AddressKey {
     /// Generate [`AddressKey`] from corresponding
     /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html) value  
-    pub fn from_multisigner(multisigner: &MultiSigner) -> Self {
-        Self(AddressKeyContent(multisigner.to_owned()).encode())
+    /// and a network prefix.
+    pub fn new(multisigner: MultiSigner, base58prefix: u16) -> Self {
+        Self {
+            multisigner,
+            base58prefix,
+        }
     }
 
     /// Generate [`AddressKey`] from parts: raw public key and [`Encryption`]  
@@ -201,16 +204,17 @@ impl AddressKey {
     /// Could result in error if public key length does not match the
     /// expected length for chosen encryption algorithm.  
     #[cfg(feature = "signer")]
-    pub fn from_parts(public: &[u8], encryption: &Encryption) -> Result<Self> {
+    pub fn from_parts(public: &[u8], encryption: &Encryption, base58prefix: u16) -> Result<Self> {
         let multisigner = get_multisigner(public, encryption)?;
-        Ok(Self::from_multisigner(&multisigner))
+        Ok(Self::new(multisigner, base58prefix))
     }
 
     /// Transform database `IVec` key into [`AddressKey`] prior to processing  
     ///
     /// Infallible, the validity of resulting `AddressKey` is not checked.
-    pub fn from_ivec(ivec: &IVec) -> Self {
-        Self(ivec.to_vec())
+    pub fn from_ivec(ivec: &IVec) -> Result<Self> {
+        let mut vec = ivec.to_vec();
+        Ok(Self::decode(&mut &vec[..])?)
     }
 
     /// Transform hexadecimal `String` into [`AddressKey`]  
@@ -221,12 +225,12 @@ impl AddressKey {
     /// check happens here.  
     #[cfg(feature = "signer")]
     pub fn from_hex(hex_address_key: &str) -> Result<Self> {
-        Ok(Self(unhex(hex_address_key)?))
+        Ok(Self::decode(&mut &unhex(hex_address_key)?[..])?)
     }
 
     /// Get public key and [`Encryption`] from the [`AddressKey`]  
     pub fn public_key_encryption(&self) -> Result<(Vec<u8>, Encryption)> {
-        match &self.multi_signer()? {
+        match &self.multisigner {
             MultiSigner::Ed25519(b) => Ok((b.to_vec(), Encryption::Ed25519)),
             MultiSigner::Sr25519(b) => Ok((b.to_vec(), Encryption::Sr25519)),
             MultiSigner::Ecdsa(b) => Ok((b.0.to_vec(), Encryption::Ecdsa)),
@@ -235,13 +239,13 @@ impl AddressKey {
 
     /// Get [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
     /// from the [`AddressKey`]  
-    pub fn multi_signer(&self) -> Result<MultiSigner> {
-        Ok(<AddressKeyContent>::decode(&mut &self.0[..])?.0)
+    pub fn multi_signer(&self) -> &MultiSigner {
+        &self.multisigner
     }
 
     /// Transform [`AddressKey`] into `Vec<u8>` database key  
     pub fn key(&self) -> Vec<u8> {
-        self.0.to_vec()
+        self.encode()
     }
 }
 

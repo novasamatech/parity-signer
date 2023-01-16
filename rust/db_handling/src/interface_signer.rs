@@ -162,10 +162,13 @@ pub fn print_all_identities<P>(db_path: P) -> Result<Vec<MRawKey>>
 where
     P: AsRef<Path>,
 {
-    Ok(get_all_addresses(db_path)?
+    Ok(get_all_addresses(&db_path)?
         .into_iter()
         .map(|(multisigner, address_details)| {
-            let address_key = AddressKey::from_multisigner(&multisigner); // to click
+            let network_specs = get_network_specs(&db_path, &address_details.network_id).unwrap();
+
+            let address_key =
+                AddressKey::new(multisigner.clone(), network_specs.specs.base58prefix); // to click
             let public_key = multisigner_to_public(&multisigner); // to display
             let style = address_details.encryption.identicon_style();
             let identicon = make_identicon_from_multisigner(&multisigner, style);
@@ -200,7 +203,8 @@ pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<
             ),
             secret_exposed: root.1.secret_exposed,
         };
-        let address_key = hex::encode(AddressKey::from_multisigner(&root.0).key());
+        // TODO: root always prefix 42 for substrate.
+        let address_key = hex::encode(AddressKey::new(root.0.clone(), 42).key());
         MAddressCard {
             base58: print_multisigner_as_base58_or_eth(&root.0, None, root.1.encryption),
             address_key,
@@ -211,7 +215,7 @@ pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<
     let set: Result<_> = derived
         .into_iter()
         .map(|(multisigner, address_details)| -> Result<_> {
-            let network_specs = get_network_specs(&db_path, &address_details.network_id[0])?;
+            let network_specs = get_network_specs(&db_path, &address_details.network_id)?;
             let identicon = make_identicon_from_multisigner(
                 &multisigner,
                 network_specs.specs.encryption.identicon_style(),
@@ -221,7 +225,9 @@ pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<
                 Some(network_specs.specs.base58prefix),
                 network_specs.specs.encryption,
             );
-            let address_key = hex::encode(AddressKey::from_multisigner(&multisigner).key());
+            let address_key = hex::encode(
+                AddressKey::new(multisigner.clone(), network_specs.specs.base58prefix).key(),
+            );
             let address = Address {
                 path: address_details.path,
                 has_pwd: address_details.has_pwd,
@@ -282,7 +288,7 @@ where
             Some(network_specs.specs.base58prefix),
             address_details.encryption,
         );
-        let address_key = AddressKey::from_multisigner(&multisigner);
+        let address_key = AddressKey::new(multisigner.clone(), network_specs.specs.base58prefix);
         let swiped = {
             if let Some(ref swiped_multisigner) = swiped_key {
                 swiped_multisigner == &multisigner
@@ -325,7 +331,9 @@ where
         .into_iter()
         .map(
             |(multisigner, address_details, identicon, swiped, _multiselect)| MKeysCard {
-                address_key: hex::encode(AddressKey::from_multisigner(&multisigner).key()),
+                address_key: hex::encode(
+                    AddressKey::new(multisigner.clone(), network_specs.specs.base58prefix).key(),
+                ),
                 base58: print_multisigner_as_base58_or_eth(
                     &multisigner,
                     Some(network_specs.specs.base58prefix),
@@ -363,7 +371,7 @@ where
 {
     Ok(get_addresses_by_seed_name(db_path, seed_name)?
         .into_iter()
-        .filter(|(_, address_details)| address_details.network_id.contains(network_specs_key))
+        .filter(|(_, address_details)| &address_details.network_id == network_specs_key)
         .collect())
 }
 
@@ -453,7 +461,7 @@ where
 {
     let ordered_network_specs = get_network_specs(&db_path, network_specs_key)?;
     let network_specs = ordered_network_specs.specs;
-    let address_key = AddressKey::from_multisigner(multisigner);
+    let address_key = AddressKey::new(multisigner.clone(), network_specs.base58prefix);
     let address_details = get_address_details(&db_path, &address_key)?;
     if address_details.seed_name != expected_seed_name {
         return Err(Error::SeedNameNotMatching {
@@ -472,7 +480,7 @@ where
     let identicon =
         make_identicon_from_multisigner(multisigner, network_specs.encryption.identicon_style());
     let qr = {
-        if address_details.network_id.contains(network_specs_key) {
+        if &address_details.network_id == network_specs_key {
             let prefix = if network_specs.encryption == Encryption::Ethereum {
                 "ethereum"
             } else {
@@ -602,7 +610,8 @@ where
                 address_details.encryption.identicon_style(),
             );
             let seed_name = seed_name.to_string();
-            let address_key = hex::encode(AddressKey::from_multisigner(&multisigner).key());
+            let address_key =
+                hex::encode(AddressKey::new(multisigner.clone(), network_specs.base58prefix).key());
             let collision = MAddressCard {
                 base58,
                 address_key,
@@ -701,7 +710,13 @@ where
                         &multisigner,
                         address_details.encryption.identicon_style(),
                     );
-                    let address_key = hex::encode(AddressKey::from_multisigner(&multisigner).key());
+                    let address_key = hex::encode(
+                        AddressKey::new(
+                            multisigner.clone(),
+                            ordered_network_specs.specs.base58prefix,
+                        )
+                        .key(),
+                    );
                     let collision_display = MAddressCard {
                         base58: address_base58,
                         address_key,

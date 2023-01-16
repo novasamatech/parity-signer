@@ -610,35 +610,7 @@ impl TrDbColdStub {
                 general_verifier,
             ),
         });
-        {
-            let database = open_db(&db_path)?;
-            let identities = open_tree(&database, ADDRTREE)?;
-            for (address_key_vec, address_entry) in identities.iter().flatten() {
-                let address_key = AddressKey::from_ivec(&address_key_vec);
-                let (multisigner, mut address_details) =
-                    AddressDetails::process_entry_with_key_checked(&address_key, address_entry)?;
-                if address_details.is_root()
-                    && (address_details.encryption == network_specs.specs.encryption)
-                    && !address_details.network_id.contains(&network_specs_key)
-                {
-                    address_details
-                        .network_id
-                        .push(network_specs_key.to_owned());
-                    self.addresses_stub = self
-                        .addresses_stub
-                        .new_addition(address_key.key(), address_details.encode());
-                    self.history_stub.push(Event::IdentityAdded {
-                        identity_history: IdentityHistory::get(
-                            &address_details.seed_name,
-                            &address_details.encryption,
-                            &multisigner_to_public(&multisigner),
-                            &address_details.path,
-                            network_specs.specs.genesis_hash,
-                        ),
-                    });
-                }
-            }
-        }
+
         Ok(self)
     }
 

@@ -310,7 +310,7 @@ pub(crate) fn make_author_info(
 ) -> MAddressCard {
     let base58 =
         print_multisigner_as_base58_or_eth(author, Some(base58prefix), address_details.encryption);
-    let address_key = hex::encode(AddressKey::from_multisigner(author).key());
+    let address_key = hex::encode(AddressKey::new(author.clone(), base58prefix).key());
     MAddressCard {
         base58,
         address_key,

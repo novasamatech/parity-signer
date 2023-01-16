@@ -192,14 +192,12 @@ fn print_db_content(dbname: &str) -> String {
     let mut identities_set: Vec<String> = Vec::new();
     let identities: Tree = database.open_tree(ADDRTREE).unwrap();
     for (address_key_vec, address_details_encoded) in identities.iter().flatten() {
-        let address_key = AddressKey::from_ivec(&address_key_vec);
+        let address_key = AddressKey::from_ivec(&address_key_vec).unwrap();
         let address_details = AddressDetails::decode(&mut &address_details_encoded[..]).unwrap();
         let (public_key, encryption) = address_key.public_key_encryption().unwrap();
 
         let mut networks_set: Vec<String> = Vec::new();
-        for y in address_details.network_id.iter() {
-            networks_set.push(hex::encode(y.key()))
-        }
+        networks_set.push(hex::encode(address_details.network_id.key()));
         networks_set.sort();
         let mut networks_str = String::new();
         for y in networks_set.iter() {

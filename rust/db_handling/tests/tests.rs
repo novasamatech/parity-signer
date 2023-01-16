@@ -991,24 +991,23 @@ fn test_generate_default_addresses_for_alice() {
                 seed_name: "Alice".to_string(),
                 path: "".to_string(),
                 has_pwd: false,
-                network_id: vec![
-                    NetworkSpecsKey::from_hex(&hex::encode([
-                        1, 145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81,
-                        130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144,
-                        195,
-                    ]))
-                    .unwrap(),
-                    NetworkSpecsKey::from_hex(&hex::encode([
-                        1, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135,
-                        15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254,
-                    ]))
-                    .unwrap(),
-                    NetworkSpecsKey::from_hex(&hex::encode([
-                        1, 225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206,
-                        158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62,
-                    ]))
-                    .unwrap(),
-                ],
+                network_id: NetworkSpecsKey::from_hex(&hex::encode([
+                    1, 145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81, 130,
+                    251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144, 195,
+                ]))
+                .unwrap(),
+                /*
+                NetworkSpecsKey::from_hex(&hex::encode([
+                    1, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135,
+                    15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254,
+                ]))
+                .unwrap(),
+                NetworkSpecsKey::from_hex(&hex::encode([
+                    1, 225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206,
+                    158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62,
+                ]))
+                .unwrap(),
+                */
                 encryption: Encryption::Sr25519,
                 secret_exposed: false,
             },
@@ -1026,11 +1025,11 @@ fn test_generate_default_addresses_for_alice() {
                 seed_name: "Alice".to_string(),
                 path: "//kusama".to_string(),
                 has_pwd: false,
-                network_id: vec![NetworkSpecsKey::from_hex(&hex::encode([
+                network_id: NetworkSpecsKey::from_hex(&hex::encode([
                     1, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15,
                     23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254,
                 ]))
-                .unwrap()],
+                .unwrap(),
                 encryption: Encryption::Sr25519,
                 secret_exposed: false,
             },
@@ -1044,6 +1043,7 @@ fn test_generate_default_addresses_for_alice() {
     let test_key = AddressKey::from_parts(
         &hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a").unwrap(),
         &Encryption::Sr25519,
+        53,
     )
     .unwrap();
     assert!(identities.contains_key(test_key.key()).unwrap());
@@ -1099,10 +1099,12 @@ fn test_derive() {
     println!("{:?}", identities);
     let mut flag0 = false;
     let mut flag1 = false;
+    /*
     for (_, details) in identities {
         flag0 = flag0 || details.network_id == both_networks;
         flag1 = flag1 || details.network_id == only_one_network;
     }
+    */
     assert!(flag0, "Something is wrong with //Alice");
     assert!(flag1, "Something is wrong with //Alice/1");
     fs::remove_dir_all(dbname).unwrap();
@@ -2312,13 +2314,15 @@ fn remove_all_westend() {
         for a in identities.iter().flatten() {
             let (_, address_details) = AddressDetails::process_entry_checked(a).unwrap();
             assert!(
-                !address_details.network_id.contains(&network_specs_key),
+                address_details.network_id != network_specs_key,
                 "Some westend identities still remain."
             );
+            /*
             assert!(
                 !address_details.network_id.is_empty(),
                 "Did not remove address key entried with no network keys associated"
             );
+            */
         }
     }
     let history: Vec<_> = get_history(dbname)
