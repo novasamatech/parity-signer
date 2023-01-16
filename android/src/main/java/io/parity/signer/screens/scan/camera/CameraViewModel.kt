@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
 import io.parity.signer.models.encodeHex
+import io.parity.signer.models.submitErrorState
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -93,6 +94,14 @@ class CameraViewModel() : ViewModel() {
 			)
 			when (payload) {
 				is DecodeSequenceResult.BBananaSplitRecoveryResult -> {
+					when (val bananaResult = payload.b) {
+						is BananaSplitRecoveryResult.RecoveredSeed -> {
+							submitErrorState("cannot happen here that for scanning we don't have password request")
+						}
+						BananaSplitRecoveryResult.RequestPassword -> {
+							TODO()
+						}
+					}
 					//todo banana
 				}
 				is DecodeSequenceResult.Other -> {

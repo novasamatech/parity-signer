@@ -14,6 +14,7 @@ import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.components.panels.BottomBarSingleton
 import io.parity.signer.components.panels.toAction
 import io.parity.signer.models.Navigator
+import io.parity.signer.screens.scan.camera.ScanScreen
 import io.parity.signer.screens.scan.elements.ScanErrorBottomSheet
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
 import io.parity.signer.screens.scan.transaction.TransactionPreviewType
