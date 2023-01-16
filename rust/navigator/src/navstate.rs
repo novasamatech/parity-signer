@@ -1052,18 +1052,14 @@ impl State {
         let mut errorline = String::new();
         match self.navstate.screen {
             Screen::Keys(ref keys_state) => {
-                if let Modal::SeedMenu = self.navstate.modal {
-                    match db_handling::identities::remove_seed(dbname, &keys_state.seed_name()) {
-                        Ok(()) => {
-                            new_navstate = Navstate::clean_screen(Screen::Log);
-                        }
-                        Err(e) => {
-                            new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
-                        }
+                match db_handling::identities::remove_seed(dbname, &keys_state.seed_name()) {
+                    Ok(()) => {
+                        new_navstate = Navstate::clean_screen(Screen::Log);
                     }
-                } else {
-                    println!("RemoveSeed does nothing here")
+                    Err(e) => {
+                        new_navstate.alert = Alert::Error;
+                        let _ = write!(&mut errorline, "{}", e);
+                    }
                 }
             }
             _ => println!("RemoveSeed does nothing here"),
