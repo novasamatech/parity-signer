@@ -12,7 +12,7 @@ qr_reader_phone = {path = "../qr_reader_phone"}
 anyhow = "1.0.68"
 image = "0.24.4"
 quircs = "0.10.0"
-indicatif = "0.17.2"
+indicatif = "0.17.3"
 
 [dependencies.opencv]
 version = "0.75"
