@@ -214,6 +214,11 @@
 	<string name="toast_network_added">Network %1$s was added</string>
     <string name="transactions_title_network">Add Network</string>
 	<string name="transactions_title_metadata">Add Metadata</string>
+    <string name="banana_split_password_title">Banana Split Recovery</string>
+	<string name="banana_split_password_name_header">Enter display name for recovered key set</string>
+	<string name="banana_split_password_password_header">Enter banana split password</string>
+	<string name="banana_split_password_name_label">Display Name</string>
+	<string name="banana_split_password_password_label">Password</string>
 
 </resources>
 

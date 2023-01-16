@@ -18,6 +18,9 @@ class CameraViewModel() : ViewModel() {
 
 	val isTorchEnabled = MutableStateFlow(false)
 
+	private val _isBananaPassword = MutableStateFlow(false)
+	val isBananaPassword: StateFlow<Boolean> = _isBananaPassword.asStateFlow()
+
 	private val _pendingPayloads = MutableStateFlow<Set<String>>(emptySet())
 	val pendingTransactionPayloads: StateFlow<Set<String>> =
 		_pendingPayloads.asStateFlow()
@@ -96,13 +99,14 @@ class CameraViewModel() : ViewModel() {
 				is DecodeSequenceResult.BBananaSplitRecoveryResult -> {
 					when (val bananaResult = payload.b) {
 						is BananaSplitRecoveryResult.RecoveredSeed -> {
+							//we passed a null in qrparserTryDecodeQrSequence so we can't get there
 							submitErrorState("cannot happen here that for scanning we don't have password request")
 						}
 						BananaSplitRecoveryResult.RequestPassword -> {
-							TODO()
+							_isBananaPassword.value = true
+							resetPendingTransactions() 				//todo banana
 						}
 					}
-					//todo banana
 				}
 				is DecodeSequenceResult.Other -> {
 					val actualPayload = payload.s
