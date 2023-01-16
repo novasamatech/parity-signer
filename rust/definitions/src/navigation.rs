@@ -1,6 +1,7 @@
 use plot_icon::EMPTY_PNG;
 use sp_core::H256;
 
+use crate::derivations::SeedKeysPreview;
 use crate::{
     crypto::Encryption, history::Event, keyring::NetworkSpecsKey,
     network_specs::OrderedNetworkSpecs,
@@ -37,9 +38,6 @@ pub struct TransactionSignAction {
 pub enum TransactionAction {
     Derivations {
         content: Box<TransactionCardSet>,
-        network_info: Box<OrderedNetworkSpecs>,
-        checksum: u32,
-        network_specs_key: NetworkSpecsKey,
     },
     Sign {
         actions: Vec<TransactionSignAction>,
@@ -711,7 +709,7 @@ pub enum Card {
     BlockHashCard { f: String },
     CallCard { f: MSCCall },
     DefaultCard { f: String },
-    DerivationsCard { f: Vec<String> },
+    DerivationsCard { f: Vec<SeedKeysPreview> },
     EnumVariantNameCard { f: MSCEnumVariantName },
     EraImmortalCard,
     EraMortalCard { f: MSCEraMortal },

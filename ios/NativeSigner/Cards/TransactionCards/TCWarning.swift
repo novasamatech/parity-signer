@@ -18,7 +18,7 @@ struct TCWarning: View {
         .foregroundColor(Asset.accentRed400.swiftUIColor)
         .font(PrimaryFont.bodyM.font)
         .padding(Spacing.small)
-        .containerBackground(isError: true)
+        .containerBackground(state: .error)
     }
 }
 

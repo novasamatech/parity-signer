@@ -72,6 +72,7 @@ use parity_scale_codec::{Decode, Encode};
 use sp_core;
 use sp_runtime::{MultiSignature, MultiSigner};
 
+use crate::error::Error;
 use crate::{helpers::IdenticonStyle, network_specs::VerifierValue};
 
 /// Encryption algorithm
@@ -106,6 +107,20 @@ impl Encryption {
         match self {
             Encryption::Ethereum => IdenticonStyle::Blockies,
             _ => IdenticonStyle::Dots,
+        }
+    }
+}
+
+impl TryFrom<String> for Encryption {
+    type Error = Error;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "ed25519" => Ok(Encryption::Ed25519),
+            "sr25519" => Ok(Encryption::Sr25519),
+            "ecdsa" => Ok(Encryption::Ecdsa),
+            "ethereum" => Ok(Encryption::Ethereum),
+            _ => Err(Error::UnknownEncryption(value)),
         }
     }
 }

@@ -22,6 +22,9 @@ pub enum Error {
     Wasm(#[from] crate::error_active::Wasm),
 
     #[error(transparent)]
+    Ss58(#[from] sp_core::crypto::PublicError),
+
+    #[error(transparent)]
     Io(#[from] std::io::Error),
 
     #[error(transparent)]
@@ -111,6 +114,9 @@ pub enum Error {
         that_name: String,
         that_version: u32,
     },
+
+    #[error("Cannot convert {0} to valid encryption.")]
+    UnknownEncryption(String),
 }
 
 /// Error decoding transfer content

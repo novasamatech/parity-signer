@@ -13,6 +13,7 @@ pub mod cards;
 use cards::Card;
 pub mod check_signature;
 mod derivations;
+pub use derivations::prepare_derivations_preview;
 use derivations::process_derivations;
 mod helpers;
 mod holds;

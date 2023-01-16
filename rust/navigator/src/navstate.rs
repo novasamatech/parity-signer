@@ -19,8 +19,8 @@ use crate::alerts::Alert;
 use crate::export_signatures_bulk;
 use crate::modals::Modal;
 use crate::screens::{
-    AddressState, AddressStateMulti, DeriveState, KeysState, RecoverSeedPhraseState, Screen,
-    SpecialtyKeysState, SufficientCryptoState,
+    AddressState, DeriveState, KeysState, RecoverSeedPhraseState, Screen, SpecialtyKeysState,
+    SufficientCryptoState,
 };
 use crate::states::{SignResult, TransactionState};
 use db_handling::interface_signer::{get_all_seed_names_with_identicons, guess};
@@ -394,113 +394,72 @@ impl State {
                     }
                 }
             }
-            Screen::Transaction(ref t) => {
-                match t.action() {
-                    transaction_parsing::TransactionAction::Sign { .. } => {
-                        let mut new = t.clone();
-                        new.update_seeds(secret_seed_phrase);
-                        if let Modal::EnterPassword = self.navstate.modal {
-                            new.password_entered(details_str);
-                            new_navstate.modal = Modal::Empty;
-                        }
-                        match new.handle_sign(dbname) {
-                            Ok(result) => {
-                                match result {
-                                    SignResult::RequestPassword { .. } => {
-                                        if t.ok() {
-                                            new_navstate.screen = Screen::Transaction(new);
-                                            new_navstate.modal = Modal::EnterPassword;
-                                        } else {
-                                            new_navstate = Navstate::clean_screen(Screen::Log);
-                                        }
-                                    }
-                                    SignResult::Ready { signatures } => {
-                                        new_navstate.modal = Modal::SignatureReady(signatures);
-                                    }
-                                };
-                            }
-                            Err(e) => {
-                                new_navstate.alert = Alert::Error;
-                                let _ = write!(&mut errorline, "{}", e);
-                            }
-                        }
+            Screen::Transaction(ref t) => match t.action() {
+                transaction_parsing::TransactionAction::Sign { .. } => {
+                    let mut new = t.clone();
+                    new.update_seeds(secret_seed_phrase);
+                    if let Modal::EnterPassword = self.navstate.modal {
+                        new.password_entered(details_str);
+                        new_navstate.modal = Modal::Empty;
                     }
-                    transaction_parsing::TransactionAction::Stub {
-                        s: _,
-                        u: checksum,
-                        stub: stub_nav,
-                    } => match transaction_signing::handle_stub(*checksum, dbname) {
-                        Ok(()) => match stub_nav {
-                            transaction_parsing::StubNav::AddSpecs {
-                                n: network_specs_key,
-                            } => {
-                                new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
-                                    network_specs_key.clone(),
-                                ));
-                            }
-                            transaction_parsing::StubNav::LoadMeta {
-                                l: network_specs_key,
-                            } => {
-                                new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
-                                    network_specs_key.clone(),
-                                ));
-                            }
-                            transaction_parsing::StubNav::LoadTypes => {
-                                new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
-                            }
-                        },
+                    match new.handle_sign(dbname) {
+                        Ok(result) => {
+                            match result {
+                                SignResult::RequestPassword { .. } => {
+                                    if t.ok() {
+                                        new_navstate.screen = Screen::Transaction(new);
+                                        new_navstate.modal = Modal::EnterPassword;
+                                    } else {
+                                        new_navstate = Navstate::clean_screen(Screen::Log);
+                                    }
+                                }
+                                SignResult::Ready { signatures } => {
+                                    new_navstate.modal = Modal::SignatureReady(signatures);
+                                }
+                            };
+                        }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
                             let _ = write!(&mut errorline, "{}", e);
                         }
-                    },
-                    transaction_parsing::TransactionAction::Read { .. } => {
-                        println!("GoForward does nothing here")
-                    }
-                    transaction_parsing::TransactionAction::Derivations {
-                        content: _,
-                        network_info: _,
-                        checksum,
-                        network_specs_key,
-                    } => {
-                        match self.navstate.modal {
-                            Modal::SelectSeed => {
-                                // details_str is seed_name
-                                // `secret_seed_phrase` is `seed_phrase`
-                                match db_handling::identities::import_derivations(
-                                    *checksum,
-                                    details_str,
-                                    secret_seed_phrase,
-                                    dbname,
-                                ) {
-                                    Ok(()) => {
-                                        new_navstate = Navstate::clean_screen(Screen::Keys(
-                                            KeysState::new_in_network(
-                                                details_str,
-                                                network_specs_key,
-                                            ),
-                                        ));
-                                    }
-                                    Err(e) => {
-                                        new_navstate.alert = Alert::Error;
-                                        let _ = write!(&mut errorline, "{}", e);
-                                    }
-                                }
-                            }
-                            Modal::Empty => {
-                                if self.seed_names.is_empty() {
-                                    new_navstate.alert = Alert::Error;
-
-                                    let _ = write!(&mut errorline, "No known seeds");
-                                } else {
-                                    new_navstate.modal = Modal::SelectSeed;
-                                }
-                            }
-                            _ => println!("GoForward does nothing here"),
-                        }
                     }
                 }
-            }
+                transaction_parsing::TransactionAction::Stub {
+                    s: _,
+                    u: checksum,
+                    stub: stub_nav,
+                } => match transaction_signing::handle_stub(*checksum, dbname) {
+                    Ok(()) => match stub_nav {
+                        transaction_parsing::StubNav::AddSpecs {
+                            n: network_specs_key,
+                        } => {
+                            new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
+                                network_specs_key.clone(),
+                            ));
+                        }
+                        transaction_parsing::StubNav::LoadMeta {
+                            l: network_specs_key,
+                        } => {
+                            new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
+                                network_specs_key.clone(),
+                            ));
+                        }
+                        transaction_parsing::StubNav::LoadTypes => {
+                            new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
+                        }
+                    },
+                    Err(e) => {
+                        new_navstate.alert = Alert::Error;
+                        let _ = write!(&mut errorline, "{}", e);
+                    }
+                },
+                transaction_parsing::TransactionAction::Read { .. } => {
+                    println!("GoForward does nothing here")
+                }
+                transaction_parsing::TransactionAction::Derivations { content: _ } => {
+                    new_navstate = Navstate::clean_screen(Screen::SeedSelector);
+                }
+            },
             Screen::ManageNetworks => match NetworkSpecsKey::from_hex(details_str) {
                 Ok(network_specs_key) => {
                     new_navstate = Navstate::clean_screen(Screen::NetworkDetails(network_specs_key))
@@ -787,33 +746,6 @@ impl State {
             }
         }
 
-        (new_navstate, errorline)
-    }
-
-    fn handle_next_unit(&self) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let errorline = String::new();
-
-        match self.navstate.screen {
-            Screen::KeyDetailsMulti(ref address_state_multi) => {
-                new_navstate =
-                    Navstate::clean_screen(Screen::KeyDetailsMulti(address_state_multi.next()));
-            }
-            _ => println!("NextUnit does nothing here"),
-        }
-        (new_navstate, errorline)
-    }
-
-    fn handle_previous_unit(&self) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let errorline = String::new();
-        match self.navstate.screen {
-            Screen::KeyDetailsMulti(ref address_state_multi) => {
-                new_navstate =
-                    Navstate::clean_screen(Screen::KeyDetailsMulti(address_state_multi.previous()));
-            }
-            _ => println!("PreviousUnit does nothing here"),
-        }
         (new_navstate, errorline)
     }
 
@@ -1181,125 +1113,6 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_swipe(&self, details_str: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let mut errorline = String::new();
-        match self.navstate.screen {
-            Screen::Keys(ref keys_state) => match process_hex_address_key(details_str) {
-                Ok(multisigner) => {
-                    new_navstate =
-                        Navstate::clean_screen(Screen::Keys(keys_state.swipe(&multisigner)));
-                }
-                Err(e) => {
-                    new_navstate.alert = Alert::Error;
-                    let _ = write!(&mut errorline, "{}", e);
-                }
-            },
-            _ => println!("Swipe does nothing here"),
-        }
-
-        (new_navstate, errorline)
-    }
-
-    fn handle_long_tap(&self, details_str: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let mut errorline = String::new();
-        match self.navstate.screen {
-            Screen::Keys(ref keys_state) => match process_hex_address_key(details_str) {
-                Ok(multisigner) => {
-                    new_navstate = Navstate::clean_screen(Screen::Keys(
-                        keys_state.select_single(&multisigner),
-                    ));
-                }
-                Err(e) => {
-                    new_navstate.alert = Alert::Error;
-                    let _ = write!(&mut errorline, "{}", e);
-                }
-            },
-            _ => println!("LongTap does nothing here"),
-        }
-
-        (new_navstate, errorline)
-    }
-
-    fn handle_select_all(&self, dbname: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let mut errorline = String::new();
-
-        match self.navstate.screen {
-            Screen::Keys(ref keys_state) => match keys_state.get_specialty() {
-                SpecialtyKeysState::MultiSelect(ref multiselect) => {
-                    match db_handling::interface_signer::addresses_set_seed_name_network(
-                        dbname,
-                        &keys_state.seed_name(),
-                        &keys_state.network_specs_key(),
-                    ) {
-                        Ok(set) => {
-                            let all: Vec<MultiSigner> = set
-                                .into_iter()
-                                .map(|(multisigner, _)| multisigner)
-                                .collect();
-                            let mut complete = true;
-                            for multisigner in all.iter() {
-                                if !multiselect.contains(multisigner) {
-                                    complete = false
-                                }
-                            }
-                            let new_multiselect = {
-                                if complete {
-                                    Vec::new()
-                                } else {
-                                    all
-                                }
-                            };
-                            new_navstate = Navstate::clean_screen(Screen::Keys(
-                                keys_state.select_set(new_multiselect),
-                            ));
-                        }
-                        Err(e) => {
-                            new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
-                        }
-                    }
-                }
-                _ => println!("SelectAll does nothing here"),
-            },
-            _ => println!("SelectAll does nothing here"),
-        }
-
-        (new_navstate, errorline)
-    }
-
-    fn handle_export_multi_select(&self, dbname: &str) -> (Navstate, String) {
-        let mut new_navstate = self.navstate.clone();
-        let mut errorline = String::new();
-
-        match self.navstate.screen {
-            Screen::Keys(ref keys_state) => {
-                if let SpecialtyKeysState::MultiSelect(ref multiselect) = keys_state.get_specialty()
-                {
-                    match AddressStateMulti::new(
-                        keys_state.seed_name(),
-                        keys_state.network_specs_key(),
-                        multiselect,
-                        dbname,
-                    ) {
-                        Ok(a) => new_navstate = Navstate::clean_screen(Screen::KeyDetailsMulti(a)),
-                        Err(e) => {
-                            new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
-                        }
-                    }
-                } else {
-                    println!("ExportMultiSelect does nothing here")
-                }
-            }
-            _ => println!("ExportMultiSelect does nothing here"),
-        }
-
-        (new_navstate, errorline)
-    }
-
     fn handle_increment(
         &self,
         details_str: &str,
@@ -1426,15 +1239,11 @@ impl State {
             Screen::Scan => ScreenData::Scan,
             Screen::Transaction(ref t) => {
                 let f = match t.action() {
-                    TransactionAction::Derivations {
-                        content,
-                        network_info,
-                        ..
-                    } => vec![MTransaction {
+                    TransactionAction::Derivations { content, .. } => vec![MTransaction {
                         content: *content.clone(),
                         ttype: TransactionType::ImportDerivations,
                         author_info: None,
-                        network_info: Some(network_info.as_ref().clone().into()),
+                        network_info: None,
                     }],
                     TransactionAction::Sign { actions, .. } => actions
                         .iter()
@@ -1780,8 +1589,6 @@ impl State {
                 Action::RecoverSeed => self.handle_recover_seed(),
                 Action::BackupSeed => self.handle_backup_seed(dbname, details_str),
                 Action::NetworkSelector => self.handle_network_selector(),
-                Action::NextUnit => self.handle_next_unit(),
-                Action::PreviousUnit => self.handle_previous_unit(),
                 Action::CheckPassword => self.handle_change_password(details_str),
                 Action::TransactionFetched => self.handle_transaction_fetched(dbname, details_str),
                 Action::RemoveNetwork => self.handle_remove_network(dbname),
@@ -1798,10 +1605,6 @@ impl State {
                 Action::ClearLog => self.handle_clear_log(dbname),
                 Action::CreateLogComment => self.handle_create_log_comment(),
                 Action::ShowLogDetails => self.handle_show_log_details(details_str),
-                Action::Swipe => self.handle_swipe(details_str),
-                Action::LongTap => self.handle_long_tap(details_str),
-                Action::SelectAll => self.handle_select_all(dbname),
-                Action::ExportMultiSelect => self.handle_export_multi_select(dbname),
                 Action::Increment => self.handle_increment(details_str, dbname, secret_seed_phrase),
                 Action::ShowDocuments => self.handle_show_documents(),
                 Action::TextEntry => self.handle_text_entry(details_str),
@@ -2042,11 +1845,3 @@ fn process_hex_address_key_address_details(
     let address_details = db_handling::helpers::get_address_details(dbname, &address_key)?;
     Ok((multisigner, address_details))
 }
-
-fn process_hex_address_key(hex_address_key: &str) -> Result<MultiSigner> {
-    let address_key = AddressKey::from_hex(hex_address_key)?;
-    Ok(address_key.multi_signer()?)
-}
-
-//TODO: tests should probably be performed here, as static object in lib.rs
-//will only allow for 1-2 integration tests

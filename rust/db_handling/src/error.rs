@@ -259,10 +259,6 @@ pub enum Error {
     #[error("Derivation had password, then lost it.")]
     LostPwd,
 
-    /// Provided file contains no valid derivations that could be exported
-    #[error("No valid derivations found to generate ContentDerivations.")]
-    NoValidDerivationToExport,
-
     /// Temporary database entry in `TRANSACTION` tree of the Signer database
     /// under the key `DRV`, used to store the derivation import data.
     ///
@@ -384,10 +380,16 @@ pub enum Error {
     #[error("Wrong password.")]
     WrongPassword,
 
+    #[error("Missing information about whether the path {0} is passworded.")]
+    MissingPasswordInfo(String),
+
     #[error("Key pair with public key {} can't be expressed as a direct derivation from a seed",
     hex::encode(multisigner_to_public(.multisigner)),
     )]
     NoSeedForKeyPair { multisigner: MultiSigner },
+
+    #[error("No root derivation for seed {0}")]
+    NoRootKeyForSeed(String),
 }
 
 /// DB handling result.

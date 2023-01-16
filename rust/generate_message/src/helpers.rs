@@ -660,7 +660,7 @@ pub fn generate_key_info_export_to_qr<P: AsRef<Path>>(
     use sp_keyring::sr25519::Keyring;
     use sp_runtime::MultiSigner;
 
-    let multisigner = Some(MultiSigner::from(Keyring::Alice.public()));
+    let multisigner = MultiSigner::from(Keyring::Alice.public());
     let name = "a very long key name a very long key name".to_owned();
 
     let derived_keys: Vec<AddrInfo> = (0..keys_num)

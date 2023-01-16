@@ -105,7 +105,7 @@ struct EnterPasswordModal: View {
             Identicon(identicon: viewModel.dataModel.authorInfo.address.identicon, rowHeight: Heights.identiconInCell)
         }
         .padding(Spacing.small)
-        .containerBackground(isError: true)
+        .containerBackground(state: .error)
     }
 
     /// Manual string interpolation for `lock` `SFSymbol`

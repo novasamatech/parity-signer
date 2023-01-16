@@ -20,7 +20,7 @@ use sp_runtime::MultiSigner;
 use constants::{ADDRESS_BOOK, META_HISTORY, SPECSTREEPREP};
 use constants::{ADDRTREE, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, VERIFIERS};
 #[cfg(feature = "signer")]
-use constants::{DRV, GENERALVERIFIER, SIGN, STUB, TYPES};
+use constants::{GENERALVERIFIER, SIGN, STUB, TYPES};
 
 #[cfg(feature = "signer")]
 use definitions::{
@@ -1046,104 +1046,5 @@ impl TrDbColdSignOne {
     /// Get [`MultiSigner`] value
     pub fn multisigner(&self) -> MultiSigner {
         self.multisigner.to_owned()
-    }
-}
-
-/// Temporary storage for derivations import data.
-///
-/// Signer can import derivations in bulk using
-/// [`ContentDerivations`](definitions::qr_transfers::ContentDerivations)
-/// payloads.
-///
-/// To approve the derivation payload, i.e. generate addresses for each of the
-/// derivations, seed name and secret seed phrase are needed. This operation is
-/// done by [`import_derivations`](crate::identities::import_derivations).
-///
-/// While the user selects seed to be used in derivations import, SCALE-encoded
-/// [`TrDbColdDerivations`] is stored in [`TRANSACTION`] tree of the cold
-/// database under the key [`DRV`].
-///
-/// [`TrDbColdDerivations`] contains:
-///
-/// - a set of derivations, that was checked when the derivation import was
-/// received by Signer
-/// - [`OrderedNetworkSpecs`] for the network in which the derivations will be used to
-/// generate addresses
-#[cfg(feature = "signer")]
-#[derive(Debug, Decode, Encode)]
-pub struct TrDbColdDerivations {
-    /// set of derivation path strings, from received `derivations` payload
-    checked_derivations: Vec<String>,
-
-    /// network specs for the network in which to generate the derivations,
-    /// from received `derivations` payload
-    network_specs: OrderedNetworkSpecs,
-}
-
-#[cfg(feature = "signer")]
-impl TrDbColdDerivations {
-    /// Construct [`TrDbColdDerivations`] from payload components.
-    pub fn generate(checked_derivations: &[String], network_specs: &OrderedNetworkSpecs) -> Self {
-        Self {
-            checked_derivations: checked_derivations.to_owned(),
-            network_specs: network_specs.to_owned(),
-        }
-    }
-
-    /// Recover [`TrDbColdDerivations`] from storage in the cold database.
-    ///
-    /// Function requires correct checksum to make sure the proposed derivations
-    /// are the ones approved by the user, and no changes to the database have
-    /// occured.
-    ///
-    /// [`TRANSACTION`] tree is cleared in the process.
-    pub fn from_storage<P>(db_path: P, checksum: u32) -> Result<Self>
-    where
-        P: AsRef<Path>,
-    {
-        let drv_encoded = {
-            let database = open_db(&db_path)?;
-            verify_checksum(&database, checksum)?;
-            let transaction = open_tree(&database, TRANSACTION)?;
-            match transaction.get(DRV)? {
-                Some(a) => a,
-                None => return Err(Error::DerivationsNotFound),
-            }
-        };
-        TrDbCold::new()
-            .set_transaction(make_batch_clear_tree(&db_path, TRANSACTION)?) // clear transaction tree
-            .apply(&db_path)?;
-        Ok(Self::decode(&mut &drv_encoded[..])?)
-    }
-
-    /// Get checked derivations
-    pub fn checked_derivations(&self) -> &[String] {
-        &self.checked_derivations
-    }
-
-    /// Get network specs
-    pub fn network_specs(&self) -> &OrderedNetworkSpecs {
-        &self.network_specs
-    }
-
-    /// Put SCALE-encoded [`TrDbColdDerivations`] into storage in the
-    /// [`TRANSACTION`] tree of the cold database under the key [`STUB`].
-    ///
-    /// Function returns `u32` checksum. This checksum is needed to recover
-    /// stored [`TrDbColdDerivations`] using `from_storage` method.
-    ///
-    /// The [`TRANSACTION`] tree is cleared prior to adding data to storage.
-    pub fn store_and_get_checksum<P>(&self, db_path: P) -> Result<u32>
-    where
-        P: AsRef<Path>,
-    {
-        let mut transaction_batch = make_batch_clear_tree(&db_path, TRANSACTION)?;
-        transaction_batch.insert(DRV, self.encode());
-        TrDbCold::new()
-            .set_transaction(transaction_batch) // clear transaction tree
-            .apply(&db_path)?;
-        let database = open_db(&db_path)?;
-
-        Ok(database.checksum()?)
     }
 }

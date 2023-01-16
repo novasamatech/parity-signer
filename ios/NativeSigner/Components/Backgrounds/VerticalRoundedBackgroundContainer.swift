@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct VerticalRoundedBackgroundContainer: ViewModifier {
-    var cornerRadius: CGFloat
+    let cornerRadius: CGFloat
+    let alignment: HorizontalAlignment
 
     func body(content: Content) -> some View {
-        VStack {
+        VStack(alignment: alignment) {
             content
                 .padding(Spacing.medium)
         }
@@ -21,7 +22,10 @@ struct VerticalRoundedBackgroundContainer: ViewModifier {
 }
 
 extension View {
-    func verticalRoundedBackgroundContainer(_ cornerRadius: CGFloat = CornerRadius.medium) -> some View {
-        modifier(VerticalRoundedBackgroundContainer(cornerRadius: cornerRadius))
+    func verticalRoundedBackgroundContainer(
+        _ cornerRadius: CGFloat = CornerRadius.medium,
+        alignment: HorizontalAlignment = .center
+    ) -> some View {
+        modifier(VerticalRoundedBackgroundContainer(cornerRadius: cornerRadius, alignment: alignment))
     }
 }
