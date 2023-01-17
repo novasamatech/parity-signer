@@ -45,8 +45,7 @@ struct LandingView: View {
                         }
                     }
                 )
-                BigButton(
-                    text: Localizable.next.key,
+                PrimaryButton(
                     action: {
                         if connectivityMediator.isConnectivityOn {
                             presentInitialConnectivityWarning = true
@@ -54,7 +53,8 @@ struct LandingView: View {
                             accept = true
                         }
                     },
-                    isDisabled: !(tacAccept && ppAccept)
+                    text: Localizable.next.key,
+                    style: .primary(isDisabled: .constant(!(tacAccept && ppAccept)))
                 )
                 .padding(.top, 16.0)
                 .alert(isPresented: $accept, content: {

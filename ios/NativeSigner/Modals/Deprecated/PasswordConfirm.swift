@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PasswordConfirm: View {
     var content: MPasswordConfirm
-    let createAddress: (String, String) -> Void
+    @EnvironmentObject var data: SignerDataModel
     @State private var passwordCheck: String = ""
     @FocusState private var focused: Bool
 
@@ -44,15 +44,15 @@ struct PasswordConfirm: View {
                             }
                     }
                 }
-                BigButton(
-                    text: Localizable.next.key,
+                PrimaryButton(
                     action: {
-                        createAddress(
-                            content.croppedPath + Localizable.Path.delimeter.string + content.pwd,
-                            content.seedName
+                        data.createAddress(
+                            path: content.croppedPath + Localizable.Path.delimeter.string + content.pwd,
+                            seedName: content.seedName
                         )
                     },
-                    isDisabled: passwordCheck != content.pwd
+                    text: Localizable.next.key,
+                    style: .primary(isDisabled: .constant(passwordCheck != content.pwd))
                 )
             }
         }

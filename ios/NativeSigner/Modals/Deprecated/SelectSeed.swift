@@ -9,8 +9,8 @@ import SwiftUI
 
 struct SelectSeed: View {
     let content: MSeeds
-    let sign: (String, String) -> Void
-    let navigationRequest: NavigationRequest
+    @EnvironmentObject var data: SignerDataModel
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.backgroundPrimary.swiftUIColor)
@@ -24,7 +24,7 @@ struct SelectSeed: View {
                             HStack {
                                 Button(
                                     action: {
-                                        sign(seedNameCard.seedName, seedNameCard.seedName)
+                                        data.sign(seedName: seedNameCard.seedName, comment: seedNameCard.seedName)
                                     },
                                     label: {
                                         SeedCardForManager(seedNameCard: seedNameCard)

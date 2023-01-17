@@ -23,7 +23,6 @@ final class SignerDataModel: ObservableObject {
 
     // Alert indicator
     @Published var alert: Bool = false
-    @Published var alertShow: Bool = false
 
     /// internal boilerplate
     private var dbName: String {
@@ -145,18 +144,14 @@ extension SignerDataModel {
 
 extension SignerDataModel {
     func sign(seedName: String, comment: String) {
-        if alert {
-            alertShow = true
-        } else {
-            navigation.perform(
-                navigation:
-                .init(
-                    action: .goForward,
-                    details: comment,
-                    seedPhrase: seedsMediator.getSeed(seedName: seedName)
-                )
+        navigation.perform(
+            navigation:
+            .init(
+                action: .goForward,
+                details: comment,
+                seedPhrase: seedsMediator.getSeed(seedName: seedName)
             )
-        }
+        )
     }
 }
 
