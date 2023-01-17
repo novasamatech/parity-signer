@@ -45,6 +45,9 @@ struct ChooseNetworkForKeyView: View {
                         ) {
                             item(for: $0)
                         }
+                        Divider()
+                            .padding(Spacing.medium)
+                        allowOnAnyNetwork()
                     }
                     .padding(.bottom, Spacing.small)
                 }
