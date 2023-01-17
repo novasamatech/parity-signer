@@ -54,6 +54,7 @@ enum Heights {
     static let networkSelectionSettings: CGFloat = 52
     static let selectionBox: CGFloat = 48
     static let capsuleSelectionView: CGFloat = 28
+    static let minimumActionSheetButtonHeight: CGFloat = 48
 }
 
 enum Sizes {
