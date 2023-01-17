@@ -18,12 +18,12 @@ class CameraViewModel() : ViewModel() {
 
 	val isTorchEnabled = MutableStateFlow(false)
 
-	private val _isBananaPassword = MutableStateFlow(false)
-	val isBananaPassword: StateFlow<Boolean> = _isBananaPassword.asStateFlow()
+	private val _bananaSplitPayload = MutableStateFlow<List<String>?>(null)
+	val bananaSplitPayload: StateFlow<List<String>?> = _bananaSplitPayload.asStateFlow()
 
-	private val _pendingPayloads = MutableStateFlow<Set<String>>(emptySet())
+	private val _pendingTransactionPayloads = MutableStateFlow<Set<String>>(emptySet())
 	val pendingTransactionPayloads: StateFlow<Set<String>> =
-		_pendingPayloads.asStateFlow()
+		_pendingTransactionPayloads.asStateFlow()
 
 	private val _total = MutableStateFlow<Int?>(null)
 	private val _captured = MutableStateFlow<Int?>(null)
@@ -103,8 +103,8 @@ class CameraViewModel() : ViewModel() {
 							submitErrorState("cannot happen here that for scanning we don't have password request")
 						}
 						BananaSplitRecoveryResult.RequestPassword -> {
-							_isBananaPassword.value = true
-							resetPendingTransactions() 				//todo banana
+							resetScanValues()
+							_bananaSplitPayload.value = completePayload
 						}
 					}
 				}
@@ -121,7 +121,7 @@ class CameraViewModel() : ViewModel() {
 	}
 
 	private fun addPendingTransaction(payload: String) {
-		_pendingPayloads.value += payload
+		_pendingTransactionPayloads.value += payload
 	}
 
 	/**
@@ -134,8 +134,8 @@ class CameraViewModel() : ViewModel() {
 	}
 
 	fun resetPendingTransactions() {
-		_pendingPayloads.value = emptySet()
+		_pendingTransactionPayloads.value = emptySet()
+		_bananaSplitPayload.value = null
 		resetScanValues()
 	}
-
 }

@@ -65,9 +65,11 @@ fun ScanNavSubgraph(
 	if (bananaQrData != null) {
 
 		BananaSplitPasswordScreen(
+			qrData = bananaQrData,
 			onClose = { /*TODO*/ },
 			onDone = {}, //todo banana split
-			onShowError = { error -> },
+			onCustomError = { error -> },
+			onErrorWrongPassword = {}//todo banana
 		)
 	} else if (transactionsValue == null || showingModals) {
 

@@ -35,7 +35,7 @@ class ScanViewModel : ViewModel() {
 		MutableStateFlow(null)
 	var signature: MutableStateFlow<MSignatureReady?> =
 		MutableStateFlow(null)
-	var bananaSplitPassword: MutableStateFlow<String?> =
+	var bananaSplitPassword: MutableStateFlow<List<String>?> =
 		MutableStateFlow(null)
 	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)

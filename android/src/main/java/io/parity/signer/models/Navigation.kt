@@ -135,8 +135,9 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 				)
 		) {
 			singleton.activity.moveTaskToBack(true)
-		} else
+		} else {
 			navigate(Action.GO_BACK)
+		}
 	}
 }
 

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.models.Callback
@@ -35,10 +36,14 @@ import io.parity.signer.ui.theme.red500
 
 @Composable
 fun BananaSplitPasswordScreen(
+	qrData: List<String>,
 	onClose: Callback,
 	onDone: Callback,
-	onShowError: (String) -> Unit,
+	onErrorWrongPassword: Callback,
+	onCustomError: (String) -> Unit,
 ) {
+
+	val bananaViewModel: BananaSplitViewModel by viewModel()
 	var name by remember { mutableStateOf("") }
 	var password by remember { mutableStateOf("") }
 
@@ -49,6 +54,13 @@ fun BananaSplitPasswordScreen(
 	val passwordFocusRequester = remember { FocusRequester() }
 
 	var passwordVisible by remember { mutableStateOf(false) }
+
+
+	DisposableEffect(Unit) {
+		bananaViewModel.initState(qrData)
+		pathFocusRequester.requestFocus()
+		onDispose { focusManager.clearFocus() }
+	}
 
 	Column() {
 		ScreenHeaderWithButton(
@@ -100,7 +112,7 @@ fun BananaSplitPasswordScreen(
 					.fillMaxWidth(1f)
 			)
 
-			val errorForPath = "some error" //todo banana
+			val errorForPath = "Given display name already exists." //todo banana
 			errorForPath?.let { error ->
 				Text(
 					text = error,
@@ -157,11 +169,6 @@ fun BananaSplitPasswordScreen(
 			)
 			Spacer(modifier = Modifier.padding(bottom = 24.dp))
 		}
-
-		DisposableEffect(Unit) {
-			pathFocusRequester.requestFocus()
-			onDispose { focusManager.clearFocus() }
-		}
 	}
 }
 
@@ -179,9 +186,11 @@ fun BananaSplitPasswordScreen(
 private fun PreviewBananaSplitPasswordScreen() {
 	SignerNewTheme {
 		BananaSplitPasswordScreen(
+			qrData = emptyList(),
 			onClose = {},
 			onDone = {},
-			onShowError = { _ -> }
+			onCustomError = { _ -> },
+			onErrorWrongPassword = {},
 		)
 	}
 }

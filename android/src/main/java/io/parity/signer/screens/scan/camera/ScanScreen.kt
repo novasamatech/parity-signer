@@ -26,30 +26,43 @@ import io.parity.signer.screens.scan.camera.*
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 @Composable
 fun ScanScreen(
 	onClose: Callback,
 	performPayloads: suspend (String) -> Unit,
-	onBananaSplit: (String) -> Unit,
+	onBananaSplit: (List<String>) -> Unit,
 ) {
 	val viewModel: CameraViewModel = viewModel()
 
 	val captured by viewModel.captured.collectAsState()
 	val total by viewModel.total.collectAsState()
 
+
 	LaunchedEffect(Unit) {
 		//there can be data from last time camera was open since it's scanning during transition to a new screen
 		viewModel.resetPendingTransactions()
-		//if multi scan mode - on button click reaction should be handled
-		viewModel.pendingTransactionPayloads
-			.filter { it.isNotEmpty() }
-			.collect {
-				//scanned qr codes is signer transaction qr code
-				performPayloads(it.joinToString(separator = ""))
-				viewModel.resetPendingTransactions()
-			}
+
+		launch {
+			viewModel.pendingTransactionPayloads
+				.filter { it.isNotEmpty() }
+				.collect {
+					//scanned qr codes is signer transaction qr code
+					performPayloads(it.joinToString(separator = ""))
+					viewModel.resetPendingTransactions()
+				}
+		}
+
+		launch {
+			viewModel.bananaSplitPayload
+				.filterNotNull()
+				.filter { it.isNotEmpty() }
+				.collect { qrData ->
+					onBananaSplit(qrData)
+				}
+		}
 	}
 
 	Box(
