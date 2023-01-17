@@ -32,6 +32,7 @@ import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.red500
+import io.parity.signer.uniffi.updateSeedNames
 
 
 @Composable
@@ -43,11 +44,15 @@ fun BananaSplitPasswordScreen(
 	onCustomError: (String) -> Unit,
 ) {
 
-	val bananaViewModel: BananaSplitViewModel by viewModel()
-	var name by remember { mutableStateOf("") }
-	var password by remember { mutableStateOf("") }
+	val bananaViewModel: BananaSplitViewModel = viewModel()
 
-	val canProceed = name.isNotEmpty() && password.isNotEmpty()
+	val name = bananaViewModel.seedName.collectAsState()
+	val password = bananaViewModel.password.collectAsState()
+	val nameCollision = bananaViewModel.seedCollision.collectAsState()
+	val wrongPassword = bananaViewModel.wrongPasswordCurrent.collectAsState()
+
+
+	val canProceed = name.value.isNotEmpty() && password.value.isNotEmpty()
 
 	val focusManager = LocalFocusManager.current
 	val pathFocusRequester = remember { FocusRequester() }
@@ -90,8 +95,8 @@ fun BananaSplitPasswordScreen(
 			)
 
 			OutlinedTextField(
-				value = name,
-				onValueChange = { newStr -> name = newStr },
+				value = name.value,
+				onValueChange = { newStr -> (bananaViewModel::updateSeedName)(newStr) },
 				keyboardOptions = KeyboardOptions(
 					imeAction = if (canProceed) ImeAction.Done else ImeAction.None
 				),
@@ -99,8 +104,7 @@ fun BananaSplitPasswordScreen(
 					passwordFocusRequester.requestFocus()
 				}),
 				label = { Text(text = stringResource(R.string.banana_split_password_name_label)) },
-				isError = false, //pathValidity != DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD,
-				//todo banana
+				isError = nameCollision.value,
 				singleLine = true,
 				textStyle = SignerTypeface.LabelM,
 				colors = TextFieldDefaults.textFieldColors(
@@ -111,11 +115,9 @@ fun BananaSplitPasswordScreen(
 					.focusRequester(pathFocusRequester)
 					.fillMaxWidth(1f)
 			)
-
-			val errorForPath = "Given display name already exists." //todo banana
-			errorForPath?.let { error ->
+			if (nameCollision.value) {
 				Text(
-					text = error,
+					text = "Given display name already exists.",
 					color = MaterialTheme.colors.red500,
 					style = SignerTypeface.CaptionM,
 				)
@@ -130,8 +132,8 @@ fun BananaSplitPasswordScreen(
 				modifier = Modifier
 			)
 			OutlinedTextField(
-				value = password,
-				onValueChange = { password = it },
+				value = password.value,
+				onValueChange = { password -> (bananaViewModel::updatePassword)(password) },
 				modifier = Modifier
 					.focusRequester(passwordFocusRequester)
 					.fillMaxWidth(1f),
@@ -143,15 +145,19 @@ fun BananaSplitPasswordScreen(
 				keyboardActions = KeyboardActions(
 					onDone = {
 						if (canProceed) {
-//						proceed(password)
+//						proceed(password)//todo banana
 //						focusManager.clearFocus(true)
 						}
 					}
 				),
 				label = { Text(text = stringResource(R.string.banana_split_password_password_label)) },
+				isError = wrongPassword.value,
 				singleLine = true,
 				textStyle = SignerTypeface.LabelM,
-				colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
+				colors = TextFieldDefaults.textFieldColors(
+					textColor = MaterialTheme.colors.primary,
+					errorCursorColor = MaterialTheme.colors.primary,
+				),
 				trailingIcon = {
 					val image = if (passwordVisible)
 						Icons.Filled.Visibility
@@ -167,6 +173,13 @@ fun BananaSplitPasswordScreen(
 					}
 				},
 			)
+			if (wrongPassword.value) {
+				Text(
+					text = "The password you entered is incorrect",
+					color = MaterialTheme.colors.red500,
+					style = SignerTypeface.CaptionM,
+				)
+			}
 			Spacer(modifier = Modifier.padding(bottom = 24.dp))
 		}
 	}

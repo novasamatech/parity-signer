@@ -12,13 +12,25 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class BananaSplitViewModel() : ViewModel() {
 
-	private val _isWrongPassword = MutableStateFlow(false)
-	val isWrongPassword = _isWrongPassword.asStateFlow()
+	//terminal events
+	private val _isWrongPasswordTerminal = MutableStateFlow(false)
+	val isWrongPasswordTerminal = _isWrongPasswordTerminal.asStateFlow()
+	private val _isCustomErrorTerminal = MutableStateFlow<String?>(null)
+	val isCustomErrorTerminal = _isCustomErrorTerminal.asStateFlow()
+	private val _isSuccessTerminal = MutableStateFlow<String?>(null)
+	//String is seed name
+	val isSuccessTerminal = _isSuccessTerminal.asStateFlow()
 
-	private val _isError = MutableStateFlow<String?>(null)
-	val isError = _isError.asStateFlow()
-	private val _isSuccess = MutableStateFlow<String?>(null)
-	val isSuccess = _isSuccess.asStateFlow()
+	//ongoing events
+	private val _password = MutableStateFlow<String>("")
+	val password = _password.asStateFlow()
+	private val _seedName = MutableStateFlow<String>("")
+	val seedName = _seedName.asStateFlow()
+	private val _seedCollision = MutableStateFlow<Boolean>(false)
+	val seedCollision = _seedCollision.asStateFlow()
+	private val _wrongPasswordCurrent = MutableStateFlow<Boolean>(false)
+	val wrongPasswordCurrent = _wrongPasswordCurrent.asStateFlow()
+
 
 	private val uniffiInteractor = ServiceLocator.backendScope.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
@@ -28,14 +40,22 @@ class BananaSplitViewModel() : ViewModel() {
 	fun initState(qrCodeData: List<String>) {
 		this.qrCodeData = qrCodeData
 		this.invalidPasswordAttempts = 0
-		_isWrongPassword.value = false
+		_isWrongPasswordTerminal.value = false
 	}
 
-	fun isPathCollision(): Boolean {
-		return false
+	fun updatePassword(newPassword: String) {
+		if (wrongPasswordCurrent.value && newPassword != password.value) {
+			_wrongPasswordCurrent.value = false
+		}
+		_password.value = newPassword
 	}
 
-	suspend fun onDoneTap(seedName: String, password: String) {
+	fun updateSeedName(newSeedName: String) {
+		_seedCollision.value = seedRepository.containSeedName(newSeedName)
+		_seedName.value = newSeedName
+	}
+
+	suspend fun onDoneTap() {
 		try {
 			when (val qrResult =
 				qrparserTryDecodeQrSequence(qrCodeData, password, false)) {
@@ -43,7 +63,7 @@ class BananaSplitViewModel() : ViewModel() {
 					when (val seed = qrResult.b) {
 						is BananaSplitRecoveryResult.RecoveredSeed -> {
 							if (seedRepository.isSeedPhraseCollision(seed.s)) {
-//								dismissWithError(.seedPhraseAlreadyExists())
+//								dismissWithError(.seedPhraseAlreadyExists())//todo banana
 //						return
 							}
 							//fake navigations
@@ -58,7 +78,7 @@ class BananaSplitViewModel() : ViewModel() {
 								isOptionalAuth = true
 							)
 							uniffiInteractor.navigate(Action.GO_BACK)
-							_isSuccess.value = seedName
+							_isSuccessTerminal.value = seedName
 							//todo banana
 //					navigation.overrideQRScannerDismissalNavigation = .init(action: .selectSeed, details: seedName)
 						}
@@ -80,7 +100,7 @@ class BananaSplitViewModel() : ViewModel() {
 //						dismissWithError(.signingForgotPassword())
 //					return
 					}
-					_isWrongPassword.value = true
+					_isWrongPasswordTerminal.value = true
 				}
 				is QrSequenceDecodeException.BananaSplit -> {
 					val error = e.s

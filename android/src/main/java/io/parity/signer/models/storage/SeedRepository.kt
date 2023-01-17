@@ -17,6 +17,10 @@ class SeedRepository(
 	private val activity: FragmentActivity,
 ) {
 
+	fun containSeedName(seedName: String) : Boolean {
+		return storage.lastKnownSeedNames.value.contains(seedName)
+	}
+
 	suspend fun getSeedPhrases(seedNames: List<String>): RepoResult<String> {
 		return try {
 			try {
