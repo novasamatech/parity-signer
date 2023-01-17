@@ -32,7 +32,7 @@ import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.red500
-import io.parity.signer.uniffi.updateSeedNames
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -51,18 +51,49 @@ fun BananaSplitPasswordScreen(
 	val nameCollision = bananaViewModel.seedCollision.collectAsState()
 	val wrongPassword = bananaViewModel.wrongPasswordCurrent.collectAsState()
 
+	LaunchedEffect(Unit) {
+		bananaViewModel.initState(qrData)
 
-	val canProceed = name.value.isNotEmpty() && password.value.isNotEmpty()
+		launch {
+
+		}
+
+
+	}
+
+	BananaSplitPasswordInternal(
+		onClose = onClose,
+		onDone = onDone,
+		name = name,
+		nameCollision = nameCollision,
+		password = password,
+		wrongPassword = wrongPassword,
+		onChangePassword = bananaViewModel::updatePassword,
+		onChangeSeedName = bananaViewModel::updateSeedName,
+	)
+}
+
+@Composable
+private fun BananaSplitPasswordInternal(
+	onClose: Callback,
+	onDone: Callback,
+	name: State<String>,
+	nameCollision: State<Boolean>,
+	password: State<String>,
+	wrongPassword: State<Boolean>,
+	onChangeSeedName: (String) -> Unit,
+	onChangePassword: (String) -> Unit,
+) {
 
 	val focusManager = LocalFocusManager.current
 	val pathFocusRequester = remember { FocusRequester() }
 	val passwordFocusRequester = remember { FocusRequester() }
 
+	val canProceed = name.value.isNotEmpty() && password.value.isNotEmpty()
+
 	var passwordVisible by remember { mutableStateOf(false) }
 
-
 	DisposableEffect(Unit) {
-		bananaViewModel.initState(qrData)
 		pathFocusRequester.requestFocus()
 		onDispose { focusManager.clearFocus() }
 	}
@@ -96,7 +127,7 @@ fun BananaSplitPasswordScreen(
 
 			OutlinedTextField(
 				value = name.value,
-				onValueChange = { newStr -> (bananaViewModel::updateSeedName)(newStr) },
+				onValueChange = { newStr -> onChangeSeedName(newStr) },
 				keyboardOptions = KeyboardOptions(
 					imeAction = if (canProceed) ImeAction.Done else ImeAction.None
 				),
@@ -133,7 +164,7 @@ fun BananaSplitPasswordScreen(
 			)
 			OutlinedTextField(
 				value = password.value,
-				onValueChange = { password -> (bananaViewModel::updatePassword)(password) },
+				onValueChange = { password -> onChangePassword(password) },
 				modifier = Modifier
 					.focusRequester(passwordFocusRequester)
 					.fillMaxWidth(1f),

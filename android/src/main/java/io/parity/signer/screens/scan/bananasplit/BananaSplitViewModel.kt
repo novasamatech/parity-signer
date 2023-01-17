@@ -56,6 +56,8 @@ class BananaSplitViewModel() : ViewModel() {
 	}
 
 	suspend fun onDoneTap() {
+		val password = password.value
+		val seedName = seedName.value
 		try {
 			when (val qrResult =
 				qrparserTryDecodeQrSequence(qrCodeData, password, false)) {
@@ -63,8 +65,8 @@ class BananaSplitViewModel() : ViewModel() {
 					when (val seed = qrResult.b) {
 						is BananaSplitRecoveryResult.RecoveredSeed -> {
 							if (seedRepository.isSeedPhraseCollision(seed.s)) {
-//								dismissWithError(.seedPhraseAlreadyExists())//todo banana
-//						return
+								_isCustomErrorTerminal.value = "This seed phrase already exists"
+								return
 							}
 							//fake navigations
 							uniffiInteractor.navigate(Action.NAVBAR_KEYS)
@@ -96,19 +98,18 @@ class BananaSplitViewModel() : ViewModel() {
 				is QrSequenceDecodeException.BananaSplitWrongPassword -> {
 					invalidPasswordAttempts += 1
 					if (invalidPasswordAttempts > 3) {
-//						todo banana
-//						dismissWithError(.signingForgotPassword())
-//					return
+						_isWrongPasswordTerminal.value = true
+					return
 					}
 					_isWrongPasswordTerminal.value = true
 				}
 				is QrSequenceDecodeException.BananaSplit -> {
 					val error = e.s
-//					dismissWithError(.alertError(message: errorDetail))
+					_isCustomErrorTerminal.value = error
 				}
 				is QrSequenceDecodeException.GenericException -> {
 					val error = e.s
-//					dismissWithError(.alertError(message: errorDetail))
+					_isCustomErrorTerminal.value = error
 				}
 			}
 		}
