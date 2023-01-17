@@ -22,6 +22,17 @@ enum CornerRadius {
     static let extraLarge: CGFloat = 32
     /// Extra Extra Large: 40 pts
     static let extraExtraLarge: CGFloat = 40
-    /// QR Code scanner: 56 pts
-    static let qrCodeScanner: CGFloat = 74
+    /// QR Code scanner: 56pts or 74pts, depending on device width
+    static var qrCodeScanner: CGFloat {
+        switch UIScreen.main.bounds.width {
+        case DeviceConstants.compactDeviceWidth:
+            return 56
+        default:
+            return 74
+        }
+    }
+}
+
+enum DeviceConstants {
+    static let compactDeviceWidth: CGFloat = 320
 }

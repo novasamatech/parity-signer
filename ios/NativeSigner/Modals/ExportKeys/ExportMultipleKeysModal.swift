@@ -19,6 +19,7 @@ extension QRCodeAddressFooterViewModel {
         identicon = derivedKey.viewModel.identicon
         rootKeyName = derivedKey.viewModel.rootKeyName
         path = derivedKey.viewModel.path
+        hasPassword = derivedKey.viewModel.hasPassword
         network = derivedKey.keyData.network.networkTitle
         base58 = derivedKey.viewModel.base58
     }
@@ -55,7 +56,7 @@ struct ExportMultipleKeysModal: View {
             header
                 .padding([.leading], Spacing.large)
                 .padding([.trailing], Spacing.medium)
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 VStack(alignment: .center) {
                     // QR Code container
                     VStack(spacing: 0) {

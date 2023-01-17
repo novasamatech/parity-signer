@@ -29,7 +29,7 @@ struct DerivationMethodsInfoView: View {
                     .padding(.leading, Spacing.large)
                     .padding(.trailing, Spacing.medium)
                     .padding(.bottom, Spacing.medium)
-                    ScrollView {
+                    ScrollView(showsIndicators: false) {
                         VStack(alignment: .leading, spacing: Spacing.small) {
                             Localizable.CreateDerivedKey.InfoModal.DerivationMethods.Soft.title.text
                                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)

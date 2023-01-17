@@ -59,7 +59,7 @@ struct BackupModal: View {
                     .padding(.trailing, Spacing.medium)
                     Divider()
                         .padding(.top, Spacing.medium)
-                    ScrollView {
+                    ScrollView(showsIndicators: false) {
                         VStack(alignment: .center, spacing: Spacing.medium) {
                             // Seed phrase
                             HStack {
