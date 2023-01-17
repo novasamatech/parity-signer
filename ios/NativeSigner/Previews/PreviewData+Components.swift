@@ -18,6 +18,7 @@ extension PreviewData {
         identicon: PreviewData.exampleIdenticon,
         rootKeyName: "Dotsama parachains",
         path: "//polkadot//path",
+        hasPassword: true,
         network: "Polkadot",
         base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
     )

@@ -19,6 +19,7 @@ struct KeyDetailsPublicKeyViewModel: Equatable {
             identicon: keyDetails.address.identicon.svgPayload,
             rootKeyName: keyDetails.address.seedName,
             path: keyDetails.address.path,
+            hasPassword: keyDetails.address.hasPwd,
             network: keyDetails.networkInfo.networkTitle,
             base58: keyDetails.base58
         )
