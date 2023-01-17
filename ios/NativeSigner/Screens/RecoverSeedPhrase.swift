@@ -63,7 +63,7 @@ struct RecoverSeedPhrase: View {
                             }
                         }
                         .background(RoundedRectangle(cornerRadius: 8).stroke(Asset.fill12.swiftUIColor))
-                        ScrollView(.horizontal) {
+                        ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack {
                                 ForEach(content.guessSet, id: \.self) { guess in
                                     Text(guess)

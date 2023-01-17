@@ -35,7 +35,7 @@ struct TransactionPreview: View {
                     rightBarMenuAction: {}
                 )
             )
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 ForEach(viewModel.dataModel, id: \.id) { singleTransaction(content: $0.content) }
                 qrCodeComponent(viewModel.dataModel.count)
                 logNote(viewModel.dataModel.first?.content.ttype)

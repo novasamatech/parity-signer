@@ -55,7 +55,7 @@ struct ExportMultipleKeysModal: View {
             header
                 .padding([.leading], Spacing.large)
                 .padding([.trailing], Spacing.medium)
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 VStack(alignment: .center) {
                     // QR Code container
                     VStack(spacing: 0) {
