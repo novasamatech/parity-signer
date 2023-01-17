@@ -134,5 +134,6 @@ struct Snackbar_Previews: PreviewProvider {
     static var previews: some View {
         SnackbarDemo()
             .preferredColorScheme(.light)
+            .previewDevice(PreviewDevice(rawValue: "iPod Touch (7th generation)"))
     }
 }

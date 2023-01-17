@@ -26,9 +26,12 @@ struct KeyDetailsView: View {
                         leftButton: .arrow,
                         rightButton: .more
                     ),
-                    actionModel: .init(rightBarMenuAction: {
-                        viewModel.isShowingActionSheet.toggle()
-                    })
+                    actionModel: .init(
+                        leftBarMenuAction: { viewModel.onBackTap() },
+                        rightBarMenuAction: {
+                            viewModel.isShowingActionSheet.toggle()
+                        }
+                    )
                 )
                 ScrollView(showsIndicators: false) {
                     // Main key cell
