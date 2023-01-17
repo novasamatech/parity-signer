@@ -181,7 +181,7 @@ private fun PreviewBananaSplitPasswordScreen() {
 		BananaSplitPasswordScreen(
 			onClose = {},
 			onDone = {},
-			onShowError = {_ ->}
+			onShowError = { _ -> }
 		)
 	}
 }
