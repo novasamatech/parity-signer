@@ -73,7 +73,11 @@ struct Snackbar: View {
                     .padding(.trailing, Spacing.medium)
             }
         }
-        .padding(.vertical, Spacing.small)
+        .padding(.vertical, Spacing.medium)
+        .frame(
+            minHeight: Heights.snackbarHeight,
+            alignment: .center
+        )
         .background(viewModel.style.tintColor)
         .cornerRadius(CornerRadius.small)
         .padding([.top, .bottom])
