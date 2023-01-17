@@ -35,6 +35,10 @@ struct SeedPhraseView: View {
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
+    private let reducedWidthColumn = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
 
     init(
         viewModel: SeedPhraseViewModel
@@ -43,7 +47,7 @@ struct SeedPhraseView: View {
     }
 
     var body: some View {
-        LazyVGrid(columns: columns, alignment: .leading, spacing: 0) {
+        LazyVGrid(columns: layout(), alignment: .leading, spacing: 0) {
             ForEach(viewModel.seeds, id: \.position) { seedWord in
                 HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
                     Text(seedWord.position)
@@ -64,6 +68,10 @@ struct SeedPhraseView: View {
         }
         .padding(Spacing.medium)
         .containerBackground(CornerRadius.small)
+    }
+
+    private func layout() -> [GridItem] {
+        UIScreen.main.bounds.width == DeviceConstants.compactDeviceWidth ? reducedWidthColumn : columns
     }
 }
 
