@@ -18,9 +18,9 @@ struct RootKeyDetailsModal: View {
                 animateDismissal()
             },
             animateBackground: $animateBackground,
-            safeAreaInsetsMode: .full,
+            safeAreaInsetsMode: .partial,
             content: {
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 0) {
                     // Header with X button
                     HStack {
                         Text(viewModel.name)
@@ -31,7 +31,7 @@ struct RootKeyDetailsModal: View {
                     }
                     .padding([.leading], Spacing.large)
                     .padding([.trailing], Spacing.medium)
-                    .padding(.vertical, Spacing.small)
+                    .padding(.vertical, Spacing.medium)
                     Divider()
                         .padding(.horizontal, Spacing.large)
                     // Content
@@ -46,6 +46,8 @@ struct RootKeyDetailsModal: View {
                     .padding(.horizontal, Spacing.large)
                     .padding(.vertical, Spacing.small)
                 }
+                .padding(.bottom, Spacing.medium)
+                .padding(.top, -Spacing.medium)
             }
         )
     }

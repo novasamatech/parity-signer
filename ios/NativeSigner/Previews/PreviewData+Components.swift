@@ -51,7 +51,7 @@ extension PreviewData {
 extension PreviewData {
     static let seedPhraseViewModel = SeedPhraseViewModel(
         seedPhrase: """
-        awesome change room lottery song useless hurdle dry educate type debate
+        awesome change room lottery song useless elephant dry educate type debate
          season give exact gift push bid rich atom system pig put welcome exit
         """
     )

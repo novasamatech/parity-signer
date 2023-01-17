@@ -63,7 +63,8 @@ struct Snackbar: View {
             Text(viewModel.title)
                 .font(PrimaryFont.bodyL.font)
                 .foregroundColor(Asset.accentForegroundText.swiftUIColor)
-                .padding(Spacing.large)
+                .padding(.horizontal, Spacing.medium)
+                .lineSpacing(Spacing.extraSmall)
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer()
@@ -72,12 +73,7 @@ struct Snackbar: View {
                     .padding(.trailing, Spacing.medium)
             }
         }
-        .frame(
-            minHeight: Heights.snackbarHeight,
-            idealHeight: Heights.snackbarHeight,
-            maxHeight: Heights.snackbarMaxHeight,
-            alignment: .center
-        )
+        .padding(.vertical, Spacing.small)
         .background(viewModel.style.tintColor)
         .cornerRadius(CornerRadius.small)
         .padding([.top, .bottom])
@@ -122,7 +118,8 @@ struct SnackbarDemo: View {
                 style: .info,
                 countdown: .init(counter: 60, viewModel: .snackbarCountdown, onCompletion: {})
             ),
-            isPresented: $showInfo
+            isPresented: $showInfo,
+            autodismissCounter: 60
         )
     }
 }

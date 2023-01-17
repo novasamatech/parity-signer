@@ -43,20 +43,23 @@ struct SeedPhraseView: View {
     }
 
     var body: some View {
-        LazyVGrid(columns: columns, alignment: .center, spacing: 0) {
+        LazyVGrid(columns: columns, alignment: .leading, spacing: 0) {
             ForEach(viewModel.seeds, id: \.position) { seedWord in
-                HStack {
+                HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
                     Text(seedWord.position)
-                        .font(.robotoMono)
+                        .font(.robotoMonoRegular)
                         .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
-                        .padding(.leading, Spacing.extraExtraSmall)
                         .frame(minWidth: Sizes.seedWordPositionWidth, alignment: .trailing)
+                        .minimumScaleFactor(1)
+                        .lineLimit(1)
                     Text(seedWord.word)
-                        .font(.robotoMono)
+                        .font(.robotoMonoBold)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .minimumScaleFactor(1)
+                        .lineLimit(1)
                 }
-                .padding([.bottom, .top], Spacing.extraSmall)
+                .frame(height: 24)
+                .padding([.bottom, .top], Spacing.extraExtraSmall)
             }
         }
         .padding(Spacing.medium)
@@ -72,7 +75,7 @@ struct SeedPhraseView: View {
                 SeedPhraseView(
                     viewModel: PreviewData.seedPhraseViewModel
                 )
-                .padding(Spacing.large)
+                .padding(Spacing.medium)
                 Spacer()
             }
             .background(Asset.backgroundSecondary.swiftUIColor)

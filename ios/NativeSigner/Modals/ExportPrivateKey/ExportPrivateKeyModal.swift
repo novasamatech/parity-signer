@@ -27,7 +27,7 @@ struct ExportPrivateKeyModal: View {
             animateBackground: $animateBackground,
             safeAreaInsetsMode: .full,
             content: {
-                VStack(alignment: .center) {
+                VStack(alignment: .center, spacing: 0) {
                     // Header with X button
                     HStack {
                         Localizable.KeyExport.Label.header.text
@@ -38,6 +38,7 @@ struct ExportPrivateKeyModal: View {
                     }
                     .padding([.leading], Spacing.large)
                     .padding([.trailing], Spacing.medium)
+                    .padding(.bottom, Spacing.medium)
                     // QR Code container
                     VStack(spacing: 0) {
                         AnimatedQRCodeView(
@@ -55,7 +56,8 @@ struct ExportPrivateKeyModal: View {
                     .padding([.leading, .trailing], Spacing.large)
                     // Bottom "Hide" container
                     ExportPrivateKeyAddressFooter(hideAction: animateDismissal)
-                        .padding([.leading, .trailing], Spacing.extraSmall)
+                        .padding(.horizontal, Spacing.extraSmall)
+                        .padding(.vertical, Spacing.medium)
                 }
             }
         )
