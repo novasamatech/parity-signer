@@ -67,7 +67,7 @@ fun ScanNavSubgraph(
 		BananaSplitPasswordScreen(
 			qrData = bananaQrData,
 			onClose = { /*TODO*/ },
-			onDone = {}, //todo banana split
+			onSuccess = {}, //todo banana split
 			onCustomError = { error -> },
 			onErrorWrongPassword = {}//todo banana
 		)

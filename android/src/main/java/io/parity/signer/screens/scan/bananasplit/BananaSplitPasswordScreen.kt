@@ -1,5 +1,6 @@
 package io.parity.signer.screens.scan.bananasplit
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,16 +33,18 @@ import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.red500
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 @Composable
 fun BananaSplitPasswordScreen(
 	qrData: List<String>,
 	onClose: Callback,
-	onDone: Callback,
+	onSuccess: (newSeed: String) -> Unit,
 	onErrorWrongPassword: Callback,
-	onCustomError: (String) -> Unit,
+	onCustomError: (errorText: String) -> Unit,
 ) {
 
 	val bananaViewModel: BananaSplitViewModel = viewModel()
@@ -55,34 +58,55 @@ fun BananaSplitPasswordScreen(
 		bananaViewModel.initState(qrData)
 
 		launch {
-
+			bananaViewModel.isWrongPasswordTerminal.collect {
+				if (it) {
+					onErrorWrongPassword()
+					bananaViewModel.cleanState()
+				}
+			}
 		}
-
-
+		launch {
+			bananaViewModel.isCustomErrorTerminal
+				.filterNotNull()
+				.collect {
+					onCustomError(it)
+					bananaViewModel.cleanState()
+				}
+		}
+		launch {
+			bananaViewModel.isSuccessTerminal
+				.filterNotNull()
+				.collect {
+					onSuccess(it)
+					bananaViewModel.cleanState()
+				}
+		}
 	}
 
 	BananaSplitPasswordInternal(
 		onClose = onClose,
-		onDone = onDone,
 		name = name,
 		nameCollision = nameCollision,
 		password = password,
 		wrongPassword = wrongPassword,
 		onChangePassword = bananaViewModel::updatePassword,
 		onChangeSeedName = bananaViewModel::updateSeedName,
+		onDoneTap = {
+			runBlocking { bananaViewModel.onDoneTap() }
+		}
 	)
 }
 
 @Composable
 private fun BananaSplitPasswordInternal(
+	onDoneTap: Callback,
 	onClose: Callback,
-	onDone: Callback,
+	onChangeSeedName: (String) -> Unit,
+	onChangePassword: (String) -> Unit,
 	name: State<String>,
 	nameCollision: State<Boolean>,
 	password: State<String>,
-	wrongPassword: State<Boolean>,
-	onChangeSeedName: (String) -> Unit,
-	onChangePassword: (String) -> Unit,
+	wrongPassword: State<Boolean>
 ) {
 
 	val focusManager = LocalFocusManager.current
@@ -103,7 +127,7 @@ private fun BananaSplitPasswordInternal(
 			canProceed = canProceed,
 			title = "",
 			onClose = onClose,
-			onDone = onDone, //todo banana
+			onDone = onDoneTap,
 		)
 
 		Column(
@@ -148,7 +172,7 @@ private fun BananaSplitPasswordInternal(
 			)
 			if (nameCollision.value) {
 				Text(
-					text = "Given display name already exists.",
+					text = stringResource(R.string.banana_split_password_name_error_collision),
 					color = MaterialTheme.colors.red500,
 					style = SignerTypeface.CaptionM,
 				)
@@ -206,7 +230,7 @@ private fun BananaSplitPasswordInternal(
 			)
 			if (wrongPassword.value) {
 				Text(
-					text = "The password you entered is incorrect",
+					text = stringResource(R.string.banana_split_password_password_error_wrong),
 					color = MaterialTheme.colors.red500,
 					style = SignerTypeface.CaptionM,
 				)
@@ -217,6 +241,7 @@ private fun BananaSplitPasswordInternal(
 }
 
 
+@SuppressLint("UnrememberedMutableState")
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -227,14 +252,43 @@ private fun BananaSplitPasswordInternal(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewBananaSplitPasswordScreen() {
+private fun PreviewBananaSplitPasswordScreenEmpty() {
 	SignerNewTheme {
-		BananaSplitPasswordScreen(
-			qrData = emptyList(),
+		BananaSplitPasswordInternal(
+			onDoneTap = {},
 			onClose = {},
-			onDone = {},
-			onCustomError = { _ -> },
-			onErrorWrongPassword = {},
+			onChangeSeedName = {},
+			onChangePassword = {},
+			name = mutableStateOf(""),
+			nameCollision = mutableStateOf(false),
+			password = mutableStateOf(""),
+			wrongPassword = mutableStateOf(false),
+		)
+	}
+}
+
+@SuppressLint("UnrememberedMutableState")
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewBananaSplitPasswordScreenFull() {
+	SignerNewTheme {
+		BananaSplitPasswordInternal(
+			onDoneTap = {},
+			onClose = {},
+			onChangeSeedName = {},
+			onChangePassword = {},
+			name = mutableStateOf("Seed"),
+			nameCollision = mutableStateOf(true),
+			password = mutableStateOf("special"),
+			wrongPassword = mutableStateOf(true),
 		)
 	}
 }

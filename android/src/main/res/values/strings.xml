@@ -219,6 +219,8 @@
 	<string name="banana_split_password_password_header">Enter banana split password</string>
 	<string name="banana_split_password_name_label">Display Name</string>
 	<string name="banana_split_password_password_label">Password</string>
+	<string name="banana_split_password_name_error_collision">Given display name already exists.</string>
+	<string name="banana_split_password_password_error_wrong">The password you entered is incorrect</string>
 
 </resources>
 

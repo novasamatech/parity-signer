@@ -43,6 +43,17 @@ class BananaSplitViewModel() : ViewModel() {
 		_isWrongPasswordTerminal.value = false
 	}
 
+	fun cleanState() {
+		_password.value = ""
+		_seedName.value = ""
+		_seedCollision.value = false
+		_wrongPasswordCurrent.value = false
+
+		_isWrongPasswordTerminal.value = false
+		_isSuccessTerminal.value = null
+		_isCustomErrorTerminal.value = null
+	}
+
 	fun updatePassword(newPassword: String) {
 		if (wrongPasswordCurrent.value && newPassword != password.value) {
 			_wrongPasswordCurrent.value = false
