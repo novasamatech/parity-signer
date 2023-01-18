@@ -2,6 +2,7 @@ package io.parity.signer.screens.scan.bananasplit
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,6 +34,7 @@ import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.backgroundSystem
 import io.parity.signer.ui.theme.red500
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -46,6 +48,7 @@ fun BananaSplitPasswordScreen(
 	onSuccess: (newSeed: String) -> Unit,
 	onErrorWrongPassword: Callback,
 	onCustomError: (errorText: String) -> Unit,
+	modifier: Modifier = Modifier,
 ) {
 
 	val bananaViewModel: BananaSplitViewModel = viewModel()
@@ -95,7 +98,8 @@ fun BananaSplitPasswordScreen(
 		onChangeSeedName = bananaViewModel::updateSeedName,
 		onDoneTap = {
 			runBlocking { bananaViewModel.onDoneTap(context) }
-		}
+		},
+		modifier = modifier,
 	)
 }
 
@@ -108,7 +112,8 @@ private fun BananaSplitPasswordInternal(
 	name: State<String>,
 	nameCollision: State<Boolean>,
 	password: State<String>,
-	wrongPassword: State<Boolean>
+	wrongPassword: State<Boolean>,
+	modifier: Modifier = Modifier,
 ) {
 
 	val focusManager = LocalFocusManager.current
@@ -125,7 +130,9 @@ private fun BananaSplitPasswordInternal(
 		onDispose { focusManager.clearFocus() }
 	}
 
-	Column() {
+	Column(
+		modifier.background(MaterialTheme.colors.backgroundSystem)
+	) {
 		ScreenHeaderWithButton(
 			canProceed = canProceed,
 			title = "",
