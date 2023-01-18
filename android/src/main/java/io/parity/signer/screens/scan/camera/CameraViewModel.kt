@@ -54,17 +54,15 @@ class CameraViewModel() : ViewModel() {
 			.addOnSuccessListener { barcodes ->
 				barcodes.forEach {
 					val payloadString = it?.rawBytes?.encodeHex()
-					//todo banana check what is the difference between this currentMultiQrTransaction and pendingTransactionPayloads
-// and like ios/NativeSigner/Models/CameraService.swift:35 todo banana
 					if (!currentMultiQrTransaction.contains(payloadString) && !payloadString.isNullOrEmpty()) {
 						if (total.value == null) {
 							try {
-								val proposeTotal =
-									qrparserGetPacketsTotal(payloadString, true).toInt()
+								val proposeTotal = qrparserGetPacketsTotal(payloadString, true).toInt()
 								if (proposeTotal == 1) {
 									decode(listOf(payloadString))
 								} else {
 									currentMultiQrTransaction += payloadString
+									_captured.value = currentMultiQrTransaction.size
 									_total.value = proposeTotal
 								}
 							} catch (e: java.lang.Exception) {
