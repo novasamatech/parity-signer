@@ -21,7 +21,7 @@ struct NetworkSettingsDetails: View {
                 ),
                 actionModel: .init(rightBarMenuAction: viewModel.onMoreMenuTap)
             )
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 0) {
                     VStack(alignment: .center, spacing: 0) {
                         NetworkLogoIcon(logo: viewModel.networkDetails.logo, size: Heights.networkLogoInHeader)

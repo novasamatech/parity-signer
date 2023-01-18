@@ -58,6 +58,7 @@ extension KeyDetailsView {
 
         func use(appState: AppState) {
             self.appState = appState
+            keysData = appState.userData.keysData
             $isPresentingNetworkSelection.sink { newValue in
                 guard !newValue else { return }
                 self.isFilteringActive = !self.appState.userData.selectedNetworks.isEmpty
@@ -90,6 +91,11 @@ extension KeyDetailsView {
                     self.updateRenderables()
                 }
             }
+        }
+
+        func onBackTap() {
+            appState.userData.keysData = nil
+            navigation.perform(navigation: .init(action: .goBack))
         }
     }
 }

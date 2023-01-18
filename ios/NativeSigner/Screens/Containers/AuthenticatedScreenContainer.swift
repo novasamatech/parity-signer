@@ -39,7 +39,7 @@ struct AuthenticatedScreenContainer: View {
             }
             .gesture(
                 DragGesture().updating($dragOffset, body: { value, _, _ in
-                    if value.startLocation.x < 20, value.translation.width > 100 {
+                    if value.startLocation.x < 20, value.translation.width > 100, !navigation.disableSwipeToBack {
                         navigation.perform(navigation: .init(action: .goBack))
                     }
                 })

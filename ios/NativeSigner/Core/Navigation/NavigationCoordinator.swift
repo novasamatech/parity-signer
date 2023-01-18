@@ -69,6 +69,7 @@ final class NavigationCoordinator: ObservableObject {
     ///
     /// This is a temporary fix that should be removed after introduction of Rust API
     @Published var currentKeyDetails: MKeyDetails!
+    @Published var disableSwipeToBack: Bool = false
 
     init(
         backendActionPerformer: BackendNavigationPerforming = BackendNavigationAdapter(),
@@ -124,8 +125,10 @@ private extension NavigationCoordinator {
     func updateIntermediateNavigation(_ actionResult: ActionResult) {
         var updatedShouldSkipInjectedViews: Bool
         switch actionResult.screenData {
+        case .keys:
+            disableSwipeToBack = true
+            updatedShouldSkipInjectedViews = true
         case .seedSelector, // Main `Keys` screen
-             .keys, // `Key Details` screen
              .keyDetails, // `Public Key` screen
              .transaction,
              .log,

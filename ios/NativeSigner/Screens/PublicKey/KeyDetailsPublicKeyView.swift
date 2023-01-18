@@ -58,40 +58,38 @@ struct KeyDetailsPublicKeyView: View {
                 ),
                 actionModel: .init(rightBarMenuAction: { isShowingActionSheet.toggle() })
             )
-            ScrollView {
-                VStack {
-                    VStack(spacing: 0) {
-                        AnimatedQRCodeView(
-                            viewModel: Binding<AnimatedQRCodeViewModel>.constant(
-                                .init(
-                                    qrCodes: [viewModel.qrCode.payload]
-                                )
+            VStack {
+                VStack(spacing: 0) {
+                    AnimatedQRCodeView(
+                        viewModel: Binding<AnimatedQRCodeViewModel>.constant(
+                            .init(
+                                qrCodes: [viewModel.qrCode.payload]
                             )
                         )
-                        .padding(0.5)
-                        QRCodeAddressFooterView(viewModel: viewModel.footer)
-                    }
-                    .strokeContainerBackground()
-                    // Exposed key alert
-                    if viewModel.isKeyExposed {
-                        HStack {
-                            Localizable.KeyScreen.Label.hotkey.text
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Spacer().frame(maxWidth: Spacing.medium)
-                            Asset.exclamationRed.swiftUIImage
-                        }
-                        .padding()
-                        .foregroundColor(Asset.accentRed300.swiftUIColor)
-                        .font(PrimaryFont.bodyM.font)
-                        .strokeContainerBackground(CornerRadius.small, state: .error)
-                    }
+                    )
+                    .padding(0.5)
+                    QRCodeAddressFooterView(viewModel: viewModel.footer)
                 }
-                .padding([.leading, .trailing], Spacing.large)
-                .padding([.top, .bottom], Spacing.componentSpacer)
-                .background(Asset.backgroundPrimary.swiftUIColor)
+                .strokeContainerBackground()
+                // Exposed key alert
+                if viewModel.isKeyExposed {
+                    HStack {
+                        Localizable.KeyScreen.Label.hotkey.text
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Spacer().frame(maxWidth: Spacing.medium)
+                        Asset.exclamationRed.swiftUIImage
+                    }
+                    .padding()
+                    .foregroundColor(Asset.accentRed300.swiftUIColor)
+                    .font(PrimaryFont.bodyM.font)
+                    .strokeContainerBackground(CornerRadius.small, state: .error)
+                }
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .padding([.leading, .trailing], Spacing.large)
+            .padding([.top, .bottom], Spacing.flexibleComponentSpacer)
+            Spacer()
         }
+        .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             navigation.performFake(navigation: .init(action: .rightButtonAction))
         }

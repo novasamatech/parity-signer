@@ -21,7 +21,7 @@ struct NetworkSelectionSettings: View {
                     backgroundColor: Asset.backgroundSystem.swiftUIColor
                 )
             )
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(viewModel.networks, id: \.key) {
                         item(for: $0)

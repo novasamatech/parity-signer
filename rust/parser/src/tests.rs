@@ -10,9 +10,12 @@ use pretty_assertions::assert_eq;
 use sp_core::H256;
 
 use subxt::{
-    config::PolkadotConfig,
-    ext::{sp_core::crypto::Ss58Codec, sp_runtime::AccountId32},
-    tx::{BaseExtrinsicParams, BaseExtrinsicParamsBuilder, Era, ExtrinsicParams, PlainTip},
+    config::{
+        extrinsic_params::{BaseExtrinsicParams, BaseExtrinsicParamsBuilder, Era, ExtrinsicParams},
+        polkadot::PlainTip,
+        PolkadotConfig,
+    },
+    utils::AccountId32,
 };
 
 fn metadata(filename: &str) -> RuntimeMetadata {
@@ -44,7 +47,6 @@ mod westend9122 {}
 #[subxt::subxt(runtime_metadata_path = "for_tests/acala2012.scale")]
 mod acala2012 {}
 
-#[allow(clippy::*)]
 #[subxt::subxt(runtime_metadata_path = "for_tests/moonbase1802.scale")]
 mod moonbase1802 {}
 
@@ -96,7 +98,7 @@ fn tr_1() {
     let mut calls = Vec::new();
 
     let staking_call_bond = StakingCall::bond {
-        controller: AccountId32::from_ss58check("5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV")
+        controller: AccountId32::from_str("5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV")
             .unwrap()
             .into(),
         value: 1061900000000,
@@ -111,7 +113,7 @@ fn tr_1() {
             "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f",
         ]
         .iter()
-        .map(|addr| AccountId32::from_ss58check(addr).unwrap().into())
+        .map(|addr| AccountId32::from_str(addr).unwrap().into())
         .collect(),
     };
 
@@ -182,7 +184,7 @@ fn tr_2() {
     let mut calls = Vec::new();
 
     let staking_call_bond = StakingCall::bond {
-        controller: AccountId32::from_ss58check("5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV")
+        controller: AccountId32::from_str("5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV")
             .unwrap()
             .into(),
         value: 1061900000000,
@@ -197,7 +199,7 @@ fn tr_2() {
             "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f",
         ]
         .iter()
-        .map(|addr| AccountId32::from_ss58check(addr).unwrap().into())
+        .map(|addr| AccountId32::from_str(addr).unwrap().into())
         .collect(),
     };
 
@@ -275,7 +277,7 @@ fn tr_4() {
         pallet_balances::pallet::Call as BalancesCall, westend_runtime::Call,
     };
 
-    let dest = AccountId32::from_ss58check("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty")
+    let dest = AccountId32::from_str("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty")
         .unwrap()
         .into();
     let genesis_hash = westend_genesis();
@@ -376,7 +378,7 @@ fn tr_6() {
         acala_runtime::Call, pallet_balances::pallet::Call as BalancesCall,
     };
 
-    let dest = AccountId32::from_ss58check("25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C")
+    let dest = AccountId32::from_str("25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C")
         .unwrap()
         .into();
 
