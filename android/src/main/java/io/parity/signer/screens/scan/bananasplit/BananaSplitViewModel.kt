@@ -20,6 +20,7 @@ class BananaSplitViewModel() : ViewModel() {
 	private val _isCustomErrorTerminal = MutableStateFlow<String?>(null)
 	val isCustomErrorTerminal = _isCustomErrorTerminal.asStateFlow()
 	private val _isSuccessTerminal = MutableStateFlow<String?>(null)
+
 	//String is seed name
 	val isSuccessTerminal = _isSuccessTerminal.asStateFlow()
 
@@ -79,7 +80,8 @@ class BananaSplitViewModel() : ViewModel() {
 					when (val seed = qrResult.b) {
 						is BananaSplitRecoveryResult.RecoveredSeed -> {
 							if (seedRepository.isSeedPhraseCollision(seed.s)) {
-								_isCustomErrorTerminal.value = context.getString(R.string.banana_split_password_error_seed_phrase_exists)
+								_isCustomErrorTerminal.value =
+									context.getString(R.string.banana_split_password_error_seed_phrase_exists)
 								return
 							}
 							//fake navigations
@@ -95,8 +97,6 @@ class BananaSplitViewModel() : ViewModel() {
 							)
 							uniffiInteractor.navigate(Action.GO_BACK)
 							_isSuccessTerminal.value = seedName
-							//todo banana
-//					navigation.overrideQRScannerDismissalNavigation = .init(action: .selectSeed, details: seedName)
 						}
 						BananaSplitRecoveryResult.RequestPassword -> {
 							submitErrorState("We passed password but recieved password request again, should be unreacheble ")
@@ -113,7 +113,7 @@ class BananaSplitViewModel() : ViewModel() {
 					invalidPasswordAttempts += 1
 					if (invalidPasswordAttempts > 3) {
 						_isWrongPasswordTerminal.value = true
-					return
+						return
 					}
 					_isWrongPasswordTerminal.value = true
 				}
