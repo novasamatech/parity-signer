@@ -20,7 +20,7 @@ struct DerivationPathNameView: View {
         VStack(alignment: .leading, spacing: 0) {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: Localizable.CreateDerivedKey.Label.title.string,
+                    title: Localizable.CreateDerivedKey.Modal.Path.title.string,
                     leftButton: .xmark,
                     rightButton: .activeAction(
                         Localizable.CreateDerivedKey.Modal.Path.Action.navigation.key,
@@ -33,79 +33,81 @@ struct DerivationPathNameView: View {
                     rightBarMenuAction: viewModel.onRightNavigationButtonTap
                 )
             )
-            VStack(alignment: .leading, spacing: 0) {
-                TextField("", text: $viewModel.inputText)
-                    .primaryTextFieldStyle(
-                        Localizable.CreateDerivedKey.Modal.Path.Placeholder.path.string,
-                        text: $viewModel.inputText,
-                        isValid: .constant(viewModel.derivationPathError == nil)
-                    )
-                    .autocorrectionDisabled()
-                    .submitLabel(.next)
-                    .focused($focusedPath)
-                    .onSubmit {
-                        if viewModel.isPassworded {
-                            focusedField = .secure
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 0) {
+                    TextField("", text: $viewModel.inputText)
+                        .primaryTextFieldStyle(
+                            Localizable.CreateDerivedKey.Modal.Path.Placeholder.path.string,
+                            text: $viewModel.inputText,
+                            isValid: .constant(viewModel.derivationPathError == nil)
+                        )
+                        .autocorrectionDisabled()
+                        .submitLabel(.next)
+                        .focused($focusedPath)
+                        .onSubmit {
+                            if viewModel.isPassworded {
+                                focusedField = .secure
+                            }
                         }
-                    }
-                    .onChange(of: viewModel.inputText) { newValue in
-                        self.viewModel.isPassworded = newValue
-                            .contains(DerivationPathComponent.passworded.description)
-                        self.viewModel.validateDerivationPath()
-                    }
-                    .padding(.bottom, Spacing.extraSmall)
-                if let derivationPathError = viewModel.derivationPathError {
-                    Text(derivationPathError)
-                        .foregroundColor(Asset.accentRed300.swiftUIColor)
-                        .font(PrimaryFont.captionM.font)
-                        .padding(.bottom, Spacing.small)
-                }
-                if viewModel.isEntrySuggestionActive {
-                    Localizable.CreateDerivedKey.Modal.Path.Suggestion.path.text
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(PrimaryFont.captionM.font)
-                        .padding(.bottom, Spacing.small)
-                }
-                quickActions()
-                    .padding(.bottom, Spacing.extraSmall)
-                Localizable.CreateDerivedKey.Modal.Path.Footer.path.text
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(PrimaryFont.captionM.font)
-                    .padding(.vertical, Spacing.extraSmall)
-                if viewModel.isPassworded {
-                    Localizable.CreateDerivedKey.Modal.Path.Header.password.text
-                        .font(PrimaryFont.bodyL.font)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .padding(.bottom, Spacing.medium)
-                        .padding(.top, Spacing.medium)
-                    SecurePrimaryTextField(
-                        placeholder: Localizable.CreateDerivedKey.Modal.Path.Placeholder.password.string,
-                        text: $viewModel.passwordConfirmation,
-                        isValid: $viewModel.isPasswordValid,
-                        focusedField: _focusedField,
-                        onCommit: {
-                            self.focusedField = nil
-                            focusedPath = false
-                            viewModel.onPasswordConfirmationDoneTap()
+                        .onChange(of: viewModel.inputText) { newValue in
+                            self.viewModel.isPassworded = newValue
+                                .contains(DerivationPathComponent.passworded.description)
+                            self.viewModel.validateDerivationPath()
                         }
-                    )
-                    .padding(.bottom, Spacing.small)
-                    if !viewModel.isPasswordValid {
-                        Localizable.CreateDerivedKey.Modal.Path.Error.password.text
+                        .padding(.bottom, Spacing.extraSmall)
+                    if let derivationPathError = viewModel.derivationPathError {
+                        Text(derivationPathError)
                             .foregroundColor(Asset.accentRed300.swiftUIColor)
                             .font(PrimaryFont.captionM.font)
                             .padding(.bottom, Spacing.small)
                     }
+                    if viewModel.isEntrySuggestionActive {
+                        Localizable.CreateDerivedKey.Modal.Path.Suggestion.path.text
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .font(PrimaryFont.captionM.font)
+                            .padding(.bottom, Spacing.small)
+                    }
+                    quickActions()
+                        .padding(.bottom, Spacing.extraSmall)
+                    Localizable.CreateDerivedKey.Modal.Path.Footer.path.text
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .font(PrimaryFont.captionM.font)
+                        .padding(.vertical, Spacing.extraSmall)
+                    if viewModel.isPassworded {
+                        Localizable.CreateDerivedKey.Modal.Path.Header.password.text
+                            .font(PrimaryFont.bodyL.font)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .padding(.bottom, Spacing.medium)
+                            .padding(.top, Spacing.medium)
+                        SecurePrimaryTextField(
+                            placeholder: Localizable.CreateDerivedKey.Modal.Path.Placeholder.password.string,
+                            text: $viewModel.passwordConfirmation,
+                            isValid: $viewModel.isPasswordValid,
+                            focusedField: _focusedField,
+                            onCommit: {
+                                self.focusedField = nil
+                                focusedPath = false
+                                viewModel.onPasswordConfirmationDoneTap()
+                            }
+                        )
+                        .padding(.bottom, Spacing.small)
+                        if !viewModel.isPasswordValid {
+                            Localizable.CreateDerivedKey.Modal.Path.Error.password.text
+                                .foregroundColor(Asset.accentRed300.swiftUIColor)
+                                .font(PrimaryFont.captionM.font)
+                                .padding(.bottom, Spacing.small)
+                        }
+                    }
+                    AttributedInfoBoxView(text: Localizable.createDerivedKeyModalPathInfo())
+                        .onTapGesture { viewModel.onInfoBoxTap() }
+                        .padding(.vertical, Spacing.extraSmall)
+                    Spacer()
                 }
-                AttributedInfoBoxView(text: Localizable.createDerivedKeyModalPathInfo())
-                    .onTapGesture { viewModel.onInfoBoxTap() }
-                    .padding(.vertical, Spacing.extraSmall)
-                Spacer()
+                .padding(.horizontal, Spacing.large)
+                .padding(.vertical, Spacing.medium)
             }
-            .padding(.horizontal, Spacing.large)
-            .padding(.vertical, Spacing.medium)
+            .background(Asset.backgroundPrimary.swiftUIColor)
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
@@ -215,6 +217,7 @@ extension DerivationPathNameView {
             if derivationPath.isEmpty {
                 skipValidation = true
                 inputText = DerivationPathComponent.hard.description
+                isMainActionDisabled = true
             } else {
                 inputText = derivationPath
             }
@@ -307,7 +310,7 @@ extension DerivationPathNameView {
                                 self.derivationPathError != nil
                         )
                     } else {
-                        return inputText.isEmpty || derivationPathError != nil
+                        return inputText.isEmpty || self.isInitialEntry() || derivationPathError != nil
                     }
                 }
                 .assign(to: \.isMainActionDisabled, on: self)
@@ -321,6 +324,10 @@ extension DerivationPathNameView {
                 return substring == passwordConfirmation
             }
             return false
+        }
+
+        private func isInitialEntry() -> Bool {
+            inputText == DerivationPathComponent.hard.description
         }
     }
 }

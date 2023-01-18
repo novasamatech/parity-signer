@@ -9,7 +9,7 @@ import Foundation
 
 extension String {
     private enum Constants {
-        static let defaultTruncate = 8
+        static let defaultTruncate = 6
     }
 
     /// Truncates middle of `String` value

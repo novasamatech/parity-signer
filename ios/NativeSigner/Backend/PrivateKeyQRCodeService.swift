@@ -23,7 +23,7 @@ final class PrivateKeyQRCodeService {
         else { return nil }
         let seedName = root.address.seedName
         let seedPhrase = seedsMediator.getSeedBackup(seedName: seedName)
-
+        guard !seedPhrase.isEmpty else { return nil }
         return BackupModalViewModel(
             header: KeySummaryViewModel(
                 keyName: seedName,

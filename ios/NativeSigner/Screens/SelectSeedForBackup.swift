@@ -12,7 +12,7 @@ struct SelectSeedForBackup: View {
     @EnvironmentObject var navigation: NavigationCoordinator
     var body: some View {
         VStack {
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 LazyVStack {
                     ForEach(
                         content.seedNameCards.sorted(by: { $0.seedName < $1.seedName }),

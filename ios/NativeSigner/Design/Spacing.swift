@@ -33,14 +33,14 @@ enum Spacing {
     static let componentSpacer: CGFloat = 60
     /// Spacing for top area offset: 20 pts
     static let topSafeAreaSpacing: CGFloat = 20
-}
 
-enum Padding {
-    /// To be used on clickable cells and headers (top: 8, leading: 24, bottom: 8, trailing: 24)
-    static let detailsCell: EdgeInsets = .init(
-        top: Spacing.extraSmall,
-        leading: Spacing.large,
-        bottom: Spacing.extraSmall,
-        trailing: Spacing.large
-    )
+    /// Spacing for dedicated spacer: 40 / 60 pts
+    static var flexibleComponentSpacer: CGFloat {
+        switch UIScreen.main.bounds.width {
+        case DeviceConstants.compactDeviceWidth:
+            return 40
+        default:
+            return 60
+        }
+    }
 }

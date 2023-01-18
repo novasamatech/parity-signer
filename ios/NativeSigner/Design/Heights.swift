@@ -54,6 +54,7 @@ enum Heights {
     static let networkSelectionSettings: CGFloat = 52
     static let selectionBox: CGFloat = 48
     static let capsuleSelectionView: CGFloat = 28
+    static let minimumActionSheetButtonHeight: CGFloat = 48
 }
 
 enum Sizes {
@@ -62,7 +63,7 @@ enum Sizes {
     /// Size for left-aligned icons within `MenuButton` / `ActionSheetButton`, 30pt
     static let actionSheetIcon: CGFloat = 30
     /// Size for seed word position label
-    static let seedWordPositionWidth: CGFloat = 28
+    static let seedWordPositionWidth: CGFloat = 18
     /// Diameter for ">" button in circle, 28pt
     static let chevronCircleButton: CGFloat = 28
     static let rightChevronContainerSize: CGFloat = 28

@@ -15,7 +15,7 @@ struct SelectSeed: View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.backgroundPrimary.swiftUIColor)
             VStack {
-                ScrollView {
+                ScrollView(showsIndicators: false) {
                     LazyVStack {
                         ForEach(
                             content.seedNameCards.sorted(by: { $0.seedName < $1.seedName }),

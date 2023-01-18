@@ -29,7 +29,7 @@ extension KeyDetailsView {
                 // Select All
                 Button(action: { selectAll() }) {
                     Localizable.KeyDetails.Overlay.Action.selectAll.text
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(Asset.accentPink300.swiftUIColor)
                         .font(PrimaryFont.labelL.font)
                 }
                 .padding(.leading, Spacing.medium)
@@ -39,7 +39,7 @@ extension KeyDetailsView {
                     Localizable.KeyDetails.Overlay.Action.export.text
                         .foregroundColor(
                             viewModel.selectedSeeds.isEmpty ? Asset.textAndIconsDisabled.swiftUIColor : Asset
-                                .textAndIconsPrimary.swiftUIColor
+                                .accentPink300.swiftUIColor
                         )
                         .font(PrimaryFont.labelL.font)
                 }

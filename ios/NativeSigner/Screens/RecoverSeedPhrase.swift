@@ -27,13 +27,13 @@ struct RecoverSeedPhrase: View {
                             )
                             .lineLimit(nil)
                             .fixedSize(horizontal: false, vertical: true)
-                            .font(.robotoMono)
+                            .font(.robotoMonoBold)
                             .foregroundColor(Asset.accentPink300.swiftUIColor)
                             .padding(12)
                             Divider().foregroundColor(Asset.fill12.swiftUIColor)
                             HStack {
                                 Text(">").foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                                    .font(.robotoMono)
+                                    .font(.robotoMonoBold)
                                 TextField(Localizable.seed.string, text: $userInput, prompt: Localizable.seedName.text)
                                     .focused($focus)
                                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
@@ -63,7 +63,7 @@ struct RecoverSeedPhrase: View {
                             }
                         }
                         .background(RoundedRectangle(cornerRadius: 8).stroke(Asset.fill12.swiftUIColor))
-                        ScrollView(.horizontal) {
+                        ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack {
                                 ForEach(content.guessSet, id: \.self) { guess in
                                     Text(guess)

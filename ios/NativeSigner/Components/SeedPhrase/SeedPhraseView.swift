@@ -35,6 +35,10 @@ struct SeedPhraseView: View {
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
+    private let reducedWidthColumn = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
 
     init(
         viewModel: SeedPhraseViewModel
@@ -43,24 +47,31 @@ struct SeedPhraseView: View {
     }
 
     var body: some View {
-        LazyVGrid(columns: columns, alignment: .center, spacing: 0) {
+        LazyVGrid(columns: layout(), alignment: .leading, spacing: 0) {
             ForEach(viewModel.seeds, id: \.position) { seedWord in
-                HStack {
+                HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
                     Text(seedWord.position)
-                        .font(.robotoMono)
+                        .font(.robotoMonoRegular)
                         .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
-                        .padding(.leading, Spacing.extraExtraSmall)
                         .frame(minWidth: Sizes.seedWordPositionWidth, alignment: .trailing)
+                        .minimumScaleFactor(1)
+                        .lineLimit(1)
                     Text(seedWord.word)
-                        .font(.robotoMono)
+                        .font(.robotoMonoBold)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .minimumScaleFactor(1)
+                        .lineLimit(1)
                 }
-                .padding([.bottom, .top], Spacing.extraSmall)
+                .frame(height: 24)
+                .padding([.bottom, .top], Spacing.extraExtraSmall)
             }
         }
         .padding(Spacing.medium)
         .containerBackground(CornerRadius.small)
+    }
+
+    private func layout() -> [GridItem] {
+        UIScreen.main.bounds.width == DeviceConstants.compactDeviceWidth ? reducedWidthColumn : columns
     }
 }
 
@@ -72,7 +83,7 @@ struct SeedPhraseView: View {
                 SeedPhraseView(
                     viewModel: PreviewData.seedPhraseViewModel
                 )
-                .padding(Spacing.large)
+                .padding(Spacing.medium)
                 Spacer()
             }
             .background(Asset.backgroundSecondary.swiftUIColor)

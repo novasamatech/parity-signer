@@ -11,6 +11,7 @@ struct QRCodeAddressFooterViewModel: Equatable {
     let identicon: [UInt8]
     let rootKeyName: String
     let path: String
+    let hasPassword: Bool
     let network: String
     let base58: String
 }
@@ -29,11 +30,11 @@ struct QRCodeAddressFooterView: View {
         VStack(spacing: Spacing.small) {
             HStack(alignment: .center, spacing: Spacing.small) {
                 VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
+                    fullPath
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .font(PrimaryFont.bodyM.font)
                     Text(viewModel.rootKeyName)
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(PrimaryFont.bodyM.font)
-                    Text(viewModel.path)
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                         .font(PrimaryFont.bodyM.font)
                 }
                 Spacer()
@@ -64,6 +65,16 @@ struct QRCodeAddressFooterView: View {
         }
         .padding(Spacing.medium)
         .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// String interpolation for SFSymbols is a bit unstable if creating `String` inline by using conditional logic or
+    /// `appending` from `StringProtocol`. Hence less DRY approach and dedicated function to wrap that
+    private var fullPath: Text {
+        viewModel.hasPassword ?
+            Text(
+                "\(viewModel.path)\(Localizable.Shared.Label.passwordedPathDelimeter.string)\(Image(.lock))"
+            ) :
+            Text(viewModel.path)
     }
 }
 
