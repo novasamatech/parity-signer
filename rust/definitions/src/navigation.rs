@@ -331,12 +331,6 @@ pub enum DerivationDestination {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MDeriveKey {
     pub seed_name: String,
-    pub network_title: String,
-    pub network_logo: String,
-    pub network_specs_key: String,
-    pub suggested_derivation: String,
-    pub keyboard: bool,
-    pub derivation_check: DerivationCheck,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]

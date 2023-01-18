@@ -588,65 +588,17 @@ where
 // should be corrected, after json fix; `seed_name` in existing derivation
 // display also seems to be excessive
 pub fn derive_prep<P>(
-    db_path: P,
+    _db_path: P,
     seed_name: &str,
-    network_specs_key: &NetworkSpecsKey,
-    collision: Option<(MultiSigner, AddressDetails)>,
-    suggest: &str,
-    keyboard: bool,
+    _collision: Option<(MultiSigner, AddressDetails)>,
+    _suggest: &str,
+    _keyboard: bool,
 ) -> Result<MDeriveKey>
 where
     P: AsRef<Path>,
 {
-    let ordered_network_specs = get_network_specs(&db_path, network_specs_key)?;
-    let network_specs = ordered_network_specs.specs;
-
-    let derivation_check = match collision {
-        Some((multisigner, address_details)) => {
-            let base58 = print_multisigner_as_base58_or_eth(
-                &multisigner,
-                Some(network_specs.base58prefix),
-                address_details.encryption,
-            );
-
-            let path = address_details.path;
-            let has_pwd = address_details.has_pwd;
-            let identicon = make_identicon_from_multisigner(
-                &multisigner,
-                address_details.encryption.identicon_style(),
-            );
-            let seed_name = seed_name.to_string();
-            let address_key = hex::encode(
-                AddressKey::new(multisigner.clone(), Some(network_specs.genesis_hash)).key(),
-            );
-            let collision = MAddressCard {
-                base58,
-                address_key,
-                address: Address {
-                    path,
-                    has_pwd,
-                    identicon,
-                    seed_name,
-                    secret_exposed: address_details.secret_exposed,
-                },
-            };
-
-            NavDerivationCheck {
-                collision: Some(collision),
-                ..Default::default()
-            }
-        }
-        None => dynamic_path_check_unhexed(&db_path, seed_name, suggest, network_specs_key),
-    };
-
     Ok(MDeriveKey {
         seed_name: seed_name.to_string(),
-        network_title: network_specs.title,
-        network_logo: network_specs.logo,
-        network_specs_key: hex::encode(network_specs_key.key()),
-        suggested_derivation: suggest.to_string(),
-        keyboard,
-        derivation_check,
     })
 }
 

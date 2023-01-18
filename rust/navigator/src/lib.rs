@@ -117,6 +117,7 @@ pub fn export_signatures_bulk(
 
 /// Get keys by seed name
 pub fn keys_by_seed_name(dbname: &str, seed_name: &str) -> Result<MKeysNew> {
+    log::warn!("seed name {seed_name}");
     Ok(db_handling::interface_signer::keys_by_seed_name(
         dbname, seed_name,
     )?)

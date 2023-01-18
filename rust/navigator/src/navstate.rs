@@ -4,10 +4,11 @@ use db_handling::helpers::get_danger_status;
 use db_handling::identities::get_multisigner_by_address;
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
-    ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MLog,
-    MLogDetails, MManageNetworks, MNewSeed, MPasswordConfirm, MRecoverSeedName, MRecoverSeedPhrase,
-    MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSufficientCryptoReady, MTransaction,
-    ModalData, RightButton, ScreenData, ScreenNameType, ShieldAlert, TransactionType,
+    ActionResult, AlertData, FooterButton, History, MDeriveKey, MEnterPassword, MKeyDetailsMulti,
+    MLog, MLogDetails, MManageNetworks, MNewSeed, MPasswordConfirm, MRecoverSeedName,
+    MRecoverSeedPhrase, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
+    MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData, ScreenNameType,
+    ShieldAlert, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use std::fmt::Write;
@@ -358,44 +359,8 @@ impl State {
                     }
                 }
             }
-            Screen::DeriveKey(ref derive_state) => {
-                new_navstate.screen = Screen::DeriveKey(derive_state.update(details_str));
-                if let Some(ns) = derive_state.network_specs_key() {
-                    match db_handling::identities::try_create_address(
-                        &derive_state.seed_name(),
-                        secret_seed_phrase,
-                        details_str,
-                        &ns,
-                        dbname,
-                    ) {
-                        Ok(()) => {
-                            new_navstate = Navstate::clean_screen(Screen::Keys(
-                                KeysState::new_in_network(&derive_state.seed_name(), &ns),
-                            ))
-                        }
-                        Err(e) => {
-                            if let db_handling::Error::DerivationExists {
-                                ref multisigner,
-                                ref address_details,
-                                ..
-                            } = e
-                            {
-                                new_navstate.screen = Screen::DeriveKey(
-                                    derive_state.collided_with(multisigner, address_details),
-                                );
-                                new_navstate.modal = Modal::Empty;
-                                new_navstate.alert = Alert::Error;
-                                let _ = write!(&mut errorline, "{}", e);
-                            } else {
-                                new_navstate.alert = Alert::Error;
-                                let _ = write!(&mut errorline, "{}", e);
-                            }
-                        }
-                    }
-                } else {
-                    new_navstate.alert = Alert::Error;
-                    let _ = write!(&mut errorline, "No network");
-                }
+            Screen::DeriveKey(ref _derive_state) => {
+                log::info!("Go Forward does nothing on Screen::DeriveKey");
             }
             Screen::Transaction(ref t) => match t.action() {
                 transaction_parsing::TransactionAction::Sign { .. } => {
@@ -624,29 +589,15 @@ impl State {
 
     fn handle_new_key(&self, dbname: &str, details_str: &str) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
-        let mut errorline = String::new();
+        let errorline = String::new();
         match self.navstate.screen {
             Screen::Keys(ref keys_state) => {
-                if let Some(ns) = keys_state.network_specs_key() {
-                    let collision = match db_handling::identities::derivation_check(
-                        &keys_state.seed_name(),
-                        details_str,
-                        &ns,
-                        dbname,
-                    ) {
-                        Ok(db_handling::identities::DerivationCheck::NoPassword(a)) => a,
-                        _ => None,
-                    };
-                    new_navstate = Navstate::clean_screen(Screen::DeriveKey(DeriveState::new(
-                        details_str,
-                        keys_state,
-                        collision,
-                    )));
-                } else {
-                    log::warn!("No network");
-                    new_navstate.alert = Alert::Error;
-                    let _ = write!(&mut errorline, "No network");
-                }
+                let collision = None;
+                new_navstate = Navstate::clean_screen(Screen::DeriveKey(DeriveState::new(
+                    details_str,
+                    keys_state,
+                    collision,
+                )));
             }
             _ => println!("NewKey does nothing here"),
         }
@@ -971,23 +922,8 @@ impl State {
         let mut errorline = String::new();
         match self.navstate.screen {
             Screen::Keys(ref keys_state) => match keys_state.get_specialty() {
-                SpecialtyKeysState::Swiped(ref multisigner) => {
-                    if let Some(ns) = keys_state.network_specs_key() {
-                        match db_handling::identities::remove_key(dbname, multisigner, &ns) {
-                            Ok(()) => {
-                                new_navstate = Navstate::clean_screen(Screen::Keys(
-                                    KeysState::new_in_network(&keys_state.seed_name(), &ns),
-                                ));
-                            }
-                            Err(e) => {
-                                new_navstate.alert = Alert::Error;
-                                let _ = write!(&mut errorline, "{}", e);
-                            }
-                        }
-                    } else {
-                        new_navstate.alert = Alert::Error;
-                        let _ = write!(&mut errorline, "No network");
-                    }
+                SpecialtyKeysState::Swiped(ref _multisigner) => {
+                    log::info!("Swiped state is currently disabled");
                 }
                 SpecialtyKeysState::MultiSelect(ref multiselect) => {
                     if let Some(ns) = keys_state.network_specs_key() {
@@ -1126,44 +1062,13 @@ impl State {
         secret_seed_phrase: &str,
     ) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
-        let mut errorline = String::new();
+        let errorline = String::new();
 
         match self.navstate.screen {
             Screen::Keys(ref keys_state) => {
-                if let SpecialtyKeysState::Swiped(multisigner) = keys_state.get_specialty() {
-                    match details_str.parse::<u32>() {
-                        Ok(increment) => {
-                            if let Some(ns) = keys_state.network_specs_key() {
-                                match db_handling::identities::create_increment_set(
-                                    increment,
-                                    &multisigner,
-                                    &ns,
-                                    secret_seed_phrase,
-                                    dbname,
-                                ) {
-                                    Ok(()) => {
-                                        new_navstate = Navstate::clean_screen(Screen::Keys(
-                                            KeysState::new_in_network(&keys_state.seed_name(), &ns),
-                                        ));
-                                    }
-                                    Err(e) => {
-                                        new_navstate.alert = Alert::Error;
-                                        let _ = write!(&mut errorline, "{}", e);
-                                    }
-                                }
-                            } else {
-                                new_navstate.alert = Alert::Error;
-                                let _ = write!(&mut errorline, "No network");
-                            }
-                        }
-                        Err(e) => {
-                            new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
-                        }
-                    }
-                } else {
-                    println!("Increment does nothing here")
-                }
+                new_navstate = Navstate::clean_screen(Screen::Keys(
+                    KeysState::new(&keys_state.seed_name(), dbname).unwrap(),
+                ));
             }
             _ => println!("Increment does nothing here"),
         }
@@ -1356,17 +1261,11 @@ impl State {
                 draft.zeroize();
                 ScreenData::RecoverSeedPhrase { f }
             }
-            Screen::DeriveKey(ref derive_state) => {
-                let f = db_handling::interface_signer::derive_prep(
-                    dbname,
-                    &derive_state.seed_name(),
-                    &derive_state.network_specs_key().unwrap(),
-                    derive_state.collision(),
-                    details_str,
-                    new_navstate.keyboard(),
-                )?;
-                ScreenData::DeriveKey { f }
-            }
+            Screen::DeriveKey(ref derive_state) => ScreenData::DeriveKey {
+                f: MDeriveKey {
+                    seed_name: derive_state.seed_name(),
+                },
+            },
             Screen::Settings => {
                 // for now has same content as Screen::Verifier
                 //
