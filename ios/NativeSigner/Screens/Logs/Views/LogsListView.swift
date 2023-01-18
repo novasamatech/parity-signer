@@ -65,6 +65,10 @@ struct LogsListView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenCover(isPresented: $viewModel.isPresentingAddNoteModal) {
+            LogNoteModal(viewModel: .init(isPresented: $viewModel.isPresentingAddNoteModal))
+                .clearModalBackground()
+        }
     }
 }
 
@@ -76,6 +80,7 @@ extension LogsListView {
         @Published var shouldPresentAddNoteModal = false
         @Published var isShowingActionSheet = false
         @Published var isPresentingClearConfirmationModal = false
+        @Published var isPresentingAddNoteModal = false
 
         private weak var navigation: NavigationCoordinator!
 
@@ -101,7 +106,7 @@ extension LogsListView {
         func onMoreActionSheetDismissal() {
             if shouldPresentAddNoteModal {
                 shouldPresentAddNoteModal = false
-                navigation.perform(navigation: .init(action: .createLogComment))
+                isPresentingAddNoteModal = true
             }
             if shouldPresentClearConfirmationModal {
                 shouldPresentClearConfirmationModal = false
