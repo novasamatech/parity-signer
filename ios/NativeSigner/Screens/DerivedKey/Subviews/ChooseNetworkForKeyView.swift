@@ -23,6 +23,7 @@ struct ChooseNetworkForKeyView: View {
             },
             animateBackground: $viewModel.animateBackground,
             ignoredEdges: .bottom,
+            safeAreaInsetsMode: .full,
             content: {
                 VStack(spacing: 0) {
                     // Header with X button
@@ -46,7 +47,7 @@ struct ChooseNetworkForKeyView: View {
                             item(for: $0)
                         }
                         Divider()
-                            .padding(Spacing.medium)
+                            .padding(.horizontal, Spacing.medium)
                         allowOnAnyNetwork()
                     }
                     .padding(.bottom, Spacing.small)

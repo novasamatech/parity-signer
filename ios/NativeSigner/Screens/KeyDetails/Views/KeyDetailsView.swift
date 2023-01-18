@@ -66,9 +66,7 @@ struct KeyDetailsView: View {
                         ))
                     )
                     PrimaryButton(
-                        action: {
-                            navigation.perform(navigation: viewModel.createDerivedKey)
-                        },
+                        action: viewModel.onCreateDerivedKeyTap,
                         text: Localizable.KeyDetails.Action.create.key
                     )
                     .padding(.horizontal, Spacing.large)
@@ -164,6 +162,15 @@ struct KeyDetailsView: View {
             RootKeyDetailsModal(
                 isPresented: $viewModel.isPresentingRootDetails,
                 viewModel: viewModel.rootKeyDetails()
+            )
+            .clearModalBackground()
+        }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingError
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableError,
+                isShowingBottomAlert: $viewModel.isPresentingError
             )
             .clearModalBackground()
         }

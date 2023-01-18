@@ -11,6 +11,7 @@ extension KeyDetailsView {
     final class ViewModel: ObservableObject {
         let keyDetailsService: KeyDetailsService
         private let networksService: GetAllNetworksService
+        private let cancelBag = CancelBag()
         let exportPrivateKeyService: PrivateKeyQRCodeService
         let keyName: String
         /// `MKwysNew` will currently be `nil` when navigating through given navigation path:
@@ -35,10 +36,10 @@ extension KeyDetailsView {
         @Published var derivedKeys: [DerivedKeyRowModel] = []
         @Published var selectedSeeds: [String] = []
         @Published var isFilteringActive: Bool = false
-        private var cancelBag = CancelBag()
+        // Error handling
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel = .noNetworksAvailable()
 
-        /// Navigation for `Create Derived Key`
-        let createDerivedKey: Navigation = .init(action: .newKey)
         /// Name of seed to be removed with `Remove Seed` action
         var removeSeed: String = ""
 
@@ -80,6 +81,7 @@ extension KeyDetailsView {
         func updateRenderables() {
             refreshDerivedKeys()
             refreshKeySummary()
+            refreshNetworks()
         }
 
         func refreshData() {
@@ -91,12 +93,29 @@ extension KeyDetailsView {
                 }
             }
         }
+
+        func refreshNetworks() {
+            networksService.getNetworks { result in
+                if case let .success(networks) = result {
+                    self.appState.userData.allNetworks = networks
+                }
+            }
+        }
     }
 }
 
 // MARK: - Tap Actions
 
 extension KeyDetailsView.ViewModel {
+    func onCreateDerivedKeyTap() {
+        if !appState.userData.allNetworks.isEmpty {
+            navigation.perform(navigation: .init(action: .newKey))
+        } else {
+            presentableError = .noNetworksAvailable()
+            isPresentingError = true
+        }
+    }
+
     func onRootKeyTap() {
         guard !isPresentingSelectionOverlay else { return }
         isPresentingRootDetails = true
