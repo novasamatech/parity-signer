@@ -116,11 +116,6 @@ pub enum Error {
         encryption: Encryption,
     },
 
-    /// Signer has attempted an operation that requires at least one network to
-    /// be loaded into Signer.
-    #[error("No networks available. Please load networks information to proceed.")]
-    NoNetworksAvailable,
-
     /// To generate QR code with public address information export, Signer
     /// receives both seed name and
     /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)

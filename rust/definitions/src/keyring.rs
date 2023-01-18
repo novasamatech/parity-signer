@@ -185,17 +185,18 @@ impl VerifierKey {
 #[derive(Decode, Encode, Debug, PartialEq, Eq, Clone)]
 pub struct AddressKey {
     multisigner: MultiSigner,
-    base58prefix: u16,
+    /// the root address is not used on any network and hence has no genesis hash.
+    genesis_hash: Option<H256>,
 }
 
 impl AddressKey {
     /// Generate [`AddressKey`] from corresponding
     /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html) value  
     /// and a network prefix.
-    pub fn new(multisigner: MultiSigner, base58prefix: u16) -> Self {
+    pub fn new(multisigner: MultiSigner, genesis_hash: Option<H256>) -> Self {
         Self {
             multisigner,
-            base58prefix,
+            genesis_hash,
         }
     }
 
@@ -204,9 +205,13 @@ impl AddressKey {
     /// Could result in error if public key length does not match the
     /// expected length for chosen encryption algorithm.  
     #[cfg(feature = "signer")]
-    pub fn from_parts(public: &[u8], encryption: &Encryption, base58prefix: u16) -> Result<Self> {
+    pub fn from_parts(
+        public: &[u8],
+        encryption: &Encryption,
+        genesis_hash: Option<H256>,
+    ) -> Result<Self> {
         let multisigner = get_multisigner(public, encryption)?;
-        Ok(Self::new(multisigner, base58prefix))
+        Ok(Self::new(multisigner, genesis_hash))
     }
 
     /// Transform database `IVec` key into [`AddressKey`] prior to processing  

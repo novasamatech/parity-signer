@@ -611,7 +611,7 @@ where
             let (multisigner, mut address_details) =
                 AddressDetails::process_entry_checked((address_key_vec, entry))?;
             for key in keys_to_wipe.iter() {
-                if &address_details.network_id == key {
+                if &address_details.network_id.as_ref() == &Some(key) {
                     let identity_history = IdentityHistory::get(
                         &address_details.seed_name,
                         &address_details.encryption,

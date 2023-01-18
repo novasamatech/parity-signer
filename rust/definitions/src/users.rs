@@ -36,7 +36,7 @@ pub struct AddressDetails {
 
     /// set of networks, identified through [`NetworkSpecsKey`], that are available
     /// to work with this address key  
-    pub network_id: NetworkSpecsKey,
+    pub network_id: Option<NetworkSpecsKey>,
 
     /// encryption algorithm associated with the address key and all its associated networks  
     pub encryption: Encryption,
@@ -67,12 +67,14 @@ impl AddressDetails {
             });
         }
         let network_specs_key = &address_details.network_id;
-        let (_, network_specs_key_encryption) = network_specs_key.genesis_hash_encryption()?;
-        if network_specs_key_encryption != address_details.encryption {
-            return Err(Error::EncryptionMismatch {
-                address_key: address_key.to_owned(),
-                encryption: address_details.encryption,
-            });
+        if let Some(network_specs_key) = network_specs_key {
+            let (_, network_specs_key_encryption) = network_specs_key.genesis_hash_encryption()?;
+            if network_specs_key_encryption != address_details.encryption {
+                return Err(Error::EncryptionMismatch {
+                    address_key: address_key.to_owned(),
+                    encryption: address_details.encryption,
+                });
+            }
         }
         Ok((multisigner, address_details))
     }
@@ -106,6 +108,6 @@ impl AddressDetails {
     ///
     /// Address key in this case is called root key or seed key.  
     pub fn is_root(&self) -> bool {
-        (self.path.is_empty()) && (!self.has_pwd)
+        self.path.is_empty() && !self.has_pwd && self.network_id.is_none()
     }
 }

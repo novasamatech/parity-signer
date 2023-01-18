@@ -1,4 +1,5 @@
 use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
+use sp_core::H256;
 use sp_runtime::{generic::Era, MultiSigner};
 
 use definitions::helpers::{make_identicon_from_account, make_identicon_from_id20, IdenticonStyle};
@@ -31,6 +32,7 @@ pub(crate) enum Card<'a> {
     Author {
         author: &'a MultiSigner,
         base58prefix: u16,
+        genesis_hash: H256,
         address_details: &'a AddressDetails,
     },
     AuthorPlain {
@@ -208,9 +210,10 @@ impl<'a> Card<'a> {
             Card::Author {
                 author,
                 base58prefix,
+                genesis_hash,
                 address_details,
             } => NavCard::AuthorCard {
-                f: make_author_info(author, *base58prefix, address_details),
+                f: make_author_info(author, *base58prefix, *genesis_hash, address_details),
             },
             Card::AuthorPlain {
                 author,
@@ -306,11 +309,12 @@ impl<'a> Card<'a> {
 pub(crate) fn make_author_info(
     author: &MultiSigner,
     base58prefix: u16,
+    genesis_hash: H256,
     address_details: &AddressDetails,
 ) -> MAddressCard {
     let base58 =
         print_multisigner_as_base58_or_eth(author, Some(base58prefix), address_details.encryption);
-    let address_key = hex::encode(AddressKey::new(author.clone(), base58prefix).key());
+    let address_key = hex::encode(AddressKey::new(author.clone(), Some(genesis_hash)).key());
     MAddressCard {
         base58,
         address_key,

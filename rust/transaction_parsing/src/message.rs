@@ -38,11 +38,11 @@ where
         Some(network_specs) => {
             let address_key = AddressKey::new(
                 author_multi_signer.clone(),
-                network_specs.specs.base58prefix,
+                Some(network_specs.specs.genesis_hash),
             );
             match try_get_address_details(&db_path, &address_key)? {
                 Some(address_details) => {
-                    if address_details.network_id == network_specs_key {
+                    if address_details.network_id == Some(network_specs_key) {
                         let message_card = Card::ParserCard(&ParserCard::Text(display_msg))
                             .card(&mut index, indent);
                         let sign = TrDbColdSignOne::generate(
@@ -58,6 +58,7 @@ where
                         let author_info = make_author_info(
                             &author_multi_signer,
                             network_specs.specs.base58prefix,
+                            network_specs.specs.genesis_hash,
                             &address_details,
                         );
                         let network_info = network_specs;
@@ -77,6 +78,7 @@ where
                         let author_card = Card::Author {
                             author: &author_multi_signer,
                             base58prefix: network_specs.specs.base58prefix,
+                            genesis_hash: network_specs.specs.genesis_hash,
                             address_details: &address_details,
                         }
                         .card(&mut index, indent);

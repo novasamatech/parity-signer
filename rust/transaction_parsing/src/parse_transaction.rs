@@ -67,18 +67,19 @@ where
         Some(network_specs) => {
             let address_key = AddressKey::new(
                 author_multi_signer.clone(),
-                network_specs.specs.base58prefix,
+                Some(network_specs.specs.genesis_hash),
             );
             let mut history: Vec<Event> = Vec::new();
 
             let mut cards_prep = match try_get_address_details(&db_path, &address_key)? {
                 Some(address_details) => {
-                    if address_details.network_id == network_specs_key {
+                    if address_details.network_id.as_ref() == Some(&network_specs_key) {
                         CardsPrep::SignProceed(address_details, None)
                     } else {
                         let author_card = (Card::Author {
                             author: &author_multi_signer,
                             base58prefix: network_specs.specs.base58prefix,
+                            genesis_hash: network_specs.specs.genesis_hash,
                             address_details: &address_details,
                         })
                         .card(&mut index, indent);
@@ -175,6 +176,7 @@ where
                                         let author_info = make_author_info(
                                             &author_multi_signer,
                                             network_specs.specs.base58prefix,
+                                            network_specs.specs.genesis_hash,
                                             &address_details,
                                         );
                                         let warning = possible_warning
@@ -224,6 +226,7 @@ where
                                         let author = Card::Author {
                                             author: &author_multi_signer,
                                             base58prefix: network_specs.specs.base58prefix,
+                                            genesis_hash: network_specs.specs.genesis_hash,
                                             address_details: &address_details,
                                         }
                                         .card(&mut index, indent);
@@ -320,16 +323,18 @@ where
                     .cloned()
                     .unwrap();
 
-                let address_key = AddressKey::new(m.clone(), network.specs.base58prefix);
+                let address_key = AddressKey::new(m.clone(), Some(network.specs.genesis_hash));
                 let verifier_details = Some(sign_display.signed_by.show_card());
 
                 if let Some(address_details) = try_get_address_details(&db_path, &address_key)? {
                     let mut specs_found = None;
                     let id = &address_details.network_id;
-                    let specs = try_get_network_specs(&db_path, id)?;
-                    if let Some(ordered_specs) = specs {
-                        if ordered_specs.specs.name == sign_display.network_name {
-                            specs_found = Some(ordered_specs);
+                    if let Some(id) = &id {
+                        let specs = try_get_network_specs(&db_path, id)?;
+                        if let Some(ordered_specs) = specs {
+                            if ordered_specs.specs.name == sign_display.network_name {
+                                specs_found = Some(ordered_specs);
+                            }
                         }
                     }
 
@@ -339,6 +344,7 @@ where
                             Some(make_author_info(
                                 m,
                                 specs_found.specs.base58prefix,
+                                specs_found.specs.genesis_hash,
                                 &address_details,
                             )),
                             Some(decode_signable_from_history(sign_display, &db_path)?),
