@@ -63,13 +63,23 @@ fun ScanNavSubgraph(
 	val transactionsValue = transactions.value
 	val bananaQrData = bananaSplitPassword.value
 	if (bananaQrData != null) {
-
 		BananaSplitPasswordScreen(
 			qrData = bananaQrData,
-			onClose = { /*TODO*/ },
-			onSuccess = {}, //todo banana split
-			onCustomError = { error -> },
-			onErrorWrongPassword = {}//todo banana
+			onClose = {
+				backAction()
+			},
+			onSuccess = { seedName ->
+				scanViewModel.clearState()
+				rootNavigator.navigate(Action.SELECT_SEED, seedName)
+			},
+			onCustomError = { error ->
+				scanViewModel.presentableError.value = error
+				scanViewModel.bananaSplitPassword.value = null
+			},
+			onErrorWrongPassword = {
+				scanViewModel.errorWrongPassword.value = true
+				scanViewModel.bananaSplitPassword.value = null
+			},
 		)
 	} else if (transactionsValue == null || showingModals) {
 
@@ -90,7 +100,7 @@ fun ScanNavSubgraph(
 			modifier = Modifier.statusBarsPadding(),
 			onBack = {
 				backendAction(Action.GO_BACK, "", "")
-				scanViewModel.clearTransactionState()
+				scanViewModel.clearState()
 			},
 			onFinish = {
 				when (val previewType =
@@ -120,23 +130,23 @@ fun ScanNavSubgraph(
 						//nothing
 					}
 				}
-				scanViewModel.clearTransactionState()
+				scanViewModel.clearState()
 				rootNavigator.navigate(Action.GO_FORWARD)
 			},
 		)
 	}
 	//Bottom sheets
 	presentableError.value?.let { presentableErrorValue ->
-		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
+		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearState) {
 			ScanErrorBottomSheet(
 				errorMessage = presentableErrorValue,
-				onOK = scanViewModel::clearTransactionState,
+				onOK = scanViewModel::clearState,
 			)
 		}
 	} ?: passwordModel.value?.let { passwordModelValue ->
 		BottomSheetWrapperRoot(onClosedAction = {
 			scanViewModel.resetRustModalToNewScan()
-			scanViewModel.clearTransactionState()
+			scanViewModel.clearState()
 		}) {
 			EnterPassword(
 				data = passwordModelValue,
@@ -147,14 +157,14 @@ fun ScanNavSubgraph(
 				},
 				onClose = {
 					scanViewModel.resetRustModalToNewScan()
-					scanViewModel.clearTransactionState()
+					scanViewModel.clearState()
 				},
 			)
 		}
 	} ?: if (errorWrongPassword.value) {
-		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
+		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearState) {
 			WrongPasswordBottomSheet(
-				onOk = scanViewModel::clearTransactionState
+				onOk = scanViewModel::clearState
 			)
 		}
 	} else {

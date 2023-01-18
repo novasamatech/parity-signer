@@ -40,6 +40,7 @@ class BananaSplitViewModel() : ViewModel() {
 	private var invalidPasswordAttempts = 0
 
 	fun initState(qrCodeData: List<String>) {
+		cleanState()
 		this.qrCodeData = qrCodeData
 		this.invalidPasswordAttempts = 0
 		_isWrongPasswordTerminal.value = false

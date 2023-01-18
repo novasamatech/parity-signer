@@ -116,6 +116,7 @@ private fun BananaSplitPasswordInternal(
 	val passwordFocusRequester = remember { FocusRequester() }
 
 	val canProceed = name.value.isNotEmpty() && password.value.isNotEmpty()
+		&& !nameCollision.value && !wrongPassword.value
 
 	var passwordVisible by remember { mutableStateOf(false) }
 
@@ -155,9 +156,9 @@ private fun BananaSplitPasswordInternal(
 				value = name.value,
 				onValueChange = { newStr -> onChangeSeedName(newStr) },
 				keyboardOptions = KeyboardOptions(
-					imeAction = if (canProceed) ImeAction.Done else ImeAction.None
+					imeAction = if (name.value.isNotEmpty() && !nameCollision.value) ImeAction.Go else ImeAction.None
 				),
-				keyboardActions = KeyboardActions(onDone = {
+				keyboardActions = KeyboardActions(onGo = {
 					passwordFocusRequester.requestFocus()
 				}),
 				label = { Text(text = stringResource(R.string.banana_split_password_name_label)) },
@@ -202,8 +203,7 @@ private fun BananaSplitPasswordInternal(
 				keyboardActions = KeyboardActions(
 					onDone = {
 						if (canProceed) {
-//						proceed(password)//todo banana
-//						focusManager.clearFocus(true)
+							onDoneTap()
 						}
 					}
 				),
