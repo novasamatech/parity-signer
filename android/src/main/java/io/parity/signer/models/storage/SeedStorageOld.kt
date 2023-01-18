@@ -2,14 +2,12 @@ package io.parity.signer.models.storage
 
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.navigate
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.initNavigation
 import io.parity.signer.uniffi.updateSeedNames
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /**
  * Refresh seed names list
@@ -32,8 +30,7 @@ fun SignerDataModel.addSeed(
 	seedName: String,
 	seedPhrase: String,
 ) {
-
-	GlobalScope.launch {
+	viewModelScope.launch {
 		val repository = ServiceLocator.activityScope!!.seedRepository
 		repository.addSeed(
 			seedName = seedName,
