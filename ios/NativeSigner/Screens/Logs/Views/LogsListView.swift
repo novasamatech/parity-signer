@@ -65,7 +65,10 @@ struct LogsListView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(isPresented: $viewModel.isPresentingAddNoteModal) {
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingAddNoteModal,
+            onDismiss: { viewModel.loadData() }
+        ) {
             LogNoteModal(viewModel: .init(isPresented: $viewModel.isPresentingAddNoteModal))
                 .clearModalBackground()
         }
@@ -95,6 +98,9 @@ extension LogsListView {
         }
 
         func loadData() {
+            if case let .log(updatedLogs) = navigation.performFake(navigation: .init(action: .navbarLog)).screenData {
+                logs = updatedLogs
+            }
             renderables = LogEntryRenderableBuilder().build(logs)
         }
 

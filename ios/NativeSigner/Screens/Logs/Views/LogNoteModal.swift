@@ -106,8 +106,7 @@ extension LogNoteModal {
         }
 
         func onDoneTap() {
-            navigation.perform(navigation: .init(action: .goForward, details: note))
-            navigation.perform(navigation: .init(action: .navbarLog))
+            navigation.performFake(navigation: .init(action: .goForward, details: note))
             isPresented.toggle()
         }
 
