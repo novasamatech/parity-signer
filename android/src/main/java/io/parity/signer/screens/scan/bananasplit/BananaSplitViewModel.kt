@@ -75,7 +75,7 @@ class BananaSplitViewModel() : ViewModel() {
 		val seedName = seedName.value
 		try {
 			when (val qrResult =
-				qrparserTryDecodeQrSequence(qrCodeData, password, false)) {
+				qrparserTryDecodeQrSequence(qrCodeData, password, true)) {
 				is DecodeSequenceResult.BBananaSplitRecoveryResult -> {
 					when (val seed = qrResult.b) {
 						is BananaSplitRecoveryResult.RecoveredSeed -> {
@@ -115,7 +115,7 @@ class BananaSplitViewModel() : ViewModel() {
 						_isWrongPasswordTerminal.value = true
 						return
 					}
-					_isWrongPasswordTerminal.value = true
+					_wrongPasswordCurrent.value = true
 				}
 				is QrSequenceDecodeException.BananaSplit -> {
 					val error = e.s

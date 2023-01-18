@@ -80,6 +80,7 @@ fun ScanNavSubgraph(
 				scanViewModel.errorWrongPassword.value = true
 				scanViewModel.bananaSplitPassword.value = null
 			},
+			modifier = Modifier.statusBarsPadding(),
 		)
 	} else if (transactionsValue == null || showingModals) {
 

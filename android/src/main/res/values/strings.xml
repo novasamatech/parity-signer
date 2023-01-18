@@ -194,7 +194,7 @@
 	<string name="enable_airplane_mode_error">Please enable airplane mode</string>
 	<string name="wrong_password_title">Did you forget your password?</string>
 	<string name="wrong_password_message">Your password was entered incorrectly more than once. Retrieve it and scan the QR code again.</string>
-	<string name="transaction_generic_error_title">Error signing Transaction</string>
+	<string name="transaction_generic_error_title">Error processing Transaction</string>
 	<string name="transaction_generic_error_description">View the details below to find out more.</string>
 	<string name="transaction_action_done">Done</string>
 	<string name="transaction_action_approve">Approve</string>

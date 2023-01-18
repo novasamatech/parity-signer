@@ -3,10 +3,7 @@ package io.parity.signer.screens.scan.bananasplit
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -131,7 +128,9 @@ private fun BananaSplitPasswordInternal(
 	}
 
 	Column(
-		modifier.background(MaterialTheme.colors.backgroundSystem)
+		modifier
+			.background(MaterialTheme.colors.backgroundSystem)
+			.fillMaxSize(1f)
 	) {
 		ScreenHeaderWithButton(
 			canProceed = canProceed,

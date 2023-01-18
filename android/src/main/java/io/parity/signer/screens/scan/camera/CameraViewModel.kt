@@ -33,7 +33,7 @@ class CameraViewModel() : ViewModel() {
 	internal val captured: StateFlow<Int?> = _captured.asStateFlow()
 
 	// payload of currently scanned qr codes for multiqr transaction like metadata update.
-	private var currentMultiQrTransaction = arrayOf<String>()
+	private var currentMultiQrTransaction = mutableSetOf<String>()
 
 	/**
 	 * Barcode detecting function.
@@ -54,7 +54,9 @@ class CameraViewModel() : ViewModel() {
 			.addOnSuccessListener { barcodes ->
 				barcodes.forEach {
 					val payloadString = it?.rawBytes?.encodeHex()
-					if (!(currentMultiQrTransaction.contains(payloadString) || payloadString.isNullOrEmpty())) {
+					//todo banana check what is the difference between this currentMultiQrTransaction and pendingTransactionPayloads
+// and like ios/NativeSigner/Models/CameraService.swift:35 todo banana
+					if (!currentMultiQrTransaction.contains(payloadString) && !payloadString.isNullOrEmpty()) {
 						if (total.value == null) {
 							try {
 								val proposeTotal =
@@ -97,9 +99,9 @@ class CameraViewModel() : ViewModel() {
 			)
 			when (payload) {
 				is DecodeSequenceResult.BBananaSplitRecoveryResult -> {
-					when (val bananaResult = payload.b) {
+					when (payload.b) {
 						is BananaSplitRecoveryResult.RecoveredSeed -> {
-							//we passed a null in qrparserTryDecodeQrSequence so we can't get there
+							//we passed a null password in qrparserTryDecodeQrSequence so we can't get there
 							submitErrorState("cannot happen here that for scanning we don't have password request")
 						}
 						BananaSplitRecoveryResult.RequestPassword -> {
@@ -128,7 +130,7 @@ class CameraViewModel() : ViewModel() {
 	 * Clears camera progress
 	 */
 	fun resetScanValues() {
-		currentMultiQrTransaction = arrayOf()
+		currentMultiQrTransaction = mutableSetOf()
 		_captured.value = null
 		_total.value = null
 	}
