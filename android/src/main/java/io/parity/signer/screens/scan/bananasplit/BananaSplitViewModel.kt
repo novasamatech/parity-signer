@@ -1,6 +1,8 @@
 package io.parity.signer.screens.scan.bananasplit
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
+import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.FakeNavigator
 import io.parity.signer.models.storage.SeedRepository
@@ -66,7 +68,7 @@ class BananaSplitViewModel() : ViewModel() {
 		_seedName.value = newSeedName
 	}
 
-	suspend fun onDoneTap() {
+	suspend fun onDoneTap(context: Context) {
 		val password = password.value
 		val seedName = seedName.value
 		try {
@@ -76,7 +78,7 @@ class BananaSplitViewModel() : ViewModel() {
 					when (val seed = qrResult.b) {
 						is BananaSplitRecoveryResult.RecoveredSeed -> {
 							if (seedRepository.isSeedPhraseCollision(seed.s)) {
-								_isCustomErrorTerminal.value = "This seed phrase already exists"
+								_isCustomErrorTerminal.value = context.getString(R.string.banana_split_password_error_seed_phrase_exists)
 								return
 							}
 							//fake navigations
