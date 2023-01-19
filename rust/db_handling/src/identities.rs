@@ -1016,7 +1016,7 @@ where
             network_specs.specs.genesis_hash,
         );
         events.push(Event::IdentityRemoved { identity_history });
-        if &address_details.network_id.as_ref() == &Some(network_specs_key) {
+        if address_details.network_id.as_ref() == Some(network_specs_key) {
             id_batch.remove(address_key.key())
         } else {
             id_batch.insert(address_key.key(), address_details.encode())
@@ -1213,7 +1213,7 @@ where
             for (multisigner, address_details) in get_all_addresses(db_path)?.into_iter() {
                 if (address_details.seed_name == seed_name) // seed name
                     && (address_details.path == path) // derivation path, cropped part without password
-                    && (&address_details.network_id.as_ref() == &Some(network_specs_key)) // in this network
+                    && (address_details.network_id.as_ref() == Some(network_specs_key)) // in this network
                     && (!address_details.has_pwd)
                 // has no password to begin with
                 {
@@ -1528,7 +1528,7 @@ where
             real_seed_name: address_details.seed_name,
         });
     }
-    if &address_details.network_id.as_ref() != &Some(network_specs_key) {
+    if address_details.network_id.as_ref() != Some(network_specs_key) {
         return Err(Error::NetworkSpecsKeyForAddressNotFound {
             network_specs_key: network_specs_key.to_owned(),
             address_key,

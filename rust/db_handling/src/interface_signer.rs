@@ -358,7 +358,7 @@ where
     let network_specs = ordered_network_specs.specs;
     let address_key = AddressKey::new(multisigner.clone(), Some(network_specs.genesis_hash));
     let address_details = get_address_details(&db_path, &address_key);
-    let address_details = if let Err(_) = address_details {
+    let address_details = if address_details.is_err() {
         let address_key = AddressKey::new(multisigner.clone(), None);
         get_address_details(db_path, &address_key)
     } else {
@@ -384,7 +384,7 @@ where
     let identicon =
         make_identicon_from_multisigner(multisigner, network_specs.encryption.identicon_style());
     let qr = {
-        if &address_details.network_id.as_ref() == &Some(network_specs_key) {
+        if address_details.network_id.as_ref() == Some(network_specs_key) {
             let prefix = if network_specs.encryption == Encryption::Ethereum {
                 "ethereum"
             } else {
