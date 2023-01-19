@@ -19,7 +19,6 @@
 		2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C52774AEE7004B27BE /* SelectSeedForBackup.swift */; };
 		2D48F3D02777A823004B27BE /* NewSeedBackupModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */; };
 		2D48F3D2277A0AB2004B27BE /* HistoryCardExtended.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */; };
-		2D48F3E0278305AE004B27BE /* LogComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DF278305AE004B27BE /* LogComment.swift */; };
 		2D59B9FD278F1D930088057A /* InstructionsSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D59B9FC278F1D930088057A /* InstructionsSquare.swift */; };
 		2D6A9F84278C8275000DAE64 /* TCNetworkInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -309,7 +308,6 @@
 		2D48F3C52774AEE7004B27BE /* SelectSeedForBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSeedForBackup.swift; sourceTree = "<group>"; };
 		2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSeedBackupModal.swift; sourceTree = "<group>"; };
 		2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCardExtended.swift; sourceTree = "<group>"; };
-		2D48F3DF278305AE004B27BE /* LogComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogComment.swift; sourceTree = "<group>"; };
 		2D59B9FC278F1D930088057A /* InstructionsSquare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsSquare.swift; sourceTree = "<group>"; };
 		2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNetworkInfo.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -1549,7 +1547,6 @@
 				2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */,
 				2DAA8298278738C0002917C0 /* SelectSeed.swift */,
 				2D48F36E2767419D004B27BE /* PasswordConfirm.swift */,
-				2D48F3DF278305AE004B27BE /* LogComment.swift */,
 				2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */,
 			);
 			path = Deprecated;
@@ -1981,7 +1978,6 @@
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,
 				6DB99039295E95E9001101DC /* NetworkCapsuleView.swift in Sources */,
 				2DAA8299278738C0002917C0 /* SelectSeed.swift in Sources */,
-				2D48F3E0278305AE004B27BE /* LogComment.swift in Sources */,
 				2D48F3B82771D250004B27BE /* SignSufficientCrypto.swift in Sources */,
 				6DA2ACA72939DBCE00AAEADC /* DateFormatter+Utils.swift in Sources */,
 				6D84441F28D317FE0072FBAC /* KeyDetailsPublicKeyViewModel.swift in Sources */,
