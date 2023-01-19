@@ -154,7 +154,6 @@ extension EnterBananaSplitPasswordModal {
                         return
                     }
                     navigation.performFake(navigation: .init(action: .navbarKeys))
-                    navigation.performFake(navigation: .init(action: .rightButtonAction))
                     navigation.performFake(navigation: .init(action: .recoverSeed))
                     navigation.performFake(navigation: .init(action: .goForward, details: seedName))
                     seedsMediator.restoreSeed(seedName: seedName, seedPhrase: seedPhrase, navigate: false)
