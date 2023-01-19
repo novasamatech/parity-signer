@@ -21,6 +21,10 @@ class SeedRepository(
 		return storage.lastKnownSeedNames.value.contains(seedName)
 	}
 
+	fun getLastKnownSeedNames(): Array<String> {
+		return storage.lastKnownSeedNames.value
+	}
+
 	suspend fun getSeedPhrases(seedNames: List<String>): RepoResult<String> {
 		return try {
 			try {

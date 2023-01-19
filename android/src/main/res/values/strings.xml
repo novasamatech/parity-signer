@@ -222,6 +222,7 @@
 	<string name="banana_split_password_name_error_collision">Given display name already exists.</string>
 	<string name="banana_split_password_password_error_wrong">The password you entered is incorrect</string>
 	<string name="banana_split_password_error_seed_phrase_exists">This seed phrase already exists</string>
+	<string name="banana_split_password_error_cannot_save_seed">Given combination of seed phrase and seed name couldn\'t be saved.</string>
 
 </resources>
 

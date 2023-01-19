@@ -86,15 +86,26 @@ class BananaSplitViewModel() : ViewModel() {
 							}
 							//fake navigations
 							uniffiInteractor.navigate(Action.NAVBAR_KEYS)
-							uniffiInteractor.navigate(Action.RIGHT_BUTTON_ACTION)
+							// Key Set List state has different "modalData" state depending on whether user has at least one key or not
+							// So we need to check whether we should actually "pretend" to open "more" navigation bar menu by
+							if (seedRepository.getLastKnownSeedNames().isNotEmpty()) {
+								uniffiInteractor.navigate(Action.RIGHT_BUTTON_ACTION)
+							}
 							uniffiInteractor.navigate(Action.RECOVER_SEED)
 							uniffiInteractor.navigate(Action.GO_FORWARD, seedName)
-							seedRepository.addSeed(
+							// We should do additional check on whether seed can be successfully saved and not call navigation
+							// further if there are any issues (i.e. somehow seedname is still empty, etc)
+							val isSaved = seedRepository.addSeed(
 								seedName = seedName,
 								seedPhrase = seed.s,
 								navigator = FakeNavigator(),
 								isOptionalAuth = true,
 							)
+							if (!isSaved) {
+								_isCustomErrorTerminal.value =
+									context.getString(R.string.banana_split_password_error_cannot_save_seed)
+								return
+							}
 							uniffiInteractor.navigate(Action.GO_BACK)
 							_isSuccessTerminal.value = seedName
 						}
