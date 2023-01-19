@@ -159,7 +159,7 @@ where
         .filter_map(|(multisigner, address_details)| {
             match &address_details.network_id {
                 Some(id) => {
-                    let network_specs = get_network_specs(&db_path, &id).unwrap();
+                    let network_specs = get_network_specs(&db_path, id).unwrap();
 
                     let address_key = AddressKey::new(
                         multisigner.clone(),
@@ -566,7 +566,7 @@ where
                     );
                     let address_key = hex::encode(
                         AddressKey::new(
-                            multisigner.clone(),
+                            multisigner,
                             Some(ordered_network_specs.specs.genesis_hash),
                         )
                         .key(),

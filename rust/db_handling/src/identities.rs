@@ -805,7 +805,7 @@ where
                             Err(Error::DerivationExists {
                                 multisigner,
                                 address_details,
-                                network_specs_key: network_specs_key.clone(),
+                                network_specs_key,
                             })
                         } else {
                             Ok(PrepData {
@@ -1403,7 +1403,7 @@ where
 
     for (multisigner, address_details) in id_set.iter() {
         if let Some(id) = &address_details.network_id {
-            let network_specs = get_network_specs(&db_path, &id)?;
+            let network_specs = get_network_specs(&db_path, id)?;
             let address_key =
                 AddressKey::new(multisigner.clone(), Some(network_specs.specs.genesis_hash));
 

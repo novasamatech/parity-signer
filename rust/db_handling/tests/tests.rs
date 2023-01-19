@@ -144,7 +144,7 @@ fn print_all_ids() {
                 "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f3401{}",
                 hex::encode(westend_genesis())
             )
-            .to_string(),
+            ,
             public_key: "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                 .to_string(),
             address: Address {
