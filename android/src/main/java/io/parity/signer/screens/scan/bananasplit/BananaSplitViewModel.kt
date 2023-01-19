@@ -93,7 +93,7 @@ class BananaSplitViewModel() : ViewModel() {
 								seedName = seedName,
 								seedPhrase = seed.s,
 								navigator = FakeNavigator(),
-								isOptionalAuth = true
+								isOptionalAuth = true,
 							)
 							uniffiInteractor.navigate(Action.GO_BACK)
 							_isSuccessTerminal.value = seedName
