@@ -6,6 +6,7 @@ import io.parity.signer.backend.UniffiResult
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.models.FakeNavigator
 import io.parity.signer.models.storage.RepoResult
 import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
@@ -91,6 +92,34 @@ class ScanViewModel : ViewModel() {
 //						we can get result.navResult.alertData with error from Rust but it's not in new design
 					}
 				}
+			}
+			TransactionType.IMPORT_DERIVATIONS -> {
+				//todo import derivations  as in CameraView.swift:320
+				val fakeNavigator = FakeNavigator()
+				// We always need to `.goBack` as even if camera is dismissed without import, navigation "forward" already happened
+				fakeNavigator.navigate(Action.GO_BACK)
+
+
+//ios todo import derivations
+//				navigation.performFake(navigation: .init(action: .goBack))
+//				if let importError = transactions.dominantImportError {
+//					switch importError {
+//						case .networkMissing:
+//						presentableError = .importDerivedKeysMissingNetwork()
+//						case .keySetMissing:
+//						presentableError = .importDerivedKeysMissingKeySet()
+//						case .badFormat:
+//						presentableError = .importDerivedKeysBadFormat()
+//					}
+//					isPresentingError = true
+//				} else if !transactions.hasImportableKeys {
+//					presentableError = .allKeysAlreadyExist()
+//					isPresentingError = true
+//				} else {
+//					self.transactions = transactions
+//					isPresentingTransactionPreview = true
+//				}
+//			}
 			}
 			else -> {
 				// Transaction with error OR
