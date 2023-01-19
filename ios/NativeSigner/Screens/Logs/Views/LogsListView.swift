@@ -65,6 +65,13 @@ struct LogsListView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingAddNoteModal,
+            onDismiss: { viewModel.loadData() }
+        ) {
+            LogNoteModal(viewModel: .init(isPresented: $viewModel.isPresentingAddNoteModal))
+                .clearModalBackground()
+        }
     }
 }
 
@@ -76,6 +83,7 @@ extension LogsListView {
         @Published var shouldPresentAddNoteModal = false
         @Published var isShowingActionSheet = false
         @Published var isPresentingClearConfirmationModal = false
+        @Published var isPresentingAddNoteModal = false
 
         private weak var navigation: NavigationCoordinator!
 
@@ -90,6 +98,9 @@ extension LogsListView {
         }
 
         func loadData() {
+            if case let .log(updatedLogs) = navigation.performFake(navigation: .init(action: .navbarLog)).screenData {
+                logs = updatedLogs
+            }
             renderables = LogEntryRenderableBuilder().build(logs)
         }
 
@@ -101,7 +112,7 @@ extension LogsListView {
         func onMoreActionSheetDismissal() {
             if shouldPresentAddNoteModal {
                 shouldPresentAddNoteModal = false
-                navigation.perform(navigation: .init(action: .createLogComment))
+                isPresentingAddNoteModal = true
             }
             if shouldPresentClearConfirmationModal {
                 shouldPresentClearConfirmationModal = false

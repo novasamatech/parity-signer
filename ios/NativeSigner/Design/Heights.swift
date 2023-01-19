@@ -31,6 +31,8 @@ enum Heights {
     static let identiconSmall: CGFloat = 16
     static let tabbarHeight: CGFloat = 49
     static let textFieldHeight: CGFloat = 48
+    static let minTextEditorHeight: CGFloat = 96
+    static let maxTextEditorHeight: CGFloat = 230
     static let tabbarAssetHeight: CGFloat = 28
     static let errorModalIconContainer: CGFloat = 80
     /// All variants of `ProgressSnackbar`, 96 pt
