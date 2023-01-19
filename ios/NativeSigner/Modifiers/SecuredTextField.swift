@@ -27,12 +27,14 @@ struct SecurePrimaryTextField: View {
                 SecureField("", text: $text, onCommit: {
                     onCommit()
                 })
+                .autocorrectionDisabled()
                 .transaction { $0.animation = nil }
                 .focused($focusedField, equals: .secure)
                 .opacity(isSecured ? 1 : 0)
                 TextField("", text: $text, onCommit: {
                     onCommit()
                 })
+                .autocorrectionDisabled()
                 .transaction { $0.animation = nil }
                 .focused($focusedField, equals: .plain)
                 .opacity(isSecured ? 0 : 1)
