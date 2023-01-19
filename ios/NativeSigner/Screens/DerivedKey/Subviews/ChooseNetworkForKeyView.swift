@@ -169,7 +169,6 @@ struct ChooseNetworkForKeyView_Previews: PreviewProvider {
                 networkSelection: .constant(.allowedOnAnyNetwork([]))
             )
         )
-        .environmentObject(NavigationCoordinator())
         .environmentObject(AppState.preview)
     }
 }

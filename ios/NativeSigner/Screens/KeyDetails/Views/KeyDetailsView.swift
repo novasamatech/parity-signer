@@ -26,11 +26,14 @@ struct KeyDetailsView: View {
                         leftButton: .arrow,
                         rightButton: .more
                     ),
-                    actionModel: .init(rightBarMenuAction: {
-                        viewModel.isShowingActionSheet.toggle()
-                    })
+                    actionModel: .init(
+                        leftBarMenuAction: { viewModel.onBackTap() },
+                        rightBarMenuAction: {
+                            viewModel.isShowingActionSheet.toggle()
+                        }
+                    )
                 )
-                ScrollView {
+                ScrollView(showsIndicators: false) {
                     // Main key cell
                     rootKeyHeader()
                     // Derived Keys header
@@ -214,7 +217,6 @@ struct KeyDetailsView: View {
                 viewModel: keySummary,
                 isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
             )
-            .padding(Padding.detailsCell)
             .contentShape(Rectangle())
             .onTapGesture { viewModel.onRootKeyTap() }
         } else {
@@ -241,7 +243,7 @@ private struct KeySummaryView: View {
                     .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
             }
         }
-        .padding(.vertical, Spacing.medium)
+        .padding(.bottom, Spacing.medium)
         .padding(.horizontal, Spacing.large)
     }
 }

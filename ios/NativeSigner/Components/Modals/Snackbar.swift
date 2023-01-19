@@ -63,7 +63,8 @@ struct Snackbar: View {
             Text(viewModel.title)
                 .font(PrimaryFont.bodyL.font)
                 .foregroundColor(Asset.accentForegroundText.swiftUIColor)
-                .padding(Spacing.large)
+                .padding(.horizontal, Spacing.medium)
+                .lineSpacing(Spacing.extraSmall)
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer()
@@ -72,10 +73,9 @@ struct Snackbar: View {
                     .padding(.trailing, Spacing.medium)
             }
         }
+        .padding(.vertical, Spacing.medium)
         .frame(
             minHeight: Heights.snackbarHeight,
-            idealHeight: Heights.snackbarHeight,
-            maxHeight: Heights.snackbarMaxHeight,
             alignment: .center
         )
         .background(viewModel.style.tintColor)
@@ -122,7 +122,8 @@ struct SnackbarDemo: View {
                 style: .info,
                 countdown: .init(counter: 60, viewModel: .snackbarCountdown, onCompletion: {})
             ),
-            isPresented: $showInfo
+            isPresented: $showInfo,
+            autodismissCounter: 60
         )
     }
 }
@@ -133,5 +134,6 @@ struct Snackbar_Previews: PreviewProvider {
     static var previews: some View {
         SnackbarDemo()
             .preferredColorScheme(.light)
+            .previewDevice(PreviewDevice(rawValue: "iPod Touch (7th generation)"))
     }
 }

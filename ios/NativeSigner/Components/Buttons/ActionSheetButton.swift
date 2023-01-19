@@ -54,7 +54,7 @@ struct ActionSheetButton: View {
                 Text(text)
                 Spacer()
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, minHeight: Heights.minimumActionSheetButtonHeight)
             .contentShape(Rectangle())
         }
         .buttonStyle(style)

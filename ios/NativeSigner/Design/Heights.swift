@@ -31,6 +31,8 @@ enum Heights {
     static let identiconSmall: CGFloat = 16
     static let tabbarHeight: CGFloat = 49
     static let textFieldHeight: CGFloat = 48
+    static let minTextEditorHeight: CGFloat = 96
+    static let maxTextEditorHeight: CGFloat = 230
     static let tabbarAssetHeight: CGFloat = 28
     static let errorModalIconContainer: CGFloat = 80
     /// All variants of `ProgressSnackbar`, 96 pt
@@ -54,6 +56,7 @@ enum Heights {
     static let networkSelectionSettings: CGFloat = 52
     static let selectionBox: CGFloat = 48
     static let capsuleSelectionView: CGFloat = 28
+    static let minimumActionSheetButtonHeight: CGFloat = 48
 }
 
 enum Sizes {
@@ -62,7 +65,7 @@ enum Sizes {
     /// Size for left-aligned icons within `MenuButton` / `ActionSheetButton`, 30pt
     static let actionSheetIcon: CGFloat = 30
     /// Size for seed word position label
-    static let seedWordPositionWidth: CGFloat = 28
+    static let seedWordPositionWidth: CGFloat = 18
     /// Diameter for ">" button in circle, 28pt
     static let chevronCircleButton: CGFloat = 28
     static let rightChevronContainerSize: CGFloat = 28

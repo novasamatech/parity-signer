@@ -69,6 +69,7 @@ struct CameraView: View {
                         }
                         .padding([.leading, .trailing], Spacing.medium)
                         .padding(.top, Spacing.medium + safeAreaInsets.top)
+                        Spacer()
                         // Camera cutout
                         ZStack {
                             RoundedRectangle(cornerRadius: CornerRadius.qrCodeScanner)
@@ -81,9 +82,9 @@ struct CameraView: View {
                                 )
                         }
                         .padding([.leading, .trailing], Spacing.medium)
-                        .padding([.top, .bottom], Spacing.x3Large)
+                        Spacer()
                         // Text description
-                        VStack(spacing: Spacing.small) {
+                        VStack(alignment: .center, spacing: Spacing.small) {
                             Text(viewModel.header)
                                 .font(PrimaryFont.titleL.font)
                             Text(viewModel.message)
@@ -91,7 +92,7 @@ struct CameraView: View {
                                 .multilineTextAlignment(.center)
                         }
                         .foregroundColor(Asset.accentForegroundText.swiftUIColor)
-                        .padding([.leading, .trailing], Spacing.componentSpacer)
+                        .frame(width: UIScreen.main.bounds.width * 0.86, alignment: .center)
                         Spacer()
                     }
                     if viewModel.isScanningMultiple, !model.multipleTransactions.isEmpty {

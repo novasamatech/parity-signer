@@ -438,6 +438,11 @@
 "LogsList.ClearConfirmation.Label.Title" = "Are You Sure?";
 "LogsList.ClearConfirmation.Action.Cancel" = "Cancel";
 "LogsList.ClearConfirmation.Action.Clear" = "Clear Log";
+"LogsList.Modal.AddNote.Label.Title" = "Add Note";
+"LogsList.Modal.AddNote.Label.Header" = "Enter text to save as note visible in Logs list";
+"LogsList.Modal.AddNote.Label.Placeholder" = "Enter note";
+"LogsList.Modal.AddNote.Action.Done" = "Done";
+
 
 "Settings.Label.Title" = "Settings";
 "Settings.Label.Networks" = "Networks";

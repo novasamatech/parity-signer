@@ -27,14 +27,13 @@ struct ModalSelector: View {
             NewSeedBackupModal(
                 content: value
             )
-        case .logComment:
-            LogComment()
         case let .selectSeed(value):
             SelectSeed(
                 content: value
             )
         // Handled in native navigation
         case
+            .logComment,
             .enterPassword,
             .backup,
             .keyDetailsAction,

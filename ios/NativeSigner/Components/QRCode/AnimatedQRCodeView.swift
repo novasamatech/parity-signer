@@ -16,7 +16,6 @@ struct AnimatedQRCodeViewModel: Equatable {
 struct AnimatedQRCodeView: View {
     private enum Constants {
         static let animationFps = 0.125
-        static let compactDeviceWidth: CGFloat = 320
         static let qrCodeWidthForSmallDevices: CGFloat = 216
         static let qrCodeWidthForStandardDevices: CGFloat = 232
         static let qrCodeWidthForLargerDevices: CGFloat = 320
@@ -79,7 +78,7 @@ struct AnimatedQRCodeView: View {
                 }
         }
         .padding(
-            UIScreen.main.bounds.width == Constants.compactDeviceWidth ? Spacing.large : Spacing.x3Large
+            UIScreen.main.bounds.width == DeviceConstants.compactDeviceWidth ? Spacing.large : Spacing.x3Large
         )
         .background(
             RoundedRectangle(cornerRadius: CornerRadius.medium)
