@@ -24,19 +24,17 @@ use constants::{GENERALVERIFIER, SIGN, STUB, TYPES};
 
 #[cfg(feature = "signer")]
 use definitions::{
-    helpers::multisigner_to_public,
     history::{
-        Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay,
-        SignDisplay, SignMessageDisplay, TypesDisplay,
+        Event, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay,
+        SignMessageDisplay, TypesDisplay,
     },
-    keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey},
+    keyring::{MetaKey, NetworkSpecsKey, VerifierKey},
     metadata::MetaValues,
     network_specs::{
         CurrentVerifier, NetworkSpecs, OrderedNetworkSpecs, ValidCurrentVerifier, Verifier,
         VerifierValue,
     },
     qr_transfers::ContentLoadTypes,
-    users::AddressDetails,
 };
 
 use crate::helpers::{open_db, open_tree};

@@ -548,6 +548,9 @@ impl State {
     fn handle_select_key(&self, dbname: &str, details_str: &str) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let mut errorline = String::new();
+
+        println!("handle select key");
+
         match self.navstate.screen {
             Screen::Keys(ref keys_state) => {
                 if keys_state.is_multiselect() {
@@ -572,6 +575,7 @@ impl State {
                 } else {
                     match AddressState::new(details_str, keys_state, dbname) {
                         Ok(a) => {
+                            println!("key details");
                             new_navstate = Navstate::clean_screen(Screen::KeyDetails(a));
                         }
                         Err(e) => {
@@ -587,7 +591,7 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_new_key(&self, dbname: &str, details_str: &str) -> (Navstate, String) {
+    fn handle_new_key(&self, _dbname: &str, details_str: &str) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let errorline = String::new();
         match self.navstate.screen {
@@ -1057,9 +1061,9 @@ impl State {
 
     fn handle_increment(
         &self,
-        details_str: &str,
+        _details_str: &str,
         dbname: &str,
-        secret_seed_phrase: &str,
+        _secret_seed_phrase: &str,
     ) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let errorline = String::new();
@@ -1123,7 +1127,7 @@ impl State {
     fn get_screen_data(
         &mut self,
         new_navstate: &Navstate,
-        details_str: &str,
+        _details_str: &str,
         dbname: &str,
     ) -> Result<ScreenData> {
         let sd = match new_navstate.screen {
@@ -1203,6 +1207,7 @@ impl State {
                 f: keys_state.seed_name(),
             },
             Screen::KeyDetails(ref address_state) => {
+                println!("here {:?}", address_state);
                 let f = if let Some(key) = address_state.network_specs_key().as_ref() {
                     Some(db_handling::interface_signer::export_key(
                         dbname,

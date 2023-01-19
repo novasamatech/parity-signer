@@ -630,10 +630,19 @@ pub struct MSCFieldNumber {
     pub docs_type: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub enum SignerImage {
     Svg { image: Vec<u8> },
     Png { image: Vec<u8> },
+}
+
+impl std::fmt::Debug for SignerImage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SignerImage::Svg { image } => write!(f, "SVG {}", hex::encode(&image[..32])),
+            SignerImage::Png { image } => write!(f, "PNG {}", hex::encode(&image[..32])),
+        }
+    }
 }
 
 impl Default for SignerImage {

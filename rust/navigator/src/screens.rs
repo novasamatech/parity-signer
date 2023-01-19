@@ -9,7 +9,6 @@ use crate::{
 };
 use db_handling::{
     helpers::{get_address_details, get_network_specs},
-    identities::get_multisigner_by_address,
     interface_signer::{first_network, SeedDraft},
 };
 use definitions::navigation::MAddressCard;

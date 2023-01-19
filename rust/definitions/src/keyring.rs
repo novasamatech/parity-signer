@@ -218,7 +218,7 @@ impl AddressKey {
     ///
     /// Infallible, the validity of resulting `AddressKey` is not checked.
     pub fn from_ivec(ivec: &IVec) -> Result<Self> {
-        let mut vec = ivec.to_vec();
+        let vec = ivec.to_vec();
         Ok(Self::decode(&mut &vec[..])?)
     }
 

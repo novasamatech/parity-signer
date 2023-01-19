@@ -404,6 +404,7 @@ where
     let mut out: Vec<(MultiSigner, AddressDetails)> = Vec::new();
     for (address_key_vec, address_entry) in identities.iter().flatten() {
         let address_key = AddressKey::from_ivec(&address_key_vec)?;
+        println!("address key {:?}", address_key);
         let (multisigner, address_details) =
             AddressDetails::process_entry_with_key_checked(&address_key, address_entry)?;
         out.push((multisigner, address_details));
@@ -762,48 +763,14 @@ where
 
     // number in `(AddressKey, AddressDetails)` set with same `AddressKey`, if
     // found
-    let mut number_in_current = None;
+    let number_in_current = None;
 
-    for (i, (x_address_key, x_address_details)) in address_prep.iter().enumerate() {
-        // `AddressKey` found in transaction preparation
-        /*
-        if x_address_key == &address_key {
-            continue;
-            let in_this_network = x_address_details.network_id.contains(&network_specs_key);
-
-            // Even though the public key and `Encryption` are same (resulting
-            // in the same `AddressKey`), the path in corresponding
-            // `AddressDetails` already in transaction preparation is different
-            // from the cropped path used in current address generation.
-            // If not checked, may result in uncertainty, as two entries with
-            // identical `AddressKey` would be in the set, and during database
-            // updating would be effectively overwritten, with only one,
-            // undefined, staying in the database.
-            if x_address_details.path != cropped_path {
-                return Err(Error::KeyCollisionBatch {
-                    seed_name_existing: x_address_details.seed_name.to_string(),
-                    seed_name_new: seed_name.to_string(),
-                    cropped_path_existing: x_address_details.path.to_string(),
-                    cropped_path_new: cropped_path.to_string(),
-                    in_this_network,
-                });
-            }
-
-            // Note that no error would be caused if two identical addresses
-            // were proposed in same address generation set.
-            if !in_this_network {
-                number_in_current = Some(i);
-                break;
-            }
-        }
-        */
-    }
     match number_in_current {
         // `AddressKey` already participates in transaction, just add
         // `NetworkSpecsKey` into corresponding `AddressDetails` `network_id`
         // set
         Some(i) => {
-            let mut mod_entry = address_prep.remove(i);
+            let mod_entry = address_prep.remove(i);
             address_prep.push(mod_entry);
             Ok(PrepData {
                 address_prep,
@@ -829,55 +796,21 @@ where
                 match identities.get(address_key.key()) {
                     // `AddressKey` is in the database
                     Ok(Some(address_entry)) => {
-                        let mut address_details = AddressDetails::from_entry_with_key_checked(
-                            &address_key,
-                            address_entry,
-                        )?;
+                        if let Some(network_specs_key) = network_specs_key {
+                            let address_details = AddressDetails::from_entry_with_key_checked(
+                                &address_key,
+                                address_entry,
+                            )?;
 
-                        // Even though the public key and `Encryption` are same
-                        // (resulting in the same `AddressKey`), the path in
-                        // corresponding `AddressDetails` in the database is
-                        // different from the cropped path currently used.
-                        // <seed phrase 1> + <derivation path 1> resulted in same
-                        // public key as <seed phrase 2> + <derivation path 2>.
-                        // For different seed phrases it is possible, but quite
-                        // unlikely situation.
-                        // For different *spellings* of derivation path, e.g. "//01"
-                        // and "//1" it is more likely to happen.
-                        // In any case, this is collision error and address is not
-                        // created.
-                        // TODO more descriptive error may be better
-                        if address_details.path != cropped_path {
-                            return Err(Error::KeyCollision {
-                                seed_name: address_details.seed_name,
-                            });
-                        }
-
-                        // Expected `secret_exposed` flag activated. Could indicate
-                        // the database corruption.
-                        if secret_exposed && !address_details.secret_exposed {
-                            return Err(Error::SecretExposedMismatch {
-                                multisigner,
-                                address_details,
-                            });
-                        }
-
-                        // Check if the address already exists for the network.
-                        // UI should not allow user get here unless the derivation
-                        // is passworded and already exists.
-                        // Proposed derivation is checked dynamically before
-                        // address generation could be even called.
-                        if address_details.network_id == network_specs_key {
-                            address_prep.push((address_key, address_details));
-                            Ok(PrepData {
-                                address_prep,
-                                history_prep,
-                            })
-                        } else {
                             Err(Error::DerivationExists {
                                 multisigner,
                                 address_details,
-                                network_specs_key: network_specs_key.unwrap(),
+                                network_specs_key: network_specs_key.clone(),
+                            })
+                        } else {
+                            Ok(PrepData {
+                                address_prep,
+                                history_prep,
                             })
                         }
                     }

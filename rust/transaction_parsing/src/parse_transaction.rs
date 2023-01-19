@@ -1,6 +1,7 @@
 use db_handling::{
     db_transactions::{SignContent, TrDbColdSign, TrDbColdSignOne},
     helpers::{get_all_networks, try_get_address_details, try_get_network_specs},
+    identities::get_all_addresses,
 };
 use definitions::{
     history::{Entry, Event, SignDisplay},
@@ -71,6 +72,10 @@ where
             );
             let mut history: Vec<Event> = Vec::new();
 
+            let addrs = get_all_addresses(&db_path)?;
+            println!("addr {:#?}", addrs);
+            println!("addr key {:#?}", address_key);
+
             let mut cards_prep = match try_get_address_details(&db_path, &address_key)? {
                 Some(address_details) => {
                     if address_details.network_id.as_ref() == Some(&network_specs_key) {
@@ -89,14 +94,18 @@ where
                         )
                     }
                 }
-                None => CardsPrep::ShowOnly(
-                    (Card::AuthorPlain {
-                        author: &author_multi_signer,
-                        base58prefix: network_specs.specs.base58prefix,
-                    })
-                    .card(&mut index, indent),
-                    Box::new((Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent)),
-                ),
+                None => {
+                    println!("here 2");
+
+                    CardsPrep::ShowOnly(
+                        (Card::AuthorPlain {
+                            author: &author_multi_signer,
+                            base58prefix: network_specs.specs.base58prefix,
+                        })
+                        .card(&mut index, indent),
+                        Box::new((Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent)),
+                    )
+                }
             };
 
             let short_specs = network_specs.specs.short();

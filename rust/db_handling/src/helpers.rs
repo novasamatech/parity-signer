@@ -608,10 +608,10 @@ where
         // scan through address tree to clean up the network_key(s) from identities
         for (address_key_vec, entry) in identities.iter().flatten() {
             let address_key = AddressKey::from_ivec(&address_key_vec)?;
-            let (multisigner, mut address_details) =
+            let (multisigner, address_details) =
                 AddressDetails::process_entry_checked((address_key_vec, entry))?;
             for key in keys_to_wipe.iter() {
-                if &address_details.network_id.as_ref() == &Some(key) {
+                if address_details.network_id.as_ref() == Some(key) {
                     let identity_history = IdentityHistory::get(
                         &address_details.seed_name,
                         &address_details.encryption,
