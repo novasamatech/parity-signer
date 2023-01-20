@@ -542,6 +542,7 @@
 "EnterBananaSplitPasswordModal.Error.Label.InvalidSeedName" = "Given display name already exists.\nPlease try again.";
 "EnterBananaSplitPasswordModal.Error.SeedPhraseExists.Title" = "Seed phrase already exists";
 "EnterBananaSplitPasswordModal.Error.SeedPhraseExists.Message" = "Seed phrase that you are trying to recover already exists in the app.";
+"EnterBananaSplitPasswordModal.Error.LocalRestoreFailed.Message" = "Given combination of seed phrase and seed name couldn't be saved.";
 
 "CreateDerivedKey.Label.Title" = "Create Derived Key";
 "CreateDerivedKey.Label.Header.Network" = "Choose Network";
