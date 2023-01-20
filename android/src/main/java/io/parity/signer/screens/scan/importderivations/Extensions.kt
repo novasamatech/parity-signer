@@ -8,9 +8,9 @@ import io.parity.signer.uniffi.*
 //ios/NativeSigner/Screens/Scan/Models/MTransaction+ImportDerivedKeys.swift:10
 
 
-/// Rust error state for import derived keys is different comparing to UI requirements,
-/// hence we need this support function to find out what is the proper UI error to show
-/// if there are no importable keys left
+// Rust error state for import derived keys is different comparing to UI requirements,
+// hence we need this support function to find out what is the proper UI error to show
+// if there are no importable keys left
 fun List<MTransaction>.dominantImportError(): DerivedKeyError? {
 	if (hasImportableKeys()) return null
 
@@ -29,8 +29,8 @@ fun List<MTransaction>.dominantImportError(): DerivedKeyError? {
 	return mostCommonError
 }
 
-/// Extracts list of all `SeedKeysPreview` that are within given `[MTransaction]`
-fun List<MTransaction>.allImportDerivedKeys: List<SeedKeysPreview> {
+// Extracts list of all `SeedKeysPreview` that are within given `[MTransaction]`
+fun List<MTransaction>.allImportDerivedKeys(): List<SeedKeysPreview> {
 	return flatMap { it.allImportDerivedKeys() }
 }
 
@@ -58,7 +58,7 @@ internal fun MTransaction.hasImportableKeys(): Boolean {
 	}
 }
 
-/// Extracts list of all `SeedKeysPreview` that are within given `MTransaction`
+// Extracts list of all `SeedKeysPreview` that are within given `MTransaction`
 internal fun MTransaction.allImportDerivedKeys(): List<SeedKeysPreview> {
 	return when (ttype) {
 		TransactionType.IMPORT_DERIVATIONS -> {
@@ -79,7 +79,7 @@ internal fun MTransaction.importableKeysCount(): Int {
 }
 
 
-/// Extracts list of importable `SeedKeysPreview` that are within given `MTransaction`
+// Extracts list of importable `SeedKeysPreview` that are within given `MTransaction`
 internal fun MTransaction.importableSeedKeysPreviews(): List<SeedKeysPreview> {
 	return when (ttype) {
 		TransactionType.IMPORT_DERIVATIONS -> {
