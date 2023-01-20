@@ -5,6 +5,7 @@
 //  Created by Krzysztof Rodak on 19/09/2022.
 //
 
+import Combine
 import SwiftUI
 
 struct SeedPhraseElementModel: Equatable {
@@ -29,7 +30,9 @@ struct SeedPhraseViewModel: Equatable {
 /// Component to present seed phrase divided by words along with word position label
 /// Layout is fixed to 3 columns
 struct SeedPhraseView: View {
-    private let viewModel: SeedPhraseViewModel
+    @StateObject var viewModel: ViewModel
+    @EnvironmentObject var applicationStatePublisher: ApplicationStatePublisher
+
     private let columns = [
         GridItem(.flexible()),
         GridItem(.flexible()),
@@ -40,15 +43,9 @@ struct SeedPhraseView: View {
         GridItem(.flexible())
     ]
 
-    init(
-        viewModel: SeedPhraseViewModel
-    ) {
-        self.viewModel = viewModel
-    }
-
     var body: some View {
         LazyVGrid(columns: layout(), alignment: .leading, spacing: 0) {
-            ForEach(viewModel.seeds, id: \.position) { seedWord in
+            ForEach(viewModel.dataModel.seeds, id: \.position) { seedWord in
                 HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
                     Text(seedWord.position)
                         .font(.robotoMonoRegular)
@@ -61,6 +58,7 @@ struct SeedPhraseView: View {
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                         .minimumScaleFactor(1)
                         .lineLimit(1)
+                        .privacySensitive()
                 }
                 .frame(height: 24)
                 .padding([.bottom, .top], Spacing.extraExtraSmall)
@@ -68,10 +66,25 @@ struct SeedPhraseView: View {
         }
         .padding(Spacing.medium)
         .containerBackground(CornerRadius.small)
+        .redacted(
+            reason: applicationStatePublisher.applicationState == .inactive ? .privacy : []
+        )
     }
 
     private func layout() -> [GridItem] {
         UIScreen.main.bounds.width == DeviceConstants.compactDeviceWidth ? reducedWidthColumn : columns
+    }
+}
+
+extension SeedPhraseView {
+    final class ViewModel: ObservableObject {
+        let dataModel: SeedPhraseViewModel
+
+        init(
+            dataModel: SeedPhraseViewModel
+        ) {
+            self.dataModel = dataModel
+        }
     }
 }
 
@@ -81,7 +94,9 @@ struct SeedPhraseView: View {
             VStack {
                 Spacer()
                 SeedPhraseView(
-                    viewModel: PreviewData.seedPhraseViewModel
+                    viewModel: .init(
+                        dataModel: PreviewData.seedPhraseViewModel
+                    )
                 )
                 .padding(Spacing.medium)
                 Spacer()

@@ -33,7 +33,7 @@ struct NewSeedBackupModal: View {
                 .padding(.bottom, Spacing.medium)
                 .padding(.horizontal, Spacing.medium)
                 VStack(alignment: .leading, spacing: 0) {
-                    SeedPhraseView(viewModel: .init(seedPhrase: content.seedPhrase))
+                    SeedPhraseView(viewModel: .init(dataModel: .init(seedPhrase: content.seedPhrase)))
                         .padding(.bottom, Spacing.medium)
                     Button(
                         action: {

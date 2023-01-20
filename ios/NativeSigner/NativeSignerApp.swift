@@ -12,6 +12,7 @@ struct NativeSignerApp: App {
     @StateObject var connectivityMediator = ConnectivityMediator()
     @StateObject var navigation = NavigationCoordinator()
     @StateObject var appState = AppState()
+    @StateObject var applicationStatePublisher = ApplicationStatePublisher()
 
     var body: some Scene {
         WindowGroup {
@@ -24,6 +25,7 @@ struct NativeSignerApp: App {
             .environmentObject(navigation)
             .environmentObject(connectivityMediator)
             .environmentObject(appState)
+            .environmentObject(applicationStatePublisher)
         }
     }
 }
