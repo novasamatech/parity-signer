@@ -7,10 +7,6 @@
 
 import Foundation
 
-enum ServiceError: Error {
-    case unknown
-}
-
 final class ExportMultipleKeysService {
     private let databaseMediator: DatabaseMediating
     private let callQueue: Dispatching
@@ -61,7 +57,7 @@ final class ExportMultipleKeysService {
                 ).frames
                 result = .success(AnimatedQRCodeViewModel(qrCodes: qrCodes.map(\.payload)))
             } catch {
-                result = .failure(.unknown)
+                result = .failure(.init(message: error.localizedDescription))
             }
             self.callbackQueue.async {
                 completion(result)

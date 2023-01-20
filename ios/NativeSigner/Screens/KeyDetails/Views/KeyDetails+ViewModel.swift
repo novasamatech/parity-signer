@@ -87,21 +87,30 @@ extension KeyDetailsView {
 
         func refreshData() {
             keyDetailsService.getKeys(for: keyName) { result in
-                if case let .success(keysData) = result {
+                switch result {
+                case let .success(keysData):
                     self.appState.userData.keysData = keysData
                     self.keysData = keysData
                     self.updateRenderables()
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.description)
+                    self.isPresentingError = true
                 }
             }
         }
 
         func refreshNetworks() {
             networksService.getNetworks { result in
-                if case let .success(networks) = result {
+                switch result {
+                case let .success(networks):
                     self.appState.userData.allNetworks = networks
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.description)
+                    self.isPresentingError = true
                 }
             }
         }
+
         func onBackTap() {
             appState.userData.keysData = nil
             navigation.perform(navigation: .init(action: .goBack))

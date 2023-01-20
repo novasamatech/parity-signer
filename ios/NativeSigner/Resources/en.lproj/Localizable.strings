@@ -337,6 +337,9 @@
 "Error.Navigation.Label.Message" = "Please restart Signer app and try again.\nInternal error description: %@";
 "Error.Navigation.Label.Suffix" = "Report an issue to Signer team via Github at: https://github.com/paritytech/parity-signer/";
 "Error.Navigation.Label.NoAction" = "No further action available from this state.\nLast action: \"%@\" details: \"%@\"";
+"Error.Service.Label.Prefix" = "Internal service error.";
+"Error.Service.Label.Message" = "Rust backend operation failed, please try again.\nInternal error description: %@";
+"Error.Service.Label.Suffix" = "Report an issue to Signer team via Github at: https://github.com/paritytech/parity-signer/";
 
 "KeysExport.KeySets.Label.Header" = "Export %@ %@";
 "KeysExport.KeySets.Label.Header.Suffix.Single" = "Key Set";

@@ -32,7 +32,7 @@ final class KeyDetailsService {
                 let keys: MKeysNew = try keysBySeedName(dbname: self.databaseMediator.databaseName, seedName: seedName)
                 result = .success(keys)
             } catch {
-                result = .failure(.unknown)
+                result = .failure(.init(message: error.localizedDescription))
             }
             self.callbackQueue.async {
                 completion(result)
