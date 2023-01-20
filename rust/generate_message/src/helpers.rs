@@ -13,7 +13,7 @@ use std::{cmp::Ordering, convert::TryInto};
 use constants::{ADDRESS_BOOK, COLOR, METATREE, META_HISTORY, SECONDARY_COLOR, SPECSTREEPREP};
 use db_handling::{
     db_transactions::TrDbHot,
-    helpers::{make_batch_clear_tree, open_db, open_tree},
+    helpers::{make_batch_clear_tree, open_tree},
 };
 use definitions::{
     crypto::Encryption,
@@ -30,11 +30,7 @@ use crate::interpret_specs::{check_specs, interpret_properties, TokenFetch};
 use crate::parser::{Goal, Token};
 
 /// Get [`AddressBookEntry`] from the database for given address book title.
-pub fn get_address_book_entry<P>(title: &str, db_path: P) -> Result<AddressBookEntry>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(db_path)?;
+pub fn get_address_book_entry(database: &sled::Db, title: &str) -> Result<AddressBookEntry> {
     let address_book = open_tree(&database, ADDRESS_BOOK)?;
     match address_book.get(AddressBookKey::from_title(title).key())? {
         Some(a) => Ok(AddressBookEntry::from_entry_with_title(title, &a)?),
@@ -43,11 +39,8 @@ where
 }
 
 /// Get [`NetworkSpecs`] from the database for given address book title.
-pub fn network_specs_from_title<P>(title: &str, db_path: P) -> Result<NetworkSpecs>
-where
-    P: AsRef<Path>,
-{
-    network_specs_from_entry(&get_address_book_entry(title, &db_path)?, &db_path)
+pub fn network_specs_from_title(database: &sled::Db, title: &str) -> Result<NetworkSpecs> {
+    network_specs_from_entry(database, &get_address_book_entry(database, title)?)
 }
 
 /// Get [`NetworkSpecs`] corresponding to the given [`AddressBookEntry`].
@@ -56,18 +49,15 @@ where
 /// be added and removed only simultaneously.
 // TODO consider combining those, key would be address book title, network specs
 // key will stay only in cold database then?
-pub fn network_specs_from_entry<P>(
+pub fn network_specs_from_entry(
+    database: &sled::Db,
     address_book_entry: &AddressBookEntry,
-    db_path: P,
-) -> Result<NetworkSpecs>
-where
-    P: AsRef<Path>,
-{
+) -> Result<NetworkSpecs> {
     let network_specs_key = NetworkSpecsKey::from_parts(
         &address_book_entry.genesis_hash,
         &address_book_entry.encryption,
     );
-    let network_specs = get_network_specs_to_send(&network_specs_key, db_path)?;
+    let network_specs = get_network_specs_to_send(database, &network_specs_key)?;
     if network_specs.name != address_book_entry.name {
         return Err(Error::AddressBookSpecsName {
             address_book_name: address_book_entry.name.to_string(),
@@ -81,14 +71,10 @@ where
 ///
 /// If the [`NetworkSpecsKey`] and associated [`NetworkSpecs`] are not
 /// found in the [`SPECSTREEPREP`], the result is `Ok(None)`.
-pub fn try_get_network_specs_to_send<P>(
+pub fn try_get_network_specs_to_send(
+    database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
-    db_path: P,
-) -> Result<Option<NetworkSpecs>>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(db_path)?;
+) -> Result<Option<NetworkSpecs>> {
     let chainspecs = open_tree(&database, SPECSTREEPREP)?;
     match chainspecs.get(network_specs_key.key())? {
         Some(specs_encoded) => Ok(Some(NetworkSpecs::from_entry_with_key_checked(
@@ -103,14 +89,11 @@ where
 ///
 /// Network specs here are expected to be found, not finding them results in an
 /// error.
-pub fn get_network_specs_to_send<P>(
+pub fn get_network_specs_to_send(
+    database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
-    db_path: P,
-) -> Result<NetworkSpecs>
-where
-    P: AsRef<Path>,
-{
-    match try_get_network_specs_to_send(network_specs_key, db_path)? {
+) -> Result<NetworkSpecs> {
+    match try_get_network_specs_to_send(database, network_specs_key)? {
         Some(a) => Ok(a),
         None => Err(Error::NetworkSpecs(network_specs_key.to_owned())),
     }
@@ -126,10 +109,11 @@ where
 ///
 /// Key for [`AddressBookEntry`] is the network address book title. It always
 /// has format `<network_name>-<network_encryption>`.
-pub fn db_upd_network<P>(address: &str, network_specs: &NetworkSpecs, db_path: P) -> Result<()>
-where
-    P: AsRef<Path>,
-{
+pub fn db_upd_network(
+    database: &sled::Db,
+    address: &str,
+    network_specs: &NetworkSpecs,
+) -> Result<()> {
     let mut network_specs_prep_batch = Batch::default();
     network_specs_prep_batch.insert(
         NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption).key(),
@@ -153,7 +137,7 @@ where
     TrDbHot::new()
         .set_address_book(address_book_batch)
         .set_network_specs_prep(network_specs_prep_batch)
-        .apply(db_path)?;
+        .apply(database)?;
     Ok(())
 }
 
@@ -180,11 +164,7 @@ pub enum Write {
 }
 
 /// Get all [`ADDRESS_BOOK`] entries with address book titles.
-pub fn address_book_content<P>(db_path: P) -> Result<Vec<(String, AddressBookEntry)>>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(db_path)?;
+pub fn address_book_content(database: &sled::Db) -> Result<Vec<(String, AddressBookEntry)>> {
     let address_book = open_tree(&database, ADDRESS_BOOK)?;
     let mut out: Vec<(String, AddressBookEntry)> = Vec::new();
     for x in address_book.iter().flatten() {
@@ -195,16 +175,13 @@ where
 
 /// Get all [`ADDRESS_BOOK`] entries with address book titles, for given URL
 /// address.
-pub fn filter_address_book_by_url<P>(
+pub fn filter_address_book_by_url(
+    database: &sled::Db,
     address: &str,
-    db_path: P,
-) -> Result<Vec<(String, AddressBookEntry)>>
-where
-    P: AsRef<Path>,
-{
+) -> Result<Vec<(String, AddressBookEntry)>> {
     let mut out: Vec<(String, AddressBookEntry)> = Vec::new();
     let mut found_name = None;
-    for (title, address_book_entry) in address_book_content(db_path)?.into_iter() {
+    for (title, address_book_entry) in address_book_content(database)?.into_iter() {
         if address_book_entry.address == address {
             found_name = match found_name {
                 Some(name) => {
@@ -225,12 +202,12 @@ where
 }
 
 /// Search for any [`ADDRESS_BOOK`] entry with given genesis hash.
-pub fn genesis_hash_in_hot_db<P>(genesis_hash: H256, db_path: P) -> Result<Option<AddressBookEntry>>
-where
-    P: AsRef<Path>,
-{
+pub fn genesis_hash_in_hot_db(
+    database: &sled::Db,
+    genesis_hash: H256,
+) -> Result<Option<AddressBookEntry>> {
     let mut out = None;
-    for (_, address_book_entry) in address_book_content(db_path)?.into_iter() {
+    for (_, address_book_entry) in address_book_content(database)?.into_iter() {
         if address_book_entry.genesis_hash == genesis_hash {
             out = Some(address_book_entry);
             break;
@@ -241,11 +218,7 @@ where
 
 /// Check if [`ADDRESS_BOOK`] has entries with given `name` and title other than
 /// `except_title`.
-pub fn is_specname_in_db<P>(name: &str, except_title: &str, db_path: P) -> Result<bool>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(db_path)?;
+pub fn is_specname_in_db(database: &sled::Db, name: &str, except_title: &str) -> Result<bool> {
     let address_book = open_tree(&database, ADDRESS_BOOK)?;
     let mut out = false;
     for x in address_book.iter().flatten() {
@@ -259,11 +232,7 @@ where
 }
 
 /// Get all entries from `META_HISTORY`.
-pub fn meta_history_content<P>(db_path: P) -> Result<Vec<MetaHistoryEntry>>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(db_path)?;
+pub fn meta_history_content(database: &sled::Db) -> Result<Vec<MetaHistoryEntry>> {
     let meta_history = open_tree(&database, META_HISTORY)?;
     let mut out: Vec<MetaHistoryEntry> = Vec::new();
     for x in meta_history.iter().flatten() {
@@ -283,11 +252,7 @@ pub struct MetaValuesStamped {
 }
 
 /// Collect all [`MetaValuesStamped`] from the hot database.
-pub fn read_metadata_database<P>(db_path: P) -> Result<Vec<MetaValuesStamped>>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(db_path)?;
+pub fn read_metadata_database(database: &sled::Db) -> Result<Vec<MetaValuesStamped>> {
     let metadata = open_tree(&database, METATREE)?;
     let meta_history = open_tree(&database, META_HISTORY)?;
     let mut out: Vec<MetaValuesStamped> = Vec::new();
@@ -528,11 +493,8 @@ pub fn add_new_metadata(new: &MetaValuesStamped, sorted: &mut SortedMetaValues) 
 }
 
 /// Collect and sort [`MetaValuesStamped`] from the hot database
-pub fn prepare_metadata<P>(db_path: P) -> Result<SortedMetaValues>
-where
-    P: AsRef<Path>,
-{
-    let known_metavalues = read_metadata_database(db_path)?;
+pub fn prepare_metadata(database: &sled::Db) -> Result<SortedMetaValues> {
+    let known_metavalues = read_metadata_database(database)?;
     sort_metavalues(known_metavalues)
 }
 
@@ -542,11 +504,8 @@ where
 /// it.
 ///
 /// Update [`META_HISTORY`] tree.
-pub fn db_upd_metadata<P>(sorted_meta_values: SortedMetaValues, db_path: P) -> Result<()>
-where
-    P: AsRef<Path>,
-{
-    let mut metadata_batch = make_batch_clear_tree(&db_path, METATREE)?;
+pub fn db_upd_metadata(database: &sled::Db, sorted_meta_values: SortedMetaValues) -> Result<()> {
+    let mut metadata_batch = make_batch_clear_tree(database, METATREE)?;
     let mut meta_history_batch = Batch::default();
     let mut all_meta = sorted_meta_values.newer;
     all_meta.extend_from_slice(&sorted_meta_values.older);
@@ -560,7 +519,7 @@ where
     TrDbHot::new()
         .set_metadata(metadata_batch)
         .set_meta_history(meta_history_batch)
-        .apply(&db_path)?;
+        .apply(database)?;
 
     Ok(())
 }

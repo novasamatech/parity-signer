@@ -91,7 +91,9 @@ use hot_default::reset_hot_database;
 /// the active side.
 #[cfg(feature = "active")]
 pub fn default_cold_release(path: Option<PathBuf>) -> Result<()> {
-    populate_cold_release(path.unwrap_or_else(|| COLD_DB_NAME_RELEASE.into()))
+    populate_cold_release(&sled::open(
+        path.unwrap_or_else(|| COLD_DB_NAME_RELEASE.into()),
+    )?)
 }
 
 /// Generate or restore "hot" database with default values.
@@ -109,5 +111,5 @@ pub fn default_cold_release(path: Option<PathBuf>) -> Result<()> {
 /// All metadata-related entries get in the hot database only through RPC calls.
 #[cfg(feature = "active")]
 pub fn default_hot(path: Option<PathBuf>) -> Result<()> {
-    reset_hot_database(path.unwrap_or_else(|| HOT_DB_NAME.into()))
+    reset_hot_database(&sled::open(path.unwrap_or_else(|| HOT_DB_NAME.into()))?)
 }

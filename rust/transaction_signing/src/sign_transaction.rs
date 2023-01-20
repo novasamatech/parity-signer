@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use definitions::crypto::Encryption;
 use parity_scale_codec::Encode;
 use sp_core::blake2_256;
@@ -52,17 +50,17 @@ impl ToString for SignatureAndChecksum {
 
 /// Function to create signatures using RN output action line, and user entered pin and password.
 /// Also needs database name to fetch saved transaction and key.
-pub fn create_signature<P: AsRef<Path>>(
+pub fn create_signature(
+    database: &sled::Db,
     seed_phrase: &str,
     pwd_entry: &str,
     user_comment: &str,
-    database_name: P,
     checksum: u32,
     idx: usize,
     encryption: Encryption,
 ) -> Result<SignatureAndChecksum> {
-    let sign = TrDbColdSign::from_storage(&database_name, Some(checksum))?
-        .ok_or(db_handling::Error::Sign)?;
+    let sign =
+        TrDbColdSign::from_storage(database, Some(checksum))?.ok_or(db_handling::Error::Sign)?;
     let pwd = {
         if sign.signing_bulk[idx].has_pwd() {
             Some(pwd_entry)
@@ -97,13 +95,13 @@ pub fn create_signature<P: AsRef<Path>>(
     ) {
         Ok(s) => {
             full_address.zeroize();
-            let c = sign.apply(false, user_comment, idx, database_name)?;
+            let c = sign.apply(database, false, user_comment, idx)?;
             Ok((s.multi_signature(), c))
         }
         Err(e) => {
             full_address.zeroize();
             if let Error::WrongPassword = e {
-                let checksum = sign.apply(true, user_comment, idx, database_name)?;
+                let checksum = sign.apply(database, true, user_comment, idx)?;
                 Err(Error::WrongPasswordNewChecksum(checksum))
             } else {
                 Err(e)

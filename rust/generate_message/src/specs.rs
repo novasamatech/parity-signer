@@ -33,14 +33,15 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
                 }
 
                 // collect `ADDRESS_BOOK` entries
-                let address_book_set = address_book_content(&instruction.db)?;
+                let database = sled::open(instruction.db)?;
+                let address_book_set = address_book_content(&database)?;
                 if address_book_set.is_empty() {
                     return Err(Error::AddressBookEmpty);
                 }
 
                 // process each entry
                 for (_, address_book_entry) in address_book_set.iter() {
-                    specs_f_a_element(address_book_entry, &instruction.db, &instruction.files_dir)?;
+                    specs_f_a_element(&database, address_book_entry, &instruction.files_dir)?;
                 }
                 Ok(())
             }
@@ -59,11 +60,12 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
                 if instruction.over.token().is_some() {
                     return Err(Error::NotSupported);
                 }
+                let database = sled::open(instruction.db)?;
                 specs_f_n(
+                    &database,
                     &name,
                     instruction.over.encryption,
                     instruction.over.title,
-                    instruction.db,
                     instruction.files_dir,
                 )
             }
@@ -144,12 +146,13 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             //
             // Payload files are not created.
             Content::Name { s: name } => {
+                let database = sled::open(instruction.db)?;
                 // using this command makes sense only if there is some override
                 specs_pt_n(
+                    &database,
                     &name,
                     instruction.over,
                     false,
-                    &instruction.db,
                     &instruction.files_dir,
                 )
             }
@@ -169,13 +172,14 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             Content::Address { s: address } => {
                 // not allowed to proceed without encryption override defined
                 if let Some(encryption) = instruction.over.encryption {
+                    let database = sled::open(instruction.db)?;
                     specs_pt_u(
+                        &database,
                         &address,
                         encryption,
                         instruction.over.token(),
                         instruction.over.title,
                         false,
-                        instruction.db,
                         instruction.files_dir,
                     )
                 } else {
@@ -202,13 +206,17 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // displayed network title
             //
             // Payload files are created.
-            Content::Name { s: name } => specs_pt_n(
-                &name,
-                instruction.over,
-                true,
-                instruction.db,
-                instruction.files_dir,
-            ),
+            Content::Name { s: name } => {
+                let database = sled::open(instruction.db)?;
+
+                specs_pt_n(
+                    &database,
+                    &name,
+                    instruction.over,
+                    true,
+                    instruction.files_dir,
+                )
+            }
 
             // `$ cargo run add-specs -u network_url_address
             // <encryption override> <optional token override>`
@@ -226,13 +234,14 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             Content::Address { s: address } => {
                 // not allowed to proceed without encryption override defined
                 if let Some(encryption) = instruction.over.encryption {
+                    let database = sled::open(&instruction.db)?;
                     specs_pt_u(
+                        &database,
                         &address,
                         encryption,
                         instruction.over.token(),
                         instruction.over.title,
                         true,
-                        instruction.db,
                         instruction.files_dir,
                     )
                 } else {
@@ -249,11 +258,11 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
 /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from
 /// the database using information in address book entry
 /// - Output raw bytes payload file
-fn specs_f_a_element<P>(entry: &AddressBookEntry, db_path: P, files_dir: P) -> Result<()>
+fn specs_f_a_element<P>(database: &sled::Db, entry: &AddressBookEntry, files_dir: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
-    let network_specs = network_specs_from_entry(entry, db_path)?;
+    let network_specs = network_specs_from_entry(database, entry)?;
     add_specs_print(&network_specs, files_dir)
 }
 
@@ -268,16 +277,16 @@ where
 /// the database using information in address book entry
 /// - Output raw bytes payload file
 fn specs_f_n<P>(
+    database: &sled::Db,
     title: &str,
     optional_encryption_override: Option<Encryption>,
     optional_signer_title_override: Option<String>,
-    db_path: P,
     files_dir: P,
 ) -> Result<()>
 where
     P: AsRef<Path>,
 {
-    let mut network_specs = network_specs_from_title(title, db_path)?;
+    let mut network_specs = network_specs_from_title(database, title)?;
     match optional_encryption_override {
         Some(encryption) => {
             if network_specs.encryption == encryption {
@@ -356,18 +365,18 @@ where
 /// `<network_name>-<encryption>` for non-default networks, unless overridden by
 /// the user.
 fn specs_pt_n<P>(
+    database: &sled::Db,
     title: &str,
     over: Override,
     printing: bool,
-    db_path: P,
     files_dir: P,
 ) -> Result<()>
 where
     P: AsRef<Path>,
 {
     // address book entry for `title`
-    let address_book_entry = get_address_book_entry(title, &db_path)?;
-    let mut network_specs_to_change = network_specs_from_entry(&address_book_entry, &db_path)?;
+    let address_book_entry = get_address_book_entry(database, title)?;
+    let mut network_specs_to_change = network_specs_from_entry(database, &address_book_entry)?;
     let make_update = match over.encryption {
         // requested encryption override
         Some(ref encryption) => {
@@ -389,7 +398,7 @@ where
 
                 // check if this new network specs key has an entry in the
                 // database
-                match try_get_network_specs_to_send(&network_specs_key_possible, &db_path)? {
+                match try_get_network_specs_to_send(database, &network_specs_key_possible)? {
                     // user entered encryption override that already has an
                     // entry in the database, only with wrong address book title
                     //
@@ -429,9 +438,9 @@ where
 
     if make_update {
         db_upd_network(
+            database,
             &address_book_entry.address,
             &network_specs_to_change,
-            db_path,
         )?;
         if printing {
             add_specs_print(&network_specs_to_change, &files_dir)
@@ -469,18 +478,18 @@ where
 /// - Update the database (network specs and address book)
 /// - Output raw bytes payload files if requested
 fn specs_pt_u<P>(
+    database: &sled::Db,
     address: &str,
     encryption: Encryption,
     optional_token_override: Option<Token>,
     optional_signer_title_override: Option<String>,
     printing: bool,
-    db_path: P,
     files_dir: P,
 ) -> Result<()>
 where
     P: AsRef<Path>,
 {
-    let known_address_set = filter_address_book_by_url(address, &db_path)?;
+    let known_address_set = filter_address_book_by_url(database, address)?;
 
     if !known_address_set.is_empty() {
         return Err(Error::UKeyUrlInDb {
@@ -496,13 +505,13 @@ where
         optional_signer_title_override,
     )?;
 
-    match genesis_hash_in_hot_db(specs.genesis_hash, &db_path)? {
+    match genesis_hash_in_hot_db(database, specs.genesis_hash)? {
         Some(address_book_entry) => Err(Error::UKeyHashInDb {
             address_book_entry,
             url: address.to_string(),
         }),
         None => {
-            db_upd_network(address, &specs, &db_path)?;
+            db_upd_network(database, address, &specs)?;
             if printing {
                 add_specs_print(&specs, &files_dir)?
             }

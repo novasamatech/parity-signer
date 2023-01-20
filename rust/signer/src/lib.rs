@@ -24,9 +24,21 @@
 
 mod ffi_types;
 
+use lazy_static::lazy_static;
+use sled::Db;
+
 use crate::ffi_types::*;
 use db_handling::identities::{import_all_addrs, inject_derivations_has_pwd};
-use std::{collections::HashMap, fmt::Display, str::FromStr};
+use std::{
+    collections::HashMap,
+    fmt::Display,
+    str::FromStr,
+    sync::{Arc, Mutex},
+};
+
+lazy_static! {
+    static ref DB: Arc<Mutex<Option<Db>>> = Arc::new(Mutex::new(None));
+}
 
 /// Container for severe error message
 ///
@@ -39,12 +51,14 @@ pub enum ErrorDisplayed {
         s: String,
     },
     MutexPoisoned,
+    DbNotInitialized,
 }
 
 impl From<navigator::Error> for ErrorDisplayed {
     fn from(e: navigator::Error) -> Self {
         match e {
             navigator::Error::MutexPoisoned => Self::MutexPoisoned,
+            navigator::Error::DbNotInitialized => Self::DbNotInitialized,
             _ => Self::Str {
                 s: format!("{}", e),
             },
@@ -144,8 +158,14 @@ fn backend_action(
 ///
 /// Accepts list of seed names to avoid calling [`update_seed_names`] every time
 fn init_navigation(dbname: &str, seed_names: Vec<String>) -> Result<(), ErrorDisplayed> {
+    let val = Some(sled::open(dbname).map_err(|e| ErrorDisplayed::from(e.to_string()))?);
+
+    *DB.lock().unwrap() = val;
     init_logging("Signer".to_string());
-    Ok(navigator::init_navigation(dbname, seed_names)?)
+    Ok(navigator::init_navigation(
+        DB.clone().lock().unwrap().as_ref().unwrap().clone(),
+        seed_names,
+    )?)
 }
 
 /// Should be called every time any change could have been done to seeds. Accepts updated list of
@@ -178,34 +198,37 @@ fn qrparser_try_decode_qr_sequence(
     Ok(res?)
 }
 
+fn get_db() -> Result<sled::Db, ErrorDisplayed> {
+    DB.lock()
+        .unwrap()
+        .clone()
+        .ok_or(ErrorDisplayed::DbNotInitialized)
+}
+
 /// Exports secret (private) key as QR code
 ///
 /// `public_key` is hex-encoded public key of the key to export. Can be taken from [`MKeyDetails`]
 /// `network_specs_key` is hex-encoded [`NetworkSpecsKey`]. Can be taken from [`MSCNetworkInfo`]
 fn generate_secret_key_qr(
-    dbname: &str,
     public_key: &str,
     expected_seed_name: &str,
     network_specs_key: &str,
     seed_phrase: &str,
     key_password: Option<String>,
-) -> Result<MKeyDetails, anyhow::Error> {
+) -> Result<MKeyDetails, ErrorDisplayed> {
     db_handling::identities::export_secret_key(
-        dbname,
+        &get_db()?,
         public_key,
         expected_seed_name,
         network_specs_key,
         seed_phrase,
         key_password,
     )
-    .map_err(Into::into)
+    .map_err(|e| e.to_string().into())
 }
 
-fn import_derivations(
-    dbname: &str,
-    seed_derived_keys: Vec<SeedKeysPreview>,
-) -> Result<(), anyhow::Error> {
-    import_all_addrs(dbname, seed_derived_keys).map_err(Into::into)
+fn import_derivations(seed_derived_keys: Vec<SeedKeysPreview>) -> Result<(), ErrorDisplayed> {
+    import_all_addrs(&get_db()?, seed_derived_keys).map_err(|e| e.to_string().into())
 }
 
 /// Calculate if derivation path has a password
@@ -226,9 +249,13 @@ fn substrate_path_check(
     seed_name: &str,
     path: &str,
     network: &str,
-    dbname: &str,
-) -> DerivationCheck {
-    db_handling::interface_signer::dynamic_path_check(dbname, seed_name, path, network)
+) -> Result<DerivationCheck, ErrorDisplayed> {
+    Ok(db_handling::interface_signer::dynamic_path_check(
+        &get_db()?,
+        seed_name,
+        path,
+        network,
+    ))
 }
 
 fn try_create_address(
@@ -236,22 +263,21 @@ fn try_create_address(
     seed_phrase: &str,
     path: &str,
     network: &str,
-    dbname: &str,
-) -> anyhow::Result<(), String> {
+) -> anyhow::Result<(), ErrorDisplayed> {
     let network = NetworkSpecsKey::from_hex(network).map_err(|e| format!("{}", e))?;
-    db_handling::identities::try_create_address(seed_name, seed_phrase, path, &network, dbname)
-        .map_err(|e| format!("{}", e))
+    db_handling::identities::try_create_address(&get_db()?, seed_name, seed_phrase, path, &network)
+        .map_err(|e| e.to_string().into())
 }
 
 /// Must be called once on normal first start of the app upon accepting conditions; relies on old
 /// data being already removed
-fn history_init_history_with_cert(dbname: &str) -> anyhow::Result<(), String> {
-    db_handling::cold_default::signer_init_with_cert(dbname).map_err(|e| format!("{}", e))
+fn history_init_history_with_cert() -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::cold_default::signer_init_with_cert(&get_db()?).map_err(|e| e.to_string().into())
 }
 
 /// Must be called once upon jailbreak (removal of general verifier) after all old data was removed
-fn history_init_history_no_cert(dbname: &str) -> anyhow::Result<(), String> {
-    db_handling::cold_default::signer_init_no_cert(dbname).map_err(|e| format!("{}", e))
+fn history_init_history_no_cert() -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::cold_default::signer_init_no_cert(&get_db()?).map_err(|e| e.to_string().into())
 }
 
 /// Must be called every time network detector detects network. Sets alert flag in database that could
@@ -259,42 +285,43 @@ fn history_init_history_no_cert(dbname: &str) -> anyhow::Result<(), String> {
 ///
 /// This changes log, so it is expected to fail all operations that check that database remained
 /// intact
-fn history_device_was_online(dbname: &str) -> anyhow::Result<(), String> {
-    db_handling::manage_history::device_was_online(dbname).map_err(|e| format!("{}", e))
+fn history_device_was_online() -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::manage_history::device_was_online(&get_db()?).map_err(|e| e.to_string().into())
 }
 
 /// Checks if network alert flag was set
-fn history_get_warnings(dbname: &str) -> anyhow::Result<bool, String> {
-    db_handling::helpers::get_danger_status(dbname).map_err(|e| format!("{}", e))
+fn history_get_warnings() -> anyhow::Result<bool, ErrorDisplayed> {
+    db_handling::helpers::get_danger_status(&get_db()?).map_err(|e| e.to_string().into())
 }
 
 /// Resets network alert flag; makes record of reset in log
-fn history_acknowledge_warnings(dbname: &str) -> anyhow::Result<(), String> {
-    db_handling::manage_history::reset_danger_status_to_safe(dbname).map_err(|e| format!("{}", e))
+fn history_acknowledge_warnings() -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::manage_history::reset_danger_status_to_safe(&get_db()?)
+        .map_err(|e| e.to_string().into())
 }
 
 /// Allows frontend to send events into log; TODO: maybe this is not needed
-fn history_entry_system(event: Event, dbname: &str) -> anyhow::Result<(), String> {
-    db_handling::manage_history::history_entry_system(dbname, event).map_err(|e| format!("{}", e))
+fn history_entry_system(event: Event) -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::manage_history::history_entry_system(&get_db()?, event)
+        .map_err(|e| e.to_string().into())
 }
 
 /// Must be called every time seed backup shows seed to user
 ///
 /// Makes record in log
-fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<(), String> {
-    db_handling::manage_history::seed_name_was_shown(dbname, seed_name.to_string())
-        .map_err(|e| format!("{}", e))
+fn history_seed_name_was_shown(seed_name: &str) -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::manage_history::seed_name_was_shown(&get_db()?, seed_name.to_string())
+        .map_err(|e| e.to_string().into())
 }
 
 fn export_key_info(
-    dbname: &str,
     selected_names: HashMap<String, ExportedSet>,
-) -> anyhow::Result<MKeysInfoExport, String> {
-    navigator::export_key_info(dbname, selected_names).map_err(|e| format!("{}", e))
+) -> anyhow::Result<MKeysInfoExport, ErrorDisplayed> {
+    navigator::export_key_info(&get_db()?, selected_names).map_err(|e| e.to_string().into())
 }
 
-fn keys_by_seed_name(dbname: &str, seed_name: &str) -> anyhow::Result<MKeysNew, String> {
-    navigator::keys_by_seed_name(dbname, seed_name).map_err(|e| format!("{}", e))
+fn keys_by_seed_name(seed_name: &str) -> anyhow::Result<MKeysNew, ErrorDisplayed> {
+    navigator::keys_by_seed_name(&get_db()?, seed_name).map_err(|e| e.to_string().into())
 }
 
 /// Encode binary info into qr code
@@ -309,8 +336,8 @@ fn encode_to_qr(payload: &[u8], is_danger: bool) -> anyhow::Result<Vec<u8>, Stri
 }
 
 /// Get all networks registered within this device
-fn get_all_networks(dbname: &str) -> anyhow::Result<Vec<MMNetwork>, String> {
-    db_handling::interface_signer::show_all_networks(dbname).map_err(|e| format!("{}", e))
+fn get_all_networks() -> anyhow::Result<Vec<MMNetwork>, ErrorDisplayed> {
+    db_handling::interface_signer::show_all_networks(&get_db()?).map_err(|e| e.to_string().into())
 }
 
 /// Must be called once to initialize logging from Rust in development mode.

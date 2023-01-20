@@ -76,10 +76,10 @@ impl TransactionState {
         }
     }
 
-    pub fn new<P: AsRef<Path>>(details_str: &str, dbname: P) -> Self {
+    pub fn new(database: &sled::Db, details_str: &str) -> Self {
         Self {
             seeds: vec![],
-            action: produce_output(details_str, dbname),
+            action: produce_output(database, details_str),
             counter: 1,
             passwords: HashMap::new(),
             comments: vec![],
@@ -114,7 +114,7 @@ impl TransactionState {
     }
 
     /// Try to further progress the signing of transactions.
-    pub fn handle_sign<P: AsRef<Path>>(&mut self, db_path: P) -> Result<SignResult> {
+    pub fn handle_sign(&mut self, database: &sled::Db) -> Result<SignResult> {
         if let TransactionAction::Sign { actions, checksum } = &mut self.action {
             if self.seeds.len() != actions.len() {
                 return Err(Error::SeedsNumMismatch(self.seeds.len(), actions.len()));
@@ -141,13 +141,13 @@ impl TransactionState {
 
                 // Try to sign it.
                 match transaction_signing::create_signature(
+                    database,
                     &self.seeds[self.currently_signing],
                     password,
                     self.comments
                         .get(self.currently_signing)
                         .map(|s| s.as_str())
                         .unwrap_or_else(|| ""),
-                    &db_path,
                     *checksum,
                     self.currently_signing,
                     action.network_info.specs.encryption,

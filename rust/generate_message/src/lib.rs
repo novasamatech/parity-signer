@@ -1046,37 +1046,52 @@ pub use error::{Error, Result};
 /// Process incoming command as interpreted by parser.
 pub fn full_run(command: Command) -> Result<()> {
     match command {
-        Command::Show { s: show, db_path } => match show {
-            Show::Metadata => show_metadata(db_path),
-            Show::Networks => show_networks(db_path),
-            Show::Specs { s: title } => show_specs(title, db_path),
-            Show::CheckFile { s: path } => check_file(path, db_path),
-            Show::BlockHistory => show_block_history(db_path),
-        },
+        Command::Show { s: show, db_path } => {
+            let database = sled::open(db_path)?;
+            match show {
+                Show::Metadata => show_metadata(&database),
+                Show::Networks => show_networks(&database),
+                Show::Specs { s: title } => show_specs(&database, title),
+                Show::CheckFile { s: path } => check_file(&database, path),
+                Show::BlockHistory => show_block_history(&database),
+            }
+        }
         Command::Specs { s: instruction } => gen_add_specs(instruction),
         Command::Load(instruction) => gen_load_meta(instruction),
         Command::Types { db_path, files_dir } => {
-            Ok(prep_types(db_path)?.write(files_dir.join("sign_me_load_types"))?)
+            let database = sled::open(db_path)?;
+            Ok(prep_types(&database)?.write(files_dir.join("sign_me_load_types"))?)
         }
         Command::Sign(make) | Command::Make(make) => make_message(make),
-        Command::Remove { r: info, db_path } => remove_info(info, db_path),
+        Command::Remove { r: info, db_path } => {
+            let database = sled::open(db_path)?;
+            remove_info(&database, info)
+        }
         Command::RestoreDefaults { db_path } => Ok(default_hot(Some(db_path))?),
         Command::MakeColdRelease { path } => Ok(default_cold_release(path)?),
         Command::TransferMetaToColdRelease { cold_db, hot_db } => {
-            Ok(transfer_metadata_to_cold(hot_db, cold_db)?)
+            let hot_db = sled::open(hot_db)?;
+            let cold_db = sled::open(cold_db)?;
+            Ok(transfer_metadata_to_cold(&hot_db, &cold_db)?)
         }
         Command::Unwasm {
             filename,
             update_db,
             db_path,
             files_dir,
-        } => unwasm(&filename, update_db, db_path, files_dir),
+        } => {
+            let database = sled::open(db_path)?;
+            unwasm(&database, &filename, update_db, files_dir)
+        }
         Command::MetaDefaultFile {
             name,
             version,
             db_path,
             export_dir,
-        } => meta_default_file(&name, version, db_path, export_dir),
+        } => {
+            let database = sled::open(db_path)?;
+            meta_default_file(&database, &name, version, export_dir)
+        }
         Command::MetaAtBlock {
             url,
             block_hash,
