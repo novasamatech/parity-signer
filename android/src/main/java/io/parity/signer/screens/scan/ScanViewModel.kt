@@ -1,5 +1,6 @@
 package io.parity.signer.screens.scan
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import io.parity.signer.backend.UniffiResult
@@ -9,6 +10,7 @@ import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.FakeNavigator
 import io.parity.signer.models.storage.RepoResult
 import io.parity.signer.models.storage.SeedRepository
+import io.parity.signer.screens.scan.elements.PresentableErrorModel
 import io.parity.signer.screens.scan.importderivations.dominantImportError
 import io.parity.signer.screens.scan.importderivations.hasImportableKeys
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
@@ -39,13 +41,13 @@ class ScanViewModel : ViewModel() {
 		MutableStateFlow(null)
 	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
-	val presentableError: MutableStateFlow<String?> =
+	val presentableError: MutableStateFlow<PresentableErrorModel?> =
 		MutableStateFlow(null)
 	val errorWrongPassword = MutableStateFlow<Boolean>(false)
 
 	private val transactionIsInProgress = MutableStateFlow<Boolean>(false)
 
-	suspend fun performPayload(payload: String) {
+	suspend fun performPayload(payload: String, context: Context) {
 		if (transactionIsInProgress.value) {
 			Log.e(TAG, "started transaction while it was in progress, ignoring")
 			return
@@ -66,8 +68,9 @@ class ScanViewModel : ViewModel() {
 
 		// Handle transactions with just error payload
 		if (transactions.all { it.isDisplayingErrorOnly() }) {
-			presentableError.value =
-				transactions.joinToString("\n") { it.transactionIssues() }
+			presentableError.value = PresentableErrorModel(
+				details = transactions.joinToString("\n") { it.transactionIssues() }
+			)
 			uniffiInteractor.navigate(Action.GO_BACK) //fake call
 			return
 		}
@@ -102,18 +105,39 @@ class ScanViewModel : ViewModel() {
 				fakeNavigator.navigate(Action.GO_BACK)
 				when (val importError = transactions.dominantImportError()) {
 					DerivedKeyError.BadFormat -> {
-						TODO() //todo import derivations
-						//						presentableError = .importDerivedKeysBadFormat()
+						presentableError.value = PresentableErrorModel(
+							title = "Import keys paths in bad format",
+							message = "Some keys paths are in bad format so they cannot be imported",
+						)
+//						"ImportKeys.ErrorModal.BadFormat.Label.Title" =
+//							"Import keys paths in bad format";
+//						"ImportKeys.ErrorModal.BadFormat.Label.Content" =
+//							"Some keys paths are in bad format so they cannot be imported";
 						return
+						TODO() //todo import derivations
 
 					}
 					DerivedKeyError.KeySetMissing -> {
+						presentableError.value = PresentableErrorModel(
+							title = "Please recover the missing Key Sets.",
+							message = "Some keys can not be imported until their key sets are recovered.",
+						)
 						TODO() //todo import derivations
-						//						presentableError = .importDerivedKeysMissingKeySet()
+//						"ImportKeys.ErrorModal.MissingKeySets.Label.Title" =
+//							"Please recover the missing Key Sets.";
+//						"ImportKeys.ErrorModal.MissingKeySets.Label.Content" =
+//							"Some keys can not be imported until their key sets are recovered.";
 						return
 					}
 					DerivedKeyError.NetworkMissing -> {
-						//						presentableError = .importDerivedKeysMissingNetwork()
+						presentableError.value = PresentableErrorModel(
+							title = "Please add missing networks and their metadata.",
+							message = "Some keys can not be imported until their networks are added.",
+						)
+//						"ImportKeys.ErrorModal.MissingNetwork.Label.Title" =
+//							"Please add missing networks and their metadata.";
+//						"ImportKeys.ErrorModal.MissingNetwork.Label.Content" =
+//							"Some keys can not be imported until their networks are added.";
 						TODO() //todo import derivations
 						return
 					}
@@ -124,6 +148,14 @@ class ScanViewModel : ViewModel() {
 						} else {
 							TODO() //todo import derivations
 //							            presentableError = .allKeysAlreadyExist()
+							presentableError.value = PresentableErrorModel(
+								title = "Derived keys already exist",
+								message = "All of the scanned derived keys are already imported",
+							)
+//							"ImportKeys.ErrorModal.AlreadyExists.Label.Title" =
+//								"Derived keys already exist";
+//							"ImportKeys.ErrorModal.AlreadyExists.Label.Content" =
+//								"All of the scanned derived keys are already imported";
 							return
 						}
 					}

@@ -16,6 +16,7 @@ import io.parity.signer.components.panels.toAction
 import io.parity.signer.models.Navigator
 import io.parity.signer.screens.scan.bananasplit.BananaSplitPasswordScreen
 import io.parity.signer.screens.scan.camera.ScanScreen
+import io.parity.signer.screens.scan.elements.PresentableErrorModel
 import io.parity.signer.screens.scan.elements.ScanErrorBottomSheet
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
 import io.parity.signer.screens.scan.transaction.TransactionPreviewType
@@ -73,7 +74,7 @@ fun ScanNavSubgraph(
 				rootNavigator.navigate(Action.SELECT_SEED, seedName)
 			},
 			onCustomError = { error ->
-				scanViewModel.presentableError.value = error
+				scanViewModel.presentableError.value = PresentableErrorModel(details = error)
 				scanViewModel.bananaSplitPassword.value = null
 			},
 			onErrorWrongPassword = {
@@ -140,7 +141,7 @@ fun ScanNavSubgraph(
 	presentableError.value?.let { presentableErrorValue ->
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearState) {
 			ScanErrorBottomSheet(
-				errorMessage = presentableErrorValue,
+				error = presentableErrorValue,
 				onOK = scanViewModel::clearState,
 			)
 		}
