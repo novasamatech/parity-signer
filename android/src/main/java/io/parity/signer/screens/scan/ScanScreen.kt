@@ -20,7 +20,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import io.parity.signer.R
-import io.parity.signer.components.KeepScreenOn
+import io.parity.signer.models.KeepScreenOn
 import io.parity.signer.models.Callback
 import io.parity.signer.screens.scan.camera.*
 import io.parity.signer.ui.theme.SignerNewTheme
