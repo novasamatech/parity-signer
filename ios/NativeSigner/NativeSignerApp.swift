@@ -12,6 +12,7 @@ struct NativeSignerApp: App {
     @StateObject var connectivityMediator = ConnectivityMediator()
     @StateObject var navigation = NavigationCoordinator()
     @StateObject var appState = AppState()
+    @StateObject var jailbreakDetectionPublisher = JailbreakDetectionPublisher()
 
     var body: some Scene {
         WindowGroup {
@@ -19,11 +20,16 @@ struct NativeSignerApp: App {
                 navigation: navigation,
                 connectivityMediator: connectivityMediator
             ))
+            .onReceive(jailbreakDetectionPublisher.$isJailbroken) { isJailbroken in
+                print("Device is Jailbroken: \(isJailbroken)")
+                // Perform logic when device is jailbroken
+            }
             .font(PrimaryFont.bodyL.font)
             .background(Asset.backgroundPrimary.swiftUIColor)
             .environmentObject(navigation)
             .environmentObject(connectivityMediator)
             .environmentObject(appState)
+            .environmentObject(jailbreakDetectionPublisher)
         }
     }
 }
