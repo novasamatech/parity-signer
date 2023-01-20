@@ -88,7 +88,7 @@ fun ScanNavSubgraph(
 		ScanScreen(
 			onClose = { navigateToPrevious() },
 			performPayloads = { payloads ->
-				scanViewModel.performPayload(payloads)
+				scanViewModel.performPayload(payloads, context)
 			},
 			onBananaSplit = { payloads ->
 				scanViewModel.bananaSplitPassword.value = payloads

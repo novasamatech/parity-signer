@@ -3,6 +3,7 @@ package io.parity.signer.screens.scan
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import io.parity.signer.R
 import io.parity.signer.backend.UniffiResult
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
@@ -106,39 +107,23 @@ class ScanViewModel : ViewModel() {
 				when (val importError = transactions.dominantImportError()) {
 					DerivedKeyError.BadFormat -> {
 						presentableError.value = PresentableErrorModel(
-							title = "Import keys paths in bad format",
-							message = "Some keys paths are in bad format so they cannot be imported",
+							title = context.getString(R.string.scan_screen_error_bad_format_title),
+							message = context.getString(R.string.scan_screen_error_bad_format_message),
 						)
-//						"ImportKeys.ErrorModal.BadFormat.Label.Title" =
-//							"Import keys paths in bad format";
-//						"ImportKeys.ErrorModal.BadFormat.Label.Content" =
-//							"Some keys paths are in bad format so they cannot be imported";
 						return
-						TODO() //todo import derivations
-
 					}
 					DerivedKeyError.KeySetMissing -> {
 						presentableError.value = PresentableErrorModel(
-							title = "Please recover the missing Key Sets.",
-							message = "Some keys can not be imported until their key sets are recovered.",
+							title = context.getString(R.string.scan_screen_error_missing_key_set_title),
+							message = context.getString(R.string.scan_screen_error_missing_key_set_message),
 						)
-						TODO() //todo import derivations
-//						"ImportKeys.ErrorModal.MissingKeySets.Label.Title" =
-//							"Please recover the missing Key Sets.";
-//						"ImportKeys.ErrorModal.MissingKeySets.Label.Content" =
-//							"Some keys can not be imported until their key sets are recovered.";
 						return
 					}
 					DerivedKeyError.NetworkMissing -> {
 						presentableError.value = PresentableErrorModel(
-							title = "Please add missing networks and their metadata.",
-							message = "Some keys can not be imported until their networks are added.",
+							title = context.getString(R.string.scan_screen_error_missing_network_title),
+							message = context.getString(R.string.scan_screen_error_missing_network_message),
 						)
-//						"ImportKeys.ErrorModal.MissingNetwork.Label.Title" =
-//							"Please add missing networks and their metadata.";
-//						"ImportKeys.ErrorModal.MissingNetwork.Label.Content" =
-//							"Some keys can not be imported until their networks are added.";
-						TODO() //todo import derivations
 						return
 					}
 					null -> {
@@ -146,16 +131,10 @@ class ScanViewModel : ViewModel() {
 						if (transactions.hasImportableKeys()) {
 							this.transactions.value = TransactionsState(transactions)
 						} else {
-							TODO() //todo import derivations
-//							            presentableError = .allKeysAlreadyExist()
 							presentableError.value = PresentableErrorModel(
-								title = "Derived keys already exist",
-								message = "All of the scanned derived keys are already imported",
+								title = context.getString(R.string.scan_screen_error_key_already_exists_title),
+								message = context.getString(R.string.scan_screen_error_key_already_exists_message),
 							)
-//							"ImportKeys.ErrorModal.AlreadyExists.Label.Title" =
-//								"Derived keys already exist";
-//							"ImportKeys.ErrorModal.AlreadyExists.Label.Content" =
-//								"All of the scanned derived keys are already imported";
 							return
 						}
 					}

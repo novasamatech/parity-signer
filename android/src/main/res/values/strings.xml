@@ -223,6 +223,15 @@
 	<string name="banana_split_password_password_error_wrong">The password you entered is incorrect</string>
 	<string name="banana_split_password_error_seed_phrase_exists">This seed phrase already exists</string>
 	<string name="banana_split_password_error_cannot_save_seed">Given combination of seed phrase and seed name couldn\'t be saved.</string>
+	<string name="scan_screen_error_bad_format_title">Import keys paths in bad format</string>
+	<string name="scan_screen_error_bad_format_message">Some keys paths are in bad format so they cannot be imported</string>
+	<string name="scan_screen_error_missing_key_set_title">Please recover the missing Key Sets.</string>
+	<string name="scan_screen_error_missing_key_set_message">Some keys can not be imported until their key sets are recovered.</string>
+	<string name="scan_screen_error_missing_network_title">Please add missing networks and their metadata.</string>
+	<string name="scan_screen_error_missing_network_message">Some keys can not be imported until their networks are added.</string>
+	<string name="scan_screen_error_key_already_exists_title">Derived keys already exist</string>
+	<string name="scan_screen_error_key_already_exists_message">All of the scanned derived keys are already imported</string>
+
 
 </resources>
 
