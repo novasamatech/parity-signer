@@ -104,7 +104,7 @@ class ScanViewModel : ViewModel() {
 				val fakeNavigator = FakeNavigator()
 				// We always need to `.goBack` as even if camera is dismissed without import, navigation "forward" already happened
 				fakeNavigator.navigate(Action.GO_BACK)
-				when (val importError = transactions.dominantImportError()) {
+				when (transactions.dominantImportError()) {
 					DerivedKeyError.BadFormat -> {
 						presentableError.value = PresentableErrorModel(
 							title = context.getString(R.string.scan_screen_error_bad_format_title),
