@@ -146,8 +146,7 @@ class ScanViewModel : ViewModel() {
 				// will set them below for any case and show anyway
 				this.transactions.value = TransactionsState(transactions)
 			}
-			//handle alert error
-			//						rust/navigator/src/navstate.rs:396
+			//handle alert error rust/navigator/src/navstate.rs:396
 		}
 	}
 
