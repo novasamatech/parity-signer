@@ -16,14 +16,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.AuthResult
-import io.parity.signer.models.Callback
-import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.Navigator
+import io.parity.signer.models.*
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
@@ -51,7 +49,7 @@ fun LogsMenu(
 				onRemoveKey = {
 					coroutineScope.launch {
 						val authenticator = ServiceLocator.authentication
-						when (authenticator.authenticate(context.find)) {
+						when (authenticator.authenticate(context.findActivity() as FragmentActivity)) {
 							AuthResult.AuthSuccess -> {
 								navigator.navigate(Action.CLEAR_LOG)
 							}
