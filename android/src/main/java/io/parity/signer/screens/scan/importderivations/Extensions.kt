@@ -14,9 +14,7 @@ import io.parity.signer.uniffi.*
 fun List<MTransaction>.dominantImportError(): DerivedKeyError? {
 	if (hasImportableKeys()) return null
 
-	val importableKeys = allImportDerivedKeys()
-
-	val allErrors: List<DerivedKeyError> = importableKeys
+	val allErrors: List<DerivedKeyError> = allImportDerivedKeys()
 		.flatMap { it.derivedKeys }
 		.map { it.status }
 		.filterIsInstance<DerivedKeyStatus.Invalid>()
@@ -24,7 +22,8 @@ fun List<MTransaction>.dominantImportError(): DerivedKeyError? {
 
 	val mostCommonError = allErrors
 		.groupBy { it }
-		.maxBy { entry -> entry.value.size }.key
+		.maxBy { entry -> entry.value.size }
+		.key
 
 	return mostCommonError
 }

@@ -9,6 +9,8 @@ import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.FakeNavigator
 import io.parity.signer.models.storage.RepoResult
 import io.parity.signer.models.storage.SeedRepository
+import io.parity.signer.screens.scan.importderivations.dominantImportError
+import io.parity.signer.screens.scan.importderivations.hasImportableKeys
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues
 import io.parity.signer.uniffi.*
@@ -92,46 +94,50 @@ class ScanViewModel : ViewModel() {
 //						we can get result.navResult.alertData with error from Rust but it's not in new design
 					}
 				}
+				this.transactions.value = TransactionsState(transactions)
 			}
 			TransactionType.IMPORT_DERIVATIONS -> {
-				//todo import derivations  as in CameraView.swift:320
 				val fakeNavigator = FakeNavigator()
 				// We always need to `.goBack` as even if camera is dismissed without import, navigation "forward" already happened
 				fakeNavigator.navigate(Action.GO_BACK)
+				when (val importError = transactions.dominantImportError()) {
+					DerivedKeyError.BadFormat -> {
+						TODO() //todo import derivations
+						//						presentableError = .importDerivedKeysBadFormat()
+						return
 
-
-//ios todo import derivations
-//				navigation.performFake(navigation: .init(action: .goBack))
-//				if let importError = transactions.dominantImportError {
-//					switch importError {
-//						case .networkMissing:
-//						presentableError = .importDerivedKeysMissingNetwork()
-//						case .keySetMissing:
-//						presentableError = .importDerivedKeysMissingKeySet()
-//						case .badFormat:
-//						presentableError = .importDerivedKeysBadFormat()
-//					}
-//					isPresentingError = true
-//				} else if !transactions.hasImportableKeys {
-//					presentableError = .allKeysAlreadyExist()
-//					isPresentingError = true
-//				} else {
-//					self.transactions = transactions
-//					isPresentingTransactionPreview = true
-//				}
-//			}
+					}
+					DerivedKeyError.KeySetMissing -> {
+						TODO() //todo import derivations
+						//						presentableError = .importDerivedKeysMissingKeySet()
+						return
+					}
+					DerivedKeyError.NetworkMissing -> {
+						//						presentableError = .importDerivedKeysMissingNetwork()
+						TODO() //todo import derivations
+						return
+					}
+					null -> {
+						//proceed, no full error
+						if (transactions.hasImportableKeys()) {
+							this.transactions.value = TransactionsState(transactions)
+						} else {
+							TODO() //todo import derivations
+//							            presentableError = .allKeysAlreadyExist()
+							return
+						}
+					}
+				}
 			}
 			else -> {
 				// Transaction with error OR
 				// Transaction that does not require signing (i.e. adding network or metadata)
 				// will set them below for any case and show anyway
+				this.transactions.value = TransactionsState(transactions)
 			}
 			//handle alert error
 			//						rust/navigator/src/navstate.rs:396
 		}
-		this.transactions.value =
-			TransactionsState(transactions,)
-		// navigateResponse.result.screenLabel - it's coming empty so generated guess on android
 	}
 
 	fun ifHasStateThenClear(): Boolean {
