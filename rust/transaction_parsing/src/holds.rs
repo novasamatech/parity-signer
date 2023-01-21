@@ -1,6 +1,5 @@
 use std::fmt::Write;
 
-
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES, VERIFIERS};
 use db_handling::{
     db_transactions::TrDbColdStub,

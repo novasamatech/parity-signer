@@ -45,7 +45,7 @@ use sp_core::{ecdsa, ed25519, sr25519, Pair};
 use sp_runtime::MultiSignature;
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_runtime::MultiSigner;
-use std::{collections::HashMap};
+use std::collections::HashMap;
 #[cfg(any(feature = "active", feature = "signer"))]
 use zeroize::Zeroize;
 
