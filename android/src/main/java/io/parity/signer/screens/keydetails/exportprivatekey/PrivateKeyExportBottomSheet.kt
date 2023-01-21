@@ -23,6 +23,7 @@ import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.sharedcomponents.CircularCountDownTimer
 import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.sharedcomponents.KeyCardModel
+import io.parity.signer.models.DisableScreenshots
 import io.parity.signer.models.EmptyNavigator
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.intoImageBitmap
@@ -52,7 +53,7 @@ fun PrivateKeyExportBottomSheet(
 		Column(
 			modifier = Modifier
 				.verticalScroll(rememberScrollState())
-				.weight(weight =1f, fill = false)
+				.weight(weight = 1f, fill = false)
 				.padding(start = sidePadding, end = sidePadding)
 		) {
 			val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
@@ -95,6 +96,8 @@ fun PrivateKeyExportBottomSheet(
 			) { navigator.backAction() }
 		}
 	}
+
+	DisableScreenshots()
 }
 
 class PrivateKeyExportModel(
