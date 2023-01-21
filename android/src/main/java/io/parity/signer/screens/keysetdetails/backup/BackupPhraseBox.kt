@@ -24,7 +24,8 @@ import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.SizeMode
 import io.parity.signer.R
-import io.parity.signer.components.KeepScreenOn
+import io.parity.signer.models.KeepScreenOn
+import io.parity.signer.models.DisableScreenshots
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.fill6
 import io.parity.signer.ui.theme.textDisabled
@@ -64,6 +65,7 @@ fun BackupPhraseBox(seedPhrase: String) {
 		}
 	}
 
+	DisableScreenshots()
 	KeepScreenOn()
 }
 

@@ -71,10 +71,16 @@ fun CircularCountDownTimer(
 	}
 
 	LaunchedEffect(key1 = Unit) {
-		while (timeLeft > 0) {
-			delay(1.seconds)
-			timeLeft -= 1
-			if (timeLeft == 0) {
+		try {
+			while (timeLeft > 0) {
+				delay(1.seconds)
+				timeLeft -= 1
+				if (timeLeft == 0) {
+					onTimeOutAction()
+				}
+			}
+		} finally {
+			if (timeLeft > 0) {
 				onTimeOutAction()
 			}
 		}
@@ -95,7 +101,8 @@ fun SnackBarCircularCountDownTimer(
 		submitErrorState("timer started with wrong value $timeoutSeconds")
 	}
 
-	val innerShape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+	val innerShape =
+		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 
 	var timeLeft by remember { mutableStateOf<Int>(timeoutSeconds) }
 	Row(
@@ -134,11 +141,17 @@ fun SnackBarCircularCountDownTimer(
 	}
 
 	LaunchedEffect(key1 = Unit) {
-		while (timeLeft > 0) {
-			delay(1.seconds)
-			timeLeft -= 1
-			if (timeLeft == 0) {
-				onTimeOutAction()
+		try {
+			while (timeLeft > 0) {
+				delay(1.seconds)
+				timeLeft -= 1
+				if (timeLeft == 0) {
+					onTimeOutAction()
+				}
+			}
+		} finally {
+			if (timeLeft > 0) {
+				onTimeOutAction
 			}
 		}
 	}

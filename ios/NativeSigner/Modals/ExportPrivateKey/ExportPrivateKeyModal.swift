@@ -17,6 +17,7 @@ struct ExportPrivateKeyModal: View {
 
     @Binding var isPresentingExportKeysModal: Bool
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject var applicationStatePublisher: ApplicationStatePublisher
     let viewModel: ExportPrivateKeyViewModel
 
     var body: some View {
@@ -49,8 +50,12 @@ struct ExportPrivateKeyModal: View {
                             )
                         )
                         .padding(0.5)
+                        .privacySensitive()
                         QRCodeAddressFooterView(viewModel: viewModel.addressFooter)
                     }
+                    .redacted(
+                        reason: applicationStatePublisher.applicationState == .inactive ? .privacy : []
+                    )
                     .fixedSize(horizontal: false, vertical: true)
                     .strokeContainerBackground()
                     .padding([.leading, .trailing], Spacing.large)
