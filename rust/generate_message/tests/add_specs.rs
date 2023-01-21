@@ -1,6 +1,6 @@
 pub mod common;
 
-use crate::common::{assert_cmd_stdout, assert_files_eq, setup};
+use crate::common::{assert_cmd_stdout, setup};
 use std::path::PathBuf;
 use tempfile::tempdir;
 

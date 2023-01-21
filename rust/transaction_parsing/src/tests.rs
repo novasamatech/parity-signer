@@ -514,7 +514,7 @@ fn load_types_unknown_alice_signed() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, &line.trim());
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, expected_set);
         assert_eq!(stub, StubNav::LoadTypes);
@@ -1199,7 +1199,7 @@ fn parse_transaction_3() {
         },
     };
     let network_info_known = westend_spec();
-    let output = produce_output(&db, &line);
+    let output = produce_output(&db, line);
     if let TransactionAction::Sign { actions, .. } = output {
         let TransactionSignAction {
             content,
@@ -1797,7 +1797,7 @@ fn add_specs_bad_westend_ed25519_not_signed() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(&db, &line.trim());
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {

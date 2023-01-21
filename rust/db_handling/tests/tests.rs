@@ -1326,7 +1326,7 @@ fn remove_seed_history() {
 
 #[cfg(feature = "test")]
 fn get_multisigner_path_set(database: &sled::Db) -> Vec<(MultiSigner, String)> {
-    let identities = open_tree(&database, ADDRTREE).unwrap();
+    let identities = open_tree(database, ADDRTREE).unwrap();
     let mut multisigner_path_set: Vec<(MultiSigner, String)> = Vec::new();
     for a in identities.iter().flatten() {
         let (multisigner, address_details) = AddressDetails::process_entry_checked(a).unwrap();
@@ -1720,13 +1720,13 @@ fn insert_metadata_from_file(database: &sled::Db, filename: &str) {
 
 #[cfg(feature = "test")]
 fn metadata_len(database: &sled::Db) -> usize {
-    let metadata = open_tree(&database, METATREE).unwrap();
+    let metadata = open_tree(database, METATREE).unwrap();
     metadata.len()
 }
 
 #[cfg(feature = "test")]
 fn metadata_contents(database: &sled::Db) -> Vec<(String, u32)> {
-    let metadata = open_tree(&database, METATREE).unwrap();
+    let metadata = open_tree(database, METATREE).unwrap();
     let mut out: Vec<(String, u32)> = Vec::new();
     for (meta_key_vec, _) in metadata.iter().flatten() {
         let new = MetaKey::from_ivec(&meta_key_vec).name_version().unwrap();
