@@ -47,7 +47,7 @@ pub fn open_tree(database: &Db, tree_name: &[u8]) -> Result<Tree> {
 
 /// Assemble a [`Batch`] that removes all elements from a tree.
 pub fn make_batch_clear_tree(database: &sled::Db, tree_name: &[u8]) -> Result<Batch> {
-    let tree = open_tree(&database, tree_name)?;
+    let tree = open_tree(database, tree_name)?;
     let mut out = Batch::default();
     for (key, _) in tree.iter().flatten() {
         out.remove(key)
@@ -83,7 +83,7 @@ pub fn try_get_valid_current_verifier(
     verifier_key: &VerifierKey,
 ) -> Result<Option<ValidCurrentVerifier>> {
     let general_verifier = get_general_verifier(database)?;
-    let verifiers = open_tree(&database, VERIFIERS)?;
+    let verifiers = open_tree(database, VERIFIERS)?;
     match verifiers.get(verifier_key.key())? {
         // verifier entry is found
         Some(verifier_encoded) => {
@@ -247,7 +247,7 @@ pub fn get_general_verifier(database: &sled::Db) -> Result<Verifier> {
 ///
 /// If no types information is found, result is `Ok(None)`.
 pub fn try_get_types(database: &sled::Db) -> Result<Option<Vec<TypeEntry>>> {
-    let settings = open_tree(&database, SETTREE)?;
+    let settings = open_tree(database, SETTREE)?;
     let res = settings
         .get(TYPES)?
         .map(|types_info_encoded| <Vec<TypeEntry>>::decode(&mut &types_info_encoded[..]))
@@ -427,8 +427,8 @@ pub fn get_meta_values_by_name_version(
 pub fn transfer_metadata_to_cold(database_hot: &sled::Db, database_cold: &sled::Db) -> Result<()> {
     let mut for_metadata = Batch::default();
     {
-        let metadata_hot = open_tree(&database_hot, METATREE)?;
-        let chainspecs_cold = open_tree(&database_cold, SPECSTREE)?;
+        let metadata_hot = open_tree(database_hot, METATREE)?;
+        let chainspecs_cold = open_tree(database_cold, SPECSTREE)?;
         for x in chainspecs_cold.iter().flatten() {
             let network_specs = NetworkSpecs::from_entry_checked(x)?;
             for (key, value) in metadata_hot
@@ -441,7 +441,7 @@ pub fn transfer_metadata_to_cold(database_hot: &sled::Db, database_cold: &sled::
     }
     TrDbCold::new()
         .set_metadata(for_metadata)
-        .apply(&database_cold)
+        .apply(database_cold)
 }
 
 /// Remove the network from the database.
@@ -515,8 +515,8 @@ pub fn remove_network(database: &Db, network_specs_key: &NetworkSpecsKey) -> Res
     }
 
     {
-        let chainspecs = open_tree(&database, SPECSTREE)?;
-        let identities = open_tree(&database, ADDRTREE)?;
+        let chainspecs = open_tree(database, SPECSTREE)?;
+        let identities = open_tree(database, ADDRTREE)?;
 
         // scan through chainspecs tree to mark for removal all networks with target genesis hash
         let mut keys_to_wipe: Vec<NetworkSpecsKey> = Vec::new();
@@ -674,7 +674,7 @@ pub(crate) fn verify_checksum(database: &Db, checksum: u32) -> Result<()> {
 /// device was online. This may change eventually.
 #[cfg(feature = "signer")]
 pub fn get_danger_status(database: &sled::Db) -> Result<bool> {
-    let settings = open_tree(&database, SETTREE)?;
+    let settings = open_tree(database, SETTREE)?;
     let a = settings.get(DANGER)?.ok_or(Error::DangerStatusNotFound)?;
     Ok(DangerRecord::from_ivec(&a).device_was_online()?)
 }

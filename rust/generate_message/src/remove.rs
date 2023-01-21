@@ -98,8 +98,8 @@ pub fn remove_info(database: &sled::Db, info: Remove) -> Result<()> {
             // except the one currently being removed, the metadata and
             // the block history entries get removed
             if !is_specname_in_db(database, &address_book_entry.name, &network_title)? {
-                let metadata = open_tree(&database, METATREE)?;
-                let meta_history = open_tree(&database, META_HISTORY)?;
+                let metadata = open_tree(database, METATREE)?;
+                let meta_history = open_tree(database, META_HISTORY)?;
                 let meta_key_prefix = MetaKeyPrefix::from_name(&address_book_entry.name);
                 for (x, _) in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
                     // add element to `Batch` for `METATREE`
@@ -115,7 +115,7 @@ pub fn remove_info(database: &sled::Db, info: Remove) -> Result<()> {
                 .set_metadata(metadata_batch)
                 .set_meta_history(meta_history_batch)
                 .set_network_specs_prep(network_specs_prep_batch)
-                .apply(&database)?;
+                .apply(database)?;
         }
 
         // network metadata by network name and version

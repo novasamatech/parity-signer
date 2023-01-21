@@ -253,7 +253,7 @@ where
     P: AsRef<Path>,
 {
     let meta_key_prefix = MetaKeyPrefix::from_name(&set_element.name);
-    let metadata = open_tree(&database, METATREE)?;
+    let metadata = open_tree(database, METATREE)?;
     for x in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
         let meta_values = MetaValues::from_entry_checked(x)?;
         if meta_values.warn_incomplete_extensions {

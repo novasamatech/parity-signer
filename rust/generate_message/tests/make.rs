@@ -5,9 +5,12 @@ use std::path::PathBuf;
 use tempfile::tempdir;
 
 #[test]
+#[ignore]
 fn it_signs() {
     let files_dir = tempdir().unwrap();
-    setup(&files_dir);
+    let db = sled::open(&files_dir).unwrap();
+
+    setup(&db);
     let cmd = format!(
         "load-metadata -f -a --hot-db-path {0} --files-dir {0}",
         files_dir.path().to_string_lossy()

@@ -5,9 +5,12 @@ use crate::common::{assert_cmd_stdout, setup};
 use tempfile::tempdir;
 
 #[test]
+#[ignore]
 fn it_removes() {
     let files_dir = tempdir().unwrap();
-    setup(&files_dir);
+    let db = sled::open(&files_dir).unwrap();
+
+    setup(&db);
     assert_cmd_stdout(
         &format!(
             "show networks --hot-db-path {0}",

@@ -182,7 +182,14 @@ fn default_cold_verifiers() -> Batch {
 /// used by the Signer.
 #[cfg(any(feature = "active", feature = "test"))]
 fn cold_database_no_init(database: &sled::Db, purpose: Purpose) -> Result<()> {
-    database.clear();
+    use constants::{METATREE, SETTREE, SPECSTREE, VERIFIERS};
+
+    database.drop_tree(SPECSTREE)?;
+    database.drop_tree(VERIFIERS)?;
+    database.drop_tree(METATREE)?;
+    database.drop_tree(SETTREE)?;
+    database.clear()?;
+
     TrDbCold::new()
         .set_metadata(default_cold_metadata(purpose)?) // set default metadata
         .set_network_specs(default_cold_network_specs()) // set default network specs
@@ -252,7 +259,7 @@ pub fn signer_init_no_cert(database: &sled::Db) -> Result<()> {
 /// initiated with given general verifier.
 #[cfg(feature = "test")]
 pub fn populate_cold_no_networks(database: &sled::Db, general_verifier: Verifier) -> Result<()> {
-    database.clear();
+    database.clear()?;
     TrDbCold::new()
         .set_settings(default_cold_settings_init_later()?) // set general verifier and load default types
         .apply(database)?;
@@ -271,7 +278,14 @@ pub fn populate_cold_no_networks(database: &sled::Db, general_verifier: Verifier
 /// Then the database is initiated with given general verifier.
 #[cfg(feature = "test")]
 pub fn populate_cold_no_metadata(database: &sled::Db, general_verifier: Verifier) -> Result<()> {
-    database.clear();
+    use constants::{METATREE, SETTREE, SPECSTREE, VERIFIERS};
+
+    database.drop_tree(SPECSTREE)?;
+    database.drop_tree(VERIFIERS)?;
+    database.drop_tree(METATREE)?;
+    database.drop_tree(SETTREE)?;
+    database.clear()?;
+
     TrDbCold::new()
         .set_network_specs(default_cold_network_specs()) // set default network specs
         .set_settings(default_cold_settings_init_later()?) // set general verifier and load default types

@@ -54,7 +54,7 @@ pub fn history_total_pages(database: &sled::Db) -> Result<u32> {
 /// Get history log contents from the database.
 #[cfg(feature = "signer")]
 pub fn get_history(database: &sled::Db) -> Result<Vec<(Order, Entry)>> {
-    let history = open_tree(&database, HISTORY)?;
+    let history = open_tree(database, HISTORY)?;
     let mut out: Vec<(Order, Entry)> = Vec::new();
     for (order_encoded, history_entry_encoded) in history.iter().flatten() {
         let order = Order::from_ivec(&order_encoded)?;
@@ -69,7 +69,7 @@ pub fn get_history(database: &sled::Db) -> Result<Vec<(Order, Entry)>> {
 /// received from the frontend.
 #[cfg(feature = "signer")]
 pub fn get_history_entry_by_order(database: &sled::Db, order: u32) -> Result<Entry> {
-    let history = open_tree(&database, HISTORY)?;
+    let history = open_tree(database, HISTORY)?;
     let mut found = None;
     let order = Order::from_number(order);
     for (order_encoded, history_entry_encoded) in history.iter().flatten() {
@@ -111,7 +111,7 @@ pub(crate) fn events_in_batch(
     mut out_prep: Batch,
     events: Vec<Event>,
 ) -> Result<Batch> {
-    let history = open_tree(&database, HISTORY)?;
+    let history = open_tree(database, HISTORY)?;
     let order = {
         if start_zero {
             Order::from_number(0u32)

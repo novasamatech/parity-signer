@@ -78,10 +78,10 @@ fn default_hot_settings() -> Result<Batch> {
 /// Note that no metadata entries are loaded. It is intended that all metadata
 /// entries appear during the database use.
 pub fn reset_hot_database(database: &sled::Db) -> Result<()> {
-    database.clear();
+    database.clear()?;
     TrDbHot::new()
         .set_address_book(default_hot_address_book()?) // set default address book
         .set_network_specs_prep(default_hot_network_specs_prep()?) // set default network specs
         .set_settings(default_hot_settings()?) // load default types
-        .apply(&database)
+        .apply(database)
 }

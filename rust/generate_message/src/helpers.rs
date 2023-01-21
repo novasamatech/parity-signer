@@ -31,7 +31,7 @@ use crate::parser::{Goal, Token};
 
 /// Get [`AddressBookEntry`] from the database for given address book title.
 pub fn get_address_book_entry(database: &sled::Db, title: &str) -> Result<AddressBookEntry> {
-    let address_book = open_tree(&database, ADDRESS_BOOK)?;
+    let address_book = open_tree(database, ADDRESS_BOOK)?;
     match address_book.get(AddressBookKey::from_title(title).key())? {
         Some(a) => Ok(AddressBookEntry::from_entry_with_title(title, &a)?),
         None => Err(Error::NotFound(title.to_string())),
@@ -75,7 +75,7 @@ pub fn try_get_network_specs_to_send(
     database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
 ) -> Result<Option<NetworkSpecs>> {
-    let chainspecs = open_tree(&database, SPECSTREEPREP)?;
+    let chainspecs = open_tree(database, SPECSTREEPREP)?;
     match chainspecs.get(network_specs_key.key())? {
         Some(specs_encoded) => Ok(Some(NetworkSpecs::from_entry_with_key_checked(
             network_specs_key,
@@ -165,7 +165,7 @@ pub enum Write {
 
 /// Get all [`ADDRESS_BOOK`] entries with address book titles.
 pub fn address_book_content(database: &sled::Db) -> Result<Vec<(String, AddressBookEntry)>> {
-    let address_book = open_tree(&database, ADDRESS_BOOK)?;
+    let address_book = open_tree(database, ADDRESS_BOOK)?;
     let mut out: Vec<(String, AddressBookEntry)> = Vec::new();
     for x in address_book.iter().flatten() {
         out.push(AddressBookEntry::process_entry(x)?)
@@ -219,7 +219,7 @@ pub fn genesis_hash_in_hot_db(
 /// Check if [`ADDRESS_BOOK`] has entries with given `name` and title other than
 /// `except_title`.
 pub fn is_specname_in_db(database: &sled::Db, name: &str, except_title: &str) -> Result<bool> {
-    let address_book = open_tree(&database, ADDRESS_BOOK)?;
+    let address_book = open_tree(database, ADDRESS_BOOK)?;
     let mut out = false;
     for x in address_book.iter().flatten() {
         let (title, address_book_entry) = <AddressBookEntry>::process_entry(x)?;
@@ -233,7 +233,7 @@ pub fn is_specname_in_db(database: &sled::Db, name: &str, except_title: &str) ->
 
 /// Get all entries from `META_HISTORY`.
 pub fn meta_history_content(database: &sled::Db) -> Result<Vec<MetaHistoryEntry>> {
-    let meta_history = open_tree(&database, META_HISTORY)?;
+    let meta_history = open_tree(database, META_HISTORY)?;
     let mut out: Vec<MetaHistoryEntry> = Vec::new();
     for x in meta_history.iter().flatten() {
         out.push(MetaHistoryEntry::from_entry(x)?)
@@ -253,8 +253,8 @@ pub struct MetaValuesStamped {
 
 /// Collect all [`MetaValuesStamped`] from the hot database.
 pub fn read_metadata_database(database: &sled::Db) -> Result<Vec<MetaValuesStamped>> {
-    let metadata = open_tree(&database, METATREE)?;
-    let meta_history = open_tree(&database, META_HISTORY)?;
+    let metadata = open_tree(database, METATREE)?;
+    let meta_history = open_tree(database, META_HISTORY)?;
     let mut out: Vec<MetaValuesStamped> = Vec::new();
     for x in metadata.iter().flatten() {
         let meta_values = MetaValues::from_entry_checked(x)?;

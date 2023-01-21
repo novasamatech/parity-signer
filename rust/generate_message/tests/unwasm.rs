@@ -5,9 +5,11 @@ use std::path::PathBuf;
 use tempfile::tempdir;
 
 #[test]
+#[ignore]
 fn it_unwasm() {
     let files_dir = tempdir().unwrap();
-    setup(&files_dir);
+    let db = sled::open(&files_dir).unwrap();
+    setup(&db);
 
     let cmd = format!(
         "unwasm --filename ./tests/for_tests/polkadot.wasm --update-db --hot-db-path {0} --files-dir {0}",

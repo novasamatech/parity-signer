@@ -54,7 +54,7 @@ pub(crate) fn specs_by_name(
 }
 
 pub fn find_meta_set(database: &sled::Db, short_specs: &ShortSpecs) -> Result<Vec<MetaSetElement>> {
-    let metadata = open_tree(&database, METATREE)?;
+    let metadata = open_tree(database, METATREE)?;
     let mut out: Vec<MetaSetElement> = Vec::new();
     let meta_key_prefix = MetaKeyPrefix::from_name(&short_specs.name);
     for x in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
@@ -118,7 +118,7 @@ pub fn accept_meta_values(database: &sled::Db, meta_values: &MetaValues) -> Resu
 /// Function to check if the chain specs are already in the database
 pub fn specs_are_new(database: &sled::Db, new: &NetworkSpecs) -> Result<bool> {
     let network_specs_key = NetworkSpecsKey::from_parts(&new.genesis_hash, &new.encryption);
-    let chainspecs = open_tree(&database, SPECSTREE)?;
+    let chainspecs = open_tree(database, SPECSTREE)?;
     match chainspecs.get(network_specs_key.key())? {
         Some(encoded_known_network_specs) => {
             let old = OrderedNetworkSpecs::from_entry_with_key_checked(

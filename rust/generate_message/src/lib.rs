@@ -1067,8 +1067,16 @@ pub fn full_run(command: Command) -> Result<()> {
             let database = sled::open(db_path)?;
             remove_info(&database, info)
         }
-        Command::RestoreDefaults { db_path } => Ok(default_hot(Some(db_path))?),
-        Command::MakeColdRelease { path } => Ok(default_cold_release(path)?),
+        Command::RestoreDefaults { db_path } => {
+            let db = sled::open(db_path)?;
+
+            Ok(default_hot(Some(&db))?)
+        }
+        Command::MakeColdRelease { path } => {
+            let db = sled::open(path.unwrap())?;
+
+            Ok(default_cold_release(Some(&db))?)
+        }
         Command::TransferMetaToColdRelease { cold_db, hot_db } => {
             let hot_db = sled::open(hot_db)?;
             let cold_db = sled::open(cold_db)?;

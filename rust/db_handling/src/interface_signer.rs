@@ -834,7 +834,7 @@ pub fn print_new_seed(seed_name: &str) -> Result<MNewSeedBackup> {
 
 /// Get database history tree checksum to be displayed in log screen.
 pub fn history_hex_checksum(database: &sled::Db) -> Result<String> {
-    let history = open_tree(&database, HISTORY)?;
+    let history = open_tree(database, HISTORY)?;
     let checksum = history.checksum()?;
     Ok(hex::encode(checksum.encode()).to_uppercase())
 }

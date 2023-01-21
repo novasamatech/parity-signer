@@ -38,7 +38,6 @@ pub struct State {
     navstate: Navstate,
     db: sled::Db,
     seed_names: Vec<String>,
-    networks: Vec<NetworkSpecsKey>,
 }
 
 ///Navigation state is completely defined here
@@ -66,18 +65,12 @@ impl Default for Navstate {
 }
 
 impl State {
-    pub fn init_navigation(db: sled::Db, seed_names: Vec<String>) -> Result<Self> {
-        let networks = db_handling::helpers::get_all_networks(&db)?
-            .into_iter()
-            .map(|x| (NetworkSpecsKey::from_parts(&x.specs.genesis_hash, &x.specs.encryption)))
-            .collect();
-
-        Ok(Self {
+    pub fn init_navigation(db: sled::Db, seed_names: Vec<String>) -> Self {
+        Self {
             navstate: Navstate::new(),
             db,
             seed_names,
-            networks,
-        })
+        }
     }
 
     pub fn update_seed_names(&mut self, seed_names: Vec<String>) {

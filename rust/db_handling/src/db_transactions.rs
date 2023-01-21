@@ -7,7 +7,7 @@
 //!
 //! For transactions scanned into Signer, currently a temporary database entry
 //! is made to store transaction details while they are displayed to user.
-use std::path::Path;
+
 // TODO this is a temporary solution, the data eventually could be stored in
 // `navigator` state.
 #[cfg(feature = "signer")]
@@ -154,13 +154,13 @@ impl TrDbCold {
     ///
     /// Note that both `ErrorSource` variants are available.
     pub fn apply(&self, database: &sled::Db) -> Result<()> {
-        let addresses = open_tree(&database, ADDRTREE)?;
-        let history = open_tree(&database, HISTORY)?;
-        let metadata = open_tree(&database, METATREE)?;
-        let network_specs = open_tree(&database, SPECSTREE)?;
-        let settings = open_tree(&database, SETTREE)?;
-        let transaction = open_tree(&database, TRANSACTION)?;
-        let verifiers = open_tree(&database, VERIFIERS)?;
+        let addresses = open_tree(database, ADDRTREE)?;
+        let history = open_tree(database, HISTORY)?;
+        let metadata = open_tree(database, METATREE)?;
+        let network_specs = open_tree(database, SPECSTREE)?;
+        let settings = open_tree(database, SETTREE)?;
+        let transaction = open_tree(database, TRANSACTION)?;
+        let verifiers = open_tree(database, VERIFIERS)?;
         let s = (
             &addresses,
             &history,
@@ -294,11 +294,11 @@ impl TrDbHot {
     /// Apply constructed set of batches within [`TrDbHot`] to the database
     /// with a given name, in a single transaction.
     pub fn apply(&self, database: &sled::Db) -> Result<()> {
-        let address_book = open_tree(&database, ADDRESS_BOOK)?;
-        let metadata = open_tree(&database, METATREE)?;
-        let meta_history = open_tree(&database, META_HISTORY)?;
-        let network_specs_prep = open_tree(&database, SPECSTREEPREP)?;
-        let settings = open_tree(&database, SETTREE)?;
+        let address_book = open_tree(database, ADDRESS_BOOK)?;
+        let metadata = open_tree(database, METATREE)?;
+        let meta_history = open_tree(database, META_HISTORY)?;
+        let network_specs_prep = open_tree(database, SPECSTREEPREP)?;
+        let settings = open_tree(database, SETTREE)?;
         let s = (
             &address_book,
             &metadata,
@@ -474,13 +474,13 @@ impl TrDbColdStub {
     /// [`TRANSACTION`] tree is cleared in the process.
     pub fn from_storage(database: &sled::Db, checksum: u32) -> Result<Self> {
         let stub_encoded = {
-            verify_checksum(&database, checksum)?;
-            let transaction = open_tree(&database, TRANSACTION)?;
+            verify_checksum(database, checksum)?;
+            let transaction = open_tree(database, TRANSACTION)?;
             transaction.get(STUB)?.ok_or(Error::Stub)?
         };
         TrDbCold::new()
             .set_transaction(make_batch_clear_tree(database, TRANSACTION)?) // clear transaction tree
-            .apply(&database)?;
+            .apply(database)?;
         Ok(Self::decode(&mut &stub_encoded[..])?)
     }
 
@@ -576,7 +576,7 @@ impl TrDbColdStub {
             &network_specs_to_send.encryption,
         );
         let order = {
-            let chainspecs = open_tree(&database, SPECSTREE)?;
+            let chainspecs = open_tree(database, SPECSTREE)?;
             chainspecs.len()
         } as u8;
         let network_specs = network_specs_to_send.to_store(order);
@@ -591,7 +591,7 @@ impl TrDbColdStub {
             ),
         });
         {
-            let identities = open_tree(&database, ADDRTREE)?;
+            let identities = open_tree(database, ADDRTREE)?;
             for (address_key_vec, address_entry) in identities.iter().flatten() {
                 let address_key = AddressKey::from_ivec(&address_key_vec);
                 let (multisigner, mut address_details) =
@@ -809,9 +809,9 @@ impl TrDbColdSign {
     pub fn from_storage(database: &sled::Db, checksum: Option<u32>) -> Result<Option<Self>> {
         let sign_encoded = {
             if let Some(checksum) = checksum {
-                verify_checksum(&database, checksum)?;
+                verify_checksum(database, checksum)?;
             }
-            let transaction = open_tree(&database, TRANSACTION)?;
+            let transaction = open_tree(database, TRANSACTION)?;
             match transaction.get(SIGN)? {
                 Some(a) => a,
                 None => return Ok(None),

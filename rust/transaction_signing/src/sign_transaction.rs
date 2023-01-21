@@ -139,10 +139,12 @@ mod tests {
     #[test]
     fn sign_long_msg() {
         let tmp_dir = tempdir().unwrap();
-        populate_cold(tmp_dir.path(), Verifier { v: None }).unwrap();
+        let db = sled::open(&tmp_dir).unwrap();
+
+        populate_cold(&db, Verifier { v: None }).unwrap();
         let message = format!("<Bytes>{}bbb</Bytes>", "a".repeat(256));
         let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", hex::encode(&message));
-        let output = produce_output(&line, tmp_dir.path());
+        let output = produce_output(&db, &line);
         let public = sp_core::sr25519::Public::try_from(
             hex::decode("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")
                 .unwrap()
@@ -155,10 +157,10 @@ mod tests {
         } = output
         {
             let signature = create_signature(
+                &db,
                 ALICE_SEED_PHRASE,
                 "",
                 "",
-                tmp_dir.path(),
                 checksum,
                 0,
                 Encryption::Sr25519,

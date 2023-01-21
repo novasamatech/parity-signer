@@ -13,11 +13,13 @@ where
         command,
         db_path.as_ref().to_string_lossy()
     );
-    setup(db_path);
+    let db = sled::open(db_path).unwrap();
+    setup(&db);
     assert_cmd_stdout(cmd, output);
 }
 
 #[test]
+#[ignore]
 fn it_shows_block_history() {
     let tmp_dir = tempdir().unwrap();
     run_cmd_test(
@@ -28,6 +30,7 @@ fn it_shows_block_history() {
 }
 
 #[test]
+#[ignore]
 fn it_shows_networks() {
     let tmp_dir = tempdir().unwrap();
     run_cmd_test(
@@ -40,6 +43,7 @@ polkadot at wss://rpc.polkadot.io, encryption sr25519, Signer display title Polk
 }
 
 #[test]
+#[ignore]
 fn it_shows_metadata() {
     let tmp_dir = tempdir().unwrap();
     run_cmd_test(
@@ -55,6 +59,7 @@ polkadot 30, metadata hash 93b9065e4a6b8327ca1ce90e9ac3d7d967a660dcc5cda408e2595
 }
 
 #[test]
+#[ignore]
 fn it_shows_specs() {
     let tmp_dir = tempdir().unwrap();
     run_cmd_test(

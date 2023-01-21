@@ -45,7 +45,7 @@ use sp_core::{ecdsa, ed25519, sr25519, Pair};
 use sp_runtime::MultiSignature;
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_runtime::MultiSigner;
-use std::{collections::HashMap, path::Path};
+use std::{collections::HashMap};
 #[cfg(any(feature = "active", feature = "signer"))]
 use zeroize::Zeroize;
 
@@ -392,7 +392,7 @@ pub fn inject_derivations_has_pwd(
 /// Get all existing addresses from the database.
 #[cfg(any(feature = "active", feature = "signer"))]
 pub fn get_all_addresses(database: &sled::Db) -> Result<Vec<(MultiSigner, AddressDetails)>> {
-    let identities = open_tree(&database, ADDRTREE)?;
+    let identities = open_tree(database, ADDRTREE)?;
     let mut out: Vec<(MultiSigner, AddressDetails)> = Vec::new();
     for (address_key_vec, address_entry) in identities.iter().flatten() {
         let address_key = AddressKey::from_ivec(&address_key_vec);
@@ -778,10 +778,10 @@ fn do_create_address(
             // `secret_exposed` flag will not be changed by extending key to
             // another network.
             let secret_exposed =
-                has_parent_with_exposed_secret(cropped_path, has_pwd, seed_name, &database)?;
+                has_parent_with_exposed_secret(cropped_path, has_pwd, seed_name, database)?;
 
             // check if the `AddressKey` is already in the database
-            let identities = open_tree(&database, ADDRTREE)?;
+            let identities = open_tree(database, ADDRTREE)?;
             match identities.get(address_key.key()) {
                 // `AddressKey` is in the database
                 Ok(Some(address_entry)) => {

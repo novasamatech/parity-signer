@@ -25,7 +25,6 @@
 //! Feature `"test"` includes both `"signer"` and `"active"` features, along
 //! with some testing, and is the default one.  
 
-#![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
 // possibly TODO: rename all database_name into database_path or whatever,
@@ -33,8 +32,6 @@
 
 #[cfg(feature = "active")]
 use constants::{COLD_DB_NAME_RELEASE, HOT_DB_NAME};
-#[cfg(feature = "active")]
-use std::path::PathBuf;
 
 pub mod cold_default;
 
@@ -90,10 +87,13 @@ use hot_default::reset_hot_database;
 /// This operation is performed **not** on Signer device, and is governed by
 /// the active side.
 #[cfg(feature = "active")]
-pub fn default_cold_release(path: Option<PathBuf>) -> Result<()> {
-    populate_cold_release(&sled::open(
-        path.unwrap_or_else(|| COLD_DB_NAME_RELEASE.into()),
-    )?)
+pub fn default_cold_release(database: Option<&sled::Db>) -> Result<()> {
+    let database = if let Some(database) = database {
+        database.clone()
+    } else {
+        sled::open(COLD_DB_NAME_RELEASE)?
+    };
+    populate_cold_release(&database)
 }
 
 /// Generate or restore "hot" database with default values.
@@ -110,6 +110,12 @@ pub fn default_cold_release(path: Option<PathBuf>) -> Result<()> {
 ///
 /// All metadata-related entries get in the hot database only through RPC calls.
 #[cfg(feature = "active")]
-pub fn default_hot(path: Option<PathBuf>) -> Result<()> {
-    reset_hot_database(&sled::open(path.unwrap_or_else(|| HOT_DB_NAME.into()))?)
+pub fn default_hot(database: Option<&sled::Db>) -> Result<()> {
+    let database = if let Some(database) = database {
+        database.clone()
+    } else {
+        sled::open(HOT_DB_NAME)?
+    };
+
+    reset_hot_database(&database)
 }

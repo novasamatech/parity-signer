@@ -1,5 +1,5 @@
 use std::fmt::Write;
-use std::path::Path;
+
 
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES, VERIFIERS};
 use db_handling::{
@@ -110,10 +110,10 @@ impl GeneralHold {
         let mut network_specs_set = Vec::new(); // all are verified by general_verifier
         let mut verifier_set = Vec::new();
 
-        let metadata = open_tree(&database, METATREE)?;
-        let chainspecs = open_tree(&database, SPECSTREE)?;
-        let settings = open_tree(&database, SETTREE)?;
-        let verifiers = open_tree(&database, VERIFIERS)?;
+        let metadata = open_tree(database, METATREE)?;
+        let chainspecs = open_tree(database, SPECSTREE)?;
+        let settings = open_tree(database, SETTREE)?;
+        let verifiers = open_tree(database, VERIFIERS)?;
         for (verifier_key_vec, current_verifier_encoded) in verifiers.iter().flatten() {
             let verifier_key = VerifierKey::from_ivec(&verifier_key_vec)?;
             let current_verifier = <CurrentVerifier>::decode(&mut &current_verifier_encoded[..])?;
@@ -177,8 +177,8 @@ impl Hold {
     }
     /// function to find all entries in the database corresponding to given `verifier_key`, that was used to store the former verifier
     pub(crate) fn get(database: &sled::Db, verifier_key: &VerifierKey) -> Result<Self> {
-        let metadata = open_tree(&database, METATREE)?;
-        let chainspecs = open_tree(&database, SPECSTREE)?;
+        let metadata = open_tree(database, METATREE)?;
+        let chainspecs = open_tree(database, SPECSTREE)?;
         let (metadata_set, network_specs_set) = collect_set(verifier_key, &chainspecs, &metadata)?;
         Ok(Self {
             metadata_set,
