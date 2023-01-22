@@ -70,17 +70,17 @@ final class SignerDataModel: ObservableObject {
             return
         }
         do {
+            try initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
             if jailbreak {
-                try historyInitHistoryNoCert(dbname: dbName)
+                try historyInitHistoryNoCert()
             } else {
-                try historyInitHistoryWithCert(dbname: dbName)
+                try historyInitHistoryWithCert()
             }
             onboardingDone = true
             // Mean app mode:
             // if self.isConnectivityOn {
             // device_was_online(nil, self.dbName)
             // }
-            try initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
             totalRefresh()
             seedsMediator.refreshSeeds()
         } catch {
@@ -171,7 +171,7 @@ extension SignerDataModel {
     func checkAlert() {
         guard onboardingDone else { return }
         do {
-            let res = try historyGetWarnings(dbname: dbName)
+            let res = try historyGetWarnings()
             if res {
                 alert = true
             } else {

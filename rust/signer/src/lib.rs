@@ -158,6 +158,7 @@ fn backend_action(
 ///
 /// Accepts list of seed names to avoid calling [`update_seed_names`] every time
 fn init_navigation(dbname: &str, seed_names: Vec<String>) -> Result<(), ErrorDisplayed> {
+    log::warn!("init_navigation {dbname}");
     let val = Some(sled::open(dbname).map_err(|e| ErrorDisplayed::from(e.to_string()))?);
 
     *DB.lock().unwrap() = val;

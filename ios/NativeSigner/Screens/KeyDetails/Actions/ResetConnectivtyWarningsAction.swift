@@ -20,8 +20,8 @@ final class ResetConnectivtyWarningsAction {
     }
 
     func resetConnectivityWarnings() {
-        try? historyAcknowledgeWarnings(dbname: databaseMediator.databaseName)
-        _ = try? historyGetWarnings(dbname: databaseMediator.databaseName)
+        try? historyAcknowledgeWarnings()
+        _ = try? historyGetWarnings()
         alert = false
     }
 }

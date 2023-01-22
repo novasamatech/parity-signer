@@ -2129,6 +2129,7 @@ dependencies = [
  "definitions",
  "hex",
  "lazy_static",
+ "log",
  "parity-scale-codec",
  "parser",
  "pretty_assertions",
