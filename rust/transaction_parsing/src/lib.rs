@@ -4,7 +4,6 @@
 use db_handling::identities::TransactionBulk;
 use definitions::{helpers::unhex, navigation::TransactionCardSet};
 use parity_scale_codec::Decode;
-use std::path::Path;
 
 pub use definitions::navigation::{StubNav, TransactionAction};
 mod add_specs;
@@ -38,10 +37,7 @@ pub use crate::error::{Error, Result};
 /// - actual content (differs between transaction types, could be even empty)
 /// actual content is handled individually depending on prelude
 
-fn handle_scanner_input<P>(payload: &str, db_path: P) -> Result<TransactionAction>
-where
-    P: AsRef<Path>,
-{
+fn handle_scanner_input(database: &sled::Db, payload: &str) -> Result<TransactionAction> {
     let data_hex = {
         if let Some(a) = payload.strip_prefix("0x") {
             a
@@ -59,17 +55,18 @@ where
     }
 
     match &data_hex[4..6] {
-        "00" | "02" => parse_transaction(data_hex, db_path, false),
-        "03" => process_message(data_hex, db_path),
-        "04" => parse_transaction_bulk(data_hex, db_path),
-        "80" => load_metadata(data_hex, db_path),
-        "81" => load_types(data_hex, db_path),
-        "c1" => add_specs(data_hex, db_path),
-        "de" => process_derivations(data_hex, db_path),
+        "00" | "02" => parse_transaction(database, data_hex, false),
+        "03" => process_message(database, data_hex),
+        "04" => parse_transaction_bulk(database, data_hex),
+        "80" => load_metadata(database, data_hex),
+        "81" => load_types(database, data_hex),
+        "c1" => add_specs(database, data_hex),
+        "de" => process_derivations(database, data_hex),
         _ => Err(Error::PayloadNotSupported(data_hex[4..6].to_string())),
     }
 }
-fn parse_transaction_bulk<P: AsRef<Path>>(payload: &str, dbname: P) -> Result<TransactionAction> {
+
+fn parse_transaction_bulk(database: &sled::Db, payload: &str) -> Result<TransactionAction> {
     let decoded_data = unhex(payload)?;
 
     let bulk = TransactionBulk::decode(&mut &decoded_data[3..])?;
@@ -82,7 +79,7 @@ fn parse_transaction_bulk<P: AsRef<Path>>(payload: &str, dbname: P) -> Result<Tr
             for t in &b.encoded_transactions {
                 let encoded = hex::encode(t);
                 let encoded = "53".to_string() + &encoded;
-                let action = parse_transaction(&encoded, &dbname, true)?;
+                let action = parse_transaction(database, &encoded, true)?;
                 if let TransactionAction::Sign {
                     actions: a,
                     checksum: c,
@@ -98,11 +95,8 @@ fn parse_transaction_bulk<P: AsRef<Path>>(payload: &str, dbname: P) -> Result<Tr
     }
 }
 
-pub fn produce_output<P>(payload: &str, dbname: P) -> TransactionAction
-where
-    P: AsRef<Path>,
-{
-    match handle_scanner_input(payload, dbname) {
+pub fn produce_output(database: &sled::Db, payload: &str) -> TransactionAction {
+    match handle_scanner_input(database, payload) {
         Ok(out) => out,
         Err(e) => TransactionAction::Read {
             r: Box::new(TransactionCardSet {

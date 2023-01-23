@@ -110,7 +110,7 @@ class SignerDataModel : ViewModel() {
 	fun onBoard() {
 		wipe()
 		copyAsset("")
-		historyInitHistoryWithCert(dbName)
+		historyInitHistoryWithCert()
 		totalRefresh()
 	}
 
@@ -120,7 +120,7 @@ class SignerDataModel : ViewModel() {
 	private fun jailbreak() {
 		wipe()
 		copyAsset("")
-		historyInitHistoryNoCert(dbName)
+		historyInitHistoryNoCert()
 		totalRefresh()
 	}
 
@@ -190,7 +190,7 @@ class SignerDataModel : ViewModel() {
 			if (alertState.value != AlertState.Active) {
 				_alertState.value = AlertState.Active
 				if (onBoardingDone.value == OnboardingWasShown.Yes) {
-					historyDeviceWasOnline(dbName)
+					historyDeviceWasOnline()
 				}
 			}
 		} else {
@@ -251,7 +251,7 @@ class SignerDataModel : ViewModel() {
 	}
 
 	private fun getAlertState() {
-		_alertState.value = if (historyGetWarnings(dbName)) {
+		_alertState.value = if (historyGetWarnings()) {
 			if (alertState.value == AlertState.Active) AlertState.Active else AlertState.Past
 		} else {
 			AlertState.None
@@ -260,7 +260,7 @@ class SignerDataModel : ViewModel() {
 
 	fun acknowledgeWarning() {
 		if (alertState.value == AlertState.Past) {
-			historyAcknowledgeWarnings(dbName)
+			historyAcknowledgeWarnings()
 			_alertState.value = AlertState.None
 		}
 	}

@@ -28,9 +28,7 @@ final class GetAllNetworksService {
         callQueue.async {
             let result: Result<[MmNetwork], ServiceError>
             do {
-                let networks: [MmNetwork] = try getAllNetworks(
-                    dbname: self.databaseMediator.databaseName
-                )
+                let networks: [MmNetwork] = try getAllNetworks()
                 result = .success(networks)
             } catch {
                 result = .failure(.unknown)

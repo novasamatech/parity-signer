@@ -10,19 +10,15 @@ use definitions::keyring::NetworkSpecsKey;
 use definitions::{helpers::unhex, navigation::TransactionCardSet};
 use parity_scale_codec::Decode;
 use sp_runtime::MultiSigner;
-use std::path::Path;
 
 use crate::cards::Card;
 use crate::error::Result;
 use crate::TransactionAction;
 
-pub fn process_derivations<P>(data_hex: &str, db_path: P) -> Result<TransactionAction>
-where
-    P: AsRef<Path>,
-{
+pub fn process_derivations(database: &sled::Db, data_hex: &str) -> Result<TransactionAction> {
     let data = unhex(data_hex)?;
     let export_info = <ExportAddrs>::decode(&mut &data[3..])?;
-    let import_info = prepare_derivations_preview(db_path, export_info)?;
+    let import_info = prepare_derivations_preview(database, export_info)?;
     let derivations_card = Card::Derivations(&import_info).card(&mut 0, 0);
     Ok(TransactionAction::Derivations {
         content: Box::new(TransactionCardSet {
@@ -32,22 +28,19 @@ where
     })
 }
 
-pub fn prepare_derivations_preview<P>(
-    db_path: P,
+pub fn prepare_derivations_preview(
+    database: &sled::Db,
     export_info: ExportAddrs,
-) -> Result<Vec<SeedKeysPreview>>
-where
-    P: AsRef<Path>,
-{
+) -> Result<Vec<SeedKeysPreview>> {
     match export_info {
-        ExportAddrs::V1(v1) => prepare_derivations_v1(db_path, v1),
+        ExportAddrs::V1(v1) => prepare_derivations_v1(database, v1),
     }
 }
 
-fn prepare_derivations_v1<P>(db_path: P, export_info: ExportAddrsV1) -> Result<Vec<SeedKeysPreview>>
-where
-    P: AsRef<Path>,
-{
+fn prepare_derivations_v1(
+    database: &sled::Db,
+    export_info: ExportAddrsV1,
+) -> Result<Vec<SeedKeysPreview>> {
     let mut result = Vec::new();
     for seed_info in export_info.addrs {
         let mut derived_keys = vec![];
@@ -60,16 +53,16 @@ where
             );
             let network_specs_key =
                 NetworkSpecsKey::from_parts(&addr_info.genesis_hash, &addr_info.encryption);
-            let network_title = get_network_specs(&db_path, &network_specs_key)
+            let network_title = get_network_specs(database, &network_specs_key)
                 .map(|specs| specs.specs.title)
                 .ok();
             let path = addr_info.derivation_path.clone().unwrap_or_default();
             let status = get_derivation_status(
+                database,
                 &path,
                 &network_title,
                 &seed_info.multisigner,
                 &multisigner,
-                &db_path,
             )?;
             derived_keys.push(DerivedKeyPreview {
                 address: addr_info.address.clone(),
@@ -91,19 +84,16 @@ where
     Ok(result)
 }
 
-fn get_derivation_status<P>(
+fn get_derivation_status(
+    database: &sled::Db,
     path: &str,
     network_title: &Option<String>,
     seed_multisigner: &MultiSigner,
     key_multisigner: &MultiSigner,
-    db_path: P,
-) -> Result<DerivedKeyStatus>
-where
-    P: AsRef<Path>,
-{
+) -> Result<DerivedKeyStatus> {
     let mut seed_found = false;
     // FIXME: nested loop, should be optimized
-    for (m, _) in get_all_addresses(db_path)?.into_iter() {
+    for (m, _) in get_all_addresses(database)?.into_iter() {
         if m == *seed_multisigner {
             seed_found = true;
         }

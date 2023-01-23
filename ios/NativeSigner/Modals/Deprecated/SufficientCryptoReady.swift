@@ -16,10 +16,19 @@ struct SufficientCryptoReady: View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Asset.backgroundPrimary.swiftUIColor)
             VStack {
-                HeaderBar(
-                    line1: Localizable.yourSignature.key,
-                    line2: Localizable.scanItIntoYourApplication.key
-                )
+                VStack(alignment: .leading, spacing: 2) {
+                    Localizable.yourSignature.text
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .font(PrimaryFont.labelS.font)
+                        .tracking(0.5)
+                        .textCase(.uppercase)
+                    Localizable.scanItIntoYourApplication.text
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .font(PrimaryFont.bodyM.font)
+                    Divider()
+                        .padding(.top, 6)
+                }
+                .font(PrimaryFont.captionM.font)
                 AnimatedQRCodeView(
                     viewModel: Binding<AnimatedQRCodeViewModel>.constant(
                         .init(

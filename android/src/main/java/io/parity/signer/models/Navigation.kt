@@ -74,7 +74,6 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 				}
 				val secretKeyDetailsQR = try {
 					generateSecretKeyQr(
-						dbname = singleton.dbName,
 						publicKey = action.publicKey,
 						expectedSeedName = keyDetails.address.seedName,
 						networkSpecsKey = keyDetails.networkInfo.networkSpecsKey,

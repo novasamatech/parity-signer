@@ -2,6 +2,7 @@
 interface ErrorDisplayed {
     Str(string s);
     MutexPoisoned();
+    DbNotInitialized();
 };
 
 [Error]
@@ -566,51 +567,52 @@ namespace signer {
     DecodeSequenceResult qrparser_try_decode_qr_sequence([ByRef] sequence<string> data, string? password, boolean cleaned);
 
     [Throws=ErrorDisplayed]
-    MKeyDetails generate_secret_key_qr([ByRef] string dbname, [ByRef] string public_key, [ByRef] string expected_seed_name, [ByRef] string network_specs_key, [ByRef] string seed_phrase, string? key_password);
+    MKeyDetails generate_secret_key_qr([ByRef] string public_key, [ByRef] string expected_seed_name, [ByRef] string network_specs_key, [ByRef] string seed_phrase, string? key_password);
 
     [Throws=ErrorDisplayed]
-    void import_derivations([ByRef] string dbname, sequence<SeedKeysPreview> seed_derived_keys);
+    void import_derivations(sequence<SeedKeysPreview> seed_derived_keys);
 
     [Throws=ErrorDisplayed]
     sequence<SeedKeysPreview> populate_derivations_has_pwd(record<string, string> seeds, sequence<SeedKeysPreview> seed_derived_keys);
 
-    DerivationCheck substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
+    [Throws=ErrorDisplayed]
+    DerivationCheck substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network);
 
     [Throws=ErrorDisplayed]
-    void try_create_address([ByRef] string seed_name, [ByRef] string seed_phrase, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
+    void try_create_address([ByRef] string seed_name, [ByRef] string seed_phrase, [ByRef] string path, [ByRef] string network);
 
     [Throws=ErrorDisplayed]
-    void history_init_history_with_cert([ByRef] string dbname);
+    void history_init_history_with_cert();
 
     [Throws=ErrorDisplayed]
-    void history_init_history_no_cert([ByRef] string dbname);
+    void history_init_history_no_cert();
 
     [Throws=ErrorDisplayed]
-    void history_device_was_online([ByRef] string dbname);
+    void history_device_was_online();
 
     [Throws=ErrorDisplayed]
-    boolean history_get_warnings([ByRef] string dbname);
+    boolean history_get_warnings();
 
     [Throws=ErrorDisplayed]
-    void history_acknowledge_warnings([ByRef] string dbname);
+    void history_acknowledge_warnings();
 
     [Throws=ErrorDisplayed]
-    void history_entry_system(Event event, [ByRef] string dbname);
+    void history_entry_system(Event event);
 
     [Throws=ErrorDisplayed]
-    void history_seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
+    void history_seed_name_was_shown([ByRef] string seed_name);
 
     [Throws=ErrorDisplayed]
-    MKeysInfoExport export_key_info([ByRef] string dbname, record<DOMString, ExportedSet> selected_names);
+    MKeysInfoExport export_key_info(record<DOMString, ExportedSet> selected_names);
 
     [Throws=ErrorDisplayed]
-    MKeysNew keys_by_seed_name([ByRef] string dbname, [ByRef] string seed_name);
+    MKeysNew keys_by_seed_name([ByRef] string seed_name);
 
     [Throws=ErrorDisplayed]
     sequence<u8> encode_to_qr([ByRef] sequence<u8> payload, boolean is_danger);
 
     [Throws=ErrorDisplayed]
-    sequence<MMNetwork> get_all_networks([ByRef] string dbname);
+    sequence<MMNetwork> get_all_networks();
 
     void init_logging(string tag);
 };

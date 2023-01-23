@@ -45,6 +45,5 @@ fun SignerDataModel.checkPath(
 		seedName = seedName,
 		path = path,
 		network = network,
-		dbname = dbName
 	)
 }

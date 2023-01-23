@@ -16,6 +16,7 @@ sp-core = { git = "https://github.com/paritytech/substrate", default-features = 
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
 thiserror = "1.0.38"
 anyhow = "1.0.68"
+sled = "0.34"
 
 
 [dev-dependencies]
