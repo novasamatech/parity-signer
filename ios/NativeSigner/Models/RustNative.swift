@@ -24,11 +24,6 @@ final class SignerDataModel: ObservableObject {
     // Alert indicator
     @Published var alert: Bool = false
 
-    /// internal boilerplate
-    private var dbName: String {
-        databaseMediator.databaseName
-    }
-
     /// did user set up password?
     let protected = LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
 
@@ -63,24 +58,20 @@ final class SignerDataModel: ObservableObject {
 
     /// Should be called once on factory-new state of the app
     /// Populates database with starting values
-    func onboard(jailbreak: Bool = false) {
+    func onboard(verifierRemoved: Bool = false) {
         wipe()
         guard databaseMediator.recreateDatabaseFile() else {
             print("Database could not be recreated")
             return
         }
         do {
-            if jailbreak {
-                try historyInitHistoryNoCert(dbname: dbName)
+            try initNavigation(dbname: databaseMediator.databaseName, seedNames: seedsMediator.seedNames)
+            if verifierRemoved {
+                try historyInitHistoryNoCert()
             } else {
-                try historyInitHistoryWithCert(dbname: dbName)
+                try historyInitHistoryWithCert()
             }
             onboardingDone = true
-            // Mean app mode:
-            // if self.isConnectivityOn {
-            // device_was_online(nil, self.dbName)
-            // }
-            try initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
             totalRefresh()
             seedsMediator.refreshSeeds()
         } catch {
@@ -98,7 +89,7 @@ private extension SignerDataModel {
         if onboardingDone {
             seedsMediator.refreshSeeds()
             do {
-                try initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
+                try initNavigation(dbname: databaseMediator.databaseName, seedNames: seedsMediator.seedNames)
             } catch {
                 print("InitNavigation has failed! This will not do.")
             }
@@ -124,21 +115,14 @@ extension SignerDataModel {
         databaseMediator.wipeDatabase()
         onboardingDone = false
         seedsMediator.seedNames = []
-        do {
-            try initNavigation(dbname: dbName, seedNames: seedsMediator.seedNames)
-        } catch {
-            print("InitNavigation has failed. This will not do.")
-        }
     }
 }
 
 extension SignerDataModel {
     /// Remove general verifier; wipes everything, obviously
-    func jailbreak() {
+    func removeGeneralVerifier() {
         wipe()
-        if !onboardingDone {
-            onboard(jailbreak: true)
-        }
+        onboard(verifierRemoved: true)
     }
 }
 
@@ -171,12 +155,7 @@ extension SignerDataModel {
     func checkAlert() {
         guard onboardingDone else { return }
         do {
-            let res = try historyGetWarnings(dbname: dbName)
-            if res {
-                alert = true
-            } else {
-                alert = false
-            }
+            alert = try historyGetWarnings()
         } catch {
             print("History init failed! This will not do.")
             alert = true

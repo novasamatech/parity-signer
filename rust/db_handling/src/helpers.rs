@@ -3,10 +3,9 @@
 use parity_scale_codec::Decode;
 #[cfg(any(feature = "active", feature = "signer"))]
 use parity_scale_codec::Encode;
-use sled::{open, Batch, Db, Tree};
+use sled::{Batch, Db, Tree};
 #[cfg(feature = "signer")]
 use sp_core::H256;
-use std::path::Path;
 
 #[cfg(feature = "signer")]
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, VERIFIERS};
@@ -38,16 +37,6 @@ use crate::db_transactions::TrDbCold;
 #[cfg(feature = "signer")]
 use crate::manage_history::events_to_batch;
 
-/// Open a database.
-///
-/// Wrapper for [`open`] from [`sled`]. Input is database location path.
-pub fn open_db<P>(db_path: P) -> Result<Db>
-where
-    P: AsRef<Path>,
-{
-    Ok(open(db_path)?)
-}
-
 /// Open a tree in the database.
 ///
 /// Wrapper for `open_tree()` method for database [`Db`] from [`sled`].
@@ -57,12 +46,8 @@ pub fn open_tree(database: &Db, tree_name: &[u8]) -> Result<Tree> {
 }
 
 /// Assemble a [`Batch`] that removes all elements from a tree.
-pub fn make_batch_clear_tree<P>(db_path: P, tree_name: &[u8]) -> Result<Batch>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(&db_path)?;
-    let tree = open_tree(&database, tree_name)?;
+pub fn make_batch_clear_tree(database: &sled::Db, tree_name: &[u8]) -> Result<Batch> {
+    let tree = open_tree(database, tree_name)?;
     let mut out = Batch::default();
     for (key, _) in tree.iter().flatten() {
         out.remove(key)
@@ -74,12 +59,8 @@ where
 ///
 /// Function is used both on active and Signer side, but only for the cold
 /// database.
-pub fn get_all_networks<P>(db_path: P) -> Result<Vec<OrderedNetworkSpecs>>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(&db_path)?;
-    let chainspecs = open_tree(&database, SPECSTREE)?;
+pub fn get_all_networks(database: &sled::Db) -> Result<Vec<OrderedNetworkSpecs>> {
+    let chainspecs = open_tree(database, SPECSTREE)?;
     let mut out: Vec<OrderedNetworkSpecs> = Vec::new();
     for x in chainspecs.iter().flatten() {
         out.push(OrderedNetworkSpecs::from_entry_checked(x)?)
@@ -97,16 +78,12 @@ where
 /// Note that `CurrentVerifier::Dead` or damaged verifier data result in
 /// errors.
 #[cfg(feature = "signer")]
-pub fn try_get_valid_current_verifier<P>(
+pub fn try_get_valid_current_verifier(
+    database: &sled::Db,
     verifier_key: &VerifierKey,
-    db_path: P,
-) -> Result<Option<ValidCurrentVerifier>>
-where
-    P: AsRef<Path>,
-{
-    let general_verifier = get_general_verifier(&db_path)?;
-    let database = open_db(&db_path)?;
-    let verifiers = open_tree(&database, VERIFIERS)?;
+) -> Result<Option<ValidCurrentVerifier>> {
+    let general_verifier = get_general_verifier(database)?;
+    let verifiers = open_tree(database, VERIFIERS)?;
     match verifiers.get(verifier_key.key())? {
         // verifier entry is found
         Some(verifier_encoded) => {
@@ -143,7 +120,7 @@ where
             // If the genesis hash is found in network specs, but no verifier
             // entry exists, it indicated that the database is corrupted.
             if let Some(specs_invariants) =
-                genesis_hash_in_specs(verifier_key.genesis_hash(), &database)?
+                genesis_hash_in_specs(database, verifier_key.genesis_hash())?
             {
                 return Err(Error::UnexpectedGenesisHash {
                     name: specs_invariants.name,
@@ -161,14 +138,11 @@ where
 /// Entry here is expected to be in the database, failure to find it results in
 /// an error.
 #[cfg(feature = "signer")]
-pub fn get_valid_current_verifier<P>(
+pub fn get_valid_current_verifier(
+    database: &sled::Db,
     verifier_key: &VerifierKey,
-    db_path: P,
-) -> Result<ValidCurrentVerifier>
-where
-    P: AsRef<Path>,
-{
-    try_get_valid_current_verifier(verifier_key, db_path)?
+) -> Result<ValidCurrentVerifier> {
+    try_get_valid_current_verifier(database, verifier_key)?
         .ok_or_else(|| Error::NoValidCurrentVerifier(verifier_key.clone()))
 }
 
@@ -202,7 +176,10 @@ pub struct SpecsInvariants {
 /// could be a part of the network metadata, and therefore must not depend on
 /// encryption used.
 #[cfg(feature = "signer")]
-pub fn genesis_hash_in_specs(genesis_hash: H256, database: &Db) -> Result<Option<SpecsInvariants>> {
+pub fn genesis_hash_in_specs(
+    database: &sled::Db,
+    genesis_hash: H256,
+) -> Result<Option<SpecsInvariants>> {
     let chainspecs = open_tree(database, SPECSTREE)?;
     let mut specs_set: Vec<(NetworkSpecsKey, OrderedNetworkSpecs)> = Vec::new();
     let mut found_permanent_specs: Option<(u16, String)> = None;
@@ -258,12 +235,8 @@ pub fn genesis_hash_in_specs(genesis_hash: H256, database: &Db) -> Result<Option
 /// Signer works only with an initiated database, i.e. the one with general
 /// verifier set up. Failure to find general verifier is always an error.
 #[cfg(feature = "signer")]
-pub fn get_general_verifier<P>(db_path: P) -> Result<Verifier>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(&db_path)?;
-    let settings = open_tree(&database, SETTREE)?;
+pub fn get_general_verifier(database: &sled::Db) -> Result<Verifier> {
+    let settings = open_tree(database, SETTREE)?;
     let verifier_encoded = settings
         .get(GENERALVERIFIER)?
         .ok_or(Error::GeneralVerifierNotFound)?;
@@ -273,12 +246,8 @@ where
 /// Try to get types information from the database.
 ///
 /// If no types information is found, result is `Ok(None)`.
-pub fn try_get_types<P>(db_path: P) -> Result<Option<Vec<TypeEntry>>>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(&db_path)?;
-    let settings = open_tree(&database, SETTREE)?;
+pub fn try_get_types(database: &sled::Db) -> Result<Option<Vec<TypeEntry>>> {
+    let settings = open_tree(database, SETTREE)?;
     let res = settings
         .get(TYPES)?
         .map(|types_info_encoded| <Vec<TypeEntry>>::decode(&mut &types_info_encoded[..]))
@@ -297,11 +266,8 @@ where
 /// being decoded
 ///
 /// Not finding types data results in an error.
-pub fn get_types<P>(db_path: P) -> Result<Vec<TypeEntry>>
-where
-    P: AsRef<Path>,
-{
-    try_get_types(db_path)?.ok_or(Error::TypesNotFound)
+pub fn get_types(database: &sled::Db) -> Result<Vec<TypeEntry>> {
+    try_get_types(database)?.ok_or(Error::TypesNotFound)
 }
 
 /// Get types information as [`ContentLoadTypes`] from the database.
@@ -313,11 +279,8 @@ where
 /// payload.
 ///
 /// Not finding types data results in an error.
-pub fn prep_types<P>(db_path: P) -> Result<ContentLoadTypes>
-where
-    P: AsRef<Path>,
-{
-    Ok(ContentLoadTypes::generate(&get_types(db_path)?))
+pub fn prep_types(database: &sled::Db) -> Result<ContentLoadTypes> {
+    Ok(ContentLoadTypes::generate(&get_types(database)?))
 }
 
 /// Try to get network specs [`OrderedNetworkSpecs`] from the Signer database.
@@ -325,15 +288,11 @@ where
 /// If the [`NetworkSpecsKey`] and associated [`OrderedNetworkSpecs`] are not found in
 /// the [`SPECSTREE`], the result is `Ok(None)`.
 #[cfg(feature = "signer")]
-pub fn try_get_network_specs<P>(
-    db_path: P,
+pub fn try_get_network_specs(
+    database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<Option<OrderedNetworkSpecs>>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(&db_path)?;
-    let chainspecs = open_tree(&database, SPECSTREE)?;
+) -> Result<Option<OrderedNetworkSpecs>> {
+    let chainspecs = open_tree(database, SPECSTREE)?;
     Ok(chainspecs
         .get(network_specs_key.key())?
         .map(|network_specs_encoded| {
@@ -350,14 +309,11 @@ where
 /// Network specs here are expected to be found, not finding them results in an
 /// error.
 #[cfg(feature = "signer")]
-pub fn get_network_specs<P>(
-    db_path: P,
+pub fn get_network_specs(
+    database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<OrderedNetworkSpecs>
-where
-    P: AsRef<Path>,
-{
-    try_get_network_specs(db_path, network_specs_key)?
+) -> Result<OrderedNetworkSpecs> {
+    try_get_network_specs(database, network_specs_key)?
         .ok_or_else(|| Error::NetworkSpecsNotFound(network_specs_key.clone()))
 }
 
@@ -366,15 +322,11 @@ where
 ///
 /// If no entry with provided [`AddressKey`] is found, the result is `Ok(None)`.
 #[cfg(feature = "signer")]
-pub fn try_get_address_details<P>(
-    db_path: P,
+pub fn try_get_address_details(
+    database: &sled::Db,
     address_key: &AddressKey,
-) -> Result<Option<AddressDetails>>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(&db_path)?;
-    let identities = open_tree(&database, ADDRTREE)?;
+) -> Result<Option<AddressDetails>> {
+    let identities = open_tree(database, ADDRTREE)?;
     identities
         .get(address_key.key())?
         .map(|address_details_encoded| -> Result<AddressDetails> {
@@ -391,11 +343,11 @@ where
 ///
 /// Address is expected to exist, not finding it results in an error.
 #[cfg(feature = "signer")]
-pub fn get_address_details<P>(db_path: P, address_key: &AddressKey) -> Result<AddressDetails>
-where
-    P: AsRef<Path>,
-{
-    try_get_address_details(db_path, address_key)?
+pub fn get_address_details(
+    database: &sled::Db,
+    address_key: &AddressKey,
+) -> Result<AddressDetails> {
+    try_get_address_details(database, address_key)?
         .ok_or_else(|| Error::AddressNotFound(address_key.clone()))
 }
 
@@ -405,12 +357,11 @@ where
 /// available for the network and to find the metadata to be deleted, when the
 /// network gets deleted.
 #[cfg(feature = "signer")]
-pub(crate) fn get_meta_values_by_name<P>(db_path: P, network_name: &str) -> Result<Vec<MetaValues>>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(&db_path)?;
-    let metadata = open_tree(&database, METATREE)?;
+pub(crate) fn get_meta_values_by_name(
+    database: &sled::Db,
+    network_name: &str,
+) -> Result<Vec<MetaValues>> {
+    let metadata = open_tree(database, METATREE)?;
     let mut out: Vec<MetaValues> = Vec::new();
     let meta_key_prefix = MetaKeyPrefix::from_name(network_name);
     for x in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
@@ -426,16 +377,12 @@ where
 /// from the database.
 ///
 /// If no entry is found, the result is `Ok(None)`.
-pub fn try_get_meta_values_by_name_version<P>(
-    db_path: P,
+pub fn try_get_meta_values_by_name_version(
+    database: &sled::Db,
     network_name: &str,
     network_version: u32,
-) -> Result<Option<MetaValues>>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(&db_path)?;
-    let metadata = open_tree(&database, METATREE)?;
+) -> Result<Option<MetaValues>> {
+    let metadata = open_tree(database, METATREE)?;
     let meta_key = MetaKey::from_parts(network_name, network_version);
     Ok(metadata
         .get(meta_key.key())?
@@ -455,15 +402,12 @@ where
 ///
 /// Entry is expected to be in the database, error is produced if it is not
 /// found.
-pub fn get_meta_values_by_name_version<P>(
-    db_path: P,
+pub fn get_meta_values_by_name_version(
+    database: &sled::Db,
     network_name: &str,
     network_version: u32,
-) -> Result<MetaValues>
-where
-    P: AsRef<Path>,
-{
-    try_get_meta_values_by_name_version(db_path, network_name, network_version)?.ok_or(
+) -> Result<MetaValues> {
+    try_get_meta_values_by_name_version(database, network_name, network_version)?.ok_or(
         Error::MetaValuesNotFound {
             name: network_name.to_owned(),
             version: network_version,
@@ -480,16 +424,11 @@ where
 ///
 /// Applicable only on the active side.
 #[cfg(feature = "active")]
-pub fn transfer_metadata_to_cold<P>(hot_db_path: P, cold_db_path: P) -> Result<()>
-where
-    P: AsRef<Path>,
-{
+pub fn transfer_metadata_to_cold(database_hot: &sled::Db, database_cold: &sled::Db) -> Result<()> {
     let mut for_metadata = Batch::default();
     {
-        let database_hot = open_db(&hot_db_path)?;
-        let metadata_hot = open_tree(&database_hot, METATREE)?;
-        let database_cold = open_db(&cold_db_path)?;
-        let chainspecs_cold = open_tree(&database_cold, SPECSTREE)?;
+        let metadata_hot = open_tree(database_hot, METATREE)?;
+        let chainspecs_cold = open_tree(database_cold, SPECSTREE)?;
         for x in chainspecs_cold.iter().flatten() {
             let network_specs = NetworkSpecs::from_entry_checked(x)?;
             for (key, value) in metadata_hot
@@ -502,7 +441,7 @@ where
     }
     TrDbCold::new()
         .set_metadata(for_metadata)
-        .apply(&cold_db_path)
+        .apply(database_cold)
 }
 
 /// Remove the network from the database.
@@ -542,21 +481,18 @@ where
 /// removal of network with one of the encryptions will cause the networks
 /// with other encryptions be removed as well.
 #[cfg(feature = "signer")]
-pub fn remove_network<P>(network_specs_key: &NetworkSpecsKey, db_path: P) -> Result<()>
-where
-    P: AsRef<Path>,
-{
+pub fn remove_network(database: &Db, network_specs_key: &NetworkSpecsKey) -> Result<()> {
     let mut address_batch = Batch::default();
     let mut meta_batch = Batch::default();
     let mut network_specs_batch = Batch::default();
     let mut verifiers_batch = Batch::default();
     let mut events: Vec<Event> = Vec::new();
 
-    let general_verifier = get_general_verifier(&db_path)?;
-    let network_specs = get_network_specs(&db_path, network_specs_key)?;
+    let general_verifier = get_general_verifier(database)?;
+    let network_specs = get_network_specs(database, network_specs_key)?;
 
     let verifier_key = VerifierKey::from_parts(network_specs.specs.genesis_hash);
-    let valid_current_verifier = get_valid_current_verifier(&verifier_key, &db_path)?;
+    let valid_current_verifier = get_valid_current_verifier(database, &verifier_key)?;
 
     // modify verifier as needed
     if let ValidCurrentVerifier::Custom { ref v } = valid_current_verifier {
@@ -570,7 +506,7 @@ where
     }
 
     // scan through metadata tree to mark for removal all networks with target name
-    for meta_values in get_meta_values_by_name(&db_path, &network_specs.specs.name)?.iter() {
+    for meta_values in get_meta_values_by_name(database, &network_specs.specs.name)?.iter() {
         let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
         meta_batch.remove(meta_key.key());
         events.push(Event::MetadataRemoved {
@@ -579,9 +515,8 @@ where
     }
 
     {
-        let database = open_db(&db_path)?;
-        let chainspecs = open_tree(&database, SPECSTREE)?;
-        let identities = open_tree(&database, ADDRTREE)?;
+        let chainspecs = open_tree(database, SPECSTREE)?;
+        let identities = open_tree(database, ADDRTREE)?;
 
         // scan through chainspecs tree to mark for removal all networks with target genesis hash
         let mut keys_to_wipe: Vec<NetworkSpecsKey> = Vec::new();
@@ -629,11 +564,11 @@ where
     }
     TrDbCold::new()
         .set_addresses(address_batch) // upd addresses
-        .set_history(events_to_batch(&db_path, events)?) // add corresponding history
+        .set_history(events_to_batch(database, events)?) // add corresponding history
         .set_metadata(meta_batch) // upd metadata
         .set_network_specs(network_specs_batch) // upd network_specs
         .set_verifiers(verifiers_batch) // upd network_verifiers
-        .apply(&db_path)
+        .apply(database)
 }
 
 /// Remove the network metadata entry from the database.
@@ -648,24 +583,21 @@ where
 /// network. Therefore if the network supports more than one encryption
 /// algorithm, removing metadata for one will affect all encryptions.
 #[cfg(feature = "signer")]
-pub fn remove_metadata<P>(
+pub fn remove_metadata(
+    database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
     network_version: u32,
-    db_path: P,
-) -> Result<()>
-where
-    P: AsRef<Path>,
-{
-    let network_specs = get_network_specs(&db_path, network_specs_key)?;
+) -> Result<()> {
+    let network_specs = get_network_specs(database, network_specs_key)?;
     let meta_key = MetaKey::from_parts(&network_specs.specs.name, network_version);
     let mut meta_batch = Batch::default();
     meta_batch.remove(meta_key.key());
 
     let meta_values =
-        get_meta_values_by_name_version(&db_path, &network_specs.specs.name, network_version)?;
+        get_meta_values_by_name_version(database, &network_specs.specs.name, network_version)?;
     let meta_values_display = MetaValuesDisplay::get(&meta_values);
     let history_batch = events_to_batch(
-        &db_path,
+        database,
         vec![Event::MetadataRemoved {
             meta_values_display,
         }],
@@ -673,7 +605,7 @@ where
     TrDbCold::new()
         .set_metadata(meta_batch) // remove metadata
         .set_history(history_batch) // add corresponding history
-        .apply(&db_path)
+        .apply(database)
 }
 
 /// User-initiated removal of the types information from the Signer database.
@@ -692,24 +624,21 @@ where
 /// in **not** related to the `remove_types_info` function and is handled
 /// elsewhere.
 #[cfg(feature = "signer")]
-pub fn remove_types_info<P>(db_path: P) -> Result<()>
-where
-    P: AsRef<Path>,
-{
+pub fn remove_types_info(database: &sled::Db) -> Result<()> {
     let mut settings_batch = Batch::default();
     settings_batch.remove(TYPES);
     let events: Vec<Event> = vec![Event::TypesRemoved {
         types_display: TypesDisplay::get(
-            &ContentLoadTypes::generate(&get_types(&db_path)?),
-            &get_general_verifier(&db_path)?,
+            &ContentLoadTypes::generate(&get_types(database)?),
+            &get_general_verifier(database)?,
         ),
     }];
     TrDbCold::new()
-        .set_history(events_to_batch(&db_path, events)?)
+        .set_history(events_to_batch(database, events)?)
         // add history
         .set_settings(settings_batch)
         // upd settings
-        .apply(&db_path)
+        .apply(database)
 }
 
 /// Modify existing batch for [`ADDRTREE`](constants::ADDRTREE) with incoming
@@ -741,12 +670,8 @@ pub(crate) fn verify_checksum(database: &Db, checksum: u32) -> Result<()> {
 /// Currently, the only flag contributing to the danger status is whether the
 /// device was online. This may change eventually.
 #[cfg(feature = "signer")]
-pub fn get_danger_status<P>(db_path: P) -> Result<bool>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(&db_path)?;
-    let settings = open_tree(&database, SETTREE)?;
+pub fn get_danger_status(database: &sled::Db) -> Result<bool> {
+    let settings = open_tree(database, SETTREE)?;
     let a = settings.get(DANGER)?.ok_or(Error::DangerStatusNotFound)?;
     Ok(DangerRecord::from_ivec(&a).device_was_online()?)
 }

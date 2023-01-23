@@ -7,7 +7,6 @@ use plot_icon::EMPTY_PNG;
 use sp_core::{blake2_256, sr25519, Pair};
 use sp_runtime::MultiSigner;
 use std::collections::HashMap;
-use std::path::Path;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
@@ -33,7 +32,7 @@ use definitions::{
 
 use crate::helpers::{
     get_address_details, get_all_networks, get_general_verifier, get_meta_values_by_name,
-    get_meta_values_by_name_version, get_network_specs, make_batch_clear_tree, open_db, open_tree,
+    get_meta_values_by_name_version, get_network_specs, make_batch_clear_tree, open_tree,
     try_get_types,
 };
 use crate::identities::{
@@ -55,16 +54,13 @@ use crate::{Error, Result};
 /// [`Encryption`](definitions::crypto::Encryption) algorithm, only one
 /// identicon is selected, in order of preference: `Sr25519`, `Ed25519`,
 /// `Ecdsa`.
-pub fn get_all_seed_names_with_identicons<P>(
-    db_path: P,
+pub fn get_all_seed_names_with_identicons(
+    database: &sled::Db,
     names_phone_knows: &[String],
-) -> Result<Vec<SeedNameCard>>
-where
-    P: AsRef<Path>,
-{
+) -> Result<Vec<SeedNameCard>> {
     let mut data_set: HashMap<String, Vec<MultiSigner>> = HashMap::new();
     let mut derivation_count: HashMap<String, u32> = HashMap::new();
-    for (multisigner, address_details) in get_all_addresses(&db_path)?.into_iter() {
+    for (multisigner, address_details) in get_all_addresses(database)?.into_iter() {
         if address_details.is_root() {
             // found a seed key; could be any of the supported encryptions;
             match data_set.get(&address_details.seed_name) {
@@ -150,16 +146,13 @@ fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> SignerIma
 /// address to generate
 /// [`SufficientCrypto`](definitions::crypto::SufficientCrypto) for signing
 /// updates with the Signer.
-pub fn print_all_identities<P>(db_path: P) -> Result<Vec<MRawKey>>
-where
-    P: AsRef<Path>,
-{
-    Ok(get_all_addresses(&db_path)?
+pub fn print_all_identities(database: &sled::Db) -> Result<Vec<MRawKey>> {
+    Ok(get_all_addresses(database)?
         .into_iter()
         .filter_map(|(multisigner, address_details)| {
             match &address_details.network_id {
                 Some(id) => {
-                    let network_specs = get_network_specs(&db_path, id).unwrap();
+                    let network_specs = get_network_specs(&database, id).unwrap();
 
                     let address_key = AddressKey::new(
                         multisigner.clone(),
@@ -186,8 +179,8 @@ where
         .collect())
 }
 
-pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<MKeysNew> {
-    let (root, derived): (Vec<_>, Vec<_>) = get_addresses_by_seed_name(&db_path, seed_name)?
+pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNew> {
+    let (root, derived): (Vec<_>, Vec<_>) = get_addresses_by_seed_name(database, seed_name)?
         .into_iter()
         .partition(|(_, address)| address.is_root());
 
@@ -214,7 +207,8 @@ pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<
     let mut set = vec![];
     for (multisigner, address_details) in derived.into_iter() {
         if let Some(id) = &address_details.network_id {
-            let network_specs = get_network_specs(&db_path, id)?;
+            let network_specs = get_network_specs(database, id)?;
+
             let identicon = make_identicon_from_multisigner(
                 &multisigner,
                 network_specs.specs.encryption.identicon_style(),
@@ -259,15 +253,12 @@ pub fn keys_by_seed_name<P: AsRef<Path>>(db_path: P, seed_name: &str) -> Result<
 
 /// Get address-associated public data for all addresses from the Signer
 /// database with given seed name and network [`NetworkSpecsKey`].
-pub fn addresses_set_seed_name_network<P>(
-    db_path: P,
+pub fn addresses_set_seed_name_network(
+    database: &sled::Db,
     seed_name: &str,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<Vec<(MultiSigner, AddressDetails)>>
-where
-    P: AsRef<Path>,
-{
-    Ok(get_addresses_by_seed_name(db_path, seed_name)?
+) -> Result<Vec<(MultiSigner, AddressDetails)>> {
+    Ok(get_addresses_by_seed_name(database, seed_name)?
         .into_iter()
         .filter(|(_, address_details)| {
             address_details.network_id.as_ref() == Some(network_specs_key)
@@ -277,14 +268,11 @@ where
 
 /// Return `Vec` with network information for all networks in the Signer database,
 /// with bool indicator which one is currently selected.
-pub fn show_all_networks_with_flag<P>(
-    db_path: P,
+pub fn show_all_networks_with_flag(
+    database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<MNetworkMenu>
-where
-    P: AsRef<Path>,
-{
-    let mut networks: Vec<_> = get_all_networks(db_path)?
+) -> Result<MNetworkMenu> {
+    let mut networks: Vec<_> = get_all_networks(database)?
         .into_iter()
         .map(|network| {
             let network_specs_key_current =
@@ -301,11 +289,8 @@ where
 
 /// Make `Vec` with network information for all networks in the Signer database,
 /// without any selection.
-pub fn show_all_networks<P>(db_path: P) -> Result<Vec<MMNetwork>>
-where
-    P: AsRef<Path>,
-{
-    let networks = get_all_networks(db_path)?;
+pub fn show_all_networks(database: &sled::Db) -> Result<Vec<MMNetwork>> {
+    let networks = get_all_networks(database)?;
     let mut networks = networks
         .into_iter()
         .map(|n| MMNetwork {
@@ -326,11 +311,11 @@ where
 /// network on the list.
 ///
 /// If there are no networks in the system, throws error.
-pub fn first_network<P>(db_path: P) -> Result<Option<OrderedNetworkSpecs>>
-where
-    P: AsRef<Path>,
-{
-    let mut networks = get_all_networks(db_path)?;
+pub fn first_network(database: &sled::Db) -> Result<Option<OrderedNetworkSpecs>> {
+    let mut networks = get_all_networks(database)?;
+    if networks.is_empty() {
+        return Err(Error::NoNetworksAvailable);
+    }
     networks.sort_by(|a, b| a.order.cmp(&b.order));
     Ok(networks.get(0).cloned())
 }
@@ -345,22 +330,19 @@ where
 /// information is contained in the QR code. If there are multiple `Encryption`
 /// algorithms supported by the network, the only visible difference in exports
 /// would be the identicon.
-pub fn export_key<P>(
-    db_path: P,
+pub fn export_key(
+    database: &sled::Db,
     multisigner: &MultiSigner,
     expected_seed_name: &str,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<MKeyDetails>
-where
-    P: AsRef<Path>,
-{
-    let ordered_network_specs = get_network_specs(&db_path, network_specs_key)?;
+) -> Result<MKeyDetails> {
+    let ordered_network_specs = get_network_specs(database, network_specs_key)?;
     let network_specs = ordered_network_specs.specs;
     let address_key = AddressKey::new(multisigner.clone(), Some(network_specs.genesis_hash));
-    let address_details = get_address_details(&db_path, &address_key);
+    let address_details = get_address_details(&database, &address_key);
     let address_details = if address_details.is_err() {
         let address_key = AddressKey::new(multisigner.clone(), None);
-        get_address_details(db_path, &address_key)
+        get_address_details(database, &address_key)
     } else {
         address_details
     };
@@ -434,15 +416,15 @@ where
 ///
 /// Function inputs seed name, outputs `Vec` with all known derivations in all
 /// networks.
-pub fn backup_prep<P>(db_path: P, seed_name: &str) -> Result<MBackup>
-where
-    P: AsRef<Path>,
-{
-    let networks = get_all_networks(&db_path)?;
+pub fn backup_prep(database: &sled::Db, seed_name: &str) -> Result<MBackup> {
+    let networks = get_all_networks(database)?;
+    if networks.is_empty() {
+        return Err(Error::NoNetworksAvailable);
+    }
     let mut derivations = Vec::new();
     for network in networks.into_iter() {
         let id_set: Vec<_> = addresses_set_seed_name_network(
-            &db_path,
+            database,
             seed_name,
             &NetworkSpecsKey::from_parts(&network.specs.genesis_hash, &network.specs.encryption),
         )?
@@ -482,16 +464,13 @@ where
 // derivation path and same password if any password exists) - this mislabel
 // should be corrected, after json fix; `seed_name` in existing derivation
 // display also seems to be excessive
-pub fn derive_prep<P>(
-    _db_path: P,
+pub fn derive_prep(
+    _database: &sled::Db,
     seed_name: &str,
     _collision: Option<(MultiSigner, AddressDetails)>,
     _suggest: &str,
     _keyboard: bool,
-) -> Result<MDeriveKey>
-where
-    P: AsRef<Path>,
-{
+) -> Result<MDeriveKey> {
     Ok(MDeriveKey {
         seed_name: seed_name.to_string(),
     })
@@ -510,17 +489,14 @@ where
 /// Function makes only preliminary check on password-free derivations, it
 /// **does not** use seed phrase and does not calculate the [`AddressKey`], i.e.
 /// it can't check passworded derivations, and allows them to proceed anyway.
-pub fn dynamic_path_check<P>(
-    db_path: P,
+pub fn dynamic_path_check(
+    database: &sled::Db,
     seed_name: &str,
     path: &str,
     network_specs_key_hex: &str,
-) -> NavDerivationCheck
-where
-    P: AsRef<Path>,
-{
+) -> NavDerivationCheck {
     match NetworkSpecsKey::from_hex(network_specs_key_hex) {
-        Ok(key) => dynamic_path_check_unhexed(db_path, seed_name, path, &key),
+        Ok(key) => dynamic_path_check_unhexed(database, seed_name, path, &key),
         Err(e) => NavDerivationCheck {
             error: Some(e.to_string()),
             ..Default::default()
@@ -528,18 +504,15 @@ where
     }
 }
 
-fn dynamic_path_check_unhexed<P>(
-    db_path: P,
+fn dynamic_path_check_unhexed(
+    database: &sled::Db,
     seed_name: &str,
     path: &str,
     network_specs_key: &NetworkSpecsKey,
-) -> NavDerivationCheck
-where
-    P: AsRef<Path>,
-{
-    match get_network_specs(&db_path, network_specs_key) {
+) -> NavDerivationCheck {
+    match get_network_specs(database, network_specs_key) {
         Ok(ordered_network_specs) => {
-            match derivation_check(seed_name, path, network_specs_key, &db_path) {
+            match derivation_check(database, seed_name, path, network_specs_key) {
                 Ok(DerivationCheck::BadFormat) => NavDerivationCheck {
                     button_good: false,
                     ..Default::default()
@@ -603,13 +576,10 @@ where
 
 /// Return [`MNetworkDetails`] with network specs and metadata set information
 /// for network with given [`NetworkSpecsKey`].
-pub fn network_details_by_key<P>(
-    db_path: P,
+pub fn network_details_by_key(
+    database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<MNetworkDetails>
-where
-    P: AsRef<Path>,
-{
+) -> Result<MNetworkDetails> {
     let OrderedNetworkSpecs {
         specs:
             NetworkSpecs {
@@ -626,11 +596,11 @@ where
                 unit,
             },
         order,
-    } = get_network_specs(&db_path, network_specs_key)?;
+    } = get_network_specs(database, network_specs_key)?;
     let verifier_key = VerifierKey::from_parts(genesis_hash);
-    let general_verifier = get_general_verifier(&db_path)?;
-    let current_verifier = get_valid_current_verifier(&verifier_key, &db_path)?;
-    let meta: Vec<_> = get_meta_values_by_name(&db_path, &name)?
+    let general_verifier = get_general_verifier(database)?;
+    let current_verifier = get_valid_current_verifier(database, &verifier_key)?;
+    let meta: Vec<_> = get_meta_values_by_name(database, &name)?
         .into_iter()
         .map(|m| {
             let meta_hash = blake2_256(&m.meta);
@@ -671,19 +641,16 @@ where
 
 /// Return [`MManageMetadata`] with metadata details for network with given
 /// [`NetworkSpecsKey`] and given version.
-pub fn metadata_details<P>(
-    db_path: P,
+pub fn metadata_details(
+    database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
     network_version: u32,
-) -> Result<MManageMetadata>
-where
-    P: AsRef<Path>,
-{
-    let ordered_network_specs = get_network_specs(&db_path, network_specs_key)?;
+) -> Result<MManageMetadata> {
+    let ordered_network_specs = get_network_specs(database, network_specs_key)?;
     let network_specs = ordered_network_specs.specs;
     let meta_values =
-        get_meta_values_by_name_version(&db_path, &network_specs.name, network_version)?;
-    let networks: Vec<_> = get_all_networks(&db_path)?
+        get_meta_values_by_name_version(database, &network_specs.name, network_version)?;
+    let networks: Vec<_> = get_all_networks(database)?
         .into_iter()
         .filter(|a| a.specs.name == network_specs.name)
         .map(|network| MMMNetwork {
@@ -709,11 +676,8 @@ where
 }
 
 /// Make types status display.
-pub fn show_types_status<P>(db_path: P) -> Result<MTypesInfo>
-where
-    P: AsRef<Path>,
-{
-    match try_get_types(&db_path)? {
+pub fn show_types_status(database: &sled::Db) -> Result<MTypesInfo> {
+    match try_get_types(database)? {
         Some(a) => {
             let (types_hash, types_id_pic) = ContentLoadTypes::generate(&a).show();
             Ok(MTypesInfo {
@@ -748,12 +712,8 @@ pub fn print_new_seed(seed_name: &str) -> Result<MNewSeedBackup> {
 }
 
 /// Get database history tree checksum to be displayed in log screen.
-pub fn history_hex_checksum<P>(db_path: P) -> Result<String>
-where
-    P: AsRef<Path>,
-{
-    let database = open_db(&db_path)?;
-    let history = open_tree(&database, HISTORY)?;
+pub fn history_hex_checksum(database: &sled::Db) -> Result<String> {
+    let history = open_tree(database, HISTORY)?;
     let checksum = history.checksum()?;
     Ok(hex::encode(checksum.encode()).to_uppercase())
 }
@@ -762,13 +722,10 @@ where
 ///
 /// Function is intended for cases when transaction is declined by the user
 /// (e.g. user has scanned something, read it, clicked `back` or `decline`)
-pub fn purge_transactions<P>(db_path: P) -> Result<()>
-where
-    P: AsRef<Path>,
-{
+pub fn purge_transactions(database: &sled::Db) -> Result<()> {
     TrDbCold::new()
-        .set_transaction(make_batch_clear_tree(&db_path, TRANSACTION)?) // clear transaction
-        .apply(&db_path)
+        .set_transaction(make_batch_clear_tree(database, TRANSACTION)?) // clear transaction
+        .apply(database)
 }
 
 /// Get possible options of English `bip39` words that start with user-entered

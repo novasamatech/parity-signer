@@ -288,7 +288,8 @@ fn erase_public_keys(m: &mut ScreenData) {
 
 #[test]
 fn bulk_signing_test_unpassworded() {
-    let dbname = "for_tests/bulk_signing_test_unpassworded";
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
     let alice_westend_public =
         "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34".to_string();
     let tx = "a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33";
@@ -311,17 +312,17 @@ fn bulk_signing_test_unpassworded() {
     let payload = [&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat();
     let seeds = format!("{}\n{}", ALICE_SEED_PHRASE, ALICE_SEED_PHRASE);
 
-    populate_cold_nav_test(dbname).unwrap();
+    populate_cold_nav_test(&db).unwrap();
 
-    try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
+    try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
 
-    let mut tx_state = TransactionState::new(&hex::encode(payload), dbname);
+    let mut tx_state = TransactionState::new(&db, &hex::encode(payload));
 
     tx_state.update_seeds(&seeds);
 
     // Two passwordless transactions are signed with no further
     // interactions.
-    let result = tx_state.handle_sign(dbname).unwrap();
+    let result = tx_state.handle_sign(&db).unwrap();
 
     if let SignResult::Ready { signatures } = result {
         assert_eq!(signatures.len(), 2);
@@ -346,7 +347,8 @@ const WESTEND_GENESIS: &str = "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cf
 //   4) Produced signatures are valid.
 #[test]
 fn bulk_signing_test_passworded() {
-    let dbname = "for_tests/bulk_signing_test_passworded";
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
 
     let tx =
 "a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33";
@@ -371,13 +373,14 @@ fn bulk_signing_test_passworded() {
             .unwrap(),
     ));
 
-    populate_cold_nav_test(dbname).unwrap();
+    populate_cold_nav_test(&db).unwrap();
 
     // Create alice seeds.
-    try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
+    try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
 
     // Add passworded derivations.
     try_create_address(
+        &db,
         "Alice",
         ALICE_SEED_PHRASE,
         "//westend///password123",
@@ -385,11 +388,11 @@ fn bulk_signing_test_passworded() {
             &H256::from_str(WESTEND_GENESIS).unwrap(),
             &Encryption::Sr25519,
         ),
-        dbname,
     )
     .unwrap();
 
     try_create_address(
+        &db,
         "Alice",
         ALICE_SEED_PHRASE,
         "//westend///password345",
@@ -397,11 +400,10 @@ fn bulk_signing_test_passworded() {
             &H256::from_str(WESTEND_GENESIS).unwrap(),
             &Encryption::Sr25519,
         ),
-        dbname,
     )
     .unwrap();
 
-    db_handling::manage_history::clear_history(dbname).unwrap();
+    db_handling::manage_history::clear_history(&db).unwrap();
 
     // Prepare transactions and put them in the bulk.
     let tx_passworded_123_1 =
@@ -431,14 +433,14 @@ fn bulk_signing_test_passworded() {
 
     let payload = [&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat();
 
-    let mut tx_state = TransactionState::new(&hex::encode(payload), dbname);
+    let mut tx_state = TransactionState::new(&db, &hex::encode(payload));
     tx_state.update_seeds(&format!(
         "{}\n{}\n{}",
         ALICE_SEED_PHRASE, ALICE_SEED_PHRASE, ALICE_SEED_PHRASE
     ));
 
     // Begin signing process.
-    let result = tx_state.handle_sign(dbname).unwrap();
+    let result = tx_state.handle_sign(&db).unwrap();
 
     // The password is requested.
     assert_eq!(result, SignResult::RequestPassword { idx: 0, counter: 1 });
@@ -446,14 +448,14 @@ fn bulk_signing_test_passworded() {
     // A wrong password is provided.
     tx_state.password_entered("password_wrong");
 
-    let result = tx_state.handle_sign(dbname).unwrap();
+    let result = tx_state.handle_sign(&db).unwrap();
 
     // A password is requested another time.
     assert_eq!(result, SignResult::RequestPassword { idx: 0, counter: 2 });
 
     // A correct password is provided.
     tx_state.password_entered("password123");
-    let result = tx_state.handle_sign(dbname).unwrap();
+    let result = tx_state.handle_sign(&db).unwrap();
 
     // Two first transactions for the first key are signed,
     // password is requested for the second transaction.
@@ -462,7 +464,7 @@ fn bulk_signing_test_passworded() {
 
     // Password is provided.
     tx_state.password_entered("password345");
-    let result = tx_state.handle_sign(dbname).unwrap();
+    let result = tx_state.handle_sign(&db).unwrap();
 
     // All signatures are ready, check them.
     if let SignResult::Ready { signatures } = result {
@@ -475,7 +477,7 @@ fn bulk_signing_test_passworded() {
         panic!("Unexpected sign result: {:?}", result);
     }
 
-    let mut log = db_handling::manage_history::get_history(dbname).unwrap();
+    let mut log = db_handling::manage_history::get_history(&db).unwrap();
 
     for l in log.iter_mut() {
         l.1.timestamp = String::new();
@@ -569,17 +571,20 @@ fn export_import_addrs() {
     let westend_genesis =
         H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
 
-    populate_cold_nav_test(dbname_from).unwrap();
-    populate_cold_nav_test(dbname_to).unwrap();
-    try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname_from).unwrap();
-    try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname_to).unwrap();
+    let db_from = sled::open(dbname_from).unwrap();
+    let db_to = sled::open(dbname_to).unwrap();
+
+    populate_cold_nav_test(&db_from).unwrap();
+    populate_cold_nav_test(&db_to).unwrap();
+    try_create_seed(&db_from, "Alice", ALICE_SEED_PHRASE, true).unwrap();
+    try_create_seed(&db_to, "Alice", ALICE_SEED_PHRASE, true).unwrap();
 
     try_create_address(
+        &db_from,
         "Alice",
         ALICE_SEED_PHRASE,
         "//secret///abracadabra",
         &NetworkSpecsKey::from_parts(&westend_genesis, &Encryption::Sr25519),
-        dbname_from,
     )
     .unwrap();
 
@@ -587,8 +592,8 @@ fn export_import_addrs() {
     alice_seeds.insert("Alice".to_owned(), ALICE_SEED_PHRASE.to_owned());
 
     let selected = HashMap::from([("Alice".to_owned(), ExportedSet::All)]);
-    let addrs = export_all_addrs(dbname_from, selected.clone()).unwrap();
-    let addrs = prepare_derivations_preview(dbname_from, addrs).unwrap();
+    let addrs = export_all_addrs(&db_from, selected.clone()).unwrap();
+    let addrs = prepare_derivations_preview(&db_from, addrs).unwrap();
     let addrs = inject_derivations_has_pwd(addrs, alice_seeds.clone()).unwrap();
 
     let addrs_expected = vec![SeedKeysPreview {
@@ -677,8 +682,8 @@ fn export_import_addrs() {
             }],
         },
     );
-    let addrs_filtered = export_all_addrs(dbname_from, selected_hashmap).unwrap();
-    let addrs_filtered = prepare_derivations_preview(dbname_from, addrs_filtered).unwrap();
+    let addrs_filtered = export_all_addrs(&db_from, selected_hashmap).unwrap();
+    let addrs_filtered = prepare_derivations_preview(&db_from, addrs_filtered).unwrap();
     let addrs_filtered = inject_derivations_has_pwd(addrs_filtered, alice_seeds.clone()).unwrap();
 
     let addrs_expected_filtered = vec![SeedKeysPreview {
@@ -704,10 +709,10 @@ fn export_import_addrs() {
 
     assert_eq!(addrs_filtered, addrs_expected_filtered);
 
-    import_all_addrs(dbname_to, addrs).unwrap();
+    import_all_addrs(&db_to, addrs).unwrap();
 
-    let addrs_new = export_all_addrs(dbname_to, selected).unwrap();
-    let addrs_new = prepare_derivations_preview(dbname_from, addrs_new).unwrap();
+    let addrs_new = export_all_addrs(&db_to, selected).unwrap();
+    let addrs_new = prepare_derivations_preview(&db_from, addrs_new).unwrap();
     let addrs_new = inject_derivations_has_pwd(addrs_new, alice_seeds).unwrap();
     assert_eq!(addrs_new, addrs_expected);
 }
@@ -716,10 +721,10 @@ fn export_import_addrs() {
 #[ignore]
 fn flow_test_1() {
     let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
-    populate_cold_nav_test(dbname).unwrap();
-    init_db(dbname, verifier_alice_sr25519()).unwrap();
-    let mut state = State::default();
-    state.init_navigation(dbname, Vec::new()).unwrap();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_nav_test(&db).unwrap();
+    init_db(&db, verifier_alice_sr25519()).unwrap();
+    let mut state = State::init_navigation(db.clone(), vec![]);
 
     let action = state.perform(Action::Start, "", "").unwrap();
     let expected_action = ActionResult {
@@ -3389,7 +3394,7 @@ fn flow_test_1() {
         "BackupSeed on Keys screen with SeedMenu button. Expected Keys screen with Backup modal"
     );
     // mock signal from phone; elsewise untestable;
-    db_handling::manage_history::seed_name_was_shown(dbname, String::from("Alice")).unwrap();
+    db_handling::manage_history::seed_name_was_shown(&db, String::from("Alice")).unwrap();
 
     let mut action = state.perform(Action::NavbarLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
@@ -3802,7 +3807,7 @@ fn flow_test_1() {
     let mut seeds = HashMap::new();
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
     let seed_keys = inject_derivations_has_pwd(seed_keys, seeds).unwrap();
-    import_all_addrs(dbname, seed_keys).unwrap();
+    import_all_addrs(&db, seed_keys).unwrap();
 
     // After successful import => select seed
     let action = state.perform(Action::GoForward, "", "").unwrap();
@@ -4120,7 +4125,7 @@ fn flow_test_1() {
         )
     );
     // mock signal from phone
-    db_handling::manage_history::seed_name_was_shown(dbname, String::from("Alice")).unwrap();
+    db_handling::manage_history::seed_name_was_shown(&db, String::from("Alice")).unwrap();
 
     state.perform(Action::NavbarSettings, "", "").unwrap();
     state.perform(Action::ManageNetworks, "", "").unwrap();
@@ -5417,7 +5422,7 @@ fn flow_test_1() {
     };
 
     let (pepper_westend_public, pepper_westend_base58, pepper_westend_identicon) = {
-        let res = keys_by_seed_name(dbname, "Pepper")
+        let res = keys_by_seed_name(&db, "Pepper")
             .unwrap()
             .set
             .iter()
@@ -5709,7 +5714,7 @@ fn flow_test_1() {
         .perform(Action::GoForward, "//0///secret", &seed_phrase_pepper)
         .unwrap();
     let (pepper_key0_public, _pepper_key0_base58, _pepper_key0_identicon) = {
-        let res = keys_by_seed_name(dbname, "Pepper")
+        let res = keys_by_seed_name(&db, "Pepper")
             .unwrap()
             .set
             .iter()
@@ -6164,7 +6169,7 @@ fn flow_test_1() {
     */
 
     // no init after population
-    populate_cold_nav_test(dbname).unwrap();
+    populate_cold_nav_test(&db).unwrap();
     let action = state.perform(Action::NavbarSettings, "", "").unwrap();
     let expected_action = ActionResult {
         screen_label: String::new(),

@@ -68,7 +68,7 @@ struct BackupModal: View {
                                     .font(PrimaryFont.bodyL.font)
                                 Spacer()
                             }
-                            SeedPhraseView(viewModel: viewModel.seedPhrase)
+                            SeedPhraseView(viewModel: .init(dataModel: viewModel.seedPhrase))
                             // Derived Keys
                             HStack {
                                 Localizable.BackupModal.Label.derived.text

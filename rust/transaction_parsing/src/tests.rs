@@ -28,6 +28,7 @@ use sp_core::H256;
 use sp_runtime::MultiSigner;
 use std::convert::TryFrom;
 use std::{fs, str::FromStr};
+use tempfile::tempdir;
 
 const ALICE: [u8; 32] = [
     212, 53, 147, 199, 21, 253, 211, 28, 97, 20, 26, 189, 4, 169, 159, 214, 130, 44, 133, 88, 133,
@@ -78,13 +79,10 @@ fn westend_spec() -> OrderedNetworkSpecs {
 
 #[test]
 fn add_specs_westend_no_network_info_not_signed() {
-    let dbname = "for_tests/add_specs_westend_no_network_info_not_signed";
-    populate_cold_no_networks(dbname, Verifier { v: None }).unwrap();
-    let current_history: Vec<_> = get_history(dbname)
-        .unwrap()
-        .into_iter()
-        .map(|e| e.1)
-        .collect();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_no_networks(&db, Verifier { v: None }).unwrap();
+    let current_history: Vec<_> = get_history(&db).unwrap().into_iter().map(|e| e.1).collect();
     assert!(entries_contain_event(
         &current_history,
         &Event::DatabaseInitiated
@@ -136,7 +134,7 @@ fn add_specs_westend_no_network_info_not_signed() {
         ..Default::default()
     };
 
-    let output = produce_output(line.trim(), dbname);
+    let output = produce_output(&db, line.trim());
 
     if let TransactionAction::Stub { s, u: _, stub } = output {
         assert_eq!(*s, card_set_known);
@@ -150,10 +148,12 @@ fn add_specs_westend_no_network_info_not_signed() {
 
 #[test]
 fn add_specs_westend_not_signed() {
-    let dbname = "for_tests/add_specs_westend_not_signed";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend_unverified.txt").unwrap();
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     let expected_action = TransactionAction::Read {
         r: Box::new(TransactionCardSet {
             error: Some(vec![TransactionCard {
@@ -170,10 +170,11 @@ fn add_specs_westend_not_signed() {
 
 #[test]
 fn add_specs_westend_not_signed_general_verifier_disappear() {
-    let dbname = "for_tests/add_specs_westend_not_signed_general_verifier_disappear";
-    populate_cold(dbname, verifier_alice_sr25519()).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend_unverified.txt").unwrap();
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     let expected_action = TransactionAction::Read {
         r: Box::new(TransactionCardSet {
             error: Some(vec![TransactionCard {
@@ -191,10 +192,11 @@ fn add_specs_westend_not_signed_general_verifier_disappear() {
 
 #[test]
 fn load_types_known_not_signed() {
-    let dbname = "for_tests/load_types_known_not_signed";
-    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_no_metadata(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/types_info_None.txt").unwrap();
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     let expected_action = TransactionAction::Read {
         r: Box::new(TransactionCardSet {
             error: Some(vec![TransactionCard {
@@ -215,10 +217,11 @@ fn load_types_known_not_signed() {
 
 #[test]
 fn load_types_known_not_signed_general_verifier_disappear() {
-    let dbname = "for_tests/load_types_known_not_signed_general_verifier_disappear";
-    populate_cold_no_metadata(dbname, verifier_alice_sr25519()).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_no_metadata(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/types_info_None.txt").unwrap();
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     let expected_action = TransactionAction::Read {
         r: Box::new(TransactionCardSet {
             error: Some(vec![TransactionCard {
@@ -238,10 +241,11 @@ fn load_types_known_not_signed_general_verifier_disappear() {
 
 #[test]
 fn load_types_known_alice_signed() {
-    let dbname = "for_tests/load_types_known_alice_signed";
-    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
-    let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
 
+    populate_cold_no_metadata(&db, Verifier { v: None }).unwrap();
+    let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
     let expected_warning_1 =  "Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Kusama, Polkadot, Westend; affected metadata entries: none. Types information is purged.".to_string();
 
     let warning = Some(vec![
@@ -297,7 +301,7 @@ fn load_types_known_alice_signed() {
         ..Default::default()
     };
 
-    let output = produce_output(line.trim(), dbname);
+    let output = produce_output(&db, line.trim());
     if let TransactionAction::Stub {
         s: reply,
         u: _,
@@ -314,8 +318,9 @@ fn load_types_known_alice_signed() {
 
 #[test]
 fn load_types_known_alice_signed_known_general_verifier() {
-    let dbname = "for_tests/load_types_known_alice_signed_known_general_verifier";
-    populate_cold_no_metadata(dbname, verifier_alice_sr25519()).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_no_metadata(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
     let reply_known = TransactionCardSet {
         error: Some(vec![TransactionCard {
@@ -329,7 +334,7 @@ fn load_types_known_alice_signed_known_general_verifier() {
         ..Default::default()
     };
 
-    let output = produce_output(line.trim(), dbname);
+    let output = produce_output(&db, line.trim());
     if let TransactionAction::Read { r: reply } = output {
         assert_eq!(*reply, reply_known);
     } else {
@@ -340,8 +345,9 @@ fn load_types_known_alice_signed_known_general_verifier() {
 
 #[test]
 fn load_types_known_alice_signed_bad_general_verifier() {
-    let dbname = "for_tests/load_types_known_alice_signed_bad_general_verifier";
-    populate_cold_no_metadata(dbname, verifier_alice_ed25519()).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_no_metadata(&db, verifier_alice_ed25519()).unwrap();
     let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
     let action_expected = TransactionCardSet {
         error: Some(vec![TransactionCard {
@@ -352,7 +358,7 @@ fn load_types_known_alice_signed_bad_general_verifier() {
         ..Default::default()
     };
 
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Read { r: reply } = action {
         assert_eq!(*reply, action_expected);
     } else {
@@ -363,8 +369,9 @@ fn load_types_known_alice_signed_bad_general_verifier() {
 
 #[test]
 fn load_types_known_alice_signed_metadata_hold() {
-    let dbname = "for_tests/load_types_known_alice_signed_metadata_hold";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
     let set_expected = TransactionCardSet {
         verifier: Some(vec![TransactionCard {
@@ -403,7 +410,7 @@ fn load_types_known_alice_signed_metadata_hold() {
         ..Default::default()
     };
 
-    let output = produce_output(line.trim(), dbname);
+    let output = produce_output(&db, line.trim());
     if let TransactionAction::Stub { s: set, u: _, stub } = output {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, StubNav::LoadTypes);
@@ -415,8 +422,9 @@ fn load_types_known_alice_signed_metadata_hold() {
 
 #[test]
 fn load_types_unknown_not_signed() {
-    let dbname = "for_tests/load_types_unknown_not_signed";
-    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_no_metadata(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/updating_types_info_None.txt").unwrap();
     let expected_set = TransactionCardSet {
         warning: Some(vec![
@@ -454,7 +462,7 @@ fn load_types_unknown_not_signed() {
         ..Default::default()
     };
 
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(stub, StubNav::LoadTypes);
         assert_eq!(*set, expected_set);
@@ -466,8 +474,9 @@ fn load_types_unknown_not_signed() {
 
 #[test]
 fn load_types_unknown_alice_signed() {
-    let dbname = "for_tests/load_types_unknown_alice_signed";
-    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_no_metadata(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/updating_types_info_Alice.txt").unwrap();
     let expected_set = TransactionCardSet {
         verifier: Some(vec![TransactionCard {
@@ -505,20 +514,20 @@ fn load_types_unknown_alice_signed() {
         ..Default::default()
     };
 
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, expected_set);
         assert_eq!(stub, StubNav::LoadTypes);
     } else {
         panic!("Wrong action {:?}", action)
     }
-    fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
 fn parse_transaction_westend_50_not_in_db() {
-    let dbname = "for_tests/parse_transaction_westend_50_not_in_db";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003200000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
     let expected_set = TransactionCardSet {
         error: Some(vec![TransactionCard {
@@ -529,19 +538,19 @@ fn parse_transaction_westend_50_not_in_db() {
         ..Default::default()
     };
 
-    let action = produce_output(line, dbname);
+    let action = produce_output(&db, line);
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, expected_set);
     } else {
         panic!("Wrong action {:?}", action)
     }
-    fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
 fn parse_transaction_1() {
-    let dbname = "for_tests/parse_transaction_1";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
     let content_known = TransactionCardSet {
@@ -700,7 +709,7 @@ fn parse_transaction_1() {
         },
         order: 2,
     };
-    let output = produce_output(line, dbname);
+    let output = produce_output(&db, line);
     if let TransactionAction::Sign { actions, .. } = output {
         let TransactionSignAction {
             content,
@@ -722,8 +731,9 @@ fn parse_transaction_1() {
 
 #[test]
 fn parse_transaction_2() {
-    let dbname = "for_tests/parse_transaction_2";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d550210020c060000d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0700b864d9450006050800aebb0211dbb07b4d335a657257b8ac5e53794c901e4f616d4a254f2490c43934009ae581fef1fc06828723715731adcf810e42ce4dadad629b1b7fa5c3c144a81d0608008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48f501b4003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e314e9f9aef4e836a54bdd109aba380106e05e2ea83fbc490206b476840cd68e3e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
     let docs1 = " Send a batch of dispatch calls and atomically execute them.\n The whole transaction will rollback and fail if any of the calls failed.\n\n May be called from any origin.\n\n - `calls`: The calls to be dispatched from the same origin.\n\n If origin is root then call are dispatch without checking origin filter. (This includes\n bypassing `frame_system::Config::BaseCallFilter`).\n\n # <weight>\n - Complexity: O(C) where C is the number of calls to be batched.\n # </weight>".to_string();
 
@@ -1029,7 +1039,7 @@ fn parse_transaction_2() {
     };
     let network_info_known = westend_spec();
 
-    let action = produce_output(line, dbname);
+    let action = produce_output(&db, line);
     if let TransactionAction::Sign { actions, .. } = action {
         let TransactionSignAction {
             content,
@@ -1051,8 +1061,9 @@ fn parse_transaction_2() {
 
 #[test]
 fn parse_transaction_3() {
-    let dbname = "for_tests/parse_transaction_3";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27dac0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480f00c06e31d91001750365010f00c06e31d910013223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423ea8dfb73a4b44e6bf84affe258954c12db1fe8e8cf00b965df2af2f49c1ec11cde143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
     let docs1 = " Same as the [`transfer`] call, but with a check that the transfer will not kill the\n origin account.\n\n 99% of the time you want [`transfer`] instead.\n\n [`transfer`]: struct.Pallet.html#method.transfer\n # <weight>\n - Cheaper than transfer because account cannot be killed.\n - Base Weight: 51.4 µs\n - DB Weight: 1 Read and 1 Write to dest (sender is in overlay already)\n #</weight>".to_string();
@@ -1197,7 +1208,7 @@ fn parse_transaction_3() {
         },
     };
     let network_info_known = westend_spec();
-    let output = produce_output(line, dbname);
+    let output = produce_output(&db, line);
     if let TransactionAction::Sign { actions, .. } = output {
         let TransactionSignAction {
             content,
@@ -1214,13 +1225,14 @@ fn parse_transaction_3() {
     } else {
         panic!("Wrong action {:?}", output)
     }
-    fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
 fn load_westend9070_not_signed() {
-    let dbname = "for_tests/load_westend9070_not_signed";
-    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_no_metadata(&db, Verifier { v: None }).unwrap();
+
     let line = fs::read_to_string("for_tests/network_metadata_westendV9070_None.txt").unwrap();
     let set_expected = TransactionCardSet {
         warning: Some(vec![TransactionCard {
@@ -1255,20 +1267,20 @@ fn load_westend9070_not_signed() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
     } else {
         panic!("Wrong action {:?}", action)
     }
-    fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
 fn load_westend9070_alice_signed() {
-    let dbname = "for_tests/load_westend9070_alice_signed";
-    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_no_metadata(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/network_metadata_westendV9070_Alice.txt").unwrap();
     let set_expected = TransactionCardSet {
         error: Some(vec![TransactionCard {
@@ -1278,19 +1290,19 @@ fn load_westend9070_alice_signed() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Read { r: reply } = action {
         assert_eq!(*reply, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
-    fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
 fn load_westend9000_already_in_db_not_signed() {
-    let dbname = "for_tests/load_westend9000_already_in_db_not_signed";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/network_from_db_westendV9000_None.txt").unwrap();
     let set_expected = TransactionCardSet {
         error: Some(vec![TransactionCard {
@@ -1303,7 +1315,7 @@ fn load_westend9000_already_in_db_not_signed() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -1314,8 +1326,9 @@ fn load_westend9000_already_in_db_not_signed() {
 
 #[test]
 fn load_westend9000_already_in_db_alice_signed() {
-    let dbname = "for_tests/load_westend9000_already_in_db_alice_signed";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/network_from_db_westendV9000_Alice.txt").unwrap();
     let set_expected = TransactionCardSet {
         error: Some(vec![TransactionCard {
@@ -1328,19 +1341,19 @@ fn load_westend9000_already_in_db_alice_signed() {
         ..Default::default()
     };
 
-    let output = produce_output(line.trim(), dbname);
+    let output = produce_output(&db, line.trim());
     if let TransactionAction::Read { r: set } = output {
         assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", output)
     }
-    fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
 fn load_westend9000_already_in_db_alice_signed_known_general_verifier() {
-    let dbname = "for_tests/load_westend9000_already_in_db_alice_signed_known_general_verifier";
-    populate_cold(dbname, verifier_alice_sr25519()).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/network_from_db_westendV9000_Alice.txt").unwrap();
     let set_expected = TransactionCardSet {
         error: Some(vec![TransactionCard {
@@ -1354,19 +1367,19 @@ fn load_westend9000_already_in_db_alice_signed_known_general_verifier() {
         ..Default::default()
     };
 
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
-    fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
 fn load_westend9000_already_in_db_alice_signed_bad_general_verifier() {
-    let dbname = "for_tests/load_westend9000_already_in_db_alice_signed_bad_general_verifier";
-    populate_cold(dbname, verifier_alice_ed25519()).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, verifier_alice_ed25519()).unwrap();
     let line = fs::read_to_string("for_tests/network_from_db_westendV9000_Alice.txt").unwrap();
     let set_expected = TransactionCardSet {
         error: Some(vec![TransactionCard {
@@ -1376,19 +1389,19 @@ fn load_westend9000_already_in_db_alice_signed_bad_general_verifier() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
         panic!("Wrong action {:?}", action)
     }
-    fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
 fn load_dock31_unknown_network() {
-    let dbname = "for_tests/load_dock31_unknown_network";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line =
         fs::read_to_string("for_tests/load_metadata_dock-pos-main-runtimeV31_unverified.txt")
             .unwrap();
@@ -1401,7 +1414,7 @@ fn load_dock31_unknown_network() {
        ..Default::default()
     };
 
-    let output = produce_output(line.trim(), dbname);
+    let output = produce_output(&db, line.trim());
     if let TransactionAction::Read { r: set } = output {
         assert_eq!(*set, set_expected);
     } else {
@@ -1412,8 +1425,9 @@ fn load_dock31_unknown_network() {
 
 #[test]
 fn add_specs_dock_not_verified_db_not_verified() {
-    let dbname = "for_tests/add_specs_dock_not_verified_db_not_verified";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt")
             .unwrap();
@@ -1457,7 +1471,7 @@ fn add_specs_dock_not_verified_db_not_verified() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1469,8 +1483,9 @@ fn add_specs_dock_not_verified_db_not_verified() {
 
 #[test]
 fn add_specs_dock_alice_verified_db_not_verified() {
-    let dbname = "for_tests/add_specs_dock_alice_verified_db_not_verified";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-sr25519.txt")
             .unwrap();
@@ -1522,7 +1537,7 @@ fn add_specs_dock_alice_verified_db_not_verified() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1534,8 +1549,9 @@ fn add_specs_dock_alice_verified_db_not_verified() {
 
 #[test]
 fn add_specs_dock_not_verified_db_alice_verified() {
-    let dbname = "for_tests/add_specs_dock_not_verified_db_alice_verified";
-    populate_cold(dbname, verifier_alice_sr25519()).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt")
             .unwrap();
@@ -1579,7 +1595,7 @@ fn add_specs_dock_not_verified_db_alice_verified() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1591,8 +1607,9 @@ fn add_specs_dock_not_verified_db_alice_verified() {
 
 #[test]
 fn add_specs_dock_both_verified_same() {
-    let dbname = "for_tests/add_specs_dock_both_verified_same";
-    populate_cold(dbname, verifier_alice_sr25519()).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-sr25519.txt")
             .unwrap();
@@ -1643,7 +1660,7 @@ fn add_specs_dock_both_verified_same() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1655,8 +1672,9 @@ fn add_specs_dock_both_verified_same() {
 
 #[test]
 fn add_specs_dock_both_verified_different() {
-    let dbname = "for_tests/add_specs_dock_both_verified_different";
-    populate_cold(dbname, verifier_alice_sr25519()).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt")
             .unwrap();
@@ -1707,7 +1725,7 @@ fn add_specs_dock_both_verified_different() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1719,8 +1737,9 @@ fn add_specs_dock_both_verified_different() {
 
 #[test]
 fn add_specs_westend_ed25519_not_signed() {
-    let dbname = "for_tests/add_specs_westend_ed25519_not_signed";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified.txt").unwrap();
     let set_expected = TransactionCardSet {
         warning: Some(vec![TransactionCard {
@@ -1761,7 +1780,7 @@ fn add_specs_westend_ed25519_not_signed() {
             &Encryption::Ed25519,
         ),
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1773,8 +1792,9 @@ fn add_specs_westend_ed25519_not_signed() {
 
 #[test]
 fn add_specs_bad_westend_ed25519_not_signed() {
-    let dbname = "for_tests/add_specs_bad_westend_ed25519_not_signed";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line =
         fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified_bad_ones.txt").unwrap();
     let set_expected = TransactionCardSet {
@@ -1786,7 +1806,7 @@ fn add_specs_bad_westend_ed25519_not_signed() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -1797,8 +1817,9 @@ fn add_specs_bad_westend_ed25519_not_signed() {
 
 #[test]
 fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
-    let dbname = "for_tests/add_specs_westend_ed25519_alice_signed_db_not_verified";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_Alice-sr25519.txt").unwrap();
     let warning_str = "Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Kusama, Polkadot, Westend; affected metadata entries: kusama2030, polkadot30, westend9000, westend9010. Types information is purged.".to_string();
 
@@ -1853,7 +1874,7 @@ fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
             &Encryption::Ed25519,
         ),
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1865,8 +1886,9 @@ fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
 
 #[test]
 fn add_specs_westend_ed25519_not_verified_db_alice_verified() {
-    let dbname = "for_tests/add_specs_westend_ed25519_not_verified_db_alice_verified";
-    populate_cold(dbname, verifier_alice_sr25519()).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified.txt").unwrap();
     let set_expected = TransactionCardSet {
         error: Some(vec![TransactionCard {
@@ -1877,7 +1899,7 @@ fn add_specs_westend_ed25519_not_verified_db_alice_verified() {
         ..Default::default()
     };
 
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -1888,8 +1910,9 @@ fn add_specs_westend_ed25519_not_verified_db_alice_verified() {
 
 #[test]
 fn add_specs_westend_ed25519_both_verified_same() {
-    let dbname = "for_tests/add_specs_westend_ed25519_both_verified_same";
-    populate_cold(dbname, verifier_alice_sr25519()).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_Alice-sr25519.txt").unwrap();
     let set_expected = TransactionCardSet {
         verifier: Some(vec![TransactionCard {
@@ -1938,7 +1961,7 @@ fn add_specs_westend_ed25519_both_verified_same() {
             &Encryption::Ed25519,
         ),
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1950,8 +1973,9 @@ fn add_specs_westend_ed25519_both_verified_same() {
 
 #[test]
 fn add_specs_westend_ed25519_both_verified_different() {
-    let dbname = "for_tests/add_specs_westend_ed25519_both_verified_different";
-    populate_cold(dbname, verifier_alice_sr25519()).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_Alice-ed25519.txt").unwrap();
     let error = "Bad input data. General verifier in the database is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Received westend network information could be accepted only if verified by the same general verifier. Current message is verified by public key: 88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee, encryption: ed25519.".to_string();
     let set_expected = TransactionCardSet {
@@ -1962,7 +1986,7 @@ fn add_specs_westend_ed25519_both_verified_different() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(line.trim(), dbname);
+    let action = produce_output(&db, line.trim());
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -1973,8 +1997,9 @@ fn add_specs_westend_ed25519_both_verified_different() {
 
 #[test]
 fn parse_transaction_4_unknown_author() {
-    let dbname = "for_tests/parse_transaction_4_unknown_author";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = "5301008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48a4040300d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
     let docs = " Same as the [`transfer`] call, but with a check that the transfer will not kill the\n origin account.\n\n 99% of the time you want [`transfer`] instead.\n\n [`transfer`]: struct.Pallet.html#method.transfer\n # <weight>\n - Cheaper than transfer because account cannot be killed.\n - Base Weight: 51.4 µs\n - DB Weight: 1 Read and 1 Write to dest (sender is in overlay already)\n #</weight>".to_string();
@@ -2120,7 +2145,7 @@ fn parse_transaction_4_unknown_author() {
         ..Default::default()
     };
 
-    let action = produce_output(line, dbname);
+    let action = produce_output(&db, line);
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2131,8 +2156,9 @@ fn parse_transaction_4_unknown_author() {
 
 #[test]
 fn parse_transaction_5_unknown_network() {
-    let dbname = "for_tests/parse_transaction_5_unknown_network";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = "530102761291ee5faf5b5b67b028aa7e28fb1271bf40af17a486b368e8c7de86ad3c62a8030300761291ee5faf5b5b67b028aa7e28fb1271bf40af17a486b368e8c7de86ad3c620b00407a10f35aa707000b00a0724e1809140000000a000000f7a99d3cb92853d00d5275c971c132c074636256583fee53b3bbe60d7b8769badc21d36b69bae1e8a41dedb34758567ba4efe711412f33d1461f795ffcd1de13f7a99d3cb92853d00d5275c971c132c074636256583fee53b3bbe60d7b8769ba";
     let set_expected = TransactionCardSet {
         author: Some(vec![TransactionCard {
@@ -2154,7 +2180,7 @@ fn parse_transaction_5_unknown_network() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(line, dbname);
+    let action = produce_output(&db, line);
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2165,8 +2191,10 @@ fn parse_transaction_5_unknown_network() {
 
 #[test]
 fn parse_transaction_6_error_on_parsing() {
-    let dbname = "for_tests/parse_transaction_6_error_on_parsing";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403018eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
     let error = "Bad input data. Error parsing incoming transaction content. After decoding the method some data remained unused.".to_string();
@@ -2255,7 +2283,7 @@ fn parse_transaction_6_error_on_parsing() {
         ..Default::default()
     };
 
-    let action = produce_output(line, dbname);
+    let action = produce_output(&db, line);
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2266,8 +2294,9 @@ fn parse_transaction_6_error_on_parsing() {
 
 #[test]
 fn parse_transaction_7_error_on_parsing() {
-    let dbname = "for_tests/parse_transaction_7_error_on_parsing";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403068eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
     let error = "Bad input data. Error parsing incoming transaction content. Encountered unexpected enum variant."
@@ -2357,7 +2386,7 @@ fn parse_transaction_7_error_on_parsing() {
         ..Default::default()
     };
 
-    let action = produce_output(line, dbname);
+    let action = produce_output(&db, line);
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2368,8 +2397,9 @@ fn parse_transaction_7_error_on_parsing() {
 
 #[test]
 fn parse_transaction_8_error_on_parsing() {
-    let dbname = "for_tests/parse_transaction_8_error_on_parsing";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403028eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
     let data = "Bad input data. Error parsing incoming transaction content. Data too short for expected content."
@@ -2460,7 +2490,7 @@ fn parse_transaction_8_error_on_parsing() {
         ..Default::default()
     };
 
-    let action = produce_output(line, dbname);
+    let action = produce_output(&db, line);
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2471,8 +2501,9 @@ fn parse_transaction_8_error_on_parsing() {
 
 #[test]
 fn parse_msg_1() {
-    let dbname = "for_tests/parse_msg_1";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let sign_msg = hex::encode(b"<Bytes>uuid-abcd</Bytes>");
     let text = String::from("uuid-abcd");
     let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", sign_msg);
@@ -2505,7 +2536,7 @@ fn parse_msg_1() {
     };
 
     let network_info_known = westend_spec();
-    let action = produce_output(&line, dbname);
+    let action = produce_output(&db, &line);
 
     if let TransactionAction::Sign { actions, .. } = action {
         let TransactionSignAction {
@@ -2527,8 +2558,9 @@ fn parse_msg_1() {
 
 #[test]
 fn parse_msg_2() {
-    let dbname = "for_tests/parse_msg_2";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     // sneaking one extra byte in the text body
     let sign_msg = hex::encode(b"<Bytes>uuid-abcd");
     let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", sign_msg);
@@ -2542,7 +2574,7 @@ fn parse_msg_2() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(&line, dbname);
+    let action = produce_output(&db, &line);
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2553,8 +2585,9 @@ fn parse_msg_2() {
 
 #[test]
 fn import_derivations() {
-    let dbname = "for_tests/import_derivations";
-    populate_cold(dbname, Verifier { v: None }).unwrap();
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
     let line = "53ffde00041c6d7920736565640146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a04c0354847694263466745424d6754364745756f395341393873426e4767774874504b44586955756b5436617143724b457801302f2f77657374656e642f2f3001e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
     let set_expected = TransactionCardSet {
         importing_derivations: Some(vec![TransactionCard {
@@ -2594,7 +2627,7 @@ fn import_derivations() {
         ..Default::default()
     };
 
-    let action = produce_output(line, dbname);
+    let action = produce_output(&db, line);
     if let TransactionAction::Derivations { content: set } = action {
         assert_eq!(*set, set_expected);
     } else {

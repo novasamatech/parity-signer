@@ -52,7 +52,6 @@ final class ExportMultipleKeysService {
             let result: Result<AnimatedQRCodeViewModel, ServiceError>
             do {
                 let qrCodes = try exportKeyInfo(
-                    dbname: self.databaseMediator.databaseName,
                     selectedNames: selectedItems
                 ).frames
                 result = .success(AnimatedQRCodeViewModel(qrCodes: qrCodes.map(\.payload)))

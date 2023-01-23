@@ -12,6 +12,9 @@ use sp_runtime::MultiSigner;
 /// DB handling error type.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    #[error("No networks available")]
+    NoNetworksAvailable,
+
     #[error(transparent)]
     DbTransactionError(#[from] sled::transaction::TransactionError),
 

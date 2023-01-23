@@ -34,12 +34,11 @@ use definitions::{
 use crate::error::{Error, Result};
 
 ///State of the app as remembered by backend
-#[derive(Default, Clone)]
+#[derive(Clone)]
 pub struct State {
     navstate: Navstate,
-    dbname: Option<String>,
+    db: sled::Db,
     seed_names: Vec<String>,
-    networks: Vec<NetworkSpecsKey>,
 }
 
 ///Navigation state is completely defined here
@@ -67,19 +66,12 @@ impl Default for Navstate {
 }
 
 impl State {
-    pub fn init_navigation(&mut self, dbname: &str, seed_names: Vec<String>) -> Result<()> {
-        self.seed_names = seed_names;
-        self.dbname = Some(dbname.to_string());
-
-        let networks = db_handling::helpers::get_all_networks(dbname)?;
-        for x in &networks {
-            self.networks.push(NetworkSpecsKey::from_parts(
-                &x.specs.genesis_hash,
-                &x.specs.encryption,
-            ));
+    pub fn init_navigation(db: sled::Db, seed_names: Vec<String>) -> Self {
+        Self {
+            navstate: Navstate::new(),
+            db,
+            seed_names,
         }
-
-        Ok(())
     }
 
     pub fn update_seed_names(&mut self, seed_names: Vec<String>) {
@@ -123,10 +115,10 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_action_start(&self, dbname: &str) -> (Navstate, String) {
+    fn handle_action_start(&self) -> (Navstate, String) {
         let mut new_navstate = self.navstate.to_owned();
         let mut errorline = String::new();
-        match db_handling::interface_signer::purge_transactions(dbname) {
+        match db_handling::interface_signer::purge_transactions(&self.db) {
             Ok(()) => {
                 if self.seed_names.is_empty() {
                     new_navstate = self.correct_seed_selector();
@@ -143,7 +135,7 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_action_go_back(&self, dbname: &str) -> (Navstate, String) {
+    fn handle_action_go_back(&self) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let mut errorline = String::new();
 
@@ -155,7 +147,7 @@ impl State {
                             new_navstate.screen = Screen::Log;
                         }
                         Screen::Transaction(_) => {
-                            match db_handling::interface_signer::purge_transactions(dbname) {
+                            match db_handling::interface_signer::purge_transactions(&self.db) {
                                 Ok(()) => new_navstate.screen = Screen::Scan,
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
@@ -225,7 +217,7 @@ impl State {
                 } else {
                     match &self.navstate.screen {
                         Screen::Transaction(_) => {
-                            match db_handling::interface_signer::purge_transactions(dbname) {
+                            match db_handling::interface_signer::purge_transactions(&self.db) {
                                 Ok(()) => new_navstate = Navstate::clean_screen(Screen::Log),
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
@@ -253,7 +245,6 @@ impl State {
 
     fn handle_action_go_forward(
         &self,
-        dbname: &str,
         details_str: &str,
         secret_seed_phrase: &str,
     ) -> (Navstate, String) {
@@ -264,7 +255,8 @@ impl State {
                 match self.navstate.modal {
                     Modal::LogComment => {
                         // details_str is user entered comment
-                        match db_handling::manage_history::history_entry_user(dbname, details_str) {
+                        match db_handling::manage_history::history_entry_user(&self.db, details_str)
+                        {
                             Ok(()) => new_navstate = Navstate::clean_screen(Screen::Log),
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
@@ -284,12 +276,12 @@ impl State {
                     Modal::NewSeedBackup(ref seed_name) => match details_str.parse::<bool>() {
                         Ok(roots) => {
                             match db_handling::identities::try_create_seed(
+                                &self.db,
                                 seed_name,
                                 secret_seed_phrase,
                                 roots,
-                                dbname,
                             ) {
-                                Ok(()) => match KeysState::new(seed_name, dbname) {
+                                Ok(()) => match KeysState::new(&self.db, seed_name) {
                                     Ok(a) => new_navstate = Navstate::clean_screen(Screen::Keys(a)),
                                     Err(e) => {
                                         new_navstate.alert = Alert::Error;
@@ -311,7 +303,7 @@ impl State {
                 }
             }
             Screen::RecoverSeedName(_) => {
-                match db_handling::identities::get_addresses_by_seed_name(dbname, details_str) {
+                match db_handling::identities::get_addresses_by_seed_name(&self.db, details_str) {
                     Ok(a) => {
                         if a.is_empty() {
                             new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(
@@ -336,12 +328,12 @@ impl State {
                 let seed_name = recover_seed_phrase_state.name();
                 match details_str.parse::<bool>() {
                     Ok(roots) => match db_handling::identities::try_create_seed(
+                        &self.db,
                         &seed_name,
                         secret_seed_phrase,
                         roots,
-                        dbname,
                     ) {
-                        Ok(()) => match KeysState::new(&seed_name, dbname) {
+                        Ok(()) => match KeysState::new(&self.db, &seed_name) {
                             Ok(a) => new_navstate = Navstate::clean_screen(Screen::Keys(a)),
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
@@ -370,7 +362,7 @@ impl State {
                         new.password_entered(details_str);
                         new_navstate.modal = Modal::Empty;
                     }
-                    match new.handle_sign(dbname) {
+                    match new.handle_sign(&self.db) {
                         Ok(result) => {
                             match result {
                                 SignResult::RequestPassword { .. } => {
@@ -396,7 +388,7 @@ impl State {
                     s: _,
                     u: checksum,
                     stub: stub_nav,
-                } => match transaction_signing::handle_stub(*checksum, dbname) {
+                } => match transaction_signing::handle_stub(&self.db, *checksum) {
                     Ok(()) => match stub_nav {
                         transaction_parsing::StubNav::AddSpecs {
                             n: network_specs_key,
@@ -445,10 +437,10 @@ impl State {
                         if let Modal::EnterPassword = self.navstate.modal {
                             let mut seed = s.seed();
                             match transaction_signing::sign_content(
+                                &self.db,
                                 &multisigner,
                                 &address_details,
                                 s.content(),
-                                dbname,
                                 &seed,
                                 details_str,
                             ) {
@@ -475,7 +467,7 @@ impl State {
                     None => {
                         // `details_str` is `hex_address_key`
                         // `secret_seed_phrase` is seed phrase
-                        match process_hex_address_key_address_details(details_str, dbname) {
+                        match process_hex_address_key_address_details(&self.db, details_str) {
                             Ok((multisigner, address_details)) => {
                                 if address_details.has_pwd {
                                     new_navstate.screen = Screen::SignSufficientCrypto(s.update(
@@ -486,10 +478,10 @@ impl State {
                                     new_navstate.modal = Modal::EnterPassword;
                                 } else {
                                     match transaction_signing::sign_content(
+                                        &self.db,
                                         &multisigner,
                                         &address_details,
                                         s.content(),
-                                        dbname,
                                         secret_seed_phrase,
                                         "",
                                     ) {
@@ -519,14 +511,14 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_select_seed(&self, dbname: &str, details_str: &str) -> (Navstate, String) {
+    fn handle_select_seed(&self, details_str: &str) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let mut errorline = String::new();
         match self.navstate.screen {
             Screen::SeedSelector => {
                 if !details_str.is_empty() {
                     // details_str is seed name
-                    match KeysState::new(details_str, dbname) {
+                    match KeysState::new(&self.db, details_str) {
                         Ok(a) => {
                             new_navstate = Navstate::clean_screen(Screen::Keys(a));
                         }
@@ -545,7 +537,7 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_select_key(&self, dbname: &str, details_str: &str) -> (Navstate, String) {
+    fn handle_select_key(&self, details_str: &str) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let mut errorline = String::new();
 
@@ -555,7 +547,7 @@ impl State {
             Screen::Keys(ref keys_state) => {
                 if keys_state.is_multiselect() {
                     match get_multisigner_by_address(
-                        dbname,
+                        &self.db,
                         &AddressKey::from_hex(details_str).unwrap(),
                     ) {
                         Ok(Some(multisigner)) => {
@@ -573,7 +565,7 @@ impl State {
                         }
                     }
                 } else {
-                    match AddressState::new(details_str, keys_state, dbname) {
+                    match AddressState::new(&self.db, details_str, keys_state) {
                         Ok(a) => {
                             println!("key details");
                             new_navstate = Navstate::clean_screen(Screen::KeyDetails(a));
@@ -591,7 +583,7 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_new_key(&self, _dbname: &str, details_str: &str) -> (Navstate, String) {
+    fn handle_new_key(&self, details_str: &str) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let errorline = String::new();
         match self.navstate.screen {
@@ -659,7 +651,7 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_backup_seed(&self, dbname: &str, details_str: &str) -> (Navstate, String) {
+    fn handle_backup_seed(&self, details_str: &str) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let mut errorline = String::new();
         if details_str.is_empty() {
@@ -675,7 +667,7 @@ impl State {
                 _ => println!("BackupSeed without seed_name does nothing here"),
             }
         } else if let Screen::SelectSeedForBackup = self.navstate.screen {
-            new_navstate = match KeysState::new(details_str, dbname) {
+            new_navstate = match KeysState::new(&self.db, details_str) {
                 Ok(a) => Navstate {
                     screen: Screen::Keys(a),
                     modal: Modal::Backup(details_str.to_string()),
@@ -728,23 +720,23 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_transaction_fetched(&self, dbname: &str, details_str: &str) -> (Navstate, String) {
+    fn handle_transaction_fetched(&self, details_str: &str) -> (Navstate, String) {
         let errorline = String::new();
 
         let new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
-            TransactionState::new(details_str, dbname),
+            TransactionState::new(&self.db, details_str),
         )));
 
         (new_navstate, errorline)
     }
 
-    fn handle_remove_network(&self, dbname: &str) -> (Navstate, String) {
+    fn handle_remove_network(&self) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let mut errorline = String::new();
         match self.navstate.screen {
             Screen::NetworkDetails(ref network_specs_key) => {
                 if let Modal::NetworkDetailsMenu = self.navstate.modal {
-                    match db_handling::helpers::remove_network(network_specs_key, dbname) {
+                    match db_handling::helpers::remove_network(&self.db, network_specs_key) {
                         Ok(()) => {
                             new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
                         }
@@ -761,16 +753,16 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_remove_metadata(&self, dbname: &str) -> (Navstate, String) {
+    fn handle_remove_metadata(&self) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let mut errorline = String::new();
         match self.navstate.screen {
             Screen::NetworkDetails(ref network_specs_key) => match self.navstate.modal {
                 Modal::ManageMetadata(network_version) => {
                     match db_handling::helpers::remove_metadata(
+                        &self.db,
                         network_specs_key,
                         network_version,
-                        dbname,
                     ) {
                         Ok(()) => {
                             new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
@@ -791,12 +783,12 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_remove_types(&self, dbname: &str) -> (Navstate, String) {
+    fn handle_remove_types(&self) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let mut errorline = String::new();
         match self.navstate.screen {
             Screen::ManageNetworks => match self.navstate.modal {
-                Modal::TypesInfo => match db_handling::helpers::remove_types_info(dbname) {
+                Modal::TypesInfo => match db_handling::helpers::remove_types_info(&self.db) {
                     Ok(()) => {
                         new_navstate = Navstate::clean_screen(Screen::Log);
                     }
@@ -921,7 +913,7 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_remove_key(&self, dbname: &str) -> (Navstate, String) {
+    fn handle_remove_key(&self) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let mut errorline = String::new();
         match self.navstate.screen {
@@ -931,7 +923,7 @@ impl State {
                 }
                 SpecialtyKeysState::MultiSelect(ref multiselect) => {
                     if let Some(ns) = keys_state.network_specs_key() {
-                        match db_handling::identities::remove_keys_set(dbname, multiselect, &ns) {
+                        match db_handling::identities::remove_keys_set(&self.db, multiselect, &ns) {
                             Ok(()) => {
                                 new_navstate = Navstate::clean_screen(Screen::Keys(
                                     KeysState::new_in_network(&keys_state.seed_name(), &ns),
@@ -951,7 +943,7 @@ impl State {
                 if let Modal::KeyDetailsAction = self.navstate.modal {
                     if let Some(network_specs_key) = address_state.network_specs_key() {
                         match db_handling::identities::remove_key(
-                            dbname,
+                            &self.db,
                             &address_state.multisigner(),
                             &network_specs_key,
                         ) {
@@ -993,12 +985,12 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_remove_seed(&self, dbname: &str) -> (Navstate, String) {
+    fn handle_remove_seed(&self) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let mut errorline = String::new();
         match self.navstate.screen {
             Screen::Keys(ref keys_state) => {
-                match db_handling::identities::remove_seed(dbname, &keys_state.seed_name()) {
+                match db_handling::identities::remove_seed(&self.db, &keys_state.seed_name()) {
                     Ok(()) => {
                         new_navstate = Navstate::clean_screen(Screen::Log);
                     }
@@ -1014,13 +1006,13 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_clear_log(&self, dbname: &str) -> (Navstate, String) {
+    fn handle_clear_log(&self) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let mut errorline = String::new();
         match self.navstate.screen {
             Screen::Log => {
                 if let Modal::LogRight = self.navstate.modal {
-                    match db_handling::manage_history::clear_history(dbname) {
+                    match db_handling::manage_history::clear_history(&self.db) {
                         Ok(()) => {
                             new_navstate = Navstate::clean_screen(Screen::Log);
                         }
@@ -1062,7 +1054,6 @@ impl State {
     fn handle_increment(
         &self,
         _details_str: &str,
-        dbname: &str,
         _secret_seed_phrase: &str,
     ) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
@@ -1071,7 +1062,7 @@ impl State {
         match self.navstate.screen {
             Screen::Keys(ref keys_state) => {
                 new_navstate = Navstate::clean_screen(Screen::Keys(
-                    KeysState::new(&keys_state.seed_name(), dbname).unwrap(),
+                    KeysState::new(&self.db, &keys_state.seed_name()).unwrap(),
                 ));
             }
             _ => println!("Increment does nothing here"),
@@ -1128,11 +1119,10 @@ impl State {
         &mut self,
         new_navstate: &Navstate,
         _details_str: &str,
-        dbname: &str,
     ) -> Result<ScreenData> {
         let sd = match new_navstate.screen {
             Screen::Log => {
-                let history = db_handling::manage_history::get_history(dbname)?;
+                let history = db_handling::manage_history::get_history(&self.db)?;
                 let log: Vec<_> = history
                     .into_iter()
                     .map(|(order, entry)| History {
@@ -1146,9 +1136,9 @@ impl State {
                 ScreenData::Log { f }
             }
             Screen::LogDetails(order) => {
-                let e = get_history_entry_by_order(order, dbname)?;
+                let e = get_history_entry_by_order(&self.db, order)?;
                 let timestamp = e.timestamp.clone();
-                let events = entry_to_transactions_with_decoding(e, dbname)?;
+                let events = entry_to_transactions_with_decoding(&self.db, e)?;
                 let f = MLogDetails { timestamp, events };
                 ScreenData::LogDetails { f }
             }
@@ -1188,7 +1178,7 @@ impl State {
             Screen::SeedSelector => {
                 let seed_name_cards =
                     db_handling::interface_signer::get_all_seed_names_with_identicons(
-                        dbname,
+                        &self.db,
                         &self.seed_names,
                     )?;
                 let f = MSeeds { seed_name_cards };
@@ -1197,7 +1187,7 @@ impl State {
             Screen::SelectSeedForBackup => {
                 let seed_name_cards =
                     db_handling::interface_signer::get_all_seed_names_with_identicons(
-                        dbname,
+                        &self.db,
                         &self.seed_names,
                     )?;
                 let f = MSeeds { seed_name_cards };
@@ -1210,7 +1200,7 @@ impl State {
                 println!("here {:?}", address_state);
                 let f = if let Some(key) = address_state.network_specs_key().as_ref() {
                     Some(db_handling::interface_signer::export_key(
-                        dbname,
+                        &self.db,
                         &address_state.multisigner(),
                         &address_state.seed_name(),
                         key,
@@ -1222,7 +1212,7 @@ impl State {
             }
             Screen::KeyDetailsMulti(ref address_state_multi) => {
                 let key_details = db_handling::interface_signer::export_key(
-                    dbname,
+                    &self.db,
                     &address_state_multi.multisigner(),
                     &address_state_multi.seed_name(),
                     &address_state_multi.network_specs_key(),
@@ -1282,7 +1272,7 @@ impl State {
                 // you have `error` field for that.
                 //
                 // Don't ignore this on refactor like everyone else before you.
-                let f = match db_handling::helpers::get_general_verifier(dbname) {
+                let f = match db_handling::helpers::get_general_verifier(&self.db) {
                     Ok(Verifier { v: Some(vv) }) => {
                         let card = vv.show_card();
                         MSettings {
@@ -1303,23 +1293,23 @@ impl State {
                 ScreenData::Settings { f }
             }
             Screen::Verifier => {
-                let f = db_handling::helpers::get_general_verifier(dbname)?;
+                let f = db_handling::helpers::get_general_verifier(&self.db)?;
                 ScreenData::VVerifier { f: f.show_card() }
             }
             Screen::ManageNetworks => {
-                let networks = db_handling::interface_signer::show_all_networks(dbname)?;
+                let networks = db_handling::interface_signer::show_all_networks(&self.db)?;
                 let f = MManageNetworks { networks };
                 ScreenData::ManageNetworks { f }
             }
             Screen::NetworkDetails(ref network_specs_key) => {
                 let f = db_handling::interface_signer::network_details_by_key(
-                    dbname,
+                    &self.db,
                     network_specs_key,
                 )?;
                 ScreenData::NNetworkDetails { f }
             }
             Screen::SignSufficientCrypto(_) => {
-                let identities = db_handling::interface_signer::print_all_identities(dbname)?;
+                let identities = db_handling::interface_signer::print_all_identities(&self.db)?;
                 let f = MSignSufficientCrypto { identities };
                 ScreenData::SignSufficientCrypto { f }
             }
@@ -1329,14 +1319,10 @@ impl State {
         Ok(sd)
     }
 
-    fn get_modal_details(
-        &mut self,
-        new_navstate: &mut Navstate,
-        dbname: &str,
-    ) -> Result<Option<ModalData>> {
+    fn get_modal_details(&mut self, new_navstate: &mut Navstate) -> Result<Option<ModalData>> {
         let modal = match new_navstate.modal {
             Modal::Backup(ref seed_name) => Some(ModalData::Backup {
-                f: db_handling::interface_signer::backup_prep(dbname, seed_name)?,
+                f: db_handling::interface_signer::backup_prep(&self.db, seed_name)?,
             }),
             Modal::SeedMenu => match new_navstate.screen {
                 Screen::Keys(ref keys_state) => {
@@ -1353,7 +1339,7 @@ impl State {
             }),
             Modal::NetworkSelector(ref network_specs_key) => Some(ModalData::NetworkSelector {
                 f: db_handling::interface_signer::show_all_networks_with_flag(
-                    dbname,
+                    &self.db,
                     network_specs_key,
                 )?,
             }),
@@ -1408,13 +1394,13 @@ impl State {
             },
             Modal::LogRight => Some(ModalData::LogRight {
                 f: definitions::navigation::MLogRight {
-                    checksum: db_handling::interface_signer::history_hex_checksum(dbname)?,
+                    checksum: db_handling::interface_signer::history_hex_checksum(&self.db)?,
                 },
             }),
             Modal::ManageMetadata(network_version) => match new_navstate.screen {
                 Screen::NetworkDetails(ref network_specs_key) => Some(ModalData::ManageMetadata {
                     f: db_handling::interface_signer::metadata_details(
-                        dbname,
+                        &self.db,
                         network_specs_key,
                         network_version,
                     )?,
@@ -1440,10 +1426,10 @@ impl State {
                 }
             }
             Modal::TypesInfo => Some(ModalData::TypesInfo {
-                f: db_handling::interface_signer::show_types_status(dbname)?,
+                f: db_handling::interface_signer::show_types_status(&self.db)?,
             }),
             Modal::SelectSeed => {
-                match get_all_seed_names_with_identicons(dbname, &self.seed_names) {
+                match get_all_seed_names_with_identicons(&self.db, &self.seed_names) {
                     Ok(a) => Some(ModalData::SelectSeed {
                         f: MSeeds { seed_name_cards: a },
                     }),
@@ -1475,113 +1461,107 @@ impl State {
     ) -> Result<ActionResult> {
         let mut new_navstate = self.navstate.to_owned();
 
-        if let Some(ref dbname) = self.dbname.clone() {
-            let mut errorline;
-            //Try to perform action
-            (new_navstate, errorline) = match action {
-                //App init
-                Action::Start => self.handle_action_start(dbname),
-                //Simple navigation commands
-                Action::NavbarLog => self.handle_navbar_log(),
-                Action::NavbarScan => self.handle_navbar_scan(),
-                Action::NavbarKeys => self.handle_navbar_keys(),
-                Action::NavbarSettings => self.handle_navbar_settings(),
-                //General back action is defined here
-                Action::GoBack => self.handle_action_go_back(dbname),
-                Action::GoForward => {
-                    self.handle_action_go_forward(dbname, details_str, secret_seed_phrase)
+        let mut errorline;
+        //Try to perform action
+        (new_navstate, errorline) = match action {
+            //App init
+            Action::Start => self.handle_action_start(),
+            //Simple navigation commands
+            Action::NavbarLog => self.handle_navbar_log(),
+            Action::NavbarScan => self.handle_navbar_scan(),
+            Action::NavbarKeys => self.handle_navbar_keys(),
+            Action::NavbarSettings => self.handle_navbar_settings(),
+            //General back action is defined here
+            Action::GoBack => self.handle_action_go_back(),
+            Action::GoForward => self.handle_action_go_forward(details_str, secret_seed_phrase),
+            Action::SelectSeed => self.handle_select_seed(details_str),
+            Action::SelectKey => self.handle_select_key(details_str),
+            Action::NewKey => self.handle_new_key(details_str),
+            Action::RightButtonAction => self.handle_right_button(),
+            Action::Shield => self.handle_shield(),
+            Action::NewSeed => self.handle_new_seed(),
+            Action::RecoverSeed => self.handle_recover_seed(),
+            Action::BackupSeed => self.handle_backup_seed(details_str),
+            Action::NetworkSelector => self.handle_network_selector(),
+            Action::CheckPassword => self.handle_change_password(details_str),
+            Action::TransactionFetched => self.handle_transaction_fetched(details_str),
+            Action::RemoveNetwork => self.handle_remove_network(),
+            Action::RemoveMetadata => self.handle_remove_metadata(),
+            Action::RemoveTypes => self.handle_remove_types(),
+            Action::SignNetworkSpecs => self.handle_sign_network_specs(),
+            Action::SignMetadata => self.handle_sign_metadata(),
+            Action::SignTypes => self.handle_sign_types(),
+            Action::ManageNetworks => self.handle_manage_networks(),
+            Action::ViewGeneralVerifier => self.handle_view_general_verifier(),
+            Action::ManageMetadata => self.handle_manage_metadata(details_str),
+            Action::RemoveKey => self.handle_remove_key(),
+            Action::RemoveSeed => self.handle_remove_seed(),
+            Action::ClearLog => self.handle_clear_log(),
+            Action::CreateLogComment => self.handle_create_log_comment(),
+            Action::ShowLogDetails => self.handle_show_log_details(details_str),
+            Action::Increment => self.handle_increment(details_str, secret_seed_phrase),
+            Action::ShowDocuments => self.handle_show_documents(),
+            Action::TextEntry => self.handle_text_entry(details_str),
+            Action::PushWord => self.handle_push_word(details_str),
+            Action::Nothing => (new_navstate, String::new()),
+        };
+
+        //Prepare screen details
+        let screen_data = match self.get_screen_data(&new_navstate, details_str) {
+            Ok(sd) => sd,
+            Err(e) => {
+                let _ = write!(&mut errorline, "{}", e);
+                //This is special error used only
+                //here; please do not change it to
+                //`Alert::Error` or app may get stuck
+                new_navstate.alert = Alert::ErrorDisplay;
+                ScreenData::Settings {
+                    f: MSettings::default(),
                 }
-                Action::SelectSeed => self.handle_select_seed(dbname, details_str),
-                Action::SelectKey => self.handle_select_key(dbname, details_str),
-                Action::NewKey => self.handle_new_key(dbname, details_str),
-                Action::RightButtonAction => self.handle_right_button(),
-                Action::Shield => self.handle_shield(),
-                Action::NewSeed => self.handle_new_seed(),
-                Action::RecoverSeed => self.handle_recover_seed(),
-                Action::BackupSeed => self.handle_backup_seed(dbname, details_str),
-                Action::NetworkSelector => self.handle_network_selector(),
-                Action::CheckPassword => self.handle_change_password(details_str),
-                Action::TransactionFetched => self.handle_transaction_fetched(dbname, details_str),
-                Action::RemoveNetwork => self.handle_remove_network(dbname),
-                Action::RemoveMetadata => self.handle_remove_metadata(dbname),
-                Action::RemoveTypes => self.handle_remove_types(dbname),
-                Action::SignNetworkSpecs => self.handle_sign_network_specs(),
-                Action::SignMetadata => self.handle_sign_metadata(),
-                Action::SignTypes => self.handle_sign_types(),
-                Action::ManageNetworks => self.handle_manage_networks(),
-                Action::ViewGeneralVerifier => self.handle_view_general_verifier(),
-                Action::ManageMetadata => self.handle_manage_metadata(details_str),
-                Action::RemoveKey => self.handle_remove_key(dbname),
-                Action::RemoveSeed => self.handle_remove_seed(dbname),
-                Action::ClearLog => self.handle_clear_log(dbname),
-                Action::CreateLogComment => self.handle_create_log_comment(),
-                Action::ShowLogDetails => self.handle_show_log_details(details_str),
-                Action::Increment => self.handle_increment(details_str, dbname, secret_seed_phrase),
-                Action::ShowDocuments => self.handle_show_documents(),
-                Action::TextEntry => self.handle_text_entry(details_str),
-                Action::PushWord => self.handle_push_word(details_str),
-                Action::Nothing => (new_navstate, String::new()),
-            };
+            }
+        };
 
-            //Prepare screen details
-            let screen_data = match self.get_screen_data(&new_navstate, details_str, dbname) {
-                Ok(sd) => sd,
-                Err(e) => {
-                    let _ = write!(&mut errorline, "{}", e);
-                    //This is special error used only
-                    //here; please do not change it to
-                    //`Alert::Error` or app may get stuck
-                    new_navstate.alert = Alert::ErrorDisplay;
-                    ScreenData::Settings {
-                        f: MSettings::default(),
-                    }
-                }
-            };
+        //Prepare modal details
+        let modal_data = match self.get_modal_details(&mut new_navstate) {
+            Ok(md) => md,
+            Err(e) => {
+                let _ = write!(&mut errorline, "{}", e);
+                new_navstate.alert = Alert::Error;
+                None
+            }
+        };
 
-            //Prepare modal details
-            let modal_data = match self.get_modal_details(&mut new_navstate, dbname) {
-                Ok(md) => md,
-                Err(e) => {
-                    let _ = write!(&mut errorline, "{}", e);
-                    new_navstate.alert = Alert::Error;
-                    None
-                }
-            };
+        //Prepare alert details
+        //Important! No errors could be handled in this block!
+        let alert_data = match new_navstate.alert {
+            Alert::Error | Alert::ErrorDisplay => Some(AlertData::ErrorData { f: errorline }),
+            Alert::Empty => None,
+            Alert::Shield => match get_danger_status(&self.db) {
+                Ok(true) => Some(AlertData::Shield {
+                    f: Some(ShieldAlert::Past),
+                }),
+                Ok(false) => Some(AlertData::Shield { f: None }),
+                Err(e) => Some(AlertData::ErrorData {
+                    f: format!("{}", e),
+                }),
+            },
+        };
 
-            //Prepare alert details
-            //Important! No errors could be handled in this block!
-            let alert_data = match new_navstate.alert {
-                Alert::Error | Alert::ErrorDisplay => Some(AlertData::ErrorData { f: errorline }),
-                Alert::Empty => None,
-                Alert::Shield => match get_danger_status(dbname) {
-                    Ok(true) => Some(AlertData::Shield {
-                        f: Some(ShieldAlert::Past),
-                    }),
-                    Ok(false) => Some(AlertData::Shield { f: None }),
-                    Err(e) => Some(AlertData::ErrorData {
-                        f: format!("{}", e),
-                    }),
-                },
-            };
+        self.navstate = new_navstate;
 
-            self.navstate = new_navstate;
+        let action_result = ActionResult {
+            screen_label: self.get_screen_label(),
+            back: self.navstate.screen.has_back(),
+            footer: self.get_footer(),
+            footer_button: self.get_active_navbutton(),
+            right_button: self.get_right_button(),
+            screen_name_type: self.get_screen_name_type(),
+            screen_data,
+            modal_data,
+            alert_data,
+        };
 
-            let action_result = ActionResult {
-                screen_label: self.get_screen_label(),
-                back: self.navstate.screen.has_back(),
-                footer: self.get_footer(),
-                footer_button: self.get_active_navbutton(),
-                right_button: self.get_right_button(),
-                screen_name_type: self.get_screen_name_type(),
-                screen_data,
-                modal_data,
-                alert_data,
-            };
-
-            Ok(action_result)
-        } else {
-            Err(Error::DbNotInitialized)
-        }
+        Ok(action_result)
     }
 
     fn toggle_modal(&self, modal: Modal) -> Modal {
@@ -1747,12 +1727,12 @@ impl Navstate {
 }
 
 fn process_hex_address_key_address_details(
+    database: &sled::Db,
     hex_address_key: &str,
-    dbname: &str,
 ) -> Result<(MultiSigner, AddressDetails)> {
     let address_key = AddressKey::from_hex(hex_address_key)?;
-    let multisigner = get_multisigner_by_address(dbname, &address_key)?
+    let multisigner = get_multisigner_by_address(database, &address_key)?
         .ok_or_else(|| Error::KeyNotFound(format!("0x{}", hex_address_key)))?;
-    let address_details = db_handling::helpers::get_address_details(dbname, &address_key)?;
+    let address_details = db_handling::helpers::get_address_details(database, &address_key)?;
     Ok((multisigner, address_details))
 }

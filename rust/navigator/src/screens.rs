@@ -111,8 +111,9 @@ pub struct RecoverSeedPhraseState {
 pub struct EnteredInfo(pub String);
 
 impl KeysState {
-    pub fn new(seed_name: &str, database_name: &str) -> Result<Self> {
-        let network_specs = first_network(database_name)?;
+    pub fn new(database: &sled::Db, seed_name: &str) -> Result<Self> {
+        let network_specs = first_network(database)?;
+
         Ok(Self {
             seed_name: seed_name.to_string(),
             network_specs_key: network_specs.map(|ns| {
@@ -218,7 +219,7 @@ impl KeysState {
 }
 
 impl AddressState {
-    pub fn new(details_str: &str, keys_state: &KeysState, database_name: &str) -> Result<Self> {
+    pub fn new(database: &sled::Db, details_str: &str, keys_state: &KeysState) -> Result<Self> {
         let lines: Vec<_> = details_str.lines().collect();
         let hex_address_key = lines[0];
         let network_specs_key = lines.get(1);
@@ -229,9 +230,9 @@ impl AddressState {
         };
         let address_key = AddressKey::from_hex(hex_address_key)?;
         let multisigner = address_key.multi_signer().clone();
-        let network_specs = get_network_specs(database_name, &network_specs_key)?;
+        let network_specs = get_network_specs(database, &network_specs_key)?;
         let is_root = get_address_details(
-            database_name,
+            database,
             &AddressKey::new(multisigner.clone(), Some(network_specs.specs.genesis_hash)),
         )?
         .is_root();
@@ -269,17 +270,17 @@ impl AddressState {
 
 impl AddressStateMulti {
     pub fn new(
+        database: &sled::Db,
         seed_name: String,
         network_specs_key: NetworkSpecsKey,
         multiselect: &[MultiSigner],
-        database_name: &str,
     ) -> Result<Self> {
         let mut set: Vec<(MultiSigner, bool)> = Vec::new();
-        let network = get_network_specs(database_name, &network_specs_key)?;
+        let network = get_network_specs(database, &network_specs_key)?;
 
         for multisigner in multiselect.iter() {
             let address_details = get_address_details(
-                database_name,
+                database,
                 &AddressKey::new(multisigner.clone(), Some(network.specs.genesis_hash)),
             )?;
             set.push((multisigner.to_owned(), address_details.is_root()))

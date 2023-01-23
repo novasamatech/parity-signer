@@ -25,6 +25,7 @@ zeroize = {version = "1.5.7", optional = true}
 
 [dev-dependencies]
 pretty_assertions = { version = "1.3" }
+tempfile = { version = "3.3" }
 
 [features]
 default = ["test"]
