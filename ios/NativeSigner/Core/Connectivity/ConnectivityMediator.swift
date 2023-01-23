@@ -28,7 +28,7 @@ private extension ConnectivityMediator {
         connectivityMonitor.startMonitoring { [weak self] isConnected in
             guard let self = self else { return }
             if isConnected, self.databaseMediator.isDatabaseAvailable() {
-                try? historyDeviceWasOnline(dbname: self.databaseMediator.databaseName)
+                try? historyDeviceWasOnline()
             }
             self.isConnectivityOn = isConnected
         }

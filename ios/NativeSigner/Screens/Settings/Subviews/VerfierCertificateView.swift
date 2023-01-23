@@ -100,7 +100,7 @@ extension VerfierCertificateView {
         }
 
         func onRemoveConfirmationTap() {
-            data.jailbreak()
+            data.removeGeneralVerifier()
         }
     }
 }

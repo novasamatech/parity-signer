@@ -23,6 +23,7 @@ nom = "7.1.3"
 [dev-dependencies]
 pretty_assertions = "1"
 db_handling = {path = "../db_handling"}
+tempfile = "3.3"
 
 [lib]
 name = "transaction_parsing"

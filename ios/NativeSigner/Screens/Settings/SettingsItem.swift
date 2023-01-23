@@ -38,19 +38,4 @@ extension SettingsItem {
     var hasDetails: Bool {
         ![.wipe].contains(self)
     }
-
-    var detailsNavigation: Action? {
-        switch self {
-        case .networks:
-            return .manageNetworks
-        case .verifier:
-            return .viewGeneralVerifier
-        case .privacyPolicy:
-            return .showDocuments
-        case .termsAndConditions:
-            return .showDocuments
-        case .wipe:
-            return nil
-        }
-    }
 }
