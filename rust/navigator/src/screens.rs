@@ -112,8 +112,8 @@ pub struct RecoverSeedPhraseState {
 pub struct EnteredInfo(pub String);
 
 impl KeysState {
-    pub fn new(seed_name: &str, database_name: &str) -> Result<Self> {
-        let network_specs = first_network(database_name)?.specs;
+    pub fn new(database: &sled::Db, seed_name: &str) -> Result<Self> {
+        let network_specs = first_network(database)?.specs;
         Ok(Self {
             seed_name: seed_name.to_string(),
             network_specs_key: NetworkSpecsKey::from_parts(
@@ -220,7 +220,7 @@ impl KeysState {
 }
 
 impl AddressState {
-    pub fn new(details_str: &str, keys_state: &KeysState, database_name: &str) -> Result<Self> {
+    pub fn new(database: &sled::Db, details_str: &str, keys_state: &KeysState) -> Result<Self> {
         let lines: Vec<_> = details_str.lines().collect();
         let hex_address_key = lines[0];
         let network_specs_key = lines.get(1);
@@ -228,14 +228,13 @@ impl AddressState {
         let address_key = AddressKey::from_hex(hex_address_key)?;
         let multisigner = if let Ok(m) = address_key.multi_signer() {
             m
-        } else if let Some(key) = get_multisigner_by_address(database_name, &address_key)? {
+        } else if let Some(key) = get_multisigner_by_address(database, &address_key)? {
             key
         } else {
             return Err(Error::KeyNotFound(format!("{:?}", address_key)));
         };
         let is_root =
-            get_address_details(database_name, &AddressKey::from_multisigner(&multisigner))?
-                .is_root();
+            get_address_details(database, &AddressKey::from_multisigner(&multisigner))?.is_root();
         let network_specs_key = if let Some(network_specs_key) = &network_specs_key {
             Some(NetworkSpecsKey::from_hex(network_specs_key)?)
         } else {
@@ -275,15 +274,15 @@ impl AddressState {
 
 impl AddressStateMulti {
     pub fn new(
+        database: &sled::Db,
         seed_name: String,
         network_specs_key: NetworkSpecsKey,
         multiselect: &[MultiSigner],
-        database_name: &str,
     ) -> Result<Self> {
         let mut set: Vec<(MultiSigner, bool)> = Vec::new();
         for multisigner in multiselect.iter() {
             let address_details =
-                get_address_details(database_name, &AddressKey::from_multisigner(multisigner))?;
+                get_address_details(database, &AddressKey::from_multisigner(multisigner))?;
             set.push((multisigner.to_owned(), address_details.is_root()))
         }
         Ok(Self {

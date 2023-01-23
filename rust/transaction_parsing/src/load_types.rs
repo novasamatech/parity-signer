@@ -7,7 +7,6 @@ use definitions::{
     navigation::TransactionCardSet, network_specs::Verifier, qr_transfers::ContentLoadTypes,
     types::TypeEntry,
 };
-use std::path::Path;
 
 use crate::cards::{Card, Warning};
 use crate::check_signature::pass_crypto;
@@ -15,15 +14,12 @@ use crate::error::{Error, Result};
 use crate::holds::GeneralHold;
 use crate::{StubNav, TransactionAction};
 
-pub fn load_types<P>(data_hex: &str, db_path: P) -> Result<TransactionAction>
-where
-    P: AsRef<Path>,
-{
+pub fn load_types(database: &sled::Db, data_hex: &str) -> Result<TransactionAction> {
     let checked_info = pass_crypto(data_hex, TransferContent::LoadTypes)?;
     let content_new_types = ContentLoadTypes::from_slice(&checked_info.message);
     let new_types = content_new_types.types()?;
-    let old_types: Vec<TypeEntry> = try_get_types(&db_path)?.unwrap_or_default();
-    let general_verifier = get_general_verifier(&db_path)?;
+    let old_types: Vec<TypeEntry> = try_get_types(database)?.unwrap_or_default();
+    let general_verifier = get_general_verifier(database)?;
     let mut stub = TrDbColdStub::new();
     let mut index = 0;
     match checked_info.verifier {
@@ -39,7 +35,7 @@ where
                         warning: Warning::UpdatingTypes.show(),
                     });
                     stub = stub.add_types(&content_new_types, &checked_info.verifier);
-                    let checksum = stub.store_and_get_checksum(&db_path)?;
+                    let checksum = stub.store_and_get_checksum(database)?;
                     let warning_card_1 =
                         Card::Warning(Warning::TypesNotVerified).card(&mut index, 0);
                     let warning_card_2 = Card::Warning(Warning::UpdatingTypes).card(&mut index, 0);
@@ -74,7 +70,7 @@ where
                         warning: Warning::UpdatingTypes.show(),
                     });
                     stub = stub.add_types(&content_new_types, &checked_info.verifier);
-                    let checksum = stub.store_and_get_checksum(&db_path)?;
+                    let checksum = stub.store_and_get_checksum(database)?;
                     let warning_card = Card::Warning(Warning::UpdatingTypes).card(&mut index, 0);
                     let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
                     Ok(TransactionAction::Stub {
@@ -92,8 +88,8 @@ where
                 match general_verifier {
                     Verifier { v: None } => {
                         let new_general_verifier = checked_info.verifier;
-                        let general_hold = GeneralHold::get(&db_path)?;
-                        stub = general_hold.upd_stub(stub, &new_general_verifier, &db_path)?;
+                        let general_hold = GeneralHold::get(database)?;
+                        stub = general_hold.upd_stub(database, stub, &new_general_verifier)?;
                         stub = stub.add_types(&content_new_types, &new_general_verifier);
                         let warning_card_1 =
                             Card::Warning(Warning::GeneralVerifierAppeared(&general_hold))
@@ -112,7 +108,7 @@ where
                             }
                         };
                         let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
-                        let checksum = stub.store_and_get_checksum(&db_path)?;
+                        let checksum = stub.store_and_get_checksum(database)?;
                         Ok(TransactionAction::Stub {
                             s: Box::new(TransactionCardSet {
                                 verifier: Some(vec![verifier_card]),

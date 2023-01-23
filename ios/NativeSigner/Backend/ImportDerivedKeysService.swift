@@ -37,7 +37,7 @@ final class ImportDerivedKeysService {
                     seedPreviewsToImport[index].derivedKeys = seedPreview.derivedKeys
                         .filter { $0.status == .importable }
                 }
-                try importDerivations(dbname: self.databaseMediator.databaseName, seedDerivedKeys: seedPreviewsToImport)
+                try importDerivations(seedDerivedKeys: seedPreviewsToImport)
                 result = .success(())
             } catch {
                 result = .failure(.unknown)

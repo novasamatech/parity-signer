@@ -7,7 +7,10 @@ use tempfile::tempdir;
 #[test]
 fn it_removes() {
     let files_dir = tempdir().unwrap();
-    setup(&files_dir);
+    let db = sled::open(&files_dir).unwrap();
+
+    setup(&db);
+    drop(db);
     assert_cmd_stdout(
         &format!(
             "show networks --hot-db-path {0}",
