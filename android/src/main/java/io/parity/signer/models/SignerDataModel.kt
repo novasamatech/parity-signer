@@ -214,9 +214,9 @@ class SignerDataModel : ViewModel() {
 		if (checkRefresh) _onBoardingDone.value =
 			OnboardingWasShown.Yes else _onBoardingDone.value = OnboardingWasShown.No
 		if (checkRefresh) {
+			tellRustSeedNames(init = true)
 			getAlertState()
 			isAirplaneOn()
-			tellRustSeedNames(init = true)
 			navigator.navigate(Action.START)
 		}
 	}
