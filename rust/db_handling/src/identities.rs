@@ -45,6 +45,7 @@ use sp_core::{ecdsa, ed25519, sr25519, Pair};
 use sp_runtime::MultiSignature;
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_runtime::MultiSigner;
+#[cfg(feature = "signer")]
 use std::collections::HashMap;
 #[cfg(any(feature = "active", feature = "signer"))]
 use zeroize::Zeroize;
@@ -53,7 +54,9 @@ use zeroize::Zeroize;
 use constants::ADDRTREE;
 #[cfg(feature = "active")]
 use constants::ALICE_SEED_PHRASE;
+#[cfg(feature = "signer")]
 use definitions::derivations::SeedKeysPreview;
+#[cfg(feature = "signer")]
 use definitions::helpers::base58_or_eth_to_multisigner;
 #[cfg(feature = "signer")]
 use definitions::helpers::print_multisigner_as_base58_or_eth;
@@ -665,7 +668,7 @@ pub(crate) fn create_address(
     )
 }
 
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(any(feature = "signer"))]
 pub(crate) fn create_derivation_address(
     database: &sled::Db,
     input_batch_prep: &[(AddressKey, AddressDetails)],

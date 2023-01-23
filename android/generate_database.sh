@@ -7,7 +7,7 @@ set -e
 
 pushd ../rust/generate_message
 
-cargo run --locked make-cold-release
+cargo run --locked make-cold-release $DBPATH
 
 popd
 

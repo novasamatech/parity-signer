@@ -348,7 +348,7 @@ fn get_all_networks() -> anyhow::Result<Vec<MMNetwork>, ErrorDisplayed> {
 fn init_logging(tag: String) {
     android_logger::init_once(
         android_logger::Config::default()
-            .with_min_level(log::Level::Trace) // limit log level
+            .with_max_level(log::LevelFilter::Trace) // limit log level
             .with_tag(tag) // logs will show under mytag tag
             .with_filter(
                 // configure messages for specific crate

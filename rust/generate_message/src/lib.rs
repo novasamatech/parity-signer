@@ -1073,6 +1073,7 @@ pub fn full_run(command: Command) -> Result<()> {
             Ok(default_hot(Some(&db))?)
         }
         Command::MakeColdRelease { path } => {
+            println!("PATH {:?}", path);
             let db = sled::open(path.unwrap())?;
 
             Ok(default_cold_release(Some(&db))?)
