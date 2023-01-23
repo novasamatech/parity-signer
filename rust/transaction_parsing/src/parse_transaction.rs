@@ -10,7 +10,6 @@ use definitions::{
     users::AddressDetails,
 };
 use parser::{cut_method_extensions, decoding_commons::OutputCard, parse_extensions, parse_method};
-use std::path::Path;
 
 use crate::cards::{make_author_info, Card, Warning};
 use crate::error::{Error, Result};
@@ -40,16 +39,13 @@ enum CardsPrep<'a> {
 /// i.e. it starts with 53****, followed by author address, followed by actual transaction piece,
 /// followed by extrinsics, concluded with chain genesis hash
 
-pub(crate) fn parse_transaction<P>(
+pub(crate) fn parse_transaction(
+    database: &sled::Db,
     data_hex: &str,
-    db_path: P,
     _in_bulk: bool,
-) -> Result<TransactionAction>
-where
-    P: AsRef<Path>,
-{
+) -> Result<TransactionAction> {
     let (author_multi_signer, parser_data, genesis_hash, encryption) =
-        multisigner_msg_genesis_encryption(&db_path, data_hex)?;
+        multisigner_msg_genesis_encryption(database, data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
     // Some(true/false) should be here by the standard; should stay None for now, as currently existing transactions apparently do not comply to standard.
@@ -63,12 +59,12 @@ where
     let mut index: u32 = 0;
     let indent: u32 = 0;
 
-    match try_get_network_specs(&db_path, &network_specs_key)? {
+    match try_get_network_specs(database, &network_specs_key)? {
         Some(network_specs) => {
             let address_key = AddressKey::from_multisigner(&author_multi_signer);
             let mut history: Vec<Event> = Vec::new();
 
-            let mut cards_prep = match try_get_address_details(&db_path, &address_key)? {
+            let mut cards_prep = match try_get_address_details(database, &address_key)? {
                 Some(address_details) => {
                     if address_details.network_id.contains(&network_specs_key) {
                         CardsPrep::SignProceed(address_details, None)
@@ -98,7 +94,7 @@ where
             let short_specs = network_specs.specs.short();
             let (method_data, extensions_data) = cut_method_extensions(&parser_data)?;
 
-            let meta_set = find_meta_set(&short_specs, &db_path)?;
+            let meta_set = find_meta_set(database, &short_specs)?;
             if meta_set.is_empty() {
                 return Err(Error::NoMetadata {
                     name: network_specs.specs.name,
@@ -109,7 +105,7 @@ where
             let latest_version = meta_set[0].version();
             for (i, x) in meta_set.iter().enumerate() {
                 let used_version = x.version();
-                let metadata_bundle = bundle_from_meta_set_element(x, &db_path)?;
+                let metadata_bundle = bundle_from_meta_set_element(database, x)?;
                 match parse_extensions(
                     extensions_data.to_vec(),
                     &metadata_bundle,
@@ -165,10 +161,10 @@ where
                                             &author_multi_signer,
                                             history,
                                         );
-                                        let mut sign = TrDbColdSign::from_storage(&db_path, None)?
+                                        let mut sign = TrDbColdSign::from_storage(database, None)?
                                             .unwrap_or_default();
                                         sign.signing_bulk.push(sign_one);
-                                        let checksum = sign.store_and_get_checksum(&db_path)?;
+                                        let checksum = sign.store_and_get_checksum(database)?;
                                         let author_info = make_author_info(
                                             &author_multi_signer,
                                             network_specs.specs.base58prefix,
@@ -296,13 +292,10 @@ fn into_cards(set: &[OutputCard], index: &mut u32) -> Vec<TransactionCard> {
         .collect()
 }
 
-pub fn entry_to_transactions_with_decoding<P>(
+pub fn entry_to_transactions_with_decoding(
+    database: &sled::Db,
     entry: Entry,
-    db_path: P,
-) -> Result<Vec<MEventMaybeDecoded>>
-where
-    P: AsRef<Path>,
-{
+) -> Result<Vec<MEventMaybeDecoded>> {
     let mut res = Vec::new();
 
     // TODO: insanely bad code.
@@ -314,10 +307,10 @@ where
                 let address_key = AddressKey::from_multisigner(m);
                 let verifier_details = Some(sign_display.signed_by.show_card());
 
-                if let Some(address_details) = try_get_address_details(&db_path, &address_key)? {
+                if let Some(address_details) = try_get_address_details(database, &address_key)? {
                     let mut specs_found = None;
                     for id in &address_details.network_id {
-                        let specs = try_get_network_specs(&db_path, id)?;
+                        let specs = try_get_network_specs(database, id)?;
                         if let Some(ordered_specs) = specs {
                             if ordered_specs.specs.name == sign_display.network_name {
                                 specs_found = Some(ordered_specs);
@@ -333,7 +326,7 @@ where
                                 specs_found.specs.base58prefix,
                                 &address_details,
                             )),
-                            Some(decode_signable_from_history(sign_display, &db_path)?),
+                            Some(decode_signable_from_history(database, sign_display)?),
                         )
                     } else {
                         (verifier_details, None, None)
@@ -355,17 +348,14 @@ where
     Ok(res)
 }
 
-pub(crate) fn decode_signable_from_history<P>(
+pub(crate) fn decode_signable_from_history(
+    database: &sled::Db,
     found_signable: &SignDisplay,
-    db_path: P,
-) -> Result<TransactionCardSet>
-where
-    P: AsRef<Path>,
-{
+) -> Result<TransactionCardSet> {
     let (parser_data, network_name, encryption) = found_signable.transaction_network_encryption();
 
-    let short_specs = specs_by_name(&network_name, &encryption, &db_path)?.short();
-    let meta_set = find_meta_set(&short_specs, &db_path)?;
+    let short_specs = specs_by_name(database, &network_name, &encryption)?.short();
+    let meta_set = find_meta_set(database, &short_specs)?;
     if meta_set.is_empty() {
         return Err(Error::HistoricalMetadata { name: network_name });
     }
@@ -379,7 +369,7 @@ where
 
     for x in meta_set.iter() {
         let used_version = x.version();
-        let metadata_bundle = bundle_from_meta_set_element(x, &db_path)?;
+        let metadata_bundle = bundle_from_meta_set_element(database, x)?;
 
         match parse_extensions(
             extensions_data.to_vec(),

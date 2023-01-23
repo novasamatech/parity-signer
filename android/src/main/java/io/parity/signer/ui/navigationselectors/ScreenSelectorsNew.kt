@@ -59,7 +59,7 @@ fun CombinedScreensSelector(
 			)
 		}
 		is ScreenData.Keys -> {
-			val keys = keysBySeedName(signerDataModel.dbName, screenData.f)
+			val keys = keysBySeedName(screenData.f)
 			KeySetDetailsNavSubgraph(
 				model = keys.toKeySetDetailsModel(),
 				rootNavigator = rootNavigator,

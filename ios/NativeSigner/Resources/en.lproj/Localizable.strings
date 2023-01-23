@@ -500,6 +500,10 @@
 "Settings.Modal.GeneralVerifier.Action.Remove" = "I Understand, remove all data";
 "Settings.Modal.GeneralVerifier.Action.Cancel" = "Cancel";
 
+"Settings.TermsOfService.Label.Title" = "Terms of service";
+"Settings.PrivacyPolicy.Label.Title" = "Privacy Policy";
+
+
 "VerifierCertificate.Label.Title" = "Verifier Certificate";
 "VerifierCertificate.Action.Remove" = "Remove certificate";
 

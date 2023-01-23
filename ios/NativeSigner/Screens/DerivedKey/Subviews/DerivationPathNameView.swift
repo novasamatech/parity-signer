@@ -267,23 +267,36 @@ extension DerivationPathNameView {
             case let .allowedOnAnyNetwork(networks):
                 let checks = networks
                     .map { network in createKeyService.checkForCollision(seedName, inputText, network.key) }
-                if let firstEncounteredError = checks.first(where: { $0.buttonGood == false || $0.error != nil }) {
-                    pathErrorCheck(firstEncounteredError)
+                if let firstEncounteredError = checks
+                    .compactMap({
+                        if case let .success(derivationCheck) = $0 {
+                            return derivationCheck
+                        } else {
+                            return nil
+                        }
+                    }).first(where: { $0.buttonGood == false || $0.error != nil }) {
+                    pathErrorCheck(.success(firstEncounteredError))
                 } else {
                     derivationPathError = nil
                 }
             }
         }
 
-        private func pathErrorCheck(_ derivationCheck: DerivationCheck) {
-            if derivationCheck.collision != nil {
-                derivationPathError = Localizable.CreateDerivedKey.Modal.Path.Error.alreadyExists.string
-            } else if !derivationCheck.buttonGood {
-                derivationPathError = Localizable.CreateDerivedKey.Modal.Path.Error.pathInvalid.string
-            } else if derivationCheck.error != nil {
-                derivationPathError = derivationCheck.error
-            } else {
-                derivationPathError = nil
+        private func pathErrorCheck(_ result: Result<DerivationCheck, ServiceError>) {
+            switch result {
+            case let .success(derivationCheck):
+                if derivationCheck.collision != nil {
+                    derivationPathError = Localizable.CreateDerivedKey.Modal.Path.Error.alreadyExists.string
+                } else if !derivationCheck.buttonGood {
+                    derivationPathError = Localizable.CreateDerivedKey.Modal.Path.Error.pathInvalid.string
+                } else if derivationCheck.error != nil {
+                    derivationPathError = derivationCheck.error
+                } else {
+                    derivationPathError = nil
+                }
+            case let .failure(error):
+                presentableInfoModal = .alertError(message: error.localizedDescription)
+                isPresentingInfoModal = true
             }
         }
 

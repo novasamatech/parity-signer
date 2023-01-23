@@ -102,13 +102,13 @@ fn sufficient_crypto(
 
 /// Function to generate hex line of qr data corresponding to `sufficient_crypto` for `load_types` message
 pub(crate) fn sufficient_crypto_load_types(
+    database: &sled::Db,
     multisigner: &MultiSigner,
     address_details: &AddressDetails,
-    database_name: &str,
     seed_phrase: &str,
     pwd_entry: &str,
 ) -> Result<(Vec<u8>, MSCContent)> {
-    let types_content = prep_types(database_name)?;
+    let types_content = prep_types(database)?;
     let sufficient = match sufficient_crypto(
         multisigner,
         address_details,
@@ -119,19 +119,19 @@ pub(crate) fn sufficient_crypto_load_types(
         Ok(s) => {
             TrDbCold::new()
                 .set_history(events_to_batch(
-                    database_name,
+                    database,
                     vec![Event::TypesSigned {
                         types_export: TypesExport::get(&types_content, &s.verifier_value()),
                     }],
                 )?)
-                .apply(database_name)?;
+                .apply(database)?;
             s.encode()
         }
         Err(e) => {
             if let Error::WrongPassword = e {
                 TrDbCold::new()
-                    .set_history(events_to_batch(database_name, vec![Event::WrongPassword])?)
-                    .apply(database_name)?;
+                    .set_history(events_to_batch(database, vec![Event::WrongPassword])?)
+                    .apply(database)?;
             }
             return Err(e);
         }
@@ -142,17 +142,17 @@ pub(crate) fn sufficient_crypto_load_types(
 
 /// Function to generate hex line of qr data corresponding to `sufficient_crypto` for `load_metadata` message
 pub(crate) fn sufficient_crypto_load_metadata(
+    database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
     network_version: u32,
     multisigner: &MultiSigner,
     address_details: &AddressDetails,
-    database_name: &str,
     seed_phrase: &str,
     pwd_entry: &str,
 ) -> Result<(Vec<u8>, MSCContent)> {
-    let network_specs = get_network_specs(database_name, network_specs_key)?.specs;
+    let network_specs = get_network_specs(database, network_specs_key)?.specs;
     let meta_values =
-        get_meta_values_by_name_version(database_name, &network_specs.name, network_version)?;
+        get_meta_values_by_name_version(database, &network_specs.name, network_version)?;
     let load_meta_content =
         ContentLoadMeta::generate(&meta_values.meta, &network_specs.genesis_hash);
     let sufficient = match sufficient_crypto(
@@ -165,7 +165,7 @@ pub(crate) fn sufficient_crypto_load_metadata(
         Ok(s) => {
             TrDbCold::new()
                 .set_history(events_to_batch(
-                    database_name,
+                    database,
                     vec![Event::MetadataSigned {
                         meta_values_export: MetaValuesExport::get(
                             &meta_values,
@@ -173,14 +173,14 @@ pub(crate) fn sufficient_crypto_load_metadata(
                         ),
                     }],
                 )?)
-                .apply(database_name)?;
+                .apply(database)?;
             s.encode()
         }
         Err(e) => {
             if let Error::WrongPassword = e {
                 TrDbCold::new()
-                    .set_history(events_to_batch(database_name, vec![Event::WrongPassword])?)
-                    .apply(database_name)?;
+                    .set_history(events_to_batch(database, vec![Event::WrongPassword])?)
+                    .apply(database)?;
             }
             return Err(e);
         }
@@ -196,14 +196,14 @@ pub(crate) fn sufficient_crypto_load_metadata(
 
 /// Function to generate hex line of qr data corresponding to `sufficient_crypto` for `add_specs` message
 pub(crate) fn sufficient_crypto_add_specs(
+    database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
     multisigner: &MultiSigner,
     address_details: &AddressDetails,
-    database_name: &str,
     seed_phrase: &str,
     pwd_entry: &str,
 ) -> Result<(Vec<u8>, MSCContent)> {
-    let network_specs_to_send = get_network_specs(database_name, network_specs_key)?.specs;
+    let network_specs_to_send = get_network_specs(database, network_specs_key)?.specs;
     let add_specs_content = ContentAddSpecs::generate(&network_specs_to_send);
     let sufficient = match sufficient_crypto(
         multisigner,
@@ -215,7 +215,7 @@ pub(crate) fn sufficient_crypto_add_specs(
         Ok(s) => {
             TrDbCold::new()
                 .set_history(events_to_batch(
-                    database_name,
+                    database,
                     vec![Event::NetworkSpecsSigned {
                         network_specs_export: NetworkSpecsExport::get(
                             &network_specs_to_send,
@@ -223,14 +223,14 @@ pub(crate) fn sufficient_crypto_add_specs(
                         ),
                     }],
                 )?)
-                .apply(database_name)?;
+                .apply(database)?;
             s.encode()
         }
         Err(e) => {
             if let Error::WrongPassword = e {
                 TrDbCold::new()
-                    .set_history(events_to_batch(database_name, vec![Event::WrongPassword])?)
-                    .apply(database_name)?;
+                    .set_history(events_to_batch(database, vec![Event::WrongPassword])?)
+                    .apply(database)?;
             }
             return Err(e);
         }
