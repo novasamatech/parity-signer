@@ -62,10 +62,14 @@ struct CircularProgressView: View {
     @State private var timer = Timer
         .publish(every: Constants.animationPrecision, on: .main, in: .common)
         .autoconnect()
+    @EnvironmentObject var applicationStatePublisher: ApplicationStatePublisher
+    @State private var lastApplicationState: ApplicationState?
+    @State private var moveToBackgroundDate: Date?
+    private let cancelBag = CancelBag()
 
     init(_ model: CircularCountdownModel) {
         self.model = model
-        counter = model.counter
+        _counter = State(initialValue: model.counter)
     }
 
     var body: some View {
@@ -94,11 +98,29 @@ struct CircularProgressView: View {
         .frame(width: model.viewModel.size, height: model.viewModel.size, alignment: .center)
         .onReceive(timer) { _ in
             if counter > 0 {
-                counter -= Constants.animationPrecision
+                counter = max(0, counter - Constants.animationPrecision)
             } else {
                 timer.upstream.connect().cancel()
                 model.onCompletion()
             }
+        }
+        .onAppear {
+            applicationStatePublisher.$applicationState.sink { updatedState in
+                guard lastApplicationState != updatedState, counter > 0 else { return }
+                self.lastApplicationState = updatedState
+                switch updatedState {
+                case .active:
+                    guard let moveToBackgroundDate = moveToBackgroundDate else { return }
+                    let timePassed = Date().timeIntervalSince(moveToBackgroundDate)
+                    self.counter = max(0, self.counter - timePassed)
+                    if self.counter < 0 {
+                        self.timer.upstream.connect().cancel()
+                        self.model.onCompletion()
+                    }
+                case .inactive:
+                    self.moveToBackgroundDate = .now
+                }
+            }.store(in: cancelBag)
         }
     }
 
@@ -133,5 +155,6 @@ struct CircularProgressView_Previews: PreviewProvider {
         .padding()
         .preferredColorScheme(.light)
         .previewLayout(.sizeThatFits)
+        .environmentObject(ApplicationStatePublisher())
     }
 }
