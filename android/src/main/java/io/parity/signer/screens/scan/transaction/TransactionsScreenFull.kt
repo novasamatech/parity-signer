@@ -230,6 +230,8 @@ private fun ActionButtons(
 				onClicked = onBack,
 			)
 		}
+
+//		continueImportDerivedKeys todo import derivations
 		TransactionType.IMPORT_DERIVATIONS -> {
 			PrimaryButtonWide(
 				label = stringResource(R.string.transaction_action_select_seed),

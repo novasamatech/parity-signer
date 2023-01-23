@@ -29,7 +29,8 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 fun NotificationFrameText(
-	@StringRes messageRes: Int
+	@StringRes messageRes: Int,
+	withBorder: Boolean = true,
 ) {
 	val innerShape =
 		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))

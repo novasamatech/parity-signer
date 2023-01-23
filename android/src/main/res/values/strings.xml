@@ -231,6 +231,11 @@
 	<string name="scan_screen_error_missing_network_message">Some keys can not be imported until their networks are added.</string>
 	<string name="scan_screen_error_key_already_exists_title">Derived keys already exist</string>
 	<string name="scan_screen_error_key_already_exists_message">All of the scanned derived keys are already imported</string>
+	<string name="import_derivations_error_key_missing">Some keys can not be imported until their key sets are recovered. Please recover the missing Key Sets.</string>
+	<string name="import_derivations_error_network_missing">Some keys can not be imported until their networks are added. Please add missing networks and their metadata. </string>
+	<string name="import_derivations_error_path_bad_format">Path bad format. Key already added or wrong data.</string>
+<!--	<string name="import_derivations_error_path_bad_format">Some are hidden from the list because they have already been imported.</string> -->
+	<string name="import_derivations_error_keys_already_exist">Some are hidden from the list because they have already been imported.</string>
 
 
 </resources>
