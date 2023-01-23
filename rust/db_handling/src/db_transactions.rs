@@ -551,11 +551,15 @@ impl TrDbColdStub {
     /// `network_specs_stub`. Key is [`NetworkSpecsKey`] in key form, value is
     /// SCALE-encoded [`OrderedNetworkSpecs`].
     /// - Add corresponding `Event::NetworkSpecsAdded(_)` into `history_stub`.
-    /// - Add root address for the network if the [`AddressDetails`] entry with
+    /// - Add root address for the network if the
+    /// [`AddressDetails`](definitions::users::AddressDetails) entry with
     /// matching [`Encryption`](definitions::crypto::Encryption) already exists,
     /// i.e. add (key, value) pair to the address additions queue in
-    /// `addresses_stub`. Key is [`AddressKey`] in key form, value is
-    /// SCALE-encoded updated [`AddressDetails`].
+    /// `addresses_stub`. Key is
+    /// [`AddressKey`](definitions::keyring::AddressKey)
+    /// in key form, value is
+    /// SCALE-encoded updated
+    /// [`AddressDetails`](definitions::users::AddressDetails).
     /// - If address was added, add corresponding `Event::IdentityAdded(_)`
     /// into `history_stub`.
     ///
