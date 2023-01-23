@@ -13,7 +13,9 @@ where
         command,
         db_path.as_ref().to_string_lossy()
     );
-    setup(db_path);
+    let db = sled::open(db_path).unwrap();
+    setup(&db);
+    drop(db);
     assert_cmd_stdout(cmd, output);
 }
 

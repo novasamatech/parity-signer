@@ -17,6 +17,8 @@ transaction_signing = {path = "../transaction_signing"}
 zeroize = "1.5.7"
 qrcode_rtx = { path = "../qrcode_rtx" }
 parity-scale-codec = "3.2.2"
+sled = "0.34"
+log = "0.4"
 
 [dev-dependencies]
 pretty_assertions = "1"

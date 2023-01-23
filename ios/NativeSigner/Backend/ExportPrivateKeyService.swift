@@ -24,7 +24,6 @@ final class ExportPrivateKeyService {
 
     func exportPrivateKey() -> ExportPrivateKeyViewModel? {
         guard let qrCode = try? generateSecretKeyQr(
-            dbname: databaseMediator.databaseName,
             publicKey: keyDetails.pubkey,
             expectedSeedName: keyDetails.address.seedName,
             networkSpecsKey: keyDetails.networkInfo.networkSpecsKey,

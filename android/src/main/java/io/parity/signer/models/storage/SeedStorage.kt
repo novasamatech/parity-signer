@@ -135,7 +135,7 @@ class SeedStorage {
 			""
 		} else {
 			if (showInLogs) {
-				historySeedNameWasShown(seedName, dbName)
+				historySeedNameWasShown(seedName)
 			}
 			seedPhrase
 		}
