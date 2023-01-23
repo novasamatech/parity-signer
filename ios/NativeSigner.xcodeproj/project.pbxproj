@@ -1800,6 +1800,7 @@
 		};
 		6DDEF13A28AE744F004CA2FD /* Generate Database */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 12;
 			files = (
 			);
@@ -1816,7 +1817,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ $ACTION != \"indexbuild\" ]; then\n    bash $PROJECT_DIR/scripts/generate_database.sh\nfi\n";
+			shellScript = "bash $PROJECT_DIR/scripts/generate_database.sh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
