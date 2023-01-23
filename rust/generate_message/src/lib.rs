@@ -1073,10 +1073,9 @@ pub fn full_run(command: Command) -> Result<()> {
             Ok(default_hot(Some(&db))?)
         }
         Command::MakeColdRelease { path } => {
-            println!("PATH {:?}", path);
-            let db = sled::open(path.unwrap())?;
+            let db = path.and_then(|path| sled::open(path).ok());
 
-            Ok(default_cold_release(Some(&db))?)
+            Ok(default_cold_release(db.as_ref())?)
         }
         Command::TransferMetaToColdRelease { cold_db, hot_db } => {
             let hot_db = sled::open(hot_db)?;

@@ -33,11 +33,11 @@ use std::{
     collections::HashMap,
     fmt::Display,
     str::FromStr,
-    sync::{Arc, Mutex},
+    sync::{Arc, RwLock},
 };
 
 lazy_static! {
-    static ref DB: Arc<Mutex<Option<Db>>> = Arc::new(Mutex::new(None));
+    static ref DB: Arc<RwLock<Option<Db>>> = Arc::new(RwLock::new(None));
 }
 
 /// Container for severe error message
@@ -161,10 +161,10 @@ fn init_navigation(dbname: &str, seed_names: Vec<String>) -> Result<(), ErrorDis
     log::warn!("init_navigation {dbname}");
     let val = Some(sled::open(dbname).map_err(|e| ErrorDisplayed::from(e.to_string()))?);
 
-    *DB.lock().unwrap() = val;
+    *DB.write().unwrap() = val;
     init_logging("Signer".to_string());
     Ok(navigator::init_navigation(
-        DB.clone().lock().unwrap().as_ref().unwrap().clone(),
+        DB.clone().read().unwrap().as_ref().unwrap().clone(),
         seed_names,
     )?)
 }
@@ -200,7 +200,7 @@ fn qrparser_try_decode_qr_sequence(
 }
 
 fn get_db() -> Result<sled::Db, ErrorDisplayed> {
-    DB.lock()
+    DB.read()
         .unwrap()
         .clone()
         .ok_or(ErrorDisplayed::DbNotInitialized)
