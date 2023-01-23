@@ -214,10 +214,10 @@ class SignerDataModel : ViewModel() {
 		if (checkRefresh) _onBoardingDone.value =
 			OnboardingWasShown.Yes else _onBoardingDone.value = OnboardingWasShown.No
 		if (checkRefresh) {
-			getAlertState()
-			isAirplaneOn()
 			val allNames = seedStorage.getSeedNames()
 			initNavigation(dbName, allNames.toList())
+			getAlertState()
+			isAirplaneOn()
 			navigator.navigate(Action.START)
 		}
 	}
