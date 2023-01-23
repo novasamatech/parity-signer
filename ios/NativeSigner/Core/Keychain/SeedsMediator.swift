@@ -152,14 +152,13 @@ final class SeedsMediator: SeedsMediating {
         switch result {
         case let .success(resultSeed):
             do {
-                try historySeedNameWasShown(seedName: seedName, dbname: databaseMediator.databaseName)
+                try historySeedNameWasShown(seedName: seedName)
             } catch {
                 // Revisit why exactly we are returning empty String here, if Keychain data is all good
                 print("Seed access logging error! This system is broken and should not be used anymore.")
                 do {
                     try historyEntrySystem(
-                        event: .systemEntry(systemEntry: "Seed access logging failed!"),
-                        dbname: databaseMediator.databaseName
+                        event: .systemEntry(systemEntry: "Seed access logging failed!")
                     )
                 } catch {
                     return ""

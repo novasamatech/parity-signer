@@ -8,7 +8,6 @@ use definitions::{
 };
 use nom::bytes::complete::{tag, take_until};
 use parser::cards::ParserCard;
-use std::path::Path;
 use std::str;
 
 use nom::sequence::preceded;
@@ -19,12 +18,9 @@ use crate::error::{Error, Result};
 use crate::helpers::multisigner_msg_genesis_encryption;
 use crate::TransactionAction;
 
-pub fn process_message<P>(data_hex: &str, db_path: P) -> Result<TransactionAction>
-where
-    P: AsRef<Path>,
-{
+pub fn process_message(database: &sled::Db, data_hex: &str) -> Result<TransactionAction> {
     let (author_multi_signer, message_vec, genesis_hash, encryption) =
-        multisigner_msg_genesis_encryption(&db_path, data_hex)?;
+        multisigner_msg_genesis_encryption(database, data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
     let message = str::from_utf8(&message_vec)?.to_owned();
@@ -34,10 +30,10 @@ where
     let mut index: u32 = 0;
     let indent: u32 = 0;
 
-    match try_get_network_specs(&db_path, &network_specs_key)? {
+    match try_get_network_specs(database, &network_specs_key)? {
         Some(network_specs) => {
             let address_key = AddressKey::from_multisigner(&author_multi_signer);
-            match try_get_address_details(&db_path, &address_key)? {
+            match try_get_address_details(database, &address_key)? {
                 Some(address_details) => {
                     if address_details.network_id.contains(&network_specs_key) {
                         let message_card = Card::ParserCard(&ParserCard::Text(display_msg))
@@ -51,7 +47,7 @@ where
                             Vec::new(),
                         );
                         let sign: TrDbColdSign = sign.into();
-                        let checksum = sign.store_and_get_checksum(&db_path)?;
+                        let checksum = sign.store_and_get_checksum(database)?;
                         let author_info = make_author_info(
                             &author_multi_signer,
                             network_specs.specs.base58prefix,

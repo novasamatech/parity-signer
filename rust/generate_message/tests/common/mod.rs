@@ -6,16 +6,13 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
-pub fn setup<P>(db_path: P)
-where
-    P: AsRef<Path>,
-{
+pub fn setup(database: &sled::Db) {
     TrDbHot::new()
         .set_address_book(data::address_book())
         .set_network_specs_prep(data::network_specs_prep())
         .set_metadata(data::metadata())
         .set_settings(data::settings())
-        .apply(&db_path)
+        .apply(database)
         .unwrap();
 }
 
