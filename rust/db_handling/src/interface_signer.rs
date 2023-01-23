@@ -152,7 +152,7 @@ pub fn print_all_identities(database: &sled::Db) -> Result<Vec<MRawKey>> {
         .filter_map(|(multisigner, address_details)| {
             match &address_details.network_id {
                 Some(id) => {
-                    let network_specs = get_network_specs(&database, id).unwrap();
+                    let network_specs = get_network_specs(database, id).unwrap();
 
                     let address_key = AddressKey::new(
                         multisigner.clone(),
@@ -339,7 +339,7 @@ pub fn export_key(
     let ordered_network_specs = get_network_specs(database, network_specs_key)?;
     let network_specs = ordered_network_specs.specs;
     let address_key = AddressKey::new(multisigner.clone(), Some(network_specs.genesis_hash));
-    let address_details = get_address_details(&database, &address_key);
+    let address_details = get_address_details(database, &address_key);
     let address_details = if address_details.is_err() {
         let address_key = AddressKey::new(multisigner.clone(), None);
         get_address_details(database, &address_key)

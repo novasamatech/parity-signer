@@ -774,7 +774,7 @@ fn do_create_address(
                 has_parent_with_exposed_secret(cropped_path, has_pwd, seed_name, database)?;
 
             // check if the `AddressKey` is already in the database
-            let identities = open_tree(&database, ADDRTREE)?;
+            let identities = open_tree(database, ADDRTREE)?;
             if let Some(address_key) = address_key {
                 match identities.get(address_key.key()) {
                     // `AddressKey` is in the database
@@ -1488,13 +1488,13 @@ pub fn export_secret_key(
             address_key,
         });
     }
-    let public_key = multisigner_to_public(&multisigner);
+    let public_key = multisigner_to_public(multisigner);
 
     let style = address_details.encryption.identicon_style();
     let address = Address {
         path: address_details.path.to_string(),
         has_pwd: address_details.has_pwd,
-        identicon: make_identicon_from_multisigner(&multisigner, style),
+        identicon: make_identicon_from_multisigner(multisigner, style),
         seed_name: address_details.seed_name.to_string(),
         secret_exposed: true,
     };
@@ -1545,7 +1545,7 @@ pub fn export_secret_key(
     )?;
 
     let qr = generate_secret_qr(
-        &multisigner,
+        multisigner,
         &address_details,
         &network_specs.specs.genesis_hash,
         seed_phrase,
@@ -1563,7 +1563,7 @@ pub fn export_secret_key(
         pubkey: hex::encode(public_key),
         network_info,
         base58: print_multisigner_as_base58_or_eth(
-            &multisigner,
+            multisigner,
             Some(network_specs.specs.base58prefix),
             address_details.encryption,
         ),

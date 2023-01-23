@@ -68,7 +68,7 @@ pub(crate) fn parse_transaction(
             );
             let mut history: Vec<Event> = Vec::new();
 
-            let addrs = get_all_addresses(&database)?;
+            let addrs = get_all_addresses(database)?;
             println!("addr {:#?}", addrs);
             println!("addr key {:#?}", address_key);
 
