@@ -13,16 +13,8 @@ struct ModalSelector: View {
 
     var body: some View {
         switch navigation.actionResult.modalData {
-        case let .passwordConfirm(value):
-            PasswordConfirm(
-                content: value
-            )
         case let .sufficientCryptoReady(value):
             SufficientCryptoReady(content: value)
-        case let .typesInfo(value):
-            TypesMenu(
-                content: value
-            )
         case let .newSeedBackup(value):
             NewSeedBackupModal(
                 content: value
@@ -33,6 +25,8 @@ struct ModalSelector: View {
             )
         // Handled in native navigation
         case
+            .typesInfo,
+            .passwordConfirm,
             .logComment,
             .enterPassword,
             .backup,

@@ -39,8 +39,7 @@ final class CreateDerivedKeyService {
                     seedName: seedName,
                     seedPhrase: seedPhrase,
                     path: path,
-                    network: network,
-                    dbname: self.databaseMediator.databaseName
+                    network: network
                 )
                 result = .success(())
             } catch {
@@ -61,18 +60,15 @@ final class CreateDerivedKeyService {
             let result: Result<Void, Error>
             let seedPhrase = self.seedsMediator.getSeed(seedName: seedName)
             do {
-                try getAllNetworks(
-                    dbname: self.databaseMediator.databaseName
-                )
-                .forEach {
-                    try tryCreateAddress(
-                        seedName: seedName,
-                        seedPhrase: seedPhrase,
-                        path: path,
-                        network: $0.key,
-                        dbname: self.databaseMediator.databaseName
-                    )
-                }
+                try getAllNetworks()
+                    .forEach {
+                        try tryCreateAddress(
+                            seedName: seedName,
+                            seedPhrase: seedPhrase,
+                            path: path,
+                            network: $0.key
+                        )
+                    }
                 result = .success(())
             } catch {
                 result = .failure(error)
@@ -87,7 +83,12 @@ final class CreateDerivedKeyService {
         _ seedName: String,
         _ path: String,
         _ network: String
-    ) -> DerivationCheck {
-        substratePathCheck(seedName: seedName, path: path, network: network, dbname: databaseMediator.databaseName)
+    ) -> Result<DerivationCheck, ServiceError> {
+        do {
+            return .success(try substratePathCheck(seedName: seedName, path: path, network: network))
+        } catch {
+            // Update with presentable message when `origin/fs-address-keys` is merged
+            return .failure(.unknown)
+        }
     }
 }

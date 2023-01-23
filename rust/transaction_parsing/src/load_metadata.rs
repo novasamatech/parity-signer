@@ -1,8 +1,6 @@
 use db_handling::{
     db_transactions::TrDbColdStub,
-    helpers::{
-        genesis_hash_in_specs, get_general_verifier, open_db, try_get_valid_current_verifier,
-    },
+    helpers::{genesis_hash_in_specs, get_general_verifier, try_get_valid_current_verifier},
 };
 use definitions::{
     error::TransferContent,
@@ -14,7 +12,6 @@ use definitions::{
     network_specs::{ValidCurrentVerifier, Verifier},
     qr_transfers::ContentLoadMeta,
 };
-use std::path::Path;
 
 use crate::cards::{Card, Warning};
 use crate::check_signature::pass_crypto;
@@ -27,27 +24,23 @@ enum FirstCard {
     VerifierCard(TransactionCard),
 }
 
-pub fn load_metadata<P>(data_hex: &str, db_path: P) -> Result<TransactionAction>
-where
-    P: AsRef<Path>,
-{
+pub fn load_metadata(database: &sled::Db, data_hex: &str) -> Result<TransactionAction> {
     let checked_info = pass_crypto(data_hex, TransferContent::LoadMeta)?;
     let (meta, genesis_hash) = ContentLoadMeta::from_slice(&checked_info.message).meta_genhash()?;
     let meta_values = MetaValues::from_slice_metadata(&meta)?;
-    let general_verifier = get_general_verifier(&db_path)?;
+    let general_verifier = get_general_verifier(database)?;
     let verifier_key = VerifierKey::from_parts(genesis_hash);
-    let valid_current_verifier = try_get_valid_current_verifier(&verifier_key, &db_path)?.ok_or(
+    let valid_current_verifier = try_get_valid_current_verifier(database, &verifier_key)?.ok_or(
         Error::LoadMetaUnknownNetwork {
             name: meta_values.name.clone(),
         },
     )?;
-    let specs_invariants = genesis_hash_in_specs(genesis_hash, &open_db(&db_path)?)?.ok_or(
-        Error::LoadMetaNoSpecs {
+    let specs_invariants =
+        genesis_hash_in_specs(database, genesis_hash)?.ok_or(Error::LoadMetaNoSpecs {
             name: meta_values.name.clone(),
             valid_current_verifier: valid_current_verifier.clone(),
             general_verifier: general_verifier.clone(),
-        },
-    )?;
+        })?;
     if meta_values.name != specs_invariants.name {
         return Err(Error::LoadMetaWrongGenesisHash {
             name_metadata: meta_values.name,
@@ -165,9 +158,9 @@ where
             FirstCard::VerifierCard(Card::Verifier(new_verifier_value).card(&mut index, 0))
         }
     };
-    if accept_meta_values(&meta_values, &db_path)? {
+    if accept_meta_values(database, &meta_values)? {
         stub = stub.add_metadata(&meta_values);
-        let checksum = stub.store_and_get_checksum(&db_path)?;
+        let checksum = stub.store_and_get_checksum(database)?;
         let meta_display = MetaValuesDisplay::get(&meta_values);
         let meta_card = Card::Meta(meta_display).card(&mut index, 0);
         match first_card {

@@ -62,6 +62,12 @@ struct SettingsView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenCover(isPresented: $viewModel.isPresentingTermsOfService) {
+            TermsOfServiceView(viewModel: .init(isPresented: $viewModel.isPresentingTermsOfService))
+        }
+        .fullScreenCover(isPresented: $viewModel.isPresentingPrivacyPolicy) {
+            PrivacyPolicyView(viewModel: .init(isPresented: $viewModel.isPresentingPrivacyPolicy))
+        }
     }
 }
 
@@ -69,6 +75,8 @@ extension SettingsView {
     final class ViewModel: ObservableObject {
         @Published var renderable: SettingsViewRenderable = .init()
         @Published var isPresentingWipeConfirmation = false
+        @Published var isPresentingTermsOfService = false
+        @Published var isPresentingPrivacyPolicy = false
 
         private weak var navigation: NavigationCoordinator!
         private weak var data: SignerDataModel!
@@ -88,20 +96,30 @@ extension SettingsView {
         }
 
         func onTapAction(_ item: SettingsItem) {
-            if let action = item.detailsNavigation {
-                navigation.perform(navigation: .init(action: action))
-            } else {
-                switch item {
-                case .wipe:
-                    onTapWipe()
-                default:
-                    ()
-                }
+            switch item {
+            case .wipe:
+                onTapWipe()
+            case .termsAndConditions:
+                onTermsAndConditionsTap()
+            case .privacyPolicy:
+                onPrivacyPolicyTap()
+            case .networks:
+                navigation.perform(navigation: .init(action: .manageNetworks))
+            case .verifier:
+                navigation.perform(navigation: .init(action: .viewGeneralVerifier))
             }
         }
 
         private func onTapWipe() {
             isPresentingWipeConfirmation = true
+        }
+
+        private func onTermsAndConditionsTap() {
+            isPresentingTermsOfService = true
+        }
+
+        private func onPrivacyPolicyTap() {
+            isPresentingPrivacyPolicy = true
         }
 
         func wipe() {
