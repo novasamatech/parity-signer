@@ -83,14 +83,12 @@ final class CreateDerivedKeyService {
         _ seedName: String,
         _ path: String,
         _ network: String
-    ) -> DerivationCheck {
+    ) -> Result<DerivationCheck, ServiceError> {
         do {
-            let result = try substratePathCheck(seedName: seedName, path: path, network: network)
-            return result
+            return .success(try substratePathCheck(seedName: seedName, path: path, network: network))
         } catch {
-            print("bla")
-
-            return DerivationCheck(buttonGood: false, whereTo: nil, collision: nil, error: "Error")
+            // Update with presentable message when `origin/fs-address-keys` is merged
+            return .failure(.unknown)
         }
     }
 }
