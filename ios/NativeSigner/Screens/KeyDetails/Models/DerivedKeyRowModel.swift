@@ -8,6 +8,7 @@
 import UIKit
 
 struct DerivedKeyRowModel: Equatable {
+    let keyData: MKeyAndNetworkCard
     let viewModel: DerivedKeyRowViewModel
     let actionModel: DerivedKeyActionModel
 }

@@ -144,7 +144,7 @@ struct KeyDetailsView: View {
                 )
                 .clearModalBackground()
                 .onAppear {
-                    viewModel.selectedSeeds.removeAll()
+                    viewModel.selectedKeys.removeAll()
                     viewModel.isPresentingSelectionOverlay.toggle()
                 }
             } else {
@@ -188,21 +188,12 @@ struct KeyDetailsView: View {
             ) { deriveKey in
                 DerivedKeyRow(
                     viewModel: deriveKey.viewModel,
-                    selectedSeeds: $viewModel.selectedSeeds,
+                    selectedKeys: $viewModel.selectedKeys,
                     isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
                 )
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    if viewModel.isPresentingSelectionOverlay {
-                        let seedName = deriveKey.viewModel.path
-                        if viewModel.selectedSeeds.contains(seedName) {
-                            viewModel.selectedSeeds.removeAll { $0 == seedName }
-                        } else {
-                            viewModel.selectedSeeds.append(seedName)
-                        }
-                    } else {
-                        navigation.perform(navigation: deriveKey.actionModel.tapAction)
-                    }
+                    viewModel.onDerivedKeyTap(deriveKey)
                 }
             }
             Spacer()
