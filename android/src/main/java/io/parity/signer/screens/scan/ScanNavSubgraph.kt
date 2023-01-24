@@ -14,6 +14,8 @@ import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.components.panels.BottomBarSingleton
 import io.parity.signer.components.panels.toAction
 import io.parity.signer.models.Navigator
+import io.parity.signer.screens.scan.bananasplit.BananaSplitPasswordScreen
+import io.parity.signer.screens.scan.camera.ScanScreen
 import io.parity.signer.screens.scan.elements.ScanErrorBottomSheet
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
 import io.parity.signer.screens.scan.transaction.TransactionPreviewType
@@ -36,6 +38,8 @@ fun ScanNavSubgraph(
 
 	val transactions = scanViewModel.transactions.collectAsState()
 	val signature = scanViewModel.signature.collectAsState()
+	val bananaSplitPassword = scanViewModel.bananaSplitPassword.collectAsState()
+
 	val presentableError = scanViewModel.presentableError.collectAsState()
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
@@ -57,21 +61,47 @@ fun ScanNavSubgraph(
 
 	//Full screens
 	val transactionsValue = transactions.value
-	if (transactionsValue == null || showingModals) {
+	val bananaQrData = bananaSplitPassword.value
+	if (bananaQrData != null) {
+		BananaSplitPasswordScreen(
+			qrData = bananaQrData,
+			onClose = {
+				backAction()
+			},
+			onSuccess = { seedName ->
+				scanViewModel.clearState()
+				rootNavigator.navigate(Action.SELECT_SEED, seedName)
+			},
+			onCustomError = { error ->
+				scanViewModel.presentableError.value = error
+				scanViewModel.bananaSplitPassword.value = null
+			},
+			onErrorWrongPassword = {
+				scanViewModel.errorWrongPassword.value = true
+				scanViewModel.bananaSplitPassword.value = null
+			},
+			modifier = Modifier.statusBarsPadding(),
+		)
+	} else if (transactionsValue == null || showingModals) {
+
 		ScanScreen(
 			onClose = { navigateToPrevious() },
 			performPayloads = { payloads ->
 				scanViewModel.performPayload(payloads)
+			},
+			onBananaSplit = { payloads ->
+				scanViewModel.bananaSplitPassword.value = payloads
 			}
 		)
 	} else {
+
 		TransactionsScreenFull(
 			transactions = transactionsValue.transactions,
 			signature = signature.value,
 			modifier = Modifier.statusBarsPadding(),
 			onBack = {
 				backendAction(Action.GO_BACK, "", "")
-				scanViewModel.clearTransactionState()
+				scanViewModel.clearState()
 			},
 			onFinish = {
 				when (val previewType =
@@ -101,23 +131,23 @@ fun ScanNavSubgraph(
 						//nothing
 					}
 				}
-				scanViewModel.clearTransactionState()
+				scanViewModel.clearState()
 				rootNavigator.navigate(Action.GO_FORWARD)
 			},
 		)
 	}
 	//Bottom sheets
 	presentableError.value?.let { presentableErrorValue ->
-		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
+		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearState) {
 			ScanErrorBottomSheet(
 				errorMessage = presentableErrorValue,
-				onOK = scanViewModel::clearTransactionState,
+				onOK = scanViewModel::clearState,
 			)
 		}
 	} ?: passwordModel.value?.let { passwordModelValue ->
 		BottomSheetWrapperRoot(onClosedAction = {
 			scanViewModel.resetRustModalToNewScan()
-			scanViewModel.clearTransactionState()
+			scanViewModel.clearState()
 		}) {
 			EnterPassword(
 				data = passwordModelValue,
@@ -128,14 +158,14 @@ fun ScanNavSubgraph(
 				},
 				onClose = {
 					scanViewModel.resetRustModalToNewScan()
-					scanViewModel.clearTransactionState()
+					scanViewModel.clearState()
 				},
 			)
 		}
 	} ?: if (errorWrongPassword.value) {
-		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearTransactionState) {
+		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearState) {
 			WrongPasswordBottomSheet(
-				onOk = scanViewModel::clearTransactionState
+				onOk = scanViewModel::clearState
 			)
 		}
 	} else {

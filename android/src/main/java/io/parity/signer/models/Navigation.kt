@@ -27,7 +27,7 @@ interface Navigator {
 	 * For old Rust-backed navigation actions
 	 */
 	fun navigate(
-		button: Action,
+		action: Action,
 		details: String = "",
 		seedPhrase: String = ""
 	)
@@ -39,14 +39,14 @@ interface Navigator {
 
 class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 
-	override fun navigate(button: Action, details: String, seedPhrase: String) {
+	override fun navigate(action: Action, details: String, seedPhrase: String) {
 		if (singleton.localNavAction.value != LocalNavAction.None) {
 			//if state machine navigation triggered - remove platform layers on top
 			singleton._localNavAction.value = LocalNavAction.None
 		}
 
 		try {
-			val navigationAction = backendAction(button, details, seedPhrase)
+			val navigationAction = backendAction(action, details, seedPhrase)
 			//Workaround while Rust state machine is keeping state inside as it's needed for exporting private key in different screen
 			if (navigationAction.screenData is ScreenData.KeyDetails) {
 				singleton.lastOpenedKeyDetails =
@@ -134,13 +134,14 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 				)
 		) {
 			singleton.activity.moveTaskToBack(true)
-		} else
+		} else {
 			navigate(Action.GO_BACK)
+		}
 	}
 }
 
 class EmptyNavigator : Navigator {
-	override fun navigate(button: Action, details: String, seedPhrase: String) {
+	override fun navigate(action: Action, details: String, seedPhrase: String) {
 		//do nothing
 	}
 
@@ -149,6 +150,21 @@ class EmptyNavigator : Navigator {
 	}
 
 	override fun backAction() {
+	}
+}
+
+class FakeNavigator : Navigator {
+	override fun navigate(action: Action, details: String, seedPhrase: String) {
+		backendAction(action, details, seedPhrase)
+		//do nothing
+	}
+
+	override fun navigate(action: LocalNavRequest) {
+		//do nothing
+	}
+
+	override fun backAction() {
+		navigate(Action.GO_BACK)
 	}
 }
 

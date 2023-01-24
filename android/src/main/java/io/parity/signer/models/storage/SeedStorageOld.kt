@@ -2,12 +2,12 @@ package io.parity.signer.models.storage
 
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.navigate
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.initNavigation
 import io.parity.signer.uniffi.updateSeedNames
+import kotlinx.coroutines.*
 
 /**
  * Refresh seed names list
@@ -15,13 +15,9 @@ import io.parity.signer.uniffi.updateSeedNames
  * authentication.authenticate(activity) {refreshSeedNames()}
  * which is somewhat asynchronous
  */
-internal fun SignerDataModel.tellRustSeedNames(init: Boolean = false) {
+internal fun SignerDataModel.tellRustSeedNames() {
 	val allNames = seedStorage.getSeedNames()
-	if (init) {
-		initNavigation(dbName, allNames.toList())
-	} else {
-		updateSeedNames(allNames.toList())
-	}
+	updateSeedNames(allNames.toList())
 }
 
 /**
@@ -29,31 +25,19 @@ internal fun SignerDataModel.tellRustSeedNames(init: Boolean = false) {
  *
  * @param createRoots is fake and should always be true. It's added for educational reasons
  */
-@Deprecated("Use SeedStorage or better SeedRepository")
+@Deprecated("Use SeedRepository directly")
 fun SignerDataModel.addSeed(
 	seedName: String,
 	seedPhrase: String,
-	createRoots: Boolean
 ) {
-
-	// Check if seed name already exists
-	if (seedStorage.lastKnownSeedNames.value.contains(seedName)) {
-		return
-	}
-
-	// Run standard login prompt!
-	ServiceLocator.authentication.authenticate(activity) {
-		try {
-			seedStorage.addSeed(seedName, seedPhrase)
-			tellRustSeedNames()
-			navigate(
-				button = Action.GO_FORWARD,
-				details = if (createRoots) "true" else "false",
-				seedPhrase = seedPhrase
-			)
-		} catch (e: java.lang.Exception) {
-			Log.e("Seed creation error", e.toString())
-		}
+	viewModelScope.launch {
+		val repository = ServiceLocator.activityScope!!.seedRepository
+		repository.addSeed(
+			seedName = seedName,
+			seedPhrase = seedPhrase,
+			navigator = navigator,
+			isOptionalAuth = false
+		)
 	}
 }
 

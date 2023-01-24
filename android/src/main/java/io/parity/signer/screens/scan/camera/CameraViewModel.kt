@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
 import io.parity.signer.models.encodeHex
+import io.parity.signer.models.submitErrorState
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,9 +18,12 @@ class CameraViewModel() : ViewModel() {
 
 	val isTorchEnabled = MutableStateFlow(false)
 
-	private val _pendingPayloads = MutableStateFlow<Set<String>>(emptySet())
+	private val _bananaSplitPayload = MutableStateFlow<List<String>?>(null)
+	val bananaSplitPayload: StateFlow<List<String>?> = _bananaSplitPayload.asStateFlow()
+
+	private val _pendingTransactionPayloads = MutableStateFlow<Set<String>>(emptySet())
 	val pendingTransactionPayloads: StateFlow<Set<String>> =
-		_pendingPayloads.asStateFlow()
+		_pendingTransactionPayloads.asStateFlow()
 
 	private val _total = MutableStateFlow<Int?>(null)
 	private val _captured = MutableStateFlow<Int?>(null)
@@ -29,7 +33,7 @@ class CameraViewModel() : ViewModel() {
 	internal val captured: StateFlow<Int?> = _captured.asStateFlow()
 
 	// payload of currently scanned qr codes for multiqr transaction like metadata update.
-	private var currentMultiQrTransaction = arrayOf<String>()
+	private var currentMultiQrTransaction = mutableSetOf<String>()
 
 	/**
 	 * Barcode detecting function.
@@ -50,26 +54,15 @@ class CameraViewModel() : ViewModel() {
 			.addOnSuccessListener { barcodes ->
 				barcodes.forEach {
 					val payloadString = it?.rawBytes?.encodeHex()
-					if (!(currentMultiQrTransaction.contains(payloadString) || payloadString.isNullOrEmpty())) {
+					if (!currentMultiQrTransaction.contains(payloadString) && !payloadString.isNullOrEmpty()) {
 						if (total.value == null) {
 							try {
-								val proposeTotal =
-									qrparserGetPacketsTotal(payloadString, true).toInt()
+								val proposeTotal = qrparserGetPacketsTotal(payloadString, true).toInt()
 								if (proposeTotal == 1) {
-									try {
-										val payload = qrparserTryDecodeQrSequence(
-											data = listOf(payloadString),
-											password = null,
-											cleaned = true,
-										) as? DecodeSequenceResult.Other
-										val actualPayload = payload?.s ?: "" //todo dmitry banana split handle #1506 gh
-										resetScanValues()
-										addPendingTransaction(actualPayload)
-									} catch (e: java.lang.Exception) {
-										Log.e("scanVM", "Single frame decode failed $e")
-									}
+									decode(listOf(payloadString))
 								} else {
 									currentMultiQrTransaction += payloadString
+									_captured.value = currentMultiQrTransaction.size
 									_total.value = proposeTotal
 								}
 							} catch (e: java.lang.Exception) {
@@ -78,22 +71,10 @@ class CameraViewModel() : ViewModel() {
 						} else {
 							currentMultiQrTransaction += payloadString
 							if ((currentMultiQrTransaction.size + 1) >= (total.value ?: 0)) {
-								try {
-									val payload = qrparserTryDecodeQrSequence(
-										data = currentMultiQrTransaction.toList(),
-										password = null,
-										cleaned = true,
-									) as? DecodeSequenceResult.Other
-									val actualPayload = payload?.s ?: "" //todo dmitry banana split handle #1506 gh
-									if (actualPayload.isNotEmpty()) {
-										resetScanValues()
-										addPendingTransaction(actualPayload)
-									}
-								} catch (e: java.lang.Exception) {
-									Log.e("scanVM", "failed to parse sequence $e")
-								}
+								decode(currentMultiQrTransaction.toList())
+							} else {
+								_captured.value = currentMultiQrTransaction.size
 							}
-							_captured.value = currentMultiQrTransaction.size
 							Log.d("scanVM", "captured " + captured.value.toString())
 						}
 					}
@@ -107,22 +88,54 @@ class CameraViewModel() : ViewModel() {
 			}
 	}
 
+	private fun decode(completePayload: List<String>) {
+		try {
+			val payload = qrparserTryDecodeQrSequence(
+				data = completePayload,
+				password = null,
+				cleaned = true,
+			)
+			when (payload) {
+				is DecodeSequenceResult.BBananaSplitRecoveryResult -> {
+					when (payload.b) {
+						is BananaSplitRecoveryResult.RecoveredSeed -> {
+							//we passed a null password in qrparserTryDecodeQrSequence so we can't get there
+							submitErrorState("cannot happen here that for scanning we don't have password request")
+						}
+						BananaSplitRecoveryResult.RequestPassword -> {
+							resetScanValues()
+							_bananaSplitPayload.value = completePayload
+						}
+					}
+				}
+				is DecodeSequenceResult.Other -> {
+					val actualPayload = payload.s
+					resetScanValues()
+					addPendingTransaction(actualPayload)
+				}
+			}
+
+		} catch (e: Exception) {
+			Log.e("scanVM", "Single frame decode failed $e")
+		}
+	}
+
 	private fun addPendingTransaction(payload: String) {
-		_pendingPayloads.value += payload
+		_pendingTransactionPayloads.value += payload
 	}
 
 	/**
 	 * Clears camera progress
 	 */
 	fun resetScanValues() {
-		currentMultiQrTransaction = arrayOf()
+		currentMultiQrTransaction = mutableSetOf()
 		_captured.value = null
 		_total.value = null
 	}
 
 	fun resetPendingTransactions() {
-		_pendingPayloads.value = emptySet()
+		_pendingTransactionPayloads.value = emptySet()
+		_bananaSplitPayload.value = null
 		resetScanValues()
 	}
-
 }
