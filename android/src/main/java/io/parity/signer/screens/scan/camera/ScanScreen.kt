@@ -76,7 +76,7 @@ fun ScanScreen(
 			Spacer(
 				modifier = Modifier
 					.statusBarsPadding()
-					.padding(top = 12.dp)
+					.padding(top = 4.dp)
 			)
 			ScanHeader(onClose = onClose)
 

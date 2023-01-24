@@ -20,8 +20,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.models.Callback
+import io.parity.signer.screens.scan.elements.CameraCloseIcon
 import io.parity.signer.screens.scan.elements.CameraLightIcon
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.forcedFill40
@@ -130,7 +130,7 @@ internal fun ScanHeader(
 			.fillMaxWidth(1f)
 			.padding(horizontal = 16.dp)
 	) {
-		CloseIcon(
+		CameraCloseIcon(
 			onCloseClicked = onClose
 		)
 		Spacer(modifier = Modifier.weight(1f))
