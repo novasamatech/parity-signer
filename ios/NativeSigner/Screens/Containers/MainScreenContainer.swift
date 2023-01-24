@@ -13,27 +13,20 @@ struct MainScreenContainer: View {
     @StateObject var data: SignerDataModel
 
     var body: some View {
-        if data.onboardingDone, data.authenticated {
-            AuthenticatedScreenContainer()
-                .environmentObject(data)
-        } else if data.onboardingDone {
-            UnauthenticatedScreenContainer()
-                .environmentObject(data)
-        } else if data.protected {
-            LandingView()
-                .environmentObject(data)
-        } else if data.protected, connectivityMediator.isConnectivityOn {
-            Localizable.Connectivity.detected.text
-                .background(Asset.backgroundPrimary.swiftUIColor)
-        } else {
+        if !data.protected {
             Localizable.pleaseProtectDeviceWithPinOrPassword.text
                 .background(Asset.backgroundPrimary.swiftUIColor)
+        } else {
+            if data.onboardingDone, data.authenticated {
+                AuthenticatedScreenContainer()
+                    .environmentObject(data)
+            } else if data.onboardingDone {
+                UnauthenticatedScreenContainer()
+                    .environmentObject(data)
+            } else {
+                OnboardingAgreementsView(viewModel: .init())
+                    .environmentObject(data)
+            }
         }
     }
 }
-
-// struct MainButtonScreen_Previews: PreviewProvider {
-// static var previews: some View {
-// MainScreenContainer()
-// }
-// }
