@@ -25,7 +25,7 @@ class DerivationPathAnalyzer {
 	fun getHint(path: String): Hint {
 		return when {
 			getPassword(path) == "" -> Hint.CREATE_PASSWORD
-			path.endsWith("//") -> Hint.PATH_NAME
+			path.endsWith("//") && getPassword(path) == null -> Hint.PATH_NAME
 			else -> Hint.NONE
 		}
 	}
@@ -57,7 +57,7 @@ class DerivationPathAnalyzer {
 			return if (password == null) {
 				text
 			} else {
-				text.replace(password, maskStar.repeat(password.length))
+				text.replaceAfter("///", maskStar.repeat(password.length))
 			}
 		}
 	}

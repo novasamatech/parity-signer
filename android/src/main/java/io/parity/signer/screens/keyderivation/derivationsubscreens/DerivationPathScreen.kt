@@ -246,7 +246,7 @@ fun DerivationPathScreen(
 					onDoneLocal()
 				}),
 				isError = passwordNotMatch,
-				label = { Text(text = stringResource(R.string.derivation_path_screen_password_empty_hint)) },
+				placeholder = { Text(text = stringResource(R.string.derivation_path_screen_password_empty_hint)) },
 				singleLine = true,
 				textStyle = SignerTypeface.LabelM,
 				colors = TextFieldDefaults.textFieldColors(
