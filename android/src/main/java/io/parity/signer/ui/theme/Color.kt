@@ -97,3 +97,10 @@ val Colors.forcedFill40: Color
 val Colors.red500fill12: Color
 	get() = Color(0x1FFE8D81)
 
+
+
+val Colors.primaryButtonDisabledBackground: Color
+	get() = if (isLight) Color(0xFFF7A8D2) else Color(0xFF521B37)
+
+val Colors.primaryButtonDisabledText: Color
+	get() = if (isLight) Color(0xFFFBD2E7) else Color(0xFF543747)

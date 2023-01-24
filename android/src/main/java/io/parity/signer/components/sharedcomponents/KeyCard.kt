@@ -39,9 +39,9 @@ import io.parity.signer.uniffi.MAddressCard
 @Composable
 fun KeyCard(model: KeyCardModel) {
 	Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+		Modifier
+			.fillMaxWidth()
+			.padding(16.dp)
 	) {
 
 		//left
@@ -107,27 +107,33 @@ fun KeyCard(model: KeyCardModel) {
 
 			Spacer(Modifier.padding(top = 14.dp))
 
-			Text(
-				model.network,
-				color = MaterialTheme.colors.textTertiary,
-				style = SignerTypeface.CaptionM,
-				modifier = Modifier
-                    .background(
-                        MaterialTheme.colors.fill12,
-                        RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
-                    )
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
-			)
+			val networkName = model.network
+			NetworkLabel(networkName)
 		}
 	}
 }
 
 @Composable
+private fun NetworkLabel(networkName: String) {
+	Text(
+		networkName,
+		color = MaterialTheme.colors.textTertiary,
+		style = SignerTypeface.CaptionM,
+		modifier = Modifier
+			.background(
+				MaterialTheme.colors.fill12,
+				RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+			)
+			.padding(horizontal = 8.dp, vertical = 2.dp)
+	)
+}
+
+@Composable
 fun KeySeedCard(seedTitle: String, base58: String) {
 	Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+		Modifier
+			.fillMaxWidth()
+			.padding(16.dp)
 	) {
 		Text(
 			seedTitle,
@@ -144,8 +150,8 @@ fun ShowBase58Collapsible(base58: String) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
-            .clickable { expanded.value = !expanded.value }
-            .animateContentSize()
+			.clickable { expanded.value = !expanded.value }
+			.animateContentSize()
 	) {
 		if (expanded.value) {
 			Text(
@@ -306,5 +312,24 @@ private fun PreviewKeySeedCard() {
 			seedTitle = "Seed title",
 			base58 = KeyCardModel.createStub().cardBase.base58,
 		)
+	}
+}
+
+@Preview(
+	name = "day",
+	uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true,
+)
+@Preview(
+	name = "dark theme",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	backgroundColor = 0xFFFFFFFF
+)
+@Composable
+private fun PreviewNetworkLabel() {
+	SignerNewTheme {
+		Box(Modifier.size(width = 100.dp, height = 500.dp)) {
+			NetworkLabel("Polkadot")
+		}
 	}
 }

@@ -70,7 +70,7 @@ struct ScreenSelector: View {
                 content: value
             )
         case .documents:
-            DocumentModal()
+            OnboardingAgreementsView(viewModel: .init())
         // Screens handled outside of Rust navigation
         case .scan:
             EmptyView()
