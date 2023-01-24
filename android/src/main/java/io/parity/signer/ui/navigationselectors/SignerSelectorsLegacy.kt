@@ -7,7 +7,6 @@ import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.components.exposesecurity.ShieldAlert
 import io.parity.signer.bottomsheets.*
-import io.parity.signer.bottomsheets.password.PasswordConfirm
 import io.parity.signer.components.Documents
 import io.parity.signer.models.*
 import io.parity.signer.models.storage.addSeed
@@ -28,18 +27,12 @@ fun ScreenSelector(
 	navigate: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
-	val button1: (Action) -> Unit = { action -> navigate(action, "", "") }
 	val button2: (Action, String) -> Unit =
 		{ action, details -> navigate(action, details, "") }
 	val seedNames = signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
-		is ScreenData.DeriveKey -> NewAddressScreen(
-			screenData.f,
-			button = button2,
-			addKey = signerDataModel::addKey,
-			checkPath = signerDataModel::checkPath,
-		)
+		is ScreenData.DeriveKey -> {} // migrated
 		ScreenData.Documents -> Documents()
 		is ScreenData.KeyDetails -> {}//migrated
 		is ScreenData.KeyDetailsMulti -> {
@@ -109,13 +102,15 @@ fun ModalSelector(
 			is ModalData.SeedMenu -> {} //migrated
 			is ModalData.NetworkSelector -> NetworkSelector(
 				modalData.f,
-				button2
+				button2,
 			)
 			is ModalData.Backup -> {} //new screen is part of key details subgraph
-			is ModalData.PasswordConfirm -> PasswordConfirm(
-				modalData.f,
-				signerDataModel = signerDataModel
-			)
+			is ModalData.PasswordConfirm -> {
+				//this is part of Derivation flow and should never called here
+				submitErrorState("unreacheble state reached - root navigator should never " +
+					"get to confirm password as it's part derivation details and never " +
+					"called now $modalData")
+			}
 			is ModalData.SignatureReady -> {} //in new selector
 			is ModalData.EnterPassword -> {} //in new selector
 			is ModalData.LogRight -> {} //migrated to bottom sheet

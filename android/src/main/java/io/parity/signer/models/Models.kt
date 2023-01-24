@@ -100,12 +100,12 @@ fun MKeysCard.toKeyModel() = KeyModel(
 /**
  * Local copy of shared [MNetworkCard] class
  */
-data class NetworkModel(
+data class NetworkBasicModel(
 	val title: String,
 	val logo: String,
 )
 
-fun MNetworkCard.toNetworkModel() = NetworkModel(
+fun MNetworkCard.toNetworkBasicModel() = NetworkBasicModel(
 	title = title,
 	logo = logo,
 )
@@ -219,4 +219,37 @@ fun QrData.getData(): List<UByte> =
 		is QrData.Regular -> this.data
 		is QrData.Sensitive -> this.data
 	}
+
+
+/**
+ * Local copy of shared [Network] and [MmNetwork]
+ */
+data class NetworkModel(
+	val key: String,
+	val logo: String,
+	val title: String
+) {
+	companion object {
+		fun createStub(): NetworkModel = NetworkModel(
+			key = "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+			logo = "polkadot",
+			title = "Polkadot",
+		)
+	}
+}
+
+fun Network.toNetworkModel(): NetworkModel = NetworkModel(
+	key = key,
+	logo = logo,
+	title = title,
+)
+fun MmNetwork.toNetworkModel(): NetworkModel = NetworkModel(
+	key = key,
+	logo = logo,
+	title = title,
+)
+
+
+
+
 
