@@ -38,8 +38,8 @@ lazy_static! {
     ///
     /// Navigation state is unsafe either way, since it has to persist
     /// No matter if here or beyond FFI
-    pub static ref STATE: Mutex<State> = Mutex::new(
-        State::default()
+    pub static ref STATE: Mutex<Option<State>> = Mutex::new(
+        None
     );
 }
 
@@ -53,29 +53,38 @@ pub fn do_action(
     secret_seed_phrase: &str,
 ) -> Result<ActionResult> {
     let mut navstate = STATE.lock().map_err(|_| Error::MutexPoisoned)?;
-    navstate.perform(action, details_str, secret_seed_phrase)
+    navstate.as_mut().ok_or(Error::DbNotInitialized)?.perform(
+        action,
+        details_str,
+        secret_seed_phrase,
+    )
 }
 
 /// Should be called in the beginning to recall things stored only by phone
-pub fn init_navigation(dbname: &str, seed_names: Vec<String>) -> Result<()> {
+pub fn init_navigation(db: sled::Db, seed_names: Vec<String>) -> Result<()> {
+    log::warn!("init navigation");
     let mut navstate = STATE.lock().map_err(|_| Error::MutexPoisoned)?;
-    navstate.init_navigation(dbname, seed_names)
+    *navstate = Some(State::init_navigation(db, seed_names));
+    Ok(())
 }
 
 /// Should be called when seed names are modified in native to synchronize data
 pub fn update_seed_names(seed_names: Vec<String>) -> Result<()> {
     let mut navstate = STATE.lock().map_err(|_| Error::MutexPoisoned)?;
-    navstate.update_seed_names(seed_names);
+    navstate
+        .as_mut()
+        .ok_or(Error::DbNotInitialized)?
+        .update_seed_names(seed_names);
 
     Ok(())
 }
 
 /// Export key info with derivations.
 pub fn export_key_info(
-    dbname: &str,
+    database: &sled::Db,
     selected_names: HashMap<String, ExportedSet>,
 ) -> Result<MKeysInfoExport> {
-    let export_all_addrs = export_all_addrs(dbname, selected_names)?;
+    let export_all_addrs = export_all_addrs(database, selected_names)?;
 
     let data = [&[0x53, 0xff, 0xde], export_all_addrs.encode().as_slice()].concat();
     let frames = make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?;
@@ -116,8 +125,8 @@ pub fn export_signatures_bulk(
 }
 
 /// Get keys by seed name
-pub fn keys_by_seed_name(dbname: &str, seed_name: &str) -> Result<MKeysNew> {
+pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNew> {
     Ok(db_handling::interface_signer::keys_by_seed_name(
-        dbname, seed_name,
+        database, seed_name,
     )?)
 }

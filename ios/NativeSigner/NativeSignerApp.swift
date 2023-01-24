@@ -13,6 +13,7 @@ struct NativeSignerApp: App {
     @StateObject var navigation = NavigationCoordinator()
     @StateObject var appState = AppState()
     @StateObject var jailbreakDetectionPublisher = JailbreakDetectionPublisher()
+    @StateObject var applicationStatePublisher = ApplicationStatePublisher()
 
     var body: some Scene {
         WindowGroup {
@@ -30,6 +31,7 @@ struct NativeSignerApp: App {
             .environmentObject(connectivityMediator)
             .environmentObject(appState)
             .environmentObject(jailbreakDetectionPublisher)
+            .environmentObject(applicationStatePublisher)
         }
     }
 }

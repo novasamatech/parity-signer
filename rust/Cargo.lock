@@ -71,9 +71,9 @@ checksum = "85965b6739a430150bdd138e2374a98af0c3ee0d030b3bb7fc3bddff58d0102e"
 
 [[package]]
 name = "android_logger"
-version = "0.11.3"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8619b80c242aa7bd638b5c7ddd952addeecb71f69c75e33f1d47b2804f8f883a"
+checksum = "037f3e1da32ddba7770530e69258b742c15ad67bdf90e5f6b35f4b6db9a60eb7"
 dependencies = [
  "android_log-sys",
  "env_logger",
@@ -394,9 +394,9 @@ dependencies = [
 
 [[package]]
 name = "bumpalo"
-version = "3.9.1"
+version = "3.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4a45a46ab1f2412e53d3a0ade76ffad2025804294569aae387231a0cd6e0899"
+checksum = "0d261e256854913907f67ed06efbc3338dfe6179796deefc1ff763fc1aee5535"
 
 [[package]]
 name = "byte-slice-cast"
@@ -816,6 +816,7 @@ dependencies = [
  "sled",
  "sp-core",
  "sp-runtime",
+ "tempfile",
  "thiserror",
  "time",
  "tiny-bip39 1.0.0",
@@ -2128,11 +2129,13 @@ dependencies = [
  "definitions",
  "hex",
  "lazy_static",
+ "log",
  "parity-scale-codec",
  "parser",
  "pretty_assertions",
  "qrcode_rtx",
  "regex",
+ "sled",
  "sp-core",
  "sp-runtime",
  "tempfile",
@@ -3487,11 +3490,13 @@ dependencies = [
  "ffi-support",
  "generate_message",
  "hex",
+ "lazy_static",
  "log",
  "navigator",
  "oslog",
  "qr_reader_phone",
  "qrcode_static",
+ "sled",
  "sp-core",
  "sp-runtime",
  "uniffi",
@@ -4054,7 +4059,7 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 [[package]]
 name = "subxt"
 version = "0.25.0"
-source = "git+https://github.com/paritytech/subxt#e036087db794622e9447514dad0801bf91722dde"
+source = "git+https://github.com/paritytech/subxt#e4e9562b45451f807099a0749dfc4f9a100247c6"
 dependencies = [
  "base58",
  "blake2",
@@ -4083,7 +4088,7 @@ dependencies = [
 [[package]]
 name = "subxt-codegen"
 version = "0.25.0"
-source = "git+https://github.com/paritytech/subxt#e036087db794622e9447514dad0801bf91722dde"
+source = "git+https://github.com/paritytech/subxt#e4e9562b45451f807099a0749dfc4f9a100247c6"
 dependencies = [
  "darling",
  "frame-metadata",
@@ -4103,7 +4108,7 @@ dependencies = [
 [[package]]
 name = "subxt-macro"
 version = "0.25.0"
-source = "git+https://github.com/paritytech/subxt#e036087db794622e9447514dad0801bf91722dde"
+source = "git+https://github.com/paritytech/subxt#e4e9562b45451f807099a0749dfc4f9a100247c6"
 dependencies = [
  "darling",
  "proc-macro-error",
@@ -4114,7 +4119,7 @@ dependencies = [
 [[package]]
 name = "subxt-metadata"
 version = "0.25.0"
-source = "git+https://github.com/paritytech/subxt#e036087db794622e9447514dad0801bf91722dde"
+source = "git+https://github.com/paritytech/subxt#e4e9562b45451f807099a0749dfc4f9a100247c6"
 dependencies = [
  "frame-metadata",
  "parity-scale-codec",
@@ -4489,6 +4494,7 @@ dependencies = [
  "sled",
  "sp-core",
  "sp-runtime",
+ "tempfile",
  "thiserror",
 ]
 

@@ -21,6 +21,7 @@ struct AnimatedQRCodeView: View {
         static let qrCodeWidthForLargerDevices: CGFloat = 320
     }
 
+    @EnvironmentObject var applicationStatePublisher: ApplicationStatePublisher
     @Binding var viewModel: AnimatedQRCodeViewModel
     private let qrCodesGenerator: QRCodeImageGenerator
     @State private var images: [UIImage] = []
