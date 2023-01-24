@@ -39,9 +39,9 @@ import io.parity.signer.uniffi.MAddressCard
 @Composable
 fun KeyCard(model: KeyCardModel) {
 	Row(
-		Modifier
-			.fillMaxWidth()
-			.padding(16.dp)
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
 	) {
 
 		//left
@@ -107,21 +107,17 @@ fun KeyCard(model: KeyCardModel) {
 
 			Spacer(Modifier.padding(top = 14.dp))
 
-			Box(
+			Text(
+				model.network,
+				color = MaterialTheme.colors.textTertiary,
+				style = SignerTypeface.CaptionM,
 				modifier = Modifier
-					.background(
-						MaterialTheme.colors.fill12,
-						RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
-					)
-					.padding(horizontal = 8.dp, vertical = 2.dp),
-				contentAlignment = Alignment.Center,
-			) {
-				Text(
-					model.network,
-					color = MaterialTheme.colors.textTertiary,
-					style = SignerTypeface.CaptionM,
-				)
-			}
+                    .background(
+                        MaterialTheme.colors.fill12,
+                        RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+                    )
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
+			)
 		}
 	}
 }
@@ -129,9 +125,9 @@ fun KeyCard(model: KeyCardModel) {
 @Composable
 fun KeySeedCard(seedTitle: String, base58: String) {
 	Column(
-		Modifier
-			.fillMaxWidth()
-			.padding(16.dp)
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
 	) {
 		Text(
 			seedTitle,
@@ -148,8 +144,8 @@ fun ShowBase58Collapsible(base58: String) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
-			.clickable { expanded.value = !expanded.value }
-			.animateContentSize()
+            .clickable { expanded.value = !expanded.value }
+            .animateContentSize()
 	) {
 		if (expanded.value) {
 			Text(

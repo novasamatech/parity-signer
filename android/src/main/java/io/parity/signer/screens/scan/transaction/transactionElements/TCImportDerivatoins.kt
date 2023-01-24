@@ -2,35 +2,38 @@ package io.parity.signer.screens.scan.transaction.transactionElements
 
 import android.content.res.Configuration
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.ImageContent
-import io.parity.signer.components.base.CheckboxWithText
 import io.parity.signer.components.base.NotificationFrameTextImportant
+import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.toImageContent
-import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
-import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.textSecondary
-import io.parity.signer.ui.theme.textTertiary
+import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Card
 import io.parity.signer.uniffi.DerivedKeyError
 import io.parity.signer.uniffi.DerivedKeyStatus
@@ -52,10 +55,84 @@ fun TCImportDerivationsFull(model: ImportDerivationsModel) {
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun TCDerivationsSingle(model: DerivedKeysSetModel) {
-	Column() {
+	val outerShape =
+		RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
+	val innerShape =
+		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+	Column(
+		modifier = Modifier
+			.fillMaxWidth(1f)
+			.background(MaterialTheme.colors.fill6, outerShape),
+	) {
 		SeedKeyCollapsible(model.seedName, model.address)
+		Text(
+			pluralStringResource(
+				id = R.plurals.import_derivations_subtitle_keys_imported,
+				count = model.keys.size, model.keys.size
+			),
+			color = MaterialTheme.colors.textTertiary,
+			style = SignerTypeface.BodyM,
+			modifier = Modifier.padding(top = 8.dp)
+		)
+		Row(
+			modifier = Modifier
+				.fillMaxWidth(1f)
+				.padding(horizontal = 8.dp)
+				.background(MaterialTheme.colors.fill6, innerShape),
+		) {
+			model.keys.forEachIndexed { index, derivedKeyModel ->
+				SingleKeyElement(derivedKeyModel)
+				if (index != model.keys.lastIndex) {
+					SignerDivider()
+				}
+			}
+		}
+	}
+}
+
+@Composable
+private fun SingleKeyElement(key: DerivedKeysSetModel.DerivedKeyModel) {
+	val innerShape =
+		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+	Column(modifier = Modifier.padding(16.dp)) {
+		Row() {
+			IdentIcon(key.identicon, 16.dp)
+			Text(
+				key.derivationPath,
+				color = MaterialTheme.colors.textSecondary,
+				style = SignerTypeface.CaptionM,
+			)
+			if (key.hadPwd) {
+				Text(
+					" •••• ",
+					color = MaterialTheme.colors.textSecondary,
+					style = SignerTypeface.CaptionM,
+				)
+				Icon(
+					Icons.Default.Lock,
+					contentDescription = stringResource(R.string.description_locked_icon),
+					tint = MaterialTheme.colors.textSecondary,
+				)
+			}
+		}
+		Text(
+			text = key.address,
+			color = MaterialTheme.colors.textTertiary,
+			style = SignerTypeface.BodyM,
+		)
+		if (key.networkTitle != null) {
+			Text(
+				text = key.networkTitle,
+				color = MaterialTheme.colors.textTertiary,
+				style = SignerTypeface.CaptionM,
+				modifier = Modifier
+					.background(MaterialTheme.colors.fill12, innerShape)
+					.padding(horizontal = 8.dp, vertical = 2.dp),
+			)
+		}
 	}
 }
 
@@ -68,25 +145,30 @@ private fun SeedKeyCollapsible(seedName: String, base58: String) {
 			.clickable { expanded.value = !expanded.value }
 			.animateContentSize()
 	) {
+		Row(verticalAlignment = Alignment.CenterVertically) {
+			Text(
+				seedName,
+				color = MaterialTheme.colors.primary,
+				style = SignerTypeface.TitleS
+			)
+			Icon(
+				imageVector = if (expanded.value) {
+					Icons.Default.KeyboardArrowUp
+				} else {
+					Icons.Default.KeyboardArrowDown
+				},
+				modifier = Modifier
+					.size(24.dp)
+					.padding(horizontal = 4.dp),
+				contentDescription = stringResource(R.string.description_expand_button),
+				tint = MaterialTheme.colors.textTertiary
+			)
+		}
 		if (expanded.value) {
 			Text(
-				base58,
-				color = MaterialTheme.colors.textTertiary,
-				style = SignerTypeface.BodyM
-			)
-		} else {
-			Text(
-				base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
+				text = base58,
 				color = MaterialTheme.colors.textTertiary,
 				style = SignerTypeface.BodyM,
-				maxLines = 1,
-			)
-			Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-			Icon(
-				imageVector = Icons.Default.KeyboardArrowDown,
-				modifier = Modifier.size(20.dp),
-				contentDescription = stringResource(R.string.description_expand_button),
-				tint = MaterialTheme.colors.textSecondary
 			)
 		}
 	}
