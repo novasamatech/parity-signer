@@ -22,7 +22,7 @@ class SignerDataModel : ViewModel() {
 	// Internal model values
 	private val _onBoardingDone = MutableStateFlow(OnboardingWasShown.InProgress)
 
-// todo migrate to use dependencies from ServiceLocator rather than expecting them here
+	// todo migrate to use dependencies from ServiceLocator rather than expecting them here
 	val context: Context get() = ServiceLocator.appContext
 	val activity: FragmentActivity get() = ServiceLocator.activityScope!!.activity
 
@@ -38,7 +38,7 @@ class SignerDataModel : ViewModel() {
 	// Transaction
 	internal var action = JSONObject()
 
- val seedStorage: SeedStorage = ServiceLocator.seedStorage
+	val seedStorage: SeedStorage = ServiceLocator.seedStorage
 
 	// Navigator
 	internal val _actionResult = MutableStateFlow(
@@ -214,7 +214,8 @@ class SignerDataModel : ViewModel() {
 		if (checkRefresh) _onBoardingDone.value =
 			OnboardingWasShown.Yes else _onBoardingDone.value = OnboardingWasShown.No
 		if (checkRefresh) {
-			tellRustSeedNames(init = true)
+			val allNames = seedStorage.getSeedNames()
+			initNavigation(dbName, allNames.toList())
 			getAlertState()
 			isAirplaneOn()
 			navigator.navigate(Action.START)

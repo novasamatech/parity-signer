@@ -131,6 +131,7 @@ fun ModalSelector(
 			is ModalData.NewSeedBackup -> {}//moved to new selector
 			is ModalData.LogComment -> {} //moved to new sheet
 			is ModalData.SelectSeed -> {
+				submitErrorState("This is part of refactored screen and not shown separately")
 				SelectSeed(modalData.f, signerDataModel = signerDataModel)
 			}
 			null -> {}

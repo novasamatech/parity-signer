@@ -2,9 +2,7 @@ package io.parity.signer.screens.scan
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import io.parity.signer.backend.UniffiResult
-import io.parity.signer.backend.mapError
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
@@ -14,7 +12,6 @@ import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 
 
 private const val TAG = "ScanViewModelTag"
@@ -34,6 +31,8 @@ class ScanViewModel : ViewModel() {
 	var transactions: MutableStateFlow<TransactionsState?> =
 		MutableStateFlow(null)
 	var signature: MutableStateFlow<MSignatureReady?> =
+		MutableStateFlow(null)
+	var bananaSplitPassword: MutableStateFlow<List<String>?> =
 		MutableStateFlow(null)
 	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
@@ -107,22 +106,27 @@ class ScanViewModel : ViewModel() {
 	}
 
 	fun ifHasStateThenClear(): Boolean {
-		return if (transactions.value != null
+		return if (
+			transactions.value != null
 			|| signature.value != null
 			|| passwordModel.value != null
 			|| presentableError.value != null
 			|| transactionIsInProgress.value
 			|| errorWrongPassword.value
+			|| bananaSplitPassword.value != null
 		) {
-			clearTransactionState()
+			clearState()
 			true
-		} else false
+		} else {
+			false
+		}
 	}
 
-	fun clearTransactionState() {
+	fun clearState() {
 		transactions.value = null
 		signature.value = null
 		passwordModel.value = null
+		bananaSplitPassword.value = null
 		presentableError.value = null
 		transactionIsInProgress.value = false
 		errorWrongPassword.value = false

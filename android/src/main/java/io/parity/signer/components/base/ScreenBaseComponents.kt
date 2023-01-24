@@ -1,7 +1,6 @@
 package io.parity.signer.components.base
 
 import android.content.res.Configuration
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,9 +21,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.models.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textTertiary
+
 
 @Composable
 fun ScreenHeader(
@@ -152,6 +153,61 @@ fun ScreenHeaderClose(
 }
 
 
+//todo dmitry DerivationPathScreen.kt:350 migrate to this view when merged
+@Composable
+fun ScreenHeaderWithButton(
+	canProceed: Boolean,
+	title: String = "",
+	onClose: Callback,
+	onDone: Callback,
+) {
+	Box(
+		modifier = Modifier.padding(
+			start = 24.dp,
+			end = 8.dp,
+			top = 8.dp,
+			bottom = 8.dp
+		),
+		contentAlignment = Alignment.Center,
+	) {
+		Box(
+			modifier = Modifier.fillMaxWidth(1f),
+			contentAlignment = Alignment.CenterStart,
+		) {
+			CloseIcon(
+				noBackground = true,
+				onCloseClicked = onClose,
+			)
+		}
+		Box(
+			modifier = Modifier.fillMaxWidth(1f),
+			contentAlignment = Alignment.Center,
+		) {
+			Text(
+				text = title,
+				color = MaterialTheme.colors.primary,
+				style = SignerTypeface.TitleS,
+				textAlign = TextAlign.Center,
+				modifier = Modifier.fillMaxWidth(1f)
+			)
+		}
+		Box(
+			modifier = Modifier.fillMaxWidth(1f),
+			contentAlignment = Alignment.CenterEnd,
+		) {
+			PrimaryButtonGreyDisabled(
+				label = stringResource(R.string.generic_done),
+				isEnabled = canProceed,
+			) {
+				if (canProceed) {
+					onDone()
+				}
+			}
+		}
+	}
+}
+
+
 @Preview(
 	name = "day",
 	group = "themes",
@@ -198,6 +254,8 @@ private fun PreviewScreenBaseComponent() {
 				onClose = {},
 				onMenu = {},
 			)
+			ScreenHeaderWithButton(true, "Derivation", {}, {})
+			ScreenHeaderWithButton(false, "Derivation", {}, {})
 			ScreenHeaderClose(
 				stringResource(id = R.string.key_sets_screem_title),
 				onClose = {},
