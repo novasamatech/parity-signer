@@ -173,6 +173,7 @@ private fun SeedKeyCollapsible(
 				contentDescription = stringResource(R.string.description_expand_button),
 				tint = MaterialTheme.colors.textTertiary
 			)
+			Spacer(modifier = Modifier.weight(1f))
 		}
 		if (expanded.value) {
 			Text(

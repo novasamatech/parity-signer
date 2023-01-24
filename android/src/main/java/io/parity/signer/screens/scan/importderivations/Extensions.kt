@@ -4,17 +4,13 @@ import io.parity.signer.screens.scan.transaction.sortedValueCards
 import io.parity.signer.uniffi.*
 
 
-//todo import derivations
-//ios/NativeSigner/Screens/Scan/Models/MTransaction+ImportDerivedKeys.swift:10
-
-
 // Rust error state for import derived keys is different comparing to UI requirements,
 // hence we need this support function to find out what is the proper UI error to show
 // if there are no importable keys left
 fun List<MTransaction>.dominantImportError(): DerivedKeyError? {
 	if (hasImportableKeys()) return null
 
-	val allErrors: List<DerivedKeyError> = allImportDerivedKeys()
+	val allErrors: List<DerivedKeyError> = flatMap { it.allImportDerivedKeys() }
 		.flatMap { it.derivedKeys }
 		.map { it.status }
 		.filterIsInstance<DerivedKeyStatus.Invalid>()
@@ -26,11 +22,6 @@ fun List<MTransaction>.dominantImportError(): DerivedKeyError? {
 		.key
 
 	return mostCommonError
-}
-
-// Extracts list of all `SeedKeysPreview` that are within given `[MTransaction]`
-fun List<MTransaction>.allImportDerivedKeys(): List<SeedKeysPreview> {
-	return flatMap { it.allImportDerivedKeys() }
 }
 
 // Informs whether there are any valid keys to be imported in `[MTransaction]` payload
