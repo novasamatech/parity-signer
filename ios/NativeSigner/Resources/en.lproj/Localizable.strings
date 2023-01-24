@@ -610,3 +610,9 @@
 "NewSeed.Name.Action.Next" = "Next";
 "NewSeed.Backup.Label.Header" = "Write down your Secret\nRecovery Phrase";
 "NewSeed.Backup.Action.Create" = "Create Key Set";
+
+"Onboarding.Agreements.Label.Title" = "Please Agree to our Terms of Service and Privacy Policy";
+"Onboarding.Agreements.Label.PrivacyCell" = "Privacy Policy";
+"Onboarding.Agreements.Label.ToSCell" = "Terms of Service";
+"Onboarding.Agreements.Label.Confirmation" = "I’ve read and accept the Terms of Service and Privacy Policy";
+"Onboarding.Agreements.Action.Accept" = "I Accept";

@@ -57,6 +57,7 @@ enum Heights {
     static let selectionBox: CGFloat = 48
     static let capsuleSelectionView: CGFloat = 28
     static let minimumActionSheetButtonHeight: CGFloat = 48
+    static let onboardingAgreementRecord: CGFloat = 52
 }
 
 enum Sizes {
