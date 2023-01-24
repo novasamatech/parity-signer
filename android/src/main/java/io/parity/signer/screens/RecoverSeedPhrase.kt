@@ -28,7 +28,6 @@ fun RecoverSeedPhrase(
 	addSeed: (
 		seedName: String,
 		seedPhrase: String,
-		createRoots: Boolean
 	) -> Unit
 ) {
 	val seedPhrase =
@@ -80,7 +79,6 @@ fun RecoverSeedPhrase(
 							addSeed(
 								seedName,
 								it,
-								true,
 							)
 						}
 					}

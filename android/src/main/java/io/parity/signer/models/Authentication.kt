@@ -32,8 +32,10 @@ class Authentication {
 			BiometricPrompt.PromptInfo.Builder()
 				.setTitle(context.getString(R.string.unlock_device_title))
 				.setSubtitle(context.getString(R.string.unlock_device_subtitle))
-				.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL
-					or BiometricManager.Authenticators.BIOMETRIC_WEAK)
+				.setAllowedAuthenticators(
+					BiometricManager.Authenticators.DEVICE_CREDENTIAL
+						or BiometricManager.Authenticators.BIOMETRIC_WEAK
+				)
 				.build()
 
 		when (biometricManager.canAuthenticate(

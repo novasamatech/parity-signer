@@ -106,7 +106,7 @@ class SeedStorage {
 	) {
 
 		// First check for seed collision
-		if (sharedPreferences.all.values.contains(seedPhrase)) {
+		if (checkIfSeedNameAlreadyExists(seedPhrase)) {
 			error("This seed phrase already exists")
 		}
 
@@ -116,6 +116,12 @@ class SeedStorage {
 			apply()
 		}
 	}
+
+	/**
+	 * @throws UserNotAuthenticatedException
+	 */
+	fun checkIfSeedNameAlreadyExists(seedPhrase: String) =
+		sharedPreferences.all.values.contains(seedPhrase)
 
 	/**
 	 * @throws UserNotAuthenticatedException
@@ -148,4 +154,7 @@ class SeedStorage {
 	fun wipe() {
 		sharedPreferences.edit().clear().commit() // No, not apply(), do it now!
 	}
+
+
+
 }
