@@ -9,6 +9,7 @@ import io.parity.signer.models.Authentication
 import io.parity.signer.models.Navigator
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.updateSeedNames
+import io.parity.signer.models.submitErrorState
 
 
 class SeedRepository(
@@ -25,6 +26,9 @@ class SeedRepository(
 		return storage.lastKnownSeedNames.value
 	}
 
+	/**
+	 * Try to get phrases if timeout if
+	 */
 	suspend fun getSeedPhrases(seedNames: List<String>): RepoResult<String> {
 		return try {
 			try {
@@ -48,6 +52,24 @@ class SeedRepository(
 			RepoResult.Failure(RuntimeException("Unexpected Exception", e))
 		}
 	}
+
+	/**
+	 * Force ask for authentication and get seed phrase
+	 */
+	suspend fun getSeedPhraseForceAuth(seed: String): RepoResult<String> {
+		return when (val authResult =
+			authentication.authenticate(activity)) {
+			AuthResult.AuthSuccess -> {
+				getSeedPhrasesDangerous(listOf(seed))
+			}
+			AuthResult.AuthError,
+			AuthResult.AuthFailed,
+			AuthResult.AuthUnavailable -> {
+				RepoResult.Failure(RuntimeException("auth error - $authResult"))
+			}
+		}
+	}
+
 
 	/**
 	 * Add seed, encrypt it, and create default accounts
@@ -153,4 +175,14 @@ sealed class RepoResult<T> {
 	data class Success<T>(val result: T) : RepoResult<T>()
 	data class Failure<T>(val error: Throwable) : RepoResult<T>()
 }
-
+fun <T> RepoResult<T>.mapError(): T? {
+	return when (this) {
+		is RepoResult.Failure -> {
+			submitErrorState("uniffi interaction exception $error")
+			null
+		}
+		is RepoResult.Success -> {
+			result
+		}
+	}
+}

@@ -167,7 +167,7 @@ private fun BananaSplitPasswordInternal(
 				keyboardActions = KeyboardActions(onGo = {
 					passwordFocusRequester.requestFocus()
 				}),
-				label = { Text(text = stringResource(R.string.banana_split_password_name_label)) },
+				placeholder = { Text(text = stringResource(R.string.banana_split_password_name_label)) },
 				isError = nameCollision.value,
 				singleLine = true,
 				textStyle = SignerTypeface.LabelM,
@@ -213,7 +213,7 @@ private fun BananaSplitPasswordInternal(
 						}
 					}
 				),
-				label = { Text(text = stringResource(R.string.banana_split_password_password_label)) },
+				placeholder = { Text(text = stringResource(R.string.banana_split_password_password_label)) },
 				isError = wrongPassword.value,
 				singleLine = true,
 				textStyle = SignerTypeface.LabelM,
