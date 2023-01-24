@@ -14,7 +14,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,22 +65,27 @@ private fun TCDerivationsSingle(model: DerivedKeysSetModel) {
 	Column(
 		modifier = Modifier
 			.fillMaxWidth(1f)
-			.background(MaterialTheme.colors.fill6, outerShape),
+			.background(MaterialTheme.colors.fill6, outerShape)
+			.padding(8.dp),
 	) {
-		SeedKeyCollapsible(model.seedName, model.address)
+		SeedKeyCollapsible(
+			seedName = model.seedName,
+			base58 = model.address,
+			modifier = Modifier.padding(8.dp)
+		)
 		Text(
 			pluralStringResource(
 				id = R.plurals.import_derivations_subtitle_keys_imported,
-				count = model.keys.size, model.keys.size
+				count = model.keys.size,
+				model.keys.size
 			),
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.BodyM,
-			modifier = Modifier.padding(top = 8.dp)
+			modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
 		)
-		Row(
+		Column(
 			modifier = Modifier
 				.fillMaxWidth(1f)
-				.padding(horizontal = 8.dp)
 				.background(MaterialTheme.colors.fill6, innerShape),
 		) {
 			model.keys.forEachIndexed { index, derivedKeyModel ->
@@ -97,24 +102,29 @@ private fun TCDerivationsSingle(model: DerivedKeysSetModel) {
 private fun SingleKeyElement(key: DerivedKeysSetModel.DerivedKeyModel) {
 	val innerShape =
 		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
-	Column(modifier = Modifier.padding(16.dp)) {
+	Column(
+		modifier = Modifier.padding(16.dp),
+		verticalArrangement = Arrangement.spacedBy(8.dp),
+	) {
 		Row() {
 			IdentIcon(key.identicon, 16.dp)
+			Spacer(modifier = Modifier.padding(end = 8.dp))
 			Text(
 				key.derivationPath,
-				color = MaterialTheme.colors.textSecondary,
+				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.CaptionM,
 			)
 			if (key.hadPwd) {
 				Text(
 					" •••• ",
-					color = MaterialTheme.colors.textSecondary,
+					color = MaterialTheme.colors.primary,
 					style = SignerTypeface.CaptionM,
 				)
 				Icon(
-					Icons.Default.Lock,
+					imageVector = Icons.Outlined.Lock,
 					contentDescription = stringResource(R.string.description_locked_icon),
-					tint = MaterialTheme.colors.textSecondary,
+					tint = MaterialTheme.colors.primary,
+					modifier = Modifier.size(14.dp)
 				)
 			}
 		}
@@ -137,14 +147,14 @@ private fun SingleKeyElement(key: DerivedKeysSetModel.DerivedKeyModel) {
 }
 
 @Composable
-private fun SeedKeyCollapsible(seedName: String, base58: String) {
+private fun SeedKeyCollapsible(
+	seedName: String, base58: String, modifier: Modifier = Modifier
+) {
 	val expanded = remember { mutableStateOf(false) }
-	Column(
-		horizontalAlignment = Alignment.Start,
-		modifier = Modifier
+	Column(horizontalAlignment = Alignment.Start,
+		modifier = modifier
 			.clickable { expanded.value = !expanded.value }
-			.animateContentSize()
-	) {
+			.animateContentSize()) {
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			Text(
 				seedName,
@@ -169,6 +179,7 @@ private fun SeedKeyCollapsible(seedName: String, base58: String) {
 				text = base58,
 				color = MaterialTheme.colors.textTertiary,
 				style = SignerTypeface.BodyM,
+				modifier = Modifier.padding(top = 4.dp),
 			)
 		}
 	}
@@ -225,11 +236,14 @@ data class ImportDerivationsModel(
 
 	companion object {
 		fun createStub(): ImportDerivationsModel = ImportDerivationsModel(
-			keySets = listOf(DerivedKeysSetModel.createStub()),
+			keySets = listOf(
+				DerivedKeysSetModel.createStub(),
+				DerivedKeysSetModel.createStub()
+			),
 			errors = Errors(
 				isNetworkMissing = true,
 				isKeySetMissing = false,
-				isPathInBadFormat = true,
+				isPathInBadFormat = false,
 				keysAlreadyExist = true,
 			),
 		)
@@ -240,32 +254,17 @@ fun Card.DerivationsCard.toImportDerivationsModel(): ImportDerivationsModel =
 	ImportDerivationsModel(
 		keySets = f.map { it.toDerivedKeysSetModel() },
 		errors = ImportDerivationsModel.Errors(
-			isNetworkMissing = f
-				.asSequence()
-				.flatMap { it.derivedKeys }
-				.map { it.status }
-				.filterIsInstance<DerivedKeyStatus.Invalid>()
-				.flatMap { it.errors }
-				.any { it is DerivedKeyError.NetworkMissing },
-			isKeySetMissing = f
-				.asSequence()
-				.flatMap { it.derivedKeys }
-				.map { it.status }
-				.filterIsInstance<DerivedKeyStatus.Invalid>()
-				.flatMap { it.errors }
-				.any { it is DerivedKeyError.KeySetMissing },
-			isPathInBadFormat = f
-				.asSequence()
-				.flatMap { it.derivedKeys }
-				.map { it.status }
-				.filterIsInstance<DerivedKeyStatus.Invalid>()
-				.flatMap { it.errors }
-				.any { it is DerivedKeyError.BadFormat },
-			keysAlreadyExist = f
-				.asSequence()
-				.flatMap { it.derivedKeys }
-				.map { it.status }
-				.any { it is DerivedKeyStatus.AlreadyExists },
+			isNetworkMissing = f.asSequence().flatMap { it.derivedKeys }
+				.map { it.status }.filterIsInstance<DerivedKeyStatus.Invalid>()
+				.flatMap { it.errors }.any { it is DerivedKeyError.NetworkMissing },
+			isKeySetMissing = f.asSequence().flatMap { it.derivedKeys }
+				.map { it.status }.filterIsInstance<DerivedKeyStatus.Invalid>()
+				.flatMap { it.errors }.any { it is DerivedKeyError.KeySetMissing },
+			isPathInBadFormat = f.asSequence().flatMap { it.derivedKeys }
+				.map { it.status }.filterIsInstance<DerivedKeyStatus.Invalid>()
+				.flatMap { it.errors }.any { it is DerivedKeyError.BadFormat },
+			keysAlreadyExist = f.asSequence().flatMap { it.derivedKeys }
+				.map { it.status }.any { it is DerivedKeyStatus.AlreadyExists },
 		),
 	)
 
@@ -273,9 +272,7 @@ fun Card.DerivationsCard.toImportDerivationsModel(): ImportDerivationsModel =
  * Local version of shared [SeedKeysPreview] class
  */
 data class DerivedKeysSetModel(
-	val seedName: String,
-	val address: String,
-	val keys: List<DerivedKeyModel>
+	val seedName: String, val address: String, val keys: List<DerivedKeyModel>
 ) {
 
 	data class DerivedKeyModel(
@@ -287,59 +284,55 @@ data class DerivedKeysSetModel(
 	)
 
 	companion object {
-		fun createStub(): DerivedKeysSetModel =
-			DerivedKeysSetModel(
-				seedName = "Derivation 1",
-				address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
-				keys = listOf(
-					DerivedKeyModel(
-						identicon = PreviewData.exampleIdenticonPng,
-						derivationPath = "//kusama",
-						hadPwd = false,
-						address = "address",
-						networkTitle = "Kusama",
-					),
-					DerivedKeyModel(
-						identicon = PreviewData.exampleIdenticonPng,
-						derivationPath = "//westendMain",
-						hadPwd = true,
-						address = "GD5434gFGFD543Dgdf",
-						networkTitle = "Westend",
-					),
-					DerivedKeyModel(
-						identicon = PreviewData.exampleIdenticonPng,
-						derivationPath = "//polka",
-						hadPwd = false,
-						address = "address",
-						networkTitle = "Polkadot",
-					),
-					DerivedKeyModel(
-						identicon = PreviewData.exampleIdenticonPng,
-						derivationPath = "//polkadot//parachains",
-						hadPwd = false,
-						address = "address",
-						networkTitle = null,
-					),
-					DerivedKeyModel(
-						identicon = PreviewData.exampleIdenticonPng,
-						derivationPath = "//polkadot//staking",
-						hadPwd = false,
-						address = "address",
-						networkTitle = null,
-					),
+		fun createStub(): DerivedKeysSetModel = DerivedKeysSetModel(
+			seedName = "Derivation 1",
+			address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
+			keys = listOf(
+				DerivedKeyModel(
+					identicon = PreviewData.exampleIdenticonPng,
+					derivationPath = "//kusama",
+					hadPwd = false,
+					address = "address",
+					networkTitle = "Kusama",
 				),
-			)
+				DerivedKeyModel(
+					identicon = PreviewData.exampleIdenticonPng,
+					derivationPath = "//westendMain",
+					hadPwd = true,
+					address = "GD5434gFGFD543Dgdf",
+					networkTitle = "Westend",
+				),
+				DerivedKeyModel(
+					identicon = PreviewData.exampleIdenticonPng,
+					derivationPath = "//polka",
+					hadPwd = false,
+					address = "address",
+					networkTitle = "Polkadot",
+				),
+				DerivedKeyModel(
+					identicon = PreviewData.exampleIdenticonPng,
+					derivationPath = "//polkadot//parachains",
+					hadPwd = false,
+					address = "address",
+					networkTitle = null,
+				),
+				DerivedKeyModel(
+					identicon = PreviewData.exampleIdenticonPng,
+					derivationPath = "//polkadot//staking",
+					hadPwd = false,
+					address = "address",
+					networkTitle = null,
+				),
+			),
+		)
 	}
 }
 
 fun SeedKeysPreview.toDerivedKeysSetModel(): DerivedKeysSetModel =
-	DerivedKeysSetModel(
-		seedName = name,
+	DerivedKeysSetModel(seedName = name,
 		address = multisigner.firstOrNull() ?: "",
-		keys = derivedKeys
-			.filter { it.status == DerivedKeyStatus.Importable }
-			.filter { it.hasPwd != null }
-			.map {
+		keys = derivedKeys.filter { it.status == DerivedKeyStatus.Importable }
+			.filter { it.hasPwd != null }.map {
 				DerivedKeysSetModel.DerivedKeyModel(
 					identicon = it.identicon.toImageContent(),
 					derivationPath = it.derivationPath ?: "",
@@ -347,8 +340,7 @@ fun SeedKeysPreview.toDerivedKeysSetModel(): DerivedKeysSetModel =
 					address = it.address,
 					networkTitle = it.networkTitle,
 				)
-			}
-	)
+			})
 
 
 ///** todo import derivations delete?
