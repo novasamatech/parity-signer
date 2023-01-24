@@ -1,20 +1,35 @@
 package io.parity.signer.screens.scan.transaction.transactionElements
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Column
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.ImageContent
-import io.parity.signer.components.base.NotificationFrameText
+import io.parity.signer.components.base.CheckboxWithText
+import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.toImageContent
+import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
+import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.pink300
+import io.parity.signer.ui.theme.textSecondary
 import io.parity.signer.ui.theme.textTertiary
 import io.parity.signer.uniffi.Card
 import io.parity.signer.uniffi.DerivedKeyError
@@ -25,15 +40,55 @@ import io.parity.signer.uniffi.SeedKeysPreview
 fun TCImportDerivationsFull(model: ImportDerivationsModel) {
 	Column {
 		TCDerivationsErrors(model.errors)
+		LazyColumn(
+			contentPadding = PaddingValues(horizontal = 8.dp),
+			verticalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+			items(model.keySets) { keySet ->
+				TCDerivationsSingle(keySet)
+			}
+		}
 	}
 }
 
 
 @Composable
-fun TCDerivationsSingle(model: DerivedKeysSetModel) {
+private fun TCDerivationsSingle(model: DerivedKeysSetModel) {
 	Column() {
+		SeedKeyCollapsible(model.seedName, model.address)
+	}
+}
 
-
+@Composable
+private fun SeedKeyCollapsible(seedName: String, base58: String) {
+	val expanded = remember { mutableStateOf(false) }
+	Column(
+		horizontalAlignment = Alignment.Start,
+		modifier = Modifier
+			.clickable { expanded.value = !expanded.value }
+			.animateContentSize()
+	) {
+		if (expanded.value) {
+			Text(
+				base58,
+				color = MaterialTheme.colors.textTertiary,
+				style = SignerTypeface.BodyM
+			)
+		} else {
+			Text(
+				base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
+				color = MaterialTheme.colors.textTertiary,
+				style = SignerTypeface.BodyM,
+				maxLines = 1,
+			)
+			Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+			Icon(
+				imageVector = Icons.Default.KeyboardArrowDown,
+				modifier = Modifier.size(20.dp),
+				contentDescription = stringResource(R.string.description_expand_button),
+				tint = MaterialTheme.colors.textSecondary
+			)
+		}
 	}
 }
 
@@ -41,16 +96,32 @@ fun TCDerivationsSingle(model: DerivedKeysSetModel) {
 private fun TCDerivationsErrors(errors: ImportDerivationsModel.Errors) {
 	Column() {
 		if (errors.isKeySetMissing) {
-			NotificationFrameText(R.string.import_derivations_error_key_missing, withBorder = false)
+			NotificationFrameTextImportant(
+				stringResource(id = R.string.import_derivations_error_key_missing),
+				withBorder = false
+			)
+			Spacer(modifier = Modifier.padding(bottom = 8.dp))
 		}
 		if (errors.isNetworkMissing) {
-			NotificationFrameText(R.string.import_derivations_error_network_missing, withBorder = false)
+			NotificationFrameTextImportant(
+				stringResource(R.string.import_derivations_error_network_missing),
+				withBorder = false
+			)
+			Spacer(modifier = Modifier.padding(bottom = 8.dp))
 		}
 		if (errors.isPathInBadFormat) {
-			NotificationFrameText(R.string.import_derivations_error_path_bad_format, withBorder = false)
+			NotificationFrameTextImportant(
+				stringResource(R.string.import_derivations_error_path_bad_format),
+				withBorder = false
+			)
+			Spacer(modifier = Modifier.padding(bottom = 8.dp))
 		}
 		if (errors.keysAlreadyExist) {
-			NotificationFrameText(R.string.import_derivations_error_keys_already_exist, withBorder = false)
+			NotificationFrameTextImportant(
+				stringResource(R.string.import_derivations_error_keys_already_exist),
+				withBorder = false
+			)
+			Spacer(modifier = Modifier.padding(bottom = 8.dp))
 		}
 	}
 }
@@ -137,7 +208,7 @@ data class DerivedKeysSetModel(
 		fun createStub(): DerivedKeysSetModel =
 			DerivedKeysSetModel(
 				seedName = "Derivation 1",
-				address = "long address",
+				address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
 				keys = listOf(
 					DerivedKeyModel(
 						identicon = PreviewData.exampleIdenticonPng,
