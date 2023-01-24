@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 fun NewKeySetBackupScreenFull(
 	model: NewSeedBackupModel,
 	onBack: Callback,
-	onCreateKeySet: (String, String, Boolean) -> Unit
+	onCreateKeySet: (String, String) -> Unit
 ) {
 	val modalBottomSheetState =
 		rememberModalBottomSheetState(
@@ -33,8 +33,7 @@ fun NewKeySetBackupScreenFull(
 		bottomSheetContent = {
 			NewKeySetBackupBottomSheet(
 				onProceed = {
-					val alwaysCreateRootKeys = true
-					onCreateKeySet(model.seed, model.seedPhrase, alwaysCreateRootKeys)
+					onCreateKeySet(model.seed, model.seedPhrase)
 				},
 				onCancel = { scope.launch { modalBottomSheetState.hide() } },
 			)
