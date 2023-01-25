@@ -12,9 +12,7 @@ import io.parity.signer.models.FakeNavigator
 import io.parity.signer.models.storage.RepoResult
 import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.screens.scan.elements.PresentableErrorModel
-import io.parity.signer.screens.scan.importderivations.ImportDerivedKeysRepository
-import io.parity.signer.screens.scan.importderivations.dominantImportError
-import io.parity.signer.screens.scan.importderivations.hasImportableKeys
+import io.parity.signer.screens.scan.importderivations.*
 import io.parity.signer.screens.scan.importderivations.importableSeedKeysPreviews
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues
@@ -156,8 +154,15 @@ class ScanViewModel : ViewModel() {
 	fun onImportKeysTap(transactions: TransactionsState) {
 		val importableKeys = transactions.transactions.flatMap { it.importableSeedKeysPreviews() }
 
-		importKeysService.importDerivedKeys(importableKeys)
+		val importResult = importKeysService.importDerivedKeys(importableKeys)
+		val derivedKeysCount = transactions.transactions.sumOf { it.importableKeysCount() }
+		when (importResult) {
+			is RepoResult.Success -> TODO()
+			is RepoResult.Failure -> TODO()
+		}
+
 		//todo import derivations finish
+		this.transactions.value = null
 	}
 
 

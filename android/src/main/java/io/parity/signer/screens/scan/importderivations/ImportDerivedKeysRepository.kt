@@ -13,7 +13,6 @@ class ImportDerivedKeysRepository(
 	private val seedRepository: SeedRepository,
 ) {
 
-	//todo import derivations ios/NativeSigner/Backend/ImportDerivedKeysService.swift:28
 	fun importDerivedKeys(seedKeysPreview: List<SeedKeysPreview>): RepoResult<Unit> {
 		val newSeeds = seedKeysPreview.map {
 			it.copy(derivedKeys = it.derivedKeys
