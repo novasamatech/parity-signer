@@ -32,7 +32,7 @@ struct ExportMultipleKeysModalViewModel: Equatable {
     }
 
     let selectedItems: SelectedItems
-    let seedNames: [String]
+    let count: Int
 }
 
 struct ExportMultipleKeysModal: View {
@@ -174,7 +174,7 @@ private struct ExportPrivateKeyAddressFooter: View {
 private extension ExportMultipleKeysModal {
     var headerName: String {
         let localizableKey = Localizable.KeysExport.KeySets.Label.self
-        let count = viewModel.viewModel.seedNames.count
+        let count = viewModel.viewModel.count
         let suffix = count == 1 ? localizableKey.Header.Suffix.single.string : localizableKey.Header.Suffix.plural
             .string
         return localizableKey.header(String(count), suffix)

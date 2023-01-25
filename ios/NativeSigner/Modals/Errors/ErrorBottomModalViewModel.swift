@@ -243,4 +243,12 @@ struct ErrorBottomModalViewModel {
             )
         )
     }
+
+    static func noNetworksAvailable(_ action: @escaping @autoclosure () -> Void = {}()) -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.KeyDetails.Error.NoNetworks.title.string,
+            content: Localizable.KeyDetails.Error.NoNetworks.message.string,
+            secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
+        )
+    }
 }

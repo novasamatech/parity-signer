@@ -118,7 +118,7 @@ struct KeySetList: View {
                 viewModel: .init(
                     viewModel: ExportMultipleKeysModalViewModel(
                         selectedItems: .keySets(selectedItems),
-                        seedNames: selectedItems.map(\.seed.seedName)
+                        count: selectedItems.count
                     ),
                     isPresented: $viewModel.isShowingKeysExportModal
                 )

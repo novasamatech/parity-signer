@@ -1,6 +1,7 @@
 use db_handling::{
     db_transactions::{SignContent, TrDbColdSign, TrDbColdSignOne},
-    helpers::{try_get_address_details, try_get_network_specs},
+    helpers::{get_all_networks, try_get_address_details, try_get_network_specs},
+    identities::get_all_addresses,
 };
 use definitions::{
     history::{Entry, Event, SignDisplay},
@@ -61,17 +62,25 @@ pub(crate) fn parse_transaction(
 
     match try_get_network_specs(database, &network_specs_key)? {
         Some(network_specs) => {
-            let address_key = AddressKey::from_multisigner(&author_multi_signer);
+            let address_key = AddressKey::new(
+                author_multi_signer.clone(),
+                Some(network_specs.specs.genesis_hash),
+            );
             let mut history: Vec<Event> = Vec::new();
+
+            let addrs = get_all_addresses(database)?;
+            println!("addr {:#?}", addrs);
+            println!("addr key {:#?}", address_key);
 
             let mut cards_prep = match try_get_address_details(database, &address_key)? {
                 Some(address_details) => {
-                    if address_details.network_id.contains(&network_specs_key) {
+                    if address_details.network_id.as_ref() == Some(&network_specs_key) {
                         CardsPrep::SignProceed(address_details, None)
                     } else {
                         let author_card = (Card::Author {
                             author: &author_multi_signer,
                             base58prefix: network_specs.specs.base58prefix,
+                            genesis_hash: network_specs.specs.genesis_hash,
                             address_details: &address_details,
                         })
                         .card(&mut index, indent);
@@ -81,14 +90,18 @@ pub(crate) fn parse_transaction(
                         )
                     }
                 }
-                None => CardsPrep::ShowOnly(
-                    (Card::AuthorPlain {
-                        author: &author_multi_signer,
-                        base58prefix: network_specs.specs.base58prefix,
-                    })
-                    .card(&mut index, indent),
-                    Box::new((Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent)),
-                ),
+                None => {
+                    println!("here 2");
+
+                    CardsPrep::ShowOnly(
+                        (Card::AuthorPlain {
+                            author: &author_multi_signer,
+                            base58prefix: network_specs.specs.base58prefix,
+                        })
+                        .card(&mut index, indent),
+                        Box::new((Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent)),
+                    )
+                }
             };
 
             let short_specs = network_specs.specs.short();
@@ -168,6 +181,7 @@ pub(crate) fn parse_transaction(
                                         let author_info = make_author_info(
                                             &author_multi_signer,
                                             network_specs.specs.base58prefix,
+                                            network_specs.specs.genesis_hash,
                                             &address_details,
                                         );
                                         let warning = possible_warning
@@ -217,6 +231,7 @@ pub(crate) fn parse_transaction(
                                         let author = Card::Author {
                                             author: &author_multi_signer,
                                             base58prefix: network_specs.specs.base58prefix,
+                                            genesis_hash: network_specs.specs.genesis_hash,
                                             address_details: &address_details,
                                         }
                                         .card(&mut index, indent);
@@ -304,12 +319,19 @@ pub fn entry_to_transactions_with_decoding(
             Event::TransactionSigned { ref sign_display }
             | Event::TransactionSignError { ref sign_display } => {
                 let VerifierValue::Standard { ref m } = sign_display.signed_by;
-                let address_key = AddressKey::from_multisigner(m);
+                let network = get_all_networks(database)?
+                    .iter()
+                    .find(|network| sign_display.network_name == network.specs.name)
+                    .cloned()
+                    .unwrap();
+
+                let address_key = AddressKey::new(m.clone(), Some(network.specs.genesis_hash));
                 let verifier_details = Some(sign_display.signed_by.show_card());
 
                 if let Some(address_details) = try_get_address_details(database, &address_key)? {
                     let mut specs_found = None;
-                    for id in &address_details.network_id {
+                    let id = &address_details.network_id;
+                    if let Some(id) = &id {
                         let specs = try_get_network_specs(database, id)?;
                         if let Some(ordered_specs) = specs {
                             if ordered_specs.specs.name == sign_display.network_name {
@@ -324,6 +346,7 @@ pub fn entry_to_transactions_with_decoding(
                             Some(make_author_info(
                                 m,
                                 specs_found.specs.base58prefix,
+                                specs_found.specs.genesis_hash,
                                 &address_details,
                             )),
                             Some(decode_signable_from_history(database, sign_display)?),

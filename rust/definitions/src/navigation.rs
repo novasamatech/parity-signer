@@ -331,12 +331,6 @@ pub enum DerivationDestination {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MDeriveKey {
     pub seed_name: String,
-    pub network_title: String,
-    pub network_logo: String,
-    pub network_specs_key: String,
-    pub suggested_derivation: String,
-    pub keyboard: bool,
-    pub derivation_check: DerivationCheck,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -636,10 +630,19 @@ pub struct MSCFieldNumber {
     pub docs_type: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub enum SignerImage {
     Svg { image: Vec<u8> },
     Png { image: Vec<u8> },
+}
+
+impl std::fmt::Debug for SignerImage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SignerImage::Svg { image } => write!(f, "SVG {}", hex::encode(&image[..32])),
+            SignerImage::Png { image } => write!(f, "PNG {}", hex::encode(&image[..32])),
+        }
+    }
 }
 
 impl Default for SignerImage {

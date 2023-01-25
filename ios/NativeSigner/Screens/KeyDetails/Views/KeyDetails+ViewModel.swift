@@ -11,6 +11,7 @@ extension KeyDetailsView {
     final class ViewModel: ObservableObject {
         let keyDetailsService: KeyDetailsService
         private let networksService: GetAllNetworksService
+        private let cancelBag = CancelBag()
         let exportPrivateKeyService: PrivateKeyQRCodeService
         let keyName: String
         /// `MKwysNew` will currently be `nil` when navigating through given navigation path:
@@ -33,12 +34,12 @@ extension KeyDetailsView {
 
         @Published var keySummary: KeySummaryViewModel?
         @Published var derivedKeys: [DerivedKeyRowModel] = []
-        @Published var selectedSeeds: [String] = []
+        @Published var selectedKeys: [DerivedKeyRowModel] = []
         @Published var isFilteringActive: Bool = false
-        private var cancelBag = CancelBag()
+        // Error handling
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel = .noNetworksAvailable()
 
-        /// Navigation for `Create Derived Key`
-        let createDerivedKey: Navigation = .init(action: .newKey)
         /// Name of seed to be removed with `Remove Seed` action
         var removeSeed: String = ""
 
@@ -81,14 +82,31 @@ extension KeyDetailsView {
         func updateRenderables() {
             refreshDerivedKeys()
             refreshKeySummary()
+            refreshNetworks()
         }
 
         func refreshData() {
             keyDetailsService.getKeys(for: keyName) { result in
-                if case let .success(keysData) = result {
+                switch result {
+                case let .success(keysData):
                     self.appState.userData.keysData = keysData
                     self.keysData = keysData
                     self.updateRenderables()
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.description)
+                    self.isPresentingError = true
+                }
+            }
+        }
+
+        func refreshNetworks() {
+            networksService.getNetworks { result in
+                switch result {
+                case let .success(networks):
+                    self.appState.userData.allNetworks = networks
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.description)
+                    self.isPresentingError = true
                 }
             }
         }
@@ -103,6 +121,15 @@ extension KeyDetailsView {
 // MARK: - Tap Actions
 
 extension KeyDetailsView.ViewModel {
+    func onCreateDerivedKeyTap() {
+        if !appState.userData.allNetworks.isEmpty {
+            navigation.perform(navigation: .init(action: .newKey))
+        } else {
+            presentableError = .noNetworksAvailable()
+            isPresentingError = true
+        }
+    }
+
     func onRootKeyTap() {
         guard !isPresentingSelectionOverlay else { return }
         isPresentingRootDetails = true
@@ -119,11 +146,10 @@ extension KeyDetailsView.ViewModel {
 
     func onDerivedKeyTap(_ deriveKey: DerivedKeyRowModel) {
         if isPresentingSelectionOverlay {
-            let seedName = deriveKey.viewModel.path
-            if selectedSeeds.contains(seedName) {
-                selectedSeeds.removeAll { $0 == seedName }
+            if selectedKeys.contains(deriveKey) {
+                selectedKeys.removeAll { $0 == deriveKey }
             } else {
-                selectedSeeds.append(seedName)
+                selectedKeys.append(deriveKey)
             }
         } else {
             navigation.perform(navigation: deriveKey.actionModel.tapAction)
@@ -161,18 +187,15 @@ extension KeyDetailsView.ViewModel {
 
     func keyExportModel() -> ExportMultipleKeysModalViewModel? {
         guard let keySummary = keySummary else { return nil }
-        let derivedKeys: [DerivedKeyExportModel] = derivedKeys
-            .filter { selectedSeeds.contains($0.viewModel.path) }
-            .compactMap {
-                guard let keyData = keyData(for: $0.viewModel.path) else { return nil }
-                return DerivedKeyExportModel(viewModel: $0.viewModel, keyData: keyData)
-            }
+        let derivedKeys = selectedKeys.map {
+            DerivedKeyExportModel(viewModel: $0.viewModel, keyData: $0.keyData)
+        }
         return ExportMultipleKeysModalViewModel(
             selectedItems: .keys(
                 key: keySummary,
                 derivedKeys: derivedKeys
             ),
-            seedNames: selectedSeeds
+            count: selectedKeys.count
         )
     }
 
@@ -182,8 +205,8 @@ extension KeyDetailsView.ViewModel {
 }
 
 private extension KeyDetailsView.ViewModel {
-    func keyData(for path: String) -> MKeyAndNetworkCard? {
-        keysData?.set.first(where: { $0.key.address.path == path })
+    func keyData(for derivedKey: DerivedKeyRowModel) -> MKeyAndNetworkCard? {
+        keysData?.set.first(where: { $0.key.address.path == derivedKey.viewModel.path })
     }
 
     func refreshDerivedKeys() {
@@ -204,6 +227,7 @@ private extension KeyDetailsView.ViewModel {
             .map {
                 let details = "\($0.key.addressKey)\n\($0.network.networkSpecsKey)"
                 return DerivedKeyRowModel(
+                    keyData: $0,
                     viewModel: DerivedKeyRowViewModel($0.key),
                     actionModel: DerivedKeyActionModel(
                         tapAction: .init(action: .selectKey, details: details)

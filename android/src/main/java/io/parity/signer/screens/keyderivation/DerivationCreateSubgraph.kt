@@ -27,11 +27,10 @@ import kotlinx.coroutines.launch
 fun DerivationCreateSubgraph(
 	rootNavigator: Navigator,
 	seedName: String,
-	networkSpecsKey: String,
 ) {
 
 	val deriveViewModel: DerivationCreateViewModel = viewModel()
-	deriveViewModel.setInitValues(seedName, networkSpecsKey, rootNavigator)
+	deriveViewModel.setInitValues(seedName, rootNavigator)
 
 	val path = deriveViewModel.path.collectAsState()
 	val selectedNetwork = deriveViewModel.selectedNetwork.collectAsState()

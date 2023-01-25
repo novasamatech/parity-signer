@@ -9,11 +9,11 @@ import SwiftUI
 
 struct DerivedKeyRow: View {
     let viewModel: DerivedKeyRowViewModel
-    @Binding var selectedSeeds: [String]
+    @Binding var selectedKeys: [DerivedKeyRowModel]
     @Binding var isPresentingSelectionOverlay: Bool
 
     private var isItemSelected: Bool {
-        selectedSeeds.contains(viewModel.path)
+        selectedKeys.map(\.viewModel).contains(viewModel)
     }
 
     var body: some View {
@@ -77,7 +77,7 @@ struct DerivedKeyRow_Previews: PreviewProvider {
                     base58: "15Gsc678654FDSG0HA04H0A",
                     rootKeyName: ""
                 ),
-                selectedSeeds: Binding<[String]>.constant(["name"]),
+                selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
                 isPresentingSelectionOverlay: Binding<Bool>.constant(true)
             )
             DerivedKeyRow(
@@ -87,7 +87,7 @@ struct DerivedKeyRow_Previews: PreviewProvider {
                     hasPassword: false,
                     base58: "15Gsc678654FDSG0HA04H0A"
                 ),
-                selectedSeeds: Binding<[String]>.constant([]),
+                selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
                 isPresentingSelectionOverlay: Binding<Bool>.constant(true)
             )
             DerivedKeyRow(
@@ -97,7 +97,7 @@ struct DerivedKeyRow_Previews: PreviewProvider {
                     hasPassword: true,
                     base58: "15Gsc678654FDSG0HA04H0A"
                 ),
-                selectedSeeds: Binding<[String]>.constant([]),
+                selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
                 isPresentingSelectionOverlay: Binding<Bool>.constant(false)
             )
             DerivedKeyRow(
@@ -107,7 +107,7 @@ struct DerivedKeyRow_Previews: PreviewProvider {
                     hasPassword: true,
                     base58: "15Gsc678654FDSG0HA04H0A"
                 ),
-                selectedSeeds: Binding<[String]>.constant([]),
+                selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
                 isPresentingSelectionOverlay: Binding<Bool>.constant(false)
             )
         }

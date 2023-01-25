@@ -39,10 +39,8 @@ class DerivationCreateViewModel : ViewModel() {
 		_path.value = newPath
 	}
 
-	fun setInitValues(seed: String, network: String, rootNavigator: Navigator) {
+	fun setInitValues(seed: String, rootNavigator: Navigator) {
 		seedName = seed
-		allNetworks.firstOrNull { it.key == network }
-			?.let { _selectedNetwork.value = it }
 		this.rootNavigator = rootNavigator
 	}
 
