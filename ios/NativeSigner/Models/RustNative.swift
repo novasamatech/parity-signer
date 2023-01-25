@@ -87,7 +87,7 @@ private extension SignerDataModel {
 
     func finaliseInitialisation() {
         if onboardingDone {
-            seedsMediator.refreshSeeds()
+            seedsMediator.initialRefreshSeeds()
             do {
                 try initNavigation(dbname: databaseMediator.databaseName, seedNames: seedsMediator.seedNames)
             } catch {
