@@ -2,6 +2,7 @@ package io.parity.signer.screens.scan
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import io.parity.signer.R
 import io.parity.signer.backend.UniffiResult
@@ -13,7 +14,6 @@ import io.parity.signer.models.storage.RepoResult
 import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.screens.scan.elements.PresentableErrorModel
 import io.parity.signer.screens.scan.importderivations.*
-import io.parity.signer.screens.scan.importderivations.importableSeedKeysPreviews
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues
 import io.parity.signer.uniffi.*
@@ -29,7 +29,11 @@ class ScanViewModel : ViewModel() {
 
 	private val uniffiInteractor = ServiceLocator.backendScope.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
-	private val importKeysService: ImportDerivedKeysRepository by lazy { ImportDerivedKeysRepository(seedRepository) }
+	private val importKeysService: ImportDerivedKeysRepository by lazy {
+		ImportDerivedKeysRepository(
+			seedRepository
+		)
+	}
 
 	data class TransactionsState(
 		val transactions: List<MTransaction>,
@@ -151,17 +155,35 @@ class ScanViewModel : ViewModel() {
 		}
 	}
 
-	fun onImportKeysTap(transactions: TransactionsState) {
-		val importableKeys = transactions.transactions.flatMap { it.importableSeedKeysPreviews() }
+	fun onImportKeysTap(transactions: TransactionsState, context: Context) {
+		val importableKeys =
+			transactions.transactions.flatMap { it.importableSeedKeysPreviews() }
 
 		val importResult = importKeysService.importDerivedKeys(importableKeys)
-		val derivedKeysCount = transactions.transactions.sumOf { it.importableKeysCount() }
+		val derivedKeysCount =
+			transactions.transactions.sumOf { it.importableKeysCount() }
 		when (importResult) {
-			is RepoResult.Success -> TODO()
-			is RepoResult.Failure -> TODO()
+			is RepoResult.Success -> {
+				Toast.makeText(
+					/* context = */ context,
+					/* text = */ context.resources.getQuantityString(
+						R.plurals.import_derivations_success_keys_imported,
+						derivedKeysCount,
+						derivedKeysCount,
+					), /* duration = */ Toast.LENGTH_LONG
+				).show()
+			}
+			is RepoResult.Failure -> {
+				Toast.makeText(
+					/* context = */ context,
+					/* text = */
+					context.getString(R.string.import_derivations_failure_toast),
+					/* duration = */
+					Toast.LENGTH_LONG
+				).show()
+			}
 		}
 
-		//todo import derivations finish
 		this.transactions.value = null
 	}
 
