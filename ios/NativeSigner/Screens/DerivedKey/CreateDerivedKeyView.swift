@@ -109,7 +109,7 @@ struct CreateDerivedKeyView: View {
             CreateDerivedKeyConfirmationView(
                 viewModel: .init(
                     isPresented: $viewModel.isPresentingConfirmation,
-                    derivationPath: $viewModel.derivationPath
+                    derivationPath: viewModel.unwrappedDerivationPath()
                 )
             )
             .clearModalBackground()
@@ -164,9 +164,9 @@ struct CreateDerivedKeyView: View {
             Spacer()
                 .frame(width: Spacing.medium)
             Text(
-                viewModel.derivationPath.isEmpty ?
+                viewModel.derivationPath == nil ?
                     Localizable.CreateDerivedKey.Label.Placeholder.path.string :
-                    viewModel.derivationPath.formattedAsPasswordedPath
+                    viewModel.unwrappedDerivationPath().formattedAsPasswordedPath
             )
             .font(PrimaryFont.bodyL.font)
             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
@@ -203,7 +203,7 @@ extension CreateDerivedKeyView {
         @Published var isPresentingConfirmation: Bool = false
 
         @Published var networkSelection: NetworkSelection = .allowedOnAnyNetwork([])
-        @Published var derivationPath: String = ""
+        @Published var derivationPath: String?
         private let cancelBag = CancelBag()
 
         init(
@@ -262,16 +262,20 @@ extension CreateDerivedKeyView {
             }
             switch networkSelection {
             case let .network(network):
-                createKeyService.createDerivedKey(seedName, derivationPath, network.key, completion)
+                createKeyService.createDerivedKey(seedName, unwrappedDerivationPath(), network.key, completion)
             case .allowedOnAnyNetwork:
-                createKeyService.createDerivedKeyOnAllNetworks(seedName, derivationPath, completion)
+                createKeyService.createDerivedKeyOnAllNetworks(seedName, unwrappedDerivationPath(), completion)
             }
         }
 
         private func subscribeToChanges() {
             $derivationPath.sink {
-                self.isActionDisabled = $0.isEmpty == true
+                self.isActionDisabled = $0 == nil
             }.store(in: cancelBag)
+        }
+
+        func unwrappedDerivationPath() -> String {
+            derivationPath ?? ""
         }
     }
 }

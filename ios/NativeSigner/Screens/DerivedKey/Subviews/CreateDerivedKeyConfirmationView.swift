@@ -81,17 +81,17 @@ extension CreateDerivedKeyConfirmationView {
 
         @Published var animateBackground: Bool = false
         @Binding var isPresented: Bool
-        @Binding var derivationPath: String
+        let derivationPath: String
         @Published var isActionDisabled: Bool = true
         @Published var isCheckboxSelected: Bool = false
 
         init(
             isPresented: Binding<Bool>,
-            derivationPath: Binding<String>,
+            derivationPath: String,
             snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation
         ) {
             _isPresented = isPresented
-            _derivationPath = derivationPath
+            self.derivationPath = derivationPath
             self.snackbarPresentation = snackbarPresentation
         }
 
@@ -133,7 +133,7 @@ extension CreateDerivedKeyConfirmationView {
             CreateDerivedKeyConfirmationView(
                 viewModel: .init(
                     isPresented: .constant(true),
-                    derivationPath: .constant("//polkadot//1///•••••••")
+                    derivationPath: "//polkadot//1///•••••••"
                 )
             )
             .environmentObject(NavigationCoordinator())
