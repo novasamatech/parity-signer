@@ -257,10 +257,6 @@ extension DerivationPathNameView {
                 skipValidation = false
                 return
             }
-            guard !inputText.isEmpty else {
-                derivationPathError = nil
-                return
-            }
             switch networkSelection {
             case let .network(network):
                 pathErrorCheck(createKeyService.checkForCollision(seedName, inputText, network.key))
