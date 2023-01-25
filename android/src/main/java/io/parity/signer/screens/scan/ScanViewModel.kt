@@ -35,9 +35,7 @@ class ScanViewModel : ViewModel() {
 		)
 	}
 
-	data class TransactionsState(
-		val transactions: List<MTransaction>,
-	)
+	data class TransactionsState(val transactions: List<MTransaction>)
 
 	var transactions: MutableStateFlow<TransactionsState?> =
 		MutableStateFlow(null)
@@ -140,17 +138,23 @@ class ScanViewModel : ViewModel() {
 								this.transactions.value = TransactionsState(transactions)
 							}
 
-							when (val result = importKeysService.updateWithSeed(importDerivedKeys)) {
+							when (val result =
+								importKeysService.updateWithSeed(importDerivedKeys)) {
 								is RepoResult.Success -> {
 									val updatedKeys = result.result
 									val newTransactionsState =
-										updateTransactionsWithImportDerivations(transactions, updatedKeys)
-									this.transactions.value = TransactionsState(newTransactionsState)
+										updateTransactionsWithImportDerivations(
+											transactions = transactions,
+											updatedKeys = updatedKeys
+										)
+									this.transactions.value =
+										TransactionsState(newTransactionsState)
 								}
 								is RepoResult.Failure -> {
 									Toast.makeText(
 										/* context = */ context,
-										/* text = */ context.getString(R.string.import_derivations_failure_update_toast),
+										/* text = */
+										context.getString(R.string.import_derivations_failure_update_toast),
 										/* duration = */ Toast.LENGTH_LONG
 									).show()
 								}
@@ -207,9 +211,10 @@ class ScanViewModel : ViewModel() {
 	private fun areSeedKeysTheSameButUpdated(
 		originalKey: SeedKeysPreview,
 		resultKey: SeedKeysPreview
-	): Boolean = originalKey.name == resultKey.name && resultKey.derivedKeys.all { derKey ->
-		originalKey.derivedKeys.any { it.derivationPath == derKey.derivationPath }
-	}
+	): Boolean =
+		originalKey.name == resultKey.name && resultKey.derivedKeys.all { derKey ->
+			originalKey.derivedKeys.any { it.derivationPath == derKey.derivationPath }
+		}
 
 	fun onImportKeysTap(transactions: TransactionsState, context: Context) {
 		val importableKeys =
