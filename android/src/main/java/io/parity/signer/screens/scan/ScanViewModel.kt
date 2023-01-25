@@ -14,6 +14,7 @@ import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.screens.scan.elements.PresentableErrorModel
 import io.parity.signer.screens.scan.importderivations.dominantImportError
 import io.parity.signer.screens.scan.importderivations.hasImportableKeys
+import io.parity.signer.screens.scan.importderivations.importableSeedKeysPreviews
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues
 import io.parity.signer.uniffi.*
@@ -148,6 +149,12 @@ class ScanViewModel : ViewModel() {
 			}
 			//handle alert error rust/navigator/src/navstate.rs:396
 		}
+	}
+
+	fun onImportKeysTap() {
+		val importableKeys = transactions.value.transactions.map { it.importableSeedKeysPreviews() }
+
+		importKeysService.importDerivedKeys(importableKeys)
 	}
 
 	fun ifHasStateThenClear(): Boolean {

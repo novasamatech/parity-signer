@@ -201,7 +201,7 @@
 	<string name="transaction_action_approve">Approve</string>
 	<string name="transaction_action_decline">Decline</string>
 	<string name="transaction_action_back">Back</string>
-	<string name="transaction_action_select_seed">Select seed</string>
+	<string name="transaction_action_import_keys">Import keys</string>
 	<string name="transaction_summary_field_transaction_details">Transaction Details</string>
 	<string name="transaction_summary_field_pallet">Pallet</string>
 	<string name="transaction_summary_field_method">Method</string>

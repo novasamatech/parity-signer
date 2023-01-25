@@ -104,7 +104,7 @@ fun ScanNavSubgraph(
 				backendAction(Action.GO_BACK, "", "")
 				scanViewModel.clearState()
 			},
-			onFinish = {
+			onApprove = {
 				when (val previewType =
 					transactions.value?.transactions?.previewType) {
 					is TransactionPreviewType.AddNetwork -> {
@@ -135,6 +135,11 @@ fun ScanNavSubgraph(
 				scanViewModel.clearState()
 				rootNavigator.navigate(Action.GO_FORWARD)
 			},
+			onImportKeys = {
+				scanViewModel.onImportKeysTap()
+				// todo import derivations
+//				ios/NativeSigner/Screens/Scan/TransactionPreview.swift:345
+			}
 		)
 	}
 	//Bottom sheets

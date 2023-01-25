@@ -26,8 +26,12 @@ class SeedRepository(
 		return storage.lastKnownSeedNames.value
 	}
 
+	suspend fun getAllSeeds(): RepoResult<Map<String, String>> {
+
+	}
+
 	/**
-	 * Try to get phrases if timeout if
+	 * Try to get phrases if timeout - request auth
 	 */
 	suspend fun getSeedPhrases(seedNames: List<String>): RepoResult<String> {
 		return try {
@@ -173,7 +177,7 @@ const val TAG = "Seed_Repository"
 
 sealed class RepoResult<T> {
 	data class Success<T>(val result: T) : RepoResult<T>()
-	data class Failure<T>(val error: Throwable) : RepoResult<T>()
+	data class Failure<T>(val error: Throwable = UnknownError()) : RepoResult<T>()
 }
 fun <T> RepoResult<T>.mapError(): T? {
 	return when (this) {
