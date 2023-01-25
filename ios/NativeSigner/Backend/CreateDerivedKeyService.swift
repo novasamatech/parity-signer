@@ -87,8 +87,7 @@ final class CreateDerivedKeyService {
         do {
             return .success(try substratePathCheck(seedName: seedName, path: path, network: network))
         } catch {
-            // Update with presentable message when `origin/fs-address-keys` is merged
-            return .failure(.unknown)
+            return .failure(.init(message: error.localizedDescription))
         }
     }
 }

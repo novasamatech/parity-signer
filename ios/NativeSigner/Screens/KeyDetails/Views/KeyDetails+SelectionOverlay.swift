@@ -38,13 +38,13 @@ extension KeyDetailsView {
                 Button(action: { viewModel.isShowingKeysExportModal.toggle() }) {
                     Localizable.KeyDetails.Overlay.Action.export.text
                         .foregroundColor(
-                            viewModel.selectedSeeds.isEmpty ? Asset.textAndIconsDisabled.swiftUIColor : Asset
+                            viewModel.selectedKeys.isEmpty ? Asset.textAndIconsDisabled.swiftUIColor : Asset
                                 .accentPink300.swiftUIColor
                         )
                         .font(PrimaryFont.labelL.font)
                 }
                 .padding(.trailing, Spacing.medium)
-                .disabled(viewModel.selectedSeeds.isEmpty)
+                .disabled(viewModel.selectedKeys.isEmpty)
             }
             .frame(height: Heights.tabbarHeight)
             .background(Asset.backgroundSecondary.swiftUIColor)
@@ -53,12 +53,12 @@ extension KeyDetailsView {
 
     var selectionTitle: String {
         let localizable = Localizable.KeyDetails.Overlay.Label.self
-        let itemsCount = viewModel.selectedSeeds.count
+        let itemsCount = viewModel.selectedKeys.count
         let keyString = itemsCount == 1 ? localizable.Key.single.string : localizable.Key.plural.string
         return localizable.title(String(itemsCount), keyString)
     }
 
     func selectAll() {
-        viewModel.selectedSeeds = viewModel.derivedKeys.map(\.viewModel.path)
+        viewModel.selectedKeys = viewModel.derivedKeys
     }
 }

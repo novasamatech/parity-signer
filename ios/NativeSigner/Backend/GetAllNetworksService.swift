@@ -31,7 +31,7 @@ final class GetAllNetworksService {
                 let networks: [MmNetwork] = try getAllNetworks()
                 result = .success(networks)
             } catch {
-                result = .failure(.unknown)
+                result = .failure(.init(message: error.localizedDescription))
             }
             self.callbackQueue.async {
                 completion(result)

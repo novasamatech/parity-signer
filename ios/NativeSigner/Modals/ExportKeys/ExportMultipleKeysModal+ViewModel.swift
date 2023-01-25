@@ -33,8 +33,8 @@ extension ExportMultipleKeysModal {
                 self.qrCode = (try? result.get()) ?? .init(qrCodes: [])
             }
             switch viewModel.selectedItems {
-            case .keySets:
-                keysExportService.exportMultipleKeySets(seedNames: viewModel.seedNames, completion)
+            case let .keySets(keySets):
+                keysExportService.exportMultipleKeySets(seedNames: keySets.map(\.seed.seedName), completion)
             case let .keys(key, derivedKeys):
                 keysExportService.exportRootWithDerivedKeys(
                     seedName: key.keyName,

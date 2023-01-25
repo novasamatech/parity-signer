@@ -214,12 +214,14 @@ pub fn export_all_addrs(
                         s: selected_derivations,
                     } => {
                         for selected_derivation in selected_derivations {
-                            if selected_derivation.derivation == key.1.path
-                                && selected_derivation.network_specs_key
-                                    == hex::encode(key.1.network_id[0].key())
-                            {
-                                selected = true;
-                                break;
+                            if let Some(id) = &key.1.network_id {
+                                if selected_derivation.derivation == key.1.path
+                                    && selected_derivation.network_specs_key
+                                        == hex::encode(id.key())
+                                {
+                                    selected = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -230,22 +232,24 @@ pub fn export_all_addrs(
                 }
             }
 
-            let specs = get_network_specs(database, &key.1.network_id[0])?;
-            let address = print_multisigner_as_base58_or_eth(
-                &key.0,
-                Some(specs.specs.base58prefix),
-                key.1.encryption,
-            );
-            derived_keys.push(AddrInfo {
-                address: address.clone(),
-                derivation_path: if key.1.path.is_empty() {
-                    None
-                } else {
-                    Some(key.1.path.to_owned())
-                },
-                encryption: key.1.encryption,
-                genesis_hash: specs.specs.genesis_hash,
-            });
+            if let Some(id) = &key.1.network_id {
+                let specs = get_network_specs(database, id)?;
+                let address = print_multisigner_as_base58_or_eth(
+                    &key.0,
+                    Some(specs.specs.base58prefix),
+                    key.1.encryption,
+                );
+                derived_keys.push(AddrInfo {
+                    address: address.clone(),
+                    derivation_path: if key.1.path.is_empty() {
+                        None
+                    } else {
+                        Some(key.1.path.to_owned())
+                    },
+                    encryption: key.1.encryption,
+                    genesis_hash: specs.specs.genesis_hash,
+                });
+            }
         }
 
         addrs.push(SeedInfo {
@@ -398,7 +402,8 @@ pub fn get_all_addresses(database: &sled::Db) -> Result<Vec<(MultiSigner, Addres
     let identities = open_tree(database, ADDRTREE)?;
     let mut out: Vec<(MultiSigner, AddressDetails)> = Vec::new();
     for (address_key_vec, address_entry) in identities.iter().flatten() {
-        let address_key = AddressKey::from_ivec(&address_key_vec);
+        let address_key = AddressKey::from_ivec(&address_key_vec)?;
+        println!("address key {:?}", address_key);
         let (multisigner, address_details) =
             AddressDetails::process_entry_with_key_checked(&address_key, address_entry)?;
         out.push((multisigner, address_details));
@@ -597,7 +602,7 @@ pub(crate) fn create_address(
     database: &sled::Db,
     input_batch_prep: &[(AddressKey, AddressDetails)],
     path: &str,
-    network_specs: &NetworkSpecs,
+    network_specs: Option<&NetworkSpecs>,
     seed_name: &str,
     seed_phrase: &str,
 ) -> Result<PrepData> {
@@ -611,7 +616,11 @@ pub(crate) fn create_address(
     full_address.push_str(seed_phrase);
     full_address.push_str(path);
 
-    let multisigner = match network_specs.encryption {
+    let encryption = network_specs
+        .map(|ns| ns.encryption)
+        .unwrap_or(Encryption::Sr25519);
+
+    let multisigner = match encryption {
         Encryption::Ed25519 => match ed25519::Pair::from_string(&full_address, None) {
             Ok(a) => {
                 full_address.zeroize();
@@ -683,7 +692,7 @@ pub(crate) fn create_derivation_address(
         database,
         input_batch_prep,
         path,
-        network_specs,
+        Some(network_specs),
         seed_name,
         multisigner,
         has_pwd,
@@ -694,7 +703,7 @@ fn do_create_address(
     database: &sled::Db,
     input_batch_prep: &[(AddressKey, AddressDetails)],
     cropped_path: &str,
-    network_specs: &NetworkSpecs,
+    network_specs: Option<&NetworkSpecs>,
     seed_name: &str,
     multisigner: MultiSigner,
     has_pwd: bool,
@@ -704,67 +713,48 @@ fn do_create_address(
         return Err(Error::EmptySeedName);
     }
     let mut address_prep = input_batch_prep.to_vec();
-    let network_specs_key =
-        NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
+    let mut history_prep = vec![];
+    let mut address_key: Option<AddressKey> = None;
+    let mut network_specs_key: Option<NetworkSpecsKey> = None;
+    if let Some(network_specs) = network_specs {
+        network_specs_key = Some(NetworkSpecsKey::from_parts(
+            &network_specs.genesis_hash,
+            &network_specs.encryption,
+        ));
 
-    let public_key = multisigner_to_public(&multisigner);
-    let address_key = AddressKey::from_multisigner(&multisigner);
+        let public_key = multisigner_to_public(&multisigner);
+        address_key = Some(AddressKey::new(
+            multisigner.clone(),
+            Some(network_specs.genesis_hash),
+        ));
 
-    // prepare history log here
-    let identity_history = IdentityHistory::get(
-        seed_name,
-        &network_specs.encryption,
-        &public_key,
-        cropped_path,
-        network_specs.genesis_hash,
-    );
-    let history_prep = vec![Event::IdentityAdded { identity_history }];
+        // prepare history log here
+        let identity_history = IdentityHistory::get(
+            seed_name,
+            &network_specs.encryption,
+            &public_key,
+            cropped_path,
+            network_specs.genesis_hash,
+        );
+        history_prep.push(Event::IdentityAdded { identity_history });
+    }
+    if address_key.is_none() {
+        address_key = Some(AddressKey::new(multisigner.clone(), None))
+    }
 
     // check if the same address key already participates in current database
     // transaction
 
     // number in `(AddressKey, AddressDetails)` set with same `AddressKey`, if
     // found
-    let mut number_in_current = None;
+    let number_in_current = None;
 
-    for (i, (x_address_key, x_address_details)) in address_prep.iter().enumerate() {
-        // `AddressKey` found in transaction preparation
-        if x_address_key == &address_key {
-            let in_this_network = x_address_details.network_id.contains(&network_specs_key);
-
-            // Even though the public key and `Encryption` are same (resulting
-            // in the same `AddressKey`), the path in corresponding
-            // `AddressDetails` already in transaction preparation is different
-            // from the cropped path used in current address generation.
-            // If not checked, may result in uncertainty, as two entries with
-            // identical `AddressKey` would be in the set, and during database
-            // updating would be effectively overwritten, with only one,
-            // undefined, staying in the database.
-            if x_address_details.path != cropped_path {
-                return Err(Error::KeyCollisionBatch {
-                    seed_name_existing: x_address_details.seed_name.to_string(),
-                    seed_name_new: seed_name.to_string(),
-                    cropped_path_existing: x_address_details.path.to_string(),
-                    cropped_path_new: cropped_path.to_string(),
-                    in_this_network,
-                });
-            }
-
-            // Note that no error would be caused if two identical addresses
-            // were proposed in same address generation set.
-            if !in_this_network {
-                number_in_current = Some(i);
-                break;
-            }
-        }
-    }
     match number_in_current {
         // `AddressKey` already participates in transaction, just add
         // `NetworkSpecsKey` into corresponding `AddressDetails` `network_id`
         // set
         Some(i) => {
-            let mut mod_entry = address_prep.remove(i);
-            mod_entry.1.network_id.push(network_specs_key);
+            let mod_entry = address_prep.remove(i);
             address_prep.push(mod_entry);
             Ok(PrepData {
                 address_prep,
@@ -785,81 +775,57 @@ fn do_create_address(
 
             // check if the `AddressKey` is already in the database
             let identities = open_tree(database, ADDRTREE)?;
-            match identities.get(address_key.key()) {
-                // `AddressKey` is in the database
-                Ok(Some(address_entry)) => {
-                    let mut address_details =
-                        AddressDetails::from_entry_with_key_checked(&address_key, address_entry)?;
+            if let Some(address_key) = address_key {
+                match identities.get(address_key.key()) {
+                    // `AddressKey` is in the database
+                    Ok(Some(address_entry)) => {
+                        if let Some(network_specs_key) = network_specs_key {
+                            let address_details = AddressDetails::from_entry_with_key_checked(
+                                &address_key,
+                                address_entry,
+                            )?;
 
-                    // Even though the public key and `Encryption` are same
-                    // (resulting in the same `AddressKey`), the path in
-                    // corresponding `AddressDetails` in the database is
-                    // different from the cropped path currently used.
-                    // <seed phrase 1> + <derivation path 1> resulted in same
-                    // public key as <seed phrase 2> + <derivation path 2>.
-                    // For different seed phrases it is possible, but quite
-                    // unlikely situation.
-                    // For different *spellings* of derivation path, e.g. "//01"
-                    // and "//1" it is more likely to happen.
-                    // In any case, this is collision error and address is not
-                    // created.
-                    // TODO more descriptive error may be better
-                    if address_details.path != cropped_path {
-                        return Err(Error::KeyCollision {
-                            seed_name: address_details.seed_name,
-                        });
+                            Err(Error::DerivationExists {
+                                multisigner,
+                                address_details,
+                                network_specs_key,
+                            })
+                        } else {
+                            Ok(PrepData {
+                                address_prep,
+                                history_prep,
+                            })
+                        }
                     }
 
-                    // Expected `secret_exposed` flag activated. Could indicate
-                    // the database corruption.
-                    if secret_exposed && !address_details.secret_exposed {
-                        return Err(Error::SecretExposedMismatch {
-                            multisigner,
-                            address_details,
-                        });
-                    }
-
-                    // Check if the address already exists for the network.
-                    // UI should not allow user get here unless the derivation
-                    // is passworded and already exists.
-                    // Proposed derivation is checked dynamically before
-                    // address generation could be even called.
-                    if !address_details.network_id.contains(&network_specs_key) {
-                        address_details.network_id.push(network_specs_key);
+                    // `AddressKey` is not in the database either.
+                    // Make altogether new entry.
+                    Ok(None) => {
+                        let address_details = AddressDetails {
+                            seed_name: seed_name.to_string(),
+                            path: cropped_path.to_string(),
+                            has_pwd,
+                            network_id: network_specs_key,
+                            encryption: network_specs
+                                .map(|ns| ns.encryption)
+                                .unwrap_or(Encryption::Sr25519),
+                            secret_exposed,
+                        };
                         address_prep.push((address_key, address_details));
                         Ok(PrepData {
                             address_prep,
                             history_prep,
                         })
-                    } else {
-                        Err(Error::DerivationExists {
-                            multisigner,
-                            address_details,
-                            network_specs_key,
-                        })
                     }
-                }
 
-                // `AddressKey` is not in the database either.
-                // Make altogether new entry.
-                Ok(None) => {
-                    let address_details = AddressDetails {
-                        seed_name: seed_name.to_string(),
-                        path: cropped_path.to_string(),
-                        has_pwd,
-                        network_id: vec![network_specs_key],
-                        encryption: network_specs.encryption.to_owned(),
-                        secret_exposed,
-                    };
-                    address_prep.push((address_key, address_details));
-                    Ok(PrepData {
-                        address_prep,
-                        history_prep,
-                    })
+                    // database error
+                    Err(e) => Err(e.into()),
                 }
-
-                // database error
-                Err(e) => Err(e.into()),
+            } else {
+                Ok(PrepData {
+                    address_prep,
+                    history_prep,
+                })
             }
         }
     }
@@ -910,24 +876,15 @@ fn populate_addresses(
     // Note: networks with all `Encryption` variants are used here if they are
     // in the Signer database.
     let specs_set = get_all_networks(database)?;
-
+    // Make seed keys if requested.
+    // Seed keys **must** be possible to generate,
+    // if a seed key has a collision with some other key, it is an error
+    if make_seed_keys {
+        let prep_data = create_address(database, &address_prep, "", None, seed_name, seed_phrase)?;
+        address_prep = prep_data.address_prep;
+        history_prep.extend_from_slice(&prep_data.history_prep);
+    }
     for network_specs in specs_set.iter() {
-        // Make seed keys if requested.
-        // Seed keys **must** be possible to generate,
-        // if a seed key has a collision with some other key, it is an error
-        if make_seed_keys {
-            let prep_data = create_address(
-                database,
-                &address_prep,
-                "",
-                &network_specs.specs,
-                seed_name,
-                seed_phrase,
-            )?;
-            address_prep = prep_data.address_prep;
-            history_prep.extend_from_slice(&prep_data.history_prep);
-        }
-
         // make keys with default derivation if possible;
         // key with default derivation may collide with some other key,
         // this should not prevent generating a seed;
@@ -935,7 +892,7 @@ fn populate_addresses(
             database,
             &address_prep,
             &network_specs.specs.path_id,
-            &network_specs.specs,
+            Some(&network_specs.specs),
             seed_name,
             seed_phrase,
         ) {
@@ -1019,8 +976,9 @@ pub fn remove_keys_set(
     let network_specs = get_network_specs(database, network_specs_key)?;
     for multisigner in multiselect.iter() {
         let public_key = multisigner_to_public(multisigner);
-        let address_key = AddressKey::from_multisigner(multisigner);
-        let mut address_details = get_address_details(database, &address_key)?;
+        let address_key =
+            AddressKey::new(multisigner.clone(), Some(network_specs.specs.genesis_hash));
+        let address_details = get_address_details(database, &address_key)?;
         let identity_history = IdentityHistory::get(
             &address_details.seed_name,
             &network_specs.specs.encryption,
@@ -1029,10 +987,7 @@ pub fn remove_keys_set(
             network_specs.specs.genesis_hash,
         );
         events.push(Event::IdentityRemoved { identity_history });
-        address_details
-            .network_id
-            .retain(|id| id != network_specs_key);
-        if address_details.network_id.is_empty() {
+        if address_details.network_id.as_ref() == Some(network_specs_key) {
             id_batch.remove(address_key.key())
         } else {
             id_batch.insert(address_key.key(), address_details.encode())
@@ -1107,8 +1062,12 @@ pub fn create_increment_set(
     network_specs_key: &NetworkSpecsKey,
     seed_phrase: &str,
 ) -> Result<()> {
-    let address_details =
-        get_address_details(database, &AddressKey::from_multisigner(multisigner))?;
+    let network_specs = get_network_specs(database, network_specs_key)?;
+    let address_details = get_address_details(
+        database,
+        &AddressKey::new(multisigner.clone(), Some(network_specs.specs.genesis_hash)),
+    )?;
+
     let existing_identities =
         addresses_set_seed_name_network(database, &address_details.seed_name, network_specs_key)?;
     let mut last_index = 0;
@@ -1121,7 +1080,6 @@ pub fn create_increment_set(
             }
         }
     }
-    let network_specs = get_network_specs(database, network_specs_key)?;
     let mut identity_adds: Vec<(AddressKey, AddressDetails)> = Vec::new();
     let mut current_events: Vec<Event> = Vec::new();
     for i in 0..increment {
@@ -1130,7 +1088,7 @@ pub fn create_increment_set(
             database,
             &identity_adds,
             &path,
-            &network_specs.specs,
+            Some(&network_specs.specs),
             &address_details.seed_name,
             seed_phrase,
         )?;
@@ -1221,7 +1179,7 @@ pub fn derivation_check(
             for (multisigner, address_details) in get_all_addresses(database)?.into_iter() {
                 if (address_details.seed_name == seed_name) // seed name
                     && (address_details.path == path) // derivation path, cropped part without password
-                    && (address_details.network_id.contains(network_specs_key)) // in this network
+                    && (address_details.network_id.as_ref() == Some(network_specs_key)) // in this network
                     && (!address_details.has_pwd)
                 // has no password to begin with
                 {
@@ -1314,7 +1272,7 @@ pub fn try_create_address(
                 database,
                 &Vec::new(), // a single address is created, no data to check against here
                 path,
-                &network_specs.specs,
+                Some(&network_specs.specs),
                 seed_name,
                 seed_phrase,
             )?;
@@ -1364,7 +1322,7 @@ pub fn generate_test_identities(database: &sled::Db) -> Result<()> {
                 database,
                 &address_prep, // address
                 "//Alice",
-                &network_specs.specs,
+                Some(&network_specs.specs),
                 "Alice",
                 ALICE_SEED_PHRASE,
             )?;
@@ -1401,14 +1359,16 @@ pub fn remove_seed(database: &sled::Db, seed_name: &str) -> Result<()> {
     }];
 
     for (multisigner, address_details) in id_set.iter() {
-        let address_key = AddressKey::from_multisigner(multisigner);
+        if let Some(id) = &address_details.network_id {
+            let network_specs = get_network_specs(database, id)?;
+            let address_key =
+                AddressKey::new(multisigner.clone(), Some(network_specs.specs.genesis_hash));
 
-        // removal of all addresses corresponging to `AddressKey`
-        identity_batch.remove(address_key.key());
+            // removal of all addresses corresponging to `AddressKey`
+            identity_batch.remove(address_key.key());
 
-        let public_key = multisigner_to_public(multisigner);
-        for network_specs_key in address_details.network_id.iter() {
-            let (genesis_hash_vec, _) = network_specs_key.genesis_hash_encryption()?;
+            let public_key = multisigner_to_public(multisigner);
+            let (genesis_hash_vec, _) = id.genesis_hash_encryption()?;
             let identity_history = IdentityHistory::get(
                 seed_name,
                 &address_details.encryption,
@@ -1513,7 +1473,7 @@ pub fn export_secret_key(
     let network_specs_key = &NetworkSpecsKey::from_hex(network_specs_key_hex)?;
     let network_specs = get_network_specs(database, network_specs_key)?;
     let multisigner = &get_multisigner(public_key, &network_specs.specs.encryption)?;
-    let address_key = AddressKey::from_multisigner(multisigner);
+    let address_key = AddressKey::new(multisigner.clone(), Some(network_specs.specs.genesis_hash));
     let address_details = get_address_details(database, &address_key)?;
     if address_details.seed_name != expected_seed_name {
         return Err(Error::SeedNameNotMatching {
@@ -1522,7 +1482,7 @@ pub fn export_secret_key(
             real_seed_name: address_details.seed_name,
         });
     }
-    if !address_details.network_id.contains(network_specs_key) {
+    if address_details.network_id.as_ref() != Some(network_specs_key) {
         return Err(Error::NetworkSpecsKeyForAddressNotFound {
             network_specs_key: network_specs_key.to_owned(),
             address_key,
@@ -1558,10 +1518,17 @@ pub fn export_secret_key(
     for (x_multisigner, x_address_details) in exposed_addresses.into_iter() {
         let mut new_address_details = x_address_details;
         new_address_details.secret_exposed = true;
-        identity_batch.insert(
-            AddressKey::from_multisigner(&x_multisigner).key(),
-            new_address_details.encode(),
-        )
+        if let Some(id) = &new_address_details.network_id {
+            let network_specs = get_network_specs(database, id)?;
+            identity_batch.insert(
+                AddressKey::new(
+                    x_multisigner.clone(),
+                    Some(network_specs.specs.genesis_hash),
+                )
+                .key(),
+                new_address_details.encode(),
+            )
+        }
     }
 
     let history_batch = events_to_batch(

@@ -29,30 +29,9 @@ tempfile = { version = "3.3" }
 
 [features]
 default = ["test"]
-active = [
-	"constants/active",
-	"defaults/active",
-	"definitions/active",
-    "tiny-bip39",
-	"sp-core",
-	"sp-runtime",
-	"zeroize",
-]
-signer = [
-	"constants/signer",
-	"defaults/signer",
-	"definitions/signer",
-	"plot_icon",
-    "tiny-bip39",
-	"sp-core",
-	"sp-runtime",
-	"zeroize",
-]
-test = [
-	"active",
-	"constants/test",
-	"signer",
-]
+active = ["constants/active", "defaults/active", "definitions/active", "tiny-bip39", "sp-core", "sp-runtime", "zeroize"]
+signer = ["constants/signer", "defaults/signer", "definitions/signer", "plot_icon", "tiny-bip39", "sp-core", "sp-runtime", "zeroize"]
+test = ["active", "constants/test", "signer"]
 
 [lib]
 name = "db_handling"

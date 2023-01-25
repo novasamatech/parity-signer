@@ -192,7 +192,7 @@ extension CreateDerivedKeyView {
         private weak var appState: AppState!
         private let networkService: GetAllNetworksService
         private let createKeyService: CreateDerivedKeyService
-        let seedName: String
+        @Published var seedName: String = ""
         // State presentatation
         @Published var isPresentingInfoModal: Bool = false
         @Published var presentableInfoModal: ErrorBottomModalViewModel = .derivedKeysInfo()
@@ -207,11 +207,9 @@ extension CreateDerivedKeyView {
         private let cancelBag = CancelBag()
 
         init(
-            seedName: String,
             networkService: GetAllNetworksService = GetAllNetworksService(),
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService()
         ) {
-            self.seedName = seedName
             self.networkService = networkService
             self.createKeyService = createKeyService
             subscribeToChanges()
@@ -223,6 +221,7 @@ extension CreateDerivedKeyView {
 
         func use(appState: AppState) {
             self.appState = appState
+            seedName = appState.userData.keysData?.root?.address.seedName ?? ""
             networkService.getNetworks {
                 if case let .success(networks) = $0 {
                     appState.userData.allNetworks = networks
@@ -281,7 +280,7 @@ extension CreateDerivedKeyView {
     struct CreateDerivedKeyView_Previews: PreviewProvider {
         static var previews: some View {
             CreateDerivedKeyView(
-                viewModel: .init(seedName: "Parity Keys")
+                viewModel: .init()
             )
             .environmentObject(NavigationCoordinator())
         }

@@ -97,7 +97,7 @@ extension PreviewData {
 extension PreviewData {
     static let exampleExportMultipleKeysModal = ExportMultipleKeysModalViewModel(
         selectedItems: .keySets(KeySetListViewModelBuilder().build(for: PreviewData.mseeds).list),
-        seedNames: mseeds.seedNameCards.map(\.seedName)
+        count: mseeds.seedNameCards.count
     )
 }
 

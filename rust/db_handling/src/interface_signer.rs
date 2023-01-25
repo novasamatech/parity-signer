@@ -15,8 +15,8 @@ use definitions::network_specs::NetworkSpecs;
 use definitions::{
     crypto::Encryption,
     helpers::{
-        make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public,
-        pic_meta, print_multisigner_as_base58_or_eth,
+        make_identicon_from_multisigner, multisigner_to_public, pic_meta,
+        print_multisigner_as_base58_or_eth,
     },
     keyring::{AddressKey, NetworkSpecsKey, VerifierKey},
     navigation::{
@@ -65,14 +65,6 @@ pub fn get_all_seed_names_with_identicons(
             // found a seed key; could be any of the supported encryptions;
             match data_set.get(&address_details.seed_name) {
                 Some(root_set) => {
-                    for id in root_set.iter() {
-                        if multisigner_to_encryption(id) == address_details.encryption {
-                            return Err(Error::TwoRootKeys {
-                                seed_name: address_details.seed_name.to_string(),
-                                encryption: address_details.encryption.to_owned(),
-                            });
-                        }
-                    }
                     let mut new_root_set = root_set.to_vec();
                     new_root_set.push(multisigner);
                     data_set.insert(address_details.seed_name.to_string(), new_root_set);
@@ -157,21 +149,31 @@ fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> SignerIma
 pub fn print_all_identities(database: &sled::Db) -> Result<Vec<MRawKey>> {
     Ok(get_all_addresses(database)?
         .into_iter()
-        .map(|(multisigner, address_details)| {
-            let address_key = AddressKey::from_multisigner(&multisigner); // to click
-            let public_key = multisigner_to_public(&multisigner); // to display
-            let style = address_details.encryption.identicon_style();
-            let identicon = make_identicon_from_multisigner(&multisigner, style);
-            MRawKey {
-                address: Address {
-                    identicon,
-                    has_pwd: address_details.has_pwd,
-                    path: address_details.path,
-                    secret_exposed: address_details.secret_exposed,
-                    seed_name: address_details.seed_name,
-                },
-                address_key: hex::encode(address_key.key()),
-                public_key: hex::encode(public_key),
+        .filter_map(|(multisigner, address_details)| {
+            match &address_details.network_id {
+                Some(id) => {
+                    let network_specs = get_network_specs(database, id).unwrap();
+
+                    let address_key = AddressKey::new(
+                        multisigner.clone(),
+                        Some(network_specs.specs.genesis_hash),
+                    ); // to click
+                    let public_key = multisigner_to_public(&multisigner); // to display
+                    let style = address_details.encryption.identicon_style();
+                    let identicon = make_identicon_from_multisigner(&multisigner, style);
+                    Some(MRawKey {
+                        address: Address {
+                            identicon,
+                            has_pwd: address_details.has_pwd,
+                            path: address_details.path,
+                            secret_exposed: address_details.secret_exposed,
+                            seed_name: address_details.seed_name,
+                        },
+                        address_key: hex::encode(address_key.key()),
+                        public_key: hex::encode(public_key),
+                    })
+                }
+                None => None,
             }
         })
         .collect())
@@ -193,7 +195,8 @@ pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNe
             ),
             secret_exposed: root.1.secret_exposed,
         };
-        let address_key = hex::encode(AddressKey::from_multisigner(&root.0).key());
+        // TODO: root always prefix 42 for substrate.
+        let address_key = hex::encode(AddressKey::new(root.0.clone(), None).key());
         MAddressCard {
             base58: print_multisigner_as_base58_or_eth(&root.0, None, root.1.encryption),
             address_key,
@@ -201,10 +204,11 @@ pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNe
         }
     });
 
-    let set: Result<_> = derived
-        .into_iter()
-        .map(|(multisigner, address_details)| -> Result<_> {
-            let network_specs = get_network_specs(database, &address_details.network_id[0])?;
+    let mut set = vec![];
+    for (multisigner, address_details) in derived.into_iter() {
+        if let Some(id) = &address_details.network_id {
+            let network_specs = get_network_specs(database, id)?;
+
             let identicon = make_identicon_from_multisigner(
                 &multisigner,
                 network_specs.specs.encryption.identicon_style(),
@@ -214,7 +218,9 @@ pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNe
                 Some(network_specs.specs.base58prefix),
                 network_specs.specs.encryption,
             );
-            let address_key = hex::encode(AddressKey::from_multisigner(&multisigner).key());
+            let address_key = hex::encode(
+                AddressKey::new(multisigner.clone(), Some(network_specs.specs.genesis_hash)).key(),
+            );
             let address = Address {
                 path: address_details.path,
                 has_pwd: address_details.has_pwd,
@@ -238,107 +244,11 @@ pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNe
                 network_specs_key: hex::encode(network_specs_key.key()),
             };
 
-            Ok(MKeyAndNetworkCard { key, network })
-        })
-        .collect();
-
-    Ok(MKeysNew { root, set: set? })
-}
-
-/// Return `Vec` with address-associated public data for all addresses from the
-/// Signer database with given seed name and network [`NetworkSpecsKey`].
-///
-/// In addition, marks with flags swiped key or group of keys in multiselect
-/// selection.
-///
-/// Separately processes the seed key. If there is no seed key, empty export for
-/// seed key is still generated.
-pub fn print_identities_for_seed_name_and_network(
-    database: &sled::Db,
-    seed_name: &str,
-    network_specs_key: &NetworkSpecsKey,
-    swiped_key: Option<MultiSigner>,
-    multiselect: Vec<MultiSigner>,
-) -> Result<(MKeysCard, Vec<MKeysCard>, String, String)> {
-    let network_specs = get_network_specs(database, network_specs_key)?;
-    let identities = addresses_set_seed_name_network(database, seed_name, network_specs_key)?;
-    let mut root_id = None;
-    let mut other_id: Vec<(MultiSigner, AddressDetails, SignerImage, bool, bool)> = Vec::new();
-    for (multisigner, address_details) in identities.into_iter() {
-        let style = address_details.encryption.identicon_style();
-        let identicon = make_identicon_from_multisigner(&multisigner, style);
-        let base58 = print_multisigner_as_base58_or_eth(
-            &multisigner,
-            Some(network_specs.specs.base58prefix),
-            address_details.encryption,
-        );
-        let address_key = AddressKey::from_multisigner(&multisigner);
-        let swiped = {
-            if let Some(ref swiped_multisigner) = swiped_key {
-                swiped_multisigner == &multisigner
-            } else {
-                false
-            }
-        };
-        let multiselect = multiselect.contains(&multisigner);
-        if address_details.is_root() {
-            if root_id.is_some() {
-                return Err(Error::TwoRootKeys {
-                    seed_name: seed_name.to_string(),
-                    encryption: network_specs.specs.encryption,
-                });
-            }
-            root_id = Some(MKeysCard {
-                address: Address {
-                    seed_name: address_details.seed_name,
-                    identicon,
-                    has_pwd: address_details.has_pwd,
-                    path: address_details.path,
-                    secret_exposed: address_details.secret_exposed,
-                },
-                address_key: hex::encode(address_key.key()),
-                base58,
-                swiped,
-            });
-        } else {
-            other_id.push((multisigner, address_details, identicon, swiped, multiselect))
+            set.push(MKeyAndNetworkCard { key, network })
         }
     }
-    let root = root_id.unwrap_or(MKeysCard {
-        address: Address {
-            seed_name: seed_name.to_string(),
-            ..Default::default()
-        },
-        ..Default::default()
-    });
-    let set: Vec<_> = other_id
-        .into_iter()
-        .map(
-            |(multisigner, address_details, identicon, swiped, _multiselect)| MKeysCard {
-                address_key: hex::encode(AddressKey::from_multisigner(&multisigner).key()),
-                base58: print_multisigner_as_base58_or_eth(
-                    &multisigner,
-                    Some(network_specs.specs.base58prefix),
-                    address_details.encryption,
-                ),
-                address: Address {
-                    seed_name: address_details.seed_name,
-                    identicon,
-                    has_pwd: address_details.has_pwd,
-                    path: address_details.path,
-                    secret_exposed: address_details.secret_exposed,
-                },
-                swiped,
-            },
-        )
-        .collect();
 
-    Ok((
-        root,
-        set,
-        network_specs.specs.title,
-        network_specs.specs.logo,
-    ))
+    Ok(MKeysNew { root, set })
 }
 
 /// Get address-associated public data for all addresses from the Signer
@@ -350,7 +260,9 @@ pub fn addresses_set_seed_name_network(
 ) -> Result<Vec<(MultiSigner, AddressDetails)>> {
     Ok(get_addresses_by_seed_name(database, seed_name)?
         .into_iter()
-        .filter(|(_, address_details)| address_details.network_id.contains(network_specs_key))
+        .filter(|(_, address_details)| {
+            address_details.network_id.as_ref() == Some(network_specs_key)
+        })
         .collect())
 }
 
@@ -399,15 +311,13 @@ pub fn show_all_networks(database: &sled::Db) -> Result<Vec<MMNetwork>> {
 /// network on the list.
 ///
 /// If there are no networks in the system, throws error.
-// TODO: should be an option, not an error. Forbid getting to this point from ui
-// for the seed making process, allow backups.
-pub fn first_network(database: &sled::Db) -> Result<OrderedNetworkSpecs> {
+pub fn first_network(database: &sled::Db) -> Result<Option<OrderedNetworkSpecs>> {
     let mut networks = get_all_networks(database)?;
     if networks.is_empty() {
         return Err(Error::NoNetworksAvailable);
     }
     networks.sort_by(|a, b| a.order.cmp(&b.order));
-    Ok(networks.remove(0))
+    Ok(networks.get(0).cloned())
 }
 
 /// Prepare export key screen struct [`MKeyDetails`].
@@ -428,8 +338,17 @@ pub fn export_key(
 ) -> Result<MKeyDetails> {
     let ordered_network_specs = get_network_specs(database, network_specs_key)?;
     let network_specs = ordered_network_specs.specs;
-    let address_key = AddressKey::from_multisigner(multisigner);
-    let address_details = get_address_details(database, &address_key)?;
+    let address_key = AddressKey::new(multisigner.clone(), Some(network_specs.genesis_hash));
+    let address_details = get_address_details(database, &address_key);
+    let address_details = if address_details.is_err() {
+        let address_key = AddressKey::new(multisigner.clone(), None);
+        get_address_details(database, &address_key)
+    } else {
+        address_details
+    };
+
+    let address_details = address_details?;
+
     if address_details.seed_name != expected_seed_name {
         return Err(Error::SeedNameNotMatching {
             address_key,
@@ -447,7 +366,7 @@ pub fn export_key(
     let identicon =
         make_identicon_from_multisigner(multisigner, network_specs.encryption.identicon_style());
     let qr = {
-        if address_details.network_id.contains(network_specs_key) {
+        if address_details.network_id.as_ref() == Some(network_specs_key) {
             let prefix = if network_specs.encryption == Encryption::Ethereum {
                 "ethereum"
             } else {
@@ -546,60 +465,14 @@ pub fn backup_prep(database: &sled::Db, seed_name: &str) -> Result<MBackup> {
 // should be corrected, after json fix; `seed_name` in existing derivation
 // display also seems to be excessive
 pub fn derive_prep(
-    database: &sled::Db,
+    _database: &sled::Db,
     seed_name: &str,
-    network_specs_key: &NetworkSpecsKey,
-    collision: Option<(MultiSigner, AddressDetails)>,
-    suggest: &str,
-    keyboard: bool,
+    _collision: Option<(MultiSigner, AddressDetails)>,
+    _suggest: &str,
+    _keyboard: bool,
 ) -> Result<MDeriveKey> {
-    let ordered_network_specs = get_network_specs(database, network_specs_key)?;
-    let network_specs = ordered_network_specs.specs;
-
-    let derivation_check = match collision {
-        Some((multisigner, address_details)) => {
-            let base58 = print_multisigner_as_base58_or_eth(
-                &multisigner,
-                Some(network_specs.base58prefix),
-                address_details.encryption,
-            );
-
-            let path = address_details.path;
-            let has_pwd = address_details.has_pwd;
-            let identicon = make_identicon_from_multisigner(
-                &multisigner,
-                address_details.encryption.identicon_style(),
-            );
-            let seed_name = seed_name.to_string();
-            let address_key = hex::encode(AddressKey::from_multisigner(&multisigner).key());
-            let collision = MAddressCard {
-                base58,
-                address_key,
-                address: Address {
-                    path,
-                    has_pwd,
-                    identicon,
-                    seed_name,
-                    secret_exposed: address_details.secret_exposed,
-                },
-            };
-
-            NavDerivationCheck {
-                collision: Some(collision),
-                ..Default::default()
-            }
-        }
-        None => dynamic_path_check_unhexed(database, seed_name, suggest, network_specs_key),
-    };
-
     Ok(MDeriveKey {
         seed_name: seed_name.to_string(),
-        network_title: network_specs.title,
-        network_logo: network_specs.logo,
-        network_specs_key: hex::encode(network_specs_key.key()),
-        suggested_derivation: suggest.to_string(),
-        keyboard,
-        derivation_check,
     })
 }
 
@@ -664,7 +537,13 @@ fn dynamic_path_check_unhexed(
                         &multisigner,
                         address_details.encryption.identicon_style(),
                     );
-                    let address_key = hex::encode(AddressKey::from_multisigner(&multisigner).key());
+                    let address_key = hex::encode(
+                        AddressKey::new(
+                            multisigner,
+                            Some(ordered_network_specs.specs.genesis_hash),
+                        )
+                        .key(),
+                    );
                     let collision_display = MAddressCard {
                         base58: address_base58,
                         address_key,
