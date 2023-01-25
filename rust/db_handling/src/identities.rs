@@ -891,7 +891,7 @@ fn populate_addresses(
         if let Ok(prep_data) = create_address(
             database,
             &address_prep,
-            &network_specs.specs.path_id,
+            "",
             Some(&network_specs.specs),
             seed_name,
             seed_phrase,
