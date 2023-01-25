@@ -301,14 +301,10 @@ extension DerivationPathNameView {
         }
 
         private func subscribeToChanges() {
-            let passwordValidators = Publishers
-                .CombineLatest3($isPassworded, $isPasswordValid, $passwordConfirmation)
-            let inputValidators = Publishers
-                .CombineLatest($inputText, $derivationPathError)
-            passwordValidators.combineLatest(inputValidators)
-                .map { passwordValidators, inputValidators -> Bool in
-                    let (isPassworded, isPasswordValid, passwordConfirmation) = passwordValidators
-                    let (inputText, derivationPathError) = inputValidators
+            Publishers
+                .CombineLatest3($isPassworded, $isPasswordValid, $derivationPathError)
+                .map { validators -> Bool in
+                    let (isPassworded, isPasswordValid, derivationPathError) = validators
                     if isPassworded {
                         return (
                             !isPasswordValid ||
