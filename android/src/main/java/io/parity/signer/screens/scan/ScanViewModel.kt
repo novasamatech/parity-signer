@@ -12,6 +12,7 @@ import io.parity.signer.models.FakeNavigator
 import io.parity.signer.models.storage.RepoResult
 import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.screens.scan.elements.PresentableErrorModel
+import io.parity.signer.screens.scan.importderivations.ImportDerivedKeysRepository
 import io.parity.signer.screens.scan.importderivations.dominantImportError
 import io.parity.signer.screens.scan.importderivations.hasImportableKeys
 import io.parity.signer.screens.scan.importderivations.importableSeedKeysPreviews
@@ -30,6 +31,7 @@ class ScanViewModel : ViewModel() {
 
 	private val uniffiInteractor = ServiceLocator.backendScope.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
+	private val importKeysService: ImportDerivedKeysRepository by lazy { ImportDerivedKeysRepository(seedRepository) }
 
 	data class TransactionsState(
 		val transactions: List<MTransaction>,
@@ -151,11 +153,13 @@ class ScanViewModel : ViewModel() {
 		}
 	}
 
-	fun onImportKeysTap() {
-		val importableKeys = transactions.value.transactions.map { it.importableSeedKeysPreviews() }
+	fun onImportKeysTap(transactions: TransactionsState) {
+		val importableKeys = transactions.transactions.flatMap { it.importableSeedKeysPreviews() }
 
 		importKeysService.importDerivedKeys(importableKeys)
+		//todo import derivations finish
 	}
+
 
 	fun ifHasStateThenClear(): Boolean {
 		return if (

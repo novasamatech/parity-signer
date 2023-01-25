@@ -17,7 +17,7 @@ class ImportDerivedKeysRepository(
 	fun importDerivedKeys(seedKeysPreview: List<SeedKeysPreview>): RepoResult<Unit> {
 		val newSeeds = seedKeysPreview.map {
 			it.copy(derivedKeys = it.derivedKeys
-				.filter { it.status == DerivedKeyStatus.Importable })
+				.filter { key -> key.status == DerivedKeyStatus.Importable })
 		}
 		return try {
 			importDerivations(newSeeds)

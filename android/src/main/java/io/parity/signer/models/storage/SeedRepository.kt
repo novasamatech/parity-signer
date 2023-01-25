@@ -27,7 +27,18 @@ class SeedRepository(
 	}
 
 	suspend fun getAllSeeds(): RepoResult<Map<String, String>> {
-
+		return when (val authResult = authentication.authenticate(activity)) {
+			AuthResult.AuthSuccess -> {
+				val result = storage.getSeedNames()
+					.associateWith { seedName -> storage.getSeed(seedName, false) }
+				RepoResult.Success(result)
+			}
+			AuthResult.AuthError,
+			AuthResult.AuthFailed,
+			AuthResult.AuthUnavailable -> {
+				RepoResult.Failure(RuntimeException("auth error - $authResult"))
+			}
+		}
 	}
 
 	/**
