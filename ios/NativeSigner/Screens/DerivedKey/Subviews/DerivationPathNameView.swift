@@ -180,7 +180,7 @@ extension DerivationPathNameView {
         @Published var isPasswordValid: Bool = true
         @Published var isMainActionDisabled: Bool = true
         @Published var derivationPathError: String?
-        @Binding var derivationPath: String
+        @Binding var derivationPath: String?
         @Binding var networkSelection: NetworkSelection
         @Binding var isPresented: Bool
         private var skipValidation = false
@@ -196,7 +196,7 @@ extension DerivationPathNameView {
 
         init(
             seedName: String,
-            derivationPath: Binding<String>,
+            derivationPath: Binding<String?>,
             isPresented: Binding<Bool>,
             networkSelection: Binding<NetworkSelection>,
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService()
@@ -214,12 +214,12 @@ extension DerivationPathNameView {
         }
 
         func onAppear() {
-            if derivationPath.isEmpty {
+            if derivationPath == nil {
                 skipValidation = true
                 inputText = DerivationPathComponent.hard.description
                 isMainActionDisabled = true
             } else {
-                inputText = derivationPath
+                inputText = derivationPath ?? ""
             }
         }
 
@@ -301,9 +301,7 @@ extension DerivationPathNameView {
         }
 
         func onPasswordConfirmationDoneTap() {
-            guard let password = inputText
-                .components(separatedBy: DerivationPathComponent.passworded.description).last else { return }
-            isPasswordValid = password == passwordConfirmation
+            isPasswordValid = isPasswordConfirmationValid()
         }
 
         private func subscribeToChanges() {
@@ -318,19 +316,18 @@ extension DerivationPathNameView {
                     if isPassworded {
                         return (
                             !isPasswordValid ||
-                                passwordConfirmation.isEmpty ||
                                 !self.isPasswordConfirmationValid() ||
                                 self.derivationPathError != nil
                         )
                     } else {
-                        return inputText.isEmpty || self.isInitialEntry() || derivationPathError != nil
+                        return derivationPathError != nil || self.isInitialEntry()
                     }
                 }
                 .assign(to: \.isMainActionDisabled, on: self)
                 .store(in: cancelBag)
         }
 
-        private func isPasswordConfirmationValid() -> Bool {
+        func isPasswordConfirmationValid() -> Bool {
             guard isPassworded else { return true }
             if let range = inputText.range(of: DerivationPathComponent.passworded.description) {
                 let substring = inputText.suffix(from: range.upperBound)
