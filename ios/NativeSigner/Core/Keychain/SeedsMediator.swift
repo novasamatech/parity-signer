@@ -29,6 +29,8 @@ protocol SeedsMediating: AnyObject {
     ///
     /// This is also used as generic auth request operation that will lock the app on failure
     func refreshSeeds()
+    /// Get all seed names from secure storage without sending update to Rust
+    func initialRefreshSeeds()
     /// Saves a seed within Keychain and adjust app state
     /// - Parameters:
     ///   - seedName: seed name
@@ -96,6 +98,14 @@ final class SeedsMediator: SeedsMediating {
     }
 
     func refreshSeeds() {
+        refreshSeeds(firstRun: false)
+    }
+
+    func initialRefreshSeeds() {
+        refreshSeeds(firstRun: true)
+    }
+
+    private func refreshSeeds(firstRun: Bool) {
         let result = keychainAccessAdapter.fetchSeedNames()
         switch result {
         case let .success(payload):
@@ -103,7 +113,9 @@ final class SeedsMediator: SeedsMediating {
             if let authenticated = payload.authenticated {
                 signerDataModel.authenticated = authenticated
             }
-            attemptToUpdate(seedNames: seedNames)
+            if !firstRun {
+                attemptToUpdate(seedNames: seedNames)
+            }
         case .failure:
             signerDataModel.authenticated = false
         }
