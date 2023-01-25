@@ -63,14 +63,15 @@ class ScanViewModel : ViewModel() {
 			uniffiInteractor.navigate(Action.TRANSACTION_FETCHED, payload)
 		val screenData =
 			(navigateResponse as? UniffiResult.Success)?.result?.screenData
-		val transactions = (screenData as? ScreenData.Transaction)?.f
-			?: run {
-				Log.e(
-					TAG, "Error in getting transaction from qr payload, " +
-						"screenData is $screenData, navigation resp is $navigateResponse"
-				)
-				return
-			}
+		val transactions: List<MTransaction> =
+			(screenData as? ScreenData.Transaction)?.f
+				?: run {
+					Log.e(
+						TAG, "Error in getting transaction from qr payload, " +
+							"screenData is $screenData, navigation resp is $navigateResponse"
+					)
+					return
+				}
 
 		// Handle transactions with just error payload
 		if (transactions.all { it.isDisplayingErrorOnly() }) {
@@ -132,9 +133,28 @@ class ScanViewModel : ViewModel() {
 						return
 					}
 					null -> {
-						//proceed, no full error
+						//proceed, all good, now check if we need to update for derivations keys
 						if (transactions.hasImportableKeys()) {
-							this.transactions.value = TransactionsState(transactions)
+							val importDerivedKeys = transactions.flatMap { it.allImportDerivedKeys() }
+							if (importDerivedKeys.isEmpty()) {
+								this.transactions.value = TransactionsState(transactions)
+							}
+
+							when (val result = importKeysService.updateWithSeed(importDerivedKeys)) {
+								is RepoResult.Success -> {
+									val updatedKeys = result.result
+									val newTransactionsState =
+										updateTransactionsWithImportDerivations(transactions, updatedKeys)
+									this.transactions.value = TransactionsState(newTransactionsState)
+								}
+								is RepoResult.Failure -> {
+									Toast.makeText(
+										/* context = */ context,
+										/* text = */ context.getString(R.string.import_derivations_failure_update_toast),
+										/* duration = */ Toast.LENGTH_LONG
+									).show()
+								}
+							}
 						} else {
 							presentableError.value = PresentableErrorModel(
 								title = context.getString(R.string.scan_screen_error_key_already_exists_title),
@@ -153,6 +173,42 @@ class ScanViewModel : ViewModel() {
 			}
 			//handle alert error rust/navigator/src/navstate.rs:396
 		}
+	}
+
+	private fun updateTransactionsWithImportDerivations(
+		transactions: List<MTransaction>,
+		updatedKeys: List<SeedKeysPreview>
+	): List<MTransaction> = transactions.map { transaction ->
+		if (transaction.hasImportableKeys()) {
+			transaction.content.importingDerivations =
+				transaction.content.importingDerivations?.map { transactionCard ->
+					transactionCard.copy(
+						card = when (val card = transactionCard.card) {
+							is Card.DerivationsCard -> {
+								card.copy(f = card.f.map { originalKey ->
+									updatedKeys.firstOrNull { resultKey ->
+										areSeedKeysTheSameButUpdated(originalKey, resultKey)
+									} ?: originalKey
+								})
+							}
+							else -> {
+								card
+								//don't update
+							}
+						}
+					)
+				}
+			transaction
+		} else {
+			transaction
+		}
+	}
+
+	private fun areSeedKeysTheSameButUpdated(
+		originalKey: SeedKeysPreview,
+		resultKey: SeedKeysPreview
+	): Boolean = originalKey.name == resultKey.name && resultKey.derivedKeys.all { derKey ->
+		originalKey.derivedKeys.any { it.derivationPath == derKey.derivationPath }
 	}
 
 	fun onImportKeysTap(transactions: TransactionsState, context: Context) {

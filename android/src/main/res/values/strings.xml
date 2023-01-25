@@ -279,8 +279,8 @@
 	<string name="import_derivations_error_path_bad_format">Path bad format. Key already added or wrong data.</string>
 <!--	<string name="import_derivations_error_path_bad_format">Some are hidden from the list because they have already been imported.</string> -->
 	<string name="import_derivations_error_keys_already_exist">Some are hidden from the list because they have already been imported.</string>
-    <string name="import_derivations_failure_toast">Import Keys Has Failed</string>
-
+	<string name="import_derivations_failure_toast">Import Keys Has Failed</string>
+	<string name="import_derivations_failure_update_toast">Import Keys Has Failed. Update keys failed.</string>
 
 </resources>
 

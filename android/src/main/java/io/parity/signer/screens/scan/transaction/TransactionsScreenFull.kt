@@ -236,7 +236,6 @@ private fun ActionButtons(
 			)
 		}
 
-//		continueImportDerivedKeys todo import derivations
 		TransactionType.IMPORT_DERIVATIONS -> {
 			PrimaryButtonWide(
 				label = stringResource(R.string.transaction_action_import_keys),

@@ -344,31 +344,6 @@ fun SeedKeysPreview.toDerivedKeysSetModel(): DerivedKeysSetModel =
 			})
 
 
-///** todo import derivations delete?
-//// * Local copy of shared [DerivationsCard] class
-//// */
-//data class DerivationCardModel(val seedKeys: List<SeedKeysPreviewModel>)
-//
-//fun Card.DerivationsCard.toDerivationCardModel() = DerivationCardModel(
-//	this.f.map { it.toSeedKeysPreviewModel() }
-//)
-//
-///**
-// * Local copy of shared [SeedKeysPreview] class
-// */
-//data class SeedKeysPreviewModel(
-//	val name: String,
-//	val derivedKeys: List<DerivedKeyPreview>,
-////	var `multisigner`: MultiSigner,
-//)
-//
-//fun SeedKeysPreview.toSeedKeysPreviewModel() = SeedKeysPreviewModel(
-//	name = name,
-//	derivedKeys = derivedKeys
-//)
-////ios/NativeSigner/Cards/TransactionCards/TCDerivations.swift todo import derivations
-
-
 @Preview(
 	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,

@@ -26,7 +26,6 @@ class ImportDerivedKeysRepository(
 		}
 	}
 
-	//todo import derivations updateImportDerivationsIfNeeeded
 	suspend fun updateWithSeed(seedPreviews: List<SeedKeysPreview>): RepoResult<List<SeedKeysPreview>> {
 		val seeds: Map<String, String> =
 			seedRepository.getAllSeeds().mapError() ?: return RepoResult.Failure()

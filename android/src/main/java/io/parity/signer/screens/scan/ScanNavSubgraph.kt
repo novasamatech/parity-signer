@@ -137,8 +137,6 @@ fun ScanNavSubgraph(
 			},
 			onImportKeys = {
 				scanViewModel.onImportKeysTap(transactionsValue, context)
-				// todo import derivations
-//				ios/NativeSigner/Screens/Scan/TransactionPreview.swift:345
 			}
 		)
 	}
