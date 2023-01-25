@@ -413,12 +413,6 @@ dictionary MRecoverSeedPhrase {
 
 dictionary MDeriveKey {
     string seed_name;
-    string network_title;
-    string network_logo;
-    string network_specs_key;
-    string suggested_derivation;
-    boolean keyboard;
-    DerivationCheck derivation_check;
 };
 
 dictionary DerivationCheck {

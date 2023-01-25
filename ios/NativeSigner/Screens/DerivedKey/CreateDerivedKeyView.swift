@@ -109,7 +109,7 @@ struct CreateDerivedKeyView: View {
             CreateDerivedKeyConfirmationView(
                 viewModel: .init(
                     isPresented: $viewModel.isPresentingConfirmation,
-                    derivationPath: $viewModel.derivationPath
+                    derivationPath: viewModel.unwrappedDerivationPath()
                 )
             )
             .clearModalBackground()
@@ -164,9 +164,9 @@ struct CreateDerivedKeyView: View {
             Spacer()
                 .frame(width: Spacing.medium)
             Text(
-                viewModel.derivationPath.isEmpty ?
+                viewModel.derivationPath == nil ?
                     Localizable.CreateDerivedKey.Label.Placeholder.path.string :
-                    viewModel.derivationPath.formattedAsPasswordedPath
+                    viewModel.unwrappedDerivationPath().formattedAsPasswordedPath
             )
             .font(PrimaryFont.bodyL.font)
             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
@@ -192,7 +192,7 @@ extension CreateDerivedKeyView {
         private weak var appState: AppState!
         private let networkService: GetAllNetworksService
         private let createKeyService: CreateDerivedKeyService
-        let seedName: String
+        @Published var seedName: String = ""
         // State presentatation
         @Published var isPresentingInfoModal: Bool = false
         @Published var presentableInfoModal: ErrorBottomModalViewModel = .derivedKeysInfo()
@@ -203,15 +203,13 @@ extension CreateDerivedKeyView {
         @Published var isPresentingConfirmation: Bool = false
 
         @Published var networkSelection: NetworkSelection = .allowedOnAnyNetwork([])
-        @Published var derivationPath: String = ""
+        @Published var derivationPath: String?
         private let cancelBag = CancelBag()
 
         init(
-            seedName: String,
             networkService: GetAllNetworksService = GetAllNetworksService(),
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService()
         ) {
-            self.seedName = seedName
             self.networkService = networkService
             self.createKeyService = createKeyService
             subscribeToChanges()
@@ -223,6 +221,7 @@ extension CreateDerivedKeyView {
 
         func use(appState: AppState) {
             self.appState = appState
+            seedName = appState.userData.keysData?.root?.address.seedName ?? ""
             networkService.getNetworks {
                 if case let .success(networks) = $0 {
                     appState.userData.allNetworks = networks
@@ -263,16 +262,20 @@ extension CreateDerivedKeyView {
             }
             switch networkSelection {
             case let .network(network):
-                createKeyService.createDerivedKey(seedName, derivationPath, network.key, completion)
+                createKeyService.createDerivedKey(seedName, unwrappedDerivationPath(), network.key, completion)
             case .allowedOnAnyNetwork:
-                createKeyService.createDerivedKeyOnAllNetworks(seedName, derivationPath, completion)
+                createKeyService.createDerivedKeyOnAllNetworks(seedName, unwrappedDerivationPath(), completion)
             }
         }
 
         private func subscribeToChanges() {
             $derivationPath.sink {
-                self.isActionDisabled = $0.isEmpty == true
+                self.isActionDisabled = $0 == nil
             }.store(in: cancelBag)
+        }
+
+        func unwrappedDerivationPath() -> String {
+            derivationPath ?? ""
         }
     }
 }
@@ -281,7 +284,7 @@ extension CreateDerivedKeyView {
     struct CreateDerivedKeyView_Previews: PreviewProvider {
         static var previews: some View {
             CreateDerivedKeyView(
-                viewModel: .init(seedName: "Parity Keys")
+                viewModel: .init()
             )
             .environmentObject(NavigationCoordinator())
         }

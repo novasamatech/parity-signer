@@ -8,8 +8,7 @@ use crate::{
     states::TransactionState,
 };
 use db_handling::{
-    helpers::get_address_details,
-    identities::get_multisigner_by_address,
+    helpers::{get_address_details, get_network_specs},
     interface_signer::{first_network, SeedDraft},
 };
 use definitions::navigation::MAddressCard;
@@ -60,7 +59,7 @@ pub enum SpecialtyKeysState {
 #[derive(Debug, Clone)]
 pub struct KeysState {
     seed_name: String,
-    network_specs_key: NetworkSpecsKey,
+    network_specs_key: Option<NetworkSpecsKey>,
     specialty: SpecialtyKeysState,
 }
 
@@ -113,34 +112,34 @@ pub struct EnteredInfo(pub String);
 
 impl KeysState {
     pub fn new(database: &sled::Db, seed_name: &str) -> Result<Self> {
-        let network_specs = first_network(database)?.specs;
+        let network_specs = first_network(database)?;
+
         Ok(Self {
             seed_name: seed_name.to_string(),
-            network_specs_key: NetworkSpecsKey::from_parts(
-                &network_specs.genesis_hash,
-                &network_specs.encryption,
-            ),
+            network_specs_key: network_specs.map(|ns| {
+                NetworkSpecsKey::from_parts(&ns.specs.genesis_hash, &ns.specs.encryption)
+            }),
             specialty: SpecialtyKeysState::None,
         })
     }
     pub fn new_in_network(seed_name: &str, network_specs_key: &NetworkSpecsKey) -> Self {
         Self {
             seed_name: seed_name.to_string(),
-            network_specs_key: network_specs_key.to_owned(),
+            network_specs_key: Some(network_specs_key.to_owned()),
             specialty: SpecialtyKeysState::None,
         }
     }
     pub fn change_network(&self, network_specs_key: &NetworkSpecsKey) -> Self {
         Self {
             seed_name: self.seed_name(),
-            network_specs_key: network_specs_key.to_owned(),
+            network_specs_key: Some(network_specs_key.to_owned()),
             specialty: SpecialtyKeysState::None,
         }
     }
     pub fn seed_name(&self) -> String {
         self.seed_name.to_owned()
     }
-    pub fn network_specs_key(&self) -> NetworkSpecsKey {
+    pub fn network_specs_key(&self) -> Option<NetworkSpecsKey> {
         self.network_specs_key.to_owned()
     }
     pub fn get_specialty(&self) -> SpecialtyKeysState {
@@ -224,26 +223,23 @@ impl AddressState {
         let lines: Vec<_> = details_str.lines().collect();
         let hex_address_key = lines[0];
         let network_specs_key = lines.get(1);
-
-        let address_key = AddressKey::from_hex(hex_address_key)?;
-        let multisigner = if let Ok(m) = address_key.multi_signer() {
-            m
-        } else if let Some(key) = get_multisigner_by_address(database, &address_key)? {
-            key
-        } else {
-            return Err(Error::KeyNotFound(format!("{:?}", address_key)));
-        };
-        let is_root =
-            get_address_details(database, &AddressKey::from_multisigner(&multisigner))?.is_root();
         let network_specs_key = if let Some(network_specs_key) = &network_specs_key {
-            Some(NetworkSpecsKey::from_hex(network_specs_key)?)
+            NetworkSpecsKey::from_hex(network_specs_key)?
         } else {
-            None
+            return Err(Error::KeyNotFound("network specs key".to_string()));
         };
+        let address_key = AddressKey::from_hex(hex_address_key)?;
+        let multisigner = address_key.multi_signer().clone();
+        let network_specs = get_network_specs(database, &network_specs_key)?;
+        let is_root = get_address_details(
+            database,
+            &AddressKey::new(multisigner.clone(), Some(network_specs.specs.genesis_hash)),
+        )?
+        .is_root();
 
         Ok(Self {
             seed_name: keys_state.seed_name(),
-            network_specs_key,
+            network_specs_key: Some(network_specs_key),
             multisigner,
             is_root,
         })
@@ -253,7 +249,7 @@ impl AddressState {
             seed_name: self.seed_name(),
             // TODO: Derive in network correct implementation:
             // https://github.com/paritytech/parity-signer/issues/1505
-            network_specs_key: self.network_specs_key().unwrap(),
+            network_specs_key: Some(self.network_specs_key().unwrap()),
             specialty: SpecialtyKeysState::None,
         }
     }
@@ -280,9 +276,13 @@ impl AddressStateMulti {
         multiselect: &[MultiSigner],
     ) -> Result<Self> {
         let mut set: Vec<(MultiSigner, bool)> = Vec::new();
+        let network = get_network_specs(database, &network_specs_key)?;
+
         for multisigner in multiselect.iter() {
-            let address_details =
-                get_address_details(database, &AddressKey::from_multisigner(multisigner))?;
+            let address_details = get_address_details(
+                database,
+                &AddressKey::new(multisigner.clone(), Some(network.specs.genesis_hash)),
+            )?;
             set.push((multisigner.to_owned(), address_details.is_root()))
         }
         Ok(Self {
@@ -295,7 +295,7 @@ impl AddressStateMulti {
     pub fn blank_keys_state(&self) -> KeysState {
         KeysState {
             seed_name: self.seed_name(),
-            network_specs_key: self.network_specs_key(),
+            network_specs_key: Some(self.network_specs_key()),
             specialty: SpecialtyKeysState::None,
         }
     }
@@ -374,7 +374,7 @@ impl DeriveState {
     pub fn seed_name(&self) -> String {
         self.keys_state.seed_name()
     }
-    pub fn network_specs_key(&self) -> NetworkSpecsKey {
+    pub fn network_specs_key(&self) -> Option<NetworkSpecsKey> {
         self.keys_state.network_specs_key()
     }
     pub fn path(&self) -> String {
@@ -431,7 +431,7 @@ impl SufficientCryptoState {
         };
 
         let identicon = make_identicon_from_multisigner(multisigner, style);
-        let address_key = hex::encode(AddressKey::from_multisigner(multisigner).key());
+        let address_key = hex::encode(AddressKey::new(multisigner.clone(), None).key());
         let author_info = MAddressCard {
             base58: hex::encode(multisigner_to_public(multisigner)),
             address_key,
@@ -591,7 +591,7 @@ mod tests {
             seed_name: String::from("Alice"),
             path: String::from("//alice"),
             has_pwd: false,
-            network_id: Vec::new(),
+            network_id: Some(NetworkSpecsKey::from_hex("").unwrap()),
             encryption: Encryption::Sr25519,
             secret_exposed: false,
         }

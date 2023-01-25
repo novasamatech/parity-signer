@@ -126,7 +126,7 @@ fun CombinedScreensSelector(
 					.background(MaterialTheme.colors.background)
 			) {
 				DerivationCreateSubgraph(
-					rootNavigator, screenData.f.seedName, screenData.f.networkSpecsKey
+					rootNavigator, screenData.f.seedName,
 				)
 			}
 		}

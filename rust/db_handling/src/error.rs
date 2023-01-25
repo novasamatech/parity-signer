@@ -12,6 +12,9 @@ use sp_runtime::MultiSigner;
 /// DB handling error type.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    #[error("No networks available")]
+    NoNetworksAvailable,
+
     #[error(transparent)]
     DbTransactionError(#[from] sled::transaction::TransactionError),
 
@@ -115,11 +118,6 @@ pub enum Error {
         /// encryption algorithm for which two seed keys were found
         encryption: Encryption,
     },
-
-    /// Signer has attempted an operation that requires at least one network to
-    /// be loaded into Signer.
-    #[error("No networks available. Please load networks information to proceed.")]
-    NoNetworksAvailable,
 
     /// To generate QR code with public address information export, Signer
     /// receives both seed name and
