@@ -281,6 +281,9 @@
 	<string name="import_derivations_error_keys_already_exist">Some are hidden from the list because they have already been imported.</string>
 	<string name="import_derivations_failure_toast">Import Keys Has Failed</string>
 	<string name="import_derivations_failure_update_toast">Import Keys Has Failed. Update keys failed.</string>
+	<string name="create_derivations_success">Derived key successfully created.</string>
+	<string name="create_derivations_failure">Derivation key failure: %1$s</string>
+
 
 </resources>
 

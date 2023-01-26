@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -31,7 +32,7 @@ fun DerivationCreateSubgraph(
 
 	val deriveViewModel: DerivationCreateViewModel = viewModel()
 	deriveViewModel.setInitValues(seedName, rootNavigator)
-
+	val context = LocalContext.current
 	val path = deriveViewModel.path.collectAsState()
 	val selectedNetwork = deriveViewModel.selectedNetwork.collectAsState()
 
@@ -105,7 +106,7 @@ fun DerivationCreateSubgraph(
 							path = path.value,
 							onCancel = closeAction,
 							onDone = {
-								deriveViewModel.viewModelScope.launch { deriveViewModel.proceedCreateKey() }
+								deriveViewModel.viewModelScope.launch { deriveViewModel.proceedCreateKey(context) }
 								closeAction()
 							},
 						)
