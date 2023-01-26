@@ -18,8 +18,8 @@ fun List<MTransaction>.dominantImportError(): DerivedKeyError? {
 
 	val mostCommonError = allErrors
 		.groupBy { it }
-		.maxBy { entry -> entry.value.size }
-		.key
+		.maxByOrNull { entry -> entry.value.size }
+		?.key
 
 	return mostCommonError
 }
