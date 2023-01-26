@@ -68,6 +68,7 @@ class ScanViewModel : ViewModel() {
 						TAG, "Error in getting transaction from qr payload, " +
 							"screenData is $screenData, navigation resp is $navigateResponse"
 					)
+					clearState()
 					return
 				}
 
@@ -77,6 +78,7 @@ class ScanViewModel : ViewModel() {
 				details = transactions.joinToString("\n") { it.transactionIssues() }
 			)
 			uniffiInteractor.navigate(Action.GO_BACK) //fake call
+			clearState()
 			return
 		}
 
@@ -114,6 +116,7 @@ class ScanViewModel : ViewModel() {
 							title = context.getString(R.string.scan_screen_error_bad_format_title),
 							message = context.getString(R.string.scan_screen_error_bad_format_message),
 						)
+						clearState()
 						return
 					}
 					DerivedKeyError.KeySetMissing -> {
@@ -121,6 +124,7 @@ class ScanViewModel : ViewModel() {
 							title = context.getString(R.string.scan_screen_error_missing_key_set_title),
 							message = context.getString(R.string.scan_screen_error_missing_key_set_message),
 						)
+						clearState()
 						return
 					}
 					DerivedKeyError.NetworkMissing -> {
@@ -128,6 +132,7 @@ class ScanViewModel : ViewModel() {
 							title = context.getString(R.string.scan_screen_error_missing_network_title),
 							message = context.getString(R.string.scan_screen_error_missing_network_message),
 						)
+						clearState()
 						return
 					}
 					null -> {
@@ -157,6 +162,7 @@ class ScanViewModel : ViewModel() {
 										context.getString(R.string.import_derivations_failure_update_toast),
 										/* duration = */ Toast.LENGTH_LONG
 									).show()
+									clearState()
 								}
 							}
 						} else {
@@ -221,8 +227,8 @@ class ScanViewModel : ViewModel() {
 			transactions.transactions.flatMap { it.importableSeedKeysPreviews() }
 
 		val importResult = importKeysService.importDerivedKeys(importableKeys)
-		val derivedKeysCount =
-			transactions.transactions.sumOf { it.importableKeysCount() }
+		val derivedKeysCount = importableKeys.sumOf { it.derivedKeys.size }
+
 		when (importResult) {
 			is RepoResult.Success -> {
 				Toast.makeText(

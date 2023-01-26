@@ -45,8 +45,8 @@ fun ScanNavSubgraph(
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
 
-	val showingModals =
-		presentableError.value != null || passwordModel.value != null || errorWrongPassword.value
+	val showingModals = presentableError.value != null ||
+		passwordModel.value != null || errorWrongPassword.value
 
 	val navigateToPrevious = {
 		rootNavigator.navigate(BottomBarSingleton.lastUsedTab.toAction())
