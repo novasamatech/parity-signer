@@ -85,7 +85,6 @@ class DerivationCreateViewModel : ViewModel() {
 			val phrase =
 				seedRepository.getSeedPhraseForceAuth(seedName).mapError() ?: return
 			if (phrase.isNotBlank()) {
-				//todo derivation extra step for password?
 				rootNavigator.navigate(Action.GO_FORWARD, path.value, phrase)
 			} else {
 				Log.e(TAG, "Seed phrase received but it's empty")
