@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keyderivation
+package io.parity.signer.screens.createderivation
 
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -13,13 +13,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.models.Callback
 import io.parity.signer.models.Navigator
-import io.parity.signer.screens.keyderivation.derivationsubscreens.DerivationCreateConfirmBottomSheet
-import io.parity.signer.screens.keyderivation.derivationsubscreens.DerivationPathScreen
-import io.parity.signer.screens.keyderivation.derivationsubscreens.DeriveKeyBaseScreen
-import io.parity.signer.screens.keyderivation.derivationsubscreens.NetworkSelectionBottomSheet
-import io.parity.signer.screens.keyderivation.help.DerivationKeysHelpBottomSheet
-import io.parity.signer.screens.keyderivation.help.DerivationMethodsHelpBottomSheet
-import io.parity.signer.screens.keyderivation.help.DerivationPathHelpBottomSheet
+import io.parity.signer.screens.createderivation.derivationsubscreens.DerivationCreateConfirmBottomSheet
+import io.parity.signer.screens.createderivation.derivationsubscreens.DerivationPathScreen
+import io.parity.signer.screens.createderivation.derivationsubscreens.DeriveKeyBaseScreen
+import io.parity.signer.screens.createderivation.derivationsubscreens.NetworkSelectionBottomSheet
+import io.parity.signer.screens.createderivation.help.DerivationKeysHelpBottomSheet
+import io.parity.signer.screens.createderivation.help.DerivationMethodsHelpBottomSheet
+import io.parity.signer.screens.createderivation.help.DerivationPathHelpBottomSheet
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import kotlinx.coroutines.launch
 

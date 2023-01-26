@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keyderivation
+package io.parity.signer.screens.createderivation
 
 import android.content.Context
 import android.util.Log
@@ -11,7 +11,6 @@ import io.parity.signer.models.Navigator
 import io.parity.signer.models.NetworkModel
 import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.models.storage.mapError
-import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.DerivationCheck
 import io.parity.signer.uniffi.tryCreateAddress
 import kotlinx.coroutines.flow.MutableStateFlow

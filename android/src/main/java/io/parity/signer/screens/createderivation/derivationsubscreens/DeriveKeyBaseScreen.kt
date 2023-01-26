@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keyderivation.derivationsubscreens
+package io.parity.signer.screens.createderivation.derivationsubscreens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -25,8 +25,8 @@ import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.models.Callback
 import io.parity.signer.models.NetworkModel
-import io.parity.signer.screens.keyderivation.DerivationPathAnalyzer
-import io.parity.signer.screens.keyderivation.INITIAL_DERIVATION_PATH
+import io.parity.signer.screens.createderivation.DerivationPathAnalyzer
+import io.parity.signer.screens.createderivation.INITIAL_DERIVATION_PATH
 import io.parity.signer.ui.theme.*
 
 @Composable

@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keyderivation
+package io.parity.signer.screens.createderivation
 
 import org.junit.Test
 import org.junit.Assert.*

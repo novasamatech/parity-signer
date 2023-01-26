@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keyderivation
+package io.parity.signer.screens.createderivation
 
 import android.content.Context
 import androidx.compose.material.Colors
