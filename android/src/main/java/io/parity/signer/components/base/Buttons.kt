@@ -51,32 +51,23 @@ fun PrimaryButton(
 				}
 			}
 			.background(
-				MaterialTheme.colors.pink500,
+				if (isEnabled) MaterialTheme.colors.pink500 else MaterialTheme.colors.primaryButtonDisabledBackground,
 				RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
 			),
 		contentAlignment = Alignment.Center,
 	) {
 		Text(
 			text = label,
-			color = if (isEnabled) Color.White else MaterialTheme.colors.textTertiaryDarkForced,
+			color = if (isEnabled) Color.White else MaterialTheme.colors.primaryButtonDisabledText,
 			style = SignerTypeface.TitleS,
 			textAlign = TextAlign.Center,
 			maxLines = 1,
 			modifier = Modifier
-				.padding(horizontal = dimensionResource(id = R.dimen.buttonHorizontalTextPadding),
-					vertical = dimensionResource(id = R.dimen.buttonVerticalPadding))
+				.padding(
+					horizontal = dimensionResource(id = R.dimen.buttonHorizontalTextPadding),
+					vertical = dimensionResource(id = R.dimen.buttonVerticalPadding)
+				)
 		)
-		if (!isEnabled) {
-			Box(
-				modifier = Modifier
-					.background(
-						MaterialTheme.colors.fill30Inverted,
-						RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
-					)
-					.matchParentSize(),
-				content = {}
-			)
-		}
 	}
 }
 

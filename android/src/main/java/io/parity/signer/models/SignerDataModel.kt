@@ -110,8 +110,8 @@ class SignerDataModel : ViewModel() {
 	fun onBoard() {
 		wipe()
 		copyAsset("")
-		historyInitHistoryWithCert()
 		totalRefresh()
+		historyInitHistoryWithCert()
 	}
 
 	/**

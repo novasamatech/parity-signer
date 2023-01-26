@@ -1,9 +1,11 @@
 package io.parity.signer.ui.navigationselectors
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -15,6 +17,7 @@ import io.parity.signer.components.panels.BottomBarSingleton
 import io.parity.signer.components.panels.toAction
 import io.parity.signer.models.*
 import io.parity.signer.models.storage.addSeed
+import io.parity.signer.screens.keyderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
@@ -110,11 +113,23 @@ fun CombinedScreensSelector(
 				rootNavigator = rootNavigator
 			)
 		}
-		is ScreenData.Transaction ->{
-			Log.e("Selector","Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData")
+		is ScreenData.Transaction -> {
+			Log.e(
+				"Selector",
+				"Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData"
+			)
 			rootNavigator.navigate(BottomBarSingleton.lastUsedTab.toAction())
 		}
-
+		is ScreenData.DeriveKey -> {
+			Box(
+				modifier = Modifier
+					.background(MaterialTheme.colors.background)
+			) {
+				DerivationCreateSubgraph(
+					rootNavigator, screenData.f.seedName,
+				)
+			}
+		}
 		else -> {} //old Selector showing them
 	}
 }

@@ -1,6 +1,8 @@
 package io.parity.signer.backend
 
+import io.parity.signer.models.NetworkModel
 import io.parity.signer.models.submitErrorState
+import io.parity.signer.models.toNetworkModel
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -37,27 +39,25 @@ class UniffiInteractor(private val dbName: String) {
 		}
 
 	suspend fun exportSeedWithKeys(
-		seed: String,
-		derivedKeyAddr: List<String>
-	): UniffiResult<MKeysInfoExport> =
-		withContext(Dispatchers.IO) {
-			try {
-				val keys = keysBySeedName(seed)
-				val pathAndNetworks = derivedKeyAddr.map { keyAddr ->
-					val key = keys.set.find { it.key.addressKey == keyAddr }!!
-					PathAndNetwork(
-						key.key.address.path,
-						key.network.networkSpecsKey
-					)
-				}
-				val keyInfo = exportKeyInfo(
-					selectedNames = mapOf(seed to ExportedSet.Selected(pathAndNetworks)),
+		seed: String, derivedKeyAddr: List<String>
+	): UniffiResult<MKeysInfoExport> = withContext(Dispatchers.IO) {
+		try {
+			val keys = keysBySeedName( seed)
+			val pathAndNetworks = derivedKeyAddr.map { keyAddr ->
+				val key = keys.set.find { it.key.addressKey == keyAddr }!!
+				PathAndNetwork(
+					key.key.address.path, key.network.networkSpecsKey
 				)
-				UniffiResult.Success(keyInfo)
-			} catch (e: ErrorDisplayed) {
-				UniffiResult.Error(e)
 			}
+			val keyInfo = exportKeyInfo(
+
+				selectedNames = mapOf(seed to ExportedSet.Selected(pathAndNetworks)),
+			)
+			UniffiResult.Success(keyInfo)
+		} catch (e: ErrorDisplayed) {
+			UniffiResult.Error(e)
 		}
+	}
 
 	suspend fun encodeToQrImages(binaryData: List<List<UByte>>): UniffiResult<List<List<UByte>>> =
 		withContext(Dispatchers.IO) {
@@ -68,6 +68,34 @@ class UniffiInteractor(private val dbName: String) {
 					}
 				}.map { it.await() }
 				UniffiResult.Success(images)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun getAllNetworks(): UniffiResult<List<NetworkModel>> =
+		withContext(Dispatchers.IO) {
+			try {
+				val networks = io.parity.signer.uniffi.getAllNetworks().map { it.toNetworkModel() }
+				UniffiResult.Success(networks)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun validateDerivationPath(
+		path: String,
+		seed: String,
+		selectedNetworkSpecs: String
+	): UniffiResult<DerivationCheck> =
+		withContext(Dispatchers.IO) {
+			try {
+				val validationResult = substratePathCheck(
+					seedName = seed,
+					path = path,
+					network = selectedNetworkSpecs
+				)
+				UniffiResult.Success(validationResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
 			}
@@ -90,3 +118,4 @@ fun <T> UniffiResult<T>.mapError(): T? {
 		}
 	}
 }
+

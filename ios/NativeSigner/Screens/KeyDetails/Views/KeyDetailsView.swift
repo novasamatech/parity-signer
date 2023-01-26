@@ -69,9 +69,7 @@ struct KeyDetailsView: View {
                         ))
                     )
                     PrimaryButton(
-                        action: {
-                            navigation.perform(navigation: viewModel.createDerivedKey)
-                        },
+                        action: viewModel.onCreateDerivedKeyTap,
                         text: Localizable.KeyDetails.Action.create.key
                     )
                     .padding(.horizontal, Spacing.large)
@@ -146,7 +144,7 @@ struct KeyDetailsView: View {
                 )
                 .clearModalBackground()
                 .onAppear {
-                    viewModel.selectedSeeds.removeAll()
+                    viewModel.selectedKeys.removeAll()
                     viewModel.isPresentingSelectionOverlay.toggle()
                 }
             } else {
@@ -170,6 +168,15 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingError
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableError,
+                isShowingBottomAlert: $viewModel.isPresentingError
+            )
+            .clearModalBackground()
+        }
     }
 
     var mainList: some View {
@@ -181,21 +188,12 @@ struct KeyDetailsView: View {
             ) { deriveKey in
                 DerivedKeyRow(
                     viewModel: deriveKey.viewModel,
-                    selectedSeeds: $viewModel.selectedSeeds,
+                    selectedKeys: $viewModel.selectedKeys,
                     isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
                 )
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    if viewModel.isPresentingSelectionOverlay {
-                        let seedName = deriveKey.viewModel.path
-                        if viewModel.selectedSeeds.contains(seedName) {
-                            viewModel.selectedSeeds.removeAll { $0 == seedName }
-                        } else {
-                            viewModel.selectedSeeds.append(seedName)
-                        }
-                    } else {
-                        navigation.perform(navigation: deriveKey.actionModel.tapAction)
-                    }
+                    viewModel.onDerivedKeyTap(deriveKey)
                 }
             }
             Spacer()

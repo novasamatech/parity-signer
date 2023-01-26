@@ -286,6 +286,9 @@
 "KeyDetails.Overlay.Action.SelectAll" = "Select All";
 "KeyDetails.Overlay.Action.Export" = "Export";
 "KeyDetails.Root.Label.PublicKey" = "Public key";
+"KeyDetails.Error.NoNetworks.Title" = "No Networks Available";
+"KeyDetails.Error.NoNetworks.Message" = "In order to create derived key, you need to add some networks first. Use \"Scan\" tab to scan network metadata first and try again.";
+
 
 "PublicKeyDetails.Label.Title" = "Public Key";
 "PublicKeyDetails.Label.Subtitle" = "Derived Key";
@@ -334,6 +337,9 @@
 "Error.Navigation.Label.Message" = "Please restart Signer app and try again.\nInternal error description: %@";
 "Error.Navigation.Label.Suffix" = "Report an issue to Signer team via Github at: https://github.com/paritytech/parity-signer/";
 "Error.Navigation.Label.NoAction" = "No further action available from this state.\nLast action: \"%@\" details: \"%@\"";
+"Error.Service.Label.Prefix" = "Internal service error.";
+"Error.Service.Label.Message" = "Rust backend operation failed, please try again.\nInternal error description: %@";
+"Error.Service.Label.Suffix" = "Report an issue to Signer team via Github at: https://github.com/paritytech/parity-signer/";
 
 "KeysExport.KeySets.Label.Header" = "Export %@ %@";
 "KeysExport.KeySets.Label.Header.Suffix.Single" = "Key Set";
@@ -604,3 +610,12 @@
 "NewSeed.Name.Action.Next" = "Next";
 "NewSeed.Backup.Label.Header" = "Write down your Secret\nRecovery Phrase";
 "NewSeed.Backup.Action.Create" = "Create Key Set";
+
+"Onboarding.Agreements.Label.Title" = "Please Agree to our Terms of Service and Privacy Policy";
+"Onboarding.Agreements.Label.PrivacyCell" = "Privacy Policy";
+"Onboarding.Agreements.Label.ToSCell" = "Terms of Service";
+"Onboarding.Agreements.Label.Confirmation" = "I’ve read and accept the Terms of Service and Privacy Policy";
+"Onboarding.Agreements.Action.Accept" = "I Accept";
+
+"Error.Jailbreak.Label.Title" = "Please try again with not Jailbroken device";
+"Error.Jailbreak.Label.Subtitle" = "We’ve detected that this Device Has Been Jailbroken and Isn’t Safe to Use. Please try again with another device";

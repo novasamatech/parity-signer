@@ -36,7 +36,7 @@ pub struct AddressDetails {
 
     /// set of networks, identified through [`NetworkSpecsKey`], that are available
     /// to work with this address key  
-    pub network_id: Vec<NetworkSpecsKey>,
+    pub network_id: Option<NetworkSpecsKey>,
 
     /// encryption algorithm associated with the address key and all its associated networks  
     pub encryption: Encryption,
@@ -55,7 +55,7 @@ impl AddressDetails {
         address_key: &AddressKey,
         address_details_encoded: IVec,
     ) -> Result<(MultiSigner, Self)> {
-        let multisigner = address_key.multi_signer()?;
+        let multisigner = address_key.multi_signer().clone();
         let address_details = AddressDetails::decode(&mut &address_details_encoded[..])?;
         if multisigner_to_encryption(&multisigner) != address_details.encryption
             && multisigner_to_encryption(&multisigner) != Encryption::Ecdsa
@@ -66,7 +66,8 @@ impl AddressDetails {
                 encryption: address_details.encryption,
             });
         }
-        for network_specs_key in address_details.network_id.iter() {
+        let network_specs_key = &address_details.network_id;
+        if let Some(network_specs_key) = network_specs_key {
             let (_, network_specs_key_encryption) = network_specs_key.genesis_hash_encryption()?;
             if network_specs_key_encryption != address_details.encryption {
                 return Err(Error::EncryptionMismatch {
@@ -85,7 +86,7 @@ impl AddressDetails {
     pub fn process_entry_checked(
         (address_key_vec, address_details_encoded): (IVec, IVec),
     ) -> Result<(MultiSigner, Self)> {
-        let address_key = AddressKey::from_ivec(&address_key_vec);
+        let address_key = AddressKey::from_ivec(&address_key_vec)?;
         AddressDetails::process_entry_with_key_checked(&address_key, address_details_encoded)
     }
 
@@ -107,6 +108,6 @@ impl AddressDetails {
     ///
     /// Address key in this case is called root key or seed key.  
     pub fn is_root(&self) -> bool {
-        (self.path.is_empty()) && (!self.has_pwd)
+        self.path.is_empty() && !self.has_pwd && self.network_id.is_none()
     }
 }

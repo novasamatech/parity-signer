@@ -675,8 +675,11 @@ fn parse_transaction_1() {
 
     let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
-            .to_string(),
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
         address: Address {
             identicon: SignerImage::Png {
                 image: alice_sr_alice().to_vec(),
@@ -1019,8 +1022,11 @@ fn parse_transaction_2() {
 
     let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
-            .to_string(),
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
         address: Address {
             identicon: SignerImage::Png {
                 image: alice_sr_alice().to_vec(),
@@ -1186,8 +1192,11 @@ fn parse_transaction_3() {
 
     let author_info_known = MAddressCard {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
-            .to_string(),
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
         address: Address {
             identicon: SignerImage::Png {
                 image: alice_sr_alice().to_vec(),
@@ -2195,9 +2204,11 @@ fn parse_transaction_6_error_on_parsing() {
             indent: 0,
             card: Card::AuthorCard {
                 f: MAddressCard {
-                    address_key:
-                        "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
-                            .to_string(),
+                    address_key: concat!(
+                        "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+                        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                    )
+                    .to_string(),
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                     address: Address {
                         identicon: SignerImage::Png {
@@ -2297,9 +2308,11 @@ fn parse_transaction_7_error_on_parsing() {
             card: Card::AuthorCard {
                 f: MAddressCard {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    address_key:
-                        "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
-                            .to_string(),
+                    address_key: concat!(
+                        "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+                        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                    )
+                    .to_string(),
                     address: Address {
                         identicon: SignerImage::Png {
                             image: alice_sr_alice().to_vec(),
@@ -2399,9 +2412,11 @@ fn parse_transaction_8_error_on_parsing() {
             card: Card::AuthorCard {
                 f: MAddressCard {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    address_key:
-                        "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
-                            .to_string(),
+                    address_key: concat!(
+                        "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+                        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                    )
+                    .to_string(),
                     address: Address {
                         identicon: SignerImage::Png {
                             image: alice_sr_alice().to_vec(),
@@ -2503,8 +2518,11 @@ fn parse_msg_1() {
     };
 
     let author_info_known = MAddressCard {
-        address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
-            .to_string(),
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
         address: Address {
             identicon: SignerImage::Png {

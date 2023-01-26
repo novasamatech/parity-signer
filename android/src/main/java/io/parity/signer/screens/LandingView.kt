@@ -19,6 +19,7 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.Documents
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
+import io.parity.signer.ui.theme.SignerOldTheme
 
 /**
  * First screen with legal consent request
@@ -86,14 +87,16 @@ fun LandingView(onBoard: () -> Unit, modifier: Modifier) {
 		}
 	}
 
-	AndroidCalledConfirm(
-		show = confirm,
-		header = "Accept terms and conditions and privacy policy?",
-		back = { confirm = false },
-		forward = { onBoard() },
-		backText = "Decline",
-		forwardText = "Accept"
-	)
+	SignerOldTheme() {
+		AndroidCalledConfirm(
+			show = confirm,
+			header = "Accept terms and conditions and privacy policy?",
+			back = { confirm = false },
+			forward = { onBoard() },
+			backText = "Decline",
+			forwardText = "Accept"
+		)
+	}
 }
 
 

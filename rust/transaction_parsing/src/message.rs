@@ -32,10 +32,13 @@ pub fn process_message(database: &sled::Db, data_hex: &str) -> Result<Transactio
 
     match try_get_network_specs(database, &network_specs_key)? {
         Some(network_specs) => {
-            let address_key = AddressKey::from_multisigner(&author_multi_signer);
+            let address_key = AddressKey::new(
+                author_multi_signer.clone(),
+                Some(network_specs.specs.genesis_hash),
+            );
             match try_get_address_details(database, &address_key)? {
                 Some(address_details) => {
-                    if address_details.network_id.contains(&network_specs_key) {
+                    if address_details.network_id == Some(network_specs_key) {
                         let message_card = Card::ParserCard(&ParserCard::Text(display_msg))
                             .card(&mut index, indent);
                         let sign = TrDbColdSignOne::generate(
@@ -51,6 +54,7 @@ pub fn process_message(database: &sled::Db, data_hex: &str) -> Result<Transactio
                         let author_info = make_author_info(
                             &author_multi_signer,
                             network_specs.specs.base58prefix,
+                            network_specs.specs.genesis_hash,
                             &address_details,
                         );
                         let network_info = network_specs;
@@ -70,6 +74,7 @@ pub fn process_message(database: &sled::Db, data_hex: &str) -> Result<Transactio
                         let author_card = Card::Author {
                             author: &author_multi_signer,
                             base58prefix: network_specs.specs.base58prefix,
+                            genesis_hash: network_specs.specs.genesis_hash,
                             address_details: &address_details,
                         }
                         .card(&mut index, indent);
@@ -96,6 +101,7 @@ pub fn process_message(database: &sled::Db, data_hex: &str) -> Result<Transactio
                         base58prefix: network_specs.specs.base58prefix,
                     }
                     .card(&mut index, indent);
+                    println!("here 1");
                     let warning_card =
                         Card::Warning(Warning::AuthorNotFound).card(&mut index, indent);
                     let message_card =

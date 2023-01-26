@@ -96,12 +96,15 @@ extension View {
         isPresented: Binding<Bool>,
         autodismissCounter: TimeInterval = 3
     ) -> some View {
-        bottomEdgeOverlay(overlayView: Snackbar(viewModel: viewModel), isPresented: isPresented)
-            .tapAndDelayDismiss(
-                autodismissCounter: autodismissCounter,
-                isTapToDismissActive: viewModel.tapToDismiss,
-                isPresented: isPresented
-            )
+        bottomEdgeOverlay(
+            overlayView: Snackbar(viewModel: viewModel)
+                .tapAndDelayDismiss(
+                    autodismissCounter: autodismissCounter,
+                    isTapToDismissActive: viewModel.tapToDismiss,
+                    isPresented: isPresented
+                ),
+            isPresented: isPresented
+        )
     }
 }
 

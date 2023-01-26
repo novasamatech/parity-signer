@@ -9,11 +9,13 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -90,6 +92,7 @@ fun ScreenHeaderClose(
 	subtitle: String? = null,
 	onClose: () -> Unit,
 	onMenu: (() -> Unit)? = null,
+	differentMenuIcon: ImageVector? = null,
 ) {
 	Row(
 		modifier = Modifier
@@ -133,7 +136,7 @@ fun ScreenHeaderClose(
 		//end
 		if (onMenu != null) {
 			Image(
-				imageVector = Icons.Filled.MoreHoriz,
+				imageVector = differentMenuIcon ?: Icons.Filled.MoreHoriz,
 				contentDescription = stringResource(R.string.description_menu_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
@@ -223,7 +226,7 @@ fun ScreenHeaderWithButton(
 private fun PreviewScreenBaseComponent() {
 	SignerNewTheme() {
 		Column(
-			modifier = Modifier.size(300.dp),
+			modifier = Modifier.size(500.dp),
 		) {
 			ScreenHeader(
 				null,
@@ -253,6 +256,12 @@ private fun PreviewScreenBaseComponent() {
 			)
 			ScreenHeaderWithButton(true, "Derivation", {}, {})
 			ScreenHeaderWithButton(false, "Derivation", {}, {})
+			ScreenHeaderClose(
+				stringResource(id = R.string.key_sets_screem_title),
+				onClose = {},
+				onMenu = {},
+				differentMenuIcon = Icons.Filled.HelpOutline,
+			)
 		}
 	}
 }

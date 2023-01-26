@@ -53,8 +53,8 @@ struct ScreenSelector: View {
             RecoverSeedPhrase(
                 content: value
             )
-        case let .deriveKey(value):
-            CreateDerivedKeyView(viewModel: .init(seedName: value.seedName))
+        case let .deriveKey:
+            CreateDerivedKeyView(viewModel: .init())
         case let .vVerifier(value):
             VerfierCertificateView(viewModel: .init(content: value))
         case let .manageNetworks(value):
@@ -70,7 +70,7 @@ struct ScreenSelector: View {
                 content: value
             )
         case .documents:
-            DocumentModal()
+            OnboardingAgreementsView(viewModel: .init())
         // Screens handled outside of Rust navigation
         case .scan:
             EmptyView()

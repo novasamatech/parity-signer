@@ -17,21 +17,21 @@ struct NativeSignerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainScreenContainer(data: SignerDataModel(
-                navigation: navigation,
-                connectivityMediator: connectivityMediator
-            ))
-            .onReceive(jailbreakDetectionPublisher.$isJailbroken) { isJailbroken in
-                print("Device is Jailbroken: \(isJailbroken)")
-                // Perform logic when device is jailbroken
+            if jailbreakDetectionPublisher.isJailbroken {
+                JailbreakDetectedView()
+            } else {
+                MainScreenContainer(data: SignerDataModel(
+                    navigation: navigation,
+                    connectivityMediator: connectivityMediator
+                ))
+                .font(PrimaryFont.bodyL.font)
+                .background(Asset.backgroundPrimary.swiftUIColor)
+                .environmentObject(navigation)
+                .environmentObject(connectivityMediator)
+                .environmentObject(appState)
+                .environmentObject(jailbreakDetectionPublisher)
+                .environmentObject(applicationStatePublisher)
             }
-            .font(PrimaryFont.bodyL.font)
-            .background(Asset.backgroundPrimary.swiftUIColor)
-            .environmentObject(navigation)
-            .environmentObject(connectivityMediator)
-            .environmentObject(appState)
-            .environmentObject(jailbreakDetectionPublisher)
-            .environmentObject(applicationStatePublisher)
         }
     }
 }
