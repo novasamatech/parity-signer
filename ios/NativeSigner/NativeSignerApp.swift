@@ -12,20 +12,26 @@ struct NativeSignerApp: App {
     @StateObject var connectivityMediator = ConnectivityMediator()
     @StateObject var navigation = NavigationCoordinator()
     @StateObject var appState = AppState()
+    @StateObject var jailbreakDetectionPublisher = JailbreakDetectionPublisher()
     @StateObject var applicationStatePublisher = ApplicationStatePublisher()
 
     var body: some Scene {
         WindowGroup {
-            MainScreenContainer(data: SignerDataModel(
-                navigation: navigation,
-                connectivityMediator: connectivityMediator
-            ))
-            .font(PrimaryFont.bodyL.font)
-            .background(Asset.backgroundPrimary.swiftUIColor)
-            .environmentObject(navigation)
-            .environmentObject(connectivityMediator)
-            .environmentObject(appState)
-            .environmentObject(applicationStatePublisher)
+            if jailbreakDetectionPublisher.isJailbroken {
+                JailbreakDetectedView()
+            } else {
+                MainScreenContainer(data: SignerDataModel(
+                    navigation: navigation,
+                    connectivityMediator: connectivityMediator
+                ))
+                .font(PrimaryFont.bodyL.font)
+                .background(Asset.backgroundPrimary.swiftUIColor)
+                .environmentObject(navigation)
+                .environmentObject(connectivityMediator)
+                .environmentObject(appState)
+                .environmentObject(jailbreakDetectionPublisher)
+                .environmentObject(applicationStatePublisher)
+            }
         }
     }
 }
