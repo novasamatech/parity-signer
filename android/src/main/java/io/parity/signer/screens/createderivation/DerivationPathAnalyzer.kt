@@ -19,11 +19,12 @@ class DerivationPathAnalyzer {
 	private val regexCheckPath: Regex = "^((//?[^/]+)+)(///.*)?$".toRegex()
 
 	fun isCorrect(path: String): Boolean {
-		return regexCheckPath.matches(path)
+		return path.isEmpty() || regexCheckPath.matches(path)
 	}
 
 	fun getHint(path: String): Hint {
 		return when {
+			path.isEmpty() -> Hint.CREATING_ROOT
 			getPassword(path) == "" -> Hint.CREATE_PASSWORD
 			path.endsWith("//") && getPassword(path) == null -> Hint.PATH_NAME
 			else -> Hint.NONE
@@ -31,12 +32,13 @@ class DerivationPathAnalyzer {
 	}
 
 	enum class Hint {
-		PATH_NAME, CREATE_PASSWORD, NONE;
+		PATH_NAME, CREATE_PASSWORD, CREATING_ROOT, NONE;
 
 		fun getLocalizedString(context: Context): String? {
 			return when (this) {
 				PATH_NAME -> context.getString(R.string.derivation_path_hint_enter_path_name)
 				CREATE_PASSWORD -> context.getString(R.string.derivation_path_hint_create_password)
+				CREATING_ROOT -> context.getString(R.string.derivation_path_hint_it_is_root)
 				NONE -> null
 			}
 		}

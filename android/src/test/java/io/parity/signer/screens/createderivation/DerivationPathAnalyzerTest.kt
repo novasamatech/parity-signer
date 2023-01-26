@@ -15,6 +15,7 @@ class DerivationPathAnalyzerTest {
 		assertEquals(DerivationPathAnalyzer.Hint.PATH_NAME, analyzer.getHint("//"))
 		assertEquals(DerivationPathAnalyzer.Hint.NONE, analyzer.getHint("//seed///sd"))
 		assertEquals(DerivationPathAnalyzer.Hint.NONE, analyzer.getHint("//se"))
+		assertEquals(DerivationPathAnalyzer.Hint.CREATING_ROOT, analyzer.getHint(""))
 	}
 
 	@Test
@@ -54,6 +55,6 @@ class DerivationPathAnalyzerTest {
 		assertFalse(analyzer.isCorrect("//"))
 		assertFalse(analyzer.isCorrect("///"))
 		assertFalse(analyzer.isCorrect("///sdf"))
-		assertFalse(analyzer.isCorrect(""))
+		assertTrue(analyzer.isCorrect(""))//root key
 	}
 }
