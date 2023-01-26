@@ -616,3 +616,6 @@
 "Onboarding.Agreements.Label.ToSCell" = "Terms of Service";
 "Onboarding.Agreements.Label.Confirmation" = "I’ve read and accept the Terms of Service and Privacy Policy";
 "Onboarding.Agreements.Action.Accept" = "I Accept";
+
+"Error.Jailbreak.Label.Title" = "Please try again with not Jailbroken device";
+"Error.Jailbreak.Label.Subtitle" = "We’ve detected that this Device Has Been Jailbroken and Isn’t Safe to Use. Please try again with another device";
