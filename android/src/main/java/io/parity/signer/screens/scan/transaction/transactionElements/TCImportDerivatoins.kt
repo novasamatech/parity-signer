@@ -5,8 +5,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -43,11 +41,11 @@ import io.parity.signer.uniffi.SeedKeysPreview
 fun TCImportDerivationsFull(model: ImportDerivationsModel) {
 	Column {
 		TCDerivationsErrors(model.errors)
-		LazyColumn(
-			contentPadding = PaddingValues(horizontal = 8.dp),
+		Column(
+			modifier = Modifier.padding(8.dp),
 			verticalArrangement = Arrangement.spacedBy(10.dp)
 		) {
-			items(model.keySets) { keySet ->
+			model.keySets.forEach { keySet ->
 				TCDerivationsSingle(keySet)
 			}
 		}
