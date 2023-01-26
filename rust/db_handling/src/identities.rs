@@ -437,7 +437,7 @@ pub fn get_multisigner_by_address(
 
         // TODO: for ecdsa address is not simply a public key
         // Do a general check after Ethereum-specific one
-        if address.key() == m.encode() {
+        if address.multi_signer() == &m {
             return Some(m);
         }
         None
