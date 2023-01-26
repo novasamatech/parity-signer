@@ -152,8 +152,7 @@ class ScanViewModel : ViewModel() {
 											transactions = transactions,
 											updatedKeys = updatedKeys
 										)
-									this.transactions.value =
-										TransactionsState(newTransactionsState)
+									this.transactions.value = TransactionsState(newTransactionsState)
 								}
 								is RepoResult.Failure -> {
 									Toast.makeText(
