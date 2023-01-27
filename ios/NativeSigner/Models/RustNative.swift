@@ -49,15 +49,11 @@ final class SignerDataModel: ObservableObject {
         finaliseInitialisation()
     }
 
-    /// refresh everything except for seedNames
-    /// should be called as often as reasonably possible - on flow interrupts, changes, events, etc.
     func totalRefresh() {
         navigation.perform(navigation: .init(action: .start))
         checkAlert()
     }
 
-    /// Should be called once on factory-new state of the app
-    /// Populates database with starting values
     func onboard(verifierRemoved: Bool = false) {
         wipe()
         guard databaseMediator.recreateDatabaseFile() else {
