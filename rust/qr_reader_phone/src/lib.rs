@@ -89,7 +89,7 @@ mod tests {
     fn get_length_raptorq() {
         let line = "40088800000820000000190c30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ec11ec11ec11ec11ec11ec11ec11ec";
         let res = get_length(line, false);
-        assert!(res.is_ok(), "Expected ok, {res:?}");
+        assert!(res.is_ok(), "{}", "Expected ok, {res:?}");
         assert_eq!(res.unwrap(), 2); // 1 + 1 extra packet
     }
 
@@ -97,7 +97,7 @@ mod tests {
     fn get_length_legacy_format() {
         let line = format!("40005{}{}{}{}", "00", "0009", "ff", "ff");
         let res = get_length(&line, false);
-        assert!(res.is_ok(), "Expected ok, {res:?}");
+        assert!(res.is_ok(), "{}", "Expected ok, {res:?}");
         assert_eq!(res.unwrap(), 9);
     }
 
@@ -105,7 +105,7 @@ mod tests {
     fn get_length_static_qr() {
         let line = format!("40001{}", "01");
         let res = get_length(&line, false);
-        assert!(res.is_ok(), "Expected ok, {res:?}");
+        assert!(res.is_ok(), "{}", "Expected ok, {res:?}");
         assert_eq!(res.unwrap(), 1);
     }
 
@@ -117,20 +117,20 @@ mod tests {
             "400021578".to_string(),
         ];
         let result = decode_sequence(&jsonline, &None, false);
-        assert!(result.is_ok(), "Expected ok, {result:?}");
+        assert!(result.is_ok(), "{}", "Expected ok, {result:?}");
     }
 
     #[test]
     fn legacy_multiframe_one_frame() {
         let jsonline = vec!["400be00000100005301025a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969a40403005a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe9690700e40b5402c5005c00ec07000004000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafebcd1b489599db4424ed928804ddad3a4689fb8c835151ef34bc250bb845cdc1eb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe0ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec".to_string()];
         let result = decode_sequence(&jsonline, &None, false);
-        assert!(result.is_ok(), "Expected ok, {result:?}");
+        assert!(result.is_ok(), "{}", "Expected ok, {result:?}");
     }
 
     #[test]
     fn get_cleaned_payload() {
         let res = get_payload("ab", true);
-        assert!(res.is_ok(), "Expected ok, {res:?}");
+        assert!(res.is_ok(), "{}", "Expected ok, {res:?}");
         assert_eq!(res.unwrap(), vec![171]);
     }
 }
