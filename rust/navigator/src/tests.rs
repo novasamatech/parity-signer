@@ -245,9 +245,7 @@ fn erase_log_timestamps(log: &mut ScreenData) {
             f.timestamp = String::new();
         }
         _ => {
-            panic!(
-                "expected SreenData::Log or ScreenData::LogDetails got {log:?}"
-            );
+            panic!("expected SreenData::Log or ScreenData::LogDetails got {log:?}");
         }
     }
 }

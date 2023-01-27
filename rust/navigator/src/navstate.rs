@@ -1540,9 +1540,7 @@ impl State {
                     f: Some(ShieldAlert::Past),
                 }),
                 Ok(false) => Some(AlertData::Shield { f: None }),
-                Err(e) => Some(AlertData::ErrorData {
-                    f: format!("{e}"),
-                }),
+                Err(e) => Some(AlertData::ErrorData { f: format!("{e}") }),
             },
         };
 

@@ -59,9 +59,7 @@ impl From<navigator::Error> for ErrorDisplayed {
         match e {
             navigator::Error::MutexPoisoned => Self::MutexPoisoned,
             navigator::Error::DbNotInitialized => Self::DbNotInitialized,
-            _ => Self::Str {
-                s: format!("{e}"),
-            },
+            _ => Self::Str { s: format!("{e}") },
         }
     }
 }
@@ -112,9 +110,7 @@ impl From<qr_reader_phone::Error> for QrSequenceDecodeError {
     fn from(value: qr_reader_phone::Error) -> Self {
         match value {
             qr_reader_phone::Error::BananaSplitWrongPassword => Self::BananaSplitWrongPassword,
-            qr_reader_phone::Error::BananaSplitError(e) => Self::BananaSplit {
-                s: format!("{e}"),
-            },
+            qr_reader_phone::Error::BananaSplitError(e) => Self::BananaSplit { s: format!("{e}") },
             other => QrSequenceDecodeError::GenericError {
                 s: format!("{other}"),
             },
