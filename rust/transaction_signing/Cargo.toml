@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 hex = "0.4.3"
-parity-scale-codec = "3.2.2"
+parity-scale-codec = "3.3.0"
 zeroize = "1.5.7"
 
 definitions = { path = "../definitions", default-features = false, features = ["signer"] }
