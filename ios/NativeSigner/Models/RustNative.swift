@@ -6,11 +6,8 @@
 //
 
 import Foundation
-import LocalAuthentication // to detect if password is set
 import SwiftUI
 
-/// Object to store all data; since the data really is mostly stored in RustNative side,
-/// just one object (to describe it) is used here.
 final class SignerDataModel: ObservableObject {
     private let seedsMediator: SeedsMediating
 
@@ -23,9 +20,6 @@ final class SignerDataModel: ObservableObject {
 
     // Alert indicator
     @Published var alert: Bool = false
-
-    /// did user set up password?
-    let protected = LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
 
     private let bundle: BundleProtocol
     private let databaseMediator: DatabaseMediating

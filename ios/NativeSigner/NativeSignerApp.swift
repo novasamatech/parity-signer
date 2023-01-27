@@ -14,6 +14,7 @@ struct NativeSignerApp: App {
     @StateObject var appState = AppState()
     @StateObject var jailbreakDetectionPublisher = JailbreakDetectionPublisher()
     @StateObject var applicationStatePublisher = ApplicationStatePublisher()
+    @StateObject var passwordProtectionStatePublisher = PasswordProtectionStatePublisher()
 
     var body: some Scene {
         WindowGroup {
@@ -31,6 +32,7 @@ struct NativeSignerApp: App {
                 .environmentObject(appState)
                 .environmentObject(jailbreakDetectionPublisher)
                 .environmentObject(applicationStatePublisher)
+                .environmentObject(passwordProtectionStatePublisher)
             }
         }
     }
