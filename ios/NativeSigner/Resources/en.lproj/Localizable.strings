@@ -619,3 +619,7 @@
 
 "Error.Jailbreak.Label.Title" = "Please try again with not Jailbroken device";
 "Error.Jailbreak.Label.Subtitle" = "We’ve detected that this Device Has Been Jailbroken and Isn’t Safe to Use. Please try again with another device";
+
+"Error.DevicePincodeRequired.Label.Title" = "Please try again with not Jailbroken device";
+"Error.DevicePincodeRequired.Label.Subtitle" = "We’ve detected that this Device Has Been Jailbroken and Isn’t Safe to Use. Please try again with another device";
+"Error.DevicePincodeRequired.Action.Settings" = "Open Settings";
