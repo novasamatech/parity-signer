@@ -19,9 +19,6 @@ import java.io.FileOutputStream
 
 class SignerDataModel : ViewModel() {
 
-	// Internal model values
-	private val _onBoardingDone = MutableStateFlow(OnboardingWasShown.InProgress)
-
 	// todo migrate to use dependencies from ServiceLocator rather than expecting them here
 	val context: Context get() = ServiceLocator.appContext
 	val activity: FragmentActivity get() = ServiceLocator.activityScope!!.activity
@@ -63,8 +60,6 @@ class SignerDataModel : ViewModel() {
 	internal var dbName: String = ""
 
 	// Observables for screens state
-
-	val onBoardingDone: StateFlow<OnboardingWasShown> = _onBoardingDone
 	val authenticated: StateFlow<Boolean> = ServiceLocator.authentication.auth
 
 	val alertState: StateFlow<AlertState> = _alertState
