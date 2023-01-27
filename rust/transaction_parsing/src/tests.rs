@@ -2506,7 +2506,7 @@ fn parse_msg_1() {
     populate_cold(&db, Verifier { v: None }).unwrap();
     let sign_msg = hex::encode(b"<Bytes>uuid-abcd</Bytes>");
     let text = String::from("uuid-abcd");
-    let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", sign_msg);
+    let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{sign_msg}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
 
     let set_expected = TransactionCardSet {
         message: Some(vec![TransactionCard {
@@ -2563,7 +2563,7 @@ fn parse_msg_2() {
     populate_cold(&db, Verifier { v: None }).unwrap();
     // sneaking one extra byte in the text body
     let sign_msg = hex::encode(b"<Bytes>uuid-abcd");
-    let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", sign_msg);
+    let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{sign_msg}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
     let set_expected = TransactionCardSet {
         error: Some(vec![TransactionCard {
             index: 0,

@@ -26,6 +26,8 @@
 //! with some testing, and is the default one.  
 
 #![deny(rustdoc::broken_intra_doc_links)]
+// TODO: Fix the large error lint https://github.com/paritytech/parity-signer/issues/1585
+#![allow(clippy::result_large_err)]
 
 // possibly TODO: rename all database_name into database_path or whatever,
 // currently it is quite confusing

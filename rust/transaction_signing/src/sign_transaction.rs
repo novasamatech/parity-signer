@@ -170,7 +170,7 @@ mod tests {
                 .signature
                 .verify(message.as_bytes(), &AccountId32::new(public.0)));
         } else {
-            panic!("Wrong action: {:?}", output)
+            panic!("Wrong action: {output:?}")
         }
     }
 }

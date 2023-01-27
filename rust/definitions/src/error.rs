@@ -145,7 +145,7 @@ impl TransferContent {
             TransferContent::LoadMeta => "`load_meta`",
             TransferContent::LoadTypes => "`load_types`",
         };
-        format!("Payload could not be decoded as {}.", insert)
+        format!("Payload could not be decoded as {insert}.")
     }
 }
 

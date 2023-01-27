@@ -570,7 +570,7 @@ fn fetch_set_element(set_element: &AddressSpecs) -> Result<MetaFetched> {
 
 /// Show warning if the metadata (`v14`) has incomplete set of signed extensions.
 fn warn(name: &str, version: u32) {
-    println!("Warning. Metadata {}{} has incomplete set of signed extensions, and could cause Signer to fail in parsing signable transactions using this metadata.", name, version);
+    println!("Warning. Metadata {name}{version} has incomplete set of signed extensions, and could cause Signer to fail in parsing signable transactions using this metadata.");
 }
 
 /// `unwasm -payload <wasm_file_path> <optional -d key>`
@@ -643,7 +643,7 @@ where
     P: AsRef<Path>,
 {
     let meta_values = get_meta_values_by_name_version(database, name, version)?;
-    let file_path = export_dir.as_ref().join(format!("{}{}", name, version));
+    let file_path = export_dir.as_ref().join(format!("{name}{version}"));
     std::fs::write(file_path, hex::encode(meta_values.meta))?;
     Ok(())
 }

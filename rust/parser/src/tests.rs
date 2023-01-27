@@ -263,12 +263,7 @@ tip: 0 pWND,
 network: westend9010,
 tx_version: 5,
 block_hash: 538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33";
-    assert!(
-        reply == reply_known,
-        "Expected: {}\nReceived: {}",
-        reply_known,
-        reply
-    );
+    assert_eq!(reply, reply_known);
 }
 
 #[test]
