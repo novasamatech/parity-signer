@@ -69,8 +69,8 @@ pub(crate) fn parse_transaction(
             let mut history: Vec<Event> = Vec::new();
 
             let addrs = get_all_addresses(database)?;
-            println!("addr {:#?}", addrs);
-            println!("addr key {:#?}", address_key);
+            println!("addr {addrs:#?}");
+            println!("addr key {address_key:#?}");
 
             let mut cards_prep = match try_get_address_details(database, &address_key)? {
                 Some(address_details) => {

@@ -26,14 +26,14 @@ fn word_search_1() {
 fn word_search_2() {
     let word_part = "umbra";
     let out = guess(word_part);
-    assert!(out.is_empty(), "Found different word set:\n{:?}", out);
+    assert!(out.is_empty(), "Found different word set:\n{out:?}");
 }
 
 #[test]
 fn word_search_3() {
     let word_part = "котик";
     let out = guess(word_part);
-    assert!(out.is_empty(), "Found different word set:\n{:?}", out);
+    assert!(out.is_empty(), "Found different word set:\n{out:?}");
 }
 
 #[test]
@@ -57,7 +57,7 @@ fn word_search_4() {
 fn word_search_5() {
     let word_part = " ";
     let out = guess(word_part);
-    assert!(out.is_empty(), "Found different word set:\n{:?}", out);
+    assert!(out.is_empty(), "Found different word set:\n{out:?}");
 }
 
 #[test]

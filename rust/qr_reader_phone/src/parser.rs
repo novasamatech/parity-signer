@@ -131,27 +131,27 @@ mod tests {
     #[test]
     fn get_payload_wrong_prefix() {
         let res = parse_qr_payload("30001ab");
-        assert!(res.is_err(), "Expected err, {:?}", res);
+        assert!(res.is_err(), "{}", "Expected err, {res:?}");
     }
 
     #[test]
     fn get_valid_payload() {
         let res = parse_qr_payload("40001ab");
-        assert!(res.is_ok(), "Expected ok, {:?}", res);
+        assert!(res.is_ok(), "{}", "Expected ok, {res:?}");
         assert_eq!(res.unwrap(), "ab");
     }
 
     #[test]
     fn get_old_version_payload() {
         let res = parse_qr_payload("401ab");
-        assert!(res.is_ok(), "Expected ok, {:?}", res);
+        assert!(res.is_ok(), "{}", "Expected ok, {res:?}");
         assert_eq!(res.unwrap(), "ab");
     }
 
     #[test]
     fn ignore_remaining() {
         let res = parse_qr_payload("40001abf");
-        assert!(res.is_ok(), "Expected ok, {:?}", res);
+        assert!(res.is_ok(), "{}", "Expected ok, {res:?}");
         assert_eq!(res.unwrap(), "ab");
     }
 }

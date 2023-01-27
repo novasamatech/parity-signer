@@ -166,7 +166,7 @@ fn print_list_of_cameras() {
     }
     println!("\nList of available devices:");
     for index in indexes {
-        println!("Camera index: {}", index);
+        println!("Camera index: {index}");
     }
 }
 

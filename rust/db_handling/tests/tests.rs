@@ -95,7 +95,7 @@ fn print_seed_names() {
         },
         derived_keys_count: 4, // "//westend", "//kusama", "//polkadot", "//Alice"
     }];
-    assert!(cards == expected_cards, "\nReceived: \n{:?}", cards);
+    assert!(cards == expected_cards, "\nReceived: \n{cards:?}");
 }
 
 #[cfg(feature = "test")]
@@ -125,7 +125,7 @@ fn print_seed_names_with_orphan() {
             derived_keys_count: 0,
         },
     ];
-    assert!(cards == expected_cards, "\nReceived: \n{:?}", cards);
+    assert!(cards == expected_cards, "\nReceived: \n{cards:?}");
 }
 
 #[cfg(feature = "test")]
@@ -803,7 +803,7 @@ fn not_find_mock_verifier() {
     match try_get_valid_current_verifier(&db, &verifier_key) {
         Ok(Some(_)) => panic!("Found network key that should not be in database."),
         Ok(None) => (),
-        Err(e) => panic!("Error looking for mock verifier: {}", e),
+        Err(e) => panic!("Error looking for mock verifier: {e}"),
     }
 }
 
@@ -925,7 +925,7 @@ fn test_identity_deletion() {
     //    NetworkSpecsKey::from_parts(&chainspecs[1].specs.genesis_hash, &Encryption::Sr25519);
     let mut identities = addresses_set_seed_name_network(&db, "Alice", &network_specs_key_0)
         .expect("Alice should have some addresses by default");
-    println!("{:?}", identities);
+    println!("{identities:?}");
     //let (key0, _) = identities.remove(0); //TODO: this should be root key
     let (key1, _) = identities.remove(0); //TODO: this should be network-specific key
                                           //remove_key(&db, &key0, &network_specs_key_0).expect("delete an address");
@@ -1037,8 +1037,7 @@ fn history_with_identities() {
     for (i, e) in element3.iter().enumerate() {
         assert!(
             entries_contain_event(&history_printed_after_create_seed, e),
-            "{}-th missing",
-            i
+            "{i}-th missing"
         );
     }
 }
@@ -1094,8 +1093,7 @@ fn increment_identities_1() {
     let multisigner_path_set = get_multisigner_path_set(&db);
     assert!(
         multisigner_path_set.len() == 1,
-        "Wrong number of identities: {:?}",
-        multisigner_path_set
+        "Wrong number of identities: {multisigner_path_set:?}"
     );
     println!("{}", multisigner_path_set[0].1);
     create_increment_set(
@@ -1109,8 +1107,7 @@ fn increment_identities_1() {
     let multisigner_path_set = get_multisigner_path_set(&db);
     assert!(
         multisigner_path_set.len() == 5,
-        "Wrong number of identities after increment: {:?}",
-        multisigner_path_set
+        "Wrong number of identities after increment: {multisigner_path_set:?}"
     );
     let path_set: Vec<String> = multisigner_path_set
         .iter()
@@ -1145,8 +1142,7 @@ fn increment_identities_2() {
         .unwrap();
     assert!(
         multisigner_path_set.len() == 2,
-        "Wrong number of identities: {:?}",
-        multisigner_path_set
+        "Wrong number of identities: {multisigner_path_set:?}"
     );
     create_increment_set(
         &db,
@@ -1159,8 +1155,7 @@ fn increment_identities_2() {
     let multisigner_path_set = get_multisigner_path_set(&db);
     assert!(
         multisigner_path_set.len() == 5,
-        "Wrong number of identities after increment: {:?}",
-        multisigner_path_set
+        "Wrong number of identities after increment: {multisigner_path_set:?}"
     );
     let path_set: Vec<String> = multisigner_path_set
         .iter()
@@ -1194,8 +1189,7 @@ fn increment_identities_3() {
         .unwrap();
     assert!(
         multisigner_path_set.len() == 2,
-        "Wrong number of identities: {:?}",
-        multisigner_path_set
+        "Wrong number of identities: {multisigner_path_set:?}"
     );
     create_increment_set(
         &db,
@@ -1208,8 +1202,7 @@ fn increment_identities_3() {
     let multisigner_path_set = get_multisigner_path_set(&db);
     assert!(
         multisigner_path_set.len() == 5,
-        "Wrong number of identities after increment: {:?}",
-        multisigner_path_set
+        "Wrong number of identities after increment: {multisigner_path_set:?}"
     );
     let path_set: Vec<String> = multisigner_path_set
         .iter()
@@ -1263,7 +1256,7 @@ fn creating_derivation_1() {
                         .to_string()
                 );
             } else {
-                panic!("expected Error::DerivationExists, got {:?}", e);
+                panic!("expected Error::DerivationExists, got {e:?}");
             }
         }
     }
@@ -1438,7 +1431,7 @@ fn creating_derivation_5() {
                         .to_string()
                 );
             } else {
-                panic!("expected Error::DerivationExists, got {:?}", e);
+                panic!("expected Error::DerivationExists, got {e:?}");
             }
         }
     }

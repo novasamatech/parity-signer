@@ -83,7 +83,7 @@ impl ParserCard {
             ParserCard::IdentityField(variant) => readable(indent, "identity_field", variant),
             ParserCard::BitVec(bv) => readable(indent, "bitvec", bv),
             ParserCard::Balance { number, units } => {
-                readable(indent, "balance", &format!("{} {}", number, units))
+                readable(indent, "balance", &format!("{number} {units}"))
             }
             ParserCard::FieldName {
                 name,
@@ -106,7 +106,7 @@ impl ParserCard {
                 Era::Mortal(period, phase) => readable(
                     indent,
                     "era",
-                    &format!("Mortal, phase: {}, period: {}", phase, period),
+                    &format!("Mortal, phase: {phase}, period: {period}"),
                 ),
             },
             ParserCard::Nonce(nonce) => readable(indent, "nonce", nonce),
@@ -114,10 +114,10 @@ impl ParserCard {
                 readable(indent, "block_hash", &hex::encode(block_hash))
             }
             ParserCard::Tip { number, units } => {
-                readable(indent, "tip", &format!("{} {}", number, units))
+                readable(indent, "tip", &format!("{number} {units}"))
             }
             ParserCard::NetworkNameVersion { name, version } => {
-                readable(indent, "network", &format!("{}{}", name, version))
+                readable(indent, "network", &format!("{name}{version}"))
             }
             ParserCard::TxVersion(x) => readable(indent, "tx_version", x),
         }
