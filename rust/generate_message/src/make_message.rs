@@ -73,7 +73,7 @@ pub fn make_message(make: Make) -> Result<()> {
         Crypto::Alice { e: encryption } => match encryption {
             Encryption::Ed25519 => {
                 let crypto_type_code = "00";
-                let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
+                let prelude = format!("53{crypto_type_code}{msg_type_code}");
                 let ed25519_pair =
                     ed25519::Pair::from_string(&alice_secret(), None).expect("known Alice secret");
                 let signature = ed25519_pair.sign(&message_to_verify[..]).0.to_vec();
@@ -84,11 +84,11 @@ pub fn make_message(make: Make) -> Result<()> {
                     signature,
                 ]
                 .concat();
-                (complete_message, format!("{}_Alice-ed25519", name_stub))
+                (complete_message, format!("{name_stub}_Alice-ed25519"))
             }
             Encryption::Sr25519 => {
                 let crypto_type_code = "01";
-                let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
+                let prelude = format!("53{crypto_type_code}{msg_type_code}");
                 let sr25519_pair =
                     sr25519::Pair::from_string(&alice_secret(), None).expect("known Alice secret");
                 let signature = sr25519_pair.sign(&message_to_verify[..]).0.to_vec();
@@ -99,11 +99,11 @@ pub fn make_message(make: Make) -> Result<()> {
                     signature,
                 ]
                 .concat();
-                (complete_message, format!("{}_Alice-sr25519", name_stub))
+                (complete_message, format!("{name_stub}_Alice-sr25519"))
             }
             Encryption::Ecdsa | Encryption::Ethereum => {
                 let crypto_type_code = "02";
-                let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
+                let prelude = format!("53{crypto_type_code}{msg_type_code}");
                 let ecdsa_pair =
                     ecdsa::Pair::from_string(&alice_secret(), None).expect("known Alice secret");
                 let signature = ecdsa_pair.sign(&message_to_verify[..]).0.to_vec();
@@ -114,20 +114,20 @@ pub fn make_message(make: Make) -> Result<()> {
                     signature,
                 ]
                 .concat();
-                (complete_message, format!("{}_Alice-ecdsa", name_stub))
+                (complete_message, format!("{name_stub}_Alice-ecdsa"))
             }
         },
 
         // no verifier
         Crypto::None => {
             let crypto_type_code = "ff";
-            let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
+            let prelude = format!("53{crypto_type_code}{msg_type_code}");
             let complete_message = [
                 hex::decode(prelude).expect("known value"),
                 message_to_transfer,
             ]
             .concat();
-            (complete_message, format!("{}_unverified", name_stub))
+            (complete_message, format!("{name_stub}_unverified"))
         }
 
         // real verifier with real signature: check that signature is valid
@@ -135,7 +135,7 @@ pub fn make_message(make: Make) -> Result<()> {
         Crypto::Sufficient { s } => match s {
             SufficientCrypto::Ed25519 { public, signature } => {
                 let crypto_type_code = "00";
-                let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
+                let prelude = format!("53{crypto_type_code}{msg_type_code}");
                 if ed25519::Pair::verify(&signature, &message_to_verify, &public) {
                     let complete_message = [
                         hex::decode(prelude).expect("known value"),
@@ -151,7 +151,7 @@ pub fn make_message(make: Make) -> Result<()> {
             }
             SufficientCrypto::Sr25519 { public, signature } => {
                 let crypto_type_code = "01";
-                let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
+                let prelude = format!("53{crypto_type_code}{msg_type_code}");
                 if sr25519::Pair::verify(&signature, &message_to_verify, &public) {
                     let complete_message = [
                         hex::decode(prelude).expect("known value"),
@@ -167,7 +167,7 @@ pub fn make_message(make: Make) -> Result<()> {
             }
             SufficientCrypto::Ecdsa { public, signature } => {
                 let crypto_type_code = "02";
-                let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
+                let prelude = format!("53{crypto_type_code}{msg_type_code}");
                 if ecdsa::Pair::verify(&signature, &message_to_verify, &public) {
                     let complete_message = [
                         hex::decode(prelude).expect("known value"),

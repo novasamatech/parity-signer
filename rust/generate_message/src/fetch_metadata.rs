@@ -272,8 +272,7 @@ mod tests {
         let address_calc = address_with_port(address);
         assert!(
             address_expected == address_calc,
-            "Fetch address calc: \n{}",
-            address_calc
+            "Fetch address calc: \n{address_calc}"
         );
     }
 
@@ -284,8 +283,7 @@ mod tests {
         let address_calc = address_with_port(address);
         assert!(
             address_expected == address_calc,
-            "Fetch address calc: \n{}",
-            address_calc
+            "Fetch address calc: \n{address_calc}"
         );
     }
 
@@ -296,8 +294,7 @@ mod tests {
         let address_calc = address_with_port(address);
         assert!(
             address_expected == address_calc,
-            "Fetch address calc: \n{}",
-            address_calc
+            "Fetch address calc: \n{address_calc}"
         );
     }
 
@@ -308,8 +305,7 @@ mod tests {
         let address_calc = address_with_port(address);
         assert!(
             address_expected == address_calc,
-            "Fetch address calc: \n{}",
-            address_calc
+            "Fetch address calc: \n{address_calc}"
         );
     }
 
@@ -320,8 +316,7 @@ mod tests {
         let address_calc = address_with_port(address);
         assert!(
             address_expected == address_calc,
-            "Fetch address calc: \n{}",
-            address_calc
+            "Fetch address calc: \n{address_calc}"
         );
     }
 
@@ -332,8 +327,7 @@ mod tests {
         let address_calc = address_with_port(address);
         assert!(
             address_expected == address_calc,
-            "Fetch address calc: \n{}",
-            address_calc
+            "Fetch address calc: \n{address_calc}"
         );
     }
 }

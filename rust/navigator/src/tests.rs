@@ -105,7 +105,7 @@ fn cut_seed_remove_identicon(data: &mut Option<ModalData>) -> String {
         f.identicon = SignerImage::default();
         res
     } else {
-        panic!("Expected ModalData::NewSeedBackup, got {:?}", data);
+        panic!("Expected ModalData::NewSeedBackup, got {data:?}");
     }
 }
 
@@ -230,7 +230,7 @@ fn erase_modal_data_checksum(m: &mut ModalData) {
     if let ModalData::LogRight { f } = m {
         f.checksum = String::new();
     } else {
-        panic!("Expected ModalData::LogRight, got {:?}", m);
+        panic!("Expected ModalData::LogRight, got {m:?}");
     }
 }
 
@@ -246,8 +246,7 @@ fn erase_log_timestamps(log: &mut ScreenData) {
         }
         _ => {
             panic!(
-                "expected SreenData::Log or ScreenData::LogDetails got {:?}",
-                log
+                "expected SreenData::Log or ScreenData::LogDetails got {log:?}"
             );
         }
     }
@@ -259,7 +258,7 @@ fn erase_identicon(m: &mut ScreenData) {
             seed_name_card.identicon = SignerImage::default();
         }
     } else {
-        panic!("expected ScreenData::SeedSelector, got {:?}", m);
+        panic!("expected ScreenData::SeedSelector, got {m:?}");
     }
 }
 
@@ -270,7 +269,7 @@ fn erase_modal_seed_phrase_and_identicon(m: &mut ModalData) -> String {
         f.identicon = SignerImage::default();
         res
     } else {
-        panic!("expected ModalData::NewSeedBackup got {:?}", m);
+        panic!("expected ModalData::NewSeedBackup got {m:?}");
     }
 }
 
@@ -310,7 +309,7 @@ fn bulk_signing_test_unpassworded() {
     });
 
     let payload = [&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat();
-    let seeds = format!("{}\n{}", ALICE_SEED_PHRASE, ALICE_SEED_PHRASE);
+    let seeds = format!("{ALICE_SEED_PHRASE}\n{ALICE_SEED_PHRASE}");
 
     populate_cold_nav_test(&db).unwrap();
 
@@ -341,7 +340,7 @@ fn bulk_signing_test_unpassworded() {
             assert!(signature_is_good(tx, &hex::encode(signature.0.encode())));
         }
     } else {
-        panic!("Unexpected sign result {:?}", result);
+        panic!("Unexpected sign result {result:?}");
     }
 
     fs::remove_dir_all(dbname).unwrap();
@@ -445,8 +444,7 @@ fn bulk_signing_test_passworded() {
 
     let mut tx_state = TransactionState::new(&db, &hex::encode(payload));
     tx_state.update_seeds(&format!(
-        "{}\n{}\n{}",
-        ALICE_SEED_PHRASE, ALICE_SEED_PHRASE, ALICE_SEED_PHRASE
+        "{ALICE_SEED_PHRASE}\n{ALICE_SEED_PHRASE}\n{ALICE_SEED_PHRASE}"
     ));
 
     // Begin signing process.
@@ -484,7 +482,7 @@ fn bulk_signing_test_passworded() {
             assert!(signature_is_good(tx, &hex::encode(signature.0.encode())));
         }
     } else {
-        panic!("Unexpected sign result: {:?}", result);
+        panic!("Unexpected sign result: {result:?}");
     }
 
     let mut log = db_handling::manage_history::get_history(&db).unwrap();
@@ -5093,8 +5091,7 @@ fn flow_test_1() {
 
     assert!(
         signature_is_good(transaction_hex, &signature_hex),
-        "Produced bad signature: \n{}",
-        signature_hex
+        "Produced bad signature: \n{signature_hex}"
     );
 
     let mut action = state.perform(Action::GoBack, "", "").unwrap();
@@ -5171,7 +5168,7 @@ fn flow_test_1() {
     state.perform(Action::NavbarScan, "", "").unwrap();
     let card_text = String::from("uuid-abcd");
     let sign_msg = hex::encode(b"<Bytes>uuid-abcd</Bytes>");
-    let message_hex = format!("5301033efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", sign_msg);
+    let message_hex = format!("5301033efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34{sign_msg}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
     let action = state
         .perform(Action::TransactionFetched, &message_hex, "")
         .unwrap();
@@ -5253,8 +5250,7 @@ fn flow_test_1() {
 
     assert!(
         signature_is_good(&message_hex, &signature_hex),
-        "Produced bad signature: \n{}",
-        signature_hex
+        "Produced bad signature: \n{signature_hex}"
     );
 
     let mut action = state.perform(Action::GoBack, "", "").unwrap();
@@ -5667,8 +5663,7 @@ fn flow_test_1() {
 
     assert!(
         signature_is_good(&transaction_hex_pepper, &signature_hex),
-        "Produced bad signature: \n{}",
-        signature_hex
+        "Produced bad signature: \n{signature_hex}"
     );
 
     state.perform(Action::GoBack, "", "").unwrap();

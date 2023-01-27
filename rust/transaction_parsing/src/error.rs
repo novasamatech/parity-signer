@@ -597,8 +597,7 @@ fn display_parsing_errors(network_name: &str, errors: &[(u32, parser::Error)]) -
         }
         let _ = write!(
             &mut insert,
-            "Parsing with {}{} metadata: {}",
-            network_name, version, parser_error,
+            "Parsing with {network_name}{version} metadata: {parser_error}",
         );
     }
 
@@ -607,7 +606,7 @@ fn display_parsing_errors(network_name: &str, errors: &[(u32, parser::Error)]) -
 
 fn display_general_verifier_for_content(g: &GeneralVerifierForContent) -> String {
     match g {
-        GeneralVerifierForContent::Network { name } => format!("{} network information", name),
+        GeneralVerifierForContent::Network { name } => format!("{name} network information"),
         GeneralVerifierForContent::Types => String::from("types information"),
     }
 }

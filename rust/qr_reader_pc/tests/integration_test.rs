@@ -28,8 +28,8 @@ fn check_single_qr_hex() -> Result<(), String> {
     };
 
     if result != correct_result {
-        println!("Correct result: {}", correct_result);
-        println!("Decoding result: {}", result);
+        println!("Correct result: {correct_result}");
+        println!("Decoding result: {result}");
         Err(String::from("Incorrect result"))
     } else {
         Ok(())

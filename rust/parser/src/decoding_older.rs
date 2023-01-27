@@ -919,7 +919,7 @@ fn decode_simple(
                                     let mut fancy_out: Vec<OutputCard> = Vec::new();
                                     let mut i = 1;
                                     loop {
-                                        let capture_name = format!("arg{}", i);
+                                        let capture_name = format!("arg{i}");
                                         match caps.name(&capture_name) {
                                             Some(x) => {
                                                 fancy_out.push(OutputCard {

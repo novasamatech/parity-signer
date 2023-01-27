@@ -721,7 +721,7 @@ mod tests {
             Err(e) => {
                 if let Error::MetadataError(MetadataError::NoVersionInConstants) = e {
                 } else {
-                    panic!("expected Error::WrongPublicKeyLength, got {:?}", e);
+                    panic!("expected Error::WrongPublicKeyLength, got {e:?}");
                 }
             }
         }
@@ -737,7 +737,7 @@ mod tests {
             Err(e) => {
                 if let Error::MetadataError(MetadataError::VersionIncompatible) = e {
                 } else {
-                    panic!("expected Error::WrongPublicKeyLength, got {:?}", e);
+                    panic!("expected Error::WrongPublicKeyLength, got {e:?}");
                 }
             }
         }

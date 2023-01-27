@@ -60,7 +60,7 @@ impl From<navigator::Error> for ErrorDisplayed {
             navigator::Error::MutexPoisoned => Self::MutexPoisoned,
             navigator::Error::DbNotInitialized => Self::DbNotInitialized,
             _ => Self::Str {
-                s: format!("{}", e),
+                s: format!("{e}"),
             },
         }
     }
@@ -69,7 +69,7 @@ impl From<navigator::Error> for ErrorDisplayed {
 impl From<anyhow::Error> for ErrorDisplayed {
     fn from(e: anyhow::Error) -> Self {
         Self::Str {
-            s: format!("error on signer side: {}", e),
+            s: format!("error on signer side: {e}"),
         }
     }
 }
@@ -113,10 +113,10 @@ impl From<qr_reader_phone::Error> for QrSequenceDecodeError {
         match value {
             qr_reader_phone::Error::BananaSplitWrongPassword => Self::BananaSplitWrongPassword,
             qr_reader_phone::Error::BananaSplitError(e) => Self::BananaSplit {
-                s: format!("{}", e),
+                s: format!("{e}"),
             },
             other => QrSequenceDecodeError::GenericError {
-                s: format!("{}", other),
+                s: format!("{other}"),
             },
         }
     }
@@ -265,7 +265,7 @@ fn try_create_address(
     path: &str,
     network: &str,
 ) -> anyhow::Result<(), ErrorDisplayed> {
-    let network = NetworkSpecsKey::from_hex(network).map_err(|e| format!("{}", e))?;
+    let network = NetworkSpecsKey::from_hex(network).map_err(|e| format!("{e}"))?;
     db_handling::identities::try_create_address(&get_db()?, seed_name, seed_phrase, path, &network)
         .map_err(|e| e.to_string().into())
 }
@@ -333,7 +333,7 @@ fn encode_to_qr(payload: &[u8], is_danger: bool) -> anyhow::Result<Vec<u8>, Stri
     } else {
         DataType::Regular
     };
-    qrcode_static::png_qr(payload, sensitivity).map_err(|e| format!("{}", e))
+    qrcode_static::png_qr(payload, sensitivity).map_err(|e| format!("{e}"))
 }
 
 /// Get all networks registered within this device

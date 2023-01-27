@@ -561,7 +561,7 @@ mod tests {
             match gen_add_specs(instruction) {
                 Ok(()) => (),
                 Err(e) => {
-                    println!("Error: \n{}", e);
+                    println!("Error: \n{e}");
                     all_clear = false;
                 }
             };
