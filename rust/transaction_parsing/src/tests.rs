@@ -2595,7 +2595,7 @@ fn import_derivations() {
             indent: 0,
             card: Card::DerivationsCard {
                 f: vec![SeedKeysPreview {
-                    name: "my seed".to_string(),
+                    name: "Alice".to_string(),
                     multisigner: MultiSigner::Sr25519(
                         Public::try_from(
                             hex::decode(
