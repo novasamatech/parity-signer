@@ -3,16 +3,22 @@ package io.parity.signer.models
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 
 
-fun Modifier.conditional(condition : Boolean, modifier : Modifier.() -> Modifier) : Modifier {
-	return if (condition) {
-		then(modifier(Modifier))
+fun Modifier.conditional(
+	condition: Boolean,
+	modifier: @Composable Modifier.() -> Modifier
+): Modifier = composed {
+	if (condition) {
+		then(modifier(this))
 	} else {
 		this
 	}
 }
+
 
 /**
  * Method, used in accompanist/permission by Google

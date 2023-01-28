@@ -15,6 +15,7 @@ import io.parity.signer.screens.*
 import io.parity.signer.screens.logs.logdetails.LogDetails
 import io.parity.signer.screens.networks.NetworkDetails
 import io.parity.signer.screens.settings.VerifierScreen
+import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.ModalData
@@ -29,7 +30,8 @@ fun ScreenSelector(
 ) {
 	val button2: (Action, String) -> Unit =
 		{ action, details -> navigate(action, details, "") }
-	val seedNames = signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
+	val seedNames =
+		signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
 		is ScreenData.DeriveKey -> {} // migrated
@@ -37,8 +39,10 @@ fun ScreenSelector(
 		is ScreenData.KeyDetails -> {}//migrated
 		is ScreenData.KeyDetailsMulti -> {
 			//migrated, now part of KeySetDetails subgraph and old data used
-			submitErrorState("unreacheble state reached - root navigator should never " +
-				"get to Key Details Multi $screenData")
+			submitErrorState(
+				"unreacheble state reached - root navigator should never " +
+					"get to Key Details Multi $screenData"
+			)
 		}
 		is ScreenData.Keys -> {} //migrated to new selector
 		is ScreenData.Log -> {} //migrated to new selector
@@ -107,9 +111,11 @@ fun ModalSelector(
 			is ModalData.Backup -> {} //new screen is part of key details subgraph
 			is ModalData.PasswordConfirm -> {
 				//this is part of Derivation flow and should never called here
-				submitErrorState("unreacheble state reached - root navigator should never " +
-					"get to confirm password as it's part derivation details and never " +
-					"called now $modalData")
+				submitErrorState(
+					"unreacheble state reached - root navigator should never " +
+						"get to confirm password as it's part derivation details and never " +
+						"called now $modalData"
+				)
 			}
 			is ModalData.SignatureReady -> {} //in new selector
 			is ModalData.EnterPassword -> {} //in new selector
@@ -147,20 +153,21 @@ fun AlertSelector(
 	acknowledgeWarning: Callback
 ) {
 	val button1: (Action) -> Unit = { action -> navigate(action, "", "") }
-
-	when (alert) {
-		AlertData.Confirm -> Confirm(button = button1)
-		is AlertData.ErrorData -> ErrorModal(
-			error = alert.f,
-			button = button1
-		)
-		is AlertData.Shield -> ShieldAlert(
-			// alert.f,
-			alertState = alertState,
-			navigateBack = { button1(Action.GO_BACK) },
-			acknowledgeWarning = acknowledgeWarning
-		)
-		null -> {}
+	SignerOldTheme() {
+		when (alert) {
+			AlertData.Confirm -> Confirm(button = button1)
+			is AlertData.ErrorData -> ErrorModal(
+				error = alert.f,
+				button = button1
+			)
+			is AlertData.Shield -> ShieldAlert(
+				// alert.f,
+				alertState = alertState,
+				navigateBack = { button1(Action.GO_BACK) },
+				acknowledgeWarning = acknowledgeWarning
+			)
+			null -> {}
+		}
 	}
 }
 

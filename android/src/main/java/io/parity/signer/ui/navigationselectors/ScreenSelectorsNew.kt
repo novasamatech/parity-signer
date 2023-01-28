@@ -17,7 +17,7 @@ import io.parity.signer.components.panels.BottomBarSingleton
 import io.parity.signer.components.panels.toAction
 import io.parity.signer.models.*
 import io.parity.signer.models.storage.addSeed
-import io.parity.signer.screens.keyderivation.DerivationCreateSubgraph
+import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet

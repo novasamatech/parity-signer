@@ -24,6 +24,16 @@
 		<item quantity="one">Sign Transaction</item>
 		<item quantity="other">Sign %1$d Transactions</item>
 	</plurals>
+
+	<plurals name="import_derivations_subtitle_keys_imported">
+		<item quantity="one">%1$d Derived Key Can Be Imported</item>
+		<item quantity="other">%1$d Derived Keys Can Be Imported</item>
+	</plurals>
+
+	<plurals name="import_derivations_success_keys_imported">
+		<item quantity="one">%1$d Key Has Been Imported</item>
+		<item quantity="other">%1$d Keys Has Been Imported</item>
+	</plurals>
 </resources>
 
 

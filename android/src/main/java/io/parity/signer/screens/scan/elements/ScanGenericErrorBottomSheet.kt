@@ -24,7 +24,7 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 fun ScanErrorBottomSheet(
-	errorMessage: String,
+	error: PresentableErrorModel,
 	onOK: Callback,
 ) {
 	Column(
@@ -33,7 +33,7 @@ fun ScanErrorBottomSheet(
 			.verticalScroll(rememberScrollState())
 	) {
 		Text(
-			text = stringResource(R.string.transaction_generic_error_title),
+			text = error.title ?: stringResource(R.string.transaction_generic_error_title),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleM,
 			modifier = Modifier.padding(
@@ -44,27 +44,29 @@ fun ScanErrorBottomSheet(
 			),
 		)
 		Text(
-			text = stringResource(R.string.transaction_generic_error_description),
+			text = error.message ?: stringResource(R.string.transaction_generic_error_description),
 			color = MaterialTheme.colors.textSecondary,
 			style = SignerTypeface.BodyM,
 			modifier = Modifier.padding(horizontal = 32.dp),
 		)
 
-		Surface(
-			shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
-			color = MaterialTheme.colors.fill6,
-			border = BorderStroke(1.dp, color = MaterialTheme.colors.fill12),
-			modifier = Modifier
-				.fillMaxWidth(1f)
-				.padding(horizontal = 24.dp)
-				.padding(top = 24.dp)
-		) {
-			Text(
-				text = errorMessage,
-				color = MaterialTheme.colors.primary,
-				style = SignerTypeface.BodyL,
-				modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)
-			)
+		if (error.details != null) {
+			Surface(
+				shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
+				color = MaterialTheme.colors.fill6,
+				border = BorderStroke(1.dp, color = MaterialTheme.colors.fill12),
+				modifier = Modifier
+					.fillMaxWidth(1f)
+					.padding(horizontal = 24.dp)
+					.padding(top = 24.dp)
+			) {
+				Text(
+					text = error.details,
+					color = MaterialTheme.colors.primary,
+					style = SignerTypeface.BodyL,
+					modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)
+				)
+			}
 		}
 		SecondaryButtonWide(
 			label = stringResource(id = R.string.generic_ok),
@@ -74,6 +76,13 @@ fun ScanErrorBottomSheet(
 		)
 	}
 }
+
+
+data class PresentableErrorModel(
+	val title: String? = null,
+	val message: String? = null,
+	val details: String? = null,
+)
 
 
 @Preview(
@@ -87,10 +96,39 @@ fun ScanErrorBottomSheet(
 	backgroundColor = 0xFFFFFFFF
 )
 @Composable
-private fun PreviewScanErrorBottomSheet() {
+private fun PreviewScanErrorBottomSheetWithDetails() {
 	SignerNewTheme {
+		val model = PresentableErrorModel(
+			details = "Bad input data. Metadata for westend9330 is already in the database.",
+		)
 		ScanErrorBottomSheet(
-			"Bad input data. Metadata for westend9330 is already in the database.",
-			{})
+			error = model,
+			onOK = {},
+		)
 	}
 }
+
+@Preview(
+	name = "light theme",
+	uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true,
+)
+@Preview(
+	name = "dark theme",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	backgroundColor = 0xFFFFFFFF
+)
+@Composable
+private fun PreviewScanErrorBottomSheetWithCustomTitle() {
+	SignerNewTheme {
+		val model = PresentableErrorModel(
+			title = "Please recover the missing Key Sets.",
+			message = "Some keys can not be imported until their key sets are recovered.",
+		)
+		ScanErrorBottomSheet(
+			error = model,
+			onOK = {},
+		)
+	}
+}
+

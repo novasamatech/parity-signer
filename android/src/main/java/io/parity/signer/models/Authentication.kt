@@ -58,8 +58,7 @@ class Authentication {
 								context,
 								context.getString(R.string.auth_error_message, errString),
 								Toast.LENGTH_SHORT
-							)
-								.show()
+							).show()
 							_auth.value = false
 						}
 
