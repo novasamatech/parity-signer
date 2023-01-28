@@ -520,7 +520,7 @@ pub struct SetFlags {
 
 impl std::fmt::Display for Set {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 
@@ -643,7 +643,7 @@ impl std::fmt::Display for Goal {
             Goal::Text => "text",
             Goal::Both => "both",
         };
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }
 

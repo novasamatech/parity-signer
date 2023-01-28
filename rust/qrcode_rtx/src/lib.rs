@@ -128,7 +128,7 @@ where
         let qr = png_qr(input, DataType::Regular)?;
         match std::fs::write(output_name, qr) {
             Ok(_) => Ok(()),
-            Err(e) => Err(Box::from(format!("Output error {}", e))),
+            Err(e) => Err(Box::from(format!("Output error {e}"))),
         }
     } else {
         transform_into_qr_apng(input, CHUNK_SIZE, FPS_DEN, output_name)

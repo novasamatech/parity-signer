@@ -521,8 +521,7 @@ impl std::fmt::Display for Changed {
 
         write!(
             f,
-            "Network {} differs from the one in the hot database. Old: {}. New: {}.",
-            insert, old, new
+            "Network {insert} differs from the one in the hot database. Old: {old}. New: {new}."
         )
     }
 }

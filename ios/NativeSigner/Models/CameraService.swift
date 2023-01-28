@@ -137,8 +137,8 @@ private extension CameraService {
 
     /// Collect frames and attempt to decode if it seems that enough are collected
     func appendToCurrentBucket(qrCodePayload: String) {
-        bucket.append(qrCodePayload)
         callbackQueue.async {
+            self.bucket.append(qrCodePayload)
             self.captured = self.bucket.count
         }
         guard total <= bucket.count else { return }

@@ -153,7 +153,7 @@ fn take_until_suffix(i: &str) -> IResult<&str, &str> {
 
 fn strip_bytes_tag(message: &str) -> Result<String> {
     let mut parser = preceded(bytes_prefix, take_until_suffix);
-    let (_, payload) = parser(message).map_err(|e| Error::ParserError(format!("{:?}", e)))?;
+    let (_, payload) = parser(message).map_err(|e| Error::ParserError(format!("{e:?}")))?;
     Ok(payload.to_owned())
 }
 

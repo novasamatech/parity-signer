@@ -144,7 +144,7 @@ pub fn db_upd_network(
 /// Process error depending on pass errors flag `-s`.
 pub fn error_occured(e: Error, pass_errors: bool) -> Result<()> {
     if pass_errors {
-        println!("Error encountered. {} Skipping it.", e);
+        println!("Error encountered. {e} Skipping it.");
         Ok(())
     } else {
         Err(e)
@@ -425,12 +425,12 @@ pub fn add_new_metadata(new: &MetaValuesStamped, sorted: &mut SortedMetaValues) 
                         let mut sus2: Vec<u8> = Vec::new();
                         for a in 0..x.meta_values.meta.len() {
                             if new.meta_values.meta[a] != x.meta_values.meta[a] {
-                                println!("Suspicious number {}", a);
+                                println!("Suspicious number {a}");
                                 sus1.push(new.meta_values.meta[a]);
                                 sus2.push(x.meta_values.meta[a]);
                             }
                         }
-                        println!("new: {:?}, in db: {:?}", sus1, sus2);
+                        println!("new: {sus1:?}, in db: {sus2:?}");
 
                         return Err(Error::SameVersionDifferentMetadata {
                             name: new.meta_values.name.to_string(),
@@ -626,7 +626,7 @@ pub fn generate_key_info_export_to_qr<P: AsRef<Path>>(
         .into_iter()
         .map(|num| AddrInfo {
             address: "0xdeadbeefdeadbeefdeadbeef".to_string(),
-            derivation_path: Some(format!("//this//is//a//path//{}", num)),
+            derivation_path: Some(format!("//this//is//a//path//{num}")),
             encryption: Encryption::Sr25519,
             genesis_hash: H256::default(),
         })

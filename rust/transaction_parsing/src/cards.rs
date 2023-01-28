@@ -83,7 +83,7 @@ impl<'a> Warning<'a> {
     pub(crate) fn show(&self) -> String {
         match &self {
             Warning::AuthorNotFound => String::from("Transaction author public key not found."),
-            Warning::NewerVersion {used_version, latest_version} => format!("Transaction uses outdated runtime version {}. Latest known available version is {}.", used_version, latest_version),
+            Warning::NewerVersion {used_version, latest_version} => format!("Transaction uses outdated runtime version {used_version}. Latest known available version is {latest_version}."),
             Warning::NoNetworkID => String::from("Public key is on record, but not associated with the network used."),
             Warning::NotVerified => String::from("Received network information is not verified."),
             Warning::UpdatingTypes => String::from("Updating types (really rare operation)."),
@@ -93,7 +93,7 @@ impl<'a> Warning<'a> {
             Warning::VerifierChangingToCustom{verifier_key, hold} => format!("Received message is verified. Currently no verifier is set for network with genesis hash {}. Proceeding will update the network verifier to custom verifier. All previously acquired network information that was received unverified will be purged. {}", hex::encode(verifier_key.genesis_hash()), hold.show()),
             Warning::VerifierGeneralSuper{verifier_key, hold} => format!("Received message is verified. Currently no verifier is set for network with genesis hash {} and no general verifier is set. Proceeding will update the network verifier to general. All previously acquired network information that was received unverified will be purged. {}", hex::encode(verifier_key.genesis_hash()), hold.show()),
             Warning::TypesAlreadyThere => String::from("Received types information is identical to the one that was in the database."),
-            Warning::NetworkSpecsAlreadyThere (x) => format!("Received network specs information for {} is same as the one already in the database.", x),
+            Warning::NetworkSpecsAlreadyThere (x) => format!("Received network specs information for {x} is same as the one already in the database."),
             Warning::MetadataExtensionsIncomplete => String::from("Received metadata has incomplete set of signed extensions. As a result, Signer may be unable to parse signable transactions using this metadata."),
         }
     }
@@ -292,7 +292,7 @@ impl<'a> Card<'a> {
             Card::Derivations(x) => NavCard::DerivationsCard { f: x.to_vec() },
             Card::Warning(warn) => NavCard::WarningCard { f: warn.show() },
             Card::Error(err) => NavCard::ErrorCard {
-                f: format!("Bad input data. {}", err),
+                f: format!("Bad input data. {err}"),
             },
         };
 

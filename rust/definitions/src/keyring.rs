@@ -450,7 +450,7 @@ mod tests {
         let error = network_specs_key.genesis_hash_encryption().unwrap_err();
         if let Error::CodecError(_) = error {
         } else {
-            panic!("Expected codec error, received {:?}", error);
+            panic!("Expected codec error, received {error:?}");
         }
     }
 
@@ -463,7 +463,7 @@ mod tests {
         let error = network_specs_key.genesis_hash_encryption().unwrap_err();
         if let Error::CodecError(_) = error {
         } else {
-            panic!("Expected codec error, received {:?}", error);
+            panic!("Expected codec error, received {error:?}");
         }
     }
 }

@@ -64,8 +64,8 @@ pub fn convert_balance_pretty(balance: &str, decimals: u8, units: &str) -> Prett
                     if decimals <= MINUS_MIN * 3 {
                         match decimals % 3 {
                             0 => (balance.to_string(), None, (decimals / 3) as i8),
-                            1 => (format!("{}00", balance), None, (decimals / 3) as i8 + 1),
-                            2 => (format!("{}0", balance), None, (decimals / 3) as i8 + 1),
+                            1 => (format!("{balance}00"), None, (decimals / 3) as i8 + 1),
+                            2 => (format!("{balance}0"), None, (decimals / 3) as i8 + 1),
                             _ => unreachable!(),
                         }
                     } else {
@@ -89,7 +89,7 @@ pub fn convert_balance_pretty(balance: &str, decimals: u8, units: &str) -> Prett
                                 Some(balance[1..].to_string()),
                                 (decimals / 3) as i8,
                             ),
-                            1 => (format!("{}0", balance), None, (decimals / 3) as i8 + 1),
+                            1 => (format!("{balance}0"), None, (decimals / 3) as i8 + 1),
                             2 => (balance.to_string(), None, (decimals / 3) as i8),
                             _ => unreachable!(),
                         }
@@ -217,7 +217,7 @@ pub fn convert_balance_pretty(balance: &str, decimals: u8, units: &str) -> Prett
 
     PrettyOutput {
         number,
-        units: format!("{}{}", unit_prefix, units),
+        units: format!("{unit_prefix}{units}"),
     }
 }
 

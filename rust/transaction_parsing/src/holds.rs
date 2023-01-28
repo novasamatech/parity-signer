@@ -42,8 +42,7 @@ fn print_affected(
         out_metadata = String::from("none");
     }
     format!(
-        "Affected network specs entries: {}; affected metadata entries: {}.",
-        out_network_specs, out_metadata
+        "Affected network specs entries: {out_network_specs}; affected metadata entries: {out_metadata}."
     )
 }
 
@@ -98,7 +97,7 @@ impl GeneralHold {
     pub(crate) fn show(&self) -> String {
         let part = print_affected(&self.metadata_set, &self.network_specs_set);
         if self.types {
-            format!("{} Types information is purged.", part)
+            format!("{part} Types information is purged.")
         } else {
             part
         }

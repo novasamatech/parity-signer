@@ -97,12 +97,12 @@ fn print_db_content(database: &sled::Db) -> String {
     for (meta_key_vec, _) in metadata.iter().flatten() {
         let meta_key = MetaKey::from_ivec(&meta_key_vec);
         let (name, version) = meta_key.name_version().unwrap();
-        metadata_set.push(format!("{}{}", name, version));
+        metadata_set.push(format!("{name}{version}"));
     }
     metadata_set.sort();
     let mut metadata_str = String::new();
     for x in metadata_set.iter() {
-        let _ = write!(&mut metadata_str, "\n    {}", x);
+        let _ = write!(&mut metadata_str, "\n    {x}");
     }
 
     let mut network_specs_set: Vec<(NetworkSpecsKey, OrderedNetworkSpecs)> = Vec::new();
@@ -185,7 +185,7 @@ fn print_db_content(database: &sled::Db) -> String {
     verifiers_set.sort();
     let mut verifiers_str = String::new();
     for x in verifiers_set.iter() {
-        let _ = write!(&mut verifiers_str, "\n    {}", x);
+        let _ = write!(&mut verifiers_str, "\n    {x}");
     }
 
     let mut identities_set: Vec<String> = Vec::new();
@@ -202,7 +202,7 @@ fn print_db_content(database: &sled::Db) -> String {
         networks_set.sort();
         let mut networks_str = String::new();
         for y in networks_set.iter() {
-            let _ = write!(&mut networks_str, "\n        {}", y);
+            let _ = write!(&mut networks_str, "\n        {y}");
         }
 
         identities_set.push(format!(
@@ -216,7 +216,7 @@ fn print_db_content(database: &sled::Db) -> String {
     identities_set.sort();
     let mut identities_str = String::new();
     for x in identities_set.iter() {
-        let _ = write!(&mut identities_str, "\n    {}", x);
+        let _ = write!(&mut identities_str, "\n    {x}");
     }
 
     format!("Database contents:\nMetadata:{}\nNetwork Specs:{}\nVerifiers:{}\nGeneral Verifier: {}\nIdentities:{}", metadata_str, network_specs_str, verifiers_str, general_verifier.show_error(), identities_str)
@@ -421,10 +421,9 @@ fn can_sign_transaction_1() {
         ) {
             Ok(signature) => assert!(
                 (signature.len() == 130) && (signature.starts_with("01")),
-                "Wrong signature format,\nReceived: \n{}",
-                signature
+                "Wrong signature format,\nReceived: \n{signature}"
             ),
-            Err(e) => panic!("Was unable to sign. {:?}", e),
+            Err(e) => panic!("Was unable to sign. {e:?}"),
         }
 
         let history_recorded: Vec<_> = get_history(&db).unwrap().into_iter().map(|e| e.1).collect();
@@ -463,7 +462,7 @@ fn can_sign_transaction_1() {
         if let Err(e) = result {
             if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
             } else {
-                panic!("Expected wrong checksum. Got error: {:?}.", e)
+                panic!("Expected wrong checksum. Got error: {e:?}.")
             }
         } else {
             panic!("Checksum should have changed.")
@@ -599,7 +598,7 @@ fn can_sign_transaction_1() {
             .iter()
             .any(|m| m.decoded.as_ref() == Some(&historic_reply_known)));
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -613,7 +612,7 @@ fn can_sign_message_1() {
 
     let card_text = String::from("uuid-abcd");
     let message = hex::encode(b"<Bytes>uuid-abcd</Bytes>");
-    let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", message);
+    let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{message}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
     let output = produce_output(&db, &line);
 
     let content_known = TransactionCardSet {
@@ -690,7 +689,7 @@ fn can_sign_message_1() {
                 "Wrong signature format,\nReceived: \n{}",
                 signature
             ),
-            Err(e) => panic!("Was unable to sign. {:?}", e),
+            Err(e) => panic!("Was unable to sign. {e:?}"),
         }
 
         let history_recorded: Vec<_> = get_history(&db)
@@ -723,8 +722,7 @@ fn can_sign_message_1() {
         // TODO: fails since .message has to be encoded (or decoded) everywhere.
         assert!(
             history_recorded.contains(&my_event),
-            "Recorded {:?}",
-            history_recorded
+            "Recorded {history_recorded:?}"
         );
 
         let result = sign_action_test(
@@ -738,13 +736,13 @@ fn can_sign_message_1() {
         if let Err(e) = result {
             if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
             } else {
-                panic!("Expected wrong checksum. Got error: {:?}.", e)
+                panic!("Expected wrong checksum. Got error: {e:?}.")
             }
         } else {
             panic!("Checksum should have changed.")
         }
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -810,8 +808,7 @@ fn add_specs_westend_no_network_info_not_signed() {
         let expected_print_before = "Database contents:\nMetadata:\nNetwork Specs:\nVerifiers:\nGeneral Verifier: none\nIdentities:";
         assert!(
             print_before == expected_print_before,
-            "Received: \n{}",
-            print_before
+            "Received: \n{print_before}"
         );
 
         handle_stub(&db, checksum).unwrap();
@@ -827,7 +824,7 @@ General Verifier: none
 Identities:"#;
         assert_eq!(print_after, expected_print_after);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     fs::remove_dir_all(dbname).unwrap();
@@ -1061,7 +1058,7 @@ Identities:
         01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"#;
         assert_eq!(print_after, expected_print_after);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -1175,7 +1172,7 @@ Identities:
         01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"#;
         assert_eq!(print_after, expected_print_after);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -1302,7 +1299,7 @@ Identities:
         01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"#;
         assert_eq!(print_after, expected_print_after);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -1427,7 +1424,7 @@ Identities:
         01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"#;
         assert_eq!(print_after, expected_print_after);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -1552,7 +1549,7 @@ Identities:
         01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"#;
         assert_eq!(print_after, expected_print_after);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let line =
@@ -1634,7 +1631,7 @@ Identities:
         01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"#;
         assert_eq!(print_after, expected_print_after);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let line =
@@ -1745,7 +1742,7 @@ Identities:
         01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"#;
         assert_eq!(print_after, expected_print_after);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     fs::remove_dir_all(dbname).unwrap();
@@ -1874,7 +1871,7 @@ Identities:
         01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"#;
         assert_eq!(print_after, expected_print_after);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let line =
@@ -1958,7 +1955,7 @@ Identities:
         01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"#;
         assert_eq!(print_after, expected_print_after);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let line =
@@ -2073,7 +2070,7 @@ Identities:
         01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"#;
         assert_eq!(print_after, expected_print_after);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let warning = "Received message is verified by the general verifier. Current verifier for network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is a custom one, and proceeding will update the network verifier to general. All previously acquired information associated with former custom verifier will be purged. Affected network specs entries: dock-pos-main-runtime-sr25519; affected metadata entries: none.".to_string();
@@ -2184,7 +2181,7 @@ Identities:
         01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"#;
         assert_eq!(print_after, expected_print_after);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     fs::remove_dir_all(dbname).unwrap();
@@ -2300,7 +2297,7 @@ Identities:
         01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"#;
         assert_eq!(print_after, expected_print_after);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let line = "530102d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d9c0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480284d717d5031504025a62029723000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
@@ -2480,7 +2477,7 @@ Identities:
         )
         .unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let line = "530102d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d4d0210020806000046ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a07001b2c3ef70006050c0008264834504a64ace1373f0c8ed5d57381ddf54a2f67a318fa42b1352681606d00aebb0211dbb07b4d335a657257b8ac5e53794c901e4f616d4a254f2490c43934009ae581fef1fc06828723715731adcf810e42ce4dadad629b1b7fa5c3c144a81d550008009723000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ffe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
@@ -2808,7 +2805,7 @@ Identities:
         )
         .unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let entry = get_history_entry_by_order(&db, 3).unwrap();
@@ -2891,7 +2888,7 @@ fn parse_transaction_alice_remarks_westend9122() {
         assert_eq!(stub_nav, stub_nav_known);
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let line = "530102d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d2509000115094c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20436f6e67756520657520636f6e7365717561742061632066656c697320646f6e65632e20547572706973206567657374617320696e7465676572206567657420616c6971756574206e696268207072616573656e742e204e6571756520636f6e76616c6c6973206120637261732073656d70657220617563746f72206e657175652e204e65747573206574206d616c6573756164612066616d6573206163207475727069732065676573746173207365642074656d7075732e2050656c6c656e746573717565206861626974616e74206d6f726269207472697374697175652073656e6563747573206574206e657475732065742e205072657469756d2076756c7075746174652073617069656e206e656320736167697474697320616c697175616d2e20436f6e76616c6c69732061656e65616e20657420746f72746f7220617420726973757320766976657272612e20566976616d757320617263752066656c697320626962656e64756d207574207472697374697175652065742065676573746173207175697320697073756d2e204d616c6573756164612070726f696e206c696265726f206e756e6320636f6e73657175617420696e74657264756d207661726975732e2045022c00a223000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e1b2b0a177ad4f3f93f9a56dae700e938a40201a5beabbda160a74c70e612c66ae143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
@@ -3023,7 +3020,7 @@ fn parse_transaction_alice_remarks_westend9122() {
         // TODO: assert_eq!(network_info == network_info_known);
         assert!(!has_pwd, "Expected no password");
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3046,7 +3043,7 @@ fn proper_hold_display() {
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
@@ -3112,7 +3109,7 @@ fn proper_hold_display() {
         assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3172,7 +3169,7 @@ Identities:
     if let TransactionAction::Read { r: reply } = output {
         assert_eq!(*reply, reply_known);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3198,7 +3195,7 @@ fn dock_adventures_3() {
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let line =
@@ -3214,7 +3211,7 @@ fn dock_adventures_3() {
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let print_before = print_db_content(&db)
@@ -3308,7 +3305,7 @@ Identities:
     if let TransactionAction::Read { r: reply } = output {
         assert_eq!(*reply, reply_known);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let line =
@@ -3329,7 +3326,7 @@ Identities:
     if let TransactionAction::Read { r: reply } = output {
         assert_eq!(*reply, reply_known);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3353,7 +3350,7 @@ fn acala_adventures() {
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let print_after = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
@@ -3367,8 +3364,7 @@ General Verifier: none
 Identities:"#;
     assert!(
         print_after == expected_print_after,
-        "Received: \n{}",
-        print_after
+        "Received: \n{print_after}"
     );
 
     let line = fs::read_to_string("for_tests/load_metadata_acalaV2012_unverified.txt").unwrap();
@@ -3382,7 +3378,7 @@ Identities:"#;
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let line = "530102dc621b10081b4b51335553ef8df227feb0327649d00beab6e09c10a1dce97359a80a0000dc621b10081b4b51335553ef8df227feb0327649d00beab6e09c10a1dce973590b00407a10f35a24010000dc07000001000000fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c";
@@ -3542,7 +3538,7 @@ Identities:"#;
     if let TransactionAction::Read { r: content } = output {
         assert_eq!(*content, content_known);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3565,7 +3561,7 @@ fn shell_no_token_warning_on_metadata() {
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let line = fs::read_to_string("for_tests/load_metadata_shellV200_unverified.txt").unwrap();
@@ -3622,7 +3618,7 @@ fn shell_no_token_warning_on_metadata() {
         assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3646,7 +3642,7 @@ fn rococo_and_verifiers_1() {
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     // added rococo specs with `sr25519`, custom verifier
@@ -3660,7 +3656,7 @@ fn rococo_and_verifiers_1() {
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let print = print_db_content(&db).replace(&hex::encode(ed()), r#"<ed>"#);
@@ -3717,7 +3713,7 @@ fn rococo_and_verifiers_2() {
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let print =
@@ -3775,7 +3771,7 @@ fn rococo_and_verifiers_3() {
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let print = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
@@ -3831,7 +3827,7 @@ fn rococo_and_verifiers_4() {
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let print = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
@@ -3856,7 +3852,7 @@ Identities:"#;
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let print =
@@ -3892,7 +3888,7 @@ fn rococo_and_verifiers_5() {
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let print = print_db_content(&db).replace(&hex::encode(ed()), r#"<ed>"#);
@@ -3917,7 +3913,7 @@ Identities:"#;
     {
         handle_stub(&db, checksum).unwrap();
     } else {
-        panic!("Wrong action: {:?}", output)
+        panic!("Wrong action: {output:?}")
     }
 
     let print =
