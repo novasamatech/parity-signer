@@ -625,8 +625,7 @@ mod tests {
         let memory_string = String::from_utf8_lossy(memory);
         assert!(
             !memory_string.contains("super secret seed element"),
-            "\n{:?}",
-            memory_string
+            "\n{memory_string:?}"
         );
     }
 }

@@ -128,7 +128,7 @@ impl State {
             }
             Err(e) => {
                 new_navstate.alert = Alert::Error;
-                let _ = write!(&mut errorline, "{}", e);
+                let _ = write!(&mut errorline, "{e}");
             }
         }
 
@@ -151,7 +151,7 @@ impl State {
                                 Ok(()) => new_navstate.screen = Screen::Scan,
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
-                                    let _ = write!(&mut errorline, "{}", e);
+                                    let _ = write!(&mut errorline, "{e}");
                                 }
                             }
                         }
@@ -221,7 +221,7 @@ impl State {
                                 Ok(()) => new_navstate = Navstate::clean_screen(Screen::Log),
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
-                                    let _ = write!(&mut errorline, "{}", e);
+                                    let _ = write!(&mut errorline, "{e}");
                                 }
                             }
                         }
@@ -260,7 +260,7 @@ impl State {
                             Ok(()) => new_navstate = Navstate::clean_screen(Screen::Log),
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
-                                let _ = write!(&mut errorline, "{}", e);
+                                let _ = write!(&mut errorline, "{e}");
                             }
                         }
                     }
@@ -285,18 +285,18 @@ impl State {
                                     Ok(a) => new_navstate = Navstate::clean_screen(Screen::Keys(a)),
                                     Err(e) => {
                                         new_navstate.alert = Alert::Error;
-                                        let _ = write!(&mut errorline, "{}", e);
+                                        let _ = write!(&mut errorline, "{e}");
                                     }
                                 },
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
-                                    let _ = write!(&mut errorline, "{}", e);
+                                    let _ = write!(&mut errorline, "{e}");
                                 }
                             }
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
+                            let _ = write!(&mut errorline, "{e}");
                         }
                     },
                     _ => println!("GoForward does nothing here"),
@@ -313,14 +313,13 @@ impl State {
                             new_navstate.alert = Alert::Error;
                             let _ = write!(
                                 &mut errorline,
-                                "Bad input data. Seed name {} already exists.",
-                                details_str
+                                "Bad input data. Seed name {details_str} already exists."
                             );
                         }
                     }
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        let _ = write!(&mut errorline, "{}", e);
+                        let _ = write!(&mut errorline, "{e}");
                     }
                 }
             }
@@ -337,17 +336,17 @@ impl State {
                             Ok(a) => new_navstate = Navstate::clean_screen(Screen::Keys(a)),
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
-                                let _ = write!(&mut errorline, "{}", e);
+                                let _ = write!(&mut errorline, "{e}");
                             }
                         },
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
+                            let _ = write!(&mut errorline, "{e}");
                         }
                     },
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        let _ = write!(&mut errorline, "{}", e);
+                        let _ = write!(&mut errorline, "{e}");
                     }
                 }
             }
@@ -380,7 +379,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
+                            let _ = write!(&mut errorline, "{e}");
                         }
                     }
                 }
@@ -410,7 +409,7 @@ impl State {
                     },
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        let _ = write!(&mut errorline, "{}", e);
+                        let _ = write!(&mut errorline, "{e}");
                     }
                 },
                 transaction_parsing::TransactionAction::Read { .. } => {
@@ -426,7 +425,7 @@ impl State {
                 }
                 Err(e) => {
                     new_navstate.alert = Alert::Error;
-                    let _ = write!(&mut errorline, "{}", e);
+                    let _ = write!(&mut errorline, "{e}");
                 }
             },
             Screen::SignSufficientCrypto(ref s) => {
@@ -459,7 +458,7 @@ impl State {
                                         }
                                     }
                                     new_navstate.alert = Alert::Error;
-                                    let _ = write!(&mut errorline, "{}", e);
+                                    let _ = write!(&mut errorline, "{e}");
                                 }
                             }
                         }
@@ -493,14 +492,14 @@ impl State {
                                         }
                                         Err(e) => {
                                             new_navstate.alert = Alert::Error;
-                                            let _ = write!(&mut errorline, "{}", e);
+                                            let _ = write!(&mut errorline, "{e}");
                                         }
                                     }
                                 }
                             }
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
-                                let _ = write!(&mut errorline, "{}", e);
+                                let _ = write!(&mut errorline, "{e}");
                             }
                         }
                     }
@@ -524,7 +523,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
+                            let _ = write!(&mut errorline, "{e}");
                         }
                     }
                 } else {
@@ -557,11 +556,11 @@ impl State {
                         }
                         Ok(None) => {
                             new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "key not found {}", details_str);
+                            let _ = write!(&mut errorline, "key not found {details_str}");
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
+                            let _ = write!(&mut errorline, "{e}");
                         }
                     }
                 } else {
@@ -572,7 +571,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
+                            let _ = write!(&mut errorline, "{e}");
                         }
                     }
                 }
@@ -674,7 +673,7 @@ impl State {
                     alert: Alert::Empty,
                 },
                 Err(e) => {
-                    let _ = write!(&mut errorline, "{}", e);
+                    let _ = write!(&mut errorline, "{e}");
                     Navstate {
                         screen: Screen::Log,
                         modal: Modal::Empty,
@@ -742,7 +741,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
+                            let _ = write!(&mut errorline, "{e}");
                         }
                     }
                 }
@@ -771,7 +770,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
+                            let _ = write!(&mut errorline, "{e}");
                         }
                     }
                 }
@@ -794,7 +793,7 @@ impl State {
                     }
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        let _ = write!(&mut errorline, "{}", e);
+                        let _ = write!(&mut errorline, "{e}");
                     }
                 },
                 _ => println!("RemoveTypes does nothing here"),
@@ -904,7 +903,7 @@ impl State {
                 }
                 Err(e) => {
                     new_navstate.alert = Alert::Error;
-                    let _ = write!(&mut errorline, "{}", e);
+                    let _ = write!(&mut errorline, "{e}");
                 }
             },
             _ => println!("ManageMetadata does nothing here"),
@@ -931,7 +930,7 @@ impl State {
                             }
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
-                                let _ = write!(&mut errorline, "{}", e);
+                                let _ = write!(&mut errorline, "{e}");
                             }
                         }
                     } else {
@@ -952,7 +951,7 @@ impl State {
                             }
                             Err(e) => {
                                 new_navstate.alert = Alert::Error;
-                                let _ = write!(&mut errorline, "{}", e);
+                                let _ = write!(&mut errorline, "{e}");
                             }
                         }
                     } else {
@@ -996,7 +995,7 @@ impl State {
                     }
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        let _ = write!(&mut errorline, "{}", e);
+                        let _ = write!(&mut errorline, "{e}");
                     }
                 }
             }
@@ -1018,7 +1017,7 @@ impl State {
                         }
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            let _ = write!(&mut errorline, "{}", e);
+                            let _ = write!(&mut errorline, "{e}");
                         }
                     }
                 } else {
@@ -1041,7 +1040,7 @@ impl State {
                     Ok(order) => new_navstate = Navstate::clean_screen(Screen::LogDetails(order)),
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
-                        let _ = write!(&mut errorline, "{}", e);
+                        let _ = write!(&mut errorline, "{e}");
                     }
                 }
             }
@@ -1197,7 +1196,7 @@ impl State {
                 f: keys_state.seed_name(),
             },
             Screen::KeyDetails(ref address_state) => {
-                println!("here {:?}", address_state);
+                println!("here {address_state:?}");
                 let f = if let Some(key) = address_state.network_specs_key().as_ref() {
                     Some(db_handling::interface_signer::export_key(
                         &self.db,
@@ -1287,7 +1286,7 @@ impl State {
                         public_key: None,
                         identicon: None,
                         encryption: None,
-                        error: Some(format!("{}", e)),
+                        error: Some(format!("{e}")),
                     },
                 };
                 ScreenData::Settings { f }
@@ -1510,7 +1509,7 @@ impl State {
         let screen_data = match self.get_screen_data(&new_navstate, details_str) {
             Ok(sd) => sd,
             Err(e) => {
-                let _ = write!(&mut errorline, "{}", e);
+                let _ = write!(&mut errorline, "{e}");
                 //This is special error used only
                 //here; please do not change it to
                 //`Alert::Error` or app may get stuck
@@ -1525,7 +1524,7 @@ impl State {
         let modal_data = match self.get_modal_details(&mut new_navstate) {
             Ok(md) => md,
             Err(e) => {
-                let _ = write!(&mut errorline, "{}", e);
+                let _ = write!(&mut errorline, "{e}");
                 new_navstate.alert = Alert::Error;
                 None
             }
@@ -1541,9 +1540,7 @@ impl State {
                     f: Some(ShieldAlert::Past),
                 }),
                 Ok(false) => Some(AlertData::Shield { f: None }),
-                Err(e) => Some(AlertData::ErrorData {
-                    f: format!("{}", e),
-                }),
+                Err(e) => Some(AlertData::ErrorData { f: format!("{e}") }),
             },
         };
 
@@ -1732,7 +1729,7 @@ fn process_hex_address_key_address_details(
 ) -> Result<(MultiSigner, AddressDetails)> {
     let address_key = AddressKey::from_hex(hex_address_key)?;
     let multisigner = get_multisigner_by_address(database, &address_key)?
-        .ok_or_else(|| Error::KeyNotFound(format!("0x{}", hex_address_key)))?;
+        .ok_or_else(|| Error::KeyNotFound(format!("0x{hex_address_key}")))?;
     let address_details = db_handling::helpers::get_address_details(database, &address_key)?;
     Ok((multisigner, address_details))
 }

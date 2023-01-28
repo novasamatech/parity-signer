@@ -403,7 +403,7 @@ pub fn get_all_addresses(database: &sled::Db) -> Result<Vec<(MultiSigner, Addres
     let mut out: Vec<(MultiSigner, AddressDetails)> = Vec::new();
     for (address_key_vec, address_entry) in identities.iter().flatten() {
         let address_key = AddressKey::from_ivec(&address_key_vec)?;
-        println!("address key {:?}", address_key);
+        println!("address key {address_key:?}");
         let (multisigner, address_details) =
             AddressDetails::process_entry_with_key_checked(&address_key, address_entry)?;
         out.push((multisigner, address_details));
@@ -494,7 +494,7 @@ pub(crate) fn is_potentially_exposed(
     exposed_path: &str,
     exposed_is_passworded: bool,
 ) -> bool {
-    if (path == exposed_path) || path.starts_with(&format!("{}/", exposed_path)) {
+    if (path == exposed_path) || path.starts_with(&format!("{exposed_path}/")) {
         path_is_passworded || !exposed_is_passworded
     } else {
         false

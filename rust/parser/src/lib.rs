@@ -303,7 +303,7 @@ pub fn parse_and_display_set(
                 method.push_str(&x.card.show_no_docs(x.indent));
             }
         }
-        Err(e) => method = format!("{}", e),
+        Err(e) => method = format!("{e}"),
     }
     for (i, x) in extensions_cards.iter().enumerate() {
         if i > 0 {
@@ -312,8 +312,7 @@ pub fn parse_and_display_set(
         extensions.push_str(&x.card.show_no_docs(x.indent));
     }
     Ok(format!(
-        "\nMethod:\n\n{}\n\n\nExtensions:\n\n{}",
-        method, extensions
+        "\nMethod:\n\n{method}\n\n\nExtensions:\n\n{extensions}"
     ))
 }
 
