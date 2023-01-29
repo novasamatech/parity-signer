@@ -403,7 +403,6 @@ pub fn get_all_addresses(database: &sled::Db) -> Result<Vec<(MultiSigner, Addres
     let mut out: Vec<(MultiSigner, AddressDetails)> = Vec::new();
     for (address_key_vec, address_entry) in identities.iter().flatten() {
         let address_key = AddressKey::from_ivec(&address_key_vec)?;
-        println!("address key {address_key:?}");
         let (multisigner, address_details) =
             AddressDetails::process_entry_with_key_checked(&address_key, address_entry)?;
         out.push((multisigner, address_details));
@@ -1378,6 +1377,9 @@ pub fn remove_seed(database: &sled::Db, seed_name: &str) -> Result<()> {
             );
             // separate `Event` for each `NetworkSpecsKey` from `network_id` set
             events.push(Event::IdentityRemoved { identity_history });
+        } else {
+            let address_key = AddressKey::new(multisigner.clone(), None);
+            identity_batch.remove(address_key.key());
         }
     }
     TrDbCold::new()
