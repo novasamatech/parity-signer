@@ -201,7 +201,7 @@
 	<string name="transaction_action_approve">Approve</string>
 	<string name="transaction_action_decline">Decline</string>
 	<string name="transaction_action_back">Back</string>
-	<string name="transaction_action_select_seed">Select seed</string>
+	<string name="transaction_action_import_keys">Import keys</string>
 	<string name="transaction_summary_field_transaction_details">Transaction Details</string>
 	<string name="transaction_summary_field_pallet">Pallet</string>
 	<string name="transaction_summary_field_method">Method</string>
@@ -256,6 +256,7 @@
 	<string name="derivation_path_screen_password_input_button">/// Password</string>
 	<string name="derivation_path_hint_create_password">Create a Password</string>
 	<string name="derivation_path_hint_enter_path_name">Enter Path Name</string>
+	<string name="derivation_path_hint_it_is_root">Empty path = creating root</string>
 	<string name="enter_password_input_label">Enter password</string>
 	<string name="network_selection_buttomsheet_title">Choose Network</string>
 	<string name="network_selection_selected_network_mark">Selected network</string>
@@ -266,6 +267,24 @@
 	<string name="derivation_path_screen_error_contain_spaces">The derivation path name can’t contain spaces</string>
 	<string name="derivation_path_screen_password_empty_hint">Confirm Password</string>
 	<string name="derivation_path_screen_password_error_not_match">Passwords don’t match</string>
+	<string name="scan_screen_error_bad_format_title">Import keys paths in bad format</string>
+	<string name="scan_screen_error_bad_format_message">Some keys paths are in bad format so they cannot be imported</string>
+	<string name="scan_screen_error_missing_key_set_title">Please recover the missing Key Sets.</string>
+	<string name="scan_screen_error_missing_key_set_message">Some keys can not be imported until their key sets are recovered.</string>
+	<string name="scan_screen_error_missing_network_title">Please add missing networks and their metadata.</string>
+	<string name="scan_screen_error_missing_network_message">Some keys can not be imported until their networks are added.</string>
+	<string name="scan_screen_error_key_already_exists_title">Derived keys already exist</string>
+	<string name="scan_screen_error_key_already_exists_message">All of the scanned derived keys are already imported</string>
+	<string name="import_derivations_error_key_missing">Some keys can not be imported until their key sets are recovered. Please recover the missing Key Sets.</string>
+	<string name="import_derivations_error_network_missing">Some keys can not be imported until their networks are added. Please add missing networks and their metadata. </string>
+	<string name="import_derivations_error_path_bad_format">Path bad format. Key already added or wrong data.</string>
+<!--	<string name="import_derivations_error_path_bad_format">Some are hidden from the list because they have already been imported.</string> -->
+	<string name="import_derivations_error_keys_already_exist">Some are hidden from the list because they have already been imported.</string>
+	<string name="import_derivations_failure_toast">Import Keys Has Failed</string>
+	<string name="import_derivations_failure_update_toast">Import Keys Has Failed. Update keys failed.</string>
+	<string name="create_derivations_success">Derived key successfully created.</string>
+	<string name="create_derivations_failure">Derivation key failure: %1$s</string>
+
 
 </resources>
 

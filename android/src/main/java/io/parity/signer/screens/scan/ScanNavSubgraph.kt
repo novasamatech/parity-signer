@@ -16,6 +16,7 @@ import io.parity.signer.components.panels.toAction
 import io.parity.signer.models.Navigator
 import io.parity.signer.screens.scan.bananasplit.BananaSplitPasswordScreen
 import io.parity.signer.screens.scan.camera.ScanScreen
+import io.parity.signer.screens.scan.elements.PresentableErrorModel
 import io.parity.signer.screens.scan.elements.ScanErrorBottomSheet
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
 import io.parity.signer.screens.scan.transaction.TransactionPreviewType
@@ -44,8 +45,8 @@ fun ScanNavSubgraph(
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
 
-	val showingModals =
-		presentableError.value != null || passwordModel.value != null || errorWrongPassword.value
+	val showingModals = presentableError.value != null ||
+		passwordModel.value != null || errorWrongPassword.value
 
 	val navigateToPrevious = {
 		rootNavigator.navigate(BottomBarSingleton.lastUsedTab.toAction())
@@ -73,7 +74,7 @@ fun ScanNavSubgraph(
 				rootNavigator.navigate(Action.SELECT_SEED, seedName)
 			},
 			onCustomError = { error ->
-				scanViewModel.presentableError.value = error
+				scanViewModel.presentableError.value = PresentableErrorModel(details = error)
 				scanViewModel.bananaSplitPassword.value = null
 			},
 			onErrorWrongPassword = {
@@ -87,7 +88,7 @@ fun ScanNavSubgraph(
 		ScanScreen(
 			onClose = { navigateToPrevious() },
 			performPayloads = { payloads ->
-				scanViewModel.performPayload(payloads)
+				scanViewModel.performPayload(payloads, context)
 			},
 			onBananaSplit = { payloads ->
 				scanViewModel.bananaSplitPassword.value = payloads
@@ -103,7 +104,7 @@ fun ScanNavSubgraph(
 				backendAction(Action.GO_BACK, "", "")
 				scanViewModel.clearState()
 			},
-			onFinish = {
+			onApprove = {
 				when (val previewType =
 					transactions.value?.transactions?.previewType) {
 					is TransactionPreviewType.AddNetwork -> {
@@ -134,13 +135,16 @@ fun ScanNavSubgraph(
 				scanViewModel.clearState()
 				rootNavigator.navigate(Action.GO_FORWARD)
 			},
+			onImportKeys = {
+				scanViewModel.onImportKeysTap(transactionsValue, context)
+			}
 		)
 	}
 	//Bottom sheets
 	presentableError.value?.let { presentableErrorValue ->
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearState) {
 			ScanErrorBottomSheet(
-				errorMessage = presentableErrorValue,
+				error = presentableErrorValue,
 				onOK = scanViewModel::clearState,
 			)
 		}
@@ -172,3 +176,5 @@ fun ScanNavSubgraph(
 		//no bottom sheet
 	}
 }
+
+

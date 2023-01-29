@@ -24,23 +24,27 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.models.conditional
 import io.parity.signer.ui.theme.*
 
 
 @Composable
 fun NotificationFrameText(
-	@StringRes messageRes: Int
+	@StringRes messageRes: Int,
+	withBorder: Boolean = true,
 ) {
 	val innerShape =
 		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 	Row(
 		modifier = Modifier
-            .padding(8.dp)
-            .border(
-                BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-                innerShape
-            )
-            .background(MaterialTheme.colors.fill6, innerShape)
+			.padding(8.dp)
+			.conditional(withBorder) {
+				border(
+					BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+					innerShape
+				)
+			}
+			.background(MaterialTheme.colors.fill6, innerShape)
 
 	) {
 		Text(
@@ -48,16 +52,16 @@ fun NotificationFrameText(
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.CaptionM,
 			modifier = Modifier
-                .weight(1f)
-                .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+				.weight(1f)
+				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
 		)
 		Icon(
 			imageVector = Icons.Outlined.Info,
 			contentDescription = null,
 			tint = MaterialTheme.colors.pink300,
 			modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .padding(start = 18.dp, end = 18.dp)
+				.align(Alignment.CenterVertically)
+				.padding(start = 18.dp, end = 18.dp)
 		)
 	}
 }
@@ -65,6 +69,7 @@ fun NotificationFrameText(
 @Composable
 fun NotificationFrameTextImportant(
 	message: String,
+	withBorder: Boolean = true,
 	modifier: Modifier = Modifier,
 ) {
 	val BACKGROUND = Color(0x14F272B6)
@@ -72,11 +77,13 @@ fun NotificationFrameTextImportant(
 		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 	Row(
 		modifier = modifier
-            .border(
-                BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-                innerShape
-            )
-            .background(BACKGROUND, innerShape)
+			.conditional(withBorder) {
+				border(
+					BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+					innerShape
+				)
+			}
+			.background(BACKGROUND, innerShape)
 
 	) {
 		Text(
@@ -84,16 +91,16 @@ fun NotificationFrameTextImportant(
 			color = MaterialTheme.colors.pink300,
 			style = SignerTypeface.CaptionM,
 			modifier = Modifier
-                .weight(1f)
-                .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+				.weight(1f)
+				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
 		)
 		Icon(
 			imageVector = Icons.Outlined.Info,
 			contentDescription = null,
 			tint = MaterialTheme.colors.pink300,
 			modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .padding(start = 18.dp, end = 18.dp)
+				.align(Alignment.CenterVertically)
+				.padding(start = 18.dp, end = 18.dp)
 		)
 	}
 }
@@ -118,6 +125,12 @@ private fun PreviewFrameContainers() {
 			NotificationFrameTextImportant(
 				message = stringResource(id = R.string.key_set_export_description_content),
 				modifier = Modifier.padding(horizontal = 8.dp),
+			)
+			SignerDivider()
+			NotificationFrameTextImportant(
+				message = stringResource(id = R.string.key_set_export_description_content),
+				modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp),
+				withBorder = false
 			)
 		}
 	}

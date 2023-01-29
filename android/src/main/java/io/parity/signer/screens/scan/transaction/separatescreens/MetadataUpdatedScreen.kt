@@ -1,4 +1,4 @@
-package io.parity.signer.screens.scan.transaction.designbutnodatamodel
+package io.parity.signer.screens.scan.transaction.separatescreens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background

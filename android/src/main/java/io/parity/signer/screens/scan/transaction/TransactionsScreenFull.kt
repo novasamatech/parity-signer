@@ -45,7 +45,8 @@ fun TransactionsScreenFull(
 	signature: MSignatureReady?,
 	modifier: Modifier = Modifier,
 	onBack: Callback,
-	onFinish: Callback,
+	onApprove: Callback,
+	onImportKeys: Callback,
 ) {
 	val detailedTransaction = remember {
 		mutableStateOf<MTransaction?>(null)
@@ -65,7 +66,8 @@ fun TransactionsScreenFull(
 			transactions,
 			detailedTransaction,
 			signature,
-			onFinish
+			onApprove,
+			onImportKeys,
 		)
 	}
 }
@@ -77,7 +79,8 @@ internal fun TransactionsScreenFull(
 	transactions: List<MTransaction>,
 	detailedTransaction: MutableState<MTransaction?>,
 	signature: MSignatureReady?,
-	onFinish: Callback,
+	onApprove: Callback,
+	onImportKeys: Callback,
 ) {
 	// otherwise rust state machine will stuck in transaction state and won't allow navigation to default NAVBAR action when user leaves camera.
 	BackHandler(onBack = onBack)
@@ -109,7 +112,8 @@ internal fun TransactionsScreenFull(
 			ActionButtons(
 				transactions,
 				onBack,
-				onFinish
+				onApprove,
+				onImportKeys,
 			)
 		}
 	}
@@ -185,7 +189,8 @@ private fun QrSignatureData(signature: MSignatureReady) {
 private fun ActionButtons(
 	transactions: List<MTransaction>,
 	onBack: Callback,
-	onFinish: Callback,
+	onApprove: Callback,
+	onImportKeys: Callback,
 ) {
 	when (transactions.first().ttype) {
 		TransactionType.SIGN -> {
@@ -212,7 +217,7 @@ private fun ActionButtons(
 				modifier = Modifier
                     .padding(horizontal = 24.dp)
                     .padding(top = 32.dp, bottom = 8.dp),
-				onClicked = { onFinish() },
+				onClicked = { onApprove() },
 			)
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_decline),
@@ -230,13 +235,14 @@ private fun ActionButtons(
 				onClicked = onBack,
 			)
 		}
+
 		TransactionType.IMPORT_DERIVATIONS -> {
 			PrimaryButtonWide(
-				label = stringResource(R.string.transaction_action_select_seed),
+				label = stringResource(R.string.transaction_action_import_keys),
 				modifier = Modifier
                     .padding(horizontal = 24.dp)
                     .padding(top = 32.dp, bottom = 8.dp),
-				onClicked = onFinish,
+				onClicked = onImportKeys,
 			)
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_decline),

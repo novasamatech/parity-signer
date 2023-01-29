@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keyderivation.help
+package io.parity.signer.screens.createderivation.help
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
