@@ -115,21 +115,17 @@ fun KeyCard(model: KeyCardModel) {
 
 @Composable
 private fun NetworkLabel(networkName: String) {
-	Box(
+	Text(
+		networkName,
+		color = MaterialTheme.colors.textTertiary,
+		style = SignerTypeface.CaptionM,
 		modifier = Modifier
 			.background(
 				MaterialTheme.colors.fill12,
 				RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 			)
-			.padding(horizontal = 8.dp, vertical = 2.dp),
-		contentAlignment = Alignment.Center,
-	) {
-		Text(
-			networkName,
-			color = MaterialTheme.colors.textTertiary,
-			style = SignerTypeface.CaptionM,
-		)
-	}
+			.padding(horizontal = 8.dp, vertical = 2.dp)
+	)
 }
 
 @Composable

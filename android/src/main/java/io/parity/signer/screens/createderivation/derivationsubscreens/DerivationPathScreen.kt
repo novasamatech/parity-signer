@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keyderivation.derivationsubscreens
+package io.parity.signer.screens.createderivation.derivationsubscreens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
@@ -35,9 +35,9 @@ import io.parity.signer.R
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.components.base.PrimaryButtonGreyDisabled
 import io.parity.signer.models.Callback
-import io.parity.signer.screens.keyderivation.DerivationCreateViewModel
-import io.parity.signer.screens.keyderivation.DerivationPathAnalyzer
-import io.parity.signer.screens.keyderivation.DerivationPathVisualTransformation
+import io.parity.signer.screens.createderivation.DerivationCreateViewModel
+import io.parity.signer.screens.createderivation.DerivationPathAnalyzer
+import io.parity.signer.screens.createderivation.DerivationPathVisualTransformation
 import io.parity.signer.ui.theme.*
 
 

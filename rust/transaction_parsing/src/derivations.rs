@@ -42,6 +42,7 @@ fn prepare_derivations_v1(
     export_info: ExportAddrsV1,
 ) -> Result<Vec<SeedKeysPreview>> {
     let mut result = Vec::new();
+    let all_addrs = get_all_addresses(database)?;
     for seed_info in export_info.addrs {
         let mut derived_keys = vec![];
         for addr_info in seed_info.derived_keys {
@@ -75,11 +76,21 @@ fn prepare_derivations_v1(
                 status,
             })
         }
-        result.push(SeedKeysPreview {
-            name: seed_info.name,
-            multisigner: seed_info.multisigner,
-            derived_keys,
-        })
+        let looking_for_ms = seed_info.multisigner.clone();
+        let name = all_addrs
+            .iter()
+            .find(|(m, a)| m == &looking_for_ms && a.network_id.is_none())
+            .map(|(_, a)| a.seed_name.clone());
+
+        if let Some(name) = name {
+            result.push(SeedKeysPreview {
+                name,
+                multisigner: seed_info.multisigner,
+                derived_keys,
+            })
+        } else {
+            log::error!("seed not found for {:?}", seed_info.multisigner);
+        }
     }
     Ok(result)
 }

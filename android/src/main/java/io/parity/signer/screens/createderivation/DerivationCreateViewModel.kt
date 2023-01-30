@@ -1,15 +1,18 @@
-package io.parity.signer.screens.keyderivation
+package io.parity.signer.screens.createderivation
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import io.parity.signer.R
 import io.parity.signer.backend.mapError
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.Navigator
 import io.parity.signer.models.NetworkModel
 import io.parity.signer.models.storage.SeedRepository
 import io.parity.signer.models.storage.mapError
-import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.DerivationCheck
+import io.parity.signer.uniffi.tryCreateAddress
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -80,13 +83,24 @@ class DerivationCreateViewModel : ViewModel() {
 	}
 
 
-	suspend fun proceedCreateKey() {
+	suspend fun proceedCreateKey(context: Context) {
 		try {
 			val phrase =
 				seedRepository.getSeedPhraseForceAuth(seedName).mapError() ?: return
 			if (phrase.isNotBlank()) {
-				//todo derivation extra step for password?
-				rootNavigator.navigate(Action.GO_FORWARD, path.value, phrase)
+				try {
+					tryCreateAddress(seedName, phrase, path.value, selectedNetwork.value.key)
+					Toast.makeText(
+						context,
+						context.getString(R.string.create_derivations_success),
+						Toast.LENGTH_SHORT
+					).show()
+				} catch (e: Exception) {
+					Toast.makeText(
+						context, context.getString(R.string.create_derivations_failure, e.localizedMessage),
+						Toast.LENGTH_SHORT
+					).show()
+				}
 			} else {
 				Log.e(TAG, "Seed phrase received but it's empty")
 			}
