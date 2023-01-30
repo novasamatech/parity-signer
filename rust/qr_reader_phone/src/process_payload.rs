@@ -188,7 +188,7 @@ fn try_fountain(packet: EncodingPacket, decoder: &mut raptorq::Decoder) -> Optio
 }
 
 fn try_legacy(collected: &mut LegacyMulti) -> Option<Vec<u8>> {
-    if collected.length < collected.elements.len() as u16 {
+    if collected.length > collected.elements.len() as u16 {
         None
     } else {
         collected.elements.sort_by_key(|element| element.number);
