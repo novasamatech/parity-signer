@@ -16,7 +16,7 @@ import io.parity.signer.models.SignerDataModel
 
 const val unlockAppScreenRoute = "navigation_point_unlock_app"//
 
-fun NavGraphBuilder.unlockAppScreenRoute() {
+fun NavGraphBuilder.unlockAppScreenFlow() {
 	composable(route = unlockAppScreenRoute) {
 		UnlockAppAuthScreen()
 	}

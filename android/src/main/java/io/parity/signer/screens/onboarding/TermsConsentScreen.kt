@@ -1,19 +1,18 @@
-package io.parity.signer.screens
+package io.parity.signer.screens.onboarding
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.Checkbox
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.Documents
@@ -21,11 +20,31 @@ import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.SignerOldTheme
 
+
+
+const val termsConsentRoute = "navigation_point_terms_consent" //todo onboarding remove this part
+
+fun NavGraphBuilder.termsConsentAppFlow() {
+	composable(route = termsConsentRoute) {
+		Scaffold(
+			modifier = Modifier
+				.navigationBarsPadding()
+				.captionBarPadding()
+				.statusBarsPadding(),
+		) { padding ->
+			TermsConsentScreen(
+				signerDataModel::onBoard,
+				modifier = Modifier.padding(padding)
+			)
+		}
+	}
+}
+
 /**
  * First screen with legal consent request
  */
 @Composable
-fun TermsConsentScreen(onBoard: () -> Unit, modifier: Modifier) {
+private fun TermsConsentScreen(onBoard: () -> Unit, modifier: Modifier) {
 	var confirm by remember { mutableStateOf(false) }
 	var tacAccept by remember { mutableStateOf(false) }
 	var ppAccept by remember { mutableStateOf(false) }

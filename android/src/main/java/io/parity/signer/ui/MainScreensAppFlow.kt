@@ -1,4 +1,4 @@
-package io.parity.signer
+package io.parity.signer.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
@@ -7,25 +7,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import io.parity.signer.components.BigButton
 import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.TopBar
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.NavigationMigrations
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.screens.onboarding.unlockAppScreenRoute
-import io.parity.signer.ui.navigationselectors.*
-import kotlinx.coroutines.flow.collect
+import io.parity.signer.ui.rustnavigationselectors.*
 
 
 const val mainScreenRoute = "navigation_main_screen"
 
-fun NavGraphBuilder.mainSignerSubgraph(globalNavController: NavHostController) {
+fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 	composable(route = mainScreenRoute) {
 		SignerMainSubgraph()
 		LaunchedEffect(Unit) {
@@ -37,6 +34,7 @@ fun NavGraphBuilder.mainSignerSubgraph(globalNavController: NavHostController) {
 		}
 	}
 }
+
 
 @Composable
 fun SignerMainSubgraph() {

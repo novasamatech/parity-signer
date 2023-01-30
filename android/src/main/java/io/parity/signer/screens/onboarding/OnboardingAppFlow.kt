@@ -11,69 +11,66 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import io.parity.signer.components.BigButton
 import io.parity.signer.models.AlertState
-import io.parity.signer.screens.TermsConsentScreen
 import io.parity.signer.screens.WaitingScreen
 import io.parity.signer.ui.theme.Text600
 
 
-@Composable
-internal fun OnboardingAppFlow() {
-	//todo onboarding this is old reference implementation, break it in a few screens and remove this file
-	val onboardingModel: OnboardingViewModel = viewModel()
 
-	val onBoardingDone = onboardingModel.onBoardingDone.collectAsState()
+const val onboardingRoute = "navigation_point_onboarding" //todo onboarding remove this part
 
-	when (onBoardingDone.value) {
-		OnboardingWasShown.No -> {
-			if (shieldAlert.value == AlertState.None) {
-				Scaffold(
-					modifier = Modifier
-						.navigationBarsPadding()
-						.captionBarPadding()
-						.statusBarsPadding(),
-				) { padding ->
-					TermsConsentScreen(
-						signerDataModel::onBoard,
-						modifier = Modifier.padding(padding)
-					)
-				}
-			} else {
-				EnableAirgapScreen()
-			}
-		}
-		OnboardingWasShown.Unknown -> {
-			if (authenticated.value) {
-				WaitingScreen()
-			} else {
-				Column(verticalArrangement = Arrangement.Center) {
-					Spacer(Modifier.weight(0.5f))
-					BigButton(
-						text = stringResource(R.string.unlock_app_button),
-						action = {
-							signerDataModel.lateInit()
-						}
-					)
-					Spacer(Modifier.weight(0.5f))
-				}
-			}
-		}
-		OnboardingWasShown.Yes -> TODO()
+fun NavGraphBuilder.onboardingAppFlow() {
+	composable(route = onboardingRoute) {
+//		OnboardingAppFlow()
 	}
 }
 
-@Composable
-fun EnableAirgapScreen() {
-	Box(
-		contentAlignment = Alignment.Center,
-		modifier = Modifier
-			.padding(12.dp)
-			.fillMaxSize(1f),
-	) {
-		Text(
-			text = stringResource(R.string.enable_airplane_mode_error),
-			color = MaterialTheme.colors.Text600
-		)
-	}
-}
+//@Composable
+//private fun OnboardingAppFlow() {
+//	//todo onboarding this is old reference implementation, break it in a few screens and remove this file
+//	val onboardingModel: OnboardingViewModel = viewModel()
+//
+//	val onBoardingDone = onboardingModel.onBoardingDone.collectAsState()
+//
+//	when (onBoardingDone.value) {
+//		OnboardingWasShown.No -> {
+//			if (shieldAlert.value == AlertState.None) {
+//				Scaffold(
+//					modifier = Modifier
+//						.navigationBarsPadding()
+//						.captionBarPadding()
+//						.statusBarsPadding(),
+//				) { padding ->
+//					TermsConsentScreen(
+//						signerDataModel::onBoard,
+//						modifier = Modifier.padding(padding)
+//					)
+//				}
+//			} else {
+//				EnableAirgapScreen()
+//			}
+//		}
+//		OnboardingWasShown.Unknown -> {
+//			if (authenticated.value) {
+//				WaitingScreen()
+//			} else {
+//				Column(verticalArrangement = Arrangement.Center) {
+//					Spacer(Modifier.weight(0.5f))
+//					BigButton(
+//						text = stringResource(R.string.unlock_app_button),
+//						action = {
+//							signerDataModel.lateInit()
+//						}
+//					)
+//					Spacer(Modifier.weight(0.5f))
+//				}
+//			}
+//		}
+//		OnboardingWasShown.Yes -> TODO()
+//	}
+//}
+
+

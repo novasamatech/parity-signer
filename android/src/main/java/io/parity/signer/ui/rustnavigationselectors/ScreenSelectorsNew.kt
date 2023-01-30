@@ -1,4 +1,4 @@
-package io.parity.signer.ui.navigationselectors
+package io.parity.signer.ui.rustnavigationselectors
 
 import android.util.Log
 import androidx.compose.foundation.background

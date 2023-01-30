@@ -7,15 +7,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.runtime.Composable
 import androidx.core.view.WindowCompat
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.screens.onboarding.unlockAppScreenRoute
-import io.parity.signer.screens.onboarding.onboardingAppFlow
+import io.parity.signer.ui.SignerNavHost
 import io.parity.signer.ui.theme.SignerNewTheme
 
 @ExperimentalMaterialApi
@@ -51,16 +47,4 @@ class MainActivity : AppCompatActivity() {
 }
 
 
-@ExperimentalMaterialApi
-@ExperimentalAnimationApi
-@Composable
-fun SignerNavHost(
-	navController: NavHostController,
-	startDestination: String = unlockAppScreenRoute,
-) {
-	NavHost(navController = navController, startDestination = startDestination) {
-		onboardingAppFlow()
-		unlockAppScreenRoute()
-		mainSignerSubgraph(navController)
-	}
-}
+

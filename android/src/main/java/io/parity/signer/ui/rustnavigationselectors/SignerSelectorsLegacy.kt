@@ -1,4 +1,4 @@
-package io.parity.signer.ui.navigationselectors
+package io.parity.signer.ui.rustnavigationselectors
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
