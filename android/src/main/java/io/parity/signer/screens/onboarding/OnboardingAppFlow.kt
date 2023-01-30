@@ -19,8 +19,8 @@ import io.parity.signer.ui.theme.Text600
 
 
 @Composable
-internal fun OnboardingFlowSubgraph() {
-	//todo onboarding this is old reference implementation, break it in a few
+internal fun OnboardingAppFlow() {
+	//todo onboarding this is old reference implementation, break it in a few screens and remove this file
 	val onboardingModel: OnboardingViewModel = viewModel()
 
 	val onBoardingDone = onboardingModel.onBoardingDone.collectAsState()

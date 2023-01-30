@@ -15,7 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.screens.onboarding.unlockAppScreenRoute
-import io.parity.signer.screens.onboarding.onboardingSubgraph
+import io.parity.signer.screens.onboarding.onboardingAppFlow
 import io.parity.signer.ui.theme.SignerNewTheme
 
 @ExperimentalMaterialApi
@@ -59,7 +59,7 @@ fun SignerNavHost(
 	startDestination: String = unlockAppScreenRoute,
 ) {
 	NavHost(navController = navController, startDestination = startDestination) {
-		onboardingSubgraph()
+		onboardingAppFlow()
 		unlockAppScreenRoute()
 		mainSignerSubgraph(navController)
 	}

@@ -6,9 +6,9 @@ import androidx.navigation.compose.composable
 
 const val onboardingRoute = "navigation_point_onboarding" //todo onboarding remove this part
 
-fun NavGraphBuilder.onboardingSubgraph() {
+fun NavGraphBuilder.onboardingAppFlow() {
 	composable(route = unlockAppScreenRoute) {
-		OnboardingFlowSubgraph()
+		OnboardingAppFlow()
 	}
 }
 
