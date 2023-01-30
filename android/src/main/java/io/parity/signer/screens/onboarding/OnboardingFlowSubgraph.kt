@@ -13,16 +13,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.components.BigButton
 import io.parity.signer.models.AlertState
-import io.parity.signer.screens.LandingView
+import io.parity.signer.screens.TermsConsentScreen
 import io.parity.signer.screens.WaitingScreen
-import io.parity.signer.ui.navigationselectors.OnboardingWasShown
 import io.parity.signer.ui.theme.Text600
 
 
 @Composable
 internal fun OnboardingFlowSubgraph() {
 	val onboardingModel: OnboardingViewModel = viewModel()
+
 	val onBoardingDone = onboardingModel.onBoardingDone.collectAsState()
+
+
 	when (onBoardingDone.value) {
 		OnboardingWasShown.No -> {
 			if (shieldAlert.value == AlertState.None) {
@@ -32,24 +34,16 @@ internal fun OnboardingFlowSubgraph() {
 						.captionBarPadding()
 						.statusBarsPadding(),
 				) { padding ->
-					LandingView(
+					TermsConsentScreen(
 						signerDataModel::onBoard,
 						modifier = Modifier.padding(padding)
 					)
 				}
 			} else {
-				Box(
-					contentAlignment = Alignment.Center,
-					modifier = Modifier.padding(12.dp).fillMaxSize(1f),
-				) {
-					Text(
-						text = stringResource(R.string.enable_airplane_mode_error),
-						color = MaterialTheme.colors.Text600
-					)
-				}
+				EnableAirgapScreen()
 			}
 		}
-		OnboardingWasShown.InProgress -> {
+		OnboardingWasShown.Unknown -> {
 			if (authenticated.value) {
 				WaitingScreen()
 			} else {
@@ -66,5 +60,20 @@ internal fun OnboardingFlowSubgraph() {
 			}
 		}
 		OnboardingWasShown.Yes -> TODO()
+	}
+}
+
+@Composable
+fun EnableAirgapScreen() {
+	Box(
+		contentAlignment = Alignment.Center,
+		modifier = Modifier
+			.padding(12.dp)
+			.fillMaxSize(1f),
+	) {
+		Text(
+			text = stringResource(R.string.enable_airplane_mode_error),
+			color = MaterialTheme.colors.Text600
+		)
 	}
 }

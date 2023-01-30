@@ -25,7 +25,7 @@ import io.parity.signer.ui.theme.SignerOldTheme
  * First screen with legal consent request
  */
 @Composable
-fun LandingView(onBoard: () -> Unit, modifier: Modifier) {
+fun TermsConsentScreen(onBoard: () -> Unit, modifier: Modifier) {
 	var confirm by remember { mutableStateOf(false) }
 	var tacAccept by remember { mutableStateOf(false) }
 	var ppAccept by remember { mutableStateOf(false) }
@@ -110,5 +110,5 @@ fun LandingView(onBoard: () -> Unit, modifier: Modifier) {
 )
 @Composable
 private fun PreviewLandingView() {
-	LandingView({}, Modifier)
+	TermsConsentScreen({}, Modifier)
 }

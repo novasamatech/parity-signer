@@ -170,9 +170,3 @@ fun AlertSelector(
 		}
 	}
 }
-
-enum class OnboardingWasShown {
-	InProgress,
-	No,
-	Yes;
-}
