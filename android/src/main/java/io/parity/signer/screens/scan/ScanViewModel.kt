@@ -1,13 +1,19 @@
 package io.parity.signer.screens.scan
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import io.parity.signer.R
 import io.parity.signer.backend.UniffiResult
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.models.FakeNavigator
 import io.parity.signer.models.storage.RepoResult
 import io.parity.signer.models.storage.SeedRepository
+import io.parity.signer.screens.scan.elements.PresentableErrorModel
+import io.parity.signer.screens.scan.importderivations.*
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues
 import io.parity.signer.uniffi.*
@@ -23,10 +29,13 @@ class ScanViewModel : ViewModel() {
 
 	private val uniffiInteractor = ServiceLocator.backendScope.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
+	private val importKeysService: ImportDerivedKeysRepository by lazy {
+		ImportDerivedKeysRepository(
+			seedRepository
+		)
+	}
 
-	data class TransactionsState(
-		val transactions: List<MTransaction>,
-	)
+	data class TransactionsState(val transactions: List<MTransaction>)
 
 	var transactions: MutableStateFlow<TransactionsState?> =
 		MutableStateFlow(null)
@@ -36,13 +45,13 @@ class ScanViewModel : ViewModel() {
 		MutableStateFlow(null)
 	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
-	val presentableError: MutableStateFlow<String?> =
+	val presentableError: MutableStateFlow<PresentableErrorModel?> =
 		MutableStateFlow(null)
 	val errorWrongPassword = MutableStateFlow<Boolean>(false)
 
 	private val transactionIsInProgress = MutableStateFlow<Boolean>(false)
 
-	suspend fun performPayload(payload: String) {
+	suspend fun performPayload(payload: String, context: Context) {
 		if (transactionIsInProgress.value) {
 			Log.e(TAG, "started transaction while it was in progress, ignoring")
 			return
@@ -52,20 +61,24 @@ class ScanViewModel : ViewModel() {
 			uniffiInteractor.navigate(Action.TRANSACTION_FETCHED, payload)
 		val screenData =
 			(navigateResponse as? UniffiResult.Success)?.result?.screenData
-		val transactions = (screenData as? ScreenData.Transaction)?.f
-			?: run {
-				Log.e(
-					TAG, "Error in getting transaction from qr payload, " +
-						"screenData is $screenData, navigation resp is $navigateResponse"
-				)
-				return
-			}
+		val transactions: List<MTransaction> =
+			(screenData as? ScreenData.Transaction)?.f
+				?: run {
+					Log.e(
+						TAG, "Error in getting transaction from qr payload, " +
+							"screenData is $screenData, navigation resp is $navigateResponse"
+					)
+					clearState()
+					return
+				}
 
 		// Handle transactions with just error payload
 		if (transactions.all { it.isDisplayingErrorOnly() }) {
-			presentableError.value =
-				transactions.joinToString("\n") { it.transactionIssues() }
+			presentableError.value = PresentableErrorModel(
+				details = transactions.joinToString("\n") { it.transactionIssues() }
+			)
 			uniffiInteractor.navigate(Action.GO_BACK) //fake call
+			clearState()
 			return
 		}
 
@@ -91,19 +104,155 @@ class ScanViewModel : ViewModel() {
 //						we can get result.navResult.alertData with error from Rust but it's not in new design
 					}
 				}
+				this.transactions.value = TransactionsState(transactions)
+			}
+			TransactionType.IMPORT_DERIVATIONS -> {
+				val fakeNavigator = FakeNavigator()
+				// We always need to `.goBack` as even if camera is dismissed without import, navigation "forward" already happened
+				fakeNavigator.navigate(Action.GO_BACK)
+				when (transactions.dominantImportError()) {
+					DerivedKeyError.BadFormat -> {
+						presentableError.value = PresentableErrorModel(
+							title = context.getString(R.string.scan_screen_error_bad_format_title),
+							message = context.getString(R.string.scan_screen_error_bad_format_message),
+						)
+						clearState()
+						return
+					}
+					DerivedKeyError.KeySetMissing -> {
+						presentableError.value = PresentableErrorModel(
+							title = context.getString(R.string.scan_screen_error_missing_key_set_title),
+							message = context.getString(R.string.scan_screen_error_missing_key_set_message),
+						)
+						clearState()
+						return
+					}
+					DerivedKeyError.NetworkMissing -> {
+						presentableError.value = PresentableErrorModel(
+							title = context.getString(R.string.scan_screen_error_missing_network_title),
+							message = context.getString(R.string.scan_screen_error_missing_network_message),
+						)
+						clearState()
+						return
+					}
+					null -> {
+						//proceed, all good, now check if we need to update for derivations keys
+						if (transactions.hasImportableKeys()) {
+							val importDerivedKeys = transactions.flatMap { it.allImportDerivedKeys() }
+							if (importDerivedKeys.isEmpty()) {
+								this.transactions.value = TransactionsState(transactions)
+							}
+
+							when (val result =
+								importKeysService.updateWithSeed(importDerivedKeys)) {
+								is RepoResult.Success -> {
+									val updatedKeys = result.result
+									val newTransactionsState =
+										updateTransactionsWithImportDerivations(
+											transactions = transactions,
+											updatedKeys = updatedKeys
+										)
+									this.transactions.value = TransactionsState(newTransactionsState)
+								}
+								is RepoResult.Failure -> {
+									Toast.makeText(
+										/* context = */ context,
+										/* text = */
+										context.getString(R.string.import_derivations_failure_update_toast),
+										/* duration = */ Toast.LENGTH_LONG
+									).show()
+									clearState()
+								}
+							}
+						} else {
+							presentableError.value = PresentableErrorModel(
+								title = context.getString(R.string.scan_screen_error_key_already_exists_title),
+								message = context.getString(R.string.scan_screen_error_key_already_exists_message),
+							)
+							return
+						}
+					}
+				}
 			}
 			else -> {
 				// Transaction with error OR
 				// Transaction that does not require signing (i.e. adding network or metadata)
 				// will set them below for any case and show anyway
+				this.transactions.value = TransactionsState(transactions)
 			}
-			//handle alert error
-			//						rust/navigator/src/navstate.rs:396
+			//handle alert error rust/navigator/src/navstate.rs:396
 		}
-		this.transactions.value =
-			TransactionsState(transactions,)
-		// navigateResponse.result.screenLabel - it's coming empty so generated guess on android
 	}
+
+	private fun updateTransactionsWithImportDerivations(
+		transactions: List<MTransaction>,
+		updatedKeys: List<SeedKeysPreview>
+	): List<MTransaction> = transactions.map { transaction ->
+		if (transaction.hasImportableKeys()) {
+			transaction.content.importingDerivations =
+				transaction.content.importingDerivations?.map { transactionCard ->
+					transactionCard.copy(
+						card = when (val card = transactionCard.card) {
+							is Card.DerivationsCard -> {
+								card.copy(f = card.f.map { originalKey ->
+									updatedKeys.firstOrNull { resultKey ->
+										areSeedKeysTheSameButUpdated(originalKey, resultKey)
+									} ?: originalKey
+								})
+							}
+							else -> {
+								card
+								//don't update
+							}
+						}
+					)
+				}
+			transaction
+		} else {
+			transaction
+		}
+	}
+
+	private fun areSeedKeysTheSameButUpdated(
+		originalKey: SeedKeysPreview,
+		resultKey: SeedKeysPreview
+	): Boolean =
+		originalKey.name == resultKey.name && resultKey.derivedKeys.all { derKey ->
+			originalKey.derivedKeys.any { it.derivationPath == derKey.derivationPath }
+		}
+
+	fun onImportKeysTap(transactions: TransactionsState, context: Context) {
+		val importableKeys =
+			transactions.transactions.flatMap { it.importableSeedKeysPreviews() }
+
+		val importResult = importKeysService.importDerivedKeys(importableKeys)
+		val derivedKeysCount = importableKeys.sumOf { it.derivedKeys.size }
+
+		when (importResult) {
+			is RepoResult.Success -> {
+				Toast.makeText(
+					/* context = */ context,
+					/* text = */ context.resources.getQuantityString(
+						R.plurals.import_derivations_success_keys_imported,
+						derivedKeysCount,
+						derivedKeysCount,
+					), /* duration = */ Toast.LENGTH_LONG
+				).show()
+			}
+			is RepoResult.Failure -> {
+				Toast.makeText(
+					/* context = */ context,
+					/* text = */
+					context.getString(R.string.import_derivations_failure_toast),
+					/* duration = */
+					Toast.LENGTH_LONG
+				).show()
+			}
+		}
+
+		this.transactions.value = null
+	}
+
 
 	fun ifHasStateThenClear(): Boolean {
 		return if (

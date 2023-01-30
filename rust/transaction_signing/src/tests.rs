@@ -1024,8 +1024,7 @@ Verifiers:
     b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
     e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
-Identities:
-    public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks:"#;
+Identities:"#;
         assert_eq!(print_after, expected_print_after);
 
         try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
