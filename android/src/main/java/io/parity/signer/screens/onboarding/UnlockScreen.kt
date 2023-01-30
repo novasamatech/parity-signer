@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import io.parity.signer.R
@@ -21,7 +22,8 @@ const val unlockAppScreenRoute = "navigation_point_unlock_app"//
 
 fun NavGraphBuilder.unlockAppScreenFlow() {
 	composable(route = unlockAppScreenRoute) {
-		UnlockAppAuthScreen()
+		val model: SignerDataModel = viewModel() //todo onboarding remove
+		UnlockAppAuthScreen(model)
 	}
 }
 

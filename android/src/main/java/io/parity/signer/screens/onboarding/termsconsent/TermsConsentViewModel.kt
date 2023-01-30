@@ -5,10 +5,12 @@ import io.parity.signer.uniffi.historyInitHistoryWithCert
 
 
 class TermsConsentViewModel: ViewModel() {
-	fun onBoard() {
-		wipe()
-		copyAsset("")
-		totalRefresh()
-		historyInitHistoryWithCert()
-	}
+
+//	todo onboardign we can't do total refrash
+//	fun onBoard() {
+//		wipe()
+//		copyAsset("")
+//		totalRefresh()
+//		historyInitHistoryWithCert()
+//	}
 }
