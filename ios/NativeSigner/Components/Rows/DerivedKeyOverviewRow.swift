@@ -60,39 +60,40 @@ struct DerivedKeyOverviewRow: View {
     }
 }
 
-struct DerivedKeyOverviewRow_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(alignment: .leading) {
-            DerivedKeyOverviewRow(
-                DerivedKeyOverviewViewModel(
-                    identicon: PreviewData.exampleIdenticon,
-                    path: "// polkadot",
-                    hasPassword: false
+#if DEBUG
+    struct DerivedKeyOverviewRow_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack(alignment: .leading) {
+                DerivedKeyOverviewRow(
+                    DerivedKeyOverviewViewModel(
+                        identicon: PreviewData.exampleIdenticon,
+                        path: "// polkadot",
+                        hasPassword: false
+                    )
                 )
-            )
-            DerivedKeyOverviewRow(
-                DerivedKeyOverviewViewModel(
-                    identicon: PreviewData.exampleIdenticon,
-                    path: "// astar",
-                    hasPassword: false
+                DerivedKeyOverviewRow(
+                    DerivedKeyOverviewViewModel(
+                        identicon: PreviewData.exampleIdenticon,
+                        path: "// astar",
+                        hasPassword: false
+                    )
                 )
-            )
-            DerivedKeyOverviewRow(
-                DerivedKeyOverviewViewModel(
-                    identicon: PreviewData.exampleIdenticon,
-                    path: "// kusama",
-                    hasPassword: true
+                DerivedKeyOverviewRow(
+                    DerivedKeyOverviewViewModel(
+                        identicon: PreviewData.exampleIdenticon,
+                        path: "// kusama",
+                        hasPassword: true
+                    )
                 )
-            )
-            DerivedKeyOverviewRow(
-                DerivedKeyOverviewViewModel(
-                    identicon: PreviewData.exampleIdenticon,
-                    path: "// kusama // verylongpathsolongthatmightbemultilineandhaspasswordtoo",
-                    hasPassword: true
+                DerivedKeyOverviewRow(
+                    DerivedKeyOverviewViewModel(
+                        identicon: PreviewData.exampleIdenticon,
+                        path: "//kusama//verylongpathsolongthatmightbemultilineandhaspasswordtoo",
+                        hasPassword: true
+                    )
                 )
-            )
+            }
+            .preferredColorScheme(.dark)
         }
-        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
     }
-}
+#endif

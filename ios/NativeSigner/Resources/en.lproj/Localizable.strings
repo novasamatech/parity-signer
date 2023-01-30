@@ -522,7 +522,7 @@
 "ImportKeys.Error.Label.NetworkMissing" = "Some keys can not be imported until their networks are added. Please add missing networks and their metadata.";
 "ImportKeys.Error.Action.NetworkMissing" = "Add Network";
 "ImportKeys.Error.Label.AlreadyImported" = "Some are hidden from the list because they have already been imported.";
-"ImportKeys.Error.Label.BadFormat" = "Some are hidden from the list because they have already been imported.";
+"ImportKeys.Error.Label.BadFormat" = "Some keys paths are in bad format so they can't be imported.";
 "ImportKeys.Snackbar.Success.Single" = "1 Key Has Been Imported";
 "ImportKeys.Snackbar.Success.Multiple" = "%@ Keys Has Been Imported";
 "ImportKeys.Snackbar.Failure.Unknown" = "Import Keys Has Failed";

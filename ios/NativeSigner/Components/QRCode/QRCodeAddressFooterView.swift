@@ -30,9 +30,7 @@ struct QRCodeAddressFooterView: View {
         VStack(spacing: Spacing.small) {
             HStack(alignment: .center, spacing: Spacing.small) {
                 VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                    fullPath
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                        .font(PrimaryFont.bodyM.font)
+                    pathView()
                     Text(viewModel.rootKeyName)
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         .font(PrimaryFont.bodyM.font)
@@ -76,21 +74,44 @@ struct QRCodeAddressFooterView: View {
             ) :
             Text(viewModel.path)
     }
-}
 
-struct QRCodeAddressFooterView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            VStack {
-                Spacer()
-                QRCodeAddressFooterView(
-                    viewModel: PreviewData.qrCodeAddressFooterViewModel
-                )
-                .background(Asset.fill6Solid.swiftUIColor)
-                Spacer()
-            }
-            .background(.white)
-            .preferredColorScheme(.dark)
+    @ViewBuilder
+    private func pathView() -> some View {
+        if viewModel.path.isEmpty {
+            EmptyView()
+        } else {
+            fullPath
+                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                .font(PrimaryFont.bodyM.font)
         }
     }
 }
+
+#if DEBUG
+    struct QRCodeAddressFooterView_Previews: PreviewProvider {
+        static var previews: some View {
+            Group {
+                VStack {
+                    Spacer()
+                    QRCodeAddressFooterView(
+                        viewModel: PreviewData.qrCodeAddressFooterViewModel
+                    )
+                    .background(Asset.fill6Solid.swiftUIColor)
+                    Spacer()
+                    QRCodeAddressFooterView(
+                        viewModel: PreviewData.qrCodeAddressFooterViewModelNoPath
+                    )
+                    .background(Asset.fill6Solid.swiftUIColor)
+                    Spacer()
+                    QRCodeAddressFooterView(
+                        viewModel: PreviewData.qrCodeAddressFooterViewModelVeryLongPath
+                    )
+                    .background(Asset.fill6Solid.swiftUIColor)
+                    Spacer()
+                }
+                .background(.white)
+                .preferredColorScheme(.dark)
+            }
+        }
+    }
+#endif

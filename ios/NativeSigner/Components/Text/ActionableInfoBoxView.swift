@@ -27,6 +27,7 @@ struct ActionableInfoBoxView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .font(PrimaryFont.bodyM.font)
+                    .fixedSize(horizontal: false, vertical: true)
                 Spacer().frame(maxWidth: Spacing.medium)
                 Asset.infoIconBold.swiftUIImage
                     .foregroundColor(Asset.accentPink300.swiftUIColor)

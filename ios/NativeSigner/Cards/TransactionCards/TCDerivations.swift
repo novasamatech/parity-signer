@@ -11,7 +11,7 @@ struct DerivedKeysSetRenderable: Equatable, Identifiable {
     struct DerivedKeyRenderable: Equatable, Identifiable {
         let id = UUID()
         let identicon: SignerImage
-        let path: Text
+        let derivationPath: String
         let isPassworded: Bool
         let address: String
         let networkTitle: String?
@@ -85,18 +85,22 @@ struct TCDerivations: View {
     @ViewBuilder
     func derivedKey(_ preview: DerivedKeysSetRenderable.DerivedKeyRenderable) -> some View {
         VStack(alignment: .leading, spacing: Spacing.extraSmall) {
-            HStack(spacing: Spacing.extraSmall) {
+            HStack(alignment: .center, spacing: Spacing.extraSmall) {
                 Identicon(identicon: preview.identicon, rowHeight: Heights.identiconSmall)
-                preview.path
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                pathView(preview)
+                    .font(PrimaryFont.bodyM.font)
+                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Text(preview.address)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .font(PrimaryFont.bodyL.font)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .multilineTextAlignment(.leading)
             if let networkTitle = preview.networkTitle {
                 NetworkCapsuleView(network: networkTitle)
             }
         }
-        .font(PrimaryFont.bodyM.font)
         .padding(Spacing.medium)
     }
 
@@ -138,6 +142,28 @@ struct TCDerivations: View {
         }
         .padding(.bottom, Spacing.medium)
     }
+
+    @ViewBuilder
+    private func pathView(_ renderable: DerivedKeysSetRenderable.DerivedKeyRenderable) -> some View {
+        if renderable.derivationPath.isEmpty {
+            EmptyView()
+        } else if renderable.isPassworded {
+            Text(
+                "\(renderable.displayablePath)\(Image(.lock))"
+            )
+        } else {
+            Text(renderable.displayablePath)
+        }
+    }
+}
+
+private extension DerivedKeysSetRenderable.DerivedKeyRenderable {
+    /// Returns either `path` or if password protected, available path with path delimeter and lock icon
+    var displayablePath: String {
+        isPassworded ?
+            "\(derivationPath)\(Localizable.Shared.Label.passwordedPathDelimeter.string)" :
+            derivationPath
+    }
 }
 
 extension TCDerivations {
@@ -162,7 +188,7 @@ extension TCDerivations {
                             .map { DerivedKeysSetRenderable
                                 .DerivedKeyRenderable(
                                     identicon: $0.identicon,
-                                    path: fullPath($0),
+                                    derivationPath: $0.derivationPath ?? "",
                                     isPassworded: $0.hasPwd == true,
                                     address: $0.address,
                                     networkTitle: $0.networkTitle
@@ -205,26 +231,6 @@ extension TCDerivations {
                     }
                 }
         }
-
-        /// String interpolation for SFSymbols is a bit unstable if creating `String` inline by using conditional logic
-        /// or
-        /// `appending` from `StringProtocol`. Hence less DRY approach and dedicated function to wrap that
-        private func fullPath(_ preview: DerivedKeyPreview) -> Text {
-            (preview.hasPwd ?? false) ?
-                Text(
-                    "\(preview.displayablePath)\(Image(.lock))"
-                ) :
-                Text(preview.displayablePath)
-        }
-    }
-}
-
-private extension DerivedKeyPreview {
-    /// Returns either `path` or if password protected, available path with path delimeter and lock icon
-    var displayablePath: String {
-        (hasPwd ?? false) ?
-            "\(derivationPath ?? "")\(Localizable.Shared.Label.passwordedPathDelimeter.string)" :
-            derivationPath ?? ""
     }
 }
 
@@ -289,23 +295,23 @@ private extension DerivedKeyPreview {
                 ),
                 .init(
                     address: "address",
-                    derivationPath: "//polka",
+                    derivationPath: "",
                     encryption: .ed25519,
                     genesisHash: .init([3, 4, 5]),
                     identicon: .svg(image: PreviewData.exampleIdenticon),
                     hasPwd: false,
                     networkTitle: nil,
-                    status: .invalid(errors: [.networkMissing])
+                    status: .importable
                 ),
                 .init(
                     address: "address",
-                    derivationPath: "//polkadot//staking",
+                    derivationPath: "//kusama//verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
                     encryption: .ed25519,
                     genesisHash: .init([3, 4, 5]),
                     identicon: .svg(image: PreviewData.exampleIdenticon),
                     hasPwd: true,
                     networkTitle: nil,
-                    status: .invalid(errors: [.keySetMissing])
+                    status: .importable
                 )
             ]
         )
