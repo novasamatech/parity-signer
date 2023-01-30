@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.dependencygraph.getDbNameFromContext
+import io.parity.signer.models.storage.DatabaseAssetsInteractor
 import io.parity.signer.models.storage.SeedStorage
 import io.parity.signer.screens.onboarding.OnboardingWasShown
 import io.parity.signer.uniffi.*
@@ -35,6 +36,7 @@ class SignerDataModel : ViewModel() {
 	internal var action = JSONObject()
 
 	val seedStorage: SeedStorage = ServiceLocator.seedStorage
+	private val databaseAssetsInteractor = DatabaseAssetsInteractor(context, seedStorage)
 
 	// Navigator
 	internal val _actionResult = MutableStateFlow(
@@ -101,8 +103,8 @@ class SignerDataModel : ViewModel() {
 	 * This is normal onboarding
 	 */
 	fun onBoard() {
-		wipe()
-		copyAsset("")
+		databaseAssetsInteractor.wipe()
+		databaseAssetsInteractor.copyAsset("")
 		totalRefresh()
 		historyInitHistoryWithCert()
 	}
@@ -111,64 +113,12 @@ class SignerDataModel : ViewModel() {
 	 * Init database with no general certificate
 	 */
 	private fun wipeDbNoCert() {
-		wipe()
-		copyAsset("")
-		historyInitHistoryNoCert()
+		databaseAssetsInteractor.wipe()
+		databaseAssetsInteractor.copyAsset("")
 		totalRefresh()
+		historyInitHistoryNoCert()
 	}
 
-	/**
-	 * Wipes all data
-	 */
-	@SuppressLint("ApplySharedPref")
-	fun wipe() {
-		deleteDir(File(dbName))
-		seedStorage.wipe()
-	}
-
-	/**
-	 * Util to copy single Assets file
-	 */
-	private fun copyFileAsset(path: String) {
-		val file = File(dbName, path)
-		file.createNewFile()
-		val input = context.assets.open("Database$path")
-		val output = FileOutputStream(file)
-		val buffer = ByteArray(1024)
-		var read = input.read(buffer)
-		while (read != -1) {
-			output.write(buffer, 0, read)
-			read = input.read(buffer)
-		}
-		output.close()
-		input.close()
-	}
-
-	/**
-	 * Util to copy Assets to data dir; only used in onBoard().
-	 */
-	private fun copyAsset(path: String) {
-		val contents = context.assets.list("Database$path")
-		if (contents == null || contents.isEmpty()) {
-			copyFileAsset(path)
-		} else {
-			File(dbName, path).mkdirs()
-			for (entry in contents) copyAsset("$path/$entry")
-		}
-	}
-
-	/**
-	 * Util to remove directory
-	 */
-	private fun deleteDir(fileOrDirectory: File) {
-		if (fileOrDirectory.isDirectory) {
-			val listFiles = fileOrDirectory.listFiles()
-			if (!listFiles.isNullOrEmpty()) {
-				for (child in listFiles) deleteDir(child)
-			}
-		}
-		fileOrDirectory.delete()
-	}
 
 	/**
 	 * Checks if airplane mode was off
@@ -221,7 +171,7 @@ class SignerDataModel : ViewModel() {
 	fun wipeToFactory() {
 		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
-			wipe()
+			databaseAssetsInteractor.wipe()
 			totalRefresh()
 		}
 	}
