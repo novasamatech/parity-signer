@@ -14,7 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.screens.onboarding.onboardingRoute
+import io.parity.signer.screens.onboarding.unlockAppScreenRoute
 import io.parity.signer.screens.onboarding.onboardingSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
 
@@ -56,10 +56,11 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun SignerNavHost(
 	navController: NavHostController,
-	startDestination: String = onboardingRoute,
+	startDestination: String = unlockAppScreenRoute,
 ) {
 	NavHost(navController = navController, startDestination = startDestination) {
 		onboardingSubgraph()
-		mainSignerSubgraph()
+		unlockAppScreenRoute()
+		mainSignerSubgraph(navController)
 	}
 }

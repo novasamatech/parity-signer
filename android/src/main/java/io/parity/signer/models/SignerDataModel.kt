@@ -1,5 +1,6 @@
 package io.parity.signer.models
 
+import android.annotation.SuppressLint
 import android.content.*
 import android.provider.Settings
 import androidx.fragment.app.FragmentActivity
@@ -78,13 +79,11 @@ class SignerDataModel : ViewModel() {
 		isAirplaneOn()
 
 		val intentFilter = IntentFilter("android.intent.action.AIRPLANE_MODE")
-
 		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
 			override fun onReceive(context: Context, intent: Intent) {
 				isAirplaneOn()
 			}
 		}
-
 		context.registerReceiver(receiver, intentFilter)
 
 		// Imitate ios behavior

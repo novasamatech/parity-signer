@@ -20,10 +20,10 @@ import io.parity.signer.ui.theme.Text600
 
 @Composable
 internal fun OnboardingFlowSubgraph() {
+	//todo onboarding this is old reference implementation, break it in a few
 	val onboardingModel: OnboardingViewModel = viewModel()
 
 	val onBoardingDone = onboardingModel.onBoardingDone.collectAsState()
-
 
 	when (onBoardingDone.value) {
 		OnboardingWasShown.No -> {
