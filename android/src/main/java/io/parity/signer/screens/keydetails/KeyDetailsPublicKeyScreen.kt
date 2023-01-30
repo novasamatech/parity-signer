@@ -26,7 +26,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.sharedcomponents.KeySeedCard
-import io.parity.signer.models.*
+import io.parity.signer.domain.*
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action

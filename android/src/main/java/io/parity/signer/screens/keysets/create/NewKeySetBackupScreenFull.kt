@@ -5,7 +5,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import io.parity.signer.models.Callback
+import io.parity.signer.domain.Callback
 import io.parity.signer.ui.BottomSheetWrapperContent
 import kotlinx.coroutines.launch
 

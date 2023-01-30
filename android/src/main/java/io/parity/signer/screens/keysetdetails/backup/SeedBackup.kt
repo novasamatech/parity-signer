@@ -17,10 +17,10 @@ import io.parity.signer.components.base.BottomSheetSubtitle
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.items.SlimKeyItem
 import io.parity.signer.components.sharedcomponents.SnackBarCircularCountDownTimer
-import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
-import io.parity.signer.models.Callback
-import io.parity.signer.models.KeySetDetailsModel
-import io.parity.signer.models.abbreviateString
+import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.KeySetDetailsModel
+import io.parity.signer.domain.abbreviateString
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme

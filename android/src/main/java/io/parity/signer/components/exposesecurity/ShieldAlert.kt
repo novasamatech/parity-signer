@@ -3,8 +3,8 @@ package io.parity.signer.components.exposesecurity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import io.parity.signer.components.AlertComponent
-import io.parity.signer.models.AlertState
-import io.parity.signer.models.Callback
+import io.parity.signer.domain.AlertState
+import io.parity.signer.domain.Callback
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
 @Composable

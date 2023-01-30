@@ -13,9 +13,9 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.components.SeedCard
 import io.parity.signer.components.toImageContent
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.storage.getSeed
-import io.parity.signer.models.navigate
+import io.parity.signer.domain.SignerDataModel
+import io.parity.signer.domain.storage.getSeed
+import io.parity.signer.domain.navigate
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal

@@ -1,4 +1,4 @@
-package io.parity.signer.models
+package io.parity.signer.domain
 
 import java.text.ParseException
 import java.text.SimpleDateFormat

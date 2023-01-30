@@ -1,4 +1,4 @@
-package io.parity.signer.models
+package io.parity.signer.domain
 
 import android.widget.Toast
 import androidx.biometric.BiometricManager

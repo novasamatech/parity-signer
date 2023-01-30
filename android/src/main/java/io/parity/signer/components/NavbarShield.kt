@@ -8,7 +8,7 @@ import androidx.compose.material.icons.filled.GppGood
 import androidx.compose.material.icons.filled.GppMaybe
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import io.parity.signer.models.AlertState
+import io.parity.signer.domain.AlertState
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.SignalDanger
 import io.parity.signer.ui.theme.SignalWarning

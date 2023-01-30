@@ -1,4 +1,4 @@
-package io.parity.signer.models.storage
+package io.parity.signer.domain.storage
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -9,8 +9,8 @@ import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import io.parity.signer.dependencygraph.getDbNameFromContext
-import io.parity.signer.models.FeatureFlags
-import io.parity.signer.models.FeatureOption
+import io.parity.signer.domain.FeatureFlags
+import io.parity.signer.domain.FeatureOption
 import io.parity.signer.uniffi.historySeedNameWasShown
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

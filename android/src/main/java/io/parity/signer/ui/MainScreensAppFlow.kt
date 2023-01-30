@@ -14,8 +14,8 @@ import androidx.navigation.compose.composable
 import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.TopBar
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.NavigationMigrations
-import io.parity.signer.models.SignerDataModel
+import io.parity.signer.domain.NavigationMigrations
+import io.parity.signer.domain.SignerDataModel
 import io.parity.signer.screens.onboarding.unlockAppScreenRoute
 import io.parity.signer.ui.rustnavigationselectors.*
 

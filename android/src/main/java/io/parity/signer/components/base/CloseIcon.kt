@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.models.Callback
+import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.fill18
 
 @Composable

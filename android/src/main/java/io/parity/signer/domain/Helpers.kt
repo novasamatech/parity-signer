@@ -1,4 +1,4 @@
-package io.parity.signer.models
+package io.parity.signer.domain
 
 import android.util.Log
 import io.parity.signer.BuildConfig

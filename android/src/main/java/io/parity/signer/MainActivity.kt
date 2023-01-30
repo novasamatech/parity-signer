@@ -10,7 +10,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.SignerDataModel
+import io.parity.signer.domain.SignerDataModel
 import io.parity.signer.ui.SignerNavHost
 import io.parity.signer.ui.theme.SignerNewTheme
 

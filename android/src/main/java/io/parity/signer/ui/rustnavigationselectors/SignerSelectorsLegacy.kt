@@ -8,9 +8,9 @@ import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.components.exposesecurity.ShieldAlert
 import io.parity.signer.bottomsheets.*
 import io.parity.signer.components.Documents
-import io.parity.signer.models.*
-import io.parity.signer.models.storage.addSeed
-import io.parity.signer.models.storage.signSufficientCrypto
+import io.parity.signer.domain.*
+import io.parity.signer.domain.storage.addSeed
+import io.parity.signer.domain.storage.signSufficientCrypto
 import io.parity.signer.screens.*
 import io.parity.signer.screens.logs.logdetails.LogDetails
 import io.parity.signer.screens.networks.NetworkDetails

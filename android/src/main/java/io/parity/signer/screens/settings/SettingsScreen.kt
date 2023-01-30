@@ -20,10 +20,10 @@ import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
-import io.parity.signer.models.AlertState
-import io.parity.signer.models.Callback
-import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.Navigator
+import io.parity.signer.domain.AlertState
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.EmptyNavigator
+import io.parity.signer.domain.Navigator
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
 

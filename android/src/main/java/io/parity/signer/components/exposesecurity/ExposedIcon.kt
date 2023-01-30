@@ -20,9 +20,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.models.AlertState
-import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.Navigator
+import io.parity.signer.domain.AlertState
+import io.parity.signer.domain.EmptyNavigator
+import io.parity.signer.domain.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
 import io.parity.signer.uniffi.Action

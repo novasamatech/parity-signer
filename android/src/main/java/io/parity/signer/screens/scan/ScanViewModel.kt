@@ -9,9 +9,9 @@ import io.parity.signer.backend.UniffiResult
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.FakeNavigator
-import io.parity.signer.models.storage.RepoResult
-import io.parity.signer.models.storage.SeedRepository
+import io.parity.signer.domain.FakeNavigator
+import io.parity.signer.domain.storage.RepoResult
+import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.screens.scan.elements.PresentableErrorModel
 import io.parity.signer.screens.scan.importderivations.*
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly

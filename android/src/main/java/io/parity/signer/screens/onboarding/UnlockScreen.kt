@@ -14,8 +14,8 @@ import androidx.navigation.compose.composable
 import io.parity.signer.R
 import io.parity.signer.components.BigButton
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.findActivity
+import io.parity.signer.domain.SignerDataModel
+import io.parity.signer.domain.findActivity
 
 
 const val unlockAppScreenRoute = "navigation_point_unlock_app"//

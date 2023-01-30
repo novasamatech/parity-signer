@@ -13,10 +13,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.NavbarShield
-import io.parity.signer.components.SmallButton
-import io.parity.signer.models.AlertState
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.navigate
+import io.parity.signer.domain.AlertState
+import io.parity.signer.domain.SignerDataModel
+import io.parity.signer.domain.navigate
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Text400

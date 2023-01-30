@@ -5,8 +5,8 @@ import io.parity.signer.backend.mapError
 import io.parity.signer.components.qrcode.AnimatedQrImages
 import io.parity.signer.components.qrcode.AnimatedQrKeysProvider
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.KeySetModel
-import io.parity.signer.models.getData
+import io.parity.signer.domain.KeySetModel
+import io.parity.signer.domain.getData
 
 
 class KeySetsExportService : AnimatedQrKeysProvider<List<KeySetModel>> {

@@ -1,10 +1,10 @@
-package io.parity.signer.models.storage
+package io.parity.signer.domain.storage
 
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.SignerDataModel
+import io.parity.signer.domain.SignerDataModel
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.updateSeedNames
 import kotlinx.coroutines.*

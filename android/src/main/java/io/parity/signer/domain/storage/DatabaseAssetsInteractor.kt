@@ -1,4 +1,4 @@
-package io.parity.signer.models.storage
+package io.parity.signer.domain.storage
 
 import android.annotation.SuppressLint
 import android.content.Context

@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.FakeNavigator
-import io.parity.signer.models.storage.SeedRepository
-import io.parity.signer.models.submitErrorState
+import io.parity.signer.domain.FakeNavigator
+import io.parity.signer.domain.storage.SeedRepository
+import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

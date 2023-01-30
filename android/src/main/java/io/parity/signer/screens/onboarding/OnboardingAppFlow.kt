@@ -1,23 +1,7 @@
 package io.parity.signer.screens.onboarding
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import io.parity.signer.components.BigButton
-import io.parity.signer.models.AlertState
-import io.parity.signer.screens.WaitingScreen
-import io.parity.signer.ui.theme.Text600
-
 
 
 const val onboardingRoute = "navigation_point_onboarding" //todo onboarding remove this part

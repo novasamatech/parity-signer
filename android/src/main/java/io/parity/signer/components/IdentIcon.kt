@@ -10,7 +10,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.models.intoImageBitmap
+import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.uniffi.SignerImage
 
 /**

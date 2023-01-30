@@ -10,13 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.*
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.navigate
+import io.parity.signer.domain.SignerDataModel
+import io.parity.signer.domain.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MTypesInfo
-import io.parity.signer.uniffi.SignerImage
 
 @Composable
 fun TypesInfo(typesInfo: MTypesInfo, signerDataModel: SignerDataModel) {

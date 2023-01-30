@@ -1,10 +1,9 @@
-package io.parity.signer.models
+package io.parity.signer.domain
 
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import io.parity.signer.uniffi.SignerImage
 
 typealias Callback = () -> Unit
 

@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.parity.signer.models.Callback
+import io.parity.signer.domain.Callback
 import io.parity.signer.screens.scan.elements.CameraCloseIcon
 import io.parity.signer.screens.scan.elements.CameraLightIcon
 import io.parity.signer.ui.theme.SignerNewTheme

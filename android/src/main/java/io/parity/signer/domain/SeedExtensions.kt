@@ -1,7 +1,7 @@
-package io.parity.signer.models
+package io.parity.signer.domain
 
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.storage.getSeed
+import io.parity.signer.domain.storage.getSeed
 
 
 suspend fun SignerDataModel.getSeedPhraseForBackup(seedName: String,

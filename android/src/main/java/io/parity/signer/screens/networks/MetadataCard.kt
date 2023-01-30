@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.toImageContent
-import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
-import io.parity.signer.models.abbreviateString
+import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
+import io.parity.signer.domain.abbreviateString
 import io.parity.signer.uniffi.MMetadataRecord
 
 @Composable

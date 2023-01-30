@@ -3,7 +3,7 @@ package io.parity.signer
 import android.app.Application
 import android.util.Log
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.submitErrorState
+import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.initLogging
 import java.lang.Thread.UncaughtExceptionHandler

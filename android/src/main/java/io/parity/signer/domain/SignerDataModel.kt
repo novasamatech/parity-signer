@@ -1,21 +1,19 @@
-package io.parity.signer.models
+package io.parity.signer.domain
 
-import android.annotation.SuppressLint
 import android.content.*
 import android.provider.Settings
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.dependencygraph.getDbNameFromContext
-import io.parity.signer.models.storage.DatabaseAssetsInteractor
-import io.parity.signer.models.storage.SeedStorage
+import io.parity.signer.domain.storage.DatabaseAssetsInteractor
+import io.parity.signer.domain.storage.SeedStorage
 import io.parity.signer.screens.onboarding.OnboardingWasShown
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONObject
 import java.io.File
-import java.io.FileOutputStream
 
 class SignerDataModel : ViewModel() {
 

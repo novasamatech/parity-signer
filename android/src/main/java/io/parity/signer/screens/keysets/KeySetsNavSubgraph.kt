@@ -8,11 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.parity.signer.models.AlertState
-import io.parity.signer.models.KeySetsSelectModel
-import io.parity.signer.models.Navigator
-import io.parity.signer.screens.keysets.KeySetsMenuBottomSheet
-import io.parity.signer.screens.keysets.KeySetsScreen
+import io.parity.signer.domain.AlertState
+import io.parity.signer.domain.KeySetsSelectModel
+import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.keysets.export.KeySetsExportScreenFull
 import io.parity.signer.ui.BottomSheetWrapperRoot
 

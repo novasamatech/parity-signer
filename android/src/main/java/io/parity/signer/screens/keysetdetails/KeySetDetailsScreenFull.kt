@@ -5,7 +5,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.navigation.NavController
-import io.parity.signer.models.*
+import io.parity.signer.domain.*
 import io.parity.signer.ui.BottomSheetWrapperContent
 import kotlinx.coroutines.launch
 

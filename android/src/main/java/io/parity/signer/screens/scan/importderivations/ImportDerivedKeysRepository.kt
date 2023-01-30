@@ -1,8 +1,8 @@
 package io.parity.signer.screens.scan.importderivations
 
-import io.parity.signer.models.storage.RepoResult
-import io.parity.signer.models.storage.SeedRepository
-import io.parity.signer.models.storage.mapError
+import io.parity.signer.domain.storage.RepoResult
+import io.parity.signer.domain.storage.SeedRepository
+import io.parity.signer.domain.storage.mapError
 import io.parity.signer.uniffi.DerivedKeyStatus
 import io.parity.signer.uniffi.SeedKeysPreview
 import io.parity.signer.uniffi.importDerivations

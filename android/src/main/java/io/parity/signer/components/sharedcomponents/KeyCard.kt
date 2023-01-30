@@ -27,9 +27,9 @@ import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.ImageContent
 import io.parity.signer.components.toImageContent
-import io.parity.signer.models.BASE58_STYLE_ABBREVIATE
-import io.parity.signer.models.KeyModel
-import io.parity.signer.models.abbreviateString
+import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
+import io.parity.signer.domain.KeyModel
+import io.parity.signer.domain.abbreviateString
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Address

@@ -23,7 +23,7 @@ import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.items.KeySetItem
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
-import io.parity.signer.models.*
+import io.parity.signer.domain.*
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.backgroundSystem

@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import io.parity.signer.components.sharedcomponents.ShowBase58Collapsible
-import io.parity.signer.models.KeyModel
+import io.parity.signer.domain.KeyModel
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 
