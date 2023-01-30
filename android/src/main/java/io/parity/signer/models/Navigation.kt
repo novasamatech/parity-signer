@@ -37,6 +37,11 @@ interface Navigator {
 	fun backAction()
 }
 
+
+/**
+ * Class to navigate within rust state-machine area. It is one (big) part of compose-based navigation.
+ * This class have nothing to do with composa-based navigation.
+ */
 class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 
 	override fun navigate(action: Action, details: String, seedPhrase: String) {
