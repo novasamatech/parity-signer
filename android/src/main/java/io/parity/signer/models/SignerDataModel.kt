@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.dependencygraph.getDbNameFromContext
 import io.parity.signer.models.storage.SeedStorage
+import io.parity.signer.screens.onboarding.OnboardingWasShown
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -95,6 +96,7 @@ class SignerDataModel : ViewModel() {
 	}
 
 	/**
+	 * todo onboarding remove this
 	 * Populate database!
 	 * This is normal onboarding
 	 */
@@ -108,7 +110,7 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Init database with no general certificate
 	 */
-	private fun jailbreak() {
+	private fun wipeDbNoCert() {
 		wipe()
 		copyAsset("")
 		historyInitHistoryNoCert()
@@ -230,7 +232,7 @@ class SignerDataModel : ViewModel() {
 	fun wipeToJailbreak() {
 		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
-			jailbreak()
+			wipeDbNoCert()
 		}
 	}
 
