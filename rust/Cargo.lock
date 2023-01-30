@@ -2275,9 +2275,9 @@ checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
 
 [[package]]
 name = "opencv"
-version = "0.76.2"
+version = "0.76.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dacfb5acf6709efb62f7e7edac490531d524fc39554cdd3425406a7d194ed177"
+checksum = "eb91300ac0cdd5f2a1cb9ad378ed0c41716ee35529dc43fea65886bfaae2844b"
 dependencies = [
  "cc",
  "clang",
@@ -2295,9 +2295,9 @@ dependencies = [
 
 [[package]]
 name = "opencv-binding-generator"
-version = "0.54.0"
+version = "0.55.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b2d6e77c68fd056a616dff22ef6882eb7cb264e1b9e33ca3dd3f0bda85c2435"
+checksum = "8aecbf78bc1db1658419b2a7855233cfd16a8ead411b897bf96a0286d4bf81a3"
 dependencies = [
  "clang",
  "clang-sys",
@@ -4336,9 +4336,9 @@ checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
 
 [[package]]
 name = "tokio"
-version = "1.24.2"
+version = "1.25.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "597a12a59981d9e3c38d216785b0c37399f6e415e8d0712047620f189371b0bb"
+checksum = "c8e00990ebabbe4c14c08aca901caed183ecd5c09562a12c824bb53d3c3fd3af"
 dependencies = [
  "autocfg",
  "bytes",
