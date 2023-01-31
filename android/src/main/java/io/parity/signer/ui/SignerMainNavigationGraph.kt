@@ -13,12 +13,11 @@ import io.parity.signer.screens.onboarding.unlockAppScreenFlow
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
-fun SignerNavHost(
+fun SignerMainNavigationGraph(
 	navController: NavHostController,
 	startDestination: String = MainGraphRoutes.unlockAppScreenRoute,
 ) {
 	NavHost(navController = navController, startDestination = startDestination) {
-//		onboardingAppFlow() todo onboarding
 		termsConsentAppFlow(navController)
 		enableAirgapAppFlow(navController)
 		unlockAppScreenFlow(navController)
@@ -26,7 +25,7 @@ fun SignerNavHost(
 	}
 }
 
-object MainGraphRoutes{
+object MainGraphRoutes {
 	const val termsConsentRoute = "navigation_point_terms_consent"
 	const val enableAirgapRoute = "navigation_point_enable_airgap"
 	const val unlockAppScreenRoute = "navigation_point_unlock_app"

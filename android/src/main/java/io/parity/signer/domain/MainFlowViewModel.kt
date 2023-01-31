@@ -1,9 +1,11 @@
 package io.parity.signer.domain
 
+import android.annotation.SuppressLint
 import android.content.*
 import android.security.keystore.UserNotAuthenticatedException
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.storage.DatabaseAssetsInteractor
 import io.parity.signer.domain.storage.SeedStorage
@@ -12,12 +14,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONObject
 
-class MainFlowViewModel : ViewModel() {
 
-	// todo migrate to use dependencies from ServiceLocator rather than expecting them here
-	val context: Context get() = ServiceLocator.appContext
-	val activity: FragmentActivity get() = ServiceLocator.activityScope!!.activity
+@SuppressLint("StaticFieldLeak")
+class MainFlowViewModel(
+	// todo migrate to use dependencies to DI rather than expecting them here
+	val context: Context,
+	val activity: FragmentActivity,
+) : ViewModel() {
 
+	init {
+		// Imitate ios behavior
+		val authentication = ServiceLocator.authentication
+		authentication.authenticate(activity) {
+			seedStorage.init(context)
+			totalRefresh()
+		}
+	}
 	val navigator by lazy { SignerNavigator(this) }
 
 	// Current key details, after rust API will migrate to REST-like should not store this value here.
@@ -27,8 +39,10 @@ class MainFlowViewModel : ViewModel() {
 	internal var action = JSONObject()
 
 	val seedStorage: SeedStorage = ServiceLocator.seedStorage
-	private val databaseAssetsInteractor: DatabaseAssetsInteractor = ServiceLocator.databaseAssetsInteractor
-	private val networkExposedStateKeeper = ServiceLocator.networkExposedStateKeeper
+	private val databaseAssetsInteractor: DatabaseAssetsInteractor =
+		ServiceLocator.databaseAssetsInteractor
+	private val networkExposedStateKeeper =
+		ServiceLocator.networkExposedStateKeeper
 
 	// Navigator
 	internal val _actionResult = MutableStateFlow(
@@ -50,25 +64,14 @@ class MainFlowViewModel : ViewModel() {
 	)
 
 	// Observables for screens state
-	val networkState: StateFlow<NetworkState> = networkExposedStateKeeper.airplaneModeState
+	val networkState: StateFlow<NetworkState> =
+		networkExposedStateKeeper.airplaneModeState
 
 	val actionResult: StateFlow<ActionResult> = _actionResult
 
 	val localNavAction: StateFlow<LocalNavAction> = _localNavAction
 
 	// MARK: init boilerplate begin
-
-	/**
-	 * Don't forget to call real init after defining context!
-	 */
-	fun lateInit() {
-		// Imitate ios behavior
-		val authentication = ServiceLocator.authentication
-		authentication.authenticate(activity) {
-			seedStorage.init(context)
-			totalRefresh()
-		}
-	}
 
 	/**
 	 * Init database with no general certificate
@@ -130,7 +133,13 @@ class MainFlowViewModel : ViewModel() {
 	fun acknowledgeWarning() {
 		networkExposedStateKeeper.acknowledgeWarning()
 	}
-
 }
 
+
+@Suppress("UNCHECKED_CAST")
+class MainFlowViewModelFactory(private val appContext: Context, private val activity: FragmentActivity) : ViewModelProvider.Factory {
+	override fun <T : ViewModel> create(modelClass: Class<T>): T {
+		return MainFlowViewModel(appContext, activity) as T
+	}
+}
 

@@ -7,6 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -16,8 +18,9 @@ import io.parity.signer.components.panels.TopBar
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.NavigationMigrations
 import io.parity.signer.domain.MainFlowViewModel
+import io.parity.signer.domain.MainFlowViewModelFactory
+import io.parity.signer.domain.findActivity
 import io.parity.signer.ui.rustnavigationselectors.*
-
 
 
 fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
@@ -25,7 +28,7 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 		SignerMainSubgraph()
 
 		LaunchedEffect(Unit) {
-			ServiceLocator.authentication.auth.collect {authenticated ->
+			ServiceLocator.authentication.auth.collect { authenticated ->
 				if (!authenticated) {
 					globalNavController.navigate(MainGraphRoutes.unlockAppScreenRoute)
 				}
@@ -37,7 +40,12 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 
 @Composable
 fun SignerMainSubgraph() {
-	val mainFlowViewModel: MainFlowViewModel = viewModel()
+	val mainFlowViewModel: MainFlowViewModel = viewModel(
+		factory = MainFlowViewModelFactory(
+			appContext = LocalContext.current.applicationContext,
+			activity = LocalContext.current.findActivity() as FragmentActivity
+		)
+	)
 	val actionResult = mainFlowViewModel.actionResult.collectAsState()
 	val shieldAlert = mainFlowViewModel.networkState.collectAsState()
 	val localNavAction = mainFlowViewModel.localNavAction.collectAsState()
