@@ -101,7 +101,6 @@ pub fn process_message(database: &sled::Db, data_hex: &str) -> Result<Transactio
                         base58prefix: network_specs.specs.base58prefix,
                     }
                     .card(&mut index, indent);
-                    println!("here 1");
                     let warning_card =
                         Card::Warning(Warning::AuthorNotFound).card(&mut index, indent);
                     let message_card =
