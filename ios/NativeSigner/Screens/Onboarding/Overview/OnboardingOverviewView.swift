@@ -92,7 +92,7 @@ struct OnboardingOverviewView: View {
                     .font(PrimaryFont.bodyM.font)
                     .padding(.vertical, Spacing.extraSmall)
                     .padding(.horizontal, Spacing.medium)
-                    .background(Asset.fill12.swiftUIColor)
+                    .background(Asset.fill12Light.swiftUIColor)
                     .clipShape(Capsule())
                 Spacer()
                 if viewModel.currentSelectedPage != Constants.numberOfPages - 1 {
