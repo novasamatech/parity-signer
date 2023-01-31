@@ -8,28 +8,39 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.Documents
-import io.parity.signer.screens.onboarding.termsconsent.TermsConsentViewModel
+import io.parity.signer.screens.onboarding.termsconsent.OnBoardingViewModel
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.SignerOldTheme
 
 
 const val termsConsentRoute =
-	"navigation_point_terms_consent" //todo onboarding remove this part
+	"navigation_point_terms_consent"
 
-fun NavGraphBuilder.termsConsentAppFlow() {
+fun NavGraphBuilder.termsConsentAppFlow(globalNavController: NavHostController) {
 	composable(route = termsConsentRoute) {
-		val viewModel: TermsConsentViewModel = viewModel()
+		val viewModel: OnBoardingViewModel = viewModel()
+		val context = LocalContext.current
 
+		LaunchedEffect(viewModel) {
+			viewModel.checkShouldProceed(context)
+			viewModel.isFinishedOnboarding.collect { isFinished ->
+				if (isFinished) {
+					globalNavController.navigate(enableAirgapRoute)
+				}
+			}
+		}
 		Scaffold(
 			modifier = Modifier
 				.navigationBarsPadding()
@@ -37,12 +48,13 @@ fun NavGraphBuilder.termsConsentAppFlow() {
 				.statusBarsPadding(),
 		) { padding ->
 			TermsConsentScreen(
-				viewModel::onBoard,
+				onBoard = { viewModel.onBoard(context) },
 				modifier = Modifier.padding(padding)
 			)
 		}
 	}
 }
+
 
 /**
  * First screen with legal consent request
@@ -132,6 +144,6 @@ private fun TermsConsentScreen(onBoard: () -> Unit, modifier: Modifier) {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewLandingView() {
+private fun PreviewTermsConsentScreen() {
 	TermsConsentScreen({}, Modifier)
 }

@@ -20,7 +20,7 @@ fun SignerNavHost(
 ) {
 	NavHost(navController = navController, startDestination = startDestination) {
 //		onboardingAppFlow() todo onboarding
-		termsConsentAppFlow()
+		termsConsentAppFlow(navController)
 		enableAirgapAppFlow()
 		unlockAppScreenFlow()
 		mainSignerAppFlow(navController)

@@ -27,7 +27,7 @@ class MainFlowViewModel : ViewModel() {
 	internal var action = JSONObject()
 
 	val seedStorage: SeedStorage = ServiceLocator.seedStorage
-	private val databaseAssetsInteractor = DatabaseAssetsInteractor(context, seedStorage)
+	private val databaseAssetsInteractor = ServiceLocator.databaseAssetsInteractor
 	private val networkExposedStateKeeper = NetworkExposedStateKeeper(context)
 
 	// Navigator
@@ -70,18 +70,6 @@ class MainFlowViewModel : ViewModel() {
 			seedStorage.init(context)
 			totalRefresh()
 		}
-	}
-
-	/**
-	 * todo onboarding remove this
-	 * Populate database!
-	 * This is normal onboarding
-	 */
-	fun onBoard() {
-		databaseAssetsInteractor.wipe()
-		databaseAssetsInteractor.copyAsset("")
-		totalRefresh()
-		historyInitHistoryWithCert()
 	}
 
 	/**

@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 		ServiceLocator.initActivityDependencies(this)
 
 		if (savedInstanceState == null) {
-			mainFlowViewModel.lateInit()
+			mainFlowViewModel.lateInit() //todo onboarding init only when main flow started
 		}
 
 		//remove automatic insets so bottom sheet can dimm status bar, other views will add their paddings if needed.

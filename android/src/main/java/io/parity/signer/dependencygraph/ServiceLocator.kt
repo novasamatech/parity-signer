@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import io.parity.signer.backend.UniffiInteractor
 import io.parity.signer.domain.Authentication
 import io.parity.signer.domain.getDbNameFromContext
+import io.parity.signer.domain.storage.DatabaseAssetsInteractor
 import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.domain.storage.SeedStorage
 
@@ -34,6 +35,7 @@ object ServiceLocator {
 	val activityScope: ActivityScope? get() = _activityScope
 
 	val seedStorage: SeedStorage = SeedStorage()
+	val databaseAssetsInteractor by lazy { DatabaseAssetsInteractor(appContext, seedStorage) }
 	val authentication = Authentication()
 
 
