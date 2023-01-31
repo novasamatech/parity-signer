@@ -25,6 +25,7 @@ const val mainScreenRoute = "navigation_main_screen"
 fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 	composable(route = mainScreenRoute) {
 		SignerMainSubgraph()
+
 		LaunchedEffect(Unit) {
 			ServiceLocator.authentication.auth.collect {authenticated ->
 				if (!authenticated) {
