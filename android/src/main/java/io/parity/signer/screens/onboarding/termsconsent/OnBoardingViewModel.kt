@@ -27,7 +27,7 @@ class OnBoardingViewModel : ViewModel() {
 	 * Populate database!
 	 * This is normal onboarding
 	 */
-	fun onBoard(context: Context) {
+	fun onBoard(context: Context) {  //todo onboarding move to main thread
 		databaseAssetsInteractor.wipe()
 		databaseAssetsInteractor.copyAsset("")
 		historyInitHistoryWithCert()

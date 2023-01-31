@@ -20,20 +20,8 @@ import io.parity.signer.domain.MainFlowViewModel
 import io.parity.signer.domain.findActivity
 import io.parity.signer.ui.MainGraphRoutes
 
-
-fun NavGraphBuilder.unlockAppScreenFlow(globalNavController: NavHostController) {
-	composable(route = MainGraphRoutes.unlockAppScreenRoute) {
-		val model: MainFlowViewModel = viewModel() //todo onboarding remove
-		UnlockAppAuthScreen {
-			globalNavController.navigate(MainGraphRoutes.mainScreenRoute)
-			model.totalRefresh() //todo onboarding remove
-		}
-	}
-}
-
-
 @Composable
-private fun UnlockAppAuthScreen(onSuccess: Callback) {
+fun UnlockAppAuthScreen(onSuccess: Callback) {
 	val activity = LocalContext.current.findActivity() as FragmentActivity
 
 	Column(verticalArrangement = Arrangement.Center) {

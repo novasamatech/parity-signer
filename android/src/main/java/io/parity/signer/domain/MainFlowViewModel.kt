@@ -87,12 +87,13 @@ class MainFlowViewModel(
 	// MARK: General utils begin
 
 	/**
-	 * This returns the app into starting state; should be called
-	 * on all "back"-like events and new screen spawns just in case
+	 * This returns the app into starting state;
 	 */
 	fun totalRefresh() {
-		val checkRefresh = context.isDbCreatedAndOnboardingPassed()
-		if (checkRefresh) totalRefreshDbExist()
+		if (!context.isDbCreatedAndOnboardingPassed()) {
+			initAssets()
+		}
+		totalRefreshDbExist()
 	}
 
 	private fun totalRefreshDbExist() {
@@ -100,6 +101,16 @@ class MainFlowViewModel(
 		initNavigation(context.getDbNameFromContext(), allNames.toList())
 		networkExposedStateKeeper.updateAlertState()
 		navigator.navigate(Action.START)
+	}
+
+	/**
+	 * Populate database!
+	 * This is first start of the app
+	 */
+	fun initAssets() {
+		databaseAssetsInteractor.wipe()
+		databaseAssetsInteractor.copyAsset("")
+		historyInitHistoryWithCert()
 	}
 
 	/**
