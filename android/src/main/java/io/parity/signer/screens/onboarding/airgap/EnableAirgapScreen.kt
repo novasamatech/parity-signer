@@ -1,4 +1,4 @@
-package io.parity.signer.screens.onboarding
+package io.parity.signer.screens.onboarding.airgap
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -15,19 +15,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import io.parity.signer.screens.onboarding.airgap.AirGapViewModel
+import io.parity.signer.ui.MainGraphRoutes
 import io.parity.signer.ui.theme.Text600
-import kotlinx.coroutines.flow.collect
 
-
-const val enableAirgapRoute = "navigation_point_enable_airgap" //todo onboarding remove this part
 
 fun NavGraphBuilder.enableAirgapAppFlow(globalNavController: NavHostController) {
-	composable(route = enableAirgapRoute) {
+	composable(route = MainGraphRoutes.enableAirgapRoute) {
 		val viewModel: AirGapViewModel = viewModel()
 		LaunchedEffect(viewModel) {
 			viewModel.isFinished.collect{
-				if (it) globalNavController.navigate(unlockAppScreenRoute)
+				if (it) globalNavController.navigate(MainGraphRoutes.unlockAppScreenRoute)
 			}
 		}
 		EnableAirgapScreen()

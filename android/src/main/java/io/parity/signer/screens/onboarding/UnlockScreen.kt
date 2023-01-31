@@ -18,16 +18,14 @@ import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.MainFlowViewModel
 import io.parity.signer.domain.findActivity
-import io.parity.signer.ui.mainScreenRoute
+import io.parity.signer.ui.MainGraphRoutes
 
-
-const val unlockAppScreenRoute = "navigation_point_unlock_app"
 
 fun NavGraphBuilder.unlockAppScreenFlow(globalNavController: NavHostController) {
-	composable(route = unlockAppScreenRoute) {
+	composable(route = MainGraphRoutes.unlockAppScreenRoute) {
 		val model: MainFlowViewModel = viewModel() //todo onboarding remove
 		UnlockAppAuthScreen {
-			globalNavController.navigate(mainScreenRoute)
+			globalNavController.navigate(MainGraphRoutes.mainScreenRoute)
 			model.totalRefresh() //todo onboarding remove
 		}
 	}

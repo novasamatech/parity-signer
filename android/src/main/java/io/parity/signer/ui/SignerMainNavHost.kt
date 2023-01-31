@@ -5,9 +5,8 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import io.parity.signer.screens.onboarding.enableAirgapAppFlow
+import io.parity.signer.screens.onboarding.airgap.enableAirgapAppFlow
 import io.parity.signer.screens.onboarding.termsconsent.termsConsentAppFlow
-import io.parity.signer.screens.onboarding.unlockAppScreenRoute
 import io.parity.signer.screens.onboarding.unlockAppScreenFlow
 
 
@@ -16,7 +15,7 @@ import io.parity.signer.screens.onboarding.unlockAppScreenFlow
 @Composable
 fun SignerNavHost(
 	navController: NavHostController,
-	startDestination: String = unlockAppScreenRoute,
+	startDestination: String = MainGraphRoutes.unlockAppScreenRoute,
 ) {
 	NavHost(navController = navController, startDestination = startDestination) {
 //		onboardingAppFlow() todo onboarding
@@ -25,4 +24,11 @@ fun SignerNavHost(
 		unlockAppScreenFlow(navController)
 		mainSignerAppFlow(navController)
 	}
+}
+
+object MainGraphRoutes{
+	const val termsConsentRoute = "navigation_point_terms_consent"
+	const val enableAirgapRoute = "navigation_point_enable_airgap"
+	const val unlockAppScreenRoute = "navigation_point_unlock_app"
+	const val mainScreenRoute = "navigation_main_screen"
 }

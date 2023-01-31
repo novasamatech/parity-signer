@@ -16,20 +16,18 @@ import io.parity.signer.components.panels.TopBar
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.NavigationMigrations
 import io.parity.signer.domain.MainFlowViewModel
-import io.parity.signer.screens.onboarding.unlockAppScreenRoute
 import io.parity.signer.ui.rustnavigationselectors.*
 
 
-const val mainScreenRoute = "navigation_main_screen"
 
 fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
-	composable(route = mainScreenRoute) {
+	composable(route = MainGraphRoutes.mainScreenRoute) {
 		SignerMainSubgraph()
 
 		LaunchedEffect(Unit) {
 			ServiceLocator.authentication.auth.collect {authenticated ->
 				if (!authenticated) {
-					globalNavController.navigate(unlockAppScreenRoute)
+					globalNavController.navigate(MainGraphRoutes.unlockAppScreenRoute)
 				}
 			}
 		}

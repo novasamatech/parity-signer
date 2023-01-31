@@ -22,17 +22,14 @@ import androidx.navigation.compose.composable
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.Documents
-import io.parity.signer.screens.onboarding.enableAirgapRoute
+import io.parity.signer.ui.MainGraphRoutes
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.SignerOldTheme
 
 
-const val termsConsentRoute =
-	"navigation_point_terms_consent"
-
 fun NavGraphBuilder.termsConsentAppFlow(globalNavController: NavHostController) {
-	composable(route = termsConsentRoute) {
+	composable(route = MainGraphRoutes.termsConsentRoute) {
 		val viewModel: OnBoardingViewModel = viewModel()
 		val context = LocalContext.current
 
@@ -40,7 +37,7 @@ fun NavGraphBuilder.termsConsentAppFlow(globalNavController: NavHostController) 
 			viewModel.checkShouldProceed(context)
 			viewModel.isFinishedOnboarding.collect { isFinished ->
 				if (isFinished) {
-					globalNavController.navigate(enableAirgapRoute)
+					globalNavController.navigate(MainGraphRoutes.enableAirgapRoute)
 				}
 			}
 		}
