@@ -14,14 +14,14 @@ import kotlinx.coroutines.flow.StateFlow
 
 class NetworkExposedStateKeeper(private val appContext: Context) {
 
+	private val _airplaneModeState: MutableStateFlow<NetworkState> =
+		MutableStateFlow(NetworkState.None)
+	val airplaneModeState: StateFlow<NetworkState> = _airplaneModeState
+
 	init {
 		reactOnAirplaneMode()
 		registerAirplaneBroadcastReceiver()
 	}
-
-	private val _airplaneModeState: MutableStateFlow<NetworkState> =
-		MutableStateFlow(NetworkState.None)
-	val airplaneModeState: StateFlow<NetworkState> = _airplaneModeState
 
 	fun acknowledgeWarning() {
 		if (airplaneModeState.value == NetworkState.Past) {
