@@ -79,9 +79,10 @@ class MainFlowViewModel(
 	 */
 	fun totalRefresh() {
 		if (!context.isDbCreatedAndOnboardingPassed()) {
-			initAssets()
+			initAssetsAndTotalRefresh()
+		} else {
+			totalRefreshDbExist()
 		}
-		totalRefreshDbExist()
 	}
 
 	private fun totalRefreshDbExist() {
@@ -95,9 +96,10 @@ class MainFlowViewModel(
 	 * Populate database!
 	 * This is first start of the app
 	 */
-	private fun initAssets() {
+	private fun initAssetsAndTotalRefresh() {
 		databaseAssetsInteractor.wipe()
 		databaseAssetsInteractor.copyAsset("")
+		totalRefreshDbExist()
 		historyInitHistoryWithCert()
 	}
 
