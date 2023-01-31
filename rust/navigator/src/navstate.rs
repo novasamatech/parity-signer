@@ -1196,7 +1196,6 @@ impl State {
                 f: keys_state.seed_name(),
             },
             Screen::KeyDetails(ref address_state) => {
-                println!("here {address_state:?}");
                 let f = if let Some(key) = address_state.network_specs_key().as_ref() {
                     Some(db_handling::interface_signer::export_key(
                         &self.db,

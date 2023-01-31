@@ -62,7 +62,6 @@ pub fn do_action(
 
 /// Should be called in the beginning to recall things stored only by phone
 pub fn init_navigation(db: sled::Db, seed_names: Vec<String>) -> Result<()> {
-    log::warn!("init navigation");
     let mut navstate = STATE.lock().map_err(|_| Error::MutexPoisoned)?;
     *navstate = Some(State::init_navigation(db, seed_names));
     Ok(())

@@ -70,14 +70,12 @@ final class DatabaseMediator: DatabaseMediating {
                 do {
                     try fileManager.removeItem(at: destination)
                 } catch {
-                    print("Database exists but could not be removed; please report bug")
                     return false
                 }
             }
             try fileManager.copyItem(at: source, to: destination)
             return true
         } catch {
-            print("Database initialisation failed")
             return false
         }
     }
@@ -88,7 +86,6 @@ final class DatabaseMediator: DatabaseMediating {
             try fileManager.removeItem(atPath: databasePath)
             return true
         } catch {
-            print("FileManager failed to delete databse")
             return false
         }
     }

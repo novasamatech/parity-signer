@@ -34,7 +34,6 @@ final class CaptureDeviceConfigurator: CaptureDeviceConfiguring {
         guard let videoDevice = AVCaptureDevice.default(
             for: .video
         ) else {
-            print("Default camera is unavailable")
             return false
         }
         session.beginConfiguration()
@@ -77,11 +76,9 @@ private extension CaptureDeviceConfigurator {
                 session.addInput(videoDeviceInput)
                 return true
             } else {
-                print("Couldn't add camera input to the session")
                 return false
             }
         } catch {
-            print("Couldn't create video device input: \(error)")
             return false
         }
     }
@@ -100,7 +97,6 @@ private extension CaptureDeviceConfigurator {
             videoDataOutput.connection(with: .video)?.isEnabled = true
             return true
         } else {
-            print("Could not add metadata output to the session")
             return false
         }
     }
