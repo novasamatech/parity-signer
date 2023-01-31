@@ -99,15 +99,11 @@ final class KeychainAccessAdapter: KeychainAccessAdapting {
                 return .success(())
             } else {
                 let message = SecCopyErrorMessageString(osStatus, nil) as? String ?? ""
-                print("Key set addition failure \(osStatus) \(message)")
                 return .failure(.saveError(message: message))
             }
         } catch KeychainError.accessControlNotAvailable {
-            print("Access flags could not be allocated")
             return .failure(.accessControlNotAvailable)
         } catch {
-            let message = "Unkown error occured while saving seed"
-            print(message)
             return .failure(.saveError(message: message))
         }
     }
@@ -163,7 +159,6 @@ final class KeychainAccessAdapter: KeychainAccessAdapting {
             return .success(())
         }
         let errorMessage = SecCopyErrorMessageString(osStatus, nil) as? String ?? ""
-        print("Remove seed from secure storage error: \(errorMessage)")
         return .failure(.deleteError(message: errorMessage))
     }
 
