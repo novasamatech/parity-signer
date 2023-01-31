@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import io.parity.signer.screens.onboarding.enableAirgapAppFlow
-import io.parity.signer.screens.onboarding.termsConsentAppFlow
+import io.parity.signer.screens.onboarding.termsconsent.termsConsentAppFlow
 import io.parity.signer.screens.onboarding.unlockAppScreenRoute
 import io.parity.signer.screens.onboarding.unlockAppScreenFlow
 

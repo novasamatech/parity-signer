@@ -1,10 +1,13 @@
-package io.parity.signer.screens.onboarding
+package io.parity.signer.screens.onboarding.termsconsent
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.*
+import androidx.compose.material.Checkbox
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,7 +22,7 @@ import androidx.navigation.compose.composable
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.Documents
-import io.parity.signer.screens.onboarding.termsconsent.OnBoardingViewModel
+import io.parity.signer.screens.onboarding.enableAirgapRoute
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.SignerOldTheme
@@ -41,17 +44,13 @@ fun NavGraphBuilder.termsConsentAppFlow(globalNavController: NavHostController) 
 				}
 			}
 		}
-		Scaffold(
+		TermsConsentScreen(
+			onBoard = { viewModel.onBoard(context) },
 			modifier = Modifier
 				.navigationBarsPadding()
 				.captionBarPadding()
-				.statusBarsPadding(),
-		) { padding ->
-			TermsConsentScreen(
-				onBoard = { viewModel.onBoard(context) },
-				modifier = Modifier.padding(padding)
-			)
-		}
+				.statusBarsPadding()
+		)
 	}
 }
 
