@@ -26,7 +26,7 @@ final class CameraVideoOutputDelegate: NSObject, AVCaptureVideoDataOutputSampleB
             let detectionRequest = VNDetectBarcodesRequest(completionHandler: qrCodeDetection)
             detectionRequest.symbologies = [.qr]
             try imageRequestHandler.perform([detectionRequest])
-        } catch { }
+        } catch {}
     }
 
     func set(updateReceiver: QRPayloadUpdateReceiving) {
@@ -35,7 +35,7 @@ final class CameraVideoOutputDelegate: NSObject, AVCaptureVideoDataOutputSampleB
 }
 
 private extension CameraVideoOutputDelegate {
-    func qrCodeDetection(request: VNRequest, error: Error?) {
+    func qrCodeDetection(request: VNRequest, error _: Error?) {
         guard
             let qrCodeDescriptor = (request as? VNDetectBarcodesRequest)?.results?.first?
             .barcodeDescriptor as? CIQRCodeDescriptor

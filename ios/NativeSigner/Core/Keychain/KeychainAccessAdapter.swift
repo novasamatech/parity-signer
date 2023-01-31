@@ -104,6 +104,7 @@ final class KeychainAccessAdapter: KeychainAccessAdapting {
         } catch KeychainError.accessControlNotAvailable {
             return .failure(.accessControlNotAvailable)
         } catch {
+            let message = "Unkown error occured while saving seed"
             return .failure(.saveError(message: message))
         }
     }

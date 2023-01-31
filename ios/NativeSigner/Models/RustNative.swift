@@ -69,7 +69,7 @@ final class SignerDataModel: ObservableObject {
             onboardingDone = true
             totalRefresh()
             seedsMediator.refreshSeeds()
-        } catch { }
+        } catch {}
     }
 }
 
@@ -83,8 +83,7 @@ private extension SignerDataModel {
             seedsMediator.initialRefreshSeeds()
             do {
                 try initNavigation(dbname: databaseMediator.databaseName, seedNames: seedsMediator.seedNames)
-            } catch {
-            }
+            } catch {}
             totalRefresh()
         } else {
             // remove secrets first
