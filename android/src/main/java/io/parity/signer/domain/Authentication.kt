@@ -1,5 +1,6 @@
 package io.parity.signer.domain
 
+import android.util.Log
 import android.widget.Toast
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt

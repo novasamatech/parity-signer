@@ -27,6 +27,7 @@ fun NavGraphBuilder.enableAirgapAppFlow(globalNavController: NavHostController) 
 				if (it) globalNavController.navigate(MainGraphRoutes.initialUnlockRoute)
 			}
 		}
+
 		EnableAirgapScreen()
 	}
 }

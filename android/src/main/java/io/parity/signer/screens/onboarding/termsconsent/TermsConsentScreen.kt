@@ -29,18 +29,13 @@ import io.parity.signer.ui.theme.SignerOldTheme
 
 
 fun NavGraphBuilder.termsConsentAppFlow(globalNavController: NavHostController) {
-	composable(route = MainGraphRoutes.termsConsentRoute) {
-		val viewModel: OnBoardingViewModel = viewModel()
-		val context = LocalContext.current
+	composable(route = MainGraphRoutes.onboardingRoute) {
+//		val viewModel: OnBoardingViewModel = viewModel()
 
-		LaunchedEffect(viewModel) {
-			viewModel.checkShouldProceed(context)
-			viewModel.isFinishedOnboarding.collect { isFinished ->
-				if (isFinished) {
-					globalNavController.navigate(MainGraphRoutes.enableAirgapRoute)
-				}
-			}
+		if (!OnBoardingViewModel.shouldShowOnboarding(LocalContext.current)) {
+			globalNavController.navigate(MainGraphRoutes.enableAirgapRoute)
 		}
+
 		TermsConsentScreen(
 			onBoard = { globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) },
 			modifier = Modifier
