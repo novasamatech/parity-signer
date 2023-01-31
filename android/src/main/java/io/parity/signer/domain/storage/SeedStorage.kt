@@ -31,7 +31,6 @@ class SeedStorage {
 
 
 	private lateinit var masterKey: MasterKey
-	private lateinit var dbName: String
 	private var hasStrongbox: Boolean = false
 	private lateinit var sharedPreferences: SharedPreferences
 	private val KEYSTORE_NAME = "AndroidKeyStore"
@@ -47,8 +46,6 @@ class SeedStorage {
 		} else {
 			false
 		}
-
-		dbName = appContext.getDbNameFromContext()
 
 		Log.d("strongbox available:", hasStrongbox.toString())
 

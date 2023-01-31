@@ -1,6 +1,7 @@
 package io.parity.signer.domain
 
 import android.content.*
+import android.security.keystore.UserNotAuthenticatedException
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
@@ -27,7 +28,7 @@ class MainFlowViewModel : ViewModel() {
 	internal var action = JSONObject()
 
 	val seedStorage: SeedStorage = ServiceLocator.seedStorage
-	private val databaseAssetsInteractor = ServiceLocator.databaseAssetsInteractor
+	private val databaseAssetsInteractor: DatabaseAssetsInteractor = ServiceLocator.databaseAssetsInteractor
 	private val networkExposedStateKeeper = NetworkExposedStateKeeper(context)
 
 	// Navigator
@@ -50,8 +51,6 @@ class MainFlowViewModel : ViewModel() {
 	)
 
 	// Observables for screens state
-	val authenticated: StateFlow<Boolean> = ServiceLocator.authentication.auth
-
 	val networkState: StateFlow<NetworkState> = networkExposedStateKeeper.networkState
 
 	val actionResult: StateFlow<ActionResult> = _actionResult
@@ -74,6 +73,7 @@ class MainFlowViewModel : ViewModel() {
 
 	/**
 	 * Init database with no general certificate
+	 * @throws UserNotAuthenticatedException
 	 */
 	private fun wipeDbNoCert() {
 		databaseAssetsInteractor.wipe()

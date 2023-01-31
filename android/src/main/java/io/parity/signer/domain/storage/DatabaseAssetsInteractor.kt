@@ -2,6 +2,7 @@ package io.parity.signer.domain.storage
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.security.keystore.UserNotAuthenticatedException
 import io.parity.signer.domain.getDbNameFromContext
 import java.io.File
 import java.io.FileOutputStream
@@ -16,6 +17,7 @@ class DatabaseAssetsInteractor(private val context: Context,
 
 	/**
 	 * Wipes all data
+	 * @throws UserNotAuthenticatedException
 	 */
 	@SuppressLint("ApplySharedPref")
 	fun wipe() {
@@ -25,6 +27,7 @@ class DatabaseAssetsInteractor(private val context: Context,
 
 	/**
 	 * Util to copy Assets to data dir; only used in onBoard().
+	 * @throws UserNotAuthenticatedException
 	 */
 	fun copyAsset(path: String) {
 		val contents = context.assets.list("Database$path")
@@ -38,6 +41,7 @@ class DatabaseAssetsInteractor(private val context: Context,
 
 	/**
 	 * Util to copy single Assets file
+	 * @throws UserNotAuthenticatedException
 	 */
 	private fun copyFileAsset(path: String) {
 		val file = File(dbName, path)
@@ -56,6 +60,7 @@ class DatabaseAssetsInteractor(private val context: Context,
 
 	/**
 	 * Util to remove directory
+	 * @throws UserNotAuthenticatedException
 	 */
 	private fun deleteDir(fileOrDirectory: File) {
 		if (fileOrDirectory.isDirectory) {
