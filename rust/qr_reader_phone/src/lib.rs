@@ -30,7 +30,6 @@ pub fn get_length(line: &str, cleaned: bool) -> Result<u32> {
     } else if let Ok(frame) = LegacyFrame::try_from(payload.as_ref()) {
         Ok(frame.total as u32)
     } else if let Ok(banana_spilt_qr) = Share::new(payload) {
-        log::warn!("banana");
         Ok(banana_spilt_qr.required_shards() as u32)
     } else {
         Ok(1)
@@ -45,7 +44,6 @@ pub fn decode_sequence(
     let mut out = Ready::NotYet(InProgress::None);
     let mut final_result: Option<String> = None;
     for x in set {
-        log::warn!("decode sequence {x}");
         let payload = get_payload(x, cleaned)?;
         if let Ready::NotYet(decoding) = out {
             out = process_decoded_payload(payload, password, decoding)?;

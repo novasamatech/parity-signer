@@ -166,8 +166,6 @@ final class SeedsMediator: SeedsMediating {
             do {
                 try historySeedNameWasShown(seedName: seedName)
             } catch {
-                // Revisit why exactly we are returning empty String here, if Keychain data is all good
-                print("Seed access logging error! This system is broken and should not be used anymore.")
                 do {
                     try historyEntrySystem(
                         event: .systemEntry(systemEntry: "Seed access logging failed!")
@@ -235,9 +233,6 @@ final class SeedsMediator: SeedsMediating {
 
     func checkSeedPhraseCollision(seedPhrase: String) -> Bool {
         guard let seedPhraseAsData = seedPhrase.data(using: .utf8) else {
-            // We should probably inform user that their data input can't be parsed
-            // due to non-utf characters pasted in textfield
-            print("Could not encode seed phrase to using .utf8")
             return true
         }
         let result = keychainAccessAdapter.checkIfSeedPhraseAlreadyExists(seedPhrase: seedPhraseAsData)
