@@ -626,6 +626,7 @@
 
 "OnboardingOverview.Label.Header" = "Welcome to Signer";
 "OnboardingOverview.Action.Skip" = "Skip";
+"OnboardingOverview.Action.Continue" = "Continue";
 "OnboardingOverview.Label.Header" = "Welcome to Signer";
 "OnboardingOverview.Label.Step1" = "Turn Your Smartphone\nInto a Hardware Wallet";
 "OnboardingOverview.Label.Step2" = "Generate and Store\nMultiple Private Keys";

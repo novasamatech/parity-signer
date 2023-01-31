@@ -21,6 +21,7 @@ struct MainScreenContainer: View {
             if data.onboardingDone, data.authenticated {
                 AuthenticatedScreenContainer()
                     .environmentObject(data)
+                    .environmentObject(onboarding)
             } else if data.onboardingDone {
                 UnlockDeviceView(viewModel: .init())
                     .environmentObject(data)

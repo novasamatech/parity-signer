@@ -32,7 +32,7 @@ final class OnboardingStateMachine: ObservableObject {
         }
     }
 
-    func onOverviewSkipTap() {
+    func onOverviewFinishTap() {
         currentState = .terms
     }
 

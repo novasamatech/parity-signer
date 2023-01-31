@@ -58,6 +58,18 @@ struct OnboardingOverviewView: View {
             .padding(.top, Spacing.largeComponentSpacer)
             .edgesIgnoringSafeArea(.bottom)
             overlayView()
+            if viewModel.currentSelectedPage == Constants.numberOfPages - 1 {
+                VStack {
+                    Spacer()
+                    PrimaryButton(
+                        action: viewModel.onContinueTap,
+                        text: Localizable.OnboardingOverview.Action.continue.key,
+                        style: .white()
+                    )
+                    .padding(.horizontal, Spacing.large)
+                    .padding(.bottom, Spacing.large)
+                }
+            }
         }
     }
 
@@ -84,11 +96,13 @@ struct OnboardingOverviewView: View {
                     .background(Asset.fill12.swiftUIColor)
                     .clipShape(Capsule())
                 Spacer()
-                Button(action: viewModel.onSkipTap) {
-                    Localizable.OnboardingOverview.Action.skip.text
-                        .foregroundColor(Asset.accentForegroundText.swiftUIColor)
-                        .font(PrimaryFont.labelS.font)
-                        .padding(Spacing.extraExtraSmall)
+                if viewModel.currentSelectedPage != Constants.numberOfPages - 1 {
+                    Button(action: viewModel.onSkipTap) {
+                        Localizable.OnboardingOverview.Action.skip.text
+                            .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                            .font(PrimaryFont.labelS.font)
+                            .padding(Spacing.extraExtraSmall)
+                    }
                 }
             }
             Spacer()
@@ -114,6 +128,7 @@ struct FeatureOverviewView: View {
             }
         }
         .padding(.horizontal, Spacing.large)
+        .padding(.bottom, Spacing.large)
     }
 }
 
@@ -127,7 +142,11 @@ extension OnboardingOverviewView {
         }
 
         func onSkipTap() {
-            stateMachine.onOverviewSkipTap()
+            stateMachine.onOverviewFinishTap()
+        }
+
+        func onContinueTap() {
+            stateMachine.onOverviewFinishTap()
         }
     }
 }
