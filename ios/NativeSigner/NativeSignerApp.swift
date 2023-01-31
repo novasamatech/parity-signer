@@ -20,10 +20,13 @@ struct NativeSignerApp: App {
             if jailbreakDetectionPublisher.isJailbroken {
                 JailbreakDetectedView()
             } else {
-                MainScreenContainer(data: SignerDataModel(
-                    navigation: navigation,
-                    connectivityMediator: connectivityMediator
-                ))
+                MainScreenContainer(
+                    data: SignerDataModel(
+                        navigation: navigation,
+                        connectivityMediator: connectivityMediator
+                    ),
+                    onboarding: OnboardingStateMachine()
+                )
                 .font(PrimaryFont.bodyL.font)
                 .background(Asset.backgroundPrimary.swiftUIColor)
                 .environmentObject(navigation)

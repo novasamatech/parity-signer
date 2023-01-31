@@ -98,7 +98,12 @@ extension OnboardingAgreementsView {
         @Published var isPresentingPrivacyPolicy = false
         @Published var isActionDisabled: Bool = true
 
+        private weak var stateMachine: OnboardingStateMachine!
         private weak var data: SignerDataModel!
+
+        init(stateMachine: OnboardingStateMachine) {
+            self.stateMachine = stateMachine
+        }
 
         func use(data: SignerDataModel) {
             self.data = data
@@ -113,6 +118,7 @@ extension OnboardingAgreementsView {
         }
 
         func onDoneTap() {
+            stateMachine.onAgreementNextTap()
             data.onboard()
         }
 
@@ -127,7 +133,7 @@ extension OnboardingAgreementsView {
     struct OnboardingAgreementsView_Previews: PreviewProvider {
         static var previews: some View {
             OnboardingAgreementsView(
-                viewModel: .init()
+                viewModel: .init(stateMachine: OnboardingStateMachine())
             )
         }
     }
