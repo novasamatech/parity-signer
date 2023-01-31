@@ -26,8 +26,9 @@ class SignerApp : Application() {
 }
 
 
-class SignerExceptionHandler(private val defaultHandler: UncaughtExceptionHandler?) :
-	UncaughtExceptionHandler {
+class SignerExceptionHandler(
+	private val defaultHandler: UncaughtExceptionHandler?
+) : UncaughtExceptionHandler {
 	private val TAG = "SignerExceptionHandler"
 
 	override fun uncaughtException(t: Thread, e: Throwable) {
